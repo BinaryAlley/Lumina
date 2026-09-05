@@ -68,6 +68,35 @@ public class ScheduledJobRepositoryTests
     }
 
     [Fact]
+    public async Task GetByIdWithoutTrackingAsync_WhenScheduledJobExists_ShouldReturnScheduledJob()
+    {
+        // Arrange
+        ScheduledJobEntity scheduledJob = _scheduledJobEntityFixture.Create();
+        _mockContext.ScheduledJobs.Add(scheduledJob);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<ScheduledJobEntity?> result = await _sut.GetByIdWithoutTrackingAsync(scheduledJob.Id, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Equal(scheduledJob.Id, result.Value!.Id);
+        Assert.Equal(scheduledJob.Name, result.Value.Name);
+    }
+
+    [Fact]
+    public async Task GetByIdWithoutTrackingAsync_WhenScheduledJobDoesNotExist_ShouldReturnNull()
+    {
+        // Act
+        Result<ScheduledJobEntity?> result = await _sut.GetByIdWithoutTrackingAsync(Guid.NewGuid(), CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Null(result.Value);
+    }
+
+    [Fact]
     public async Task GetAllAsync_WhenScheduledJobsExist_ShouldReturnAllScheduledJobs()
     {
         // Arrange

@@ -153,6 +153,22 @@ public class StopScheduledJobCommandHandlerTests
     }
 
     [Fact]
+    public async Task HandleAsync_WhenUserIsNotAdministrator_ShouldReturnNotAuthorized()
+    {
+        // Arrange
+        StopScheduledJobCommand command = _stopScheduledJobCommandFixture.Create();
+        _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>()).Returns(false);
+
+        // Act
+        Result<ScheduledJobResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
+        await _mockScheduledJobRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task HandleAsync_WhenScheduledJobDoesNotExist_ShouldReturnNotFound()
     {
         // Arrange
@@ -211,6 +227,48 @@ public class StopScheduledJobCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(DomainErrors.Scheduling.ScheduledJobNotFound, result.FirstError);
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockScheduledJobScheduler.DidNotReceive().StopCycleAsync(Arg.Any<Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects.ScheduledJobId>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenGettingTheScheduledJobFails_ShouldReturnTheRepositoryError()
+    {
+        // Arrange
+        StopScheduledJobCommand command = _stopScheduledJobCommandFixture.Create();
+        Error repositoryError = DomainErrors.Scheduling.ScheduledJobNotFound;
+        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, Arg.Any<CancellationToken>())
+            .Returns(repositoryError);
+
+        // Act
+        Result<ScheduledJobResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(repositoryError, result.FirstError);
+        await _mockScheduledJobScheduler.DidNotReceive().StopCycleAsync(Arg.Any<Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects.ScheduledJobId>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenTheScheduledJobCannotBeConvertedToDomain_ShouldReturnTheMappingError()
+    {
+        // Arrange
+        StopScheduledJobCommand command = _stopScheduledJobCommandFixture.Create();
+        // An interval schedule whose interval is not positive cannot be converted to its domain object.
+        ScheduledJobEntity invalidScheduledJob = _scheduledJobEntityFixture.Create(
+            id: command.ScheduledJobId,
+            scheduleType: ScheduleType.WithIntervalInMinutes,
+            intervalMinutes: 0,
+            status: ScheduledJobStatus.Active);
+        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<ScheduledJobEntity?>(invalidScheduledJob));
+
+        // Act
+        Result<ScheduledJobResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(DomainErrors.Scheduling.IntervalMinutesMustBePositive, result.FirstError);
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
         await _mockScheduledJobScheduler.DidNotReceive().StopCycleAsync(Arg.Any<Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects.ScheduledJobId>(), Arg.Any<CancellationToken>());
     }

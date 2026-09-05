@@ -200,4 +200,46 @@ public class StartScheduledJobCommandHandlerTests
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
         _mockDomainEventsQueue.DidNotReceive().Enqueue(Arg.Any<IDomainEvent>());
     }
+
+    [Fact]
+    public async Task HandleAsync_WhenGettingTheScheduledJobFails_ShouldReturnTheRepositoryError()
+    {
+        // Arrange
+        StartScheduledJobCommand command = _startScheduledJobCommandFixture.Create();
+        Error repositoryError = DomainErrors.Scheduling.ScheduledJobNotFound;
+        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, Arg.Any<CancellationToken>())
+            .Returns(repositoryError);
+
+        // Act
+        Result<ScheduledJobResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(repositoryError, result.FirstError);
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenTheScheduledJobCannotBeConvertedToDomain_ShouldReturnTheMappingError()
+    {
+        // Arrange
+        StartScheduledJobCommand command = _startScheduledJobCommandFixture.Create();
+        // An interval schedule whose interval is not positive cannot be converted to its domain object.
+        ScheduledJobEntity invalidScheduledJob = _scheduledJobEntityFixture.Create(
+            id: command.ScheduledJobId,
+            scheduleType: ScheduleType.WithIntervalInMinutes,
+            intervalMinutes: 0,
+            status: ScheduledJobStatus.Added);
+        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<ScheduledJobEntity?>(invalidScheduledJob));
+
+        // Act
+        Result<ScheduledJobResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(DomainErrors.Scheduling.IntervalMinutesMustBePositive, result.FirstError);
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        _mockDomainEventsQueue.DidNotReceive().Enqueue(Arg.Any<IDomainEvent>());
+    }
 }

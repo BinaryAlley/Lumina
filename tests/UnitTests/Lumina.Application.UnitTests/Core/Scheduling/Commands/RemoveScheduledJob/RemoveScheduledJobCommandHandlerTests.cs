@@ -216,4 +216,47 @@ public class RemoveScheduledJobCommandHandlerTests
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
         _mockDomainEventsQueue.DidNotReceive().Enqueue(Arg.Any<IDomainEvent>());
     }
+
+    [Fact]
+    public async Task HandleAsync_WhenGettingTheScheduledJobFails_ShouldReturnTheRepositoryError()
+    {
+        // Arrange
+        RemoveScheduledJobCommand command = _removeScheduledJobCommandFixture.Create();
+        Error repositoryError = DomainErrors.Scheduling.ScheduledJobNotFound;
+        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, Arg.Any<CancellationToken>())
+            .Returns(repositoryError);
+
+        // Act
+        Result<Success> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(repositoryError, result.FirstError);
+        await _mockScheduledJobScheduler.DidNotReceive().StopCycleAsync(Arg.Any<ScheduledJobId>(), Arg.Any<CancellationToken>());
+        await _mockScheduledJobExecutionRepository.DidNotReceive().DeleteByScheduledJobIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenTheScheduledJobCannotBeConvertedToDomain_ShouldReturnTheMappingError()
+    {
+        // Arrange
+        RemoveScheduledJobCommand command = _removeScheduledJobCommandFixture.Create();
+        // An interval schedule whose interval is not positive cannot be converted to its domain object.
+        ScheduledJobEntity invalidScheduledJob = _scheduledJobEntityFixture.Create(
+            id: command.ScheduledJobId,
+            scheduleType: ScheduleType.WithIntervalInMinutes,
+            intervalMinutes: 0,
+            status: ScheduledJobStatus.Active);
+        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<ScheduledJobEntity?>(invalidScheduledJob));
+
+        // Act
+        Result<Success> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(DomainErrors.Scheduling.IntervalMinutesMustBePositive, result.FirstError);
+        await _mockScheduledJobScheduler.DidNotReceive().StopCycleAsync(Arg.Any<ScheduledJobId>(), Arg.Any<CancellationToken>());
+        await _mockScheduledJobExecutionRepository.DidNotReceive().DeleteByScheduledJobIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+    }
 }

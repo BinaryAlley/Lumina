@@ -253,4 +253,30 @@ public class AddScheduledJobCommandHandlerTests
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
         _mockDomainEventsQueue.DidNotReceive().Enqueue(Arg.Any<IDomainEvent>());
     }
+
+    [Fact]
+    public async Task HandleAsync_WhenCommandIsValidWithOnceAtStartupSchedule_ShouldInsertScheduledJobAndReturnResponse()
+    {
+        // Arrange
+        AddScheduledJobCommand command = _addScheduledJobCommandFixture.Create(scheduleType: ScheduleType.OnceAtStartup);
+        _mockScheduledJobRepository.InsertAsync(Arg.Any<ScheduledJobEntity>(), Arg.Any<CancellationToken>()).Returns(Result.Created);
+
+        // Act
+        Result<ScheduledJobResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(command.Name, result.Value.Name);
+        Assert.Equal(ScheduleType.OnceAtStartup, result.Value.ScheduleType);
+        Assert.Null(result.Value.IntervalMinutes);
+        Assert.Null(result.Value.Hour);
+        Assert.Null(result.Value.Minute);
+        await _mockScheduledJobRepository.Received(1).InsertAsync(
+            Arg.Is<ScheduledJobEntity>(scheduledJob =>
+                scheduledJob.Name == command.Name &&
+                scheduledJob.ScheduleType == ScheduleType.OnceAtStartup),
+            Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        _mockDomainEventsQueue.Received(1).Enqueue(Arg.Is<IDomainEvent>(domainEvent => domainEvent is ScheduledJobAddedDomainEvent));
+    }
 }

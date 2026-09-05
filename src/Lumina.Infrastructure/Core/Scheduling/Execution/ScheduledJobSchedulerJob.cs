@@ -2,6 +2,7 @@
 using Lumina.Application.Common.DataAccess.Entities.Scheduling;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Scheduling;
+using Lumina.Application.Common.Infrastructure.Themes;
 using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Application.Common.Mapping.Scheduling;
 using Lumina.Application.Common.Utilities;
@@ -10,11 +11,13 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
 using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
+using Lumina.Infrastructure.Core.Themes;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -29,6 +32,7 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly IScheduledJobRuntimeRegistry _runtimeRegistry;
     private readonly ILogger<ScheduledJobSchedulerJob> _logger;
+    private readonly Func<TimeSpan, IScheduledJobCycleTicker> _cycleTickerFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ScheduledJobSchedulerJob"/> class.
@@ -37,10 +41,23 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
     /// <param name="logger">Injected service for logging.</param>
     /// <param name="serviceScopeFactory">Injected factory used for creating scopes in which services are requested.</param>
     public ScheduledJobSchedulerJob(IScheduledJobRuntimeRegistry runtimeRegistry, ILogger<ScheduledJobSchedulerJob> logger, IServiceScopeFactory serviceScopeFactory)
+        : this(runtimeRegistry, logger, serviceScopeFactory, period => new PeriodicScheduledJobCycleTicker(period))
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ScheduledJobSchedulerJob"/> class with a custom cycle ticker factory.
+    /// </summary>
+    /// <param name="runtimeRegistry">Injected registry that holds the live runtime state of the scheduled jobs.</param>
+    /// <param name="logger">Injected service for logging.</param>
+    /// <param name="serviceScopeFactory">Injected factory used for creating scopes in which services are requested.</param>
+    /// <param name="cycleTickerFactory">Factory that creates the ticker driving the cadence of an execution cycle, for which the unit tests substitute a stubbed ticker.</param>
+    internal ScheduledJobSchedulerJob(IScheduledJobRuntimeRegistry runtimeRegistry, ILogger<ScheduledJobSchedulerJob> logger, IServiceScopeFactory serviceScopeFactory, Func<TimeSpan, IScheduledJobCycleTicker> cycleTickerFactory)
     {
         _serviceScopeFactory = serviceScopeFactory;
         _runtimeRegistry = runtimeRegistry;
         _logger = logger;
+        _cycleTickerFactory = cycleTickerFactory;
     }
 
     /// <summary>
@@ -85,12 +102,50 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
     /// <param name="stoppingToken">Cancellation token that can be used to stop the execution.</param>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        await SynchronizeBundledThemesIfNeededAsync(stoppingToken).ConfigureAwait(false);
         await ResumeActiveCyclesAsync(stoppingToken).ConfigureAwait(false);
         try
         {
             await Task.Delay(Timeout.InfiniteTimeSpan, stoppingToken).ConfigureAwait(false);
         }
         catch (OperationCanceledException) { }
+    }
+
+    /// <summary>
+    /// Installs and repairs the bundled themes at startup, but only when no active "Repair themes at startup" scheduled job will do it.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <remarks>
+    /// The default "Repair themes at startup" job is the single owner of the theme synchronization once the default jobs are
+    /// seeded during the application setup. Until then, for example on a fresh installation before the administrator account is
+    /// created, no scheduled job exists yet, so the themes are synchronized here, otherwise the pages of the setup flow would
+    /// have no theme to render and a hosted test host would have no bundled themes installed.
+    /// </remarks>
+    private async Task SynchronizeBundledThemesIfNeededAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await using AsyncServiceScope scope = _serviceScopeFactory.CreateAsyncScope();
+            IUnitOfWork unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+            Result<IEnumerable<ScheduledJobEntity>> getScheduledJobsResult = await unitOfWork.ScheduledJobRepository.GetActiveOrRunningAsync(cancellationToken).ConfigureAwait(false);
+            if (getScheduledJobsResult.IsFailure)
+            {
+                _logger.LogWarning("Failed to read the scheduled jobs to decide whether the themes must be synchronized: {Error}", getScheduledJobsResult.FirstError.Description);
+                return;
+            }
+            // When an active "Repair themes at startup" job exists, its cycle is resumed below and it runs the synchronization.
+            if (getScheduledJobsResult.Value.Any(scheduledJob => scheduledJob.TaskType == ScheduledTaskType.RepairThemes))
+                return;
+
+            IThemeService themeService = scope.ServiceProvider.GetRequiredService<IThemeService>();
+            await ThemeSynchronizer.SynchronizeAsync(themeService, unitOfWork, _logger, cancellationToken).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) { }
+        catch (Exception exception)
+        {
+            // Synchronizing the themes at startup is best effort, so a failure here must never stop the scheduler.
+            _logger.LogWarning(exception, "Failed to synchronize the bundled themes at startup.");
+        }
     }
 
     /// <summary>
@@ -162,23 +217,24 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
                 return;
 
             TimeSpan delay = await CalculateDelayAsync(schedule).ConfigureAwait(false);
-            // The periodic timer owns the cadence of the cycle: an interval schedule ticks every interval, and a daily
-            // schedule ticks after the delay until the next daily hour and minute.
-            using PeriodicTimer timer = new(delay);
-            // Each iteration waits for the next tick, runs the task and loops; a cancelled token or a disposed timer makes WaitForNextTickAsync exit,
-            // which ends the cycle through the finally block below.
-            while (await timer.WaitForNextTickAsync(cycleToken).ConfigureAwait(false))
+            // The ticker owns the cadence of the cycle: an interval schedule ticks every interval, and a daily schedule ticks
+            // after the delay until the next daily hour and minute. The default ticker wraps a periodic timer, which does not
+            // queue missed ticks, so a run that outlasts its period drops the missed ticks instead of piling them up.
+            using IScheduledJobCycleTicker cycleTicker = _cycleTickerFactory(delay);
+            // Each iteration waits for the next tick, runs the task and loops; a cancelled token or a disposed ticker makes
+            // WaitForNextTickAsync exit, which ends the cycle through the finally block below.
+            while (await cycleTicker.WaitForNextTickAsync(cycleToken).ConfigureAwait(false))
             {
                 if (cycleToken.IsCancellationRequested)
                     return;
-                // The run is awaited inside the tick and the periodic timer does not queue missed ticks, so a task that
-                // outlasts its interval drops the missed ticks instead of piling them up; the run slot acquired inside
-                // RunScheduledJobAsync is the second guard against overlapping executions.
+                // The run is awaited inside the tick and missed ticks are not queued, so a task that outlasts its interval
+                // drops the missed ticks instead of piling them up; the run slot acquired inside RunScheduledJobAsync is the
+                // second guard against overlapping executions.
                 await RunScheduledJobAsync(scheduledJobId, isCycleRun: true, cycleToken).ConfigureAwait(false);
                 // A daily schedule needs its delay recalculated after every run from the current time, so the next run
                 // happens at the next day's hour and minute, also across daylight saving time changes.
                 if (schedule.ScheduleType == ScheduleType.DailyAtHourAndMinute)
-                    timer.Period = await CalculateDelayAsync(schedule).ConfigureAwait(false);
+                    cycleTicker.Period = await CalculateDelayAsync(schedule).ConfigureAwait(false);
             }
         }
         catch (OperationCanceledException)

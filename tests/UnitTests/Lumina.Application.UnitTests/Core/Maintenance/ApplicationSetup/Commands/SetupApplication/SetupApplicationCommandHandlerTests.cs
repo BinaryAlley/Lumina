@@ -45,6 +45,7 @@ public class SetupApplicationCommandHandlerTests
     private readonly IDateTimeProvider _mockDateTimeProvider;
     private readonly IDataSeedService _mockDataSeedService;
     private readonly IDomainEventsQueue _mockDomainEventsQueue;
+    private readonly IValidator<SetupApplicationCommand> _mockValidator;
     private readonly SetupApplicationCommandHandler _sut;
     private readonly UserEntityFixture _userEntityFixture = new();
     private readonly ScheduledJobEntityFixture _scheduledJobEntityFixture = new();
@@ -65,8 +66,8 @@ public class SetupApplicationCommandHandlerTests
         _mockDateTimeProvider = Substitute.For<IDateTimeProvider>();
         _mockDataSeedService = Substitute.For<IDataSeedService>();
         _mockDomainEventsQueue = Substitute.For<IDomainEventsQueue>();
-        IValidator<SetupApplicationCommand> mockValidator = Substitute.For<IValidator<SetupApplicationCommand>>();
-        mockValidator.Validate(Arg.Any<SetupApplicationCommand>())
+        _mockValidator = Substitute.For<IValidator<SetupApplicationCommand>>();
+        _mockValidator.Validate(Arg.Any<SetupApplicationCommand>())
             .Returns([]);
 
         _mockUnitOfWork.UserRepository.Returns(_mockUserRepository);
@@ -86,7 +87,7 @@ public class SetupApplicationCommandHandlerTests
             _mockDateTimeProvider,
             _mockDataSeedService,
             _mockDomainEventsQueue,
-            mockValidator);
+            _mockValidator);
     }
 
     [Fact]
@@ -455,5 +456,55 @@ public class SetupApplicationCommandHandlerTests
         _mockDomainEventsQueue.Received(1).Enqueue(Arg.Is<ScheduledJobCycleStartedDomainEvent>(domainEvent => domainEvent.ScheduledJobId.Value == activeScheduledJob1.Id));
         _mockDomainEventsQueue.Received(1).Enqueue(Arg.Is<ScheduledJobCycleStartedDomainEvent>(domainEvent => domainEvent.ScheduledJobId.Value == activeScheduledJob2.Id));
         _mockDomainEventsQueue.DidNotReceive().Enqueue(Arg.Is<ScheduledJobCycleStartedDomainEvent>(domainEvent => domainEvent.ScheduledJobId.Value == addedScheduledJob.Id));
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenValidatorReturnsError_ShouldReturnValidationErrorAndNotCreateAnyUser()
+    {
+        // Arrange
+        SetupApplicationCommand command = _setupApplicationCommandFixture.Create();
+        Error validationError = Error.Validation("Setup.Validation", "The setup command is invalid.");
+        _mockValidator.Validate(Arg.Any<SetupApplicationCommand>()).Returns([validationError]);
+
+        // Act
+        Result<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(validationError, result.FirstError);
+        await _mockUserRepository.DidNotReceive().GetAllAsync(Arg.Any<CancellationToken>());
+        await _mockUserRepository.DidNotReceive().InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenReadingTheSeededScheduledJobsFails_ShouldReturnTheRepositoryError()
+    {
+        // Arrange
+        SetupApplicationCommand command = _setupApplicationCommandFixture.Create();
+        _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
+            .Returns(Result.From(Enumerable.Empty<UserEntity>()));
+        _mockHashService.HashString(command.Password!)
+            .Returns("hashedPassword");
+        _mockUserRepository.InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+        _mockDataSeedService.SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+        _mockDataSeedService.SetDefaultAuthorizationRolesAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+        _mockDataSeedService.SetAdminRolePermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+        _mockDataSeedService.SetAdminRoleToAdministratorAccount(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+        Error expectedError = Error.Failure("ScheduledJobs.NotFound", "Failed to read the scheduled jobs");
+        _mockScheduledJobRepository.GetAllAsync(Arg.Any<CancellationToken>())
+            .Returns(expectedError);
+
+        // Act
+        Result<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(expectedError, result.FirstError);
+        _mockDomainEventsQueue.DidNotReceive().Enqueue(Arg.Any<ScheduledJobCycleStartedDomainEvent>());
     }
 }

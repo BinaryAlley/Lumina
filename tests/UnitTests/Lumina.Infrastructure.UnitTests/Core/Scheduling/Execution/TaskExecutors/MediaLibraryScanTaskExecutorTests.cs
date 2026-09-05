@@ -7,6 +7,7 @@ using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Infrastructure.Core.Scheduling.Execution.TaskExecutors;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -31,6 +32,7 @@ public class MediaLibraryScanTaskExecutorTests
     private readonly MediaLibraryScanTaskExecutor _sut;
     private readonly ScheduledJobFixture _scheduledJobFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
+    private readonly LibraryScanEntityFixture _libraryScanEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MediaLibraryScanTaskExecutorTests"/> class.
@@ -99,5 +101,72 @@ public class MediaLibraryScanTaskExecutorTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
+    }
+
+    [Fact]
+    public async Task ExecutePayloadAsync_WhenALibraryIsAlreadyBeingScanned_ShouldSkipThatLibrary()
+    {
+        // Arrange
+        ScheduledJob scheduledJob = _scheduledJobFixture.Create();
+        LibraryEntity library = _libraryEntityFixture.Create();
+        _mockLibraryRepository.GetAllEnabledAndUnlockedAsync(Arg.Any<CancellationToken>())
+            .Returns(Result.From<IEnumerable<LibraryEntity>>([library]));
+        LibraryScanEntity runningScan = _libraryScanEntityFixture.Create(libraryId: library.Id, status: LibraryScanJobStatus.Running);
+        _mockUnitOfWork.LibraryScanRepository.GetPastMonthScansByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From<IEnumerable<LibraryScanEntity>>([runningScan]));
+
+        // Act
+        Result<Success> result = await _sut.ExecutePayloadAsync(scheduledJob, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockDomainEventPublisher.DidNotReceive().PublishAsync(Arg.Any<IDomainEvent>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ExecutePayloadAsync_WhenAQueuedScanIsInserted_ShouldPublishItsDomainEvents()
+    {
+        // Arrange
+        ScheduledJob scheduledJob = _scheduledJobFixture.Create();
+        LibraryEntity library = _libraryEntityFixture.Create();
+        _mockLibraryRepository.GetAllEnabledAndUnlockedAsync(Arg.Any<CancellationToken>())
+            .Returns(Result.From<IEnumerable<LibraryEntity>>([library]));
+        _mockUnitOfWork.LibraryScanRepository.GetPastMonthScansByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From<IEnumerable<LibraryScanEntity>>([]));
+        _mockUnitOfWork.LibraryScanRepository.InsertAsync(Arg.Any<LibraryScanEntity>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+
+        // Act
+        Result<Success> result = await _sut.ExecutePayloadAsync(scheduledJob, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockUnitOfWork.LibraryScanRepository.Received(1).InsertAsync(Arg.Any<LibraryScanEntity>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Any<IDomainEvent>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ExecutePayloadAsync_WhenInsertingTheQueuedScanFails_ShouldReturnError()
+    {
+        // Arrange
+        ScheduledJob scheduledJob = _scheduledJobFixture.Create();
+        LibraryEntity library = _libraryEntityFixture.Create();
+        _mockLibraryRepository.GetAllEnabledAndUnlockedAsync(Arg.Any<CancellationToken>())
+            .Returns(Result.From<IEnumerable<LibraryEntity>>([library]));
+        _mockUnitOfWork.LibraryScanRepository.GetPastMonthScansByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From<IEnumerable<LibraryScanEntity>>([]));
+        Error error = Error.Failure("Database.Error", "Failed to insert the scan");
+        _mockUnitOfWork.LibraryScanRepository.InsertAsync(Arg.Any<LibraryScanEntity>(), Arg.Any<CancellationToken>())
+            .Returns(error);
+
+        // Act
+        Result<Success> result = await _sut.ExecutePayloadAsync(scheduledJob, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(error, result.FirstError);
+        await _mockDomainEventPublisher.DidNotReceive().PublishAsync(Arg.Any<IDomainEvent>(), Arg.Any<CancellationToken>());
     }
 }

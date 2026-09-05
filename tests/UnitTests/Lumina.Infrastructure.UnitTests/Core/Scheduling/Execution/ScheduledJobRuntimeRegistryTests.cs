@@ -120,4 +120,99 @@ public class ScheduledJobRuntimeRegistryTests
         // Assert
         Assert.True(result);
     }
+
+    [Fact]
+    public void HasActiveCycle_WhenCycleIsRunning_ShouldReturnTrue()
+    {
+        // Arrange
+        ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create();
+        using CancellationTokenSource cycleCancellationTokenSource = new();
+        _sut.TryStartCycle(scheduledJobId, cycleCancellationTokenSource);
+
+        // Act
+        bool result = _sut.HasActiveCycle(scheduledJobId);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void HasActiveCycle_WhenNoCycleIsRunning_ShouldReturnFalse()
+    {
+        // Arrange
+        ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create();
+
+        // Act
+        bool result = _sut.HasActiveCycle(scheduledJobId);
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void HasActiveCycle_AfterTheCycleWasStopped_ShouldReturnFalse()
+    {
+        // Arrange
+        ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create();
+        using CancellationTokenSource cycleCancellationTokenSource = new();
+        _sut.TryStartCycle(scheduledJobId, cycleCancellationTokenSource);
+        _sut.StopCycle(scheduledJobId);
+
+        // Act
+        bool result = _sut.HasActiveCycle(scheduledJobId);
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void EndCycle_WhenCalledWithTheOwnedTokenSource_ShouldCancelItAndClearTheCycle()
+    {
+        // Arrange
+        ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create();
+        using CancellationTokenSource cycleCancellationTokenSource = new();
+        _sut.TryStartCycle(scheduledJobId, cycleCancellationTokenSource);
+
+        // Act
+        _sut.EndCycle(scheduledJobId, cycleCancellationTokenSource);
+
+        // Assert
+        Assert.True(cycleCancellationTokenSource.IsCancellationRequested);
+        Assert.False(_sut.HasActiveCycle(scheduledJobId));
+    }
+
+    [Fact]
+    public void EndCycle_WhenTheCycleWasReplacedByANewerOne_ShouldNotCancelTheNewerCycle()
+    {
+        // Arrange
+        ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create();
+        using CancellationTokenSource oldCycleCancellationTokenSource = new();
+        using CancellationTokenSource newCycleCancellationTokenSource = new();
+        _sut.TryStartCycle(scheduledJobId, oldCycleCancellationTokenSource);
+        _sut.StopCycle(scheduledJobId);
+        _sut.TryStartCycle(scheduledJobId, newCycleCancellationTokenSource);
+
+        // Act
+        _sut.EndCycle(scheduledJobId, oldCycleCancellationTokenSource);
+
+        // Assert
+        Assert.True(oldCycleCancellationTokenSource.IsCancellationRequested);
+        Assert.False(newCycleCancellationTokenSource.IsCancellationRequested);
+        Assert.True(_sut.HasActiveCycle(scheduledJobId));
+    }
+
+    [Fact]
+    public void EndCycle_WhenNoCycleIsRegistered_ShouldStillCancelTheOwnedTokenSource()
+    {
+        // Arrange
+        ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create();
+        using CancellationTokenSource cycleCancellationTokenSource = new();
+
+        // Act
+        _sut.EndCycle(scheduledJobId, cycleCancellationTokenSource);
+
+        // Assert
+        Assert.True(cycleCancellationTokenSource.IsCancellationRequested);
+        Assert.False(_sut.HasActiveCycle(scheduledJobId));
+    }
 }

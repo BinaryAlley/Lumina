@@ -40,7 +40,6 @@ public class DataSeedServiceTests
     private readonly UserEntityFixture _userEntityFixture = new();
     private readonly RoleEntityFixture _roleEntityFixture = new();
     private readonly PermissionEntityFixture _permissionEntityFixture = new();
-    private readonly ScheduledJobEntityFixture _scheduledJobEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DataSeedServiceTests"/> class.
@@ -551,14 +550,12 @@ public class DataSeedServiceTests
     }
 
     [Fact]
-    public async Task SetDefaultScheduledJobsAsync_WhenNoScheduledJobsExist_ShouldInsertTheFiveDefaultJobsAndReturnCreated()
+    public async Task SetDefaultScheduledJobsAsync_WhenCalled_ShouldInsertTheFiveDefaultJobsAndReturnCreated()
     {
         // Arrange
         Guid adminUserId = Guid.NewGuid();
         IScheduledJobRepository mockScheduledJobRepository = Substitute.For<IScheduledJobRepository>();
         _mockUnitOfWork.ScheduledJobRepository.Returns(mockScheduledJobRepository);
-        mockScheduledJobRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(Result.From(Enumerable.Empty<ScheduledJobEntity>()));
         List<ScheduledJobEntity> capturedScheduledJobs = [];
         mockScheduledJobRepository.InsertAsync(Arg.Any<ScheduledJobEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Created)
@@ -583,48 +580,7 @@ public class DataSeedServiceTests
 
         await mockScheduledJobRepository.Received(5).InsertAsync(Arg.Any<ScheduledJobEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
-    }
-
-    [Fact]
-    public async Task SetDefaultScheduledJobsAsync_WhenScheduledJobsAlreadyExist_ShouldNotInsertAnyJob()
-    {
-        // Arrange
-        Guid adminUserId = Guid.NewGuid();
-        IScheduledJobRepository mockScheduledJobRepository = Substitute.For<IScheduledJobRepository>();
-        _mockUnitOfWork.ScheduledJobRepository.Returns(mockScheduledJobRepository);
-        ScheduledJobEntity existingScheduledJob = _scheduledJobEntityFixture.Create(scheduleType: ScheduleType.WithIntervalInMinutes);
-        mockScheduledJobRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(new[] { existingScheduledJob });
-
-        // Act
-        Result<Created> result = await _sut.SetDefaultScheduledJobsAsync(adminUserId, CancellationToken.None);
-
-        // Assert
-        Assert.False(result.IsFailure);
-        Assert.Equal(Result.Created, result.Value);
-        await mockScheduledJobRepository.DidNotReceive().InsertAsync(Arg.Any<ScheduledJobEntity>(), Arg.Any<CancellationToken>());
-        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
-    }
-
-    [Fact]
-    public async Task SetDefaultScheduledJobsAsync_WhenGetAllScheduledJobsFails_ShouldReturnError()
-    {
-        // Arrange
-        Guid adminUserId = Guid.NewGuid();
-        IScheduledJobRepository mockScheduledJobRepository = Substitute.For<IScheduledJobRepository>();
-        _mockUnitOfWork.ScheduledJobRepository.Returns(mockScheduledJobRepository);
-        Error expectedError = Error.Failure("ScheduledJobs.NotFound", "Failed to retrieve the scheduled jobs");
-        mockScheduledJobRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(expectedError);
-
-        // Act
-        Result<Created> result = await _sut.SetDefaultScheduledJobsAsync(adminUserId, CancellationToken.None);
-
-        // Assert
-        Assert.True(result.IsFailure);
-        Assert.Equal(expectedError, result.FirstError);
-        await mockScheduledJobRepository.DidNotReceive().InsertAsync(Arg.Any<ScheduledJobEntity>(), Arg.Any<CancellationToken>());
-        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await mockScheduledJobRepository.DidNotReceive().GetAllAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -634,8 +590,6 @@ public class DataSeedServiceTests
         Guid adminUserId = Guid.NewGuid();
         IScheduledJobRepository mockScheduledJobRepository = Substitute.For<IScheduledJobRepository>();
         _mockUnitOfWork.ScheduledJobRepository.Returns(mockScheduledJobRepository);
-        mockScheduledJobRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(Result.From(Enumerable.Empty<ScheduledJobEntity>()));
         Error expectedError = Error.Failure("ScheduledJobs.InsertFailed", "Failed to insert the scheduled job");
         mockScheduledJobRepository.InsertAsync(Arg.Any<ScheduledJobEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Created, expectedError);
