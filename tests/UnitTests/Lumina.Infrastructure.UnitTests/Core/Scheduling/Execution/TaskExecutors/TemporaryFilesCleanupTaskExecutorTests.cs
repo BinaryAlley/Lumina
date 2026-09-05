@@ -72,6 +72,10 @@ public class TemporaryFilesCleanupTaskExecutorTests
     [Fact]
     public async Task ExecutePayloadAsync_WhenDeletingTheDirectoryFails_ShouldReturnError()
     {
+        // On non Windows platforms deleting a file that is locked open succeeds, so the failure path can only be forced on Windows.
+        if (!OperatingSystem.IsWindows())
+            return;
+
         // Arrange
         ScheduledJob scheduledJob = _scheduledJobFixture.Create();
         string temporaryDirectory = Path.Combine(AppContext.BaseDirectory, "reading-cache");
