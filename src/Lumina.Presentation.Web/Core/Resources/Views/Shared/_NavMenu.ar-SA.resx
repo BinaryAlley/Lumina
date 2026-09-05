@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -215,5 +215,8 @@
   </data>
   <data name="Plugins" xml:space="preserve">
     <value>الإضافات</value>
+  </data>
+  <data name="ScheduledJobs" xml:space="preserve">
+    <value>المهام المجدولة</value>
   </data>
 </root>

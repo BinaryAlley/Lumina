@@ -4,6 +4,7 @@ using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Library
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -19,6 +20,7 @@ public class LibraryScanQueuedDomainEventTests
 {
     private readonly ScanIdFixture _scanIdFixture = new();
     private readonly LibraryIdFixture _libraryIdFixture = new();
+    private readonly LibraryScanQueuedDomainEventFixture _libraryScanQueuedDomainEventFixture = new();
 
     [Fact]
     public void Constructor_WhenCalled_ShouldSetAllProperties()
@@ -30,7 +32,7 @@ public class LibraryScanQueuedDomainEventTests
         DateTime occurredOnUtc = DateTime.UtcNow;
 
         // Act
-        LibraryScanQueuedDomainEvent domainEvent = new(id, scanId, libraryId, occurredOnUtc);
+        LibraryScanQueuedDomainEvent domainEvent = _libraryScanQueuedDomainEventFixture.Create(id, scanId, libraryId, occurredOnUtc);
 
         // Assert
         Assert.Equal(id, domainEvent.Id);

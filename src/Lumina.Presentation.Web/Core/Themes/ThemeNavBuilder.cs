@@ -20,7 +20,7 @@ namespace Lumina.Presentation.Web.Core.Themes;
 /// </summary>
 public sealed class ThemeNavBuilder
 {
-    // the resource base name deliberately excludes the "Core.Resources" segment: the localization factory re-roots it with the configured ResourcesPath
+    // The resource base name deliberately excludes the "Core.Resources" segment: the localization factory re-roots it with the configured ResourcesPath.
     private const string VIEW_RESOURCE_BASE_NAME = "Lumina.Presentation.Web.Views.Shared._NavMenu";
     private const string VIEW_RESOURCE_LOCATION = "Lumina.Presentation.Web";
 
@@ -60,8 +60,8 @@ public sealed class ThemeNavBuilder
         string returnUrl = Uri.EscapeDataString(GetCurrentRequestUrl());
         ThemeNavEntryDto[] languages = CreateLanguageEntries(returnUrl);
 
-        // the mobile and desktop menus arrange the same sections differently, notably the language switcher, which is
-        // its own mobile heading but a submenu under Tools on the desktop, so each menu gets its own section list
+        // The mobile and desktop menus arrange the same sections differently, notably the language switcher, which is
+        // its own mobile heading but a submenu under Tools on the desktop, so each menu gets its own section list.
         List<ThemeNavSectionDto> mobileSections = [];
         mobileSections.Add(CreateSiteSection());
         mobileSections.Add(CreateAccountSection(isAuthenticated));
@@ -134,7 +134,8 @@ public sealed class ThemeNavBuilder
                 new ThemeNavEntryDto(Localize("ManageRoles"), _urlService.GetAbsoluteUrl(WebRoutes.Admin.MANAGE_ROLES), "nav-link", []),
                 new ThemeNavEntryDto(Localize("ManagePermissions"), _urlService.GetAbsoluteUrl(WebRoutes.Admin.MANAGE_PERMISSIONS), "nav-link", []),
                 new ThemeNavEntryDto(Localize("Plugins"), _urlService.GetAbsoluteUrl(WebRoutes.Plugins.INDEX), "nav-link", []),
-                new ThemeNavEntryDto(Localize("Themes"), _urlService.GetAbsoluteUrl(WebRoutes.Admin.MANAGE_THEMES), "nav-link", [])
+                new ThemeNavEntryDto(Localize("Themes"), _urlService.GetAbsoluteUrl(WebRoutes.Admin.MANAGE_THEMES), "nav-link", []),
+                new ThemeNavEntryDto(Localize("ScheduledJobs"), _urlService.GetAbsoluteUrl(WebRoutes.Scheduler.INDEX), "nav-link", [])
             ]);
     }
 

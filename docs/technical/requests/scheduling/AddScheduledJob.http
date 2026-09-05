@@ -1,0 +1,12 @@
+POST {{host}}/api/v1/scheduled-jobs
+Authorization: Bearer {{ACCESS_TOKEN}}
+Content-Type: application/json
+
+{
+  "name": "Rescan media libraries",
+  "taskType": "ScanMediaLibraries",
+  "scheduleType": "DailyAtHourAndMinute",
+  "intervalMinutes": null,
+  "hour": 3,
+  "minute": 0
+}

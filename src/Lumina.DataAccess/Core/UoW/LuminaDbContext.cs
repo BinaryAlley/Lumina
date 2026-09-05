@@ -4,6 +4,7 @@ using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
+using Lumina.Application.Common.DataAccess.Entities.Scheduling;
 using Lumina.Application.Common.DataAccess.Entities.Themes;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Microsoft.EntityFrameworkCore;
@@ -39,6 +40,9 @@ public class LuminaDbContext : DbContext
     public virtual DbSet<ThemeEntity> Themes { get; set; } = null!;
     public virtual DbSet<MediaContributorEntity> MediaContributors { get; set; } = null!;
     public virtual DbSet<BookContributorEntity> BookContributors { get; set; } = null!;
+    public virtual DbSet<ScheduledJobEntity> ScheduledJobs { get; set; } = null!;
+    public virtual DbSet<ScheduledJobExecutionEntity> ScheduledJobExecutions { get; set; } = null!;
+    public virtual DbSet<SchedulerDisplayPreferencesEntity> SchedulerDisplayPreferences { get; set; } = null!;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LuminaDbContext"/> class.
@@ -54,7 +58,7 @@ public class LuminaDbContext : DbContext
     /// <param name="modelBuilder">The model builder used to configure the entity mappings.</param>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // find all the entity configurations in the assembly and apply them
+        // Find all the entity configurations in the assembly and apply them.
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(LuminaDbContext).Assembly);
 
         base.OnModelCreating(modelBuilder);

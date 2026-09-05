@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ScheduledJobs" xml:space="preserve">
+    <value>Sarcini programate</value>
+  </data>
+  <data name="FilterByJobType" xml:space="preserve">
+    <value>Filtrează după tipul de sarcină</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>Toate</value>
+  </data>
+  <data name="TaskType.ScanMediaLibraries" xml:space="preserve">
+    <value>Scanează bibliotecile media</value>
+  </data>
+  <data name="TaskType.CleanTemporaryFiles" xml:space="preserve">
+    <value>Curăță fișierele temporare</value>
+  </data>
+  <data name="DisplayLast" xml:space="preserve">
+    <value>Afișează ultimele</value>
+  </data>
+  <data name="TimeUnit" xml:space="preserve">
+    <value>Unitate de timp</value>
+  </data>
+  <data name="Minutes" xml:space="preserve">
+    <value>Minute</value>
+  </data>
+  <data name="MinutesShort" xml:space="preserve">
+    <value>min</value>
+  </data>
+  <data name="Hours" xml:space="preserve">
+    <value>Ore</value>
+  </data>
+  <data name="Days" xml:space="preserve">
+    <value>Zile</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Actualizează</value>
+  </data>
+  <data name="CurrentJobs" xml:space="preserve">
+    <value>Sarcini curente</value>
+  </data>
+  <data name="AddNewJob" xml:space="preserve">
+    <value>Adaugă sarcină</value>
+  </data>
+  <data name="Id" xml:space="preserve">
+    <value>Id</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Nume</value>
+  </data>
+  <data name="JobType" xml:space="preserve">
+    <value>Tip de sarcină</value>
+  </data>
+  <data name="ScheduleType" xml:space="preserve">
+    <value>Tip de programare</value>
+  </data>
+  <data name="Interval" xml:space="preserve">
+    <value>Interval</value>
+  </data>
+  <data name="Time" xml:space="preserve">
+    <value>Ora</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Stare</value>
+  </data>
+  <data name="Started" xml:space="preserve">
+    <value>Începută</value>
+  </data>
+  <data name="Completed" xml:space="preserve">
+    <value>Finalizată</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Acțiuni</value>
+  </data>
+  <data name="JobName" xml:space="preserve">
+    <value>Numele sarcinii</value>
+  </data>
+  <data name="IntervalSchedule" xml:space="preserve">
+    <value>Interval</value>
+  </data>
+  <data name="DailySchedule" xml:space="preserve">
+    <value>Zilnic</value>
+  </data>
+  <data name="IntervalMinutes" xml:space="preserve">
+    <value>Interval (minute)</value>
+  </data>
+  <data name="Hour" xml:space="preserve">
+    <value>Oră</value>
+  </data>
+  <data name="Minute" xml:space="preserve">
+    <value>Minut</value>
+  </data>
+  <data name="AddJob" xml:space="preserve">
+    <value>Adaugă sarcină</value>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>Pornește</value>
+  </data>
+  <data name="Stop" xml:space="preserve">
+    <value>Oprește</value>
+  </data>
+  <data name="Fire" xml:space="preserve">
+    <value>Execută</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Elimină</value>
+  </data>
+  <data name="NoJobs" xml:space="preserve">
+    <value>Nicio sarcină adăugată</value>
+  </data>
+  <data name="JobStarted" xml:space="preserve">
+    <value>Sarcina a fost pornită cu succes.</value>
+  </data>
+  <data name="JobStopped" xml:space="preserve">
+    <value>Sarcina a fost oprită cu succes.</value>
+  </data>
+  <data name="JobFired" xml:space="preserve">
+    <value>Sarcina a fost executată cu succes.</value>
+  </data>
+  <data name="JobAdded" xml:space="preserve">
+    <value>Sarcina a fost adăugată cu succes.</value>
+  </data>
+  <data name="JobRemoved" xml:space="preserve">
+    <value>Sarcina a fost eliminată cu succes.</value>
+  </data>
+  <data name="JobNotFound" xml:space="preserve">
+    <value>Sarcina nu a fost găsită.</value>
+  </data>
+  <data name="JobAlreadyRunning" xml:space="preserve">
+    <value>Sarcina rulează deja.</value>
+  </data>
+  <data name="Status.Added" xml:space="preserve">
+    <value>Adăugată</value>
+  </data>
+  <data name="Status.Active" xml:space="preserve">
+    <value>Activă</value>
+  </data>
+  <data name="Status.Running" xml:space="preserve">
+    <value>În execuție</value>
+  </data>
+  <data name="Status.Completed" xml:space="preserve">
+    <value>Finalizată</value>
+  </data>
+  <data name="RemoveJobConfirm" xml:space="preserve">
+    <value>Elimini această sarcină programată?</value>
+  </data>
+  <data name="JobNameRequired" xml:space="preserve">
+    <value>Numele sarcinii este obligatoriu.</value>
+  </data>
+  <data name="TaskType.RepairThemes" xml:space="preserve">
+    <value>Repară temele</value>
+  </data>
+  <data name="TaskType.CleanScheduledJobExecutionHistory" xml:space="preserve">
+    <value>Curăță istoricul proceselor</value>
+  </data>
+  <data name="StartupSchedule" xml:space="preserve">
+    <value>La pornire</value>
+  </data>
+</root>

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ScheduledJobs" xml:space="preserve">
+    <value>المهام المجدولة</value>
+  </data>
+  <data name="FilterByJobType" xml:space="preserve">
+    <value>تصفية حسب نوع المهمة</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>الكل</value>
+  </data>
+  <data name="TaskType.ScanMediaLibraries" xml:space="preserve">
+    <value>فحص مكتبات الوسائط</value>
+  </data>
+  <data name="TaskType.CleanTemporaryFiles" xml:space="preserve">
+    <value>تنظيف الملفات المؤقتة</value>
+  </data>
+  <data name="DisplayLast" xml:space="preserve">
+    <value>عرض آخر</value>
+  </data>
+  <data name="TimeUnit" xml:space="preserve">
+    <value>وحدة الوقت</value>
+  </data>
+  <data name="Minutes" xml:space="preserve">
+    <value>دقائق</value>
+  </data>
+  <data name="MinutesShort" xml:space="preserve">
+    <value>دقيقة</value>
+  </data>
+  <data name="Hours" xml:space="preserve">
+    <value>ساعات</value>
+  </data>
+  <data name="Days" xml:space="preserve">
+    <value>أيام</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>تحديث</value>
+  </data>
+  <data name="CurrentJobs" xml:space="preserve">
+    <value>المهام الحالية</value>
+  </data>
+  <data name="AddNewJob" xml:space="preserve">
+    <value>إضافة مهمة</value>
+  </data>
+  <data name="Id" xml:space="preserve">
+    <value>المعرّف</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>الاسم</value>
+  </data>
+  <data name="JobType" xml:space="preserve">
+    <value>نوع المهمة</value>
+  </data>
+  <data name="ScheduleType" xml:space="preserve">
+    <value>نوع الجدولة</value>
+  </data>
+  <data name="Interval" xml:space="preserve">
+    <value>الفاصل الزمني</value>
+  </data>
+  <data name="Time" xml:space="preserve">
+    <value>الوقت</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>الحالة</value>
+  </data>
+  <data name="Started" xml:space="preserve">
+    <value>بدأت</value>
+  </data>
+  <data name="Completed" xml:space="preserve">
+    <value>اكتملت</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>الإجراءات</value>
+  </data>
+  <data name="JobName" xml:space="preserve">
+    <value>اسم المهمة</value>
+  </data>
+  <data name="IntervalSchedule" xml:space="preserve">
+    <value>فاصل زمني</value>
+  </data>
+  <data name="DailySchedule" xml:space="preserve">
+    <value>يومي</value>
+  </data>
+  <data name="IntervalMinutes" xml:space="preserve">
+    <value>الفاصل الزمني (دقائق)</value>
+  </data>
+  <data name="Hour" xml:space="preserve">
+    <value>الساعة</value>
+  </data>
+  <data name="Minute" xml:space="preserve">
+    <value>الدقيقة</value>
+  </data>
+  <data name="AddJob" xml:space="preserve">
+    <value>إضافة مهمة</value>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>بدء</value>
+  </data>
+  <data name="Stop" xml:space="preserve">
+    <value>إيقاف</value>
+  </data>
+  <data name="Fire" xml:space="preserve">
+    <value>تنفيذ</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>إزالة</value>
+  </data>
+  <data name="NoJobs" xml:space="preserve">
+    <value>لم تتم إضافة مهام</value>
+  </data>
+  <data name="JobStarted" xml:space="preserve">
+    <value>تم بدء المهمة بنجاح.</value>
+  </data>
+  <data name="JobStopped" xml:space="preserve">
+    <value>تم إيقاف المهمة بنجاح.</value>
+  </data>
+  <data name="JobFired" xml:space="preserve">
+    <value>تم تنفيذ المهمة بنجاح.</value>
+  </data>
+  <data name="JobAdded" xml:space="preserve">
+    <value>تمت إضافة المهمة بنجاح.</value>
+  </data>
+  <data name="JobRemoved" xml:space="preserve">
+    <value>تمت إزالة المهمة بنجاح.</value>
+  </data>
+  <data name="JobNotFound" xml:space="preserve">
+    <value>لم يتم العثور على المهمة.</value>
+  </data>
+  <data name="JobAlreadyRunning" xml:space="preserve">
+    <value>المهمة قيد التشغيل بالفعل.</value>
+  </data>
+  <data name="Status.Added" xml:space="preserve">
+    <value>مضافة</value>
+  </data>
+  <data name="Status.Active" xml:space="preserve">
+    <value>نشطة</value>
+  </data>
+  <data name="Status.Running" xml:space="preserve">
+    <value>قيد التشغيل</value>
+  </data>
+  <data name="Status.Completed" xml:space="preserve">
+    <value>مكتملة</value>
+  </data>
+  <data name="RemoveJobConfirm" xml:space="preserve">
+    <value>هل تريد إزالة هذه المهمة المجدولة؟</value>
+  </data>
+  <data name="JobNameRequired" xml:space="preserve">
+    <value>اسم المهمة مطلوب.</value>
+  </data>
+  <data name="TaskType.RepairThemes" xml:space="preserve">
+    <value>إصلاح السمات</value>
+  </data>
+  <data name="TaskType.CleanScheduledJobExecutionHistory" xml:space="preserve">
+    <value>تنظيف سجل الوظائف</value>
+  </data>
+  <data name="StartupSchedule" xml:space="preserve">
+    <value>عند بدء التشغيل</value>
+  </data>
+</root>

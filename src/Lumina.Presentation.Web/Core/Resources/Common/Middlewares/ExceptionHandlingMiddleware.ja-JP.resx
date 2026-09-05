@@ -738,4 +738,46 @@
   <data name="PluginArchiveNotReadable" xml:space="preserve">
     <value>アップロードされたプラグインアーカイブを読み取れませんでした!</value>
   </data>
+  <data name="ScheduledJobNotFound" xml:space="preserve">
+    <value>スケジュールされたジョブが見つかりません！</value>
+  </data>
+  <data name="ScheduledJobNameCannotBeEmpty" xml:space="preserve">
+    <value>スケジュールされたジョブの名前を空にすることはできません！</value>
+  </data>
+  <data name="IntervalMinutesMustBePositive" xml:space="preserve">
+    <value>間隔の分数は正の数である必要があります！</value>
+  </data>
+  <data name="HourMustBeBetweenZeroAndTwentyThree" xml:space="preserve">
+    <value>時間は0から23の間である必要があります！</value>
+  </data>
+  <data name="MinuteMustBeBetweenZeroAndFiftyNine" xml:space="preserve">
+    <value>分は0から59の間である必要があります！</value>
+  </data>
+  <data name="ScheduledJobAlreadyExists" xml:space="preserve">
+    <value>この名前のスケジュールされたジョブは既に存在します！</value>
+  </data>
+  <data name="ScheduledJobExecutionAlreadyExists" xml:space="preserve">
+    <value>スケジュールされたジョブの実行は既に存在します！</value>
+  </data>
+  <data name="ScheduledJobExecutionNotFound" xml:space="preserve">
+    <value>スケジュールされたジョブの実行が見つかりません！</value>
+  </data>
+  <data name="ScheduledJobCycleAlreadyStarted" xml:space="preserve">
+    <value>スケジュールされたジョブの実行サイクルは既に開始されています！</value>
+  </data>
+  <data name="ScheduledJobNotStarted" xml:space="preserve">
+    <value>スケジュールされたジョブの実行サイクルは開始されていません！</value>
+  </data>
+  <data name="ScheduledJobAlreadyRunning" xml:space="preserve">
+    <value>スケジュールされたジョブは既に実行中です！</value>
+  </data>
+  <data name="CanOnlyCompleteRunningScheduledJob" xml:space="preserve">
+    <value>実行中のスケジュールされたジョブのみ完了できます！</value>
+  </data>
+  <data name="SchedulerDisplayTimeSpanMustBePositive" xml:space="preserve">
+    <value>スケジューラーページの表示期間は正の数である必要があります！</value>
+  </data>
+  <data name="InvalidScheduleType" xml:space="preserve">
+    <value>スケジュールタイプが無効です！</value>
+  </data>
 </root>

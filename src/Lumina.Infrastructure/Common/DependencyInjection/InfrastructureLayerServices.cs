@@ -8,12 +8,14 @@ using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
 using Lumina.Application.Common.Infrastructure.Plugins;
 using Lumina.Application.Common.Infrastructure.Reading;
 using Lumina.Application.Common.Infrastructure.Security;
+using Lumina.Application.Common.Infrastructure.Scheduling;
 using Lumina.Application.Common.Infrastructure.Themes;
 using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.MediaLibrary.Management.Progress;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Artwork;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
+using Lumina.Application.Core.Scheduling.Notifications;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
@@ -34,6 +36,9 @@ using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Queue;
 using Lumina.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Artwork;
 using Lumina.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
 using Lumina.Infrastructure.Core.Plugins;
+using Lumina.Infrastructure.Core.Scheduling.Execution;
+using Lumina.Infrastructure.Core.Scheduling.Execution.TaskExecutors;
+using Lumina.Infrastructure.Core.Scheduling.Notifications;
 using Lumina.Infrastructure.Core.Security;
 using Lumina.Infrastructure.Core.Themes;
 using Lumina.Infrastructure.Core.Time;
@@ -113,8 +118,8 @@ public static class InfrastructureLayerServices
         services.AddHttpClient();
         services.AddScoped<IBookArtworkService, BookArtworkService>();
 
-        // Book reading: resolves the book reader plugins, extracts the books into a temporary directory, and serves their contents;
-        // the enablement cache lets the reading service skip the per-request database read of the reader configurations.
+        // Book reading: resolves the book reader plugins, extracts the books into a temporary directory, and serves their contents.
+        // The enablement cache lets the reading service skip the per-request database read of the reader configurations.
         services.AddSingleton<IBookReaderEnablementCache, BookReaderEnablementCache>();
         services.AddSingleton<IBookReaderRegistry, BookReaderRegistry>();
         services.AddSingleton<IBookReadingService, BookReadingService>();
@@ -134,9 +139,20 @@ public static class InfrastructureLayerServices
             serviceProvider.GetRequiredService<ILogger<PluginDetectionSyncJob>>()));
         services.AddHostedService(serviceProvider => serviceProvider.GetRequiredService<PluginDetectionSyncJob>());
 
-        // Themes: the theme service stores and serves theme packs, and the detection job seeds the bundled themes at startup.
+        // Themes: the theme service stores and serves theme packs; the bundled themes are installed and repaired by the
+        // default "Repair themes at startup" scheduled job that is seeded when the application is set up.
         services.AddSingleton<IThemeService, ThemeService>();
-        services.AddHostedService<ThemeDetectionSyncJob>();
+
+        // Scheduled jobs: the scheduler executes the tasks of the scheduled jobs on their schedules, and the notifier broadcasts their state to the SignalR clients.
+        services.AddSingleton<IScheduledJobScheduler, ScheduledJobSchedulerJob>();
+        services.AddHostedService(serviceProvider => (ScheduledJobSchedulerJob)serviceProvider.GetRequiredService<IScheduledJobScheduler>());
+        services.AddSingleton<IScheduledJobRuntimeRegistry, ScheduledJobRuntimeRegistry>();
+        services.AddSingleton<IScheduledJobNotifier, ScheduledJobNotifier>();
+        services.AddScoped<IScheduledTaskExecutorFactory, ScheduledTaskExecutorFactory>();
+        services.AddScoped<MediaLibraryScanTaskExecutor>();
+        services.AddScoped<TemporaryFilesCleanupTaskExecutor>();
+        services.AddScoped<RepairThemesTaskExecutor>();
+        services.AddScoped<CleanScheduledJobExecutionHistoryTaskExecutor>();
 
         return services;
     }

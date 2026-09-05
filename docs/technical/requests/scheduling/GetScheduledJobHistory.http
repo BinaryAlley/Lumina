@@ -1,0 +1,2 @@
+GET {{host}}/api/v1/scheduled-jobs/history?from=2026-09-02T00%3A00%3A00.0000000Z&to=2026-09-03T00%3A00%3A00.0000000Z
+Authorization: Bearer {{ACCESS_TOKEN}}

@@ -43,4 +43,12 @@ public interface IDataSeedService
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     Task<Result<Created>> SetAdminRoleToAdministratorAccount(Guid userId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Sets up the default scheduled jobs, owned by the administrator account.
+    /// </summary>
+    /// <param name="adminUserId">The unique identifier of the administrator account that owns the default scheduled jobs.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Created>> SetDefaultScheduledJobsAsync(Guid adminUserId, CancellationToken cancellationToken);
 }

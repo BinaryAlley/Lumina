@@ -8,7 +8,7 @@
 @using System.Security.Claims
 
 @{
-    // generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler
+    // Generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler.
     var scriptId = ScriptIdentifierHelper.GenerateScriptId();
 }
 
@@ -162,7 +162,7 @@
 @section Scripts {
     <!-- The "text/plain" type is a design choice, not a mistake: it keeps the browser from executing this view script during HTML parsing, before site.js defines the API helpers it calls (callApiGetAsync, callApiPostAsync, ...). site.js (which loads deferred) executes these scripts once it is loaded, both on the initial page load and during AJAX navigation. -->
     <script type="text/plain" data-form="@scriptId">
-        // create cleanup registry for this view
+        // Create cleanup registry for this view.
         const cleanupFunctions = [];
         let isInitialized = false;
         const jsLocalizedLibraryScanStatuses = {
@@ -217,9 +217,15 @@
         const btnScanAllLibraries = document.getElementById('btn-scan-all-libraries');
         const btnCancelLibrariesScan = document.getElementById('btn-cancel-libraries-scan');
 
-        // SignalR
+        // SignalR.
+        const accessTokenUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Authentication.GET_API_ACCESS_TOKEN)';
         const signalRConnection = new signalR.HubConnectionBuilder()
-            .withUrl('http://localhost:5214/scanProgressHub')
+            .withUrl('http://localhost:5214/scanProgressHub', {
+                accessTokenFactory: async () => {
+                    const tokenResponse = await callApiGetAsync(accessTokenUrl);
+                    return tokenResponse ? tokenResponse.token : null;
+                }
+            })
             .withAutomaticReconnect({
                 nextRetryDelayInMilliseconds: retryContext =>
                     Math.min(retryContext.elapsedMilliseconds * 2, 10000)
@@ -227,7 +233,7 @@
             .configureLogging(signalR.LogLevel.Warning)
             .build();
 
-        // get media libraries
+        // Get media libraries.
         const loadLibrariesAsync = async function() {
             const response = await callApiGetAsync('@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.GET_LIBRARIES)');
             const table = document.getElementById('media-libraries-table');
@@ -282,14 +288,14 @@
             }
         };
 
-        // get which libraries have active scans
+        // Get which libraries have active scans.
         const getRunningLibraryScansAsync = async function() {
             const response = await callApiGetAsync('@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.GET_RUNNING_LIBRARY_SCANS)');
             if (response && response.length > 0) {
                 await Promise.all(response.map(async scan => {
                     const row = document.querySelector(`tr[data-library-id="${scan.libraryId}"]`);
                     if (row) {
-                        // restore UI state
+                        // Restore UI state.
                         const scanProgress = row.querySelector('.scan-progress');
                         const totalProgressDiv = row.querySelector('.scan-progress-total > div');
                         const jobProgressDiv = row.querySelector('.scan-progress-job > div');
@@ -309,14 +315,14 @@
                         scanIcon.classList.add('hidden');
                         cancelScanIcon.classList.remove('hidden');
 
-                        // re-subscribe to SignalR
-                        await signalRConnection.invoke('SubscribeToScan', scan.scanId, '@User.FindFirst(ClaimTypes.NameIdentifier)?.Value');
+                        // Re-subscribe to SignalR.
+                        await signalRConnection.invoke('SubscribeToScan', scan.scanId);
                     }
                 }));
             }
         };
 
-        // on delete library icon click
+        // On delete library icon click.
         const handleDeleteLibraryClick = async function(e) {
             if (e.target.matches('img[src*="delete.svg"]')) {
                 const row = e.target.closest('tr');
@@ -334,14 +340,14 @@
             }
         };
 
-        // on scan all libraries button click
+        // On scan all libraries button click.
         const handleScanAllLibrariesClick = async function(e) {
             const data = await callApiPostAsync('@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.SCAN_LIBRARIES)', {});
             if (data) {                
                 btnScanAllLibraries.style.display = 'none';
                 btnCancelLibrariesScan.style.display = 'block';
 
-                // toggle icons only for libraries that had their scan started
+                // Toggle icons only for libraries that had their scan started.
                 const tbody = document.querySelector('tbody');
                 data.forEach(async scan => {
                     const row = tbody.querySelector(`tr[data-library-id="${scan.libraryId}"]`);
@@ -353,23 +359,22 @@
                         const failedIdon = row.querySelector('img[src*="red.png"]');
                         const canceledIdon = row.querySelector('img[src*="yellow.png"]');
 
-                        // hide scan status icons
+                        // Hide scan status icons.
                         completedIdon.classList.add('hidden');
                         failedIdon.classList.add('hidden');
                         canceledIdon.classList.add('hidden');
-                        // toggle visibility on scan action icons
+                        // Toggle visibility on scan action icons.
                         scanIcon.classList.add('hidden');
                         cancelScanIcon.classList.remove('hidden');
 
                         const scanId = scan.scanId;
-                        const userId = '@User.FindFirst(ClaimTypes.NameIdentifier)?.Value';
-                        await signalRConnection.invoke('SubscribeToScan', scanId, userId);
+                        await signalRConnection.invoke('SubscribeToScan', scanId);
                     }
                 });
             }
         };
 
-        // on scan library icon click
+        // On scan library icon click.
         const handleScanLibraryClick = async function(e) {
             if (e.target.matches('img[src*="trigger.svg"]')) {
                 const row = e.target.closest('tr');
@@ -386,32 +391,31 @@
                     const failedIdon = row.querySelector('img[src*="red.png"]');
                     const canceledIdon = row.querySelector('img[src*="yellow.png"]');
 
-                    // hide scan status icons
+                    // Hide scan status icons.
                     completedIdon.classList.add('hidden');
                     failedIdon.classList.add('hidden');
                     canceledIdon.classList.add('hidden');
-                    // toggle visibility on scan action icons
+                    // Toggle visibility on scan action icons.
                     scanIcon.classList.add('hidden');
                     cancelScanIcon.classList.remove('hidden');
 
                     const scanId = success.scanId;
-                    const userId = '@User.FindFirst(ClaimTypes.NameIdentifier)?.Value';
-                    await signalRConnection.invoke('SubscribeToScan', scanId, userId);
+                    await signalRConnection.invoke('SubscribeToScan', scanId);
                 }
             }
         };
 
-        // on cancel all libraries scan button click
+        // On cancel all libraries scan button click.
         const handleCancelLibrariesScanClick = async function(e) {
             await callApiPostAsync('@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.CANCEL_LIBRARIES_SCAN)', {});
             btnCancelLibrariesScan.style.display = 'none';
             btnScanAllLibraries.style.display = 'block';
 
-            // toggle icons for all active scan rows
+            // Toggle icons for all active scan rows.
             const rows = document.querySelectorAll('tr[data-scan-id]');
 
             rows.forEach(row => {
-                // remove the scan Id, its no longer being scanned
+                // Remove the scan Id, its no longer being scanned.
                 row.removeAttribute('data-scan-id');
 
                 const statusSpan = row.querySelector('.scan-job-status');
@@ -419,11 +423,11 @@
                 const scanProgress = row.querySelector('.scan-progress');
                 scanProgress.classList.add('hidden');
 
-                // show scan status icon
+                // Show scan status icon.
                 const completedIdon = row.querySelector('img[src*="yellow.png"]');
                 completedIdon.classList.remove('hidden');
 
-                // toggle scan action icons
+                // Toggle scan action icons.
                 const scanIcon = row.querySelector('img[src*="trigger.svg"]');
                 const cancelScanIcon = row.querySelector('img[src*="stop.svg"]');
                 scanIcon.classList.remove('hidden');
@@ -431,22 +435,22 @@
             });
         };
 
-        // on cancel library scan icon click
+        // On cancel library scan icon click.
         const handleCancelLibraryScanClick = async function(e) {
             if (e.target.matches('img[src*="stop.svg"]')) {
                 const row = e.target.closest('tr');
 
                 const url = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.CANCEL_LIBRARY_SCAN, new { libraryId = default(Guid), scanId = default(Guid) })';
 
-                // make a list of values from DOM that are needed as URL query params (they need to be in the order they appear in the URL!)
+                // Make a list of values from DOM that are needed as URL query params (they need to be in the order they appear in the URL!).
                 const params = [
                     row.getAttribute('data-library-id'),
                     row.getAttribute('data-scan-id')
                 ];
-                // split URL into segments for precise replacement
+                // Split URL into segments for precise replacement.
                 const segments = url.split('/');
                 let paramIndex = 0;
-                // replace each default GUID sequentially with the values of the query params list, in the order they were added
+                // Replace each default GUID sequentially with the values of the query params list, in the order they were added.
                 const finalUrl = segments.map(segment =>
                     segment === '00000000-0000-0000-0000-000000000000'
                         ? params[paramIndex++]
@@ -455,7 +459,7 @@
 
                 await callApiPostAsync(finalUrl);
                 
-                // remove the scan Id, its no longer being scanned
+                // Remove the scan Id, its no longer being scanned.
                 row.removeAttribute('data-scan-id');
 
                 const statusSpan = row.querySelector('.scan-job-status');
@@ -463,24 +467,24 @@
                 const scanProgress = row.querySelector('.scan-progress');
                 scanProgress.classList.add('hidden');
 
-                // show scan status icon
+                // Show scan status icon.
                 const completedIdon = row.querySelector('img[src*="yellow.png"]');
                 completedIdon.classList.remove('hidden');
 
-                // toggle scan action icons
+                // Toggle scan action icons.
                 const scanIcon = row.querySelector('img[src*="trigger.svg"]');
                 const cancelScanIcon = row.querySelector('img[src*="stop.svg"]');
                 scanIcon.classList.remove('hidden');
                 cancelScanIcon.classList.add('hidden');
 
-                // toggle scan action buttons
+                // Toggle scan action buttons.
                 const hasActiveScans = document.querySelectorAll('tr[data-scan-id]').length > 0;
                 btnCancelLibrariesScan.style.display = hasActiveScans ? 'block' : 'none';
                 btnScanAllLibraries.style.display = hasActiveScans ? 'none' : 'block';
             }
         };
 
-        // handle all SignalR stuff
+        // Handle all SignalR stuff.
         function setupSignalRHandlers() {
             const onReconnecting = error => {
                 console.log(error ? `SignalR reconnected with error: ${error}` : "SignalR reconnecting...");
@@ -491,16 +495,16 @@
             const onClose = error => {
                 console.log(error ? `SignalR connection closed with error: ${error}` : "SignalR connection closed");
             };
-            // progress update handler
+            // Progress update handler.
             const progressHandler = (progress) => {
                 const rows = document.querySelectorAll(`tr[data-scan-id="${progress.scanId}"]`);
                 rows.forEach(row => {
-                    // update status text
+                    // Update status text.
                     const statusSpan = row.querySelector('.scan-job-status');
                     statusSpan.textContent = jsLocalizedLibraryScanJobsStatuses[progress.currentJobProgress.currentOperation];
                     statusSpan.classList.remove('hidden');
 
-                    // update progress bars
+                    // Update progress bars.
                     const scanProgress = row.querySelector('.scan-progress');
                     const totalProgressDiv = row.querySelector('.scan-progress-total > div');
                     const jobProgressDiv = row.querySelector('.scan-progress-job > div');
@@ -508,7 +512,7 @@
                     totalProgressDiv.style.width = `${progress.overallProgressPercentage}%`;
                     jobProgressDiv.style.width = `${progress.currentJobProgress.progressPercentage}%`;
 
-                    // toggle scan action icons
+                    // Toggle scan action icons.
                     const scanIcon = row.querySelector('img[src*="trigger.svg"]');
                     const cancelScanIcon = row.querySelector('img[src*="stop.svg"]');
                     scanIcon.classList.add('hidden');
@@ -516,11 +520,11 @@
                 });
             };
 
-            // scan completion handler
+            // Scan completion handler.
             const completionHandler = (progress) => {
                 const rows = document.querySelectorAll(`tr[data-scan-id="${progress.scanId}"]`);
                 rows.forEach(row => {
-                    // remove the scan Id, its no longer being scanned
+                    // Remove the scan Id, its no longer being scanned.
                     row.removeAttribute('data-scan-id');
 
                     const statusSpan = row.querySelector('.scan-job-status');
@@ -528,11 +532,11 @@
                     const scanProgress = row.querySelector('.scan-progress');
                     scanProgress.classList.add('hidden');
 
-                    // show scan status icon
+                    // Show scan status icon.
                     const completedIdon = row.querySelector('img[src*="green.png"]');
                     completedIdon.classList.remove('hidden');
 
-                    // toggle scan action icons
+                    // Toggle scan action icons.
                     const scanIcon = row.querySelector('img[src*="trigger.svg"]');
                     const cancelScanIcon = row.querySelector('img[src*="stop.svg"]');
                     scanIcon.classList.remove('hidden');
@@ -543,11 +547,11 @@
                 btnScanAllLibraries.style.display = hasActiveScans ? 'none' : 'block';
             };
 
-            // scan failure handler
+            // Scan failure handler.
             const failureHandler = (progress) => {
                 const rows = document.querySelectorAll(`tr[data-scan-id="${progress.scanId}"]`);
                 rows.forEach(row => {
-                    // remove the scan Id, its no longer being scanned
+                    // Remove the scan Id, its no longer being scanned.
                     row.removeAttribute('data-scan-id');
                     
                     const statusSpan = row.querySelector('.scan-job-status');
@@ -555,11 +559,11 @@
                     const scanProgress = row.querySelector('.scan-progress');
                     scanProgress.classList.add('hidden');
 
-                    // show scan status icon
+                    // Show scan status icon.
                     const completedIdon = row.querySelector('img[src*="red.png"]');
                     completedIdon.classList.remove('hidden');
 
-                    // toggle scan action icons
+                    // Toggle scan action icons.
                     const scanIcon = row.querySelector('img[src*="trigger.svg"]');
                     const cancelScanIcon = row.querySelector('img[src*="stop.svg"]');
                     scanIcon.classList.remove('hidden');
@@ -570,14 +574,14 @@
                 btnScanAllLibraries.style.display = hasActiveScans ? 'none' : 'block';
             };
 
-            // subscribe to events
+            // Subscribe to events.
             signalRConnection.on("libraryScanProgressUpdateEvent", progressHandler);
             signalRConnection.on("libraryScanFinishedEvent", completionHandler);
             signalRConnection.on("libraryScanFailedEvent", failureHandler);
             signalRConnection.onclose(onClose);
             signalRConnection.onreconnecting(onReconnecting);
             signalRConnection.onreconnected(onReconnected);
-            // add to cleanup
+            // Add to cleanup.
             cleanupFunctions.push(() => {
                 signalRConnection.off("libraryScanProgressUpdateEvent", progressHandler);
                 signalRConnection.off("libraryScanFinishedEvent", completionHandler);
@@ -588,7 +592,7 @@
             });
         }
 
-        // add listeners
+        // Add listeners.
         btnScanAllLibraries.addEventListener('click', handleScanAllLibrariesClick);
         btnCancelLibrariesScan.addEventListener('click', handleCancelLibrariesScanClick);
         document.addEventListener('click', handleDeleteLibraryClick);
@@ -596,9 +600,9 @@
         document.addEventListener('click', handleCancelLibraryScanClick);
         document.addEventListener('DOMContentLoaded', InitializeAsync);
 
-        // register cleanup for these listeners
+        // Register cleanup for these listeners.
         cleanupFunctions.push(() => {            
-            // proper connection stop
+            // Proper connection stop.
             if (signalRConnection.state === 'Connected') 
                 signalRConnection.stop().then(() => console.log('SignalR connection stopped'));
 
@@ -610,7 +614,7 @@
             document.removeEventListener('DOMContentLoaded', InitializeAsync);
         });
 
-        // store all cleanups for this view on window object using the scriptId
+        // Store all cleanups for this view on window object using the scriptId.
         window.viewCleanups = window.viewCleanups || {};
         window.viewCleanups['@scriptId'] = () => {
             cleanupFunctions.forEach(cleanup => cleanup());

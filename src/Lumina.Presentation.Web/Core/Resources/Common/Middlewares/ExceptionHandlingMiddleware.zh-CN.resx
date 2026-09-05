@@ -738,4 +738,46 @@
   <data name="PluginArchiveNotReadable" xml:space="preserve">
     <value>无法读取上传的插件存档!</value>
   </data>
+  <data name="ScheduledJobNotFound" xml:space="preserve">
+    <value>未找到计划任务！</value>
+  </data>
+  <data name="ScheduledJobNameCannotBeEmpty" xml:space="preserve">
+    <value>计划任务的名称不能为空！</value>
+  </data>
+  <data name="IntervalMinutesMustBePositive" xml:space="preserve">
+    <value>间隔分钟必须为正数！</value>
+  </data>
+  <data name="HourMustBeBetweenZeroAndTwentyThree" xml:space="preserve">
+    <value>小时必须在0到23之间！</value>
+  </data>
+  <data name="MinuteMustBeBetweenZeroAndFiftyNine" xml:space="preserve">
+    <value>分钟必须在0到59之间！</value>
+  </data>
+  <data name="ScheduledJobAlreadyExists" xml:space="preserve">
+    <value>已存在同名计划任务！</value>
+  </data>
+  <data name="ScheduledJobExecutionAlreadyExists" xml:space="preserve">
+    <value>计划任务的执行记录已存在！</value>
+  </data>
+  <data name="ScheduledJobExecutionNotFound" xml:space="preserve">
+    <value>未找到计划任务的执行记录！</value>
+  </data>
+  <data name="ScheduledJobCycleAlreadyStarted" xml:space="preserve">
+    <value>计划任务的执行周期已启动！</value>
+  </data>
+  <data name="ScheduledJobNotStarted" xml:space="preserve">
+    <value>计划任务的执行周期尚未启动！</value>
+  </data>
+  <data name="ScheduledJobAlreadyRunning" xml:space="preserve">
+    <value>计划任务已在运行！</value>
+  </data>
+  <data name="CanOnlyCompleteRunningScheduledJob" xml:space="preserve">
+    <value>只有运行中的计划任务才能完成！</value>
+  </data>
+  <data name="SchedulerDisplayTimeSpanMustBePositive" xml:space="preserve">
+    <value>计划任务页面的显示时长必须是正数！</value>
+  </data>
+  <data name="InvalidScheduleType" xml:space="preserve">
+    <value>调度类型无效！</value>
+  </data>
 </root>

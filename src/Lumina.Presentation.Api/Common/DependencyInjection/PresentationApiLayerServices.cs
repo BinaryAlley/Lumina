@@ -20,6 +20,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
+using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Api.Common.DependencyInjection;
@@ -128,6 +129,15 @@ public static class PresentationApiLayerServices
 
                 jwtBearerOptions.Events = new JwtBearerEvents
                 {
+                    OnMessageReceived = jwtBearerMessageReceivedContext => // The SignalR clients send the token as a query string parameter, because the browser cannot set the Authorization header of a WebSocket connection.
+                    {
+                        string? accessToken = jwtBearerMessageReceivedContext.Request.Query["access_token"];
+                        PathString requestPath = jwtBearerMessageReceivedContext.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) &&
+                            (requestPath.StartsWithSegments("/scanProgressHub") || requestPath.StartsWithSegments("/scheduledJobsHub")))
+                            jwtBearerMessageReceivedContext.Token = accessToken;
+                        return Task.CompletedTask;
+                    },
                     OnChallenge = jwtBearerChallengeContext => // Event triggered when authentication is not successful for whatever reason.
                     {
                         jwtBearerChallengeContext.HandleResponse(); // Prevent the default 401 response.
@@ -223,6 +233,10 @@ public static class PresentationApiLayerServices
         });
 
         services.AddSignalR()
+            .AddJsonProtocol(jsonHubProtocolOptions =>
+                // The scheduler page consumes enum values as strings (job status and task type names), so the hub must
+                // serialize enums the same way the REST API does, which is also configured with JsonStringEnumConverter.
+                jsonHubProtocolOptions.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter()))
             .AddMessagePackProtocol(messagePackHubProtocolOptions => 
             messagePackHubProtocolOptions.SerializerOptions = MessagePackSerializerOptions.Standard.WithSecurity(MessagePackSecurity.UntrustedData));
         

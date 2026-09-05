@@ -1,0 +1,2 @@
+PUT {{host}}/api/v1/scheduled-jobs/{{$guid}}/stop
+Authorization: Bearer {{ACCESS_TOKEN}}

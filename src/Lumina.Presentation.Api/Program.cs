@@ -8,6 +8,7 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Infrastructure.Common.DependencyInjection;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Progress;
+using Lumina.Infrastructure.Core.Scheduling.Notifications;
 using Lumina.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
 using Lumina.Presentation.Api.Common.DependencyInjection;
 using Lumina.Presentation.Api.Common.Middlewares;
@@ -133,7 +134,7 @@ public class Program
 
         // Add API documentation (OpenApi/Scalar).
         app.MapOpenApi();
-        app.UseOpenApi(openApiDocumentMiddlewareSettings => openApiDocumentMiddlewareSettings.Path = "/openapi/{documentName}.json"); // this is needed for API versioning to work correctly with Scalar
+        app.UseOpenApi(openApiDocumentMiddlewareSettings => openApiDocumentMiddlewareSettings.Path = "/openapi/{documentName}.json"); // This is needed for API versioning to work correctly with Scalar.
         app.MapScalarApiReference(scalarOptions =>
         {
             scalarOptions.WithTitle("Lumina API")
@@ -145,7 +146,9 @@ public class Program
 
         // Add the middleware that fires domain events and ensures eventual transactional consistency, but NOT for long-polling/WebSockets stuff like SignalR, which would keep the db locked,
         // and NOT for the health probes, which would otherwise begin a database transaction on every probe.
-        app.UseWhen(ctx => !ctx.Request.Path.StartsWithSegments("/scanProgressHub") && !ctx.Request.Path.StartsWithSegments("/health"), app => app.UseMiddleware<EventualConsistencyMiddleware>());
+        app.UseWhen(ctx => !ctx.Request.Path.StartsWithSegments("/scanProgressHub") &&
+                            !ctx.Request.Path.StartsWithSegments("/scheduledJobsHub") &&
+                            !ctx.Request.Path.StartsWithSegments("/health"), app => app.UseMiddleware<EventualConsistencyMiddleware>());
 
         // Create a directory relative to the application's startup directory, and use it to store static files that are served at the /media route on the API.
         string mediaRootDirectoryPathSetting = app.Configuration.GetValue<string>("MediaSettings:RootDirectory") ?? string.Empty;
@@ -176,13 +179,14 @@ public class Program
             RequestPath = "/media",
             OnPrepareResponse = staticFileContext =>
             {
-                // the served media must not run as active content, so that attacker-influenced files (e.g. SVG covers) cannot execute scripts on the API origin
+                // The served media must not run as active content, so that attacker-influenced files (e.g. SVG covers) cannot execute scripts on the API origin.
                 staticFileContext.Context.Response.Headers["X-Content-Type-Options"] = "nosniff";
                 staticFileContext.Context.Response.Headers["Content-Security-Policy"] = "default-src 'none'; script-src 'none'; style-src 'unsafe-inline'; img-src 'self' data:";
             }
         });
 
         app.MapHub<MediaLibraryScanProgressHub>("/scanProgressHub");
+        app.MapHub<ScheduledJobsHub>("/scheduledJobsHub");
 
         // The liveness probe reports whether the process is running, while the readiness probe also verifies that the database is reachable.
         app.MapHealthChecks("/health/live", new HealthCheckOptions

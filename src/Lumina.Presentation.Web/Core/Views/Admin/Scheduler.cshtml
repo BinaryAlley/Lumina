@@ -1,0 +1,824 @@
+@*
+/admin/scheduled-jobs
+
+This view is the application fallback of the scheduler page, rendered only when the theme page of the scheduler cannot be loaded.
+It is intentionally plain and unstyled: on a healthy site the page comes from the theme's scheduler template, styled by the theme.
+It keeps the DOM contract the client script binds to, without any images or colors, so that the active theme cannot leak into the fallback.
+*@
+
+@using Lumina.Presentation.Web.Common.DTO.Configuration
+@using Lumina.Presentation.Web.Common.DTO.Scheduling
+@using Lumina.Presentation.Web.Common.Routes
+@using Lumina.Presentation.Web.Common.Services
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.Extensions.Options
+@using System.Linq
+
+@inject IViewLocalizer _localizer
+@inject IUrlService _urlService
+@inject IOptionsSnapshot<ServerConfigurationDto> _serverConfigurationOptions
+
+@{
+    // Generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler.
+    var scriptId = ScriptIdentifierHelper.GenerateScriptId();
+    var serverConfiguration = _serverConfigurationOptions.Value;
+    string scheduledJobsHubUrl = $"{serverConfiguration.BaseAddress}:{serverConfiguration.Port}/scheduledJobsHub";
+}
+
+@Html.AntiForgeryToken()
+
+<div class="scheduler-page w-100 mx-auto pl-10 pr-10 pt-10 pb-10">
+    <h2 id="scheduler-title" class="text-light-two scheduler-title engraved-title">@_localizer["ScheduledJobs"]</h2>
+
+    <div id="scheduler-filter-bar" class="scheduler-filter-bar">
+        <div class="scheduler-filter-groups">
+            <div class="scheduler-filter-row" id="scheduler-job-filter-row">
+                <label for="scheduler-job-type-filter" class="text-light-two">@_localizer["FilterByJobType"]</label>
+                <div class="enlightenment-combobox" id="scheduler-job-type-filter">
+                    <div class="shine-effect" style="top: 1px;"></div>
+                    <input type="checkbox" class="enlightenment-toggle-checkbox" id="scheduler-job-type-filter-toggle" />
+                    <label class="enlightenment-toggle" for="scheduler-job-type-filter-toggle">
+                        <span class="enlightenment-selected-text" data-value="All">@_localizer["All"]</span>
+                    </label>
+                    <div class="enlightenment-dropdown">
+                        <div class="shine-effect" style="top: -4px;"></div>
+                        <div class="enlightenment-option first-option" data-value="All">@_localizer["All"]</div>
+                        <div class="enlightenment-option" data-value="ScanMediaLibraries">@_localizer["TaskType.ScanMediaLibraries"]</div>
+                        <div class="enlightenment-option" data-value="CleanTemporaryFiles">@_localizer["TaskType.CleanTemporaryFiles"]</div>
+                        <div class="enlightenment-option" data-value="RepairThemes">@_localizer["TaskType.RepairThemes"]</div>
+                        <div class="enlightenment-option last-option" data-value="CleanScheduledJobExecutionHistory">@_localizer["TaskType.CleanScheduledJobExecutionHistory"]</div>
+                    </div>
+                </div>
+            </div>
+            <div class="scheduler-filter-row" id="scheduler-timespan-navigation-row">
+                <label for="scheduler-timespan" class="text-light-two">@_localizer["DisplayLast"]</label>
+                <input id="scheduler-timespan" type="number" min="1" step="1" value="10" class="enlightenment-input" />
+                <div class="enlightenment-combobox" id="scheduler-timeunit">
+                    <div class="shine-effect" style="top: 1px;"></div>
+                    <input type="checkbox" class="enlightenment-toggle-checkbox" id="scheduler-timeunit-toggle" />
+                    <label class="enlightenment-toggle" for="scheduler-timeunit-toggle">
+                        <span class="enlightenment-selected-text" data-value="Minutes">@_localizer["Minutes"]</span>
+                    </label>
+                    <div class="enlightenment-dropdown">
+                        <div class="shine-effect" style="top: -4px;"></div>
+                        <div class="enlightenment-option first-option" data-value="Minutes">@_localizer["Minutes"]</div>
+                        <div class="enlightenment-option" data-value="Hours">@_localizer["Hours"]</div>
+                        <div class="enlightenment-option last-option" data-value="Days">@_localizer["Days"]</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button id="scheduler-update-timespan" type="button" class="confirm-button f-12">@_localizer["Update"]</button>
+    </div>
+
+    <div class="scheduler-graph-container">
+        <canvas id="scheduler-graph"></canvas>
+        <div id="scheduler-legend" class="scheduler-legend text-light-two"></div>
+    </div>
+
+    <h3 class="text-light-two scheduler-section-title engraved-title">@_localizer["CurrentJobs"]</h3>
+    <div class="scheduler-table-wrap">
+        <table id="scheduler-jobs-table" class="text-light-two">
+            <thead>
+                <tr>
+                    <th>@_localizer["Id"]</th>
+                    <th>@_localizer["Name"]</th>
+                    <th>@_localizer["JobType"]</th>
+                    <th>@_localizer["ScheduleType"]</th>
+                    <th>@_localizer["Interval"]</th>
+                    <th>@_localizer["Time"]</th>
+                    <th>@_localizer["Status"]</th>
+                    <th>@_localizer["Started"]</th>
+                    <th>@_localizer["Completed"]</th>
+                    <th>@_localizer["Actions"]</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <h3 class="text-light-two scheduler-section-title engraved-title">@_localizer["AddNewJob"]</h3>
+    <div class="scheduler-form-container">
+        <div class="scheduler-job-form">
+            <div class="scheduler-job-form-group">
+                <label for="scheduler-job-name" class="text-light-two">@_localizer["JobName"]</label>
+                <input id="scheduler-job-name" type="text" class="enlightenment-input" />
+            </div>
+            <div class="scheduler-job-form-group">
+                <label for="scheduler-job-task-type" class="text-light-two">@_localizer["JobType"]</label>
+                <div class="enlightenment-combobox" id="scheduler-job-task-type">
+                    <div class="shine-effect" style="top: 1px;"></div>
+                    <input type="checkbox" class="enlightenment-toggle-checkbox" id="scheduler-job-task-type-toggle" />
+                    <label class="enlightenment-toggle" for="scheduler-job-task-type-toggle">
+                        <span class="enlightenment-selected-text" data-value="ScanMediaLibraries">@_localizer["TaskType.ScanMediaLibraries"]</span>
+                    </label>
+                    <div class="enlightenment-dropdown">
+                        <div class="shine-effect" style="top: -4px;"></div>
+                        <div class="enlightenment-option first-option" data-value="ScanMediaLibraries">@_localizer["TaskType.ScanMediaLibraries"]</div>
+                        <div class="enlightenment-option" data-value="CleanTemporaryFiles">@_localizer["TaskType.CleanTemporaryFiles"]</div>
+                        <div class="enlightenment-option" data-value="RepairThemes">@_localizer["TaskType.RepairThemes"]</div>
+                        <div class="enlightenment-option last-option" data-value="CleanScheduledJobExecutionHistory">@_localizer["TaskType.CleanScheduledJobExecutionHistory"]</div>
+                    </div>
+                </div>
+            </div>
+            <div class="scheduler-job-form-group">
+                <label for="scheduler-job-schedule-type" class="text-light-two">@_localizer["ScheduleType"]</label>
+                <div class="enlightenment-combobox" id="scheduler-job-schedule-type">
+                    <div class="shine-effect" style="top: 1px;"></div>
+                    <input type="checkbox" class="enlightenment-toggle-checkbox" id="scheduler-job-schedule-type-toggle" />
+                    <label class="enlightenment-toggle" for="scheduler-job-schedule-type-toggle">
+                        <span class="enlightenment-selected-text" data-value="WithIntervalInMinutes">@_localizer["IntervalSchedule"]</span>
+                    </label>
+                    <div class="enlightenment-dropdown">
+                        <div class="shine-effect" style="top: -4px;"></div>
+                        <div class="enlightenment-option first-option" data-value="WithIntervalInMinutes">@_localizer["IntervalSchedule"]</div>
+                        <div class="enlightenment-option" data-value="DailyAtHourAndMinute">@_localizer["DailySchedule"]</div>
+                        <div class="enlightenment-option last-option" data-value="OnceAtStartup">@_localizer["StartupSchedule"]</div>
+                    </div>
+                </div>
+            </div>
+            <div class="scheduler-job-form-group" id="scheduler-interval-group">
+                <label for="scheduler-job-interval" class="text-light-two">@_localizer["IntervalMinutes"]</label>
+                <input id="scheduler-job-interval" type="number" min="1" step="1" value="60" class="enlightenment-input" />
+            </div>
+            <div class="scheduler-daily-fields hidden" id="scheduler-daily-group">
+                <div class="scheduler-job-form-group">
+                    <label for="scheduler-job-hour" class="text-light-two">@_localizer["Hour"]</label>
+                    <input id="scheduler-job-hour" type="number" min="0" max="23" step="1" value="3" class="enlightenment-input" />
+                </div>
+                <div class="scheduler-job-form-group" id="scheduler-daily-minute-group">
+                    <label for="scheduler-job-minute" class="text-light-two">@_localizer["Minute"]</label>
+                    <input id="scheduler-job-minute" type="number" min="0" max="59" step="1" value="0" class="enlightenment-input" />
+                </div>
+            </div>
+            <div class="scheduler-job-form-group scheduler-job-add-button-group">
+                <button id="scheduler-add-job" type="button" class="confirm-button">@_localizer["AddJob"]</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- The "text/plain" type is a design choice, not a mistake: it keeps the browser from executing this view script during HTML parsing, before site.js defines the API helpers it calls (callApiGetAsync, callApiPostAsync, ...). site.js (which loads deferred) executes these scripts once it is loaded, both on the initial page load and during AJAX navigation. -->
+    <script type="text/plain" data-form="@scriptId">
+        const cleanupFunctions = [];
+
+        // Localized strings.
+        const schedulerStrings = {
+            noJobs: '@_localizer["NoJobs"]',
+            daily: '@_localizer["DailySchedule"]',
+            interval: '@_localizer["IntervalSchedule"]',
+            startup: '@_localizer["StartupSchedule"]',
+            jobStarted: '@_localizer["JobStarted"]',
+            jobRemoved: '@_localizer["JobRemoved"]',
+            jobStopped: '@_localizer["JobStopped"]',
+            jobFired: '@_localizer["JobFired"]',
+            jobAdded: '@_localizer["JobAdded"]',
+            jobNotFound: '@_localizer["JobNotFound"]',
+            jobAlreadyRunning: '@_localizer["JobAlreadyRunning"]',
+            taskTypeNames: {
+                ScanMediaLibraries: '@_localizer["TaskType.ScanMediaLibraries"]',
+                CleanTemporaryFiles: '@_localizer["TaskType.CleanTemporaryFiles"]',
+                RepairThemes: '@_localizer["TaskType.RepairThemes"]',
+                CleanScheduledJobExecutionHistory: '@_localizer["TaskType.CleanScheduledJobExecutionHistory"]'
+            },
+            statusNames: {
+                Added: '@_localizer["Status.Added"]',
+                Active: '@_localizer["Status.Active"]',
+                Running: '@_localizer["Status.Running"]',
+                Completed: '@_localizer["Status.Completed"]'
+            }
+        };
+
+        // Colors of the job types.
+        const jobTypeColors = {
+            ScanMediaLibraries: '#5aa7c7',
+            CleanTemporaryFiles: '#c7a15a',
+            RepairThemes: '#8bc34a',
+            CleanScheduledJobExecutionHistory: '#ba68c8'
+        };
+
+        const jobsTable = document.getElementById('scheduler-jobs-table');
+        const jobsTableBody = jobsTable.querySelector('tbody');
+        const legend = document.getElementById('scheduler-legend');
+        const graphCanvas = document.getElementById('scheduler-graph');
+        const graphContext = graphCanvas.getContext('2d');
+        const jobTypeFilter = document.getElementById('scheduler-job-type-filter');
+        const timespanInput = document.getElementById('scheduler-timespan');
+        const timeunitSelect = document.getElementById('scheduler-timeunit');
+        const updateTimespanButton = document.getElementById('scheduler-update-timespan');
+        const addJobButton = document.getElementById('scheduler-add-job');
+        const jobNameInput = document.getElementById('scheduler-job-name');
+        const jobTaskTypeSelect = document.getElementById('scheduler-job-task-type');
+        const jobScheduleTypeSelect = document.getElementById('scheduler-job-schedule-type');
+        const intervalGroup = document.getElementById('scheduler-interval-group');
+        const dailyGroup = document.getElementById('scheduler-daily-group');
+        const dailyMinuteGroup = document.getElementById('scheduler-daily-minute-group');
+        const jobIntervalInput = document.getElementById('scheduler-job-interval');
+        const jobHourInput = document.getElementById('scheduler-job-hour');
+        const jobMinuteInput = document.getElementById('scheduler-job-minute');
+
+        const jobsListUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Scheduler.GET_SCHEDULED_JOBS)';
+        const addJobUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Scheduler.ADD_SCHEDULED_JOB)';
+        const historyUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Scheduler.GET_SCHEDULED_JOB_HISTORY)';
+        const guidPlaceholder = '00000000-0000-0000-0000-000000000000';
+        const startJobUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Scheduler.START_SCHEDULED_JOB, new { scheduledJobId = default(Guid) })';
+        const stopJobUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Scheduler.STOP_SCHEDULED_JOB, new { scheduledJobId = default(Guid) })';
+        const fireJobUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Scheduler.FIRE_SCHEDULED_JOB, new { scheduledJobId = default(Guid) })';
+        const removeJobUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Scheduler.REMOVE_SCHEDULED_JOB, new { scheduledJobId = default(Guid) })';
+        const accessTokenUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Authentication.GET_API_ACCESS_TOKEN)';
+        const schedulerHubUrl = '@scheduledJobsHubUrl';
+        const getDisplayPreferencesUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Scheduler.GET_DISPLAY_PREFERENCES)';
+        const updateDisplayPreferencesUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Scheduler.UPDATE_DISPLAY_PREFERENCES)';
+
+        function getComboboxValue(combobox) {
+            const selected = combobox.querySelector('.enlightenment-selected-text');
+            return selected ? (selected.getAttribute('data-value') || '') : '';
+        }
+
+        // Binds the change of a themed combobox to a callback, so the page reacts to a selection the same way it did to
+        // the change event of a native select.
+        function bindComboboxChange(combobox, onChange) {
+            const handler = event => {
+                const option = event.target.closest('.enlightenment-option');
+                if (!option || !combobox.contains(option))
+                    return;
+                const selected = combobox.querySelector('.enlightenment-selected-text');
+                if (selected) {
+                    selected.textContent = option.textContent;
+                    selected.setAttribute('data-value', option.getAttribute('data-value'));
+                }
+                onChange();
+            };
+            combobox.addEventListener('click', handler);
+            return () => combobox.removeEventListener('click', handler);
+        }
+
+        // Reads the display preferences of the scheduler page from its controls, as the payload sent to the update endpoint.
+        function getDisplayPreferencesPayload() {
+            const selectedJobType = getComboboxValue(jobTypeFilter) || 'All';
+            return {
+                jobTypeFilter: selectedJobType === 'All' ? null : selectedJobType,
+                displayTimeSpan: Number(timespanInput.value),
+                displayTimeUnit: getComboboxValue(timeunitSelect)
+            };
+        }
+
+        // Persists the display preferences of the scheduler page (the job type filter, the time span and its unit) on the
+        // server, so that they are shared by every client the current user signs in from, not only by the browser that changed them.
+        async function persistDisplayPreferences() {
+            await callApiPutAsync(updateDisplayPreferencesUrl, getDisplayPreferencesPayload());
+        }
+
+        // Loads the display preferences of the current user from the server, and applies them to the controls, before the graph and
+        // the jobs list are loaded; the server returns the default display preferences when none are stored for the user yet.
+        async function applyDisplayPreferences() {
+            const displayPreferences = await callApiGetAsync(getDisplayPreferencesUrl);
+            if (!displayPreferences)
+                return;
+            setComboboxValue(jobTypeFilter, displayPreferences.jobTypeFilter || 'All');
+            setComboboxValue(timeunitSelect, displayPreferences.displayTimeUnit || 'Minutes');
+            const storedTimeSpan = Number(displayPreferences.displayTimeSpan);
+            if (Number.isFinite(storedTimeSpan) && storedTimeSpan >= 1)
+                timespanInput.value = storedTimeSpan;
+        }
+
+        function setComboboxValue(combobox, value) {
+            const option = combobox.querySelector(`.enlightenment-option[data-value="${value}"]`);
+            if (!option)
+                return;
+            const selected = combobox.querySelector('.enlightenment-selected-text');
+            if (selected) {
+                selected.textContent = option.textContent;
+                selected.setAttribute('data-value', option.getAttribute('data-value'));
+            }
+        }
+
+        // Graph state.
+        const taskTypeOrder = ['ScanMediaLibraries', 'CleanTemporaryFiles', 'RepairThemes', 'CleanScheduledJobExecutionHistory'];
+        const graphState = {
+            dataPoints: [],
+            pixelsPerSecond: 0,
+            visibleTime: 0,
+            scrollOffset: 0,
+            startTime: null,
+            width: 0,
+            height: 0,
+            gridSpacing: 0
+        };
+
+        let currentJobs = [];
+        let schedulerHubConnection = null;
+        let graphSizeObserver = null;
+        let isInitialized = false;
+
+        //+----------------------------------------------------------------------------------------+
+        // |                                      Rendering                                          |.
+        //+----------------------------------------------------------------------------------------+
+
+        // The API stores the execution and job timestamps in UTC, but the persistence medium (SQLite) stores them as
+        // plain text, so the JSON the browser receives carries no time zone offset (no "Z"). Without an explicit offset,
+        // new Date(...) interprets the value as a local time, which shifts every tick by the local UTC offset and pushes
+        // it off the graph. Appending "Z" keeps those values anchored to UTC, where they were recorded.
+        function parseUtcTimestamp(timestampValue) {
+            if (!timestampValue)
+                return null;
+            const value = String(timestampValue);
+            const hasOffset = /(?:Z|[+-]\d{2}:\d{2})$/i.test(value);
+            return new Date(hasOffset ? value : value + 'Z');
+        }
+
+        function formatDateTime(dateTimeValue) {
+            const date = parseUtcTimestamp(dateTimeValue);
+            if (!date || isNaN(date.getTime()))
+                return '-';
+            return date.toLocaleString();
+        }
+
+        function renderJobsTable() {
+            const filter = getComboboxValue(jobTypeFilter);
+            const jobs = filter === 'All' ? currentJobs : currentJobs.filter(job => job.taskType === filter);
+            const columnLabels = getColumnLabels();
+            jobsTableBody.innerHTML = '';
+            if (jobs.length === 0) {
+                const emptyRow = document.createElement('tr');
+                const emptyCell = document.createElement('td');
+                emptyCell.colSpan = 10;
+                emptyCell.className = 'text-center text-disabled';
+                emptyCell.textContent = schedulerStrings.noJobs;
+                emptyRow.appendChild(emptyCell);
+                jobsTableBody.appendChild(emptyRow);
+                return;
+            }
+            jobs.forEach(job => {
+                const row = document.createElement('tr');
+                row.dataset.scheduledJobId = job.id;
+
+                const isInterval = job.scheduleType === 'WithIntervalInMinutes';
+                const isDaily = job.scheduleType === 'DailyAtHourAndMinute';
+                const scheduleLabel = isInterval ? schedulerStrings.interval : isDaily ? schedulerStrings.daily : schedulerStrings.startup;
+                row.innerHTML = `
+                    <td data-label="${escapeHtml(columnLabels[0])}">${job.id}</td>
+                    <td data-label="${escapeHtml(columnLabels[1])}">${escapeHtml(job.name)}</td>
+                    <td data-label="${escapeHtml(columnLabels[2])}">${schedulerStrings.taskTypeNames[job.taskType] ?? job.taskType}</td>
+                    <td data-label="${escapeHtml(columnLabels[3])}">${scheduleLabel}</td>
+                    <td data-label="${escapeHtml(columnLabels[4])}">${isInterval ? job.intervalMinutes + ' ' + '@_localizer["MinutesShort"]' : '-'}</td>
+                    <td data-label="${escapeHtml(columnLabels[5])}">${isDaily ? String(job.hour).padStart(2, '0') + ':' + String(job.minute).padStart(2, '0') : '-'}</td>
+                    <td data-label="${escapeHtml(columnLabels[6])}">${schedulerStrings.statusNames[job.status] ?? job.status}</td>
+                    <td data-label="${escapeHtml(columnLabels[7])}">${formatDateTime(job.lastStartedOnUtc)}</td>
+                    <td data-label="${escapeHtml(columnLabels[8])}">${formatDateTime(job.lastCompletedOnUtc)}</td>
+                `;
+
+                const actionsCell = document.createElement('td');
+                actionsCell.className = 'text-center';
+                actionsCell.dataset.label = columnLabels[9];
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'scheduler-action-buttons justify-center';
+
+                const isRunning = job.status === 'Running';
+                const isActive = job.status === 'Active';
+                const canStop = isActive || isRunning;
+                actionsDiv.appendChild(createActionButton('@_localizer["Start"]', () => startJobAsync(job.id), canStop));
+                actionsDiv.appendChild(createActionButton('@_localizer["Stop"]', () => stopJobAsync(job.id), !canStop));
+                actionsDiv.appendChild(createActionButton('@_localizer["Fire"]', () => fireJobAsync(job.id), isRunning));
+                // The cycle of a job that was started must be stopped before the job can be removed.
+                actionsDiv.appendChild(createActionButton('@_localizer["Remove"]', () => removeJobAsync(job.id), canStop));
+                actionsCell.appendChild(actionsDiv);
+                row.appendChild(actionsCell);
+
+                jobsTableBody.appendChild(row);
+            });
+        }
+
+        function createActionButton(label, action, isDisabled) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.textContent = label;
+            button.className = 'confirm-button f-12 h-22px';
+            if (isDisabled) {
+                button.disabled = true;
+                button.classList.add('text-disabled');
+            }
+            button.addEventListener('click', action);
+            return button;
+        }
+
+        function escapeHtml(value) {
+            const div = document.createElement('div');
+            div.textContent = value;
+            return div.innerHTML;
+        }
+
+        function getColumnLabels() {
+            return Array.from(jobsTable.querySelectorAll('thead th')).map(header => header.textContent.trim());
+        }
+
+        function renderLegend() {
+            legend.innerHTML = '';
+            // The graph draws its task lanes from bottom to top, so the legend lists the entries in the same order,
+            // and each entry stretches across one lane height to keep the legend labels aligned with the graph lanes.
+            const entries = Object.entries(jobTypeColors);
+            for (let index = entries.length - 1; index >= 0; index--) {
+                const [taskType, color] = entries[index];
+                const item = document.createElement('div');
+                item.className = 'scheduler-legend-item';
+                const swatch = document.createElement('span');
+                swatch.className = 'scheduler-legend-swatch';
+                swatch.style.backgroundColor = color;
+                const label = document.createElement('span');
+                label.textContent = schedulerStrings.taskTypeNames[taskType] ?? taskType;
+                item.appendChild(swatch);
+                item.appendChild(label);
+                legend.appendChild(item);
+            }
+        }
+
+        //+----------------------------------------------------------------------------------------+
+        // |                                         Graph                                          |.
+        //+----------------------------------------------------------------------------------------+
+
+        function resizeGraph() {
+            // The graph fills the width of its container next to the legend, and its height follows the legend,
+            // with a sensible floor; the height must not be derived from the canvas element box, because the flex
+            // layout stretches the canvas and its replaced-element aspect ratio would blow the box up.
+            const container = graphCanvas.parentElement;
+            if (!container || container.clientWidth <= 0)
+                return;
+            const isStacked = getComputedStyle(container).flexDirection === 'column';
+            const canvasWidth = isStacked
+                ? container.clientWidth
+                : Math.max(container.clientWidth - legend.offsetWidth - 20, 300);
+            const canvasHeight = Math.max(legend.offsetHeight, 200);
+            graphState.width = canvasWidth;
+            graphState.height = canvasHeight;
+            graphCanvas.width = canvasWidth;
+            graphCanvas.height = canvasHeight;
+            graphCanvas.style.width = canvasWidth + 'px';
+            graphCanvas.style.height = canvasHeight + 'px';
+            adjustTimeScale();
+            drawGraph();
+        }
+
+        function observeGraphSize() {
+            // Re-measure whenever the graph or its legend changes size, since the graph only grows to its final
+            // width once the page and the theme assets have finished laying out (for example after AJAX navigation).
+            if (typeof ResizeObserver === 'undefined')
+                return null;
+            const observer = new ResizeObserver(() => resizeGraph());
+            observer.observe(graphCanvas);
+            observer.observe(graphCanvas.parentElement);
+            observer.observe(legend);
+            return observer;
+        }
+
+        function adjustTimeScale() {
+            const secondsPerUnit = { Minutes: 60, Hours: 3600, Days: 86400 };
+            const totalSeconds = Number(timespanInput.value) * secondsPerUnit[getComboboxValue(timeunitSelect)];
+            graphState.pixelsPerSecond = graphState.width / totalSeconds;
+            graphState.visibleTime = graphState.width / graphState.pixelsPerSecond;
+            graphState.gridSpacing = 3600 * graphState.pixelsPerSecond;
+        }
+
+        function drawGraph() {
+            graphContext.clearRect(0, 0, graphState.width, graphState.height);
+            drawGrid();
+            drawBars();
+        }
+
+        function drawGrid() {
+            graphContext.clearRect(0, 0, graphState.width, graphState.height);
+            graphContext.fillStyle = '#151515';
+            graphContext.fillRect(0, 0, graphState.width, graphState.height);
+
+            const numberOfTasks = taskTypeOrder.length;
+            graphContext.strokeStyle = '#3a3a3a';
+            graphContext.lineWidth = 0.5;
+            graphContext.fillStyle = '#a8a8a8';
+            graphContext.font = '10px Arial';
+            for (let index = 1; index < numberOfTasks; index++) {
+                const y = graphState.height - (index * graphState.height / numberOfTasks);
+                graphContext.beginPath();
+                graphContext.moveTo(0, y);
+                graphContext.lineTo(graphState.width, y);
+                graphContext.stroke();
+            }
+            // Label each task lane with its type color.
+            taskTypeOrder.forEach((taskType, index) => {
+                const laneY = graphState.height - ((index + 0.5) * graphState.height / numberOfTasks);
+                graphContext.fillStyle = jobTypeColors[taskType];
+                graphContext.fillText(schedulerStrings.taskTypeNames[taskType] ?? taskType, 4, laneY);
+            });
+
+            drawVerticalGridLines();
+        }
+
+        function drawVerticalGridLines() {
+            const currentTime = new Date();
+            const offsetX = graphState.scrollOffset % graphState.gridSpacing;
+            const minuteInterval = determineMinuteInterval();
+
+            // Hour lines, scrolling with the passage of time.
+            for (let x = graphState.width - offsetX; x > -graphState.gridSpacing; x -= graphState.gridSpacing) {
+                drawGridLine(x, '#333333');
+                const pixelsFromRight = graphState.width - x;
+                const secondsAgo = pixelsFromRight / graphState.pixelsPerSecond;
+                const labelTime = new Date(currentTime - secondsAgo * 1000);
+                if (labelTime.getMinutes() >= 30)
+                    labelTime.setHours(labelTime.getHours() + 1);
+                labelTime.setMinutes(0, 0, 0);
+                graphContext.fillStyle = '#a8a8a8';
+                graphContext.font = '10px Arial';
+                graphContext.fillText(labelTime.toTimeString().substring(0, 5), x - 25, graphState.height - 5);
+
+                // Minute lines between this hour mark and the next.
+                for (let i = minuteInterval; i < 60; i += minuteInterval) {
+                    const minuteX = x + (graphState.gridSpacing * i / 60);
+                    if (minuteX >= 0 && minuteX <= graphState.width)
+                        drawGridLine(minuteX, '#3a3a3a');
+                }
+            }
+
+            // Minute labels when the displayed time span is shorter than three hours.
+            if (graphState.visibleTime < 3 * 3600) {
+                graphContext.fillStyle = '#777777';
+                graphContext.font = '8px Arial';
+                const minutesToDisplay = Math.ceil(graphState.visibleTime / 60);
+                for (let i = 0; i <= minutesToDisplay; i++) {
+                    const x = graphState.width - (graphState.scrollOffset % (graphState.gridSpacing / 60)) - (i * graphState.gridSpacing / 60);
+                    if (x < 0)
+                        break;
+                    const minutes = (currentTime.getMinutes() - i + 60) % 60;
+                    if (minutes % minuteInterval === 0)
+                        graphContext.fillText(minutes.toString().padStart(2, '0'), x, graphState.height - 20);
+                }
+            }
+        }
+
+        function determineMinuteInterval() {
+            if (graphState.visibleTime > 6 * 3600) return 30;
+            if (graphState.visibleTime > 3 * 3600) return 15;
+            if (graphState.visibleTime > 1800) return 10;
+            return 1;
+        }
+
+        function drawGridLine(x, color) {
+            graphContext.beginPath();
+            graphContext.moveTo(x, 0);
+            graphContext.lineTo(x, graphState.height);
+            graphContext.strokeStyle = color;
+            graphContext.stroke();
+        }
+
+        function drawBars() {
+            const numberOfTasks = taskTypeOrder.length;
+            graphState.dataPoints.forEach(point => {
+                // The offset is computed here, on every draw, and not when the point was added, because the graph
+                // scale (pixels per second) is only known once the canvas has been laid out; a point whose offset was
+                // baked in before the first layout would otherwise be drawn at the wrong position, or not drawn at all.
+                const pointOffset = (point.time - graphState.startTime) / 1000 * graphState.pixelsPerSecond;
+                const x = graphState.width - (graphState.scrollOffset - pointOffset);
+                if (x >= -2 && x <= graphState.width) {
+                    const taskIndex = taskTypeOrder.indexOf(point.taskType);
+                    if (taskIndex < 0)
+                        return;
+                    // A task occupies its own horizontal lane between two consecutive horizontal grid lines; the lanes
+                    // are stacked from bottom to top, so the tick spans the entire height of its lane, from the top
+                    // boundary of the lane down to its bottom boundary, without spilling into the neighboring lanes.
+                    const laneHeight = graphState.height / numberOfTasks;
+                    const barTop = graphState.height - (taskIndex + 1) * laneHeight;
+                    graphContext.fillStyle = jobTypeColors[point.taskType];
+                    graphContext.fillRect(x, barTop, 2, laneHeight);
+                }
+            });
+        }
+
+        function addGraphDataPoint(timestampValue, taskType) {
+            const timestamp = parseUtcTimestamp(timestampValue);
+            if (!timestamp || isNaN(timestamp.getTime()))
+                return;
+            const point = {
+                time: timestamp,
+                taskType: taskType
+            };
+            graphState.dataPoints.push(point);
+        }
+
+        function updateGraph() {
+            const elapsedSeconds = (new Date() - graphState.startTime) / 1000;
+            graphState.scrollOffset = elapsedSeconds * graphState.pixelsPerSecond + (graphState.startTime.getMinutes() * 60 * graphState.pixelsPerSecond);
+            graphContext.clearRect(0, 0, graphState.width, graphState.height);
+            drawGrid();
+            drawBars();
+            window.requestAnimationFrame(updateGraph);
+        }
+
+        //+----------------------------------------------------------------------------------------+
+        // |                                   Data loading                                        |.
+        //+----------------------------------------------------------------------------------------+
+
+        async function loadJobsAsync() {
+            const response = await callApiGetAsync(jobsListUrl);
+            if (response && Array.isArray(response)) {
+                currentJobs = response;
+                renderJobsTable();
+            }
+        }
+
+        // Determines whether the task of an execution is shown, given the selected job type filter.
+        function shouldShowTaskType(taskType) {
+            const filter = getComboboxValue(jobTypeFilter);
+            return filter === 'All' || taskType === filter;
+        }
+
+        async function loadHistoryAsync() {
+            const from = new Date(Date.now() - Number(timespanInput.value) * { Minutes: 60000, Hours: 3600000, Days: 86400000 }[getComboboxValue(timeunitSelect)]);
+            const url = historyUrl + '?from=' + encodeURIComponent(from.toISOString());
+            const executions = await callApiGetAsync(url);
+            if (executions && Array.isArray(executions))
+                executions.forEach(execution => {
+                    if (shouldShowTaskType(execution.taskType))
+                        addGraphDataPoint(execution.startedOnUtc, execution.taskType);
+                });
+        }
+
+        async function updateTimeSpanAsync() {
+            adjustTimeScale();
+            graphState.dataPoints = [];
+            await persistDisplayPreferences();
+            await loadHistoryAsync();
+        }
+
+        //+----------------------------------------------------------------------------------------+
+        // |                                    Job actions                                         |.
+        //+----------------------------------------------------------------------------------------+
+
+        async function executeJobActionAsync(url, successMessage) {
+            const result = await callApiPutAsync(url, {});
+            if (result && result.success) {
+                notificationService.show(successMessage, NotificationType.SUCCESS);
+                await loadJobsAsync();
+            }
+        }
+
+        function getJobActionUrl(baseUrl, jobId) {
+            return baseUrl.replace(guidPlaceholder, jobId);
+        }
+
+        async function startJobAsync(jobId) {
+            await executeJobActionAsync(getJobActionUrl(startJobUrlTemplate, jobId), schedulerStrings.jobStarted);
+        }
+
+        async function stopJobAsync(jobId) {
+            await executeJobActionAsync(getJobActionUrl(stopJobUrlTemplate, jobId), schedulerStrings.jobStopped);
+        }
+
+        async function fireJobAsync(jobId) {
+            await executeJobActionAsync(getJobActionUrl(fireJobUrlTemplate, jobId), schedulerStrings.jobFired);
+        }
+
+        async function removeJobAsync(jobId) {
+            if (await dialogService.show('@_localizer["RemoveJobConfirm"]', jsLocalizedDialogs.confirmation, DialogButtons.YES_NO, DialogIcon.QUESTION) === DialogButton.YES) {
+                const removed = await callApiDeleteAsync(getJobActionUrl(removeJobUrlTemplate, jobId));
+                if (removed)
+                    notificationService.show(schedulerStrings.jobRemoved, NotificationType.SUCCESS);
+            }
+        }
+
+        async function addJobAsync() {
+            const scheduleType = getComboboxValue(jobScheduleTypeSelect);
+            const payload = {
+                name: jobNameInput.value.trim(),
+                taskType: getComboboxValue(jobTaskTypeSelect),
+                scheduleType: scheduleType,
+                intervalMinutes: scheduleType === 'WithIntervalInMinutes' ? Number(jobIntervalInput.value) : null,
+                hour: scheduleType === 'DailyAtHourAndMinute' ? Number(jobHourInput.value) : null,
+                minute: scheduleType === 'DailyAtHourAndMinute' ? Number(jobMinuteInput.value) : null
+            };
+            if (!payload.name) {
+                notificationService.show('@_localizer["JobNameRequired"]', NotificationType.ERROR);
+                return;
+            }
+            const response = await callApiPostAsync(addJobUrl, payload);
+            if (response) {
+                notificationService.show(schedulerStrings.jobAdded, NotificationType.SUCCESS);
+                jobNameInput.value = '';
+                await loadJobsAsync();
+            }
+        }
+
+        //+----------------------------------------------------------------------------------------+
+        // |                                     SignalR                                           |.
+        //+----------------------------------------------------------------------------------------+
+
+        async function getAccessTokenAsync() {
+            const response = await callApiGetAsync(accessTokenUrl);
+            return response ? response.token : null;
+        }
+
+        async function connectHubAsync() {
+            const token = await getAccessTokenAsync();
+            schedulerHubConnection = new signalR.HubConnectionBuilder()
+                .withUrl(schedulerHubUrl, { accessTokenFactory: () => token })
+                .withAutomaticReconnect({ nextRetryDelayInMilliseconds: retryContext => Math.min(retryContext.elapsedMilliseconds * 2, 10000) })
+                .configureLogging(signalR.LogLevel.Warning)
+                .build();
+
+            schedulerHubConnection.on('ReceiveScheduledJobsAsync', scheduledJobs => {
+                currentJobs = scheduledJobs || [];
+                renderJobsTable();
+            });
+            schedulerHubConnection.on('ScheduledJobExecutionStartedAsync', execution => {
+                if (shouldShowTaskType(execution.taskType))
+                    addGraphDataPoint(execution.startedOnUtc, execution.taskType);
+                loadJobsAsync();
+            });
+            schedulerHubConnection.on('ScheduledJobExecutionCompletedAsync', execution => {
+                loadJobsAsync();
+            });
+
+            try {
+                await schedulerHubConnection.start();
+            } catch (error) {
+                console.error('Failed to connect to the scheduled jobs hub:', error);
+            }
+        }
+
+        //+----------------------------------------------------------------------------------------+
+        // |                                    Initialization                                      |.
+        //+----------------------------------------------------------------------------------------+
+
+        async function initialize() {
+            await applyDisplayPreferences();
+            renderLegend();
+            graphState.startTime = new Date();
+            graphState.startTime.setMinutes(0, 0, 0);
+            resizeGraph();
+            await loadJobsAsync();
+            await loadHistoryAsync();
+            await connectHubAsync();
+            window.requestAnimationFrame(updateGraph);
+            window.addEventListener('resize', resizeGraph);
+            graphSizeObserver = observeGraphSize();
+
+            // Toggle the schedule fields based on the selected schedule type.
+            const toggleScheduleFields = () => {
+                const scheduleType = getComboboxValue(jobScheduleTypeSelect);
+                const isInterval = scheduleType === 'WithIntervalInMinutes';
+                const isDaily = scheduleType === 'DailyAtHourAndMinute';
+                intervalGroup.classList.toggle('hidden', !isInterval);
+                dailyGroup.classList.toggle('hidden', !isDaily);
+                dailyMinuteGroup.classList.toggle('hidden', !isDaily);
+            };
+            const unbindScheduleTypeChange = bindComboboxChange(jobScheduleTypeSelect, toggleScheduleFields);
+            toggleScheduleFields();
+
+            // Persist the display preferences when they change, and reload the history when the job type filter changes,
+            // so that the graph and the jobs list always respect the selected filter, on every client of the current user.
+            const handleJobTypeFilterChange = async () => {
+                renderJobsTable();
+                await updateTimeSpanAsync();
+            };
+            const unbindJobTypeFilterChange = bindComboboxChange(jobTypeFilter, handleJobTypeFilterChange);
+            const handleTimeUnitChange = async () => {
+                await persistDisplayPreferences();
+            };
+            const unbindTimeUnitChange = bindComboboxChange(timeunitSelect, handleTimeUnitChange);
+            const handleTimespanChange = async () => {
+                await persistDisplayPreferences();
+            };
+            timespanInput.addEventListener('change', handleTimespanChange);
+            updateTimespanButton.addEventListener('click', updateTimeSpanAsync);
+            addJobButton.addEventListener('click', addJobAsync);
+
+            cleanupFunctions.push(() => {
+                window.removeEventListener('resize', resizeGraph);
+                if (graphSizeObserver) {
+                    graphSizeObserver.disconnect();
+                    graphSizeObserver = null;
+                }
+                unbindScheduleTypeChange();
+                unbindJobTypeFilterChange();
+                unbindTimeUnitChange();
+                timespanInput.removeEventListener('change', handleTimespanChange);
+                updateTimespanButton.removeEventListener('click', updateTimeSpanAsync);
+                addJobButton.removeEventListener('click', addJobAsync);
+                if (schedulerHubConnection)
+                    schedulerHubConnection.stop();
+            });
+        }
+
+        // Run the initialization once, the AJAX navigator may execute this view script again after navigating back.
+        if (!isInitialized) {
+            isInitialized = true;
+            initialize();
+        }
+
+        // Store all cleanups for this view on window object using the scriptId.
+        window.viewCleanups = window.viewCleanups || {};
+        window.viewCleanups['@scriptId'] = () => {
+            cleanupFunctions.forEach(cleanup => cleanup());
+            console.log(`Unloaded @scriptId`);
+        };
+        console.log(`Loaded @scriptId`);
+    </script>
+}

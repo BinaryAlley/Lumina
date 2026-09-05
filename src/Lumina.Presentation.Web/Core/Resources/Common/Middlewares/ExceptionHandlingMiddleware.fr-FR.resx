@@ -738,4 +738,46 @@
   <data name="PluginArchiveNotReadable" xml:space="preserve">
     <value>L'archive du plugin téléversé n a pas pu être lue !</value>
   </data>
+  <data name="ScheduledJobNotFound" xml:space="preserve">
+    <value>Le travail planifié est introuvable !</value>
+  </data>
+  <data name="ScheduledJobNameCannotBeEmpty" xml:space="preserve">
+    <value>Le nom du travail planifié ne peut pas être vide !</value>
+  </data>
+  <data name="IntervalMinutesMustBePositive" xml:space="preserve">
+    <value>Les minutes de l'intervalle doivent être un nombre positif !</value>
+  </data>
+  <data name="HourMustBeBetweenZeroAndTwentyThree" xml:space="preserve">
+    <value>L'heure doit être comprise entre 0 et 23 !</value>
+  </data>
+  <data name="MinuteMustBeBetweenZeroAndFiftyNine" xml:space="preserve">
+    <value>La minute doit être comprise entre 0 et 59 !</value>
+  </data>
+  <data name="ScheduledJobAlreadyExists" xml:space="preserve">
+    <value>Un travail planifié portant ce nom existe déjà !</value>
+  </data>
+  <data name="ScheduledJobExecutionAlreadyExists" xml:space="preserve">
+    <value>L'exécution du travail planifié existe déjà !</value>
+  </data>
+  <data name="ScheduledJobExecutionNotFound" xml:space="preserve">
+    <value>L'exécution du travail planifié est introuvable !</value>
+  </data>
+  <data name="ScheduledJobCycleAlreadyStarted" xml:space="preserve">
+    <value>Le cycle d'exécution du travail planifié a déjà été démarré !</value>
+  </data>
+  <data name="ScheduledJobNotStarted" xml:space="preserve">
+    <value>Le cycle d'exécution du travail planifié n'a pas été démarré !</value>
+  </data>
+  <data name="ScheduledJobAlreadyRunning" xml:space="preserve">
+    <value>Le travail planifié est déjà en cours d'exécution !</value>
+  </data>
+  <data name="CanOnlyCompleteRunningScheduledJob" xml:space="preserve">
+    <value>Seul un travail planifié en cours d'exécution peut être terminé !</value>
+  </data>
+  <data name="SchedulerDisplayTimeSpanMustBePositive" xml:space="preserve">
+    <value>La durée d'affichage de la page des travaux planifiés doit être un nombre positif !</value>
+  </data>
+  <data name="InvalidScheduleType" xml:space="preserve">
+    <value>Le type de planification n'est pas valide !</value>
+  </data>
 </root>

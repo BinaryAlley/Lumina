@@ -4,6 +4,7 @@ using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Library
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -19,6 +20,7 @@ public class LibraryScanFailedDomainEventTests
 {
     private readonly LibraryIdFixture _libraryIdFixture = new();
     private readonly MediaLibraryScanCompositeIdFixture _mediaLibraryScanCompositeIdFixture = new();
+    private readonly LibraryScanFailedDomainEventFixture _libraryScanFailedDomainEventFixture = new();
 
     [Fact]
     public void Constructor_WhenCalledWithErrorMessage_ShouldSetAllProperties()
@@ -31,7 +33,12 @@ public class LibraryScanFailedDomainEventTests
         string errorMessage = "Scan failed unexpectedly.";
 
         // Act
-        LibraryScanFailedDomainEvent domainEvent = new(id, libraryId, compositeId, occurredOnUtc, errorMessage);
+        LibraryScanFailedDomainEvent domainEvent = _libraryScanFailedDomainEventFixture.Create(
+            id: id,
+            libraryId: libraryId,
+            mediaLibraryScanCompositeId: compositeId,
+            occurredOnUtc: occurredOnUtc,
+            errorMessage: errorMessage);
 
         // Assert
         Assert.Equal(id, domainEvent.Id);
@@ -46,11 +53,7 @@ public class LibraryScanFailedDomainEventTests
     public void Constructor_WhenCalledWithoutErrorMessage_ShouldDefaultErrorMessageToNull()
     {
         // Act
-        LibraryScanFailedDomainEvent domainEvent = new(
-            Guid.NewGuid(),
-            _libraryIdFixture.Create(),
-            _mediaLibraryScanCompositeIdFixture.Create(),
-            DateTime.UtcNow);
+        LibraryScanFailedDomainEvent domainEvent = _libraryScanFailedDomainEventFixture.Create(includeErrorMessage: false);
 
         // Assert
         Assert.Null(domainEvent.ErrorMessage);

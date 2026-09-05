@@ -12,10 +12,8 @@ using Lumina.Domain.Common.Exceptions;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System;
@@ -40,10 +38,9 @@ public class LibraryMediaItemDeletedDomainEventHandlerTests
     private readonly ILogger<LibraryMediaItemDeletedDomainEventHandler> _mockLogger;
     private readonly LibraryMediaItemDeletedDomainEventHandler _sut;
     private readonly LibraryIdFixture _libraryIdFixture = new();
-    private readonly ScanIdFixture _scanIdFixture = new();
-    private readonly UserIdFixture _userIdFixture = new();
     private readonly BookEntityFixture _bookEntityFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
+    private readonly LibraryMediaItemDeletedDomainEventFixture _libraryMediaItemDeletedDomainEventFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LibraryMediaItemDeletedDomainEventHandlerTests"/> class.
@@ -81,12 +78,7 @@ public class LibraryMediaItemDeletedDomainEventHandlerTests
             .Returns(Result.Deleted);
         _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
 
-        LibraryMediaItemDeletedDomainEvent domainEvent = new(
-            Guid.NewGuid(),
-            libraryId,
-            MediaLibraryScanCompositeId.Create(_scanIdFixture.Create(), _userIdFixture.Create()),
-            book.Path,
-            DateTime.UtcNow);
+        LibraryMediaItemDeletedDomainEvent domainEvent = _libraryMediaItemDeletedDomainEventFixture.Create(libraryId: libraryId, path: book.Path);
 
         // Act
         await _sut.HandleAsync(domainEvent, CancellationToken.None);
@@ -105,12 +97,7 @@ public class LibraryMediaItemDeletedDomainEventHandlerTests
         _mockBookRepository.GetByPathAsync(libraryId.Value, "/books/deleted.epub", Arg.Any<CancellationToken>())
             .Returns(Result.From<BookEntity?>(null));
 
-        LibraryMediaItemDeletedDomainEvent domainEvent = new(
-            Guid.NewGuid(),
-            libraryId,
-            MediaLibraryScanCompositeId.Create(_scanIdFixture.Create(), _userIdFixture.Create()),
-            "/books/deleted.epub",
-            DateTime.UtcNow);
+        LibraryMediaItemDeletedDomainEvent domainEvent = _libraryMediaItemDeletedDomainEventFixture.Create(libraryId: libraryId, path: "/books/deleted.epub");
 
         // Act
         await _sut.HandleAsync(domainEvent, CancellationToken.None);
@@ -140,12 +127,7 @@ public class LibraryMediaItemDeletedDomainEventHandlerTests
             .Returns(Result.From(Result.Deleted));
         _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
 
-        LibraryMediaItemDeletedDomainEvent domainEvent = new(
-            Guid.NewGuid(),
-            libraryId,
-            MediaLibraryScanCompositeId.Create(_scanIdFixture.Create(), _userIdFixture.Create()),
-            book.Path,
-            DateTime.UtcNow);
+        LibraryMediaItemDeletedDomainEvent domainEvent = _libraryMediaItemDeletedDomainEventFixture.Create(libraryId: libraryId, path: book.Path);
 
         // Act
         await _sut.HandleAsync(domainEvent, CancellationToken.None);
@@ -165,12 +147,7 @@ public class LibraryMediaItemDeletedDomainEventHandlerTests
         _mockBookRepository.GetByPathAsync(libraryId.Value, "/books/deleted.epub", Arg.Any<CancellationToken>())
             .Returns(error);
 
-        LibraryMediaItemDeletedDomainEvent domainEvent = new(
-            Guid.NewGuid(),
-            libraryId,
-            MediaLibraryScanCompositeId.Create(_scanIdFixture.Create(), _userIdFixture.Create()),
-            "/books/deleted.epub",
-            DateTime.UtcNow);
+        LibraryMediaItemDeletedDomainEvent domainEvent = _libraryMediaItemDeletedDomainEventFixture.Create(libraryId: libraryId, path: "/books/deleted.epub");
 
         // Act
         EventualConsistencyException exception = await Assert.ThrowsAsync<EventualConsistencyException>(
@@ -200,12 +177,7 @@ public class LibraryMediaItemDeletedDomainEventHandlerTests
         _mockBookRepository.DeleteAsync(book.Id, Arg.Any<CancellationToken>())
             .Returns(error);
 
-        LibraryMediaItemDeletedDomainEvent domainEvent = new(
-            Guid.NewGuid(),
-            libraryId,
-            MediaLibraryScanCompositeId.Create(_scanIdFixture.Create(), _userIdFixture.Create()),
-            book.Path,
-            DateTime.UtcNow);
+        LibraryMediaItemDeletedDomainEvent domainEvent = _libraryMediaItemDeletedDomainEventFixture.Create(libraryId: libraryId, path: book.Path);
 
         // Act
         EventualConsistencyException exception = await Assert.ThrowsAsync<EventualConsistencyException>(

@@ -1,0 +1,66 @@
+#region ========================================================================= USING =====================================================================================
+using Bogus;
+using Lumina.Application.Common.DataAccess.Entities.Scheduling;
+using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+#endregion
+
+namespace Lumina.Application.Fixtures.Common.DataAccess.Entities.Scheduling;
+
+/// <summary>
+/// Fixture class for the <see cref="ScheduledJobExecutionEntity"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class ScheduledJobExecutionEntityFixture
+{
+    /// <summary>
+    /// Creates a random valid <see cref="ScheduledJobExecutionEntity"/>.
+    /// </summary>
+    /// <param name="id">Optional. The Id of the execution.</param>
+    /// <param name="scheduledJobId">Optional. The Id of the scheduled job whose task was executed.</param>
+    /// <param name="taskType">Optional. The type of the task that was executed.</param>
+    /// <param name="isCycleRun">Optional. Whether the execution was a cycle run.</param>
+    /// <param name="wasCycleActive">Optional. Whether the execution cycle of the scheduled job was active when the execution started.</param>
+    /// <param name="startedOnUtc">Optional. The start time of the execution.</param>
+    /// <param name="completedOnUtc">Optional. The completion time of the execution.</param>
+    /// <returns>The created <see cref="ScheduledJobExecutionEntity"/>.</returns>
+    public ScheduledJobExecutionEntity Create(
+        Guid? id = null,
+        Guid? scheduledJobId = null,
+        ScheduledTaskType? taskType = null,
+        bool? isCycleRun = null,
+        bool? wasCycleActive = null,
+        DateTime? startedOnUtc = null,
+        DateTime? completedOnUtc = null)
+    {
+        return new Faker<ScheduledJobExecutionEntity>()
+            .CustomInstantiator(f => new ScheduledJobExecutionEntity
+            {
+                Id = id ?? Guid.NewGuid(),
+                ScheduledJobId = scheduledJobId ?? Guid.NewGuid(),
+                TaskType = taskType ?? f.PickRandom<ScheduledTaskType>(),
+                IsCycleRun = isCycleRun ?? f.Random.Bool(),
+                WasCycleActive = wasCycleActive ?? f.Random.Bool(),
+                StartedOnUtc = startedOnUtc ?? DateTime.UtcNow,
+                CompletedOnUtc = completedOnUtc,
+                CreatedOnUtc = DateTime.UtcNow,
+                CreatedBy = Guid.NewGuid(),
+                UpdatedOnUtc = null,
+                UpdatedBy = null
+            })
+            .Generate();
+    }
+
+    /// <summary>
+    /// Creates a list of <see cref="ScheduledJobExecutionEntity"/> instances with randomized test data.
+    /// </summary>
+    /// <param name="count">Number of instances to create.</param>
+    /// <returns>List of configured <see cref="ScheduledJobExecutionEntity"/> instances.</returns>
+    public List<ScheduledJobExecutionEntity> CreateMany(int count = 3)
+    {
+        return [.. Enumerable.Range(0, count).Select(_ => Create())];
+    }
+}

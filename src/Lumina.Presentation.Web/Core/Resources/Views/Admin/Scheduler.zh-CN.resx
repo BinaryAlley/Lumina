@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ScheduledJobs" xml:space="preserve">
+    <value>计划任务</value>
+  </data>
+  <data name="FilterByJobType" xml:space="preserve">
+    <value>按任务类型筛选</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>全部</value>
+  </data>
+  <data name="TaskType.ScanMediaLibraries" xml:space="preserve">
+    <value>扫描媒体库</value>
+  </data>
+  <data name="TaskType.CleanTemporaryFiles" xml:space="preserve">
+    <value>清理临时文件</value>
+  </data>
+  <data name="DisplayLast" xml:space="preserve">
+    <value>显示最近</value>
+  </data>
+  <data name="TimeUnit" xml:space="preserve">
+    <value>时间单位</value>
+  </data>
+  <data name="Minutes" xml:space="preserve">
+    <value>分钟</value>
+  </data>
+  <data name="MinutesShort" xml:space="preserve">
+    <value>分</value>
+  </data>
+  <data name="Hours" xml:space="preserve">
+    <value>小时</value>
+  </data>
+  <data name="Days" xml:space="preserve">
+    <value>天</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>更新</value>
+  </data>
+  <data name="CurrentJobs" xml:space="preserve">
+    <value>当前任务</value>
+  </data>
+  <data name="AddNewJob" xml:space="preserve">
+    <value>添加新任务</value>
+  </data>
+  <data name="Id" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>名称</value>
+  </data>
+  <data name="JobType" xml:space="preserve">
+    <value>任务类型</value>
+  </data>
+  <data name="ScheduleType" xml:space="preserve">
+    <value>计划类型</value>
+  </data>
+  <data name="Interval" xml:space="preserve">
+    <value>间隔</value>
+  </data>
+  <data name="Time" xml:space="preserve">
+    <value>时间</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>状态</value>
+  </data>
+  <data name="Started" xml:space="preserve">
+    <value>已开始</value>
+  </data>
+  <data name="Completed" xml:space="preserve">
+    <value>已完成</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>操作</value>
+  </data>
+  <data name="JobName" xml:space="preserve">
+    <value>任务名称</value>
+  </data>
+  <data name="IntervalSchedule" xml:space="preserve">
+    <value>间隔</value>
+  </data>
+  <data name="DailySchedule" xml:space="preserve">
+    <value>每日</value>
+  </data>
+  <data name="IntervalMinutes" xml:space="preserve">
+    <value>间隔（分钟）</value>
+  </data>
+  <data name="Hour" xml:space="preserve">
+    <value>小时</value>
+  </data>
+  <data name="Minute" xml:space="preserve">
+    <value>分钟</value>
+  </data>
+  <data name="AddJob" xml:space="preserve">
+    <value>添加任务</value>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>开始</value>
+  </data>
+  <data name="Stop" xml:space="preserve">
+    <value>停止</value>
+  </data>
+  <data name="Fire" xml:space="preserve">
+    <value>执行</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="NoJobs" xml:space="preserve">
+    <value>尚未添加任务</value>
+  </data>
+  <data name="JobStarted" xml:space="preserve">
+    <value>任务已成功开始。</value>
+  </data>
+  <data name="JobStopped" xml:space="preserve">
+    <value>任务已成功停止。</value>
+  </data>
+  <data name="JobFired" xml:space="preserve">
+    <value>任务已成功执行。</value>
+  </data>
+  <data name="JobAdded" xml:space="preserve">
+    <value>任务已成功添加。</value>
+  </data>
+  <data name="JobRemoved" xml:space="preserve">
+    <value>任务已成功删除。</value>
+  </data>
+  <data name="JobNotFound" xml:space="preserve">
+    <value>找不到任务。</value>
+  </data>
+  <data name="JobAlreadyRunning" xml:space="preserve">
+    <value>任务已在运行中。</value>
+  </data>
+  <data name="Status.Added" xml:space="preserve">
+    <value>已添加</value>
+  </data>
+  <data name="Status.Active" xml:space="preserve">
+    <value>活动中</value>
+  </data>
+  <data name="Status.Running" xml:space="preserve">
+    <value>运行中</value>
+  </data>
+  <data name="Status.Completed" xml:space="preserve">
+    <value>已完成</value>
+  </data>
+  <data name="RemoveJobConfirm" xml:space="preserve">
+    <value>删除此计划任务？</value>
+  </data>
+  <data name="JobNameRequired" xml:space="preserve">
+    <value>需要提供任务名称。</value>
+  </data>
+  <data name="TaskType.RepairThemes" xml:space="preserve">
+    <value>修复主题</value>
+  </data>
+  <data name="TaskType.CleanScheduledJobExecutionHistory" xml:space="preserve">
+    <value>清理作业历史</value>
+  </data>
+  <data name="StartupSchedule" xml:space="preserve">
+    <value>启动时</value>
+  </data>
+</root>

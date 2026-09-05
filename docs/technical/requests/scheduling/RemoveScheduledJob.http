@@ -1,0 +1,2 @@
+DELETE {{host}}/api/v1/scheduled-jobs/{{$guid}}
+Authorization: Bearer {{ACCESS_TOKEN}}

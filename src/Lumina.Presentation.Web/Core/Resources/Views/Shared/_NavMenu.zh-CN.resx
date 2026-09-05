@@ -216,4 +216,7 @@
   <data name="Plugins" xml:space="preserve">
     <value>插件</value>
   </data>
+  <data name="ScheduledJobs" xml:space="preserve">
+    <value>计划任务</value>
+  </data>
 </root>

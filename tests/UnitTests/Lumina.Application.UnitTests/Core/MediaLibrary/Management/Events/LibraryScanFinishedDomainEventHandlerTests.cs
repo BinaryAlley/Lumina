@@ -8,14 +8,11 @@ using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Manage
 using Lumina.Domain.Common.Exceptions;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Progress;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using DomainErrors = Lumina.Domain.Common.Errors.Errors;
 using NSubstitute;
@@ -41,10 +38,7 @@ public class LibraryScanFinishedDomainEventHandlerTests
     private readonly IMediaLibraryScanProgressNotifier _mockDebouncedLibraryScanProgressNotifier;
     private readonly LibraryScanFinishedDomainEventHandler _sut;
     private readonly LibraryScanEntityFixture _libraryScanEntityFixture = new();
-    private readonly ScanIdFixture _scanIdFixture = new();
-    private readonly UserIdFixture _userIdFixture = new();
-    private readonly LibraryIdFixture _libraryIdFixture = new();
-    private readonly MediaLibraryScanCompositeIdFixture _mediaLibraryScanCompositeIdFixture = new();
+    private readonly LibraryScanFinishedDomainEventFixture _libraryScanFinishedDomainEventFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LibraryScanFinishedDomainEventHandlerTests"/> class.
@@ -69,11 +63,11 @@ public class LibraryScanFinishedDomainEventHandlerTests
     public async Task HandleAsync_WhenScanIsRunning_ShouldFinishScanAndNotifyClients()
     {
         // Arrange
-        LibraryScanEntity scan = _libraryScanEntityFixture.Create();
-        MediaLibraryScanCompositeId compositeId = _mediaLibraryScanCompositeIdFixture.Create(
-            scanId: _scanIdFixture.Create(value: scan.Id),
-            userId: _userIdFixture.Create(value: scan.UserId));
-        LibraryScanFinishedDomainEvent domainEvent = new(Guid.NewGuid(), compositeId, DateTime.UtcNow);
+        LibraryScanFinishedDomainEvent domainEvent = _libraryScanFinishedDomainEventFixture.Create();
+        MediaLibraryScanCompositeId compositeId = domainEvent.MediaLibraryScanCompositeId;
+        LibraryScanEntity scan = _libraryScanEntityFixture.Create(
+            id: compositeId.ScanId.Value,
+            userId: compositeId.UserId.Value);
         _mockLibraryScanRepository.GetByIdAsync(scan.Id, Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryScanEntity?>(scan));
         _mockMediaLibrariesScanProgressTracker.UpdateScanProgress(Arg.Any<LibraryId>(), compositeId).Returns(Result.Updated);
@@ -93,8 +87,7 @@ public class LibraryScanFinishedDomainEventHandlerTests
     public async Task HandleAsync_WhenGetByIdFails_ShouldThrowEventualConsistencyException()
     {
         // Arrange
-        MediaLibraryScanCompositeId compositeId = _mediaLibraryScanCompositeIdFixture.Create();
-        LibraryScanFinishedDomainEvent domainEvent = new(Guid.NewGuid(), compositeId, DateTime.UtcNow);
+        LibraryScanFinishedDomainEvent domainEvent = _libraryScanFinishedDomainEventFixture.Create();
         Error error = Error.Failure(description: "Failed to get library scan");
         _mockLibraryScanRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
             .Returns(error);
@@ -112,8 +105,7 @@ public class LibraryScanFinishedDomainEventHandlerTests
     public async Task HandleAsync_WhenScanDoesNotExist_ShouldThrowEventualConsistencyExceptionWithNotFoundError()
     {
         // Arrange
-        MediaLibraryScanCompositeId compositeId = _mediaLibraryScanCompositeIdFixture.Create();
-        LibraryScanFinishedDomainEvent domainEvent = new(Guid.NewGuid(), compositeId, DateTime.UtcNow);
+        LibraryScanFinishedDomainEvent domainEvent = _libraryScanFinishedDomainEventFixture.Create();
         _mockLibraryScanRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
             .Returns(Result<LibraryScanEntity?>.Success(null));
 
@@ -130,11 +122,12 @@ public class LibraryScanFinishedDomainEventHandlerTests
     public async Task HandleAsync_WhenScanIsNotRunning_ShouldThrowEventualConsistencyException()
     {
         // Arrange
-        LibraryScanEntity scan = _libraryScanEntityFixture.Create(status: LibraryScanJobStatus.Pending);
-        MediaLibraryScanCompositeId compositeId = _mediaLibraryScanCompositeIdFixture.Create(
-            scanId: _scanIdFixture.Create(value: scan.Id),
-            userId: _userIdFixture.Create(value: scan.UserId));
-        LibraryScanFinishedDomainEvent domainEvent = new(Guid.NewGuid(), compositeId, DateTime.UtcNow);
+        LibraryScanFinishedDomainEvent domainEvent = _libraryScanFinishedDomainEventFixture.Create();
+        MediaLibraryScanCompositeId compositeId = domainEvent.MediaLibraryScanCompositeId;
+        LibraryScanEntity scan = _libraryScanEntityFixture.Create(
+            id: compositeId.ScanId.Value,
+            userId: compositeId.UserId.Value,
+            status: LibraryScanJobStatus.Pending);
         _mockLibraryScanRepository.GetByIdAsync(scan.Id, Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryScanEntity?>(scan));
 
@@ -152,11 +145,11 @@ public class LibraryScanFinishedDomainEventHandlerTests
     public async Task HandleAsync_WhenUpdateFails_ShouldThrowEventualConsistencyException()
     {
         // Arrange
-        LibraryScanEntity scan = _libraryScanEntityFixture.Create();
-        MediaLibraryScanCompositeId compositeId = _mediaLibraryScanCompositeIdFixture.Create(
-            scanId: _scanIdFixture.Create(value: scan.Id),
-            userId: _userIdFixture.Create(value: scan.UserId));
-        LibraryScanFinishedDomainEvent domainEvent = new(Guid.NewGuid(), compositeId, DateTime.UtcNow);
+        LibraryScanFinishedDomainEvent domainEvent = _libraryScanFinishedDomainEventFixture.Create();
+        MediaLibraryScanCompositeId compositeId = domainEvent.MediaLibraryScanCompositeId;
+        LibraryScanEntity scan = _libraryScanEntityFixture.Create(
+            id: compositeId.ScanId.Value,
+            userId: compositeId.UserId.Value);
         _mockLibraryScanRepository.GetByIdAsync(scan.Id, Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryScanEntity?>(scan));
         Error error = Error.Failure(description: "Failed to update library scan");

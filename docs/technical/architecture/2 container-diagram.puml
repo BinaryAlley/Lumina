@@ -8,11 +8,11 @@ Person(user, "Home User", "A person who wants to manage and stream their persona
 Person(admin, "Administrator", "A person who manages the media library system")
 
 System_Boundary(c1, "Lumina 1.1") {
-    Container(webapp, "Web Application Client 2.1", "ASP.NET Core MVC", "Delivers server-rendered views with dynamic client-side functionality for media management and playback [detailed in '3.1 component-web-client-diagram.puml']")
+    Container(webapp, "Web Application Client 2.1", "ASP.NET Core MVC", "Delivers server-rendered views with dynamic client-side functionality for media management, playback, and the scheduled jobs dashboard [detailed in '3.1 component-web-client-diagram.puml']")
     
-    Container(api, "API Server 2.2", "ASP.NET Core", "Provides media management functionality via a REST API, processes media tasks, manages metadata synchronization, and serves books for reading through format plugins [detailed in '3.2 component-api-server-diagram.puml']")
+    Container(api, "API Server 2.2", "ASP.NET Core", "Provides media management functionality via a REST API, processes media tasks, manages metadata synchronization, serves books for reading through format plugins, and runs the scheduled jobs that maintain the system [detailed in '3.2 component-api-server-diagram.puml']")
     
-    ContainerDb(db, "Database", "SQLite", "Stores user data, media metadata, library configuration, automated jobs information, etc")
+    ContainerDb(db, "Database", "SQLite", "Stores user data, media metadata, library configuration, scheduled jobs and their executions, automated jobs information, etc")
     
     Container(filestore, "Media Store", "File System", "Stores the actual media files")
     

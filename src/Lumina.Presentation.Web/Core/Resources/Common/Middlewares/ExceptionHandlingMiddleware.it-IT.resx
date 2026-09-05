@@ -738,4 +738,46 @@
   <data name="PluginArchiveNotReadable" xml:space="preserve">
     <value>Non è stato possibile leggere l archivio del plugin caricato!</value>
   </data>
+  <data name="ScheduledJobNotFound" xml:space="preserve">
+    <value>Il processo pianificato non è stato trovato!</value>
+  </data>
+  <data name="ScheduledJobNameCannotBeEmpty" xml:space="preserve">
+    <value>Il nome del processo pianificato non può essere vuoto!</value>
+  </data>
+  <data name="IntervalMinutesMustBePositive" xml:space="preserve">
+    <value>I minuti dell'intervallo devono essere un numero positivo!</value>
+  </data>
+  <data name="HourMustBeBetweenZeroAndTwentyThree" xml:space="preserve">
+    <value>L'ora deve essere compresa tra 0 e 23!</value>
+  </data>
+  <data name="MinuteMustBeBetweenZeroAndFiftyNine" xml:space="preserve">
+    <value>Il minuto deve essere compreso tra 0 e 59!</value>
+  </data>
+  <data name="ScheduledJobAlreadyExists" xml:space="preserve">
+    <value>Esiste già un processo pianificato con questo nome!</value>
+  </data>
+  <data name="ScheduledJobExecutionAlreadyExists" xml:space="preserve">
+    <value>L'esecuzione del processo pianificato esiste già!</value>
+  </data>
+  <data name="ScheduledJobExecutionNotFound" xml:space="preserve">
+    <value>L'esecuzione del processo pianificato non è stata trovata!</value>
+  </data>
+  <data name="ScheduledJobCycleAlreadyStarted" xml:space="preserve">
+    <value>Il ciclo di esecuzione del processo pianificato è già stato avviato!</value>
+  </data>
+  <data name="ScheduledJobNotStarted" xml:space="preserve">
+    <value>Il ciclo di esecuzione del processo pianificato non è stato avviato!</value>
+  </data>
+  <data name="ScheduledJobAlreadyRunning" xml:space="preserve">
+    <value>Il processo pianificato è già in esecuzione!</value>
+  </data>
+  <data name="CanOnlyCompleteRunningScheduledJob" xml:space="preserve">
+    <value>Solo un processo pianificato in esecuzione può essere completato!</value>
+  </data>
+  <data name="SchedulerDisplayTimeSpanMustBePositive" xml:space="preserve">
+    <value>L'intervallo di visualizzazione della pagina dei processi pianificati deve essere un numero positivo!</value>
+  </data>
+  <data name="InvalidScheduleType" xml:space="preserve">
+    <value>Il tipo di pianificazione non è valido!</value>
+  </data>
 </root>

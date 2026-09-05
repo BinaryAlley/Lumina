@@ -1,20 +1,25 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
+using Lumina.Application.Common.DataAccess.Entities.Scheduling;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
+using Lumina.Application.Common.DataAccess.Repositories.Scheduling;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Scheduling;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.DataAccess.Core.Seed;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
+using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -541,6 +546,60 @@ public class DataSeedServiceTests
         Assert.True(result.IsFailure);
         Assert.Equal(expectedError, result.FirstError);
 
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task SetDefaultScheduledJobsAsync_WhenCalled_ShouldInsertTheFiveDefaultJobsAndReturnCreated()
+    {
+        // Arrange
+        Guid adminUserId = Guid.NewGuid();
+        IScheduledJobRepository mockScheduledJobRepository = Substitute.For<IScheduledJobRepository>();
+        _mockUnitOfWork.ScheduledJobRepository.Returns(mockScheduledJobRepository);
+        List<ScheduledJobEntity> capturedScheduledJobs = [];
+        mockScheduledJobRepository.InsertAsync(Arg.Any<ScheduledJobEntity>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created)
+            .AndDoes(info => capturedScheduledJobs.Add(info.Arg<ScheduledJobEntity>()));
+
+        // Act
+        Result<Created> result = await _sut.SetDefaultScheduledJobsAsync(adminUserId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Created, result.Value);
+        Assert.Equal(5, capturedScheduledJobs.Count);
+        Assert.All(capturedScheduledJobs, scheduledJob => Assert.Equal(ScheduledJobStatus.Active, scheduledJob.Status));
+        Assert.All(capturedScheduledJobs, scheduledJob => Assert.Equal(adminUserId, scheduledJob.OwnerUserId));
+        Assert.All(capturedScheduledJobs, scheduledJob => Assert.Equal(adminUserId, scheduledJob.CreatedBy));
+        Assert.All(capturedScheduledJobs, scheduledJob => Assert.Equal(_fixedUtcNow, scheduledJob.CreatedOnUtc));
+        Assert.Contains(capturedScheduledJobs, scheduledJob => scheduledJob.TaskType == ScheduledTaskType.ScanMediaLibraries && scheduledJob.ScheduleType == ScheduleType.DailyAtHourAndMinute && scheduledJob.Hour == 0 && scheduledJob.Minute == 0);
+        Assert.Contains(capturedScheduledJobs, scheduledJob => scheduledJob.TaskType == ScheduledTaskType.CleanTemporaryFiles && scheduledJob.ScheduleType == ScheduleType.OnceAtStartup);
+        Assert.Contains(capturedScheduledJobs, scheduledJob => scheduledJob.TaskType == ScheduledTaskType.CleanTemporaryFiles && scheduledJob.ScheduleType == ScheduleType.WithIntervalInMinutes && scheduledJob.IntervalMinutes == 720);
+        Assert.Contains(capturedScheduledJobs, scheduledJob => scheduledJob.TaskType == ScheduledTaskType.RepairThemes && scheduledJob.ScheduleType == ScheduleType.OnceAtStartup);
+        Assert.Contains(capturedScheduledJobs, scheduledJob => scheduledJob.TaskType == ScheduledTaskType.CleanScheduledJobExecutionHistory && scheduledJob.ScheduleType == ScheduleType.OnceAtStartup);
+
+        await mockScheduledJobRepository.Received(5).InsertAsync(Arg.Any<ScheduledJobEntity>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        await mockScheduledJobRepository.DidNotReceive().GetAllAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task SetDefaultScheduledJobsAsync_WhenInsertScheduledJobFails_ShouldReturnError()
+    {
+        // Arrange
+        Guid adminUserId = Guid.NewGuid();
+        IScheduledJobRepository mockScheduledJobRepository = Substitute.For<IScheduledJobRepository>();
+        _mockUnitOfWork.ScheduledJobRepository.Returns(mockScheduledJobRepository);
+        Error expectedError = Error.Failure("ScheduledJobs.InsertFailed", "Failed to insert the scheduled job");
+        mockScheduledJobRepository.InsertAsync(Arg.Any<ScheduledJobEntity>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created, expectedError);
+
+        // Act
+        Result<Created> result = await _sut.SetDefaultScheduledJobsAsync(adminUserId, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(expectedError, result.FirstError);
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 }
