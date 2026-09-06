@@ -700,7 +700,6 @@ public class FileProviderServiceTests
         _mockFileSystem.FileInfo.New(path.Path).Returns(fileInfo);
         _mockFileSystem.Path.Combine(parentPath, newName).Returns(newPath);
         _mockFileSystemPermissionsService.CanAccessPath(Arg.Any<FileSystemPathId>(), FileAccessMode.Write).Returns(true);
-        _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.Execute).Returns(true);
 
         // Act
         Result<FileSystemPathId> result = _sut.RenameFile(path, newName);
@@ -727,33 +726,6 @@ public class FileProviderServiceTests
         _mockFileSystem.FileInfo.New(path.Path).Returns(fileInfo);
         _mockFileSystem.Path.Combine(parentPath, newName).Returns(newPath);
         _mockFileSystemPermissionsService.CanAccessPath(Arg.Any<FileSystemPathId>(), FileAccessMode.Write).Returns(false);
-
-        // Act
-        Result<FileSystemPathId> result = _sut.RenameFile(path, newName);
-
-        // Assert
-        Assert.True(result.IsFailure);
-        Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
-        _mockFileSystem.File.DidNotReceive().Move(Arg.Any<string>(), Arg.Any<string>());
-    }
-
-    [Fact]
-    public void RenameFile_WhenFileIsNotExecutable_ShouldReturnUnauthorizedAccessError()
-    {
-        // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.Create(
-            s_isUnix ? "/OldName.txt" : @"C:\OldName.txt"
-        );
-        string newName = "NewName.txt";
-        string parentPath = s_isUnix ? "/" : @"C:\";
-        string newPath = s_isUnix ? "/NewName.txt" : @"C:\NewName.txt";
-
-        IFileInfo fileInfo = Substitute.For<IFileInfo>();
-        fileInfo.DirectoryName.Returns(parentPath);
-        _mockFileSystem.FileInfo.New(path.Path).Returns(fileInfo);
-        _mockFileSystem.Path.Combine(parentPath, newName).Returns(newPath);
-        _mockFileSystemPermissionsService.CanAccessPath(Arg.Any<FileSystemPathId>(), FileAccessMode.Write).Returns(true);
-        _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.Execute).Returns(false);
 
         // Act
         Result<FileSystemPathId> result = _sut.RenameFile(path, newName);

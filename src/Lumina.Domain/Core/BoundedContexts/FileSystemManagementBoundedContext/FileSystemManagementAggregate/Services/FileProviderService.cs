@@ -247,9 +247,7 @@ internal class FileProviderService : IFileProviderService
                 Result<FileSystemPathId> newFilePathResult = FileSystemPathId.Create(newFile);
                 if (newFilePathResult.IsFailure)
                     return newFilePathResult.Errors;
-                // check if the user has access permissions to the provided path
-                if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.Execute))
-                    return Errors.Permission.UnauthorizedAccess;
+                // renaming a file only requires write access to its parent directory, never execute access to the file itself
                 if (!_fileSystemPermissionsService.CanAccessPath(parendDirectoryResult.Value, FileAccessMode.Write))
                     return Errors.Permission.UnauthorizedAccess;
                 _fileSystem.File.Move(path.Path, newFilePathResult.Value.Path);
