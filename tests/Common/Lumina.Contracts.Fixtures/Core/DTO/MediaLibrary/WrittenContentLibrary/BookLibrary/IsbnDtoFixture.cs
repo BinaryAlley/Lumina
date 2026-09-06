@@ -28,7 +28,7 @@ public class IsbnDtoFixture
         string resolvedValue = value ?? (format == IsbnFormat.Isbn10 ? GenerateValidIsbn10() : GenerateValidIsbn13());
         return new IsbnDto(
             resolvedValue,
-            format
+            format ?? (resolvedValue.Length > 13 ? IsbnFormat.Isbn13 : IsbnFormat.Isbn10)
         );
     }
 
@@ -42,6 +42,10 @@ public class IsbnDtoFixture
         return [.. Enumerable.Range(0, count).Select(_ => Create())];
     }
 
+    /// <summary>
+    /// Generates a valid ISBN-10 with the correct checksum.
+    /// </summary>
+    /// <returns>A valid ISBN-10 value.</returns>
     private string GenerateValidIsbn10()
     {
         int[] digits = new int[9];
@@ -58,6 +62,10 @@ public class IsbnDtoFixture
         return $"{digits[0]}-{digits[1]}{digits[2]}-{digits[3]}{digits[4]}{digits[5]}{digits[6]}{digits[7]}{digits[8]}-{checkChar}";
     }
 
+    /// <summary>
+    /// Generates a valid ISBN-13 with the correct checksum.
+    /// </summary>
+    /// <returns>A valid ISBN-13 value.</returns>
     private string GenerateValidIsbn13()
     {
         string prefix = _random.Next(2) == 0 ? "978" : "979";

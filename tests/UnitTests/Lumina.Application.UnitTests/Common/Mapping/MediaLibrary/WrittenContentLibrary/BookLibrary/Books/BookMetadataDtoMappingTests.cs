@@ -57,10 +57,8 @@ public class BookMetadataDtoMappingTests
         Book book = _bookFixture.Create();
         BookMetadataDto metadata = _bookMetadataDtoFixture.Create(
             title: "The Fellowship of the Ring",
-            goodreadsId: "3") with
-        {
-            Genres = [_genreDtoFixture.Create(name: "")]
-        };
+            goodreadsId: "3",
+            genres: [_genreDtoFixture.Create(name: "")]);
 
         // Act
         Result<Success> result = book.ApplyMetadata(metadata);

@@ -10,7 +10,7 @@ using System.Net.Http.Headers;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Themes.GetThemes;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/admin/themes/api-get-themes</c> route served by the <see cref="GetThemesEndpoint"/> class.
+/// Contains security tests for the <see cref="GetThemesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetThemesEndpointTests : IClassFixture<LuminaWebFactory>

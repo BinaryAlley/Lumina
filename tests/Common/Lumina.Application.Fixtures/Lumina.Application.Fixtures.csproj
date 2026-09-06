@@ -20,5 +20,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\src\Lumina.Application\Lumina.Application.csproj" />
+        <ProjectReference Include="..\Lumina.Contracts.Fixtures\Lumina.Contracts.Fixtures.csproj" />
     </ItemGroup>
 </Project>

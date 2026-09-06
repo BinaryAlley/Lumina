@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Themes.GetThemes;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/admin/themes/api-get-themes</c> route served by the <see cref="GetThemesEndpoint"/> class.
+/// Contains integration tests for the <see cref="GetThemesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetThemesEndpointTests : IClassFixture<LuminaWebFactory>

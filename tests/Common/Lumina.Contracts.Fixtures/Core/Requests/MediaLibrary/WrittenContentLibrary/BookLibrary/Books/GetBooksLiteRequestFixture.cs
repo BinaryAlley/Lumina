@@ -29,6 +29,8 @@ public class GetBooksLiteRequestFixture
     /// <param name="shouldIgnoreThePrefixForAlphaPicker">Optional. Whether the leading "The " prefix of a title should be ignored when computing the alpha key, or not.</param>
     /// <param name="sortBy">Optional. The name of the field by which to sort the results.</param>
     /// <param name="sortOrder">Optional. The direction in which to sort the results.</param>
+    /// <param name="includeCurrentPage">Whether the current page should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includePerPage">Whether the per page count should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="GetBooksLiteRequest"/>.</returns>
     public GetBooksLiteRequest Create(
         Guid? libraryId = null,
@@ -38,12 +40,14 @@ public class GetBooksLiteRequestFixture
         string? filterAlphaKey = null,
         bool shouldIgnoreThePrefixForAlphaPicker = false,
         string? sortBy = null,
-        SortOrder? sortOrder = null)
+        SortOrder? sortOrder = null,
+        bool includeCurrentPage = true,
+        bool includePerPage = true)
     {
         return new GetBooksLiteRequest(
             LibraryId: libraryId ?? _faker.Random.Guid(),
-            CurrentPage: currentPage ?? _faker.Random.Number(1, 100),
-            PerPage: perPage ?? _faker.Random.Number(1, 200),
+            CurrentPage: includeCurrentPage ? (currentPage ?? _faker.Random.Number(1, 100)) : null,
+            PerPage: includePerPage ? (perPage ?? _faker.Random.Number(1, 200)) : null,
             SearchTerm: searchTerm ?? _faker.Lorem.Word(),
             FilterAlphaKey: filterAlphaKey,
             ShouldIgnoreThePrefixForAlphaPicker: shouldIgnoreThePrefixForAlphaPicker,

@@ -10,7 +10,7 @@ using System.Net.Http.Headers;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.Management.GetRunningLibraryScans;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/libraries/manage/api-get-running-library-scans</c> route served by the <see cref="GetRunningLibraryScansEndpoint"/> class.
+/// Contains security tests for the <see cref="GetRunningLibraryScansEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetRunningLibraryScansEndpointTests : IClassFixture<LuminaWebFactory>

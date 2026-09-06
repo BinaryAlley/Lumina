@@ -9,7 +9,7 @@ using System.Net;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Home;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/privacy</c> route served by the <see cref="HomePrivacyEndpoint"/> class.
+/// Contains security tests for the <see cref="HomePrivacyEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class HomePrivacyEndpointTests : IClassFixture<LuminaWebFactory>

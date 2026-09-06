@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Scheduler;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/admin/scheduled-jobs</c> route served by the <see cref="SchedulerIndexViewEndpoint"/> class.
+/// Contains integration tests for the <see cref="SchedulerIndexViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class SchedulerIndexViewEndpointTests : IClassFixture<LuminaWebFactory>

@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Management.GetArtworkProviders;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/libraries/manage/api-get-artwork-providers/{{libraryId}}</c> route served by the <see cref="GetArtworkProvidersEndpoint"/> class.
+/// Contains integration tests for the <see cref="GetArtworkProvidersEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetArtworkProvidersEndpointTests : IClassFixture<LuminaWebFactory>

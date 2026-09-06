@@ -1,19 +1,16 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.SecurityTests.Common.Setup;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Scheduler.UpdateSchedulerDisplayPreferences;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/admin/api-scheduled-jobs/display-preferences</c> route served by the <see cref="UpdateSchedulerDisplayPreferencesEndpoint"/> class.
+/// Contains security tests for the <see cref="UpdateSchedulerDisplayPreferencesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class UpdateSchedulerDisplayPreferencesEndpointTests : IClassFixture<LuminaWebFactory>

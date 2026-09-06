@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Home;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}</c> and <c>/</c> routes served by the <see cref="HomeIndexEndpoint"/> class.
+/// Contains integration tests for the <see cref="HomeIndexEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class HomeIndexEndpointTests : IClassFixture<LuminaWebFactory>

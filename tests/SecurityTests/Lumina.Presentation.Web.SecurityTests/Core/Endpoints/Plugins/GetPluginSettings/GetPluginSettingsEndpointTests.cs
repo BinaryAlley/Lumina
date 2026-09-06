@@ -11,7 +11,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Plugins.GetPluginSettings;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/admin/manage-plugins/api-get-plugin-settings/{pluginId}</c> route served by the <see cref="GetPluginSettingsEndpoint"/> class.
+/// Contains security tests for the <see cref="GetPluginSettingsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetPluginSettingsEndpointTests : IClassFixture<LuminaWebFactory>

@@ -87,9 +87,10 @@ public class LibraryEntityFixture
     /// Creates a list of <see cref="LibraryEntity"/> instances with randomized test data.
     /// </summary>
     /// <param name="count">Number of instances to create.</param>
+    /// <param name="userId">Optional. The Id of the user that owns the created media libraries.</param>
     /// <returns>List of configured <see cref="LibraryEntity"/> instances.</returns>
-    public List<LibraryEntity> CreateMany(int count = 3)
+    public List<LibraryEntity> CreateMany(int count = 3, Guid? userId = null)
     {
-        return [.. Enumerable.Range(0, count).Select(_ => Create())];
+        return [.. Enumerable.Range(0, count).Select(_ => Create(userId: userId))];
     }
 }

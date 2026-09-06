@@ -28,7 +28,7 @@ public sealed class ThemePackFixture
     /// <param name="templates">Optional template mappings written to the manifest.</param>
     /// <param name="preview">Optional preview path written to the manifest, or <see langword="null"/> to omit the preview.</param>
     /// <param name="defaultTemplateContent">Optional content for the default template file.</param>
-    /// <param name="includePreviewAsset">Whether to include the preview asset file in the archive.</param>
+    /// <param name="includePreviewAsset">Whether to include the preview asset file in the archive or not.</param>
     /// <param name="additionalFiles">Optional additional files written into the archive.</param>
     /// <returns>The created theme pack ZIP archive.</returns>
     public byte[] Create(

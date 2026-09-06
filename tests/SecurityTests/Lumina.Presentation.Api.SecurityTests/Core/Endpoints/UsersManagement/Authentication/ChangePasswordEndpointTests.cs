@@ -20,7 +20,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.Authentication;
 
 /// <summary>
-/// Contains security tests for the <c>/auth/change-password</c> route.
+/// Contains security tests for the <see cref="ChangePasswordEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
@@ -121,9 +121,9 @@ public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDis
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/change-password", request);
 
         // Assert
-        // the malicious username is queried by GetByUsernameAsync, so it must never be executed against the database;
+        // The malicious username is queried by GetByUsernameAsync, so it must never be executed against the database;
         // if a boolean-injection regression returned the only user in the database, the current password would match and
-        // the password would change, so the response must be a failure and the stored password hash must be unchanged
+        // the password would change, so the response must be a failure and the stored password hash must be unchanged.
         Assert.NotEqual(HttpStatusCode.OK, response.StatusCode);
         Assert.DoesNotContain("SqliteException", await response.Content.ReadAsStringAsync(), StringComparison.OrdinalIgnoreCase);
 
@@ -157,14 +157,14 @@ public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDis
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
-        // create test user
+        // Create test user.
         UserEntity user = _userEntityFixture.Create(username: _testUsername, password: _hashService.HashString("TestPass123!"));
         user.TotpSecret = null;
 
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();
 
-        // authenticate user
+        // Authenticate user.
         LoginRequest loginRequest = new(
             Username: user.Username,
             Password: "TestPass123!"
@@ -174,7 +174,7 @@ public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDis
         string content = await loginResponse.Content.ReadAsStringAsync();
         LoginResponse? result = JsonSerializer.Deserialize<LoginResponse>(content, _jsonOptions);
 
-        // set auth header for subsequent requests
+        // Set auth header for subsequent requests.
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result!.Token);
 
         return user;

@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.FileSystemManagement.Files.GetTreeFiles;
 
 /// <summary>
-/// Contains integration tests for the <c>/files/api-get-tree-files</c> route served by the <see cref="GetTreeFilesEndpoint"/> class.
+/// Contains integration tests for the <see cref="GetTreeFilesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetTreeFilesEndpointTests : IClassFixture<LuminaWebFactory>

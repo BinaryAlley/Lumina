@@ -28,7 +28,7 @@ public class BookEntityFixture
     /// <param name="path">Optional. The file system path of the book.</param>
     /// <param name="title">Optional. The title of the book.</param>
     /// <param name="originalTitle">Optional. The original title of the book.</param>
-    /// <param name="includeMetadata">Whether the book should include its owned metadata collections (Tags, Genres, ISBNs, Ratings) or not.</param>
+    /// <param name="includeMetadata">Whether the owned metadata collections (Tags, Genres, ISBNs, Ratings) should be included, or forced to empty collections.</param>
     /// <returns>The created <see cref="BookEntity"/>.</returns>
     public BookEntity Create(
         Guid? id = null,

@@ -24,8 +24,7 @@ public class GetBooksQueryValidatorTests
     public void Validate_WhenLibraryIdIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        GetBooksQuery query = _getBooksQueryFixture.Create();
-        query = query with { Filter = query.Filter with { LibraryId = Guid.Empty } };
+        GetBooksQuery query = _getBooksQueryFixture.Create(libraryId: Guid.Empty);
 
         // Act
         List<Error> result = _validator.TestValidate(query);

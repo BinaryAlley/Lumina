@@ -13,7 +13,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.Management.GetLibraryScanProgress;
 
 /// <summary>
-/// Contains security tests for the <c>/libraries/{libraryId}/scans/{scanId}/progress</c> route.
+/// Contains security tests for the <see cref="GetLibraryScanProgressEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetLibraryScanProgressEndpointTests : IClassFixture<LuminaApiFactory>

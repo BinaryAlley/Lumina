@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.FileSystemManagement.FileSystem.GetType;
 
 /// <summary>
-/// Contains integration tests for the <c>/file-system/api-get-type</c> route served by the <see cref="GetTypeEndpoint"/> class.
+/// Contains integration tests for the <see cref="GetTypeEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetTypeEndpointTests : IClassFixture<LuminaWebFactory>

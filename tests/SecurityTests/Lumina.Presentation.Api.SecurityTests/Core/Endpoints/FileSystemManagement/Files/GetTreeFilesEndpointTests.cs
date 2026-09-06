@@ -9,7 +9,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.FileSystemManagement.Files;
 
 /// <summary>
-/// Contains security tests for the <c>/files/get-tree-files</c> route.
+/// Contains security tests for the <see cref="GetTreeFilesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetTreeFilesEndpointTests : IClassFixture<LuminaApiFactory>

@@ -224,4 +224,46 @@ public class BookArtworkServiceTests
             authorName,
             $"{bookTitle}-{bookId}");
     }
+
+    [Fact]
+    public async Task SaveBookArtworkAsync_WhenUploadedStreamIsNull_ShouldReturnFileNotFound()
+    {
+        // Act
+        Result<string> result = await _sut.SaveBookArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", "Author", "Title", null!, "cover.jpg", CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.FileNotFound, result.FirstError);
+    }
+
+    [Fact]
+    public async Task SaveBookArtworkAsync_WhenUploadedStreamIsEmpty_ShouldReturnFileNotFound()
+    {
+        // Arrange
+        await using MemoryStream emptyStream = new([]);
+
+        // Act
+        Result<string> result = await _sut.SaveBookArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", "Author", "Title", emptyStream, "cover.jpg", CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.FileNotFound, result.FirstError);
+        await _mockFileTypeService.DidNotReceive().GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task SaveBookArtworkAsync_WhenUploadedStreamExceedsTheMaximumSize_ShouldReturnFileTooLarge()
+    {
+        // Arrange
+        await using MemoryStream oversizedStream = new(new byte[(10 * 1024 * 1024) + 1]);
+
+        // Act
+        Result<string> result = await _sut.SaveBookArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", "Author", "Title", oversizedStream, "cover.jpg", CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.FileTooLarge, result.FirstError);
+        await _mockFileTypeService.DidNotReceive().GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>());
+    }
 }
+

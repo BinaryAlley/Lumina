@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.Management.SetBookReaderEnabled;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/libraries/manage/api-set-book-reader-enabled</c> route served by the <see cref="SetBookReaderEnabledEndpoint"/> class.
+/// Contains security tests for the <see cref="SetBookReaderEnabledEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class SetBookReaderEnabledEndpointTests : IClassFixture<LuminaWebFactory>

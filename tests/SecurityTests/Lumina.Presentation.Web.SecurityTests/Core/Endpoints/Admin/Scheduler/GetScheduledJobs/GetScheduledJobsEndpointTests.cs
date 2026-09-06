@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Scheduler.GetScheduledJobs;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/admin/api-scheduled-jobs</c> route served by the <see cref="GetScheduledJobsEndpoint"/> class.
+/// Contains security tests for the <see cref="GetScheduledJobsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetScheduledJobsEndpointTests : IClassFixture<LuminaWebFactory>

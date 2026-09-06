@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Scheduler.GetSchedulerDisplayPreferences;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/admin/api-scheduled-jobs/display-preferences</c> route served by the <see cref="GetSchedulerDisplayPreferencesEndpoint"/> class.
+/// Contains integration tests for the <see cref="GetSchedulerDisplayPreferencesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetSchedulerDisplayPreferencesEndpointTests : IClassFixture<LuminaWebFactory>

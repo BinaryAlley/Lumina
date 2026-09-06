@@ -28,10 +28,10 @@ public class ThemeResponseFixture
     /// <param name="author">Optional. The author of the theme.</param>
     /// <param name="version">Optional. The version of the theme.</param>
     /// <param name="previewPath">Optional. The preview image path of the theme, or <see langword="null"/> when the theme has no preview.</param>
-    /// <param name="includePreviewPath">Whether to set <paramref name="previewPath"/>, or <see langword="null"/> when <see langword="false"/>.</param>
+    /// <param name="includePreviewPath">Whether the preview path should be included, or forced to <see langword="null"/>.</param>
     /// <param name="installSource">Optional. The source the theme was installed from.</param>
     /// <param name="isCurrent">Optional. Whether the theme is the currently active one.</param>
-    /// <param name="includeIsCurrent">Whether to set <paramref name="isCurrent"/>, or <see langword="null"/> when <see langword="false"/>.</param>
+    /// <param name="includeIsCurrent">Whether the currently active flag should be included, or forced to <see langword="null"/>.</param>
     /// <param name="installedAtUtc">Optional. The UTC timestamp when the theme was installed.</param>
     /// <param name="isDeleted">Optional. Whether the theme was deleted by the user.</param>
     /// <returns>The created <see cref="ThemeResponse"/>.</returns>

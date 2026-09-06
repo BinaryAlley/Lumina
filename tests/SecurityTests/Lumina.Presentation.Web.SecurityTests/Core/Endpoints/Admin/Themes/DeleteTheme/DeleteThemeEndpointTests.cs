@@ -11,7 +11,7 @@ using System.Text;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Themes.DeleteTheme;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/admin/themes/api-delete-theme/{themeId}</c> route served by the <see cref="DeleteThemeEndpoint"/> class.
+/// Contains security tests for the <see cref="DeleteThemeEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class DeleteThemeEndpointTests : IClassFixture<LuminaWebFactory>

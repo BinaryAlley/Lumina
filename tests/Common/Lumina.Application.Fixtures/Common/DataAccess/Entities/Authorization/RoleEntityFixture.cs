@@ -23,7 +23,7 @@ public class RoleEntityFixture
     /// <param name="id">Optional. The Id of the role.</param>
     /// <param name="roleName">Optional. The name of the role.</param>
     /// <param name="rolePermissions">Optional. The role permission associations of the role.</param>
-    /// <param name="includeRolePermissions">Whether the role should include role permission associations or not.</param>
+    /// <param name="includeRolePermissions">Whether the role permission associations should be included, or forced to an empty collection.</param>
     /// <param name="createdBy">Optional. The Id of the user that created the role.</param>
     /// <param name="createdOnUtc">Optional. The time and date when the role was added.</param>
     /// <returns>The created <see cref="RoleEntity"/>.</returns>

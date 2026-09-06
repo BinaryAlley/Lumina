@@ -11,7 +11,7 @@ using System.Net.Http.Headers;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.FileSystemManagement.Files.GetFiles;
 
 /// <summary>
-/// Contains security tests for the <c>/files/api-get-files</c> route served by the <see cref="GetFilesEndpoint"/> class.
+/// Contains security tests for the <see cref="GetFilesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetFilesEndpointTests : IClassFixture<LuminaWebFactory>

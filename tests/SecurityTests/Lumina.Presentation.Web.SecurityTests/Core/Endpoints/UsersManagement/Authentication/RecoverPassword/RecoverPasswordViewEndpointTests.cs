@@ -9,7 +9,7 @@ using System.Net;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.UsersManagement.Authentication.RecoverPassword;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/auth/recover-password</c> route served by the <see cref="RecoverPasswordViewEndpoint"/> class.
+/// Contains security tests for the <see cref="RecoverPasswordViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class RecoverPasswordViewEndpointTests : IClassFixture<LuminaWebFactory>

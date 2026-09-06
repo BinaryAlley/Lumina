@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Authorization.Roles.GetRoles;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/admin/api-get-roles</c> route served by the <see cref="GetRolesEndpoint"/> class.
+/// Contains integration tests for the <see cref="GetRolesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetRolesEndpointTests : IClassFixture<LuminaWebFactory>

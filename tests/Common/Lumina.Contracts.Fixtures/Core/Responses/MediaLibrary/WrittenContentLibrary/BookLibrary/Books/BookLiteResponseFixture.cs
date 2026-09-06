@@ -24,18 +24,22 @@ public class BookLiteResponseFixture
     /// <param name="title">Optional. The title of the book.</param>
     /// <param name="releaseYear">Optional. The release year of the book.</param>
     /// <param name="coverPath">Optional. The path of the image representing the cover of the book.</param>
+    /// <param name="includeReleaseYear">Whether the release year should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeCoverPath">Whether the cover path should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="BookLiteResponse"/>.</returns>
     public BookLiteResponse Create(
         Guid? id = null,
         string? title = null,
         int? releaseYear = null,
-        string? coverPath = null)
+        string? coverPath = null,
+        bool includeReleaseYear = true,
+        bool includeCoverPath = true)
     {
         return new BookLiteResponse(
             id ?? Guid.NewGuid(),
             title ?? _faker.Commerce.ProductName(),
-            releaseYear ?? _faker.Random.Int(1900, 2024),
-            coverPath ?? _faker.System.FilePath()
+            includeReleaseYear ? (releaseYear ?? _faker.Random.Int(1900, 2024)) : null,
+            includeCoverPath ? (coverPath ?? _faker.System.FilePath()) : null
         );
     }
 

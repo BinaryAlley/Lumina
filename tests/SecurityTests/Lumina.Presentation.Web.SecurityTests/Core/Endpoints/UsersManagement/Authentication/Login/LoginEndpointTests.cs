@@ -16,7 +16,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.UsersManagement.Authentication.Login;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/auth/api-login</c> route served by the <see cref="LoginEndpoint"/> class.
+/// Contains security tests for the <see cref="LoginEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class LoginEndpointTests : IClassFixture<LuminaWebFactory>

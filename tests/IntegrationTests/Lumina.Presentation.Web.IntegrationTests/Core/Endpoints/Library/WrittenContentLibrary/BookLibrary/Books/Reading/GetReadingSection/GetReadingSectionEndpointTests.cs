@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.Reading.GetReadingSection;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/library/written-content-library/books-library/books/{bookId}/api-get-reading-section</c> route served by the <see cref="GetReadingSectionEndpoint"/> class.
+/// Contains integration tests for the <see cref="GetReadingSectionEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetReadingSectionEndpointTests : IClassFixture<LuminaWebFactory>

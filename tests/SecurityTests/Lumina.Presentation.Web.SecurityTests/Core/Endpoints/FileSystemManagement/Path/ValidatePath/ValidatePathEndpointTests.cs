@@ -11,7 +11,7 @@ using System.Net.Http.Headers;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.FileSystemManagement.Path.ValidatePath;
 
 /// <summary>
-/// Contains security tests for the <c>/path/api-validate</c> route served by the <see cref="ValidatePathEndpoint"/> class.
+/// Contains security tests for the <see cref="ValidatePathEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ValidatePathEndpointTests : IClassFixture<LuminaWebFactory>

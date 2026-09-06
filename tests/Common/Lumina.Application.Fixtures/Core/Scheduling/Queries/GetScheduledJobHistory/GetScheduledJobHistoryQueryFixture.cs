@@ -20,8 +20,8 @@ public class GetScheduledJobHistoryQueryFixture
     /// </summary>
     /// <param name="from">Optional. The inclusive lower bound of the requested interval.</param>
     /// <param name="to">Optional. The inclusive upper bound of the requested interval.</param>
-    /// <param name="includeFrom">Whether to include the lower bound in the query. When false, the lower bound is left unset.</param>
-    /// <param name="includeTo">Whether to include the upper bound in the query. When false, the upper bound is left unset.</param>
+    /// <param name="includeFrom">Whether the lower bound should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeTo">Whether the upper bound should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created query.</returns>
     public GetScheduledJobHistoryQuery Create(
         DateTime? from = null,

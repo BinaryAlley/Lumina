@@ -9,7 +9,7 @@ using System.Net;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.UsersManagement.Authentication.AccessDenied;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/auth/access-denied</c> route served by the <see cref="AccessDeniedViewEndpoint"/> class.
+/// Contains security tests for the <see cref="AccessDeniedViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class AccessDeniedViewEndpointTests : IClassFixture<LuminaWebFactory>

@@ -14,7 +14,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Plugins.GetLibraryArtworkProviders;
 
 /// <summary>
-/// Contains security tests for the <c>/libraries/{libraryId}/artwork-providers</c> route.
+/// Contains security tests for the <see cref="GetLibraryArtworkProvidersEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetLibraryArtworkProvidersEndpointTests : IClassFixture<LuminaApiFactory>

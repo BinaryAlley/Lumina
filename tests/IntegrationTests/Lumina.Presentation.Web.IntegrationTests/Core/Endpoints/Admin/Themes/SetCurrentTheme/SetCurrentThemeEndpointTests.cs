@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Themes.SetCurrentTheme;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/admin/themes/api-set-current-theme</c> route served by the <see cref="SetCurrentThemeEndpoint"/> class.
+/// Contains integration tests for the <see cref="SetCurrentThemeEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class SetCurrentThemeEndpointTests : IClassFixture<LuminaWebFactory>

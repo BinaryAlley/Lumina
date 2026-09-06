@@ -27,6 +27,8 @@ public class GetBooksRequestFixture
     /// <param name="searchTerm">Optional. The search term used to filter results.</param>
     /// <param name="sortBy">Optional. The name of the field by which to sort the results.</param>
     /// <param name="sortOrder">Optional. The direction in which to sort the results.</param>
+    /// <param name="includeCurrentPage">Whether the current page should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includePerPage">Whether the per page count should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="GetBooksRequest"/>.</returns>
     public GetBooksRequest Create(
         Guid? libraryId = null,
@@ -34,12 +36,14 @@ public class GetBooksRequestFixture
         int? perPage = null,
         string? searchTerm = null,
         string? sortBy = null,
-        SortOrder? sortOrder = null)
+        SortOrder? sortOrder = null,
+        bool includeCurrentPage = true,
+        bool includePerPage = true)
     {
         return new GetBooksRequest(
             LibraryId: libraryId ?? _faker.Random.Guid(),
-            CurrentPage: currentPage ?? _faker.Random.Number(1, 100),
-            PerPage: perPage ?? _faker.Random.Number(1, 200),
+            CurrentPage: includeCurrentPage ? (currentPage ?? _faker.Random.Number(1, 100)) : null,
+            PerPage: includePerPage ? (perPage ?? _faker.Random.Number(1, 200)) : null,
             SearchTerm: searchTerm ?? _faker.Lorem.Word(),
             SortBy: sortBy ?? _faker.Lorem.Word(),
             SortOrder: sortOrder ?? _faker.PickRandom<SortOrder>()

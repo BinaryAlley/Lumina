@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.FileSystemManagement.Path.GetPathRoot;
 
 /// <summary>
-/// Contains integration tests for the <c>/path/api-get-path-root</c> route served by the <see cref="GetPathRootEndpoint"/> class.
+/// Contains integration tests for the <see cref="GetPathRootEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetPathRootEndpointTests : IClassFixture<LuminaWebFactory>

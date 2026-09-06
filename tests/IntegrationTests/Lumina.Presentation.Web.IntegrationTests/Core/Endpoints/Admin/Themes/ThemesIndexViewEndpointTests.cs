@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Themes;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/admin/manage-themes</c> route served by the <see cref="ThemesIndexViewEndpoint"/> class.
+/// Contains integration tests for the <see cref="ThemesIndexViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ThemesIndexViewEndpointTests : IClassFixture<LuminaWebFactory>

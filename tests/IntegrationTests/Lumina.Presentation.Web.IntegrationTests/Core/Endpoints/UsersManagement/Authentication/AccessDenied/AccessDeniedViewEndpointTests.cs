@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.UsersManagement.Authentication.AccessDenied;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/auth/access-denied</c> route served by the <see cref="AccessDeniedViewEndpoint"/> class.
+/// Contains integration tests for the <see cref="AccessDeniedViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class AccessDeniedViewEndpointTests : IClassFixture<LuminaWebFactory>

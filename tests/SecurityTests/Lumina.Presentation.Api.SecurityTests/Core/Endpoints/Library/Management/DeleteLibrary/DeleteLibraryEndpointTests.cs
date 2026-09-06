@@ -13,7 +13,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.Management.DeleteLibrary;
 
 /// <summary>
-/// Contains security tests for the <c>/libraries/{id}</c> route.
+/// Contains security tests for the <see cref="DeleteLibraryEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class DeleteLibraryEndpointTests : IClassFixture<LuminaApiFactory>

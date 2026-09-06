@@ -2,14 +2,12 @@
 using Lumina.Presentation.Api.SecurityTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Maintenance;
 
 /// <summary>
-/// Contains security tests for the <c>/check-health</c> route.
+/// Contains security tests for the <see cref="CheckHealthEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class CheckHealthEndpointTests : IClassFixture<LuminaApiFactory>

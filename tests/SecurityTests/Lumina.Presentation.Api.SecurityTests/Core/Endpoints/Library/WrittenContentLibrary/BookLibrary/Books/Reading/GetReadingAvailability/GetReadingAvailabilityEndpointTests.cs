@@ -9,7 +9,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.Reading.GetReadingAvailability;
 
 /// <summary>
-/// Contains security tests for the <c>/books/{bookId}/reading/availability</c> route.
+/// Contains security tests for the <see cref="GetReadingAvailabilityEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetReadingAvailabilityEndpointTests : IClassFixture<LuminaApiFactory>

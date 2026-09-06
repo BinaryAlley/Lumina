@@ -16,7 +16,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.UsersManagement.Authentication.Register;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/auth/api-register</c> route served by the <see cref="RegisterEndpoint"/> class.
+/// Contains security tests for the <see cref="RegisterEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class RegisterEndpointTests : IClassFixture<LuminaWebFactory>

@@ -12,7 +12,7 @@ using System.Net.Http.Json;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Themes.SetCurrentTheme;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/admin/themes/api-set-current-theme</c> route served by the <see cref="SetCurrentThemeEndpoint"/> class.
+/// Contains security tests for the <see cref="SetCurrentThemeEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class SetCurrentThemeEndpointTests : IClassFixture<LuminaWebFactory>

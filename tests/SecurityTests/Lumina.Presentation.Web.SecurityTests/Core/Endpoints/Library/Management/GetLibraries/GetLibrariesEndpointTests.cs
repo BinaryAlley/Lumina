@@ -10,7 +10,7 @@ using System.Net.Http.Headers;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.Management.GetLibraries;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/libraries/manage/api-get-libraries</c> route served by the <see cref="GetLibrariesEndpoint"/> class.
+/// Contains security tests for the <see cref="GetLibrariesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetLibrariesEndpointTests : IClassFixture<LuminaWebFactory>

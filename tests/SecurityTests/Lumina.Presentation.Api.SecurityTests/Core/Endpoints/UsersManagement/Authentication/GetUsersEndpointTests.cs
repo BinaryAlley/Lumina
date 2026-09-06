@@ -9,7 +9,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.Authentication;
 
 /// <summary>
-/// Contains security tests for the <c>/auth/users</c> route.
+/// Contains security tests for the <see cref="GetUsersEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetUsersEndpointTests : IClassFixture<LuminaApiFactory>

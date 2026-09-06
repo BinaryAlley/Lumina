@@ -29,7 +29,7 @@ public class LibraryScanFailedDomainEventFixture
     /// <param name="mediaLibraryScanCompositeId">Optional. The composite identifier of the media library scan that has failed.</param>
     /// <param name="occurredOnUtc">Optional. The date and time when the domain event occurred.</param>
     /// <param name="errorMessage">Optional. The descriptive message of the failure.</param>
-    /// <param name="includeErrorMessage">Whether to include an error message in the domain event. When false, the error message is left unset.</param>
+    /// <param name="includeErrorMessage">Whether the error message should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="LibraryScanFailedDomainEvent"/>.</returns>
     public LibraryScanFailedDomainEvent Create(
         Guid? id = null,

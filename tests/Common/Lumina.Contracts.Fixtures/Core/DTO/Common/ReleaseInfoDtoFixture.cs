@@ -15,7 +15,7 @@ namespace Lumina.Contracts.Fixtures.Core.DTO.Common;
 public class ReleaseInfoDtoFixture
 {
     /// <summary>
-    /// Creates an <see cref="ReleaseInfoDto"/>, preserving the values that are not provided as <see langword="null"/>.
+    /// Creates a <see cref="ReleaseInfoDto"/>, preserving the values that are not provided as <see langword="null"/>.
     /// </summary>
     /// <param name="originalReleaseDate">Optional. The original release date of the content.</param>
     /// <param name="originalReleaseYear">Optional. The original release year of the content.</param>
@@ -23,6 +23,12 @@ public class ReleaseInfoDtoFixture
     /// <param name="reReleaseYear">Optional. The re-release year of the content.</param>
     /// <param name="releaseCountry">Optional. The country where the content was released.</param>
     /// <param name="releaseVersion">Optional. The version or edition of the content's release.</param>
+    /// <param name="includeOriginalReleaseDate">Whether the original release date should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeOriginalReleaseYear">Whether the original release year should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeReReleaseDate">Whether the re-release date should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeReReleaseYear">Whether the re-release year should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeReleaseCountry">Whether the release country should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeReleaseVersion">Whether the release version should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="ReleaseInfoDto"/>.</returns>
     public ReleaseInfoDto Create(
         DateOnly? originalReleaseDate = null,
@@ -30,15 +36,21 @@ public class ReleaseInfoDtoFixture
         DateOnly? reReleaseDate = null,
         int? reReleaseYear = null,
         string? releaseCountry = null,
-        string? releaseVersion = null)
+        string? releaseVersion = null,
+        bool includeOriginalReleaseDate = true,
+        bool includeOriginalReleaseYear = true,
+        bool includeReReleaseDate = true,
+        bool includeReReleaseYear = true,
+        bool includeReleaseCountry = true,
+        bool includeReleaseVersion = true)
     {
         return new ReleaseInfoDto(
-            originalReleaseDate,
-            originalReleaseYear,
-            reReleaseDate,
-            reReleaseYear,
-            releaseCountry,
-            releaseVersion);
+            includeOriginalReleaseDate ? originalReleaseDate : null,
+            includeOriginalReleaseYear ? originalReleaseYear : null,
+            includeReReleaseDate ? reReleaseDate : null,
+            includeReReleaseYear ? reReleaseYear : null,
+            includeReleaseCountry ? releaseCountry : null,
+            includeReleaseVersion ? releaseVersion : null);
     }
 
     /// <summary>

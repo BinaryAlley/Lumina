@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Management.CancelLibraryScan;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/libraries/manage/{{libraryId}}/api-cancel-library-scan/{{scanId}}</c> route served by the <see cref="CancelLibraryScanEndpoint"/> class.
+/// Contains integration tests for the <see cref="CancelLibraryScanEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class CancelLibraryScanEndpointTests : IClassFixture<LuminaWebFactory>

@@ -10,7 +10,7 @@ using System.Net.Http.Headers;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.Management.GetEnabledLibraries;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/libraries/manage/api-get-enabled-libraries</c> route served by the <see cref="GetEnabledLibrariesEndpoint"/> class.
+/// Contains security tests for the <see cref="GetEnabledLibrariesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetEnabledLibrariesEndpointTests : IClassFixture<LuminaWebFactory>

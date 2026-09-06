@@ -22,8 +22,8 @@ public class PluginSettingsDtoFixture
     /// Creates a new <see cref="PluginSettingsDto"/> instance with randomized test data.
     /// </summary>
     /// <param name="pluginId">Optional unique identifier of the plugin.</param>
-    /// <param name="includeSettings">Whether to populate the current settings values, or leave them null.</param>
-    /// <param name="includeSchema">Whether to populate the settings schema, or leave it empty.</param>
+    /// <param name="includeSettings">Whether the current settings values should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeSchema">Whether the settings schema should be included, or forced to an empty collection.</param>
     /// <returns>A configured <see cref="PluginSettingsDto"/> instance.</returns>
     public PluginSettingsDto Create(
         Guid? pluginId = null, 

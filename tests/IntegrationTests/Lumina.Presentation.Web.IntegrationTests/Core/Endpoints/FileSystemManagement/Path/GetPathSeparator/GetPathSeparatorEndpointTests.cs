@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.FileSystemManagement.Path.GetPathSeparator;
 
 /// <summary>
-/// Contains integration tests for the <c>/path/api-get-path-separator</c> route served by the <see cref="GetPathSeparatorEndpoint"/> class.
+/// Contains integration tests for the <see cref="GetPathSeparatorEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetPathSeparatorEndpointTests : IClassFixture<LuminaWebFactory>

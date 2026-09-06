@@ -13,7 +13,7 @@ using System.Net.Http.Json;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.Management.ReorderMetadataProviders;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/libraries/manage/api-reorder-metadata-providers</c> route served by the <see cref="ReorderMetadataProvidersEndpoint"/> class.
+/// Contains security tests for the <see cref="ReorderMetadataProvidersEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ReorderMetadataProvidersEndpointTests : IClassFixture<LuminaWebFactory>

@@ -11,7 +11,7 @@ using System.Net.Http.Headers;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetLibraryItems;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/library/written-content-library/books-library/books/api-get-library-items</c> route served by the <see cref="GetLibraryItemsEndpoint"/> class.
+/// Contains security tests for the <see cref="GetLibraryItemsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetLibraryItemsEndpointTests : IClassFixture<LuminaWebFactory>

@@ -9,7 +9,7 @@ using System.Net;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.UsersManagement.Authentication.Logout;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/auth/logout</c> route served by the <see cref="LogoutEndpoint"/> class.
+/// Contains security tests for the <see cref="LogoutEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class LogoutEndpointTests : IClassFixture<LuminaWebFactory>

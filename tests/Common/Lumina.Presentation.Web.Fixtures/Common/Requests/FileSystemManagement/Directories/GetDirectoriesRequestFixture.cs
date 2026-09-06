@@ -17,9 +17,11 @@ public class GetDirectoriesRequestFixture
     /// Creates a new <see cref="GetDirectoriesRequest"/> instance with randomized test data.
     /// </summary>
     /// <param name="path">Optional file system path whose directories are retrieved.</param>
-    /// <param name="includeHiddenElements">Whether hidden file system elements are included or not.</param>
+    /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
     /// <returns>A configured <see cref="GetDirectoriesRequest"/> instance.</returns>
-    public GetDirectoriesRequest Create(string? path = null, bool includeHiddenElements = false)
+    public GetDirectoriesRequest Create(
+        string? path = null, 
+        bool includeHiddenElements = false)
     {
         return new GetDirectoriesRequest(
             Path: path ?? $"/media/{System.Guid.NewGuid():N}",

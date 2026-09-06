@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Plugins.GetPluginSettings;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/admin/manage-plugins/api-get-plugin-settings/{pluginId}</c> route served by the <see cref="GetPluginSettingsEndpoint"/> class.
+/// Contains integration tests for the <see cref="GetPluginSettingsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetPluginSettingsEndpointTests : IClassFixture<LuminaWebFactory>

@@ -9,7 +9,7 @@ using System.Net;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.FileSystemManagement.Drives.GetDrives;
 
 /// <summary>
-/// Contains security tests for the <c>/drives/api-get-drives</c> route served by the <see cref="GetDrivesEndpoint"/> class.
+/// Contains security tests for the <see cref="GetDrivesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetDrivesEndpointTests : IClassFixture<LuminaWebFactory>

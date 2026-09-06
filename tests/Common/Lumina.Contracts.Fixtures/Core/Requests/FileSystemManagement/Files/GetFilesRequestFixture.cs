@@ -20,9 +20,11 @@ public class GetFilesRequestFixture
     /// Creates a <see cref="GetFilesRequest"/> with default or random values.
     /// </summary>
     /// <param name="path">Optional. The file system path for which to get the files.</param>
-    /// <param name="includeHiddenElements">Optional. Whether to include hidden file system elements.</param>
+    /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
     /// <returns>The created <see cref="GetFilesRequest"/>.</returns>
-    public GetFilesRequest Create(string? path = null, bool? includeHiddenElements = null)
+    public GetFilesRequest Create(
+        string? path = null, 
+        bool? includeHiddenElements = null)
     {
         return new GetFilesRequest(
             Path: path ?? _faker.System.FilePath(),

@@ -18,7 +18,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Plugins.UpdatePluginSettings;
 
 /// <summary>
-/// Contains security tests for the <c>/plugins/{pluginId}/settings</c> route.
+/// Contains security tests for the <see cref="UpdatePluginSettingsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class UpdatePluginSettingsEndpointTests : IClassFixture<LuminaApiFactory>

@@ -18,7 +18,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.Management.GetRunningLibraryScans;
 
 /// <summary>
-/// Contains security tests for the <c>/libraries/scans/running</c> route.
+/// Contains security tests for the <see cref="GetRunningLibraryScansEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetRunningLibraryScansEndpointTests : IClassFixture<LuminaApiFactory>

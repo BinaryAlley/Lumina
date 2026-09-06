@@ -9,7 +9,7 @@ using System.Net;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Home;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}</c> and <c>/</c> routes served by the <see cref="HomeIndexEndpoint"/> class.
+/// Contains security tests for the <see cref="HomeIndexEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class HomeIndexEndpointTests : IClassFixture<LuminaWebFactory>
@@ -35,7 +35,7 @@ public class HomeIndexEndpointTests : IClassFixture<LuminaWebFactory>
         HttpResponseMessage response = await client.GetAsync("/en-us");
 
         // Assert
-        // the home page requires authentication, so an anonymous request must be redirected to the login page
+        // The home page requires authentication, so an anonymous request must be redirected to the login page.
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
         Assert.Equal("http://localhost/en-us/auth/login", response.Headers.Location!.ToString());
         string content = await response.Content.ReadAsStringAsync();
@@ -52,7 +52,7 @@ public class HomeIndexEndpointTests : IClassFixture<LuminaWebFactory>
         HttpResponseMessage response = await client.GetAsync("/");
 
         // Assert
-        // the culture-less root must never demand authentication or leak internals, only redirect to the default culture
+        // The culture-less root must never demand authentication or leak internals, only redirect to the default culture.
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
         Assert.Equal("/en-us/", response.Headers.Location!.ToString());
         string content = await response.Content.ReadAsStringAsync();

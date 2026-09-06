@@ -26,7 +26,7 @@ public class BookRatingDtoFixture
     /// <param name="maxValue">Optional. The maximum possible rating value.</param>
     /// <param name="source">Optional. The rating source.</param>
     /// <param name="voteCount">Optional. The number of votes.</param>
-    /// <param name="includeOptionalProperties">Whether the optional source and vote count should be included.</param>
+    /// <param name="includeOptionalProperties">Whether the optional source and vote count should be randomized, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="BookRatingDto"/>.</returns>
     public BookRatingDto Create(
         decimal? value = null,
@@ -38,8 +38,8 @@ public class BookRatingDtoFixture
         return new BookRatingDto(
             value ?? _random.Next(1, 5),
             maxValue ?? 5,
-            includeOptionalProperties ? (source ?? _fixture.Create<BookRatingSource>()) : null,
-            includeOptionalProperties ? (voteCount ?? _random.Next(1, 1000)) : null
+            source ?? (includeOptionalProperties ? _fixture.Create<BookRatingSource>() : null),
+            voteCount ?? (includeOptionalProperties ? _random.Next(1, 1000) : null)
         );
     }
 

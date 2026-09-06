@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.EditBook;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/library/written-content-library/books-library/books/{{id}}</c> route served by the <see cref="EditBookViewEndpoint"/> class.
+/// Contains integration tests for the <see cref="EditBookViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class EditBookViewEndpointTests : IClassFixture<LuminaWebFactory>

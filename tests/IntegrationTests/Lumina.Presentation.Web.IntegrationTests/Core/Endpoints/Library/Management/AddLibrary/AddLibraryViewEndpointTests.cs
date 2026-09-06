@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Management.AddLibrary;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/libraries/manage/item</c> route served by the <see cref="AddLibraryViewEndpoint"/> class.
+/// Contains integration tests for the <see cref="AddLibraryViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class AddLibraryViewEndpointTests : IClassFixture<LuminaWebFactory>

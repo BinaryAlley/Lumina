@@ -10,7 +10,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.Authorization;
 
 /// <summary>
-/// Contains security tests for the <c>/auth/users/{userId}/role-and-permissions</c> route.
+/// Contains security tests for the <see cref="UpdateUserRoleAndPermissionsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<LuminaApiFactory>

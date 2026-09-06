@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.Reading.GetReadingManifest;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/library/written-content-library/books-library/books/{bookId}/api-get-reading-manifest</c> route served by the <see cref="GetReadingManifestEndpoint"/> class.
+/// Contains integration tests for the <see cref="GetReadingManifestEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetReadingManifestEndpointTests : IClassFixture<LuminaWebFactory>

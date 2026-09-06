@@ -40,8 +40,7 @@ public class GetBooksRequestMappingTests
     public void ToQuery_WhenNoPaginationProvided_ShouldNotBuildPaginationData()
     {
         // Arrange
-        GetBooksRequest request = _getBooksRequestFixture.Create();
-        request = request with { CurrentPage = null, PerPage = null };
+        GetBooksRequest request = _getBooksRequestFixture.Create(includeCurrentPage: false, includePerPage: false);
 
         // Act
         GetBooksQuery result = request.ToQuery();
@@ -56,8 +55,7 @@ public class GetBooksRequestMappingTests
     public void ToQuery_WhenOnlyPerPageProvided_ShouldDefaultCurrentPageToOne()
     {
         // Arrange
-        GetBooksRequest request = _getBooksRequestFixture.Create();
-        request = request with { CurrentPage = null, PerPage = 25 };
+        GetBooksRequest request = _getBooksRequestFixture.Create(perPage: 25, includeCurrentPage: false);
 
         // Act
         GetBooksQuery result = request.ToQuery();
@@ -72,8 +70,7 @@ public class GetBooksRequestMappingTests
     public void ToQuery_WhenOnlyCurrentPageProvided_ShouldDefaultPerPageToTwoHundred()
     {
         // Arrange
-        GetBooksRequest request = _getBooksRequestFixture.Create();
-        request = request with { CurrentPage = 3, PerPage = null };
+        GetBooksRequest request = _getBooksRequestFixture.Create(currentPage: 3, includePerPage: false);
 
         // Act
         GetBooksQuery result = request.ToQuery();

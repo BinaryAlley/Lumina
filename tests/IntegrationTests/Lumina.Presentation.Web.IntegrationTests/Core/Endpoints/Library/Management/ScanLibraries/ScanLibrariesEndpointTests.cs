@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Management.ScanLibraries;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/libraries/manage/api-scan-libraries</c> route served by the <see cref="ScanLibrariesEndpoint"/> class.
+/// Contains integration tests for the <see cref="ScanLibrariesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ScanLibrariesEndpointTests : IClassFixture<LuminaWebFactory>

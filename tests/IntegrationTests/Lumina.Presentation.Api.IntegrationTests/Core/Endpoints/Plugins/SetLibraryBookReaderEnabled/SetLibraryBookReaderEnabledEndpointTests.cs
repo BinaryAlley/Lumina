@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Plugins.SetLibraryBookReaderEnabled;
 
 /// <summary>
-/// Contains integration tests for the <c>/libraries/{libraryId}/book-readers/{pluginId}/enabled</c> route.
+/// Contains integration tests for the <see cref="SetLibraryBookReaderEnabledEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class SetLibraryBookReaderEnabledEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Tools.Settings;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/tools/settings</c> route served by the <see cref="SettingsViewEndpoint"/> class.
+/// Contains integration tests for the <see cref="SettingsViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class SettingsViewEndpointTests : IClassFixture<LuminaWebFactory>

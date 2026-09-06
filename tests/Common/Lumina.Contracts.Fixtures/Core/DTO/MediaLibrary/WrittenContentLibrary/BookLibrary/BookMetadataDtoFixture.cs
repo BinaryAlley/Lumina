@@ -3,6 +3,7 @@ using Bogus;
 using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Contracts.Fixtures.Core.DTO.Common;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,10 @@ namespace Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.
 public class BookMetadataDtoFixture
 {
     private readonly Faker _faker = new();
+    private readonly ReleaseInfoDtoFixture _releaseInfoDtoFixture = new();
+    private readonly GenreDtoFixture _genreDtoFixture = new();
+    private readonly TagDtoFixture _tagDtoFixture = new();
+    private readonly LanguageInfoDtoFixture _languageInfoDtoFixture = new();
 
     /// <summary>
     /// Creates a random valid <see cref="BookMetadataDto"/>.
@@ -51,7 +56,7 @@ public class BookMetadataDtoFixture
     /// <param name="ratings">Optional. The ratings of the book.</param>
     /// <param name="coverImagePath">Optional. The path of the cover image of the book.</param>
     /// <param name="includeTitle">Whether the title should be included, or forced to <see langword="null"/>.</param>
-    /// <param name="includeOptionalProperties">Whether the properties that are not explicitly provided should be randomized, or left <see langword="null"/>.</param>
+    /// <param name="includeOptionalProperties">Whether the properties that are not explicitly provided should be randomized, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="BookMetadataDto"/>.</returns>
     public BookMetadataDto Create(
         string? title = null,
@@ -89,10 +94,13 @@ public class BookMetadataDtoFixture
             includeTitle ? title ?? (includeOptionalProperties ? _faker.Lorem.Sentence(3) : null) : null,
             originalTitle,
             description,
-            releaseInfo ?? (includeOptionalProperties ? new ReleaseInfoDto(new DateOnly(releaseYear, 1, 1), releaseYear, null, null, _faker.Address.CountryCode(), null) : null),
-            genres ?? (includeOptionalProperties ? [new GenreDto(_faker.Lorem.Word())] : null),
-            tags ?? (includeOptionalProperties ? [new TagDto(_faker.Lorem.Word())] : null),
-            language ?? (includeOptionalProperties ? new LanguageInfoDto("en", "English", "English") : null),
+            releaseInfo ?? (includeOptionalProperties ? _releaseInfoDtoFixture.Create(
+                originalReleaseDate: new DateOnly(releaseYear, 1, 1),
+                originalReleaseYear: releaseYear,
+                releaseCountry: _faker.Address.CountryCode()) : null),
+            genres ?? (includeOptionalProperties ? [_genreDtoFixture.Create()] : null),
+            tags ?? (includeOptionalProperties ? [_tagDtoFixture.Create()] : null),
+            language ?? (includeOptionalProperties ? _languageInfoDtoFixture.Create() : null),
             originalLanguage,
             publisher,
             pageCount,

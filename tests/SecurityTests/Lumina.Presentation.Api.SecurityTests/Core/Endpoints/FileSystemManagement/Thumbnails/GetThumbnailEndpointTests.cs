@@ -9,7 +9,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.FileSystemManagement.Thumbnails;
 
 /// <summary>
-/// Contains security tests for the <c>/thumbnails/get-thumbnail</c> route.
+/// Contains security tests for the <see cref="GetThumbnailEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetThumbnailEndpointTests : IClassFixture<LuminaApiFactory>

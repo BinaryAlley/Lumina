@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Management.DeleteLibrary;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/libraries/manage/api-item/{{id}}</c> route served by the <see cref="DeleteLibraryEndpoint"/> class.
+/// Contains integration tests for the <see cref="DeleteLibraryEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class DeleteLibraryEndpointTests : IClassFixture<LuminaWebFactory>

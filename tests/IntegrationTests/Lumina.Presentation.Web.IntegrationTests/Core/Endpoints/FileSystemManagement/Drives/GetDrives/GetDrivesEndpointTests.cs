@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.FileSystemManagement.Drives.GetDrives;
 
 /// <summary>
-/// Contains integration tests for the <c>/drives/api-get-drives</c> route served by the <see cref="GetDrivesEndpoint"/> class.
+/// Contains integration tests for the <see cref="GetDrivesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetDrivesEndpointTests : IClassFixture<LuminaWebFactory>

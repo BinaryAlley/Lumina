@@ -14,7 +14,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.Management.CancelLibraryScan;
 
 /// <summary>
-/// Contains security tests for the <c>/libraries/{libraryId}/scans/{scanId}/cancel</c> route.
+/// Contains security tests for the <see cref="CancelLibraryScanEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class CancelLibraryScanEndpointTests : IClassFixture<LuminaApiFactory>

@@ -9,7 +9,7 @@ using System.Net;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.FileSystemManagement.FileSystem.GetType;
 
 /// <summary>
-/// Contains security tests for the <c>/file-system/api-get-type</c> route served by the <see cref="GetTypeEndpoint"/> class.
+/// Contains security tests for the <see cref="GetTypeEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetTypeEndpointTests : IClassFixture<LuminaWebFactory>

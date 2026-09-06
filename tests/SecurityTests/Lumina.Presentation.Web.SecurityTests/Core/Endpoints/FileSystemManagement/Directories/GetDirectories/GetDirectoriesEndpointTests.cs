@@ -11,7 +11,7 @@ using System.Net.Http.Headers;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.FileSystemManagement.Directories.GetDirectories;
 
 /// <summary>
-/// Contains security tests for the <c>/directories/api-get-directories</c> route served by the <see cref="GetDirectoriesEndpoint"/> class.
+/// Contains security tests for the <see cref="GetDirectoriesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetDirectoriesEndpointTests : IClassFixture<LuminaWebFactory>

@@ -3,15 +3,13 @@ using Lumina.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Net.Http;
 using System.Text.Json;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Themes.Queries.GetCurrentTheme;
 
 /// <summary>
-/// Contains security tests for the <c>/api/v1/themes/current</c> route.
+/// Contains security tests for the <see cref="GetCurrentThemeEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetCurrentThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
@@ -29,7 +27,7 @@ public class GetCurrentThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDi
     public GetCurrentThemeEndpointTests(LuminaApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
-        // a unique X-Forwarded-For isolates rate limiting state per test
+        // A unique X-Forwarded-For isolates rate limiting state per test.
         _client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
     }
 
@@ -42,7 +40,7 @@ public class GetCurrentThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDi
         string content = await response.Content.ReadAsStringAsync();
 
         // Assert
-        // the route is AllowAnonymous, so anonymous callers must never be challenged for credentials
+        // The route is AllowAnonymous, so anonymous callers must never be challenged for credentials.
         Assert.NotEqual(HttpStatusCode.Unauthorized, response.StatusCode);
         Assert.NotEqual(HttpStatusCode.InternalServerError, response.StatusCode);
 
@@ -54,7 +52,7 @@ public class GetCurrentThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDi
         Assert.DoesNotContain("salt", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
 
-        // when no active theme exists yet, the failure must be a clean, generic 404 that discloses nothing internal
+        // When no active theme exists yet, the failure must be a clean, generic 404 that discloses nothing internal.
         if (response.StatusCode == HttpStatusCode.NotFound)
         {
             Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);

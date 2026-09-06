@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Plugins.Index;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/admin/manage-plugins</c> route served by the <see cref="PluginsIndexViewEndpoint"/> class.
+/// Contains integration tests for the <see cref="PluginsIndexViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class PluginsIndexViewEndpointTests : IClassFixture<LuminaWebFactory>

@@ -10,7 +10,7 @@ using System.Net.Http.Headers;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.Management.GetMetadataProviders;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/libraries/manage/api-get-metadata-providers/{{libraryId}}</c> route served by the <see cref="GetMetadataProvidersEndpoint"/> class.
+/// Contains security tests for the <see cref="GetMetadataProvidersEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetMetadataProvidersEndpointTests : IClassFixture<LuminaWebFactory>

@@ -9,7 +9,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.FileSystemManagement.Drives;
 
 /// <summary>
-/// Contains security tests for the <c>/drives/get-drives</c> route.
+/// Contains security tests for the <see cref="GetDrivesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetDrivesEndpointTests : IClassFixture<LuminaApiFactory>

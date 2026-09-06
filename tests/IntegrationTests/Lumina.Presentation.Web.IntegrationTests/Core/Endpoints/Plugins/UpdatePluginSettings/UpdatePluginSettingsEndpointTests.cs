@@ -4,7 +4,6 @@ using Lumina.Presentation.Web.Core.Endpoints.Plugins.UpdatePluginSettings;
 using Lumina.Presentation.Web.Fixtures.Common.Requests.Plugins;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
@@ -17,7 +16,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Plugins.UpdatePluginSettings;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/admin/manage-plugins/api-update-plugin-settings</c> route served by the <see cref="UpdatePluginSettingsEndpoint"/> class.
+/// Contains integration tests for the <see cref="UpdatePluginSettingsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class UpdatePluginSettingsEndpointTests : IClassFixture<LuminaWebFactory>

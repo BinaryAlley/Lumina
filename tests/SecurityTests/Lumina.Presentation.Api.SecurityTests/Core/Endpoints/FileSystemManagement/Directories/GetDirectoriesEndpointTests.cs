@@ -9,7 +9,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.FileSystemManagement.Directories;
 
 /// <summary>
-/// Contains security tests for the <c>/directories/get-directories</c> route.
+/// Contains security tests for the <see cref="GetDirectoriesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetDirectoriesEndpointTests : IClassFixture<LuminaApiFactory>

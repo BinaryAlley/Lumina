@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Authorization.Roles.DeleteRole;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/admin/api-delete-role/{roleId}</c> route served by the <see cref="DeleteRoleEndpoint"/> class.
+/// Contains integration tests for the <see cref="DeleteRoleEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class DeleteRoleEndpointTests : IClassFixture<LuminaWebFactory>

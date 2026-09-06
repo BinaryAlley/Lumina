@@ -9,7 +9,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.FileSystemManagement.Path;
 
 /// <summary>
-/// Contains security tests for the <c>/path/validate</c> route.
+/// Contains security tests for the <see cref="ValidatePathEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ValidatePathEndpointTests : IClassFixture<LuminaApiFactory>

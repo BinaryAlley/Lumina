@@ -12,7 +12,7 @@ using System.Net;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.UsersManagement.Authorization.GetUserPermissions;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/admin/api-get-permissions-by-user-id/{userId}</c> route served by the <see cref="GetUserPermissionsEndpoint"/> class.
+/// Contains security tests for the <see cref="GetUserPermissionsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetUserPermissionsEndpointTests : IClassFixture<LuminaWebFactory>

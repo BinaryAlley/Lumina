@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.FileSystemManagement.Directories.GetDirectories;
 
 /// <summary>
-/// Contains integration tests for the <c>/directories/api-get-directories</c> route served by the <see cref="GetDirectoriesEndpoint"/> class.
+/// Contains integration tests for the <see cref="GetDirectoriesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetDirectoriesEndpointTests : IClassFixture<LuminaWebFactory>

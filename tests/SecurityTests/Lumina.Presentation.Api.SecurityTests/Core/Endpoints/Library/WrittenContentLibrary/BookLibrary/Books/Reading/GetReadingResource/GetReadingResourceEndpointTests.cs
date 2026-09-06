@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.Reading.GetReadingResource;
 
 /// <summary>
-/// Contains security tests for the <c>/books/{bookId}/reading/resources/{resourceKey}</c> route.
+/// Contains security tests for the <see cref="GetReadingResourceEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetReadingResourceEndpointTests : IClassFixture<LuminaApiFactory>

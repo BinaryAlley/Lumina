@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Scheduler.GetScheduledJobs;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/admin/api-scheduled-jobs</c> route served by the <see cref="GetScheduledJobsEndpoint"/> class.
+/// Contains integration tests for the <see cref="GetScheduledJobsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetScheduledJobsEndpointTests : IClassFixture<LuminaWebFactory>

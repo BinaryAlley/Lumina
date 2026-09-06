@@ -11,7 +11,7 @@ using System.Text;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Themes.RestoreTheme;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/admin/themes/api-restore-theme/{themeId}</c> route served by the <see cref="RestoreThemeEndpoint"/> class.
+/// Contains security tests for the <see cref="RestoreThemeEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class RestoreThemeEndpointTests : IClassFixture<LuminaWebFactory>

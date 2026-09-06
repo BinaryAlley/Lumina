@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.Authentication;
 
 /// <summary>
-/// Contains security tests for the <c>/auth/recover-password</c> route.
+/// Contains security tests for the <see cref="RecoverPasswordEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class RecoverPasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
@@ -47,7 +47,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDi
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
-        // set a fake IP for this test instance
+        // Set a fake IP for this test instance.
         _client.DefaultRequestHeaders.Clear();
         _client.DefaultRequestHeaders.Add("X-Forwarded-For", $"192.168.1.4");
         _testUsername = $"testuser_{Guid.NewGuid()}";
@@ -64,7 +64,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDi
 
         // Act
         List<HttpResponseMessage> responses = [];
-        for (int i = 0; i < 11; i++) // exceed the 10 request limit
+        for (int i = 0; i < 11; i++) // Exceed the 10 request limit.
             responses.Add(await _client.PostAsJsonAsync("/api/v1/auth/recover-password", request));
 
         // Assert
@@ -91,8 +91,8 @@ public class RecoverPasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDi
     public async Task RecoverPassword_WithSQLInjectionInUsername_ShouldNotCorruptOrDeleteData(string maliciousUsername)
     {
         // Arrange
-        // use a dedicated unique IP, so the rate-limit test (which exhausts the 10-permit window on its own IP)
-        // cannot run first and 429 this test; the NotEqual(TooManyRequests) assertion below guards against any collision
+        // Use a dedicated unique IP, so the rate-limit test (which exhausts the 10-permit window on its own IP)
+        // cannot run first and 429 this test; the NotEqual(TooManyRequests) assertion below guards against any collision.
         HttpClient client = _apiFactory.CreateClient();
         client.DefaultRequestHeaders.Clear();
         client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
@@ -106,7 +106,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDi
         HttpResponseMessage response = await client.PostAsJsonAsync("/api/v1/auth/recover-password", request);
 
         // Assert
-        // the malicious username queries for a user, so it must never be executed against the database
+        // The malicious username queries for a user, so it must never be executed against the database.
         Assert.NotEqual(HttpStatusCode.TooManyRequests, response.StatusCode);
         Assert.DoesNotContain("SqliteException", await response.Content.ReadAsStringAsync(), StringComparison.OrdinalIgnoreCase);
 

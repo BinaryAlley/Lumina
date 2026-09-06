@@ -20,7 +20,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.Settings.UpdateUserSettings;
 
 /// <summary>
-/// Contains security tests for the <c>/users/me/settings</c> route.
+/// Contains security tests for the <see cref="UpdateUserSettingsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class UpdateUserSettingsEndpointTests : IClassFixture<LuminaApiFactory>

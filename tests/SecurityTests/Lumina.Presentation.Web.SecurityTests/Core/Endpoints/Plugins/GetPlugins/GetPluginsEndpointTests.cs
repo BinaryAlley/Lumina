@@ -12,7 +12,7 @@ using System.Net.Http.Headers;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Plugins.GetPlugins;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/admin/manage-plugins/api-get-plugins</c> route served by the <see cref="GetPluginsEndpoint"/> class.
+/// Contains security tests for the <see cref="GetPluginsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetPluginsEndpointTests : IClassFixture<LuminaWebFactory>

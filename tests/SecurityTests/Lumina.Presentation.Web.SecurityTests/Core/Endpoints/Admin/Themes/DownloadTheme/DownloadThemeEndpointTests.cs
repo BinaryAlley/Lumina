@@ -10,7 +10,7 @@ using System.Net.Http.Headers;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Themes.DownloadTheme;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/admin/themes/api-download-theme/{themeId}</c> route served by the <see cref="DownloadThemeEndpoint"/> class.
+/// Contains security tests for the <see cref="DownloadThemeEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class DownloadThemeEndpointTests : IClassFixture<LuminaWebFactory>

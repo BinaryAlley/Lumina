@@ -1,10 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Plugins;
 using Lumina.Presentation.Web.Core.Endpoints.Plugins.InstallPlugin;
 using Lumina.Presentation.Web.Fixtures.Common.DTO.Plugins;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
@@ -16,7 +14,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Plugins.InstallPlugin;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/admin/manage-plugins/api-install-plugin</c> route served by the <see cref="InstallPluginEndpoint"/> class.
+/// Contains integration tests for the <see cref="InstallPluginEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class InstallPluginEndpointTests : IClassFixture<LuminaWebFactory>

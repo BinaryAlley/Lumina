@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Scheduler.FireScheduledJob;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/admin/api-scheduled-jobs/{scheduledJobId}/fire</c> route served by the <see cref="FireScheduledJobEndpoint"/> class.
+/// Contains security tests for the <see cref="FireScheduledJobEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class FireScheduledJobEndpointTests : IClassFixture<LuminaWebFactory>

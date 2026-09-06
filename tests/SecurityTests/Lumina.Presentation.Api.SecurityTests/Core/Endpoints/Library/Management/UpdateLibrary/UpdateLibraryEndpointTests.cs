@@ -18,7 +18,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.Management.UpdateLibrary;
 
 /// <summary>
-/// Contains security tests for the <c>/libraries/{id}</c> route.
+/// Contains security tests for the <see cref="UpdateLibraryEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class UpdateLibraryEndpointTests : IClassFixture<LuminaApiFactory>

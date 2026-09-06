@@ -9,7 +9,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.FileSystemManagement.FileSystem;
 
 /// <summary>
-/// Contains security tests for the <c>/file-system/get-type</c> route.
+/// Contains security tests for the <see cref="GetTypeEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetTypeEndpointTests : IClassFixture<LuminaApiFactory>

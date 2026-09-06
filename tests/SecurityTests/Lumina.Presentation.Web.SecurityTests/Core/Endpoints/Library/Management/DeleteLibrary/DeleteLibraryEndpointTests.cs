@@ -11,7 +11,7 @@ using System.Text;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.Management.DeleteLibrary;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/libraries/manage/api-item/{{id}}</c> route served by the <see cref="DeleteLibraryEndpoint"/> class.
+/// Contains security tests for the <see cref="DeleteLibraryEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class DeleteLibraryEndpointTests : IClassFixture<LuminaWebFactory>

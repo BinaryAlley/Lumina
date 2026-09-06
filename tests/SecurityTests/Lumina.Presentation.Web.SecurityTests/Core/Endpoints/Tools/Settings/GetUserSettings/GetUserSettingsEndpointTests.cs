@@ -10,7 +10,7 @@ using System.Net.Http.Headers;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Tools.Settings.GetUserSettings;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/tools/settings/api-get-user-settings</c> route served by the <see cref="GetUserSettingsEndpoint"/> class.
+/// Contains security tests for the <see cref="GetUserSettingsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetUserSettingsEndpointTests : IClassFixture<LuminaWebFactory>

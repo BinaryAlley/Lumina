@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.Reading.GetReadingAvailability;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/library/written-content-library/books-library/books/{bookId}/api-get-reading-availability</c> route served by the <see cref="GetReadingAvailabilityEndpoint"/> class.
+/// Contains security tests for the <see cref="GetReadingAvailabilityEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetReadingAvailabilityEndpointTests : IClassFixture<LuminaWebFactory>

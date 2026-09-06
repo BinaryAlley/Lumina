@@ -9,7 +9,7 @@ using System.Net;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Home;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/error</c> route served by the <see cref="HomeErrorEndpoint"/> class.
+/// Contains security tests for the <see cref="HomeErrorEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class HomeErrorEndpointTests : IClassFixture<LuminaWebFactory>

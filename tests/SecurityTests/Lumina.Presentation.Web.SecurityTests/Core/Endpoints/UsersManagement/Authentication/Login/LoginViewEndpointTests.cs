@@ -9,7 +9,7 @@ using System.Net;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.UsersManagement.Authentication.Login;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/auth/login/{returnUrl?}</c> route served by the <see cref="LoginViewEndpoint"/> class.
+/// Contains security tests for the <see cref="LoginViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class LoginViewEndpointTests : IClassFixture<LuminaWebFactory>

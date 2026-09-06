@@ -23,7 +23,7 @@ using System.Text.Json.Serialization;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.Authentication;
 
 /// <summary>
-/// Contains security tests for the <c>/auth/login</c> route.
+/// Contains security tests for the <see cref="LoginEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
@@ -50,7 +50,7 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
-        // set a fake IP for this test instance
+        // Set a fake IP for this test instance.
         _client.DefaultRequestHeaders.Clear();
         _client.DefaultRequestHeaders.Add("X-Forwarded-For", $"192.168.1.1");
         _testUsername = $"testuser_{Guid.NewGuid()}";
@@ -85,7 +85,7 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         DateTimeOffset tokenExpiration = DateTimeOffset.FromUnixTimeSeconds(long.Parse(expValue));
         DateTimeOffset expectedExpiration = beforeRequest.AddMinutes(15);
 
-        // verify token duration (should be 15 minutes from request time - expiration value is set in tests setup class)
+        // Verify token duration (should be 15 minutes from request time - expiration value is set in tests setup class).
         TimeSpan allowedVariance = TimeSpan.FromSeconds(30); // allow for processing time
         TimeSpan actualDifference = tokenExpiration - beforeRequest;
         TimeSpan expectedDifference = TimeSpan.FromMinutes(15);
@@ -146,7 +146,7 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
     public async Task Login_WhenRateLimitExceeded_ShouldReturnTooManyRequests()
     {
         // Arrange
-        // set a fake IP for this test instance
+        // Set a fake IP for this test instance.
         _client.DefaultRequestHeaders.Clear();
         _client.DefaultRequestHeaders.Add("X-Forwarded-For", $"192.168.1.3");
         LoginRequest request = _loginRequestFixture.Create(
@@ -156,7 +156,7 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
 
         // Act
         List<HttpResponseMessage> responses = [];
-        for (int i = 0; i < 11; i++) // exceed the 10 request limit
+        for (int i = 0; i < 11; i++) // Exceed the 10 request limit.
             responses.Add(await _client.PostAsJsonAsync("/api/v1/auth/login", request));
 
         // Assert
@@ -200,10 +200,10 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.DoesNotContain("SQL", content);
         Assert.DoesNotContain("Exception", content);
-        Assert.DoesNotContain(legitimateUser.Username, content); // shouldn't expose other usernames
-        Assert.DoesNotContain(legitimateUser.Password, content); // shouldn't expose password hashes
+        Assert.DoesNotContain(legitimateUser.Username, content); // Shouldn't expose other usernames.
+        Assert.DoesNotContain(legitimateUser.Password, content); // Shouldn't expose password hashes.
 
-        // the injected statement must never be executed: the Users table and the seeded user must still be there
+        // The injected statement must never be executed: the Users table and the seeded user must still be there.
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         Assert.NotNull(await dbContext.Users.FirstOrDefaultAsync(user => user.Id == legitimateUser.Id));

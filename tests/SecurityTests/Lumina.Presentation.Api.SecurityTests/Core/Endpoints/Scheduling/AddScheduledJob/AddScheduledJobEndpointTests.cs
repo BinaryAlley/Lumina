@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Scheduling.AddScheduledJob;
 
 /// <summary>
-/// Contains security tests for the <c>/api/v1/scheduled-jobs</c> route.
+/// Contains security tests for the <see cref="AddScheduledJobEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class AddScheduledJobEndpointTests : IClassFixture<LuminaApiFactory>, IAsyncDisposable

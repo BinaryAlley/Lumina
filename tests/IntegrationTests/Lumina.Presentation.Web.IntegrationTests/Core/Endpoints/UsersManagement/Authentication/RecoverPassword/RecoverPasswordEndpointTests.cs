@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.UsersManagement.Authentication.RecoverPassword;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/auth/api-recover-password</c> route served by the <see cref="RecoverPasswordEndpoint"/> class.
+/// Contains integration tests for the <see cref="RecoverPasswordEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class RecoverPasswordEndpointTests : IClassFixture<LuminaWebFactory>

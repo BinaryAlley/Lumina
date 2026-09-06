@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Management.ReorderArtworkProviders;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/libraries/manage/api-reorder-artwork-providers</c> route served by the <see cref="ReorderArtworkProvidersEndpoint"/> class.
+/// Contains integration tests for the <see cref="ReorderArtworkProvidersEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ReorderArtworkProvidersEndpointTests : IClassFixture<LuminaWebFactory>

@@ -11,7 +11,7 @@ using System.Net;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.UsersManagement.Authorization.GetUserRole;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/admin/api-get-role-by-user-id/{userId}</c> route served by the <see cref="GetUserRoleEndpoint"/> class.
+/// Contains security tests for the <see cref="GetUserRoleEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetUserRoleEndpointTests : IClassFixture<LuminaWebFactory>

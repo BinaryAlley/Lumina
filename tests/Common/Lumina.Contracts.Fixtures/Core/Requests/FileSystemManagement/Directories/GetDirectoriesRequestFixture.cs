@@ -20,9 +20,11 @@ public class GetDirectoriesRequestFixture
     /// Creates a <see cref="GetDirectoriesRequest"/> with default or random values.
     /// </summary>
     /// <param name="path">Optional. The file system path for which to get the directories.</param>
-    /// <param name="includeHiddenElements">Optional. Whether to include hidden file system elements.</param>
+    /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
     /// <returns>The created <see cref="GetDirectoriesRequest"/>.</returns>
-    public GetDirectoriesRequest Create(string? path = null, bool? includeHiddenElements = null)
+    public GetDirectoriesRequest Create(
+        string? path = null, 
+        bool? includeHiddenElements = null)
     {
         return new GetDirectoriesRequest(
             Path: path ?? _faker.System.FilePath(),

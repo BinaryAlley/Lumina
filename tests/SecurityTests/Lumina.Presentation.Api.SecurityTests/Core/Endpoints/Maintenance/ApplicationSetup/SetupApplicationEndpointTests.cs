@@ -10,7 +10,7 @@ using System.Net.Http.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Maintenance.ApplicationSetup;
 
 /// <summary>
-/// Contains security tests for the <c>/initialization</c> route.
+/// Contains security tests for the <see cref="SetupApplicationEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class SetupApplicationEndpointTests : IClassFixture<LuminaApiFactory>

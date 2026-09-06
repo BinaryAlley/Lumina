@@ -17,7 +17,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Plugins.ReorderLibraryMetadataProviders;
 
 /// <summary>
-/// Contains security tests for the <c>/libraries/{libraryId}/metadata-providers/reorder</c> route.
+/// Contains security tests for the <see cref="ReorderLibraryMetadataProvidersEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ReorderLibraryMetadataProvidersEndpointTests : IClassFixture<LuminaApiFactory>

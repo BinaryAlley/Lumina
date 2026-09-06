@@ -13,7 +13,7 @@ using System.Net.Http.Json;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.Management.SaveLibrary;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/libraries/manage/api-item</c> route served by the <see cref="SaveLibraryEndpoint"/> class.
+/// Contains security tests for the <see cref="SaveLibraryEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class SaveLibraryEndpointTests : IClassFixture<LuminaWebFactory>

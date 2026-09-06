@@ -348,6 +348,129 @@ public class BookRepositoryTests
     }
 
     [Fact]
+    public async Task UpdateAsync_WhenChangingIdentityAndEnrichmentColumns_ShouldPreserveTheStoredValues()
+    {
+        // Arrange
+        BookEntity storedBook = _bookEntityFixture.Create();
+        _mockContext.Books.Add(storedBook);
+        await _mockContext.SaveChangesAsync();
+
+        Guid storedLibraryId = storedBook.LibraryId;
+        string storedPath = storedBook.Path;
+        MetadataStatus storedMetadataStatus = storedBook.MetadataStatus;
+        DateTime? storedLastMetadataUpdateUtc = storedBook.LastMetadataUpdateUtc;
+        string? storedMetadataProvider = storedBook.MetadataProvider;
+        DateTime storedCreatedOnUtc = storedBook.CreatedOnUtc;
+        Guid storedCreatedBy = storedBook.CreatedBy;
+
+        BookEntity data = _bookEntityFixture.Create(id: storedBook.Id);
+        data.Title = "Updated Title";
+        data.LibraryId = Guid.NewGuid();
+        data.Path = "/books/updated.epub";
+        data.MetadataStatus = MetadataStatus.Enriched;
+        data.LastMetadataUpdateUtc = DateTime.UtcNow;
+        data.MetadataProvider = "UpdatedProvider";
+        data.CreatedOnUtc = DateTime.UtcNow.AddYears(-10);
+        data.CreatedBy = Guid.NewGuid();
+
+        // Act
+        Result<Updated> result = await _sut.UpdateAsync(data, CancellationToken.None);
+        await _mockContext.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        BookEntity? retrievedBook = await _mockContext.Books
+            .Include(book => book.Tags)
+            .Include(book => book.Genres)
+            .Include(book => book.ISBNs)
+            .Include(book => book.Ratings)
+            .Include(book => book.BookContributors)
+            .FirstOrDefaultAsync(book => book.Id == storedBook.Id);
+        Assert.NotNull(retrievedBook);
+        Assert.Equal("Updated Title", retrievedBook!.Title);
+        // The identity, enrichment and audit columns of the stored book are never overwritten by an edit.
+        Assert.Equal(storedLibraryId, retrievedBook.LibraryId);
+        Assert.Equal(storedPath, retrievedBook.Path);
+        Assert.Equal(storedMetadataStatus, retrievedBook.MetadataStatus);
+        Assert.Equal(storedLastMetadataUpdateUtc, retrievedBook.LastMetadataUpdateUtc);
+        Assert.Equal(storedMetadataProvider, retrievedBook.MetadataProvider);
+        Assert.Equal(storedCreatedOnUtc, retrievedBook.CreatedOnUtc);
+        Assert.Equal(storedCreatedBy, retrievedBook.CreatedBy);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WhenDataContainsExistingTagAndGenreNames_ShouldReuseTheStoredTagAndGenreEntities()
+    {
+        // Arrange
+        TagEntity existingTag = _tagEntityFixture.Create(name: "ExistingTag");
+        GenreEntity existingGenre = _genreEntityFixture.Create(name: "ExistingGenre");
+        BookEntity storedBook = _bookEntityFixture.Create();
+        storedBook.Tags = [existingTag];
+        storedBook.Genres = [existingGenre];
+        _mockContext.Books.Add(storedBook);
+        await _mockContext.SaveChangesAsync();
+
+        BookEntity data = _bookEntityFixture.Create(id: storedBook.Id);
+        data.Tags = [_tagEntityFixture.Create(name: "ExistingTag")];
+        data.Genres = [_genreEntityFixture.Create(name: "ExistingGenre")];
+
+        // Act
+        Result<Updated> result = await _sut.UpdateAsync(data, CancellationToken.None);
+        await _mockContext.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        BookEntity? retrievedBook = await _mockContext.Books
+            .Include(book => book.Tags)
+            .Include(book => book.Genres)
+            .FirstOrDefaultAsync(book => book.Id == storedBook.Id);
+        Assert.NotNull(retrievedBook);
+        TagEntity retrievedTag = Assert.Single(retrievedBook!.Tags);
+        GenreEntity retrievedGenre = Assert.Single(retrievedBook.Genres);
+        Assert.Equal("ExistingTag", retrievedTag.Name);
+        Assert.Equal("ExistingGenre", retrievedGenre.Name);
+        // The stored rows of the shared tables are not duplicated by the update.
+        Assert.Single(_mockContext.Set<TagEntity>().Where(tag => tag.Name == "ExistingTag"));
+        Assert.Single(_mockContext.Set<GenreEntity>().Where(genre => genre.Name == "ExistingGenre"));
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WhenReplacingOwnedCollections_ShouldReplaceIsbnsRatingsAndBookContributors()
+    {
+        // Arrange
+        BookEntity storedBook = _bookEntityFixture.Create();
+        storedBook.ISBNs = [_isbnEntityFixture.Create(value: "9780395272237", format: IsbnFormat.Isbn13)];
+        storedBook.Ratings = [_bookRatingEntityFixture.Create(value: 4.5M, maxValue: 5, source: BookRatingSource.Goodreads, voteCount: 100)];
+        storedBook.BookContributors = [_bookContributorEntityFixture.Create(bookId: storedBook.Id, roleCategory: MediaContributorRoleCategory.Author)];
+        _mockContext.Books.Add(storedBook);
+        await _mockContext.SaveChangesAsync();
+
+        BookEntity data = _bookEntityFixture.Create(id: storedBook.Id);
+        data.ISBNs = [_isbnEntityFixture.Create(value: "9780261102693", format: IsbnFormat.Isbn13)];
+        data.Ratings = [_bookRatingEntityFixture.Create(value: 3.5M, maxValue: 5, source: BookRatingSource.Amazon, voteCount: 50)];
+        data.BookContributors = [_bookContributorEntityFixture.Create(bookId: storedBook.Id, mediaContributorId: Guid.NewGuid(), roleCategory: MediaContributorRoleCategory.Illustrator)];
+
+        // Act
+        Result<Updated> result = await _sut.UpdateAsync(data, CancellationToken.None);
+        await _mockContext.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        BookEntity? retrievedBook = await _mockContext.Books
+            .Include(book => book.ISBNs)
+            .Include(book => book.Ratings)
+            .Include(book => book.BookContributors)
+            .FirstOrDefaultAsync(book => book.Id == storedBook.Id);
+        Assert.NotNull(retrievedBook);
+        IsbnEntity retrievedIsbn = Assert.Single(retrievedBook!.ISBNs);
+        BookRatingEntity retrievedRating = Assert.Single(retrievedBook.Ratings);
+        BookContributorEntity retrievedContributor = Assert.Single(retrievedBook.BookContributors);
+        Assert.Equal("9780261102693", retrievedIsbn.Value);
+        Assert.Equal(3.5M, retrievedRating.Value);
+        Assert.Equal(MediaContributorRoleCategory.Illustrator, retrievedContributor.RoleCategory);
+    }
+
+    [Fact]
     public async Task GetPaginatedAsync_WhenFilterIncludesLibraryId_ShouldReturnPaginatedBooks()
     {
         // Arrange

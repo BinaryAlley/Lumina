@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.Reading.GetReadingResource;
 
 /// <summary>
-/// Contains integration tests for the <c>/books/{bookId}/reading/resources/{resourceKey}</c> route.
+/// Contains integration tests for the <see cref="GetReadingResourceEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetReadingResourceEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime

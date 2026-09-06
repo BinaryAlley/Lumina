@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.FileSystemManagement.Path.SplitPath;
 
 /// <summary>
-/// Contains integration tests for the <c>/path/api-split</c> route served by the <see cref="SplitPathEndpoint"/> class.
+/// Contains integration tests for the <see cref="SplitPathEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class SplitPathEndpointTests : IClassFixture<LuminaWebFactory>

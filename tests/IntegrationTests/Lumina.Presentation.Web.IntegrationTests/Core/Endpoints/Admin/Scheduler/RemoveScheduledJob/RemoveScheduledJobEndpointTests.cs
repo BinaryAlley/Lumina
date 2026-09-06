@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Scheduler.RemoveScheduledJob;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/admin/api-scheduled-jobs/{scheduledJobId}</c> route served by the <see cref="RemoveScheduledJobEndpoint"/> class.
+/// Contains integration tests for the <see cref="RemoveScheduledJobEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class RemoveScheduledJobEndpointTests : IClassFixture<LuminaWebFactory>
