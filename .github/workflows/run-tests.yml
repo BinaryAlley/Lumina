@@ -12,7 +12,7 @@ jobs:
     timeout-minutes: 60
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, windows-latest, macOS-latest]
     steps:
       - uses: actions/checkout@v2
       - name: Set up .NET
@@ -29,7 +29,7 @@ jobs:
       - name: Run tests
         # blame-hang terminates a test that blocks for 10 minutes and dumps the hang stack,
         # turning the recurring 'stuck job' into a failing job that names the culprit test
-        run: dotnet test src/Lumina.sln --no-build --verbosity normal --blame-hang --blame-hang-timeout 10m --filter "FullyQualifiedName~UpdateBookCoverEndpointTests"
+        run: dotnet test src/Lumina.sln --no-build --verbosity normal --blame-hang --blame-hang-timeout 10m
       - name: Upload hang diagnostics
         if: failure()
         uses: actions/upload-artifact@v4

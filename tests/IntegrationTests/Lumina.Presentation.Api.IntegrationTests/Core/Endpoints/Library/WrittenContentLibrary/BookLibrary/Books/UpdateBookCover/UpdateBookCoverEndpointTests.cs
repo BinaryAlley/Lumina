@@ -66,8 +66,8 @@ public class UpdateBookCoverEndpointTests : IClassFixture<AuthenticatedLuminaApi
         HttpResponseMessage response = await _client.PutAsync($"/api/v1/books/{bookId}/cover", CreateCoverForm("cover.png"));
 
         // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        Assert.True(response.StatusCode == HttpStatusCode.OK, $"Unexpected status {(int)response.StatusCode}: {content}");
         string storedPath = JsonSerializer.Deserialize<string>(content)!;
         Assert.False(string.IsNullOrWhiteSpace(storedPath));
         Assert.Contains("cover.png", storedPath, StringComparison.OrdinalIgnoreCase);
@@ -92,8 +92,8 @@ public class UpdateBookCoverEndpointTests : IClassFixture<AuthenticatedLuminaApi
         HttpResponseMessage response = await _client.PutAsync($"/api/v1/books/{bookId}/cover", CreateCoverForm("cover.png"));
 
         // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        Assert.True(response.StatusCode == HttpStatusCode.OK, $"Unexpected status {(int)response.StatusCode}: {content}");
         string storedPath = JsonSerializer.Deserialize<string>(content)!;
         Assert.False(string.IsNullOrWhiteSpace(storedPath));
 
