@@ -112,7 +112,8 @@ public class GetBooksLiteEndpointSummary : Summary<GetBooksLiteEndpoint, GetBook
                     {
                         "General.Validation", new[]
                         {
-                            "LibraryIdCannotBeEmpty"
+                            "LibraryIdCannotBeEmpty",
+                            "InvalidFilterAlphaKey"
                         }
                     }
                 },

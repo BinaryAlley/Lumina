@@ -26,18 +26,18 @@ public class ThemeEntityFixture
     /// <param name="author">Optional author of the theme.</param>
     /// <param name="version">Optional version of the theme.</param>
     /// <param name="previewPath">Optional preview image path of the theme, or <see langword="null"/> when the theme has no preview.</param>
-    /// <param name="includePreviewPath">Whether to set <paramref name="previewPath"/>, or <see langword="null"/> when <see langword="false"/>.</param>
+    /// <param name="includePreviewPath">Whether the preview path should be included, or forced to <see langword="null"/>.</param>
     /// <param name="installSource">Optional source the theme was installed from.</param>
     /// <param name="isCurrent">Optional value indicating whether the theme is the currently active one.</param>
-    /// <param name="includeIsCurrent">Whether to set <paramref name="isCurrent"/>, or <see langword="null"/> when <see langword="false"/>.</param>
+    /// <param name="includeIsCurrent">Whether the currently active flag should be included, or forced to <see langword="null"/>.</param>
     /// <param name="isDeleted">Optional value indicating whether the theme was soft deleted.</param>
     /// <param name="installedAtUtc">Optional UTC timestamp when the theme was installed.</param>
     /// <param name="createdOnUtc">Optional UTC timestamp when the entity was created.</param>
     /// <param name="createdBy">Optional Id of the user that created the entity.</param>
     /// <param name="updatedOnUtc">Optional UTC timestamp when the entity was updated.</param>
-    /// <param name="includeUpdatedOnUtc">Whether to set <paramref name="updatedOnUtc"/>, or <see langword="null"/> when <see langword="false"/>.</param>
+    /// <param name="includeUpdatedOnUtc">Whether the updated-on timestamp should be included, or forced to <see langword="null"/>.</param>
     /// <param name="updatedBy">Optional Id of the user that updated the entity.</param>
-    /// <param name="includeUpdatedBy">Whether to set <paramref name="updatedBy"/>, or <see langword="null"/> when <see langword="false"/>.</param>
+    /// <param name="includeUpdatedBy">Whether the updated-by user Id should be included, or forced to <see langword="null"/>.</param>
     /// <returns>A configured <see cref="ThemeEntity"/> instance.</returns>
     public ThemeEntity Create(
         Guid? id = null,

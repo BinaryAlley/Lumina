@@ -9,7 +9,7 @@ using System.Net;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.UsersManagement.Authentication.Register;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/auth/register</c> route served by the <see cref="RegisterViewEndpoint"/> class.
+/// Contains security tests for the <see cref="RegisterViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class RegisterViewEndpointTests : IClassFixture<LuminaWebFactory>

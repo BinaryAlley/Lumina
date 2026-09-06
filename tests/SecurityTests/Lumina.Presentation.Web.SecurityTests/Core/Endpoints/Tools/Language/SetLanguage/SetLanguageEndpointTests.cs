@@ -9,7 +9,7 @@ using System.Net;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Tools.Language.SetLanguage;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/tools/language/set-language</c> route served by the <see cref="SetLanguageEndpoint"/> class.
+/// Contains security tests for the <see cref="SetLanguageEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class SetLanguageEndpointTests : IClassFixture<LuminaWebFactory>

@@ -39,7 +39,7 @@ public class BookLiteResponseTests
     public void RoundTrip_WhenSerializingBookLiteResponseWithNullValues_ShouldPreserveNulls()
     {
         // Arrange
-        BookLiteResponse expected = _bookLiteResponseFixture.Create() with { ReleaseYear = null, CoverPath = null };
+        BookLiteResponse expected = _bookLiteResponseFixture.Create(includeReleaseYear: false, includeCoverPath: false);
 
         // Act
         string json = JsonSerializer.Serialize(expected, _jsonOptions);

@@ -21,9 +21,9 @@ public class ThemeNavEntryDtoFixture
     /// </summary>
     /// <param name="label">Optional label of the entry.</param>
     /// <param name="url">Optional URL of the link, or <see langword="null"/> for a submenu.</param>
-    /// <param name="includeUrl">Whether to set <paramref name="url"/>, or <see langword="null"/> when <see langword="false"/>.</param>
+    /// <param name="includeUrl">Whether the URL should be included, or forced to <see langword="null"/>.</param>
     /// <param name="cssClass">Optional CSS classes of the link.</param>
-    /// <param name="includeCssClass">Whether to set <paramref name="cssClass"/>, or <see langword="null"/> when <see langword="false"/>.</param>
+    /// <param name="includeCssClass">Whether the CSS class should be included, or forced to <see langword="null"/>.</param>
     /// <param name="children">Optional child links of a submenu.</param>
     /// <returns>The created <see cref="ThemeNavEntryDto"/>.</returns>
     public ThemeNavEntryDto Create(

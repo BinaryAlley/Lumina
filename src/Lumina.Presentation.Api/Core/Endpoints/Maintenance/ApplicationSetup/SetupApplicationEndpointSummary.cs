@@ -74,7 +74,7 @@ public class SetupApplicationEndpointSummary : Summary<SetupApplicationEndpoint,
                         "General.Validation", new[]
                         {
                             "UsernameCannotBeEmpty",
-                            "PassordCannotBeEmpty",
+                            "PasswordCannotBeEmpty",
                             "InvalidPassword",
                             "PasswordConfirmCannotBeEmpty",
                             "PasswordsNotMatch"

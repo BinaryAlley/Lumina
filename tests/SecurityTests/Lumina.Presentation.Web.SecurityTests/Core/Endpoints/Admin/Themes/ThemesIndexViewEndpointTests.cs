@@ -9,7 +9,7 @@ using System.Net;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Themes;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/admin/manage-themes</c> route served by the <see cref="ThemesIndexViewEndpoint"/> class.
+/// Contains security tests for the <see cref="ThemesIndexViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ThemesIndexViewEndpointTests : IClassFixture<LuminaWebFactory>

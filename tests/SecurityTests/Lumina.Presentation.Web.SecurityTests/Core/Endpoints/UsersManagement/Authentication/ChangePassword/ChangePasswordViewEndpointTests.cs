@@ -9,7 +9,7 @@ using System.Net;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.UsersManagement.Authentication.ChangePassword;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/auth/change-password</c> route served by the <see cref="ChangePasswordViewEndpoint"/> class.
+/// Contains security tests for the <see cref="ChangePasswordViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ChangePasswordViewEndpointTests : IClassFixture<LuminaWebFactory>

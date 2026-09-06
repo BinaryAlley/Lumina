@@ -22,7 +22,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.Reading.GetReadingAvailability;
 
 /// <summary>
-/// Contains integration tests for the <c>/books/{bookId}/reading/availability</c> route.
+/// Contains integration tests for the <see cref="GetReadingAvailabilityEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetReadingAvailabilityEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime

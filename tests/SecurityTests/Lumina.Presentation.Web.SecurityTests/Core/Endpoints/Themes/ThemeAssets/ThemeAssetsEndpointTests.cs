@@ -10,7 +10,7 @@ using System.Net;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Themes.ThemeAssets;
 
 /// <summary>
-/// Contains security tests for the <c>/theme-assets/{themeId}/{path}</c> route served by the <see cref="ThemeAssetsEndpoint"/> class.
+/// Contains security tests for the <see cref="ThemeAssetsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ThemeAssetsEndpointTests : IClassFixture<LuminaWebFactory>

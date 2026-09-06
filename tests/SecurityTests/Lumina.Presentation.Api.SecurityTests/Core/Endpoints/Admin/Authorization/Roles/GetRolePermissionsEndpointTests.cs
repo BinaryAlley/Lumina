@@ -9,7 +9,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Admin.Authorization.Roles;
 
 /// <summary>
-/// Contains security tests for the <c>/auth/roles/{roleId}/permissions</c> route.
+/// Contains security tests for the <see cref="GetRolePermissionsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetRolePermissionsEndpointTests : IClassFixture<LuminaApiFactory>

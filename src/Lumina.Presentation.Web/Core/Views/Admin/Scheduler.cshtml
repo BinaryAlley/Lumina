@@ -198,6 +198,7 @@ It keeps the DOM contract the client script binds to, without any images or colo
             CleanScheduledJobExecutionHistory: '#ba68c8'
         };
 
+        // The element references are captured once, so that the cleanup can unbind their listeners even after the AJAX navigator has swapped the content out of the document.
         const jobsTable = document.getElementById('scheduler-jobs-table');
         const jobsTableBody = jobsTable.querySelector('tbody');
         const legend = document.getElementById('scheduler-legend');
@@ -236,8 +237,7 @@ It keeps the DOM contract the client script binds to, without any images or colo
             return selected ? (selected.getAttribute('data-value') || '') : '';
         }
 
-        // Binds the change of a themed combobox to a callback, so the page reacts to a selection the same way it did to
-        // the change event of a native select.
+        // Binds the change of a themed combobox to a callback, so the page reacts to a selection the same way it did to the change event of a native select.
         function bindComboboxChange(combobox, onChange) {
             const handler = event => {
                 const option = event.target.closest('.enlightenment-option');
@@ -313,7 +313,7 @@ It keeps the DOM contract the client script binds to, without any images or colo
         let isInitialized = false;
 
         //+----------------------------------------------------------------------------------------+
-        // |                                      Rendering                                          |.
+        //|                                      Rendering                                         |
         //+----------------------------------------------------------------------------------------+
 
         // The API stores the execution and job timestamps in UTC, but the persistence medium (SQLite) stores them as
@@ -434,13 +434,12 @@ It keeps the DOM contract the client script binds to, without any images or colo
         }
 
         //+----------------------------------------------------------------------------------------+
-        // |                                         Graph                                          |.
+        //|                                         Graph                                          |
         //+----------------------------------------------------------------------------------------+
 
         function resizeGraph() {
-            // The graph fills the width of its container next to the legend, and its height follows the legend,
-            // with a sensible floor; the height must not be derived from the canvas element box, because the flex
-            // layout stretches the canvas and its replaced-element aspect ratio would blow the box up.
+            // The graph fills the width of its container next to the legend, and its height follows the legend, with a sensible floor; the height must not be derived 
+            from the canvas element box, because the flex layout stretches the canvas and its replaced-element aspect ratio would blow the box up.
             const container = graphCanvas.parentElement;
             if (!container || container.clientWidth <= 0)
                 return;
@@ -613,7 +612,7 @@ It keeps the DOM contract the client script binds to, without any images or colo
         }
 
         //+----------------------------------------------------------------------------------------+
-        // |                                   Data loading                                        |.
+        //|                                   Data loading                                         |
         //+----------------------------------------------------------------------------------------+
 
         async function loadJobsAsync() {
@@ -649,7 +648,7 @@ It keeps the DOM contract the client script binds to, without any images or colo
         }
 
         //+----------------------------------------------------------------------------------------+
-        // |                                    Job actions                                         |.
+        //|                                    Job actions                                         |
         //+----------------------------------------------------------------------------------------+
 
         async function executeJobActionAsync(url, successMessage) {
@@ -707,7 +706,7 @@ It keeps the DOM contract the client script binds to, without any images or colo
         }
 
         //+----------------------------------------------------------------------------------------+
-        // |                                     SignalR                                           |.
+        //|                                     SignalR                                            |
         //+----------------------------------------------------------------------------------------+
 
         async function getAccessTokenAsync() {
@@ -744,7 +743,7 @@ It keeps the DOM contract the client script binds to, without any images or colo
         }
 
         //+----------------------------------------------------------------------------------------+
-        // |                                    Initialization                                      |.
+        //|                                    Initialization                                      |
         //+----------------------------------------------------------------------------------------+
 
         async function initialize() {

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -50,5 +50,11 @@
   </data>
   <data name="ReaderDisabled" xml:space="preserve">
     <value>打开此图书的图书阅读器已在此媒体库中禁用。在媒体库设置中启用它即可阅读该图书。</value>
+  </data>
+  <data name="Read" xml:space="preserve">
+    <value>阅读</value>
+  </data>
+  <data name="ViewDetails" xml:space="preserve">
+    <value>查看详情</value>
   </data>
 </root>

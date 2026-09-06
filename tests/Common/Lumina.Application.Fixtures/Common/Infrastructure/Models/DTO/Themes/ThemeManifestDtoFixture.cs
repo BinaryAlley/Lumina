@@ -25,7 +25,7 @@ public class ThemeManifestDtoFixture
     /// <param name="author">Optional author of the theme.</param>
     /// <param name="version">Optional version of the theme.</param>
     /// <param name="preview">Optional preview image path of the theme, or <see langword="null"/> when the theme has no preview.</param>
-    /// <param name="includePreview">Whether to set <paramref name="preview"/>, or <see langword="null"/> when <see langword="false"/>.</param>
+    /// <param name="includePreview">Whether the preview path should be included, or forced to <see langword="null"/>.</param>
     /// <param name="templates">Optional template mappings of the theme.</param>
     /// <returns>A configured <see cref="ThemeManifestDto"/> instance.</returns>
     public ThemeManifestDto Create(

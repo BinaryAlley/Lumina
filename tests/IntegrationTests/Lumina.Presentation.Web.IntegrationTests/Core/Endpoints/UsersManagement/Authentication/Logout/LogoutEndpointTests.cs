@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.UsersManagement.Authentication.Logout;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/auth/logout</c> route served by the <see cref="LogoutEndpoint"/> class.
+/// Contains integration tests for the <see cref="LogoutEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class LogoutEndpointTests : IClassFixture<LuminaWebFactory>

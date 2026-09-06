@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AddContributor" xml:space="preserve">
+    <value>Aggiungi collaboratore</value>
+  </data>
+  <data name="AddRating" xml:space="preserve">
+    <value>Aggiungi valutazione</value>
+  </data>
+  <data name="AddRow" xml:space="preserve">
+    <value>Aggiungi</value>
+  </data>
+  <data name="AppleBooksIdDescription" xml:space="preserve">
+    <value>L'identificatore del libro su Apple Books.</value>
+  </data>
+  <data name="ASINDescription" xml:space="preserve">
+    <value>Il numero di identificazione standard Amazon del libro.</value>
+  </data>
+  <data name="Audiobook" xml:space="preserve">
+    <value>Audiolibro</value>
+  </data>
+  <data name="Author" xml:space="preserve">
+    <value>Autore</value>
+  </data>
+  <data name="BackToLibrary" xml:space="preserve">
+    <value>Torna alla biblioteca</value>
+  </data>
+  <data name="BarnesAndNobleIdDescription" xml:space="preserve">
+    <value>L'identificatore del libro su Barnes &amp; Noble.</value>
+  </data>
+  <data name="BoardBook" xml:space="preserve">
+    <value>Libro cartonato</value>
+  </data>
+  <data name="BookDetails" xml:space="preserve">
+    <value>Dettagli del libro</value>
+  </data>
+  <data name="BookSaved" xml:space="preserve">
+    <value>Il libro è stato salvato.</value>
+  </data>
+  <data name="ChangeCover" xml:space="preserve">
+    <value>Cambia copertina</value>
+  </data>
+  <data name="ContributorName" xml:space="preserve">
+    <value>Nome</value>
+  </data>
+  <data name="ContributorsDescription" xml:space="preserve">
+    <value>Le persone che hanno contribuito al libro, come i suoi autori.</value>
+  </data>
+  <data name="CoverImage" xml:space="preserve">
+    <value>Immagine di copertina</value>
+  </data>
+  <data name="CoverSaved" xml:space="preserve">
+    <value>L'immagine di copertina è stata aggiornata.</value>
+  </data>
+  <data name="CoverUploadFailed" xml:space="preserve">
+    <value>L'immagine di copertina non è stato possibile caricarla.</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Descrizione</value>
+  </data>
+  <data name="DescriptionDescription" xml:space="preserve">
+    <value>Un breve riassunto o descrizione del libro.</value>
+  </data>
+  <data name="eBook" xml:space="preserve">
+    <value>Libro elettronico</value>
+  </data>
+  <data name="Edition" xml:space="preserve">
+    <value>Edizione</value>
+  </data>
+  <data name="EditionDescription" xml:space="preserve">
+    <value>L'edizione del libro.</value>
+  </data>
+  <data name="Format" xml:space="preserve">
+    <value>Formato</value>
+  </data>
+  <data name="FormatDescription" xml:space="preserve">
+    <value>Il formato fisico o digitale del libro.</value>
+  </data>
+  <data name="GeneralInformation" xml:space="preserve">
+    <value>Informazioni generali</value>
+  </data>
+  <data name="Genres" xml:space="preserve">
+    <value>Generi</value>
+  </data>
+  <data name="GenresDescription" xml:space="preserve">
+    <value>I generi del libro, separati da virgole.</value>
+  </data>
+  <data name="GoodreadsIdDescription" xml:space="preserve">
+    <value>L'identificatore numerico del libro su Goodreads.</value>
+  </data>
+  <data name="GoogleBooksIdDescription" xml:space="preserve">
+    <value>L'identificatore del libro su Google Books.</value>
+  </data>
+  <data name="Hardcover" xml:space="preserve">
+    <value>Copertina rigida</value>
+  </data>
+  <data name="Identifiers" xml:space="preserve">
+    <value>Identificatori</value>
+  </data>
+  <data name="Illustrator" xml:space="preserve">
+    <value>Illustratore</value>
+  </data>
+  <data name="IsbnFormat" xml:space="preserve">
+    <value>Formato ISBN</value>
+  </data>
+  <data name="ISBNsDescription" xml:space="preserve">
+    <value>I numeri internazionali normalizzati del libro (ISBN).</value>
+  </data>
+  <data name="IsbnValue" xml:space="preserve">
+    <value>Valore ISBN</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Lingua</value>
+  </data>
+  <data name="LanguageCode" xml:space="preserve">
+    <value>Codice lingua</value>
+  </data>
+  <data name="LanguageCodeDescription" xml:space="preserve">
+    <value>Il codice di due lettere della lingua del libro.</value>
+  </data>
+  <data name="LanguageName" xml:space="preserve">
+    <value>Nome della lingua</value>
+  </data>
+  <data name="LanguageNameDescription" xml:space="preserve">
+    <value>Il nome della lingua del libro.</value>
+  </data>
+  <data name="LargePrint" xml:space="preserve">
+    <value>Caratteri grandi</value>
+  </data>
+  <data name="LCCNDescription" xml:space="preserve">
+    <value>Il numero di controllo della Library of Congress del libro.</value>
+  </data>
+  <data name="LeatherBound" xml:space="preserve">
+    <value>Legatura in pelle</value>
+  </data>
+  <data name="LibraryBinding" xml:space="preserve">
+    <value>Legatura da biblioteca</value>
+  </data>
+  <data name="LibraryThingIdDescription" xml:space="preserve">
+    <value>L'identificatore del libro su LibraryThing.</value>
+  </data>
+  <data name="MassMarketPaperback" xml:space="preserve">
+    <value>Tascabile</value>
+  </data>
+  <data name="Narrator" xml:space="preserve">
+    <value>Narratore</value>
+  </data>
+  <data name="NativeName" xml:space="preserve">
+    <value>Nome nativo</value>
+  </data>
+  <data name="NativeNameDescription" xml:space="preserve">
+    <value>Il nome nativo della lingua del libro.</value>
+  </data>
+  <data name="NoCover" xml:space="preserve">
+    <value>Nessuna copertina</value>
+  </data>
+  <data name="OCLCNumber" xml:space="preserve">
+    <value>Numero OCLC</value>
+  </data>
+  <data name="OCLCNumberDescription" xml:space="preserve">
+    <value>Il numero OCLC del libro.</value>
+  </data>
+  <data name="OpenLibraryIdDescription" xml:space="preserve">
+    <value>L'identificatore del libro su Open Library.</value>
+  </data>
+  <data name="OriginalLanguage" xml:space="preserve">
+    <value>Lingua originale</value>
+  </data>
+  <data name="OriginalLanguageCode" xml:space="preserve">
+    <value>Codice della lingua originale</value>
+  </data>
+  <data name="OriginalLanguageCodeDescription" xml:space="preserve">
+    <value>Il codice di due lettere della lingua originale del libro.</value>
+  </data>
+  <data name="OriginalLanguageName" xml:space="preserve">
+    <value>Nome della lingua originale</value>
+  </data>
+  <data name="OriginalLanguageNameDescription" xml:space="preserve">
+    <value>Il nome della lingua originale del libro.</value>
+  </data>
+  <data name="OriginalLanguageNativeName" xml:space="preserve">
+    <value>Nome nativo della lingua originale</value>
+  </data>
+  <data name="OriginalLanguageNativeNameDescription" xml:space="preserve">
+    <value>Il nome nativo della lingua originale del libro.</value>
+  </data>
+  <data name="OriginalReleaseDate" xml:space="preserve">
+    <value>Data di pubblicazione originale</value>
+  </data>
+  <data name="OriginalReleaseDateDescription" xml:space="preserve">
+    <value>La data di pubblicazione originale del libro.</value>
+  </data>
+  <data name="OriginalReleaseYear" xml:space="preserve">
+    <value>Anno di pubblicazione originale</value>
+  </data>
+  <data name="OriginalReleaseYearDescription" xml:space="preserve">
+    <value>L'anno di pubblicazione originale del libro.</value>
+  </data>
+  <data name="OriginalTitle" xml:space="preserve">
+    <value>Titolo originale</value>
+  </data>
+  <data name="OriginalTitleDescription" xml:space="preserve">
+    <value>Il titolo originale del libro, quando differisce da quello attuale.</value>
+  </data>
+  <data name="OtherRole" xml:space="preserve">
+    <value>Altro</value>
+  </data>
+  <data name="PageCount" xml:space="preserve">
+    <value>Numero di pagine</value>
+  </data>
+  <data name="PageCountDescription" xml:space="preserve">
+    <value>Il numero di pagine del libro.</value>
+  </data>
+  <data name="Paperback" xml:space="preserve">
+    <value>Brossura</value>
+  </data>
+  <data name="PopupBook" xml:space="preserve">
+    <value>Libro animato</value>
+  </data>
+  <data name="Publisher" xml:space="preserve">
+    <value>Editore</value>
+  </data>
+  <data name="PublisherDescription" xml:space="preserve">
+    <value>L'editore del libro.</value>
+  </data>
+  <data name="PublisherRole" xml:space="preserve">
+    <value>Editore</value>
+  </data>
+  <data name="RatingMaxValue" xml:space="preserve">
+    <value>Valutazione massima</value>
+  </data>
+  <data name="Ratings" xml:space="preserve">
+    <value>Valutazioni</value>
+  </data>
+  <data name="RatingsDescription" xml:space="preserve">
+    <value>Le valutazioni del libro da diverse fonti.</value>
+  </data>
+  <data name="RatingSource" xml:space="preserve">
+    <value>Fonte</value>
+  </data>
+  <data name="RatingValue" xml:space="preserve">
+    <value>Valutazione</value>
+  </data>
+  <data name="RatingVoteCount" xml:space="preserve">
+    <value>Numero di voti</value>
+  </data>
+  <data name="ReleaseCountry" xml:space="preserve">
+    <value>Paese di pubblicazione</value>
+  </data>
+  <data name="ReleaseCountryDescription" xml:space="preserve">
+    <value>Il codice di due lettere del paese di pubblicazione.</value>
+  </data>
+  <data name="ReleaseInformation" xml:space="preserve">
+    <value>Informazioni di pubblicazione</value>
+  </data>
+  <data name="ReleaseVersion" xml:space="preserve">
+    <value>Versione di pubblicazione</value>
+  </data>
+  <data name="ReleaseVersionDescription" xml:space="preserve">
+    <value>La versione della pubblicazione, come quella originale.</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Rimuovi</value>
+  </data>
+  <data name="ReReleaseDate" xml:space="preserve">
+    <value>Data di ripubblicazione</value>
+  </data>
+  <data name="ReReleaseDateDescription" xml:space="preserve">
+    <value>La data di ripubblicazione del libro.</value>
+  </data>
+  <data name="ReReleaseYear" xml:space="preserve">
+    <value>Anno di ripubblicazione</value>
+  </data>
+  <data name="ReReleaseYearDescription" xml:space="preserve">
+    <value>L'anno di ripubblicazione del libro.</value>
+  </data>
+  <data name="RoleCategory" xml:space="preserve">
+    <value>Categoria del ruolo</value>
+  </data>
+  <data name="RoleName" xml:space="preserve">
+    <value>Ruolo</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Salva</value>
+  </data>
+  <data name="SaveFailed" xml:space="preserve">
+    <value>Il libro non è stato possibile salvarlo.</value>
+  </data>
+  <data name="SpiralBound" xml:space="preserve">
+    <value>Rilegatura a spirale</value>
+  </data>
+  <data name="Tags" xml:space="preserve">
+    <value>Etichette</value>
+  </data>
+  <data name="TagsDescription" xml:space="preserve">
+    <value>Le etichette del libro, separate da virgole.</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>Titolo</value>
+  </data>
+  <data name="TitleDescription" xml:space="preserve">
+    <value>Il titolo principale del libro.</value>
+  </data>
+  <data name="TradePaperback" xml:space="preserve">
+    <value>Brossura editoriale</value>
+  </data>
+  <data name="Translator" xml:space="preserve">
+    <value>Traduttore</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>Utente</value>
+  </data>
+  <data name="VolumeNumber" xml:space="preserve">
+    <value>Numero del volume</value>
+  </data>
+  <data name="VolumeNumberDescription" xml:space="preserve">
+    <value>Il numero del volume del libro all'interno della sua serie.</value>
+  </data>
+  <data name="Isbn13" xml:space="preserve">
+    <value>ISBN-13</value>
+  </data>
+  <data name="LCCN" xml:space="preserve">
+    <value>LCCN</value>
+  </data>
+  <data name="Calibre" xml:space="preserve">
+    <value>Calibre</value>
+  </data>
+  <data name="AppleBooksId" xml:space="preserve">
+    <value>ID Apple Books</value>
+  </data>
+  <data name="OpenLibrary" xml:space="preserve">
+    <value>Open Library</value>
+  </data>
+  <data name="GoogleBooks" xml:space="preserve">
+    <value>Google Books</value>
+  </data>
+  <data name="ASIN" xml:space="preserve">
+    <value>ASIN</value>
+  </data>
+  <data name="Isbn10" xml:space="preserve">
+    <value>ISBN-10</value>
+  </data>
+  <data name="GoogleBooksId" xml:space="preserve">
+    <value>ID Google Books</value>
+  </data>
+  <data name="LibraryThingId" xml:space="preserve">
+    <value>ID LibraryThing</value>
+  </data>
+  <data name="Goodreads" xml:space="preserve">
+    <value>Goodreads</value>
+  </data>
+  <data name="Amazon" xml:space="preserve">
+    <value>Amazon</value>
+  </data>
+  <data name="BarnesAndNobleId" xml:space="preserve">
+    <value>ID Barnes &amp; Noble</value>
+  </data>
+  <data name="OpenLibraryId" xml:space="preserve">
+    <value>ID Open Library</value>
+  </data>
+  <data name="ISBNs" xml:space="preserve">
+    <value>ISBN</value>
+  </data>
+  <data name="Contributors" xml:space="preserve">
+    <value>Collaboratori</value>
+  </data>
+  <data name="GoodreadsId" xml:space="preserve">
+    <value>ID Goodreads</value>
+  </data>
+</root>

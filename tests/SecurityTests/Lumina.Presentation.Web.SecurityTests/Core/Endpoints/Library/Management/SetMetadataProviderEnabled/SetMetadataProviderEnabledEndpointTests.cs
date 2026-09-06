@@ -13,7 +13,7 @@ using System.Net.Http.Json;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.Management.SetMetadataProviderEnabled;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/libraries/manage/api-set-metadata-provider-enabled</c> route served by the <see cref="SetMetadataProviderEnabledEndpoint"/> class.
+/// Contains security tests for the <see cref="SetMetadataProviderEnabledEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class SetMetadataProviderEnabledEndpointTests : IClassFixture<LuminaWebFactory>

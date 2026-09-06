@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Management.EditLibrary;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/libraries/manage/item/{{id}}</c> route served by the <see cref="EditLibraryViewEndpoint"/> class.
+/// Contains integration tests for the <see cref="EditLibraryViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class EditLibraryViewEndpointTests : IClassFixture<LuminaWebFactory>

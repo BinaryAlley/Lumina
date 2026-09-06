@@ -2,6 +2,7 @@
 using Lumina.Contracts.DTO.Common;
 using Lumina.Domain.Common.Primitives;
 using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -25,6 +26,20 @@ public interface IBookArtworkService
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either the relative path of the stored artwork, or an error.</returns>
     Task<Result<string>> SaveBookArtworkAsync(Guid libraryId, Guid bookId, string libraryName, string authorName, string bookTitle, ArtworkDto artwork, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Stores the artwork uploaded in the <paramref name="artworkStream"/> of the book into the internal media directory, and returns the relative path of the stored artwork.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library the book belongs to.</param>
+    /// <param name="bookId">The Id of the book.</param>
+    /// <param name="libraryName">The name of the media library the book belongs to.</param>
+    /// <param name="authorName">The name of the author of the book.</param>
+    /// <param name="bookTitle">The title of the book.</param>
+    /// <param name="artworkStream">The stream of the uploaded artwork file.</param>
+    /// <param name="fileName">The name of the uploaded artwork file.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the relative path of the stored artwork, or an error.</returns>
+    Task<Result<string>> SaveBookArtworkAsync(Guid libraryId, Guid bookId, string libraryName, string authorName, string bookTitle, Stream artworkStream, string fileName, CancellationToken cancellationToken);
 
     /// <summary>
     /// Deletes the artwork of the book from the internal media directory.

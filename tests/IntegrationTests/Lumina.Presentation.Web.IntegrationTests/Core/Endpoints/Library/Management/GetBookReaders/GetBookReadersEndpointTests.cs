@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Management.GetBookReaders;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/libraries/manage/api-get-book-readers/{{libraryId}}</c> route served by the <see cref="GetBookReadersEndpoint"/> class.
+/// Contains integration tests for the <see cref="GetBookReadersEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetBookReadersEndpointTests : IClassFixture<LuminaWebFactory>

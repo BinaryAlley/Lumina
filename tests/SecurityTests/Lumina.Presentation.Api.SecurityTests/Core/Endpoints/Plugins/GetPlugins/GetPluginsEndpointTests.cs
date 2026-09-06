@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Plugins.GetPlugins;
 
 /// <summary>
-/// Contains security tests for the <c>/plugins</c> route.
+/// Contains security tests for the <see cref="GetPluginsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetPluginsEndpointTests : IClassFixture<LuminaApiFactory>

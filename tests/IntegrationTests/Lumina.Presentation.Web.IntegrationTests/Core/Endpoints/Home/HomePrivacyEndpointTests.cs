@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Home;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/privacy</c> route served by the <see cref="HomePrivacyEndpoint"/> class.
+/// Contains integration tests for the <see cref="HomePrivacyEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class HomePrivacyEndpointTests : IClassFixture<LuminaWebFactory>

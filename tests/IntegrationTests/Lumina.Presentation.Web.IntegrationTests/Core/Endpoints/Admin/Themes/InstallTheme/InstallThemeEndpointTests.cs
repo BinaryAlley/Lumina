@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Themes.InstallTheme;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/admin/themes/api-install-theme</c> route served by the <see cref="InstallThemeEndpoint"/> class.
+/// Contains integration tests for the <see cref="InstallThemeEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class InstallThemeEndpointTests : IClassFixture<LuminaWebFactory>

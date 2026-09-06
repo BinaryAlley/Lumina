@@ -23,15 +23,33 @@ public class MediaContributorDtoFixture
     /// <param name="displayName">Optional. The display name of the media contributor.</param>
     /// <param name="roleName">Optional. The name of the role assigned to the media contributor.</param>
     /// <param name="roleCategory">Optional. The category of the role.</param>
+    /// <param name="legalName">Optional. The legal name of the media contributor.</param>
+    /// <param name="includeName">Whether the name should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeDisplayName">Whether the display name should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeLegalName">Whether the legal name should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeRole">Whether the role should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeRoleName">Whether the role name should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeRoleCategory">Whether the role category should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="MediaContributorDto"/>.</returns>
     public MediaContributorDto Create(
         string? displayName = null,
         string? roleName = null,
-        MediaContributorRoleCategory? roleCategory = null)
+        MediaContributorRoleCategory? roleCategory = null,
+        string? legalName = null,
+        bool includeName = true,
+        bool includeDisplayName = true,
+        bool includeLegalName = true,
+        bool includeRole = true,
+        bool includeRoleName = true,
+        bool includeRoleCategory = true)
     {
         return new MediaContributorDto(
-            Name: new MediaContributorNameDto(DisplayName: displayName ?? _faker.Name.FullName(), LegalName: null),
-            Role: new MediaContributorRoleDto(Name: roleName ?? _faker.Commerce.Department(), Category: roleCategory ?? _faker.PickRandom<MediaContributorRoleCategory>()));
+            Name: includeName ? new MediaContributorNameDto(
+                DisplayName: includeDisplayName ? displayName ?? _faker.Name.FullName() : null,
+                LegalName: includeLegalName ? legalName : null) : null,
+            Role: includeRole ? new MediaContributorRoleDto(
+                Name: includeRoleName ? roleName ?? _faker.Commerce.Department() : null,
+                Category: includeRoleCategory ? roleCategory ?? _faker.PickRandom<MediaContributorRoleCategory>() : null) : null);
     }
 
     /// <summary>

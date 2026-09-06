@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Themes.DeleteTheme;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/admin/themes/api-delete-theme/{themeId}</c> route served by the <see cref="DeleteThemeEndpoint"/> class.
+/// Contains integration tests for the <see cref="DeleteThemeEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class DeleteThemeEndpointTests : IClassFixture<LuminaWebFactory>

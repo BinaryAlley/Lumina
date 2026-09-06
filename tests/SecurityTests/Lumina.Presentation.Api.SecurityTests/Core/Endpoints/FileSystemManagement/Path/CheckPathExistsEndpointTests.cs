@@ -9,7 +9,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.FileSystemManagement.Path;
 
 /// <summary>
-/// Contains security tests for the <c>/path/check-path-exists</c> route.
+/// Contains security tests for the <see cref="CheckPathExistsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class CheckPathExistsEndpointTests : IClassFixture<LuminaApiFactory>

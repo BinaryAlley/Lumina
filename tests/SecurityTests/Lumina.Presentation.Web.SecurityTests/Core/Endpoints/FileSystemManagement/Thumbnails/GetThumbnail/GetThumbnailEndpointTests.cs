@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.FileSystemManagement.Thumbnails.GetThumbnail;
 
 /// <summary>
-/// Contains security tests for the <c>/thumbnails/api-get-thumbnail</c> route served by the <see cref="GetThumbnailEndpoint"/> class.
+/// Contains security tests for the <see cref="GetThumbnailEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetThumbnailEndpointTests : IClassFixture<LuminaWebFactory>

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.UsersManagement.Authentication.Register;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/auth/register</c> route served by the <see cref="RegisterViewEndpoint"/> class.
+/// Contains integration tests for the <see cref="RegisterViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class RegisterViewEndpointTests : IClassFixture<LuminaWebFactory>

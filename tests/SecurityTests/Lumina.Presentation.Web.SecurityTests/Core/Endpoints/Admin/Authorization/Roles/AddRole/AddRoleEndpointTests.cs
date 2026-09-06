@@ -15,7 +15,7 @@ using System.Net.Http.Json;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Authorization.Roles.AddRole;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/admin/api-create-role</c> route served by the <see cref="AddRoleEndpoint"/> class.
+/// Contains security tests for the <see cref="AddRoleEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class AddRoleEndpointTests : IClassFixture<LuminaWebFactory>

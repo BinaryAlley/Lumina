@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.UsersManagement.Authorization.GetUserPermissions;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/admin/api-get-permissions-by-user-id/{userId}</c> route served by the <see cref="GetUserPermissionsEndpoint"/> class.
+/// Contains integration tests for the <see cref="GetUserPermissionsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetUserPermissionsEndpointTests : IClassFixture<LuminaWebFactory>

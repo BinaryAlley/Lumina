@@ -37,6 +37,8 @@ public static partial class Errors
         public static Error VolumeNumberMustBeGreaterThanZero => Error.Validation(description: nameof(VolumeNumberMustBeGreaterThanZero));
         public static Error BookLibraryCannotBeNull => Error.Validation(description: nameof(BookLibraryCannotBeNull));
         public static Error BookPathCannotBeEmpty => Error.Validation(description: nameof(BookPathCannotBeEmpty));
+        public static Error BookIdCannotBeEmpty => Error.Validation(description: nameof(BookIdCannotBeEmpty));
+        public static Error BookCoverCannotBeNull => Error.Validation(description: nameof(BookCoverCannotBeNull));
         public static Error BookNotFound => Error.NotFound(description: nameof(BookNotFound));
     }
 }

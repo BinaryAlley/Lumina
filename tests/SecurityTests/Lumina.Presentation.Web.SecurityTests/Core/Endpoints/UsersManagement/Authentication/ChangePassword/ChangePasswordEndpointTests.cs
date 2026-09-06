@@ -16,7 +16,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.UsersManagement.Authentication.ChangePassword;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/auth/api-change-password</c> route served by the <see cref="ChangePasswordEndpoint"/> class.
+/// Contains security tests for the <see cref="ChangePasswordEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ChangePasswordEndpointTests : IClassFixture<LuminaWebFactory>

@@ -60,7 +60,7 @@ internal sealed class BookArtworkService : IBookArtworkService
     /// <returns>An <see cref="Result{TValue}"/> containing either the relative path of the stored artwork, or an error.</returns>
     public async Task<Result<string>> SaveBookArtworkAsync(Guid libraryId, Guid bookId, string libraryName, string authorName, string bookTitle, ArtworkDto artwork, CancellationToken cancellationToken)
     {
-        // resolve the local file path of the artwork, downloading it to a temporary file when it is remote
+        // Resolve the local file path of the artwork, downloading it to a temporary file when it is remote.
         Result<ArtworkSourceResult> resolveSourceResult = await ResolveArtworkSourceAsync(artwork, cancellationToken).ConfigureAwait(false);
         if (resolveSourceResult.IsFailure)
             return resolveSourceResult.Errors;
@@ -75,7 +75,7 @@ internal sealed class BookArtworkService : IBookArtworkService
         }
         finally
         {
-            // remove the temporary file downloaded for the remote artwork, never a local file of the user
+            // Remove the temporary file downloaded for the remote artwork, never a local file of the user.
             if (resolveSourceResult.Value.IsTemporary && File.Exists(sourcePath))
             {
                 try
@@ -84,11 +84,79 @@ internal sealed class BookArtworkService : IBookArtworkService
                 }
                 catch (IOException)
                 {
-                    // a failed cleanup of the temporary file must not mask the result of the operation
+                    // A failed cleanup of the temporary file must not mask the result of the operation.
                 }
                 catch (UnauthorizedAccessException)
                 {
-                    // a failed cleanup of the temporary file must not mask the result of the operation
+                    // A failed cleanup of the temporary file must not mask the result of the operation.
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Stores the artwork uploaded in the <paramref name="artworkStream"/> of the book into the internal media directory, and returns the relative path of the stored artwork.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library the book belongs to.</param>
+    /// <param name="bookId">The Id of the book.</param>
+    /// <param name="libraryName">The name of the media library the book belongs to.</param>
+    /// <param name="authorName">The name of the author of the book.</param>
+    /// <param name="bookTitle">The title of the book.</param>
+    /// <param name="artworkStream">The stream of the uploaded artwork file.</param>
+    /// <param name="fileName">The name of the uploaded artwork file.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the relative path of the stored artwork, or an error.</returns>
+    public async Task<Result<string>> SaveBookArtworkAsync(Guid libraryId, Guid bookId, string libraryName, string authorName, string bookTitle, Stream artworkStream, string fileName, CancellationToken cancellationToken)
+    {
+        if (artworkStream is null || artworkStream.Length == 0)
+            return Errors.FileSystemManagement.FileNotFound;
+        if (artworkStream.Length > MAX_ARTWORK_SIZE_BYTES)
+            return Errors.FileSystemManagement.FileTooLarge;
+
+        // Copy the uploaded artwork into a temporary file, so that the shared artwork storage can validate and copy it.
+        string temporaryPath = Path.Combine(Path.GetTempPath(), $"lumina-artwork-{Guid.NewGuid():N}{Path.GetExtension(fileName)}");
+        bool written = false;
+        try
+        {
+            await using (FileStream fileStream = new(temporaryPath, FileMode.CreateNew, FileAccess.Write, FileShare.None, bufferSize: 81920, useAsync: true))
+                await artworkStream.CopyToAsync(fileStream, cancellationToken).ConfigureAwait(false);
+            written = true;
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception)
+        {
+            return Errors.FileSystemManagement.FileNotFound;
+        }
+        finally
+        {
+            // Remove the partially written temporary file when the upload failed.
+            if (!written && File.Exists(temporaryPath))
+                File.Delete(temporaryPath);
+        }
+
+        try
+        {
+            return await StoreArtworkAsync(libraryId, bookId, libraryName, authorName, bookTitle, temporaryPath, cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            // Remove the temporary file after the artwork has been stored.
+            if (File.Exists(temporaryPath))
+            {
+                try
+                {
+                    File.Delete(temporaryPath);
+                }
+                catch (IOException)
+                {
+                    // A failed cleanup of the temporary file must not mask the result of the operation.
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    // A failed cleanup of the temporary file must not mask the result of the operation.
                 }
             }
         }
@@ -135,16 +203,16 @@ internal sealed class BookArtworkService : IBookArtworkService
         if (!fileExistsResult.Value)
             return Errors.FileSystemManagement.FileNotFound;
 
-        // reject the artwork when it is a symbolic link or a reparse point, which could point to any file of the machine
+        // Reject the artwork when it is a symbolic link or a reparse point, which could point to any file of the machine.
         if (File.GetAttributes(sourcePath).HasFlag(FileAttributes.ReparsePoint))
             return Errors.FileSystemManagement.InvalidPath;
 
-        // reject the artwork when it exceeds the maximum allowed size
+        // Reject the artwork when it exceeds the maximum allowed size.
         FileInfo sourceFileInfo = new(sourcePath);
         if (sourceFileInfo.Length > MAX_ARTWORK_SIZE_BYTES)
             return Errors.FileSystemManagement.FileTooLarge;
 
-        // make sure the file is an actual supported image
+        // Make sure the file is an actual supported image.
         Result<ImageType> imageTypeResult = await _environmentContext.FileTypeService.GetImageTypeAsync(sourcePathIdResult.Value, cancellationToken).ConfigureAwait(false);
         if (imageTypeResult.IsFailure)
             return imageTypeResult.Errors;
@@ -159,24 +227,24 @@ internal sealed class BookArtworkService : IBookArtworkService
         if (ensureDirectoryResult.IsFailure)
             return ensureDirectoryResult.Errors;
 
-        // delete the previous cover of the book, so that a changed artwork does not leave orphaned files behind
+        // Delete the previous cover of the book, so that a changed artwork does not leave orphaned files behind.
         DeleteCover(artworkDirectoryPathResult.Value);
 
         Result<FileSystemPathId> artworkDirectoryPathIdResult = FileSystemPathId.Create(artworkDirectoryPathResult.Value);
         if (artworkDirectoryPathIdResult.IsFailure)
             return artworkDirectoryPathIdResult.Errors;
 
-        // copy the artwork file from the source location
+        // Copy the artwork file from the source location.
         Result<FileSystemPathId> copyFileResult = _environmentContext.FileProviderService.CopyFile(sourcePathIdResult.Value, artworkDirectoryPathIdResult.Value, true);
         if (copyFileResult.IsFailure)
             return copyFileResult.Errors;
 
-        // rename the copied file to the standard naming
+        // Rename the copied file to the standard naming.
         Result<FileSystemPathId> renameFileResult = _environmentContext.FileProviderService.RenameFile(copyFileResult.Value, $"cover.{imageTypeResult.Value.ToString().ToLowerInvariant()}");
         if (renameFileResult.IsFailure)
             return renameFileResult.Errors;
 
-        // get the internal relative path for the copied file
+        // Get the internal relative path for the copied file.
         string relativePath = renameFileResult.Value.Path[AppContext.BaseDirectory.Length..];
         if (!relativePath.StartsWith(_pathService.PathSeparator))
             relativePath = $"{_pathService.PathSeparator}{relativePath}";
@@ -197,7 +265,7 @@ internal sealed class BookArtworkService : IBookArtworkService
         if (string.IsNullOrWhiteSpace(artwork.RemoteUrl))
             return Errors.FileSystemManagement.FileNotFound;
 
-        // download the remote artwork into a temporary file, aborting when it exceeds the maximum allowed size
+        // Download the remote artwork into a temporary file, aborting when it exceeds the maximum allowed size.
         using HttpClient httpClient = _httpClientFactory.CreateClient();
         string tempPath = Path.Combine(Path.GetTempPath(), $"lumina-artwork-{Guid.NewGuid():N}");
         bool downloaded = false;
@@ -233,7 +301,7 @@ internal sealed class BookArtworkService : IBookArtworkService
         }
         finally
         {
-            // remove the partially downloaded temporary file when the download failed
+            // Remove the partially downloaded temporary file when the download failed.
             if (!downloaded && File.Exists(tempPath))
                 File.Delete(tempPath);
         }

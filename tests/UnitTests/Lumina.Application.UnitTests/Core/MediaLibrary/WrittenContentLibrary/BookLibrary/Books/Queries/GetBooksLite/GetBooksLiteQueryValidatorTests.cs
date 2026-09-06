@@ -24,8 +24,7 @@ public class GetBooksLiteQueryValidatorTests
     public void Validate_WhenLibraryIdIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        GetBooksLiteQuery query = _getBooksLiteQueryFixture.Create();
-        query = query with { Filter = query.Filter with { LibraryId = Guid.Empty } };
+        GetBooksLiteQuery query = _getBooksLiteQueryFixture.Create(libraryId: Guid.Empty);
 
         // Act
         List<Error> result = _validator.TestValidate(query);
@@ -51,8 +50,7 @@ public class GetBooksLiteQueryValidatorTests
     public void Validate_WhenFilterAlphaKeyIsNotASingleLetterOrSpecialKey_ShouldHaveValidationError()
     {
         // Arrange
-        GetBooksLiteQuery query = _getBooksLiteQueryFixture.Create();
-        query = query with { Filter = query.Filter with { FilterAlphaKey = "AB" } };
+        GetBooksLiteQuery query = _getBooksLiteQueryFixture.Create(filterAlphaKey: "AB");
 
         // Act
         List<Error> result = _validator.TestValidate(query);
@@ -65,8 +63,7 @@ public class GetBooksLiteQueryValidatorTests
     public void Validate_WhenFilterAlphaKeyIsASingleLetter_ShouldNotHaveValidationError()
     {
         // Arrange
-        GetBooksLiteQuery query = _getBooksLiteQueryFixture.Create();
-        query = query with { Filter = query.Filter with { FilterAlphaKey = "Q" } };
+        GetBooksLiteQuery query = _getBooksLiteQueryFixture.Create(filterAlphaKey: "Q");
 
         // Act
         List<Error> result = _validator.TestValidate(query);
@@ -79,8 +76,7 @@ public class GetBooksLiteQueryValidatorTests
     public void Validate_WhenFilterAlphaKeyIsNumberOrSymbol_ShouldNotHaveValidationError()
     {
         // Arrange
-        GetBooksLiteQuery query = _getBooksLiteQueryFixture.Create();
-        query = query with { Filter = query.Filter with { FilterAlphaKey = "#" } };
+        GetBooksLiteQuery query = _getBooksLiteQueryFixture.Create(filterAlphaKey: "#");
 
         // Act
         List<Error> result = _validator.TestValidate(query);

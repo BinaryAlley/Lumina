@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Tools.Settings.GetUserSettings;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/tools/settings/api-get-user-settings</c> route served by the <see cref="GetUserSettingsEndpoint"/> class.
+/// Contains integration tests for the <see cref="GetUserSettingsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetUserSettingsEndpointTests : IClassFixture<LuminaWebFactory>

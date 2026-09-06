@@ -17,7 +17,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Plugins.ReorderLibraryArtworkProviders;
 
 /// <summary>
-/// Contains security tests for the <c>/libraries/{libraryId}/artwork-providers/reorder</c> route.
+/// Contains security tests for the <see cref="ReorderLibraryArtworkProvidersEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ReorderLibraryArtworkProvidersEndpointTests : IClassFixture<LuminaApiFactory>

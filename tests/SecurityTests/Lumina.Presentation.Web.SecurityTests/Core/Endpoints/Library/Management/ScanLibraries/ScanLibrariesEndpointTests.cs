@@ -11,7 +11,7 @@ using System.Text;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.Management.ScanLibraries;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/libraries/manage/api-scan-libraries</c> route served by the <see cref="ScanLibrariesEndpoint"/> class.
+/// Contains security tests for the <see cref="ScanLibrariesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ScanLibrariesEndpointTests : IClassFixture<LuminaWebFactory>

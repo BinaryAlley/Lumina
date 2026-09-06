@@ -12,7 +12,7 @@ using System.Net;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.ManageRoles;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/admin/manage-roles</c> route served by the <see cref="ManageRolesViewEndpoint"/> class.
+/// Contains security tests for the <see cref="ManageRolesViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ManageRolesViewEndpointTests : IClassFixture<LuminaWebFactory>

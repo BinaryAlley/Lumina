@@ -13,7 +13,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Plugins.InstallPlugin;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/admin/manage-plugins/api-install-plugin</c> route served by the <see cref="InstallPluginEndpoint"/> class.
+/// Contains security tests for the <see cref="InstallPluginEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class InstallPluginEndpointTests : IClassFixture<LuminaWebFactory>

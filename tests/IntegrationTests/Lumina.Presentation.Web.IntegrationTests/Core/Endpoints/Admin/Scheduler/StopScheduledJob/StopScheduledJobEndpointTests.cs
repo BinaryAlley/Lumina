@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Scheduler.StopScheduledJob;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/admin/api-scheduled-jobs/{scheduledJobId}/stop</c> route served by the <see cref="StopScheduledJobEndpoint"/> class.
+/// Contains integration tests for the <see cref="StopScheduledJobEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class StopScheduledJobEndpointTests : IClassFixture<LuminaWebFactory>

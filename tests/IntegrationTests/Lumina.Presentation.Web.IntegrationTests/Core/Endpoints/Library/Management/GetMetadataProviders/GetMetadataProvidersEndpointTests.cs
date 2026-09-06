@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Management.GetMetadataProviders;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/libraries/manage/api-get-metadata-providers/{{libraryId}}</c> route served by the <see cref="GetMetadataProvidersEndpoint"/> class.
+/// Contains integration tests for the <see cref="GetMetadataProvidersEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetMetadataProvidersEndpointTests : IClassFixture<LuminaWebFactory>

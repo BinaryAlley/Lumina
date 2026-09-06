@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.UsersManagement.Authentication.ChangePassword;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/auth/api-change-password</c> route served by the <see cref="ChangePasswordEndpoint"/> class.
+/// Contains integration tests for the <see cref="ChangePasswordEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ChangePasswordEndpointTests : IClassFixture<LuminaWebFactory>

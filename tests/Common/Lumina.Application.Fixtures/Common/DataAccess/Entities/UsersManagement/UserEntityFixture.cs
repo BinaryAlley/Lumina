@@ -3,7 +3,7 @@ using Bogus;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -18,6 +18,8 @@ namespace Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement
 [ExcludeFromCodeCoverage]
 public class UserEntityFixture
 {
+    private readonly LibraryEntityFixture _libraryEntityFixture = new();
+
     /// <summary>
     /// Creates a random valid <see cref="UserEntity"/>.
     /// </summary>
@@ -27,8 +29,8 @@ public class UserEntityFixture
     /// <param name="id">Optional Id to pin, or <see langword="null"/> to generate a random one.</param>
     /// <param name="userRole">Optional user role association to pin when including it.</param>
     /// <param name="userPermissions">Optional user permission associations to pin when including them.</param>
-    /// <param name="includeUserRole">Whether the user should include a user role association or not.</param>
-    /// <param name="includeUserPermissions">Whether the user should include user permission associations or not.</param>
+    /// <param name="includeUserRole">Whether the user role association should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeUserPermissions">Whether the user permission associations should be included, or forced to an empty collection.</param>
     /// <param name="libraries">Optional collection of libraries to pin for the user, or <see langword="null"/> to generate them based on <paramref name="libraryCount"/>.</param>
     /// <returns>The created user entity.</returns>
     public UserEntity Create(
@@ -44,7 +46,7 @@ public class UserEntityFixture
     {
         Guid userId = id ?? Guid.NewGuid();
         ICollection<LibraryEntity> resolvedLibraries = libraries ?? (libraryCount > 0
-            ? CreateLibraries(libraryCount, userId)
+            ? _libraryEntityFixture.CreateMany(libraryCount, userId)
             : []);
 
         return new Faker<UserEntity>()
@@ -76,29 +78,5 @@ public class UserEntityFixture
     public List<UserEntity> CreateMany(int count = 3, int libraryCount = 0)
     {
         return [.. Enumerable.Range(0, count).Select(_ => Create(libraryCount))];
-    }
-
-    /// <summary>
-    /// Creates a valid collection of user libraries.
-    /// </summary>
-    /// <param name="count">The number of user libraries to create.</param>
-    /// <param name="userId">The unique identifier of the user for whom to create the libraries.</param>
-    /// <returns>A collection of <see cref="LibraryEntity"/>.</returns>
-    private static List<LibraryEntity> CreateLibraries(int count, Guid userId)
-    {
-        return new Faker<LibraryEntity>()
-            .CustomInstantiator(f => new LibraryEntity
-            {
-                Id = Guid.NewGuid(),
-                UserId = userId,
-                Title = f.Commerce.ProductName(),
-                LibraryType = f.PickRandom<LibraryType>(),
-                ContentLocations = [],
-                CreatedOnUtc = f.Date.Past(),
-                CreatedBy = userId,
-                UpdatedOnUtc = null,
-                UpdatedBy = null
-            })
-            .Generate(count);
     }
 }

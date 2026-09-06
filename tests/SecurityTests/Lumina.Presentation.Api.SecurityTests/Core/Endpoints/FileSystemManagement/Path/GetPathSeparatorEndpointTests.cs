@@ -9,7 +9,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.FileSystemManagement.Path;
 
 /// <summary>
-/// Contains security tests for the <c>/path/get-path-separator</c> route.
+/// Contains security tests for the <see cref="GetPathSeparatorEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetPathSeparatorEndpointTests : IClassFixture<LuminaApiFactory>

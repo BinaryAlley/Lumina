@@ -16,7 +16,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.UsersManagement.Authentication.RecoverPassword;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/auth/api-recover-password</c> route served by the <see cref="RecoverPasswordEndpoint"/> class.
+/// Contains security tests for the <see cref="RecoverPasswordEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class RecoverPasswordEndpointTests : IClassFixture<LuminaWebFactory>

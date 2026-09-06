@@ -20,7 +20,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.Management.GetLibrary;
 
 /// <summary>
-/// Contains security tests for the <c>/libraries/{id}</c> route.
+/// Contains security tests for the <see cref="GetLibraryEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetLibraryEndpointTests : IClassFixture<LuminaApiFactory>

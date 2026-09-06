@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetLibraryItems;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/library/written-content-library/books-library/books/api-get-library-items</c> route served by the <see cref="GetLibraryItemsEndpoint"/> class.
+/// Contains integration tests for the <see cref="GetLibraryItemsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetLibraryItemsEndpointTests : IClassFixture<LuminaWebFactory>

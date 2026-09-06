@@ -9,7 +9,7 @@ using System.Net;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Tools.Settings;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/tools/settings</c> route served by the <see cref="SettingsViewEndpoint"/> class.
+/// Contains security tests for the <see cref="SettingsViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class SettingsViewEndpointTests : IClassFixture<LuminaWebFactory>

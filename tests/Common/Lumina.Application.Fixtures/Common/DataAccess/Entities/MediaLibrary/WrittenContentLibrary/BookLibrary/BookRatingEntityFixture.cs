@@ -26,7 +26,7 @@ public class BookRatingEntityFixture
     /// <param name="maxValue">Optional. The maximum possible rating value.</param>
     /// <param name="source">Optional. The rating source.</param>
     /// <param name="voteCount">Optional. The number of votes.</param>
-    /// <param name="includeValues">Whether the rating properties should be populated. Set to <see langword="false"/> to create an invalid entity.</param>
+    /// <param name="includeValues">Whether the rating properties should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created book rating entity.</returns>
     public BookRatingEntity Create(
         decimal? value = null,

@@ -16,7 +16,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Plugins.InstallPlugin;
 
 /// <summary>
-/// Contains security tests for the <c>POST /api/v1/plugins</c> route.
+/// Contains security tests for the <see cref="InstallPluginEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class InstallPluginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
@@ -37,7 +37,7 @@ public class InstallPluginEndpointTests : IClassFixture<LuminaApiFactory>, IDisp
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
-        // a unique X-Forwarded-For isolates rate limiting state per test
+        // A unique X-Forwarded-For isolates rate limiting state per test.
         _client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
     }
 

@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Scheduler.RemoveScheduledJob;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/admin/api-scheduled-jobs/{scheduledJobId}</c> route served by the <see cref="RemoveScheduledJobEndpoint"/> class.
+/// Contains security tests for the <see cref="RemoveScheduledJobEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class RemoveScheduledJobEndpointTests : IClassFixture<LuminaWebFactory>

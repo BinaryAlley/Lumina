@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Themes.Queries.GetThemeAsset;
 
 /// <summary>
-/// Contains security tests for the <c>/api/v1/themes/{themeId}/assets/{*assetPath}</c> route.
+/// Contains security tests for the <see cref="GetThemeAssetEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetThemeAssetEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
@@ -42,7 +42,7 @@ public class GetThemeAssetEndpointTests : IClassFixture<LuminaApiFactory>, IDisp
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
-        // a unique X-Forwarded-For isolates rate limiting state per test
+        // A unique X-Forwarded-For isolates rate limiting state per test.
         _client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
         _themeId = $"testtheme{Guid.NewGuid():N}";
     }
@@ -93,8 +93,8 @@ public class GetThemeAssetEndpointTests : IClassFixture<LuminaApiFactory>, IDisp
         string content = await response.Content.ReadAsStringAsync();
 
         // Assert
-        // the encoded traversal is rejected either by the server before it reaches the handler (403) or by the theme service validation (422);
-        // in both cases it must be a clean client error that never serves or leaks the decoy
+        // The encoded traversal is rejected either by the server before it reaches the handler (403) or by the theme service validation (422);
+        // in both cases it must be a clean client error that never serves or leaks the decoy.
         Assert.True(response.StatusCode >= HttpStatusCode.BadRequest && response.StatusCode < HttpStatusCode.InternalServerError, $"Unexpected status code {response.StatusCode}.");
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
@@ -112,7 +112,7 @@ public class GetThemeAssetEndpointTests : IClassFixture<LuminaApiFactory>, IDisp
         EnsureDecoyFileOnDisk();
 
         // Act
-        // note: Kestrel normalizes literal dot-segments out of the raw path, so the request is re-routed or rejected before the handler
+        // Note: Kestrel normalizes literal dot-segments out of the raw path, so the request is re-routed or rejected before the handler.
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/themes/{_themeId}/assets/../evil.txt");
         string content = await response.Content.ReadAsStringAsync();
 
@@ -146,8 +146,8 @@ public class GetThemeAssetEndpointTests : IClassFixture<LuminaApiFactory>, IDisp
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
 
-        // note: some payloads are normalized away by the server before routing, producing an empty-body 404;
-        // when the value reaches the handler, the failure must still be the generic theme-not-found problem
+        // Note: some payloads are normalized away by the server before routing, producing an empty-body 404;
+        // when the value reaches the handler, the failure must still be the generic theme-not-found problem.
         if (!string.IsNullOrWhiteSpace(content))
         {
             Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Themes.Management.DeleteTheme;
 
 /// <summary>
-/// Contains security tests for the <c>DELETE /api/v1/themes/{themeId}</c> route.
+/// Contains security tests for the <see cref="DeleteThemeEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class DeleteThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
@@ -31,7 +31,7 @@ public class DeleteThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
-        // a unique X-Forwarded-For isolates rate limiting state per test
+        // A unique X-Forwarded-For isolates rate limiting state per test.
         _client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
     }
 

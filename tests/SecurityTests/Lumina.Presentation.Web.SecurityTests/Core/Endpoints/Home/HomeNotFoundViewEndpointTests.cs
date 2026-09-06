@@ -9,7 +9,7 @@ using System.Net;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Home;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/not-found</c> route served by the <see cref="HomeNotFoundViewEndpoint"/> class.
+/// Contains security tests for the <see cref="HomeNotFoundViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class HomeNotFoundViewEndpointTests : IClassFixture<LuminaWebFactory>

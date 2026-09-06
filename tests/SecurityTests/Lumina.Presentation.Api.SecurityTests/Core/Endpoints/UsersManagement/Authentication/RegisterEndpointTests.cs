@@ -18,7 +18,7 @@ using System.Text.Json.Serialization;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.Authentication;
 
 /// <summary>
-/// Contains security tests for the <c>/auth/register</c> route.
+/// Contains security tests for the <see cref="RegisterEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
@@ -114,8 +114,8 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     public async Task Register_WithSQLInjectionAttempt_ShouldRemainSecure(string maliciousUsername)
     {
         // Arrange
-        // note: the register validator rejects these usernames (invalid username format) with 422 before any DB access,
-        // so the malicious username never reaches a query; the 422 assertion below is the security guarantee
+        // Note: the register validator rejects these usernames (invalid username format) with 422 before any DB access,
+        // so the malicious username never reaches a query; the 422 assertion below is the security guarantee.
         RegistrationRequest request = _registrationRequestFixture.Create(
             username: maliciousUsername,
             password: "TestPass123!",

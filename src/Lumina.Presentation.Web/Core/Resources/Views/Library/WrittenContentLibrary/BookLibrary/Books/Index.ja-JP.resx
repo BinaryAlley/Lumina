@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -50,5 +50,11 @@
   </data>
   <data name="ReaderDisabled" xml:space="preserve">
     <value>この本を開くブックリーダーは、このライブラリで無効になっています。ライブラリ設定で有効にすると本を読めます。</value>
+  </data>
+  <data name="Read" xml:space="preserve">
+    <value>読む</value>
+  </data>
+  <data name="ViewDetails" xml:space="preserve">
+    <value>詳細を表示</value>
   </data>
 </root>

@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.FileSystemManagement.Path.ValidatePath;
 
 /// <summary>
-/// Contains integration tests for the <c>/path/api-validate</c> route served by the <see cref="ValidatePathEndpoint"/> class.
+/// Contains integration tests for the <see cref="ValidatePathEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ValidatePathEndpointTests : IClassFixture<LuminaWebFactory>

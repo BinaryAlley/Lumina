@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Home;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/not-found</c> route served by the <see cref="HomeNotFoundViewEndpoint"/> class.
+/// Contains integration tests for the <see cref="HomeNotFoundViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class HomeNotFoundViewEndpointTests : IClassFixture<LuminaWebFactory>

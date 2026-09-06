@@ -11,7 +11,7 @@ using System.Net.Http.Headers;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.FileSystemManagement.Path.SplitPath;
 
 /// <summary>
-/// Contains security tests for the <c>/path/api-split</c> route served by the <see cref="SplitPathEndpoint"/> class.
+/// Contains security tests for the <see cref="SplitPathEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class SplitPathEndpointTests : IClassFixture<LuminaWebFactory>

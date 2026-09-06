@@ -4,16 +4,14 @@ using Lumina.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Themes.Management.SetCurrentTheme;
 
 /// <summary>
-/// Contains security tests for the <c>PUT /api/v1/themes/current</c> route.
+/// Contains security tests for the <see cref="SetCurrentThemeEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class SetCurrentThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
@@ -33,7 +31,7 @@ public class SetCurrentThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDi
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
-        // a unique X-Forwarded-For isolates rate limiting state per test
+        // A unique X-Forwarded-For isolates rate limiting state per test.
         _client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
     }
 

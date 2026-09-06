@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Themes.RestoreTheme;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/admin/themes/api-restore-theme/{themeId}</c> route served by the <see cref="RestoreThemeEndpoint"/> class.
+/// Contains integration tests for the <see cref="RestoreThemeEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class RestoreThemeEndpointTests : IClassFixture<LuminaWebFactory>

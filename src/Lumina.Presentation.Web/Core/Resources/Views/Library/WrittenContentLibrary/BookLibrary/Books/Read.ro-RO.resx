@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -146,5 +146,8 @@
   </data>
   <data name="ReaderDisabled" xml:space="preserve">
     <value>Cititorul de cărți care deschide această carte este dezactivat pentru această bibliotecă. Activați-l în setările bibliotecii pentru a citi cartea.</value>
+  </data>
+  <data name="BackToLibrary" xml:space="preserve">
+    <value>Înapoi la bibliotecă</value>
   </data>
 </root>

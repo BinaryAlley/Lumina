@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.FileSystemManagement.Path.CheckPathExists;
 
 /// <summary>
-/// Contains integration tests for the <c>/path/api-check-path-exists</c> route served by the <see cref="CheckPathExistsEndpoint"/> class.
+/// Contains integration tests for the <see cref="CheckPathExistsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class CheckPathExistsEndpointTests : IClassFixture<LuminaWebFactory>

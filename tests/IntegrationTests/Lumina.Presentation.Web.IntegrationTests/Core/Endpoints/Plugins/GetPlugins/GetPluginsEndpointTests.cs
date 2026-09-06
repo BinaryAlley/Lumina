@@ -4,7 +4,6 @@ using Lumina.Presentation.Web.Core.Endpoints.Plugins.GetPlugins;
 using Lumina.Presentation.Web.Fixtures.Common.DTO.Plugins;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
@@ -16,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Plugins.GetPlugins;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/admin/manage-plugins/api-get-plugins</c> route served by the <see cref="GetPluginsEndpoint"/> class.
+/// Contains integration tests for the <see cref="GetPluginsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetPluginsEndpointTests : IClassFixture<LuminaWebFactory>

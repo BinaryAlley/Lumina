@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Authorization.Roles.AddRole;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/admin/api-create-role</c> route served by the <see cref="AddRoleEndpoint"/> class.
+/// Contains integration tests for the <see cref="AddRoleEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class AddRoleEndpointTests : IClassFixture<LuminaWebFactory>

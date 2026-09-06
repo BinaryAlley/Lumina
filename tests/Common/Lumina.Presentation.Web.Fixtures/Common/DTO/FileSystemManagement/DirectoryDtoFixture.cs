@@ -23,7 +23,7 @@ public class DirectoryDtoFixture
     /// <param name="path">Optional. The full path to the directory.</param>
     /// <param name="name">Optional. The name of the directory.</param>
     /// <param name="items">Optional. The children items of the directory.</param>
-    /// <param name="includeItems">Whether the directory should include children items, or an empty collection.</param>
+    /// <param name="includeItems">Whether the children items should be included, or forced to an empty collection.</param>
     /// <returns>The created <see cref="DirectoryDto"/>.</returns>
     public DirectoryDto Create(
         string? path = null,

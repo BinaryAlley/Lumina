@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.Reading.Read;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/library/written-content-library/books-library/books/{bookId}/read</c> route served by the <see cref="ReadViewEndpoint"/> class.
+/// Contains integration tests for the <see cref="ReadViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ReadViewEndpointTests : IClassFixture<LuminaWebFactory>

@@ -28,7 +28,7 @@ public class FileFixture
     /// <param name="dateModified">Optional. The file's modification date. If not provided, a recent date is generated.</param>
     /// <param name="size">Optional. The file size. If not provided, a random size is generated.</param>
     /// <param name="status">Optional. The file's status. If not provided, a random status is assigned.</param>
-    /// <param name="includeDates">Whether the file should include creation and modification dates.</param>
+    /// <param name="includeDates">Whether the creation and modification dates should be included, or left unset.</param>
     /// <returns>The created <see cref="File"/>.</returns>
     public File Create(
         string? path = null,

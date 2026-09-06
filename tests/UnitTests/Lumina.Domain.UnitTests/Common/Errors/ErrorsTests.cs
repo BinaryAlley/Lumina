@@ -125,7 +125,7 @@ public class ErrorsTests
     {
         // Assert
         // The count assertion fails when an error is added or removed, reminding to update the assertions below.
-        Assert.Equal(27, typeof(DomainErrors.WrittenContent).GetProperties().Length);
+        Assert.Equal(29, typeof(DomainErrors.WrittenContent).GetProperties().Length);
         AssertError(DomainErrors.WrittenContent.BookAlreadyExists, ErrorType.Conflict);
         AssertError(DomainErrors.WrittenContent.IsbnValueCannotBeEmpty, ErrorType.Validation);
         AssertError(DomainErrors.WrittenContent.IsbnListCannotBeNull, ErrorType.Validation);
@@ -152,6 +152,8 @@ public class ErrorsTests
         AssertError(DomainErrors.WrittenContent.VolumeNumberMustBeGreaterThanZero, ErrorType.Validation);
         AssertError(DomainErrors.WrittenContent.BookLibraryCannotBeNull, ErrorType.Validation);
         AssertError(DomainErrors.WrittenContent.BookPathCannotBeEmpty, ErrorType.Validation);
+        AssertError(DomainErrors.WrittenContent.BookIdCannotBeEmpty, ErrorType.Validation);
+        AssertError(DomainErrors.WrittenContent.BookCoverCannotBeNull, ErrorType.Validation);
         AssertError(DomainErrors.WrittenContent.BookNotFound, ErrorType.NotFound);
     }
 

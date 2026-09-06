@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Management.SetMetadataProviderEnabled;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/libraries/manage/api-set-metadata-provider-enabled</c> route served by the <see cref="SetMetadataProviderEnabledEndpoint"/> class.
+/// Contains integration tests for the <see cref="SetMetadataProviderEnabledEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class SetMetadataProviderEnabledEndpointTests : IClassFixture<LuminaWebFactory>

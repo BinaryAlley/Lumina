@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Themes.ThemeAssets;
 
 /// <summary>
-/// Contains integration tests for the <c>/theme-assets/{themeId}/{path}</c> route served by the <see cref="ThemeAssetsEndpoint"/> class.
+/// Contains integration tests for the <see cref="ThemeAssetsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ThemeAssetsEndpointTests : IClassFixture<LuminaWebFactory>

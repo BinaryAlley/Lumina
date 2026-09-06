@@ -11,7 +11,7 @@
     var roles = ViewData["roles"] as RoleDto[];
     var users = ViewData["users"] as UserDto[];
     var permissions = ViewData["permissions"] as PermissionDto[];
-    // generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler
+    // Generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler.
     var scriptId = ScriptIdentifierHelper.GenerateScriptId();
 }
 
@@ -24,7 +24,7 @@
     <div id="authorization-permissions-container">
         <input type="hidden" name="authorization-users-selected-id" id="authorization-users-selected-id" value="" />
         <input type="hidden" name="authorization-roles-selected-id" id="authorization-roles-selected-id" value="" />
-        <!-- Users dropdown row -->
+        <!-- Users dropdown row. -->
         <div class="h-30px w-100 text-end mb-5">
             <label for="authorization-users-combobox" class="text-light-one">@_localizer["Users"]</label>
 
@@ -48,7 +48,7 @@
             </div>
         </div>
 
-        <!-- Roles dropdown row -->
+        <!-- Roles dropdown row. -->
         <div class="h-30px w-100 text-end mb-5">
             <label for="authorization-roles-combobox" class="text-light-one">@_localizer["Roles"]</label>
 
@@ -72,7 +72,7 @@
             </div>
         </div>
 
-        <!-- Permissions row -->
+        <!-- Permissions row. -->
         <div id="authorization-permissions-permissions-container" class="">
             <div id="authorization-permissions-permissions">
                 <div id="authorization-permissions-permissions-scroll" class="scroll-horizontal">
@@ -95,7 +95,7 @@
             </div>
         </div>
 
-        <!-- Submit Button Row -->
+        <!-- Submit Button Row. -->
         <div class="w-100 h-25px mt-5 text-end">
             <button id="btn-update-user" type="submit" class="confirm-button f-14 h-24px v-align-t" disabled>@_localizer["Update"]</button>
         </div>
@@ -105,9 +105,10 @@
 @section Scripts {
     <!-- The "text/plain" type is a design choice, not a mistake: it keeps the browser from executing this view script during HTML parsing, before site.js defines the API helpers it calls (callApiGetAsync, callApiPostAsync, ...). site.js (which loads deferred) executes these scripts once it is loaded, both on the initial page load and during AJAX navigation. -->
     <script type="text/plain" data-form="@scriptId">
-        // create cleanup registry for this view
+        // Create cleanup registry for this view.
         const cleanupFunctions = [];
         
+        // The element references are captured once, so that the cleanup can unbind their listeners even after the AJAX navigator has swapped the content out of the document.
         const btnUpdateUser = document.getElementById('btn-update-user');
         const form = document.getElementById('authorization-permissions-form');
         const rolesDropdown = document.getElementById('authorization-roles-combobox-dropdown');
@@ -115,7 +116,7 @@
         const roleIdInput = document.getElementById('authorization-roles-selected-id');
         const userIdInput = document.getElementById('authorization-users-selected-id');
 
-        // update user permissions and role
+        // Update user permissions and role.
         async function handleUserAuthorizationSubmitAsync() {
             const formData = {
                 userId: userIdInput.value,
@@ -131,7 +132,7 @@
 
         async function fetchUserRoleAsync(userId) {
             const url = '@_urlService.GetAbsoluteUrl(WebRoutes.Admin.GET_ROLE_BY_USER_ID, new { userId = default(Guid) })';
-            const data = await callApiGetAsync(url.replace('/@(default(Guid))', `/${userId}`)); // userId needs to be replaced here, because GetAbsoluteUrl is server side, userId is client side
+            const data = await callApiGetAsync(url.replace('/@(default(Guid))', `/${userId}`)); // userId needs to be replaced here, because GetAbsoluteUrl is server side, userId is client side.
             if (data) {
                 var roleElement = document.querySelector('#authorization-roles-combobox .enlightenment-option[data-value="' + data.id + '"]');
                 var roleName = roleElement.textContent;
@@ -143,13 +144,13 @@
 
         async function fetchUserPermissionsAsync(userId) {
             const url = '@_urlService.GetAbsoluteUrl(WebRoutes.Admin.GET_PERMISSIONS_BY_USER_ID, new { userId = default(Guid) })';
-            const data = await callApiGetAsync(url.replace('/@(default(Guid))', `/${userId}`)); // userId needs to be replaced here, because GetAbsoluteUrl is server side, userId is client side
+            const data = await callApiGetAsync(url.replace('/@(default(Guid))', `/${userId}`)); // userId needs to be replaced here, because GetAbsoluteUrl is server side, userId is client side.
             if (data) {
-                // clear all checkboxes
+                // Clear all checkboxes.
                 document.querySelectorAll("input[name='authorization-permissions-permissions']")
                     .forEach(input => input.checked = false);
 
-                // check the checkboxes for which permissions are assigned
+                // Check the checkboxes for which permissions are assigned.
                 data.forEach(p => {
                     const checkbox = document.querySelector(`input[name='authorization-permissions-permissions'][value='${p.id}']`);
                     if (checkbox)
@@ -158,7 +159,7 @@
             }
         }
 
-        // on Enter key pressed
+        // On Enter key pressed.
         const handleEnterKey = async function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -166,15 +167,15 @@
             }
         };
 
-        // on form submit event
+        // On form submit event.
         const handleSubmit = async function(e) {
             e.preventDefault();
             await handleUserAuthorizationSubmitAsync();
         };
 
-        // on document click
+        // On document click.
         const handleDocumentClick = async function(e) {
-            // users dropdown change
+            // Users dropdown change.
             if (e.target.closest('#authorization-users-combobox .enlightenment-option')) {
                 var selectedUserId = e.target.dataset.value;
                 document.querySelector('#authorization-roles-combobox .enlightenment-selected-text').textContent = '@_localizer["SelectARole"]';
@@ -190,26 +191,26 @@
                 else 
                     btnUpdateUser.disabled = true;
             } 
-            // roles dropdown change
+            // Roles dropdown change.
             else if (e.target.closest('#authorization-roles-combobox .enlightenment-option')) {
                 const roleId = e.target.dataset.value;
                 roleIdInput.value = roleId || '';
             }
         };
 
-        // add listeners
+        // Add listeners.
         form.addEventListener('keypress', handleEnterKey);
         form.addEventListener('submit', handleSubmit);
         document.addEventListener('click', handleDocumentClick);
 
-        // register cleanup for these listeners
+        // Register cleanup for these listeners.
         cleanupFunctions.push(() => {
             form.removeEventListener('keypress', handleEnterKey);
             form.removeEventListener('submit', handleSubmit);
             document.removeEventListener('click', handleDocumentClick);
         });
 
-        // when form's height changes, adjust the roles combobox dropdown maximum height accordingly, so it doesn't cause an <article> section overflow
+        // When form's height changes, adjust the roles combobox dropdown maximum height accordingly, so it doesn't cause an <article> section overflow.
         const resizeObserver = new ResizeObserver(entries => {
             const formHeight = form.getBoundingClientRect().height;
             usersDropdown.style.maxHeight = `calc(${formHeight}px - 50px)`;
@@ -219,12 +220,12 @@
         });
         resizeObserver.observe(form);
 
-        // register cleanup for observer
+        // Register cleanup for observer.
         cleanupFunctions.push(() => {
             resizeObserver.disconnect();
         });
 
-        // store all cleanups for this view on window object using the scriptId
+        // Store all cleanups for this view on window object using the scriptId.
         window.viewCleanups = window.viewCleanups || {};
         window.viewCleanups['@scriptId'] = () => {
             cleanupFunctions.forEach(cleanup => cleanup());

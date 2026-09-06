@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.Reading.GetReadingManifest;
 
 /// <summary>
-/// Contains integration tests for the <c>/books/{bookId}/reading/manifest</c> route.
+/// Contains integration tests for the <see cref="GetReadingManifestEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetReadingManifestEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime

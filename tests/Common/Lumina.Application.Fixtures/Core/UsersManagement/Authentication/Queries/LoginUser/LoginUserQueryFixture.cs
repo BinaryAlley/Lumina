@@ -19,7 +19,7 @@ public class LoginUserQueryFixture
     /// </summary>
     /// <param name="username">Optional. The username.</param>
     /// <param name="password">Optional. The password.</param>
-    /// <param name="includeTotpCode">Whether to include a TOTP code in the query.</param>
+    /// <param name="includeTotpCode">Whether the TOTP code should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created query.</returns>
     public LoginUserQuery Create(
         string? username = null,

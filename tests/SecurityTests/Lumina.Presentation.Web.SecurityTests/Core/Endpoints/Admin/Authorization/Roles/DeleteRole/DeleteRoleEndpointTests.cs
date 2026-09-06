@@ -12,7 +12,7 @@ using System.Text;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Authorization.Roles.DeleteRole;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/admin/api-delete-role/{roleId}</c> route served by the <see cref="DeleteRoleEndpoint"/> class.
+/// Contains security tests for the <see cref="DeleteRoleEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class DeleteRoleEndpointTests : IClassFixture<LuminaWebFactory>

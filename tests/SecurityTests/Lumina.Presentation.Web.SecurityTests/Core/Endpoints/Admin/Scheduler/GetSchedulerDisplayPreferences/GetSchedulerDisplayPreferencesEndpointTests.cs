@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Scheduler.GetSchedulerDisplayPreferences;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/admin/api-scheduled-jobs/display-preferences</c> route served by the <see cref="GetSchedulerDisplayPreferencesEndpoint"/> class.
+/// Contains security tests for the <see cref="GetSchedulerDisplayPreferencesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetSchedulerDisplayPreferencesEndpointTests : IClassFixture<LuminaWebFactory>

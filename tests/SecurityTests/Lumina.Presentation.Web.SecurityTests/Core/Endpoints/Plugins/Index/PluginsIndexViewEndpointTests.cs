@@ -9,7 +9,7 @@ using System.Net;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Plugins.Index;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/admin/manage-plugins</c> route served by the <see cref="PluginsIndexViewEndpoint"/> class.
+/// Contains security tests for the <see cref="PluginsIndexViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class PluginsIndexViewEndpointTests : IClassFixture<LuminaWebFactory>

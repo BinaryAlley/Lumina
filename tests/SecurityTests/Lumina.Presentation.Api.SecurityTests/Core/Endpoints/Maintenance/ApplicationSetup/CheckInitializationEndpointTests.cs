@@ -7,7 +7,7 @@ using System.Net;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Maintenance.ApplicationSetup;
 
 /// <summary>
-/// Contains security tests for the <c>/initialization</c> route.
+/// Contains security tests for the <see cref="CheckInitializationEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class CheckInitializationEndpointTests : IClassFixture<LuminaApiFactory>

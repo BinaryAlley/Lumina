@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.AddBook;
 
 /// <summary>
-/// Contains security tests for the <c>/books</c> route.
+/// Contains security tests for the <see cref="AddBookEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class AddBookEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
@@ -51,7 +51,7 @@ public class AddBookEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         (Guid userId, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(client);
         Guid libraryId = Guid.NewGuid();
         await _apiFactory.SeedLibraryAsync(libraryId, userId);
-        AddBookRequest request = _addBookRequestFixture.Create() with { LibraryId = libraryId, Path = maliciousPath };
+        AddBookRequest request = _addBookRequestFixture.Create(libraryId: libraryId, path: maliciousPath);
 
         // Act
         HttpResponseMessage response = await client.PostAsJsonAsync("/api/v1/books", request);

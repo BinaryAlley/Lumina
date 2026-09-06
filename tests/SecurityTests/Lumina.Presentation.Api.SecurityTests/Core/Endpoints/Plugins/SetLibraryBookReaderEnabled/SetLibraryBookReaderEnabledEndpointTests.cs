@@ -12,7 +12,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Plugins.SetLibraryBookReaderEnabled;
 
 /// <summary>
-/// Contains security tests for the <c>/libraries/{libraryId}/book-readers/{pluginId}/enabled</c> route.
+/// Contains security tests for the <see cref="SetLibraryBookReaderEnabledEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class SetLibraryBookReaderEnabledEndpointTests : IClassFixture<LuminaApiFactory>

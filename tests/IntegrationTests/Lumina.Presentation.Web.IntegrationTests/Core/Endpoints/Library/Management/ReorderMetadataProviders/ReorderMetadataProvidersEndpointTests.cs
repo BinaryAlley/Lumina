@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Management.ReorderMetadataProviders;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/libraries/manage/api-reorder-metadata-providers</c> route served by the <see cref="ReorderMetadataProvidersEndpoint"/> class.
+/// Contains integration tests for the <see cref="ReorderMetadataProvidersEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ReorderMetadataProvidersEndpointTests : IClassFixture<LuminaWebFactory>

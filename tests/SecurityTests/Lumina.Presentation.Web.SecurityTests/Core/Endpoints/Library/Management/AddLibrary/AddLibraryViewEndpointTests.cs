@@ -9,7 +9,7 @@ using System.Net;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.Management.AddLibrary;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/libraries/manage/item</c> route served by the <see cref="AddLibraryViewEndpoint"/> class.
+/// Contains security tests for the <see cref="AddLibraryViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class AddLibraryViewEndpointTests : IClassFixture<LuminaWebFactory>

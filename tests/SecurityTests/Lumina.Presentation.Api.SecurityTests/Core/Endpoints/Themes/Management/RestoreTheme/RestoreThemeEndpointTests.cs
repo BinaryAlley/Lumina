@@ -4,22 +4,17 @@ using Lumina.Application.Fixtures.Common.DataAccess.Entities.Themes;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Themes.Management.RestoreTheme;
 
 /// <summary>
-/// Contains security tests for the <c>POST /api/v1/themes/{themeId}/restore</c> route.
+/// Contains security tests for the <see cref="RestoreThemeEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class RestoreThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
@@ -41,7 +36,7 @@ public class RestoreThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDispo
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
-        // a unique X-Forwarded-For isolates rate limiting state per test
+        // A unique X-Forwarded-For isolates rate limiting state per test.
         _client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
         _themeId = $"testtheme{Guid.NewGuid():N}";
     }

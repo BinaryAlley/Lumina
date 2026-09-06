@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Management.GetEnabledLibraries;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/libraries/manage/api-get-enabled-libraries</c> route served by the <see cref="GetEnabledLibrariesEndpoint"/> class.
+/// Contains integration tests for the <see cref="GetEnabledLibrariesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetEnabledLibrariesEndpointTests : IClassFixture<LuminaWebFactory>

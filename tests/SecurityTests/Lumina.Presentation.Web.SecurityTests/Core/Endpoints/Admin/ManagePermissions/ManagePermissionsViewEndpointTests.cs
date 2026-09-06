@@ -14,7 +14,7 @@ using System.Net;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.ManagePermissions;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/admin/manage-permissions</c> route served by the <see cref="ManagePermissionsViewEndpoint"/> class.
+/// Contains security tests for the <see cref="ManagePermissionsViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ManagePermissionsViewEndpointTests : IClassFixture<LuminaWebFactory>

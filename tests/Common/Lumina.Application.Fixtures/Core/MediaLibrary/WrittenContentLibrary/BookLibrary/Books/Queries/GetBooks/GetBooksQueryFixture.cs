@@ -28,7 +28,7 @@ public class GetBooksQueryFixture
     /// <param name="searchTerm">Optional. The search term used to filter results.</param>
     /// <param name="sortBy">Optional. The name of the field by which to sort the results.</param>
     /// <param name="sortOrder">Optional. The direction in which to sort the results.</param>
-    /// <param name="includePaginationData">Whether the query should include pagination data or not.</param>
+    /// <param name="includePaginationData">Whether the pagination data should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created query to get books.</returns>
     public GetBooksQuery Create(
         Guid? libraryId = null,

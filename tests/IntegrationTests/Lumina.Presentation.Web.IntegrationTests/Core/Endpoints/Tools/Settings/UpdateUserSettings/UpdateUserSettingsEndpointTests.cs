@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Tools.Settings.UpdateUserSettings;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/tools/settings/api-update-user-settings</c> route served by the <see cref="UpdateUserSettingsEndpoint"/> class.
+/// Contains integration tests for the <see cref="UpdateUserSettingsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class UpdateUserSettingsEndpointTests : IClassFixture<LuminaWebFactory>

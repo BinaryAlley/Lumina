@@ -22,16 +22,22 @@ public class LanguageInfoDtoFixture
     /// <param name="languageCode">Optional. The ISO code of the language.</param>
     /// <param name="languageName">Optional. The name of the language in English.</param>
     /// <param name="nativeName">Optional. The native name of the language.</param>
+    /// <param name="includeLanguageCode">Whether the language code should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeLanguageName">Whether the language name should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeNativeName">Whether the native name should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="LanguageInfoDto"/>.</returns>
     public LanguageInfoDto Create(
-        string? languageCode = null, 
-        string? languageName = null, 
-        string? nativeName = null)
+        string? languageCode = null,
+        string? languageName = null,
+        string? nativeName = null,
+        bool includeLanguageCode = true,
+        bool includeLanguageName = true,
+        bool includeNativeName = true)
     {
         return new LanguageInfoDto(
-            languageCode ?? _faker.Random.String2(2),
-            languageName ?? _faker.Lorem.Word(),
-            nativeName ?? _faker.Lorem.Word());
+            includeLanguageCode ? (languageCode ?? _faker.Random.String2(2)) : null,
+            includeLanguageName ? (languageName ?? _faker.Lorem.Word()) : null,
+            includeNativeName ? (nativeName ?? _faker.Lorem.Word()) : null);
     }
 
     /// <summary>

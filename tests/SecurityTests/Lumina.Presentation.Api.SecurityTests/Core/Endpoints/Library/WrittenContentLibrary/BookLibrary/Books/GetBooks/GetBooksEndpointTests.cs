@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetBooks;
 
 /// <summary>
-/// Contains security tests for the <c>/books</c> route.
+/// Contains security tests for the <see cref="GetBooksEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetBooksEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable

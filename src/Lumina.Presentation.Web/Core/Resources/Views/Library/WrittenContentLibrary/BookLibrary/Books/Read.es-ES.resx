@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -146,5 +146,8 @@
   </data>
   <data name="ReaderDisabled" xml:space="preserve">
     <value>El lector de libros que abre este libro está deshabilitado para esta biblioteca. Habilítelo en la configuración de la biblioteca para leer el libro.</value>
+  </data>
+  <data name="BackToLibrary" xml:space="preserve">
+    <value>Volver a la biblioteca</value>
   </data>
 </root>

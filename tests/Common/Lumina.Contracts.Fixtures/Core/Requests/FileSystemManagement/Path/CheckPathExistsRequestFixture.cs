@@ -20,9 +20,11 @@ public class CheckPathExistsRequestFixture
     /// Creates a <see cref="CheckPathExistsRequest"/> with default or random values.
     /// </summary>
     /// <param name="path">Optional. The path to check.</param>
-    /// <param name="includeHiddenElements">Optional. Whether to include hidden elements.</param>
+    /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
     /// <returns>The created <see cref="CheckPathExistsRequest"/>.</returns>
-    public CheckPathExistsRequest Create(string? path = null, bool? includeHiddenElements = null)
+    public CheckPathExistsRequest Create(
+        string? path = null, 
+        bool? includeHiddenElements = null)
     {
         return new CheckPathExistsRequest(
             Path: path ?? _faker.System.FilePath(),

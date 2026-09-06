@@ -18,7 +18,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Admin.Authorization.Roles;
 
 /// <summary>
-/// Contains security tests for the <c>/auth/roles</c> route.
+/// Contains security tests for the <see cref="UpdateRoleEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class UpdateRoleEndpointTests : IClassFixture<LuminaApiFactory>, IAsyncDisposable

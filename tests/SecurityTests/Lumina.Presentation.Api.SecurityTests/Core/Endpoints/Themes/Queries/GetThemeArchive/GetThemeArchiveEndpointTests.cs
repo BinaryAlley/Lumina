@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Themes.Queries.GetThemeArchive;
 
 /// <summary>
-/// Contains security tests for the <c>/api/v1/themes/{themeId}/archive</c> route.
+/// Contains security tests for the <see cref="GetThemeArchiveEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetThemeArchiveEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
@@ -31,7 +31,7 @@ public class GetThemeArchiveEndpointTests : IClassFixture<LuminaApiFactory>, IDi
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
-        // a unique X-Forwarded-For isolates rate limiting state per test
+        // A unique X-Forwarded-For isolates rate limiting state per test.
         _client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
     }
 
@@ -81,8 +81,8 @@ public class GetThemeArchiveEndpointTests : IClassFixture<LuminaApiFactory>, IDi
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
 
-        // note: some payloads are normalized away by the server before routing, producing an empty-body 404;
-        // when the value reaches the handler, the failure must still be the generic theme-not-found problem
+        // Note: some payloads are normalized away by the server before routing, producing an empty-body 404;
+        // when the value reaches the handler, the failure must still be the generic theme-not-found problem.
         if (!string.IsNullOrWhiteSpace(content))
         {
             Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);

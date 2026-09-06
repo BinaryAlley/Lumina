@@ -11,7 +11,7 @@ using System.Net.Http.Headers;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.FileSystemManagement.Path.GetPathRoot;
 
 /// <summary>
-/// Contains security tests for the <c>/path/api-get-path-root</c> route served by the <see cref="GetPathRootEndpoint"/> class.
+/// Contains security tests for the <see cref="GetPathRootEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetPathRootEndpointTests : IClassFixture<LuminaWebFactory>

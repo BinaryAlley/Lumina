@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Themes.DownloadTheme;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/admin/themes/api-download-theme/{themeId}</c> route served by the <see cref="DownloadThemeEndpoint"/> class.
+/// Contains integration tests for the <see cref="DownloadThemeEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class DownloadThemeEndpointTests : IClassFixture<LuminaWebFactory>

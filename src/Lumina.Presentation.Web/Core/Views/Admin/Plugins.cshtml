@@ -11,7 +11,7 @@
 
 @{
     var settingsByPluginId = ViewData["pluginSettings"] as Dictionary<Guid, PluginSettingsDto> ?? new Dictionary<Guid, PluginSettingsDto>();
-    // generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler
+    // Generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler.
     var scriptId = ScriptIdentifierHelper.GenerateScriptId();
 }
 
@@ -20,8 +20,8 @@
 
 @Html.AntiForgeryToken()
 
-<div style="display: grid; grid-template-rows: auto 1fr;"><!--container with two rows, one fixed, one filling remaining space-->
-    <div style="min-height: 1rem;"></div><!--the first row is a dummy row for "margin", because setting a margin on the next row would offset the parent's position-->
+<div style="display: grid; grid-template-rows: auto 1fr;"><!-- Container with two rows, one fixed, one filling remaining space. -->
+    <div style="min-height: 1rem;"></div><!-- The first row is a dummy row for "margin", because setting a margin on the next row would offset the parent's position. -->
     <div class="enlightenment-panel shadow-effect mx-auto panel w-75 mb-10" style="min-width: 320px;">
         <div class="shine-effect"></div>
         <div class="form-row">
@@ -150,10 +150,10 @@
 @section Scripts {
     <!-- The "text/plain" type is a design choice, not a mistake: it keeps the browser from executing this view script during HTML parsing, before site.js defines the API helpers it calls (callApiGetAsync, callApiPostAsync, ...). site.js (which loads deferred) executes these scripts once it is loaded, both on the initial page load and during AJAX navigation. -->
     <script type="text/plain" data-form="@scriptId">
-        // create cleanup registry for this view
+        // Create cleanup registry for this view.
         const cleanupFunctions = [];
 
-        // on settings toggle button click, show/hide the settings row of the plugin
+        // On settings toggle button click, show/hide the settings row of the plugin.
         const handleSettingsToggleClick = function(e) {
             if (e.target.matches('.btn-plugin-settings-toggle')) {
                 const row = e.target.closest('tr');
@@ -164,7 +164,7 @@
             }
         };
 
-        // on save plugin settings button click, collect the settings of the panel and send them to the API
+        // On save plugin settings button click, collect the settings of the panel and send them to the API.
         const handleSavePluginSettingsClick = async function(e) {
             if (e.target.matches('.btn-save-plugin-settings')) {
                 const panel = e.target.closest('.plugin-settings-panel');
@@ -186,11 +186,12 @@
             }
         };
 
+        // The element references are captured once, so that the cleanup can unbind their listeners even after the AJAX navigator has swapped the content out of the document.
         const uploadButton = document.getElementById('btn-upload-plugin');
         const uploadInput = document.getElementById('plugin-upload-input');
         const installUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Plugins.INSTALL_PLUGIN)';
 
-        // uploads the selected plugin archive as a multipart request, keeping the antiforgery token
+        // Uploads the selected plugin archive as a multipart request, keeping the antiforgery token.
         async function handleUploadInputChange() {
             const file = uploadInput.files[0];
             if (!file)
@@ -211,18 +212,18 @@
             }
         }
 
-        // opens the file picker when the upload button is clicked
+        // Opens the file picker when the upload button is clicked.
         function handleUploadButtonClick() {
             uploadInput.click();
         }
 
-        // add listeners
+        // Add listeners.
         document.addEventListener('click', handleSettingsToggleClick);
         document.addEventListener('click', handleSavePluginSettingsClick);
         uploadButton.addEventListener('click', handleUploadButtonClick);
         uploadInput.addEventListener('change', handleUploadInputChange);
 
-        // register cleanup for these listeners
+        // Register cleanup for these listeners.
         cleanupFunctions.push(() => {
             document.removeEventListener('click', handleSettingsToggleClick);
             document.removeEventListener('click', handleSavePluginSettingsClick);
@@ -230,7 +231,7 @@
             uploadInput.removeEventListener('change', handleUploadInputChange);
         });
 
-        // store all cleanups for this view on window object using the scriptId
+        // Store all cleanups for this view on window object using the scriptId.
         window.viewCleanups = window.viewCleanups || {};
         window.viewCleanups['@scriptId'] = () => {
             cleanupFunctions.forEach(cleanup => cleanup());

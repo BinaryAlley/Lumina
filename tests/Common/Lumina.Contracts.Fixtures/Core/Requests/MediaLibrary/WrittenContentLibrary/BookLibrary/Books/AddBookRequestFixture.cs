@@ -1,14 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using AutoFixture;
 using Bogus;
-using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Contracts.Fixtures.Common.Setup;
+using Lumina.Contracts.Fixtures.Core.DTO.MediaContributors;
+using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary;
+using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -23,18 +22,10 @@ namespace Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.WrittenContentLib
 [ExcludeFromCodeCoverage]
 public class AddBookRequestFixture
 {
-    private readonly Fixture _fixture = new();
-    private readonly Random _random = new();
-    private readonly Faker _faker = new();
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AddBookRequestFixture"/> class.
-    /// </summary>
-    public AddBookRequestFixture()
-    {
-        _fixture.Customizations.Add(new DateOnlySpecimenBuilder());
-        _fixture.Customizations.Add(new NullableDateOnlySpecimenBuilder());
-    }
+    private readonly IsbnDtoFixture _isbnDtoFixture = new();
+    private readonly BookRatingDtoFixture _bookRatingDtoFixture = new();
+    private readonly MediaContributorDtoFixture _mediaContributorDtoFixture = new();
+    private readonly WrittenContentMetadataDtoFixture _writtenContentMetadataDtoFixture = new();
 
     /// <summary>
     /// Creates a random valid request to add a book.
@@ -58,7 +49,7 @@ public class AddBookRequestFixture
     /// <param name="isbns">Optional. The ISBNs of the book.</param>
     /// <param name="contributors">Optional. The contributors of the book.</param>
     /// <param name="ratings">Optional. The ratings of the book.</param>
-    /// <param name="includeOptionalProperties">Whether the properties that are not explicitly provided should be randomized, or left <see langword="null"/>.</param>
+    /// <param name="includeOptionalProperties">Whether the properties that are not explicitly provided should be randomized, or forced to <see langword="null"/>.</param>
     /// <returns>The created request to add a book.</returns>
     public AddBookRequest Create(
         Guid? libraryId = null,
@@ -82,154 +73,6 @@ public class AddBookRequestFixture
         List<BookRatingDto>? ratings = null,
         bool includeOptionalProperties = true)
     {
-        int releaseYear = _random.Next(2000, 2010);
-        int reReleaseYear = _random.Next(2010, 2020);
-
-        ReleaseInfoDto releaseInfo = new Faker<ReleaseInfoDto>()
-            .CustomInstantiator(f => new ReleaseInfoDto(
-                default,
-                default,
-                default,
-                default,
-                default,
-                default
-            ))
-            .RuleFor(x => x.OriginalReleaseDate, _faker.DateOnlyBetween(new DateOnly(releaseYear, 1, 1), new DateOnly(releaseYear, 12, 31)))
-            .RuleFor(x => x.OriginalReleaseYear, releaseYear)
-            .RuleFor(x => x.ReReleaseDate, _faker.DateOnlyBetween(new DateOnly(reReleaseYear, 1, 1), new DateOnly(reReleaseYear, 12, 31)))
-            .RuleFor(x => x.ReReleaseYear, reReleaseYear)
-            .RuleFor(x => x.ReleaseCountry, f => f.Random.String2(2))
-            .RuleFor(x => x.ReleaseVersion, f => f.Random.String2(f.Random.Number(1, 50)))
-            .Generate();
-
-        Faker<GenreDto> genre = new Faker<GenreDto>()
-            .CustomInstantiator(f => new GenreDto(
-                default!
-            ))
-            .RuleFor(e => e.Name, f => f.Random.String2(f.Random.Number(1, 50)));
-
-        Faker<TagDto> tag = new Faker<TagDto>()
-            .CustomInstantiator(f => new TagDto(
-                default!
-            ))
-            .RuleFor(e => e.Name, f => f.Random.String2(f.Random.Number(1, 50)));
-
-        Faker<MediaContributorRoleDto> mediaContributorRole = new Faker<MediaContributorRoleDto>()
-            .CustomInstantiator(f => new MediaContributorRoleDto(
-                default!,
-                default!
-            ))
-            .RuleFor(e => e.Name, f => f.Random.String2(f.Random.Number(1, 50)))
-            .RuleFor(e => e.Category, f => f.PickRandom<MediaContributorRoleCategory>());
-
-        Faker<MediaContributorNameDto> mediaContributorName = new Faker<MediaContributorNameDto>()
-            .CustomInstantiator(f => new MediaContributorNameDto(
-                default!,
-                default!
-            ))
-            .RuleFor(e => e.DisplayName, f => f.Random.String2(f.Random.Number(1, 50)))
-            .RuleFor(e => e.LegalName, f => f.Random.String2(f.Random.Number(1, 50)));
-
-        Faker<MediaContributorDto> mediaContributor = new Faker<MediaContributorDto>()
-            .CustomInstantiator(f => new MediaContributorDto(
-                default!,
-                default!
-            ))
-            .RuleFor(e => e.Name, mediaContributorName)
-            .RuleFor(e => e.Role, mediaContributorRole);
-
-        Faker<BookRatingDto> rating = new Faker<BookRatingDto>()
-            .CustomInstantiator(f => new BookRatingDto(
-                default,
-                default,
-                default,
-                default
-            ))
-            .RuleFor(e => e.Value, _random.Next(1, 5))
-            .RuleFor(e => e.MaxValue, 5)
-            .RuleFor(e => e.Source, _fixture.Create<BookRatingSource>())
-            .RuleFor(e => e.VoteCount, _random.Next(1, 1000));
-
-        Faker<LanguageInfoDto> language = new Faker<LanguageInfoDto>()
-            .CustomInstantiator(f => new LanguageInfoDto(
-                default!,
-                default!,
-                default
-            ))
-            .RuleFor(e => e.LanguageName, f => f.Random.String2(f.Random.Number(1, 50)))
-            .RuleFor(e => e.LanguageCode, f => f.Random.String2(2))
-            .RuleFor(e => e.NativeName, f => f.Random.String2(f.Random.Number(1, 50)));
-
-        Faker<LanguageInfoDto> originalLanguage = new Faker<LanguageInfoDto>()
-            .CustomInstantiator(f => new LanguageInfoDto(
-                default!,
-                default!,
-                default
-            ))
-            .RuleFor(e => e.LanguageName, f => f.Random.String2(f.Random.Number(1, 50)))
-            .RuleFor(e => e.LanguageCode, f => f.Random.String2(2))
-            .RuleFor(e => e.NativeName, f => f.Random.String2(f.Random.Number(1, 50)));
-
-        Faker<WrittenContentMetadataDto> metadataFaker = new Faker<WrittenContentMetadataDto>()
-            .CustomInstantiator(f => new WrittenContentMetadataDto(
-                default!,
-                default,
-                default,
-                default!,
-                default!,
-                default!,
-                default,
-                default,
-                default,
-                default
-            ))
-            .RuleFor(x => x.Title, f => f.Random.String2(f.Random.Number(1, 255)))
-            .RuleFor(x => x.OriginalTitle, f => f.Random.String2(f.Random.Number(1, 255)))
-            .RuleFor(x => x.Description, f => f.Random.String2(f.Random.Number(1, 2000)))
-            .RuleFor(x => x.ReleaseInfo, releaseInfo)
-            .RuleFor(p => p.Genres, f => genre.Generate(f.Random.Number(1, 5)))
-            .RuleFor(x => x.Tags, f => tag.Generate(f.Random.Number(1, 5)))
-            .RuleFor(x => x.Language, language)
-            .RuleFor(x => x.OriginalLanguage, originalLanguage)
-            .RuleFor(x => x.Publisher, f => f.Random.String2(f.Random.Number(1, 100)))
-            .RuleFor(x => x.PageCount, _random.Next(100, 300));
-
-        Faker<IsbnDto> isbn = new Faker<IsbnDto>()
-            .CustomInstantiator(f => new IsbnDto(
-                default!,
-                default
-            ))
-            .RuleFor(i => i.Value, f =>
-            {
-                bool isIsbn13 = f.Random.Bool();
-                if (isIsbn13)
-                {
-                    string prefix = f.Random.Bool() ? "978" : "979";
-                    string group = f.Random.Number(0, 99999).ToString().PadLeft(5, '0');
-                    string publisher = f.Random.Number(0, 999999).ToString().PadLeft(6, '0');
-                    string title = f.Random.Number(0, 99).ToString().PadLeft(2, '0');
-                    string isbn = $"{prefix}{group[..1]}{publisher}{title}";
-                    int sum = 0;
-                    for (int i = 0; i < 12; i++)
-                        sum += (i % 2 == 0 ? 1 : 3) * int.Parse(isbn[i].ToString());
-                    int checkDigit = (10 - sum % 10) % 10;
-                    return $"{prefix}-{group[..1]}-{publisher}-{title}-{checkDigit}";
-                }
-                else
-                {
-                    int[] digits = new int[9];
-                    for (int i = 0; i < 9; i++)
-                        digits[i] = f.Random.Number(0, 9);
-                    int sum = 0;
-                    for (int i = 0; i < 9; i++)
-                        sum += (10 - i) * digits[i];
-                    int checkDigit = (11 - sum % 11) % 11;
-                    string checkChar = checkDigit == 10 ? "X" : checkDigit.ToString();
-                    return $"{digits[0]}-{digits[1]}{digits[2]}-{digits[3]}{digits[4]}{digits[5]}{digits[6]}{digits[7]}{digits[8]}-{checkChar}";
-                }
-            })
-            .RuleFor(i => i.Format, (f, i) => i.Value!.Length > 13 ? IsbnFormat.Isbn13 : IsbnFormat.Isbn10);
-
         return new Faker<AddBookRequest>()
             .CustomInstantiator(f => new AddBookRequest(
                 default,
@@ -246,21 +89,21 @@ public class AddBookRequestFixture
                 default,
                 default,
                 default,
-                default!,
+                default,
                 default!,
                 default!,
                 default!,
                 default!
             ))
-            .RuleFor(x => x.LibraryId, libraryId ?? _fixture.Create<Guid>())
+            .RuleFor(x => x.LibraryId, libraryId ?? Guid.NewGuid())
             .RuleFor(x => x.Path, f => path ?? f.System.FilePath())
-            .RuleFor(x => x.Metadata, metadata ?? metadataFaker)
-            .RuleFor(x => x.Format, format ?? (includeOptionalProperties ? _fixture.Create<BookFormat>() : null))
+            .RuleFor(x => x.Metadata, metadata ?? _writtenContentMetadataDtoFixture.Create())
+            .RuleFor(x => x.Format, f => format ?? (includeOptionalProperties ? f.PickRandom<BookFormat>() : null))
             .RuleFor(x => x.Edition, f => edition ?? (includeOptionalProperties ? f.Random.String2(f.Random.Number(1, 50)) : null))
-            .RuleFor(x => x.VolumeNumber, volumeNumber ?? (includeOptionalProperties ? (float?)_random.Next(1, 3) : null))
+            .RuleFor(x => x.VolumeNumber, f => volumeNumber ?? (includeOptionalProperties ? (float?)f.Random.Number(1, 3) : null))
             .RuleFor(x => x.Series, series)
             .RuleFor(x => x.ASIN, f => asin ?? (includeOptionalProperties ? f.Random.String2(10) : null))
-            .RuleFor(x => x.GoodreadsId, goodreadsId ?? (includeOptionalProperties ? _random.Next(100000, 500000).ToString() : null))
+            .RuleFor(x => x.GoodreadsId, f => goodreadsId ?? (includeOptionalProperties ? f.Random.Number(100000, 500000).ToString() : null))
             .RuleFor(x => x.LCCN, f => lccn ?? (includeOptionalProperties ? CreateLccn(f) : null))
             .RuleFor(x => x.OCLCNumber, f => oclcNumber ?? (includeOptionalProperties ? CreateOclcNumber(f) : null))
             .RuleFor(x => x.OpenLibraryId, f => openLibraryId ?? (includeOptionalProperties ? CreateOpenLibraryId(f) : null))
@@ -268,9 +111,9 @@ public class AddBookRequestFixture
             .RuleFor(x => x.GoogleBooksId, f => googleBooksId ?? (includeOptionalProperties ? CreateGoogleBooksId(f) : null))
             .RuleFor(x => x.BarnesAndNobleId, f => barnesAndNobleId ?? (includeOptionalProperties ? f.Random.String2(10, "0123456789") : null))
             .RuleFor(x => x.AppleBooksId, f => appleBooksId ?? (includeOptionalProperties ? $"id{f.Random.Number(1, 999999)}" : null))
-            .RuleFor(p => p.ISBNs, f => isbns ?? (includeOptionalProperties ? isbn.Generate(f.Random.Number(1, 5)) : null))
-            .RuleFor(p => p.Ratings, f => ratings ?? (includeOptionalProperties ? rating.Generate(f.Random.Number(1, 5)) : null))
-            .RuleFor(x => x.Contributors, f => contributors ?? (includeOptionalProperties ? mediaContributor.Generate(f.Random.Number(1, 5)) : null));
+            .RuleFor(p => p.ISBNs, f => isbns ?? (includeOptionalProperties ? [.. _isbnDtoFixture.CreateMany(f.Random.Number(1, 3))] : null))
+            .RuleFor(p => p.Ratings, f => ratings ?? (includeOptionalProperties ? [.. _bookRatingDtoFixture.CreateMany(f.Random.Number(1, 3))] : null))
+            .RuleFor(x => x.Contributors, f => contributors ?? (includeOptionalProperties ? [.. _mediaContributorDtoFixture.CreateMany(f.Random.Number(1, 3))] : null));
     }
 
     /// <summary>

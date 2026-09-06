@@ -8,7 +8,7 @@
 
 @{
     string? registrationType = ViewData["RegistrationType"] as string;
-    // generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler
+    // Generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler.
     var scriptId = ScriptIdentifierHelper.GenerateScriptId();
 }
 
@@ -17,13 +17,13 @@
 
 @model RegisterRequest
 
-<div style="display: grid; grid-template-rows: auto 1fr;"><!--container with two rows, one fixed, one filling remaining space-->
-    <div style="min-height: 1rem;"></div><!--the first row is a dummy row for "margin", because setting a margin on the next row would offset the parent's position-->
+<div style="display: grid; grid-template-rows: auto 1fr;"><!-- Container with two rows, one fixed, one filling remaining space. -->
+    <div style="min-height: 1rem;"></div><!-- The first row is a dummy row for "margin", because setting a margin on the next row would offset the parent's position. -->
     <div class="enlightenment-panel shadow-effect p-2 mx-auto panel w-50 mb-10" style="min-width: 320px;">
         <div class="shine-effect"></div>
         <form method="post" id="register-account-form" class="inline">
             @Html.AntiForgeryToken()
-            <!-- section for determining registration type (regular user/admin) -->
+            <!-- Section for determining registration type (regular user/admin). -->
             <input type="hidden" name="RegistrationType" value="@registrationType" />
             <div class="form-container">
                 @if (registrationType == "Admin")
@@ -32,7 +32,7 @@
                         <p class="invalid-feedback w-95 text-center f-18">@_localizer["AdminAccountRegistration"]</p>
                     </div>
                 }
-                <!-- Username -->
+                <!-- Username. -->
                 <div class="form-row">
                     <div class="form-label">
                         <label asp-for="Username">@_localizer["Username"]</label>
@@ -43,7 +43,7 @@
                     </div>
                     <small class="form-label text-disabled form-description">@_localizer["DescriptionUsername"]</small>
                 </div>
-                <!-- Password -->
+                <!-- Password. -->
                 <div class="form-row">
                     <div class="form-label">
                         <label asp-for="Password">@_localizer["Password"]</label>
@@ -54,7 +54,7 @@
                     </div>
                     <small class="form-label text-disabled form-description">@_localizer["DescriptionPassword"]</small>
                 </div>
-                <!-- Password Confirm-->
+                <!-- Password Confirm. -->
                 <div class="form-row">
                     <div class="form-label">
                         <label asp-for="PasswordConfirm">@_localizer["PasswordConfirm"]</label>
@@ -65,7 +65,7 @@
                     </div>
                     <small class="form-label text-disabled form-description">@_localizer["DescriptionPasswordConfirm"]</small>
                 </div>
-                <!-- 2FA -->
+                <!-- 2FA. -->
                 <input type="hidden" id="hidden-use-two-fa" name="use2fa" value="true">
                 <div class="form-row">
                     <div class="form-field">
@@ -85,7 +85,7 @@
                 </div>
             </div>
         </form>
-        <!-- section registration success -->
+        <!-- Section registration success. -->
         <div class="text-center w-100">
             <p id="register-success" class="text-light-one w-100 hidden">@_localizer["AccountCreated"]</p>
             <img id="totp-image" class="w-200px h-200px h-align-m mx-auto mt-10 hidden" />
@@ -100,9 +100,10 @@
 @section Scripts {
     <!-- The "text/plain" type is a design choice, not a mistake: it keeps the browser from executing this view script during HTML parsing, before site.js defines the API helpers it calls (callApiGetAsync, callApiPostAsync, ...). site.js (which loads deferred) executes these scripts once it is loaded, both on the initial page load and during AJAX navigation. -->
     <script type="text/plain" data-form="@scriptId">
-        // create cleanup registry for this view
+        // Create cleanup registry for this view.
         const cleanupFunctions = [];
 
+        // The element references are captured once, so that the cleanup can unbind their listeners even after the AJAX navigator has swapped the content out of the document.
         const form = document.getElementById('register-account-form');
         const txtUsername = form.querySelector('[name="Username"]');
         const txtPassword = form.querySelector('[name="Password"]');
@@ -115,7 +116,7 @@
         const spnTwoFaAttention = document.getElementById('register-two-fa-attention');
         const useTwoFaInput = document.getElementById('hidden-use-two-fa');
 
-        // perform the account registration
+        // Perform the account registration.
         async function handleRegisterAccountAsync() {
             const formData = {
                 Username: txtUsername.value,
@@ -144,7 +145,7 @@
             }
         }
 
-        // on Enter key pressed
+        // On Enter key pressed.
         const handleEnterKey = async function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -152,13 +153,13 @@
             }
         };
 
-        // on form submit event
+        // On form submit event.
         const handleSubmit = async function(e) {
             e.preventDefault();
             await handleRegisterAccountAsync();
         };
 
-        // on use 2FA change event
+        // On use 2FA change event.
         const handleChkUse2FAChange = function() {
             const isChecked = this.checked;
             spnTwoFaAttention.classList.replace(
@@ -168,18 +169,18 @@
             useTwoFaInput.value = isChecked.toString();
         };
 
-        // on login button click
+        // On login button click.
         const handleBtnLoginClick = function() {
             window.location.href = '@_urlService.GetAbsoluteUrl(WebRoutes.Authentication.LOGIN_VIEW)';
         };
 
-        // add listeners
+        // Add listeners.
         form.addEventListener('keypress', handleEnterKey);
         form.addEventListener('submit', handleSubmit);
         chkUse2FA.addEventListener('click', handleChkUse2FAChange);
         btnLogin.addEventListener('click', handleBtnLoginClick);
 
-        // register cleanup for these listeners
+        // Register cleanup for these listeners.
         cleanupFunctions.push(() => {
             form.removeEventListener('keypress', handleEnterKey);
             form.removeEventListener('submit', handleSubmit);
@@ -187,7 +188,7 @@
             btnLogin.removeEventListener('click', handleBtnLoginClick);
         });
 
-        // store all cleanups for this view on window object using the scriptId
+        // Store all cleanups for this view on window object using the scriptId.
         window.viewCleanups = window.viewCleanups || {};
         window.viewCleanups['@scriptId'] = () => {
             cleanupFunctions.forEach(cleanup => cleanup());

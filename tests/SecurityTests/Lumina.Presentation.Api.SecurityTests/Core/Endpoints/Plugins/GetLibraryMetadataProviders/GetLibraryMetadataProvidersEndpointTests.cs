@@ -14,7 +14,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Plugins.GetLibraryMetadataProviders;
 
 /// <summary>
-/// Contains security tests for the <c>/libraries/{libraryId}/metadata-providers</c> route.
+/// Contains security tests for the <see cref="GetLibraryMetadataProvidersEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetLibraryMetadataProvidersEndpointTests : IClassFixture<LuminaApiFactory>

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Home;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/error</c> route served by the <see cref="HomeErrorEndpoint"/> class.
+/// Contains integration tests for the <see cref="HomeErrorEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class HomeErrorEndpointTests : IClassFixture<LuminaWebFactory>

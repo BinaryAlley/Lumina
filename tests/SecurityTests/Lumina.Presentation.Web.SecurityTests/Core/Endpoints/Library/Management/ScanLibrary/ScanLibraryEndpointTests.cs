@@ -12,7 +12,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.Management.ScanLibrary;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/libraries/manage/api-scan-library/{{id}}</c> route served by the <see cref="ScanLibraryEndpoint"/> class.
+/// Contains security tests for the <see cref="ScanLibraryEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ScanLibraryEndpointTests : IClassFixture<LuminaWebFactory>

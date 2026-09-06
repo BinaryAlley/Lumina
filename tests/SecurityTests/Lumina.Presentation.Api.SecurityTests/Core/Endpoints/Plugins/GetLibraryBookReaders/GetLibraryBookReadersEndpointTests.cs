@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Plugins.GetLibraryBookReaders;
 
 /// <summary>
-/// Contains security tests for the <c>/libraries/{libraryId}/book-readers</c> route.
+/// Contains security tests for the <see cref="GetLibraryBookReadersEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetLibraryBookReadersEndpointTests : IClassFixture<LuminaApiFactory>

@@ -151,13 +151,14 @@ public class UpdateLibraryEndpointSummary : Summary<UpdateLibraryEndpoint, Updat
                     {
                         "General.Validation", new[]
                         {
+                            "LibraryIdCannotBeEmpty",
                             "UserIdCannotBeEmpty",
-                            "LibraryTypeCannotBeNull",
                             "LibraryTypeCannotBeNull",
                             "UnknownLibraryType",
                             "PathsListCannotBeNull",
                             "PathsListCannotBeEmpty",
                             "PathCannotBeEmpty",
+                            "PathMustBeMaximum260CharactersLong",
                             "TitleCannotBeEmpty",
                             "TitleMustBeMaximum255CharactersLong"
                         }

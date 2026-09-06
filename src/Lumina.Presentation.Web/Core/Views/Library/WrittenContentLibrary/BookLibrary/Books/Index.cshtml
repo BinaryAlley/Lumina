@@ -1,4 +1,15 @@
 @*
+    FALLBACK BOOKS BROWSING VIEW - READ BEFORE EDITING
+
+    This view is the application fallback of the books browsing page, rendered only when the theme template
+    of the page cannot be loaded. On a healthy site the page comes from the theme's
+    library/written-content-library/book-library/books/index template. It keeps the DOM contract and the
+    client script the theme template mirrors, so that navigation, searching and the card actions menu keep
+    working even without the theme.
+
+    To restyle the page, edit the theme files. This fallback is intentionally plain, so that a broken theme
+    is obvious to the user while the page still functions.
+
 /library/written-content-library/books-library/books?libraryId=...
 *@
 
@@ -55,7 +66,9 @@
 
         const libraryId = '@(Model.Id ?? Guid.Empty)';
         const readUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.READ, new { bookId = default(Guid) })';
+        const detailsUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.EDIT_BOOK, new { id = default(Guid) })';
         const availabilityUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_READING_AVAILABILITY, new { bookId = default(Guid) })';
+        // The element references are captured once, so that the cleanup can unbind their listeners even after the AJAX navigator has swapped the content out of the document.
         const booksContainer = document.getElementById('books-container');
         const noItemsMessage = document.getElementById('no-items');
         const noItemsMatchingMessage = document.getElementById('no-items-matching');
@@ -89,7 +102,9 @@
             sortAscending: '@_localizer["SortAscending"]',
             sortDescending: '@_localizer["SortDescending"]',
             readerUnavailable: '@_localizer["ReaderUnavailable"]',
-            readerDisabled: '@_localizer["ReaderDisabled"]'
+            readerDisabled: '@_localizer["ReaderDisabled"]',
+            read: '@_localizer["Read"]',
+            viewDetails: '@_localizer["ViewDetails"]'
         };
 
         // Builds the URL of the retrieval endpoint, from the current state.
@@ -122,7 +137,7 @@
 
         // Renders the retrieved books, the count label and the pagination controls.
         function renderItems(response) {
-            booksContainer.querySelectorAll('.media-panel').forEach(card => card.remove());
+            booksContainer.querySelectorAll('.media-card').forEach(card => card.remove());
 
             const hasActiveFilters = state.searchTerm !== '' || state.alphaKey !== null;
             if (response.count === 0) {
@@ -144,20 +159,25 @@
         }
 
         // Creates a portrait card for a book, with its cover image (or a placeholder) and its title, that opens the reader when clicked.
+        // The card carries a actions trigger that opens a menu with the actions available for the book, like viewing its details.
         function createBookCard(book) {
-            const card = document.createElement('a');
-            card.className = 'media-panel nav-link no-underline';
-            card.style.width = '160px';
-            card.style.height = '240px';
-            card.href = readUrlTemplate.replace('/@(default(Guid))', `/${book.id}`);
+            const card = document.createElement('div');
+            card.className = 'media-card';
             card.dataset.bookId = book.id;
+
+            const cardLink = document.createElement('a');
+            cardLink.className = 'media-panel nav-link no-underline';
+            cardLink.style.width = '160px';
+            cardLink.style.height = '240px';
+            cardLink.dataset.bookId = book.id;
+            cardLink.href = readUrlTemplate.replace('/@(default(Guid))', `/${book.id}`);
             // Opening the reader is conditional on the reader being available and enabled for the library, so the generic nav-link
             // navigation is intercepted and replaced by one that first checks the reading availability, warning instead of navigating
             // when the book cannot be read.
-            card.addEventListener('click', async event => {
+            cardLink.addEventListener('click', async event => {
                 event.preventDefault();
                 event.stopImmediatePropagation();
-                await handleBookCardClickAsync(card);
+                await handleBookCardClickAsync(cardLink);
             });
 
             const image = document.createElement('img');
@@ -172,9 +192,111 @@
             title.textContent = book.title;
             titleSpan.appendChild(title);
 
-            card.appendChild(image);
-            card.appendChild(titleSpan);
+            cardLink.appendChild(image);
+            cardLink.appendChild(titleSpan);
+
+            const detailsUrl = detailsUrlTemplate.replace('/@(default(Guid))', `/${book.id}`);
+
+            const trigger = document.createElement('button');
+            trigger.type = 'button';
+            trigger.className = 'card-actions-trigger';
+            trigger.setAttribute('aria-haspopup', 'menu');
+            trigger.setAttribute('aria-label', jsLocalizedStrings.viewDetails);
+            trigger.addEventListener('click', event => {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                toggleCardMenu(card, resolveMenuAnchor(event));
+            });
+
+            const menu = document.createElement('nav');
+            menu.className = 'card-actions-menu';
+            menu.setAttribute('role', 'menu');
+            menu.innerHTML = `
+                <a role="menuitem" href="${readUrlTemplate.replace('/@(default(Guid))', `/${book.id}`)}">${jsLocalizedStrings.read}</a>
+                <a role="menuitem" href="${detailsUrl}">${jsLocalizedStrings.viewDetails}</a>`;
+
+            // Menu entries navigate through the same AJAX navigation used by the nav-links, so that the persistent chrome keeps running.
+            menu.addEventListener('click', async event => {
+                const menuItem = event.target.closest('a[role="menuitem"]');
+                if (!menuItem)
+                    return;
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                closeCardMenus();
+                await updateContentAsync(menuItem.href, true);
+            });
+
+            card.appendChild(cardLink);
+            card.appendChild(trigger);
+            card.appendChild(menu);
+
+            // A right click on the card opens the same actions menu.
+            card.addEventListener('contextmenu', event => {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                toggleCardMenu(card, resolveMenuAnchor(event));
+            });
+
+            card.addEventListener('click', event => {
+                // Clicking anywhere on the card outside the trigger and the menu closes the menu, when it is open.
+                if (card.classList.contains('open') && !event.target.closest('.card-actions-menu'))
+                    closeCardMenus();
+            });
+
             return card;
+        }
+
+        // Toggles the actions menu of the book card, opening it with its top left corner at the given viewport position.
+        function toggleCardMenu(card, anchor) {
+            const wasOpen = card.classList.contains('open');
+            closeCardMenus();
+            if (wasOpen)
+                return;
+            card.classList.add('open');
+            const menu = card.querySelector('.card-actions-menu');
+            if (menu) {
+                menu.classList.add('open');
+                positionActionsMenu(menu, anchor);
+            }
+        }
+
+        // Resolves the viewport point where the card actions menu opens: the pointer tip for mouse gestures, and the lower
+        // left corner of the actions trigger for keyboard activation, whose synthetic click carries no pointer position.
+        function resolveMenuAnchor(event) {
+            if (event.clientX !== 0 || event.clientY !== 0)
+                return { x: event.clientX, y: event.clientY };
+            const triggerRect = event.currentTarget.getBoundingClientRect();
+            return { x: triggerRect.left, y: triggerRect.bottom };
+        }
+
+        // Places the card actions menu with its top left corner at the requested viewport point, moving it left or up only
+        // when it would otherwise run past the viewport edges, like a desktop context menu does.
+        function positionActionsMenu(menu, anchor) {
+            const margin = 4;
+            const maxLeft = Math.max(margin, window.innerWidth - menu.offsetWidth - margin);
+            const maxTop = Math.max(margin, window.innerHeight - menu.offsetHeight - margin);
+            menu.style.position = 'fixed';
+            menu.style.left = `${Math.min(Math.max(margin, anchor.x), maxLeft)}px`;
+            menu.style.top = `${Math.min(Math.max(margin, anchor.y), maxTop)}px`;
+        }
+
+        // Closes the actions menus of all the book cards.
+        function closeCardMenus() {
+            booksContainer.querySelectorAll('.media-card.open').forEach(card => {
+                card.classList.remove('open');
+                const menu = card.querySelector('.card-actions-menu');
+                if (menu)
+                    menu.classList.remove('open');
+            });
+        }
+
+        // Closes the actions menus when clicking or pressing a key outside them.
+        function handleCardMenuDismiss(event) {
+            if (event.type === 'keydown' && event.key !== 'Escape')
+                return;
+            if (event.type === 'click' && event.target.closest('.card-actions-menu, .card-actions-trigger'))
+                return;
+            closeCardMenus();
         }
 
         // Opens the reader of the book when it can be read, and warns the user otherwise; the navigation is done through the same
@@ -198,6 +320,8 @@
 
         // Updates the count label: total items when pagination is off, displayed range out of total when it is on.
         function updateCountLabel(response) {
+            if (!countLabel)
+                return;
             if (state.perPage === null)
                 countLabel.textContent = `${response.count} ${jsLocalizedStrings.items}`;
             else if (response.count === 0)
@@ -211,6 +335,8 @@
 
         // Updates the pagination controls, which are only visible when pagination is enabled.
         function updatePagination(response) {
+            if (!pagination)
+                return;
             if (state.perPage === null) {
                 pagination.classList.add('hidden');
                 return;
@@ -224,6 +350,8 @@
 
         // Builds the alpha picker column, with the "All" key followed by the numbers, symbols and letters keys.
         function buildAlphaPicker() {
+            if (!alphaPicker)
+                return;
             const allKey = document.createElement('span');
             allKey.className = 'alpha-key';
             allKey.dataset.alphaKey = '';
@@ -245,6 +373,8 @@
 
         // Highlights the currently active key of the alpha picker.
         function updateAlphaPickerActiveState() {
+            if (!alphaPicker)
+                return;
             alphaPicker.querySelectorAll('.alpha-key').forEach(key => {
                 const keyValue = key.dataset.alphaKey === '' ? null : key.dataset.alphaKey;
                 key.classList.toggle('alpha-key-active', keyValue === state.alphaKey);
@@ -313,29 +443,51 @@
             loadItemsAsync();
         }
 
+        // Binds an event handler to an element, when the element is present.
+        function bindEventHandler(element, type, handler) {
+            if (element)
+                element.addEventListener(type, handler);
+        }
+
+        // Unbinds an event handler from an element, when the element is present.
+        function unbindEventHandler(element, type, handler) {
+            if (element)
+                element.removeEventListener(type, handler);
+        }
+
         // Add listeners.
-        searchButton.addEventListener('click', handleSearch);
-        searchInput.addEventListener('keydown', handleSearchKeydown);
-        sortToggle.addEventListener('click', handleSortToggle);
-        prevPageButton.addEventListener('click', handlePrevPageClick);
-        nextPageButton.addEventListener('click', handleNextPageClick);
+        bindEventHandler(searchButton, 'click', handleSearch);
+        bindEventHandler(searchInput, 'keydown', handleSearchKeydown);
+        bindEventHandler(sortToggle, 'click', handleSortToggle);
+        bindEventHandler(prevPageButton, 'click', handlePrevPageClick);
+        bindEventHandler(nextPageButton, 'click', handleNextPageClick);
         document.addEventListener('keydown', handleAlphaKeydown);
+        document.addEventListener('click', handleCardMenuDismiss);
+        document.addEventListener('keydown', handleCardMenuDismiss);
         document.addEventListener('DOMContentLoaded', InitializeAsync);
 
         // Register cleanup for these listeners.
         cleanupFunctions.push(() => {
-            searchButton.removeEventListener('click', handleSearch);
-            searchInput.removeEventListener('keydown', handleSearchKeydown);
-            sortToggle.removeEventListener('click', handleSortToggle);
-            prevPageButton.removeEventListener('click', handlePrevPageClick);
-            nextPageButton.removeEventListener('click', handleNextPageClick);
+            unbindEventHandler(searchButton, 'click', handleSearch);
+            unbindEventHandler(searchInput, 'keydown', handleSearchKeydown);
+            unbindEventHandler(sortToggle, 'click', handleSortToggle);
+            unbindEventHandler(prevPageButton, 'click', handlePrevPageClick);
+            unbindEventHandler(nextPageButton, 'click', handleNextPageClick);
             document.removeEventListener('keydown', handleAlphaKeydown);
+            document.removeEventListener('click', handleCardMenuDismiss);
+            document.removeEventListener('keydown', handleCardMenuDismiss);
             document.removeEventListener('DOMContentLoaded', InitializeAsync);
         });
 
         async function InitializeAsync() {
             if (isInitialized)
                 return;
+            // When the page is restored from the history cache before its fresh content arrives, its container may be missing;
+            // a fresh copy of this script initializes the page once the fresh content is in place, so this instance gives up.
+            if (!booksContainer || !sortToggle || !countLabel) {
+                isInitialized = true;
+                return;
+            }
             isInitialized = true;
             sortToggle.textContent = jsLocalizedStrings.sortAscending;
             buildAlphaPicker();

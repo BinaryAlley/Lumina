@@ -11,7 +11,7 @@ using System.Net.Http.Headers;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.FileSystemManagement.Path.CheckPathExists;
 
 /// <summary>
-/// Contains security tests for the <c>/path/api-check-path-exists</c> route served by the <see cref="CheckPathExistsEndpoint"/> class.
+/// Contains security tests for the <see cref="CheckPathExistsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class CheckPathExistsEndpointTests : IClassFixture<LuminaWebFactory>

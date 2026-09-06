@@ -2,9 +2,11 @@
 using Bogus;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
@@ -22,6 +24,9 @@ public class LibraryFixture
 {
     private readonly Faker _faker = new();
     private readonly Random _random = new();
+    private readonly LibraryIdFixture _libraryIdFixture = new();
+    private readonly UserIdFixture _userIdFixture = new();
+    private readonly ScanIdFixture _scanIdFixture = new();
 
     /// <summary>
     /// Creates a random valid <see cref="Library"/> domain aggregate.
@@ -32,7 +37,7 @@ public class LibraryFixture
     /// <param name="libraryType">Optional. The library type.</param>
     /// <param name="contentLocations">Optional. The content locations of the library.</param>
     /// <param name="coverImage">Optional. The cover image of the library.</param>
-    /// <param name="includeCoverImage">Whether to include a cover image or not.</param>
+    /// <param name="includeCoverImage">Whether the cover image should be included, or forced to <see langword="null"/>.</param>
     /// <param name="isEnabled">Whether the library is enabled.</param>
     /// <param name="isLocked">Whether the library is locked.</param>
     /// <param name="canDownloadMetadataFromWeb">Whether metadata download from the web is enabled.</param>
@@ -63,12 +68,13 @@ public class LibraryFixture
             "F:/Content"
         ];
 
-        List<ScanId> resolvedScanIds = scanIds is null ? [ScanId.CreateUnique(), ScanId.CreateUnique()] : [.. scanIds.Select(scanId => ScanId.Create(scanId))];
+        UserId resolvedUserId = userId is null ? _userIdFixture.Create() : _userIdFixture.Create(userId.Value);
+        List<ScanId> resolvedScanIds = scanIds is null ? [.. _scanIdFixture.CreateMany(2)] : [.. scanIds.Select(scanId => _scanIdFixture.Create(scanId))];
         string? resolvedCoverImage = includeCoverImage ? (coverImage ?? _faker.System.FilePath()) : null;
 
         Result<Library> library = id is null ?
             Library.Create(
-                userId is not null ? UserId.Create(userId.Value) : UserId.CreateUnique(),
+                resolvedUserId,
                 title ?? _faker.Random.String2(_faker.Random.Number(1, 50)),
                 libraryType ?? _faker.PickRandom<LibraryType>(),
                 contentLocations ?? validPaths.Take(_random.Next(1, validPaths.Count)),
@@ -81,8 +87,8 @@ public class LibraryFixture
                 resolvedScanIds
             ) :
             Library.Create(
-                LibraryId.Create(id.Value),
-                userId is not null ? UserId.Create(userId.Value) : UserId.CreateUnique(),
+                _libraryIdFixture.Create(id.Value),
+                resolvedUserId,
                 title ?? _faker.Random.String2(_faker.Random.Number(1, 50)),
                 libraryType ?? _faker.PickRandom<LibraryType>(),
                 contentLocations ?? validPaths.Take(_random.Next(1, validPaths.Count)),

@@ -3,17 +3,14 @@ using Lumina.Presentation.Web.Core.Endpoints.Admin.Scheduler;
 using Lumina.Presentation.Web.Fixtures.Common.Responses.Authorization;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.SecurityTests.Common.Setup;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Scheduler;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/admin/scheduled-jobs</c> route served by the <see cref="SchedulerIndexViewEndpoint"/> class.
+/// Contains security tests for the <see cref="SchedulerIndexViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class SchedulerIndexViewEndpointTests : IClassFixture<LuminaWebFactory>

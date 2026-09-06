@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.UsersManagement.Authorization.UpdateUserRoleAndPermissions;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/admin/api-update-user-authorization</c> route served by the <see cref="UpdateUserRoleAndPermissionsEndpoint"/> class.
+/// Contains integration tests for the <see cref="UpdateUserRoleAndPermissionsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<LuminaWebFactory>

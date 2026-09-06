@@ -18,12 +18,12 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.B
 /// Class used for providing a textual description for the <see cref="AddBookEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class AddLibraryEndpointSummary : Summary<AddBookEndpoint, AddBookRequest>
+public class AddBookEndpointSummary : Summary<AddBookEndpoint, AddBookRequest>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="AddLibraryEndpointSummary"/> class.
+    /// Initializes a new instance of the <see cref="AddBookEndpointSummary"/> class.
     /// </summary>
-    public AddLibraryEndpointSummary()
+    public AddBookEndpointSummary()
     {
         Summary = "Adds a new book.";
         Description = "Creates a new book and returns its details, including the location of the newly created resource.";
@@ -130,6 +130,8 @@ public class AddLibraryEndpointSummary : Summary<AddBookEndpoint, AddBookRequest
             ]
         );
 
+        RequestParam(r => r.LibraryId, "The Id of the media library this book belongs to. Required.");
+        RequestParam(r => r.Path, "The file system path of the book. Required.");
         RequestParam(r => r.Metadata, "Written content metadata of the book. Required.");
         RequestParam(r => r.Metadata!.Title, "The title of the written content. Required.");
         RequestParam(r => r.Metadata!.OriginalTitle, "The original title of the written content, if different from the current title. Optional.");
@@ -171,13 +173,55 @@ public class AddLibraryEndpointSummary : Summary<AddBookEndpoint, AddBookRequest
         RequestParam(r => r.Contributors, "The list of media contributors (actors, directors, etc) starring in this book. Required.");
         RequestParam(r => r.Ratings, "The list of ratings for this book. Required.");
 
-        ResponseParam<BookResponse>(r => r.Id, "The unique identifier of the entity.");
-        ResponseParam<BookResponse>(r => r.CreatedOnUtc, "The date and time when the entity was created.");
-        ResponseParam<BookResponse>(r => r.UpdatedOnUtc, "The date and time when the entity was last updated.");
+        ResponseParam<BookResponse>(r => r.Id, "The unique identifier of the book.");
+        ResponseParam<BookResponse>(r => r.LibraryId, "The Id of the media library the book belongs to.");
+        ResponseParam<BookResponse>(r => r.Path, "The file system path of the book.");
         ResponseParam<BookResponse>(r => r.Metadata, "The written content metadata of the book.");
-        ResponseParam<BookResponse>(r => r.Metadata.Title, "The title of the media item.");
-        ResponseParam<BookResponse>(r => r.Metadata.OriginalTitle, "The original title of the media item.");
-        // TODO: continue response params
+        ResponseParam<BookResponse>(r => r.Metadata!.Title, "The title of the book.");
+        ResponseParam<BookResponse>(r => r.Metadata!.OriginalTitle, "The original title of the book, if different from the current title.");
+        ResponseParam<BookResponse>(r => r.Metadata!.Description, "A brief description or summary of the book.");
+        ResponseParam<BookResponse>(r => r.Metadata!.ReleaseInfo, "The release information of the book, including its release date and other relevant details.");
+        ResponseParam<BookResponse>(r => r.Metadata!.ReleaseInfo!.OriginalReleaseDate, "The original release date of the book.");
+        ResponseParam<BookResponse>(r => r.Metadata!.ReleaseInfo!.OriginalReleaseYear, "The original release year of the book.");
+        ResponseParam<BookResponse>(r => r.Metadata!.ReleaseInfo!.ReReleaseDate, "The re-release date of the book.");
+        ResponseParam<BookResponse>(r => r.Metadata!.ReleaseInfo!.ReReleaseYear, "The re-release year of the book.");
+        ResponseParam<BookResponse>(r => r.Metadata!.ReleaseInfo!.ReleaseCountry, "The country where the book was released.");
+        ResponseParam<BookResponse>(r => r.Metadata!.ReleaseInfo!.ReleaseVersion, "The version or edition of the release of the book.");
+        ResponseParam<BookResponse>(r => r.Metadata!.Genres, "The list of genres of the book.");
+        ResponseParam<BookResponse>(r => r.Metadata!.Tags, "The list of tags of the book.");
+        ResponseParam<BookResponse>(r => r.Metadata!.Language, "The language in which the book is written.");
+        ResponseParam<BookResponse>(r => r.Metadata!.Language!.LanguageCode, "The ISO code of the language of the book.");
+        ResponseParam<BookResponse>(r => r.Metadata!.Language!.LanguageName, "The name of the language of the book in English.");
+        ResponseParam<BookResponse>(r => r.Metadata!.Language!.NativeName, "The native name of the language of the book.");
+        ResponseParam<BookResponse>(r => r.Metadata!.OriginalLanguage, "The original language of the book, if it has been translated.");
+        ResponseParam<BookResponse>(r => r.Metadata!.OriginalLanguage!.LanguageCode, "The ISO code of the original language of the book.");
+        ResponseParam<BookResponse>(r => r.Metadata!.OriginalLanguage!.LanguageName, "The name of the original language of the book in English.");
+        ResponseParam<BookResponse>(r => r.Metadata!.OriginalLanguage!.NativeName, "The native name of the original language of the book.");
+        ResponseParam<BookResponse>(r => r.Metadata!.Publisher, "The publisher of the book.");
+        ResponseParam<BookResponse>(r => r.Metadata!.PageCount, "The number of pages of the book.");
+        ResponseParam<BookResponse>(r => r.Format, "The format of the book (e.g., Hardcover, Paperback), if applicable.");
+        ResponseParam<BookResponse>(r => r.Edition, "The edition of the book, if applicable.");
+        ResponseParam<BookResponse>(r => r.VolumeNumber, "The volume or book number in the series, if applicable.");
+        ResponseParam<BookResponse>(r => r.Series, "The series the book is part of, if applicable.");
+        ResponseParam<BookResponse>(r => r.Series!.Title, "The title of the series the book is part of.");
+        ResponseParam<BookResponse>(r => r.ASIN, "The ASIN (Amazon Standard Identification Number) of the book, if applicable.");
+        ResponseParam<BookResponse>(r => r.GoodreadsId, "The Goodreads ID of the book, if applicable.");
+        ResponseParam<BookResponse>(r => r.LCCN, "The Library of Congress Control Number (LCCN) of the book, if applicable.");
+        ResponseParam<BookResponse>(r => r.OCLCNumber, "The OCLC Number (WorldCat identifier) of the book, if applicable.");
+        ResponseParam<BookResponse>(r => r.OpenLibraryId, "The Open Library ID of the book, if applicable.");
+        ResponseParam<BookResponse>(r => r.LibraryThingId, "The LibraryThing ID of the book, if applicable.");
+        ResponseParam<BookResponse>(r => r.GoogleBooksId, "The Google Books ID of the book, if applicable.");
+        ResponseParam<BookResponse>(r => r.BarnesAndNobleId, "The Barnes & Noble ID of the book, if applicable.");
+        ResponseParam<BookResponse>(r => r.AppleBooksId, "The Apple Books ID of the book, if applicable.");
+        ResponseParam<BookResponse>(r => r.ISBNs, "The list of ISBN (International Standard Book Number) of the book.");
+        ResponseParam<BookResponse>(r => r.Contributors, "The list of media contributors starring in this book.");
+        ResponseParam<BookResponse>(r => r.Ratings, "The list of ratings for the book.");
+        ResponseParam<BookResponse>(r => r.MetadataStatus, "The status of the metadata enrichment of the book.");
+        ResponseParam<BookResponse>(r => r.LastMetadataUpdateUtc, "The date and time when the metadata of the book was last enriched, if applicable.");
+        ResponseParam<BookResponse>(r => r.MetadataProvider, "The name of the plugin that enriched the metadata of the book, if applicable.");
+        ResponseParam<BookResponse>(r => r.CreatedOnUtc, "The date and time when the book was created.");
+        ResponseParam<BookResponse>(r => r.UpdatedOnUtc, "The date and time when the book was last updated, if applicable.");
+        ResponseParam<BookResponse>(r => r.CoverPath, "The path of the cover image of the book, if available.");
 
         Response(201, "The new book is returned.", example:
             new BookResponse(
@@ -196,16 +240,18 @@ public class AddLibraryEndpointSummary : Summary<AddBookEndpoint, AddBookRequest
                         ReleaseCountry: "uk",
                         ReleaseVersion: "50th Anniversary Edition"
                     ),
-                    Genres: new List<GenreDto>() {
-                        { new(Name: "fantasy") },
-                        { new(Name: "adventure") },
-                        { new(Name: "classic") }
-                    },
-                    Tags: new List<TagDto>() {
-                        { new(Name: "epic fantasy") },
-                        { new(Name: "quest") },
-                        { new(Name: "middle-earth") }
-                    },
+                    Genres:
+                    [
+                        new(Name: "fantasy"),
+                        new(Name: "adventure"),
+                        new(Name: "classic")
+                    ],
+                    Tags:
+                    [
+                        new(Name: "epic fantasy"),
+                        new(Name: "quest"),
+                        new(Name: "middle-earth")
+                    ],
                     Language: new(
                         LanguageCode: "en",
                         LanguageName: "English",
@@ -321,6 +367,18 @@ public class AddLibraryEndpointSummary : Summary<AddBookEndpoint, AddBookRequest
             }
         );
 
+        Response(403, "The request failed because the user making the request is not an Admin, or the owner of the media library.", "application/problem+json",
+            example: new
+            {
+                type = "https://tools.ietf.org/html/rfc9110#section-15.5.4",
+                title = "General.Unauthorized",
+                status = 403,
+                detail = "NotAuthorized",
+                instance = "/api/v1/books",
+                traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
+            }
+        );
+
         Response(422, "The request did not pass validation checks.", "application/problem+json",
            example: new
            {
@@ -334,6 +392,9 @@ public class AddLibraryEndpointSummary : Summary<AddBookEndpoint, AddBookRequest
                     {
                         "General.Validation", new[]
                         {
+                            "BookLibraryCannotBeNull",
+                            "BookPathCannotBeEmpty",
+                            "MetadataCannotBeNull",
                             "TitleCannotBeEmpty",
                             "TitleMustBeMaximum255CharactersLong",
                             "OriginalTitleMustBeMaximum255CharactersLong",
@@ -347,7 +408,6 @@ public class AddLibraryEndpointSummary : Summary<AddBookEndpoint, AddBookRequest
                             "ReReleaseDateAndYearMustMatch",
                             "ReReleaseYearCannotBeEarlierThanOriginalReleaseYear",
                             "ReReleaseDateCannotBeEarlierThanOriginalReleaseDate",
-                            "ReReleaseDateAndYearMustMatch",
                             "GenresListCannotBeNull",
                             "GenreNameCannotBeEmpty",
                             "GenreNameMustBeMaximum50CharactersLong",
@@ -360,13 +420,10 @@ public class AddLibraryEndpointSummary : Summary<AddBookEndpoint, AddBookRequest
                             "LanguageNameMustBeMaximum50CharactersLong",
                             "LanguageNativeNameMustBeMaximum50CharactersLong",
                             "PublisherMustBeMaximum100CharactersLong",
-                            "UnknownBookFormat",
                             "PageCountMustBeGreaterThanZero",
                             "UnknownBookFormat",
                             "EditionMustBeMaximum50CharactersLong",
                             "VolumeNumberMustBeGreaterThanZero",
-                            "TitleCannotBeEmpty",
-                            "TitleMustBeMaximum255CharactersLong",
                             "AsinMustBe10CharactersLong",
                             "GoodreadsIdMustBeNumeric",
                             "InvalidLccnFormat",

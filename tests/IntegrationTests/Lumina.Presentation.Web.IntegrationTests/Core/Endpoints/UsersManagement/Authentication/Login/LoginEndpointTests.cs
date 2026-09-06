@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.UsersManagement.Authentication.Login;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/auth/api-login</c> route served by the <see cref="LoginEndpoint"/> class.
+/// Contains integration tests for the <see cref="LoginEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class LoginEndpointTests : IClassFixture<LuminaWebFactory>

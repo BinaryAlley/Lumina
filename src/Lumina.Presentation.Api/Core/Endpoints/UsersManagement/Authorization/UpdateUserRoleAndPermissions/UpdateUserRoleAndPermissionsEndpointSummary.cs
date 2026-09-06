@@ -118,7 +118,6 @@ public class UpdateUserRoleAndPermissionsEndpointSummary : Summary<UpdateUserRol
                         "General.Validation", new[]
                         {
                             "UserIdCannotBeEmpty",
-                            "RoleIdCannotBeEmpty",
                             "PermissionIdCannotBeEmpty"
                         }
                     }

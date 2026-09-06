@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.Reading.GetReadingSection;
 
 /// <summary>
-/// Contains integration tests for the <c>/books/{bookId}/reading/sections/{locationRef}</c> route.
+/// Contains integration tests for the <see cref="GetReadingSectionEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetReadingSectionEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime

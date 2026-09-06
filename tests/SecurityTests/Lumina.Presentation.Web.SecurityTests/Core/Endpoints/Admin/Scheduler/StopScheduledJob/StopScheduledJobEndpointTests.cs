@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Scheduler.StopScheduledJob;
 
 /// <summary>
-/// Contains security tests for the <c>/{culture}/admin/api-scheduled-jobs/{scheduledJobId}/stop</c> route served by the <see cref="StopScheduledJobEndpoint"/> class.
+/// Contains security tests for the <see cref="StopScheduledJobEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class StopScheduledJobEndpointTests : IClassFixture<LuminaWebFactory>

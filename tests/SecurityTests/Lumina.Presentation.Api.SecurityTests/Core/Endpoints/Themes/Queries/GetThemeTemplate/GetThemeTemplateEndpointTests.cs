@@ -4,20 +4,16 @@ using Lumina.Application.Fixtures.Common.DataAccess.Entities.Themes;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Net;
-using System.Net.Http;
 using System.Text.Json;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Themes.Queries.GetThemeTemplate;
 
 /// <summary>
-/// Contains security tests for the <c>/api/v1/themes/{themeId}/templates/{*pageKey}</c> route.
+/// Contains security tests for the <see cref="GetThemeTemplateEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetThemeTemplateEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
@@ -42,7 +38,7 @@ public class GetThemeTemplateEndpointTests : IClassFixture<LuminaApiFactory>, ID
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
-        // a unique X-Forwarded-For isolates rate limiting state per test
+        // A unique X-Forwarded-For isolates rate limiting state per test.
         _client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
         _themeId = $"testtheme{Guid.NewGuid():N}";
     }
@@ -99,7 +95,7 @@ public class GetThemeTemplateEndpointTests : IClassFixture<LuminaApiFactory>, ID
         Assert.DoesNotContain(DECOY_CONTENT, content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
 
-        // a successful render must only ever come from a template inside the theme pack
+        // A successful render must only ever come from a template inside the theme pack.
         if (response.StatusCode == HttpStatusCode.OK)
             Assert.Contains("default-template", content, StringComparison.OrdinalIgnoreCase);
     }
@@ -113,7 +109,7 @@ public class GetThemeTemplateEndpointTests : IClassFixture<LuminaApiFactory>, ID
         EnsureDecoyFileOnDisk();
 
         // Act
-        // note: Kestrel normalizes literal dot-segments out of the raw path, so the request is re-routed or rejected before the handler
+        // Note: Kestrel normalizes literal dot-segments out of the raw path, so the request is re-routed or rejected before the handler.
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/themes/{_themeId}/templates/../evil.html");
         string content = await response.Content.ReadAsStringAsync();
 
@@ -147,8 +143,8 @@ public class GetThemeTemplateEndpointTests : IClassFixture<LuminaApiFactory>, ID
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
 
-        // note: some payloads are normalized away by the server before routing, producing an empty-body 404;
-        // when the value reaches the handler, the failure must still be the generic theme-not-found problem
+        // Note: some payloads are normalized away by the server before routing, producing an empty-body 404;
+        // when the value reaches the handler, the failure must still be the generic theme-not-found problem.
         if (!string.IsNullOrWhiteSpace(content))
         {
             Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);

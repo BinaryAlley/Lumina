@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.UsersManagement.Authentication.Login;
 
 /// <summary>
-/// Contains integration tests for the <c>/{culture}/auth/login/{returnUrl?}</c> route served by the <see cref="LoginViewEndpoint"/> class.
+/// Contains integration tests for the <see cref="LoginViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class LoginViewEndpointTests : IClassFixture<LuminaWebFactory>
