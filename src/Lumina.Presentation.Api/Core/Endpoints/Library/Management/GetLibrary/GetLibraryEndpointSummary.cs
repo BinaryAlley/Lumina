@@ -128,7 +128,6 @@ public class GetLibraryEndpointSummary : Summary<GetLibraryEndpoint, GetLibraryR
                     {
                         "General.Validation", new[]
                         {
-                            "UserIdCannotBeEmpty",
                             "LibraryIdCannotBeEmpty"
                         }
                     }

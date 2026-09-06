@@ -58,6 +58,18 @@ public interface IApiHttpClient
     Task<TResponse> PutAsync<TResponse, TModel>(string endpoint, TModel data, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Sends a PUT request with a multipart form containing a single file to the specified <paramref name="endpoint"/> as an asynchronous operation and returns the result.
+    /// </summary>
+    /// <typeparam name="TResponse">The expected type of the response content.</typeparam>
+    /// <param name="endpoint">The API endpoint where the request is being sent.</param>
+    /// <param name="fileStream">The stream of the file to upload.</param>
+    /// <param name="fileName">The name of the file to upload.</param>
+    /// <param name="fieldName">The name of the form field carrying the file.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>The deserialized response containing the result of the PUT request.</returns>
+    Task<TResponse> PutMultipartAsync<TResponse>(string endpoint, Stream fileStream, string fileName, string fieldName, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Sends a POST request with a multipart form containing a single file to the specified <paramref name="endpoint"/> as an asynchronous operation and returns the result.
     /// </summary>
     /// <typeparam name="TResponse">The expected type of the response content.</typeparam>

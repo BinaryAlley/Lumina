@@ -18,7 +18,7 @@
 @Html.AntiForgeryToken()
 
 <style>
-    /* main container */
+    /* Main container. */
     .td-scan {
         display: flex;
         align-items: center;
@@ -27,14 +27,14 @@
         min-height: 50px;
     }
 
-    /* text label */
+    /* Text label. */
     .scan-job-status {
         flex: 1;
         padding: 0 10px;
         min-width: 0;
     }
 
-    /* progress bar container */
+    /* Progress bar container. */
     .scan-progress {
         flex: 0 0 80px;
         height: 20px;
@@ -44,7 +44,7 @@
         gap: 2px;
     }
 
-    /* progress bars */
+    /* Progress bars. */
     .scan-progress-total,
     .scan-progress-job {
         height: 50%;
@@ -75,28 +75,28 @@
             }
 
     .icon-groups {
-        flex: 0 0 auto; /* prevent shrinking */
+        flex: 0 0 auto; /* Prevent shrinking. */
         display: flex;
         gap: 10px;
-        margin-left: auto; /* push to right */
+        margin-left: auto; /* Push to right. */
     }
 
-    /* status icons subgroup */
+    /* Status icons subgroup. */
     .status-icons {
         display: flex;
         gap: 5px;
         flex-shrink: 0;
     }
 
-    /* action icons subgroup */
+    /* Action icons subgroup. */
     .action-icons {
         display: flex;
         gap: 5px;
         flex-shrink: 0;
     }
 
-    /* icon groups */
-    /* status icons (right margin group) */
+    /* Icon groups. */
+    /* Status icons (right margin group). */
     img[src*="green.png"],
     img[src*="red.png"],
     img[src*="yellow.png"] {
@@ -104,7 +104,7 @@
         height: 20px;
     }
 
-    /* action icons (fixed size group) */
+    /* Action icons (fixed size group). */
     img[src*="stop.svg"],
     img[src*="trigger.svg"],
     img[src*="delete.svg"],
@@ -129,8 +129,8 @@
     }
 </style>
 
-<div style="display: grid; grid-template-rows: auto 1fr;"><!--container with two rows, one fixed, one filling remaining space-->
-    <div style="min-height: 1rem;"></div><!--the first row is a dummy row for "margin", because setting a margin on the next row would offset the parent's position-->
+<div style="display: grid; grid-template-rows: auto 1fr;"><!-- Container with two rows, one fixed, one filling remaining space. -->
+    <div style="min-height: 1rem;"></div><!-- The first row is a dummy row for "margin", because setting a margin on the next row would offset the parent's position. -->
     <div class="enlightenment-panel shadow-effect mx-auto panel w-75 mb-10" style="min-width: 320px;">
         <div class="shine-effect"></div>
         <div class="form-row">
@@ -149,7 +149,7 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- libraries will be populated here -->
+                <!-- Libraries will be populated here. -->
             </tbody>
         </table>
         <div class="form-row pt-10">
@@ -214,6 +214,7 @@
             PhotoAlbum: '@_localizer["PhotoAlbum"]',
             Other: '@_localizer["Other"]'
         };
+        // The element references are captured once, so that the cleanup can unbind their listeners even after the AJAX navigator has swapped the content out of the document.
         const btnScanAllLibraries = document.getElementById('btn-scan-all-libraries');
         const btnCancelLibrariesScan = document.getElementById('btn-cancel-libraries-scan');
 
@@ -280,7 +281,7 @@
                         </tr>
                     `;
                 }).join('');
-                bindNavigationLinks(); // bind the dynamically created edit links, so that editing keeps the persistent chrome running
+                bindNavigationLinks(); // Bind the dynamically created edit links, so that editing keeps the persistent chrome running.
             } else {
                 btnScanAllLibraries.style.display = 'none';
                 table.style.display = 'none';
@@ -333,7 +334,7 @@
                     const success = await callApiDeleteAsync(url.replace('/@(default(Guid))', `/${libraryId}`));
             
                     if (success) {
-                        await loadLibrariesAsync(); // reload the entire library list
+                        await loadLibrariesAsync(); // Reload the entire library list.
                         notificationService.show('@_localizer["LibraryDeleted"]', NotificationType.SUCCESS);
                     }
                 }

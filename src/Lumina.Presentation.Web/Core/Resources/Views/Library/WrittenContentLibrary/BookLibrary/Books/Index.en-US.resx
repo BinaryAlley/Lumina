@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -50,5 +50,11 @@
   </data>
   <data name="ReaderDisabled" xml:space="preserve">
     <value>The book reader that opens this book is disabled for this library. Enable it in the library settings to read the book.</value>
+  </data>
+  <data name="Read" xml:space="preserve">
+    <value>Read</value>
+  </data>
+  <data name="ViewDetails" xml:space="preserve">
+    <value>View details</value>
   </data>
 </root>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -50,5 +50,11 @@
   </data>
   <data name="ReaderDisabled" xml:space="preserve">
     <value>Cititorul de cărți care deschide această carte este dezactivat pentru această bibliotecă. Activați-l în setările bibliotecii pentru a citi cartea.</value>
+  </data>
+  <data name="Read" xml:space="preserve">
+    <value>Citește</value>
+  </data>
+  <data name="ViewDetails" xml:space="preserve">
+    <value>Vezi detalii</value>
   </data>
 </root>

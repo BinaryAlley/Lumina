@@ -1,1 +1,853 @@
-<p>A book</p>
+@*
+    FALLBACK BOOK DETAILS / EDITING VIEW - READ BEFORE EDITING
+
+    This view is the application fallback of the book details and editing page, rendered only when the
+    active theme does not provide its own template for the page. On a healthy site the page is presented
+    by the theme files, which hook into the class names and element ids that this view uses as a contract,
+    exactly like the media library editing page.
+
+    To change the behavior of the page, edit this script (and the theme template, when present). To restyle
+    the page, edit the theme files. This fallback keeps every feature working without styling, so that a
+    broken theme is obvious to the user while the page still functions.
+
+/library/written-content-library/books-library/books/{id}
+*@
+
+@using Lumina.Presentation.Web.Common.DTO.WrittenContentLibrary.BookLibrary
+@using Lumina.Presentation.Web.Common.DTO.MediaContributors
+@using Lumina.Presentation.Web.Common.Enums.BookLibrary
+@using Lumina.Presentation.Web.Common.Services
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System.Globalization
+
+@{
+    // Generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler.
+    var scriptId = ScriptIdentifierHelper.GenerateScriptId();
+
+    var bookId = Model.Id.ToString();
+    var libraryId = Model.LibraryId.ToString();
+    var metadata = Model.Metadata;
+    var releaseInfo = metadata?.ReleaseInfo;
+    var language = metadata?.Language;
+    var originalLanguage = metadata?.OriginalLanguage;
+    var genres = metadata?.Genres ?? [];
+    var tags = metadata?.Tags ?? [];
+    var isbns = Model.ISBNs ?? [];
+    var contributors = Model.Contributors ?? [];
+    var ratings = Model.Ratings ?? [];
+    // Resolves the localized label of a contributor role category, keyed by its domain value.
+    Func<string?, string> categoryLabel = category => category switch
+    {
+        "Publisher" => _localizer["PublisherRole"].Value,
+        "Other" => _localizer["OtherRole"].Value,
+        "Author" => _localizer["Author"].Value,
+        "Translator" => _localizer["Translator"].Value,
+        "Illustrator" => _localizer["Illustrator"].Value,
+        "Narrator" => _localizer["Narrator"].Value,
+        _ => category ?? string.Empty
+    };
+}
+
+@inject IViewLocalizer _localizer
+@inject IUrlService _urlService
+
+@model BookDetailsDto
+
+@Html.AntiForgeryToken()
+
+<div style="display: grid; grid-template-rows: auto 1fr;"><!-- Container with two rows, one fixed, one filling remaining space. -->
+    <div style="min-height: 1rem;"></div><!-- The first row is a dummy row for "margin", because setting a margin on the next row would offset the parent's position. -->
+    <div class="enlightenment-panel shadow-effect mx-auto panel w-60 mb-10 book-details-panel" style="min-width: 320px;">
+        <div class="shine-effect"></div>
+        <div class="form-row book-details-top-bar">
+            <button id="btn-back-to-library" type="button" class="abort-button">@_localizer["BackToLibrary"]</button>
+        </div>
+        <div class="form-row book-details-title-row">
+            <h1 class="text-light-two w-100 text-center pt-0 pb-0 engraved-title">@_localizer["BookDetails"]</h1>
+        </div>
+
+        <div class="book-details-body">
+            <!-- Cover, on the left. -->
+            <div class="book-details-cover">
+                <div class="book-cover-frame">
+                    <img id="book-cover-image" class="book-cover-image" data-cover-path="@(Model.CoverPath ?? string.Empty)" alt="@_localizer["CoverImage"]" />
+                </div>
+                <div class="form-row">
+                    <button id="btn-change-cover" type="button" class="confirm-button">@_localizer["ChangeCover"]</button>
+                    <input id="book-cover-input" type="file" accept="image/*" class="hidden" />
+                </div>
+                <div class="form-row">
+                    <small id="book-cover-path" class="book-cover-path text-disabled" title="@(Model.CoverPath ?? string.Empty)">@(Model.CoverPath ?? _localizer["NoCover"].Value)</small>
+                </div>
+            </div>
+
+            <!-- Editable fields, on the right. -->
+            <div class="book-details-form">
+                <h3 class="text-light-two">@_localizer["GeneralInformation"]</h3>
+                <!-- Title. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="title-input">@_localizer["Title"]</label>
+                        <span class="mandatory-field">*</span>:
+                    </div>
+                    <div class="form-field">
+                        <input id="title-input" type="text" class="enlightenment-input" value="@(metadata?.Title ?? string.Empty)" />
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["TitleDescription"]</small>
+                </div>
+                <!-- Original title. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="original-title-input">@_localizer["OriginalTitle"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <input id="original-title-input" type="text" class="enlightenment-input" value="@(metadata?.OriginalTitle ?? string.Empty)" />
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["OriginalTitleDescription"]</small>
+                </div>
+                <!-- Description. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="description-input">@_localizer["Description"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <textarea id="description-input" class="enlightenment-input">@(metadata?.Description ?? string.Empty)</textarea>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionDescription"]</small>
+                </div>
+                <!-- Publisher. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="publisher-input">@_localizer["Publisher"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <input id="publisher-input" type="text" class="enlightenment-input" value="@(metadata?.Publisher ?? string.Empty)" />
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["PublisherDescription"]</small>
+                </div>
+                <!-- Page count. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="page-count-input">@_localizer["PageCount"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <input id="page-count-input" type="number" min="1" class="enlightenment-input" value="@(metadata?.PageCount?.ToString(CultureInfo.InvariantCulture) ?? string.Empty)" />
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["PageCountDescription"]</small>
+                </div>
+                <!-- Format. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="format-combobox-toggle">@_localizer["Format"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <div class="enlightenment-combobox inline-block w-100" id="format-combobox">
+                            <div class="shine-effect" style="top: 1px;"></div>
+                            <input type="checkbox" class="enlightenment-toggle-checkbox" id="format-combobox-toggle" />
+                            <label class="enlightenment-toggle" for="format-combobox-toggle">
+                                <span class="enlightenment-selected-text" data-value="@(Model.Format?.ToString() ?? string.Empty)">@(Model.Format.HasValue ? _localizer[Model.Format.Value.ToString()].Value : "-")</span>
+                            </label>
+                            <div class="enlightenment-dropdown">
+                                <div class="enlightenment-option" data-value="">-</div>
+                                @foreach (string format in Enum.GetNames<BookFormat>())
+                                {
+                                    <div class="enlightenment-option" data-value="@format">@_localizer[format].Value</div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["FormatDescription"]</small>
+                </div>
+                <!-- Edition. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="edition-input">@_localizer["Edition"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <input id="edition-input" type="text" class="enlightenment-input" value="@(Model.Edition ?? string.Empty)" />
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["EditionDescription"]</small>
+                </div>
+                <!-- Volume number. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="volume-number-input">@_localizer["VolumeNumber"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <input id="volume-number-input" type="number" step="any" min="0" class="enlightenment-input" value="@(Model.VolumeNumber?.ToString(CultureInfo.InvariantCulture) ?? string.Empty)" />
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["VolumeNumberDescription"]</small>
+                </div>
+
+                <h3 class="text-light-two">@_localizer["ReleaseInformation"]</h3>
+                <!-- Original release. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="original-release-date-input">@_localizer["OriginalReleaseDate"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <input id="original-release-date-input" type="date" class="enlightenment-input" value="@(releaseInfo?.OriginalReleaseDate?.ToString("yyyy-MM-dd") ?? string.Empty)" />
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["OriginalReleaseDateDescription"]</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="original-release-year-input">@_localizer["OriginalReleaseYear"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <input id="original-release-year-input" type="number" min="1" max="9999" class="enlightenment-input" value="@(releaseInfo?.OriginalReleaseYear?.ToString(CultureInfo.InvariantCulture) ?? string.Empty)" />
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["OriginalReleaseYearDescription"]</small>
+                </div>
+                <!-- Re-release. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="re-release-date-input">@_localizer["ReReleaseDate"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <input id="re-release-date-input" type="date" class="enlightenment-input" value="@(releaseInfo?.ReReleaseDate?.ToString("yyyy-MM-dd") ?? string.Empty)" />
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["ReReleaseDateDescription"]</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="re-release-year-input">@_localizer["ReReleaseYear"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <input id="re-release-year-input" type="number" min="1" max="9999" class="enlightenment-input" value="@(releaseInfo?.ReReleaseYear?.ToString(CultureInfo.InvariantCulture) ?? string.Empty)" />
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["ReReleaseYearDescription"]</small>
+                </div>
+                <!-- Country and version. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="release-country-input">@_localizer["ReleaseCountry"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <input id="release-country-input" type="text" maxlength="2" class="enlightenment-input" value="@(releaseInfo?.ReleaseCountry ?? string.Empty)" />
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["ReleaseCountryDescription"]</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="release-version-input">@_localizer["ReleaseVersion"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <input id="release-version-input" type="text" class="enlightenment-input" value="@(releaseInfo?.ReleaseVersion ?? string.Empty)" />
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["ReleaseVersionDescription"]</small>
+                </div>
+
+                <h3 class="text-light-two">@_localizer["Language"]</h3>
+                <div class="form-row">
+                    <div class="form-label"><label for="language-code-input">@_localizer["LanguageCode"]</label>:</div>
+                    <div class="form-field"><input id="language-code-input" type="text" maxlength="2" class="enlightenment-input" value="@(language?.LanguageCode ?? string.Empty)" /></div>
+                    <small class="form-label text-disabled form-description">@_localizer["LanguageCodeDescription"]</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-label"><label for="language-name-input">@_localizer["LanguageName"]</label>:</div>
+                    <div class="form-field"><input id="language-name-input" type="text" class="enlightenment-input" value="@(language?.LanguageName ?? string.Empty)" /></div>
+                    <small class="form-label text-disabled form-description">@_localizer["LanguageNameDescription"]</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-label"><label for="language-native-name-input">@_localizer["NativeName"]</label>:</div>
+                    <div class="form-field"><input id="language-native-name-input" type="text" class="enlightenment-input" value="@(language?.NativeName ?? string.Empty)" /></div>
+                    <small class="form-label text-disabled form-description">@_localizer["NativeNameDescription"]</small>
+                </div>
+
+                <h3 class="text-light-two">@_localizer["OriginalLanguage"]</h3>
+                <div class="form-row">
+                    <div class="form-label"><label for="original-language-code-input">@_localizer["OriginalLanguageCode"]</label>:</div>
+                    <div class="form-field"><input id="original-language-code-input" type="text" maxlength="2" class="enlightenment-input" value="@(originalLanguage?.LanguageCode ?? string.Empty)" /></div>
+                    <small class="form-label text-disabled form-description">@_localizer["OriginalLanguageCodeDescription"]</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-label"><label for="original-language-name-input">@_localizer["OriginalLanguageName"]</label>:</div>
+                    <div class="form-field"><input id="original-language-name-input" type="text" class="enlightenment-input" value="@(originalLanguage?.LanguageName ?? string.Empty)" /></div>
+                    <small class="form-label text-disabled form-description">@_localizer["OriginalLanguageNameDescription"]</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-label"><label for="original-language-native-name-input">@_localizer["OriginalLanguageNativeName"]</label>:</div>
+                    <div class="form-field"><input id="original-language-native-name-input" type="text" class="enlightenment-input" value="@(originalLanguage?.NativeName ?? string.Empty)" /></div>
+                    <small class="form-label text-disabled form-description">@_localizer["OriginalLanguageNativeNameDescription"]</small>
+                </div>
+
+                <h3 class="text-light-two">@_localizer["Genres"]</h3>
+                <div class="form-row">
+                    <div class="form-label"><label for="genres-input">@_localizer["Genres"]</label>:</div>
+                    <div class="form-field">
+                        <input id="genres-input" type="text" class="enlightenment-input" value="@(string.Join(", ", genres.Select(genre => genre.Name)))" />
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["GenresDescription"]</small>
+                </div>
+
+                <h3 class="text-light-two">@_localizer["Tags"]</h3>
+                <div class="form-row">
+                    <div class="form-label"><label for="tags-input">@_localizer["Tags"]</label>:</div>
+                    <div class="form-field">
+                        <input id="tags-input" type="text" class="enlightenment-input" value="@(string.Join(", ", tags.Select(tag => tag.Name)))" />
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["TagsDescription"]</small>
+                </div>
+
+                <h3 class="text-light-two">@_localizer["Identifiers"]</h3>
+                <div class="form-row">
+                    <div class="form-label"><label for="asin-input">@_localizer["ASIN"]</label>:</div>
+                    <div class="form-field"><input id="asin-input" type="text" class="enlightenment-input" value="@(Model.ASIN ?? string.Empty)" /></div>
+                    <small class="form-label text-disabled form-description">@_localizer["ASINDescription"]</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-label"><label for="goodreads-id-input">@_localizer["GoodreadsId"]</label>:</div>
+                    <div class="form-field"><input id="goodreads-id-input" type="text" class="enlightenment-input" value="@(Model.GoodreadsId ?? string.Empty)" /></div>
+                    <small class="form-label text-disabled form-description">@_localizer["GoodreadsIdDescription"]</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-label"><label for="lccn-input">@_localizer["LCCN"]</label>:</div>
+                    <div class="form-field"><input id="lccn-input" type="text" class="enlightenment-input" value="@(Model.LCCN ?? string.Empty)" /></div>
+                    <small class="form-label text-disabled form-description">@_localizer["LCCNDescription"]</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-label"><label for="oclc-number-input">@_localizer["OCLCNumber"]</label>:</div>
+                    <div class="form-field"><input id="oclc-number-input" type="text" class="enlightenment-input" value="@(Model.OCLCNumber ?? string.Empty)" /></div>
+                    <small class="form-label text-disabled form-description">@_localizer["OCLCNumberDescription"]</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-label"><label for="open-library-id-input">@_localizer["OpenLibraryId"]</label>:</div>
+                    <div class="form-field"><input id="open-library-id-input" type="text" class="enlightenment-input" value="@(Model.OpenLibraryId ?? string.Empty)" /></div>
+                    <small class="form-label text-disabled form-description">@_localizer["OpenLibraryIdDescription"]</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-label"><label for="library-thing-id-input">@_localizer["LibraryThingId"]</label>:</div>
+                    <div class="form-field"><input id="library-thing-id-input" type="text" class="enlightenment-input" value="@(Model.LibraryThingId ?? string.Empty)" /></div>
+                    <small class="form-label text-disabled form-description">@_localizer["LibraryThingIdDescription"]</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-label"><label for="google-books-id-input">@_localizer["GoogleBooksId"]</label>:</div>
+                    <div class="form-field"><input id="google-books-id-input" type="text" class="enlightenment-input" value="@(Model.GoogleBooksId ?? string.Empty)" /></div>
+                    <small class="form-label text-disabled form-description">@_localizer["GoogleBooksIdDescription"]</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-label"><label for="barnes-noble-id-input">@_localizer["BarnesAndNobleId"]</label>:</div>
+                    <div class="form-field"><input id="barnes-noble-id-input" type="text" class="enlightenment-input" value="@(Model.BarnesAndNobleId ?? string.Empty)" /></div>
+                    <small class="form-label text-disabled form-description">@_localizer["BarnesAndNobleIdDescription"]</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-label"><label for="apple-books-id-input">@_localizer["AppleBooksId"]</label>:</div>
+                    <div class="form-field"><input id="apple-books-id-input" type="text" class="enlightenment-input" value="@(Model.AppleBooksId ?? string.Empty)" /></div>
+                    <small class="form-label text-disabled form-description">@_localizer["AppleBooksIdDescription"]</small>
+                </div>
+
+                <h3 class="text-light-two">@_localizer["ISBNs"]</h3>
+                <div class="form-row">
+                    <table class="w-100 form-table book-list-table">
+                        <thead>
+                            <tr>
+                                <th class="w-50">@_localizer["IsbnValue"]</th>
+                                <th class="w-40">@_localizer["IsbnFormat"]</th>
+                                <th class="w-10"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="isbns-body">
+                            @{ int isbnIndex = 0; }
+                            @foreach (var isbn in isbns)
+                            {
+                                <tr class="isbn-row">
+                                    <td><input type="text" class="enlightenment-input isbn-value" value="@(isbn.Value ?? string.Empty)" /></td>
+                                    <td>
+                                        <div class="enlightenment-combobox inline-block w-100 isbn-format-combobox">
+                                            <div class="shine-effect" style="top: 1px;"></div>
+                                            <input type="checkbox" class="enlightenment-toggle-checkbox" id="isbn-format-toggle-@isbnIndex" />
+                                            <label class="enlightenment-toggle" for="isbn-format-toggle-@isbnIndex">
+                                                <span class="enlightenment-selected-text" data-value="@(isbn.Format?.ToString() ?? string.Empty)">@(isbn.Format.HasValue ? _localizer[isbn.Format.Value.ToString()].Value : "-")</span>
+                                            </label>
+                                            <div class="enlightenment-dropdown">
+                                                <div class="enlightenment-option" data-value="">-</div>
+                                                <div class="enlightenment-option" data-value="Isbn10">@_localizer["Isbn10"]</div>
+                                                <div class="enlightenment-option" data-value="Isbn13">@_localizer["Isbn13"]</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><img src="~/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" /></td>
+                                </tr>
+                                isbnIndex++;
+                            }
+                        </tbody>
+                    </table>
+                    <button id="btn-add-isbn" type="button" class="confirm-button">@_localizer["AddRow"]</button>
+                    <small class="form-label text-disabled form-description">@_localizer["ISBNsDescription"]</small>
+                </div>
+
+                <h3 class="text-light-two">@_localizer["Contributors"]</h3>
+                <div class="form-row">
+                    <table class="w-100 form-table book-list-table">
+                        <thead>
+                            <tr>
+                                <th class="w-35">@_localizer["ContributorName"]</th>
+                                <th class="w-25">@_localizer["RoleName"]</th>
+                                <th class="w-30">@_localizer["RoleCategory"]</th>
+                                <th class="w-10"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="contributors-body">
+                            @{ int contributorIndex = 0; }
+                            @foreach (var contributor in contributors)
+                            {
+                                <tr class="contributor-row">
+                                    <td><input type="text" class="enlightenment-input contributor-name" value="@(contributor.Name?.DisplayName ?? string.Empty)" /></td>
+                                    <td><input type="text" class="enlightenment-input contributor-role" value="@(contributor.Role?.Name ?? string.Empty)" /></td>
+                                    <td>
+                                        <div class="enlightenment-combobox inline-block w-100 contributor-category-combobox">
+                                            <div class="shine-effect" style="top: 1px;"></div>
+                                            <input type="checkbox" class="enlightenment-toggle-checkbox" id="contributor-category-toggle-@contributorIndex" />
+                                            <label class="enlightenment-toggle" for="contributor-category-toggle-@contributorIndex">
+                                                <span class="enlightenment-selected-text" data-value="@(contributor.Role?.Category?.ToString() ?? "Other")">@categoryLabel(contributor.Role?.Category?.ToString())</span>
+                                            </label>
+                                            <div class="enlightenment-dropdown">
+                                                <div class="enlightenment-option" data-value="Other">@_localizer["OtherRole"]</div>
+                                                <div class="enlightenment-option" data-value="Author">@_localizer["Author"]</div>
+                                                <div class="enlightenment-option" data-value="Translator">@_localizer["Translator"]</div>
+                                                <div class="enlightenment-option" data-value="Illustrator">@_localizer["Illustrator"]</div>
+                                                <div class="enlightenment-option" data-value="Publisher">@_localizer["PublisherRole"]</div>
+                                                <div class="enlightenment-option" data-value="Narrator">@_localizer["Narrator"]</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><img src="~/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" /></td>
+                                </tr>
+                                contributorIndex++;
+                            }
+                        </tbody>
+                    </table>
+                    <button id="btn-add-contributor" type="button" class="confirm-button">@_localizer["AddContributor"]</button>
+                    <small class="form-label text-disabled form-description">@_localizer["ContributorsDescription"]</small>
+                </div>
+
+                <h3 class="text-light-two">@_localizer["Ratings"]</h3>
+                <div class="form-row">
+                    <table class="w-100 form-table book-list-table">
+                        <thead>
+                            <tr>
+                                <th class="w-15">@_localizer["RatingValue"]</th>
+                                <th class="w-15">@_localizer["RatingMaxValue"]</th>
+                                <th class="w-25">@_localizer["RatingSource"]</th>
+                                <th class="w-25">@_localizer["RatingVoteCount"]</th>
+                                <th class="w-10"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="ratings-body">
+                            @{ int ratingIndex = 0; }
+                            @foreach (var rating in ratings)
+                            {
+                                <tr class="rating-row">
+                                    <td><input type="number" step="any" min="0" class="enlightenment-input rating-value" value="@(rating.Value?.ToString(CultureInfo.InvariantCulture) ?? string.Empty)" /></td>
+                                    <td><input type="number" step="any" min="0" class="enlightenment-input rating-max-value" value="@(rating.MaxValue?.ToString(CultureInfo.InvariantCulture) ?? string.Empty)" /></td>
+                                    <td>
+                                        <div class="enlightenment-combobox inline-block w-100 rating-source-combobox">
+                                            <div class="shine-effect" style="top: 1px;"></div>
+                                            <input type="checkbox" class="enlightenment-toggle-checkbox" id="rating-source-toggle-@ratingIndex" />
+                                            <label class="enlightenment-toggle" for="rating-source-toggle-@ratingIndex">
+                                                <span class="enlightenment-selected-text" data-value="@(rating.Source?.ToString() ?? string.Empty)">@(rating.Source.HasValue ? _localizer[rating.Source.Value.ToString()].Value : "-")</span>
+                                            </label>
+                                            <div class="enlightenment-dropdown">
+                                                <div class="enlightenment-option" data-value="">-</div>
+                                                <div class="enlightenment-option" data-value="User">@_localizer["User"]</div>
+                                                <div class="enlightenment-option" data-value="OpenLibrary">@_localizer["OpenLibrary"]</div>
+                                                <div class="enlightenment-option" data-value="Goodreads">@_localizer["Goodreads"]</div>
+                                                <div class="enlightenment-option" data-value="Amazon">@_localizer["Amazon"]</div>
+                                                <div class="enlightenment-option" data-value="GoogleBooks">@_localizer["GoogleBooks"]</div>
+                                                <div class="enlightenment-option" data-value="Calibre">@_localizer["Calibre"]</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><input type="number" min="0" class="enlightenment-input rating-vote-count" value="@(rating.VoteCount?.ToString(CultureInfo.InvariantCulture) ?? string.Empty)" /></td>
+                                    <td><img src="~/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" /></td>
+                                </tr>
+                                ratingIndex++;
+                            }
+                        </tbody>
+                    </table>
+                    <button id="btn-add-rating" type="button" class="confirm-button">@_localizer["AddRating"]</button>
+                    <small class="form-label text-disabled form-description">@_localizer["RatingsDescription"]</small>
+                </div>
+
+                <div class="form-row mt-10">
+                    <button id="btn-save-book" type="button" class="confirm-button w-100px">@_localizer["Save"]</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- The "text/plain" type is a design choice, not a mistake: it keeps the browser from executing this view script during HTML parsing, before site.js defines the API helpers it calls (callApiGetAsync, callApiPutAsync, ...). site.js (which loads deferred) executes these scripts once it is loaded, both on the initial page load and during AJAX navigation. -->
+    <script type="text/plain" data-form="@scriptId">
+        // Create cleanup registry for this view.
+        const cleanupFunctions = [];
+        let isInitialized = false;
+        let generatedId = 1000;
+
+        const bookId = '@bookId';
+        const libraryId = '@libraryId';
+        const libraryIndexUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.INDEX)';
+        const saveUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.SAVE_BOOK, new { id = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`);
+        const coverUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.UPDATE_BOOK_COVER, new { id = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`);
+
+        // The element references are captured once, so that the cleanup can unbind their listeners even after the AJAX navigator has swapped the content out of the document.
+        const coverImage = document.getElementById('book-cover-image');
+        const coverPathLabel = document.getElementById('book-cover-path');
+        const coverInput = document.getElementById('book-cover-input');
+        const btnChangeCover = document.getElementById('btn-change-cover');
+        const btnBackToLibrary = document.getElementById('btn-back-to-library');
+        const btnSaveBook = document.getElementById('btn-save-book');
+        const isbnsBody = document.getElementById('isbns-body');
+        const contributorsBody = document.getElementById('contributors-body');
+        const ratingsBody = document.getElementById('ratings-body');
+        const btnAddIsbn = document.getElementById('btn-add-isbn');
+        const btnAddContributor = document.getElementById('btn-add-contributor');
+        const btnAddRating = document.getElementById('btn-add-rating');
+
+        const jsLocalizedStrings = {
+            bookSaved: @Json.Serialize(_localizer["BookSaved"].Value),
+            coverSaved: @Json.Serialize(_localizer["CoverSaved"].Value),
+            saveFailed: @Json.Serialize(_localizer["SaveFailed"].Value),
+            coverUploadFailed: @Json.Serialize(_localizer["CoverUploadFailed"].Value),
+            noCover: @Json.Serialize(_localizer["NoCover"].Value),
+            remove: @Json.Serialize(_localizer["Remove"].Value)
+        };
+
+        // Reads the trimmed value of the element with the provided id.
+        function readValue(id) {
+            const element = document.getElementById(id);
+            return element ? element.value.trim() : '';
+        }
+
+        // Reads the value of the enlightenment combobox with the provided id.
+        function readComboboxValue(id) {
+            const element = document.querySelector(`#${id} .enlightenment-selected-text`);
+            return element ? (element.getAttribute('data-value') || '') : '';
+        }
+
+        // Reads the value of the enlightenment combobox inside the provided row, selected by its class.
+        function readRowComboboxValue(row, className) {
+            const element = row.querySelector(className + ' .enlightenment-selected-text');
+            return element ? (element.getAttribute('data-value') || '') : '';
+        }
+
+        // Reads an optional number from a field, returning null when the field is empty or not a number.
+        function readNumber(id) {
+            const value = readValue(id);
+            if (value === '')
+                return null;
+            const parsed = Number(value);
+            return Number.isNaN(parsed) ? null : parsed;
+        }
+
+        // Splits a comma separated list into trimmed values.
+        function splitList(value) {
+            return value.split(',').map(item => item.trim()).filter(item => item !== '');
+        }
+
+        // Builds the payload of the edited book, matching the update request of the API.
+        function buildPayload() {
+            return {
+                Id: bookId,
+                Format: readComboboxValue('format-combobox') || null,
+                Edition: readValue('edition-input') || null,
+                VolumeNumber: readNumber('volume-number-input'),
+                ASIN: readValue('asin-input') || null,
+                GoodreadsId: readValue('goodreads-id-input') || null,
+                LCCN: readValue('lccn-input') || null,
+                OCLCNumber: readValue('oclc-number-input') || null,
+                OpenLibraryId: readValue('open-library-id-input') || null,
+                LibraryThingId: readValue('library-thing-id-input') || null,
+                GoogleBooksId: readValue('google-books-id-input') || null,
+                BarnesAndNobleId: readValue('barnes-noble-id-input') || null,
+                AppleBooksId: readValue('apple-books-id-input') || null,
+                ISBNs: Array.from(isbnsBody.querySelectorAll('.isbn-row')).map(row => ({
+                    Value: row.querySelector('.isbn-value').value.trim() || null,
+                    Format: readRowComboboxValue(row, '.isbn-format-combobox') || null
+                })),
+                Contributors: Array.from(contributorsBody.querySelectorAll('.contributor-row')).map(row => ({
+                    Name: { DisplayName: row.querySelector('.contributor-name').value.trim() || null },
+                    Role: {
+                        Name: row.querySelector('.contributor-role').value.trim() || null,
+                        Category: readRowComboboxValue(row, '.contributor-category-combobox') || null
+                    }
+                })),
+                Ratings: Array.from(ratingsBody.querySelectorAll('.rating-row')).map(row => ({
+                    Value: parseOptionalDecimal(row.querySelector('.rating-value').value),
+                    MaxValue: parseOptionalDecimal(row.querySelector('.rating-max-value').value),
+                    Source: readRowComboboxValue(row, '.rating-source-combobox') || null,
+                    VoteCount: parseIntOrNull(row.querySelector('.rating-vote-count').value)
+                })),
+                Metadata: {
+                    Title: readValue('title-input'),
+                    OriginalTitle: readValue('original-title-input') || null,
+                    Description: readValue('description-input') || null,
+                    Publisher: readValue('publisher-input') || null,
+                    PageCount: readNumber('page-count-input'),
+                    ReleaseInfo: {
+                        OriginalReleaseDate: readValue('original-release-date-input') || null,
+                        OriginalReleaseYear: readNumber('original-release-year-input'),
+                        ReReleaseDate: readValue('re-release-date-input') || null,
+                        ReReleaseYear: readNumber('re-release-year-input'),
+                        ReleaseCountry: readValue('release-country-input') || null,
+                        ReleaseVersion: readValue('release-version-input') || null
+                    },
+                    Genres: splitList(readValue('genres-input')).map(name => ({ Name: name })),
+                    Tags: splitList(readValue('tags-input')).map(name => ({ Name: name })),
+                    Language: buildLanguage('language-code-input', 'language-name-input', 'language-native-name-input'),
+                    OriginalLanguage: buildLanguage('original-language-code-input', 'original-language-name-input', 'original-language-native-name-input')
+                }
+            };
+        }
+
+        // Builds the language object of a language group, or null when no field of the group carries a value.
+        function buildLanguage(codeId, nameId, nativeNameId) {
+            const code = readValue(codeId);
+            const name = readValue(nameId);
+            const nativeName = readValue(nativeNameId);
+            if (code === '' && name === '' && nativeName === '')
+                return null;
+            return { LanguageCode: code || null, LanguageName: name || null, NativeName: nativeName || null };
+        }
+
+        // Parses a decimal value, returning null when the value is empty or not a number.
+        function parseOptionalDecimal(value) {
+            if (value.trim() === '')
+                return null;
+            const parsed = Number(value);
+            return Number.isNaN(parsed) ? null : parsed;
+        }
+
+        // Parses an integer value, returning null when the value is empty or not a number.
+        function parseIntOrNull(value) {
+            if (value.trim() === '')
+                return null;
+            const parsed = parseInt(value, 10);
+            return Number.isNaN(parsed) ? null : parsed;
+        }
+
+        // Sends the edited book data to the server.
+        async function handleSaveAsync() {
+            const result = await callApiPutAsync(saveUrl, buildPayload());
+            if (result && result.success === true) {
+                notificationService.show(jsLocalizedStrings.bookSaved, NotificationType.SUCCESS);
+            } else {
+                notificationService.show(jsLocalizedStrings.saveFailed, NotificationType.ERROR);
+            }
+        }
+
+        // Opens the file picker that chooses the new cover image.
+        function handleChangeCoverClick() {
+            coverInput.click();
+        }
+
+        // Uploads the selected cover image to the server.
+        async function handleCoverChangeAsync() {
+            const file = coverInput.files && coverInput.files[0];
+            if (!file)
+                return;
+            const formData = new FormData();
+            formData.append('cover', file);
+
+            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+            const headers = { 'X-Requested-With': 'XMLHttpRequest' };
+            if (token)
+                headers['RequestVerificationToken'] = token;
+
+            let response;
+            try {
+                response = await fetch(coverUrl, {
+                    method: 'PUT',
+                    headers: headers,
+                    body: formData
+                });
+            } catch (error) {
+                console.error('Error:', error);
+                notificationService.show(jsLocalizedStrings.coverUploadFailed, NotificationType.ERROR);
+                return;
+            }
+            if (response.redirected) {
+                window.location.href = response.url;
+                return;
+            }
+            if (!response.ok) {
+                notificationService.show(jsLocalizedStrings.coverUploadFailed, NotificationType.ERROR);
+                return;
+            }
+            const jsonResponse = await response.json();
+            if (jsonResponse.success === true) {
+                // Show the uploaded cover immediately, so that the user sees the change without reloading.
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    coverImage.src = event.target.result;
+                    const storedPath = jsonResponse.data || '';
+                    coverImage.dataset.coverPath = storedPath;
+                    coverPathLabel.textContent = storedPath ? storedPath : jsLocalizedStrings.noCover;
+                    coverPathLabel.title = storedPath;
+                };
+                reader.readAsDataURL(file);
+                notificationService.show(jsLocalizedStrings.coverSaved, NotificationType.SUCCESS);
+            } else {
+                notificationService.show(jsLocalizedStrings.coverUploadFailed, NotificationType.ERROR);
+            }
+        }
+
+        // Shows the cover image of the book, or a placeholder when the book has no cover.
+        function showCover() {
+            const coverPath = coverImage.dataset.coverPath || '';
+            coverImage.src = coverPath
+                ? `${globalConfiguration.serverBasePath}${coverPath}`
+                : `/images/ui/book-placeholder.svg`;
+            coverPathLabel.textContent = coverPath ? coverPath : jsLocalizedStrings.noCover;
+            coverPathLabel.title = coverPath || '';
+        }
+
+        // Navigates back to the library page of the book.
+        async function handleBackToLibraryAsync() {
+            await updateContentAsync(`${libraryIndexUrl}?libraryId=${encodeURIComponent(libraryId)}`, true);
+        }
+
+        // Builds the HTML of an enlightenment combobox of a row, with the provided option values.
+        function buildRowCombobox(optionValues, selectedValue) {
+            const id = `row-combobox-${generatedId++}`;
+            const options = optionValues.map(option => {
+                const selected = option.value === selectedValue ? ' selected' : '';
+                return `<div class="enlightenment-option" data-value="${option.value}">${option.label}</div>`;
+            }).join('');
+            return `
+                <div class="enlightenment-combobox inline-block w-100">
+                    <div class="shine-effect" style="top: 1px;"></div>
+                    <input type="checkbox" class="enlightenment-toggle-checkbox" id="${id}" />
+                    <label class="enlightenment-toggle" for="${id}">
+                        <span class="enlightenment-selected-text" data-value="${selectedValue || ''}">${selectedLabel(selectedValue)}</span>
+                    </label>
+                    <div class="enlightenment-dropdown">
+                        <div class="enlightenment-option" data-value="">-</div>
+                        ${options}
+                    </div>
+                </div>`;
+        }
+
+        // Returns the display text of a selected combobox value, using the default dash when nothing is selected.
+        function selectedLabel(value) {
+            if (!value)
+                return '-';
+            const isbn = isbnOptions.find(option => option.value === value);
+            if (isbn)
+                return isbn.label;
+            const category = contributorCategoryOptions.find(option => option.value === value);
+            if (category)
+                return category.label;
+            const source = ratingSourceOptions.find(option => option.value === value);
+            if (source)
+                return source.label;
+            return value;
+        }
+
+        const isbnOptions = [
+            { value: 'Isbn10', label: @Json.Serialize(_localizer["Isbn10"].Value) },
+            { value: 'Isbn13', label: @Json.Serialize(_localizer["Isbn13"].Value) }
+        ];
+        const contributorCategoryOptions = [
+            { value: 'Other', label: @Json.Serialize(_localizer["OtherRole"].Value) },
+            { value: 'Author', label: @Json.Serialize(_localizer["Author"].Value) },
+            { value: 'Translator', label: @Json.Serialize(_localizer["Translator"].Value) },
+            { value: 'Illustrator', label: @Json.Serialize(_localizer["Illustrator"].Value) },
+            { value: 'Publisher', label: @Json.Serialize(_localizer["PublisherRole"].Value) },
+            { value: 'Narrator', label: @Json.Serialize(_localizer["Narrator"].Value) }
+        ];
+        const ratingSourceOptions = [
+            { value: 'User', label: @Json.Serialize(_localizer["User"].Value) },
+            { value: 'OpenLibrary', label: @Json.Serialize(_localizer["OpenLibrary"].Value) },
+            { value: 'Goodreads', label: @Json.Serialize(_localizer["Goodreads"].Value) },
+            { value: 'Amazon', label: @Json.Serialize(_localizer["Amazon"].Value) },
+            { value: 'GoogleBooks', label: @Json.Serialize(_localizer["GoogleBooks"].Value) },
+            { value: 'Calibre', label: @Json.Serialize(_localizer["Calibre"].Value) }
+        ];
+
+        // Adds a blank ISBN row.
+        function addIsbnRow() {
+            isbnsBody.insertAdjacentHTML('beforeend', `
+                <tr class="isbn-row">
+                    <td><input type="text" class="enlightenment-input isbn-value" /></td>
+                    <td>${buildRowCombobox(isbnOptions, '')}</td>
+                    <td><img src="/images/ui/delete.svg" alt="${jsLocalizedStrings.remove}" title="${jsLocalizedStrings.remove}" class="remove-form-table-row-icon" /></td>
+                </tr>`);
+        }
+
+        // Adds a blank contributor row.
+        function addContributorRow() {
+            contributorsBody.insertAdjacentHTML('beforeend', `
+                <tr class="contributor-row">
+                    <td><input type="text" class="enlightenment-input contributor-name" /></td>
+                    <td><input type="text" class="enlightenment-input contributor-role" value="Author" /></td>
+                    <td>${buildRowCombobox(contributorCategoryOptions, 'Author')}</td>
+                    <td><img src="/images/ui/delete.svg" alt="${jsLocalizedStrings.remove}" title="${jsLocalizedStrings.remove}" class="remove-form-table-row-icon" /></td>
+                </tr>`);
+        }
+
+        // Adds a blank rating row.
+        function addRatingRow() {
+            ratingsBody.insertAdjacentHTML('beforeend', `
+                <tr class="rating-row">
+                    <td><input type="number" step="any" min="0" class="enlightenment-input rating-value" /></td>
+                    <td><input type="number" step="any" min="0" class="enlightenment-input rating-max-value" /></td>
+                    <td>${buildRowCombobox(ratingSourceOptions, '')}</td>
+                    <td><input type="number" min="0" class="enlightenment-input rating-vote-count" /></td>
+                    <td><img src="/images/ui/delete.svg" alt="${jsLocalizedStrings.remove}" title="${jsLocalizedStrings.remove}" class="remove-form-table-row-icon" /></td>
+                </tr>`);
+        }
+
+        // Removes the row of the clicked remove icon.
+        function handleRowRemoval(event) {
+            if (event.target.matches('.remove-form-table-row-icon'))
+                event.target.closest('tr').remove();
+        }
+
+        // Add listeners.
+        btnSaveBook.addEventListener('click', handleSaveAsync);
+        btnBackToLibrary.addEventListener('click', handleBackToLibraryAsync);
+        btnChangeCover.addEventListener('click', handleChangeCoverClick);
+        coverInput.addEventListener('change', handleCoverChangeAsync);
+        btnAddIsbn.addEventListener('click', addIsbnRow);
+        btnAddContributor.addEventListener('click', addContributorRow);
+        btnAddRating.addEventListener('click', addRatingRow);
+        isbnsBody.addEventListener('click', handleRowRemoval);
+        contributorsBody.addEventListener('click', handleRowRemoval);
+        ratingsBody.addEventListener('click', handleRowRemoval);
+        document.addEventListener('DOMContentLoaded', InitializeAsync);
+
+        // Register cleanup for these listeners.
+        cleanupFunctions.push(() => {
+            btnSaveBook.removeEventListener('click', handleSaveAsync);
+            btnBackToLibrary.removeEventListener('click', handleBackToLibraryAsync);
+            btnChangeCover.removeEventListener('click', handleChangeCoverClick);
+            coverInput.removeEventListener('change', handleCoverChangeAsync);
+            btnAddIsbn.removeEventListener('click', addIsbnRow);
+            btnAddContributor.removeEventListener('click', addContributorRow);
+            btnAddRating.removeEventListener('click', addRatingRow);
+            isbnsBody.removeEventListener('click', handleRowRemoval);
+            contributorsBody.removeEventListener('click', handleRowRemoval);
+            ratingsBody.removeEventListener('click', handleRowRemoval);
+            document.removeEventListener('DOMContentLoaded', InitializeAsync);
+        });
+
+        // Initializes the page, showing the cover image of the book.
+        function InitializeAsync() {
+            if (isInitialized)
+                return;
+            isInitialized = true;
+            showCover();
+        }
+
+        // Store all cleanups for this view on window object using the scriptId.
+        window.viewCleanups = window.viewCleanups || {};
+        window.viewCleanups['@scriptId'] = () => {
+            cleanupFunctions.forEach(cleanup => cleanup());
+            console.log(`Unloaded @scriptId`);
+        };
+        console.log(`Loaded @scriptId`);
+    </script>
+}

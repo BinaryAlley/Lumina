@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -50,5 +50,11 @@
   </data>
   <data name="ReaderDisabled" xml:space="preserve">
     <value>Der Buchleser, der dieses Buch öffnet, ist für diese Mediathek deaktiviert. Aktivieren Sie ihn in den Mediathek-Einstellungen, um das Buch zu lesen.</value>
+  </data>
+  <data name="Read" xml:space="preserve">
+    <value>Lesen</value>
+  </data>
+  <data name="ViewDetails" xml:space="preserve">
+    <value>Details anzeigen</value>
   </data>
 </root>

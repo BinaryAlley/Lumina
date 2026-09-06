@@ -271,9 +271,10 @@
 @section Scripts {
     <!-- The "text/plain" type is a design choice, not a mistake: it keeps the browser from executing this view script during HTML parsing, before site.js defines the API helpers it calls (callApiGetAsync, callApiPostAsync, ...). site.js (which loads deferred) executes these scripts once it is loaded, both on the initial page load and during AJAX navigation. -->
     <script type="text/plain" data-form="@scriptId">
-        // create cleanup registry for this view
+        // Create cleanup registry for this view.
         const cleanupFunctions = [];
 
+        // The element references are captured once, so that the cleanup can unbind their listeners even after the AJAX navigator has swapped the content out of the document.
         const saveSuccess = document.getElementById('save-success');
         const btnBackToLibraries = document.getElementById('btn-back-to-libraries');
         const btnAddNewLibrary = document.getElementById('btn-add-new-library');
@@ -288,7 +289,7 @@
         const chkShouldSaveMetadataInMediaDirectories = form.querySelector('[name="ShouldSaveMetadataInMediaDirectories"]');
         const chkShouldSkipUnchangedDirectoriesDuringScan = form.querySelector('[name="ShouldSkipUnchangedDirectoriesDuringScan"]');
 
-        // create new or update existing media library
+        // Create new or update existing media library.
         async function handleAddMediaLibraryAsync() {
             const formData = {
                 Id: form.querySelector('[name="Id"]').value || null,
@@ -298,9 +299,9 @@
                 ContentLocations: Array.from(mediaDirectoriesFormTable.querySelectorAll('.form-table-row span'))
                     .map(span => span.textContent),
                 CoverImage: (() => {
-                    // get the first (and only) span in the mediaCoverFormTable, if it exists
+                    // Get the first (and only) span in the mediaCoverFormTable, if it exists.
                     const coverSpan = mediaCoverFormTable.querySelector('.form-table-row span');
-                    return coverSpan ? coverSpan.textContent : null; // return null if no cover image is selected
+                    return coverSpan ? coverSpan.textContent : null; // Return null if no cover image is selected.
                 })(),
                 IsEnabled: chkIsEnabled.checked,
                 IsLocked: chkIsLocked.checked,
@@ -318,13 +319,13 @@
         }
 
         function addMediaLibraryDirectories(selectedPaths) {
-            // process the selected paths (remove quotes and split by comma)
+            // Process the selected paths (remove quotes and split by comma).
             const paths = selectedPaths.slice(1, -1).split('","');
-            // add each path as a new row
+            // Add each path as a new row.
             paths.forEach(path => {
-                // normalize the path for comparison
+                // Normalize the path for comparison.
                 const normalizedPath = path.replace(/\\\\/g, '\\');
-                // use querySelectorAll and compare explicitly, so that duplicates are not permitted 
+                // Use querySelectorAll and compare explicitly, so that duplicates are not permitted.
                 const existingPaths = Array.from(mediaDirectoriesFormTable.querySelectorAll('span[title]'));
                 const isDuplicate = existingPaths.some(span => span.getAttribute('title') === normalizedPath);
                 if (!isDuplicate) {
@@ -339,13 +340,13 @@
         }
 
         function addMediaLibraryCoverImage(selectedPaths) {
-            // process the selected paths
+            // Process the selected paths.
             const paths = selectedPaths.slice(1, -1).split('","');
-            // ensure only one row is allowed by first clearing all previous rows
+            // Ensure only one row is allowed by first clearing all previous rows.
             mediaCoverFormTable.innerHTML = ''; 
-            // add the first valid path (if any) as a new row
+            // Add the first valid path (if any) as a new row.
             if (paths.length > 0) {
-                const path = paths[0]; // only use the first path
+                const path = paths[0]; // Only use the first path.
                 mediaCoverFormTable.insertAdjacentHTML('beforeend', `
                     <div class="form-table-row">
                         <span title="${path}">${path}</span>
@@ -355,7 +356,7 @@
             }
         }
 
-        // on Enter key pressed
+        // On Enter key pressed.
         const handleEnterKey = async function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -363,33 +364,33 @@
             }
         };
 
-        // on form submit event
+        // On form submit event.
         const handleSubmit = async function(e) {
             e.preventDefault();
             await handleAddMediaLibraryAsync();
         };
 
-        // on back to libraries button click
+        // On back to libraries button click.
         const handleBtnBackToLibrariesClick = function() {
             window.location.href = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.INDEX)';
         };
 
-        // on add new library button click
+        // On add new library button click.
         const handleBtnAddNewLibraryClick = function() {
             window.location.href = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.EDIT_LIBRARY)';
         };
 
-        // on add media directory image click
+        // On add media directory image click.
         const handleImgAddMediaDirectoryClick = async function() {
-            await showFileSystemBrowserDialogAsync('C:\\Users\\', true, false, addMediaLibraryDirectories); // TODO: take path and include hidden elements from settings
+            await showFileSystemBrowserDialogAsync('C:\\Users\\', true, false, addMediaLibraryDirectories); // TODO: take path and include hidden elements from settings.
         };
 
-        // on add cover image click
+        // On add cover image click.
         const handleImgAddCoverClick = async function() {
-            await showFileSystemBrowserDialogAsync('C:\\Users\\', true, true, addMediaLibraryCoverImage); // TODO: take path and include hidden elements from settings
+            await showFileSystemBrowserDialogAsync('C:\\Users\\', true, true, addMediaLibraryCoverImage); // TODO: take path and include hidden elements from settings.
         };
 
-        // on remove row icon click
+        // On remove row icon click.
         const handleRowRemoval = (e) => {
             if (e.target.matches('.remove-form-table-row-icon')) 
                 e.target.parentElement.remove();
@@ -399,18 +400,18 @@
         const metadataProvidersTable = document.getElementById('metadata-providers-table');
         const metadataProvidersTbody = metadataProvidersTable ? metadataProvidersTable.querySelector('tbody') : null;
 
-        // loads the metadata providers configured for the library, when editing an existing library
+        // Loads the metadata providers configured for the library, when editing an existing library.
         async function loadMetadataProvidersAsync() {
             if (!id || !metadataProvidersTbody) return;
             const url = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.GET_METADATA_PROVIDERS, new { libraryId = default(Guid) })'
-                .replace('/@(default(Guid))', `/${id}`); // libraryId needs to be replaced here, because GetAbsoluteUrl is server side, libraryId is client side
+                .replace('/@(default(Guid))', `/${id}`); // libraryId needs to be replaced here, because GetAbsoluteUrl is server side, libraryId is client side.
             const response = await callApiGetAsync(url);
             if (response && response.length > 0) {
                 metadataProvidersTbody.innerHTML = response.map((provider, index) => renderMetadataProviderRow(provider, index, response.length)).join('');
             }
         }
 
-        // renders a metadata provider row of the library
+        // Renders a metadata provider row of the library.
         function renderMetadataProviderRow(provider, index, count) {
             return `
                 <tr data-provider-plugin-id="${provider.pluginId}">
@@ -428,7 +429,7 @@
                 </tr>`;
         }
 
-        // on metadata provider move button click, reorders the providers and persists the new order
+        // On metadata provider move button click, reorders the providers and persists the new order.
         async function handleMetadataProviderReorderAsync(e) {
             const button = e.target.closest('.metadata-provider-move-up, .metadata-provider-move-down');
             if (!button || !metadataProvidersTbody) return;
@@ -443,7 +444,7 @@
             await saveMetadataProviderOrderAsync();
         }
 
-        // persists the current order of the metadata providers of the library
+        // Persists the current order of the metadata providers of the library.
         async function saveMetadataProviderOrderAsync() {
             if (!id || !metadataProvidersTbody) return;
             const pluginIds = Array.from(metadataProvidersTbody.querySelectorAll('tr[data-provider-plugin-id]'))
@@ -454,7 +455,7 @@
             }
         }
 
-        // on metadata provider enabled checkbox change, persists the new state
+        // On metadata provider enabled checkbox change, persists the new state.
         async function handleMetadataProviderEnabledChangeAsync(e) {
             if (e.target.matches('.metadata-provider-enabled')) {
                 const row = e.target.closest('tr');
@@ -470,18 +471,18 @@
         const artworkProvidersTable = document.getElementById('artwork-providers-table');
         const artworkProvidersTbody = artworkProvidersTable ? artworkProvidersTable.querySelector('tbody') : null;
 
-        // loads the artwork providers configured for the library, when editing an existing library
+        // Loads the artwork providers configured for the library, when editing an existing library.
         async function loadArtworkProvidersAsync() {
             if (!id || !artworkProvidersTbody) return;
             const url = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.GET_ARTWORK_PROVIDERS, new { libraryId = default(Guid) })'
-                .replace('/@(default(Guid))', `/${id}`); // libraryId needs to be replaced here, because GetAbsoluteUrl is server side, libraryId is client side
+                .replace('/@(default(Guid))', `/${id}`); // libraryId needs to be replaced here, because GetAbsoluteUrl is server side, libraryId is client side.
             const response = await callApiGetAsync(url);
             if (response && response.length > 0) {
                 artworkProvidersTbody.innerHTML = response.map((provider, index) => renderArtworkProviderRow(provider, index, response.length)).join('');
             }
         }
 
-        // renders an artwork provider row of the library
+        // Renders an artwork provider row of the library.
         function renderArtworkProviderRow(provider, index, count) {
             return `
                 <tr data-provider-plugin-id="${provider.pluginId}">
@@ -499,7 +500,7 @@
                 </tr>`;
         }
 
-        // on artwork provider move button click, reorders the providers and persists the new order
+        // On artwork provider move button click, reorders the providers and persists the new order.
         async function handleArtworkProviderReorderAsync(e) {
             const button = e.target.closest('.artwork-provider-move-up, .artwork-provider-move-down');
             if (!button || !artworkProvidersTbody) return;
@@ -514,7 +515,7 @@
             await saveArtworkProviderOrderAsync();
         }
 
-        // persists the current order of the artwork providers of the library
+        // Persists the current order of the artwork providers of the library.
         async function saveArtworkProviderOrderAsync() {
             if (!id || !artworkProvidersTbody) return;
             const pluginIds = Array.from(artworkProvidersTbody.querySelectorAll('tr[data-provider-plugin-id]'))
@@ -525,7 +526,7 @@
             }
         }
 
-        // on artwork provider enabled checkbox change, persists the new state
+        // On artwork provider enabled checkbox change, persists the new state.
         async function handleArtworkProviderEnabledChangeAsync(e) {
             if (e.target.matches('.artwork-provider-enabled')) {
                 const row = e.target.closest('tr');
@@ -541,18 +542,18 @@
         const bookReadersTable = document.getElementById('book-readers-table');
         const bookReadersTbody = bookReadersTable ? bookReadersTable.querySelector('tbody') : null;
 
-        // loads the book readers configured for the library, when editing an existing library
+        // Loads the book readers configured for the library, when editing an existing library.
         async function loadBookReadersAsync() {
             if (!id || !bookReadersTbody) return;
             const url = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.GET_BOOK_READERS, new { libraryId = default(Guid) })'
-                .replace('/@(default(Guid))', `/${id}`); // libraryId needs to be replaced here, because GetAbsoluteUrl is server side, libraryId is client side
+                .replace('/@(default(Guid))', `/${id}`); // libraryId needs to be replaced here, because GetAbsoluteUrl is server side, libraryId is client side.
             const response = await callApiGetAsync(url);
             if (response && response.length > 0) {
                 bookReadersTbody.innerHTML = response.map(reader => renderBookReaderRow(reader)).join('');
             }
         }
 
-        // renders a book reader row of the library
+        // Renders a book reader row of the library.
         function renderBookReaderRow(reader) {
             const extensions = (reader.supportedExtensions || []).join(', ');
             return `
@@ -568,7 +569,7 @@
                 </tr>`;
         }
 
-        // on book reader enabled checkbox change, persists the new state
+        // On book reader enabled checkbox change, persists the new state.
         async function handleBookReaderEnabledChangeAsync(e) {
             if (e.target.matches('.book-reader-enabled')) {
                 const row = e.target.closest('tr');
@@ -581,7 +582,7 @@
             }
         };
 
-        // add listeners
+        // Add listeners.
         form.addEventListener('keypress', handleEnterKey);
         form.addEventListener('submit', handleSubmit);
         btnBackToLibraries.addEventListener('click', handleBtnBackToLibrariesClick);
@@ -602,7 +603,7 @@
             bookReadersTbody.addEventListener('change', handleBookReaderEnabledChangeAsync);
         }
 
-        // register cleanup for these listeners
+        // Register cleanup for these listeners.
         cleanupFunctions.push(() => {
             form.removeEventListener('keypress', handleEnterKey);
             form.removeEventListener('submit', handleSubmit);
@@ -625,14 +626,14 @@
             }
         });
 
-        // load the metadata and artwork providers and book readers when editing an existing library
+        // Load the metadata and artwork providers and book readers when editing an existing library.
         if (id) {
             loadMetadataProvidersAsync();
             loadArtworkProvidersAsync();
             loadBookReadersAsync();
         }
 
-        // store all cleanups for this view on window object using the scriptId
+        // Store all cleanups for this view on window object using the scriptId.
         window.viewCleanups = window.viewCleanups || {};
         window.viewCleanups['@scriptId'] = () => {
             cleanupFunctions.forEach(cleanup => cleanup());

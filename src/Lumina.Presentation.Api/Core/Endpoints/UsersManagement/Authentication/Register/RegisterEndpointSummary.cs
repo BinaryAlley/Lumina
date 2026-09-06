@@ -77,9 +77,9 @@ public class RegisterEndpointSummary : Summary<RegisterEndpoint, RegistrationReq
                         "General.Validation", new[]
                         {
                             "UsernameCannotBeEmpty",
-                            "PassordCannotBeEmpty",
                             "UsernameMustBeBetween3And255CharactersLong",
                             "InvalidUsername",
+                            "PasswordCannotBeEmpty",
                             "InvalidPassword",
                             "PasswordConfirmCannotBeEmpty",
                             "PasswordsNotMatch"

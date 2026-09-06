@@ -123,12 +123,12 @@ public class AddLibraryEndpointSummary : Summary<AddLibraryEndpoint, AddLibraryR
                     {
                         "General.Validation", new[]
                         {
-                            "UserIdCannotBeEmpty",
                             "LibraryTypeCannotBeNull",
                             "UnknownLibraryType",
                             "PathsListCannotBeNull",
                             "PathsListCannotBeEmpty",
                             "PathCannotBeEmpty",
+                            "PathMustBeMaximum260CharactersLong",
                             "TitleCannotBeEmpty",
                             "TitleMustBeMaximum255CharactersLong",
                             "CoverFileMustBeAnImage"

@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AddContributor" xml:space="preserve">
+    <value>إضافة مساهم</value>
+  </data>
+  <data name="AddRating" xml:space="preserve">
+    <value>إضافة تقييم</value>
+  </data>
+  <data name="AddRow" xml:space="preserve">
+    <value>إضافة</value>
+  </data>
+  <data name="AppleBooksIdDescription" xml:space="preserve">
+    <value>معرّف الكتاب على Apple Books.</value>
+  </data>
+  <data name="ASINDescription" xml:space="preserve">
+    <value>رقم التعريف القياسي لأمازون الخاص بالكتاب.</value>
+  </data>
+  <data name="Audiobook" xml:space="preserve">
+    <value>كتاب صوتي</value>
+  </data>
+  <data name="Author" xml:space="preserve">
+    <value>مؤلف</value>
+  </data>
+  <data name="BackToLibrary" xml:space="preserve">
+    <value>العودة إلى المكتبة</value>
+  </data>
+  <data name="BarnesAndNobleIdDescription" xml:space="preserve">
+    <value>معرّف الكتاب على Barnes &amp; Noble.</value>
+  </data>
+  <data name="BoardBook" xml:space="preserve">
+    <value>كتاب من الورق المقوى</value>
+  </data>
+  <data name="BookDetails" xml:space="preserve">
+    <value>تفاصيل الكتاب</value>
+  </data>
+  <data name="BookSaved" xml:space="preserve">
+    <value>تم حفظ الكتاب.</value>
+  </data>
+  <data name="ChangeCover" xml:space="preserve">
+    <value>تغيير الغلاف</value>
+  </data>
+  <data name="ContributorName" xml:space="preserve">
+    <value>الاسم</value>
+  </data>
+  <data name="ContributorsDescription" xml:space="preserve">
+    <value>الأشخاص الذين ساهموا في الكتاب، مثل مؤلفيه.</value>
+  </data>
+  <data name="CoverImage" xml:space="preserve">
+    <value>صورة الغلاف</value>
+  </data>
+  <data name="CoverSaved" xml:space="preserve">
+    <value>تم تحديث صورة الغلاف.</value>
+  </data>
+  <data name="CoverUploadFailed" xml:space="preserve">
+    <value>تعذر رفع صورة الغلاف.</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>الوصف</value>
+  </data>
+  <data name="DescriptionDescription" xml:space="preserve">
+    <value>ملخص قصير أو وصف للكتاب.</value>
+  </data>
+  <data name="eBook" xml:space="preserve">
+    <value>كتاب إلكتروني</value>
+  </data>
+  <data name="Edition" xml:space="preserve">
+    <value>الطبعة</value>
+  </data>
+  <data name="EditionDescription" xml:space="preserve">
+    <value>طبعة الكتاب.</value>
+  </data>
+  <data name="Format" xml:space="preserve">
+    <value>الصيغة</value>
+  </data>
+  <data name="FormatDescription" xml:space="preserve">
+    <value>الصيغة المادية أو الرقمية للكتاب.</value>
+  </data>
+  <data name="GeneralInformation" xml:space="preserve">
+    <value>معلومات عامة</value>
+  </data>
+  <data name="Genres" xml:space="preserve">
+    <value>الأنواع</value>
+  </data>
+  <data name="GenresDescription" xml:space="preserve">
+    <value>أنواع الكتاب، مفصولة بفواصل.</value>
+  </data>
+  <data name="GoodreadsIdDescription" xml:space="preserve">
+    <value>المعرّف الرقمي للكتاب على Goodreads.</value>
+  </data>
+  <data name="GoogleBooksIdDescription" xml:space="preserve">
+    <value>معرّف الكتاب على Google Books.</value>
+  </data>
+  <data name="Hardcover" xml:space="preserve">
+    <value>غلاف مقوى</value>
+  </data>
+  <data name="Identifiers" xml:space="preserve">
+    <value>المعرّفات</value>
+  </data>
+  <data name="Illustrator" xml:space="preserve">
+    <value>رسام</value>
+  </data>
+  <data name="IsbnFormat" xml:space="preserve">
+    <value>صيغة ISBN</value>
+  </data>
+  <data name="ISBNsDescription" xml:space="preserve">
+    <value>أرقام الكتاب الدولية المعيارية (ISBN).</value>
+  </data>
+  <data name="IsbnValue" xml:space="preserve">
+    <value>قيمة ISBN</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>اللغة</value>
+  </data>
+  <data name="LanguageCode" xml:space="preserve">
+    <value>رمز اللغة</value>
+  </data>
+  <data name="LanguageCodeDescription" xml:space="preserve">
+    <value>رمز الحرفين للغة الكتاب.</value>
+  </data>
+  <data name="LanguageName" xml:space="preserve">
+    <value>اسم اللغة</value>
+  </data>
+  <data name="LanguageNameDescription" xml:space="preserve">
+    <value>اسم لغة الكتاب.</value>
+  </data>
+  <data name="LargePrint" xml:space="preserve">
+    <value>حرف كبير</value>
+  </data>
+  <data name="LCCNDescription" xml:space="preserve">
+    <value>رقم ضبط مكتبة الكونغرس للكتاب.</value>
+  </data>
+  <data name="LeatherBound" xml:space="preserve">
+    <value>تجليد جلدي</value>
+  </data>
+  <data name="LibraryBinding" xml:space="preserve">
+    <value>تجليد مكتبي</value>
+  </data>
+  <data name="LibraryThingIdDescription" xml:space="preserve">
+    <value>معرّف الكتاب على LibraryThing.</value>
+  </data>
+  <data name="MassMarketPaperback" xml:space="preserve">
+    <value>ورقي للسوق الشامل</value>
+  </data>
+  <data name="Narrator" xml:space="preserve">
+    <value>راوٍ</value>
+  </data>
+  <data name="NativeName" xml:space="preserve">
+    <value>الاسم الأصلي للغة</value>
+  </data>
+  <data name="NativeNameDescription" xml:space="preserve">
+    <value>الاسم الأصلي للغة الكتاب.</value>
+  </data>
+  <data name="NoCover" xml:space="preserve">
+    <value>لا يوجد غلاف</value>
+  </data>
+  <data name="OCLCNumber" xml:space="preserve">
+    <value>رقم OCLC</value>
+  </data>
+  <data name="OCLCNumberDescription" xml:space="preserve">
+    <value>رقم OCLC للكتاب.</value>
+  </data>
+  <data name="OpenLibraryIdDescription" xml:space="preserve">
+    <value>معرّف الكتاب على Open Library.</value>
+  </data>
+  <data name="OriginalLanguage" xml:space="preserve">
+    <value>اللغة الأصلية</value>
+  </data>
+  <data name="OriginalLanguageCode" xml:space="preserve">
+    <value>رمز اللغة الأصلية</value>
+  </data>
+  <data name="OriginalLanguageCodeDescription" xml:space="preserve">
+    <value>رمز الحرفين للغة الأصلية للكتاب.</value>
+  </data>
+  <data name="OriginalLanguageName" xml:space="preserve">
+    <value>اسم اللغة الأصلية</value>
+  </data>
+  <data name="OriginalLanguageNameDescription" xml:space="preserve">
+    <value>اسم اللغة الأصلية للكتاب.</value>
+  </data>
+  <data name="OriginalLanguageNativeName" xml:space="preserve">
+    <value>الاسم الأصلي للغة الأصلية</value>
+  </data>
+  <data name="OriginalLanguageNativeNameDescription" xml:space="preserve">
+    <value>الاسم الأصلي للغة الأصلية للكتاب.</value>
+  </data>
+  <data name="OriginalReleaseDate" xml:space="preserve">
+    <value>تاريخ الإصدار الأصلي</value>
+  </data>
+  <data name="OriginalReleaseDateDescription" xml:space="preserve">
+    <value>التاريخ الذي صدر فيه الكتاب لأول مرة.</value>
+  </data>
+  <data name="OriginalReleaseYear" xml:space="preserve">
+    <value>سنة الإصدار الأصلي</value>
+  </data>
+  <data name="OriginalReleaseYearDescription" xml:space="preserve">
+    <value>السنة التي صدر فيها الكتاب لأول مرة.</value>
+  </data>
+  <data name="OriginalTitle" xml:space="preserve">
+    <value>العنوان الأصلي</value>
+  </data>
+  <data name="OriginalTitleDescription" xml:space="preserve">
+    <value>العنوان الأصلي للكتاب، عندما يختلف عن العنوان الحالي.</value>
+  </data>
+  <data name="OtherRole" xml:space="preserve">
+    <value>أخرى</value>
+  </data>
+  <data name="PageCount" xml:space="preserve">
+    <value>عدد الصفحات</value>
+  </data>
+  <data name="PageCountDescription" xml:space="preserve">
+    <value>عدد صفحات الكتاب.</value>
+  </data>
+  <data name="Paperback" xml:space="preserve">
+    <value>غلاف ورقي</value>
+  </data>
+  <data name="PopupBook" xml:space="preserve">
+    <value>كتاب منبثق</value>
+  </data>
+  <data name="Publisher" xml:space="preserve">
+    <value>الناشر</value>
+  </data>
+  <data name="PublisherDescription" xml:space="preserve">
+    <value>ناشر الكتاب.</value>
+  </data>
+  <data name="PublisherRole" xml:space="preserve">
+    <value>ناشر</value>
+  </data>
+  <data name="RatingMaxValue" xml:space="preserve">
+    <value>أقصى تقييم</value>
+  </data>
+  <data name="Ratings" xml:space="preserve">
+    <value>التقييمات</value>
+  </data>
+  <data name="RatingsDescription" xml:space="preserve">
+    <value>تقييمات الكتاب من مصادر مختلفة.</value>
+  </data>
+  <data name="RatingSource" xml:space="preserve">
+    <value>المصدر</value>
+  </data>
+  <data name="RatingValue" xml:space="preserve">
+    <value>التقييم</value>
+  </data>
+  <data name="RatingVoteCount" xml:space="preserve">
+    <value>عدد الأصوات</value>
+  </data>
+  <data name="ReleaseCountry" xml:space="preserve">
+    <value>بلد الإصدار</value>
+  </data>
+  <data name="ReleaseCountryDescription" xml:space="preserve">
+    <value>رمز الحرفين لبلد الإصدار.</value>
+  </data>
+  <data name="ReleaseInformation" xml:space="preserve">
+    <value>معلومات الإصدار</value>
+  </data>
+  <data name="ReleaseVersion" xml:space="preserve">
+    <value>نسخة الإصدار</value>
+  </data>
+  <data name="ReleaseVersionDescription" xml:space="preserve">
+    <value>نسخة الإصدار، مثل النسخة الأصلية.</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>إزالة</value>
+  </data>
+  <data name="ReReleaseDate" xml:space="preserve">
+    <value>تاريخ إعادة الإصدار</value>
+  </data>
+  <data name="ReReleaseDateDescription" xml:space="preserve">
+    <value>التاريخ الذي أعيد فيه إصدار الكتاب.</value>
+  </data>
+  <data name="ReReleaseYear" xml:space="preserve">
+    <value>سنة إعادة الإصدار</value>
+  </data>
+  <data name="ReReleaseYearDescription" xml:space="preserve">
+    <value>السنة التي أعيد فيها إصدار الكتاب.</value>
+  </data>
+  <data name="RoleCategory" xml:space="preserve">
+    <value>فئة الدور</value>
+  </data>
+  <data name="RoleName" xml:space="preserve">
+    <value>الدور</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>حفظ</value>
+  </data>
+  <data name="SaveFailed" xml:space="preserve">
+    <value>تعذر حفظ الكتاب.</value>
+  </data>
+  <data name="SpiralBound" xml:space="preserve">
+    <value>تجليد حلزوني</value>
+  </data>
+  <data name="Tags" xml:space="preserve">
+    <value>الوسوم</value>
+  </data>
+  <data name="TagsDescription" xml:space="preserve">
+    <value>وسوم الكتاب، مفصولة بفواصل.</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>العنوان</value>
+  </data>
+  <data name="TitleDescription" xml:space="preserve">
+    <value>العنوان الرئيسي للكتاب.</value>
+  </data>
+  <data name="TradePaperback" xml:space="preserve">
+    <value>ورقي تجاري</value>
+  </data>
+  <data name="Translator" xml:space="preserve">
+    <value>مترجم</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>مستخدم</value>
+  </data>
+  <data name="VolumeNumber" xml:space="preserve">
+    <value>رقم المجلد</value>
+  </data>
+  <data name="VolumeNumberDescription" xml:space="preserve">
+    <value>رقم مجلد الكتاب ضمن سلسلته.</value>
+  </data>
+  <data name="Isbn13" xml:space="preserve">
+    <value>ISBN-13</value>
+  </data>
+  <data name="LCCN" xml:space="preserve">
+    <value>LCCN</value>
+  </data>
+  <data name="Calibre" xml:space="preserve">
+    <value>Calibre</value>
+  </data>
+  <data name="AppleBooksId" xml:space="preserve">
+    <value>معرّف Apple Books</value>
+  </data>
+  <data name="OpenLibrary" xml:space="preserve">
+    <value>Open Library</value>
+  </data>
+  <data name="GoogleBooks" xml:space="preserve">
+    <value>Google Books</value>
+  </data>
+  <data name="ASIN" xml:space="preserve">
+    <value>ASIN</value>
+  </data>
+  <data name="Isbn10" xml:space="preserve">
+    <value>ISBN-10</value>
+  </data>
+  <data name="GoogleBooksId" xml:space="preserve">
+    <value>معرّف Google Books</value>
+  </data>
+  <data name="LibraryThingId" xml:space="preserve">
+    <value>معرّف LibraryThing</value>
+  </data>
+  <data name="Goodreads" xml:space="preserve">
+    <value>Goodreads</value>
+  </data>
+  <data name="Amazon" xml:space="preserve">
+    <value>Amazon</value>
+  </data>
+  <data name="BarnesAndNobleId" xml:space="preserve">
+    <value>معرّف Barnes &amp; Noble</value>
+  </data>
+  <data name="OpenLibraryId" xml:space="preserve">
+    <value>معرّف Open Library</value>
+  </data>
+  <data name="ISBNs" xml:space="preserve">
+    <value>ISBN</value>
+  </data>
+  <data name="Contributors" xml:space="preserve">
+    <value>المساهمون</value>
+  </data>
+  <data name="GoodreadsId" xml:space="preserve">
+    <value>معرّف Goodreads</value>
+  </data>
+</root>

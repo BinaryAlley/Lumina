@@ -58,7 +58,7 @@ internal sealed class BookRepository : IBookRepository
         if (bookExists)
             return Errors.WrittenContent.BookAlreadyExists;
 
-        // fetch existing tags and genres
+        // Fetch existing tags and genres.
         List<TagEntity> existingTags = await _luminaDbContext.Set<TagEntity>()
             .Where(t => book.Tags.Select(bt => bt.Name).Contains(t.Name))
             .ToListAsync(cancellationToken).ConfigureAwait(false);
@@ -67,7 +67,7 @@ internal sealed class BookRepository : IBookRepository
             .Where(g => book.Genres.Select(bg => bg.Name).Contains(g.Name))
             .ToListAsync(cancellationToken).ConfigureAwait(false);
 
-        // replace tags and genres in the book with existing ones
+        // Replace tags and genres in the book with existing ones.
         book.Tags = [.. book.Tags.Select(tag => existingTags.FirstOrDefault(existingTag => existingTag.Name == tag.Name) ?? tag)];
         book.Genres = [.. book.Genres.Select(genre => existingGenres.FirstOrDefault(existingGenre => existingGenre.Name == genre.Name) ?? genre)];
 
@@ -87,6 +87,8 @@ internal sealed class BookRepository : IBookRepository
             .Include(book => book.Tags)
             .Include(book => book.Genres)
             .Include(book => book.ISBNs)
+            .Include(book => book.Ratings)
+            .Include(book => book.BookContributors)
             .Include(book => book.BookArtwork)
             .FirstOrDefaultAsync(book => book.Id == id, cancellationToken).ConfigureAwait(false);
     }
@@ -102,6 +104,8 @@ internal sealed class BookRepository : IBookRepository
             .Include(book => book.Tags)
             .Include(book => book.Genres)
             .Include(book => book.ISBNs)
+            .Include(book => book.Ratings)
+            .Include(book => book.BookContributors)
             .Include(book => book.BookArtwork)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
     }
@@ -126,21 +130,21 @@ internal sealed class BookRepository : IBookRepository
             .Include(book => book.BookArtwork)
             .AsNoTracking();
 
-        // books should always be retrieved only per owning libraries
+        // Books should always be retrieved only per owning libraries.
         if (filterModel is not LibraryFilterDto libraryFilter || libraryFilter.LibraryId == Guid.Empty)
             return Errors.Library.FilterMustIncludeLibraryId;
 
         booksQuery = booksQuery.Where(book => book.LibraryId == libraryFilter.LibraryId);
 
         FilterSpecification<BookEntity>? filterSpecification = BuildFilterSpecification(libraryFilter);
-        // apply filtering
+        // Apply filtering.
         if (filterSpecification is not null)
             booksQuery = booksQuery.Where(filterSpecification.ToExpression());
 
-        // apply sorting based on the specified sortBy and sortOrder parameters
+        // Apply sorting based on the specified sortBy and sortOrder parameters.
         booksQuery = ApplySorting(booksQuery, sortBy, sortOrder ?? SortOrder.Ascending, libraryFilter.ShouldIgnoreThePrefixForAlphaPicker);
 
-        // if no pagination was requested, return all the books of the library
+        // If no pagination was requested, return all the books of the library.
         if (paginationData is null)
         {
             IReadOnlyList<BookEntity> allBooks = await booksQuery.ToListAsync(cancellationToken).ConfigureAwait(false);
@@ -156,9 +160,9 @@ internal sealed class BookRepository : IBookRepository
 
         int count = await booksQuery.Select(book => book.Id).CountAsync(cancellationToken).ConfigureAwait(false);
         int numberOfPages = (int)Math.Ceiling((double)count / paginationData.PerPage);
-        int currentPage = Math.Min(paginationData.CurrentPage, Math.Max(1, numberOfPages)); // make sure current page doesn't exceed maximum number of pages
+        int currentPage = Math.Min(paginationData.CurrentPage, Math.Max(1, numberOfPages)); // Make sure current page doesn't exceed maximum number of pages.
 
-        // apply pagination
+        // Apply pagination.
         IReadOnlyList<BookEntity> paginatedResult = await booksQuery
             .Skip((currentPage - 1) * paginationData.PerPage)
             .Take(paginationData.PerPage)
@@ -359,7 +363,7 @@ internal sealed class BookRepository : IBookRepository
 
         return authorRows
             .GroupBy(row => row.BookId)
-            .ToDictionary(group => group.Key, group => (string?)group.Min(row => row.DisplayName));
+            .ToDictionary(group => group.Key, group => group.Min(row => row.DisplayName));
     }
 
     /// <summary>
@@ -387,9 +391,9 @@ internal sealed class BookRepository : IBookRepository
     }
 
     /// <summary>
-    /// Updates a book.
+    /// Updates a book, replacing its editable data while preserving its identity, enrichment and audit columns.
     /// </summary>
-    /// <param name="data">The book to update.</param>
+    /// <param name="data">The book whose editable data is applied to the stored book.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Updated>> UpdateAsync(BookEntity data, CancellationToken cancellationToken)
@@ -398,11 +402,52 @@ internal sealed class BookRepository : IBookRepository
             .Include(book => book.Tags)
             .Include(book => book.Genres)
             .Include(book => book.ISBNs)
+            .Include(book => book.Ratings)
+            .Include(book => book.BookContributors)
             .FirstOrDefaultAsync(book => book.Id == data.Id, cancellationToken).ConfigureAwait(false);
         if (foundBook is null)
             return Errors.WrittenContent.BookNotFound;
-        // update the scalar properties of the book
+
+        // The stored enrichment and identity columns are never overwritten by an edit: they are owned by the scan and by the record itself.
+        Guid libraryId = foundBook.LibraryId;
+        string path = foundBook.Path;
+        MetadataStatus metadataStatus = foundBook.MetadataStatus;
+        DateTime? lastMetadataUpdateUtc = foundBook.LastMetadataUpdateUtc;
+        string? metadataProvider = foundBook.MetadataProvider;
+        DateTime createdOnUtc = foundBook.CreatedOnUtc;
+        Guid createdBy = foundBook.CreatedBy;
+
+        // Copy the editable scalar properties of the book, ignoring the unchanged collection and enrichment columns.
         _luminaDbContext.Entry(foundBook).CurrentValues.SetValues(data);
+        foundBook.LibraryId = libraryId;
+        foundBook.Path = path;
+        foundBook.MetadataStatus = metadataStatus;
+        foundBook.LastMetadataUpdateUtc = lastMetadataUpdateUtc;
+        foundBook.MetadataProvider = metadataProvider;
+        foundBook.CreatedOnUtc = createdOnUtc;
+        foundBook.CreatedBy = createdBy;
+
+        // Reuse the stored tags and genres whose names already exist, so that the shared tables are not duplicated.
+        List<TagEntity> existingTags = await _luminaDbContext.Set<TagEntity>()
+            .Where(tag => data.Tags.Select(bookTag => bookTag.Name).Contains(tag.Name))
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+        List<GenreEntity> existingGenres = await _luminaDbContext.Set<GenreEntity>()
+            .Where(genre => data.Genres.Select(bookGenre => bookGenre.Name).Contains(genre.Name))
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+
+        foundBook.Tags.Clear();
+        foundBook.Tags.UnionWith(data.Tags.Select(tag => existingTags.FirstOrDefault(existingTag => existingTag.Name == tag.Name) ?? tag));
+        foundBook.Genres.Clear();
+        foundBook.Genres.UnionWith(data.Genres.Select(genre => existingGenres.FirstOrDefault(existingGenre => existingGenre.Name == genre.Name) ?? genre));
+
+        // Replace the owned collections of the book, so that removed entries are deleted and new entries are inserted.
+        foundBook.ISBNs.Clear();
+        foundBook.ISBNs.AddRange(data.ISBNs);
+        foundBook.Ratings.Clear();
+        foundBook.Ratings.AddRange(data.Ratings);
+        foundBook.BookContributors.Clear();
+        foundBook.BookContributors.AddRange(data.BookContributors);
+
         return Result.Updated;
     }
 
@@ -445,7 +490,7 @@ internal sealed class BookRepository : IBookRepository
 
         Expression titleProperty = Expression.Property(book, nameof(BookEntity.Title));
 
-        // the raw title: the title, unless it is null or empty, in which case the original title (or an empty string) is used
+        // The raw title: the title, unless it is null or empty, in which case the original title (or an empty string) is used.
         BinaryExpression isTitleMissing = Expression.OrElse(
             Expression.Equal(titleProperty, Expression.Constant(null, typeof(string))),
             Expression.Equal(titleProperty, Expression.Constant(string.Empty)));
@@ -455,7 +500,7 @@ internal sealed class BookRepository : IBookRepository
 
         MethodCallExpression lowerTitle = Expression.Call(rawTitle, s_toLowerMethod);
 
-        // when ignoring the "The " prefix, strip a leading "the " from the lowercased title
+        // When ignoring the "The " prefix, strip a leading "the " from the lowercased title.
         Expression effectiveTitle = lowerTitle;
         if (shouldIgnoreThePrefixForAlphaPicker)
         {
@@ -476,11 +521,11 @@ internal sealed class BookRepository : IBookRepository
     {
         FilterSpecification<BookEntity>? filterSpecification = null;
 
-        // include the search term filter, if provided
+        // Include the search term filter, if provided.
         if (!string.IsNullOrWhiteSpace(libraryFilter.SearchTerm))
             filterSpecification = new BookSearchSpecification(libraryFilter.SearchTerm);
 
-        // include the alpha key filter, if provided
+        // Include the alpha key filter, if provided.
         if (libraryFilter.FilterAlphaKey is not null)
         {
             BookAlphaFilterSpecification alphaFilterSpecification = new(libraryFilter.FilterAlphaKey, libraryFilter.ShouldIgnoreThePrefixForAlphaPicker);

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -50,5 +50,11 @@
   </data>
   <data name="ReaderDisabled" xml:space="preserve">
     <value>Читач книг, який відкриває цю книгу, вимкнено для цієї бібліотеки. Увімкніть його в налаштуваннях бібліотеки, щоб читати книгу.</value>
+  </data>
+  <data name="Read" xml:space="preserve">
+    <value>Читати</value>
+  </data>
+  <data name="ViewDetails" xml:space="preserve">
+    <value>Переглянути деталі</value>
   </data>
 </root>

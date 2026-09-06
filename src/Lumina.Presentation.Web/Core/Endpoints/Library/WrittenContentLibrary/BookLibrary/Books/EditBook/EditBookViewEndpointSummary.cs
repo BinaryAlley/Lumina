@@ -24,7 +24,7 @@ public class EditBookViewEndpointSummary : Summary<EditBookViewEndpoint, GetBook
         RequestParam(r => r.Id, "The unique identifier of the book to edit. Required.");
 
         ExampleRequest = new GetBookRequest(
-            Id: Guid.NewGuid()
+            Id: Guid.NewGuid().ToString()
         );
 
         Response(200, "The view for editing the book is rendered.");

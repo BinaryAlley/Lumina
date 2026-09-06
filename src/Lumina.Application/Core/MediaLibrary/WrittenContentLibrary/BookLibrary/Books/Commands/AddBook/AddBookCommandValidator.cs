@@ -104,15 +104,7 @@ public class AddBookCommandValidator : AbstractValidator<AddBookCommand>
                                 !releaseInfoInstance.OriginalReleaseDate.HasValue ||
                                 reReleaseDate >= releaseInfoInstance.OriginalReleaseDate)
                             .When(r => r!.ReReleaseDate.HasValue && r.OriginalReleaseDate.HasValue)
-                            .WithError(Errors.Metadata.ReReleaseDateCannotBeEarlierThanOriginalReleaseDate);
-                     
-                        releaseInfo.RuleFor(r => r!.ReReleaseYear)
-                            .Must((releaseInfoInstance, reReleaseYear) =>
-                                !releaseInfoInstance!.ReReleaseDate.HasValue ||
-                                !releaseInfoInstance.ReReleaseYear.HasValue ||
-                                reReleaseYear == releaseInfoInstance.ReReleaseDate.Value.Year)
-                            .When(r => r!.ReReleaseDate.HasValue && r.ReReleaseYear.HasValue)
-                            .WithError(Errors.Metadata.ReReleaseDateAndYearMustMatch);
+                            .WithError(Errors.Metadata.ReReleaseDateCannotBeEarlierThanOriginalReleaseDate);                     
                     });
              
                 metadata.RuleFor(m => m!.Genres)

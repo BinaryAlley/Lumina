@@ -39,7 +39,7 @@ public class ApiHttpClient : IApiHttpClient
     {
         _httpClient = httpClient;
         _httpContext = httpContextAccessor.HttpContext;
-        // read the API server configuration values from the configuration, and assign them to the injected client
+        // Read the API server configuration values from the configuration, and assign them to the injected client.
         ServerConfigurationDto serverConfiguration = serverConfigurationOptions.Value;
         httpClient.BaseAddress = new Uri($"{serverConfiguration.BaseAddress}:{serverConfiguration.Port}/api/v{serverConfiguration.ApiVersion}/");
 
@@ -82,11 +82,11 @@ public class ApiHttpClient : IApiHttpClient
         AuthenticationHeaderValue? authenticationHeader = GetAuthenticationHeader();
         if (authenticationHeader is not null)
             request.Headers.Authorization = authenticationHeader;
-        // send the request and expect only headers initially - this prevents the client from buffering the entire response
+        // Send the request and expect only headers initially - this prevents the client from buffering the entire response.
         using HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
         await using Stream stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
-        // Deserialize the JSON content asynchronously as an enumerable of TResponse items
+        // Deserialize the JSON content asynchronously as an enumerable of TResponse items.
         await foreach (TResponse? item in JsonSerializer.DeserializeAsyncEnumerable<TResponse>(stream, _jsonOptions, cancellationToken).ConfigureAwait(false))
         {
             if (cancellationToken.IsCancellationRequested)
@@ -110,17 +110,17 @@ public class ApiHttpClient : IApiHttpClient
         using HttpResponseMessage response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode)
         {
-            // read the content as a string, for error messages
+            // Read the content as a string, for error messages.
             string content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
             ProblemDetailsDto? problemDetails = null;
             try
             {
                 problemDetails = JsonSerializer.Deserialize<ProblemDetailsDto>(content, _jsonOptions);
             }
-            catch { /* if we can't deserialize to ProblemDetails, we'll just use the status code */ }
+            catch { /* If we can't deserialize to ProblemDetails, we'll just use the status code. */ }
             throw new ApiException(problemDetails, response.StatusCode);
         }
-        // if the response is successful, read it as a byte array
+        // If the response is successful, read it as a byte array.
         byte[] responseContent = await response.Content.ReadAsByteArrayAsync(cancellationToken).ConfigureAwait(false);
         string contentType = response.Content.Headers.ContentType?.ToString() ?? "application/octet-stream";
         return new BlobDataDto { Data = responseContent, ContentType = contentType };
@@ -137,19 +137,18 @@ public class ApiHttpClient : IApiHttpClient
         AuthenticationHeaderValue? authenticationHeader = GetAuthenticationHeader();
         if (authenticationHeader is not null)
             request.Headers.Authorization = authenticationHeader;
-        //return await SendRequestAsync<TResponse>(request, cancellationToken).ConfigureAwait(false);
-        // send the HTTP request and read the response
+        // Send the HTTP request and read the response.
         HttpResponseMessage response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode)
         {
             ProblemDetailsDto? problemDetails = null;
             string content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-            // attempt to deserialize the response content to ProblemDetailsDto if the request fails
+            // Attempt to deserialize the response content to ProblemDetailsDto if the request fails.
             try
             {
                 problemDetails = JsonSerializer.Deserialize<ProblemDetailsDto>(content, _jsonOptions);
             }
-            catch { /* if we can't deserialize to ProblemDetails, we'll just use the status code */ }
+            catch { /* If we can't deserialize to ProblemDetails, we'll just use the status code. */ }
             throw new ApiException(problemDetails, response.StatusCode, request.RequestUri?.AbsolutePath);
         }
     }
@@ -204,13 +203,41 @@ public class ApiHttpClient : IApiHttpClient
     /// <returns>The deserialized response containing the result of the POST request.</returns>
     public async Task<TResponse> PostMultipartAsync<TResponse>(string endpoint, Stream fileStream, string fileName, string fieldName, CancellationToken cancellationToken = default)
     {
-        // the file is streamed as a generic binary part, since the exact content type of the uploaded file is not known
+        // The file is streamed as a generic binary part, since the exact content type of the uploaded file is not known.
         using MultipartFormDataContent form = [];
         using StreamContent fileContent = new(fileStream);
         fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
         form.Add(fileContent, fieldName, fileName);
 
         using HttpRequestMessage request = new(HttpMethod.Post, endpoint)
+        {
+            Content = form
+        };
+        AuthenticationHeaderValue? authenticationHeader = GetAuthenticationHeader();
+        if (authenticationHeader is not null)
+            request.Headers.Authorization = authenticationHeader;
+        return await SendRequestAsync<TResponse>(request, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Sends a PUT request with a multipart form containing a single file to the specified <paramref name="endpoint"/> as an asynchronous operation and returns the result.
+    /// </summary>
+    /// <typeparam name="TResponse">The expected type of the response content.</typeparam>
+    /// <param name="endpoint">The API endpoint where the request is being sent.</param>
+    /// <param name="fileStream">The stream of the file to upload.</param>
+    /// <param name="fileName">The name of the file to upload.</param>
+    /// <param name="fieldName">The name of the form field carrying the file.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>The deserialized response containing the result of the PUT request.</returns>
+    public async Task<TResponse> PutMultipartAsync<TResponse>(string endpoint, Stream fileStream, string fileName, string fieldName, CancellationToken cancellationToken = default)
+    {
+        // The file is streamed as a generic binary part, since the exact content type of the uploaded file is not known.
+        using MultipartFormDataContent form = [];
+        using StreamContent fileContent = new(fileStream);
+        fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+        form.Add(fileContent, fieldName, fileName);
+
+        using HttpRequestMessage request = new(HttpMethod.Put, endpoint)
         {
             Content = form
         };
@@ -231,13 +258,13 @@ public class ApiHttpClient : IApiHttpClient
     /// <exception cref="ApiException">Thrown if the response is not successful, with the <see cref="ProblemDetailsDto"/> if available.</exception>
     private async Task<TResponse> SendRequestAsync<TResponse>(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        // send the HTTP request and read the response
+        // Send the HTTP request and read the response.
         HttpResponseMessage response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
         string content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-        // if the response is successful, deserialize the content to TResponse and return it
+        // If the response is successful, deserialize the content to TResponse and return it.
         if (response.IsSuccessStatusCode)
         {
-            // handle empty content case
+            // Handle empty content case.
             if (string.IsNullOrEmpty(content))
                 return default!;
             return JsonSerializer.Deserialize<TResponse>(content, _jsonOptions)!;
@@ -245,12 +272,12 @@ public class ApiHttpClient : IApiHttpClient
         else
         {
             ProblemDetailsDto? problemDetails = null;
-            // attempt to deserialize the response content to ProblemDetailsDto if the request fails
+            // Attempt to deserialize the response content to ProblemDetailsDto if the request fails.
             try
             {
                 problemDetails = JsonSerializer.Deserialize<ProblemDetailsDto>(content, _jsonOptions);
             }
-            catch { /* if we can't deserialize to ProblemDetails, we'll just use the status code */ }
+            catch { /* If we can't deserialize to ProblemDetails, we'll just use the status code. */ }
             throw new ApiException(problemDetails, response.StatusCode, request.RequestUri?.AbsolutePath);
         }
     }

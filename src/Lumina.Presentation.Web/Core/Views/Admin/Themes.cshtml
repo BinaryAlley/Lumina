@@ -10,7 +10,7 @@
 @{
     var themes = ViewData["themes"] as IReadOnlyList<ThemeInfoDto>;
     var currentThemeId = ViewData["currentThemeId"] as string;
-    // generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler
+    // Generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler.
     var scriptId = ScriptIdentifierHelper.GenerateScriptId();
     int bundledThemeCount = 0;
     if (themes is not null)
@@ -147,25 +147,26 @@
 @section Scripts {
     <!-- The "text/plain" type is a design choice, not a mistake: it keeps the browser from executing this view script during HTML parsing, before site.js defines the API helpers it calls (callApiGetAsync, callApiPostAsync, ...). site.js (which loads deferred) executes these scripts once it is loaded, both on the initial page load and during AJAX navigation. -->
     <script type="text/plain" data-form="@scriptId">
-        // create cleanup registry for this view
+        // Create cleanup registry for this view.
         const cleanupFunctions = [];
         let isInitialized = false;
 
+        // The element references are captured once, so that the cleanup can unbind their listeners even after the AJAX navigator has swapped the content out of the document.
         const uploadButton = document.getElementById('btn-upload-theme');
         const uploadInput = document.getElementById('theme-upload-input');
         const installUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Themes.INSTALL_THEME)';
 
-        // reloads the page after a theme mutation, so the new theme state and the themed shell are re-rendered
+        // Reloads the page after a theme mutation, so the new theme state and the themed shell are re-rendered.
         function reloadPage() {
             window.location.reload();
         }
 
-        // refreshes the current page content without reloading the page, so the media player keeps playing
+        // Refreshes the current page content without reloading the page, so the media player keeps playing.
         function refreshPageContent() {
             updateContentAsync(window.location.href, false);
         }
 
-        // activates the theme of the clicked row
+        // Activates the theme of the clicked row.
         async function handleActivateClick(event) {
             const button = event.target.closest('.activate-theme-button');
             if (!button)
@@ -174,7 +175,7 @@
             reloadPage();
         }
 
-        // deletes the theme of the clicked row after confirmation
+        // Deletes the theme of the clicked row after confirmation.
         async function handleDeleteClick(event) {
             const button = event.target.closest('.delete-theme-button');
             if (!button)
@@ -185,31 +186,31 @@
             }
         }
 
-        // restores the soft deleted bundled theme of the clicked row
+        // Restores the soft deleted bundled theme of the clicked row.
         async function handleRestoreClick(event) {
             const button = event.target.closest('.restore-theme-button');
             if (!button)
                 return;
-            // an empty JSON body is sent so the antiforgery-protected POST request binds the route theme id without a JsonException
+            // An empty JSON body is sent so the antiforgery-protected POST request binds the route theme id without a JsonException.
             await callApiPostAsync(button.dataset.url, {});
             refreshPageContent();
         }
 
-        // downloads the archive of the theme of the clicked row
+        // Downloads the archive of the theme of the clicked row.
         function handleDownloadClick(event) {
             const button = event.target.closest('.download-theme-button');
             if (button)
                 window.location.href = button.dataset.url;
         }
 
-        // opens the image viewer with the preview of the clicked theme
+        // Opens the image viewer with the preview of the clicked theme.
         function handlePreviewClick(event) {
             const button = event.target.closest('.theme-preview-button');
             if (button)
                 imageViewer.open([{ src: button.dataset.previewUrl, title: button.dataset.previewTitle }]);
         }
 
-        // falls back to the placeholder image when the preview of a theme is missing or fails to load
+        // Falls back to the placeholder image when the preview of a theme is missing or fails to load.
         function attachPreviewErrorFallbacks() {
             const placeholderUrl = '@Url.Content("~/admin/theme-placeholder.svg")';
             document.querySelectorAll('.theme-preview-thumb').forEach(img => {
@@ -221,7 +222,7 @@
         }
         attachPreviewErrorFallbacks();
 
-        // uploads the selected theme archive as a multipart request, keeping the antiforgery token
+        // Uploads the selected theme archive as a multipart request, keeping the antiforgery token.
         async function handleUploadInputChange() {
             const file = uploadInput.files[0];
             if (!file)
@@ -240,12 +241,12 @@
                 notificationService.show('@_localizer["UploadFailed"]', NotificationType.ERROR);
         }
 
-        // opens the file picker when the upload button is clicked
+        // Opens the file picker when the upload button is clicked.
         function handleUploadButtonClick() {
             uploadInput.click();
         }
 
-        // add listeners
+        // Add listeners.
         uploadButton.addEventListener('click', handleUploadButtonClick);
         uploadInput.addEventListener('change', handleUploadInputChange);
         document.addEventListener('click', handleActivateClick);
@@ -254,7 +255,7 @@
         document.addEventListener('click', handleRestoreClick);
         document.addEventListener('click', handlePreviewClick);
 
-        // register cleanup for these listeners
+        // Register cleanup for these listeners.
         cleanupFunctions.push(() => {
             uploadButton.removeEventListener('click', handleUploadButtonClick);
             uploadInput.removeEventListener('change', handleUploadInputChange);
@@ -265,7 +266,7 @@
             document.removeEventListener('click', handlePreviewClick);
         });
 
-        // store all cleanups for this view on window object using the scriptId
+        // Store all cleanups for this view on window object using the scriptId.
         window.viewCleanups = window.viewCleanups || {};
         window.viewCleanups['@scriptId'] = () => {
             cleanupFunctions.forEach(cleanup => cleanup());

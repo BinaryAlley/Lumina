@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AddContributor" xml:space="preserve">
+    <value>添加贡献者</value>
+  </data>
+  <data name="AddRating" xml:space="preserve">
+    <value>添加评分</value>
+  </data>
+  <data name="AddRow" xml:space="preserve">
+    <value>添加</value>
+  </data>
+  <data name="AppleBooksIdDescription" xml:space="preserve">
+    <value>图书在 Apple Books 上的标识。</value>
+  </data>
+  <data name="ASINDescription" xml:space="preserve">
+    <value>图书的亚马逊标准识别号。</value>
+  </data>
+  <data name="Audiobook" xml:space="preserve">
+    <value>有声书</value>
+  </data>
+  <data name="Author" xml:space="preserve">
+    <value>作者</value>
+  </data>
+  <data name="BackToLibrary" xml:space="preserve">
+    <value>返回图书馆</value>
+  </data>
+  <data name="BarnesAndNobleIdDescription" xml:space="preserve">
+    <value>图书在 Barnes &amp; Noble 上的标识。</value>
+  </data>
+  <data name="BoardBook" xml:space="preserve">
+    <value>纸板书</value>
+  </data>
+  <data name="BookDetails" xml:space="preserve">
+    <value>图书详情</value>
+  </data>
+  <data name="BookSaved" xml:space="preserve">
+    <value>图书已保存。</value>
+  </data>
+  <data name="ChangeCover" xml:space="preserve">
+    <value>更换封面</value>
+  </data>
+  <data name="ContributorName" xml:space="preserve">
+    <value>姓名</value>
+  </data>
+  <data name="ContributorsDescription" xml:space="preserve">
+    <value>为图书作出贡献的人，例如其作者。</value>
+  </data>
+  <data name="CoverImage" xml:space="preserve">
+    <value>封面图片</value>
+  </data>
+  <data name="CoverSaved" xml:space="preserve">
+    <value>封面图片已更新。</value>
+  </data>
+  <data name="CoverUploadFailed" xml:space="preserve">
+    <value>无法上传封面图片。</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>简介</value>
+  </data>
+  <data name="DescriptionDescription" xml:space="preserve">
+    <value>图书的简短摘要或简介。</value>
+  </data>
+  <data name="eBook" xml:space="preserve">
+    <value>电子书</value>
+  </data>
+  <data name="Edition" xml:space="preserve">
+    <value>版本</value>
+  </data>
+  <data name="EditionDescription" xml:space="preserve">
+    <value>图书的版本。</value>
+  </data>
+  <data name="Format" xml:space="preserve">
+    <value>格式</value>
+  </data>
+  <data name="FormatDescription" xml:space="preserve">
+    <value>图书的实体或数字格式。</value>
+  </data>
+  <data name="GeneralInformation" xml:space="preserve">
+    <value>常规信息</value>
+  </data>
+  <data name="Genres" xml:space="preserve">
+    <value>体裁</value>
+  </data>
+  <data name="GenresDescription" xml:space="preserve">
+    <value>图书的体裁，以逗号分隔。</value>
+  </data>
+  <data name="GoodreadsIdDescription" xml:space="preserve">
+    <value>图书在 Goodreads 上的数字标识。</value>
+  </data>
+  <data name="GoogleBooksIdDescription" xml:space="preserve">
+    <value>图书在 Google Books 上的标识。</value>
+  </data>
+  <data name="Hardcover" xml:space="preserve">
+    <value>精装本</value>
+  </data>
+  <data name="Identifiers" xml:space="preserve">
+    <value>标识符</value>
+  </data>
+  <data name="Illustrator" xml:space="preserve">
+    <value>插画师</value>
+  </data>
+  <data name="IsbnFormat" xml:space="preserve">
+    <value>ISBN 格式</value>
+  </data>
+  <data name="ISBNsDescription" xml:space="preserve">
+    <value>图书的国际标准书号（ISBN）。</value>
+  </data>
+  <data name="IsbnValue" xml:space="preserve">
+    <value>ISBN 值</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>语言</value>
+  </data>
+  <data name="LanguageCode" xml:space="preserve">
+    <value>语言代码</value>
+  </data>
+  <data name="LanguageCodeDescription" xml:space="preserve">
+    <value>图书语言的两位代码。</value>
+  </data>
+  <data name="LanguageName" xml:space="preserve">
+    <value>语言名称</value>
+  </data>
+  <data name="LanguageNameDescription" xml:space="preserve">
+    <value>图书语言的名称。</value>
+  </data>
+  <data name="LargePrint" xml:space="preserve">
+    <value>大字版</value>
+  </data>
+  <data name="LCCNDescription" xml:space="preserve">
+    <value>图书的美国国会图书馆控制号。</value>
+  </data>
+  <data name="LeatherBound" xml:space="preserve">
+    <value>皮面装订</value>
+  </data>
+  <data name="LibraryBinding" xml:space="preserve">
+    <value>图书馆装订</value>
+  </data>
+  <data name="LibraryThingIdDescription" xml:space="preserve">
+    <value>图书在 LibraryThing 上的标识。</value>
+  </data>
+  <data name="MassMarketPaperback" xml:space="preserve">
+    <value>大众平装本</value>
+  </data>
+  <data name="Narrator" xml:space="preserve">
+    <value>叙述者</value>
+  </data>
+  <data name="NativeName" xml:space="preserve">
+    <value>本地语名称</value>
+  </data>
+  <data name="NativeNameDescription" xml:space="preserve">
+    <value>图书语言的本地语名称。</value>
+  </data>
+  <data name="NoCover" xml:space="preserve">
+    <value>无封面</value>
+  </data>
+  <data name="OCLCNumber" xml:space="preserve">
+    <value>OCLC 编号</value>
+  </data>
+  <data name="OCLCNumberDescription" xml:space="preserve">
+    <value>图书的 OCLC 编号。</value>
+  </data>
+  <data name="OpenLibraryIdDescription" xml:space="preserve">
+    <value>图书在 Open Library 上的标识。</value>
+  </data>
+  <data name="OriginalLanguage" xml:space="preserve">
+    <value>原语言</value>
+  </data>
+  <data name="OriginalLanguageCode" xml:space="preserve">
+    <value>原语言代码</value>
+  </data>
+  <data name="OriginalLanguageCodeDescription" xml:space="preserve">
+    <value>图书原语言的两位代码。</value>
+  </data>
+  <data name="OriginalLanguageName" xml:space="preserve">
+    <value>原语言名称</value>
+  </data>
+  <data name="OriginalLanguageNameDescription" xml:space="preserve">
+    <value>图书原语言的名称。</value>
+  </data>
+  <data name="OriginalLanguageNativeName" xml:space="preserve">
+    <value>原语言本地语名称</value>
+  </data>
+  <data name="OriginalLanguageNativeNameDescription" xml:space="preserve">
+    <value>图书原语言的本地语名称。</value>
+  </data>
+  <data name="OriginalReleaseDate" xml:space="preserve">
+    <value>首次发行日期</value>
+  </data>
+  <data name="OriginalReleaseDateDescription" xml:space="preserve">
+    <value>图书首次发行的日期。</value>
+  </data>
+  <data name="OriginalReleaseYear" xml:space="preserve">
+    <value>首次发行年份</value>
+  </data>
+  <data name="OriginalReleaseYearDescription" xml:space="preserve">
+    <value>图书首次发行的年份。</value>
+  </data>
+  <data name="OriginalTitle" xml:space="preserve">
+    <value>原标题</value>
+  </data>
+  <data name="OriginalTitleDescription" xml:space="preserve">
+    <value>图书的原标题，如果与当前标题不同。</value>
+  </data>
+  <data name="OtherRole" xml:space="preserve">
+    <value>其他</value>
+  </data>
+  <data name="PageCount" xml:space="preserve">
+    <value>页数</value>
+  </data>
+  <data name="PageCountDescription" xml:space="preserve">
+    <value>图书的页数。</value>
+  </data>
+  <data name="Paperback" xml:space="preserve">
+    <value>平装本</value>
+  </data>
+  <data name="PopupBook" xml:space="preserve">
+    <value>立体书</value>
+  </data>
+  <data name="Publisher" xml:space="preserve">
+    <value>出版社</value>
+  </data>
+  <data name="PublisherDescription" xml:space="preserve">
+    <value>图书的出版社。</value>
+  </data>
+  <data name="PublisherRole" xml:space="preserve">
+    <value>出版者</value>
+  </data>
+  <data name="RatingMaxValue" xml:space="preserve">
+    <value>最高评分</value>
+  </data>
+  <data name="Ratings" xml:space="preserve">
+    <value>评分</value>
+  </data>
+  <data name="RatingsDescription" xml:space="preserve">
+    <value>不同来源对图书的评分。</value>
+  </data>
+  <data name="RatingSource" xml:space="preserve">
+    <value>来源</value>
+  </data>
+  <data name="RatingValue" xml:space="preserve">
+    <value>评分</value>
+  </data>
+  <data name="RatingVoteCount" xml:space="preserve">
+    <value>票数</value>
+  </data>
+  <data name="ReleaseCountry" xml:space="preserve">
+    <value>发行国家</value>
+  </data>
+  <data name="ReleaseCountryDescription" xml:space="preserve">
+    <value>发行国家的两位代码。</value>
+  </data>
+  <data name="ReleaseInformation" xml:space="preserve">
+    <value>发行信息</value>
+  </data>
+  <data name="ReleaseVersion" xml:space="preserve">
+    <value>发行版本</value>
+  </data>
+  <data name="ReleaseVersionDescription" xml:space="preserve">
+    <value>发行版本，例如原版。</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>移除</value>
+  </data>
+  <data name="ReReleaseDate" xml:space="preserve">
+    <value>再发行日期</value>
+  </data>
+  <data name="ReReleaseDateDescription" xml:space="preserve">
+    <value>图书再次发行的日期。</value>
+  </data>
+  <data name="ReReleaseYear" xml:space="preserve">
+    <value>再发行年份</value>
+  </data>
+  <data name="ReReleaseYearDescription" xml:space="preserve">
+    <value>图书再次发行的年份。</value>
+  </data>
+  <data name="RoleCategory" xml:space="preserve">
+    <value>角色类别</value>
+  </data>
+  <data name="RoleName" xml:space="preserve">
+    <value>角色</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="SaveFailed" xml:space="preserve">
+    <value>无法保存图书。</value>
+  </data>
+  <data name="SpiralBound" xml:space="preserve">
+    <value>螺旋装订</value>
+  </data>
+  <data name="Tags" xml:space="preserve">
+    <value>标签</value>
+  </data>
+  <data name="TagsDescription" xml:space="preserve">
+    <value>图书的标签，以逗号分隔。</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>标题</value>
+  </data>
+  <data name="TitleDescription" xml:space="preserve">
+    <value>图书的主标题。</value>
+  </data>
+  <data name="TradePaperback" xml:space="preserve">
+    <value>贸易平装本</value>
+  </data>
+  <data name="Translator" xml:space="preserve">
+    <value>译者</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>用户</value>
+  </data>
+  <data name="VolumeNumber" xml:space="preserve">
+    <value>卷号</value>
+  </data>
+  <data name="VolumeNumberDescription" xml:space="preserve">
+    <value>图书在其系列中的卷号。</value>
+  </data>
+  <data name="Isbn13" xml:space="preserve">
+    <value>ISBN-13</value>
+  </data>
+  <data name="LCCN" xml:space="preserve">
+    <value>LCCN</value>
+  </data>
+  <data name="Calibre" xml:space="preserve">
+    <value>Calibre</value>
+  </data>
+  <data name="AppleBooksId" xml:space="preserve">
+    <value>Apple Books ID</value>
+  </data>
+  <data name="OpenLibrary" xml:space="preserve">
+    <value>Open Library</value>
+  </data>
+  <data name="GoogleBooks" xml:space="preserve">
+    <value>Google Books</value>
+  </data>
+  <data name="ASIN" xml:space="preserve">
+    <value>ASIN</value>
+  </data>
+  <data name="Isbn10" xml:space="preserve">
+    <value>ISBN-10</value>
+  </data>
+  <data name="GoogleBooksId" xml:space="preserve">
+    <value>Google Books ID</value>
+  </data>
+  <data name="LibraryThingId" xml:space="preserve">
+    <value>LibraryThing ID</value>
+  </data>
+  <data name="Goodreads" xml:space="preserve">
+    <value>Goodreads</value>
+  </data>
+  <data name="Amazon" xml:space="preserve">
+    <value>Amazon</value>
+  </data>
+  <data name="BarnesAndNobleId" xml:space="preserve">
+    <value>Barnes &amp; Noble ID</value>
+  </data>
+  <data name="OpenLibraryId" xml:space="preserve">
+    <value>Open Library ID</value>
+  </data>
+  <data name="ISBNs" xml:space="preserve">
+    <value>ISBN</value>
+  </data>
+  <data name="Contributors" xml:space="preserve">
+    <value>贡献者</value>
+  </data>
+  <data name="GoodreadsId" xml:space="preserve">
+    <value>Goodreads ID</value>
+  </data>
+</root>

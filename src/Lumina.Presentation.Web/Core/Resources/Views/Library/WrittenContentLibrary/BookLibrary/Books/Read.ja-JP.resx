@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -146,5 +146,8 @@
   </data>
   <data name="ReaderDisabled" xml:space="preserve">
     <value>この本を開くブックリーダーは、このライブラリで無効になっています。ライブラリ設定で有効にすると本を読めます。</value>
+  </data>
+  <data name="BackToLibrary" xml:space="preserve">
+    <value>ライブラリに戻る</value>
   </data>
 </root>

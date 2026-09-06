@@ -99,7 +99,8 @@ public class InstallPluginEndpointSummary : Summary<InstallPluginEndpoint, Empty
                     {
                         "General.Validation", new[]
                         {
-                            "PluginArchiveCannotBeNull"
+                            "PluginArchiveCannotBeNull",
+                            "PluginFileNameCannotBeEmpty"
                         }
                     }
                 },

@@ -18,7 +18,7 @@
 
 <div class="cotton-candy reader-root">
     <div class="reader-toolbar form-row">
-        <button id="btn-back" type="button" class="abort-button">@_localizer["Back"]</button>
+        <button id="btn-back" type="button" class="abort-button">@_localizer["BackToLibrary"]</button>
         <button id="btn-toc-toggle" type="button" class="confirm-button">@_localizer["TableOfContents"]</button>
         <button id="btn-prev" type="button" class="abort-button">@_localizer["Previous"]</button>
         <button id="btn-next" type="button" class="confirm-button">@_localizer["Next"]</button>
@@ -54,6 +54,7 @@
             return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         }
 
+        // The element references are captured once, so that the cleanup can unbind their listeners even after the AJAX navigator has swapped the content out of the document.
         const readerTitle = document.getElementById('reader-title');
         const readerContent = document.getElementById('reader-content');
         const readerStatus = document.getElementById('reader-status');

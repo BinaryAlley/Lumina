@@ -87,6 +87,7 @@ public class BooksIndexViewEndpoint : BaseEndpoint<GetBooksViewRequest, IResult>
                 ["itemsUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Books.GET_LIBRARY_ITEMS) ?? string.Empty,
                 ["settingsUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Settings.GET_USER_SETTINGS) ?? string.Empty,
                 ["readUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Books.READ, new { bookId = default(Guid) }) ?? string.Empty,
+                ["detailsUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Books.EDIT_BOOK, new { id = default(Guid) }) ?? string.Empty,
                 ["availabilityUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Books.GET_READING_AVAILABILITY, new { bookId = default(Guid) }) ?? string.Empty,
                 ["strings"] = ThemePageDataFactory.CreateLocalizedStrings(_localizer)
             }

@@ -16,8 +16,8 @@
 
 @model UserSettingsDto
 
-<div style="display: grid; grid-template-rows: auto 1fr;"><!--Container with two rows, one fixed, one filling remaining space.-->
-    <div style="min-height: 1rem;"></div><!--The first row is a dummy row for "margin", because setting a margin on the next row would offset the parent's position.-->
+<div style="display: grid; grid-template-rows: auto 1fr;"><!-- Container with two rows, one fixed, one filling remaining space. -->
+    <div style="min-height: 1rem;"></div><!-- The first row is a dummy row for "margin", because setting a margin on the next row would offset the parent's position. -->
     <div class="enlightenment-panel shadow-effect mx-auto panel w-50 mb-10" style="min-width: 320px;">
         <div class="shine-effect"></div>
         <form method="post" id="user-settings-form" class="inline">
@@ -52,7 +52,7 @@
                     </div>
                     <small class="form-label text-disabled form-description">@_localizer["DescriptionItemsPerPage"]</small>
                 </div>
-                <!-- Alpha picker -->
+                <!-- Alpha picker. -->
                 <div class="form-row">
                     <div class="form-label">
                         <label asp-for="ShouldIgnoreThePrefixForAlphaPicker">@_localizer["ShouldIgnoreThePrefixForAlphaPicker"]</label>:
@@ -118,6 +118,7 @@
         const cleanupFunctions = [];
         let isInitialized = false;
 
+        // The element references are captured once, so that the cleanup can unbind their listeners even after the AJAX navigator has swapped the content out of the document.
         const form = document.getElementById('user-settings-form');
         const checkboxIsPaginationEnabled = document.getElementById('IsPaginationEnabled');
         const inputItemsPerPage = document.getElementById('ItemsPerPage');

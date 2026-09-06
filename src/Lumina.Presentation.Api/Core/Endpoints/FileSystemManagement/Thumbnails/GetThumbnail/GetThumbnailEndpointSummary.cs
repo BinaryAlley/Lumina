@@ -88,7 +88,7 @@ public class GetThumbnailEndpointSummary : Summary<GetThumbnailEndpoint, GetThum
                         "General.Validation", new[]
                         {
                             "PathCannotBeEmpty",
-                            "ImageQaulityMustBeBetweenZeroAndOneHundred"
+                            "ImageQualityMustBeBetweenZeroAndOneHundred"
                         }
                     }
                 },
