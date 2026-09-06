@@ -74,8 +74,8 @@ public class WrittenContentMetadataDtoFixture
             includeOriginalTitle ? (originalTitle ?? _faker.Commerce.ProductName()) : null,
             includeDescription ? (description ?? _faker.Lorem.Paragraph()) : null,
             includeReleaseInfo ? (releaseInfo ?? CreateReleaseInfo()) : null,
-            includeGenres ? (genres ?? [_genreDtoFixture.Create(), _genreDtoFixture.Create()]) : null,
-            includeTags ? (tags ?? [_tagDtoFixture.Create(), _tagDtoFixture.Create()]) : null,
+            includeGenres ? (genres ?? CreateDistinctGenres()) : null,
+            includeTags ? (tags ?? CreateDistinctTags()) : null,
             includeLanguage ? (language ?? _languageInfoDtoFixture.Create()) : null,
             includeOriginalLanguage ? (originalLanguage ?? _languageInfoDtoFixture.Create()) : null,
             includePublisher ? (publisher ?? _faker.Company.CompanyName()) : null,
@@ -107,5 +107,37 @@ public class WrittenContentMetadataDtoFixture
             reReleaseYear,
             _faker.Address.CountryCode(),
             _faker.Random.String2(_faker.Random.Number(1, 50)));
+    }
+
+    /// <summary>
+    /// Creates two genres with distinct names, so that the storage deduplication never collapses them into one.
+    /// </summary>
+    /// <returns>The created genres.</returns>
+    private List<GenreDto> CreateDistinctGenres()
+    {
+        List<GenreDto> genres = [];
+        while (genres.Count < 2)
+        {
+            GenreDto genre = _genreDtoFixture.Create();
+            if (genres.All(existing => existing.Name != genre.Name))
+                genres.Add(genre);
+        }
+        return genres;
+    }
+
+    /// <summary>
+    /// Creates two tags with distinct names, so that the storage deduplication never collapses them into one.
+    /// </summary>
+    /// <returns>The created tags.</returns>
+    private List<TagDto> CreateDistinctTags()
+    {
+        List<TagDto> tags = [];
+        while (tags.Count < 2)
+        {
+            TagDto tag = _tagDtoFixture.Create();
+            if (tags.All(existing => existing.Name != tag.Name))
+                tags.Add(tag);
+        }
+        return tags;
     }
 }
