@@ -3,6 +3,7 @@ using Bogus;
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Fixtures.Common.Setup;using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -52,7 +53,7 @@ public class BookEntityFixture
             .RuleFor(x => x.OriginalReleaseYear, releaseYear)
             .RuleFor(x => x.ReReleaseDate, _faker.DateOnlyBetween(new DateOnly(reReleaseYear, 1, 1), new DateOnly(reReleaseYear, 12, 31)))
             .RuleFor(x => x.ReReleaseYear, reReleaseYear)
-            .RuleFor(x => x.ReleaseCountry, f => f.Random.String2(2))
+            .RuleFor(x => x.ReleaseCountry, f => f.PickRandom<ReleaseCountry>())
             .RuleFor(x => x.ReleaseVersion, f => f.Random.String2(f.Random.Number(1, 50)))
             .RuleFor(x => x.LanguageCode, f => f.Random.String2(2))
             .RuleFor(x => x.LanguageName, f => f.Random.String2(f.Random.Number(1, 50)))

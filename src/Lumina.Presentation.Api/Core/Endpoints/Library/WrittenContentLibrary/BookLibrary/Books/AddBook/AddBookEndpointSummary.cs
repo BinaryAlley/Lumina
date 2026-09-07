@@ -6,6 +6,7 @@ using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using System;
 using System.Collections.Generic;
@@ -40,7 +41,7 @@ public class AddBookEndpointSummary : Summary<AddBookEndpoint, AddBookRequest>
                     OriginalReleaseYear: 1954,
                     ReReleaseDate: DateOnly.ParseExact("2001-09-06", "yyyy-MM-dd", null),
                     ReReleaseYear: 2001,
-                    ReleaseCountry: "uk",
+                    ReleaseCountry: ReleaseCountry.GB,
                     ReleaseVersion: "50th Anniversary Edition"
                 ),
                 Genres: new List<GenreDto>() {
@@ -237,7 +238,7 @@ public class AddBookEndpointSummary : Summary<AddBookEndpoint, AddBookRequest>
                         OriginalReleaseYear: 1954,
                         ReReleaseDate: DateOnly.ParseExact("2001-09-06", "yyyy-MM-dd", null),
                         ReReleaseYear: 2001,
-                        ReleaseCountry: "uk",
+                        ReleaseCountry: ReleaseCountry.GB,
                         ReleaseVersion: "50th Anniversary Edition"
                     ),
                     Genres:

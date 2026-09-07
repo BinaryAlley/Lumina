@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -38,7 +39,7 @@ public class ReleaseInfo : ValueObject
     /// <summary>
     /// Gets the optional country or region of release.
     /// </summary>
-    public Optional<string> ReleaseCountry { get; }
+    public Optional<ReleaseCountry> ReleaseCountry { get; }
 
     /// <summary>
     /// Gets the optional release version or edition. (e.g. "Original", "Director's Cut", "2.0")
@@ -59,7 +60,7 @@ public class ReleaseInfo : ValueObject
         Optional<int> originalReleaseYear,
         Optional<DateOnly> reReleaseDate,
         Optional<int> reReleaseYear,
-        Optional<string> releaseCountry,
+        Optional<ReleaseCountry> releaseCountry,
         Optional<string> releaseVersion)
     {
         OriginalReleaseDate = originalReleaseDate;
@@ -87,7 +88,7 @@ public class ReleaseInfo : ValueObject
         Optional<int> originalReleaseYear,
         Optional<DateOnly> reReleaseDate,
         Optional<int> reReleaseYear,
-        Optional<string> releaseCountry,
+        Optional<ReleaseCountry> releaseCountry,
         Optional<string> releaseVersion)
     {
         if (originalReleaseDate.HasValue && originalReleaseYear.HasValue && originalReleaseDate.Value.Year != originalReleaseYear.Value)

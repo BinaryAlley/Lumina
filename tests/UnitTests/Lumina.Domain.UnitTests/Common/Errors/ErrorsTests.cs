@@ -86,7 +86,7 @@ public class ErrorsTests
     {
         // Assert
         // The count assertion fails when an error is added or removed, reminding to update the assertions below.
-        Assert.Equal(31, typeof(DomainErrors.Metadata).GetProperties().Length);
+        Assert.Equal(32, typeof(DomainErrors.Metadata).GetProperties().Length);
         AssertError(DomainErrors.Metadata.MetadataCannotBeNull, ErrorType.Validation);
         AssertError(DomainErrors.Metadata.TitleCannotBeEmpty, ErrorType.Validation);
         AssertError(DomainErrors.Metadata.TitleMustBeMaximum255CharactersLong, ErrorType.Validation);
@@ -98,6 +98,7 @@ public class ErrorsTests
         AssertError(DomainErrors.Metadata.TagsListCannotBeNull, ErrorType.Validation);
         AssertError(DomainErrors.Metadata.TagNameCannotBeEmpty, ErrorType.Validation);
         AssertError(DomainErrors.Metadata.TagNameMustBeMaximum50CharactersLong, ErrorType.Validation);
+        AssertError(DomainErrors.Metadata.MoodNameCannotBeEmpty, ErrorType.Validation);
         AssertError(DomainErrors.Metadata.LanguageCodeCannotBeEmpty, ErrorType.Validation);
         AssertError(DomainErrors.Metadata.LanguageNameCannotBeEmpty, ErrorType.Validation);
         AssertError(DomainErrors.Metadata.LanguageCodeMustBe2CharactersLong, ErrorType.Validation);

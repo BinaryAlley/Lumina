@@ -4,6 +4,7 @@ using Lumina.Domain.Core.BoundedContexts.MediaContributorBoundedContext.MediaCon
 using Lumina.Domain.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate.ValueObjects;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -31,7 +32,7 @@ public class MediaContributorTests
         Optional<DateOnly> dateOfDeath = Optional<DateOnly>.None();
 
         // Act
-        Result<MediaContributor> result = MediaContributor.Create(id, name, biography, dateOfBirth, dateOfDeath);
+        Result<MediaContributor> result = MediaContributor.Create(id, MediaContributorType.Person, name, biography, dateOfBirth, dateOfDeath);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -51,7 +52,7 @@ public class MediaContributorTests
         MediaContributorName name = _mediaContributorNameFixture.Create(displayName: "Jane Doe", legalName: Optional<string>.None());
 
         // Act
-        Result<MediaContributor> result = MediaContributor.Create(_mediaContributorIdFixture.Create(), name, Optional<string>.None(), Optional<DateOnly>.None(), Optional<DateOnly>.None());
+        Result<MediaContributor> result = MediaContributor.Create(_mediaContributorIdFixture.Create(), MediaContributorType.Person, name, Optional<string>.None(), Optional<DateOnly>.None(), Optional<DateOnly>.None());
 
         // Assert
         Assert.False(result.IsFailure);
@@ -67,7 +68,7 @@ public class MediaContributorTests
         MediaContributorName name = _mediaContributorNameFixture.Create(displayName: "Jane Doe", legalName: Optional<string>.None());
 
         // Act
-        Result<MediaContributor> result = MediaContributor.Create(name);
+        Result<MediaContributor> result = MediaContributor.Create(MediaContributorType.Person, name);
 
         // Assert
         Assert.False(result.IsFailure);

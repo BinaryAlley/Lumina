@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.DTO.Common;
+using Lumina.Presentation.Web.Common.Enums.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -67,7 +68,7 @@ public class BookDto
     /// <summary>
     /// Gets the optional country or region of release.
     /// </summary>
-    public string? ReleaseCountry { get; init; }
+    public ReleaseCountry? ReleaseCountry { get; init; }
 
     /// <summary>
     /// Gets the optional release version or edition. (e.g. "Original", "Director's Cut", "2.0")

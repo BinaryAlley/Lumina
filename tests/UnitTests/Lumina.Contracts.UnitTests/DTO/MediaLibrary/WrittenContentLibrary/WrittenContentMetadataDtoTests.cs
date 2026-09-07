@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -28,7 +29,7 @@ public class WrittenContentMetadataDtoTests
             "Dune",
             "Dune",
             "A science fiction novel.",
-            new ReleaseInfoDto(new DateOnly(1965, 8, 1), 1965, null, null, "US", null),
+            new ReleaseInfoDto(new DateOnly(1965, 8, 1), 1965, null, null, ReleaseCountry.US, null),
             [new GenreDto("Science Fiction")],
             [new TagDto("classic")],
             new LanguageInfoDto("en", "English", "English"),

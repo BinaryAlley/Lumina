@@ -1,4 +1,4 @@
-#region ========================================================================= USING =====================================================================================
+﻿#region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaContributors;
@@ -8,6 +8,7 @@ using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.B
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -82,7 +83,7 @@ public class UpdateBookEndpointSummary : Summary<UpdateBookEndpoint, UpdateBookR
                     OriginalReleaseYear: 1954,
                     ReReleaseDate: DateOnly.ParseExact("2001-09-06", "yyyy-MM-dd", null),
                     ReReleaseYear: 2001,
-                    ReleaseCountry: "uk",
+                    ReleaseCountry: ReleaseCountry.GB,
                     ReleaseVersion: "50th Anniversary Edition"
                 ),
                 Genres:
@@ -240,7 +241,7 @@ public class UpdateBookEndpointSummary : Summary<UpdateBookEndpoint, UpdateBookR
                         OriginalReleaseYear: 1954,
                         ReReleaseDate: DateOnly.ParseExact("2001-09-06", "yyyy-MM-dd", null),
                         ReReleaseYear: 2001,
-                        ReleaseCountry: "uk",
+                        ReleaseCountry: ReleaseCountry.GB,
                         ReleaseVersion: "50th Anniversary Edition"
                     ),
                     Genres:

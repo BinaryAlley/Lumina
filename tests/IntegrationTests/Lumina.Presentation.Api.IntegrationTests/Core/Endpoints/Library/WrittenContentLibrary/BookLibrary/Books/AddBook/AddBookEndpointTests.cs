@@ -12,6 +12,7 @@ using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Presentation.Api.IntegrationTests.Common.Converters;
@@ -114,7 +115,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
         Assert.Equal(bookRequest.Metadata.ReleaseInfo.OriginalReleaseYear, bookResponse.Metadata.ReleaseInfo.OriginalReleaseYear.Value);
         Assert.Equal(bookRequest.Metadata.ReleaseInfo.ReReleaseDate, bookResponse.Metadata.ReleaseInfo.ReReleaseDate.Value);
         Assert.Equal(bookRequest.Metadata.ReleaseInfo.ReReleaseYear, bookResponse.Metadata.ReleaseInfo.ReReleaseYear.Value);
-        Assert.Equal(bookRequest.Metadata.ReleaseInfo.ReleaseCountry, bookResponse.Metadata.ReleaseInfo.ReleaseCountry.Value);
+        Assert.Equal(bookRequest.Metadata.ReleaseInfo!.ReleaseCountry, bookResponse.Metadata.ReleaseInfo.ReleaseCountry.Value);
         Assert.Equal(bookRequest.Metadata.ReleaseInfo.ReleaseVersion, bookResponse.Metadata.ReleaseInfo.ReleaseVersion.Value);
 
         // language checks
@@ -332,19 +333,6 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
 
         // Act & Assert
         await AssertCreated(bookRequest);
-    }
-
-    [Fact]
-    public async Task AddBook_WhenCalledWithInvalidValueReleaseCountry_ShouldReturnUnprocessableEntity()
-    {
-        // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(releaseCountry: "test")));
-
-        // Act
-        HttpResponseMessage response = await PostBookAsync(bookRequest);
-
-        // Assert
-        await AssertUnprocessableEntityWithValidationErrors(response, Errors.Metadata.CountryCodeMustBe2CharactersLong.Description);
     }
 
     [Fact]

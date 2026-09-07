@@ -1,8 +1,9 @@
-#region ========================================================================= USING =====================================================================================
+﻿#region ========================================================================= USING =====================================================================================
 using Bogus;
 using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.Fixtures.Core.DTO.Common;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -22,6 +23,7 @@ public class WrittenContentMetadataDtoFixture
     private readonly GenreDtoFixture _genreDtoFixture = new();
     private readonly TagDtoFixture _tagDtoFixture = new();
     private readonly LanguageInfoDtoFixture _languageInfoDtoFixture = new();
+    private readonly ReleaseInfoDtoFixture _releaseInfoDtoFixture = new();
 
     /// <summary>
     /// Creates a random valid <see cref="WrittenContentMetadataDto"/>.
@@ -100,13 +102,13 @@ public class WrittenContentMetadataDtoFixture
     {
         int originalReleaseYear = _random.Next(1900, 2026);
         int reReleaseYear = _random.Next(originalReleaseYear, 2026);
-        return new ReleaseInfoDto(
-            new DateOnly(originalReleaseYear, 1, 1),
-            originalReleaseYear,
-            new DateOnly(reReleaseYear, 1, 1),
-            reReleaseYear,
-            _faker.Address.CountryCode(),
-            _faker.Random.String2(_faker.Random.Number(1, 50)));
+        return _releaseInfoDtoFixture.Create(
+            originalReleaseDate: new DateOnly(originalReleaseYear, 1, 1),
+            originalReleaseYear: originalReleaseYear,
+            reReleaseDate: new DateOnly(reReleaseYear, 1, 1),
+            reReleaseYear: reReleaseYear,
+            releaseCountry: _faker.PickRandom<ReleaseCountry>(),
+            releaseVersion: _faker.Random.String2(_faker.Random.Number(1, 50)));
     }
 
     /// <summary>

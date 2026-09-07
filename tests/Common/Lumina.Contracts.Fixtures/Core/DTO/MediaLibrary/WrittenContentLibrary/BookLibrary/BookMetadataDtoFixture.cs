@@ -1,10 +1,11 @@
-#region ========================================================================= USING =====================================================================================
+﻿#region ========================================================================= USING =====================================================================================
 using Bogus;
 using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Fixtures.Core.DTO.Common;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -97,7 +98,7 @@ public class BookMetadataDtoFixture
             releaseInfo ?? (includeOptionalProperties ? _releaseInfoDtoFixture.Create(
                 originalReleaseDate: new DateOnly(releaseYear, 1, 1),
                 originalReleaseYear: releaseYear,
-                releaseCountry: _faker.Address.CountryCode()) : null),
+                releaseCountry: _faker.PickRandom<ReleaseCountry>()) : null),
             genres ?? (includeOptionalProperties ? [_genreDtoFixture.Create()] : null),
             tags ?? (includeOptionalProperties ? [_tagDtoFixture.Create()] : null),
             language ?? (includeOptionalProperties ? _languageInfoDtoFixture.Create() : null),

@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.DTO.Common;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -35,7 +36,7 @@ public class ReleaseInfoDtoFixture
         int? originalReleaseYear = null,
         DateOnly? reReleaseDate = null,
         int? reReleaseYear = null,
-        string? releaseCountry = null,
+        ReleaseCountry? releaseCountry = null,
         string? releaseVersion = null,
         bool includeOriginalReleaseDate = true,
         bool includeOriginalReleaseYear = true,

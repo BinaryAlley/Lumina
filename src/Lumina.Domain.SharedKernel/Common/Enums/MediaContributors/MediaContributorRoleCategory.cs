@@ -40,5 +40,60 @@ public enum MediaContributorRoleCategory
     /// <summary>
     /// The contributor narrated the media item.
     /// </summary>
-    Narrator
+    Narrator,
+
+    /// <summary>
+    /// The contributor is credited as the artist of the media item.
+    /// </summary>
+    Artist,
+
+    /// <summary>
+    /// The contributor performed the media item, whether singing or playing an instrument.
+    /// </summary>
+    Performer,
+
+    /// <summary>
+    /// The contributor wrote the music of the media item.
+    /// </summary>
+    Composer,
+
+    /// <summary>
+    /// The contributor wrote the lyrics of the media item.
+    /// </summary>
+    Lyricist,
+
+    /// <summary>
+    /// The contributor oversaw the production of the media item.
+    /// </summary>
+    Producer,
+
+    /// <summary>
+    /// The contributor operated the recording equipment during the production of the media item.
+    /// </summary>
+    Engineer,
+
+    /// <summary>
+    /// The contributor conducted the ensemble performing the media item.
+    /// </summary>
+    Conductor,
+
+    /// <summary>
+    /// The contributor arranged the music of the media item.
+    /// </summary>
+    Arranger,
+
+    /// <summary>
+    /// The contributor mixed the audio of the media item.
+    /// </summary>
+    Mixer,
+
+    /// <summary>
+    /// The contributor created a remix of the media item.
+    /// </summary>
+    Remixer,
+
+    /// <summary>
+    /// The contributor released the media item under a record label.
+    /// </summary>
+    RecordLabel
 }

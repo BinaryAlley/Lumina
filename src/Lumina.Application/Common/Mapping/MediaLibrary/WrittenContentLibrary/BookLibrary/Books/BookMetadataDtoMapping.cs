@@ -6,6 +6,7 @@ using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.Boo
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,7 +37,7 @@ public static class BookMetadataDtoMapping
             Optional<int>.FromNullable(metadata.ReleaseInfo.OriginalReleaseYear),
             Optional<DateOnly>.FromNullable(metadata.ReleaseInfo.ReReleaseDate),
             Optional<int>.FromNullable(metadata.ReleaseInfo.ReReleaseYear),
-            Optional<string>.FromNullable(metadata.ReleaseInfo.ReleaseCountry),
+            Optional<ReleaseCountry>.FromNullable(metadata.ReleaseInfo.ReleaseCountry),
             Optional<string>.FromNullable(metadata.ReleaseInfo.ReleaseVersion)
         );
         if (releaseInfoResult.IsFailure)

@@ -66,7 +66,7 @@ internal static class MetadataAggregator
             FirstOrDefaultValue(first?.OriginalReleaseYear, second?.OriginalReleaseYear),
             FirstOrDefaultValue(first?.ReReleaseDate, second?.ReReleaseDate),
             FirstOrDefaultValue(first?.ReReleaseYear, second?.ReReleaseYear),
-            FirstOrDefaultReference(first?.ReleaseCountry, second?.ReleaseCountry),
+            FirstOrDefaultValue(first?.ReleaseCountry, second?.ReleaseCountry),
             FirstOrDefaultReference(first?.ReleaseVersion, second?.ReleaseVersion));
     }
 

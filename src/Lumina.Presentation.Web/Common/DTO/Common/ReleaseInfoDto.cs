@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Presentation.Web.Common.Enums.Common;
 using System;
 using System.Diagnostics;
 #endregion
@@ -35,7 +36,7 @@ public class ReleaseInfoDto
     /// <summary>
     /// Gets the optional country or region of release.
     /// </summary>
-    public string? ReleaseCountry { get; set; }
+    public ReleaseCountry? ReleaseCountry { get; set; }
 
     /// <summary>
     /// Gets the optional release version or edition. (e.g. "Original", "Director's Cut", "2.0")

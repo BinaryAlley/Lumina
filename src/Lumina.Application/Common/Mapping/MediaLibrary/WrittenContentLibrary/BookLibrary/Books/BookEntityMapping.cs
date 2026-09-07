@@ -16,6 +16,7 @@ using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.Boo
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.ExternalIdentifiers.LibraryManagementBoundedContext.LibraryAggregate;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
@@ -63,7 +64,7 @@ public static class BookEntityMapping
                     Optional<int>.FromNullable(repositoryEntity.OriginalReleaseYear),
                     Optional<DateOnly>.FromNullable(repositoryEntity.ReReleaseDate),
                     Optional<int>.FromNullable(repositoryEntity.ReReleaseYear),
-                    Optional<string>.FromNullable(repositoryEntity.ReleaseCountry),
+                    Optional<ReleaseCountry>.FromNullable(repositoryEntity.ReleaseCountry),
                     Optional<string>.FromNullable(repositoryEntity.ReleaseVersion)
                 );
         if (releaseInfoResult.IsFailure)

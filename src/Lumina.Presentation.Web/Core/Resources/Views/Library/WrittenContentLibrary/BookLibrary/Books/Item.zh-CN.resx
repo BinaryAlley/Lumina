@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -377,5 +377,594 @@
   </data>
   <data name="GoodreadsId" xml:space="preserve">
     <value>Goodreads ID</value>
+  </data>
+
+  <data name="Country.AF" xml:space="preserve">
+    <value>阿富汗</value>
+  </data>
+  <data name="Country.AL" xml:space="preserve">
+    <value>阿尔巴尼亚</value>
+  </data>
+  <data name="Country.DZ" xml:space="preserve">
+    <value>阿尔及利亚</value>
+  </data>
+  <data name="Country.AD" xml:space="preserve">
+    <value>安道尔</value>
+  </data>
+  <data name="Country.AO" xml:space="preserve">
+    <value>安哥拉</value>
+  </data>
+  <data name="Country.AG" xml:space="preserve">
+    <value>安提瓜和巴布达</value>
+  </data>
+  <data name="Country.AR" xml:space="preserve">
+    <value>阿根廷</value>
+  </data>
+  <data name="Country.AM" xml:space="preserve">
+    <value>亚美尼亚</value>
+  </data>
+  <data name="Country.AU" xml:space="preserve">
+    <value>澳大利亚</value>
+  </data>
+  <data name="Country.AT" xml:space="preserve">
+    <value>奥地利</value>
+  </data>
+  <data name="Country.AZ" xml:space="preserve">
+    <value>阿塞拜疆</value>
+  </data>
+  <data name="Country.BS" xml:space="preserve">
+    <value>巴哈马</value>
+  </data>
+  <data name="Country.BH" xml:space="preserve">
+    <value>巴林</value>
+  </data>
+  <data name="Country.BD" xml:space="preserve">
+    <value>孟加拉国</value>
+  </data>
+  <data name="Country.BB" xml:space="preserve">
+    <value>巴巴多斯</value>
+  </data>
+  <data name="Country.BY" xml:space="preserve">
+    <value>白俄罗斯</value>
+  </data>
+  <data name="Country.BE" xml:space="preserve">
+    <value>比利时</value>
+  </data>
+  <data name="Country.BZ" xml:space="preserve">
+    <value>伯利兹</value>
+  </data>
+  <data name="Country.BJ" xml:space="preserve">
+    <value>贝宁</value>
+  </data>
+  <data name="Country.BT" xml:space="preserve">
+    <value>不丹</value>
+  </data>
+  <data name="Country.BO" xml:space="preserve">
+    <value>玻利维亚</value>
+  </data>
+  <data name="Country.BA" xml:space="preserve">
+    <value>波斯尼亚和黑塞哥维那</value>
+  </data>
+  <data name="Country.BW" xml:space="preserve">
+    <value>博茨瓦纳</value>
+  </data>
+  <data name="Country.BR" xml:space="preserve">
+    <value>巴西</value>
+  </data>
+  <data name="Country.BN" xml:space="preserve">
+    <value>文莱</value>
+  </data>
+  <data name="Country.BG" xml:space="preserve">
+    <value>保加利亚</value>
+  </data>
+  <data name="Country.BF" xml:space="preserve">
+    <value>布基纳法索</value>
+  </data>
+  <data name="Country.BI" xml:space="preserve">
+    <value>布隆迪</value>
+  </data>
+  <data name="Country.CV" xml:space="preserve">
+    <value>佛得角</value>
+  </data>
+  <data name="Country.KH" xml:space="preserve">
+    <value>柬埔寨</value>
+  </data>
+  <data name="Country.CM" xml:space="preserve">
+    <value>喀麦隆</value>
+  </data>
+  <data name="Country.CA" xml:space="preserve">
+    <value>加拿大</value>
+  </data>
+  <data name="Country.CF" xml:space="preserve">
+    <value>中非共和国</value>
+  </data>
+  <data name="Country.TD" xml:space="preserve">
+    <value>乍得</value>
+  </data>
+  <data name="Country.CL" xml:space="preserve">
+    <value>智利</value>
+  </data>
+  <data name="Country.CN" xml:space="preserve">
+    <value>中国</value>
+  </data>
+  <data name="Country.CO" xml:space="preserve">
+    <value>哥伦比亚</value>
+  </data>
+  <data name="Country.KM" xml:space="preserve">
+    <value>科摩罗</value>
+  </data>
+  <data name="Country.CG" xml:space="preserve">
+    <value>刚果（布）</value>
+  </data>
+  <data name="Country.CD" xml:space="preserve">
+    <value>刚果（金）</value>
+  </data>
+  <data name="Country.CR" xml:space="preserve">
+    <value>哥斯达黎加</value>
+  </data>
+  <data name="Country.CI" xml:space="preserve">
+    <value>科特迪瓦</value>
+  </data>
+  <data name="Country.HR" xml:space="preserve">
+    <value>克罗地亚</value>
+  </data>
+  <data name="Country.CU" xml:space="preserve">
+    <value>古巴</value>
+  </data>
+  <data name="Country.CY" xml:space="preserve">
+    <value>塞浦路斯</value>
+  </data>
+  <data name="Country.CZ" xml:space="preserve">
+    <value>捷克</value>
+  </data>
+  <data name="Country.DK" xml:space="preserve">
+    <value>丹麦</value>
+  </data>
+  <data name="Country.DJ" xml:space="preserve">
+    <value>吉布提</value>
+  </data>
+  <data name="Country.DM" xml:space="preserve">
+    <value>多米尼克</value>
+  </data>
+  <data name="Country.DO" xml:space="preserve">
+    <value>多米尼加共和国</value>
+  </data>
+  <data name="Country.EC" xml:space="preserve">
+    <value>厄瓜多尔</value>
+  </data>
+  <data name="Country.EG" xml:space="preserve">
+    <value>埃及</value>
+  </data>
+  <data name="Country.SV" xml:space="preserve">
+    <value>萨尔瓦多</value>
+  </data>
+  <data name="Country.GQ" xml:space="preserve">
+    <value>赤道几内亚</value>
+  </data>
+  <data name="Country.ER" xml:space="preserve">
+    <value>厄立特里亚</value>
+  </data>
+  <data name="Country.EE" xml:space="preserve">
+    <value>爱沙尼亚</value>
+  </data>
+  <data name="Country.SZ" xml:space="preserve">
+    <value>斯威士兰</value>
+  </data>
+  <data name="Country.ET" xml:space="preserve">
+    <value>埃塞俄比亚</value>
+  </data>
+  <data name="Country.FJ" xml:space="preserve">
+    <value>斐济</value>
+  </data>
+  <data name="Country.FI" xml:space="preserve">
+    <value>芬兰</value>
+  </data>
+  <data name="Country.FR" xml:space="preserve">
+    <value>法国</value>
+  </data>
+  <data name="Country.GA" xml:space="preserve">
+    <value>加蓬</value>
+  </data>
+  <data name="Country.GM" xml:space="preserve">
+    <value>冈比亚</value>
+  </data>
+  <data name="Country.GE" xml:space="preserve">
+    <value>格鲁吉亚</value>
+  </data>
+  <data name="Country.DE" xml:space="preserve">
+    <value>德国</value>
+  </data>
+  <data name="Country.GH" xml:space="preserve">
+    <value>加纳</value>
+  </data>
+  <data name="Country.GR" xml:space="preserve">
+    <value>希腊</value>
+  </data>
+  <data name="Country.GD" xml:space="preserve">
+    <value>格林纳达</value>
+  </data>
+  <data name="Country.GT" xml:space="preserve">
+    <value>危地马拉</value>
+  </data>
+  <data name="Country.GN" xml:space="preserve">
+    <value>几内亚</value>
+  </data>
+  <data name="Country.GW" xml:space="preserve">
+    <value>几内亚比绍</value>
+  </data>
+  <data name="Country.GY" xml:space="preserve">
+    <value>圭亚那</value>
+  </data>
+  <data name="Country.HT" xml:space="preserve">
+    <value>海地</value>
+  </data>
+  <data name="Country.HN" xml:space="preserve">
+    <value>洪都拉斯</value>
+  </data>
+  <data name="Country.HU" xml:space="preserve">
+    <value>匈牙利</value>
+  </data>
+  <data name="Country.IS" xml:space="preserve">
+    <value>冰岛</value>
+  </data>
+  <data name="Country.IN" xml:space="preserve">
+    <value>印度</value>
+  </data>
+  <data name="Country.ID" xml:space="preserve">
+    <value>印度尼西亚</value>
+  </data>
+  <data name="Country.IR" xml:space="preserve">
+    <value>伊朗</value>
+  </data>
+  <data name="Country.IQ" xml:space="preserve">
+    <value>伊拉克</value>
+  </data>
+  <data name="Country.IE" xml:space="preserve">
+    <value>爱尔兰</value>
+  </data>
+  <data name="Country.IL" xml:space="preserve">
+    <value>以色列</value>
+  </data>
+  <data name="Country.IT" xml:space="preserve">
+    <value>意大利</value>
+  </data>
+  <data name="Country.JM" xml:space="preserve">
+    <value>牙买加</value>
+  </data>
+  <data name="Country.JP" xml:space="preserve">
+    <value>日本</value>
+  </data>
+  <data name="Country.JO" xml:space="preserve">
+    <value>约旦</value>
+  </data>
+  <data name="Country.KZ" xml:space="preserve">
+    <value>哈萨克斯坦</value>
+  </data>
+  <data name="Country.KE" xml:space="preserve">
+    <value>肯尼亚</value>
+  </data>
+  <data name="Country.KI" xml:space="preserve">
+    <value>基里巴斯</value>
+  </data>
+  <data name="Country.KP" xml:space="preserve">
+    <value>朝鲜</value>
+  </data>
+  <data name="Country.KR" xml:space="preserve">
+    <value>韩国</value>
+  </data>
+  <data name="Country.KW" xml:space="preserve">
+    <value>科威特</value>
+  </data>
+  <data name="Country.KG" xml:space="preserve">
+    <value>吉尔吉斯斯坦</value>
+  </data>
+  <data name="Country.LA" xml:space="preserve">
+    <value>老挝</value>
+  </data>
+  <data name="Country.LV" xml:space="preserve">
+    <value>拉脱维亚</value>
+  </data>
+  <data name="Country.LB" xml:space="preserve">
+    <value>黎巴嫩</value>
+  </data>
+  <data name="Country.LS" xml:space="preserve">
+    <value>莱索托</value>
+  </data>
+  <data name="Country.LR" xml:space="preserve">
+    <value>利比里亚</value>
+  </data>
+  <data name="Country.LY" xml:space="preserve">
+    <value>利比亚</value>
+  </data>
+  <data name="Country.LI" xml:space="preserve">
+    <value>列支敦士登</value>
+  </data>
+  <data name="Country.LT" xml:space="preserve">
+    <value>立陶宛</value>
+  </data>
+  <data name="Country.LU" xml:space="preserve">
+    <value>卢森堡</value>
+  </data>
+  <data name="Country.MG" xml:space="preserve">
+    <value>马达加斯加</value>
+  </data>
+  <data name="Country.MW" xml:space="preserve">
+    <value>马拉维</value>
+  </data>
+  <data name="Country.MY" xml:space="preserve">
+    <value>马来西亚</value>
+  </data>
+  <data name="Country.MV" xml:space="preserve">
+    <value>马尔代夫</value>
+  </data>
+  <data name="Country.ML" xml:space="preserve">
+    <value>马里</value>
+  </data>
+  <data name="Country.MT" xml:space="preserve">
+    <value>马耳他</value>
+  </data>
+  <data name="Country.MH" xml:space="preserve">
+    <value>马绍尔群岛</value>
+  </data>
+  <data name="Country.MR" xml:space="preserve">
+    <value>毛里塔尼亚</value>
+  </data>
+  <data name="Country.MU" xml:space="preserve">
+    <value>毛里求斯</value>
+  </data>
+  <data name="Country.MX" xml:space="preserve">
+    <value>墨西哥</value>
+  </data>
+  <data name="Country.FM" xml:space="preserve">
+    <value>密克罗尼西亚</value>
+  </data>
+  <data name="Country.MD" xml:space="preserve">
+    <value>摩尔多瓦</value>
+  </data>
+  <data name="Country.MC" xml:space="preserve">
+    <value>摩纳哥</value>
+  </data>
+  <data name="Country.MN" xml:space="preserve">
+    <value>蒙古</value>
+  </data>
+  <data name="Country.ME" xml:space="preserve">
+    <value>黑山</value>
+  </data>
+  <data name="Country.MA" xml:space="preserve">
+    <value>摩洛哥</value>
+  </data>
+  <data name="Country.MZ" xml:space="preserve">
+    <value>莫桑比克</value>
+  </data>
+  <data name="Country.MM" xml:space="preserve">
+    <value>缅甸</value>
+  </data>
+  <data name="Country.NA" xml:space="preserve">
+    <value>纳米比亚</value>
+  </data>
+  <data name="Country.NR" xml:space="preserve">
+    <value>瑙鲁</value>
+  </data>
+  <data name="Country.NP" xml:space="preserve">
+    <value>尼泊尔</value>
+  </data>
+  <data name="Country.NL" xml:space="preserve">
+    <value>荷兰</value>
+  </data>
+  <data name="Country.NZ" xml:space="preserve">
+    <value>新西兰</value>
+  </data>
+  <data name="Country.NI" xml:space="preserve">
+    <value>尼加拉瓜</value>
+  </data>
+  <data name="Country.NE" xml:space="preserve">
+    <value>尼日尔</value>
+  </data>
+  <data name="Country.NG" xml:space="preserve">
+    <value>尼日利亚</value>
+  </data>
+  <data name="Country.MK" xml:space="preserve">
+    <value>北马其顿</value>
+  </data>
+  <data name="Country.NO" xml:space="preserve">
+    <value>挪威</value>
+  </data>
+  <data name="Country.OM" xml:space="preserve">
+    <value>阿曼</value>
+  </data>
+  <data name="Country.PK" xml:space="preserve">
+    <value>巴基斯坦</value>
+  </data>
+  <data name="Country.PW" xml:space="preserve">
+    <value>帕劳</value>
+  </data>
+  <data name="Country.PS" xml:space="preserve">
+    <value>巴勒斯坦领土</value>
+  </data>
+  <data name="Country.PA" xml:space="preserve">
+    <value>巴拿马</value>
+  </data>
+  <data name="Country.PG" xml:space="preserve">
+    <value>巴布亚新几内亚</value>
+  </data>
+  <data name="Country.PY" xml:space="preserve">
+    <value>巴拉圭</value>
+  </data>
+  <data name="Country.PE" xml:space="preserve">
+    <value>秘鲁</value>
+  </data>
+  <data name="Country.PH" xml:space="preserve">
+    <value>菲律宾</value>
+  </data>
+  <data name="Country.PL" xml:space="preserve">
+    <value>波兰</value>
+  </data>
+  <data name="Country.PT" xml:space="preserve">
+    <value>葡萄牙</value>
+  </data>
+  <data name="Country.QA" xml:space="preserve">
+    <value>卡塔尔</value>
+  </data>
+  <data name="Country.RO" xml:space="preserve">
+    <value>罗马尼亚</value>
+  </data>
+  <data name="Country.RU" xml:space="preserve">
+    <value>俄罗斯</value>
+  </data>
+  <data name="Country.RW" xml:space="preserve">
+    <value>卢旺达</value>
+  </data>
+  <data name="Country.KN" xml:space="preserve">
+    <value>圣基茨和尼维斯</value>
+  </data>
+  <data name="Country.LC" xml:space="preserve">
+    <value>圣卢西亚</value>
+  </data>
+  <data name="Country.VC" xml:space="preserve">
+    <value>圣文森特和格林纳丁斯</value>
+  </data>
+  <data name="Country.WS" xml:space="preserve">
+    <value>萨摩亚</value>
+  </data>
+  <data name="Country.SM" xml:space="preserve">
+    <value>圣马力诺</value>
+  </data>
+  <data name="Country.ST" xml:space="preserve">
+    <value>圣多美和普林西比</value>
+  </data>
+  <data name="Country.SA" xml:space="preserve">
+    <value>沙特阿拉伯</value>
+  </data>
+  <data name="Country.SN" xml:space="preserve">
+    <value>塞内加尔</value>
+  </data>
+  <data name="Country.RS" xml:space="preserve">
+    <value>塞尔维亚</value>
+  </data>
+  <data name="Country.SC" xml:space="preserve">
+    <value>塞舌尔</value>
+  </data>
+  <data name="Country.SL" xml:space="preserve">
+    <value>塞拉利昂</value>
+  </data>
+  <data name="Country.SG" xml:space="preserve">
+    <value>新加坡</value>
+  </data>
+  <data name="Country.SK" xml:space="preserve">
+    <value>斯洛伐克</value>
+  </data>
+  <data name="Country.SI" xml:space="preserve">
+    <value>斯洛文尼亚</value>
+  </data>
+  <data name="Country.SB" xml:space="preserve">
+    <value>所罗门群岛</value>
+  </data>
+  <data name="Country.SO" xml:space="preserve">
+    <value>索马里</value>
+  </data>
+  <data name="Country.ZA" xml:space="preserve">
+    <value>南非</value>
+  </data>
+  <data name="Country.SS" xml:space="preserve">
+    <value>南苏丹</value>
+  </data>
+  <data name="Country.ES" xml:space="preserve">
+    <value>西班牙</value>
+  </data>
+  <data name="Country.LK" xml:space="preserve">
+    <value>斯里兰卡</value>
+  </data>
+  <data name="Country.SD" xml:space="preserve">
+    <value>苏丹</value>
+  </data>
+  <data name="Country.SR" xml:space="preserve">
+    <value>苏里南</value>
+  </data>
+  <data name="Country.SE" xml:space="preserve">
+    <value>瑞典</value>
+  </data>
+  <data name="Country.CH" xml:space="preserve">
+    <value>瑞士</value>
+  </data>
+  <data name="Country.SY" xml:space="preserve">
+    <value>叙利亚</value>
+  </data>
+  <data name="Country.TW" xml:space="preserve">
+    <value>台湾</value>
+  </data>
+  <data name="Country.TJ" xml:space="preserve">
+    <value>塔吉克斯坦</value>
+  </data>
+  <data name="Country.TZ" xml:space="preserve">
+    <value>坦桑尼亚</value>
+  </data>
+  <data name="Country.TH" xml:space="preserve">
+    <value>泰国</value>
+  </data>
+  <data name="Country.TL" xml:space="preserve">
+    <value>东帝汶</value>
+  </data>
+  <data name="Country.TG" xml:space="preserve">
+    <value>多哥</value>
+  </data>
+  <data name="Country.TO" xml:space="preserve">
+    <value>汤加</value>
+  </data>
+  <data name="Country.TT" xml:space="preserve">
+    <value>特立尼达和多巴哥</value>
+  </data>
+  <data name="Country.TN" xml:space="preserve">
+    <value>突尼斯</value>
+  </data>
+  <data name="Country.TR" xml:space="preserve">
+    <value>土耳其</value>
+  </data>
+  <data name="Country.TM" xml:space="preserve">
+    <value>土库曼斯坦</value>
+  </data>
+  <data name="Country.TV" xml:space="preserve">
+    <value>图瓦卢</value>
+  </data>
+  <data name="Country.UG" xml:space="preserve">
+    <value>乌干达</value>
+  </data>
+  <data name="Country.UA" xml:space="preserve">
+    <value>乌克兰</value>
+  </data>
+  <data name="Country.AE" xml:space="preserve">
+    <value>阿拉伯联合酋长国</value>
+  </data>
+  <data name="Country.GB" xml:space="preserve">
+    <value>英国</value>
+  </data>
+  <data name="Country.US" xml:space="preserve">
+    <value>美国</value>
+  </data>
+  <data name="Country.UY" xml:space="preserve">
+    <value>乌拉圭</value>
+  </data>
+  <data name="Country.UZ" xml:space="preserve">
+    <value>乌兹别克斯坦</value>
+  </data>
+  <data name="Country.VU" xml:space="preserve">
+    <value>瓦努阿图</value>
+  </data>
+  <data name="Country.VA" xml:space="preserve">
+    <value>梵蒂冈</value>
+  </data>
+  <data name="Country.VE" xml:space="preserve">
+    <value>委内瑞拉</value>
+  </data>
+  <data name="Country.VN" xml:space="preserve">
+    <value>越南</value>
+  </data>
+  <data name="Country.YE" xml:space="preserve">
+    <value>也门</value>
+  </data>
+  <data name="Country.ZM" xml:space="preserve">
+    <value>赞比亚</value>
+  </data>
+  <data name="Country.ZW" xml:space="preserve">
+    <value>津巴布韦</value>
   </data>
 </root>

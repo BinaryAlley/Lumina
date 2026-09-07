@@ -112,6 +112,9 @@ public sealed class Book : AggregateRoot<BookId>
     /// Gets the list of objects representing the unique identifiers of the media contributors (actors, directors, etc) starring in this book.
     /// </summary>
     public IReadOnlyCollection<MediaContributorId> Contributors => _contributors.AsReadOnly();
+    // TODO: the roles of the media contributors currently live only in the persistence layer (BookContributorEntity), and are lost
+    // at the domain level. To keep consistency with the Music aggregate, which models its credits as a MediaContributorCredit value
+    // object carrying both the contributor and the role, the roles should be moved into the Book aggregate as well.
 
     /// <summary>
     /// Gets the list of ratings for this book.

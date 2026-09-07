@@ -1,4 +1,4 @@
-#region ========================================================================= USING =====================================================================================
+﻿#region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaContributors;
@@ -63,7 +63,7 @@ public class GetBooksEndpointSummary : Summary<GetBooksEndpoint, GetBooksRequest
                                 OriginalReleaseYear: 1954,
                                 ReReleaseDate: DateOnly.ParseExact("2001-09-06", "yyyy-MM-dd", null),
                                 ReReleaseYear: 2001,
-                                ReleaseCountry: "uk",
+                                ReleaseCountry: ReleaseCountry.GB,
                                 ReleaseVersion: "50th Anniversary Edition"
                             ),
                             Genres: new List<GenreDto>() {
@@ -171,7 +171,7 @@ public class GetBooksEndpointSummary : Summary<GetBooksEndpoint, GetBooksRequest
                                 OriginalReleaseYear: 1954,
                                 ReReleaseDate: DateOnly.ParseExact("2001-11-08", "yyyy-MM-dd", null),
                                 ReReleaseYear: 2001,
-                                ReleaseCountry: "uk",
+                                ReleaseCountry: ReleaseCountry.GB,
                                 ReleaseVersion: "50th Anniversary Edition"
                             ),
                             Genres: new List<GenreDto>() {

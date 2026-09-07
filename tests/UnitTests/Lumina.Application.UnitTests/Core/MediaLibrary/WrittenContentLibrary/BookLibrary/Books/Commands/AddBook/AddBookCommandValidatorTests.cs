@@ -259,32 +259,6 @@ public class AddBookCommandValidatorTests
     }
 
     [Fact]
-    public void Validate_WhenReleaseCountryIsValid_ShouldNotHaveValidationError()
-    {
-        // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(releaseCountry: new Faker().Random.String2(2).ToUpper())));
-
-        // Act
-        List<Error> result = _validator.TestValidate(bookCommand);
-
-        // Assert
-        result.ShouldNotHaveValidationError(Errors.Metadata.CountryCodeMustBe2CharactersLong);
-    }
-
-    [Fact]
-    public void Validate_WhenReleaseCountryIsInvalid_ShouldHaveValidationError()
-    {
-        // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(releaseCountry: new Faker().Random.String2(3))));
-
-        // Act
-        List<Error> result = _validator.TestValidate(bookCommand);
-
-        // Assert
-        result.ShouldHaveValidationError(Errors.Metadata.CountryCodeMustBe2CharactersLong);
-    }
-
-    [Fact]
     public void Validate_WhenReleaseVersionIsValid_ShouldNotHaveValidationError()
     {
         // Arrange

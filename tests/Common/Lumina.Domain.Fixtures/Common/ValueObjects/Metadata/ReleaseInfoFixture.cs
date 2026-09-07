@@ -2,6 +2,7 @@
 using Bogus;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -34,7 +35,7 @@ public class ReleaseInfoFixture
         Optional<int>? originalReleaseYear = null,
         Optional<DateOnly>? reReleaseDate = null,
         Optional<int>? reReleaseYear = null,
-        Optional<string>? releaseCountry = null,
+        Optional<ReleaseCountry>? releaseCountry = null,
         Optional<string>? releaseVersion = null)
     {
         int generatedYear = _random.Next(1900, 2000);
@@ -47,31 +48,25 @@ public class ReleaseInfoFixture
             resolvedOriginalYear = Optional<int>.Some(generatedYear);
         }
         else if (!resolvedOriginalDate.HasValue)
-        {
             resolvedOriginalDate = Optional<DateOnly>.Some(new DateOnly(resolvedOriginalYear.Value, 1, 1));
-        }
         else if (!resolvedOriginalYear.HasValue)
-        {
             resolvedOriginalYear = Optional<int>.Some(resolvedOriginalDate.Value.Year);
-        }
 
         Optional<DateOnly> resolvedReReleaseDate = reReleaseDate ?? Optional<DateOnly>.None();
         Optional<int> resolvedReReleaseYear = reReleaseYear ?? Optional<int>.None();
         if (resolvedReReleaseDate.HasValue && !resolvedReReleaseYear.HasValue)
-        {
             resolvedReReleaseYear = Optional<int>.Some(resolvedReReleaseDate.Value.Year);
-        }
         else if (!resolvedReReleaseDate.HasValue && resolvedReReleaseYear.HasValue)
-        {
             resolvedReReleaseDate = Optional<DateOnly>.Some(new DateOnly(resolvedReReleaseYear.Value, 1, 1));
-        }
+
+        Optional<ReleaseCountry> resolvedReleaseCountry = releaseCountry ?? Optional<ReleaseCountry>.Some(Enum.GetValues<ReleaseCountry>()[_random.Next(Enum.GetValues<ReleaseCountry>().Length)]);
 
         Result<ReleaseInfo> releaseInfoResult = ReleaseInfo.Create(
             resolvedOriginalDate,
             resolvedOriginalYear,
             resolvedReReleaseDate,
             resolvedReReleaseYear,
-            releaseCountry ?? Optional<string>.Some(_faker.Address.Country()),
+            resolvedReleaseCountry,
             releaseVersion ?? Optional<string>.Some(_faker.Lorem.Word()));
 
         if (releaseInfoResult.IsFailure)

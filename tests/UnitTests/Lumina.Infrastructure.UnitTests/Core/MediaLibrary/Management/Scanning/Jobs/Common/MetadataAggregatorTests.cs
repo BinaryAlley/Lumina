@@ -4,6 +4,7 @@ using Lumina.Contracts.Fixtures.Core.DTO.Common;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaContributors;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -137,8 +138,8 @@ public class MetadataAggregatorTests
         // Arrange
         BookMetadataDto first = _bookMetadataDtoFixture.Create(title: "Title", coverImagePath: "First Cover", includeOptionalProperties: false);
         BookMetadataDto second = _bookMetadataDtoFixture.Create(title: "Title", coverImagePath: "First Cover", includeOptionalProperties: false);
-        first = first with { ReleaseInfo = _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2001, 1, 1), originalReleaseYear: 2001, releaseCountry: "US") };
-        second = second with { ReleaseInfo = _releaseInfoDtoFixture.Create(reReleaseDate: new DateOnly(2010, 5, 5), reReleaseYear: 2010, releaseCountry: "UK", releaseVersion: "2.0") };
+        first = first with { ReleaseInfo = _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2001, 1, 1), originalReleaseYear: 2001, releaseCountry: ReleaseCountry.US) };
+        second = second with { ReleaseInfo = _releaseInfoDtoFixture.Create(reReleaseDate: new DateOnly(2010, 5, 5), reReleaseYear: 2010, releaseCountry: ReleaseCountry.GB, releaseVersion: "2.0") };
 
         // Act
         BookMetadataDto result = MetadataAggregator.Merge(first, second);
@@ -148,7 +149,7 @@ public class MetadataAggregatorTests
         Assert.Equal(2001, result.ReleaseInfo.OriginalReleaseYear);
         Assert.Equal(new DateOnly(2010, 5, 5), result.ReleaseInfo.ReReleaseDate);
         Assert.Equal(2010, result.ReleaseInfo.ReReleaseYear);
-        Assert.Equal("US", result.ReleaseInfo.ReleaseCountry);
+        Assert.Equal(ReleaseCountry.US, result.ReleaseInfo.ReleaseCountry);
         Assert.Equal("2.0", result.ReleaseInfo.ReleaseVersion);
     }
 

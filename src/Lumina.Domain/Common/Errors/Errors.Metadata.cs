@@ -22,6 +22,7 @@ public static partial class Errors
         public static Error TagsListCannotBeNull => Error.Validation(description: nameof(TagsListCannotBeNull));
         public static Error TagNameCannotBeEmpty => Error.Validation(description: nameof(TagNameCannotBeEmpty));
         public static Error TagNameMustBeMaximum50CharactersLong => Error.Validation(description: nameof(TagNameMustBeMaximum50CharactersLong));
+        public static Error MoodNameCannotBeEmpty => Error.Validation(description: nameof(MoodNameCannotBeEmpty));
         public static Error LanguageCodeCannotBeEmpty => Error.Validation(description: nameof(LanguageCodeCannotBeEmpty));
         public static Error LanguageNameCannotBeEmpty => Error.Validation(description: nameof(LanguageNameCannotBeEmpty));
         public static Error LanguageCodeMustBe2CharactersLong => Error.Validation(description: nameof(LanguageCodeMustBe2CharactersLong));

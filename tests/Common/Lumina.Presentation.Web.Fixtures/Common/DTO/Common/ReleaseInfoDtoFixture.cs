@@ -1,6 +1,7 @@
-#region ========================================================================= USING =====================================================================================
+﻿#region ========================================================================= USING =====================================================================================
 using Bogus;
 using Lumina.Presentation.Web.Common.DTO.Common;
+using Lumina.Presentation.Web.Common.Enums.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -33,7 +34,7 @@ public class ReleaseInfoDtoFixture
         int? originalReleaseYear = null,
         DateOnly? reReleaseDate = null,
         int? reReleaseYear = null,
-        string? releaseCountry = null,
+        ReleaseCountry? releaseCountry = null,
         string? releaseVersion = null)
     {
         int resolvedOriginalReleaseYear = originalReleaseYear ?? (originalReleaseDate?.Year ?? _random.Next(1900, 2026));
@@ -47,7 +48,7 @@ public class ReleaseInfoDtoFixture
             OriginalReleaseYear = resolvedOriginalReleaseYear,
             ReReleaseDate = resolvedReReleaseDate,
             ReReleaseYear = resolvedReReleaseYear,
-            ReleaseCountry = releaseCountry ?? _faker.Address.CountryCode(),
+            ReleaseCountry = releaseCountry ?? _faker.PickRandom<ReleaseCountry>(),
             ReleaseVersion = releaseVersion ?? _faker.Random.String2(_faker.Random.Number(1, 50))
         };
     }

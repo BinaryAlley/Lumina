@@ -1,4 +1,4 @@
-﻿const scrollbarHeight = getScrollbarHeight();
+const scrollbarHeight = getScrollbarHeight();
 const scrollbarWidth = getScrollbarWidth();
 const progressIndicator = document.getElementById('progress-indicator');
 const progressIndicatorValue = document.getElementById('progress-indicator-value');
@@ -758,3 +758,44 @@ document.addEventListener('click', function (e) {
 });
 
 document.addEventListener('DOMContentLoaded', initializeNavigation);
+
+(function () {
+    'use strict';
+
+    /**
+     * Limits the height of every enlightenment dropdown to half of the height of the main content area.
+     * The computed maximum is exposed as the --enlightenment-dropdown-max-height CSS variable, which the
+     * .enlightenment-dropdown rule consumes, so that long option lists scroll inside the dropdown instead
+     * of stretching the central section of the page.
+     */
+    function declareDropdownMaxHeight() {
+        const main = document.querySelector('main[role="main"]') || document.querySelector('main');
+        if (!main)
+            return;
+        const maxHeight = Math.round(main.clientHeight * 0.5);
+        document.documentElement.style.setProperty('--enlightenment-dropdown-max-height', maxHeight + 'px');
+    }
+
+    /**
+     * Keeps the dropdown maximum height in sync with the height of the main content area.
+     * The value is recomputed whenever the main area is resized, whenever the window is resized, and whenever
+     * a combobox is opened, so that a dropdown opened near the bottom of the screen is still capped to the
+     * visible central section.
+     */
+    function watchMainArea() {
+        const main = document.querySelector('main[role="main"]') || document.querySelector('main');
+        if (!main)
+            return;
+        const observer = new MutationObserver(declareDropdownMaxHeight);
+        observer.observe(main, { attributes: true, attributeFilter: ['class', 'style'] });
+        window.addEventListener('resize', declareDropdownMaxHeight);
+        document.addEventListener('click', function (event) {
+            if (event.target.matches('.enlightenment-toggle-checkbox'))
+                declareDropdownMaxHeight();
+        });
+    }
+
+    declareDropdownMaxHeight();
+    document.addEventListener('DOMContentLoaded', declareDropdownMaxHeight);
+    watchMainArea();
+})();

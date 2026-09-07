@@ -45,6 +45,8 @@ public class BookConfiguration : IEntityTypeConfiguration<BookEntity>
         builder.Property(book => book.ReReleaseYear)
             .HasColumnOrder(7);
         builder.Property(book => book.ReleaseCountry)
+            .HasConversion<string>()
+            .HasMaxLength(2)
             .HasColumnOrder(8);
         builder.Property(book => book.ReleaseVersion)
             .HasColumnOrder(9);

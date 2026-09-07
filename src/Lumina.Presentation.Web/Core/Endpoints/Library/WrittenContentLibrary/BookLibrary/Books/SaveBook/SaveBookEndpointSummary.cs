@@ -1,4 +1,4 @@
-#region ========================================================================= USING =====================================================================================
+﻿#region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Presentation.Web.Common.DTO.Common;
 using Lumina.Presentation.Web.Common.DTO.MediaContributors;
@@ -6,6 +6,7 @@ using Lumina.Presentation.Web.Common.DTO.WrittenContentLibrary;
 using Lumina.Presentation.Web.Common.DTO.WrittenContentLibrary.BookLibrary;
 using Lumina.Presentation.Web.Common.Enums.BookLibrary;
 using Lumina.Presentation.Web.Common.Requests.Library.WrittenContentLibrary.BookLibrary.Books;
+using Lumina.Presentation.Web.Common.Enums.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -83,7 +84,7 @@ public class SaveBookEndpointSummary : Summary<SaveBookEndpoint, UpdateBookReque
                     OriginalReleaseYear = 1954,
                     ReReleaseDate = new DateOnly(2001, 9, 6),
                     ReReleaseYear = 2001,
-                    ReleaseCountry = "uk",
+                    ReleaseCountry = ReleaseCountry.GB,
                     ReleaseVersion = "50th Anniversary Edition"
                 },
                 Genres =

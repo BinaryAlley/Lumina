@@ -5,6 +5,7 @@ using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using Lumina.Plugins.OpenLibrary.Common.Models.Contracts.Responses;
 using System;
@@ -110,7 +111,7 @@ internal static partial class OpenLibraryMapper
                     originalYear,
                     editionRelease.Date,
                     editionRelease.Date?.Year ?? editionRelease.Year,
-                    NullIfWhiteSpace(releaseCountry),
+                    MapReleaseCountry(releaseCountry),
                     NullIfWhiteSpace(releaseVersion)),
                 [.. genreNames.Select(name => new GenreDto(name))],
                 [.. subjects.Select(name => new TagDto(name))],
@@ -330,6 +331,19 @@ internal static partial class OpenLibraryMapper
             string.Equals(candidate.ThreeLetterISOLanguageName, code, StringComparison.OrdinalIgnoreCase));
 
         return culture is null ? new LanguageInfoDto(code, code, null) : new LanguageInfoDto(culture.TwoLetterISOLanguageName, culture.EnglishName, culture.NativeName);
+    }
+
+    /// <summary>
+    /// Maps a country string into a release country.
+    /// </summary>
+    /// <param name="rawCountry">The country string to map.</param>
+    /// <returns>The mapped release country, or <see langword="null"/> when the string is empty or is not a known ISO 3166-1 alpha-2 code.</returns>
+    private static ReleaseCountry? MapReleaseCountry(string? rawCountry)
+    {
+        string? value = NullIfWhiteSpace(rawCountry);
+        if (value is null)
+            return null;
+        return Enum.TryParse(value, ignoreCase: true, out ReleaseCountry releaseCountry) ? releaseCountry : null;
     }
 
     /// <summary>
