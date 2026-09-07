@@ -4,6 +4,7 @@ using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -33,7 +34,7 @@ public class BookMetadataDtoTests
             "Dune",
             "Dune",
             "A science fiction novel.",
-            new ReleaseInfoDto(new DateOnly(1965, 8, 1), 1965, null, null, "US", null),
+            new ReleaseInfoDto(new DateOnly(1965, 8, 1), 1965, null, null, ReleaseCountry.US, null),
             [new GenreDto("Science Fiction")],
             [new TagDto("classic")],
             new LanguageInfoDto("en", "English", "English"),

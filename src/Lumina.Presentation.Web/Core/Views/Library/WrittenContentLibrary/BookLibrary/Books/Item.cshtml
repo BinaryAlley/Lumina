@@ -16,6 +16,7 @@
 @using Lumina.Presentation.Web.Common.DTO.WrittenContentLibrary.BookLibrary
 @using Lumina.Presentation.Web.Common.DTO.MediaContributors
 @using Lumina.Presentation.Web.Common.Enums.BookLibrary
+@using Lumina.Presentation.Web.Common.Enums.Common
 @using Lumina.Presentation.Web.Common.Services
 @using Microsoft.AspNetCore.Mvc.Localization
 @using System.Globalization
@@ -45,6 +46,18 @@
         "Illustrator" => _localizer["Illustrator"].Value,
         "Narrator" => _localizer["Narrator"].Value,
         _ => category ?? string.Empty
+    };
+    // The country of release carried by the book, keyed by its ISO code.
+    var currentReleaseCountry = releaseInfo?.ReleaseCountry?.ToString() ?? string.Empty;
+    // Resolves the localized label of a release country, shown as "DE (Germany)", keyed by its ISO code.
+    Func<string?, string> releaseCountryLabel = countryCode =>
+    {
+        if (string.IsNullOrEmpty(countryCode))
+            return "-";
+        string localizedName = _localizer[$"Country.{countryCode}"].Value;
+        if (localizedName == $"Country.{countryCode}")
+            return countryCode;
+        return $"{countryCode} ({localizedName})";
     };
 }
 
@@ -221,10 +234,23 @@
                 <!-- Country and version. -->
                 <div class="form-row">
                     <div class="form-label">
-                        <label for="release-country-input">@_localizer["ReleaseCountry"]</label>:
+                        <label for="release-country-combobox-toggle">@_localizer["ReleaseCountry"]</label>:
                     </div>
                     <div class="form-field">
-                        <input id="release-country-input" type="text" maxlength="2" class="enlightenment-input" value="@(releaseInfo?.ReleaseCountry ?? string.Empty)" />
+                        <div class="enlightenment-combobox inline-block w-100" id="release-country-combobox">
+                            <div class="shine-effect" style="top: 1px;"></div>
+                            <input type="checkbox" class="enlightenment-toggle-checkbox" id="release-country-combobox-toggle" />
+                            <label class="enlightenment-toggle" for="release-country-combobox-toggle">
+                                <span class="enlightenment-selected-text" data-value="@currentReleaseCountry">@releaseCountryLabel(currentReleaseCountry)</span>
+                            </label>
+                            <div class="enlightenment-dropdown">
+                                <div class="enlightenment-option" data-value="">-</div>
+                                @foreach (string country in Enum.GetNames<ReleaseCountry>())
+                                {
+                                    <div class="enlightenment-option" data-value="@country">@releaseCountryLabel(country)</div>
+                                }
+                            </div>
+                        </div>
                     </div>
                     <small class="form-label text-disabled form-description">@_localizer["ReleaseCountryDescription"]</small>
                 </div>
@@ -591,7 +617,7 @@
                         OriginalReleaseYear: readNumber('original-release-year-input'),
                         ReReleaseDate: readValue('re-release-date-input') || null,
                         ReReleaseYear: readNumber('re-release-year-input'),
-                        ReleaseCountry: readValue('release-country-input') || null,
+                        ReleaseCountry: readComboboxValue('release-country-combobox') || null,
                         ReleaseVersion: readValue('release-version-input') || null
                     },
                     Genres: splitList(readValue('genres-input')).map(name => ({ Name: name })),

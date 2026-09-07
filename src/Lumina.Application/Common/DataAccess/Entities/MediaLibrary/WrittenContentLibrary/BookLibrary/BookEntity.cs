@@ -2,6 +2,7 @@
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -69,7 +70,7 @@ public class BookEntity : IStorageEntity, IAuditableEntity
     /// <summary>
     /// Gets or sets the optional country or region of release.
     /// </summary>
-    public string? ReleaseCountry { get; set; }
+    public ReleaseCountry? ReleaseCountry { get; set; }
 
     /// <summary>
     /// Gets or sets the optional release version or edition. (e.g. "Original", "Director's Cut", "2.0")

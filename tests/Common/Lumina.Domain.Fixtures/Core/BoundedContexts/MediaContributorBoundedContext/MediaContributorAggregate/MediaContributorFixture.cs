@@ -3,6 +3,7 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate;
 using Lumina.Domain.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate.ValueObjects;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -24,6 +25,7 @@ public class MediaContributorFixture
     /// Creates a random valid <see cref="MediaContributor"/> domain aggregate.
     /// </summary>
     /// <param name="id">Optional. The Id of the contributor.</param>
+    /// <param name="type">Optional. The type of the contributor.</param>
     /// <param name="name">Optional. The name of the contributor.</param>
     /// <param name="biography">Optional. The biography of the contributor.</param>
     /// <param name="dateOfBirth">Optional. The date of birth of the contributor.</param>
@@ -31,6 +33,7 @@ public class MediaContributorFixture
     /// <returns>The created <see cref="MediaContributor"/> domain aggregate.</returns>
     public MediaContributor Create(
         MediaContributorId? id = null,
+        MediaContributorType? type = null,
         MediaContributorName? name = null,
         Optional<string>? biography = null,
         Optional<DateOnly>? dateOfBirth = null,
@@ -38,6 +41,7 @@ public class MediaContributorFixture
     {
         Result<MediaContributor> result = MediaContributor.Create(
             id ?? _mediaContributorIdFixture.Create(),
+            type ?? MediaContributorType.Person,
             name ?? _mediaContributorNameFixture.Create(),
             biography ?? Optional<string>.None(),
             dateOfBirth ?? Optional<DateOnly>.None(),

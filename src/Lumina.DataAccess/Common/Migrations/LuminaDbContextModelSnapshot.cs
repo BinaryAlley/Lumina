@@ -850,6 +850,7 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnOrder(7);
 
                     b.Property<string>("ReleaseCountry")
+                        .HasMaxLength(2)
                         .HasColumnType("TEXT")
                         .HasColumnOrder(8);
 

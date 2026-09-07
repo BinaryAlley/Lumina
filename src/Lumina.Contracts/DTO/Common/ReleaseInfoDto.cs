@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using System;
 using System.Diagnostics;
 #endregion
@@ -20,6 +21,6 @@ public record ReleaseInfoDto(
     int? OriginalReleaseYear,
     DateOnly? ReReleaseDate,
     int? ReReleaseYear,
-    string? ReleaseCountry,
+    ReleaseCountry? ReleaseCountry,
     string? ReleaseVersion
 );

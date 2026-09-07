@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.DTO.Common;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
@@ -29,7 +30,7 @@ public class ReleaseInfoDtoTests
             2005,
             reReleaseDate,
             2015,
-            "US",
+            ReleaseCountry.US,
             "Revised Edition"
         );
 
@@ -61,8 +62,8 @@ public class ReleaseInfoDtoTests
     public void Equality_WhenTwoInstancesHaveSameValues_ShouldBeEqual()
     {
         // Arrange
-        ReleaseInfoDto first = new(new DateOnly(2005, 6, 15), 2005, null, null, "US", null);
-        ReleaseInfoDto second = new(new DateOnly(2005, 6, 15), 2005, null, null, "US", null);
+        ReleaseInfoDto first = new(new DateOnly(2005, 6, 15), 2005, null, null, ReleaseCountry.US, null);
+        ReleaseInfoDto second = new(new DateOnly(2005, 6, 15), 2005, null, null, ReleaseCountry.US, null);
 
         // Act
         bool areEqual = first == second;

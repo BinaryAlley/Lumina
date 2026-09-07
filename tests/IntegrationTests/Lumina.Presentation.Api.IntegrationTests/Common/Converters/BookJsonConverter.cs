@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using Lumina.Domain.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate.ValueObjects;
@@ -166,12 +167,15 @@ public class BookJsonConverter : JsonConverter<Book>
         string? releaseVersion = element.TryGetProperty("releaseVersion", out JsonElement rvElement) ?
             rvElement.GetString() : null;
 
+        Optional<ReleaseCountry> releaseCountryValue = Optional<ReleaseCountry>.None();
+        if (releaseCountry is not null && Enum.TryParse(releaseCountry, ignoreCase: true, out ReleaseCountry parsedReleaseCountry))
+            releaseCountryValue = parsedReleaseCountry;
         Result<ReleaseInfo> releaseInfoResult = ReleaseInfo.Create(
             Optional<DateOnly>.FromNullable(originalReleaseDate),
             Optional<int>.FromNullable(originalReleaseYear),
             Optional<DateOnly>.FromNullable(reReleaseDate),
             Optional<int>.FromNullable(reReleaseYear),
-            Optional<string>.FromNullable(releaseCountry),
+            releaseCountryValue,
             Optional<string>.FromNullable(releaseVersion)
         );
 

@@ -60,11 +60,6 @@ public class UpdateBookCommandValidator : AbstractValidator<UpdateBookCommand>
                             .When(r => r!.ReReleaseYear.HasValue)
                             .WithError(Errors.Metadata.ReReleaseYearMustBeBetween1And9999);
 
-                        releaseInfo.RuleFor(r => r!.ReleaseCountry)
-                            .Matches("^[A-Za-z]{2}$")
-                            .When(r => r!.ReleaseCountry is not null)
-                            .WithError(Errors.Metadata.CountryCodeMustBe2CharactersLong);
-
                         releaseInfo.RuleFor(r => r!.ReleaseVersion)
                             .MaximumLength(50)
                             .When(r => r!.ReleaseVersion is not null)

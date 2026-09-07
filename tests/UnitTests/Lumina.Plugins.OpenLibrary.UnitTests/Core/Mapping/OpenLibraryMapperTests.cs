@@ -6,6 +6,7 @@ using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using Lumina.Plugins.OpenLibrary.Common.Models.Contracts.Responses;
 using Lumina.Plugins.OpenLibrary.Core.Mapping;
@@ -182,7 +183,7 @@ public class OpenLibraryMapperTests
         Assert.DoesNotContain(result.Metadata.Genres!, genre => genre.Name == "Space");
         Assert.Contains(result.Metadata.Tags!, tag => tag.Name == "Science fiction");
         Assert.Contains(result.Metadata.Tags!, tag => tag.Name == "Space");
-        Assert.Equal("London", result.Metadata.ReleaseInfo.ReleaseCountry);
+        Assert.Null(result.Metadata.ReleaseInfo.ReleaseCountry);
         BookRatingDto rating = Assert.Single(result.Ratings!);
         Assert.Equal(4.1m, rating.Value);
         Assert.Equal(5m, rating.MaxValue);
@@ -246,7 +247,7 @@ public class OpenLibraryMapperTests
         Assert.Equal(1987, result.Metadata.ReleaseInfo.OriginalReleaseYear);
         Assert.Equal(new DateOnly(2010, 5, 1), result.Metadata.ReleaseInfo.ReReleaseDate);
         Assert.Equal(2010, result.Metadata.ReleaseInfo.ReReleaseYear);
-        Assert.Equal("New York", result.Metadata.ReleaseInfo.ReleaseCountry);
+        Assert.Null(result.Metadata.ReleaseInfo.ReleaseCountry);
         Assert.Equal("First Edition", result.Metadata.ReleaseInfo.ReleaseVersion);
         GenreDto genre = Assert.Single(result.Metadata.Genres!);
         Assert.Equal("Fantasy", genre.Name);

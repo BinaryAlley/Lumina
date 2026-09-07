@@ -18,6 +18,7 @@ using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.Boo
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.ExternalIdentifiers.LibraryManagementBoundedContext.LibraryAggregate;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using System;
 using System.Collections.Generic;
@@ -122,7 +123,7 @@ public class AddBookCommandHandler : ICommandHandler<AddBookCommand, Result<Book
             Optional<int>.FromNullable(command.Metadata.ReleaseInfo.OriginalReleaseYear),
             Optional<DateOnly>.FromNullable(command.Metadata.ReleaseInfo.ReReleaseDate),
             Optional<int>.FromNullable(command.Metadata.ReleaseInfo.ReReleaseYear),
-            Optional<string>.FromNullable(command.Metadata.ReleaseInfo.ReleaseCountry),
+            Optional<ReleaseCountry>.FromNullable(command.Metadata.ReleaseInfo!.ReleaseCountry),
             Optional<string>.FromNullable(command.Metadata.ReleaseInfo.ReleaseVersion)
         );
         if (releaseInfoResult.IsFailure)
