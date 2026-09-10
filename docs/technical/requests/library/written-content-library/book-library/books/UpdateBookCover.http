@@ -1,0 +1,10 @@
+PUT {{host}}/api/v1/books/{{$guid}}/cover
+Authorization: Bearer {{ACCESS_TOKEN}}
+Content-Type: multipart/form-data; boundary=LuminaBoundary
+
+--LuminaBoundary
+Content-Disposition: form-data; name="file"; filename="cover.jpg"
+Content-Type: image/jpeg
+
+< ./cover.jpg
+--LuminaBoundary--

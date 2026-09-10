@@ -1,9 +1,9 @@
-POST {{host}}/api/v1/books
+PUT {{host}}/api/v1/books/{{$guid}}
+Authorization: Bearer {{ACCESS_TOKEN}}
 Content-Type: application/json
 
 {
-  "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
-  "path": "/books/the-fellowship-of-the-ring.pdf",
+  "id": "{{$guid}}",
   "metadata": {
     "title": "The Fellowship of the Ring",
     "originalTitle": "The Fellowship of the Ring",
@@ -13,7 +13,7 @@ Content-Type: application/json
       "originalReleaseYear": 1954,
       "reReleaseDate": "2001-09-06",
       "reReleaseYear": 2001,
-      "releaseCountry": "uk",
+      "releaseCountry": "GB",
       "releaseVersion": "50th Anniversary Edition"
     },
     "genres": [
@@ -56,33 +56,33 @@ Content-Type: application/json
   "appleBooksId": "id395211",
   "isbns": [
     {
-    "value": "0395272238",
-    "format": "Isbn10"
+      "value": "0395272238",
+      "format": "Isbn10"
     },
     {
-    "value": "9780395272237",
-    "format": "Isbn13"
+      "value": "9780395272237",
+      "format": "Isbn13"
     }
   ],
   "contributors": [
     {
-      "name": "J.R.R. Tolkien",
-      "role": {
-          "name": "author",
-          "category": "book"
-      }
+      "name": {
+        "displayName": "J.R.R. Tolkien",
+        "legalName": "John Ronald Reuel Tolkien"
+      },
+      "role": "Author"
     },
     {
-      "name": "Alan Lee",
-      "role": {
-          "name": "illustrator",
-          "category": "book"
-      }
+      "name": {
+        "displayName": "Alan Lee",
+        "legalName": "Alan Lee"
+      },
+      "role": "Illustrator"
     }
   ],
   "ratings": [
     {
-      "source": "Goodreads",
+      "source": "GoogleBooks",
       "value": 4.36,
       "maxValue": 5,
       "voteCount": 2345678

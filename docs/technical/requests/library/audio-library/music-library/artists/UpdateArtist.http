@@ -1,0 +1,14 @@
+PUT {{host}}/api/v1/artists/d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a
+Authorization: Bearer {{ACCESS_TOKEN}}
+Content-Type: application/json
+
+{
+  "artistId": "d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a",
+  "name": "Queen",
+  "website": "https://www.queenonline.com",
+  "musicBrainzArtistId": "6f9c0b2a-1d3e-4a5b-8c7d-9e0f1a2b3c4d",
+  "credits": [
+    { "contributorId": "6a3f0c2d-1b4e-4f5a-8c6d-9e0f1a2b3c4d", "role": "Vocals" },
+    { "contributorId": "7b4e1d3f-2c5a-4e6b-9d7e-0f1a2b3c4d5e", "role": "Guitar" }
+  ]
+}

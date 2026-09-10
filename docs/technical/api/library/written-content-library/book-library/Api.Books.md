@@ -103,18 +103,16 @@ POST api/v1/books
   ],
   "contributors": [
     {
-      "name": "J.R.R. Tolkien",
-      "role": {
-          "name": "author",
-          "category": "book"
-      }
+      "name": {
+        "displayName": "J.R.R. Tolkien"
+      },
+      "role": "Author"
     },
     {
-      "name": "Alan Lee",
-      "role": {
-          "name": "illustrator",
-          "category": "book"
-      }
+      "name": {
+        "displayName": "Alan Lee"
+      },
+      "role": "Illustrator"
     }
   ],
   "ratings": [
