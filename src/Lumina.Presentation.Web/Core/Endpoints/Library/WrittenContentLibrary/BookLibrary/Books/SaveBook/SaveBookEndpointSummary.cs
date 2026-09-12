@@ -1,10 +1,11 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Presentation.Web.Common.DTO.Common;
 using Lumina.Presentation.Web.Common.DTO.MediaContributors;
 using Lumina.Presentation.Web.Common.DTO.WrittenContentLibrary;
 using Lumina.Presentation.Web.Common.DTO.WrittenContentLibrary.BookLibrary;
 using Lumina.Presentation.Web.Common.Enums.BookLibrary;
+using Lumina.Presentation.Web.Common.Enums.MediaContributors;
 using Lumina.Presentation.Web.Common.Requests.Library.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Presentation.Web.Common.Enums.Common;
 using System;
@@ -28,7 +29,8 @@ public class SaveBookEndpointSummary : Summary<SaveBookEndpoint, UpdateBookReque
         Summary = "Updates a book.";
         Description = "Updates the details of the book identified by the request.";
 
-        RequestParam(r => r.Id, "The unique identifier of the book to update. Required.");
+        RequestParam(r => r.BookId, "The unique identifier of the book to update. Required.");
+        RequestParam(r => r.LibraryId, "The Id of the media library the book belongs to. Required.");
         RequestParam(r => r.Metadata, "The written content metadata of the book. Required.");
         RequestParam(r => r.Metadata!.Title, "The title of the book. Required.");
         RequestParam(r => r.Metadata!.OriginalTitle, "The original title of the book, if different from the current title. Optional.");
@@ -72,7 +74,8 @@ public class SaveBookEndpointSummary : Summary<SaveBookEndpoint, UpdateBookReque
 
         ExampleRequest = new UpdateBookRequest
         {
-            Id = Guid.NewGuid().ToString(),
+            BookId = Guid.NewGuid().ToString(),
+            LibraryId = Guid.NewGuid(),
             Metadata = new WrittenContentMetadataDto
             {
                 Title = "The Fellowship of the Ring",
@@ -140,12 +143,12 @@ public class SaveBookEndpointSummary : Summary<SaveBookEndpoint, UpdateBookReque
                 new MediaContributorDto
                 {
                     Name = new MediaContributorNameDto { DisplayName = "J.R.R. Tolkien", LegalName = "John Ronald Reuel Tolkien" },
-                    Role = new MediaContributorRoleDto { Name = "author", Category = "Author" }
+                    Role = MediaContributorRole.Author
                 },
                 new MediaContributorDto
                 {
                     Name = new MediaContributorNameDto { DisplayName = "Alan Lee", LegalName = "Alan Lee" },
-                    Role = new MediaContributorRoleDto { Name = "illustrator", Category = "Illustrator" }
+                    Role = MediaContributorRole.Illustrator
                 }
             ],
             Ratings =

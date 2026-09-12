@@ -1,4 +1,4 @@
-#region ========================================================================= USING =====================================================================================
+﻿#region ========================================================================= USING =====================================================================================
 using Bogus;
 using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
@@ -24,13 +24,12 @@ public class UpdateBookRequestFixture
 {
     private readonly IsbnDtoFixture _isbnDtoFixture = new();
     private readonly BookRatingDtoFixture _bookRatingDtoFixture = new();
-    private readonly MediaContributorDtoFixture _mediaContributorDtoFixture = new();
+    private readonly MediaContributorReferenceDtoFixture _mediaContributorReferenceDtoFixture = new();
     private readonly WrittenContentMetadataDtoFixture _writtenContentMetadataDtoFixture = new();
 
     /// <summary>
     /// Creates a random valid request to update a book.
     /// </summary>
-    /// <param name="id">Optional. The Id of the book to update.</param>
     /// <param name="metadata">Optional. The written content metadata of the book.</param>
     /// <param name="format">Optional. The format of the book.</param>
     /// <param name="edition">Optional. The edition of the book.</param>
@@ -49,11 +48,8 @@ public class UpdateBookRequestFixture
     /// <param name="contributors">Optional. The contributors of the book.</param>
     /// <param name="ratings">Optional. The ratings of the book.</param>
     /// <param name="includeOptionalProperties">Whether the properties that are not explicitly provided should be randomized, or forced to <see langword="null"/>.</param>
-    /// <param name="rawId">Optional. The raw string value of the Id of the book to update. Takes precedence over <paramref name="id"/>.</param>
-    /// <param name="includeId">Whether the Id should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created request to update a book.</returns>
     public UpdateBookRequest Create(
-        Guid? id = null,
         WrittenContentMetadataDto? metadata = null,
         BookFormat? format = null,
         string? edition = null,
@@ -69,15 +65,12 @@ public class UpdateBookRequestFixture
         string? barnesAndNobleId = null,
         string? appleBooksId = null,
         List<IsbnDto>? isbns = null,
-        List<MediaContributorDto>? contributors = null,
+        List<MediaContributorReferenceDto>? contributors = null,
         List<BookRatingDto>? ratings = null,
-        bool includeOptionalProperties = true,
-        string? rawId = null,
-        bool includeId = true)
+        bool includeOptionalProperties = true)
     {
         return new Faker<UpdateBookRequest>()
             .CustomInstantiator(f => new UpdateBookRequest(
-                default,
                 default!,
                 default,
                 default,
@@ -96,7 +89,6 @@ public class UpdateBookRequestFixture
                 default!,
                 default!
             ))
-            .RuleFor(x => x.Id, f => includeId ? (rawId ?? id?.ToString() ?? Guid.NewGuid().ToString()) : null)
             .RuleFor(x => x.Metadata, metadata ?? _writtenContentMetadataDtoFixture.Create())
             .RuleFor(x => x.Format, f => format ?? (includeOptionalProperties ? f.PickRandom<BookFormat>() : null))
             .RuleFor(x => x.Edition, f => edition ?? (includeOptionalProperties ? f.Random.String2(f.Random.Number(1, 50)) : null))
@@ -113,7 +105,7 @@ public class UpdateBookRequestFixture
             .RuleFor(x => x.AppleBooksId, f => appleBooksId ?? (includeOptionalProperties ? $"id{f.Random.Number(1, 999999)}" : null))
             .RuleFor(p => p.ISBNs, f => isbns ?? (includeOptionalProperties ? [.. _isbnDtoFixture.CreateMany(f.Random.Number(1, 3))] : null))
             .RuleFor(p => p.Ratings, f => ratings ?? (includeOptionalProperties ? [.. _bookRatingDtoFixture.CreateMany(f.Random.Number(1, 3))] : null))
-            .RuleFor(x => x.Contributors, f => contributors ?? (includeOptionalProperties ? [.. _mediaContributorDtoFixture.CreateMany(f.Random.Number(1, 3))] : null));
+            .RuleFor(x => x.Contributors, f => contributors ?? (includeOptionalProperties ? [.. _mediaContributorReferenceDtoFixture.CreateMany(f.Random.Number(1, 3))] : null));
     }
 
     /// <summary>

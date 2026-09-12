@@ -31,17 +31,20 @@ public class UpdateBookRequestFixture
     /// Creates a new <see cref="UpdateBookRequest"/> instance with randomized test data.
     /// </summary>
     /// <param name="id">Optional Id of the book to update.</param>
+    /// <param name="libraryId">Optional Id of the media library the book belongs to.</param>
     /// <param name="metadata">Optional written content metadata of the book.</param>
     /// <param name="includeOptionalProperties">Whether the properties that are not explicitly provided should be randomized, or forced to <see langword="null"/>.</param>
     /// <returns>A configured <see cref="UpdateBookRequest"/> instance.</returns>
     public UpdateBookRequest Create(
         Guid? id = null,
+        Guid? libraryId = null,
         WrittenContentMetadataDto? metadata = null,
         bool includeOptionalProperties = true)
     {
         return new UpdateBookRequest
         {
-            Id = id?.ToString() ?? Guid.NewGuid().ToString(),
+            BookId = id?.ToString() ?? Guid.NewGuid().ToString(),
+            LibraryId = libraryId ?? Guid.NewGuid(),
             Metadata = metadata ?? (includeOptionalProperties ? _writtenContentMetadataDtoFixture.Create() : null),
             Format = includeOptionalProperties ? _faker.PickRandom<BookFormat>() : null,
             Edition = includeOptionalProperties ? _faker.Random.String2(_faker.Random.Number(1, 50)) : null,

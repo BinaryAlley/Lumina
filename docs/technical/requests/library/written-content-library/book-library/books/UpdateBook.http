@@ -1,9 +1,8 @@
-PUT {{host}}/api/v1/books/{{$guid}}
+PUT {{host}}/api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books/{{$guid}}
 Authorization: Bearer {{ACCESS_TOKEN}}
 Content-Type: application/json
 
 {
-  "id": "{{$guid}}",
   "metadata": {
     "title": "The Fellowship of the Ring",
     "originalTitle": "The Fellowship of the Ring",
@@ -66,17 +65,11 @@ Content-Type: application/json
   ],
   "contributors": [
     {
-      "name": {
-        "displayName": "J.R.R. Tolkien",
-        "legalName": "John Ronald Reuel Tolkien"
-      },
+      "contributorId": "6a3f0c2d-1b4e-4f5a-8c6d-9e0f1a2b3c4d",
       "role": "Author"
     },
     {
-      "name": {
-        "displayName": "Alan Lee",
-        "legalName": "Alan Lee"
-      },
+      "contributorId": "7b4e1d3f-2c5a-4e6b-9d7e-0f1a2b3c4d5e",
       "role": "Illustrator"
     }
   ],

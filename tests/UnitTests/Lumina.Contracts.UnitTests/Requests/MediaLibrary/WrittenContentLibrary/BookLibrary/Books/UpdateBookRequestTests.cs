@@ -1,4 +1,4 @@
-#region ========================================================================= USING =====================================================================================
+﻿#region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
@@ -36,7 +36,6 @@ public class UpdateBookRequestTests
 
         // Assert
         Assert.NotNull(sut);
-        Assert.False(string.IsNullOrWhiteSpace(sut.Id));
         Assert.NotNull(sut.Metadata);
         Assert.NotNull(sut.ISBNs);
         Assert.NotEmpty(sut.ISBNs);
@@ -82,10 +81,9 @@ public class UpdateBookRequestTests
         UpdateBookRequest sut = _updateBookRequestFixture.Create();
 
         // Act
-        (string? id, WrittenContentMetadataDto? metadata, BookFormat? format, string? edition, float? volumeNumber, BookSeriesDto? series, string? asin, string? goodreadsId, string? lccn, string? oclcNumber, string? openLibraryId, string? libraryThingId, string? googleBooksId, string? barnesAndNobleId, string? appleBooksId, List<IsbnDto>? isbns, List<MediaContributorDto>? contributors, List<BookRatingDto>? ratings) = sut;
+        (WrittenContentMetadataDto? metadata, BookFormat? format, string? edition, float? volumeNumber, BookSeriesDto? series, string? asin, string? goodreadsId, string? lccn, string? oclcNumber, string? openLibraryId, string? libraryThingId, string? googleBooksId, string? barnesAndNobleId, string? appleBooksId, List<IsbnDto>? isbns, List<MediaContributorReferenceDto>? contributors, List<BookRatingDto>? ratings) = sut;
 
         // Assert
-        Assert.Equal(sut.Id, id);
         Assert.Equal(sut.Metadata, metadata);
         Assert.Equal(sut.Format, format);
         Assert.Equal(sut.Edition, edition);

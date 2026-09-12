@@ -1,4 +1,4 @@
-#region ========================================================================= USING =====================================================================================
+﻿#region ========================================================================= USING =====================================================================================
 using Bogus;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Commands.UpdateBook;
 using Lumina.Contracts.DTO.Common;
@@ -25,13 +25,14 @@ public class UpdateBookCommandFixture
 {
     private readonly IsbnDtoFixture _isbnDtoFixture = new();
     private readonly BookRatingDtoFixture _bookRatingDtoFixture = new();
-    private readonly MediaContributorDtoFixture _mediaContributorDtoFixture = new();
+    private readonly MediaContributorReferenceDtoFixture _mediaContributorReferenceDtoFixture = new();
     private readonly WrittenContentMetadataDtoFixture _writtenContentMetadataDtoFixture = new();
 
     /// <summary>
     /// Creates a random valid command to update a book.
     /// </summary>
-    /// <param name="id">Optional. The Id of the book to update.</param>
+    /// <param name="libraryId">Optional. The Id of the media library the book belongs to.</param>
+    /// <param name="bookId">Optional. The Id of the book to update.</param>
     /// <param name="metadata">Optional. The written content metadata of the book.</param>
     /// <param name="format">Optional. The format of the book.</param>
     /// <param name="edition">Optional. The edition of the book.</param>
@@ -53,7 +54,8 @@ public class UpdateBookCommandFixture
     /// <param name="includeOptionalProperties">Whether the properties that are not explicitly provided should be randomized, or forced to <see langword="null"/>.</param>
     /// <returns>The created command to update a book.</returns>
     public UpdateBookCommand Create(
-        Guid? id = null,
+        string? libraryId = null,
+        string? bookId = null,
         WrittenContentMetadataDto? metadata = null,
         BookFormat? format = null,
         string? edition = null,
@@ -69,7 +71,7 @@ public class UpdateBookCommandFixture
         string? barnesAndNobleId = null,
         string? appleBooksId = null,
         List<IsbnDto>? isbns = null,
-        List<MediaContributorDto>? contributors = null,
+        List<MediaContributorReferenceDto>? contributors = null,
         List<BookRatingDto>? ratings = null,
         bool includeMetadata = true,
         bool includeOptionalProperties = true)
@@ -77,6 +79,7 @@ public class UpdateBookCommandFixture
         return new Faker<UpdateBookCommand>()
             .CustomInstantiator(f => new UpdateBookCommand(
                 default,
+                default,
                 default!,
                 default,
                 default,
@@ -90,12 +93,13 @@ public class UpdateBookCommandFixture
                 default,
                 default,
                 default,
-                default,
+                default!,
                 default!,
                 default!,
                 default!
             ))
-            .RuleFor(x => x.Id, id ?? Guid.NewGuid())
+            .RuleFor(x => x.LibraryId, libraryId ?? Guid.NewGuid().ToString())
+            .RuleFor(x => x.BookId, bookId ?? Guid.NewGuid().ToString())
             .RuleFor(x => x.Metadata, includeMetadata ? (metadata ?? _writtenContentMetadataDtoFixture.Create()) : null)
             .RuleFor(x => x.Format, f => format ?? (includeOptionalProperties ? f.PickRandom<BookFormat>() : null))
             .RuleFor(x => x.Edition, f => edition ?? (includeOptionalProperties ? f.Random.String2(f.Random.Number(1, 50)) : null))
@@ -112,7 +116,7 @@ public class UpdateBookCommandFixture
             .RuleFor(x => x.AppleBooksId, f => appleBooksId ?? (includeOptionalProperties ? $"id{f.Random.Number(1, 999999)}" : null))
             .RuleFor(p => p.ISBNs, f => isbns ?? (includeOptionalProperties ? [.. _isbnDtoFixture.CreateMany(f.Random.Number(1, 3))] : null))
             .RuleFor(p => p.Ratings, f => ratings ?? (includeOptionalProperties ? [.. _bookRatingDtoFixture.CreateMany(f.Random.Number(1, 3))] : null))
-            .RuleFor(x => x.Contributors, f => contributors ?? (includeOptionalProperties ? [.. _mediaContributorDtoFixture.CreateMany(f.Random.Number(1, 3))] : null));
+            .RuleFor(x => x.Contributors, f => contributors ?? (includeOptionalProperties ? [.. _mediaContributorReferenceDtoFixture.CreateMany(f.Random.Number(1, 3))] : null));
     }
 
     /// <summary>

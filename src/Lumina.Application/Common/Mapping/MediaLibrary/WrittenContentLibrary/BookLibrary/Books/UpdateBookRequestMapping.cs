@@ -15,11 +15,14 @@ public static class UpdateBookRequestMapping
     /// Converts <paramref name="request"/> to <see cref="UpdateBookCommand"/>.
     /// </summary>
     /// <param name="request">The request to be converted.</param>
+    /// <param name="libraryId">The Id of the library the book belongs to, taken from the route.</param>
+    /// <param name="bookId">The Id of the book to update, taken from the route.</param>
     /// <returns>The converted command.</returns>
-    public static UpdateBookCommand ToCommand(this UpdateBookRequest request)
+    public static UpdateBookCommand ToCommand(this UpdateBookRequest request, string? libraryId, string? bookId)
     {
         return new UpdateBookCommand(
-            Guid.TryParse(request.Id, out Guid bookId) ? bookId : Guid.Empty,
+            libraryId,
+            bookId,
             request.Metadata,
             request.Format,
             request.Edition,

@@ -1,4 +1,4 @@
-#region ========================================================================= USING =====================================================================================
+﻿#region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
 using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
@@ -14,7 +14,8 @@ namespace Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary
 /// <summary>
 /// Command for updating an existing book.
 /// </summary>
-/// <param name="Id">The Id of the book to update.</param>
+/// <param name="LibraryId">The unique identifier of the media library this book belongs to, taken from the route.</param>
+/// <param name="BookId">The unique identifier of the book to update, taken from the route.</param>
 /// <param name="Metadata">Written content metadata of the book.</param>
 /// <param name="Format">The format of the book (e.g., Hardcover, Paperback), if applicable.</param>
 /// <param name="Edition">The edition of the book, if applicable.</param>
@@ -34,7 +35,8 @@ namespace Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary
 /// <param name="Ratings">The list of ratings for this book.</param>
 [DebuggerDisplay("Title: {Metadata.Title}")]
 public record UpdateBookCommand(
-    Guid Id,
+    string? LibraryId,
+    string? BookId,
     WrittenContentMetadataDto? Metadata,
     BookFormat? Format,
     string? Edition,
@@ -50,6 +52,6 @@ public record UpdateBookCommand(
     string? BarnesAndNobleId,
     string? AppleBooksId,
     List<IsbnDto>? ISBNs,
-    List<MediaContributorDto>? Contributors,
+    List<MediaContributorReferenceDto>? Contributors,
     List<BookRatingDto>? Ratings
 ) : ICommand;

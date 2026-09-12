@@ -1,6 +1,7 @@
-#region ========================================================================= USING =====================================================================================
+﻿#region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Commands.UpdateBook;
+using Lumina.Contracts.Fixtures.Core.DTO.MediaContributors;
 using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
@@ -18,20 +19,23 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenConten
 public class UpdateBookRequestMappingTests
 {
     private readonly UpdateBookRequestFixture _requestFixture = new();
+    private readonly MediaContributorReferenceDtoFixture _mediaContributorReferenceDtoFixture = new();
 
     [Fact]
     public void ToCommand_WhenMappingCompleteRequest_ShouldMapAllPropertiesCorrectly()
     {
         // Arrange
+        Guid libraryId = Guid.NewGuid();
         Guid bookId = Guid.NewGuid();
-        UpdateBookRequest request = _requestFixture.Create(id: bookId);
+        UpdateBookRequest request = _requestFixture.Create();
 
         // Act
-        UpdateBookCommand result = request.ToCommand();
+        UpdateBookCommand result = request.ToCommand(libraryId.ToString(), bookId.ToString());
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(bookId, result.Id);
+        Assert.Equal(libraryId.ToString(), result.LibraryId);
+        Assert.Equal(bookId.ToString(), result.BookId);
         Assert.Equal(request.Metadata, result.Metadata);
         Assert.Equal(request.Format, result.Format);
         Assert.Equal(request.Edition, result.Edition);
@@ -55,15 +59,16 @@ public class UpdateBookRequestMappingTests
     public void ToCommand_WhenMappingMinimalRequest_ShouldMapCorrectly()
     {
         // Arrange
+        Guid libraryId = Guid.NewGuid();
         Guid bookId = Guid.NewGuid();
-        UpdateBookRequest request = _requestFixture.Create(id: bookId, includeOptionalProperties: false);
+        UpdateBookRequest request = _requestFixture.Create(includeOptionalProperties: false);
 
         // Act
-        UpdateBookCommand result = request.ToCommand();
+        UpdateBookCommand result = request.ToCommand(libraryId.ToString(), bookId.ToString());
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(bookId, result.Id);
+        Assert.Equal(bookId.ToString(), result.BookId);
         Assert.NotNull(result.Metadata);
         Assert.Equal(request.Metadata, result.Metadata);
         Assert.Null(result.Format);
@@ -88,21 +93,20 @@ public class UpdateBookRequestMappingTests
     public void ToCommand_WhenMappingRequestWithCollections_ShouldMapCollectionsCorrectly()
     {
         // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid bookId = Guid.NewGuid();
         UpdateBookRequest request = _requestFixture.Create(
             isbns: [new("978-0-123456-78-9", IsbnFormat.Isbn13)],
             contributors:
             [
-                new(
-                    new("John Doe", "John Smith Doe"),
-                    new("Author", MediaContributorRoleCategory.Author)
-                )
+                _mediaContributorReferenceDtoFixture.Create(role: MediaContributorRole.Author)
             ],
             ratings: [new(4.5m, 5m, BookRatingSource.Goodreads, 1000)],
             includeOptionalProperties: false
         );
 
         // Act
-        UpdateBookCommand result = request.ToCommand();
+        UpdateBookCommand result = request.ToCommand(libraryId.ToString(), bookId.ToString());
 
         // Assert
         Assert.NotNull(result);
@@ -112,41 +116,16 @@ public class UpdateBookRequestMappingTests
     }
 
     [Fact]
-    public void ToCommand_WhenMappingRequestWithNullId_ShouldMapEmptyGuid()
+    public void ToCommand_WhenRouteValuesAreNotParseable_ShouldMapThemAsIs()
     {
         // Arrange
-        UpdateBookRequest request = _requestFixture.Create(includeId: false);
+        UpdateBookRequest request = _requestFixture.Create(includeOptionalProperties: false);
 
         // Act
-        UpdateBookCommand result = request.ToCommand();
+        UpdateBookCommand result = request.ToCommand("not-a-library-guid", "not-a-guid");
 
         // Assert
-        Assert.Equal(Guid.Empty, result.Id);
-    }
-
-    [Fact]
-    public void ToCommand_WhenMappingRequestWithEmptyId_ShouldMapEmptyGuid()
-    {
-        // Arrange
-        UpdateBookRequest request = _requestFixture.Create(rawId: string.Empty);
-
-        // Act
-        UpdateBookCommand result = request.ToCommand();
-
-        // Assert
-        Assert.Equal(Guid.Empty, result.Id);
-    }
-
-    [Fact]
-    public void ToCommand_WhenMappingRequestWithUnparseableId_ShouldMapEmptyGuid()
-    {
-        // Arrange
-        UpdateBookRequest request = _requestFixture.Create(rawId: "not-a-guid");
-
-        // Act
-        UpdateBookCommand result = request.ToCommand();
-
-        // Assert
-        Assert.Equal(Guid.Empty, result.Id);
+        Assert.Equal("not-a-library-guid", result.LibraryId);
+        Assert.Equal("not-a-guid", result.BookId);
     }
 }

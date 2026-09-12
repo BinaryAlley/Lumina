@@ -18,18 +18,34 @@ public class UpdateBookCommandValidator : AbstractValidator<UpdateBookCommand>
     /// </summary>
     public UpdateBookCommandValidator()
     {
-        RuleFor(command => command.Id)
+        // Validates the identifier of the media library the book belongs to, taken from the route.
+        RuleFor(command => command.LibraryId)
             .NotEmpty()
-            .WithError(Errors.WrittenContent.BookIdCannotBeEmpty)
-            .Must(id => id != Guid.Empty)
+            .WithError(Errors.Library.LibraryIdCannotBeEmpty);
+
+        RuleFor(command => command.LibraryId)
+            .Must(libraryId => Guid.TryParse(libraryId, out Guid parsedLibraryId) && parsedLibraryId != Guid.Empty)
+            .When(command => command.LibraryId is not null && command.LibraryId.Length > 0)
+            .WithError(Errors.Library.LibraryIdCannotBeEmpty);
+
+        // Validates the identifier of the book to update, taken from the route.
+        RuleFor(command => command.BookId)
+            .NotEmpty()
             .WithError(Errors.WrittenContent.BookIdCannotBeEmpty);
 
+        RuleFor(command => command.BookId)
+            .Must(bookId => Guid.TryParse(bookId, out Guid parsedBookId) && parsedBookId != Guid.Empty)
+            .When(command => command.BookId is not null && command.BookId.Length > 0)
+            .WithError(Errors.WrittenContent.BookIdCannotBeEmpty);
+
+        // Validates the metadata of the book: title, lengths, release information, languages, genres and tags.
         RuleFor(command => command.Metadata)
             .NotNull()
             .WithError(Errors.Metadata.MetadataCannotBeNull)
             .ChildRules(metadata =>
             {
                 metadata.RuleFor(m => m!.Title)
+                    .NotNull()
                     .NotEmpty()
                     .WithError(Errors.Metadata.TitleCannotBeEmpty)
                     .MaximumLength(255)
@@ -125,7 +141,7 @@ public class UpdateBookCommandValidator : AbstractValidator<UpdateBookCommand>
                 metadata.RuleFor(m => m!.Language!.LanguageCode)
                     .NotEmpty()
                     .WithError(Errors.Metadata.LanguageCodeCannotBeEmpty)
-                    .MaximumLength(2)
+                    .Length(2)
                     .WithError(Errors.Metadata.LanguageCodeMustBe2CharactersLong)
                     .When(m => m!.Language is not null);
 
@@ -144,7 +160,7 @@ public class UpdateBookCommandValidator : AbstractValidator<UpdateBookCommand>
                 metadata.RuleFor(m => m!.OriginalLanguage!.LanguageCode)
                     .NotEmpty()
                     .WithError(Errors.Metadata.LanguageCodeCannotBeEmpty)
-                    .MaximumLength(2)
+                    .Length(2)
                     .WithError(Errors.Metadata.LanguageCodeMustBe2CharactersLong)
                     .When(m => m!.OriginalLanguage is not null);
 
@@ -171,6 +187,7 @@ public class UpdateBookCommandValidator : AbstractValidator<UpdateBookCommand>
                     .WithError(Errors.WrittenContent.PageCountMustBeGreaterThanZero);
             });
 
+        // Validates the physical characteristics of the book: format, edition and volume number.
         RuleFor(command => command.Format)
             .IsInEnum()
             .When(command => command.Format is not null)
@@ -186,6 +203,7 @@ public class UpdateBookCommandValidator : AbstractValidator<UpdateBookCommand>
             .When(command => command.VolumeNumber.HasValue)
             .WithError(Errors.WrittenContent.VolumeNumberMustBeGreaterThanZero);
 
+        // Validates the series the book is part of, when the request carries one.
         RuleFor(command => command.Series)
             .ChildRules(series =>
                 series.RuleFor(s => s!.Title)
@@ -195,6 +213,7 @@ public class UpdateBookCommandValidator : AbstractValidator<UpdateBookCommand>
                     .WithError(Errors.Metadata.TitleMustBeMaximum255CharactersLong))
             .When(command => command.Series is not null);
 
+        // Validates the external identifiers of the book.
         RuleFor(command => command.ASIN)
             .Length(10)
             .When(command => command.ASIN is not null)
@@ -246,6 +265,7 @@ public class UpdateBookCommandValidator : AbstractValidator<UpdateBookCommand>
             .When(command => command.AppleBooksId is not null)
             .WithError(Errors.WrittenContent.InvalidAppleBooksIdFormat);
 
+        // Validates the ISBN list of the book.
         RuleFor(command => command.ISBNs)
             .NotNull()
             .WithError(Errors.WrittenContent.IsbnListCannotBeNull);
@@ -272,48 +292,26 @@ public class UpdateBookCommandValidator : AbstractValidator<UpdateBookCommand>
                     .WithError(Errors.WrittenContent.UnknownIsbnFormat);
             });
 
+        // Validates the media contributors that contributed to the book.
         RuleFor(command => command.Contributors)
             .NotNull()
-            .WithError(Errors.MediaContributor.ContributorsListCannotBeNull);
+            .WithError(Errors.WrittenContent.ContributorsListCannotBeNull);
 
         RuleForEach(command => command.Contributors)
             .ChildRules(contributor =>
             {
-                contributor.RuleFor(c => c.Name)
-                    .NotNull()
-                    .WithError(Errors.MediaContributor.ContributorNameCannotBeEmpty)
-                    .ChildRules(name =>
-                    {
-                        name.RuleFor(n => n!.DisplayName)
-                            .NotNull()
-                            .WithError(Errors.MediaContributor.ContributorDisplayNameCannotBeEmpty)
-                            .NotEmpty()
-                            .WithError(Errors.MediaContributor.ContributorDisplayNameCannotBeEmpty)
-                            .MaximumLength(100)
-                            .WithError(Errors.MediaContributor.ContributorDisplayNameMustBeMaximum100CharactersLong);
-
-                        name.RuleFor(n => n!.LegalName)
-                            .MaximumLength(100)
-                            .When(n => n!.LegalName is not null)
-                            .WithError(Errors.MediaContributor.ContributorLegalNameMustBeMaximum100CharactersLong);
-                    });
+                contributor.RuleFor(c => c.ContributorId)
+                    .NotEmpty()
+                    .WithError(Errors.MediaContributor.MediaContributorIdCannotBeEmpty)
+                    .Must(contributorId => contributorId != Guid.Empty)
+                    .WithError(Errors.MediaContributor.MediaContributorIdCannotBeEmpty);
 
                 contributor.RuleFor(c => c.Role)
-                    .NotNull()
-                    .WithError(Errors.MediaContributor.ContributorRoleCannotBeNull)
-                    .ChildRules(role =>
-                    {
-                        role.RuleFor(r => r!.Name)
-                            .NotEmpty()
-                            .WithError(Errors.MediaContributor.RoleNameCannotBeEmpty)
-                            .MaximumLength(50)
-                            .WithError(Errors.MediaContributor.RoleNameMustBeMaximum50CharactersLong);
-                        role.RuleFor(r => r!.Category)
-                            .NotEmpty()
-                            .WithError(Errors.MediaContributor.RoleCategoryCannotBeEmpty);
-                    });
+                    .IsInEnum()
+                    .WithError(Errors.MediaContributor.UnknownMediaContributorRole);
             });
 
+        // Validates the ratings of the book.
         RuleFor(command => command.Ratings)
             .NotNull()
             .WithError(Errors.Metadata.RatingsListCannotBeNull);
