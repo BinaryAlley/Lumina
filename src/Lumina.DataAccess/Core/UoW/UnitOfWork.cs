@@ -142,7 +142,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _albumRepository ??= new AlbumRepository(_luminaDbContext);
+            _albumRepository ??= new AlbumRepository(_luminaDbContext, TrackRepository);
             return _albumRepository;
         }
     }
