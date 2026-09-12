@@ -1,4 +1,4 @@
-#region ========================================================================= USING =====================================================================================
+﻿#region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Commands.AddBook;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaContributors;
@@ -21,20 +21,22 @@ public class AddBookRequestMappingTests
 {
     private readonly AddBookRequestFixture _requestFixture = new();
     private readonly WrittenContentMetadataDtoFixture _writtenContentMetadataDtoFixture = new();
-    private readonly MediaContributorNameDtoFixture _mediaContributorNameDtoFixture = new();
-    private readonly MediaContributorRoleDtoFixture _mediaContributorRoleDtoFixture = new();
+    private readonly MediaContributorReferenceDtoFixture _mediaContributorReferenceDtoFixture = new();
 
     [Fact]
     public void ToCommand_WhenMappingCompleteRequest_ShouldMapAllPropertiesCorrectly()
     {
         // Arrange
+        Guid libraryId = Guid.NewGuid();
         AddBookRequest request = _requestFixture.Create();
 
         // Act
-        AddBookCommand result = request.ToCommand();
+        AddBookCommand result = request.ToCommand(libraryId.ToString());
 
         // Assert
         Assert.NotNull(result);
+        Assert.Equal(libraryId.ToString(), result.LibraryId);
+        Assert.Equal(request.Path, result.Path);
         Assert.Equal(request.Metadata, result.Metadata);
         Assert.Equal(request.Format, result.Format);
         Assert.Equal(request.Edition, result.Edition);
@@ -58,15 +60,15 @@ public class AddBookRequestMappingTests
     public void ToCommand_WhenMappingMinimalRequest_ShouldMapCorrectly()
     {
         // Arrange
+        Guid libraryId = Guid.NewGuid();
         AddBookRequest request = _requestFixture.Create(
-            libraryId: Guid.NewGuid(),
             path: "/books/test.epub",
             metadata: _writtenContentMetadataDtoFixture.Create(title: "Test Book"),
             includeOptionalProperties: false
         );
 
         // Act
-        AddBookCommand result = request.ToCommand();
+        AddBookCommand result = request.ToCommand(libraryId.ToString());
 
         // Assert
         Assert.NotNull(result);
@@ -93,24 +95,21 @@ public class AddBookRequestMappingTests
     public void ToCommand_WhenMappingRequestWithCollections_ShouldMapCollectionsCorrectly()
     {
         // Arrange
+        Guid libraryId = Guid.NewGuid();
         AddBookRequest request = _requestFixture.Create(
-            libraryId: Guid.NewGuid(),
             path: "/books/test.epub",
             metadata: _writtenContentMetadataDtoFixture.Create(title: "Test Book"),
             isbns: [new("978-0-123456-78-9", IsbnFormat.Isbn13)],
             contributors:
             [
-                new(
-                    _mediaContributorNameDtoFixture.Create(displayName: "John Doe", legalName: "John Smith Doe"),
-                    _mediaContributorRoleDtoFixture.Create(name: "Author", category: MediaContributorRoleCategory.Author)
-                )
+                _mediaContributorReferenceDtoFixture.Create(role: MediaContributorRole.Author)
             ],
             ratings: [new(4.5m, 5m, BookRatingSource.Goodreads, 1000)],
             includeOptionalProperties: false
         );
 
         // Act
-        AddBookCommand result = request.ToCommand();
+        AddBookCommand result = request.ToCommand(libraryId.ToString());
 
         // Assert
         Assert.NotNull(result);

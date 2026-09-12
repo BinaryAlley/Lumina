@@ -5,12 +5,11 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.DataAccess.Entities.MediaContributors;
+namespace Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 
 /// <summary>
-/// Repository entity for the participation of a media contributor in a book, carrying the role the contributor
-/// played in that book. The role is tracked per participation, so that a single contributor can play multiple
-/// roles in the same book, or different roles in different books.
+/// Repository entity for the participation of a media contributor in a book, carrying the role the contributor played in that book. 
+/// The role is tracked per participation, so that a single contributor can play multiple roles in the same book, or different roles in different books.
 /// </summary>
 [DebuggerDisplay("BookId: {BookId} MediaContributorId: {MediaContributorId}")]
 public class BookContributorEntity : IStorageEntity, IAuditableEntity
@@ -21,24 +20,19 @@ public class BookContributorEntity : IStorageEntity, IAuditableEntity
     public required Guid Id { get; init; }
 
     /// <summary>
-    /// Gets or sets the Id of the book the contributor participated in.
+    /// Gets the Id of the book the contributor participated in.
     /// </summary>
-    public required Guid BookId { get; set; }
+    public required Guid BookId { get; init; }
 
     /// <summary>
-    /// Gets or sets the Id of the media contributor.
+    /// Gets the Id of the media contributor.
     /// </summary>
-    public required Guid MediaContributorId { get; set; }
+    public required Guid MediaContributorId { get; init; }
 
     /// <summary>
-    /// Gets or sets the display name of the role the contributor played in the book.
+    /// Gets the role the contributor played in the book.
     /// </summary>
-    public required string RoleName { get; set; }
-
-    /// <summary>
-    /// Gets or sets the canonical category of the role the contributor played in the book.
-    /// </summary>
-    public required MediaContributorRoleCategory RoleCategory { get; set; }
+    public required MediaContributorRole Role { get; init; }
 
     /// <summary>
     /// Gets or sets the time and date when the entity was added.
@@ -58,5 +52,5 @@ public class BookContributorEntity : IStorageEntity, IAuditableEntity
     /// <summary>
     /// Gets or sets the optional Id of the user that updated the entity.
     /// </summary>
-    public required Guid? UpdatedBy { get; set; }
+    public Guid? UpdatedBy { get; set; }
 }

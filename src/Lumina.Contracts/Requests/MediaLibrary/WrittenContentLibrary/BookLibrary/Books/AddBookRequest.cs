@@ -1,4 +1,4 @@
-#region ========================================================================= USING =====================================================================================
+﻿#region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
@@ -13,8 +13,7 @@ namespace Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibra
 /// <summary>
 /// Represents a request to add a book.
 /// </summary>
-/// <param name="LibraryId">The Id of the media library this book belongs to. Required.</param>
-/// <param name="Path">The file system path of the book. Required.</param>
+/// <param name="Path">The file system path of the book. It must be inside one of the content locations of the media library that owns it. Required.</param>
 /// <param name="Metadata">Written content metadata of the book. Required.</param>
 /// <param name="Format">The format of the book (e.g., Hardcover, Paperback). Optional.</param>
 /// <param name="Edition">The edition of the book. Optional.</param>
@@ -30,11 +29,10 @@ namespace Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibra
 /// <param name="BarnesAndNobleId">The Barnes & Noble Id of the book. Optional.</param>
 /// <param name="AppleBooksId">The Apple Books Id of the book. Optional.</param>
 /// <param name="ISBNs">The list of ISBN (International Standard Book Number) of the book. Required.</param>
-/// <param name="Contributors">The list of media contributors (actors, directors, etc) starring in this book. Required.</param>
+/// <param name="Contributors">The list of media contributors of the book. Required.</param>
 /// <param name="Ratings">The list of ratings for this book. Required.</param>
 [DebuggerDisplay("Title: {Metadata.Title}")]
 public record AddBookRequest(
-    Guid LibraryId,
     string Path,
     WrittenContentMetadataDto? Metadata,
     BookFormat? Format,
@@ -51,6 +49,6 @@ public record AddBookRequest(
     string? BarnesAndNobleId,
     string? AppleBooksId,
     List<IsbnDto>? ISBNs,
-    List<MediaContributorDto>? Contributors,
+    List<MediaContributorReferenceDto>? Contributors,
     List<BookRatingDto>? Ratings
 );

@@ -4,6 +4,7 @@ using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using System;
+using System.Linq;
 #endregion
 
 namespace Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
@@ -57,9 +58,19 @@ public static class BookMapping
             BarnesAndNobleId = domainEntity.BarnesAndNobleId.HasValue ? domainEntity.BarnesAndNobleId.Value : null,
             AppleBooksId = domainEntity.AppleBooksId.HasValue ? domainEntity.AppleBooksId.Value : null,
             ISBNs = [.. domainEntity.ISBNs.ToRepositoryEntities()],
+            BookContributors = [.. domainEntity.Contributors.Select(contributor => new BookContributorEntity
+            {
+                Id = Guid.NewGuid(),
+                BookId = domainEntity.Id.Value,
+                MediaContributorId = contributor.ContributorId.Value,
+                Role = contributor.Role,
+                CreatedOnUtc = domainEntity.CreatedOnUtc,
+                CreatedBy = Guid.Empty,
+                UpdatedBy = null
+            })],
             Ratings = [.. domainEntity.Ratings.ToRepositoryEntities()],
             CreatedOnUtc = domainEntity.CreatedOnUtc,
-            CreatedBy = Guid.NewGuid(),
+            CreatedBy = Guid.Empty,
             UpdatedOnUtc = domainEntity.UpdatedOnUtc.HasValue ? domainEntity.UpdatedOnUtc : null,
             UpdatedBy = domainEntity.UpdatedOnUtc.HasValue ? Guid.NewGuid() : null,
         };

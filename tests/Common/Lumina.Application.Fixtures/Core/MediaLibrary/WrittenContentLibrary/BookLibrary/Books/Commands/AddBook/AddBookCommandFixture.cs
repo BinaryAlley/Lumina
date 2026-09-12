@@ -1,4 +1,4 @@
-#region ========================================================================= USING =====================================================================================
+﻿#region ========================================================================= USING =====================================================================================
 using Bogus;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Commands.AddBook;
 using Lumina.Contracts.DTO.MediaContributors;
@@ -11,6 +11,7 @@ using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 #endregion
 
@@ -24,7 +25,7 @@ public class AddBookCommandFixture
 {
     private readonly IsbnDtoFixture _isbnDtoFixture = new();
     private readonly BookRatingDtoFixture _bookRatingDtoFixture = new();
-    private readonly MediaContributorDtoFixture _mediaContributorDtoFixture = new();
+    private readonly MediaContributorReferenceDtoFixture _mediaContributorReferenceDtoFixture = new();
     private readonly WrittenContentMetadataDtoFixture _writtenContentMetadataDtoFixture = new();
 
     /// <summary>
@@ -53,7 +54,7 @@ public class AddBookCommandFixture
     /// <param name="includeOptionalProperties">Whether the properties that are not explicitly provided should be randomized, or forced to <see langword="null"/>.</param>
     /// <returns>The created command to add a book.</returns>
     public AddBookCommand Create(
-        Guid? libraryId = null,
+        string? libraryId = null,
         string? path = null,
         WrittenContentMetadataDto? metadata = null,
         BookFormat? format = null,
@@ -70,7 +71,7 @@ public class AddBookCommandFixture
         string? barnesAndNobleId = null,
         string? appleBooksId = null,
         List<IsbnDto>? isbns = null,
-        List<MediaContributorDto>? contributors = null,
+        List<MediaContributorReferenceDto>? contributors = null,
         List<BookRatingDto>? ratings = null,
         bool includeMetadata = true,
         bool includeOptionalProperties = true)
@@ -97,8 +98,8 @@ public class AddBookCommandFixture
                 default!,
                 default!
             ))
-            .RuleFor(x => x.LibraryId, libraryId ?? Guid.NewGuid())
-            .RuleFor(x => x.Path, f => path ?? f.System.FilePath())
+            .RuleFor(x => x.LibraryId, libraryId ?? Guid.NewGuid().ToString())
+            .RuleFor(x => x.Path, f => path ?? Path.Combine(Path.GetTempPath(), "lumina-books", f.System.FileName()))
             .RuleFor(x => x.Metadata, includeMetadata ? (metadata ?? _writtenContentMetadataDtoFixture.Create()) : null)
             .RuleFor(x => x.Format, f => format ?? (includeOptionalProperties ? f.PickRandom<BookFormat>() : null))
             .RuleFor(x => x.Edition, f => edition ?? (includeOptionalProperties ? f.Random.String2(f.Random.Number(1, 50)) : null))
@@ -115,7 +116,7 @@ public class AddBookCommandFixture
             .RuleFor(x => x.AppleBooksId, f => appleBooksId ?? (includeOptionalProperties ? $"id{f.Random.Number(1, 999999)}" : null))
             .RuleFor(p => p.ISBNs, f => isbns ?? (includeOptionalProperties ? [.. _isbnDtoFixture.CreateMany(f.Random.Number(1, 3))] : null))
             .RuleFor(p => p.Ratings, f => ratings ?? (includeOptionalProperties ? [.. _bookRatingDtoFixture.CreateMany(f.Random.Number(1, 3))] : null))
-            .RuleFor(x => x.Contributors, f => contributors ?? (includeOptionalProperties ? [.. _mediaContributorDtoFixture.CreateMany(f.Random.Number(1, 3))] : null));
+            .RuleFor(x => x.Contributors, f => contributors ?? (includeOptionalProperties ? [.. _mediaContributorReferenceDtoFixture.CreateMany(f.Random.Number(1, 3))] : null));
     }
 
     /// <summary>

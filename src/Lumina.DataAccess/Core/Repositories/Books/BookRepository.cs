@@ -4,6 +4,7 @@ using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Specifications;
 using Lumina.DataAccess.Core.Repositories.Books.Specifications;
@@ -58,6 +59,11 @@ internal sealed class BookRepository : IBookRepository
         if (bookExists)
             return Errors.WrittenContent.BookAlreadyExists;
 
+        // A book is unique within its library by its file system path, so the same file can never be registered twice in the same library.
+        bool bookPathExists = await _luminaDbContext.Books.AnyAsync(repositoryBook => repositoryBook.LibraryId == book.LibraryId && repositoryBook.Path == book.Path, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (bookPathExists)
+            return Errors.WrittenContent.BookAlreadyExists;
+
         // Fetch existing tags and genres.
         List<TagEntity> existingTags = await _luminaDbContext.Set<TagEntity>()
             .Where(t => book.Tags.Select(bt => bt.Name).Contains(t.Name))
@@ -81,54 +87,52 @@ internal sealed class BookRepository : IBookRepository
     /// <param name="id">The Id of the book to get.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="BookEntity"/>, or an error.</returns>
-    public async Task<Result<BookEntity?>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<Result<BookEntity?>> GetByIdAsync(Guid id, bool includeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default)
     {
-        return await _luminaDbContext.Books
-            .Include(book => book.Tags)
-            .Include(book => book.Genres)
-            .Include(book => book.ISBNs)
-            .Include(book => book.Ratings)
-            .Include(book => book.BookContributors)
-            .Include(book => book.BookArtwork)
-            .FirstOrDefaultAsync(book => book.Id == id, cancellationToken).ConfigureAwait(false);
+        IQueryable<BookEntity> query = _luminaDbContext.Books;
+        if (!shouldTrackEntities)
+            query = query.AsNoTracking();
+        if (includeNavigationProperties)
+        {
+            query = query
+                .Include(book => book.Tags)
+                .Include(book => book.Genres)
+                .Include(book => book.ISBNs)
+                .Include(book => book.Ratings)
+                .Include(book => book.BookContributors)
+                .Include(book => book.BookArtwork);
+        }
+        return await query.FirstOrDefaultAsync(book => book.Id == id, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
-    /// Gets all books.
-    /// </summary>
-    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="BookEntity"/>, or an error.</returns>
-    public async Task<Result<IEnumerable<BookEntity>>> GetAllAsync(CancellationToken cancellationToken)
-    {
-        return await _luminaDbContext.Books
-            .Include(book => book.Tags)
-            .Include(book => book.Genres)
-            .Include(book => book.ISBNs)
-            .Include(book => book.Ratings)
-            .Include(book => book.BookContributors)
-            .Include(book => book.BookArtwork)
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
-    }
-
     /// <summary>
-    /// Gets paginated books.
+    /// Gets paginated books, or all the books of the matching filters when the pagination data is <see langword="null"/>.
     /// </summary>
     /// <typeparam name="TFilter">The type of the filter used for filtering the data.</typeparam>
     /// <param name="paginationData">The pagination data that includes the current page and the number of items per page to retrieve. If <see langword="null"/>, all matching books are returned.</param>
     /// <param name="sortBy">The name of the fields by which to sort the results.</param>
     /// <param name="sortOrder">The direction in which to sort the results.</param>
     /// <param name="filterModel">The model containing the parameters used to filter the results.</param>
+    /// <param name="includeNavigationProperties">Whether the navigation properties of the entities should be loaded together with the entities themselves. Pass <see langword="false"/> to retrieve only the data stored directly on the entity rows.</param>
+    /// <param name="shouldTrackEntities">Whether the retrieved entities should be tracked by the persistence medium, so that changes to them can be saved. Pass <see langword="false"/> for read-only scenarios, to avoid the tracking overhead.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="PaginatedResultDto{BookEntity}"/>, or an error.</returns>
-    public async Task<Result<PaginatedResultDto<BookEntity>>> GetPaginatedAsync<TFilter>(PaginationDataDto? paginationData, string? sortBy = null, SortOrder? sortOrder = null, TFilter? filterModel = null, CancellationToken cancellationToken = default) where TFilter : BaseFilterDto
+    public async Task<Result<PaginatedResultDto<BookEntity>>> GetAllAsync<TFilter>(PaginationDataDto? paginationData = null, string? sortBy = null, SortOrder? sortOrder = null, TFilter? filterModel = null, bool includeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default) where TFilter : BaseFilterDto
     {
-        IQueryable<BookEntity> booksQuery = _luminaDbContext.Books
-            .Include(book => book.Tags)
-            .Include(book => book.Genres)
-            .Include(book => book.ISBNs)
-            .Include(book => book.Ratings)
-            .Include(book => book.BookArtwork)
-            .AsNoTracking();
+        IQueryable<BookEntity> booksQuery = _luminaDbContext.Books;
+        if (!shouldTrackEntities)
+            booksQuery = booksQuery.AsNoTracking();
+        if (includeNavigationProperties)
+        {
+            booksQuery = booksQuery
+                .Include(book => book.Tags)
+                .Include(book => book.Genres)
+                .Include(book => book.ISBNs)
+                .Include(book => book.Ratings)
+                .Include(book => book.BookContributors)
+                .Include(book => book.BookArtwork);
+        }
 
         // Books should always be retrieved only per owning libraries.
         if (filterModel is not LibraryFilterDto libraryFilter || libraryFilter.LibraryId == Guid.Empty)
@@ -179,6 +183,80 @@ internal sealed class BookRepository : IBookRepository
     }
 
     /// <summary>
+    /// Gets paginated lightweight read models of the books of the media library identified by the provided <paramref name="filterModel"/>,
+    /// or all of them when the pagination data is <see langword="null"/>, projecting only the fields needed to display the books in a grid or a list.
+    /// </summary>
+    /// <typeparam name="TFilter">The type of the filter used for filtering the data.</typeparam>
+    /// <param name="paginationData">The pagination data that includes the current page and the number of items per page to retrieve. If <see langword="null"/>, all matching books are returned.</param>
+    /// <param name="sortBy">The name of the fields by which to sort the results.</param>
+    /// <param name="sortOrder">The direction in which to sort the results.</param>
+    /// <param name="filterModel">The model containing the parameters used to filter the results.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="PaginatedResultDto{BookLiteRow}"/>, or an error.</returns>
+    public async Task<Result<PaginatedResultDto<BookLiteRow>>> GetAllLiteAsync<TFilter>(PaginationDataDto? paginationData = null, string? sortBy = null, SortOrder? sortOrder = null, TFilter? filterModel = null, CancellationToken cancellationToken = default) where TFilter : BaseFilterDto
+    {
+        // Books should always be retrieved only per owning libraries.
+        if (filterModel is not LibraryFilterDto libraryFilter || libraryFilter.LibraryId == Guid.Empty)
+            return Errors.Library.FilterMustIncludeLibraryId;
+
+        // The lightweight read models are always retrieved without tracking, because they are never modified by the caller.
+        IQueryable<BookEntity> booksQuery = _luminaDbContext.Books
+            .AsNoTracking()
+            .Where(book => book.LibraryId == libraryFilter.LibraryId);
+
+        FilterSpecification<BookEntity>? filterSpecification = BuildFilterSpecification(libraryFilter);
+        if (filterSpecification is not null)
+            booksQuery = booksQuery.Where(filterSpecification.ToExpression());
+
+        // Apply sorting based on the specified sortBy and sortOrder parameters.
+        booksQuery = ApplySorting(booksQuery, sortBy, sortOrder ?? SortOrder.Ascending, libraryFilter.ShouldIgnoreThePrefixForAlphaPicker);
+
+        IQueryable<BookLiteRow> liteRowsQuery = booksQuery.Select(book => new BookLiteRow
+        {
+            Id = book.Id,
+            Title = book.Title,
+            ReleaseYear = book.ReReleaseYear ?? book.OriginalReleaseYear,
+            CoverPath = book.BookArtwork
+                .Where(artwork => artwork.ArtworkType == ArtworkType.Cover)
+                .Select(artwork => artwork.FileName)
+                .FirstOrDefault()
+        });
+
+        // If no pagination was requested, return all the books of the library.
+        if (paginationData is null)
+        {
+            IReadOnlyList<BookLiteRow> allBooks = await liteRowsQuery.ToListAsync(cancellationToken).ConfigureAwait(false);
+            return new PaginatedResultDto<BookLiteRow>
+            {
+                Data = allBooks,
+                CurrentPage = 1,
+                PerPage = allBooks.Count,
+                Count = allBooks.Count,
+                NumberOfPages = 1
+            };
+        }
+
+        int count = await booksQuery.Select(book => book.Id).CountAsync(cancellationToken).ConfigureAwait(false);
+        int numberOfPages = (int)Math.Ceiling((double)count / paginationData.PerPage);
+        int currentPage = Math.Min(paginationData.CurrentPage, Math.Max(1, numberOfPages)); // Make sure current page doesn't exceed maximum number of pages.
+
+        // Apply pagination.
+        IReadOnlyList<BookLiteRow> paginatedResult = await liteRowsQuery
+            .Skip((currentPage - 1) * paginationData.PerPage)
+            .Take(paginationData.PerPage)
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+
+        return new PaginatedResultDto<BookLiteRow>
+        {
+            Data = paginatedResult,
+            CurrentPage = currentPage,
+            PerPage = paginationData.PerPage,
+            Count = count,
+            NumberOfPages = numberOfPages
+        };
+    }
+
+    /// <summary>
     /// Gets all the books of the media library identified by <paramref name="libraryId"/>.
     /// </summary>
     /// <param name="libraryId">The Id of the media library whose books are retrieved.</param>
@@ -190,6 +268,7 @@ internal sealed class BookRepository : IBookRepository
             .Include(book => book.Tags)
             .Include(book => book.Genres)
             .Include(book => book.ISBNs)
+            .Include(book => book.BookContributors)
             .Include(book => book.BookArtwork)
             .Where(book => book.LibraryId == libraryId)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
@@ -353,7 +432,7 @@ internal sealed class BookRepository : IBookRepository
     public async Task<Result<IReadOnlyDictionary<Guid, string?>>> GetAuthorsDisplayNamesByBookIdsAsync(IReadOnlyCollection<Guid> bookIds, CancellationToken cancellationToken)
     {
         List<AuthorRow> authorRows = await _luminaDbContext.BookContributors
-            .Where(bookContributor => bookIds.Contains(bookContributor.BookId) && bookContributor.RoleCategory == MediaContributorRoleCategory.Author)
+            .Where(bookContributor => bookIds.Contains(bookContributor.BookId) && bookContributor.Role == MediaContributorRole.Author)
             .Join(_luminaDbContext.MediaContributors,
                 bookContributor => bookContributor.MediaContributorId,
                 contributor => contributor.Id,
@@ -404,6 +483,7 @@ internal sealed class BookRepository : IBookRepository
             .Include(book => book.ISBNs)
             .Include(book => book.Ratings)
             .Include(book => book.BookContributors)
+            .Include(book => book.BookArtwork)
             .FirstOrDefaultAsync(book => book.Id == data.Id, cancellationToken).ConfigureAwait(false);
         if (foundBook is null)
             return Errors.WrittenContent.BookNotFound;
@@ -447,6 +527,8 @@ internal sealed class BookRepository : IBookRepository
         foundBook.Ratings.AddRange(data.Ratings);
         foundBook.BookContributors.Clear();
         foundBook.BookContributors.AddRange(data.BookContributors);
+        foundBook.BookArtwork.Clear();
+        foundBook.BookArtwork.AddRange(data.BookArtwork);
 
         return Result.Updated;
     }

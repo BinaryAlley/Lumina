@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
 using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.ExternalIdentifiers.LibraryManagementBoundedContext.LibraryAggregate;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate.ValueObjects;
+using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.ExternalIdentifiers.MediaContributorBoundedContext.MediaContributorAggregate;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -27,7 +27,6 @@ public class BookFixture
     private readonly WrittenContentMetadataFixture _writtenContentMetadataFixture = new();
     private readonly IsbnFixture _isbnFixture = new();
     private readonly BookRatingFixture _bookRatingFixture = new();
-    private readonly MediaContributorIdFixture _mediaContributorIdFixture = new();
 
     /// <summary>
     /// Creates a random valid <see cref="Book"/> domain aggregate.
@@ -70,7 +69,7 @@ public class BookFixture
         string? barnesAndNobleId = null,
         string? appleBooksId = null,
         List<Isbn>? isbns = null,
-        List<MediaContributorId>? contributors = null,
+        List<BookMediaContributor>? contributors = null,
         List<BookRating>? ratings = null)
     {
         return Book.Create(
@@ -91,7 +90,7 @@ public class BookFixture
             barnesAndNobleId is null ? Optional<string>.Some(_faker.Random.String2(10, "0123456789")) : Optional<string>.Some(barnesAndNobleId),
             appleBooksId is null ? Optional<string>.Some($"id{_faker.Random.Number(1, 999999)}") : Optional<string>.Some(appleBooksId),
             isbns ?? [.. Enumerable.Range(0, _faker.Random.Number(1, 4)).Select(_ => _isbnFixture.Create())],
-            contributors ?? [.. Enumerable.Range(0, _faker.Random.Number(1, 4)).Select(_ => _mediaContributorIdFixture.Create())],
+            contributors ?? [.. Enumerable.Range(0, _faker.Random.Number(1, 4)).Select(_ => BookMediaContributor.Create(MediaContributorId.CreateUnique(), MediaContributorRole.Author).Value)],
             ratings ?? [.. Enumerable.Range(0, _faker.Random.Number(1, 4)).Select(_ => _bookRatingFixture.Create())]
         ).Value;
     }

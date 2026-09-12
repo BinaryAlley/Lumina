@@ -24,7 +24,7 @@ public class MediaContributorDtoTests
         // Arrange
         MediaContributorDto expected = new(
             new MediaContributorNameDto("John Smith", "Johnathan Smith"),
-            new MediaContributorRoleDto("Author", MediaContributorRoleCategory.Author)
+            MediaContributorRole.Author
         );
 
         // Act

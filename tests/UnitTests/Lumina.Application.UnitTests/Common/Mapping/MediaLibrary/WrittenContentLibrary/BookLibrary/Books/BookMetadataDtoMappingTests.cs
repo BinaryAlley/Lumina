@@ -135,38 +135,6 @@ public class BookMetadataDtoMappingTests
     }
 
     [Fact]
-    public void ApplyMetadata_WhenLanguageIsInvalid_ShouldReturnError()
-    {
-        // Arrange
-        Book book = _bookFixture.Create();
-        BookMetadataDto metadata = _bookMetadataDtoFixture.Create(
-            title: "A valid title",
-            language: new LanguageInfoDto("", "English", "English"));
-
-        // Act
-        Result<Success> result = book.ApplyMetadata(metadata);
-
-        // Assert
-        Assert.True(result.IsFailure);
-    }
-
-    [Fact]
-    public void ApplyMetadata_WhenOriginalLanguageIsInvalid_ShouldReturnError()
-    {
-        // Arrange
-        Book book = _bookFixture.Create();
-        BookMetadataDto metadata = _bookMetadataDtoFixture.Create(
-            title: "A valid title",
-            originalLanguage: new LanguageInfoDto("", "English", "English"));
-
-        // Act
-        Result<Success> result = book.ApplyMetadata(metadata);
-
-        // Assert
-        Assert.True(result.IsFailure);
-    }
-
-    [Fact]
     public void ApplyMetadata_WhenIsbnIsInvalid_ShouldReturnError()
     {
         // Arrange

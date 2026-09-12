@@ -1,20 +1,21 @@
-#region ========================================================================= USING =====================================================================================
+﻿#region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
 using Lumina.Contracts.DTO.Common;
+using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.Responses.Common;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
-using Lumina.Domain.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.ExternalIdentifiers.LibraryManagementBoundedContext.LibraryAggregate;
+using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.ExternalIdentifiers.MediaContributorBoundedContext.MediaContributorAggregate;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
@@ -59,6 +60,16 @@ public static class BookEntityMapping
             if (bookRatingResult.IsFailure)
                 return bookRatingResult.Errors;
 
+        List<BookMediaContributor> domainContributors = [];
+        foreach (BookContributorEntity bookContributor in repositoryEntity.BookContributors)
+        {
+            Result<BookMediaContributor> contributorResult = BookMediaContributor.Create(
+                MediaContributorId.Create(bookContributor.MediaContributorId), bookContributor.Role);
+            if (contributorResult.IsFailure)
+                return contributorResult.Errors;
+            domainContributors.Add(contributorResult.Value);
+        }
+
         Result<ReleaseInfo> releaseInfoResult = ReleaseInfo.Create(
                     Optional<DateOnly>.FromNullable(repositoryEntity.OriginalReleaseDate),
                     Optional<int>.FromNullable(repositoryEntity.OriginalReleaseYear),
@@ -71,30 +82,20 @@ public static class BookEntityMapping
             return releaseInfoResult.Errors;
 
         Optional<LanguageInfo> languageInfo = Optional<LanguageInfo>.None();
-        if (repositoryEntity.LanguageCode is not null)
-        {
-            Result<LanguageInfo> languageInfoResult = LanguageInfo.Create(
+        if (repositoryEntity.LanguageCode is not null && repositoryEntity.LanguageName is not null)
+            languageInfo = LanguageInfo.Create(
                     repositoryEntity.LanguageCode,
                     repositoryEntity.LanguageName,
                     Optional<string>.FromNullable(repositoryEntity.LanguageNativeName)
                 );
-            if (languageInfoResult.IsFailure)
-                return languageInfoResult.Errors;
-            languageInfo = languageInfoResult.Value;
-        }
 
         Optional<LanguageInfo> originalLanguageCode = Optional<LanguageInfo>.None();
-        if (repositoryEntity.OriginalLanguageCode is not null)
-        {
-            Result<LanguageInfo> originalLanguageInfoResult = LanguageInfo.Create(
+        if (repositoryEntity.OriginalLanguageCode is not null && repositoryEntity.OriginalLanguageName is not null)
+            originalLanguageCode = LanguageInfo.Create(
                     repositoryEntity.OriginalLanguageCode,
-                    repositoryEntity.OriginalLanguageName!,
+                    repositoryEntity.OriginalLanguageName,
                     Optional<string>.FromNullable(repositoryEntity.OriginalLanguageNativeName)
                 );
-            if (originalLanguageInfoResult.IsFailure)
-                return originalLanguageInfoResult.Errors;
-            originalLanguageCode = originalLanguageInfoResult.Value;
-        }
 
         Result<WrittenContentMetadata> writtenContentMetadataResult = WrittenContentMetadata.Create(
                 repositoryEntity.Title,
@@ -134,7 +135,7 @@ public static class BookEntityMapping
             repositoryEntity.CreatedOnUtc,
             Optional<DateTime>.FromNullable(repositoryEntity.UpdatedOnUtc),
             [.. isbnsResult.Select(isbn => isbn.Value)],
-            [.. repositoryEntity.BookContributors.Select(bookContributor => MediaContributorId.Create(bookContributor.MediaContributorId))],
+            domainContributors,
             [.. bookRatingsResult.Select(bookRating => bookRating.Value)]);
         if (bookResult.IsFailure)
             return bookResult.Errors;
@@ -218,7 +219,7 @@ public static class BookEntityMapping
             repositoryEntity.BarnesAndNobleId,
             repositoryEntity.AppleBooksId,
             [.. repositoryEntity.ISBNs.ToResponses()],
-            null,
+            [.. repositoryEntity.BookContributors.Select(contributor => new MediaContributorReferenceDto(contributor.MediaContributorId, contributor.Role))],
             [.. repositoryEntity.Ratings.ToResponses()],
             repositoryEntity.MetadataStatus,
             repositoryEntity.LastMetadataUpdateUtc,

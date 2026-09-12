@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Presentation.Web.Common.Enums.MediaContributors;
 using System.Diagnostics;
 #endregion
 
@@ -16,7 +17,7 @@ public class MediaContributorDto
     public MediaContributorNameDto? Name { get; set; }
 
     /// <summary>
-    /// Gets the role of the contributor.
+    /// Gets the canonical role of the contributor, used as the key of its localized display string.
     /// </summary>
-    public MediaContributorRoleDto? Role { get; set; }
+    public MediaContributorRole? Role { get; set; }
 }

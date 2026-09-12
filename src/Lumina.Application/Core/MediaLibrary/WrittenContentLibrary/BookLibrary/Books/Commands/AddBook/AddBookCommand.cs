@@ -1,4 +1,4 @@
-#region ========================================================================= USING =====================================================================================
+﻿#region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
 using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
@@ -14,7 +14,7 @@ namespace Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary
 /// <summary>
 /// Command for adding a book.
 /// </summary>
-/// <param name="LibraryId">The Id of the media library this book belongs to.</param>
+/// <param name="LibraryId">The unique identifier of the media library this book belongs to, taken from the route.</param>
 /// <param name="Path">The file system path of the book.</param>
 /// <param name="Metadata">Written content metadata of the book.</param>
 /// <param name="Format">The format of the book (e.g., Hardcover, Paperback), if applicable.</param>
@@ -35,7 +35,7 @@ namespace Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary
 /// <param name="Ratings">The list of ratings for this book.</param>
 [DebuggerDisplay("Title: {Metadata.Title}")]
 public record AddBookCommand(
-    Guid LibraryId,
+    string? LibraryId,
     string Path,
     WrittenContentMetadataDto? Metadata,
     BookFormat? Format,
@@ -52,6 +52,6 @@ public record AddBookCommand(
     string? BarnesAndNobleId,
     string? AppleBooksId,
     List<IsbnDto>? ISBNs,
-    List<MediaContributorDto>? Contributors,
+    List<MediaContributorReferenceDto>? Contributors,
     List<BookRatingDto>? Ratings
 ) : ICommand;

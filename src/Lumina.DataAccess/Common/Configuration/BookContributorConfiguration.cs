@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 #endregion
@@ -22,40 +22,36 @@ public class BookContributorConfiguration : IEntityTypeConfiguration<BookContrib
         builder.Property(bookContributor => bookContributor.Id)
             .ValueGeneratedNever() // because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it
             .HasColumnOrder(0);
+
         builder.Property(bookContributor => bookContributor.BookId)
             .IsRequired()
             .HasColumnOrder(1);
         builder.Property(bookContributor => bookContributor.MediaContributorId)
             .IsRequired()
             .HasColumnOrder(2);
-        builder.Property(bookContributor => bookContributor.RoleName)
-            .IsRequired()
-            .HasMaxLength(100)
-            .HasColumnOrder(3);
-        builder.Property(bookContributor => bookContributor.RoleCategory)
-            .IsRequired()
+        builder.Property(bookContributor => bookContributor.Role)
             .HasConversion<string>()
             .HasMaxLength(50)
-            .HasColumnOrder(4);
+            .IsRequired()
+            .HasColumnOrder(3);
 
         // audit
         builder.Property(bookContributor => bookContributor.CreatedOnUtc)
             .IsRequired()
-            .HasColumnOrder(5);
+            .HasColumnOrder(4);
 
         builder.Property(bookContributor => bookContributor.CreatedBy)
             .IsRequired()
-            .HasColumnOrder(6);
+            .HasColumnOrder(5);
 
         builder.Property(bookContributor => bookContributor.UpdatedOnUtc)
-            .HasDefaultValue(null)
-            .HasColumnOrder(7);
+            .HasColumnOrder(6);
 
         builder.Property(bookContributor => bookContributor.UpdatedBy)
-            .HasDefaultValue(null)
-            .HasColumnOrder(8);
+            .HasColumnOrder(7);
 
-        builder.HasIndex(bookContributor => new { bookContributor.BookId, bookContributor.MediaContributorId });
+        builder.HasIndex(bookContributor => new { bookContributor.BookId, bookContributor.MediaContributorId, bookContributor.Role })
+            .IsUnique();
         builder.HasIndex(bookContributor => bookContributor.MediaContributorId);
     }
 }

@@ -3,6 +3,7 @@ using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentL
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.DataAccess.Core.Repositories.Books;
 using Lumina.DataAccess.Core.UoW;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
@@ -134,5 +135,59 @@ public class BookRepositoryTests
         BookArtworkEntity? keptArtwork = await context.Set<BookArtworkEntity>().AsNoTracking().FirstOrDefaultAsync(artwork => artwork.BookId == bookOfAnotherLibrary.Id);
         Assert.NotNull(keptArtwork);
         Assert.Equal(ArtworkStatus.Enriched, keptArtwork!.Status);
+    }
+
+    [Fact]
+    public async Task InsertAsync_WhenCalledWithAValidBook_ShouldPersistTheBook()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-insert-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        BookRepository sut = new(context);
+
+        BookEntity book = _bookEntityFixture.Create();
+
+        // Act
+        Result<Created> result = await sut.InsertAsync(book, CancellationToken.None);
+        await context.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Created, result.Value);
+        BookEntity? storedBook = await context.Books.AsNoTracking().FirstOrDefaultAsync(candidate => candidate.Id == book.Id);
+        Assert.NotNull(storedBook);
+        Assert.Equal(book.Path, storedBook!.Path);
+        Assert.Equal(book.Title, storedBook.Title);
+    }
+
+    [Fact]
+    public async Task InsertAsync_WhenAnotherBookOfTheSameLibraryHasTheSamePath_ShouldReturnBookAlreadyExists()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-insert-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        BookRepository sut = new(context);
+
+        Guid libraryId = Guid.NewGuid();
+        BookEntity existingBook = _bookEntityFixture.Create();
+        existingBook.LibraryId = libraryId;
+        existingBook.Path = "/books/existing.epub";
+        context.Books.Add(existingBook);
+        await context.SaveChangesAsync();
+
+        BookEntity book = _bookEntityFixture.Create();
+        book.LibraryId = libraryId;
+        book.Path = "/books/existing.epub";
+
+        // Act
+        Result<Created> result = await sut.InsertAsync(book, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.WrittenContent.BookAlreadyExists, result.FirstError);
     }
 }

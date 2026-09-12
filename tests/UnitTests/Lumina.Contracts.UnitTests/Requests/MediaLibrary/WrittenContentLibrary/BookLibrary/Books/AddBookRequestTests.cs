@@ -1,4 +1,4 @@
-#region ========================================================================= USING =====================================================================================
+﻿#region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
@@ -36,7 +36,6 @@ public class AddBookRequestTests
 
         // Assert
         Assert.NotNull(sut);
-        Assert.NotEqual(Guid.Empty, sut.LibraryId);
         Assert.False(string.IsNullOrWhiteSpace(sut.Path));
         Assert.NotNull(sut.Metadata);
         Assert.NotNull(sut.ISBNs);
@@ -83,10 +82,9 @@ public class AddBookRequestTests
         AddBookRequest sut = _addBookRequestFixture.Create();
 
         // Act
-        (Guid libraryId, string path, WrittenContentMetadataDto? metadata, BookFormat? format, string? edition, float? volumeNumber, BookSeriesDto? series, string? asin, string? goodreadsId, string? lccn, string? oclcNumber, string? openLibraryId, string? libraryThingId, string? googleBooksId, string? barnesAndNobleId, string? appleBooksId, List<IsbnDto>? isbns, List<MediaContributorDto>? contributors, List<BookRatingDto>? ratings) = sut;
+        (string path, WrittenContentMetadataDto? metadata, BookFormat? format, string? edition, float? volumeNumber, BookSeriesDto? series, string? asin, string? goodreadsId, string? lccn, string? oclcNumber, string? openLibraryId, string? libraryThingId, string? googleBooksId, string? barnesAndNobleId, string? appleBooksId, List<IsbnDto>? isbns, List<MediaContributorReferenceDto>? contributors, List<BookRatingDto>? ratings) = sut;
 
         // Assert
-        Assert.Equal(sut.LibraryId, libraryId);
         Assert.Equal(sut.Path, path);
         Assert.Equal(sut.Metadata, metadata);
         Assert.Equal(sut.Format, format);

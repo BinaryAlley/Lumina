@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaContributors;
+namespace Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 
 /// <summary>
 /// Fixture class for the <see cref="BookContributorEntity"/> class.
@@ -24,23 +24,20 @@ public class BookContributorEntityFixture
     /// <param name="id">Optional. The Id of the participation.</param>
     /// <param name="bookId">Optional. The Id of the book the contributor participated in.</param>
     /// <param name="mediaContributorId">Optional. The Id of the media contributor.</param>
-    /// <param name="roleName">Optional. The display name of the role the contributor played in the book.</param>
-    /// <param name="roleCategory">Optional. The canonical category of the role the contributor played in the book.</param>
+    /// <param name="role">Optional. The role the contributor played in the book.</param>
     /// <returns>The created <see cref="BookContributorEntity"/>.</returns>
     public BookContributorEntity Create(
         Guid? id = null,
         Guid? bookId = null,
         Guid? mediaContributorId = null,
-        string? roleName = null,
-        MediaContributorRoleCategory? roleCategory = null)
+        MediaContributorRole? role = null)
     {
         return new BookContributorEntity
         {
             Id = id ?? Guid.NewGuid(),
             BookId = bookId ?? Guid.NewGuid(),
             MediaContributorId = mediaContributorId ?? Guid.NewGuid(),
-            RoleName = roleName ?? _faker.Lorem.Word(),
-            RoleCategory = roleCategory ?? _faker.PickRandom<MediaContributorRoleCategory>(),
+            Role = role ?? MediaContributorRole.Author,
             CreatedOnUtc = _faker.Date.Past(),
             CreatedBy = Guid.NewGuid(),
             UpdatedOnUtc = null,

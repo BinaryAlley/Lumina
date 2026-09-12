@@ -43,11 +43,13 @@ public class AddBookEndpointTests
     public async Task ExecuteAsync_WhenSuccessful_ShouldReturnCreatedResultWithBookResponse()
     {
         // Arrange
+        Guid libraryId = Guid.NewGuid();
         AddBookRequest request = _addBookRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
         BookResponse expectedResponse = _bookResponseFixture.Create();
         _mockHandler.HandleAsync(Arg.Any<AddBookCommand>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(expectedResponse));
+        ConfigureRequest(libraryId.ToString());
 
         // Act
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
@@ -87,10 +89,12 @@ public class AddBookEndpointTests
     public async Task ExecuteAsync_WhenCalled_ShouldSendAddBookCommandToHandler()
     {
         // Arrange
+        Guid libraryId = Guid.NewGuid();
         AddBookRequest request = _addBookRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<AddBookCommand>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(_bookResponseFixture.Create()));
+        ConfigureRequest(libraryId.ToString());
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
@@ -98,7 +102,7 @@ public class AddBookEndpointTests
         // Assert
         await _mockHandler.Received(1).HandleAsync(
             Arg.Is<AddBookCommand>(command =>
-                command.LibraryId == request.LibraryId &&
+                command.LibraryId == libraryId.ToString() &&
                 command.Path == request.Path),
             Arg.Is(cancellationToken));
     }
@@ -129,5 +133,87 @@ public class AddBookEndpointTests
 
         // Assert
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => operationTask);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenHandlerReturnsValidationErrors_ShouldReturnValidationProblemResult()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        AddBookRequest request = _addBookRequestFixture.Create();
+        CancellationToken cancellationToken = CancellationToken.None;
+        Error validationError = Error.Validation(description: "LibraryIdCannotBeEmpty");
+        _mockHandler.HandleAsync(Arg.Any<AddBookCommand>(), Arg.Any<CancellationToken>())
+            .Returns(validationError);
+        ConfigureRequest(libraryId.ToString());
+
+        // Act
+        IResult result = await _sut.ExecuteAsync(request, cancellationToken);
+
+        // Assert
+        ProblemHttpResult problemDetails = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemDetails.StatusCode);
+        Assert.Equal("application/problem+json", problemDetails.ContentType);
+        HttpValidationProblemDetails validationProblemDetails = Assert.IsType<HttpValidationProblemDetails>(problemDetails.ProblemDetails);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, validationProblemDetails.Status);
+        Assert.Equal("General.Validation", validationProblemDetails.Title);
+        Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", validationProblemDetails.Type);
+        Assert.Single(validationProblemDetails.Errors);
+        Assert.Equal(new[] { "LibraryIdCannotBeEmpty" }, validationProblemDetails.Errors["General.Validation"]);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenRouteValueIsNotParseable_ShouldSendCommandWithRawRouteValue()
+    {
+        // Arrange
+        AddBookRequest request = _addBookRequestFixture.Create();
+        CancellationToken cancellationToken = CancellationToken.None;
+        _mockHandler.HandleAsync(Arg.Any<AddBookCommand>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(_bookResponseFixture.Create()));
+        ConfigureRequest("not-a-library-guid");
+
+        // Act
+        await _sut.ExecuteAsync(request, cancellationToken);
+
+        // Assert
+        await _mockHandler.Received(1).HandleAsync(
+            Arg.Is<AddBookCommand>(command => command.LibraryId == "not-a-library-guid"),
+            Arg.Is(cancellationToken));
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenRouteValueIsMissing_ShouldSendCommandWithNullLibraryId()
+    {
+        // Arrange
+        AddBookRequest request = _addBookRequestFixture.Create();
+        CancellationToken cancellationToken = CancellationToken.None;
+        _mockHandler.HandleAsync(Arg.Any<AddBookCommand>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(_bookResponseFixture.Create()));
+        ConfigureRequestWithoutLibraryId();
+
+        // Act
+        await _sut.ExecuteAsync(request, cancellationToken);
+
+        // Assert
+        await _mockHandler.Received(1).HandleAsync(
+            Arg.Is<AddBookCommand>(command => command.LibraryId == null),
+            Arg.Is(cancellationToken));
+    }
+
+    /// <summary>
+    /// Sets the <c>libraryId</c> route value the endpoint reads the identifier from.
+    /// </summary>
+    /// <param name="libraryId">The raw route value of the library Id.</param>
+    private void ConfigureRequest(string libraryId)
+    {
+        _sut.HttpContext.Request.RouteValues["libraryId"] = libraryId;
+    }
+
+    /// <summary>
+    /// Leaves the <c>libraryId</c> route value unset.
+    /// </summary>
+    private void ConfigureRequestWithoutLibraryId()
+    {
+        _sut.HttpContext.Request.RouteValues.Remove("libraryId");
     }
 }

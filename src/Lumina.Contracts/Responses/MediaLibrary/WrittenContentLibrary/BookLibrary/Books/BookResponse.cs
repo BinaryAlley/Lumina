@@ -1,4 +1,4 @@
-#region ========================================================================= USING =====================================================================================
+﻿#region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
@@ -31,7 +31,7 @@ namespace Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibr
 /// <param name="BarnesAndNobleId">The Barnes & Noble ID of the book, if applicable.</param>
 /// <param name="AppleBooksId">The Apple Books ID of the book, if applicable.</param>
 /// <param name="ISBNs">The list of ISBN (International Standard Book Number) of the book.</param>
-/// <param name="Contributors">The list of media contributors (actors, directors, etc) starring in this book.</param>
+/// <param name="Contributors">The list of references to the media contributors that contributed to this book, each with the role they played.</param>
 /// <param name="Ratings">The list of ratings for this book.</param>
 /// <param name="MetadataStatus">The status of the metadata enrichment of the book.</param>
 /// <param name="LastMetadataUpdateUtc">The date and time when the metadata of the book was last enriched, if applicable.</param>
@@ -59,7 +59,7 @@ public record BookResponse(
     string? BarnesAndNobleId,
     string? AppleBooksId,
     List<IsbnDto>? ISBNs,
-    List<MediaContributorDto>? Contributors,
+    List<MediaContributorReferenceDto>? Contributors,
     List<BookRatingDto>? Ratings,
     MetadataStatus MetadataStatus,
     DateTime? LastMetadataUpdateUtc,

@@ -227,7 +227,8 @@ public class BookConfiguration : IEntityTypeConfiguration<BookEntity>
             .HasDefaultValue(null)
             .HasColumnOrder(35);
 
-        builder.HasIndex(book => new { book.LibraryId, book.Path });
+        builder.HasIndex(book => new { book.LibraryId, book.Path })
+            .IsUnique(); // the same physical book on disk cannot appear twice in the same library
         builder.HasIndex(book => new { book.LibraryId, book.MetadataStatus });
     }
 }

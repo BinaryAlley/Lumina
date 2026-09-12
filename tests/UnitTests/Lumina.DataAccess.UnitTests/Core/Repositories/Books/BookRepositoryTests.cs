@@ -97,6 +97,50 @@ public class BookRepositoryTests
     }
 
     [Fact]
+    public async Task InsertAsync_WhenAnotherBookOfTheSameLibraryHasTheSamePath_ShouldReturnError()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        BookEntity existingBook = _bookEntityFixture.Create();
+        existingBook.LibraryId = libraryId;
+        existingBook.Path = "/books/existing.epub";
+        _mockContext.Books.Add(existingBook);
+        await _mockContext.SaveChangesAsync();
+
+        BookEntity bookModel = _bookEntityFixture.Create();
+        bookModel.LibraryId = libraryId;
+        bookModel.Path = "/books/existing.epub";
+
+        // Act
+        Result<Created> result = await _sut.InsertAsync(bookModel, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.WrittenContent.BookAlreadyExists, result.FirstError);
+    }
+
+    [Fact]
+    public async Task InsertAsync_WhenAnotherLibraryHasABookWithTheSamePath_ShouldAddBookToContextAndReturnCreated()
+    {
+        // Arrange
+        BookEntity existingBook = _bookEntityFixture.Create();
+        existingBook.Path = "/books/existing.epub";
+        _mockContext.Books.Add(existingBook);
+        await _mockContext.SaveChangesAsync();
+
+        BookEntity bookModel = _bookEntityFixture.Create();
+        bookModel.LibraryId = Guid.NewGuid();
+        bookModel.Path = "/books/existing.epub";
+
+        // Act
+        Result<Created> result = await _sut.InsertAsync(bookModel, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Created, result.Value);
+    }
+
+    [Fact]
     public async Task InsertAsync_WhenExistingTagsFound_ShouldReplaceTagsWithExistingOnes()
     {
         // Arrange
@@ -151,54 +195,66 @@ public class BookRepositoryTests
     }
 
     [Fact]
-    public async Task GetAllAsync_WhenCalled_ShouldReturnAllBooks()
+    public async Task GetAllAsync_WhenCalled_ShouldReturnAllBooksOfTheLibrary()
     {
         // Arrange
+        Guid libraryId = Guid.NewGuid();
         List<BookEntity> books = _bookEntityFixture.CreateMany(3);
+        foreach (BookEntity book in books)
+            book.LibraryId = libraryId;
         _mockContext.Books.AddRange(books);
         await _mockContext.SaveChangesAsync();
 
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
+
         // Act
-        Result<IEnumerable<BookEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
+        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetAllAsync<LibraryFilterDto>(filterModel: filter, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
-        Assert.Equal(3, result.Value.Count());
-        Assert.Equal(books, result.Value);
+        Assert.Equal(3, result.Value.Data.Count);
+        Assert.Equal([.. books.OrderBy(book => book.Id)], [.. result.Value.Data.OrderBy(book => book.Id)]);
     }
 
     [Fact]
     public async Task GetAllAsync_WhenNoBooksExist_ShouldReturnEmptyList()
     {
+        // Arrange
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create();
+
         // Act
-        Result<IEnumerable<BookEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
+        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetAllAsync<LibraryFilterDto>(filterModel: filter, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
-        Assert.Empty(result.Value);
+        Assert.Empty(result.Value.Data);
     }
 
     [Fact]
-    public async Task GetAllAsync_WhenCalled_ShouldIncludeRelatedEntities()
+    public async Task GetAllAsync_WhenPaginationIsNotProvided_ShouldIncludeRelatedEntities()
     {
         // Arrange
+        Guid libraryId = Guid.NewGuid();
         BookEntity book = _bookEntityFixture.Create();
+        book.LibraryId = libraryId;
         book.Tags = [_tagEntityFixture.Create(name: "Tag1"), _tagEntityFixture.Create(name: "Tag2")];
         book.Genres = [_genreEntityFixture.Create(name: "Genre1"), _genreEntityFixture.Create(name: "Genre2")];
         book.ISBNs = [_isbnEntityFixture.Create(value: "1234567890", format: IsbnFormat.Isbn10), _isbnEntityFixture.Create(value: "1234567890123", format: IsbnFormat.Isbn13)];
         _mockContext.Books.Add(book);
         await _mockContext.SaveChangesAsync();
 
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
+
         // Act
-        Result<IEnumerable<BookEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
+        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetAllAsync<LibraryFilterDto>(filterModel: filter, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
-        Assert.Single(result.Value);
-        BookEntity retrievedBook = result.Value.First();
+        Assert.Single(result.Value.Data);
+        BookEntity retrievedBook = result.Value.Data.First();
         Assert.Equal(2, retrievedBook.Tags.Count);
         Assert.Equal(2, retrievedBook.Genres.Count);
         Assert.Equal(2, retrievedBook.ISBNs.Count);
@@ -441,14 +497,14 @@ public class BookRepositoryTests
         BookEntity storedBook = _bookEntityFixture.Create();
         storedBook.ISBNs = [_isbnEntityFixture.Create(value: "9780395272237", format: IsbnFormat.Isbn13)];
         storedBook.Ratings = [_bookRatingEntityFixture.Create(value: 4.5M, maxValue: 5, source: BookRatingSource.Goodreads, voteCount: 100)];
-        storedBook.BookContributors = [_bookContributorEntityFixture.Create(bookId: storedBook.Id, roleCategory: MediaContributorRoleCategory.Author)];
+        storedBook.BookContributors = [_bookContributorEntityFixture.Create(bookId: storedBook.Id, role: MediaContributorRole.Author)];
         _mockContext.Books.Add(storedBook);
         await _mockContext.SaveChangesAsync();
 
         BookEntity data = _bookEntityFixture.Create(id: storedBook.Id);
         data.ISBNs = [_isbnEntityFixture.Create(value: "9780261102693", format: IsbnFormat.Isbn13)];
         data.Ratings = [_bookRatingEntityFixture.Create(value: 3.5M, maxValue: 5, source: BookRatingSource.Amazon, voteCount: 50)];
-        data.BookContributors = [_bookContributorEntityFixture.Create(bookId: storedBook.Id, mediaContributorId: Guid.NewGuid(), roleCategory: MediaContributorRoleCategory.Illustrator)];
+        data.BookContributors = [_bookContributorEntityFixture.Create(bookId: storedBook.Id, mediaContributorId: Guid.NewGuid(), role: MediaContributorRole.Illustrator)];
 
         // Act
         Result<Updated> result = await _sut.UpdateAsync(data, CancellationToken.None);
@@ -467,11 +523,11 @@ public class BookRepositoryTests
         BookContributorEntity retrievedContributor = Assert.Single(retrievedBook.BookContributors);
         Assert.Equal("9780261102693", retrievedIsbn.Value);
         Assert.Equal(3.5M, retrievedRating.Value);
-        Assert.Equal(MediaContributorRoleCategory.Illustrator, retrievedContributor.RoleCategory);
+        Assert.Equal(MediaContributorRole.Illustrator, retrievedContributor.Role);
     }
 
     [Fact]
-    public async Task GetPaginatedAsync_WhenFilterIncludesLibraryId_ShouldReturnPaginatedBooks()
+    public async Task GetAllAsync_WhenFilterIncludesLibraryId_ShouldReturnPaginatedBooks()
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
@@ -485,7 +541,7 @@ public class BookRepositoryTests
         LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
 
         // Act
-        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(paginationData, null, null, filter, CancellationToken.None);
+        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetAllAsync(paginationData, null, null, filter, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -497,14 +553,14 @@ public class BookRepositoryTests
     }
 
     [Fact]
-    public async Task GetPaginatedAsync_WhenFilterDoesNotIncludeLibraryId_ShouldReturnError()
+    public async Task GetAllAsync_WhenFilterDoesNotIncludeLibraryId_ShouldReturnError()
     {
         // Arrange
         PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
         BaseFilterDto filter = _baseFilterDtoFixture.Create();
 
         // Act
-        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(paginationData, null, null, filter, CancellationToken.None);
+        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetAllAsync(paginationData, null, null, filter, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -512,14 +568,14 @@ public class BookRepositoryTests
     }
 
     [Fact]
-    public async Task GetPaginatedAsync_WhenFilterLibraryIdIsEmpty_ShouldReturnError()
+    public async Task GetAllAsync_WhenFilterLibraryIdIsEmpty_ShouldReturnError()
     {
         // Arrange
         PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
         LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: Guid.Empty);
 
         // Act
-        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(paginationData, null, null, filter, CancellationToken.None);
+        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetAllAsync(paginationData, null, null, filter, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -527,7 +583,7 @@ public class BookRepositoryTests
     }
 
     [Fact]
-    public async Task GetPaginatedAsync_WhenPaginationDataIsNull_ShouldReturnAllBooks()
+    public async Task GetAllAsync_WhenPaginationDataIsNull_ShouldReturnAllBooks()
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
@@ -540,7 +596,7 @@ public class BookRepositoryTests
         LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
 
         // Act
-        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(null, null, null, filter, CancellationToken.None);
+        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetAllAsync(null, null, null, filter, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -552,7 +608,7 @@ public class BookRepositoryTests
     }
 
     [Fact]
-    public async Task GetPaginatedAsync_WhenSearchTermProvided_ShouldReturnOnlyMatchingBooks()
+    public async Task GetAllAsync_WhenSearchTermProvided_ShouldReturnOnlyMatchingBooks()
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
@@ -569,7 +625,7 @@ public class BookRepositoryTests
         LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId, searchTerm: "Fellowship");
 
         // Act
-        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(paginationData, null, null, filter, CancellationToken.None);
+        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetAllAsync(paginationData, null, null, filter, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -579,7 +635,7 @@ public class BookRepositoryTests
     }
 
     [Fact]
-    public async Task GetPaginatedAsync_WhenPageSizeSmallerThanBookCount_ShouldReturnCorrectPageMetadata()
+    public async Task GetAllAsync_WhenPageSizeSmallerThanBookCount_ShouldReturnCorrectPageMetadata()
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
@@ -593,7 +649,7 @@ public class BookRepositoryTests
         LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
 
         // Act
-        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(paginationData, null, null, filter, CancellationToken.None);
+        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetAllAsync(paginationData, null, null, filter, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -605,7 +661,7 @@ public class BookRepositoryTests
     }
 
     [Fact]
-    public async Task GetPaginatedAsync_WhenSortByTitleDescending_ShouldReturnBooksInDescendingOrder()
+    public async Task GetAllAsync_WhenSortByTitleDescending_ShouldReturnBooksInDescendingOrder()
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
@@ -622,7 +678,7 @@ public class BookRepositoryTests
         LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
 
         // Act
-        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(paginationData, "title", SortOrder.Descending, filter, CancellationToken.None);
+        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetAllAsync(paginationData, "title", SortOrder.Descending, filter, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -630,7 +686,7 @@ public class BookRepositoryTests
     }
 
     [Fact]
-    public async Task GetPaginatedAsync_WhenCalled_ShouldIncludeRelatedEntities()
+    public async Task GetAllAsync_WhenPaginationIsProvided_ShouldIncludeRelatedEntities()
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
@@ -647,7 +703,7 @@ public class BookRepositoryTests
         LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
 
         // Act
-        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(paginationData, null, null, filter, CancellationToken.None);
+        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetAllAsync(paginationData, null, null, filter, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -733,8 +789,8 @@ public class BookRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         _mockContext.BookContributors.AddRange(
-            _bookContributorEntityFixture.Create(bookId: firstBook.Id, mediaContributorId: author.Id, roleName: "Author", roleCategory: MediaContributorRoleCategory.Author),
-            _bookContributorEntityFixture.Create(bookId: secondBook.Id, mediaContributorId: translator.Id, roleName: "Translator", roleCategory: MediaContributorRoleCategory.Translator));
+            _bookContributorEntityFixture.Create(bookId: firstBook.Id, mediaContributorId: author.Id, role: MediaContributorRole.Author),
+            _bookContributorEntityFixture.Create(bookId: secondBook.Id, mediaContributorId: translator.Id, role: MediaContributorRole.Translator));
         await _mockContext.SaveChangesAsync();
 
         // Act
@@ -786,7 +842,7 @@ public class BookRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        Result<BookEntity?> result = await _sut.GetByIdAsync(book.Id, CancellationToken.None);
+        Result<BookEntity?> result = await _sut.GetByIdAsync(book.Id, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -797,7 +853,7 @@ public class BookRepositoryTests
     public async Task GetByIdAsync_WhenBookDoesNotExist_ShouldReturnNull()
     {
         // Act
-        Result<BookEntity?> result = await _sut.GetByIdAsync(Guid.NewGuid(), CancellationToken.None);
+        Result<BookEntity?> result = await _sut.GetByIdAsync(Guid.NewGuid(), cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -817,7 +873,7 @@ public class BookRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        Result<BookEntity?> result = await _sut.GetByIdAsync(book.Id, CancellationToken.None);
+        Result<BookEntity?> result = await _sut.GetByIdAsync(book.Id, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -857,7 +913,7 @@ public class BookRepositoryTests
     }
 
     [Fact]
-    public async Task GetPaginatedAsync_WhenSortByLanguageCodeAscending_ShouldReturnBooksInAscendingOrder()
+    public async Task GetAllAsync_WhenSortByLanguageCodeAscending_ShouldReturnBooksInAscendingOrder()
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
@@ -874,7 +930,7 @@ public class BookRepositoryTests
         LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
 
         // Act
-        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(paginationData, "languageCode", SortOrder.Ascending, filter, CancellationToken.None);
+        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetAllAsync(paginationData, "languageCode", SortOrder.Ascending, filter, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -882,7 +938,7 @@ public class BookRepositoryTests
     }
 
     [Fact]
-    public async Task GetPaginatedAsync_WhenSortByLanguageCodeDescending_ShouldReturnBooksInDescendingOrder()
+    public async Task GetAllAsync_WhenSortByLanguageCodeDescending_ShouldReturnBooksInDescendingOrder()
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
@@ -899,7 +955,7 @@ public class BookRepositoryTests
         LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
 
         // Act
-        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(paginationData, "languageCode", SortOrder.Descending, filter, CancellationToken.None);
+        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetAllAsync(paginationData, "languageCode", SortOrder.Descending, filter, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -907,7 +963,7 @@ public class BookRepositoryTests
     }
 
     [Fact]
-    public async Task GetPaginatedAsync_WhenSortByFormatAscending_ShouldReturnBooksInAscendingOrder()
+    public async Task GetAllAsync_WhenSortByFormatAscending_ShouldReturnBooksInAscendingOrder()
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
@@ -924,7 +980,7 @@ public class BookRepositoryTests
         LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
 
         // Act
-        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(paginationData, "format", SortOrder.Ascending, filter, CancellationToken.None);
+        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetAllAsync(paginationData, "format", SortOrder.Ascending, filter, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -932,7 +988,7 @@ public class BookRepositoryTests
     }
 
     [Fact]
-    public async Task GetPaginatedAsync_WhenSortByFormatDescending_ShouldReturnBooksInDescendingOrder()
+    public async Task GetAllAsync_WhenSortByFormatDescending_ShouldReturnBooksInDescendingOrder()
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
@@ -949,7 +1005,7 @@ public class BookRepositoryTests
         LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
 
         // Act
-        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(paginationData, "format", SortOrder.Descending, filter, CancellationToken.None);
+        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetAllAsync(paginationData, "format", SortOrder.Descending, filter, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -957,7 +1013,7 @@ public class BookRepositoryTests
     }
 
     [Fact]
-    public async Task GetPaginatedAsync_WhenSortByMetadataProviderAscending_ShouldReturnBooksInAscendingOrder()
+    public async Task GetAllAsync_WhenSortByMetadataProviderAscending_ShouldReturnBooksInAscendingOrder()
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
@@ -974,7 +1030,7 @@ public class BookRepositoryTests
         LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
 
         // Act
-        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(paginationData, "metadataProvider", SortOrder.Ascending, filter, CancellationToken.None);
+        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetAllAsync(paginationData, "metadataProvider", SortOrder.Ascending, filter, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -982,7 +1038,7 @@ public class BookRepositoryTests
     }
 
     [Fact]
-    public async Task GetPaginatedAsync_WhenSortByMetadataProviderDescending_ShouldReturnBooksInDescendingOrder()
+    public async Task GetAllAsync_WhenSortByMetadataProviderDescending_ShouldReturnBooksInDescendingOrder()
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
@@ -999,7 +1055,7 @@ public class BookRepositoryTests
         LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
 
         // Act
-        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(paginationData, "metadataProvider", SortOrder.Descending, filter, CancellationToken.None);
+        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetAllAsync(paginationData, "metadataProvider", SortOrder.Descending, filter, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -1007,7 +1063,7 @@ public class BookRepositoryTests
     }
 
     [Fact]
-    public async Task GetPaginatedAsync_WhenIgnoringTheTitlePrefixForSorting_ShouldSortByTitleStrippedOfItsPrefix()
+    public async Task GetAllAsync_WhenIgnoringTheTitlePrefixForSorting_ShouldSortByTitleStrippedOfItsPrefix()
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
@@ -1022,7 +1078,7 @@ public class BookRepositoryTests
         LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId, shouldIgnoreThePrefixForAlphaPicker: true);
 
         // Act
-        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(paginationData, null, null, filter, CancellationToken.None);
+        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetAllAsync(paginationData, null, null, filter, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);

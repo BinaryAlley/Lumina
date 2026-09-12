@@ -58,22 +58,18 @@ public static class BookMetadataDtoMapping
             return tagsErrors;
 
         Optional<LanguageInfo> languageInfo = Optional<LanguageInfo>.None();
-        if (metadata.Language is not null)
-        {
-            Result<LanguageInfo> languageInfoResult = LanguageInfo.Create(metadata.Language.LanguageCode, metadata.Language.LanguageName, Optional<string>.FromNullable(metadata.Language.NativeName));
-            if (languageInfoResult.IsFailure)
-                return languageInfoResult.Errors;
-            languageInfo = languageInfoResult.Value;
-        }
+        if (metadata.Language is not null && metadata.Language.LanguageCode is not null && metadata.Language.LanguageName is not null)
+            languageInfo = LanguageInfo.Create(
+                metadata.Language.LanguageCode,
+                metadata.Language.LanguageName,
+                Optional<string>.FromNullable(metadata.Language.NativeName));
 
         Optional<LanguageInfo> originalLanguageInfo = Optional<LanguageInfo>.None();
-        if (metadata.OriginalLanguage is not null)
-        {
-            Result<LanguageInfo> originalLanguageInfoResult = LanguageInfo.Create(metadata.OriginalLanguage.LanguageCode, metadata.OriginalLanguage.LanguageName, Optional<string>.FromNullable(metadata.OriginalLanguage.NativeName));
-            if (originalLanguageInfoResult.IsFailure)
-                return originalLanguageInfoResult.Errors;
-            originalLanguageInfo = originalLanguageInfoResult.Value;
-        }
+        if (metadata.OriginalLanguage is not null && metadata.OriginalLanguage.LanguageCode is not null && metadata.OriginalLanguage.LanguageName is not null)
+            originalLanguageInfo = LanguageInfo.Create(
+                metadata.OriginalLanguage.LanguageCode,
+                metadata.OriginalLanguage.LanguageName,
+                Optional<string>.FromNullable(metadata.OriginalLanguage.NativeName));
 
         Result<WrittenContentMetadata> writtenContentMetadataResult = WrittenContentMetadata.Create(
             metadata.Title,

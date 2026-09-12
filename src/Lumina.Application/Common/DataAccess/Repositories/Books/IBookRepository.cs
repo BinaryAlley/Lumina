@@ -3,6 +3,7 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Repositories.Common.Actions;
 using Lumina.Application.Common.DataAccess.Repositories.Common.Base;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Application.Common.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -19,7 +20,7 @@ public interface IBookRepository : IRepository<BookEntity>,
                                    IUpdateRepositoryAction<BookEntity>,
                                    IGetByIdRepositoryAction<BookEntity, Guid>,
                                    IGetAllRepositoryAction<BookEntity>,
-                                   IGetPaginatedRepositoryAction<BookEntity>
+                                   IGetAllLiteRepositoryAction<BookEntity, BookLiteRow>
 {
     /// <summary>
     /// Gets all the books of the media library identified by <paramref name="libraryId"/>.
