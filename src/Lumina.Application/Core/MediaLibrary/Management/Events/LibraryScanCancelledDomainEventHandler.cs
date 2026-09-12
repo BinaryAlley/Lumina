@@ -56,25 +56,24 @@ public class LibraryScanCancelledDomainEventHandler : IDomainEventHandler<Librar
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public async ValueTask HandleAsync(LibraryScanCancelledDomainEvent domainEvent, CancellationToken cancellationToken)
     {
-        // get the library scan from the repository
-        Result<LibraryScanEntity?> getLibraryScansResult = await _unitOfWork.LibraryScanRepository.GetByIdAsync(domainEvent.ScanId.Value, cancellationToken).ConfigureAwait(false);
+        // Get the library scan from the repository.
+        Result<LibraryScanEntity?> getLibraryScansResult = await _unitOfWork.LibraryScanRepository.GetByIdAsync(domainEvent.ScanId.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getLibraryScansResult.IsFailure)
             throw new EventualConsistencyException(getLibraryScansResult.FirstError, getLibraryScansResult.Errors);
         if (getLibraryScansResult.Value is null)
             throw new EventualConsistencyException(Errors.LibraryScanning.LibraryScanNotFound);
 
-        // convert the repository scan to a domain object
+        // Convert the repository scan to a domain object.
         Result<LibraryScan> libraryScanDomainResult = getLibraryScansResult.Value.ToDomainEntity();
         if (libraryScanDomainResult.IsFailure)
             throw new EventualConsistencyException(libraryScanDomainResult.FirstError, libraryScanDomainResult.Errors);
 
-        // cancel the media library scan
+        // Cancel the media library scan.
         Result<Success> cancelScanResult = _mediaLibraryScanningService.CancelScan(libraryScanDomainResult.Value);
         if (cancelScanResult.IsFailure)
             throw new EventualConsistencyException(cancelScanResult.FirstError, cancelScanResult.Errors);
 
-        // release the scan processing resources
-
+        // Release the scan processing resources.
         MediaLibraryScanCompositeId compositeId = MediaLibraryScanCompositeId.Create(domainEvent.ScanId, UserId.Create(getLibraryScansResult.Value.UserId));
         _mediaLibrariesScanCancellationTracker.RemoveScan(compositeId);
         _mediaLibrariesScanProgressTracker.RemoveScanProgress(compositeId);

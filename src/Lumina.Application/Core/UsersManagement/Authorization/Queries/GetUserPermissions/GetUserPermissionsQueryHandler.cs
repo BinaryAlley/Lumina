@@ -58,22 +58,25 @@ public class GetUserPermissionsQueryHandler : IQueryHandler<GetUserPermissionsQu
         if (validationResult.Count > 0)
             return validationResult;
 
-        // an authenticated request must always carry a user identity
+        // An authenticated request must always carry a user identity.
         Guid? currentUserId = _currentUserService.UserId;
         if (currentUserId is null)
             return Errors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // only admins can see the list of authorization permissions
+        // Only admins can see the list of authorization permissions.
         bool isAdmin = await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false);
         if (!isAdmin)
             return Errors.Authorization.NotAuthorized;
-        // get the user from the repository and return its permissions
-        Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByIdAsync(query.UserId!.Value, cancellationToken).ConfigureAwait(false);
+
+        // Get the user from the repository, so that a missing user is reported before its permissions are mapped.
+        Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByIdAsync(query.UserId!.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getUserResult.IsFailure)
             return getUserResult.Errors;
         else if (getUserResult.Value is null)
             return Errors.Authentication.UsernameDoesNotExist;
+
+        // Return the permissions of the user, mapped to their response representations.
         return Result.From(getUserResult.Value.UserPermissions.Select(userPermission => userPermission.Permission).ToResponses());
     }
 }

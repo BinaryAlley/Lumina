@@ -21,9 +21,9 @@ public class CachedThemeHandler : DelegatingHandler
 {
     private const string THEMES_SEGMENT = "/api/v1/themes";
     private const string THEME_CACHE_TAG = "themes";
-    // responses above this size are never kept in the cache, so large binary assets do not bloat the memory
+    // Responses above this size are never kept in the cache, so large binary assets do not bloat the memory.
     private const int MAX_CACHEABLE_BYTES = 512 * 1024;
-    // themes only change when the user switches, reinstalls or deletes them, so the cached responses stay valid for a long time
+    // Themes only change when the user switches, reinstalls or deletes them, so the cached responses stay valid for a long time.
     private static readonly TimeSpan s_cacheExpiration = TimeSpan.FromMinutes(30);
 
     private readonly HybridCache _hybridCache;
@@ -56,7 +56,7 @@ public class CachedThemeHandler : DelegatingHandler
         if (!requestPath.StartsWith(THEMES_SEGMENT, StringComparison.OrdinalIgnoreCase))
             return await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
-        // a theme mutation replaces the theme files or the active selection, so every cached theme response becomes stale
+        // A theme mutation replaces the theme files or the active selection, so every cached theme response becomes stale.
         if (!request.Method.Equals(HttpMethod.Get))
         {
             HttpResponseMessage mutationResponse = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
@@ -65,16 +65,16 @@ public class CachedThemeHandler : DelegatingHandler
             return mutationResponse;
         }
 
-        // the current user can switch off the theme cache from the settings page, so their requests always receive the freshly edited theme files
+        // The current user can switch off the theme cache from the settings page, so their requests always receive the freshly edited theme files.
         Guid? userId = GetCurrentUserId();
         if (userId is not null)
         {
-            bool isCachingEnabledForUser = await _themeCachePreferenceService.GetAsync(userId.Value, defaultValue: true, cancellationToken).ConfigureAwait(false);
+            bool isCachingEnabledForUser = await _themeCachePreferenceService.GetAsync(userId.Value, isCachingEnabledByDefault: true, cancellationToken).ConfigureAwait(false);
             if (!isCachingEnabledForUser)
                 return await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
         }
 
-        // key the cached responses by the full request path and query, since each theme endpoint identifies a distinct resource
+        // Key the cached responses by the full request path and query, since each theme endpoint identifies a distinct resource.
         string cacheKey = $"themes:{request.RequestUri.PathAndQuery}";
         CachedResponse cached = await _hybridCache.GetOrCreateAsync(
             cacheKey,
@@ -96,7 +96,7 @@ public class CachedThemeHandler : DelegatingHandler
             [THEME_CACHE_TAG],
             cancellationToken);
 
-        // failed responses are only served from the call that produced them, so a temporary failure can never be served from a stale entry
+        // Failed responses are only served from the call that produced them, so a temporary failure can never be served from a stale entry.
         if (!IsSuccessful(cached.StatusCode) || cached.Bytes.Length > MAX_CACHEABLE_BYTES)
             await _hybridCache.RemoveAsync(cacheKey, cancellationToken).ConfigureAwait(false);
 

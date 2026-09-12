@@ -45,15 +45,15 @@ public class AuthorizationService : IAuthorizationService
     /// <returns><see langword="true"/> if the user has the specified permission, <see langword="false"/> otherwise.</returns>
     public async Task<bool> HasPermissionAsync(Guid userId, AuthorizationPermission permission, CancellationToken cancellationToken)
     {
-        Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByIdAsync(userId, cancellationToken).ConfigureAwait(false);
+        Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByIdAsync(userId, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getUserResult.IsFailure || getUserResult.Value is null)
             return false;
 
-        // check if the user has the permission directly
+        // Check if the user has the permission directly.
         if (getUserResult.Value.UserPermissions.Any(userPermission => userPermission.Permission.PermissionName == permission))
             return true;
 
-        // check if any of the user's roles grant the permission
+        // Check if any of the user's roles grant the permission.
         return getUserResult.Value.UserRole?.Role.RolePermissions
             .Any(rolePermission => rolePermission.Permission.PermissionName == permission) == true;
     }
@@ -67,7 +67,7 @@ public class AuthorizationService : IAuthorizationService
     /// <returns><see langword="true"/> if the user is in the specified role, <see langword="false"/> otherwise.</returns>
     public async Task<bool> IsInRoleAsync(Guid userId, string role, CancellationToken cancellationToken)
     {
-        Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByIdAsync(userId, cancellationToken).ConfigureAwait(false);
+        Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByIdAsync(userId, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getUserResult.IsFailure || getUserResult.Value is null)
             return false;
         return getUserResult.Value.UserRole?.Role.RoleName == role;
@@ -83,7 +83,7 @@ public class AuthorizationService : IAuthorizationService
     /// <returns><see langword="true"/> if the user satisfies the policy, <see langword="false"/> otherwise.</returns>
     public async Task<bool> EvaluatePolicyAsync<TAuthorizationPolicy>(Guid userId, PolicyContext? context, CancellationToken cancellationToken) where TAuthorizationPolicy : IAuthorizationPolicy
     {
-        // resolve the authorization policy dynamically using the factory
+        // Resolve the authorization policy dynamically using the factory.
         IAuthorizationPolicy policy = _authorizationPolicyFactory.CreatePolicy<TAuthorizationPolicy>();
         return await policy.EvaluateAsync(userId, context, cancellationToken).ConfigureAwait(false);
     }
@@ -96,7 +96,7 @@ public class AuthorizationService : IAuthorizationService
     /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="UserAuthorizationEntity"/>, or an error.</returns>
     public async Task<Result<UserAuthorizationEntity>> GetUserAuthorizationAsync(Guid userId, CancellationToken cancellationToken)
     {
-        Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByIdAsync(userId, cancellationToken).ConfigureAwait(false);
+        Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByIdAsync(userId, cancellationToken: cancellationToken).ConfigureAwait(false);
 
         if (getUserResult.IsFailure)
             return getUserResult.Errors;
@@ -104,18 +104,18 @@ public class AuthorizationService : IAuthorizationService
         if (getUserResult.Value is null)
             return Errors.Users.UserDoesNotExist;
 
-        // get all roles
+        // Get all roles.
         string? role = getUserResult.Value.UserRole?.Role.RoleName;
 
-        // get direct user permissions
+        // Get direct user permissions.
         HashSet<AuthorizationPermission> directPermissions = [.. getUserResult.Value.UserPermissions.Select(userPermission => userPermission.Permission.PermissionName)];
 
-        // get permissions from roles
+        // Get permissions from roles.
         HashSet<AuthorizationPermission>? rolePermissions = getUserResult.Value.UserRole?.Role.RolePermissions
             .Select(rolePermission => rolePermission.Permission.PermissionName)
             .ToHashSet();
 
-        // combine all permissions
+        // Combine all permissions.
         HashSet<AuthorizationPermission> allPermissions = rolePermissions is not null ? [.. directPermissions.Union(rolePermissions)] : directPermissions;
 
         return new UserAuthorizationEntity

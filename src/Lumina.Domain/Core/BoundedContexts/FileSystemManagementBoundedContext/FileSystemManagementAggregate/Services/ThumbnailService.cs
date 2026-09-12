@@ -56,24 +56,24 @@ public class ThumbnailService : IThumbnailService
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of bytes representing the thumbnail of the file at the specified path or an error.</returns>
     public async Task<Result<Thumbnail>> GetThumbnailAsync(FileSystemPathId path, int quality, CancellationToken cancellationToken)
     {
-        // first, get the type of the image file
+        // First, get the type of the image file.
         Result<ImageType> imageTypeResult = await _environmentContext.FileTypeService.GetImageTypeAsync(path, cancellationToken);
         if (imageTypeResult.IsFailure)
             return imageTypeResult.Errors;
         if (imageTypeResult.Value != ImageType.None)
         {
-            // then, get its bytes
+            // Then, get its bytes.
             Result<byte[]> resultFileContents = _environmentContext.FileProviderService.GetFileAsync(path);
             if (resultFileContents.IsFailure)
                 return resultFileContents.Errors;
             byte[] fileContents = resultFileContents.Value;
-            // finally, resize or adjust quality based on image type
-            byte[]? adjustedImage = null;
+            // Finally, resize or adjust the quality based on the image type.
+            Optional<byte[]> adjustedImage = Optional<byte[]>.None();
             if (imageTypeResult.Value is ImageType.JPEG or ImageType.JPEG_CANON or ImageType.JPEG2000
                 or ImageType.JPEG_UNKNOWN or ImageType.PNG or ImageType.BMP
                 or ImageType.WEBP or ImageType.GIF or ImageType.TIFF or ImageType.TGA)
-                adjustedImage = await AdjustImageResolutionAsync(fileContents, imageTypeResult.Value, quality, cancellationToken);
-            return new Thumbnail(imageTypeResult.Value, adjustedImage ?? fileContents);
+                adjustedImage = Optional<byte[]>.Some(await AdjustImageResolutionAsync(fileContents, imageTypeResult.Value, quality, cancellationToken));
+            return new Thumbnail(imageTypeResult.Value, adjustedImage.HasValue ? adjustedImage.Value : fileContents);
         }
         else
             return Errors.Thumbnails.NoThumbnail;
@@ -105,7 +105,7 @@ public class ThumbnailService : IThumbnailService
             case ImageType.PNG:
                 {
                     using Image image = await Image.LoadAsync(inputMemoryStream, cancellationToken);
-                    // PNG is lossless; quality adjustments don't apply in the same way - we can adjust compression
+                    // PNG is lossless, so quality adjustments do not apply in the same way; instead, the compression level is adjusted.
                     int compressionLevel = MapRange(quality, 1, 100, 1, 9);
                     PngEncoder encoder = new()
                     { CompressionLevel = (PngCompressionLevel)compressionLevel };
@@ -115,11 +115,11 @@ public class ThumbnailService : IThumbnailService
             case ImageType.BMP:
                 {
                     using Image image = await Image.LoadAsync(inputMemoryStream, cancellationToken);
-                    await image.SaveAsync(outputMemoryStream, new PngEncoder(), cancellationToken); // convert BMP to PNG for compression
+                    await image.SaveAsync(outputMemoryStream, new PngEncoder(), cancellationToken); // Convert BMP to PNG for compression.
                     break;
                 }
             default:
-                return imageBytes; // for unsupported formats, just return the original bytes
+                return imageBytes; // For unsupported formats, just return the original bytes.
         }
         return outputMemoryStream.ToArray();
     }
@@ -140,7 +140,7 @@ public class ThumbnailService : IThumbnailService
         double ratio = quality / 100.0;
         int newWidth = (int)(image.Width * ratio);
         int newHeight = (int)(image.Height * ratio);
-        // ensure new dimensions are not zero
+        // Ensure the new dimensions are not zero.
         newWidth = Math.Max(1, newWidth);
         newHeight = Math.Max(1, newHeight);
         ResizeOptions options = new()
@@ -148,9 +148,9 @@ public class ThumbnailService : IThumbnailService
             Size = new Size(newWidth, newHeight),
             Mode = ResizeMode.Max
         };
-        // resize the image to the specified size
+        // Resize the image to the specified size.
         image.Mutate(ctx => ctx.Resize(options));
-        // save the resized image and return its bytes
+        // Save the resized image and return its bytes.
         switch (imageType)
         {
             case ImageType.BMP:
@@ -166,7 +166,7 @@ public class ThumbnailService : IThumbnailService
                 await image.SaveAsync(outputMemoryStream, image.Metadata.DecodedImageFormat!, cancellationToken);
                 break;
             default:
-                return imageBytes; // for unsupported formats, just return the original bytes
+                return imageBytes; // For unsupported formats, just return the original bytes.
         }
         return outputMemoryStream.ToArray();
     }
