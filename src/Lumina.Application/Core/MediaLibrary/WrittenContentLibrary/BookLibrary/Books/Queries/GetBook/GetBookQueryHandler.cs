@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Authentication;
@@ -8,12 +7,10 @@ using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
@@ -67,56 +64,29 @@ public class GetBookQueryHandler : IQueryHandler<GetBookQuery, Result<BookRespon
             return ApplicationErrors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
+        // The validator guarantees that the route identifiers are non-empty Guids before this point.
+        Guid libraryId = Guid.Parse(query.LibraryId!);
+        Guid bookId = Guid.Parse(query.BookId!);
+
         // Get the book with the specified id from the repository.
-        Result<BookEntity?> getBookResult = await _unitOfWork.BookRepository.GetByIdAsync(query.Id, cancellationToken).ConfigureAwait(false);
+        Result<BookEntity?> getBookResult = await _unitOfWork.BookRepository.GetByIdAsync(bookId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getBookResult.IsFailure)
             return getBookResult.Errors;
         if (getBookResult.Value is null)
             return DomainErrors.WrittenContent.BookNotFound;
+        BookEntity existingBook = getBookResult.Value;
+
+        // Resource scoping: the book must belong to the library named by the route, so that a book can never be read through another
+        // library's route; the mismatch is reported as not found, without disclosing that the book exists in another library.
+        if (existingBook.LibraryId != libraryId)
+            return DomainErrors.WrittenContent.BookNotFound;
 
         // Admins can see the books of all libraries; for everyone else, only the books of the libraries they own.
         bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
-            userId, new LibraryOwnershipPolicyContext(getBookResult.Value.LibraryId), cancellationToken).ConfigureAwait(false);
+            userId, new LibraryOwnershipPolicyContext(existingBook.LibraryId), cancellationToken).ConfigureAwait(false);
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
-        BookResponse response = getBookResult.Value.ToResponse();
-
-        // The response carries the resolved contributor names, so that the clients can display them without querying the contributors themselves.
-        List<MediaContributorEntity> contributors = await GetContributorsAsync(getBookResult.Value, cancellationToken).ConfigureAwait(false);
-        if (contributors.Count == 0)
-            return response;
-
-        Dictionary<Guid, MediaContributorEntity> contributorsById = contributors.ToDictionary(contributor => contributor.Id);
-        List<MediaContributorDto> contributorResponses = [];
-        foreach (BookContributorEntity participation in getBookResult.Value.BookContributors)
-        {
-            if (!contributorsById.TryGetValue(participation.MediaContributorId, out MediaContributorEntity? contributor))
-                continue;
-            contributorResponses.Add(new MediaContributorDto(
-                new MediaContributorNameDto(contributor.DisplayName, contributor.LegalName),
-                new MediaContributorRoleDto(participation.RoleName, participation.RoleCategory)
-            ));
-        }
-
-        return response with { Contributors = contributorResponses };
-    }
-
-    /// <summary>
-    /// Gets the media contributors linked to the book of <paramref name="book"/>, by their unique identifiers.
-    /// </summary>
-    /// <param name="book">The book whose media contributors are retrieved.</param>
-    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="Result{TValue}"/> containing either the media contributors of the book, or an error.</returns>
-    private async Task<List<MediaContributorEntity>> GetContributorsAsync(BookEntity book, CancellationToken cancellationToken)
-    {
-        IReadOnlyCollection<Guid> contributorIds = [.. book.BookContributors.Select(participation => participation.MediaContributorId).Distinct()];
-        if (contributorIds.Count == 0)
-            return [];
-
-        Result<IReadOnlyList<MediaContributorEntity>> getContributorsResult = await _unitOfWork.MediaContributorRepository.GetByIdsAsync(contributorIds, cancellationToken).ConfigureAwait(false);
-        if (getContributorsResult.IsFailure)
-            return [];
-        return [.. getContributorsResult.Value];
+        return existingBook.ToResponse();
     }
 }

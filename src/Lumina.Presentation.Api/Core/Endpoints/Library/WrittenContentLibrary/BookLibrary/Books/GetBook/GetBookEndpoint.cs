@@ -1,8 +1,7 @@
 #region ========================================================================= USING =====================================================================================
+using FastEndpoints;
 using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Queries.GetBook;
-using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Common.Routes.Library.WrittenContentLibrary.BookLibrary;
@@ -15,9 +14,9 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetBook;
 
 /// <summary>
-/// API endpoint for the <c>/books/{id}</c> route.
+/// API endpoint for the <c>/{libraryId}/books/{bookId}</c> route.
 /// </summary>
-public class GetBookEndpoint : BaseEndpoint<GetBookRequest, IResult>
+public class GetBookEndpoint : BaseEndpoint<EmptyRequest, IResult>
 {
     private readonly IQueryHandler<GetBookQuery, Result<BookResponse>> _getBookQueryHandler;
 
@@ -35,20 +34,23 @@ public class GetBookEndpoint : BaseEndpoint<GetBookRequest, IResult>
     /// </summary>
     public override void Configure()
     {
-        Verbs(FastEndpoints.Http.GET);
+        Verbs(Http.GET);
         Routes(ApiRoutes.Books.GET_BOOK_BY_ID);
         Version(1);
         DontCatchExceptions();
     }
 
     /// <summary>
-    /// Gets the book identified by <paramref name="request"/>.
+    /// Gets the book identified by the route.
     /// </summary>
-    /// <param name="request">The request containing the Id of the book to get.</param>
+    /// <param name="request">The request object.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    public override async Task<IResult> ExecuteAsync(GetBookRequest request, CancellationToken cancellationToken)
+    public override async Task<IResult> ExecuteAsync(EmptyRequest request, CancellationToken cancellationToken)
     {
-        Result<BookResponse> result = await _getBookQueryHandler.HandleAsync(request.ToQuery(), cancellationToken).ConfigureAwait(false);
+        // Take unique identifiers from the route.
+        string? libraryId = HttpContext.Request.RouteValues["libraryId"]?.ToString();
+        string? bookId = HttpContext.Request.RouteValues["bookId"]?.ToString();
+        Result<BookResponse> result = await _getBookQueryHandler.HandleAsync(new GetBookQuery(libraryId, bookId), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
-using System;
 #endregion
 
 namespace Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Queries.GetBook;
@@ -8,7 +7,9 @@ namespace Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary
 /// <summary>
 /// Query for getting a book by its Id.
 /// </summary>
-/// <param name="Id">The Id of the book to get.</param>
+/// <param name="LibraryId">The unique identifier of the media library the book belongs to, taken from the route.</param>
+/// <param name="BookId">The unique identifier of the book to get, taken from the route.</param>
 public record GetBookQuery(
-    Guid Id
+    string? LibraryId,
+    string? BookId
 ) : IQuery;

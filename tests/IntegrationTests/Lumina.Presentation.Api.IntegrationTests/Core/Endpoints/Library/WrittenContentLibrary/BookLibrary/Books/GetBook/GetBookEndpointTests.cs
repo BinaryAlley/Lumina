@@ -68,7 +68,7 @@ public class GetBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
         (Guid libraryId, Guid bookId) = await SeedLibraryAndBookAsync(userId, "Test Book");
 
         // Act
-        HttpResponseMessage response = await _client.GetAsync($"/api/v1/books/{bookId}");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/{bookId}");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -82,10 +82,31 @@ public class GetBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     }
 
     [Fact]
+    public async Task GetBook_WhenBookBelongsToAnotherLibrary_ShouldReturnBookNotFoundProblem()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        (_, Guid bookId) = await SeedLibraryAndBookAsync(userId, "Test Book");
+
+        // Act
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{Guid.NewGuid()}/books/{bookId}");
+
+        // Assert
+        // The route library id is enforced, so a book can never be read through another library's route, and the mismatch is
+        // reported as not found, without disclosing that the book exists in another library.
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        Microsoft.AspNetCore.Mvc.ProblemDetails? problemDetails = JsonSerializer.Deserialize<Microsoft.AspNetCore.Mvc.ProblemDetails>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.NotFound", problemDetails!.Title);
+        Assert.Equal("BookNotFound", problemDetails.Detail);
+    }
+
+    [Fact]
     public async Task GetBook_WhenBookDoesNotExist_ShouldReturnBookNotFoundProblem()
     {
         // Act
-        HttpResponseMessage response = await _client.GetAsync($"/api/v1/books/{Guid.NewGuid()}");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}");
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -102,10 +123,10 @@ public class GetBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     {
         // Arrange
         (Guid otherUserId, _) = await SeedOtherUserAsync();
-        (_, Guid bookId) = await SeedLibraryAndBookAsync(otherUserId, "Other User Book");
+        (Guid otherLibraryId, Guid bookId) = await SeedLibraryAndBookAsync(otherUserId, "Other User Book");
 
         // Act
-        HttpResponseMessage response = await _client.GetAsync($"/api/v1/books/{bookId}");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{otherLibraryId}/books/{bookId}");
 
         // Assert
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
@@ -122,10 +143,42 @@ public class GetBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
         HttpClient unauthenticatedClient = _apiFactory.CreateClient();
 
         // Act
-        HttpResponseMessage response = await unauthenticatedClient.GetAsync($"/api/v1/books/{Guid.NewGuid()}");
+        HttpResponseMessage response = await unauthenticatedClient.GetAsync($"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}");
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetBook_WhenLibraryIdIsNotParseable_ShouldReturnUnprocessableEntity()
+    {
+        // Act
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/not-a-guid/books/{Guid.NewGuid()}");
+
+        // Assert
+        // The route value is kept as a raw string, so the unparseable Id reaches the query validator, which reports a clean
+        // validation error instead of failing the request binding.
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        using JsonDocument problemDetails = JsonDocument.Parse(content);
+        Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
+        Assert.Contains("LibraryIdCannotBeEmpty", content, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task GetBook_WhenBookIdIsNotParseable_ShouldReturnUnprocessableEntity()
+    {
+        // Act
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{Guid.NewGuid()}/books/not-a-guid");
+
+        // Assert
+        // The route value is kept as a raw string, so the unparseable Id reaches the query validator, which reports a clean
+        // validation error instead of failing the request binding.
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        using JsonDocument problemDetails = JsonDocument.Parse(content);
+        Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
+        Assert.Contains("BookIdCannotBeEmpty", content, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>

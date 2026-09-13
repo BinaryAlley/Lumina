@@ -29,13 +29,13 @@ public class GetBookEndpointTests : IClassFixture<LuminaApiFactory>
     }
 
     [Fact]
-    public async Task GetBook_WhenCalledWithoutAuthentication_ShouldReturnUnauthorized()
+    public async Task GetBook_WhenUnauthorized_ShouldReturnUnauthorizedResult()
     {
         // Arrange
         HttpClient client = _apiFactory.CreateClient();
 
         // Act
-        HttpResponseMessage response = await client.GetAsync($"/api/v1/books/{Guid.NewGuid()}");
+        HttpResponseMessage response = await client.GetAsync($"/api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books/{Guid.NewGuid()}");
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -53,10 +53,11 @@ public class GetBookEndpointTests : IClassFixture<LuminaApiFactory>
         (_, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(client);
 
         // Act
-        HttpResponseMessage response = await client.GetAsync($"/api/v1/books/{Uri.EscapeDataString(maliciousBookId)}");
+        HttpResponseMessage response = await client.GetAsync($"/api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books/{Uri.EscapeDataString(maliciousBookId)}");
 
         // Assert
-        // The unparseable route value becomes an empty book Id, which the query validator reports as a missing book Id.
+        // The route value is kept as a raw string, so the unparseable Id reaches the query validator, which reports a clean
+        // validation error instead of failing the request binding.
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
