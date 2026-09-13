@@ -32,7 +32,6 @@ public class GetBooksRequestTests
 
         // Assert
         Assert.NotNull(sut);
-        Assert.NotEqual(Guid.Empty, sut.LibraryId);
         Assert.True(sut.CurrentPage.HasValue);
         Assert.True(sut.PerPage.HasValue);
     }
@@ -72,14 +71,27 @@ public class GetBooksRequestTests
         GetBooksRequest sut = _getBooksRequestFixture.Create();
 
         // Act
-        (Guid libraryId, int? currentPage, int? perPage, string? searchTerm, string? sortBy, SortOrder? sortOrder) = sut;
+        (int? currentPage, int? perPage, string? searchTerm, string? sortBy, SortOrder? sortOrder) = sut;
 
         // Assert
-        Assert.Equal(sut.LibraryId, libraryId);
         Assert.Equal(sut.CurrentPage, currentPage);
         Assert.Equal(sut.PerPage, perPage);
         Assert.Equal(sut.SearchTerm, searchTerm);
         Assert.Equal(sut.SortBy, sortBy);
         Assert.Equal(sut.SortOrder, sortOrder);
+    }
+
+    [Fact]
+    public void Equality_WhenTwoInstancesHaveSameValues_ShouldBeEqual()
+    {
+        // Arrange
+        GetBooksRequest first = _getBooksRequestFixture.Create();
+        GetBooksRequest second = first with { };
+
+        // Act
+        bool areEqual = first == second;
+
+        // Assert
+        Assert.True(areEqual);
     }
 }

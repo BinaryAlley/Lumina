@@ -27,24 +27,28 @@ public class GetBooksEndpointSummary : Summary<GetBooksEndpoint, GetBooksRequest
     /// </summary>
     public GetBooksEndpointSummary()
     {
-        Summary = "Retrieves the list of books.";
-        Description = "Returns the entire list of books.";
+        Summary = "Retrieves the list of books of a media library.";
+        Description = "Returns the paginated, filterable list of the books of the media library identified by the request, with the full details of each book. The page is returned to an Admin, who can see the books of all libraries, or to the owner of the library.";
 
         ExampleRequest = new GetBooksRequest(
-            LibraryId: Guid.NewGuid(),
             CurrentPage: 1,
-            PerPage: 48,
+            PerPage: 10,
             SearchTerm: "fellowship",
             SortBy: "title",
             SortOrder: SortOrder.Ascending
         );
 
-        RequestParam(r => r.LibraryId, "The Id of the media library whose books are retrieved. Required.");
         RequestParam(r => r.CurrentPage, "The page of results to retrieve. Optional.");
         RequestParam(r => r.PerPage, "The maximum number of books to retrieve per page. Optional.");
         RequestParam(r => r.SearchTerm, "The search term used to filter results. Optional.");
         RequestParam(r => r.SortBy, "The name of the field by which to sort the results. Optional.");
         RequestParam(r => r.SortOrder, "The direction in which to sort the results. Optional.");
+
+        ResponseParam<PaginatedResponse<BookResponse>>(r => r.Data, "The books on the current page, each with the full details of the book.");
+        ResponseParam<PaginatedResponse<BookResponse>>(r => r.CurrentPage, "The current page number.");
+        ResponseParam<PaginatedResponse<BookResponse>>(r => r.PerPage, "The number of books retrieved per page.");
+        ResponseParam<PaginatedResponse<BookResponse>>(r => r.Count, "The total number of books matching the request.");
+        ResponseParam<PaginatedResponse<BookResponse>>(r => r.NumberOfPages, "The total number of pages.");
 
         Response(200, "The paginated list of books is returned.",
             example: new PaginatedResponse<BookResponse>
@@ -93,9 +97,7 @@ public class GetBooksEndpointSummary : Summary<GetBooksEndpoint, GetBooksRequest
                         Format: BookFormat.Paperback,
                         Edition: "50th Anniversary Edition",
                         VolumeNumber: 1,
-                        Series: new BookSeriesDto(
-                            Title: "The Lord of the Rings"
-                        ),
+                        Series: null,
                         ASIN: "B007978NPG",
                         GoodreadsId: "3",
                         LCCN: "54009621",
@@ -117,24 +119,12 @@ public class GetBooksEndpointSummary : Summary<GetBooksEndpoint, GetBooksRequest
                         ],
                         Contributors: [
                             new(
-                                Name: new MediaContributorNameDto(
-                                    DisplayName: "J.R.R. Tolkien",
-                                    LegalName: "John Ronald Reuel Tolkien"
-                                ),
-                                Role: new MediaContributorRoleDto(
-                                    Name: "author",
-                                    Category: MediaContributorRoleCategory.Author
-                                )
+                                ContributorId: Guid.NewGuid(),
+                                Role: MediaContributorRole.Author
                             ),
                             new(
-                                Name: new MediaContributorNameDto(
-                                    DisplayName: "Alan Lee",
-                                    LegalName: "Alan Lee"
-                                ),
-                                Role: new MediaContributorRoleDto(
-                                    Name: "illustrator",
-                                    Category: MediaContributorRoleCategory.Illustrator
-                                )
+                                ContributorId: Guid.NewGuid(),
+                                Role: MediaContributorRole.Illustrator
                             )
                         ],
                         Ratings: [
@@ -200,9 +190,7 @@ public class GetBooksEndpointSummary : Summary<GetBooksEndpoint, GetBooksRequest
                         Format: BookFormat.Hardcover,
                         Edition: "50th Anniversary Edition",
                         VolumeNumber: 2,
-                        Series: new BookSeriesDto(
-                            Title: "The Lord of the Rings"
-                        ),
+                        Series: null,
                         ASIN: "B007978NPZ",
                         GoodreadsId: "33",
                         LCCN: "54009622",
@@ -224,24 +212,12 @@ public class GetBooksEndpointSummary : Summary<GetBooksEndpoint, GetBooksRequest
                         ],
                         Contributors: [
                             new(
-                                Name: new MediaContributorNameDto(
-                                    DisplayName: "J.R.R. Tolkien",
-                                    LegalName: "John Ronald Reuel Tolkien"
-                                ),
-                                Role: new MediaContributorRoleDto(
-                                    Name: "author",
-                                    Category: MediaContributorRoleCategory.Author
-                                )
+                                ContributorId: Guid.NewGuid(),
+                                Role: MediaContributorRole.Author
                             ),
                             new(
-                                Name: new MediaContributorNameDto(
-                                    DisplayName: "Alan Lee",
-                                    LegalName: "Alan Lee"
-                                ),
-                                Role: new MediaContributorRoleDto(
-                                    Name: "illustrator",
-                                    Category: MediaContributorRoleCategory.Illustrator
-                                )
+                                ContributorId: Guid.NewGuid(),
+                                Role: MediaContributorRole.Illustrator
                             )
                         ],
                         Ratings: [
@@ -282,16 +258,16 @@ public class GetBooksEndpointSummary : Summary<GetBooksEndpoint, GetBooksRequest
                     type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                     status = 401,
                     title = "Unauthorized",
-                    detail = "You are not authorized",
-                    instance = "/api/v1/books"
+                    detail = "Authentication failed",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books"
                 },
                 new
                 {
                     type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                     status = 401,
                     title = "Unauthorized",
-                    detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
-                    instance = "/api/v1/books"
+                    detail = "The token has expired",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books"
                 },
                 new
                 {
@@ -299,8 +275,20 @@ public class GetBooksEndpointSummary : Summary<GetBooksEndpoint, GetBooksRequest
                     status = 401,
                     title = "Unauthorized",
                     detail = "The token is invalid",
-                    instance = "/api/v1/books"
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books"
                 }
+            }
+        );
+
+        Response(403, "The request failed because the user making the request is not an Admin, or the owner of the media library.", "application/problem+json",
+            example: new
+            {
+                type = "https://tools.ietf.org/html/rfc9110#section-15.5.4",
+                title = "General.Unauthorized",
+                status = 403,
+                detail = "NotAuthorized",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/books",
+                traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
             }
         );
 
@@ -311,7 +299,7 @@ public class GetBooksEndpointSummary : Summary<GetBooksEndpoint, GetBooksRequest
                 title = "General.Validation",
                 status = 422,
                 detail = "OneOrMoreValidationErrorsOccurred",
-                instance = "/api/v1/books",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/books",
                 errors = new Dictionary<string, string[]>
                 {
                     {

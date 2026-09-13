@@ -18,15 +18,19 @@ public class GetBooksLiteQueryValidator : AbstractValidator<GetBooksLiteQuery>
     /// </summary>
     public GetBooksLiteQueryValidator()
     {
-        RuleFor(query => query.Filter.LibraryId)
+        // Validates the identifier of the media library whose books are retrieved, taken from the route.
+        RuleFor(query => query.LibraryId)
             .NotEmpty()
-            .WithError(Errors.Library.LibraryIdCannotBeEmpty)
-            .Must(id => id != Guid.Empty)
+            .WithError(Errors.Library.LibraryIdCannotBeEmpty);
+
+        RuleFor(query => query.LibraryId)
+            .Must(libraryId => Guid.TryParse(libraryId, out Guid parsedLibraryId) && parsedLibraryId != Guid.Empty)
+            .When(query => query.LibraryId is not null && query.LibraryId.Length > 0)
             .WithError(Errors.Library.LibraryIdCannotBeEmpty);
 
         // the alpha key must be exactly one of the three picker bucket kinds, so that the filter specification can
         // derive the key of a title unambiguously: no filter, a number bucket, a symbol bucket, or a single ASCII letter
-        RuleFor(query => query.Filter.FilterAlphaKey)
+        RuleFor(query => query.FilterAlphaKey)
             .Must(alphaKey => alphaKey is null
                 || alphaKey == LibraryItemAlphaKeys.NUMBER
                 || alphaKey == LibraryItemAlphaKeys.SYMBOL

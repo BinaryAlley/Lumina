@@ -1,1 +1,2 @@
-GET {{host}}/api/v1/books?libraryId={{$guid}}
+GET {{host}}/api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books?currentPage=1&perPage=10&searchTerm=fellowship&sortBy=title&sortOrder=Ascending
+Authorization: Bearer {{ACCESS_TOKEN}}

@@ -3,6 +3,7 @@ using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookL
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Queries.GetBooks;
 using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -21,14 +22,15 @@ public class GetBooksRequestMappingTests
     {
         // Arrange
         GetBooksRequest request = _getBooksRequestFixture.Create();
+        string libraryId = Guid.NewGuid().ToString();
 
         // Act
-        GetBooksQuery result = request.ToQuery();
+        GetBooksQuery result = request.ToQuery(libraryId);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(request.LibraryId, result.Filter.LibraryId);
-        Assert.Equal(request.SearchTerm, result.Filter.SearchTerm);
+        Assert.Equal(libraryId, result.LibraryId);
+        Assert.Equal(request.SearchTerm, result.SearchTerm);
         Assert.Equal(request.SortBy, result.SortBy);
         Assert.Equal(request.SortOrder, result.SortOrder);
         Assert.NotNull(result.PaginationData);
@@ -37,18 +39,48 @@ public class GetBooksRequestMappingTests
     }
 
     [Fact]
+    public void ToQuery_WhenLibraryIdIsNotParseable_ShouldMapItAsIs()
+    {
+        // Arrange
+        GetBooksRequest request = _getBooksRequestFixture.Create();
+        string libraryId = "not-a-library-guid";
+
+        // Act
+        GetBooksQuery result = request.ToQuery(libraryId);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(libraryId, result.LibraryId);
+    }
+
+    [Fact]
+    public void ToQuery_WhenLibraryIdIsNull_ShouldMapNullLibraryId()
+    {
+        // Arrange
+        GetBooksRequest request = _getBooksRequestFixture.Create();
+
+        // Act
+        GetBooksQuery result = request.ToQuery(null);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Null(result.LibraryId);
+    }
+
+    [Fact]
     public void ToQuery_WhenNoPaginationProvided_ShouldNotBuildPaginationData()
     {
         // Arrange
         GetBooksRequest request = _getBooksRequestFixture.Create(includeCurrentPage: false, includePerPage: false);
+        string libraryId = Guid.NewGuid().ToString();
 
         // Act
-        GetBooksQuery result = request.ToQuery();
+        GetBooksQuery result = request.ToQuery(libraryId);
 
         // Assert
         Assert.NotNull(result);
         Assert.Null(result.PaginationData);
-        Assert.Equal(request.LibraryId, result.Filter.LibraryId);
+        Assert.Equal(libraryId, result.LibraryId);
     }
 
     [Fact]
@@ -56,9 +88,10 @@ public class GetBooksRequestMappingTests
     {
         // Arrange
         GetBooksRequest request = _getBooksRequestFixture.Create(perPage: 25, includeCurrentPage: false);
+        string libraryId = Guid.NewGuid().ToString();
 
         // Act
-        GetBooksQuery result = request.ToQuery();
+        GetBooksQuery result = request.ToQuery(libraryId);
 
         // Assert
         Assert.NotNull(result.PaginationData);
@@ -71,9 +104,10 @@ public class GetBooksRequestMappingTests
     {
         // Arrange
         GetBooksRequest request = _getBooksRequestFixture.Create(currentPage: 3, includePerPage: false);
+        string libraryId = Guid.NewGuid().ToString();
 
         // Act
-        GetBooksQuery result = request.ToQuery();
+        GetBooksQuery result = request.ToQuery(libraryId);
 
         // Assert
         Assert.NotNull(result.PaginationData);

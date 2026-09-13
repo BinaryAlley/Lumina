@@ -17,6 +17,9 @@
     - [Update Book](#update-book)
       - [Update Book Request](#update-book-request)
       - [Update Book Response](#update-book-response)
+    - [Update Book Cover](#update-book-cover)
+      - [Update Book Cover Request](#update-book-cover-request)
+      - [Update Book Cover Response](#update-book-cover-response)
     - [Get Reading Availability](#get-reading-availability)
       - [Get Reading Availability Request](#get-reading-availability-request)
       - [Get Reading Availability Response](#get-reading-availability-response)
@@ -321,9 +324,7 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books?currentPage=1&pe
       "format": "Paperback",
       "edition": "50th Anniversary Edition",
       "volumeNumber": 1,
-      "series": {
-        "title": "The Lord of the Rings"
-      },
+      "series": null,
       "asin": "B007978NPG",
       "goodreadsId": "3",
       "lccn": "54009621",
@@ -343,20 +344,30 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books?currentPage=1&pe
           "format": "Isbn13"
         }
       ],
-      "contributors": [],
+      "contributors": [
+        { "contributorId": "6a3f0c2d-1b4e-4f5a-8c6d-9e0f1a2b3c4d", "role": "Author" },
+        { "contributorId": "7b4e1d3f-2c5a-4e6b-9d7e-0f1a2b3c4d5e", "role": "Illustrator" }
+      ],
       "ratings": [
         {
           "source": "GoogleBooks",
           "value": 4.36,
           "maxValue": 5,
           "voteCount": 2345678
+        },
+        {
+          "source": "Amazon",
+          "value": 4.7,
+          "maxValue": 5,
+          "voteCount": 87654
         }
       ],
       "metadataStatus": "Pending",
       "lastMetadataUpdateUtc": null,
       "metadataProvider": null,
       "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
-      "updatedOnUtc": null
+      "updatedOnUtc": null,
+      "coverPath": null
     }
   ],
   "currentPage": 1,
@@ -371,7 +382,7 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books?currentPage=1&pe
 #### Get Books Lite Request
 
 ```js
-GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books/lite?currentPage=1&perPage=10&searchTerm=fellowship&filterAlphaKey=f&ignoreThePrefixForAlphaPicker=true&sortBy=title&sortOrder=Ascending
+GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books/lite?currentPage=1&perPage=10&searchTerm=fellowship&filterAlphaKey=f&shouldIgnoreThePrefixForAlphaPicker=true&sortBy=title&sortOrder=Ascending
 ```
 
 | Query Parameter | Type | Description |
@@ -380,7 +391,7 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books/lite?currentPage
 | `perPage` | `int` | Optional. The maximum number of books to retrieve per page. |
 | `searchTerm` | `string` | Optional. The search term used to filter results. |
 | `filterAlphaKey` | `string` | Optional. Filters results by the first character of their title. A single ASCII letter (case-insensitive), `#` for titles starting with a digit, or `*` for titles starting with any other character. |
-| `ignoreThePrefixForAlphaPicker` | `bool` | Whether the leading "The " prefix of a title should be ignored when computing the alpha key. |
+| `shouldIgnoreThePrefixForAlphaPicker` | `bool` | Whether the leading "The " prefix of a title should be ignored when computing the alpha key. |
 | `sortBy` | `string` | Optional. The name of the field by which to sort the results. |
 | `sortOrder` | `string` | Optional. The direction in which to sort the results (`Ascending` or `Descending`). |
 
@@ -608,6 +619,36 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books/{bookId}
   "metadataProvider": "GoogleBooks",
   "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
   "updatedOnUtc": "2025-02-01T12:00:00.0000000Z",
+  "coverPath": "/media/books/books-3f2504e0-4f89-41d3-9a0c-0305e82c3301/The Lord of the Rings-2b0e5f5a-0b3f-4b7e-8f4a-8c9e3d2f5a6b/cover.jpg"
+}
+```
+
+### Update Book Cover
+
+Updates the cover image of the book identified by `bookId` with the image uploaded in the multipart form of the request. The book must belong to the media library identified by `libraryId`, and the uploaded file must be an image.
+
+#### Update Book Cover Request
+
+```js
+PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books/{bookId}/cover
+Content-Type: multipart/form-data; boundary=LuminaBoundary
+
+--LuminaBoundary
+Content-Disposition: form-data; name="cover"; filename="cover.jpg"
+Content-Type: image/jpeg
+
+< ./cover.jpg
+--LuminaBoundary--
+```
+
+#### Update Book Cover Response
+
+```js
+200 Ok
+```
+
+```json
+{
   "coverPath": "/media/books/books-3f2504e0-4f89-41d3-9a0c-0305e82c3301/The Lord of the Rings-2b0e5f5a-0b3f-4b7e-8f4a-8c9e3d2f5a6b/cover.jpg"
 }
 ```

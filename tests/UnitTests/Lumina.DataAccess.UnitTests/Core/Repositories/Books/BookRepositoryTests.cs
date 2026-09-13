@@ -4,6 +4,7 @@ using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Common;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaContributors;
@@ -1086,4 +1087,273 @@ public class BookRepositoryTests
         Assert.Equal(["The Art of War", "Beneath the Surface"], result.Value.Data.Select(book => book.Title));
     }
 
+    [Fact]
+    public async Task GetAllLiteAsync_WhenFilterIncludesLibraryId_ShouldReturnPaginatedLiteRows()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        List<BookEntity> books = _bookEntityFixture.CreateMany(3);
+        foreach (BookEntity book in books)
+            book.LibraryId = libraryId;
+        _mockContext.Books.AddRange(books);
+        await _mockContext.SaveChangesAsync();
+
+        PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
+
+        // Act
+        Result<PaginatedResultDto<BookLiteRow>> result = await _sut.GetAllLiteAsync(paginationData, null, null, filter, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(3, result.Value.Count);
+        Assert.Equal(3, result.Value.Data.Count);
+        Assert.Equal(1, result.Value.CurrentPage);
+        Assert.Equal(10, result.Value.PerPage);
+        Assert.Equal(1, result.Value.NumberOfPages);
+    }
+
+    [Fact]
+    public async Task GetAllLiteAsync_WhenFilterDoesNotIncludeLibraryId_ShouldReturnError()
+    {
+        // Arrange
+        PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
+        BaseFilterDto filter = _baseFilterDtoFixture.Create();
+
+        // Act
+        Result<PaginatedResultDto<BookLiteRow>> result = await _sut.GetAllLiteAsync(paginationData, null, null, filter, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Library.FilterMustIncludeLibraryId, result.FirstError);
+    }
+
+    [Fact]
+    public async Task GetAllLiteAsync_WhenFilterLibraryIdIsEmpty_ShouldReturnError()
+    {
+        // Arrange
+        PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: Guid.Empty);
+
+        // Act
+        Result<PaginatedResultDto<BookLiteRow>> result = await _sut.GetAllLiteAsync(paginationData, null, null, filter, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Library.FilterMustIncludeLibraryId, result.FirstError);
+    }
+
+    [Fact]
+    public async Task GetAllLiteAsync_WhenPaginationDataIsNull_ShouldReturnAllLiteRows()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        List<BookEntity> books = _bookEntityFixture.CreateMany(3);
+        foreach (BookEntity book in books)
+            book.LibraryId = libraryId;
+        _mockContext.Books.AddRange(books);
+        await _mockContext.SaveChangesAsync();
+
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
+
+        // Act
+        Result<PaginatedResultDto<BookLiteRow>> result = await _sut.GetAllLiteAsync(null, null, null, filter, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(3, result.Value.Count);
+        Assert.Equal(3, result.Value.Data.Count);
+        Assert.Equal(1, result.Value.CurrentPage);
+        Assert.Equal(3, result.Value.PerPage);
+        Assert.Equal(1, result.Value.NumberOfPages);
+    }
+
+    [Fact]
+    public async Task GetAllLiteAsync_WhenSearchTermProvided_ShouldReturnOnlyMatchingLiteRows()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        BookEntity fellowshipBook = _bookEntityFixture.Create();
+        fellowshipBook.LibraryId = libraryId;
+        fellowshipBook.Title = "The Fellowship of the Ring";
+        BookEntity towersBook = _bookEntityFixture.Create();
+        towersBook.LibraryId = libraryId;
+        towersBook.Title = "The Two Towers";
+        _mockContext.Books.AddRange(fellowshipBook, towersBook);
+        await _mockContext.SaveChangesAsync();
+
+        PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId, searchTerm: "Fellowship");
+
+        // Act
+        Result<PaginatedResultDto<BookLiteRow>> result = await _sut.GetAllLiteAsync(paginationData, null, null, filter, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        BookLiteRow row = Assert.Single(result.Value.Data);
+        Assert.Equal("The Fellowship of the Ring", row.Title);
+        Assert.Equal(1, result.Value.Count);
+    }
+
+    [Fact]
+    public async Task GetAllLiteAsync_WhenPageSizeSmallerThanBookCount_ShouldReturnCorrectPageMetadata()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        List<BookEntity> books = _bookEntityFixture.CreateMany(5);
+        foreach (BookEntity book in books)
+            book.LibraryId = libraryId;
+        _mockContext.Books.AddRange(books);
+        await _mockContext.SaveChangesAsync();
+
+        PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 2, perPage: 2);
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
+
+        // Act
+        Result<PaginatedResultDto<BookLiteRow>> result = await _sut.GetAllLiteAsync(paginationData, null, null, filter, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(5, result.Value.Count);
+        Assert.Equal(3, result.Value.NumberOfPages);
+        Assert.Equal(2, result.Value.CurrentPage);
+        Assert.Equal(2, result.Value.PerPage);
+        Assert.Equal(2, result.Value.Data.Count);
+    }
+
+    [Fact]
+    public async Task GetAllLiteAsync_WhenSortByTitleDescending_ShouldReturnLiteRowsInDescendingOrder()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        BookEntity bookA = _bookEntityFixture.Create();
+        bookA.LibraryId = libraryId;
+        bookA.Title = "Book A";
+        BookEntity bookB = _bookEntityFixture.Create();
+        bookB.LibraryId = libraryId;
+        bookB.Title = "Book B";
+        _mockContext.Books.AddRange(bookA, bookB);
+        await _mockContext.SaveChangesAsync();
+
+        PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
+
+        // Act
+        Result<PaginatedResultDto<BookLiteRow>> result = await _sut.GetAllLiteAsync(paginationData, "title", SortOrder.Descending, filter, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(["Book B", "Book A"], result.Value.Data.Select(row => row.Title));
+    }
+
+    [Fact]
+    public async Task GetAllLiteAsync_WhenIgnoringTheTitlePrefixForSorting_ShouldSortByTitleStrippedOfItsPrefix()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        BookEntity beneathBook = _bookEntityFixture.Create(title: "Beneath the Surface", includeMetadata: false);
+        beneathBook.LibraryId = libraryId;
+        BookEntity artOfWarBook = _bookEntityFixture.Create(title: "The Art of War", includeMetadata: false);
+        artOfWarBook.LibraryId = libraryId;
+        _mockContext.Books.AddRange(beneathBook, artOfWarBook);
+        await _mockContext.SaveChangesAsync();
+
+        PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId, shouldIgnoreThePrefixForAlphaPicker: true);
+
+        // Act
+        Result<PaginatedResultDto<BookLiteRow>> result = await _sut.GetAllLiteAsync(paginationData, null, null, filter, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        // Without stripping the prefix, "The Art of War" would be sorted after "Beneath the Surface", since its sort key would start with "the" instead of "art".
+        Assert.Equal(["The Art of War", "Beneath the Surface"], result.Value.Data.Select(row => row.Title));
+    }
+
+    [Fact]
+    public async Task GetAllLiteAsync_WhenBookHasReReleaseYear_ShouldProjectReReleaseYearAsReleaseYear()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        BookEntity book = _bookEntityFixture.Create();
+        book.LibraryId = libraryId;
+        _mockContext.Books.Add(book);
+        await _mockContext.SaveChangesAsync();
+
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
+
+        // Act
+        Result<PaginatedResultDto<BookLiteRow>> result = await _sut.GetAllLiteAsync(null, null, null, filter, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        BookLiteRow row = Assert.Single(result.Value.Data);
+        Assert.Equal(book.ReReleaseYear, row.ReleaseYear);
+    }
+
+    [Fact]
+    public async Task GetAllLiteAsync_WhenBookHasNoReReleaseYear_ShouldProjectOriginalReleaseYearAsReleaseYear()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        BookEntity book = _bookEntityFixture.Create();
+        book.LibraryId = libraryId;
+        book.ReReleaseYear = null;
+        _mockContext.Books.Add(book);
+        await _mockContext.SaveChangesAsync();
+
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
+
+        // Act
+        Result<PaginatedResultDto<BookLiteRow>> result = await _sut.GetAllLiteAsync(null, null, null, filter, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        BookLiteRow row = Assert.Single(result.Value.Data);
+        Assert.Equal(book.OriginalReleaseYear, row.ReleaseYear);
+    }
+
+    [Fact]
+    public async Task GetAllLiteAsync_WhenBookHasCoverArtwork_ShouldProjectTheCoverFileName()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        BookEntity book = _bookEntityFixture.Create();
+        book.LibraryId = libraryId;
+        book.BookArtwork = [_bookArtworkEntityFixture.Create(bookId: book.Id, artworkType: ArtworkType.Cover, fileName: "cover.jpg")];
+        _mockContext.Books.Add(book);
+        await _mockContext.SaveChangesAsync();
+
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
+
+        // Act
+        Result<PaginatedResultDto<BookLiteRow>> result = await _sut.GetAllLiteAsync(null, null, null, filter, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        BookLiteRow row = Assert.Single(result.Value.Data);
+        Assert.Equal("cover.jpg", row.CoverPath);
+    }
+
+    [Fact]
+    public async Task GetAllLiteAsync_WhenBookHasNoCoverArtwork_ShouldProjectNullCoverPath()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        BookEntity book = _bookEntityFixture.Create();
+        book.LibraryId = libraryId;
+        book.BookArtwork = [];
+        _mockContext.Books.Add(book);
+        await _mockContext.SaveChangesAsync();
+
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
+
+        // Act
+        Result<PaginatedResultDto<BookLiteRow>> result = await _sut.GetAllLiteAsync(null, null, null, filter, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        BookLiteRow row = Assert.Single(result.Value.Data);
+        Assert.Null(row.CoverPath);
+    }
 }

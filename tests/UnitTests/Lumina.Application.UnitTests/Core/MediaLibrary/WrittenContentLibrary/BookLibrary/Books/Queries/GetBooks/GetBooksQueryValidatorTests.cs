@@ -24,7 +24,59 @@ public class GetBooksQueryValidatorTests
     public void Validate_WhenLibraryIdIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        GetBooksQuery query = _getBooksQueryFixture.Create(libraryId: Guid.Empty);
+        GetBooksQuery query = _getBooksQueryFixture.Create(libraryId: string.Empty);
+
+        // Act
+        List<Error> result = _validator.TestValidate(query);
+
+        // Assert
+        result.ShouldHaveValidationError(Errors.Library.LibraryIdCannotBeEmpty);
+    }
+
+    [Fact]
+    public void Validate_WhenLibraryIdIsNull_ShouldHaveValidationError()
+    {
+        // Arrange
+        GetBooksQuery query = _getBooksQueryFixture.Create(includeLibraryId: false);
+
+        // Act
+        List<Error> result = _validator.TestValidate(query);
+
+        // Assert
+        result.ShouldHaveValidationError(Errors.Library.LibraryIdCannotBeEmpty);
+    }
+
+    [Fact]
+    public void Validate_WhenLibraryIdIsWhitespace_ShouldHaveValidationError()
+    {
+        // Arrange
+        GetBooksQuery query = _getBooksQueryFixture.Create(libraryId: "   ");
+
+        // Act
+        List<Error> result = _validator.TestValidate(query);
+
+        // Assert
+        result.ShouldHaveValidationError(Errors.Library.LibraryIdCannotBeEmpty);
+    }
+
+    [Fact]
+    public void Validate_WhenLibraryIdIsGuidEmpty_ShouldHaveValidationError()
+    {
+        // Arrange
+        GetBooksQuery query = _getBooksQueryFixture.Create(libraryId: Guid.Empty.ToString());
+
+        // Act
+        List<Error> result = _validator.TestValidate(query);
+
+        // Assert
+        result.ShouldHaveValidationError(Errors.Library.LibraryIdCannotBeEmpty);
+    }
+
+    [Fact]
+    public void Validate_WhenLibraryIdIsNotAValidGuid_ShouldHaveValidationError()
+    {
+        // Arrange
+        GetBooksQuery query = _getBooksQueryFixture.Create(libraryId: "not-a-library-guid");
 
         // Act
         List<Error> result = _validator.TestValidate(query);

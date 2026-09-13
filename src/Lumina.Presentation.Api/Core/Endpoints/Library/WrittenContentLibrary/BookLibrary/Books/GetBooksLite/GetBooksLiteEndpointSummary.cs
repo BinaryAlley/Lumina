@@ -22,13 +22,12 @@ public class GetBooksLiteEndpointSummary : Summary<GetBooksLiteEndpoint, GetBook
     /// </summary>
     public GetBooksLiteEndpointSummary()
     {
-        Summary = "Retrieves the lightweight details of the list of books.";
-        Description = "Returns a paginated list of the lightweight details of the books of the media library, suitable for card-style navigation.";
+        Summary = "Retrieves the list of lightweight book details of a media library.";
+        Description = "Returns the paginated, filterable list of the lightweight details of the books of the media library identified by the request, suitable for card-style navigation. The page is returned to an Admin, who can see the books of all libraries, or to the owner of the library.";
 
         ExampleRequest = new GetBooksLiteRequest(
-            LibraryId: Guid.NewGuid(),
             CurrentPage: 1,
-            PerPage: 48,
+            PerPage: 10,
             SearchTerm: "fellowship",
             FilterAlphaKey: "f",
             ShouldIgnoreThePrefixForAlphaPicker: true,
@@ -36,7 +35,6 @@ public class GetBooksLiteEndpointSummary : Summary<GetBooksLiteEndpoint, GetBook
             SortOrder: SortOrder.Ascending
         );
 
-        RequestParam(r => r.LibraryId, "The Id of the media library whose books are retrieved. Required.");
         RequestParam(r => r.CurrentPage, "The page of results to retrieve. Optional.");
         RequestParam(r => r.PerPage, "The maximum number of books to retrieve per page. Optional.");
         RequestParam(r => r.SearchTerm, "The search term used to filter results. Optional.");
@@ -44,6 +42,12 @@ public class GetBooksLiteEndpointSummary : Summary<GetBooksLiteEndpoint, GetBook
         RequestParam(r => r.ShouldIgnoreThePrefixForAlphaPicker, "Whether the leading \"The \" prefix of a title should be ignored when computing the alpha key, or not. Required.");
         RequestParam(r => r.SortBy, "The name of the field by which to sort the results. Optional.");
         RequestParam(r => r.SortOrder, "The direction in which to sort the results. Optional.");
+
+        ResponseParam<PaginatedResponse<BookLiteResponse>>(r => r.Data, "The lightweight book details on the current page.");
+        ResponseParam<PaginatedResponse<BookLiteResponse>>(r => r.CurrentPage, "The current page number.");
+        ResponseParam<PaginatedResponse<BookLiteResponse>>(r => r.PerPage, "The number of books retrieved per page.");
+        ResponseParam<PaginatedResponse<BookLiteResponse>>(r => r.Count, "The total number of books matching the request.");
+        ResponseParam<PaginatedResponse<BookLiteResponse>>(r => r.NumberOfPages, "The total number of pages.");
 
         Response(200, "The paginated list of lightweight book details is returned.",
             example: new PaginatedResponse<BookLiteResponse>
@@ -77,16 +81,16 @@ public class GetBooksLiteEndpointSummary : Summary<GetBooksLiteEndpoint, GetBook
                     type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                     status = 401,
                     title = "Unauthorized",
-                    detail = "You are not authorized",
-                    instance = "/api/v1/books/lite"
+                    detail = "Authentication failed",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/lite"
                 },
                 new
                 {
                     type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                     status = 401,
                     title = "Unauthorized",
-                    detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
-                    instance = "/api/v1/books/lite"
+                    detail = "The token has expired",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/lite"
                 },
                 new
                 {
@@ -94,8 +98,20 @@ public class GetBooksLiteEndpointSummary : Summary<GetBooksLiteEndpoint, GetBook
                     status = 401,
                     title = "Unauthorized",
                     detail = "The token is invalid",
-                    instance = "/api/v1/books/lite"
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/lite"
                 }
+            }
+        );
+
+        Response(403, "The request failed because the user making the request is not an Admin, or the owner of the media library.", "application/problem+json",
+            example: new
+            {
+                type = "https://tools.ietf.org/html/rfc9110#section-15.5.4",
+                title = "General.Unauthorized",
+                status = 403,
+                detail = "NotAuthorized",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/lite",
+                traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
             }
         );
 
@@ -106,7 +122,7 @@ public class GetBooksLiteEndpointSummary : Summary<GetBooksLiteEndpoint, GetBook
                 title = "General.Validation",
                 status = 422,
                 detail = "OneOrMoreValidationErrorsOccurred",
-                instance = "/api/v1/books/lite",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/lite",
                 errors = new Dictionary<string, string[]>
                 {
                     {

@@ -106,7 +106,6 @@ internal sealed class BookRepository : IBookRepository
     }
 
     /// <summary>
-    /// <summary>
     /// Gets paginated books, or all the books of the matching filters when the pagination data is <see langword="null"/>.
     /// </summary>
     /// <typeparam name="TFilter">The type of the filter used for filtering the data.</typeparam>
@@ -191,18 +190,32 @@ internal sealed class BookRepository : IBookRepository
     /// <param name="sortBy">The name of the fields by which to sort the results.</param>
     /// <param name="sortOrder">The direction in which to sort the results.</param>
     /// <param name="filterModel">The model containing the parameters used to filter the results.</param>
+    /// <param name="includeNavigationProperties">Whether the navigation properties of the entities should be loaded together with the entities themselves. Pass <see langword="false"/> to retrieve only the data stored directly on the entity rows.</param>
+    /// <param name="shouldTrackEntities">Whether the retrieved entities should be tracked by the persistence medium, so that changes to them can be saved. Pass <see langword="false"/> for read-only scenarios, to avoid the tracking overhead.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="PaginatedResultDto{BookLiteRow}"/>, or an error.</returns>
-    public async Task<Result<PaginatedResultDto<BookLiteRow>>> GetAllLiteAsync<TFilter>(PaginationDataDto? paginationData = null, string? sortBy = null, SortOrder? sortOrder = null, TFilter? filterModel = null, CancellationToken cancellationToken = default) where TFilter : BaseFilterDto
+    public async Task<Result<PaginatedResultDto<BookLiteRow>>> GetAllLiteAsync<TFilter>(PaginationDataDto? paginationData = null, string? sortBy = null, SortOrder? sortOrder = null, TFilter? filterModel = null, bool includeNavigationProperties = false, bool shouldTrackEntities = false, CancellationToken cancellationToken = default) where TFilter : BaseFilterDto
     {
         // Books should always be retrieved only per owning libraries.
         if (filterModel is not LibraryFilterDto libraryFilter || libraryFilter.LibraryId == Guid.Empty)
             return Errors.Library.FilterMustIncludeLibraryId;
 
-        // The lightweight read models are always retrieved without tracking, because they are never modified by the caller.
-        IQueryable<BookEntity> booksQuery = _luminaDbContext.Books
-            .AsNoTracking()
-            .Where(book => book.LibraryId == libraryFilter.LibraryId);
+        // The lightweight read models are retrieved without tracking by default, because they are never modified by the caller.
+        IQueryable<BookEntity> booksQuery = _luminaDbContext.Books;
+        if (!shouldTrackEntities)
+            booksQuery = booksQuery.AsNoTracking();
+        if (includeNavigationProperties)
+        {
+            booksQuery = booksQuery
+                .Include(book => book.Tags)
+                .Include(book => book.Genres)
+                .Include(book => book.ISBNs)
+                .Include(book => book.Ratings)
+                .Include(book => book.BookContributors)
+                .Include(book => book.BookArtwork);
+        }
+
+        booksQuery = booksQuery.Where(book => book.LibraryId == libraryFilter.LibraryId);
 
         FilterSpecification<BookEntity>? filterSpecification = BuildFilterSpecification(libraryFilter);
         if (filterSpecification is not null)

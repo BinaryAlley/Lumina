@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DTO.Filtering;
 using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Queries.GetBooks;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
@@ -16,8 +15,9 @@ public static class GetBooksRequestMapping
     /// Converts <paramref name="request"/> to <see cref="GetBooksQuery"/>.
     /// </summary>
     /// <param name="request">The request to be converted.</param>
+    /// <param name="libraryId">The Id of the library whose books are retrieved, taken from the route.</param>
     /// <returns>The converted query.</returns>
-    public static GetBooksQuery ToQuery(this GetBooksRequest request)
+    public static GetBooksQuery ToQuery(this GetBooksRequest request, string? libraryId)
     {
         PaginationDataDto? paginationData = null;
         if (request.CurrentPage is not null || request.PerPage is not null)
@@ -27,12 +27,6 @@ public static class GetBooksRequestMapping
                 PerPage = request.PerPage ?? 200
             };
 
-        LibraryFilterDto libraryFilter = new()
-        {
-            LibraryId = request.LibraryId,
-            SearchTerm = request.SearchTerm
-        };
-
-        return new GetBooksQuery(paginationData, libraryFilter, request.SortBy, request.SortOrder);
+        return new GetBooksQuery(libraryId, paginationData, request.SearchTerm, request.SortBy, request.SortOrder);
     }
 }

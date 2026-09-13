@@ -256,46 +256,4 @@ public static class BookEntityMapping
             NumberOfPages = repositoryEntities.NumberOfPages
         };
     }
-
-    /// <summary>
-    /// Converts <paramref name="repositoryEntity"/> to <see cref="BookLiteResponse"/>.
-    /// </summary>
-    /// <param name="repositoryEntity">The repository entity to be converted.</param>
-    /// <returns>The converted response entity.</returns>
-    public static BookLiteResponse ToLiteResponse(this BookEntity repositoryEntity)
-    {
-        return new BookLiteResponse(
-            repositoryEntity.Id,
-            repositoryEntity.Title,
-            repositoryEntity.ReReleaseYear ?? repositoryEntity.OriginalReleaseYear,
-            repositoryEntity.BookArtwork.FirstOrDefault(artwork => artwork.ArtworkType == ArtworkType.Cover)?.FileName
-        );
-    }
-
-    /// <summary>
-    /// Converts <paramref name="repositoryEntities"/> to a collection of <see cref="BookLiteResponse"/>.
-    /// </summary>
-    /// <param name="repositoryEntities">The repository entities to be converted.</param>
-    /// <returns>The converted reponses.</returns>
-    public static IReadOnlyList<BookLiteResponse> ToLiteResponses(this IEnumerable<BookEntity> repositoryEntities)
-    {
-        return [.. repositoryEntities.Select(repositoryEntity => repositoryEntity.ToLiteResponse())];
-    }
-
-    /// <summary>
-    /// Converts <paramref name="repositoryEntities"/> to a paginated collection of <see cref="BookLiteResponse"/>.
-    /// </summary>
-    /// <param name="repositoryEntities">The paginated repository entities to be converted.</param>
-    /// <returns>The converted paginated responses.</returns>
-    public static PaginatedResponse<BookLiteResponse> ToLiteResponses(this PaginatedResultDto<BookEntity> repositoryEntities)
-    {
-        return new PaginatedResponse<BookLiteResponse>
-        {
-            Data = repositoryEntities.Data.ToLiteResponses(),
-            CurrentPage = repositoryEntities.CurrentPage,
-            PerPage = repositoryEntities.PerPage,
-            Count = repositoryEntities.Count,
-            NumberOfPages = repositoryEntities.NumberOfPages
-        };
-    }
 }

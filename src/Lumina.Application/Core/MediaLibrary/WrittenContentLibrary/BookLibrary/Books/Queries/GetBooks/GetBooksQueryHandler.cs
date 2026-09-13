@@ -16,6 +16,7 @@ using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Errors;
+using Lumina.Application.Common.DTO.Filtering;
 using Lumina.Application.Common.DTO.Pagination;
 #endregion
 
@@ -60,25 +61,34 @@ public class GetBooksQueryHandler : IQueryHandler<GetBooksQuery, Result<Paginate
         if (validationResult.Count > 0)
             return validationResult;
 
-        // an authenticated request must always carry a user identity
+        // An authenticated request must always carry a user identity.
         Guid? currentUserId = _currentUserService.UserId;
         if (currentUserId is null)
             return Errors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // admins can see all libraries; for everyone else, only the libraries they own
+        // The validator guarantees that the library id of the route is a non-empty Guid before this point.
+        Guid libraryId = Guid.Parse(query.LibraryId!);
+
+        // Admins can see all libraries; for everyone else, only the libraries they own.
         bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
-            userId, new LibraryOwnershipPolicyContext(query.Filter.LibraryId), cancellationToken).ConfigureAwait(false);
+            userId, new LibraryOwnershipPolicyContext(libraryId), cancellationToken).ConfigureAwait(false);
         if (!canAccessLibrary)
             return Errors.Authorization.NotAuthorized;
 
-        // get all books of the media library from the book repository
-        Result<PaginatedResultDto<BookEntity>> getBooksResult = await _unitOfWork.BookRepository.GetPaginatedAsync(
+        // Get all books of the media library from the book repository.
+        LibraryFilterDto libraryFilter = new()
+        {
+            LibraryId = libraryId,
+            SearchTerm = query.SearchTerm
+        };
+        Result<PaginatedResultDto<BookEntity>> getBooksResult = await _unitOfWork.BookRepository.GetAllAsync(
             query.PaginationData,
             query.SortBy,
             query.SortOrder,
-            query.Filter,
-            cancellationToken).ConfigureAwait(false);
+            libraryFilter,
+            shouldTrackEntities: false,
+            cancellationToken: cancellationToken).ConfigureAwait(false);
         return getBooksResult.Match(value => Result.From(value.ToResponses()), errors => errors);
     }
 }
