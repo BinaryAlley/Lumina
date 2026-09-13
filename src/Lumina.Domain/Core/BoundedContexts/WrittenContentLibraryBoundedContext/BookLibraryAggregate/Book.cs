@@ -185,7 +185,7 @@ public sealed class Book : AggregateRoot<BookId>
         BarnesAndNobleId = barnesAndNobleId;
         AppleBooksId = appleBooksId;
         CreatedOnUtc = createdOnUtc;
-        UpdatedOnUtc = updatedOnUtc.HasValue ? updatedOnUtc.Value : null;
+        UpdatedOnUtc = updatedOnUtc;
         _isbns = isbns;
         _contributors = [.. contributors];
         _ratings = ratings;
@@ -237,7 +237,7 @@ public sealed class Book : AggregateRoot<BookId>
         IEnumerable<BookMediaContributor> contributors,
         List<BookRating> ratings)
     {
-        // TODO: enforce invariants
+        // TODO: enforce invariants.
         return new Book(
             BookId.CreateUnique(),
             libraryId,
@@ -256,7 +256,7 @@ public sealed class Book : AggregateRoot<BookId>
             googleBooksId,
             barnesAndNobleId,
             appleBooksId,
-            DateTime.UtcNow, // TODO: should be IDateTimeProvider
+            DateTime.UtcNow, // TODO: should be IDateTimeProvider.
             default,
             isbns,
             contributors,
@@ -316,7 +316,7 @@ public sealed class Book : AggregateRoot<BookId>
         IEnumerable<BookMediaContributor> contributors,
         List<BookRating> ratings)
     {
-        // TODO: enforce invariants
+        // TODO: enforce invariants.
         return new Book(
             id,
             libraryId,
@@ -350,7 +350,7 @@ public sealed class Book : AggregateRoot<BookId>
     /// <param name="contributors">The media contributors of the book.</param>
     public void UpdateContributors(IReadOnlyCollection<BookMediaContributor> contributors)
     {
-        // replace the contents of the collection in place, preserving the readonly reference invariants of the aggregate
+        // Replace the contents of the collection in place, preserving the readonly reference invariants of the aggregate.
         _contributors.Clear();
         _contributors.UnionWith(contributors);
     }
@@ -406,7 +406,7 @@ public sealed class Book : AggregateRoot<BookId>
         GoogleBooksId = googleBooksId;
         BarnesAndNobleId = barnesAndNobleId;
         AppleBooksId = appleBooksId;
-        // replace the contents of the collections in place, preserving the readonly reference invariants of the aggregate
+        // Replace the contents of the collections in place, preserving the readonly reference invariants of the aggregate.
         _isbns.Clear();
         _isbns.AddRange(isbns);
         _ratings.Clear();

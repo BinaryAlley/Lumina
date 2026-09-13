@@ -2,7 +2,6 @@
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.Models.Core;
 
-using Lumina.Domain.Common.Errors;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
@@ -49,17 +48,9 @@ public class LanguageInfo : ValueObject
     /// <param name="languageCode">The ISO 639-1 two-letter language code.</param>
     /// <param name="languageName">The full name of the language in English.</param>
     /// <param name="nativeName">The optional native name of the language.</param>
-    /// <returns>
-    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="LanguageInfo"/>, or an error message.
-    /// </returns>
-    public static Result<LanguageInfo> Create(string? languageCode, string? languageName, Optional<string> nativeName)
+    /// <returns>The created <see cref="LanguageInfo"/>.</returns>
+    public static LanguageInfo Create(string languageCode, string languageName, Optional<string> nativeName)
     {
-        if (string.IsNullOrWhiteSpace(languageCode))
-            return Errors.Errors.Metadata.LanguageCodeCannotBeEmpty;
-        if (string.IsNullOrWhiteSpace(languageName))
-            return Errors.Errors.Metadata.LanguageNameCannotBeEmpty;
-        if (languageCode.Length != 2)
-            return Errors.Errors.Metadata.InvalidIsoCode;
         return new LanguageInfo(languageCode, languageName, nativeName);
     }
 

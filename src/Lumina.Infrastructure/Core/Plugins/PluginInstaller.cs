@@ -108,21 +108,21 @@ internal sealed class PluginInstaller : IPluginInstaller
     {
         using ZipArchive zipArchive = new(archive);
         Directory.CreateDirectory(_pluginsDirectory);
-        bool foundAssembly = false;
+        bool isAssemblyFound = false;
         foreach (ZipArchiveEntry entry in zipArchive.Entries)
         {
             cancellationToken.ThrowIfCancellationRequested();
             string? safeFileName = GetSafeFileName(entry.FullName);
             if (safeFileName is null || !string.Equals(Path.GetExtension(safeFileName), ".dll", StringComparison.OrdinalIgnoreCase))
                 continue;
-            foundAssembly = true;
+            isAssemblyFound = true;
             string destinationPath = Path.Combine(_pluginsDirectory, safeFileName);
             await using Stream entryStream = entry.Open();
             await using FileStream outputStream = new(destinationPath, FileMode.Create, FileAccess.Write, FileShare.None);
             await entryStream.CopyToAsync(outputStream, cancellationToken).ConfigureAwait(false);
         }
 
-        if (!foundAssembly)
+        if (!isAssemblyFound)
             return Errors.Plugins.PluginArchiveContainsNoAssemblies;
         return Result.Success;
     }
@@ -135,8 +135,8 @@ internal sealed class PluginInstaller : IPluginInstaller
     /// <returns>The bare file name, or <see langword="null"/> when the path contains no usable file name.</returns>
     private static string? GetSafeFileName(string path)
     {
-        // a backslash is not a directory separator on non-Windows platforms, so it is normalized to '/' first,
-        // after which Path.GetFileName can strip any directory component on every platform
+        // A backslash is not a directory separator on non-Windows platforms, so it is normalized to '/' first,
+        // after which Path.GetFileName can strip any directory component on every platform.
         string fileName = Path.GetFileName(path.Replace('\\', '/'));
         return fileName is "" or "." or ".." ? null : fileName;
     }

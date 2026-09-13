@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Domain.Common.Primitives;
 using System;
 #endregion
 
@@ -21,9 +22,9 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>> where TId : notnull
     public DateTime CreatedOnUtc { get; set; }
 
     /// <summary>
-    /// Gets the date and time when the entity was last updated.
+    /// Gets the date and time when the entity was last updated, if applicable.
     /// </summary>
-    public DateTime? UpdatedOnUtc { get; set; }
+    public Optional<DateTime> UpdatedOnUtc { get; set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Entity{TId}"/> class.

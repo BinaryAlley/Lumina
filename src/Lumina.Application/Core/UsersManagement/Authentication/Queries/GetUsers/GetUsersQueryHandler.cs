@@ -4,6 +4,8 @@ using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
@@ -50,17 +52,17 @@ public class GetUsersQueryHandler : IQueryHandler<GetUsersQuery, Result<IEnumera
     /// </returns>
     public async Task<Result<IEnumerable<UserResponse>>> HandleAsync(GetUsersQuery query, CancellationToken cancellationToken)
     {
-        // an authenticated request must always carry a user identity
+        // An authenticated request must always carry a user identity.
         Guid? currentUserId = _currentUserService.UserId;
         if (currentUserId is null)
             return Errors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // only admins can see the list of users
+        // Only admins can see the list of users.
         bool isAdmin = await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false);
         if (!isAdmin)
             return Errors.Authorization.NotAuthorized;
-        Result<IEnumerable<UserEntity>> getRolesResult = await _unitOfWork.UserRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
-        return getRolesResult.Match(value => Result.From(value.ToResponses()), errors => errors);
+        Result<PaginatedResultDto<UserEntity>> getRolesResult = await _unitOfWork.UserRepository.GetAllAsync<BaseFilterDto>(cancellationToken: cancellationToken).ConfigureAwait(false);
+        return getRolesResult.Match(value => Result.From(value.Data.ToResponses()), errors => errors);
     }
 }

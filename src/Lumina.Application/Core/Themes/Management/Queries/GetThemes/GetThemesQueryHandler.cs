@@ -2,6 +2,8 @@
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Themes;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Mapping.Themes;
 using Lumina.Contracts.Responses.Themes;
 using Lumina.Domain.Common.Primitives;
@@ -41,14 +43,14 @@ public class GetThemesQueryHandler : IQueryHandler<GetThemesQuery, Result<IReadO
     /// </returns>
     public async Task<Result<IReadOnlyList<ThemeResponse>>> HandleAsync(GetThemesQuery query, CancellationToken cancellationToken)
     {
-        Result<IEnumerable<ThemeEntity>> getThemesResult = await _unitOfWork.ThemeRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        Result<PaginatedResultDto<ThemeEntity>> getThemesResult = await _unitOfWork.ThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getThemesResult.IsFailure)
             return getThemesResult.Errors;
 
-        // deleted bundled themes are returned as well, so the administration page can offer to restore them
-        return Result.From<IReadOnlyList<ThemeResponse>>([.. getThemesResult.Value
+        // Deleted bundled themes are returned as well, so the administration page can offer to restore them.
+        return Result.From<IReadOnlyList<ThemeResponse>>([.. getThemesResult.Value.Data
             .OrderBy(theme => theme.IsDeleted)
-            // the shipped bundled themes are listed before the user themes, so the defaults stay the most visible
+            // The shipped bundled themes are listed before the user themes, so the defaults stay the most visible.
             .ThenByDescending(theme => theme.InstallSource == ThemeInstallSource.Bundled)
             .ThenBy(theme => theme.Name, StringComparer.OrdinalIgnoreCase)
             .Select(theme => theme.ToResponse())]);

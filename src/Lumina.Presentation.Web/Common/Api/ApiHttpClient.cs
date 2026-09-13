@@ -224,18 +224,21 @@ public class ApiHttpClient : IApiHttpClient
     /// </summary>
     /// <typeparam name="TResponse">The expected type of the response content.</typeparam>
     /// <param name="endpoint">The API endpoint where the request is being sent.</param>
-    /// <param name="fileStream">The stream of the file to upload.</param>
-    /// <param name="fileName">The name of the file to upload.</param>
+    /// <param name="fileStream">The stream of the file to upload, or <see langword="null"/> to send a multipart form without any file.</param>
+    /// <param name="fileName">The name of the file to upload, or <see langword="null"/> when no file is sent.</param>
     /// <param name="fieldName">The name of the form field carrying the file.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>The deserialized response containing the result of the PUT request.</returns>
-    public async Task<TResponse> PutMultipartAsync<TResponse>(string endpoint, Stream fileStream, string fileName, string fieldName, CancellationToken cancellationToken = default)
+    public async Task<TResponse> PutMultipartAsync<TResponse>(string endpoint, Stream? fileStream, string? fileName, string fieldName, CancellationToken cancellationToken = default)
     {
-        // The file is streamed as a generic binary part, since the exact content type of the uploaded file is not known.
         using MultipartFormDataContent form = [];
-        using StreamContent fileContent = new(fileStream);
-        fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-        form.Add(fileContent, fieldName, fileName);
+        if (fileStream is not null)
+        {
+            // The file is streamed as a generic binary part, since the exact content type of the uploaded file is not known.
+            StreamContent fileContent = new(fileStream);
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+            form.Add(fileContent, fieldName, fileName ?? string.Empty);
+        }
 
         using HttpRequestMessage request = new(HttpMethod.Put, endpoint)
         {
