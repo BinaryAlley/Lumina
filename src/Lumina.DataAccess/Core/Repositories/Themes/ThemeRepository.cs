@@ -2,8 +2,11 @@
 using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.Themes;
 using Lumina.Application.Common.DataAccess.Repositories.Themes;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Errors;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -38,8 +41,8 @@ internal sealed class ThemeRepository : IThemeRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Created>> InsertAsync(ThemeEntity theme, CancellationToken cancellationToken)
     {
-        bool themeExists = await _luminaDbContext.Themes.AnyAsync(repositoryTheme => repositoryTheme.Id == theme.Id, cancellationToken).ConfigureAwait(false);
-        if (themeExists)
+        bool doesThemeExist = await _luminaDbContext.Themes.AnyAsync(repositoryTheme => repositoryTheme.Id == theme.Id, cancellationToken).ConfigureAwait(false);
+        if (doesThemeExist)
             return Errors.Themes.ThemeNotFound;
 
         _luminaDbContext.Themes.Add(theme);
@@ -64,13 +67,54 @@ internal sealed class ThemeRepository : IThemeRepository
     }
 
     /// <summary>
-    /// Gets all themes from the storage medium.
+    /// Gets all the themes from the storage medium, or a page of them when the pagination data is provided.
     /// </summary>
+    /// <typeparam name="TFilter">The type of the filter carrying the criteria used to filter the results.</typeparam>
+    /// <param name="paginationData">The pagination data that includes the current page and the number of items per page to retrieve. If <see langword="null"/>, all the matching themes are returned.</param>
+    /// <param name="sortBy">The name of the field by which to sort the results.</param>
+    /// <param name="sortOrder">The direction in which to sort the results.</param>
+    /// <param name="filterModel">The model containing the parameters used to filter the results.</param>
+    /// <param name="shouldIncludeNavigationProperties">Whether the navigation properties of the entities should be loaded together with the entities themselves. Pass <see langword="false"/> to retrieve only the data stored directly on the entity rows.</param>
+    /// <param name="shouldTrackEntities">Whether the retrieved entities should be tracked by the persistence medium, so that changes to them can be saved. Pass <see langword="false"/> for read-only scenarios, to avoid the tracking overhead.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="ThemeEntity"/>, or an error.</returns>
-    public async Task<Result<IEnumerable<ThemeEntity>>> GetAllAsync(CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either a paginated result of <see cref="ThemeEntity"/>, or an error.</returns>
+    public async Task<Result<PaginatedResultDto<ThemeEntity>>> GetAllAsync<TFilter>(PaginationDataDto? paginationData = null, string? sortBy = null, SortOrder? sortOrder = null, TFilter? filterModel = null, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default) where TFilter : BaseFilterDto
     {
-        return await _luminaDbContext.Themes.ToListAsync(cancellationToken).ConfigureAwait(false);
+        IQueryable<ThemeEntity> query = _luminaDbContext.Themes;
+        if (!shouldTrackEntities)
+            query = query.AsNoTracking();
+
+        // If no pagination was requested, return all the themes.
+        if (paginationData is null)
+        {
+            IReadOnlyList<ThemeEntity> allThemes = await query.ToListAsync(cancellationToken).ConfigureAwait(false);
+            return new PaginatedResultDto<ThemeEntity>
+            {
+                Data = allThemes,
+                CurrentPage = 1,
+                PerPage = allThemes.Count,
+                Count = allThemes.Count,
+                NumberOfPages = 1
+            };
+        }
+
+        int count = await query.Select(theme => theme.Id).CountAsync(cancellationToken).ConfigureAwait(false);
+        int numberOfPages = (int)Math.Ceiling((double)count / paginationData.PerPage);
+        int currentPage = Math.Min(paginationData.CurrentPage, Math.Max(1, numberOfPages)); // Make sure current page doesn't exceed maximum number of pages.
+
+        IReadOnlyList<ThemeEntity> paginatedResult = await query
+            .Skip((currentPage - 1) * paginationData.PerPage)
+            .Take(paginationData.PerPage)
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+
+        return new PaginatedResultDto<ThemeEntity>
+        {
+            Data = paginatedResult,
+            CurrentPage = currentPage,
+            PerPage = paginationData.PerPage,
+            Count = count,
+            NumberOfPages = numberOfPages
+        };
     }
 
     /// <summary>

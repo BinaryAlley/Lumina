@@ -76,11 +76,11 @@ public class GetDirectoriesQueryValidatorTests
     }
 
     [Fact]
-    public void Validate_WhenIncludeHiddenElementsIsTrue_ShouldNotHaveValidationError()
+    public void Validate_WhenShouldIncludeHiddenElementsIsTrue_ShouldNotHaveValidationError()
     {
         // Arrange
         GetDirectoriesQuery query = _getDirectoriesQueryFixture.Create();
-        query = query with { IncludeHiddenElements = true };
+        query = query with { ShouldIncludeHiddenElements = true };
 
         // Act
         List<Error> result = _validator.TestValidate(query);
@@ -90,11 +90,11 @@ public class GetDirectoriesQueryValidatorTests
     }
 
     [Fact]
-    public void Validate_WhenIncludeHiddenElementsIsFalse_ShouldNotHaveValidationError()
+    public void Validate_WhenShouldIncludeHiddenElementsIsFalse_ShouldNotHaveValidationError()
     {
         // Arrange
         GetDirectoriesQuery query = _getDirectoriesQueryFixture.Create();
-        query = query with { IncludeHiddenElements = false };
+        query = query with { ShouldIncludeHiddenElements = false };
 
         // Act
         List<Error> result = _validator.TestValidate(query);

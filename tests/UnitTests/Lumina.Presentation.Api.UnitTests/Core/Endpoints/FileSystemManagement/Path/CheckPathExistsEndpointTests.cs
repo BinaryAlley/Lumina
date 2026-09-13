@@ -43,7 +43,7 @@ public class CheckPathExistsEndpointTests
     public async Task ExecuteAsync_WhenCalled_ShouldReturnOkResultWithPathExistsResponse()
     {
         // Arrange
-        CheckPathExistsRequest request = _checkPathExistsRequestFixture.Create(path: @"C:\Users\TestUser\Documents", includeHiddenElements: true);
+        CheckPathExistsRequest request = _checkPathExistsRequestFixture.Create(path: @"C:\Users\TestUser\Documents", shouldIncludeHiddenElements: true);
         CancellationToken cancellationToken = CancellationToken.None;
         PathExistsResponse expectedResponse = _pathExistsResponseFixture.Create(exists: true);
         _mockHandler.HandleAsync(Arg.Any<CheckPathExistsQuery>(), Arg.Any<CancellationToken>())
@@ -58,10 +58,10 @@ public class CheckPathExistsEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendCheckPathExistsQueryToHandler()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendCheckPathExistsQueryToSender()
     {
         // Arrange
-        CheckPathExistsRequest request = _checkPathExistsRequestFixture.Create(path: @"C:\Users\TestUser\Documents", includeHiddenElements: true);
+        CheckPathExistsRequest request = _checkPathExistsRequestFixture.Create(path: @"C:\Users\TestUser\Documents", shouldIncludeHiddenElements: true);
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<CheckPathExistsQuery>(), Arg.Any<CancellationToken>())
             .Returns(_pathExistsResponseFixture.Create(exists: true));
@@ -71,7 +71,7 @@ public class CheckPathExistsEndpointTests
 
         // Assert
         await _mockHandler.Received(1).HandleAsync(
-            Arg.Is<CheckPathExistsQuery>(q => q.Path == request.Path && q.IncludeHiddenElements == request.IncludeHiddenElements),
+            Arg.Is<CheckPathExistsQuery>(q => q.Path == request.Path && q.ShouldIncludeHiddenElements == request.ShouldIncludeHiddenElements),
             Arg.Is(cancellationToken));
     }
 
@@ -79,7 +79,7 @@ public class CheckPathExistsEndpointTests
     public async Task ExecuteAsync_WhenCancellationRequested_ShouldCancelOperation()
     {
         // Arrange
-        CheckPathExistsRequest request = _checkPathExistsRequestFixture.Create(path: @"C:\Users\TestUser\Documents", includeHiddenElements: true);
+        CheckPathExistsRequest request = _checkPathExistsRequestFixture.Create(path: @"C:\Users\TestUser\Documents", shouldIncludeHiddenElements: true);
         CancellationTokenSource cts = new();
         TaskCompletionSource<bool> operationStarted = new();
         TaskCompletionSource<bool> cancellationRequested = new();

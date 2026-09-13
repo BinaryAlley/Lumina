@@ -37,12 +37,12 @@ public class WindowsPathStrategy : IWindowsPathStrategy
     /// <returns><see langword="true"/> if <paramref name="path"/> is a valid path, <see langword="false"/> otherwise.</returns>
     public bool IsValidPath(FileSystemPathId path)
     { 
-        // check for invalid path characters
+        // Check for invalid path characters.
         char[] invalidChars = GetInvalidPathCharsForPlatform();
         if (path.Path.IndexOfAny(invalidChars) >= 0)
             return false;
-        // regular expression to match valid absolute paths
-        // this allows drive letters (e.g., C:\) and UNC paths (e.g., \\server\share)
+        // Regular expression to match valid absolute paths.
+        // This allows drive letters (e.g., C:\) and UNC paths (e.g., \\server\share).
         const string PATH_PATTERN = @"^(?:[a-zA-Z]:\\|\\\\[a-zA-Z0-9\s()._&+,\[\]-]+\\[a-zA-Z0-9\s()._&+,\[\]-]+)(?:[a-zA-Z0-9\s()._&+,\[\]-]+\\)*[a-zA-Z0-9\s()._&+,\[\]-]*\\?$";
         return Regex.IsMatch(path.Path, PATH_PATTERN);
     }
@@ -51,9 +51,9 @@ public class WindowsPathStrategy : IWindowsPathStrategy
     /// Checks if <paramref name="path"/> exists.
     /// </summary>
     /// <param name="path">The path to be checked.</param>
-    /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
+    /// <param name="shouldIncludeHiddenElements">Whether to include hidden file system elements or not.</param>
     /// <returns><see langword="true"/> if <paramref name="path"/> exists, <see langword="false"/> otherwise.</returns>
-    public bool Exists(FileSystemPathId path, bool includeHiddenElements = true)
+    public bool Exists(FileSystemPathId path, bool shouldIncludeHiddenElements = true)
     {
         if (!_fileSystem.Path.Exists(path.Path))
             return false;
@@ -68,9 +68,9 @@ public class WindowsPathStrategy : IWindowsPathStrategy
             IFileInfo fileInfo = _fileSystem.FileInfo.New(path.Path);
             isHidden = (fileInfo.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden;
         }
-        else // path exists but is neither a file nor a directory (drive, etc)
+        else // The path exists but is neither a file nor a directory (drive, etc.).
             return true;
-        return includeHiddenElements || !isHidden;
+        return shouldIncludeHiddenElements || !isHidden;
     }
 
     /// <summary>
@@ -81,13 +81,13 @@ public class WindowsPathStrategy : IWindowsPathStrategy
     /// <returns>An <see cref="Result{TValue}"/> containing the combined path, or an error.</returns>
     public Result<FileSystemPathId> CombinePath(FileSystemPathId path, string name)
     {
-        if (name == null)
+        if (string.IsNullOrWhiteSpace(name))
             return Errors.FileSystemManagement.NameCannotBeEmpty;
-        // trim any directory separator characters from the end of the path
+        // Trim any directory separator characters from the end of the path.
         string subpath = path.Path.TrimEnd(PathSeparator);
-        // if the name begins with a directory separator, remove it
+        // If the name begins with a directory separator, remove it.
         name = name.TrimStart(PathSeparator);
-        // combine the two parts with the Windows directory separator character
+        // Combine the two parts with the Windows directory separator character.
         return FileSystemPathId.Create(subpath + PathSeparator + name + PathSeparator);
     }
 
@@ -98,7 +98,7 @@ public class WindowsPathStrategy : IWindowsPathStrategy
     /// <returns>An <see cref="Result{TValue}"/> containing the path segments, or an error.</returns>
     public Result<IEnumerable<PathSegment>> ParsePath(FileSystemPathId path)
     {
-        // Windows paths usually start with a drive letter and colon, e.g., "C:", or "\\" (UNC paths)
+        // Windows paths usually start with a drive letter and colon (e.g., "C:") or with "\\" (UNC paths).
         if (!(path.Path.StartsWith(@"\\") || (path.Path.Length >= 3 && char.IsLetter(path.Path[0]) && path.Path[1] == ':' && path.Path[2] == PathSeparator)))
             return Errors.FileSystemManagement.InvalidPath;
         IEnumerable<Result<PathSegment>> getPathSegmentsResults = GetPathSegments();
@@ -110,25 +110,25 @@ public class WindowsPathStrategy : IWindowsPathStrategy
         {
             if (path.Path.StartsWith(@"\\"))
             {
-                // handle UNC path
+                // Handle a UNC path.
                 yield return PathSegment.Create(@"\\", isDirectory: false, isDrive: true);
 
                 string[] segments = path.Path[2..].Split([PathSeparator], StringSplitOptions.RemoveEmptyEntries);
                 for (int i = 0; i < segments.Length; i++)
                     yield return CreatePathSegment(segments[i], i, segments.Length);
             }
-            else // handle regular Windows path
+            else // Handle a regular Windows path.
             {
-                // the drive segment
+                // The drive segment.
                 yield return PathSegment.Create(path.Path[..2], isDirectory: false, isDrive: true);
-                // extract the other segments
+                // Extract the other segments.
                 string[] segments = path.Path[3..].Split([PathSeparator], StringSplitOptions.RemoveEmptyEntries);
                 for (int i = 0; i < segments.Length; i++)
                 {
                     string segment = segments[i];
                     bool isDirectory;
                     if (segment.Contains('.'))
-                        isDirectory = i != segments.Length - 1 || path.Path.EndsWith(PathSeparator); // check if it's the last segment or if the next segment also contains a path delimiter
+                        isDirectory = i != segments.Length - 1 || path.Path.EndsWith(PathSeparator); // Check if it is the last segment, or if the next segment also contains a path delimiter.
                     else
                         isDirectory = true;
                     yield return PathSegment.Create(segment, isDirectory, isDrive: false);
@@ -151,29 +151,29 @@ public class WindowsPathStrategy : IWindowsPathStrategy
     /// <returns>An <see cref="Result{TValue}"/> containing the path segments of the path up one level from <paramref name="path"/>, or an error.</returns>
     public Result<IEnumerable<PathSegment>> GoUpOneLevel(FileSystemPathId path)
     {
-        // validation: ensure the path is not null or empty
+        // Validation: ensure the path is not null or empty.
         if (!IsValidPath(path))
             return Errors.FileSystemManagement.InvalidPath;
-        // trim trailing backslash for consistent processing
+        // Trim the trailing backslash for consistent processing.
         string tempPath = path.Path.TrimEnd(PathSeparator);
-        // check for UNC path
+        // Check for a UNC path.
         if (tempPath.StartsWith(@"\\"))
         {
             string[] parts = tempPath.Split(PathSeparator, StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length <= 2)
                 return Errors.FileSystemManagement.CannotNavigateUp;
-            // if it's a single-level UNC path, return the UNC root
+            // If it is a single-level UNC path, return the UNC root.
             if (parts.Length == 3)
                 return ParsePath(FileSystemPathId.Create($@"\\{parts[0]}\{parts[1]}").Value);
-        } // check for drive root (both with and without trailing backslash)        
+        } // Check for the drive root, both with and without a trailing backslash.
         else if ((tempPath.Length == 2 && tempPath[1] == ':') || (tempPath.Length == 3 && tempPath[1] == ':' && tempPath[2] == PathSeparator))
             return Errors.FileSystemManagement.CannotNavigateUp;
-        // find the last occurrence of a backslash
+        // Find the last occurrence of a backslash.
         int lastIndex = tempPath.LastIndexOf(PathSeparator);
-        // if there's no backslash found or it's at the root level, return the root
+        // If no backslash is found or it is at the root level, return the root.
         if (lastIndex <= 2)
             return ParsePath(FileSystemPathId.Create(tempPath[..3]).Value);
-        // return the path up to the last backslash
+        // Return the path up to the last backslash.
         Result<FileSystemPathId> newPathResult = FileSystemPathId.Create(tempPath[..lastIndex]);
         if (newPathResult.IsFailure)
             return newPathResult.Errors;
@@ -184,7 +184,7 @@ public class WindowsPathStrategy : IWindowsPathStrategy
     /// <summary>
     /// Returns a collection of characters that are invalid for paths.
     /// </summary>
-    /// <returns>A collection of characters that are invalid in the context of paths</returns>
+    /// <returns>A collection of characters that are invalid in the context of paths.</returns>
     public char[] GetInvalidPathCharsForPlatform()
     {
         return ['<', '>', '"', '/', '|', '?', '*'];
@@ -208,28 +208,71 @@ public class WindowsPathStrategy : IWindowsPathStrategy
     {
         if (!IsValidPath(path))
             return Errors.FileSystemManagement.InvalidPath;
-        // handle UNC paths (e.g., \\server\share\folder)
+        // Handle UNC paths (e.g., \\server\share\folder).
         if (path.Path.StartsWith(@"\\"))
         {
-            // find the position of the second backslash (after \\server)
+            // Find the position of the second backslash (after \\server).
             int secondBackslash = path.Path.IndexOf('\\', 2);
             if (secondBackslash == -1)
-                return Errors.FileSystemManagement.InvalidPath; // invalid UNC path, missing server name
-            // find the position of the third backslash (after \\server\share)
+                return Errors.FileSystemManagement.InvalidPath; // Invalid UNC path, missing server name.
+            // Find the position of the third backslash (after \\server\share).
             int thirdBackslash = path.Path.IndexOf('\\', secondBackslash + 1);
             if (thirdBackslash == -1)
-                thirdBackslash = path.Path.Length; // no third backslash, use entire path
-            // return the UNC root (\\server\share\)
+                thirdBackslash = path.Path.Length; // No third backslash, use the entire path.
+            // Return the UNC root (\\server\share\).
             return PathSegment.Create(path.Path[..thirdBackslash] + "\\", isDirectory: true, isDrive: false);
         }
-        else // handle drive letter paths (e.g., C:\folder)
-             // check if the path starts with a drive letter followed by a colon (e.g., C:)
-             // path.Path.Length >= 2: Ensure the path is at least 2 characters long
-             // char.IsLetter(path.Path[0]): First character should be a letter
-             // path.Path[1] == ':': Second character should be a colon
+        else // Handle drive letter paths (e.g., C:\folder).
+             // Check if the path starts with a drive letter followed by a colon (e.g., C:).
+             // The path must be at least 2 characters long.
+             // The first character must be a letter.
+             // The second character must be a colon.
             if (path.Path.Length >= 2 && char.IsLetter(path.Path[0]) && path.Path[1] == ':')
-            return PathSegment.Create(path.Path[..2] + "\\", isDirectory: true, isDrive: true); // return the drive root (e.g., C:\)
-        // if we reach here, the path is neither a valid UNC path nor a valid drive path
+            return PathSegment.Create(path.Path[..2] + "\\", isDirectory: true, isDrive: true); // Return the drive root (e.g., C:\).
+        // If we reach here, the path is neither a valid UNC path nor a valid drive path.
         return Errors.FileSystemManagement.InvalidPath;
+    }
+
+    /// <summary>
+    /// Checks whether <paramref name="path"/> is located inside <paramref name="parentPath"/>. The comparison resolves the "." and ".."
+    /// segments first, so that a path can never escape its parent through relative segments, and it is case-insensitive, because
+    /// Windows paths are case-insensitive.
+    /// </summary>
+    /// <param name="path">The path to be checked.</param>
+    /// <param name="parentPath">The path that must contain the checked path.</param>
+    /// <returns><see langword="true"/> if the path is inside the parent path, <see langword="false"/> otherwise.</returns>
+    public bool IsPathWithin(FileSystemPathId path, FileSystemPathId parentPath)
+    {
+        string[] pathSegments = NormalizePathSegments(path.Path);
+        string[] parentPathSegments = NormalizePathSegments(parentPath.Path);
+        if (parentPathSegments.Length == 0 || pathSegments.Length <= parentPathSegments.Length)
+            return false;
+        for (int index = 0; index < parentPathSegments.Length; index++)
+            if (!string.Equals(pathSegments[index], parentPathSegments[index], StringComparison.OrdinalIgnoreCase))
+                return false;
+        return true;
+    }
+
+    /// <summary>
+    /// Splits <paramref name="path"/> into its segments, resolving the "." (current directory) and ".." (parent directory) segments.
+    /// </summary>
+    /// <param name="path">The path to be normalized.</param>
+    /// <returns>The normalized path segments of the path.</returns>
+    private string[] NormalizePathSegments(string path)
+    {
+        List<string> segments = [];
+        foreach (string segment in path.Split([PathSeparator], StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (segment == ".")
+                continue;
+            if (segment == "..")
+            {
+                if (segments.Count > 0)
+                    segments.RemoveAt(segments.Count - 1);
+                continue;
+            }
+            segments.Add(segment);
+        }
+        return [.. segments];
     }
 }

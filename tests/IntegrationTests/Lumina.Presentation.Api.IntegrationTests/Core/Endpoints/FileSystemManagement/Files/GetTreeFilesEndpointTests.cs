@@ -29,7 +29,6 @@ public class GetTreeFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     private readonly FileSystemStructureFixture _fileSystemStructureFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
-        ReferenceHandler = ReferenceHandler.Preserve,
         PropertyNameCaseInsensitive = true,
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
@@ -54,16 +53,16 @@ public class GetTreeFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     }
 
     [SkipWhenHiddenAttributeNotSupportedFact]
-    public async Task GetTreeFiles_WhenCalledWithValidPathAndNotIncludeHiddenElements_ShouldReturnTreeFilesWithoutHiddenElements()
+    public async Task GetTreeFiles_WhenCalledWithValidPathAndNotShouldIncludeHiddenElements_ShouldReturnTreeFilesWithoutHiddenElements()
     {
         // Arrange
         string testPath = _fileSystemStructureFixture.CreateFileSystemStructure();
         testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath;
-        bool includeHiddenElements = false;
+        bool shouldIncludeHiddenElements = false;
         try
         {
             // Act
-            HttpResponseMessage response = await _client.GetAsync($"/api/v1/files/get-tree-files?path={Uri.EscapeDataString(testPath)}&includeHiddenElements={includeHiddenElements}");
+            HttpResponseMessage response = await _client.GetAsync($"/api/v1/files/get-tree-files?path={Uri.EscapeDataString(testPath)}&shouldIncludeHiddenElements={shouldIncludeHiddenElements}");
 
             // Assert
             response.EnsureSuccessStatusCode();
@@ -90,17 +89,17 @@ public class GetTreeFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     }
 
     [SkipWhenHiddenAttributeNotSupportedFact]
-    public async Task GetTreeFiles_WhenCalledWithValidPathAndHiddenChildrenAndNotIncludeHiddenElements_ShouldReturnNoTreeFiles()
+    public async Task GetTreeFiles_WhenCalledWithValidPathAndHiddenChildrenAndNotShouldIncludeHiddenElements_ShouldReturnNoTreeFiles()
     {
         // Arrange
         string testPath = _fileSystemStructureFixture.CreateFileSystemStructure();
         testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath;
         testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath; // two levels to get to the element that has a hidden element as child
-        bool includeHiddenElements = false;
+        bool shouldIncludeHiddenElements = false;
         try
         {
             // Act
-            HttpResponseMessage response = await _client.GetAsync($"/api/v1/files/get-tree-files?path={Uri.EscapeDataString(testPath)}&includeHiddenElements={includeHiddenElements}");
+            HttpResponseMessage response = await _client.GetAsync($"/api/v1/files/get-tree-files?path={Uri.EscapeDataString(testPath)}&shouldIncludeHiddenElements={shouldIncludeHiddenElements}");
 
             // Assert
             response.EnsureSuccessStatusCode();
@@ -122,17 +121,17 @@ public class GetTreeFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     }
 
     [Fact]
-    public async Task GetTreeFiles_WhenCalledWithValidPathAndWithIncludeHiddenElements_ShouldReturnTreeFilesWithHiddenElements()
+    public async Task GetTreeFiles_WhenCalledWithValidPathAndWithShouldIncludeHiddenElements_ShouldReturnTreeFilesWithHiddenElements()
     {
         // Arrange
         string testPath = _fileSystemStructureFixture.CreateFileSystemStructure();
         testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath;
         testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath; // two levels to get to the element that has a hidden element as child
-        bool includeHiddenElements = true;
+        bool shouldIncludeHiddenElements = true;
         try
         {
             // Act
-            HttpResponseMessage response = await _client.GetAsync($"/api/v1/files/get-tree-files?path={Uri.EscapeDataString(testPath)}&includeHiddenElements={includeHiddenElements}");
+            HttpResponseMessage response = await _client.GetAsync($"/api/v1/files/get-tree-files?path={Uri.EscapeDataString(testPath)}&shouldIncludeHiddenElements={shouldIncludeHiddenElements}");
 
             // Assert
             response.EnsureSuccessStatusCode();
@@ -166,10 +165,10 @@ public class GetTreeFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         // Arrange
         string invalidPath = "invalid:path";
         string encodedPath = Uri.EscapeDataString(invalidPath);
-        bool includeHiddenElements = true;
+        bool shouldIncludeHiddenElements = true;
 
         // Act
-        HttpResponseMessage response = await _client.GetAsync($"/api/v1/files/get-tree-files?path={encodedPath}&includeHiddenElements={includeHiddenElements}");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/files/get-tree-files?path={encodedPath}&shouldIncludeHiddenElements={shouldIncludeHiddenElements}");
 
         // Assert
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
@@ -192,10 +191,10 @@ public class GetTreeFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         // Arrange
         string emptyPath = "";
         string encodedPath = Uri.EscapeDataString(emptyPath);
-        bool includeHiddenElements = true;
+        bool shouldIncludeHiddenElements = true;
 
         // Act
-        HttpResponseMessage response = await _client.GetAsync($"/api/v1/files/get-tree-files?path={encodedPath}&includeHiddenElements={includeHiddenElements}");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/files/get-tree-files?path={encodedPath}&shouldIncludeHiddenElements={shouldIncludeHiddenElements}");
 
         // Assert
         Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
@@ -223,12 +222,12 @@ public class GetTreeFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         // Arrange
         string testPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "testDirectory");
         string encodedPath = Uri.EscapeDataString(testPath);
-        bool includeHiddenElements = true;
+        bool shouldIncludeHiddenElements = true;
         using CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
 
         // Act & Assert
         Exception? exception = await Record.ExceptionAsync(async () =>
-            await _client.GetAsync($"/api/v1/files/get-tree-files?path={encodedPath}&includeHiddenElements={includeHiddenElements}", cts.Token)
+            await _client.GetAsync($"/api/v1/files/get-tree-files?path={encodedPath}&shouldIncludeHiddenElements={shouldIncludeHiddenElements}", cts.Token)
         );
         Assert.Null(exception);
     }
@@ -239,14 +238,14 @@ public class GetTreeFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         // Arrange
         string testPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "testDirectory");
         string encodedPath = Uri.EscapeDataString(testPath);
-        bool includeHiddenElements = true;
+        bool shouldIncludeHiddenElements = true;
         using CancellationTokenSource cts = new();
 
         // Act & Assert
         Exception? exception = await Record.ExceptionAsync(async () =>
         {
             cts.Cancel();
-            await _client.GetAsync($"/api/v1/files/get-tree-files?path={encodedPath}&includeHiddenElements={includeHiddenElements}", cts.Token);
+            await _client.GetAsync($"/api/v1/files/get-tree-files?path={encodedPath}&shouldIncludeHiddenElements={shouldIncludeHiddenElements}", cts.Token);
         });
         Assert.IsType<TaskCanceledException>(exception);
     }

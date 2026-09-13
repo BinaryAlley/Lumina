@@ -148,7 +148,7 @@ public class WindowsPathStrategyTests
     }
 
     [Fact]
-    public void Exists_WhenPathExistsAndIsHiddenAndIncludeHiddenElementsIsTrue_ShouldReturnTrue()
+    public void Exists_WhenPathExistsAndIsHiddenAndShouldIncludeHiddenElementsIsTrue_ShouldReturnTrue()
     {
         // Arrange
         string existingPath = @"C:\Users\User\existing_file.txt";
@@ -165,7 +165,7 @@ public class WindowsPathStrategyTests
     }
 
     [Fact]
-    public void Exists_WhenPathExistsAndIsHiddenAndIncludeHiddenElementsIsFalse_ShouldReturnFalse()
+    public void Exists_WhenPathExistsAndIsHiddenAndShouldIncludeHiddenElementsIsFalse_ShouldReturnFalse()
     {
         // Arrange
         string existingPath = @"C:\Users\User\existing_file.txt";
@@ -810,5 +810,45 @@ public class WindowsPathStrategyTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+    }
+
+    [Theory]
+    [InlineData(@"C:\Media\Books", @"C:\Media\Books\book.epub")] // direct child
+    [InlineData(@"C:\Media", @"C:\Media\Books\book.epub")] // nested descendant
+    [InlineData(@"C:\Media\Books\", @"C:\Media\Books\book.epub")] // trailing separator on the parent
+    [InlineData(@"C:\Media\Books", @"c:\media\books\book.epub")] // Windows paths are case-insensitive
+    [InlineData(@"C:\Media\Books", @"C:\Media\Books\Sub\..\book.epub")] // relative segments that stay inside
+    public void IsPathWithin_WithContainedPaths_ShouldReturnTrue(string parentPath, string path)
+    {
+        // Arrange
+        FileSystemPathId parentPathId = _fileSystemPathIdFixture.Create(parentPath);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
+
+        // Act
+        bool result = _sut.IsPathWithin(pathId, parentPathId);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Theory]
+    [InlineData(@"C:\Media\Books", @"C:\Media\book.epub")] // sibling directory
+    [InlineData(@"C:\Media\Books", @"D:\Media\Books\book.epub")] // different drive
+    [InlineData(@"C:\Media\Books", @"C:\Media\BookShelf\book.epub")] // a sibling whose name shares the prefix
+    [InlineData(@"C:\Media\Books", @"C:\Media\Other\book.epub")] // sibling directory
+    [InlineData(@"C:\Media\Books", @"C:\Media\Books\..\Other\book.epub")] // relative segment that escapes the parent
+    [InlineData(@"C:\Media\Books", @"C:\Windows\System32\config\SAM")] // unrelated location
+    [InlineData(@"C:\Media", @"C:\Media")] // the parent itself is not inside itself
+    public void IsPathWithin_WithPathsOutsideTheParent_ShouldReturnFalse(string parentPath, string path)
+    {
+        // Arrange
+        FileSystemPathId parentPathId = _fileSystemPathIdFixture.Create(parentPath);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
+
+        // Act
+        bool result = _sut.IsPathWithin(pathId, parentPathId);
+
+        // Assert
+        Assert.False(result);
     }
 }

@@ -3,11 +3,15 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Errors;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -38,8 +42,8 @@ internal sealed class UserRepository : IUserRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Created>> InsertAsync(UserEntity user, CancellationToken cancellationToken)
     {
-        bool userExists = await _luminaDbContext.Users.AnyAsync(repositoryUser => repositoryUser.Id == user.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
-        if (userExists)
+        bool doesUserExist = await _luminaDbContext.Users.AnyAsync(repositoryUser => repositoryUser.Id == user.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (doesUserExist)
             return Errors.Users.UserAlreadyExists;
 
         _luminaDbContext.Users.Add(user);
@@ -47,13 +51,54 @@ internal sealed class UserRepository : IUserRepository
     }
 
     /// <summary>
-    /// Gets all users.
+    /// Gets all the users, or a page of them when the pagination data is provided.
     /// </summary>
+    /// <typeparam name="TFilter">The type of the filter carrying the criteria used to filter the results.</typeparam>
+    /// <param name="paginationData">The pagination data that includes the current page and the number of items per page to retrieve. If <see langword="null"/>, all the matching users are returned.</param>
+    /// <param name="sortBy">The name of the field by which to sort the results.</param>
+    /// <param name="sortOrder">The direction in which to sort the results.</param>
+    /// <param name="filterModel">The model containing the parameters used to filter the results.</param>
+    /// <param name="shouldIncludeNavigationProperties">Whether the navigation properties of the entities should be loaded together with the entities themselves. Pass <see langword="false"/> to retrieve only the data stored directly on the entity rows.</param>
+    /// <param name="shouldTrackEntities">Whether the retrieved entities should be tracked by the persistence medium, so that changes to them can be saved. Pass <see langword="false"/> for read-only scenarios, to avoid the tracking overhead.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="UserEntity"/>, or an error.</returns>
-    public async Task<Result<IEnumerable<UserEntity>>> GetAllAsync(CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either a paginated result of <see cref="UserEntity"/>, or an error.</returns>
+    public async Task<Result<PaginatedResultDto<UserEntity>>> GetAllAsync<TFilter>(PaginationDataDto? paginationData = null, string? sortBy = null, SortOrder? sortOrder = null, TFilter? filterModel = null, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default) where TFilter : BaseFilterDto
     {
-        return await _luminaDbContext.Users.ToListAsync(cancellationToken).ConfigureAwait(false);
+        IQueryable<UserEntity> query = _luminaDbContext.Users;
+        if (!shouldTrackEntities)
+            query = query.AsNoTracking();
+
+        // If no pagination was requested, return all the users.
+        if (paginationData is null)
+        {
+            IReadOnlyList<UserEntity> allUsers = await query.ToListAsync(cancellationToken).ConfigureAwait(false);
+            return new PaginatedResultDto<UserEntity>
+            {
+                Data = allUsers,
+                CurrentPage = 1,
+                PerPage = allUsers.Count,
+                Count = allUsers.Count,
+                NumberOfPages = 1
+            };
+        }
+
+        int count = await query.Select(user => user.Id).CountAsync(cancellationToken).ConfigureAwait(false);
+        int numberOfPages = (int)Math.Ceiling((double)count / paginationData.PerPage);
+        int currentPage = Math.Min(paginationData.CurrentPage, Math.Max(1, numberOfPages)); // Make sure current page doesn't exceed maximum number of pages.
+
+        IReadOnlyList<UserEntity> paginatedResult = await query
+            .Skip((currentPage - 1) * paginationData.PerPage)
+            .Take(paginationData.PerPage)
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+
+        return new PaginatedResultDto<UserEntity>
+        {
+            Data = paginatedResult,
+            CurrentPage = currentPage,
+            PerPage = paginationData.PerPage,
+            Count = count,
+            NumberOfPages = numberOfPages
+        };
     }
 
     /// <summary>
@@ -95,10 +140,10 @@ internal sealed class UserRepository : IUserRepository
         if (foundUser is null)
             return Errors.Users.UserDoesNotExist;
 
-        // update scalar properties
+        // Update scalar properties.
         _luminaDbContext.Entry(foundUser).CurrentValues.SetValues(data);
 
-        // update user permissions
+        // Update user permissions.
         List<UserPermissionEntity> existingPermissions = [.. foundUser.UserPermissions];
         foreach (UserPermissionEntity permission in existingPermissions)
             _luminaDbContext.UserPermissions.Remove(permission);
@@ -114,7 +159,7 @@ internal sealed class UserRepository : IUserRepository
             });
         }
 
-        // update user role
+        // Update user role.
         if (foundUser.UserRole != null)
             _luminaDbContext.UserRoles.Remove(foundUser.UserRole);
         if (data.UserRole is not null)
@@ -136,16 +181,22 @@ internal sealed class UserRepository : IUserRepository
     /// <param name="id">The id of the user to get.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="UserEntity"/> identified by <paramref name="id"/>, or an error.</returns>
-    public async Task<Result<UserEntity?>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<Result<UserEntity?>> GetByIdAsync(Guid id, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default)
     {
-        return await _luminaDbContext.Users
-            .Include(user => user.Libraries)
-                .ThenInclude(library => library.ContentLocations)
-            .Include(user => user.UserPermissions)
-                .ThenInclude(userPermission => userPermission.Permission)
-            .Include(user => user.UserRole!.Role.RolePermissions)
-                .ThenInclude(rolePermission => rolePermission.Permission)
-            .FirstOrDefaultAsync(user => user.Id == id, cancellationToken)
+        IQueryable<UserEntity> query = _luminaDbContext.Users;
+        if (!shouldTrackEntities)
+            query = query.AsNoTracking();
+        if (shouldIncludeNavigationProperties)
+        {
+            query = query
+                .Include(user => user.Libraries)
+                    .ThenInclude(library => library.ContentLocations)
+                .Include(user => user.UserPermissions)
+                    .ThenInclude(userPermission => userPermission.Permission)
+                .Include(user => user.UserRole!.Role.RolePermissions)
+                    .ThenInclude(rolePermission => rolePermission.Permission);
+        }
+        return await query.FirstOrDefaultAsync(user => user.Id == id, cancellationToken)
             .ConfigureAwait(false);
     }
 }

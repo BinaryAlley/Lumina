@@ -89,7 +89,7 @@ public class FileProviderServiceTests
     }
 
     [Fact]
-    public void GetFilePaths_WhenIncludeHiddenElementsIsFalse_ShouldExcludeHiddenFiles()
+    public void GetFilePaths_WhenShouldIncludeHiddenElementsIsFalse_ShouldExcludeHiddenFiles()
     {
         // Arrange
         FileSystemPathId path = _fileSystemPathIdFixture.Create();
@@ -109,7 +109,7 @@ public class FileProviderServiceTests
     }
 
     [Fact]
-    public void GetFilePaths_WhenIncludeHiddenElementsIsTrue_ShouldIncludeHiddenFiles()
+    public void GetFilePaths_WhenShouldIncludeHiddenElementsIsTrue_ShouldIncludeHiddenFiles()
     {
         // Arrange
         FileSystemPathId path = _fileSystemPathIdFixture.Create();

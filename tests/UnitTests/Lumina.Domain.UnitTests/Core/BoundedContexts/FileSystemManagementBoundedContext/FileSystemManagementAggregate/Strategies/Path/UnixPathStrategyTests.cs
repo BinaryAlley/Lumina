@@ -120,7 +120,7 @@ public class UnixPathStrategyTests
     }
 
     [Fact]
-    public void Exists_WhenPathExistsAndIsHiddenAndIncludeHiddenElementsIsTrue_ShouldReturnTrue()
+    public void Exists_WhenPathExistsAndIsHiddenAndShouldIncludeHiddenElementsIsTrue_ShouldReturnTrue()
     {
         // Arrange
         string existingPath = "/home/user/existing_file.txt";
@@ -138,7 +138,7 @@ public class UnixPathStrategyTests
     }
 
     [Fact]
-    public void Exists_WhenPathExistsAndIsHiddenAndIncludeHiddenElementsIsFalse_ShouldReturnFalse()
+    public void Exists_WhenPathExistsAndIsHiddenAndShouldIncludeHiddenElementsIsFalse_ShouldReturnFalse()
     {
         // Arrange
         string existingPath = "/home/user/existing_file.txt";
@@ -595,5 +595,43 @@ public class UnixPathStrategyTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+    }
+
+    [Theory]
+    [InlineData("/media/books", "/media/books/book.epub")] // direct child
+    [InlineData("/media", "/media/books/book.epub")] // nested descendant
+    [InlineData("/media/books/", "/media/books/book.epub")] // trailing separator on the parent
+    [InlineData("/media/books", "/media/books/sub/../book.epub")] // relative segments that stay inside
+    public void IsPathWithin_WithContainedPaths_ShouldReturnTrue(string parentPath, string path)
+    {
+        // Arrange
+        FileSystemPathId parentPathId = _fileSystemPathIdFixture.Create(parentPath);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
+
+        // Act
+        bool result = _sut.IsPathWithin(pathId, parentPathId);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Theory]
+    [InlineData("/media/books", "/media/book.epub")] // sibling directory
+    [InlineData("/media/books", "/Media/Books/book.epub")] // Unix paths are case-sensitive
+    [InlineData("/media/books", "/media/other/book.epub")] // sibling directory
+    [InlineData("/media/books", "/media/books/../other/book.epub")] // relative segment that escapes the parent
+    [InlineData("/media/books", "/etc/passwd")] // unrelated location
+    [InlineData("/media", "/media")] // the parent itself is not inside itself
+    public void IsPathWithin_WithPathsOutsideTheParent_ShouldReturnFalse(string parentPath, string path)
+    {
+        // Arrange
+        FileSystemPathId parentPathId = _fileSystemPathIdFixture.Create(parentPath);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
+
+        // Act
+        bool result = _sut.IsPathWithin(pathId, parentPathId);
+
+        // Assert
+        Assert.False(result);
     }
 }

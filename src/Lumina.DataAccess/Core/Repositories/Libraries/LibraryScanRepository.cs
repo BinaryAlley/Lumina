@@ -39,9 +39,9 @@ internal sealed class LibraryScanRepository : ILibraryScanRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Created>> InsertAsync(LibraryScanEntity libraryScan, CancellationToken cancellationToken)
     {
-        bool libraryScanExists = await _luminaDbContext.LibraryScans.AnyAsync(
+        bool doesLibraryScanExist = await _luminaDbContext.LibraryScans.AnyAsync(
             repositoryScanLibrary => repositoryScanLibrary.Id == libraryScan.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
-        if (libraryScanExists)
+        if (doesLibraryScanExist)
             return Errors.LibraryScanning.LibraryScanAlreadyExists;
 
         _luminaDbContext.LibraryScans.Add(libraryScan);
@@ -54,12 +54,18 @@ internal sealed class LibraryScanRepository : ILibraryScanRepository
     /// <param name="id">The id of the library scan to get.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="LibraryScanEntity"/> identified by <paramref name="id"/>, or an error.</returns>
-    public async Task<Result<LibraryScanEntity?>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<Result<LibraryScanEntity?>> GetByIdAsync(Guid id, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default)
     {
-        return await _luminaDbContext.LibraryScans
-            .Include(libraryScan => libraryScan.Library)
-            .Include(libraryScan => libraryScan.User)
-            .FirstOrDefaultAsync(libraryScan => libraryScan.Id == id, cancellationToken).ConfigureAwait(false);
+        IQueryable<LibraryScanEntity> query = _luminaDbContext.LibraryScans;
+        if (!shouldTrackEntities)
+            query = query.AsNoTracking();
+        if (shouldIncludeNavigationProperties)
+        {
+            query = query
+                .Include(libraryScan => libraryScan.Library)
+                .Include(libraryScan => libraryScan.User);
+        }
+        return await query.FirstOrDefaultAsync(libraryScan => libraryScan.Id == id, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -101,7 +107,7 @@ internal sealed class LibraryScanRepository : ILibraryScanRepository
             .FirstOrDefaultAsync(libraryScan => libraryScan.Id == data.Id, cancellationToken).ConfigureAwait(false);
         if (foundLibraryScan is null)
             return Errors.LibraryScanning.LibraryScanNotFound;
-        // update scalar properties
+        // Update scalar properties.
         _luminaDbContext.Entry(foundLibraryScan).CurrentValues.SetValues(data);
         return Result.Updated;
     }

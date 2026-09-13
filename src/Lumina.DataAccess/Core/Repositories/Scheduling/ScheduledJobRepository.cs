@@ -1,9 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Scheduling;
 using Lumina.Application.Common.DataAccess.Repositories.Scheduling;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -37,11 +40,14 @@ internal sealed class ScheduledJobRepository : IScheduledJobRepository
     /// <param name="id">The id of the scheduled job to get.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="ScheduledJobEntity"/> identified by <paramref name="id"/>, or an error.</returns>
-    public async Task<Result<ScheduledJobEntity?>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<Result<ScheduledJobEntity?>> GetByIdAsync(Guid id, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default)
     {
-        // FindAsync returns an entity that was already loaded in the current unit of work from the change tracker, and only
-        // reads it from the storage medium when it is not tracked, so an entity loaded earlier is not read again.
-        return await _luminaDbContext.ScheduledJobs.FindAsync([id], cancellationToken).ConfigureAwait(false);
+        // The scheduled job is read with a query instead of FindAsync so that it can be retrieved without tracking when requested.
+        // When the entity is tracked, the change tracker still returns the already loaded instance instead of a new one.
+        IQueryable<ScheduledJobEntity> query = _luminaDbContext.ScheduledJobs;
+        if (!shouldTrackEntities)
+            query = query.AsNoTracking();
+        return await query.FirstOrDefaultAsync(scheduledJob => scheduledJob.Id == id, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -59,14 +65,54 @@ internal sealed class ScheduledJobRepository : IScheduledJobRepository
     }
 
     /// <summary>
-    /// Gets all scheduled jobs from the storage medium.
+    /// Gets all the scheduled jobs from the storage medium, or a page of them when the pagination data is provided.
     /// </summary>
+    /// <typeparam name="TFilter">The type of the filter carrying the criteria used to filter the results.</typeparam>
+    /// <param name="paginationData">The pagination data that includes the current page and the number of items per page to retrieve. If <see langword="null"/>, all the matching scheduled jobs are returned.</param>
+    /// <param name="sortBy">The name of the field by which to sort the results.</param>
+    /// <param name="sortOrder">The direction in which to sort the results.</param>
+    /// <param name="filterModel">The model containing the parameters used to filter the results.</param>
+    /// <param name="shouldIncludeNavigationProperties">Whether the navigation properties of the entities should be loaded together with the entities themselves. Pass <see langword="false"/> to retrieve only the data stored directly on the entity rows.</param>
+    /// <param name="shouldTrackEntities">Whether the retrieved entities should be tracked by the persistence medium, so that changes to them can be saved. Pass <see langword="false"/> for read-only scenarios, to avoid the tracking overhead.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="ScheduledJobEntity"/>, or an error.</returns>
-    public async Task<Result<IEnumerable<ScheduledJobEntity>>> GetAllAsync(CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either a paginated result of <see cref="ScheduledJobEntity"/>, or an error.</returns>
+    public async Task<Result<PaginatedResultDto<ScheduledJobEntity>>> GetAllAsync<TFilter>(PaginationDataDto? paginationData = null, string? sortBy = null, SortOrder? sortOrder = null, TFilter? filterModel = null, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default) where TFilter : BaseFilterDto
     {
-        return await _luminaDbContext.ScheduledJobs
+        IQueryable<ScheduledJobEntity> query = _luminaDbContext.ScheduledJobs;
+        if (!shouldTrackEntities)
+            query = query.AsNoTracking();
+
+        // If no pagination was requested, return all the scheduled jobs.
+        if (paginationData is null)
+        {
+            IReadOnlyList<ScheduledJobEntity> allScheduledJobs = await query.ToListAsync(cancellationToken).ConfigureAwait(false);
+            return new PaginatedResultDto<ScheduledJobEntity>
+            {
+                Data = allScheduledJobs,
+                CurrentPage = 1,
+                PerPage = allScheduledJobs.Count,
+                Count = allScheduledJobs.Count,
+                NumberOfPages = 1
+            };
+        }
+
+        int count = await query.Select(scheduledJob => scheduledJob.Id).CountAsync(cancellationToken).ConfigureAwait(false);
+        int numberOfPages = (int)Math.Ceiling((double)count / paginationData.PerPage);
+        int currentPage = Math.Min(paginationData.CurrentPage, Math.Max(1, numberOfPages)); // Make sure current page doesn't exceed maximum number of pages.
+
+        IReadOnlyList<ScheduledJobEntity> paginatedResult = await query
+            .Skip((currentPage - 1) * paginationData.PerPage)
+            .Take(paginationData.PerPage)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
+
+        return new PaginatedResultDto<ScheduledJobEntity>
+        {
+            Data = paginatedResult,
+            CurrentPage = currentPage,
+            PerPage = paginationData.PerPage,
+            Count = count,
+            NumberOfPages = numberOfPages
+        };
     }
 
     /// <summary>
