@@ -46,7 +46,7 @@ public static class TagEntityMapping
     public static Result<Tag> ToDomainEntity(this TagEntity repositoryEntity)
     {
         return Tag.Create(
-            repositoryEntity.Name ?? default
+            repositoryEntity.Name!
         );
     }
 

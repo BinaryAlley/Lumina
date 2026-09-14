@@ -23,7 +23,7 @@ public static class GenreDtoMapping
     public static Result<Genre> ToDomainEntity(this GenreDto dto)
     {
         return Genre.Create(
-            dto.Name
+            dto.Name!
         );
     }
 

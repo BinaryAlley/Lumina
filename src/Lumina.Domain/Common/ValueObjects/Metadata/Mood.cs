@@ -35,7 +35,7 @@ public class Mood : ValueObject
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="Mood"/>, or an error message.
     /// </returns>
-    public static Result<Mood> Create(string? name)
+    public static Result<Mood> Create(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
             return Errors.Errors.Metadata.MoodNameCannotBeEmpty;

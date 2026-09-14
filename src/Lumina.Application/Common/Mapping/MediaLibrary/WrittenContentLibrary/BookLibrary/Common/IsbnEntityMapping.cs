@@ -47,7 +47,7 @@ public static class IsbnEntityMapping
     public static Result<Isbn> ToDomainEntity(this IsbnEntity repositoryEntity)
     {
         return Isbn.Create(
-            repositoryEntity.Value ?? default,
+            repositoryEntity.Value!,
             repositoryEntity.Format ?? default
         );
     }
