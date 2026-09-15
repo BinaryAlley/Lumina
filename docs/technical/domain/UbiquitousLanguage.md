@@ -10,6 +10,7 @@
 - _**File**_: The actual digital file of a media item
 - _**Stream**_: A media item accessed via streaming rather than local storage
 - _**Language Track**_: An audio or text track in a specific language
+- _**Media Contributor**_: A person, group, or organization that contributed to a media item, together with the role they played
 
 ## Video Content
 - _**TV Show**_: A series of episodes typically organized into seasons
@@ -113,6 +114,7 @@
 - File
 - Stream
 - LanguageTrack
+- MediaContributor
 
 ## Aggregates
 - VideoLibrary (root: VideoLibrary, entities: TVShow, Season, Episode, Movie, FilmSeries, ConcertVideo, Documentary, TutorialVideo, HomeVideo, Anime, YouTubeVideo, MusicVideo)
