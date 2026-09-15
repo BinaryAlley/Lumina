@@ -41,7 +41,7 @@ internal sealed class PluginSettingsStore : IPluginSettingsStore
     /// <returns>The persisted settings keyed by setting key, or <see langword="null"/> when no settings were persisted for the plugin.</returns>
     public async Task<IReadOnlyDictionary<string, string>?> GetSettingsAsync(Guid pluginId, CancellationToken cancellationToken)
     {
-        Result<PluginEntity?> getPluginResult = await _unitOfWork.PluginRepository.GetByIdAsync(pluginId, cancellationToken).ConfigureAwait(false);
+        Result<PluginEntity?> getPluginResult = await _unitOfWork.PluginRepository.GetByIdAsync(pluginId, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getPluginResult.IsFailure)
         {
             _logger.LogWarning("Failed to read the settings of the plugin with Id '{PluginId}': {Error}", pluginId, getPluginResult.FirstError.Description);
