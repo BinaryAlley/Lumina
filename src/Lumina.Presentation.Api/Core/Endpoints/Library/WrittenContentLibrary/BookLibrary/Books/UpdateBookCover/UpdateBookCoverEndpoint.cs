@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Commands.UpdateBookCover;
+using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Common.Routes.Library.WrittenContentLibrary.BookLibrary;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
@@ -14,17 +15,17 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.UpdateBookCover;
 
 /// <summary>
-/// API endpoint for the <c>/books/{id}/cover</c> route.
+/// API endpoint for the <c>/books/{bookId}/cover</c> route.
 /// </summary>
-public class UpdateBookCoverEndpoint : BaseEndpoint<EmptyRequest, IResult>
+public class UpdateBookCoverEndpoint : BaseEndpoint<FastEndpoints.EmptyRequest, IResult>
 {
-    private readonly Application.Common.CQRS.ICommandHandler<UpdateBookCoverCommand, Result<string>> _updateBookCoverCommandHandler;
+    private readonly ICommandHandler<UpdateBookCoverCommand, Result<UpdateBookCoverResponse>> _updateBookCoverCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdateBookCoverEndpoint"/> class.
     /// </summary>
     /// <param name="updateBookCoverCommandHandler">Injected service for handling update book cover commands.</param>
-    public UpdateBookCoverEndpoint(Application.Common.CQRS.ICommandHandler<UpdateBookCoverCommand, Result<string>> updateBookCoverCommandHandler)
+    public UpdateBookCoverEndpoint(ICommandHandler<UpdateBookCoverCommand, Result<UpdateBookCoverResponse>> updateBookCoverCommandHandler)
     {
         _updateBookCoverCommandHandler = updateBookCoverCommandHandler;
     }
@@ -34,7 +35,7 @@ public class UpdateBookCoverEndpoint : BaseEndpoint<EmptyRequest, IResult>
     /// </summary>
     public override void Configure()
     {
-        Verbs(Http.PUT);
+        Verbs(FastEndpoints.Http.PUT);
         Routes(ApiRoutes.Books.UPDATE_BOOK_COVER);
         Version(1);
         DontCatchExceptions();
@@ -45,11 +46,11 @@ public class UpdateBookCoverEndpoint : BaseEndpoint<EmptyRequest, IResult>
     /// </summary>
     /// <param name="request">The request object.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    public override async Task<IResult> ExecuteAsync(EmptyRequest request, CancellationToken cancellationToken)
+    public override async Task<IResult> ExecuteAsync(FastEndpoints.EmptyRequest request, CancellationToken cancellationToken)
     {
-        // The endpoint takes no typed request, because its body is a multipart file, so the book id is read from the {id} route
-        // value; an unparseable value becomes Guid.Empty, which the command validator reports as a missing book id.
-        Guid bookId = Guid.TryParse(HttpContext.Request.RouteValues["id"]?.ToString(), out Guid parsedBookId) ? parsedBookId : Guid.Empty;
+        // Take the identifiers from the route.
+        string? libraryId = HttpContext.Request.RouteValues["libraryId"]?.ToString();
+        string? bookId = HttpContext.Request.RouteValues["bookId"]?.ToString();
 
         IFormFile? cover = null;
         if (HttpContext.Request.HasFormContentType)
@@ -67,10 +68,10 @@ public class UpdateBookCoverEndpoint : BaseEndpoint<EmptyRequest, IResult>
         }
 
         // The cover stream must stay open while the handler stores the image, and is disposed as soon as the handler returns.
-        UpdateBookCoverCommand command = new(bookId, cover?.OpenReadStream(), cover?.FileName);
+        UpdateBookCoverCommand command = new(libraryId, bookId, cover?.OpenReadStream(), cover?.FileName);
         try
         {
-            Result<string> result = await _updateBookCoverCommandHandler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
+            Result<UpdateBookCoverResponse> result = await _updateBookCoverCommandHandler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
             return result.Match(success => TypedResults.Ok(success), Problem);
         }
         finally

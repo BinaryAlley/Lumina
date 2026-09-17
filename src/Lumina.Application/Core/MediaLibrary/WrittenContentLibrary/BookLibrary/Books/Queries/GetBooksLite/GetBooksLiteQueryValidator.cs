@@ -28,8 +28,8 @@ public class GetBooksLiteQueryValidator : AbstractValidator<GetBooksLiteQuery>
             .When(query => query.LibraryId is not null && query.LibraryId.Length > 0)
             .WithError(Errors.Library.LibraryIdCannotBeEmpty);
 
-        // the alpha key must be exactly one of the three picker bucket kinds, so that the filter specification can
-        // derive the key of a title unambiguously: no filter, a number bucket, a symbol bucket, or a single ASCII letter
+        // The alpha key must be exactly one of the three picker bucket kinds, so that the filter specification can
+        // derive the key of a title unambiguously: no filter, a number bucket, a symbol bucket, or a single ASCII letter.
         RuleFor(query => query.FilterAlphaKey)
             .Must(alphaKey => alphaKey is null
                 || alphaKey == LibraryItemAlphaKeys.NUMBER

@@ -31,7 +31,7 @@ namespace Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary
 /// <param name="BarnesAndNobleId">The Barnes & Noble ID of the book, if applicable.</param>
 /// <param name="AppleBooksId">The Apple Books ID of the book, if applicable.</param>
 /// <param name="ISBNs">The list of ISBN (International Standard Book Number) of the book.</param>
-/// <param name="Contributors">The list of media contributors (actors, directors, etc) starring in this book.</param>
+/// <param name="Contributors">The list of media contributors that contributed to this book.</param>
 /// <param name="Ratings">The list of ratings for this book.</param>
 [DebuggerDisplay("Title: {Metadata.Title}")]
 public record UpdateBookCommand(

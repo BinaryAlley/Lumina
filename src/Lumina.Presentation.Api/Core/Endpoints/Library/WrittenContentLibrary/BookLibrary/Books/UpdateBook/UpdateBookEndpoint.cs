@@ -48,7 +48,7 @@ public class UpdateBookEndpoint : BaseEndpoint<UpdateBookRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(UpdateBookRequest request, CancellationToken cancellationToken)
     {
-        // take unique identifiers from the route
+        // Take unique identifiers from the route.
         string? libraryId = HttpContext.Request.RouteValues["libraryId"]?.ToString();
         string? bookId = HttpContext.Request.RouteValues["bookId"]?.ToString();
         Result<BookResponse> result = await _updateBookCommandHandler.HandleAsync(request.ToCommand(libraryId, bookId), cancellationToken).ConfigureAwait(false);

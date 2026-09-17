@@ -36,6 +36,9 @@ public sealed class MusicBrainzId : ValueObject
     /// <returns>The created <see cref="MusicBrainzId"/> instance.</returns>
     public static Result<MusicBrainzId> Create(Guid value)
     {
+        if (value == Guid.Empty)
+            return Errors.Music.MusicBrainzIdInvalidFormat;
+
         return new MusicBrainzId(value);
     }
 

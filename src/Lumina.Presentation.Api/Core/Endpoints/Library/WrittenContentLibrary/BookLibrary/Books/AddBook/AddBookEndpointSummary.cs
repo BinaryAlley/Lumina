@@ -27,32 +27,35 @@ public class AddBookEndpointSummary : Summary<AddBookEndpoint, AddBookRequest>
     public AddBookEndpointSummary()
     {
         Summary = "Adds a new book.";
-        Description = "Creates a new book and returns its details, including the location of the newly created resource.";
+        Description = "Creates a new book and returns its details, including the location of the newly created resource. The request is handled by an Admin, who can add books to all libraries, or by the owner of the library.";
+
+        Guid bookId = Guid.NewGuid();
+        Guid libraryId = Guid.NewGuid();
 
         ExampleRequest = new AddBookRequest(
-            Path: "/media/libraries/books/the-fellowship-of-the-ring.epub",
+                Path: "/media/libraries/books/the-fellowship-of-the-ring.pdf",
             Metadata: new(
                 Title: "The Fellowship of the Ring",
                 OriginalTitle: "The Fellowship of the Ring",
                 Description: "The first part of J.R.R. Tolkien's epic adventure The Lord of the Rings. In a sleepy village in the Shire, young Frodo Baggins finds himself faced with an immense task, as his elderly cousin Bilbo entrusts the Ring to his care. Frodo must leave his home and make a perilous journey across Middle-earth to the Cracks of Doom, there to destroy the Ring and foil the Dark Lord in his evil purpose.",
                 ReleaseInfo: new(
-                    OriginalReleaseDate: DateOnly.ParseExact("1954-07-29", "yyyy-MM-dd", null),
+                    OriginalReleaseDate: new DateOnly(1954, 7, 29),
                     OriginalReleaseYear: 1954,
-                    ReReleaseDate: DateOnly.ParseExact("2001-09-06", "yyyy-MM-dd", null),
+                    ReReleaseDate: new DateOnly(2001, 9, 6),
                     ReReleaseYear: 2001,
                     ReleaseCountry: ReleaseCountry.GB,
                     ReleaseVersion: "50th Anniversary Edition"
                 ),
-                Genres: new List<GenreDto>() {
-                    { new(Name: "fantasy") },
-                    { new(Name: "adventure") },
-                    { new(Name: "classic") }
-                },
-                Tags: new List<TagDto>() {
-                    { new(Name: "epic fantasy") },
-                    { new(Name: "quest") },
-                    { new(Name: "middle-earth") }
-                },
+                Genres: [
+                    new(Name: "fantasy"),
+                    new(Name: "adventure"),
+                    new(Name: "classic")
+                ],
+                Tags: [
+                    new(Name: "epic fantasy"),
+                    new(Name: "quest"),
+                    new(Name: "middle-earth")
+                ],
                 Language: new(
                     LanguageCode: "en",
                     LanguageName: "English",
@@ -70,7 +73,7 @@ public class AddBookEndpointSummary : Summary<AddBookEndpoint, AddBookRequest>
             Format: BookFormat.Paperback,
             Edition: "50th Anniversary Edition",
             VolumeNumber: 1,
-            Series: new BookSeriesDto(
+            Series: new(
                 Title: "The Lord of the Rings"
             ),
             ASIN: "B007978NPG",
@@ -212,17 +215,17 @@ public class AddBookEndpointSummary : Summary<AddBookEndpoint, AddBookRequest>
 
         Response(201, "The new book is returned.", example:
             new BookResponse(
-                Id: Guid.NewGuid(),
-                LibraryId: Guid.NewGuid(),
-                Path: "/media/libraries/books/the-fellowship-of-the-ring.epub",
+                Id: bookId,
+                LibraryId: libraryId,
+                Path: "/media/libraries/books/the-fellowship-of-the-ring.pdf",
                 Metadata: new(
                     Title: "The Fellowship of the Ring",
                     OriginalTitle: "The Fellowship of the Ring",
                     Description: "The first part of J.R.R. Tolkien's epic adventure The Lord of the Rings. In a sleepy village in the Shire, young Frodo Baggins finds himself faced with an immense task, as his elderly cousin Bilbo entrusts the Ring to his care. Frodo must leave his home and make a perilous journey across Middle-earth to the Cracks of Doom, there to destroy the Ring and foil the Dark Lord in his evil purpose.",
                     ReleaseInfo: new(
-                        OriginalReleaseDate: DateOnly.ParseExact("1954-07-29", "yyyy-MM-dd", null),
+                    OriginalReleaseDate: new DateOnly(1954, 7, 29),
                         OriginalReleaseYear: 1954,
-                        ReReleaseDate: DateOnly.ParseExact("2001-09-06", "yyyy-MM-dd", null),
+                    ReReleaseDate: new DateOnly(2001, 9, 6),
                         ReReleaseYear: 2001,
                         ReleaseCountry: ReleaseCountry.GB,
                         ReleaseVersion: "50th Anniversary Edition"
@@ -251,14 +254,11 @@ public class AddBookEndpointSummary : Summary<AddBookEndpoint, AddBookRequest>
                     ),
                     Publisher: "Houghton Mifflin",
                     PageCount: 398
-
                 ),
                 Format: BookFormat.Paperback,
                 Edition: "50th Anniversary Edition",
                 VolumeNumber: 1,
-                Series: new BookSeriesDto(
-                    Title: "The Lord of the Rings"
-                ),
+                Series: null,
                 ASIN: "B007978NPG",
                 GoodreadsId: "3",
                 LCCN: "54009621",
@@ -310,7 +310,6 @@ public class AddBookEndpointSummary : Summary<AddBookEndpoint, AddBookRequest>
                 CoverPath: null
             )
         );
-
 
         Response(401, "Authentication required.", "application/problem+json",
             example: new[]

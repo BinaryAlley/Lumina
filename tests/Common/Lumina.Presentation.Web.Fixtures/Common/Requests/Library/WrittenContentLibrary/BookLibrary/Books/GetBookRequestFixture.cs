@@ -18,11 +18,13 @@ public class GetBookRequestFixture
     /// Creates a new <see cref="GetBookRequest"/> instance.
     /// </summary>
     /// <param name="id">Optional unique identifier of the book to retrieve.</param>
+    /// <param name="libraryId">Optional unique identifier of the media library the book belongs to.</param>
     /// <returns>A configured <see cref="GetBookRequest"/> instance.</returns>
     public GetBookRequest Create(
-        Guid? id = null)
+        Guid? id = null,
+        Guid? libraryId = null)
     {
-        return new GetBookRequest(id?.ToString() ?? Guid.NewGuid().ToString());
+        return new GetBookRequest(id?.ToString() ?? Guid.NewGuid().ToString(), libraryId ?? Guid.NewGuid());
     }
 
     /// <summary>

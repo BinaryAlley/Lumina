@@ -48,7 +48,7 @@ public class AddBookEndpoint : BaseEndpoint<AddBookRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(AddBookRequest request, CancellationToken cancellationToken)
     {
-        // take unique identifiers from the route
+        // Take unique identifiers from the route.
         string? libraryId = HttpContext.Request.RouteValues["libraryId"]?.ToString();
         Result<BookResponse> result = await _addBookCommandHandler.HandleAsync(request.ToCommand(libraryId), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Created($"{BaseURL}api/v1/libraries/{libraryId}/books/{result.Value.Id}", result.Value), Problem);

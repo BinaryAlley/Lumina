@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -966,5 +966,89 @@
   </data>
   <data name="Country.ZW" xml:space="preserve">
     <value>Зімбабве</value>
+  </data>
+  <data name="Role" xml:space="preserve">
+    <value>Роль</value>
+  </data>
+  <data name="Actor" xml:space="preserve">
+    <value>Актор</value>
+  </data>
+  <data name="Director" xml:space="preserve">
+    <value>Режисер</value>
+  </data>
+  <data name="Screenwriter" xml:space="preserve">
+    <value>Сценарист</value>
+  </data>
+  <data name="Composer" xml:space="preserve">
+    <value>Композитор</value>
+  </data>
+  <data name="Lyricist" xml:space="preserve">
+    <value>Автор тексту</value>
+  </data>
+  <data name="Arranger" xml:space="preserve">
+    <value>Аранжувальник</value>
+  </data>
+  <data name="Conductor" xml:space="preserve">
+    <value>Диригент</value>
+  </data>
+  <data name="Producer" xml:space="preserve">
+    <value>Продюсер</value>
+  </data>
+  <data name="ExecutiveProducer" xml:space="preserve">
+    <value>Виконавчий продюсер</value>
+  </data>
+  <data name="Engineer" xml:space="preserve">
+    <value>Звукорежисер</value>
+  </data>
+  <data name="Mixer" xml:space="preserve">
+    <value>Мікшувальник</value>
+  </data>
+  <data name="Remixer" xml:space="preserve">
+    <value>Реміксер</value>
+  </data>
+  <data name="RecordLabel" xml:space="preserve">
+    <value>Лейбл</value>
+  </data>
+  <data name="Vocals" xml:space="preserve">
+    <value>Вокал</value>
+  </data>
+  <data name="BackingVocals" xml:space="preserve">
+    <value>Бек-вокал</value>
+  </data>
+  <data name="Guitar" xml:space="preserve">
+    <value>Гітара</value>
+  </data>
+  <data name="BassGuitar" xml:space="preserve">
+    <value>Бас-гітара</value>
+  </data>
+  <data name="Drums" xml:space="preserve">
+    <value>Барабани</value>
+  </data>
+  <data name="Percussion" xml:space="preserve">
+    <value>Перкусія</value>
+  </data>
+  <data name="Keyboards" xml:space="preserve">
+    <value>Клавішні</value>
+  </data>
+  <data name="Piano" xml:space="preserve">
+    <value>Фортепіано</value>
+  </data>
+  <data name="Synthesizer" xml:space="preserve">
+    <value>Синтезатор</value>
+  </data>
+  <data name="Strings" xml:space="preserve">
+    <value>Струнні</value>
+  </data>
+  <data name="Woodwinds" xml:space="preserve">
+    <value>Дерев'яні духові</value>
+  </data>
+  <data name="Brass" xml:space="preserve">
+    <value>Мідні духові</value>
+  </data>
+  <data name="Choir" xml:space="preserve">
+    <value>Хор</value>
+  </data>
+  <data name="Orchestrator" xml:space="preserve">
+    <value>Оркестратор</value>
   </data>
 </root>

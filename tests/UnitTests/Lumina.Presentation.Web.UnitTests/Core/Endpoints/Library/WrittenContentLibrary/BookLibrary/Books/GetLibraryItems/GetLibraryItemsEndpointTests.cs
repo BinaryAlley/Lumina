@@ -63,8 +63,7 @@ public class GetLibraryItemsEndpointTests
         // Assert
         await _mockApiHttpClient.Received(1).GetAsync<PaginatedBookLiteDto>(
             Arg.Is<string>(endpoint =>
-                endpoint.StartsWith(ApiRoutes.Books.GET_BOOKS_LITE, StringComparison.OrdinalIgnoreCase) &&
-                endpoint.Contains($"libraryId={request.LibraryId}") &&
+                endpoint.StartsWith(ApiRoutes.Books.GET_BOOKS_LITE.Replace("{libraryId}", request.LibraryId.ToString()), StringComparison.OrdinalIgnoreCase) &&
                 endpoint.Contains("currentPage=2") &&
                 endpoint.Contains("perPage=48") &&
                 endpoint.Contains("searchTerm=the%20hobbit") &&
@@ -89,8 +88,8 @@ public class GetLibraryItemsEndpointTests
         // Assert
         await _mockApiHttpClient.Received(1).GetAsync<PaginatedBookLiteDto>(
             Arg.Is<string>(endpoint =>
-                endpoint.StartsWith(ApiRoutes.Books.GET_BOOKS_LITE, StringComparison.OrdinalIgnoreCase) &&
-                endpoint.EndsWith($"libraryId={request.LibraryId}&shouldIgnoreThePrefixForAlphaPicker=False", StringComparison.OrdinalIgnoreCase) &&
+                endpoint.StartsWith(ApiRoutes.Books.GET_BOOKS_LITE.Replace("{libraryId}", request.LibraryId.ToString()), StringComparison.OrdinalIgnoreCase) &&
+                endpoint.EndsWith("?shouldIgnoreThePrefixForAlphaPicker=False", StringComparison.OrdinalIgnoreCase) &&
                 !endpoint.Contains("currentPage=") &&
                 !endpoint.Contains("searchTerm=") &&
                 !endpoint.Contains("sortBy=")),

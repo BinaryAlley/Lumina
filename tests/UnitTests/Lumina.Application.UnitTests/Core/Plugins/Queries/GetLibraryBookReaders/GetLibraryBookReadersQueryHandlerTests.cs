@@ -2,6 +2,8 @@
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
@@ -49,6 +51,7 @@ public class GetLibraryBookReadersQueryHandlerTests
     public GetLibraryBookReadersQueryHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockLibraryBookReaderConfigurationRepository = Substitute.For<ILibraryBookReaderConfigurationRepository>();
         _mockPluginRepository = Substitute.For<IPluginRepository>();
         _mockUnitOfWork.LibraryBookReaderConfigurationRepository.Returns(_mockLibraryBookReaderConfigurationRepository);
@@ -104,7 +107,8 @@ public class GetLibraryBookReadersQueryHandlerTests
             _pluginEntityFixture.Create(enabledPluginId, "A Reader"),
             _pluginEntityFixture.Create(disabledPluginId, "B Reader")
         ];
-        _mockPluginRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(plugins);
+        _mockPluginRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(new PaginatedResultDto<PluginEntity> { Data = plugins, CurrentPage = 1, PerPage = plugins.Count, Count = plugins.Count, NumberOfPages = 1 }));
         Dictionary<Guid, IReadOnlyList<string>> supportedExtensions = new()
         {
             [enabledPluginId] = [".epub"],
@@ -138,8 +142,8 @@ public class GetLibraryBookReadersQueryHandlerTests
         ];
         _mockLibraryBookReaderConfigurationRepository.GetByLibraryIdAsync(query.LibraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryBookReaderConfigurationEntity>>(configurations));
-        _mockPluginRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(Result.From<IEnumerable<PluginEntity>>([_pluginEntityFixture.Create()]));
+        _mockPluginRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(new PaginatedResultDto<PluginEntity> { Data = [_pluginEntityFixture.Create()], CurrentPage = 1, PerPage = 1, Count = 1, NumberOfPages = 1 }));
 
         // Act
         Result<IReadOnlyList<LibraryBookReaderResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
@@ -159,8 +163,8 @@ public class GetLibraryBookReadersQueryHandlerTests
         GetLibraryBookReadersQuery query = _getLibraryBookReadersQueryFixture.Create();
         _mockLibraryBookReaderConfigurationRepository.GetByLibraryIdAsync(query.LibraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryBookReaderConfigurationEntity>>([]));
-        _mockPluginRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(Result.From<IEnumerable<PluginEntity>>([]));
+        _mockPluginRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(new PaginatedResultDto<PluginEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
 
         // Act
         Result<IReadOnlyList<LibraryBookReaderResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
@@ -184,7 +188,7 @@ public class GetLibraryBookReadersQueryHandlerTests
 
         // Assert
         Assert.True(result.IsFailure);
-        await _mockPluginRepository.DidNotReceive().GetAllAsync(Arg.Any<CancellationToken>());
+        await _mockPluginRepository.DidNotReceive().GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -194,7 +198,7 @@ public class GetLibraryBookReadersQueryHandlerTests
         GetLibraryBookReadersQuery query = _getLibraryBookReadersQueryFixture.Create();
         _mockLibraryBookReaderConfigurationRepository.GetByLibraryIdAsync(query.LibraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryBookReaderConfigurationEntity>>([]));
-        _mockPluginRepository.GetAllAsync(Arg.Any<CancellationToken>())
+        _mockPluginRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Error.Failure(description: "Failed to get plugins"));
 
         // Act
@@ -219,7 +223,7 @@ public class GetLibraryBookReadersQueryHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
         await _mockLibraryBookReaderConfigurationRepository.DidNotReceive().GetByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
-        await _mockPluginRepository.DidNotReceive().GetAllAsync(Arg.Any<CancellationToken>());
+        await _mockPluginRepository.DidNotReceive().GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]

@@ -44,7 +44,7 @@ public class GetBookDetailsEndpointTests
     {
         // Arrange
         GetBookRequest request = _getBookRequestFixture.Create();
-        BookDetailsDto expectedBook = _bookDetailsDtoFixture.Create(id: Guid.Parse(request.Id));
+        BookDetailsDto expectedBook = _bookDetailsDtoFixture.Create(id: Guid.Parse(request.BookId));
         _mockApiHttpClient.GetAsync<BookDetailsDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(expectedBook);
 
@@ -53,7 +53,7 @@ public class GetBookDetailsEndpointTests
 
         // Assert
         await _mockApiHttpClient.Received(1).GetAsync<BookDetailsDto>(
-            Arg.Is<string>(endpoint => endpoint == ApiRoutes.Books.GET_BOOK.Replace("{id}", request.Id)),
+            Arg.Is<string>(endpoint => endpoint == ApiRoutes.Books.GET_BOOK.Replace("{libraryId}", request.LibraryId.ToString()).Replace("{bookId}", request.BookId)),
             Arg.Any<CancellationToken>());
     }
 
@@ -62,7 +62,7 @@ public class GetBookDetailsEndpointTests
     {
         // Arrange
         GetBookRequest request = _getBookRequestFixture.Create();
-        BookDetailsDto expectedBook = _bookDetailsDtoFixture.Create(id: Guid.Parse(request.Id));
+        BookDetailsDto expectedBook = _bookDetailsDtoFixture.Create(id: Guid.Parse(request.BookId));
         _mockApiHttpClient.GetAsync<BookDetailsDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(expectedBook);
 

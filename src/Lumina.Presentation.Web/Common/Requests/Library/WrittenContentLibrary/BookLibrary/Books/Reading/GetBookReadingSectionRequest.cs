@@ -10,8 +10,10 @@ namespace Lumina.Presentation.Web.Common.Requests.Library.WrittenContentLibrary.
 /// </summary>
 /// <param name="BookId">The unique identifier of the book whose reading section is retrieved. Required.</param>
 /// <param name="LocationRef">The opaque location reference of the reading section. Required.</param>
+/// <param name="LibraryId">The Id of the media library the book belongs to. Required.</param>
 [DebuggerDisplay("BookId: {BookId}, LocationRef: {LocationRef}")]
 public record GetBookReadingSectionRequest(
     Guid BookId,
-    string LocationRef
+    string LocationRef,
+    Guid LibraryId
 );

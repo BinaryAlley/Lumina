@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Reading;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Reading;
 using System;
 using System.Collections.Generic;
@@ -13,7 +12,7 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.B
 /// Class used for providing a textual description for the <see cref="GetReadingManifestEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetReadingManifestEndpointSummary : Summary<GetReadingManifestEndpoint, GetReadingManifestRequest>
+public class GetReadingManifestEndpointSummary : Summary<GetReadingManifestEndpoint, EmptyRequest>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="GetReadingManifestEndpointSummary"/> class.
@@ -23,16 +22,16 @@ public class GetReadingManifestEndpointSummary : Summary<GetReadingManifestEndpo
         Summary = "Retrieves the reading manifest of a book.";
         Description = "Retrieves the reading manifest of a book, containing the metadata, the table of contents, the spine, and the resources needed to render the reader.";
 
-        ExampleRequest = new GetReadingManifestRequest(
-            BookId: Guid.NewGuid()
-        );
-
-        RequestParam(r => r.BookId, "The Id of the book whose reading manifest is retrieved. Required.");
-
         ResponseParam<ReadingManifestResponse>(r => r.Title, "The title of the book.");
         ResponseParam<ReadingManifestResponse>(r => r.Author, "The author of the book, if known.");
         ResponseParam<ReadingManifestResponse>(r => r.CoverResourceKey, "The resource key of the cover image of the book, if applicable.");
+        ResponseParam<ReadingManifestResponse>(r => r.TableOfContents, "The hierarchical table of contents of the book.");
+        ResponseParam<ReadingManifestResponse>(r => r.TableOfContents[0].Label, "The label of the table of contents entry.");
+        ResponseParam<ReadingManifestResponse>(r => r.TableOfContents[0].LocationRef, "The opaque location reference of the reading section the entry points to.");
+        ResponseParam<ReadingManifestResponse>(r => r.TableOfContents[0].Children, "The child entries of the table of contents entry.");
         ResponseParam<ReadingManifestResponse>(r => r.Spine, "The ordered spine of the reading sections of the book.");
+        ResponseParam<ReadingManifestResponse>(r => r.Spine[0].LocationRef, "The opaque location reference of the reading section.");
+        ResponseParam<ReadingManifestResponse>(r => r.Spine[0].Title, "The title of the reading section, if known.");
         ResponseParam<ReadingManifestResponse>(r => r.ResourceKeys, "The resource keys of the resources of the book.");
         ResponseParam<ReadingManifestResponse>(r => r.HasTextContent, "Whether the book has extractable text content. A scanned book, whose pages are only images, has no text content.");
 
@@ -62,13 +61,32 @@ public class GetReadingManifestEndpointSummary : Summary<GetReadingManifestEndpo
         );
 
         Response(401, "Authentication required.", "application/problem+json",
-            example: new
+            example: new[]
             {
-                type = "https://tools.ietf.org/html/rfc7235#section-3.1",
-                status = 401,
-                title = "Unauthorized",
-                detail = "You are not authorized",
-                instance = "/api/v1/books/{bookId}/reading/manifest"
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    status = 401,
+                    title = "Unauthorized",
+                    detail = "Authentication failed",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/manifest"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    status = 401,
+                    title = "Unauthorized",
+                    detail = "The token has expired",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/manifest"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    status = 401,
+                    title = "Unauthorized",
+                    detail = "The token is invalid",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/manifest"
+                }
             }
         );
 
@@ -76,23 +94,62 @@ public class GetReadingManifestEndpointSummary : Summary<GetReadingManifestEndpo
             example: new
             {
                 type = "https://tools.ietf.org/html/rfc9110#section-15.5.4",
-                title = "General.Failure",
+                title = "General.Unauthorized",
                 status = 403,
                 detail = "NotAuthorized",
-                instance = "/api/v1/books/{bookId}/reading/manifest",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/manifest",
                 traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
             }
         );
 
-        Response(404, "The request failed because the book does not exist, no reader plugin supports its format, or the reader plugin is disabled.", "application/problem+json",
-            example: new
+        Response(404, "The request failed because the book or its media library does not exist, no reader plugin supports its format, the reader plugin is disabled, or the file of the book does not exist.", "application/problem+json",
+            example: new[]
             {
-                type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
-                title = "General.NotFound",
-                status = 404,
-                detail = "ReaderDisabled",
-                instance = "/api/v1/books/{bookId}/reading/manifest",
-                traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+                    title = "General.NotFound",
+                    status = 404,
+                    detail = "BookNotFound",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/manifest",
+                    traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+                    title = "General.NotFound",
+                    status = 404,
+                    detail = "LibraryNotFound",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/manifest",
+                    traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+                    title = "General.NotFound",
+                    status = 404,
+                    detail = "NoReaderAvailable",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/manifest",
+                    traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+                    title = "General.NotFound",
+                    status = 404,
+                    detail = "ReaderDisabled",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/manifest",
+                    traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+                    title = "General.NotFound",
+                    status = 404,
+                    detail = "BookFileNotFound",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/manifest",
+                    traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+                }
             }
         );
 
@@ -103,12 +160,13 @@ public class GetReadingManifestEndpointSummary : Summary<GetReadingManifestEndpo
                 title = "General.Validation",
                 status = 422,
                 detail = "OneOrMoreValidationErrorsOccurred",
-                instance = "/api/v1/books/{bookId}/reading/manifest",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/manifest",
                 errors = new Dictionary<string, string[]>
                 {
                     {
                         "General.Validation", new[]
                         {
+                            "LibraryIdCannotBeEmpty",
                             "BookIdCannotBeEmpty"
                         }
                     }

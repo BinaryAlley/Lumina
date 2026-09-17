@@ -38,11 +38,12 @@ public class GetReadingAvailabilityEndpointTests : IClassFixture<LuminaWebFactor
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
+        Guid libraryId = Guid.NewGuid();
         Guid bookId = Guid.NewGuid();
         ReadingAvailabilityDto availability = _readingAvailabilityDtoFixture.Create(bookId: bookId, isAvailable: true);
-        _apiFactory.ApiClientStub.RegisterGetResponse($"books/{bookId}/reading/availability", availability);
+        _apiFactory.ApiClientStub.RegisterGetResponse($"libraries/{libraryId}/books/{bookId}/reading/availability", availability);
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
-        HttpRequestMessage getRequest = new(HttpMethod.Get, $"/en-us/library/written-content-library/books-library/books/{bookId}/api-get-reading-availability");
+        HttpRequestMessage getRequest = new(HttpMethod.Get, $"/en-us/library/written-content-library/books-library/books/{bookId}/api-get-reading-availability?libraryId={libraryId}");
         getRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
         // Act
@@ -62,10 +63,11 @@ public class GetReadingAvailabilityEndpointTests : IClassFixture<LuminaWebFactor
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
+        Guid libraryId = Guid.NewGuid();
         Guid bookId = Guid.NewGuid();
-        _apiFactory.ApiClientStub.RegisterGetResponse($"books/{bookId}/reading/availability", _readingAvailabilityDtoFixture.Create(bookId: bookId));
+        _apiFactory.ApiClientStub.RegisterGetResponse($"libraries/{libraryId}/books/{bookId}/reading/availability", _readingAvailabilityDtoFixture.Create(bookId: bookId));
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
-        HttpRequestMessage getRequest = new(HttpMethod.Get, $"/en-us/library/written-content-library/books-library/books/{bookId}/api-get-reading-availability");
+        HttpRequestMessage getRequest = new(HttpMethod.Get, $"/en-us/library/written-content-library/books-library/books/{bookId}/api-get-reading-availability?libraryId={libraryId}");
         getRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
         // Act
@@ -73,7 +75,7 @@ public class GetReadingAvailabilityEndpointTests : IClassFixture<LuminaWebFactor
 
         // Assert
         response.EnsureSuccessStatusCode();
-        Assert.Contains($"books/{bookId}/reading/availability", _apiFactory.ApiClientStub.GetEndpointsCalled);
+        Assert.Contains($"libraries/{libraryId}/books/{bookId}/reading/availability", _apiFactory.ApiClientStub.GetEndpointsCalled);
     }
 
     [Fact]

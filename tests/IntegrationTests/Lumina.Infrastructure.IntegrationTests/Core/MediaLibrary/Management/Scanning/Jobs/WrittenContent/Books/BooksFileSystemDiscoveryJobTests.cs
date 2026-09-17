@@ -64,6 +64,7 @@ public class BooksFileSystemDiscoveryJobTests
         _mockServiceScope.ServiceProvider.Returns(_mockServiceProvider);
 
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockLibraryRepository = Substitute.For<ILibraryRepository>();
         _mockStagingResultsRepository = Substitute.For<ILibraryScanStagingResultsRepository>();
         _mockDirectoryScanFingerprintRepository = Substitute.For<IDirectoryScanFingerprintRepository>();
@@ -105,7 +106,7 @@ public class BooksFileSystemDiscoveryJobTests
             libraryType: LibraryType.Book,
             contentLocations: [temporaryLibraryDirectory.Path],
             shouldSkipUnchangedDirectoriesDuringScan: false);
-        _mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(_libraryId.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(libraryEntity));
         _mockStagingResultsRepository.InsertRangeAsync(Arg.Any<IReadOnlyCollection<LibraryScanStagingResultsEntity>>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(Result.Created));
@@ -154,7 +155,7 @@ public class BooksFileSystemDiscoveryJobTests
             libraryType: LibraryType.Book,
             contentLocations: [temporaryLibraryDirectory.Path],
             shouldSkipUnchangedDirectoriesDuringScan: true);
-        _mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(_libraryId.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(libraryEntity));
         _mockDirectoryScanFingerprintRepository.GetMappedByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
             .Returns(Result.From(new Dictionary<string, DirectoryScanFingerprintEntity>
@@ -200,7 +201,7 @@ public class BooksFileSystemDiscoveryJobTests
             libraryType: LibraryType.Book,
             contentLocations: [temporaryLibraryDirectory.Path],
             shouldSkipUnchangedDirectoriesDuringScan: true);
-        _mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(_libraryId.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(libraryEntity));
         _mockDirectoryScanFingerprintRepository.GetMappedByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
             .Returns(Error.Failure("Database.Error", "Failed to load the directory scan fingerprints"));
@@ -228,7 +229,7 @@ public class BooksFileSystemDiscoveryJobTests
             libraryType: LibraryType.Book,
             contentLocations: [temporaryLibraryDirectory.Path],
             shouldSkipUnchangedDirectoriesDuringScan: true);
-        _mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(_libraryId.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(libraryEntity));
         _mockDirectoryScanFingerprintRepository.GetMappedByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
             .Returns(Result.From(new Dictionary<string, DirectoryScanFingerprintEntity>()));
@@ -259,7 +260,7 @@ public class BooksFileSystemDiscoveryJobTests
             libraryType: LibraryType.Book,
             contentLocations: [temporaryLibraryDirectory.Path],
             shouldSkipUnchangedDirectoriesDuringScan: false);
-        _mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(_libraryId.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(libraryEntity));
         _mockStagingResultsRepository.InsertRangeAsync(Arg.Any<IReadOnlyCollection<LibraryScanStagingResultsEntity>>(), Arg.Any<CancellationToken>())
             .Returns(Error.Failure("Database.Error", "Failed to insert the staging results"));
@@ -289,7 +290,7 @@ public class BooksFileSystemDiscoveryJobTests
             libraryType: LibraryType.Book,
             contentLocations: [temporaryLibraryDirectory.Path],
             shouldSkipUnchangedDirectoriesDuringScan: false);
-        _mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(_libraryId.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(libraryEntity));
         _mockStagingResultsRepository.InsertRangeAsync(Arg.Any<IReadOnlyCollection<LibraryScanStagingResultsEntity>>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(Result.Created));

@@ -126,8 +126,7 @@ public class AddBookCommandValidator : AbstractValidator<AddBookCommand>
                 metadata.RuleFor(m => m!.Tags)
                     .NotNull()
                     .WithError(Errors.Metadata.TagsListCannotBeNull);
-             
-                
+
                 metadata.RuleForEach(m => m!.Tags)
                     .ChildRules(tag =>
                         tag.RuleFor(t => t.Name)
@@ -156,7 +155,8 @@ public class AddBookCommandValidator : AbstractValidator<AddBookCommand>
                     .When(m => m!.Language is not null);
              
                 metadata.RuleFor(m => m!.OriginalLanguage!.LanguageCode)
-                    .NotEmpty().WithError(Errors.Metadata.LanguageCodeCannotBeEmpty)
+                    .NotEmpty()
+                    .WithError(Errors.Metadata.LanguageCodeCannotBeEmpty)
                     .Length(2)
                     .WithError(Errors.Metadata.LanguageCodeMustBe2CharactersLong)
                     .When(m => m!.OriginalLanguage is not null);
@@ -291,7 +291,7 @@ public class AddBookCommandValidator : AbstractValidator<AddBookCommand>
         // Validates the media contributors that contributed to the book.
         RuleFor(command => command.Contributors)
             .NotNull()
-            .WithError(Errors.WrittenContent.ContributorsListCannotBeNull);
+            .WithError(Errors.MediaContributor.ContributorsListCannotBeNull);
 
         RuleForEach(command => command.Contributors)
             .ChildRules(contributor =>

@@ -50,6 +50,7 @@ public class GetReadingResourceEndpoint : BaseEndpoint<GetBookReadingResourceReq
     public override async Task<IResult> ExecuteAsync(GetBookReadingResourceRequest request, CancellationToken cancellationToken)
     {
         BlobDataDto response = await _apiHttpClient.GetBlobAsync(ApiRoutes.Books.GET_BOOK_READING_RESOURCE
+            .Replace("{libraryId}", request.LibraryId.ToString())
             .Replace("{bookId}", request.BookId.ToString())
             .Replace("{resourceKey}", Uri.EscapeDataString(request.ResourceKey)), cancellationToken).ConfigureAwait(false);
         // The resource is served without content sniffing, so that the browser never renders book content as anything but the media type the API declared.

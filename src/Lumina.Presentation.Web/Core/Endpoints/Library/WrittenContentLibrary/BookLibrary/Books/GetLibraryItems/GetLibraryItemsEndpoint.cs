@@ -7,6 +7,7 @@ using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -60,21 +61,23 @@ public class GetLibraryItemsEndpoint : BaseEndpoint<GetBooksLiteRequest, IResult
     /// <returns>The API endpoint to which the retrieval request is sent.</returns>
     private static string BuildItemsEndpoint(GetBooksLiteRequest query)
     {
-        StringBuilder endpoint = new(ApiRoutes.Books.GET_BOOKS_LITE);
-        endpoint.Append($"?libraryId={query.LibraryId}");
+        StringBuilder endpoint = new(ApiRoutes.Books.GET_BOOKS_LITE.Replace("{libraryId}", query.LibraryId.ToString()));
+        List<string> parameters = [];
         if (query.CurrentPage is not null)
-            endpoint.Append($"&currentPage={query.CurrentPage}");
+            parameters.Add($"currentPage={query.CurrentPage}");
         if (query.PerPage is not null)
-            endpoint.Append($"&perPage={query.PerPage}");
+            parameters.Add($"perPage={query.PerPage}");
         if (!string.IsNullOrWhiteSpace(query.SearchTerm))
-            endpoint.Append($"&searchTerm={Uri.EscapeDataString(query.SearchTerm)}");
+            parameters.Add($"searchTerm={Uri.EscapeDataString(query.SearchTerm)}");
         if (!string.IsNullOrWhiteSpace(query.FilterAlphaKey))
-            endpoint.Append($"&filterAlphaKey={Uri.EscapeDataString(query.FilterAlphaKey)}");
-        endpoint.Append($"&shouldIgnoreThePrefixForAlphaPicker={query.ShouldIgnoreThePrefixForAlphaPicker}");
+            parameters.Add($"filterAlphaKey={Uri.EscapeDataString(query.FilterAlphaKey)}");
+        parameters.Add($"shouldIgnoreThePrefixForAlphaPicker={query.ShouldIgnoreThePrefixForAlphaPicker}");
         if (!string.IsNullOrWhiteSpace(query.SortBy))
-            endpoint.Append($"&sortBy={Uri.EscapeDataString(query.SortBy)}");
+            parameters.Add($"sortBy={Uri.EscapeDataString(query.SortBy)}");
         if (query.SortOrder is not null)
-            endpoint.Append($"&sortOrder={query.SortOrder}");
+            parameters.Add($"sortOrder={query.SortOrder}");
+        if (parameters.Count > 0)
+            endpoint.Append('?').Append(string.Join('&', parameters));
         return endpoint.ToString();
     }
 }

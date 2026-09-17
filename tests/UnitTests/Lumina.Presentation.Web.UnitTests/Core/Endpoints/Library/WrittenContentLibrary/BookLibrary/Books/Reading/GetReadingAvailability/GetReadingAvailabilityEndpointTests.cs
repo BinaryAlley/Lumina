@@ -45,7 +45,7 @@ public class GetReadingAvailabilityEndpointTests
         // Arrange
         GetBookReadingAvailabilityRequest request = _requestFixture.Create();
         ReadingAvailabilityDto availability = _readingAvailabilityDtoFixture.Create(bookId: request.BookId, isAvailable: true);
-        _mockApiHttpClient.GetAsync<ReadingAvailabilityDto>(ApiRoutes.Books.GET_BOOK_READING_AVAILABILITY.Replace("{bookId}", request.BookId.ToString()), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.GetAsync<ReadingAvailabilityDto>(ApiRoutes.Books.GET_BOOK_READING_AVAILABILITY.Replace("{libraryId}", request.LibraryId.ToString()).Replace("{bookId}", request.BookId.ToString()), Arg.Any<CancellationToken>())
             .Returns(availability);
 
         // Act
@@ -64,7 +64,7 @@ public class GetReadingAvailabilityEndpointTests
         // Arrange
         GetBookReadingAvailabilityRequest request = _requestFixture.Create();
         ReadingAvailabilityDto availability = _readingAvailabilityDtoFixture.Create(bookId: request.BookId, isAvailable: false, errorCode: "ReaderDisabled");
-        _mockApiHttpClient.GetAsync<ReadingAvailabilityDto>(ApiRoutes.Books.GET_BOOK_READING_AVAILABILITY.Replace("{bookId}", request.BookId.ToString()), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.GetAsync<ReadingAvailabilityDto>(ApiRoutes.Books.GET_BOOK_READING_AVAILABILITY.Replace("{libraryId}", request.LibraryId.ToString()).Replace("{bookId}", request.BookId.ToString()), Arg.Any<CancellationToken>())
             .Returns(availability);
 
         // Act
@@ -81,15 +81,15 @@ public class GetReadingAvailabilityEndpointTests
     public async Task ExecuteAsync_WhenCalled_ShouldRequestReadingAvailabilityFromApi()
     {
         // Arrange
-        GetBookReadingAvailabilityRequest request = new(BookId: Guid.NewGuid());
+        GetBookReadingAvailabilityRequest request = _requestFixture.Create();
         ReadingAvailabilityDto availability = _readingAvailabilityDtoFixture.Create(bookId: request.BookId, isAvailable: true);
-        _mockApiHttpClient.GetAsync<ReadingAvailabilityDto>(ApiRoutes.Books.GET_BOOK_READING_AVAILABILITY.Replace("{bookId}", request.BookId.ToString()), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.GetAsync<ReadingAvailabilityDto>(ApiRoutes.Books.GET_BOOK_READING_AVAILABILITY.Replace("{libraryId}", request.LibraryId.ToString()).Replace("{bookId}", request.BookId.ToString()), Arg.Any<CancellationToken>())
             .Returns(availability);
 
         // Act
         await _sut.ExecuteAsync(request, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).GetAsync<ReadingAvailabilityDto>(ApiRoutes.Books.GET_BOOK_READING_AVAILABILITY.Replace("{bookId}", request.BookId.ToString()), Arg.Any<CancellationToken>());
+        await _mockApiHttpClient.Received(1).GetAsync<ReadingAvailabilityDto>(ApiRoutes.Books.GET_BOOK_READING_AVAILABILITY.Replace("{libraryId}", request.LibraryId.ToString()).Replace("{bookId}", request.BookId.ToString()), Arg.Any<CancellationToken>());
     }
 }

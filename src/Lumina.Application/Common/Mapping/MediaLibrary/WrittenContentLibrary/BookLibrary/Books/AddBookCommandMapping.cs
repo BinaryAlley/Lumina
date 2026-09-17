@@ -26,18 +26,19 @@ public static class AddBookCommandMapping
     /// Converts <paramref name="command"/> to <see cref="Book"/>.
     /// </summary>
     /// <param name="command">The command to be converted.</param>
+    /// <param name="libraryId">The Id of the media library the library is added to.</param>
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully converted <see cref="Book"/>, or an error message.
     /// </returns>
     public static Result<Book> ToDomainEntity(this AddBookCommand command, Guid libraryId)
     {
         IEnumerable<Result<BookRating>> domainRatingsResult = command.Ratings!.ToDomainEntities();
-        List<Error> errors = [.. domainRatingsResult.Where(ratingResult => ratingResult.IsFailure).SelectMany(ratingResult => ratingResult.Errors) ?? []];
+        List<Error> errors = [.. domainRatingsResult.Where(ratingResult => ratingResult.IsFailure).SelectMany(ratingResult => ratingResult.Errors)];
         if (errors.Count > 0)
             return errors;
 
         IEnumerable<Result<Isbn>> domainIsbnsResult = command.ISBNs!.ToDomainEntities();
-        errors = [.. domainIsbnsResult.Where(isbnResult => isbnResult.IsFailure).SelectMany(isbnResult => isbnResult.Errors) ?? []];
+        errors = [.. domainIsbnsResult.Where(isbnResult => isbnResult.IsFailure).SelectMany(isbnResult => isbnResult.Errors)];
         if (errors.Count > 0)
             return errors;
 
@@ -45,7 +46,7 @@ public static class AddBookCommandMapping
         if (metadataResult.IsFailure)
             return metadataResult.Errors;
 
-        // TODO: update Api.Book.md documentation when the functionality is fully implemented.
+        // TODO: update Api.Books.md documentation when the functionality is fully implemented.
         BookSeries? bookSeries = null;
         if (command.Series != null)
         {
@@ -55,13 +56,13 @@ public static class AddBookCommandMapping
 
         // Map the media contributors referenced by the user to their domain counterparts; a contributor is identified by its id and carries the role it played.
         IEnumerable<Result<BookMediaContributor>> domainContributorsResult = command.Contributors!.ToBookDomainEntities();
-        errors = [.. domainContributorsResult.Where(domainContributor => domainContributor.IsFailure).SelectMany(domainContributor => domainContributor.Errors) ?? []];
+        errors = [.. domainContributorsResult.Where(domainContributor => domainContributor.IsFailure).SelectMany(domainContributor => domainContributor.Errors)];
         if (errors.Count > 0)
             return errors;
 
         return Book.Create(
             LibraryId.Create(libraryId),
-            command.Path,
+            command.Path!,
             metadataResult.Value,
             Optional<BookFormat>.FromNullable(command.Format),
             Optional<string>.FromNullable(command.Edition),

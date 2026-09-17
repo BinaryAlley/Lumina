@@ -149,17 +149,13 @@ public class BookConfiguration : IEntityTypeConfiguration<BookEntity>
         builder.Property(book => book.MetadataProvider)
             .HasMaxLength(100)
             .HasColumnOrder(40);
-        builder.Property(book => book.CreatedOnUtc)
-            .HasColumnOrder(30);
-        builder.Property(book => book.UpdatedOnUtc)
-            .HasColumnOrder(31);
 
-        builder.HasMany(book => book.BookContributors)
+        builder.HasMany(book => book.Contributors)
             .WithOne()
             .HasForeignKey(bookContributor => bookContributor.BookId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany(book => book.BookArtwork)
+        builder.HasMany(book => book.Artwork)
             .WithOne()
             .HasForeignKey(bookArtwork => bookArtwork.BookId)
             .OnDelete(DeleteBehavior.Cascade);

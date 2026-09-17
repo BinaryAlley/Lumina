@@ -1,10 +1,10 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Common.DataAccess.Repositories.Books;
+using Lumina.Application.Common.DataAccess.Repositories.BookLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.MediaContributors;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -321,9 +321,9 @@ public class AddBookCommandHandlerTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.NotNull(insertedEntity);
-        Assert.Equal(2, insertedEntity!.BookContributors.Count);
-        Assert.Contains(insertedEntity.BookContributors, contributor => contributor.MediaContributorId == firstContributorId && contributor.Role == MediaContributorRole.Author);
-        Assert.Contains(insertedEntity.BookContributors, contributor => contributor.MediaContributorId == secondContributorId && contributor.Role == MediaContributorRole.Illustrator);
+        Assert.Equal(2, insertedEntity!.Contributors.Count);
+        Assert.Contains(insertedEntity.Contributors, contributor => contributor.MediaContributorId == firstContributorId && contributor.Role == MediaContributorRole.Author);
+        Assert.Contains(insertedEntity.Contributors, contributor => contributor.MediaContributorId == secondContributorId && contributor.Role == MediaContributorRole.Illustrator);
         await _mockBookRepository.Received(1).InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
@@ -355,10 +355,10 @@ public class AddBookCommandHandlerTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.NotNull(insertedEntity);
-        Assert.Equal(2, insertedEntity!.BookContributors.Count);
-        Assert.All(insertedEntity.BookContributors, linkedContributor => Assert.Equal(contributorId, linkedContributor.MediaContributorId));
-        Assert.Contains(insertedEntity.BookContributors, linkedContributor => linkedContributor.Role == MediaContributorRole.Author);
-        Assert.Contains(insertedEntity.BookContributors, linkedContributor => linkedContributor.Role == MediaContributorRole.Illustrator);
+        Assert.Equal(2, insertedEntity!.Contributors.Count);
+        Assert.All(insertedEntity.Contributors, linkedContributor => Assert.Equal(contributorId, linkedContributor.MediaContributorId));
+        Assert.Contains(insertedEntity.Contributors, linkedContributor => linkedContributor.Role == MediaContributorRole.Author);
+        Assert.Contains(insertedEntity.Contributors, linkedContributor => linkedContributor.Role == MediaContributorRole.Illustrator);
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 

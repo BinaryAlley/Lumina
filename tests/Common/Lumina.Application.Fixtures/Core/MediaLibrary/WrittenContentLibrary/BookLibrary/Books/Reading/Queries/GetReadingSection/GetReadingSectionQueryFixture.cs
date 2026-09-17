@@ -17,14 +17,16 @@ public class GetReadingSectionQueryFixture
     /// <summary>
     /// Creates a random valid query to get the content of a reading section of a book.
     /// </summary>
+    /// <param name="libraryId">Optional. The Id of the library the book belongs to.</param>
     /// <param name="bookId">Optional. The Id of the book whose reading section is retrieved.</param>
     /// <param name="locationRef">Optional. The opaque location reference of the reading section.</param>
     /// <returns>The created <see cref="GetReadingSectionQuery"/>.</returns>
     public GetReadingSectionQuery Create(
-        Guid? bookId = null,
+        string? libraryId = null,
+        string? bookId = null,
         string? locationRef = null)
     {
-        return new GetReadingSectionQuery(bookId ?? Guid.NewGuid(), locationRef ?? $"section-{Guid.NewGuid():N}");
+        return new GetReadingSectionQuery(libraryId ?? Guid.NewGuid().ToString(), bookId ?? Guid.NewGuid().ToString(), locationRef ?? $"section-{Guid.NewGuid():N}");
     }
 
     /// <summary>

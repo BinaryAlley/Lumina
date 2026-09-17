@@ -170,20 +170,18 @@ public class OpenLibraryMapperTests
             oclc: ["123456789"]);
 
         // Act
-        AddBookRequest result = OpenLibraryMapper.MapSearchCandidate(lookup, document);
+        BookMetadataDto result = OpenLibraryMapper.MapSearchCandidate(lookup, document);
 
         // Assert
-        Assert.Equal(lookup.LibraryId, result.LibraryId);
-        Assert.Equal(lookup.Path, result.Path);
-        Assert.Equal("Search Title", result.Metadata!.Title);
-        Assert.Equal(2003, result.Metadata.ReleaseInfo!.OriginalReleaseYear);
-        Assert.Equal("Search Publisher", result.Metadata.Publisher);
-        Assert.Equal(250, result.Metadata.PageCount);
-        Assert.Contains(result.Metadata.Genres!, genre => genre.Name == "Science fiction");
-        Assert.DoesNotContain(result.Metadata.Genres!, genre => genre.Name == "Space");
-        Assert.Contains(result.Metadata.Tags!, tag => tag.Name == "Science fiction");
-        Assert.Contains(result.Metadata.Tags!, tag => tag.Name == "Space");
-        Assert.Null(result.Metadata.ReleaseInfo.ReleaseCountry);
+        Assert.Equal("Search Title", result.Title);
+        Assert.Equal(2003, result.ReleaseInfo!.OriginalReleaseYear);
+        Assert.Equal("Search Publisher", result.Publisher);
+        Assert.Equal(250, result.PageCount);
+        Assert.Contains(result.Genres!, genre => genre.Name == "Science fiction");
+        Assert.DoesNotContain(result.Genres!, genre => genre.Name == "Space");
+        Assert.Contains(result.Tags!, tag => tag.Name == "Science fiction");
+        Assert.Contains(result.Tags!, tag => tag.Name == "Space");
+        Assert.Null(result.ReleaseInfo.ReleaseCountry);
         BookRatingDto rating = Assert.Single(result.Ratings!);
         Assert.Equal(4.1m, rating.Value);
         Assert.Equal(5m, rating.MaxValue);
@@ -192,8 +190,8 @@ public class OpenLibraryMapperTests
         Assert.Equal("79042755", result.LCCN);
         Assert.Equal("123456789", result.OCLCNumber);
         Assert.Equal("OL12345W", result.OpenLibraryId);
-        Assert.Contains(result.ISBNs!, isbn => isbn.Value == "9780306406157" && isbn.Format == IsbnFormat.Isbn13);
-        Assert.Contains(result.Contributors!, contributor => contributor.Name!.DisplayName == "Search Author" && contributor.Role!.Name == "Author");
+        Assert.Contains(result.Isbns!, isbn => isbn.Value == "9780306406157" && isbn.Format == IsbnFormat.Isbn13);
+        Assert.Contains(result.Contributors!, contributor => contributor.Name!.DisplayName == "Search Author" && contributor.Role == MediaContributorRole.Author);
     }
 
     [Fact]
@@ -235,33 +233,31 @@ public class OpenLibraryMapperTests
         OpenLibraryRatingsResponse ratings = _ratingsResponseFixture.Create(_ratingSummaryResponseFixture.Create(average: 4.2m, count: 100));
 
         // Act
-        AddBookRequest result = OpenLibraryMapper.MapDetailed(lookup, edition, work, [author], ratings);
+        BookMetadataDto result = OpenLibraryMapper.MapDetailed(lookup, edition, work, [author], ratings);
 
         // Assert
-        Assert.Equal(lookup.LibraryId, result.LibraryId);
-        Assert.Equal(lookup.Path, result.Path);
-        Assert.Equal("Edition Title", result.Metadata!.Title);
-        Assert.Equal("Original Title", result.Metadata.OriginalTitle);
-        Assert.Equal("A work description", result.Metadata.Description);
-        Assert.Equal(new DateOnly(1987, 6, 1), result.Metadata.ReleaseInfo!.OriginalReleaseDate);
-        Assert.Equal(1987, result.Metadata.ReleaseInfo.OriginalReleaseYear);
-        Assert.Equal(new DateOnly(2010, 5, 1), result.Metadata.ReleaseInfo.ReReleaseDate);
-        Assert.Equal(2010, result.Metadata.ReleaseInfo.ReReleaseYear);
-        Assert.Null(result.Metadata.ReleaseInfo.ReleaseCountry);
-        Assert.Equal("First Edition", result.Metadata.ReleaseInfo.ReleaseVersion);
-        GenreDto genre = Assert.Single(result.Metadata.Genres!);
+        Assert.Equal("Edition Title", result.Title);
+        Assert.Equal("Original Title", result.OriginalTitle);
+        Assert.Equal("A work description", result.Description);
+        Assert.Equal(new DateOnly(1987, 6, 1), result.ReleaseInfo!.OriginalReleaseDate);
+        Assert.Equal(1987, result.ReleaseInfo.OriginalReleaseYear);
+        Assert.Equal(new DateOnly(2010, 5, 1), result.ReleaseInfo.ReReleaseDate);
+        Assert.Equal(2010, result.ReleaseInfo.ReReleaseYear);
+        Assert.Null(result.ReleaseInfo.ReleaseCountry);
+        Assert.Equal("First Edition", result.ReleaseInfo.ReleaseVersion);
+        GenreDto genre = Assert.Single(result.Genres!);
         Assert.Equal("Fantasy", genre.Name);
-        Assert.Equal(3, result.Metadata.Tags!.Count);
-        Assert.Contains(result.Metadata.Tags, tag => tag.Name == "Science fiction");
-        Assert.Contains(result.Metadata.Tags, tag => tag.Name == "History");
-        Assert.Contains(result.Metadata.Tags, tag => tag.Name == "Space");
-        Assert.Equal("en", result.Metadata.Language!.LanguageCode);
-        Assert.False(string.IsNullOrWhiteSpace(result.Metadata.Language.LanguageName));
-        Assert.Equal("fre", result.Metadata.OriginalLanguage!.LanguageCode);
-        Assert.Equal("fre", result.Metadata.OriginalLanguage.LanguageName);
-        Assert.Null(result.Metadata.OriginalLanguage.NativeName);
-        Assert.Equal("Publisher Co", result.Metadata.Publisher);
-        Assert.Equal(320, result.Metadata.PageCount);
+        Assert.Equal(3, result.Tags!.Count);
+        Assert.Contains(result.Tags, tag => tag.Name == "Science fiction");
+        Assert.Contains(result.Tags, tag => tag.Name == "History");
+        Assert.Contains(result.Tags, tag => tag.Name == "Space");
+        Assert.Equal("en", result.Language!.LanguageCode);
+        Assert.False(string.IsNullOrWhiteSpace(result.Language.LanguageName));
+        Assert.Equal("fre", result.OriginalLanguage!.LanguageCode);
+        Assert.Equal("fre", result.OriginalLanguage.LanguageName);
+        Assert.Null(result.OriginalLanguage.NativeName);
+        Assert.Equal("Publisher Co", result.Publisher);
+        Assert.Equal(320, result.PageCount);
         Assert.Equal(BookFormat.Hardcover, result.Format);
         Assert.Equal("First Edition", result.Edition);
         Assert.Equal(3, result.VolumeNumber);
@@ -275,10 +271,10 @@ public class OpenLibraryMapperTests
         Assert.Equal("gid", result.GoogleBooksId);
         Assert.Equal("bnid", result.BarnesAndNobleId);
         Assert.Equal("apid", result.AppleBooksId);
-        Assert.Contains(result.ISBNs!, isbn => isbn.Value == "9780306406157" && isbn.Format == IsbnFormat.Isbn13);
-        Assert.Contains(result.ISBNs!, isbn => isbn.Value == "0306406152" && isbn.Format == IsbnFormat.Isbn10);
-        Assert.Contains(result.Contributors!, contributor => contributor.Name!.DisplayName == "Test Author" && contributor.Name.LegalName == "Test Personal Name" && contributor.Role!.Name == "Author");
-        Assert.Contains(result.Contributors!, contributor => contributor.Name!.DisplayName == "John Smith" && contributor.Role!.Name == "Illustrator" && contributor.Role.Category == MediaContributorRoleCategory.Illustrator);
+        Assert.Contains(result.Isbns!, isbn => isbn.Value == "9780306406157" && isbn.Format == IsbnFormat.Isbn13);
+        Assert.Contains(result.Isbns!, isbn => isbn.Value == "0306406152" && isbn.Format == IsbnFormat.Isbn10);
+        Assert.Contains(result.Contributors!, contributor => contributor.Name!.DisplayName == "Test Author" && contributor.Name.LegalName == "Test Personal Name" && contributor.Role == MediaContributorRole.Author);
+        Assert.Contains(result.Contributors!, contributor => contributor.Name!.DisplayName == "John Smith" && contributor.Role == MediaContributorRole.Illustrator);
         BookRatingDto mappedRating = Assert.Single(result.Ratings!);
         Assert.Equal(4.2m, mappedRating.Value);
         Assert.Equal(5m, mappedRating.MaxValue);
@@ -294,13 +290,13 @@ public class OpenLibraryMapperTests
         OpenLibraryWorkResponse work = _workResponseFixture.Create(subjects: ["Science fiction", "History", "Space"]);
 
         // Act
-        AddBookRequest result = OpenLibraryMapper.MapDetailed(lookup, null, work, [], null);
+        BookMetadataDto result = OpenLibraryMapper.MapDetailed(lookup, null, work, [], null);
 
         // Assert
-        Assert.Equal(2, result.Metadata!.Genres!.Count);
-        Assert.Contains(result.Metadata.Genres, genre => genre.Name == "Science fiction");
-        Assert.Contains(result.Metadata.Genres, genre => genre.Name == "History");
-        Assert.DoesNotContain(result.Metadata.Genres, genre => genre.Name == "Space");
+        Assert.Equal(2, result.Genres!.Count);
+        Assert.Contains(result.Genres, genre => genre.Name == "Science fiction");
+        Assert.Contains(result.Genres, genre => genre.Name == "History");
+        Assert.DoesNotContain(result.Genres, genre => genre.Name == "Space");
     }
 
     [Fact]
@@ -311,11 +307,11 @@ public class OpenLibraryMapperTests
         OpenLibrarySearchDocumentResponse fallback = _searchDocumentResponseFixture.Create(firstPublishYear: 2001);
 
         // Act
-        AddBookRequest result = OpenLibraryMapper.MapDetailed(lookup, null, null, [], null, fallback);
+        BookMetadataDto result = OpenLibraryMapper.MapDetailed(lookup, null, null, [], null, fallback);
 
         // Assert
-        Assert.Equal(2001, result.Metadata!.ReleaseInfo!.OriginalReleaseYear);
-        Assert.Null(result.Metadata.ReleaseInfo.OriginalReleaseDate);
+        Assert.Equal(2001, result.ReleaseInfo!.OriginalReleaseYear);
+        Assert.Null(result.ReleaseInfo.OriginalReleaseDate);
     }
 
     [Fact]
@@ -326,13 +322,13 @@ public class OpenLibraryMapperTests
         OpenLibraryEditionResponse edition = _editionResponseFixture.Create(languages: [_keyReferenceResponseFixture.Create(key: "/languages/xxq")]);
 
         // Act
-        AddBookRequest result = OpenLibraryMapper.MapDetailed(lookup, edition, null, [], null);
+        BookMetadataDto result = OpenLibraryMapper.MapDetailed(lookup, edition, null, [], null);
 
         // Assert
-        Assert.NotNull(result.Metadata!.Language);
-        Assert.Equal("xxq", result.Metadata.Language!.LanguageCode);
-        Assert.Equal("xxq", result.Metadata.Language.LanguageName);
-        Assert.Null(result.Metadata.Language.NativeName);
+        Assert.NotNull(result.Language);
+        Assert.Equal("xxq", result.Language!.LanguageCode);
+        Assert.Equal("xxq", result.Language.LanguageName);
+        Assert.Null(result.Language.NativeName);
     }
 
     [Fact]
@@ -343,10 +339,10 @@ public class OpenLibraryMapperTests
         OpenLibraryWorkResponse work = _workResponseFixture.Create(description: JsonDocument.Parse("\"A plain description\"").RootElement);
 
         // Act
-        AddBookRequest result = OpenLibraryMapper.MapDetailed(lookup, null, work, [], null);
+        BookMetadataDto result = OpenLibraryMapper.MapDetailed(lookup, null, work, [], null);
 
         // Assert
-        Assert.Equal("A plain description", result.Metadata!.Description);
+        Assert.Equal("A plain description", result.Description);
     }
 
     [Fact]
@@ -356,17 +352,15 @@ public class OpenLibraryMapperTests
         BookMetadataLookupDto lookup = _bookMetadataLookupDtoFixture.Create(isbn: "978-0-306-40615-7");
 
         // Act
-        AddBookRequest result = OpenLibraryMapper.MapDetailed(lookup, null, null, [], null, null);
+        BookMetadataDto result = OpenLibraryMapper.MapDetailed(lookup, null, null, [], null, null);
 
         // Assert
-        Assert.Equal(lookup.LibraryId, result.LibraryId);
-        Assert.Equal(lookup.Path, result.Path);
-        Assert.NotNull(result.Metadata);
-        Assert.Null(result.Metadata!.Title);
+        Assert.NotNull(result);
+        Assert.Null(result.Title);
         Assert.Null(result.Format);
         Assert.Null(result.Edition);
         Assert.Null(result.OpenLibraryId);
-        Assert.Contains(result.ISBNs!, isbn => isbn.Value == "9780306406157");
+        Assert.Contains(result.Isbns!, isbn => isbn.Value == "9780306406157");
         Assert.Empty(result.Ratings!);
         Assert.Empty(result.Contributors!);
     }
@@ -379,7 +373,7 @@ public class OpenLibraryMapperTests
         OpenLibrarySearchDocumentResponse fallback = _searchDocumentResponseFixture.Create(ratingsAverage: 3.5m, ratingsCount: 10);
 
         // Act
-        AddBookRequest result = OpenLibraryMapper.MapDetailed(lookup, null, null, [], null, fallback);
+        BookMetadataDto result = OpenLibraryMapper.MapDetailed(lookup, null, null, [], null, fallback);
 
         // Assert
         BookRatingDto rating = Assert.Single(result.Ratings!);
@@ -395,7 +389,7 @@ public class OpenLibraryMapperTests
         OpenLibraryEditionResponse edition = _editionResponseFixture.Create(series: ["Book 2 of the trilogy"]);
 
         // Act
-        AddBookRequest result = OpenLibraryMapper.MapDetailed(lookup, edition, null, [], null);
+        BookMetadataDto result = OpenLibraryMapper.MapDetailed(lookup, edition, null, [], null);
 
         // Assert
         Assert.Equal(2, result.VolumeNumber);
@@ -420,7 +414,7 @@ public class OpenLibraryMapperTests
             oclc: ["888888"]);
 
         // Act
-        AddBookRequest result = OpenLibraryMapper.MapDetailed(lookup, edition, null, [], null, fallback);
+        BookMetadataDto result = OpenLibraryMapper.MapDetailed(lookup, edition, null, [], null, fallback);
 
         // Assert
         Assert.Equal("B000002", result.ASIN);

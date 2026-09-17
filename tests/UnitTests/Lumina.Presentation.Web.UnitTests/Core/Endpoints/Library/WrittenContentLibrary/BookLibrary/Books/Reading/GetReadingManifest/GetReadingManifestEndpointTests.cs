@@ -49,7 +49,7 @@ public class GetReadingManifestEndpointTests
         // Arrange
         GetBookReadingManifestRequest request = _requestFixture.Create();
         ReadingManifestDto manifest = _readingManifestDtoFixture.Create();
-        _mockApiHttpClient.GetAsync<ReadingManifestDto>(ApiRoutes.Books.GET_BOOK_READING_MANIFEST.Replace("{bookId}", request.BookId.ToString()), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.GetAsync<ReadingManifestDto>(ApiRoutes.Books.GET_BOOK_READING_MANIFEST.Replace("{libraryId}", request.LibraryId.ToString()).Replace("{bookId}", request.BookId.ToString()), Arg.Any<CancellationToken>())
             .Returns(manifest);
 
         // Act
@@ -119,13 +119,13 @@ public class GetReadingManifestEndpointTests
         // Arrange
         GetBookReadingManifestRequest request = _requestFixture.Create();
         ReadingManifestDto manifest = _readingManifestDtoFixture.Create();
-        _mockApiHttpClient.GetAsync<ReadingManifestDto>(ApiRoutes.Books.GET_BOOK_READING_MANIFEST.Replace("{bookId}", request.BookId.ToString()), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.GetAsync<ReadingManifestDto>(ApiRoutes.Books.GET_BOOK_READING_MANIFEST.Replace("{libraryId}", request.LibraryId.ToString()).Replace("{bookId}", request.BookId.ToString()), Arg.Any<CancellationToken>())
             .Returns(manifest);
 
         // Act
         await _sut.ExecuteAsync(request, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).GetAsync<ReadingManifestDto>(ApiRoutes.Books.GET_BOOK_READING_MANIFEST.Replace("{bookId}", request.BookId.ToString()), Arg.Any<CancellationToken>());
+        await _mockApiHttpClient.Received(1).GetAsync<ReadingManifestDto>(ApiRoutes.Books.GET_BOOK_READING_MANIFEST.Replace("{libraryId}", request.LibraryId.ToString()).Replace("{bookId}", request.BookId.ToString()), Arg.Any<CancellationToken>());
     }
 }

@@ -2,7 +2,7 @@
 using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Common.DataAccess.Repositories.Books;
+using Lumina.Application.Common.DataAccess.Repositories.BookLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.MediaContributors;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -12,6 +12,7 @@ using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwn
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Artwork;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Commands.UpdateBookCover;
+using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaContributors;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
@@ -64,6 +65,7 @@ public class UpdateBookCoverCommandHandlerTests
         _mockLibraryRepository = Substitute.For<ILibraryRepository>();
         _mockMediaContributorRepository = Substitute.For<IMediaContributorRepository>();
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockUnitOfWork.BookRepository.Returns(_mockBookRepository);
         _mockUnitOfWork.LibraryRepository.Returns(_mockLibraryRepository);
         _mockUnitOfWork.MediaContributorRepository.Returns(_mockMediaContributorRepository);
@@ -90,24 +92,24 @@ public class UpdateBookCoverCommandHandlerTests
     {
         // Arrange
         UpdateBookCoverCommand command = _commandFixture.Create();
-        BookEntity existingBook = _bookEntityFixture.Create(id: command.BookId);
-        existingBook.BookArtwork = [];
+        BookEntity existingBook = _bookEntityFixture.Create(id: Guid.Parse(command.BookId!), libraryId: Guid.Parse(command.LibraryId!));
+        existingBook.Artwork = [];
         LibraryEntity library = _libraryEntityFixture.Create(id: existingBook.LibraryId);
-        _mockBookRepository.GetByIdAsync(command.BookId, Arg.Any<CancellationToken>())
+        _mockBookRepository.GetByIdAsync(Guid.Parse(command.BookId!), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<BookEntity?>(existingBook));
-        _mockLibraryRepository.GetByIdAsync(existingBook.LibraryId, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(existingBook.LibraryId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
 
         // Act
-        Result<string> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<UpdateBookCoverResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Equal("/media/books/cover.jpg", result.Value);
-        Assert.Single(existingBook.BookArtwork);
-        Assert.Equal(ArtworkType.Cover, existingBook.BookArtwork[0].ArtworkType);
-        Assert.Equal(result.Value, existingBook.BookArtwork[0].FileName);
-        Assert.Equal(ArtworkStatus.Enriched, existingBook.BookArtwork[0].Status);
+        Assert.Equal("/media/books/cover.jpg", result.Value.CoverPath);
+        Assert.Single(existingBook.Artwork);
+        Assert.Equal(ArtworkType.Cover, existingBook.Artwork[0].ArtworkType);
+        Assert.Equal(result.Value.CoverPath, existingBook.Artwork[0].FileName);
+        Assert.Equal(ArtworkStatus.Enriched, existingBook.Artwork[0].Status);
         await _mockBookArtworkService.Received(1).SaveBookArtworkAsync(
             existingBook.LibraryId,
             existingBook.Id,
@@ -125,23 +127,23 @@ public class UpdateBookCoverCommandHandlerTests
     {
         // Arrange
         UpdateBookCoverCommand command = _commandFixture.Create();
-        BookEntity existingBook = _bookEntityFixture.Create(id: command.BookId);
-        BookArtworkEntity existingCover = _bookArtworkEntityFixture.Create(bookId: command.BookId, artworkType: ArtworkType.Cover, fileName: "/media/books/old-cover.jpg");
-        existingBook.BookArtwork = [existingCover];
+        BookEntity existingBook = _bookEntityFixture.Create(id: Guid.Parse(command.BookId!), libraryId: Guid.Parse(command.LibraryId!));
+        BookArtworkEntity existingCover = _bookArtworkEntityFixture.Create(bookId: Guid.Parse(command.BookId!), artworkType: ArtworkType.Cover, fileName: "/media/books/old-cover.jpg");
+        existingBook.Artwork = [existingCover];
         LibraryEntity library = _libraryEntityFixture.Create(id: existingBook.LibraryId);
-        _mockBookRepository.GetByIdAsync(command.BookId, Arg.Any<CancellationToken>())
+        _mockBookRepository.GetByIdAsync(Guid.Parse(command.BookId!), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<BookEntity?>(existingBook));
-        _mockLibraryRepository.GetByIdAsync(existingBook.LibraryId, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(existingBook.LibraryId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
 
         // Act
-        Result<string> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<UpdateBookCoverResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Equal("/media/books/cover.jpg", result.Value);
-        Assert.Single(existingBook.BookArtwork);
-        Assert.Equal(result.Value, existingCover.FileName);
+        Assert.Equal("/media/books/cover.jpg", result.Value.CoverPath);
+        Assert.Single(existingBook.Artwork);
+        Assert.Equal(result.Value.CoverPath, existingCover.FileName);
         Assert.Equal(ArtworkStatus.Enriched, existingCover.Status);
         Assert.Equal(_userId, existingCover.UpdatedBy);
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
@@ -152,24 +154,24 @@ public class UpdateBookCoverCommandHandlerTests
     {
         // Arrange
         UpdateBookCoverCommand command = _commandFixture.Create();
-        BookEntity existingBook = _bookEntityFixture.Create(id: command.BookId);
+        BookEntity existingBook = _bookEntityFixture.Create(id: Guid.Parse(command.BookId!), libraryId: Guid.Parse(command.LibraryId!));
         MediaContributorEntity author = _mediaContributorEntityFixture.Create(displayName: "J.R.R. Tolkien");
         MediaContributorEntity illustrator = _mediaContributorEntityFixture.Create(displayName: "Alan Lee");
-        existingBook.BookContributors =
+        existingBook.Contributors =
         [
-            _bookContributorEntityFixture.Create(bookId: command.BookId, mediaContributorId: author.Id, roleCategory: MediaContributorRoleCategory.Author),
-            _bookContributorEntityFixture.Create(bookId: command.BookId, mediaContributorId: illustrator.Id, roleCategory: MediaContributorRoleCategory.Illustrator)
+            _bookContributorEntityFixture.Create(bookId: Guid.Parse(command.BookId!), mediaContributorId: author.Id, role: MediaContributorRole.Author),
+            _bookContributorEntityFixture.Create(bookId: Guid.Parse(command.BookId!), mediaContributorId: illustrator.Id, role: MediaContributorRole.Illustrator)
         ];
         LibraryEntity library = _libraryEntityFixture.Create(id: existingBook.LibraryId);
-        _mockBookRepository.GetByIdAsync(command.BookId, Arg.Any<CancellationToken>())
+        _mockBookRepository.GetByIdAsync(Guid.Parse(command.BookId!), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<BookEntity?>(existingBook));
-        _mockLibraryRepository.GetByIdAsync(existingBook.LibraryId, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(existingBook.LibraryId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
         _mockMediaContributorRepository.GetByIdsAsync(Arg.Any<IReadOnlyCollection<Guid>>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<MediaContributorEntity>>([author, illustrator]));
 
         // Act
-        Result<string> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<UpdateBookCoverResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -185,37 +187,31 @@ public class UpdateBookCoverCommandHandlerTests
     }
 
     [Fact]
-    public async Task HandleAsync_WhenAuthorResolutionFails_ShouldStoreArtworkWithEmptyAuthorName()
+    public async Task HandleAsync_WhenAuthorResolutionFails_ShouldReturnFailureResultWithoutStoringArtwork()
     {
         // Arrange
         UpdateBookCoverCommand command = _commandFixture.Create();
-        BookEntity existingBook = _bookEntityFixture.Create(id: command.BookId);
-        existingBook.BookContributors =
+        BookEntity existingBook = _bookEntityFixture.Create(id: Guid.Parse(command.BookId!), libraryId: Guid.Parse(command.LibraryId!));
+        existingBook.Contributors =
         [
-            _bookContributorEntityFixture.Create(bookId: command.BookId, roleCategory: MediaContributorRoleCategory.Author)
+            _bookContributorEntityFixture.Create(bookId: Guid.Parse(command.BookId!), role: MediaContributorRole.Author)
         ];
         LibraryEntity library = _libraryEntityFixture.Create(id: existingBook.LibraryId);
-        _mockBookRepository.GetByIdAsync(command.BookId, Arg.Any<CancellationToken>())
+        _mockBookRepository.GetByIdAsync(Guid.Parse(command.BookId!), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<BookEntity?>(existingBook));
-        _mockLibraryRepository.GetByIdAsync(existingBook.LibraryId, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(existingBook.LibraryId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
         _mockMediaContributorRepository.GetByIdsAsync(Arg.Any<IReadOnlyCollection<Guid>>(), Arg.Any<CancellationToken>())
             .Returns(Errors.Library.LibraryIdCannotBeEmpty);
 
         // Act
-        Result<string> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<UpdateBookCoverResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsFailure);
-        await _mockBookArtworkService.Received(1).SaveBookArtworkAsync(
-            existingBook.LibraryId,
-            existingBook.Id,
-            library.Title,
-            string.Empty,
-            existingBook.Title,
-            Arg.Any<System.IO.Stream>(),
-            Arg.Any<string>(),
-            Arg.Any<CancellationToken>());
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Library.LibraryIdCannotBeEmpty, result.FirstError);
+        await _mockBookArtworkService.DidNotReceive().SaveBookArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<System.IO.Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -226,12 +222,12 @@ public class UpdateBookCoverCommandHandlerTests
         _mockValidator.Validate(Arg.Any<UpdateBookCoverCommand>()).Returns([Errors.WrittenContent.BookCoverCannotBeNull]);
 
         // Act
-        Result<string> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<UpdateBookCoverResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.WrittenContent.BookCoverCannotBeNull, result.FirstError);
-        await _mockBookRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockBookRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -243,7 +239,7 @@ public class UpdateBookCoverCommandHandlerTests
         _mockCurrentUserService.UserId.Returns((Guid?)null);
 
         // Act
-        Result<string> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<UpdateBookCoverResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -256,16 +252,16 @@ public class UpdateBookCoverCommandHandlerTests
     {
         // Arrange
         UpdateBookCoverCommand command = _commandFixture.Create();
-        _mockBookRepository.GetByIdAsync(command.BookId, Arg.Any<CancellationToken>())
+        _mockBookRepository.GetByIdAsync(Guid.Parse(command.BookId!), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<BookEntity?>(null));
 
         // Act
-        Result<string> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<UpdateBookCoverResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.WrittenContent.BookNotFound, result.FirstError);
-        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -274,14 +270,14 @@ public class UpdateBookCoverCommandHandlerTests
     {
         // Arrange
         UpdateBookCoverCommand command = _commandFixture.Create();
-        BookEntity existingBook = _bookEntityFixture.Create(id: command.BookId);
-        _mockBookRepository.GetByIdAsync(command.BookId, Arg.Any<CancellationToken>())
+        BookEntity existingBook = _bookEntityFixture.Create(id: Guid.Parse(command.BookId!), libraryId: Guid.Parse(command.LibraryId!));
+        _mockBookRepository.GetByIdAsync(Guid.Parse(command.BookId!), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<BookEntity?>(existingBook));
         _mockAuthorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(_userId, Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>())
             .Returns(false);
 
         // Act
-        Result<string> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<UpdateBookCoverResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -295,14 +291,14 @@ public class UpdateBookCoverCommandHandlerTests
     {
         // Arrange
         UpdateBookCoverCommand command = _commandFixture.Create();
-        BookEntity existingBook = _bookEntityFixture.Create(id: command.BookId);
-        _mockBookRepository.GetByIdAsync(command.BookId, Arg.Any<CancellationToken>())
+        BookEntity existingBook = _bookEntityFixture.Create(id: Guid.Parse(command.BookId!), libraryId: Guid.Parse(command.LibraryId!));
+        _mockBookRepository.GetByIdAsync(Guid.Parse(command.BookId!), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<BookEntity?>(existingBook));
-        _mockLibraryRepository.GetByIdAsync(existingBook.LibraryId, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(existingBook.LibraryId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(null));
 
         // Act
-        Result<string> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<UpdateBookCoverResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -316,21 +312,106 @@ public class UpdateBookCoverCommandHandlerTests
     {
         // Arrange
         UpdateBookCoverCommand command = _commandFixture.Create();
-        BookEntity existingBook = _bookEntityFixture.Create(id: command.BookId);
+        BookEntity existingBook = _bookEntityFixture.Create(id: Guid.Parse(command.BookId!), libraryId: Guid.Parse(command.LibraryId!));
         LibraryEntity library = _libraryEntityFixture.Create(id: existingBook.LibraryId);
-        _mockBookRepository.GetByIdAsync(command.BookId, Arg.Any<CancellationToken>())
+        _mockBookRepository.GetByIdAsync(Guid.Parse(command.BookId!), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<BookEntity?>(existingBook));
-        _mockLibraryRepository.GetByIdAsync(existingBook.LibraryId, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(existingBook.LibraryId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
         _mockBookArtworkService.SaveBookArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<System.IO.Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(Errors.FileSystemManagement.FileTooLarge);
 
         // Act
-        Result<string> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<UpdateBookCoverResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.FileTooLarge, result.FirstError);
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenBookBelongsToAnotherLibrary_ShouldReturnBookNotFoundError()
+    {
+        // Arrange
+        UpdateBookCoverCommand command = _commandFixture.Create();
+        // The stored book belongs to a different library than the one named by the route.
+        BookEntity existingBook = _bookEntityFixture.Create(id: Guid.Parse(command.BookId!), libraryId: Guid.NewGuid());
+        _mockBookRepository.GetByIdAsync(Guid.Parse(command.BookId!), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<BookEntity?>(existingBook));
+
+        // Act
+        Result<UpdateBookCoverResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.WrittenContent.BookNotFound, result.FirstError);
+        await _mockAuthorizationService.DidNotReceive().EvaluatePolicyAsync<ILibraryOwnershipPolicy>(Arg.Any<Guid>(), Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>());
+        await _mockBookArtworkService.DidNotReceive().SaveBookArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<System.IO.Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenBookRepositoryReturnsError_ShouldReturnFailureResult()
+    {
+        // Arrange
+        UpdateBookCoverCommand command = _commandFixture.Create();
+        _mockBookRepository.GetByIdAsync(Guid.Parse(command.BookId!), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Errors.Library.LibraryIdCannotBeEmpty);
+
+        // Act
+        Result<UpdateBookCoverResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Library.LibraryIdCannotBeEmpty, result.FirstError);
+        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
+        await _mockBookArtworkService.DidNotReceive().SaveBookArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<System.IO.Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenLibraryRepositoryReturnsError_ShouldReturnFailureResult()
+    {
+        // Arrange
+        UpdateBookCoverCommand command = _commandFixture.Create();
+        BookEntity existingBook = _bookEntityFixture.Create(id: Guid.Parse(command.BookId!), libraryId: Guid.Parse(command.LibraryId!));
+        _mockBookRepository.GetByIdAsync(Guid.Parse(command.BookId!), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<BookEntity?>(existingBook));
+        _mockLibraryRepository.GetByIdAsync(existingBook.LibraryId, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Errors.Library.LibraryIdCannotBeEmpty);
+
+        // Act
+        Result<UpdateBookCoverResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Library.LibraryIdCannotBeEmpty, result.FirstError);
+        await _mockBookArtworkService.DidNotReceive().SaveBookArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<System.IO.Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenSaveChangesFails_ShouldReturnFailureResultWithoutReturningTheCoverPath()
+    {
+        // Arrange
+        UpdateBookCoverCommand command = _commandFixture.Create();
+        BookEntity existingBook = _bookEntityFixture.Create(id: Guid.Parse(command.BookId!), libraryId: Guid.Parse(command.LibraryId!));
+        LibraryEntity library = _libraryEntityFixture.Create(id: existingBook.LibraryId);
+        _mockBookRepository.GetByIdAsync(Guid.Parse(command.BookId!), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<BookEntity?>(existingBook));
+        _mockLibraryRepository.GetByIdAsync(existingBook.LibraryId, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(library));
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>())
+            .Returns(ApplicationErrors.Persistence.UniqueConstraintViolation);
+
+        // Act
+        Result<UpdateBookCoverResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(ApplicationErrors.Persistence.UniqueConstraintViolation, result.FirstError);
+        await _mockBookArtworkService.Received(1).SaveBookArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<System.IO.Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 }

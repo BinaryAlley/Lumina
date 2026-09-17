@@ -50,6 +50,7 @@ public class GetReadingSectionEndpoint : BaseEndpoint<GetBookReadingSectionReque
     public override async Task<IResult> ExecuteAsync(GetBookReadingSectionRequest request, CancellationToken cancellationToken)
     {
         ReadingSectionDto response = await _apiHttpClient.GetAsync<ReadingSectionDto>(ApiRoutes.Books.GET_BOOK_READING_SECTION
+            .Replace("{libraryId}", request.LibraryId.ToString())
             .Replace("{bookId}", request.BookId.ToString())
             .Replace("{locationRef}", Uri.EscapeDataString(request.LocationRef)), cancellationToken).ConfigureAwait(false);
         return JsonSuccess(response);

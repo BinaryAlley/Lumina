@@ -40,7 +40,7 @@ public class UpdateBookEndpointTests : IClassFixture<LuminaApiFactory>
     }
 
     [Fact]
-    public async Task UpdateBook_WhenCalledWithoutAuthentication_ShouldReturnUnauthorized()
+    public async Task UpdateBook_WhenUnauthorized_ShouldReturnUnauthorizedResult()
     {
         // Arrange
         HttpClient client = _apiFactory.CreateClient();

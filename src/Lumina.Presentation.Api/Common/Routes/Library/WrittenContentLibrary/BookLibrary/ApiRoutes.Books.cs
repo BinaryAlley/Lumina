@@ -10,15 +10,15 @@ public static partial class ApiRoutes
     /// </summary>
     public static class Books
     {
-        public const string GET_BOOK_BY_ID = "/books/{id}";
-        public const string GET_BOOKS = "/books";
-        public const string GET_BOOKS_LITE = "/books/lite";
-        public const string ADD_BOOK = "/books";
-        public const string UPDATE_BOOK = "/books/{id}";
-        public const string UPDATE_BOOK_COVER = "/books/{id}/cover";
-        public const string GET_BOOK_READING_MANIFEST = "/books/{bookId}/reading/manifest";
-        public const string GET_BOOK_READING_AVAILABILITY = "/books/{bookId}/reading/availability";
-        public const string GET_BOOK_READING_SECTION = "/books/{bookId}/reading/sections/{locationRef}";
-        public const string GET_BOOK_READING_RESOURCE = "/books/{bookId}/reading/resources/{resourceKey}";
+        public const string GET_BOOK_BY_ID = "/libraries/{libraryId}/books/{bookId}";
+        public const string GET_BOOKS = "/libraries/{libraryId}/books";
+        public const string GET_BOOKS_LITE = "/libraries/{libraryId}/books/lite";
+        public const string ADD_BOOK = "/libraries/{libraryId}/books";
+        public const string UPDATE_BOOK = "/libraries/{libraryId}/books/{bookId}";
+        public const string UPDATE_BOOK_COVER = "/libraries/{libraryId}/books/{bookId}/cover";
+        public const string GET_BOOK_READING_MANIFEST = "/libraries/{libraryId}/books/{bookId}/reading/manifest";
+        public const string GET_BOOK_READING_AVAILABILITY = "/libraries/{libraryId}/books/{bookId}/reading/availability";
+        public const string GET_BOOK_READING_SECTION = "/libraries/{libraryId}/books/{bookId}/reading/sections/{locationRef}";
+        public const string GET_BOOK_READING_RESOURCE = "/libraries/{libraryId}/books/{bookId}/reading/resources/{resourceKey}";
     }
 }

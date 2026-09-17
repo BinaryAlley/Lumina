@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Mapping.Common.Metadata;
@@ -61,7 +61,7 @@ public static class BookEntityMapping
                 return bookRatingResult.Errors;
 
         List<BookMediaContributor> domainContributors = [];
-        foreach (BookContributorEntity bookContributor in repositoryEntity.BookContributors)
+        foreach (BookContributorEntity bookContributor in repositoryEntity.Contributors)
         {
             Result<BookMediaContributor> contributorResult = BookMediaContributor.Create(
                 MediaContributorId.Create(bookContributor.MediaContributorId), bookContributor.Role);
@@ -219,14 +219,14 @@ public static class BookEntityMapping
             repositoryEntity.BarnesAndNobleId,
             repositoryEntity.AppleBooksId,
             [.. repositoryEntity.ISBNs.ToResponses()],
-            [.. repositoryEntity.BookContributors.Select(contributor => new MediaContributorReferenceDto(contributor.MediaContributorId, contributor.Role))],
+            [.. repositoryEntity.Contributors.Select(contributor => new MediaContributorReferenceDto(contributor.MediaContributorId, contributor.Role))],
             [.. repositoryEntity.Ratings.ToResponses()],
             repositoryEntity.MetadataStatus,
             repositoryEntity.LastMetadataUpdateUtc,
             repositoryEntity.MetadataProvider,
             repositoryEntity.CreatedOnUtc,
             repositoryEntity.UpdatedOnUtc,
-            repositoryEntity.BookArtwork.FirstOrDefault(artwork => artwork.ArtworkType == ArtworkType.Cover)?.FileName
+            repositoryEntity.Artwork.FirstOrDefault(artwork => artwork.ArtworkType == ArtworkType.Cover)?.FileName
         );
     }
 

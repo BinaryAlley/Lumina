@@ -58,7 +58,7 @@ public static class BookMapping
             BarnesAndNobleId = domainEntity.BarnesAndNobleId.HasValue ? domainEntity.BarnesAndNobleId.Value : null,
             AppleBooksId = domainEntity.AppleBooksId.HasValue ? domainEntity.AppleBooksId.Value : null,
             ISBNs = [.. domainEntity.ISBNs.ToRepositoryEntities()],
-            BookContributors = [.. domainEntity.Contributors.Select(contributor => new BookContributorEntity
+            Contributors = [.. domainEntity.Contributors.Select(contributor => new BookContributorEntity
             {
                 Id = Guid.NewGuid(),
                 BookId = domainEntity.Id.Value,

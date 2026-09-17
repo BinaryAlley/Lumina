@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using Bogus;
 using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
@@ -35,6 +35,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
@@ -134,9 +135,9 @@ public class UpdateBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         List<BookContributorEntity> links = dbContext.Books
-            .Include(book => book.BookContributors)
+            .Include(book => book.Contributors)
             .Single(book => book.Id == bookId)
-            .BookContributors
+            .Contributors
             .ToList();
         Assert.Equal(2, links.Count);
         Assert.All(links, link => Assert.Equal(contributorId, link.MediaContributorId));
@@ -1790,6 +1791,40 @@ public class UpdateBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdateBook_WhenCalledWithCancellationToken_ShouldCompleteSuccessfully()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        (Guid libraryId, Guid bookId) = await SeedLibraryAndBookAsync(userId, "Original Title");
+        UpdateBookRequest request = _requestBookFixture.Create();
+        using CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
+
+        // Act & Assert
+        Exception? exception = await Record.ExceptionAsync(async () =>
+            await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}/books/{bookId}", request, cts.Token)
+        );
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public async Task UpdateBook_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        (Guid libraryId, Guid bookId) = await SeedLibraryAndBookAsync(userId, "Original Title");
+        UpdateBookRequest request = _requestBookFixture.Create();
+        using CancellationTokenSource cts = new();
+
+        // Act & Assert
+        Exception? exception = await Record.ExceptionAsync(async () =>
+        {
+            cts.Cancel();
+            await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}/books/{bookId}", request, cts.Token);
+        });
+        Assert.IsType<TaskCanceledException>(exception);
     }
 
     /// <summary>

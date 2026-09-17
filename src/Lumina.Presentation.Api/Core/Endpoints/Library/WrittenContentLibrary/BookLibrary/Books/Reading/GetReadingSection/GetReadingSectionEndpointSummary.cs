@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
-using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Reading;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -13,7 +12,7 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.B
 /// Class used for providing a textual description for the <see cref="GetReadingSectionEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetReadingSectionEndpointSummary : Summary<GetReadingSectionEndpoint, GetReadingSectionRequest>
+public class GetReadingSectionEndpointSummary : Summary<GetReadingSectionEndpoint, EmptyRequest>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="GetReadingSectionEndpointSummary"/> class.
@@ -22,14 +21,6 @@ public class GetReadingSectionEndpointSummary : Summary<GetReadingSectionEndpoin
     {
         Summary = "Retrieves the content of a reading section of a book.";
         Description = "Retrieves the sanitized HTML content of the reading section of a book, ready to be rendered by the client.";
-
-        ExampleRequest = new GetReadingSectionRequest(
-            BookId: Guid.NewGuid(),
-            LocationRef: "chapter-1"
-        );
-
-        RequestParam(r => r.BookId, "The Id of the book whose reading section is retrieved. Required.");
-        RequestParam(r => r.LocationRef, "The opaque location reference of the reading section. Required.");
 
         ResponseParam<ReadingSectionDto>(r => r.LocationRef, "The opaque location reference of the reading section.");
         ResponseParam<ReadingSectionDto>(r => r.Title, "The title of the reading section, if known.");
@@ -44,13 +35,32 @@ public class GetReadingSectionEndpointSummary : Summary<GetReadingSectionEndpoin
         );
 
         Response(401, "Authentication required.", "application/problem+json",
-            example: new
+            example: new[]
             {
-                type = "https://tools.ietf.org/html/rfc7235#section-3.1",
-                status = 401,
-                title = "Unauthorized",
-                detail = "You are not authorized",
-                instance = "/api/v1/books/{bookId}/reading/sections/{locationRef}"
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    status = 401,
+                    title = "Unauthorized",
+                    detail = "Authentication failed",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/sections/chapter-1"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    status = 401,
+                    title = "Unauthorized",
+                    detail = "The token has expired",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/sections/chapter-1"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    status = 401,
+                    title = "Unauthorized",
+                    detail = "The token is invalid",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/sections/chapter-1"
+                }
             }
         );
 
@@ -58,23 +68,71 @@ public class GetReadingSectionEndpointSummary : Summary<GetReadingSectionEndpoin
             example: new
             {
                 type = "https://tools.ietf.org/html/rfc9110#section-15.5.4",
-                title = "General.Failure",
+                title = "General.Unauthorized",
                 status = 403,
                 detail = "NotAuthorized",
-                instance = "/api/v1/books/{bookId}/reading/sections/{locationRef}",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/sections/chapter-1",
                 traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
             }
         );
 
-        Response(404, "The request failed because the book does not exist, no reader plugin supports its format, the reader plugin is disabled, or the reading section was not found.", "application/problem+json",
-            example: new
+        Response(404, "The request failed because the book or its media library does not exist, no reader plugin supports its format, the reader plugin is disabled, the file of the book does not exist, or the reading section was not found.", "application/problem+json",
+            example: new[]
             {
-                type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
-                title = "General.NotFound",
-                status = 404,
-                detail = "SectionNotFound",
-                instance = "/api/v1/books/{bookId}/reading/sections/{locationRef}",
-                traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+                    title = "General.NotFound",
+                    status = 404,
+                    detail = "BookNotFound",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/sections/chapter-1",
+                    traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+                    title = "General.NotFound",
+                    status = 404,
+                    detail = "LibraryNotFound",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/sections/chapter-1",
+                    traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+                    title = "General.NotFound",
+                    status = 404,
+                    detail = "NoReaderAvailable",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/sections/chapter-1",
+                    traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+                    title = "General.NotFound",
+                    status = 404,
+                    detail = "ReaderDisabled",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/sections/chapter-1",
+                    traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+                    title = "General.NotFound",
+                    status = 404,
+                    detail = "BookFileNotFound",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/sections/chapter-1",
+                    traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+                    title = "General.NotFound",
+                    status = 404,
+                    detail = "SectionNotFound",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/sections/chapter-1",
+                    traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+                }
             }
         );
 
@@ -85,12 +143,13 @@ public class GetReadingSectionEndpointSummary : Summary<GetReadingSectionEndpoin
                 title = "General.Validation",
                 status = 422,
                 detail = "OneOrMoreValidationErrorsOccurred",
-                instance = "/api/v1/books/{bookId}/reading/sections/{locationRef}",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/sections/chapter-1",
                 errors = new Dictionary<string, string[]>
                 {
                     {
                         "General.Validation", new[]
                         {
+                            "LibraryIdCannotBeEmpty",
                             "BookIdCannotBeEmpty",
                             "LocationRefCannotBeEmpty"
                         }

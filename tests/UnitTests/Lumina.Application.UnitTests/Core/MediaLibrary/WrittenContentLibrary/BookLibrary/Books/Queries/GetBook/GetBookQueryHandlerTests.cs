@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Common.DataAccess.Repositories.Books;
+using Lumina.Application.Common.DataAccess.Repositories.BookLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
@@ -94,7 +94,7 @@ public class GetBookQueryHandlerTests
         Guid bookId = Guid.Parse(query.BookId!);
         BookEntity bookEntity = _bookEntityFixture.Create(id: bookId, libraryId: libraryId);
         Guid contributorId = Guid.NewGuid();
-        bookEntity.BookContributors =
+        bookEntity.Contributors =
         [
             _bookContributorEntityFixture.Create(bookId: bookId, mediaContributorId: contributorId, role: MediaContributorRole.Author)
         ];

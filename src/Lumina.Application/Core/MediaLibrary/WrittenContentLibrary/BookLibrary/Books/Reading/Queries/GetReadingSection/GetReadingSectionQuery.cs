@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
-using System;
 #endregion
 
 namespace Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Reading.Queries.GetReadingSection;
@@ -8,9 +7,11 @@ namespace Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary
 /// <summary>
 /// Query for getting the content of a reading section of a book.
 /// </summary>
-/// <param name="BookId">The Id of the book whose reading section is retrieved.</param>
-/// <param name="LocationRef">The opaque location reference of the reading section.</param>
+/// <param name="LibraryId">The unique identifier of the media library the book belongs to, taken from the route.</param>
+/// <param name="BookId">The unique identifier of the book whose reading section is retrieved, taken from the route.</param>
+/// <param name="LocationRef">The opaque location reference of the reading section, taken from the route.</param>
 public record GetReadingSectionQuery(
-    Guid BookId,
-    string LocationRef
+    string? LibraryId,
+    string? BookId,
+    string? LocationRef
 ) : IQuery;

@@ -59,7 +59,7 @@ public class GetLibraryBookReadersEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsFailureError_ShouldReturnProblemResult()
     {
         // Arrange
         GetLibraryBookReadersRequest request = _getLibraryBookReadersRequestFixture.Create();

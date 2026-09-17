@@ -42,11 +42,12 @@
         let isInitialized = false;
 
         const bookId = '@Model.BookId';
-        const manifestUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_READING_MANIFEST, new { bookId = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`);
-        const availabilityUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_READING_AVAILABILITY, new { bookId = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`);
+        const libraryId = '@Model.LibraryId';
+        const manifestUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_READING_MANIFEST, new { bookId = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`) + `?libraryId=${libraryId}`;
+        const availabilityUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_READING_AVAILABILITY, new { bookId = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`) + `?libraryId=${libraryId}`;
         const libraryIndexUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.INDEX)';
-        const sectionUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_READING_SECTION, new { bookId = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`) + '?locationRef=';
-        const resourceUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_READING_RESOURCE, new { bookId = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`) + '?resourceKey=';
+        const sectionUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_READING_SECTION, new { bookId = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`) + `?libraryId=${libraryId}&locationRef=`;
+        const resourceUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_READING_RESOURCE, new { bookId = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`) + `?libraryId=${libraryId}&resourceKey=`;
 
         // Escapes a string for safe interpolation into HTML markup; the table of contents labels and location references come from
         // the book file itself, so they are escaped before they are placed into innerHTML, keeping a malicious book from injecting markup.

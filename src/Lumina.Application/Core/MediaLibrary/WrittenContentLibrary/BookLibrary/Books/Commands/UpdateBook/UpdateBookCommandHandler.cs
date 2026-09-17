@@ -1,6 +1,7 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Authentication;
@@ -90,6 +91,13 @@ public class UpdateBookCommandHandler : ICommandHandler<UpdateBookCommand, Resul
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
+        // A book can only belong to a library that exists, so a client can never update a book that points to a library of the host that is not there.
+        Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(libraryId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (getLibraryResult.IsFailure)
+            return getLibraryResult.Errors;
+        if (getLibraryResult.Value is null)
+            return DomainErrors.Library.LibraryNotFound;
+
         // Media contributors are referenced by Id and are never created implicitly by editing a book, so each one must already exist.
         Result<IReadOnlyList<MediaContributorEntity>> getContributorsResult = await GetExistingContributorsAsync(command, cancellationToken).ConfigureAwait(false);
         if (getContributorsResult.IsFailure)
@@ -102,13 +110,6 @@ public class UpdateBookCommandHandler : ICommandHandler<UpdateBookCommand, Resul
 
         // Map the updated domain book onto a fresh repository entity, ready for the repository to replace the stored data.
         BookEntity updatedBook = updateBookResult.Value.ToRepositoryEntity();
-
-        // The enrichment and artwork columns are never overwritten by an edit, so they are copied onto the fresh entity that the repository
-        // replaces the stored data with; without this, the stored artwork would be cleared.
-        updatedBook.MetadataStatus = existingBook.MetadataStatus;
-        updatedBook.LastMetadataUpdateUtc = existingBook.LastMetadataUpdateUtc;
-        updatedBook.MetadataProvider = existingBook.MetadataProvider;
-        updatedBook.BookArtwork = existingBook.BookArtwork;
 
         Result<Updated> updateResult = await _unitOfWork.BookRepository.UpdateAsync(updatedBook, cancellationToken).ConfigureAwait(false);
         if (updateResult.IsFailure)

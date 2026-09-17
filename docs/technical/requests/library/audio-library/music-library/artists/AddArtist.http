@@ -1,4 +1,4 @@
-POST {{host}}/api/v1/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists
+POST {{host}}/api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists
 Authorization: Bearer {{ACCESS_TOKEN}}
 Content-Type: application/json
 
@@ -6,7 +6,7 @@ Content-Type: application/json
   "name": "Queen",
   "website": "https://www.queenonline.com",
   "musicBrainzArtistId": "6f9c0b2a-1d3e-4a5b-8c7d-9e0f1a2b3c4d",
-  "credits": [
+  "contributors": [
     { "contributorId": "6a3f0c2d-1b4e-4f5a-8c6d-9e0f1a2b3c4d", "role": "Vocals" },
     { "contributorId": "7b4e1d3f-2c5a-4e6b-9d7e-0f1a2b3c4d5e", "role": "Guitar" }
   ],
@@ -53,7 +53,7 @@ Content-Type: application/json
       "musicBrainzReleaseId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
       "musicBrainzReleaseGroupId": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
       "musicBrainzReleaseArtistId": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f",
-      "credits": [
+      "contributors": [
         { "contributorId": "0e7b4a6c-5f8d-6b9e-ca0b-3c4d5e6f7a8b", "role": "Producer" },
         { "contributorId": "1a8c5b7d-6a9e-7c0f-db1c-4d5e6f7a8b9c", "role": "Engineer" }
       ],
@@ -127,7 +127,7 @@ Content-Type: application/json
           "isrcs": [
             { "value": "GBUM71029604" }
           ],
-          "credits": [
+          "contributors": [
             { "contributorId": "6a3f0c2d-1b4e-4f5a-8c6d-9e0f1a2b3c4d", "role": "Vocals" },
             { "contributorId": "7b4e1d3f-2c5a-4e6b-9d7e-0f1a2b3c4d5e", "role": "Guitar" }
           ],
@@ -201,7 +201,7 @@ Content-Type: application/json
           "isrcs": [
             { "value": "GBUM71029609" }
           ],
-          "credits": [
+          "contributors": [
             { "contributorId": "6a3f0c2d-1b4e-4f5a-8c6d-9e0f1a2b3c4d", "role": "Vocals" },
             { "contributorId": "8c5f2e4a-3d6b-4f7c-ae8f-1a2b3c4d5e6f", "role": "BassGuitar" }
           ],

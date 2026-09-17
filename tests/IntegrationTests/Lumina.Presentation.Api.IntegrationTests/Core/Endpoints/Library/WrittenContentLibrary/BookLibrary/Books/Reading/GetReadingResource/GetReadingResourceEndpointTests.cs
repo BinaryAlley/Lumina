@@ -13,6 +13,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
@@ -52,7 +53,7 @@ public class GetReadingResourceEndpointTests : IClassFixture<AuthenticatedLumina
     public async Task GetReadingResource_WhenBookDoesNotExist_ShouldReturnBookNotFoundProblem()
     {
         // Act
-        HttpResponseMessage response = await _client.GetAsync($"/api/v1/books/{Guid.NewGuid()}/reading/resources/cover");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/resources/cover");
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -66,13 +67,35 @@ public class GetReadingResourceEndpointTests : IClassFixture<AuthenticatedLumina
     {
         // Arrange
         Guid otherUserId = await SeedOtherUserAsync();
-        Guid bookId = await SeedBookAsync(otherUserId);
+        (Guid libraryId, Guid bookId) = await SeedBookAsync(otherUserId);
 
         // Act
-        HttpResponseMessage response = await _client.GetAsync($"/api/v1/books/{bookId}/reading/resources/cover");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/{bookId}/reading/resources/cover");
 
         // Assert
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        using JsonDocument problemDetails = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        Assert.Equal("General.Unauthorized", problemDetails.RootElement.GetProperty("title").GetString());
+        Assert.Equal("NotAuthorized", problemDetails.RootElement.GetProperty("detail").GetString());
+        Assert.DoesNotContain("Exception", problemDetails.RootElement.GetRawText(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task GetReadingResource_WhenBookBelongsToAnotherLibrary_ShouldReturnBookNotFoundProblem()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        (_, Guid bookId) = await SeedBookAsync(userId);
+
+        // Act
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{Guid.NewGuid()}/books/{bookId}/reading/resources/cover");
+
+        // Assert
+        // The route library id is enforced, so a book can never be read through another library's route, and the mismatch is
+        // reported as not found, without disclosing that the book exists in another library.
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        Assert.Contains("BookNotFound", content, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -80,10 +103,10 @@ public class GetReadingResourceEndpointTests : IClassFixture<AuthenticatedLumina
     {
         // Arrange
         Guid userId = GetCurrentUserId();
-        Guid bookId = await SeedBookAsync(userId);
+        (Guid libraryId, Guid bookId) = await SeedBookAsync(userId);
 
         // Act
-        HttpResponseMessage response = await _client.GetAsync($"/api/v1/books/{bookId}/reading/resources/cover");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/{bookId}/reading/resources/cover");
 
         // Assert
         string content = await response.Content.ReadAsStringAsync();
@@ -98,18 +121,33 @@ public class GetReadingResourceEndpointTests : IClassFixture<AuthenticatedLumina
         HttpClient unauthenticatedClient = _apiFactory.CreateClient();
 
         // Act
-        HttpResponseMessage response = await unauthenticatedClient.GetAsync($"/api/v1/books/{Guid.NewGuid()}/reading/resources/cover");
+        HttpResponseMessage response = await unauthenticatedClient.GetAsync($"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/resources/cover");
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetReadingResource_WhenRouteIdsAreNotParseable_ShouldReturnUnprocessableEntity()
+    {
+        // Act
+        HttpResponseMessage response = await _client.GetAsync("/api/v1/libraries/not-a-guid/books/not-a-guid/reading/resources/cover");
+
+        // Assert
+        // The route values are kept as raw strings, so the unparseable Ids reach the query validator, which reports clean
+        // validation errors instead of failing the request binding.
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        Assert.Contains("LibraryIdCannotBeEmpty", content, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("BookIdCannotBeEmpty", content, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
     /// Seeds a library owned by <paramref name="userId"/> and an EPUB book belonging to it.
     /// </summary>
     /// <param name="userId">The Id of the user that owns the library.</param>
-    /// <returns>The Id of the seeded book.</returns>
-    private async Task<Guid> SeedBookAsync(Guid userId)
+    /// <returns>The Ids of the seeded library and book.</returns>
+    private async Task<(Guid libraryId, Guid bookId)> SeedBookAsync(Guid userId)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
@@ -120,7 +158,7 @@ public class GetReadingResourceEndpointTests : IClassFixture<AuthenticatedLumina
         dbContext.Libraries.Add(library);
         dbContext.Books.Add(book);
         await dbContext.SaveChangesAsync();
-        return bookId;
+        return (libraryId, bookId);
     }
 
     /// <summary>

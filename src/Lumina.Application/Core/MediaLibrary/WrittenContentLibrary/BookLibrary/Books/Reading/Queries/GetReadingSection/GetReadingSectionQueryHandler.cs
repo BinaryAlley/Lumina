@@ -69,14 +69,23 @@ public class GetReadingSectionQueryHandler : IQueryHandler<GetReadingSectionQuer
             return ApplicationErrors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
+        // The validator guarantees that the route identifiers are non-empty Guids before this point.
+        Guid libraryId = Guid.Parse(query.LibraryId!);
+        Guid bookId = Guid.Parse(query.BookId!);
+
         // The authorization policy works on the media library, so the book is fetched first to learn its LibraryId, and
         // the library is fetched afterwards for its type, which the reader plugins match against when resolving the format.
-        Result<BookEntity?> getBookResult = await _unitOfWork.BookRepository.GetByIdAsync(query.BookId, cancellationToken).ConfigureAwait(false);
+        Result<BookEntity?> getBookResult = await _unitOfWork.BookRepository.GetByIdAsync(bookId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getBookResult.IsFailure)
             return getBookResult.Errors;
         if (getBookResult.Value is null)
             return DomainErrors.Reading.BookNotFound;
         BookEntity book = getBookResult.Value;
+
+        // Resource scoping: the book must belong to the library named by the route, so that a book can never be read through another
+        // library's route; the mismatch is reported as not found, without disclosing that the book exists in another library.
+        if (book.LibraryId != libraryId)
+            return DomainErrors.Reading.BookNotFound;
 
         // Admins can read the books of any library; for everyone else, only their own libraries.
         bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
@@ -84,7 +93,7 @@ public class GetReadingSectionQueryHandler : IQueryHandler<GetReadingSectionQuer
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
-        Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(book.LibraryId, cancellationToken).ConfigureAwait(false);
+        Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(book.LibraryId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getLibraryResult.IsFailure)
             return getLibraryResult.Errors;
         if (getLibraryResult.Value is null)
@@ -100,6 +109,6 @@ public class GetReadingSectionQueryHandler : IQueryHandler<GetReadingSectionQuer
         bool shouldRenderPdfAsImages = getSettingsResult.Value is not null && getSettingsResult.Value.ShouldRenderPdfAsImages;
         bool shouldPreserveStyles = getSettingsResult.Value is null || getSettingsResult.Value.ShouldPreserveBookStyles;
 
-        return await _bookReadingService.GetSectionAsync(book.Id, book.LibraryId, book.Path, library.LibraryType, query.LocationRef, shouldRenderPdfAsImages, shouldPreserveStyles, cancellationToken).ConfigureAwait(false);
+        return await _bookReadingService.GetSectionAsync(book.Id, book.LibraryId, book.Path, library.LibraryType, query.LocationRef!, shouldRenderPdfAsImages, shouldPreserveStyles, cancellationToken).ConfigureAwait(false);
     }
 }

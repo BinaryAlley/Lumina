@@ -50,7 +50,7 @@ public class AddBookEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
     }
 
     [Fact]
-    public async Task AddBook_WhenCalledWithoutAuthentication_ShouldReturnUnauthorized()
+    public async Task AddBook_WhenUnauthorized_ShouldReturnUnauthorizedResult()
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();

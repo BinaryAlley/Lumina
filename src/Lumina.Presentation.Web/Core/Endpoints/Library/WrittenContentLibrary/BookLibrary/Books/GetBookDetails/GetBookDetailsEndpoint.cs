@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetBookDetails;
 
 /// <summary>
-/// API endpoint for the <c>/{culture}/library/written-content-library/books-library/books/{id}/api-get-book</c> route.
+/// API endpoint for the <c>/{culture}/library/written-content-library/books-library/books/{bookId}/api-get-book</c> route.
 /// </summary>
 public class GetBookDetailsEndpoint : BaseEndpoint<GetBookRequest, IResult>
 {
@@ -51,9 +51,9 @@ public class GetBookDetailsEndpoint : BaseEndpoint<GetBookRequest, IResult>
     {
         // The route value is normalized to a Guid before it is substituted into the upstream URL, so that a crafted route value can
         // never escape its URL segment, and an unparseable id is reported by the API as a missing book id.
-        request = request with { Id = Guid.TryParse(request.Id, out Guid bookId) ? bookId.ToString() : Guid.Empty.ToString() };
+        request = request with { BookId = Guid.TryParse(request.BookId, out Guid bookId) ? bookId.ToString() : Guid.Empty.ToString() };
 
-        BookDetailsDto book = await _apiHttpClient.GetAsync<BookDetailsDto>(ApiRoutes.Books.GET_BOOK.Replace("{id}", request.Id), cancellationToken).ConfigureAwait(false);
+        BookDetailsDto book = await _apiHttpClient.GetAsync<BookDetailsDto>(ApiRoutes.Books.GET_BOOK.Replace("{libraryId}", request.LibraryId.ToString()).Replace("{bookId}", request.BookId), cancellationToken).ConfigureAwait(false);
         return JsonSuccess(book);
     }
 }

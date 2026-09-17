@@ -2,6 +2,8 @@
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
@@ -79,10 +81,10 @@ public class GetLibraryBookReadersQueryHandler : IQueryHandler<GetLibraryBookRea
             return getConfigurationsResult.Errors;
 
         // Build a plugin name lookup from the detected plugins.
-        Result<IEnumerable<PluginEntity>> getPluginsResult = await _unitOfWork.PluginRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        Result<PaginatedResultDto<PluginEntity>> getPluginsResult = await _unitOfWork.PluginRepository.GetAllAsync<BaseFilterDto>(cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getPluginsResult.IsFailure)
             return getPluginsResult.Errors;
-        Dictionary<Guid, string> pluginNames = getPluginsResult.Value.ToDictionary(plugin => plugin.Id, plugin => plugin.Name);
+        Dictionary<Guid, string> pluginNames = getPluginsResult.Value.Data.ToDictionary(plugin => plugin.Id, plugin => plugin.Name);
 
         IReadOnlyDictionary<Guid, IReadOnlyList<string>> supportedExtensionsByPluginId = _bookReaderRegistry.GetSupportedExtensionsByPluginId();
 

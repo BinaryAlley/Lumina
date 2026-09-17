@@ -22,10 +22,12 @@ public class GetReadingSectionEndpointSummary : Summary<GetReadingSectionEndpoin
         Description = "Retrieves the sanitized HTML content of the reading section of a book, ready to be rendered by the client.";
         RequestParam(r => r.BookId, "The Id of the book whose reading section is retrieved. Required.");
         RequestParam(r => r.LocationRef, "The opaque location reference of the reading section. Required.");
+        RequestParam(r => r.LibraryId, "The Id of the media library the book belongs to. Required.");
 
         ExampleRequest = new GetBookReadingSectionRequest(
             BookId: Guid.NewGuid(),
-            LocationRef: "chapter-1"
+            LocationRef: "chapter-1",
+            LibraryId: Guid.NewGuid()
         );
 
         Response(200, "The content of the reading section is returned.");

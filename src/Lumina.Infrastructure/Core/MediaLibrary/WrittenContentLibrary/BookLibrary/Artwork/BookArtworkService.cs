@@ -115,12 +115,12 @@ internal sealed class BookArtworkService : IBookArtworkService
 
         // Copy the uploaded artwork into a temporary file, so that the shared artwork storage can validate and copy it.
         string temporaryPath = Path.Combine(Path.GetTempPath(), $"lumina-artwork-{Guid.NewGuid():N}{Path.GetExtension(fileName)}");
-        bool written = false;
+        bool isWritten = false;
         try
         {
             await using (FileStream fileStream = new(temporaryPath, FileMode.CreateNew, FileAccess.Write, FileShare.None, bufferSize: 81920, useAsync: true))
                 await artworkStream.CopyToAsync(fileStream, cancellationToken).ConfigureAwait(false);
-            written = true;
+            isWritten = true;
         }
         catch (OperationCanceledException)
         {
@@ -133,7 +133,7 @@ internal sealed class BookArtworkService : IBookArtworkService
         finally
         {
             // Remove the partially written temporary file when the upload failed.
-            if (!written && File.Exists(temporaryPath))
+            if (!isWritten && File.Exists(temporaryPath))
                 File.Delete(temporaryPath);
         }
 

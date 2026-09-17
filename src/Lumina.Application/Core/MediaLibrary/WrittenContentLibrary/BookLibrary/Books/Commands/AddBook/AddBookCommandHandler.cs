@@ -88,7 +88,7 @@ public class AddBookCommandHandler : ICommandHandler<AddBookCommand, Result<Book
         if (getLibraryResult.Value is null)
             return DomainErrors.Library.LibraryNotFound;
 
-        if (!getLibraryResult.Value.ContentLocations.Any(contentLocation => _pathService.IsPathWithin(command.Path, contentLocation.Path)))
+        if (!getLibraryResult.Value.ContentLocations.Any(contentLocation => _pathService.IsPathWithin(command.Path!, contentLocation.Path)))
             return DomainErrors.WrittenContent.BookPathMustBeWithinLibraryContentLocations;
 
         // Media contributors are referenced by Id and are never created implicitly by adding a book, so each one must already exist.

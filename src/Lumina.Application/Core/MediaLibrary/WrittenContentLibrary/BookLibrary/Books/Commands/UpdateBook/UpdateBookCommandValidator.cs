@@ -246,19 +246,17 @@ public class UpdateBookCommandValidator : AbstractValidator<UpdateBookCommand>
 
         RuleFor(command => command.GoogleBooksId)
             .Length(12)
-            .When(command => command.GoogleBooksId is not null)
             .WithError(Errors.WrittenContent.GoogleBooksIdMustBe12CharactersLong)
             .Matches(@"^[A-Za-z0-9_-]{12}$")
-            .When(command => command.GoogleBooksId is not null)
-            .WithError(Errors.WrittenContent.InvalidGoogleBooksIdFormat);
+            .WithError(Errors.WrittenContent.InvalidGoogleBooksIdFormat)
+            .When(command => command.GoogleBooksId is not null);
 
         RuleFor(command => command.BarnesAndNobleId)
             .Length(10)
-            .When(command => command.BarnesAndNobleId is not null)
             .WithError(Errors.WrittenContent.BarnesAndNoblesIdMustBe10CharactersLong)
             .Matches(@"^\d{10}$")
-            .When(command => command.BarnesAndNobleId is not null)
-            .WithError(Errors.WrittenContent.InvalidBarnesAndNoblesIdFormat);
+            .WithError(Errors.WrittenContent.InvalidBarnesAndNoblesIdFormat)
+            .When(command => command.BarnesAndNobleId is not null);
 
         RuleFor(command => command.AppleBooksId)
             .Matches(@"^id\d+$")
@@ -295,7 +293,7 @@ public class UpdateBookCommandValidator : AbstractValidator<UpdateBookCommand>
         // Validates the media contributors that contributed to the book.
         RuleFor(command => command.Contributors)
             .NotNull()
-            .WithError(Errors.WrittenContent.ContributorsListCannotBeNull);
+            .WithError(Errors.MediaContributor.ContributorsListCannotBeNull);
 
         RuleForEach(command => command.Contributors)
             .ChildRules(contributor =>

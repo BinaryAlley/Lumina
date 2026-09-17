@@ -55,7 +55,7 @@ public class BookMetadataDtoTests
             "1234567890",
             "id12345",
             [new IsbnDto("978-0-306-40615-7", IsbnFormat.Isbn13)],
-            [new MediaContributorDto(new MediaContributorNameDto("Frank Herbert", "Frank Herbert"), new MediaContributorRoleDto("Author", MediaContributorRoleCategory.Author))],
+            [new MediaContributorDto(new MediaContributorNameDto("Frank Herbert", "Frank Herbert"), MediaContributorRole.Author)],
             [new BookRatingDto(4.5m, 5m, BookRatingSource.Goodreads, 1000)],
             "https://example.com/dune.jpg"
         );

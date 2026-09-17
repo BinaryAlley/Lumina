@@ -42,7 +42,7 @@ public class GetLibraryItemsEndpointTests : IClassFixture<LuminaWebFactory>
         Guid libraryId = Guid.NewGuid();
         string searchTerm = "Harry";
         PaginatedBookLiteDto expectedResponse = _paginatedBookLiteDtoFixture.Create(data: [_bookLiteDtoFixture.Create(title: "Harry Potter")]);
-        string expectedEndpoint = $"books/lite?libraryId={libraryId}&currentPage=1&perPage=20&searchTerm={searchTerm}&shouldIgnoreThePrefixForAlphaPicker=True";
+        string expectedEndpoint = $"libraries/{libraryId}/books/lite?currentPage=1&perPage=20&searchTerm={searchTerm}&shouldIgnoreThePrefixForAlphaPicker=True";
         _apiFactory.ApiClientStub.RegisterGetResponse(expectedEndpoint, expectedResponse);
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage getRequest = new(HttpMethod.Get, $"/en-us/library/written-content-library/books-library/books/api-get-library-items?libraryId={libraryId}&currentPage=1&perPage=20&searchTerm={searchTerm}&shouldIgnoreThePrefixForAlphaPicker=true");

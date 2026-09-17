@@ -18,11 +18,13 @@ public class GetBookReadingManifestRequestFixture
     /// Creates a random valid <see cref="GetBookReadingManifestRequest"/>.
     /// </summary>
     /// <param name="bookId">Optional. The Id of the book whose reading manifest is retrieved.</param>
+    /// <param name="libraryId">Optional. The Id of the media library the book belongs to.</param>
     /// <returns>The created <see cref="GetBookReadingManifestRequest"/>.</returns>
     public GetBookReadingManifestRequest Create(
-        Guid? bookId = null)
+        Guid? bookId = null,
+        Guid? libraryId = null)
     {
-        return new GetBookReadingManifestRequest(bookId ?? Guid.NewGuid());
+        return new GetBookReadingManifestRequest(bookId ?? Guid.NewGuid(), libraryId ?? Guid.NewGuid());
     }
 
     /// <summary>

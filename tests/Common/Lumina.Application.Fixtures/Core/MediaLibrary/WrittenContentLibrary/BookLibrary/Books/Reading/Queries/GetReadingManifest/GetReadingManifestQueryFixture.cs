@@ -17,12 +17,14 @@ public class GetReadingManifestQueryFixture
     /// <summary>
     /// Creates a random valid query to get the reading manifest of a book.
     /// </summary>
+    /// <param name="libraryId">Optional. The Id of the library the book belongs to.</param>
     /// <param name="bookId">Optional. The Id of the book whose reading manifest is retrieved.</param>
     /// <returns>The created <see cref="GetReadingManifestQuery"/>.</returns>
     public GetReadingManifestQuery Create(
-        Guid? bookId = null)
+        string? libraryId = null,
+        string? bookId = null)
     {
-        return new GetReadingManifestQuery(bookId ?? Guid.NewGuid());
+        return new GetReadingManifestQuery(libraryId ?? Guid.NewGuid().ToString(), bookId ?? Guid.NewGuid().ToString());
     }
 
     /// <summary>

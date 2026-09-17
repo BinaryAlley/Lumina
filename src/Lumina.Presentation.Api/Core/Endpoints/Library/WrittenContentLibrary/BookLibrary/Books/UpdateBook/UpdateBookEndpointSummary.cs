@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaContributors;
@@ -27,8 +27,8 @@ public class UpdateBookEndpointSummary : Summary<UpdateBookEndpoint, UpdateBookR
     /// </summary>
     public UpdateBookEndpointSummary()
     {
-        Summary = "Updates a book.";
-        Description = "Updates the details of the book identified by the request.";
+        Summary = "Updates an existing book.";
+        Description = "Updates the details of the book identified by the request. The request is handled by an Admin, who can update the books of all libraries, or by the owner of the library.";
 
         RequestParam(r => r.Metadata, "The written content metadata of the book. Required.");
         RequestParam(r => r.Metadata!.Title, "The title of the book. Required.");
@@ -258,9 +258,7 @@ public class UpdateBookEndpointSummary : Summary<UpdateBookEndpoint, UpdateBookR
                 Format: BookFormat.Paperback,
                 Edition: "50th Anniversary Edition",
                 VolumeNumber: 1,
-                Series: new BookSeriesDto(
-                    Title: "The Lord of the Rings"
-                ),
+                Series: null,
                 ASIN: "B007978NPG",
                 GoodreadsId: "3",
                 LCCN: "54009621",
@@ -367,6 +365,15 @@ public class UpdateBookEndpointSummary : Summary<UpdateBookEndpoint, UpdateBookR
                     title = "General.NotFound",
                     status = 404,
                     detail = "BookNotFound",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}",
+                    traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+                    title = "General.NotFound",
+                    status = 404,
+                    detail = "LibraryNotFound",
                     instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}",
                     traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
                 },

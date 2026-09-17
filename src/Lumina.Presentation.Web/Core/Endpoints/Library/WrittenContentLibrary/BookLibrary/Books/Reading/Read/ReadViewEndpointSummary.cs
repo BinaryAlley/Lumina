@@ -21,9 +21,11 @@ public class ReadViewEndpointSummary : Summary<ReadViewEndpoint, ReadBookViewReq
         Summary = "Displays the reading view of a book.";
         Description = "Displays the reading view of the book identified by the request.";
         RequestParam(r => r.BookId, "The Id of the book to read. Required.");
+        RequestParam(r => r.LibraryId, "The Id of the media library the book belongs to. Required.");
 
         ExampleRequest = new ReadBookViewRequest(
-            BookId: Guid.NewGuid()
+            BookId: Guid.NewGuid(),
+            LibraryId: Guid.NewGuid()
         );
 
         Response(200, "The reading view of the book is displayed.");

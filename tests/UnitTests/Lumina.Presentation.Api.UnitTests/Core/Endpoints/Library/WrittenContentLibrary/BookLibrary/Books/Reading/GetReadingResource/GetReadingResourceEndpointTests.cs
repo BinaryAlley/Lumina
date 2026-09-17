@@ -1,11 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Reading.Queries.GetReadingResource;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
-using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Reading;
-using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Reading;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.Reading.GetReadingResource;
 using Microsoft.AspNetCore.Http;
@@ -27,7 +25,6 @@ public class GetReadingResourceEndpointTests
 {
     private readonly IQueryHandler<GetReadingResourceQuery, Result<ReadingResourceDataDto>> _mockHandler;
     private readonly GetReadingResourceEndpoint _sut;
-    private readonly GetReadingResourceRequestFixture _getReadingResourceRequestFixture = new();
     private readonly ReadingResourceDataDtoFixture _readingResourceDataDtoFixture = new();
 
     /// <summary>
@@ -36,21 +33,25 @@ public class GetReadingResourceEndpointTests
     public GetReadingResourceEndpointTests()
     {
         _mockHandler = Substitute.For<IQueryHandler<GetReadingResourceQuery, Result<ReadingResourceDataDto>>>();
-        _sut = Factory.Create<GetReadingResourceEndpoint>(_mockHandler);
+        _sut = FastEndpoints.Factory.Create<GetReadingResourceEndpoint>(_mockHandler);
     }
 
     [Fact]
     public async Task ExecuteAsync_WhenSuccessful_ShouldReturnBytesResultWithResourceData()
     {
         // Arrange
-        GetReadingResourceRequest request = _getReadingResourceRequestFixture.Create();
+        Guid libraryId = Guid.NewGuid();
+        Guid bookId = Guid.NewGuid();
         CancellationToken cancellationToken = CancellationToken.None;
         ReadingResourceDataDto expectedResponse = _readingResourceDataDtoFixture.Create();
         _mockHandler.HandleAsync(Arg.Any<GetReadingResourceQuery>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(expectedResponse));
+        _sut.HttpContext.Request.RouteValues["libraryId"] = libraryId.ToString();
+        _sut.HttpContext.Request.RouteValues["bookId"] = bookId.ToString();
+        _sut.HttpContext.Request.RouteValues["resourceKey"] = "cover-image";
 
         // Act
-        IResult result = await _sut.ExecuteAsync(request, cancellationToken);
+        IResult result = await _sut.ExecuteAsync(FastEndpoints.EmptyRequest.Instance, cancellationToken);
 
         // Assert
         FileContentHttpResult bytesResult = Assert.IsType<FileContentHttpResult>(result);
@@ -59,17 +60,21 @@ public class GetReadingResourceEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsNotFoundError_ShouldReturnProblemResult()
     {
         // Arrange
-        GetReadingResourceRequest request = _getReadingResourceRequestFixture.Create();
+        Guid libraryId = Guid.NewGuid();
+        Guid bookId = Guid.NewGuid();
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.NotFound("Reading.ResourceNotFound", "ResourceNotFound");
         _mockHandler.HandleAsync(Arg.Any<GetReadingResourceQuery>(), Arg.Any<CancellationToken>())
             .Returns(expectedError);
+        _sut.HttpContext.Request.RouteValues["libraryId"] = libraryId.ToString();
+        _sut.HttpContext.Request.RouteValues["bookId"] = bookId.ToString();
+        _sut.HttpContext.Request.RouteValues["resourceKey"] = "cover-image";
 
         // Act
-        IResult result = await _sut.ExecuteAsync(request, cancellationToken);
+        IResult result = await _sut.ExecuteAsync(FastEndpoints.EmptyRequest.Instance, cancellationToken);
 
         // Assert
         ProblemHttpResult problemResult = Assert.IsType<ProblemHttpResult>(result);
@@ -77,6 +82,36 @@ public class GetReadingResourceEndpointTests
         Assert.Equal("application/problem+json", problemResult.ContentType);
         Assert.Equal("Reading.ResourceNotFound", problemResult.ProblemDetails.Title);
         Assert.Equal("ResourceNotFound", problemResult.ProblemDetails.Detail);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenHandlerReturnsValidationErrors_ShouldReturnValidationProblemResult()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid bookId = Guid.NewGuid();
+        CancellationToken cancellationToken = CancellationToken.None;
+        Error validationError = Errors.WrittenContent.BookIdCannotBeEmpty;
+        _mockHandler.HandleAsync(Arg.Any<GetReadingResourceQuery>(), Arg.Any<CancellationToken>())
+            .Returns(validationError);
+        _sut.HttpContext.Request.RouteValues["libraryId"] = libraryId.ToString();
+        _sut.HttpContext.Request.RouteValues["bookId"] = bookId.ToString();
+        _sut.HttpContext.Request.RouteValues["resourceKey"] = "cover-image";
+
+        // Act
+        IResult result = await _sut.ExecuteAsync(FastEndpoints.EmptyRequest.Instance, cancellationToken);
+
+        // Assert
+        ProblemHttpResult problemDetails = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemDetails.StatusCode);
+        Assert.Equal("application/problem+json", problemDetails.ContentType);
+        HttpValidationProblemDetails validationProblemDetails = Assert.IsType<HttpValidationProblemDetails>(problemDetails.ProblemDetails);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, validationProblemDetails.Status);
+        Assert.Equal("General.Validation", validationProblemDetails.Title);
+        Assert.Equal("OneOrMoreValidationErrorsOccurred", validationProblemDetails.Detail);
+        Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", validationProblemDetails.Type);
+        Assert.Single(validationProblemDetails.Errors);
+        Assert.Equal(new[] { "BookIdCannotBeEmpty" }, validationProblemDetails.Errors["General.Validation"]);
     }
 
     [Theory]
@@ -95,14 +130,18 @@ public class GetReadingResourceEndpointTests
     public async Task ExecuteAsync_WhenServingAResource_ShouldUseTheSafeContentType(string mimeType, string expectedContentType)
     {
         // Arrange
-        GetReadingResourceRequest request = _getReadingResourceRequestFixture.Create();
+        Guid libraryId = Guid.NewGuid();
+        Guid bookId = Guid.NewGuid();
         CancellationToken cancellationToken = CancellationToken.None;
         ReadingResourceDataDto response = new(Guid.NewGuid().ToByteArray(), mimeType);
         _mockHandler.HandleAsync(Arg.Any<GetReadingResourceQuery>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(response));
+        _sut.HttpContext.Request.RouteValues["libraryId"] = libraryId.ToString();
+        _sut.HttpContext.Request.RouteValues["bookId"] = bookId.ToString();
+        _sut.HttpContext.Request.RouteValues["resourceKey"] = "cover-image";
 
         // Act
-        IResult result = await _sut.ExecuteAsync(request, cancellationToken);
+        IResult result = await _sut.ExecuteAsync(FastEndpoints.EmptyRequest.Instance, cancellationToken);
 
         // Assert
         FileContentHttpResult bytesResult = Assert.IsType<FileContentHttpResult>(result);
@@ -115,18 +154,67 @@ public class GetReadingResourceEndpointTests
     public async Task ExecuteAsync_WhenCalled_ShouldSendGetReadingResourceQueryToSender()
     {
         // Arrange
-        GetReadingResourceRequest request = _getReadingResourceRequestFixture.Create();
+        Guid libraryId = Guid.NewGuid();
+        Guid bookId = Guid.NewGuid();
         CancellationToken cancellationToken = CancellationToken.None;
-        ReadingResourceDataDto response = _readingResourceDataDtoFixture.Create();
         _mockHandler.HandleAsync(Arg.Any<GetReadingResourceQuery>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From(response));
+            .Returns(Result.From(_readingResourceDataDtoFixture.Create()));
+        _sut.HttpContext.Request.RouteValues["libraryId"] = libraryId.ToString();
+        _sut.HttpContext.Request.RouteValues["bookId"] = bookId.ToString();
+        _sut.HttpContext.Request.RouteValues["resourceKey"] = "cover-image";
 
         // Act
-        await _sut.ExecuteAsync(request, cancellationToken);
+        await _sut.ExecuteAsync(FastEndpoints.EmptyRequest.Instance, cancellationToken);
 
         // Assert
         await _mockHandler.Received(1).HandleAsync(
-            Arg.Is<GetReadingResourceQuery>(query => query.BookId == request.BookId && query.ResourceKey == request.ResourceKey),
+            Arg.Is<GetReadingResourceQuery>(query =>
+                query.LibraryId == libraryId.ToString() &&
+                query.BookId == bookId.ToString() &&
+                query.ResourceKey == "cover-image"),
+            Arg.Is(cancellationToken));
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenRouteValuesAreNotParseable_ShouldSendQueryWithRawRouteValues()
+    {
+        // Arrange
+        CancellationToken cancellationToken = CancellationToken.None;
+        _mockHandler.HandleAsync(Arg.Any<GetReadingResourceQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(_readingResourceDataDtoFixture.Create()));
+        _sut.HttpContext.Request.RouteValues["libraryId"] = "not-a-library-guid";
+        _sut.HttpContext.Request.RouteValues["bookId"] = "not-a-guid";
+        _sut.HttpContext.Request.RouteValues["resourceKey"] = "cover-image";
+
+        // Act
+        await _sut.ExecuteAsync(FastEndpoints.EmptyRequest.Instance, cancellationToken);
+
+        // Assert
+        await _mockHandler.Received(1).HandleAsync(
+            Arg.Is<GetReadingResourceQuery>(query =>
+                query.LibraryId == "not-a-library-guid" &&
+                query.BookId == "not-a-guid" &&
+                query.ResourceKey == "cover-image"),
+            Arg.Is(cancellationToken));
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenRouteValuesAreMissing_ShouldSendQueryWithNullValues()
+    {
+        // Arrange
+        CancellationToken cancellationToken = CancellationToken.None;
+        _mockHandler.HandleAsync(Arg.Any<GetReadingResourceQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(_readingResourceDataDtoFixture.Create()));
+        _sut.HttpContext.Request.RouteValues.Remove("libraryId");
+        _sut.HttpContext.Request.RouteValues.Remove("bookId");
+        _sut.HttpContext.Request.RouteValues.Remove("resourceKey");
+
+        // Act
+        await _sut.ExecuteAsync(FastEndpoints.EmptyRequest.Instance, cancellationToken);
+
+        // Assert
+        await _mockHandler.Received(1).HandleAsync(
+            Arg.Is<GetReadingResourceQuery>(query => query.LibraryId == null && query.BookId == null && query.ResourceKey == null),
             Arg.Is(cancellationToken));
     }
 
@@ -134,7 +222,8 @@ public class GetReadingResourceEndpointTests
     public async Task ExecuteAsync_WhenCancellationRequested_ShouldCancelOperation()
     {
         // Arrange
-        GetReadingResourceRequest request = _getReadingResourceRequestFixture.Create();
+        Guid libraryId = Guid.NewGuid();
+        Guid bookId = Guid.NewGuid();
         CancellationTokenSource cts = new();
         TaskCompletionSource<bool> operationStarted = new();
         TaskCompletionSource<bool> cancellationRequested = new();
@@ -147,9 +236,12 @@ public class GetReadingResourceEndpointTests
                 info.Arg<CancellationToken>().ThrowIfCancellationRequested();
                 return Result.From(_readingResourceDataDtoFixture.Create());
             }, info.Arg<CancellationToken>()));
+        _sut.HttpContext.Request.RouteValues["libraryId"] = libraryId.ToString();
+        _sut.HttpContext.Request.RouteValues["bookId"] = bookId.ToString();
+        _sut.HttpContext.Request.RouteValues["resourceKey"] = "cover-image";
 
         // Act
-        Task<IResult> operationTask = _sut.ExecuteAsync(request, cts.Token);
+        Task<IResult> operationTask = _sut.ExecuteAsync(FastEndpoints.EmptyRequest.Instance, cts.Token);
         await operationStarted.Task;
         cts.Cancel();
         cancellationRequested.SetResult(true);

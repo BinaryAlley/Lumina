@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaContributors;
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
@@ -68,7 +67,7 @@ internal static class CalibreMapper
     /// <returns>The release information of the book, always present even when the publication date is missing.</returns>
     private static ReleaseInfoDto BuildReleaseInfo(DateTimeOffset? publishDate)
     {
-        // the release info must always be present, even when the publication date is missing, so that the metadata can be applied to the book
+        // The release info must always be present, even when the publication date is missing, so that the metadata can be applied to the book.
         if (publishDate is null)
         {
             return new ReleaseInfoDto(
@@ -124,20 +123,20 @@ internal static class CalibreMapper
         List<MediaContributorDto> result = [];
         HashSet<string> seen = new(StringComparer.OrdinalIgnoreCase);
 
-        void Add(string? displayName, string role, MediaContributorRoleCategory category)
+        void Add(string? displayName, MediaContributorRole role)
         {
             if (string.IsNullOrWhiteSpace(displayName) || !seen.Add($"{displayName}|{role}"))
                 return;
             result.Add(new MediaContributorDto(
                 Name: new MediaContributorNameDto(DisplayName: displayName.Trim(), LegalName: null),
-                Role: new MediaContributorRoleDto(Name: role, Category: category))
+                Role: role)
             );
         }
 
         foreach (OpfCreatorDto creator in creators)
-            Add(creator.Name, "Author", MediaContributorRoleCategory.Author);
+            Add(creator.Name, MediaContributorRole.Author);
         foreach (OpfContributorDto contributor in contributors)
-            Add(contributor.Name, MapContributorRole(contributor.Role), MapContributorCategory(contributor.Role));
+            Add(contributor.Name, MapContributorRole(contributor.Role));
 
         return result;
     }
@@ -189,7 +188,7 @@ internal static class CalibreMapper
     private static string? NormalizeIsbn(string isbn)
     {
         string normalized = new string([.. isbn.Where(character => character is not '-' && !char.IsWhiteSpace(character))]).ToUpperInvariant();
-        // valid ISBNs must be 10 or 13 characters in length, all characters except the last one must be digits, and the last one must be a digit for ISBN-13 and X for ISBN-10
+        // Valid ISBNs must be 10 or 13 characters in length, all characters except the last one must be digits, and the last one must be a digit for ISBN-13 and X for ISBN-10.
         if ((normalized.Length != 10 && normalized.Length != 13) ||
             normalized[..^1].Any(character => !char.IsDigit(character)) ||
             (!char.IsDigit(normalized[^1]) && !(normalized.Length == 10 && normalized[^1] == 'X')))
@@ -214,30 +213,20 @@ internal static class CalibreMapper
     }
 
     /// <summary>
-    /// Maps a creator or contributor role code into a role name.
+    /// Maps a creator or contributor role code into the canonical role.
     /// </summary>
     /// <param name="role">The role code to map.</param>
-    /// <returns>The mapped role name.</returns>
-    private static string MapContributorRole(string? role)
-    {
-        return string.Equals(role, "aut", StringComparison.OrdinalIgnoreCase) ? "Author" : string.IsNullOrWhiteSpace(role) ? "Contributor" : role;
-    }
-
-    /// <summary>
-    /// Maps a creator or contributor role code into the canonical category of the role.
-    /// </summary>
-    /// <param name="role">The role code to map.</param>
-    /// <returns>The canonical category of the role.</returns>
-    private static MediaContributorRoleCategory MapContributorCategory(string? role)
+    /// <returns>The canonical role.</returns>
+    private static MediaContributorRole MapContributorRole(string? role)
     {
         if (string.Equals(role, "aut", StringComparison.OrdinalIgnoreCase) || role?.Contains("author", StringComparison.OrdinalIgnoreCase) == true)
-            return MediaContributorRoleCategory.Author;
+            return MediaContributorRole.Author;
         if (string.Equals(role, "ill", StringComparison.OrdinalIgnoreCase))
-            return MediaContributorRoleCategory.Illustrator;
+            return MediaContributorRole.Illustrator;
         if (string.Equals(role, "trl", StringComparison.OrdinalIgnoreCase))
-            return MediaContributorRoleCategory.Translator;
+            return MediaContributorRole.Translator;
         if (string.Equals(role, "bkp", StringComparison.OrdinalIgnoreCase))
-            return MediaContributorRoleCategory.Publisher;
-        return MediaContributorRoleCategory.Other;
+            return MediaContributorRole.Publisher;
+        return MediaContributorRole.Other;
     }
 }

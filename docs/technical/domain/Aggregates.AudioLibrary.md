@@ -8,7 +8,7 @@
 
 ## [Audio Library Aggregate](#audio-library-aggregate)
 
-The audio library aggregate is the aggregate root of the `MusicLibrary` aggregate, which models the music of a media library. An artist is the aggregate root, owning its albums, and each album owns its tracks. Albums and tracks carry full metadata: title, description, release information, languages, genres and tags, and the tracks additionally carry the audio characteristics of their file, their moods and their ISRC codes. The credits of the media contributors that make up an artist, or that performed on an album or a track, are carried as `MusicMediaContributorCredit` value objects.
+The audio library aggregate is the aggregate root of the `MusicLibrary` aggregate, which models the music of a media library. An artist is the aggregate root, owning its albums, and each album owns its tracks. Albums and tracks carry full metadata: title, description, release information, languages, genres and tags, and the tracks additionally carry the audio characteristics of their file, their moods and their ISRC codes. The media contributors that make up an artist, or that performed on an album or a track, are carried as `MusicMediaContributor` value objects.
 
 ### [Artist](#artist)
 
@@ -20,7 +20,7 @@ class Artist
         string name,
         Optional<string> website,
         Optional<MusicBrainzId> musicBrainzArtistId,
-        List<MusicMediaContributorCredit> credits,
+        List<MusicMediaContributor> contributors,
         List<Album> albums);
 }
 ```
@@ -38,7 +38,7 @@ class Artist
   "musicBrainzArtistId": {
     "value": "00000000-0000-0000-0000-000000000000"
   },
-  "credits": [],
+  "contributors": [],
   "albums": [
     {
       "value": "00000000-0000-0000-0000-000000000000"
@@ -60,7 +60,7 @@ class Album
         Optional<MusicBrainzId> musicBrainzReleaseId,
         Optional<MusicBrainzId> musicBrainzReleaseGroupId,
         Optional<MusicBrainzId> musicBrainzReleaseArtistId,
-        List<MusicMediaContributorCredit> credits,
+        List<MusicMediaContributor> contributors,
         List<AudioRating> ratings,
         List<Track> tracks);
 }
@@ -120,7 +120,7 @@ class Album
   "musicBrainzReleaseArtistId": {
     "value": "00000000-0000-0000-0000-000000000000"
   },
-  "credits": [],
+  "contributors": [],
   "ratings": [
     {
       "value": 4.5,
@@ -163,7 +163,7 @@ class Track
         Optional<MusicBrainzId> musicBrainzRecordingId,
         Optional<MusicBrainzId> musicBrainzTrackId,
         Optional<MusicBrainzId> musicBrainzWorkId,
-        List<MusicMediaContributorCredit> credits,
+        List<MusicMediaContributor> contributors,
         List<AudioRating> ratings);
 }
 ```
@@ -238,7 +238,7 @@ class Track
   "musicBrainzWorkId": {
     "value": "00000000-0000-0000-0000-000000000000"
   },
-  "credits": [],
+  "contributors": [],
   "ratings": [
     {
       "value": 4.5,

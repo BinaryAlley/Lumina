@@ -17,14 +17,16 @@ public class GetReadingResourceQueryFixture
     /// <summary>
     /// Creates a random valid query to get a resource of a book.
     /// </summary>
+    /// <param name="libraryId">Optional. The Id of the library the book belongs to.</param>
     /// <param name="bookId">Optional. The Id of the book whose resource is retrieved.</param>
     /// <param name="resourceKey">Optional. The opaque resource key of the resource.</param>
     /// <returns>The created <see cref="GetReadingResourceQuery"/>.</returns>
     public GetReadingResourceQuery Create(
-        Guid? bookId = null,
+        string? libraryId = null,
+        string? bookId = null,
         string? resourceKey = null)
     {
-        return new GetReadingResourceQuery(bookId ?? Guid.NewGuid(), resourceKey ?? $"resource-{Guid.NewGuid():N}");
+        return new GetReadingResourceQuery(libraryId ?? Guid.NewGuid().ToString(), bookId ?? Guid.NewGuid().ToString(), resourceKey ?? $"resource-{Guid.NewGuid():N}");
     }
 
     /// <summary>

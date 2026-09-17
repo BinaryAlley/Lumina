@@ -1,2 +1,2 @@
-GET {{host}}/api/v1/artists?libraryId=3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a&currentPage=1&perPage=10&searchTerm=queen
+GET {{host}}/api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists?currentPage=1&perPage=10&searchTerm=queen
 Authorization: Bearer {{ACCESS_TOKEN}}

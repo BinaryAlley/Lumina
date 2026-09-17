@@ -5,6 +5,7 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.Common.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
@@ -17,7 +18,7 @@ namespace Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLib
 [DebuggerDisplay("{Id}: {Metadata.Title}")]
 public sealed class Album : Entity<AlbumId>
 {
-    private readonly List<MediaContributorCredit> _credits;
+    private readonly List<MusicMediaContributor> _contributors;
     private readonly List<AudioRating> _ratings;
     private readonly List<Track> _tracks;
 
@@ -57,9 +58,9 @@ public sealed class Album : Entity<AlbumId>
     public Optional<MusicBrainzId> MusicBrainzReleaseArtistId { get; private set; }
 
     /// <summary>
-    /// Gets the list of the credits of the media contributors of the album.
+    /// Gets the list of the media contributors of the album.
     /// </summary>
-    public IReadOnlyCollection<MediaContributorCredit> Credits => _credits.AsReadOnly();
+    public IReadOnlyCollection<MusicMediaContributor> Contributors => _contributors.AsReadOnly();
 
     /// <summary>
     /// Gets the list of ratings for this album.
@@ -82,9 +83,11 @@ public sealed class Album : Entity<AlbumId>
     /// <param name="musicBrainzReleaseId">The optional MusicBrainz identifier of the release.</param>
     /// <param name="musicBrainzReleaseGroupId">The optional MusicBrainz identifier of the release group.</param>
     /// <param name="musicBrainzReleaseArtistId">The optional MusicBrainz identifier of the release artist.</param>
-    /// <param name="credits">The list of the credits of the media contributors of the album.</param>
+    /// <param name="contributors">The list of the media contributors of the album.</param>
     /// <param name="ratings">The list of ratings for the album.</param>
     /// <param name="tracks">The list of tracks of the album.</param>
+    /// <param name="createdOnUtc">The date and time when the entity was created.</param>
+    /// <param name="updatedOnUtc">The date and time when the entity was last updated.</param>
     private Album(
         AlbumId id,
         AlbumMetadata metadata,
@@ -94,9 +97,11 @@ public sealed class Album : Entity<AlbumId>
         Optional<MusicBrainzId> musicBrainzReleaseId,
         Optional<MusicBrainzId> musicBrainzReleaseGroupId,
         Optional<MusicBrainzId> musicBrainzReleaseArtistId,
-        List<MediaContributorCredit> credits,
+        List<MusicMediaContributor> contributors,
         List<AudioRating> ratings,
-        List<Track> tracks) : base(id)
+        List<Track> tracks,
+        DateTime createdOnUtc,
+        Optional<DateTime> updatedOnUtc) : base(id)
     {
         Id = id;
         Metadata = metadata;
@@ -106,9 +111,11 @@ public sealed class Album : Entity<AlbumId>
         MusicBrainzReleaseId = musicBrainzReleaseId;
         MusicBrainzReleaseGroupId = musicBrainzReleaseGroupId;
         MusicBrainzReleaseArtistId = musicBrainzReleaseArtistId;
-        _credits = credits;
+        _contributors = contributors;
         _ratings = ratings;
         _tracks = tracks;
+        CreatedOnUtc = createdOnUtc;
+        UpdatedOnUtc = updatedOnUtc.HasValue ? updatedOnUtc.Value : null;
     }
 
     /// <summary>
@@ -121,7 +128,7 @@ public sealed class Album : Entity<AlbumId>
     /// <param name="musicBrainzReleaseId">The optional MusicBrainz identifier of the release.</param>
     /// <param name="musicBrainzReleaseGroupId">The optional MusicBrainz identifier of the release group.</param>
     /// <param name="musicBrainzReleaseArtistId">The optional MusicBrainz identifier of the release artist.</param>
-    /// <param name="credits">The list of the credits of the media contributors of the album.</param>
+    /// <param name="contributors">The list of the media contributors of the album.</param>
     /// <param name="ratings">The list of ratings for the album.</param>
     /// <param name="tracks">The list of tracks of the album.</param>
     /// <returns>
@@ -135,7 +142,7 @@ public sealed class Album : Entity<AlbumId>
         Optional<MusicBrainzId> musicBrainzReleaseId,
         Optional<MusicBrainzId> musicBrainzReleaseGroupId,
         Optional<MusicBrainzId> musicBrainzReleaseArtistId,
-        List<MediaContributorCredit> credits,
+        List<MusicMediaContributor> contributors,
         List<AudioRating> ratings,
         List<Track> tracks)
     {
@@ -148,9 +155,11 @@ public sealed class Album : Entity<AlbumId>
             musicBrainzReleaseId,
             musicBrainzReleaseGroupId,
             musicBrainzReleaseArtistId,
-            credits,
+            contributors,
             ratings,
-            tracks);
+            tracks,
+            DateTime.UtcNow, // TODO: should be IDateTimeProvider
+            Optional<DateTime>.None());
     }
 
     /// <summary>
@@ -164,9 +173,11 @@ public sealed class Album : Entity<AlbumId>
     /// <param name="musicBrainzReleaseId">The optional MusicBrainz identifier of the release.</param>
     /// <param name="musicBrainzReleaseGroupId">The optional MusicBrainz identifier of the release group.</param>
     /// <param name="musicBrainzReleaseArtistId">The optional MusicBrainz identifier of the release artist.</param>
-    /// <param name="credits">The list of the credits of the media contributors of the album.</param>
+    /// <param name="contributors">The list of the media contributors of the album.</param>
     /// <param name="ratings">The list of ratings for the album.</param>
     /// <param name="tracks">The list of tracks of the album.</param>
+    /// <param name="createdOnUtc">The date and time when the entity was created.</param>
+    /// <param name="updatedOnUtc">The date and time when the entity was last updated.</param>
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="Album"/>, or an error message.
     /// </returns>
@@ -179,9 +190,11 @@ public sealed class Album : Entity<AlbumId>
         Optional<MusicBrainzId> musicBrainzReleaseId,
         Optional<MusicBrainzId> musicBrainzReleaseGroupId,
         Optional<MusicBrainzId> musicBrainzReleaseArtistId,
-        List<MediaContributorCredit> credits,
+        List<MusicMediaContributor> contributors,
         List<AudioRating> ratings,
-        List<Track> tracks)
+        List<Track> tracks,
+        DateTime createdOnUtc,
+        Optional<DateTime> updatedOnUtc)
     {
         return new Album(
             id,
@@ -192,9 +205,11 @@ public sealed class Album : Entity<AlbumId>
             musicBrainzReleaseId,
             musicBrainzReleaseGroupId,
             musicBrainzReleaseArtistId,
-            credits,
+            contributors,
             ratings,
-            tracks);
+            tracks,
+            createdOnUtc,
+            updatedOnUtc);
     }
 
     /// <summary>
@@ -224,13 +239,55 @@ public sealed class Album : Entity<AlbumId>
     }
 
     /// <summary>
-    /// Replaces the credits of the media contributors of the album with the provided <paramref name="credits"/>.
+    /// Replaces the media contributors of the album with the provided <paramref name="contributors"/>.
     /// </summary>
-    /// <param name="credits">The credits of the media contributors of the album.</param>
-    public void UpdateCredits(IReadOnlyCollection<MediaContributorCredit> credits)
+    /// <param name="contributors">The media contributors of the album.</param>
+    public void UpdateContributors(IReadOnlyCollection<MusicMediaContributor> contributors)
     {
         // replace the contents of the collection in place, preserving the readonly reference invariants of the entity
-        _credits.Clear();
-        _credits.AddRange(credits);
+        _contributors.Clear();
+        _contributors.AddRange(contributors);
+    }
+
+    /// <summary>
+    /// Replaces the ratings of the album with the provided <paramref name="ratings"/>.
+    /// </summary>
+    /// <param name="ratings">The ratings of the album.</param>
+    public void UpdateRatings(IReadOnlyCollection<AudioRating> ratings)
+    {
+        // replace the contents of the collection in place, preserving the readonly reference invariants of the entity
+        _ratings.Clear();
+        _ratings.AddRange(ratings);
+    }
+
+    /// <summary>
+    /// Updates the details of the album, without touching the ratings, the media contributors, and the tracks.
+    /// </summary>
+    /// <param name="metadata">The album metadata of the album.</param>
+    /// <param name="mediaFormat">The optional physical or digital medium of the album.</param>
+    /// <param name="barcode">The optional barcode of the album.</param>
+    /// <param name="catalogNumber">The optional catalog number of the album.</param>
+    /// <param name="musicBrainzReleaseId">The optional MusicBrainz identifier of the release.</param>
+    /// <param name="musicBrainzReleaseGroupId">The optional MusicBrainz identifier of the release group.</param>
+    /// <param name="musicBrainzReleaseArtistId">The optional MusicBrainz identifier of the release artist.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public Result<Updated> UpdateDetails(
+        AlbumMetadata metadata,
+        Optional<MusicMediaFormat> mediaFormat,
+        Optional<Barcode> barcode,
+        Optional<string> catalogNumber,
+        Optional<MusicBrainzId> musicBrainzReleaseId,
+        Optional<MusicBrainzId> musicBrainzReleaseGroupId,
+        Optional<MusicBrainzId> musicBrainzReleaseArtistId)
+    {
+        Metadata = metadata;
+        MediaFormat = mediaFormat;
+        Barcode = barcode;
+        CatalogNumber = catalogNumber;
+        MusicBrainzReleaseId = musicBrainzReleaseId;
+        MusicBrainzReleaseGroupId = musicBrainzReleaseGroupId;
+        MusicBrainzReleaseArtistId = musicBrainzReleaseArtistId;
+        UpdatedOnUtc = DateTime.UtcNow;
+        return Result.Updated;
     }
 }

@@ -19,6 +19,7 @@ public static partial class Errors
         public static Error RoleNameMustBeMaximum50CharactersLong => Error.Validation(description: nameof(RoleNameMustBeMaximum50CharactersLong));
         public static Error RoleCategoryCannotBeEmpty => Error.Validation(description: nameof(RoleCategoryCannotBeEmpty));
         public static Error ContributorRoleCannotBeNull => Error.Validation(description: nameof(ContributorRoleCannotBeNull));
+        public static Error ContributorsListCannotBeNull => Error.Validation(description: nameof(ContributorsListCannotBeNull));
         public static Error MediaContributorIdCannotBeEmpty => Error.Validation(description: nameof(MediaContributorIdCannotBeEmpty));
         public static Error MediaContributorNotFound => Error.NotFound(description: nameof(MediaContributorNotFound));
         public static Error UnknownMediaContributorRole => Error.Validation(description: nameof(UnknownMediaContributorRole));

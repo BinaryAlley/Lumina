@@ -65,6 +65,7 @@ public class GetReadingResourceEndpointTests
         _mockApiHttpClient.GetBlobAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(blob);
         string expectedEndpoint = ApiRoutes.Books.GET_BOOK_READING_RESOURCE
+            .Replace("{libraryId}", request.LibraryId.ToString())
             .Replace("{bookId}", request.BookId.ToString())
             .Replace("{resourceKey}", Uri.EscapeDataString(request.ResourceKey));
 

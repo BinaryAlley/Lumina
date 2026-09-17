@@ -67,6 +67,7 @@ public class GetReadingSectionEndpointTests
         _mockApiHttpClient.GetAsync<ReadingSectionDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(section);
         string expectedEndpoint = ApiRoutes.Books.GET_BOOK_READING_SECTION
+            .Replace("{libraryId}", request.LibraryId.ToString())
             .Replace("{bookId}", request.BookId.ToString())
             .Replace("{locationRef}", Uri.EscapeDataString(request.LocationRef));
 

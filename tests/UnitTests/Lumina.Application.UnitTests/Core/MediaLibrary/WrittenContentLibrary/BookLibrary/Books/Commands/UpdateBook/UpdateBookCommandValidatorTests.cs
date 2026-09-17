@@ -1532,7 +1532,7 @@ public class UpdateBookCommandValidatorTests
         List<Error> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationError(Errors.WrittenContent.ContributorsListCannotBeNull);
+        result.ShouldHaveValidationError(Errors.MediaContributor.ContributorsListCannotBeNull);
     }
 
     [Fact]
@@ -1545,7 +1545,7 @@ public class UpdateBookCommandValidatorTests
         List<Error> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldNotHaveValidationError(Errors.WrittenContent.ContributorsListCannotBeNull);
+        result.ShouldNotHaveValidationError(Errors.MediaContributor.ContributorsListCannotBeNull);
     }
 
     [Fact]

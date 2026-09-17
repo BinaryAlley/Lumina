@@ -33,7 +33,7 @@ namespace Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibra
 /// <param name="Ratings">The list of ratings for this book. Required.</param>
 [DebuggerDisplay("Title: {Metadata.Title}")]
 public record AddBookRequest(
-    string Path,
+    string? Path,
     WrittenContentMetadataDto? Metadata,
     BookFormat? Format,
     string? Edition,

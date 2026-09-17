@@ -196,7 +196,7 @@ public class BookDto
     public List<IsbnDto> ISBNs { get; set; } = [];
 
     /// <summary>
-    /// Gets the list of media contributors (actors, directors, etc) starring in this book.
+    /// Gets the list of media contributors that contributed to this book.
     /// </summary>
     //public List<ContributorIdModel> ContributorIds { get; init; } = [];
 

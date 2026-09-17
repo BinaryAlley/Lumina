@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Reading;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Reading;
 using System;
 using System.Collections.Generic;
@@ -13,7 +12,7 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.B
 /// Class used for providing a textual description for the <see cref="GetReadingAvailabilityEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetReadingAvailabilityEndpointSummary : Summary<GetReadingAvailabilityEndpoint, GetReadingAvailabilityRequest>
+public class GetReadingAvailabilityEndpointSummary : Summary<GetReadingAvailabilityEndpoint, EmptyRequest>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="GetReadingAvailabilityEndpointSummary"/> class.
@@ -22,12 +21,6 @@ public class GetReadingAvailabilityEndpointSummary : Summary<GetReadingAvailabil
     {
         Summary = "Checks the reading availability of a book.";
         Description = "Checks whether the book can be opened for reading, resolving the book reader configured for its media library and verifying that the reader is enabled, without extracting the book.";
-
-        ExampleRequest = new GetReadingAvailabilityRequest(
-            BookId: Guid.NewGuid()
-        );
-
-        RequestParam(r => r.BookId, "The Id of the book whose reading availability is checked. Required.");
 
         ResponseParam<ReadingAvailabilityResponse>(r => r.BookId, "The Id of the book whose reading availability is reported.");
         ResponseParam<ReadingAvailabilityResponse>(r => r.LibraryId, "The Id of the media library the book belongs to.");
@@ -44,13 +37,32 @@ public class GetReadingAvailabilityEndpointSummary : Summary<GetReadingAvailabil
         );
 
         Response(401, "Authentication required.", "application/problem+json",
-            example: new
+            example: new[]
             {
-                type = "https://tools.ietf.org/html/rfc7235#section-3.1",
-                status = 401,
-                title = "Unauthorized",
-                detail = "You are not authorized",
-                instance = "/api/v1/books/{bookId}/reading/availability"
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    status = 401,
+                    title = "Unauthorized",
+                    detail = "Authentication failed",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/availability"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    status = 401,
+                    title = "Unauthorized",
+                    detail = "The token has expired",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/availability"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    status = 401,
+                    title = "Unauthorized",
+                    detail = "The token is invalid",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/availability"
+                }
             }
         );
 
@@ -58,23 +70,35 @@ public class GetReadingAvailabilityEndpointSummary : Summary<GetReadingAvailabil
             example: new
             {
                 type = "https://tools.ietf.org/html/rfc9110#section-15.5.4",
-                title = "General.Failure",
+                title = "General.Unauthorized",
                 status = 403,
                 detail = "NotAuthorized",
-                instance = "/api/v1/books/{bookId}/reading/availability",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/availability",
                 traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
             }
         );
 
-        Response(404, "The request failed because the book does not exist.", "application/problem+json",
-            example: new
+        Response(404, "The request failed because the book or its media library does not exist.", "application/problem+json",
+            example: new[]
             {
-                type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
-                title = "General.NotFound",
-                status = 404,
-                detail = "BookNotFound",
-                instance = "/api/v1/books/{bookId}/reading/availability",
-                traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+                    title = "General.NotFound",
+                    status = 404,
+                    detail = "BookNotFound",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/availability",
+                    traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+                    title = "General.NotFound",
+                    status = 404,
+                    detail = "LibraryNotFound",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/availability",
+                    traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+                }
             }
         );
 
@@ -85,12 +109,13 @@ public class GetReadingAvailabilityEndpointSummary : Summary<GetReadingAvailabil
                 title = "General.Validation",
                 status = 422,
                 detail = "OneOrMoreValidationErrorsOccurred",
-                instance = "/api/v1/books/{bookId}/reading/availability",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/availability",
                 errors = new Dictionary<string, string[]>
                 {
                     {
                         "General.Validation", new[]
                         {
+                            "LibraryIdCannotBeEmpty",
                             "BookIdCannotBeEmpty"
                         }
                     }

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -966,5 +966,89 @@
   </data>
   <data name="Country.ZW" xml:space="preserve">
     <value>Zimbabwe</value>
+  </data>
+  <data name="Role" xml:space="preserve">
+    <value>Ruolo</value>
+  </data>
+  <data name="Actor" xml:space="preserve">
+    <value>Attore</value>
+  </data>
+  <data name="Director" xml:space="preserve">
+    <value>Regista</value>
+  </data>
+  <data name="Screenwriter" xml:space="preserve">
+    <value>Sceneggiatore</value>
+  </data>
+  <data name="Composer" xml:space="preserve">
+    <value>Compositore</value>
+  </data>
+  <data name="Lyricist" xml:space="preserve">
+    <value>Paroliere</value>
+  </data>
+  <data name="Arranger" xml:space="preserve">
+    <value>Arrangiatore</value>
+  </data>
+  <data name="Conductor" xml:space="preserve">
+    <value>Direttore d'orchestra</value>
+  </data>
+  <data name="Producer" xml:space="preserve">
+    <value>Produttore</value>
+  </data>
+  <data name="ExecutiveProducer" xml:space="preserve">
+    <value>Produttore esecutivo</value>
+  </data>
+  <data name="Engineer" xml:space="preserve">
+    <value>Ingegnere del suono</value>
+  </data>
+  <data name="Mixer" xml:space="preserve">
+    <value>Mixer</value>
+  </data>
+  <data name="Remixer" xml:space="preserve">
+    <value>Remixer</value>
+  </data>
+  <data name="RecordLabel" xml:space="preserve">
+    <value>Etichetta discografica</value>
+  </data>
+  <data name="Vocals" xml:space="preserve">
+    <value>Voce</value>
+  </data>
+  <data name="BackingVocals" xml:space="preserve">
+    <value>Cori</value>
+  </data>
+  <data name="Guitar" xml:space="preserve">
+    <value>Chitarra</value>
+  </data>
+  <data name="BassGuitar" xml:space="preserve">
+    <value>Basso</value>
+  </data>
+  <data name="Drums" xml:space="preserve">
+    <value>Batteria</value>
+  </data>
+  <data name="Percussion" xml:space="preserve">
+    <value>Percussioni</value>
+  </data>
+  <data name="Keyboards" xml:space="preserve">
+    <value>Tastiere</value>
+  </data>
+  <data name="Piano" xml:space="preserve">
+    <value>Pianoforte</value>
+  </data>
+  <data name="Synthesizer" xml:space="preserve">
+    <value>Sintetizzatore</value>
+  </data>
+  <data name="Strings" xml:space="preserve">
+    <value>Archi</value>
+  </data>
+  <data name="Woodwinds" xml:space="preserve">
+    <value>Legni</value>
+  </data>
+  <data name="Brass" xml:space="preserve">
+    <value>Ottoni</value>
+  </data>
+  <data name="Choir" xml:space="preserve">
+    <value>Coro</value>
+  </data>
+  <data name="Orchestrator" xml:space="preserve">
+    <value>Orchestratore</value>
   </data>
 </root>

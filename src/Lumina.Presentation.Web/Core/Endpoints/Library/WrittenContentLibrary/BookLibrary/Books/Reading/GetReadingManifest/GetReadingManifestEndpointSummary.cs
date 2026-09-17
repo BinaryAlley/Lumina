@@ -21,9 +21,11 @@ public class GetReadingManifestEndpointSummary : Summary<GetReadingManifestEndpo
         Summary = "Retrieves the reading manifest of a book.";
         Description = "Retrieves the reading manifest of a book, containing the metadata, the table of contents, the spine, and the resources needed to render the reader.";
         RequestParam(r => r.BookId, "The Id of the book whose reading manifest is retrieved. Required.");
+        RequestParam(r => r.LibraryId, "The Id of the media library the book belongs to. Required.");
 
         ExampleRequest = new GetBookReadingManifestRequest(
-            BookId: Guid.NewGuid()
+            BookId: Guid.NewGuid(),
+            LibraryId: Guid.NewGuid()
         );
 
         Response(200, "The reading manifest of the book is returned.");
