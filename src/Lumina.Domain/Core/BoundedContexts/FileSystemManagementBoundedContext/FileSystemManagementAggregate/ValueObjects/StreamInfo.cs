@@ -2,7 +2,6 @@
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Models.Core;
-
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
@@ -110,9 +109,9 @@ public class StreamInfo : ValueObject
         Optional<int> sampleRate,
         Optional<int> channels)
     {
-        if (streamId is null)
+        if (string.IsNullOrWhiteSpace(streamId))
             return Errors.FileSystemManagement.StreamIdCannotBeEmpty;
-        if (codec is null)
+        if (string.IsNullOrWhiteSpace(codec))
             return Errors.FileSystemManagement.CodecCannotBeEmpty;
         if (bitrate <= 0)
             return Errors.FileSystemManagement.BitrateMustBeAPositiveNumber;

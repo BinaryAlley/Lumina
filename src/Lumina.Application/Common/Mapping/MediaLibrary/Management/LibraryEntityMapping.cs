@@ -56,7 +56,7 @@ public static class LibraryEntityMapping
             repositoryEntity.Title,
             repositoryEntity.LibraryType,
             repositoryEntity.ContentLocations.Select(contentLocation => contentLocation.Path),
-            repositoryEntity.CoverImage,
+            Optional<string>.FromNullable(repositoryEntity.CoverImage),
             repositoryEntity.IsEnabled,
             repositoryEntity.IsLocked,
             repositoryEntity.CanDownloadMetadataFromWeb,
