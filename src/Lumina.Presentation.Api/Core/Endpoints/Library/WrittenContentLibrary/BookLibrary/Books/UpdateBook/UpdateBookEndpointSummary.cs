@@ -44,12 +44,12 @@ public class UpdateBookEndpointSummary : Summary<UpdateBookEndpoint, UpdateBookR
         RequestParam(r => r.Metadata!.Genres, "The list of genres of the book. Required.");
         RequestParam(r => r.Metadata!.Tags, "The list of tags of the book. Required.");
         RequestParam(r => r.Metadata!.Language, "The language in which the book is written. Optional.");
-        RequestParam(r => r.Metadata!.Language!.LanguageCode, "The ISO code of the language of the book. Optional.");
-        RequestParam(r => r.Metadata!.Language!.LanguageName, "The name of the language of the book in English. Optional.");
+        RequestParam(r => r.Metadata!.Language!.LanguageCode, "The ISO code of the language of the book. Required.");
+        RequestParam(r => r.Metadata!.Language!.LanguageName, "The name of the language of the book in English. Required.");
         RequestParam(r => r.Metadata!.Language!.NativeName, "The native name of the language of the book. Optional.");
         RequestParam(r => r.Metadata!.OriginalLanguage, "The original language of the book, if it has been translated. Optional.");
-        RequestParam(r => r.Metadata!.OriginalLanguage!.LanguageCode, "The ISO code of the original language of the book. Optional.");
-        RequestParam(r => r.Metadata!.OriginalLanguage!.LanguageName, "The name of the original language of the book in English. Optional.");
+        RequestParam(r => r.Metadata!.OriginalLanguage!.LanguageCode, "The ISO code of the original language of the book. Required.");
+        RequestParam(r => r.Metadata!.OriginalLanguage!.LanguageName, "The name of the original language of the book in English. Required.");
         RequestParam(r => r.Metadata!.OriginalLanguage!.NativeName, "The native name of the original language of the book. Optional.");
         RequestParam(r => r.Metadata!.Publisher, "The publisher of the book. Optional.");
         RequestParam(r => r.Metadata!.PageCount, "The number of pages of the book. Optional.");
@@ -386,6 +386,18 @@ public class UpdateBookEndpointSummary : Summary<UpdateBookEndpoint, UpdateBookR
                     instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}",
                     traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
                 }
+            }
+        );
+
+        Response(409, "The request failed because a unique constraint was violated.", "application/problem+json",
+            example: new
+            {
+                type = "https://tools.ietf.org/html/rfc9110#section-15.5.10",
+                title = "General.Conflict",
+                status = 409,
+                detail = "UniqueConstraintViolation",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}",
+                traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
             }
         );
 
