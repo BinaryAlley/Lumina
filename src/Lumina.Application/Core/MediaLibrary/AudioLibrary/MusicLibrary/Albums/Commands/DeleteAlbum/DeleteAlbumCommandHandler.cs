@@ -1,18 +1,23 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Domain.Common.Errors;
+using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate;
+using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Entities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
+using DomainErrors = Lumina.Domain.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Albums.Commands.DeleteAlbum;
@@ -60,25 +65,62 @@ public class DeleteAlbumCommandHandler : ICommandHandler<DeleteAlbumCommand, Res
             return ApplicationErrors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        Result<AlbumEntity?> getAlbumResult = await _unitOfWork.AlbumRepository.GetByIdAsync(command.AlbumId, cancellationToken: cancellationToken).ConfigureAwait(false);
-        if (getAlbumResult.IsFailure)
-            return getAlbumResult.Errors;
-        if (getAlbumResult.Value is null)
-            return Errors.Music.AlbumNotFound;
+        // The validator guarantees that the route identifiers are non-empty Guids before this point.
+        Guid libraryId = Guid.Parse(command.LibraryId!);
+        Guid artistId = Guid.Parse(command.ArtistId!);
+        Guid albumId = Guid.Parse(command.AlbumId!);
+
+        // An album is a child of the artist aggregate, so the whole aggregate is loaded and the album is removed within it.
+        Result<ArtistEntity?> getArtistResult = await _unitOfWork.ArtistRepository
+            .GetByIdAsync(artistId, shouldIncludeNavigationProperties: true, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (getArtistResult.IsFailure)
+            return getArtistResult.Errors;
+        if (getArtistResult.Value is null)
+            return DomainErrors.Music.ArtistNotFound;
+        ArtistEntity existingArtist = getArtistResult.Value;
+
+        // Resource scoping: the album must belong to an artist of the library named by the route, so that an album can never be deleted
+        // through another library's or artist's route; the mismatch is reported as not found, without disclosing that the album exists elsewhere.
+        if (existingArtist.LibraryId != libraryId)
+            return DomainErrors.Music.AlbumNotFound;
+        AlbumEntity? existingAlbum = existingArtist.Albums.FirstOrDefault(album => album.Id == albumId);
+        if (existingAlbum is null)
+            return DomainErrors.Music.AlbumNotFound;
 
         // Admins can delete the albums of all libraries; for everyone else, only the albums of the libraries they own.
         bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
-            userId, new LibraryOwnershipPolicyContext(getAlbumResult.Value.LibraryId), cancellationToken).ConfigureAwait(false);
+            userId, new LibraryOwnershipPolicyContext(existingArtist.LibraryId), cancellationToken).ConfigureAwait(false);
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
-        Result<Deleted> deleteAlbumResult = await _unitOfWork.AlbumRepository.DeleteByIdAsync(command.AlbumId, cancellationToken).ConfigureAwait(false);
-        if (deleteAlbumResult.IsFailure)
-            return deleteAlbumResult.Errors;
+        // An album can only belong to a library that exists, so a client can never delete an album of a library of the host that is not there.
+        Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository
+            .GetByIdAsync(libraryId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (getLibraryResult.IsFailure)
+            return getLibraryResult.Errors;
+        if (getLibraryResult.Value is null)
+            return DomainErrors.Library.LibraryNotFound;
+
+        // The write path goes through the aggregate root: an album is a child entity of the artist aggregate, unlike Book and Artist,
+        // which are aggregate roots and are deleted directly through their own repositories. This difference is intentional.
+        Result<Artist> artistResult = existingArtist.ToDomainEntity();
+        if (artistResult.IsFailure)
+            return artistResult.Errors;
+        Album? domainAlbum = artistResult.Value.Albums.FirstOrDefault(album => album.Id.Value == albumId);
+        if (domainAlbum is null)
+            return DomainErrors.Music.AlbumNotFound;
+        Result<Deleted> removeAlbumResult = artistResult.Value.RemoveAlbum(domainAlbum);
+        if (removeAlbumResult.IsFailure)
+            return removeAlbumResult.Errors;
+
+        Result<Updated> updateResult = await _unitOfWork.ArtistRepository
+            .UpdateAsync(artistResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
+        if (updateResult.IsFailure)
+            return updateResult.Errors;
         Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         if (saveChangesResult.IsFailure)
             return saveChangesResult.Errors;
 
-        return deleteAlbumResult;
+        return Result.Deleted;
     }
 }

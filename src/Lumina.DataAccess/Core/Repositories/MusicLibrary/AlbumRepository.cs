@@ -198,23 +198,6 @@ internal sealed class AlbumRepository : IAlbumRepository
     }
 
     /// <summary>
-    /// Deletes the album identified by <paramref name="id"/>.
-    /// </summary>
-    /// <param name="id">The Id of the album to delete.</param>
-    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<Result<Deleted>> DeleteByIdAsync(Guid id, CancellationToken cancellationToken)
-    {
-        AlbumEntity? album = await _luminaDbContext.Albums
-            .FirstOrDefaultAsync(repositoryAlbum => repositoryAlbum.Id == id, cancellationToken).ConfigureAwait(false);
-        if (album is null)
-            return Errors.Music.AlbumNotFound;
-
-        _luminaDbContext.Albums.Remove(album);
-        return Result.Deleted;
-    }
-
-    /// <summary>
     /// Gets all the albums of the artist identified by <paramref name="artistId"/>.
     /// </summary>
     /// <param name="artistId">The Id of the artist whose albums are retrieved.</param>

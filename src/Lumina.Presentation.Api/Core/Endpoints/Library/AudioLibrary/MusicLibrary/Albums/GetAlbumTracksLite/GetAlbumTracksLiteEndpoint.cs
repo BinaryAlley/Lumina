@@ -44,13 +44,17 @@ public class GetAlbumTracksLiteEndpoint : BaseEndpoint<GetAlbumTracksLiteRequest
     }
 
     /// <summary>
-    /// Gets the lightweight read models of all the tracks of the album identified by <paramref name="request"/>.
+    /// Gets the lightweight read models of all the tracks of the album identified by the route.
     /// </summary>
-    /// <param name="request">The request containing the id of the album whose tracks are retrieved.</param>
+    /// <param name="request">The request containing the pagination options of the tracks to be retrieved.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(GetAlbumTracksLiteRequest request, CancellationToken cancellationToken)
     {
-        Result<PaginatedResponse<TrackLiteResponse>> result = await _getAlbumTracksLiteQueryHandler.HandleAsync(request.ToQuery(), cancellationToken).ConfigureAwait(false);
+        // Take unique identifiers from the route.
+        string? libraryId = HttpContext.Request.RouteValues["libraryId"]?.ToString();
+        string? artistId = HttpContext.Request.RouteValues["artistId"]?.ToString();
+        string? albumId = HttpContext.Request.RouteValues["albumId"]?.ToString();
+        Result<PaginatedResponse<TrackLiteResponse>> result = await _getAlbumTracksLiteQueryHandler.HandleAsync(request.ToQuery(libraryId, artistId, albumId), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

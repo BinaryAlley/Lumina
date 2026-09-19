@@ -81,7 +81,7 @@ public class AddAlbumCommandHandler : ICommandHandler<AddAlbumCommand, Result<Al
         Guid artistId = Guid.Parse(command.ArtistId!);
 
         // An album is a child of the artist aggregate, so the whole aggregate is loaded and the album is added within it.
-        Result<ArtistEntity?> getArtistResult = await _unitOfWork.ArtistRepository.GetByIdAsync(artistId, cancellationToken: cancellationToken).ConfigureAwait(false);
+        Result<ArtistEntity?> getArtistResult = await _unitOfWork.ArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: true, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getArtistResult.IsFailure)
             return getArtistResult.Errors;
         if (getArtistResult.Value is null)

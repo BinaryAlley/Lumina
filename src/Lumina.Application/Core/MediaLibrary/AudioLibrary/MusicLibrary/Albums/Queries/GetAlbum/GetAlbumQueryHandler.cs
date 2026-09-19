@@ -65,18 +65,29 @@ public class GetAlbumQueryHandler : IQueryHandler<GetAlbumQuery, Result<AlbumRes
             return ApplicationErrors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        Result<AlbumEntity?> getAlbumResult = await _unitOfWork.AlbumRepository.GetByIdAsync(query.AlbumId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
+        // The validator guarantees that the route identifiers are non-empty Guids before this point.
+        Guid libraryId = Guid.Parse(query.LibraryId!);
+        Guid artistId = Guid.Parse(query.ArtistId!);
+        Guid albumId = Guid.Parse(query.AlbumId!);
+
+        Result<AlbumEntity?> getAlbumResult = await _unitOfWork.AlbumRepository.GetByIdAsync(albumId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getAlbumResult.IsFailure)
             return getAlbumResult.Errors;
         if (getAlbumResult.Value is null)
             return Errors.Music.AlbumNotFound;
+        AlbumEntity existingAlbum = getAlbumResult.Value;
+
+        // Resource scoping: the album must belong to the library and the artist named by the route, so that an album can never be read through
+        // another library's or artist's route; the mismatch is reported as not found, without disclosing that the album exists elsewhere.
+        if (existingAlbum.LibraryId != libraryId || existingAlbum.ArtistId != artistId)
+            return Errors.Music.AlbumNotFound;
 
         // Admins can see the albums of all libraries; for everyone else, only the albums of the libraries they own.
         bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
-            userId, new LibraryOwnershipPolicyContext(getAlbumResult.Value.LibraryId), cancellationToken).ConfigureAwait(false);
+            userId, new LibraryOwnershipPolicyContext(existingAlbum.LibraryId), cancellationToken).ConfigureAwait(false);
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
-        return getAlbumResult.Value.ToResponse();
+        return existingAlbum.ToResponse();
     }
 }

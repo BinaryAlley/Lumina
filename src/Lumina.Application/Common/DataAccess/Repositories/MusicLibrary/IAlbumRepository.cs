@@ -19,8 +19,7 @@ namespace Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
 public interface IAlbumRepository : IRepository<AlbumEntity>,
                                     IInsertRepositoryAction<AlbumEntity>,
                                     IUpdateRepositoryAction<AlbumEntity>,
-                                    IGetByIdRepositoryAction<AlbumEntity, Guid>,
-                                    IDeleteByIdRepositoryAction<Guid>
+                                    IGetByIdRepositoryAction<AlbumEntity, Guid>
 {
     /// <summary>
     /// Gets all the albums of the artist identified by <paramref name="artistId"/>.

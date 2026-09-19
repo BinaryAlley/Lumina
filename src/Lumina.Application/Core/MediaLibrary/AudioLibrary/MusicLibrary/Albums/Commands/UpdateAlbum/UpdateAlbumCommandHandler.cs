@@ -88,7 +88,7 @@ public class UpdateAlbumCommandHandler : ICommandHandler<UpdateAlbumCommand, Res
         Guid albumId = Guid.Parse(command.AlbumId!);
 
         // An album is a child of the artist aggregate, so the whole aggregate is loaded and the album is edited within it.
-        Result<ArtistEntity?> getArtistResult = await _unitOfWork.ArtistRepository.GetByIdAsync(artistId, cancellationToken: cancellationToken).ConfigureAwait(false);
+        Result<ArtistEntity?> getArtistResult = await _unitOfWork.ArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: true, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getArtistResult.IsFailure)
             return getArtistResult.Errors;
 
