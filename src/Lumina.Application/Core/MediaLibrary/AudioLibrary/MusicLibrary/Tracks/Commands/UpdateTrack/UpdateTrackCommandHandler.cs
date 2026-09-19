@@ -88,7 +88,7 @@ public class UpdateTrackCommandHandler : ICommandHandler<UpdateTrackCommand, Res
         Guid trackId = Guid.Parse(command.TrackId!);
 
         // A track is a child of the artist aggregate, so the whole aggregate is loaded and the track is edited within it.
-        Result<ArtistEntity?> getArtistResult = await _unitOfWork.ArtistRepository.GetByIdAsync(artistId, cancellationToken: cancellationToken).ConfigureAwait(false);
+        Result<ArtistEntity?> getArtistResult = await _unitOfWork.ArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: true, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getArtistResult.IsFailure)
             return getArtistResult.Errors;
 

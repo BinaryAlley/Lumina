@@ -4,7 +4,6 @@ using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
@@ -20,7 +19,7 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibra
 /// Class used for providing a textual description for the <see cref="GetTrackEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetTrackEndpointSummary : Summary<GetTrackEndpoint, GetTrackRequest>
+public class GetTrackEndpointSummary : Summary<GetTrackEndpoint, EmptyRequest>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="GetTrackEndpointSummary"/> class.
@@ -28,17 +27,7 @@ public class GetTrackEndpointSummary : Summary<GetTrackEndpoint, GetTrackRequest
     public GetTrackEndpointSummary()
     {
         Summary = "Gets a track by its Id.";
-        Description = "Returns the full details of the track identified by the request. The track is returned to an Admin, who can see the tracks of all libraries, or to the owner of the library of the track.";
-
-        ExampleRequest = new GetTrackRequest(
-            ArtistId: Guid.NewGuid(),
-            AlbumId: Guid.NewGuid(),
-            TrackId: Guid.NewGuid()
-        );
-
-        RequestParam(r => r.ArtistId, "The unique identifier of the artist the album of the track belongs to, taken from the route.");
-        RequestParam(r => r.AlbumId, "The unique identifier of the album the track belongs to, taken from the route.");
-        RequestParam(r => r.TrackId, "The Id of the track to get. Required.");
+        Description = "Returns the full details of the track identified by the route. The track is returned to an Admin, who can see the tracks of all libraries, or to the owner of the library of the track.";
 
         ResponseParam<TrackResponse>(r => r.Id, "The Id of the track.");
         ResponseParam<TrackResponse>(r => r.AlbumId, "The Id of the album the track belongs to.");
@@ -180,7 +169,7 @@ public class GetTrackEndpointSummary : Summary<GetTrackEndpoint, GetTrackRequest
                     status = 401,
                     title = "Unauthorized",
                     detail = "You are not authorized",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}"
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks/{Guid.NewGuid()}"
                 },
                 new
                 {
@@ -188,7 +177,7 @@ public class GetTrackEndpointSummary : Summary<GetTrackEndpoint, GetTrackRequest
                     status = 401,
                     title = "Unauthorized",
                     detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}"
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks/{Guid.NewGuid()}"
                 },
                 new
                 {
@@ -196,7 +185,7 @@ public class GetTrackEndpointSummary : Summary<GetTrackEndpoint, GetTrackRequest
                     status = 401,
                     title = "Unauthorized",
                     detail = "The token is invalid",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}"
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks/{Guid.NewGuid()}"
                 }
             }
         );
@@ -208,7 +197,7 @@ public class GetTrackEndpointSummary : Summary<GetTrackEndpoint, GetTrackRequest
                 title = "General.Unauthorized",
                 status = 403,
                 detail = "NotAuthorized",
-                instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks/{Guid.NewGuid()}",
                 traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
             }
         );
@@ -220,7 +209,7 @@ public class GetTrackEndpointSummary : Summary<GetTrackEndpoint, GetTrackRequest
                 title = "General.NotFound",
                 status = 404,
                 detail = "TrackNotFound",
-                instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks/{Guid.NewGuid()}",
                 traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
             }
         );
@@ -232,7 +221,7 @@ public class GetTrackEndpointSummary : Summary<GetTrackEndpoint, GetTrackRequest
                 title = "General.Validation",
                 status = 422,
                 detail = "OneOrMoreValidationErrorsOccurred",
-                instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks/{Guid.NewGuid()}",
                 errors = new Dictionary<string, string[]>
                 {
                     {

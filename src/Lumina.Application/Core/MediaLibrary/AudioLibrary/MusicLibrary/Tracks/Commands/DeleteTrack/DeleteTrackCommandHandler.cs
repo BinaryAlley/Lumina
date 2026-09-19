@@ -1,18 +1,24 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Domain.Common.Errors;
+using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate;
+using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Entities;
+using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.ValueObjects;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
+using DomainErrors = Lumina.Domain.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Commands.DeleteTrack;
@@ -60,25 +66,61 @@ public class DeleteTrackCommandHandler : ICommandHandler<DeleteTrackCommand, Res
             return ApplicationErrors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        Result<TrackEntity?> getTrackResult = await _unitOfWork.TrackRepository.GetByIdAsync(command.TrackId, cancellationToken: cancellationToken).ConfigureAwait(false);
-        if (getTrackResult.IsFailure)
-            return getTrackResult.Errors;
-        if (getTrackResult.Value is null)
-            return Errors.Music.TrackNotFound;
+        // The validator guarantees that the route identifiers are non-empty Guids before this point.
+        Guid libraryId = Guid.Parse(command.LibraryId!);
+        Guid artistId = Guid.Parse(command.ArtistId!);
+        Guid albumId = Guid.Parse(command.AlbumId!);
+        Guid trackId = Guid.Parse(command.TrackId!);
+
+        // A track is a child of the artist aggregate, so the whole aggregate is loaded and the track is removed within it.
+        Result<ArtistEntity?> getArtistResult = await _unitOfWork.ArtistRepository
+            .GetByIdAsync(artistId, shouldIncludeNavigationProperties: true, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (getArtistResult.IsFailure)
+            return getArtistResult.Errors;
+        if (getArtistResult.Value is null)
+            return DomainErrors.Music.ArtistNotFound;
+        ArtistEntity existingArtist = getArtistResult.Value;
+
+        // Resource scoping: the track must belong to an album of the artist of the library named by the route, so that a track can never be
+        // deleted through another library's, artist's or album's route; the mismatch is reported as not found.
+        if (existingArtist.LibraryId != libraryId)
+            return DomainErrors.Music.TrackNotFound;
+        AlbumEntity? existingAlbum = existingArtist.Albums.FirstOrDefault(album => album.Id == albumId);
+        TrackEntity? existingTrack = existingAlbum?.Tracks.FirstOrDefault(track => track.Id == trackId);
+        if (existingTrack is null)
+            return DomainErrors.Music.TrackNotFound;
 
         // Admins can delete the tracks of all libraries; for everyone else, only the tracks of the libraries they own.
         bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
-            userId, new LibraryOwnershipPolicyContext(getTrackResult.Value.LibraryId), cancellationToken).ConfigureAwait(false);
+            userId, new LibraryOwnershipPolicyContext(existingArtist.LibraryId), cancellationToken).ConfigureAwait(false);
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
-        Result<Deleted> deleteTrackResult = await _unitOfWork.TrackRepository.DeleteByIdAsync(command.TrackId, cancellationToken).ConfigureAwait(false);
-        if (deleteTrackResult.IsFailure)
-            return deleteTrackResult.Errors;
+        // A track can only belong to a library that exists, so a client can never delete a track of a library of the host that is not there.
+        Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository
+            .GetByIdAsync(libraryId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (getLibraryResult.IsFailure)
+            return getLibraryResult.Errors;
+        if (getLibraryResult.Value is null)
+            return DomainErrors.Library.LibraryNotFound;
+
+        // The write path goes through the aggregate root: a track is a child entity of the artist aggregate, unlike Book and Artist,
+        // which are aggregate roots and are deleted directly through their own repositories. This difference is intentional.
+        Result<Artist> artistResult = existingArtist.ToDomainEntity();
+        if (artistResult.IsFailure)
+            return artistResult.Errors;
+        Result<Deleted> removeTrackResult = artistResult.Value.RemoveTrackFromAlbum(AlbumId.Create(albumId), TrackId.Create(trackId));
+        if (removeTrackResult.IsFailure)
+            return removeTrackResult.Errors;
+
+        Result<Updated> updateResult = await _unitOfWork.ArtistRepository
+            .UpdateAsync(artistResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
+        if (updateResult.IsFailure)
+            return updateResult.Errors;
         Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         if (saveChangesResult.IsFailure)
             return saveChangesResult.Errors;
 
-        return deleteTrackResult;
+        return Result.Deleted;
     }
 }

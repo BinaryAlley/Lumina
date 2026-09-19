@@ -9,8 +9,14 @@ namespace Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.
 /// <summary>
 /// Query for getting a track by its Id.
 /// </summary>
-/// <param name="TrackId">The unique identifier of the track to get.</param>
+/// <param name="LibraryId">The unique identifier of the media library the track belongs to, taken from the route.</param>
+/// <param name="ArtistId">The unique identifier of the artist the album of the track belongs to, taken from the route.</param>
+/// <param name="AlbumId">The unique identifier of the album the track belongs to, taken from the route.</param>
+/// <param name="TrackId">The unique identifier of the track to get, taken from the route.</param>
 [DebuggerDisplay("TrackId: {TrackId}")]
 public record GetTrackQuery(
-    Guid TrackId
+    string? LibraryId,
+    string? ArtistId,
+    string? AlbumId,
+    string? TrackId
 ) : IQuery;

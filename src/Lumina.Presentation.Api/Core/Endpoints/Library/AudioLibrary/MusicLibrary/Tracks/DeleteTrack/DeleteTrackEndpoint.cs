@@ -1,8 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Commands.DeleteTrack;
-using Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Common.Routes.Library.AudioLibrary.MusicLibrary;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
@@ -14,9 +12,9 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.DeleteTrack;
 
 /// <summary>
-/// API endpoint for the <c>/artists/{artistId}/albums/{albumId}/tracks/{trackId}</c> route.
+/// API endpoint for the <c>/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}</c> route.
 /// </summary>
-public class DeleteTrackEndpoint : BaseEndpoint<DeleteTrackRequest, IResult>
+public class DeleteTrackEndpoint : BaseEndpoint<FastEndpoints.EmptyRequest, IResult>
 {
     private readonly ICommandHandler<DeleteTrackCommand, Result<Deleted>> _deleteTrackCommandHandler;
 
@@ -43,11 +41,17 @@ public class DeleteTrackEndpoint : BaseEndpoint<DeleteTrackRequest, IResult>
     /// <summary>
     /// Deletes a track by Id.
     /// </summary>
-    /// <param name="request">The request containing the id of the track to be deleted.</param>
+    /// <param name="request">The request object.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    public override async Task<IResult> ExecuteAsync(DeleteTrackRequest request, CancellationToken cancellationToken)
+    public override async Task<IResult> ExecuteAsync(FastEndpoints.EmptyRequest request, CancellationToken cancellationToken)
     {
-        Result<Deleted> result = await _deleteTrackCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
+        // Take unique identifiers from the route.
+        string? libraryId = HttpContext.Request.RouteValues["libraryId"]?.ToString();
+        string? artistId = HttpContext.Request.RouteValues["artistId"]?.ToString();
+        string? albumId = HttpContext.Request.RouteValues["albumId"]?.ToString();
+        string? trackId = HttpContext.Request.RouteValues["trackId"]?.ToString();
+        Result<Deleted> result = await _deleteTrackCommandHandler
+            .HandleAsync(new DeleteTrackCommand(libraryId, artistId, albumId, trackId), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

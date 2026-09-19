@@ -299,7 +299,7 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
                     status = 401,
                     title = "Unauthorized",
                     detail = "You are not authorized",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks"
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks"
                 },
                 new
                 {
@@ -307,7 +307,7 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
                     status = 401,
                     title = "Unauthorized",
                     detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks"
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks"
                 },
                 new
                 {
@@ -315,7 +315,7 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
                     status = 401,
                     title = "Unauthorized",
                     detail = "The token is invalid",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks"
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks"
                 }
             }
         );
@@ -327,7 +327,7 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
                 title = "General.Unauthorized",
                 status = 403,
                 detail = "NotAuthorized",
-                instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks",
                 traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
             }
         );
@@ -341,7 +341,7 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
                     title = "General.NotFound",
                     status = 404,
                     detail = "AlbumNotFound",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks",
                     traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
                 },
                 new
@@ -350,7 +350,7 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
                     title = "General.NotFound",
                     status = 404,
                     detail = "LibraryNotFound",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks",
                     traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
                 },
                 new
@@ -359,7 +359,7 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
                     title = "General.NotFound",
                     status = 404,
                     detail = "MediaContributorNotFound",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks",
                     traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
                 }
             }
@@ -374,7 +374,7 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
                     title = "General.Conflict",
                     status = 409,
                     detail = "TrackAlreadyExists",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks",
                     traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
                 },
                 new
@@ -383,7 +383,7 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
                     title = "General.Conflict",
                     status = 409,
                     detail = "UniqueConstraintViolation",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks",
                     traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
                 }
             }
@@ -396,7 +396,7 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
                 title = "General.Validation",
                 status = 422,
                 detail = "OneOrMoreValidationErrorsOccurred",
-                instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks",
                 errors = new Dictionary<string, string[]>
                 {
                     {

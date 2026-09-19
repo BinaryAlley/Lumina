@@ -65,18 +65,43 @@ public class GetTrackQueryHandler : IQueryHandler<GetTrackQuery, Result<TrackRes
             return ApplicationErrors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        Result<TrackEntity?> getTrackResult = await _unitOfWork.TrackRepository.GetByIdAsync(query.TrackId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
+        // The validator guarantees that the route identifiers are non-empty Guids before this point.
+        Guid libraryId = Guid.Parse(query.LibraryId!);
+        Guid artistId = Guid.Parse(query.ArtistId!);
+        Guid albumId = Guid.Parse(query.AlbumId!);
+        Guid trackId = Guid.Parse(query.TrackId!);
+
+        // The album is loaded first, so that the artist and the library named by the route are enforced before the track itself is read.
+        Result<AlbumEntity?> getAlbumResult = await _unitOfWork.AlbumRepository.GetByIdAsync(albumId, shouldIncludeNavigationProperties: false, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (getAlbumResult.IsFailure)
+            return getAlbumResult.Errors;
+        if (getAlbumResult.Value is null)
+            return Errors.Music.TrackNotFound;
+        AlbumEntity existingAlbum = getAlbumResult.Value;
+
+        // Resource scoping: the album must belong to the library and the artist named by the route, so that a track can never be read through
+        // another library's or artist's route; the mismatch is reported as not found, without disclosing that the track exists elsewhere.
+        if (existingAlbum.LibraryId != libraryId || existingAlbum.ArtistId != artistId)
+            return Errors.Music.TrackNotFound;
+
+        Result<TrackEntity?> getTrackResult = await _unitOfWork.TrackRepository.GetByIdAsync(trackId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getTrackResult.IsFailure)
             return getTrackResult.Errors;
         if (getTrackResult.Value is null)
             return Errors.Music.TrackNotFound;
+        TrackEntity existingTrack = getTrackResult.Value;
+
+        // Resource scoping: the track must belong to the album and the library named by the route, so that a track of another album can never
+        // be read through this album's route; the mismatch is reported as not found, without disclosing that the track exists elsewhere.
+        if (existingTrack.AlbumId != albumId || existingTrack.LibraryId != libraryId)
+            return Errors.Music.TrackNotFound;
 
         // Admins can see the tracks of all libraries; for everyone else, only the tracks of the libraries they own.
         bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
-            userId, new LibraryOwnershipPolicyContext(getTrackResult.Value.LibraryId), cancellationToken).ConfigureAwait(false);
+            userId, new LibraryOwnershipPolicyContext(existingTrack.LibraryId), cancellationToken).ConfigureAwait(false);
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
-        return getTrackResult.Value.ToResponse();
+        return existingTrack.ToResponse();
     }
 }

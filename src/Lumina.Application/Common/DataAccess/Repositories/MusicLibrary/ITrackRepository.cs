@@ -19,8 +19,7 @@ namespace Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
 public interface ITrackRepository : IRepository<TrackEntity>,
                                     IInsertRepositoryAction<TrackEntity>,
                                     IUpdateRepositoryAction<TrackEntity>,
-                                    IGetByIdRepositoryAction<TrackEntity, Guid>,
-                                    IDeleteByIdRepositoryAction<Guid>
+                                    IGetByIdRepositoryAction<TrackEntity, Guid>
 {
     /// <summary>
     /// Gets all the tracks of the album identified by <paramref name="albumId"/>.

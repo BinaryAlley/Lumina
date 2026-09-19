@@ -194,26 +194,10 @@ internal sealed class TrackRepository : ITrackRepository
                 .Include(track => track.Genres)
                 .Include(track => track.Moods)
                 .Include(track => track.Isrcs)
-                .Include(track => track.Contributors);
+                .Include(track => track.Contributors)
+                .AsSplitQuery();
         }
         return await query.FirstOrDefaultAsync(track => track.Id == id, cancellationToken).ConfigureAwait(false);
-    }
-
-    /// <summary>
-    /// Deletes the track identified by <paramref name="id"/>.
-    /// </summary>
-    /// <param name="id">The Id of the track to delete.</param>
-    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<Result<Deleted>> DeleteByIdAsync(Guid id, CancellationToken cancellationToken)
-    {
-        TrackEntity? track = await _luminaDbContext.Tracks
-            .FirstOrDefaultAsync(repositoryTrack => repositoryTrack.Id == id, cancellationToken).ConfigureAwait(false);
-        if (track is null)
-            return Errors.Music.TrackNotFound;
-
-        _luminaDbContext.Tracks.Remove(track);
-        return Result.Deleted;
     }
 
     /// <summary>
@@ -231,6 +215,7 @@ internal sealed class TrackRepository : ITrackRepository
             .Include(track => track.Moods)
             .Include(track => track.Isrcs)
             .Include(track => track.Contributors)
+            .AsSplitQuery()
             .Where(track => track.AlbumId == albumId)
             .OrderBy(track => track.DiscNumber)
             .ThenBy(track => track.TrackNumber)

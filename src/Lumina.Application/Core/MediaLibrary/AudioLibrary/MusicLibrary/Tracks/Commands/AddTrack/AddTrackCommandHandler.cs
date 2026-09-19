@@ -93,7 +93,7 @@ public class AddTrackCommandHandler : ICommandHandler<AddTrackCommand, Result<Tr
         Guid albumId = Guid.Parse(command.AlbumId!);
 
         // A track is a child of the artist aggregate, so the whole aggregate is loaded and the track is added within it.
-        Result<ArtistEntity?> getArtistResult = await _unitOfWork.ArtistRepository.GetByIdAsync(artistId, cancellationToken: cancellationToken).ConfigureAwait(false);
+        Result<ArtistEntity?> getArtistResult = await _unitOfWork.ArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: true, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getArtistResult.IsFailure)
             return getArtistResult.Errors;
         if (getArtistResult.Value is null || getArtistResult.Value.LibraryId != libraryId)
