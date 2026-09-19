@@ -86,7 +86,7 @@ public class ErrorsTests
     {
         // Assert
         // The count assertion fails when an error is added or removed, reminding to update the assertions below.
-        Assert.Equal(32, typeof(DomainErrors.Metadata).GetProperties().Length);
+        Assert.Equal(31, typeof(DomainErrors.Metadata).GetProperties().Length);
         AssertError(DomainErrors.Metadata.MetadataCannotBeNull, ErrorType.Validation);
         AssertError(DomainErrors.Metadata.TitleCannotBeEmpty, ErrorType.Validation);
         AssertError(DomainErrors.Metadata.TitleMustBeMaximum255CharactersLong, ErrorType.Validation);
@@ -118,7 +118,6 @@ public class ErrorsTests
         AssertError(DomainErrors.Metadata.RatingValueCannotBeGreaterThanMaxValue, ErrorType.Validation);
         AssertError(DomainErrors.Metadata.RatingVoteCountMustBePositive, ErrorType.Validation);
         AssertError(DomainErrors.Metadata.RatingsListCannotBeNull, ErrorType.Validation);
-        AssertError(DomainErrors.Metadata.InvalidIsoCode, ErrorType.Validation);
     }
 
     [Fact]
@@ -126,7 +125,7 @@ public class ErrorsTests
     {
         // Assert
         // The count assertion fails when an error is added or removed, reminding to update the assertions below.
-        Assert.Equal(29, typeof(DomainErrors.WrittenContent).GetProperties().Length);
+        Assert.Equal(31, typeof(DomainErrors.WrittenContent).GetProperties().Length);
         AssertError(DomainErrors.WrittenContent.BookAlreadyExists, ErrorType.Conflict);
         AssertError(DomainErrors.WrittenContent.IsbnValueCannotBeEmpty, ErrorType.Validation);
         AssertError(DomainErrors.WrittenContent.IsbnListCannotBeNull, ErrorType.Validation);
@@ -153,6 +152,8 @@ public class ErrorsTests
         AssertError(DomainErrors.WrittenContent.VolumeNumberMustBeGreaterThanZero, ErrorType.Validation);
         AssertError(DomainErrors.WrittenContent.BookLibraryCannotBeNull, ErrorType.Validation);
         AssertError(DomainErrors.WrittenContent.BookPathCannotBeEmpty, ErrorType.Validation);
+        AssertError(DomainErrors.WrittenContent.BookPathMustBeMaximum2048CharactersLong, ErrorType.Validation);
+        AssertError(DomainErrors.WrittenContent.BookPathMustBeWithinLibraryContentLocations, ErrorType.Validation);
         AssertError(DomainErrors.WrittenContent.BookIdCannotBeEmpty, ErrorType.Validation);
         AssertError(DomainErrors.WrittenContent.BookCoverCannotBeNull, ErrorType.Validation);
         AssertError(DomainErrors.WrittenContent.BookNotFound, ErrorType.NotFound);
@@ -163,8 +164,7 @@ public class ErrorsTests
     {
         // Assert
         // The count assertion fails when an error is added or removed, reminding to update the assertions below.
-        Assert.Equal(9, typeof(DomainErrors.MediaContributor).GetProperties().Length);
-        AssertError(DomainErrors.MediaContributor.ContributorsListCannotBeNull, ErrorType.Validation);
+        Assert.Equal(12, typeof(DomainErrors.MediaContributor).GetProperties().Length);
         AssertError(DomainErrors.MediaContributor.ContributorNameCannotBeEmpty, ErrorType.Validation);
         AssertError(DomainErrors.MediaContributor.ContributorDisplayNameCannotBeEmpty, ErrorType.Validation);
         AssertError(DomainErrors.MediaContributor.ContributorDisplayNameMustBeMaximum100CharactersLong, ErrorType.Validation);
@@ -173,6 +173,10 @@ public class ErrorsTests
         AssertError(DomainErrors.MediaContributor.RoleNameMustBeMaximum50CharactersLong, ErrorType.Validation);
         AssertError(DomainErrors.MediaContributor.RoleCategoryCannotBeEmpty, ErrorType.Validation);
         AssertError(DomainErrors.MediaContributor.ContributorRoleCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.MediaContributor.ContributorsListCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.MediaContributor.MediaContributorIdCannotBeEmpty, ErrorType.Validation);
+        AssertError(DomainErrors.MediaContributor.MediaContributorNotFound, ErrorType.NotFound);
+        AssertError(DomainErrors.MediaContributor.UnknownMediaContributorRole, ErrorType.Validation);
     }
 
     [Fact]
@@ -190,7 +194,7 @@ public class ErrorsTests
     {
         // Assert
         // The count assertion fails when an error is added or removed, reminding to update the assertions below.
-        Assert.Equal(19, typeof(DomainErrors.FileSystemManagement).GetProperties().Length);
+        Assert.Equal(20, typeof(DomainErrors.FileSystemManagement).GetProperties().Length);
         AssertError(DomainErrors.FileSystemManagement.ParentNodeCannotBeNull, ErrorType.Failure);
         AssertError(DomainErrors.FileSystemManagement.PathMustBeMaximum260CharactersLong, ErrorType.Failure);
         AssertError(DomainErrors.FileSystemManagement.FileCopyError, ErrorType.Failure);
@@ -206,6 +210,7 @@ public class ErrorsTests
         AssertError(DomainErrors.FileSystemManagement.BitrateMustBeAPositiveNumber, ErrorType.Validation);
         AssertError(DomainErrors.FileSystemManagement.CannotNavigateUp, ErrorType.Failure);
         AssertError(DomainErrors.FileSystemManagement.NameCannotBeEmpty, ErrorType.Validation);
+        AssertError(DomainErrors.FileSystemManagement.FileNameCannotBeEmpty, ErrorType.Validation);
         AssertError(DomainErrors.FileSystemManagement.FileAlreadyExists, ErrorType.Conflict);
         AssertError(DomainErrors.FileSystemManagement.DirectoryNotFound, ErrorType.NotFound);
         AssertError(DomainErrors.FileSystemManagement.DirectoryAlreadyExists, ErrorType.Conflict);
@@ -217,8 +222,7 @@ public class ErrorsTests
     {
         // Assert
         // The count assertion fails when an error is added or removed, reminding to update the assertions below.
-        Assert.Equal(9, typeof(DomainErrors.Reading).GetProperties().Length);
-        AssertError(DomainErrors.Reading.BookIdCannotBeEmpty, ErrorType.Validation);
+        Assert.Equal(8, typeof(DomainErrors.Reading).GetProperties().Length);
         AssertError(DomainErrors.Reading.LocationRefCannotBeEmpty, ErrorType.Validation);
         AssertError(DomainErrors.Reading.ResourceKeyCannotBeEmpty, ErrorType.Validation);
         AssertError(DomainErrors.Reading.BookNotFound, ErrorType.NotFound);
