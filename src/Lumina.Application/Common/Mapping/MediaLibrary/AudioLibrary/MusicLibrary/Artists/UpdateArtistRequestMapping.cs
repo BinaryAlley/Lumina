@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
 using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artists.Commands.UpdateArtist;
 using Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 using System.Linq;

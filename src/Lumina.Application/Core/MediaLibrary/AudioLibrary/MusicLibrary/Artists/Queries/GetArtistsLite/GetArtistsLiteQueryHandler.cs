@@ -66,25 +66,23 @@ public class GetArtistsLiteQueryHandler : IQueryHandler<GetArtistsLiteQuery, Res
             return ApplicationErrors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
+        // The validator guarantees that the library id of the route is a non-empty Guid before this point.
+        Guid libraryId = Guid.Parse(query.LibraryId!);
+
         // Admins can see the artists of all libraries; for everyone else, only the artists of the libraries they own.
         bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
-            userId, new LibraryOwnershipPolicyContext(query.LibraryId), cancellationToken).ConfigureAwait(false);
+            userId, new LibraryOwnershipPolicyContext(libraryId), cancellationToken).ConfigureAwait(false);
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
-        PaginationDataDto paginationData = new()
-        {
-            CurrentPage = query.CurrentPage ?? 1,
-            PerPage = query.PerPage ?? 200
-        };
         LibraryFilterDto filter = new()
         {
-            LibraryId = query.LibraryId,
+            LibraryId = libraryId,
             SearchTerm = query.SearchTerm
         };
 
         Result<PaginatedResultDto<ArtistLiteRow>> getArtistsResult = await _unitOfWork.ArtistRepository.GetAllLiteAsync(
-            paginationData,
+            query.PaginationData,
             filterModel: filter,
             cancellationToken: cancellationToken).ConfigureAwait(false);
         return getArtistsResult.Match(value => Result.From(value.ToResponses()), errors => errors);

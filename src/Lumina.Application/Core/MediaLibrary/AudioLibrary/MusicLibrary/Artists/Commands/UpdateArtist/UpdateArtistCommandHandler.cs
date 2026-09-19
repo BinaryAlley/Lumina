@@ -79,8 +79,8 @@ public class UpdateArtistCommandHandler : ICommandHandler<UpdateArtistCommand, R
         Guid libraryId = Guid.Parse(command.LibraryId!);
         Guid artistId = Guid.Parse(command.ArtistId!);
 
-        // Get the existing artist with all its related data.
-        Result<ArtistEntity?> getArtistResult = await _unitOfWork.ArtistRepository.GetByIdAsync(artistId, cancellationToken: cancellationToken).ConfigureAwait(false);
+        // Get the existing artist, only for its identity and creation metadata; the repository reloads and tracks the whole aggregate when it applies the update.
+        Result<ArtistEntity?> getArtistResult = await _unitOfWork.ArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: false, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getArtistResult.IsFailure)
             return getArtistResult.Errors;
         if (getArtistResult.Value is null)

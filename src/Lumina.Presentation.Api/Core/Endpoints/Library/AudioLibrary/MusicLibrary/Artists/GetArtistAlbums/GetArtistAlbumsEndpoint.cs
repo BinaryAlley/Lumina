@@ -1,9 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artists.Queries.GetArtistAlbums;
-using Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Common.Routes.Library.AudioLibrary.MusicLibrary;
@@ -19,7 +17,7 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibra
 /// <summary>
 /// API endpoint for the <c>/artists/{artistId}/albums</c> route.
 /// </summary>
-public class GetArtistAlbumsEndpoint : BaseEndpoint<GetArtistAlbumsRequest, IResult>
+public class GetArtistAlbumsEndpoint : BaseEndpoint<FastEndpoints.EmptyRequest, IResult>
 {
     private readonly IQueryHandler<GetArtistAlbumsQuery, Result<IReadOnlyList<AlbumResponse>>> _getArtistAlbumsQueryHandler;
 
@@ -44,13 +42,17 @@ public class GetArtistAlbumsEndpoint : BaseEndpoint<GetArtistAlbumsRequest, IRes
     }
 
     /// <summary>
-    /// Gets the list of all the albums of the artist identified by <paramref name="request"/>.
+    /// Gets the list of all the albums of the artist identified by the route.
     /// </summary>
-    /// <param name="request">The request containing the id of the artist whose albums are retrieved.</param>
+    /// <param name="request">The request object.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    public override async Task<IResult> ExecuteAsync(GetArtistAlbumsRequest request, CancellationToken cancellationToken)
+    public override async Task<IResult> ExecuteAsync(FastEndpoints.EmptyRequest request, CancellationToken cancellationToken)
     {
-        Result<IReadOnlyList<AlbumResponse>> result = await _getArtistAlbumsQueryHandler.HandleAsync(request.ToQuery(), cancellationToken).ConfigureAwait(false);
+        // Take unique identifiers from the route.
+        string? libraryId = HttpContext.Request.RouteValues["libraryId"]?.ToString();
+        string? artistId = HttpContext.Request.RouteValues["artistId"]?.ToString();
+        GetArtistAlbumsQuery query = new(libraryId, artistId);
+        Result<IReadOnlyList<AlbumResponse>> result = await _getArtistAlbumsQueryHandler.HandleAsync(query, cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

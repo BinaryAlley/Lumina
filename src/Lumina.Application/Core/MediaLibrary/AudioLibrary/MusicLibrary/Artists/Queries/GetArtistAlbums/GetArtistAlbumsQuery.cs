@@ -9,8 +9,10 @@ namespace Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artists
 /// <summary>
 /// Query for getting all the albums of an artist.
 /// </summary>
-/// <param name="ArtistId">The unique identifier of the artist whose albums are retrieved.</param>
+/// <param name="LibraryId">The unique identifier of the media library the artist belongs to, taken from the route.</param>
+/// <param name="ArtistId">The unique identifier of the artist whose albums are retrieved, taken from the route.</param>
 [DebuggerDisplay("ArtistId: {ArtistId}")]
 public record GetArtistAlbumsQuery(
-    Guid ArtistId
+    string? LibraryId,
+    string? ArtistId
 ) : IQuery;

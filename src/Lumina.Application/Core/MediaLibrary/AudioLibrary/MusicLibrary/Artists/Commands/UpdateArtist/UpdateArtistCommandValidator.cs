@@ -82,6 +82,12 @@ public class UpdateArtistCommandValidator : AbstractValidator<UpdateArtistComman
         RuleForEach(command => command.Albums)
             .ChildRules(album =>
             {
+                // Validates the identifier of the album, when the album already exists.
+                album.RuleFor(a => a!.AlbumId)
+                    .Must(albumId => albumId != Guid.Empty)
+                    .When(a => a!.AlbumId.HasValue)
+                    .WithError(Errors.Music.AlbumIdCannotBeEmpty);
+
                 // Validates the metadata of the album: title, lengths, release type and status, and disc and track counts.
                 album.RuleFor(a => a!.Metadata)
                     .NotNull()
@@ -252,6 +258,16 @@ public class UpdateArtistCommandValidator : AbstractValidator<UpdateArtistComman
                     .When(a => a!.CatalogNumber is not null)
                     .WithError(Errors.Music.CatalogNumberMustBeMaximum50CharactersLong);
 
+                album.RuleFor(a => a!.Barcode)
+                    .NotEmpty()
+                    .When(a => a!.Barcode is not null)
+                    .WithError(Errors.Music.BarcodeValueCannotBeEmpty);
+
+                album.RuleFor(a => a!.Barcode)
+                    .Matches(@"^\d{12,13}$")
+                    .When(a => a!.Barcode is not null && a!.Barcode.Length > 0)
+                    .WithError(Errors.Music.InvalidFormatForBarcode);
+
                 // Validates the MusicBrainz identifiers of the album.
                 album.RuleFor(a => a!.MusicBrainzReleaseId)
                     .Must(musicBrainzReleaseId => musicBrainzReleaseId != Guid.Empty)
@@ -319,6 +335,12 @@ public class UpdateArtistCommandValidator : AbstractValidator<UpdateArtistComman
                 album.RuleForEach(a => a!.Tracks)
                     .ChildRules(track =>
                     {
+                        // Validates the identifier of the track, when the track already exists.
+                        track.RuleFor(t => t!.TrackId)
+                            .Must(trackId => trackId != Guid.Empty)
+                            .When(t => t!.TrackId.HasValue)
+                            .WithError(Errors.Music.TrackIdCannotBeEmpty);
+
                         // Validates the file system path of the track.
                         track.RuleFor(t => t!.Path)
                             .NotEmpty()

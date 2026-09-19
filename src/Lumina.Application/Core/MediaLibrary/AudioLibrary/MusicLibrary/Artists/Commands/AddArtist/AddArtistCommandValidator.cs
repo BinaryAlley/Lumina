@@ -242,6 +242,16 @@ public class AddArtistCommandValidator : AbstractValidator<AddArtistCommand>
                     .When(a => a!.CatalogNumber is not null)
                     .WithError(Errors.Music.CatalogNumberMustBeMaximum50CharactersLong);
 
+                album.RuleFor(a => a!.Barcode)
+                    .NotEmpty()
+                    .When(a => a!.Barcode is not null)
+                    .WithError(Errors.Music.BarcodeValueCannotBeEmpty);
+
+                album.RuleFor(a => a!.Barcode)
+                    .Matches(@"^\d{12,13}$")
+                    .When(a => a!.Barcode is not null && a!.Barcode.Length > 0)
+                    .WithError(Errors.Music.InvalidFormatForBarcode);
+
                 // Validates the MusicBrainz identifiers of the album.
                 album.RuleFor(a => a!.MusicBrainzReleaseId)
                     .Must(musicBrainzReleaseId => musicBrainzReleaseId != Guid.Empty)

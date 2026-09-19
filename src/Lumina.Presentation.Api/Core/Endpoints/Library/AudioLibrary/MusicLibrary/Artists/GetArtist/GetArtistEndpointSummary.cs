@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using System;
@@ -14,7 +13,7 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibra
 /// Class used for providing a textual description for the <see cref="GetArtistEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetArtistEndpointSummary : Summary<GetArtistEndpoint, GetArtistRequest>
+public class GetArtistEndpointSummary : Summary<GetArtistEndpoint, EmptyRequest>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="GetArtistEndpointSummary"/> class.
@@ -22,13 +21,7 @@ public class GetArtistEndpointSummary : Summary<GetArtistEndpoint, GetArtistRequ
     public GetArtistEndpointSummary()
     {
         Summary = "Gets an artist by its Id.";
-        Description = "Returns the full details of the artist identified by the request. The artist is returned to an Admin, who can see the artists of all libraries, or to the owner of the library of the artist.";
-
-        ExampleRequest = new GetArtistRequest(
-            ArtistId: Guid.NewGuid()
-        );
-
-        RequestParam(r => r.ArtistId, "The Id of the artist to get. Required.");
+        Description = "Returns the full details of the artist identified by the route. The artist is returned to an Admin, who can see the artists of all libraries, or to the owner of the library of the artist.";
 
         ResponseParam<ArtistResponse>(r => r.Id, "The Id of the artist.");
         ResponseParam<ArtistResponse>(r => r.LibraryId, "The Id of the media library this artist belongs to.");
@@ -67,7 +60,7 @@ public class GetArtistEndpointSummary : Summary<GetArtistEndpoint, GetArtistRequ
                     status = 401,
                     title = "Unauthorized",
                     detail = "You are not authorized",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}"
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}"
                 },
                 new
                 {
@@ -75,7 +68,7 @@ public class GetArtistEndpointSummary : Summary<GetArtistEndpoint, GetArtistRequ
                     status = 401,
                     title = "Unauthorized",
                     detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}"
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}"
                 },
                 new
                 {
@@ -83,7 +76,7 @@ public class GetArtistEndpointSummary : Summary<GetArtistEndpoint, GetArtistRequ
                     status = 401,
                     title = "Unauthorized",
                     detail = "The token is invalid",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}"
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}"
                 }
             }
         );
@@ -95,7 +88,7 @@ public class GetArtistEndpointSummary : Summary<GetArtistEndpoint, GetArtistRequ
                 title = "General.Unauthorized",
                 status = 403,
                 detail = "NotAuthorized",
-                instance = "/api/v1/libraries/{libraryId}/artists/{artistId}",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}",
                 traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
             }
         );
@@ -107,7 +100,7 @@ public class GetArtistEndpointSummary : Summary<GetArtistEndpoint, GetArtistRequ
                 title = "General.NotFound",
                 status = 404,
                 detail = "ArtistNotFound",
-                instance = "/api/v1/libraries/{libraryId}/artists/{artistId}",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}",
                 traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
             }
         );
@@ -119,7 +112,7 @@ public class GetArtistEndpointSummary : Summary<GetArtistEndpoint, GetArtistRequ
                 title = "General.Validation",
                 status = 422,
                 detail = "OneOrMoreValidationErrorsOccurred",
-                instance = "/api/v1/libraries/{libraryId}/artists/{artistId}",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}",
                 errors = new Dictionary<string, string[]>
                 {
                     {

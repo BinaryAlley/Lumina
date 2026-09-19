@@ -370,4 +370,27 @@ public sealed class Artist : AggregateRoot<ArtistId>
 
         return Result.Created;
     }
+
+    /// <summary>
+    /// Removes a track from an album of the artist.
+    /// </summary>
+    /// <param name="albumId">The Id of the album the track is removed from.</param>
+    /// <param name="trackId">The Id of the track to remove.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    /// <remarks>
+    /// A track is a child entity of the artist aggregate, not an aggregate root, so it is removed through its owning artist,
+    /// which is the consistency boundary. This difference is intentional.
+    /// </remarks>
+    public Result<Deleted> RemoveTrackFromAlbum(AlbumId albumId, TrackId trackId)
+    {
+        Album? album = _albums.FirstOrDefault(album => album.Id == albumId);
+        if (album is null)
+            return Errors.Music.AlbumNotFound;
+
+        Track? track = album.Tracks.FirstOrDefault(track => track.Id == trackId);
+        if (track is null)
+            return Errors.Music.TrackNotFound;
+
+        return album.RemoveTrack(track);
+    }
 }

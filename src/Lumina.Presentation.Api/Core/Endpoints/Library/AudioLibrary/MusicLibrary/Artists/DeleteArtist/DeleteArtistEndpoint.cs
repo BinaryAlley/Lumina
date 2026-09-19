@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.DeleteArtist;
 
 /// <summary>
-/// API endpoint for the <c>/{libraryId}/artists/{artistId}</c> route.
+/// API endpoint for the <c>/libraries/{libraryId}/artists/{artistId}</c> route.
 /// </summary>
 public class DeleteArtistEndpoint : BaseEndpoint<FastEndpoints.EmptyRequest, IResult>
 {

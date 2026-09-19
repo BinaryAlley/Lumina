@@ -67,25 +67,29 @@ public class GetArtistAlbumsLiteQueryHandler : IQueryHandler<GetArtistAlbumsLite
             return ApplicationErrors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        Result<ArtistEntity?> getArtistResult = await _unitOfWork.ArtistRepository.GetByIdAsync(query.ArtistId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
+        // The validator guarantees that the route identifiers are non-empty Guids before this point.
+        Guid libraryId = Guid.Parse(query.LibraryId!);
+        Guid artistId = Guid.Parse(query.ArtistId!);
+
+        Result<ArtistEntity?> getArtistResult = await _unitOfWork.ArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: false, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getArtistResult.IsFailure)
             return getArtistResult.Errors;
         if (getArtistResult.Value is null)
             return Errors.Music.ArtistNotFound;
+        ArtistEntity existingArtist = getArtistResult.Value;
+
+        // Resource scoping: the artist must belong to the library named by the route, so that the albums of an artist can never be read through
+        // another library's route; the mismatch is reported as not found, without disclosing that the artist exists in another library.
+        if (existingArtist.LibraryId != libraryId)
+            return Errors.Music.ArtistNotFound;
 
         // Admins can see the albums of the artists of all libraries; for everyone else, only of the libraries they own.
         bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
-            userId, new LibraryOwnershipPolicyContext(getArtistResult.Value.LibraryId), cancellationToken).ConfigureAwait(false);
+            userId, new LibraryOwnershipPolicyContext(existingArtist.LibraryId), cancellationToken).ConfigureAwait(false);
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
-        PaginationDataDto paginationData = new()
-        {
-            CurrentPage = query.CurrentPage ?? 1,
-            PerPage = query.PerPage ?? 200
-        };
-
-        Result<PaginatedResultDto<AlbumLiteRow>> getAlbumsResult = await _unitOfWork.AlbumRepository.GetAlbumsLiteByArtistIdAsync(query.ArtistId, paginationData, cancellationToken).ConfigureAwait(false);
+        Result<PaginatedResultDto<AlbumLiteRow>> getAlbumsResult = await _unitOfWork.AlbumRepository.GetAlbumsLiteByArtistIdAsync(artistId, query.PaginationData, cancellationToken).ConfigureAwait(false);
         return getAlbumsResult.Match(value => Result.From(value.ToResponses()), errors => errors);
     }
 }

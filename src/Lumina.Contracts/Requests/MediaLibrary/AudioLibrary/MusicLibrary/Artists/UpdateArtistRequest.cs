@@ -1,6 +1,5 @@
 ﻿#region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.DTO.MediaContributors;
-using Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,5 +21,5 @@ public record UpdateArtistRequest(
     string? Website,
     Guid? MusicBrainzArtistId,
     List<MediaContributorReferenceDto>? Contributors,
-    List<AddAlbumRequest>? Albums
+    List<UpdateArtistAlbumRequest>? Albums
 );

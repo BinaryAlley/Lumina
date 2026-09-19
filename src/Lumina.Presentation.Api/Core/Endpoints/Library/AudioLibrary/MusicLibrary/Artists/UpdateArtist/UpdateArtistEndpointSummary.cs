@@ -4,9 +4,7 @@ using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
 using Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
-using Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
 using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
@@ -39,6 +37,7 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
         RequestParam(r => r.MusicBrainzArtistId, "The MusicBrainz identifier of the artist. Optional.");
         RequestParam(r => r.Contributors, "The list of media contributors that make up the artist. Required.");
         RequestParam(r => r.Albums, "The list of albums of the artist, each with its own list of tracks. Required.");
+        RequestParam(r => r.Albums![0].AlbumId, "The Id of the album, when the album already exists. Optional.");
         RequestParam(r => r.Albums![0].Metadata, "The album metadata of the album. Required.");
         RequestParam(r => r.Albums![0].Metadata!.Title, "The title of the album. Required.");
         RequestParam(r => r.Albums![0].Metadata!.OriginalTitle, "The original title of the album, if different from the current title. Optional.");
@@ -73,6 +72,7 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
         RequestParam(r => r.Albums![0].Contributors, "The list of media contributors that performed on the album. Required.");
         RequestParam(r => r.Albums![0].Ratings, "The list of ratings for this album. Required.");
         RequestParam(r => r.Albums![0].Tracks, "The list of tracks of the album. Required.");
+        RequestParam(r => r.Albums![0].Tracks![0].TrackId, "The Id of the track, when the track already exists. Optional.");
         RequestParam(r => r.Albums![0].Tracks![0].Path, "The file system path of the track. It must be inside one of the content locations of the media library that owns it. Required.");
         RequestParam(r => r.Albums![0].Tracks![0].Metadata, "The audio metadata of the track. Required.");
         RequestParam(r => r.Albums![0].Tracks![0].Metadata!.Title, "The title of the track. Required.");
@@ -131,7 +131,8 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                 )
             ],
             Albums: [
-                new AddAlbumRequest(
+                new UpdateArtistAlbumRequest(
+                    AlbumId: Guid.NewGuid(),
                     Metadata: new AlbumMetadataDto(
                         Title: "A Night at the Opera",
                         OriginalTitle: "A Night at the Opera",
@@ -199,7 +200,8 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                         )
                     ],
                     Tracks: [
-                        new AddTrackRequest(
+                        new UpdateArtistTrackRequest(
+                            TrackId: Guid.NewGuid(),
                             Path: "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
                             Metadata: new AudioMetadataDto(
                                 Title: "Bohemian Rhapsody",
@@ -280,7 +282,8 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                                 )
                             ]
                         ),
-                        new AddTrackRequest(
+                        new UpdateArtistTrackRequest(
+                            TrackId: Guid.NewGuid(),
                             Path: "/music/queen/a-night-at-the-opera/07-youre-my-best-friend.flac",
                             Metadata: new AudioMetadataDto(
                                 Title: "You're My Best Friend",
@@ -776,15 +779,27 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
             }
         );
 
-        Response(403, "The request failed because the user making the request is not an Admin, or the owner of the media library.", "application/problem+json",
-            example: new
+        Response(403, "The request failed because the user making the request is not an Admin or the owner of the media library, or because the update would leave the artist without any albums.", "application/problem+json",
+            example: new[]
             {
-                type = "https://tools.ietf.org/html/rfc9110#section-15.5.4",
-                title = "General.Unauthorized",
-                status = 403,
-                detail = "NotAuthorized",
-                instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}",
-                traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.4",
+                    title = "General.Unauthorized",
+                    status = 403,
+                    detail = "NotAuthorized",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}",
+                    traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.4",
+                    title = "General.Forbidden",
+                    status = 403,
+                    detail = "ArtistMustHaveAtLeastOneAlbum",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}",
+                    traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
+                }
             }
         );
 
@@ -844,6 +859,7 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                             "MediaContributorIdCannotBeEmpty",
                             "UnknownMediaContributorRole",
                             "AlbumsListCannotBeNull",
+                            "AlbumIdCannotBeEmpty",
                             "MetadataCannotBeNull",
                             "AlbumTitleCannotBeEmpty",
                             "AlbumTitleMustBeMaximum255CharactersLong",
@@ -876,12 +892,15 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                             "LanguageNativeNameMustBeMaximum50CharactersLong",
                             "UnknownMusicMediaFormat",
                             "CatalogNumberMustBeMaximum50CharactersLong",
+                            "BarcodeValueCannotBeEmpty",
+                            "InvalidFormatForBarcode",
                             "RatingsListCannotBeNull",
                             "RatingValueMustBePositive",
                             "RatingValueCannotBeGreaterThanMaxValue",
                             "RatingMaxValueMustBePositive",
                             "RatingVoteCountMustBePositive",
                             "TracksListCannotBeNull",
+                            "TrackIdCannotBeEmpty",
                             "TrackPathCannotBeEmpty",
                             "TrackPathMustBeMaximum2048CharactersLong",
                             "TrackNumberMustBeGreaterThanZero",
@@ -891,8 +910,7 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                             "BpmMustBeGreaterThanZero",
                             "WorkMustBeMaximum255CharactersLong",
                             "MoodNameCannotBeEmpty",
-                            "IsrcValueCannotBeEmpty",
-                            "ArtistMustHaveAtLeastOneAlbum"
+                            "IsrcValueCannotBeEmpty"
                         }
                     }
                 },

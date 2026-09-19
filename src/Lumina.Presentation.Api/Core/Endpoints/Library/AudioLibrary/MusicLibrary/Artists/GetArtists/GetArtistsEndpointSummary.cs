@@ -25,13 +25,11 @@ public class GetArtistsEndpointSummary : Summary<GetArtistsEndpoint, GetArtistsR
         Description = "Returns the paginated list of the artists of the media library identified by the request, with the full details of each artist. The page is returned to an Admin, who can see the artists of all libraries, or to the owner of the library.";
 
         ExampleRequest = new GetArtistsRequest(
-            LibraryId: Guid.NewGuid(),
             CurrentPage: 1,
             PerPage: 48,
             SearchTerm: "queen"
         );
 
-        RequestParam(r => r.LibraryId, "The Id of the media library whose artists are retrieved. Required.");
         RequestParam(r => r.CurrentPage, "The page of results to retrieve. Optional.");
         RequestParam(r => r.PerPage, "The maximum number of artists to retrieve per page. Optional.");
         RequestParam(r => r.SearchTerm, "The search term used to filter the artists by name. Optional.");
@@ -90,7 +88,7 @@ public class GetArtistsEndpointSummary : Summary<GetArtistsEndpoint, GetArtistsR
                     status = 401,
                     title = "Unauthorized",
                     detail = "You are not authorized",
-                    instance = "/api/v1/libraries/{libraryId}/artists"
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists"
                 },
                 new
                 {
@@ -98,7 +96,7 @@ public class GetArtistsEndpointSummary : Summary<GetArtistsEndpoint, GetArtistsR
                     status = 401,
                     title = "Unauthorized",
                     detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
-                    instance = "/api/v1/libraries/{libraryId}/artists"
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists"
                 },
                 new
                 {
@@ -106,7 +104,7 @@ public class GetArtistsEndpointSummary : Summary<GetArtistsEndpoint, GetArtistsR
                     status = 401,
                     title = "Unauthorized",
                     detail = "The token is invalid",
-                    instance = "/api/v1/libraries/{libraryId}/artists"
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists"
                 }
             }
         );
@@ -118,7 +116,7 @@ public class GetArtistsEndpointSummary : Summary<GetArtistsEndpoint, GetArtistsR
                 title = "General.Unauthorized",
                 status = 403,
                 detail = "NotAuthorized",
-                instance = "/api/v1/libraries/{libraryId}/artists",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists",
                 traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
             }
         );
@@ -130,7 +128,7 @@ public class GetArtistsEndpointSummary : Summary<GetArtistsEndpoint, GetArtistsR
                 title = "General.Validation",
                 status = 422,
                 detail = "OneOrMoreValidationErrorsOccurred",
-                instance = "/api/v1/libraries/{libraryId}/artists",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists",
                 errors = new Dictionary<string, string[]>
                 {
                     {

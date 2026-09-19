@@ -25,13 +25,11 @@ public class GetArtistsLiteEndpointSummary : Summary<GetArtistsLiteEndpoint, Get
         Description = "Returns the lightweight read models of the artists of a media library, projecting only the fields needed to display the artists in a card-based grid, without loading the full artist entities and their related data. The page is returned to an Admin, who can see the artists of all libraries, or to the owner of the library.";
 
         ExampleRequest = new GetArtistsLiteRequest(
-            LibraryId: Guid.NewGuid(),
             CurrentPage: 1,
             PerPage: 48,
             SearchTerm: "queen"
         );
 
-        RequestParam(r => r.LibraryId, "The Id of the media library whose artists are retrieved. Required.");
         RequestParam(r => r.CurrentPage, "The page of results to retrieve. Optional.");
         RequestParam(r => r.PerPage, "The maximum number of artists to retrieve per page. Optional.");
         RequestParam(r => r.SearchTerm, "The search term used to filter the artists by name. Optional.");
@@ -69,7 +67,7 @@ public class GetArtistsLiteEndpointSummary : Summary<GetArtistsLiteEndpoint, Get
                     status = 401,
                     title = "Unauthorized",
                     detail = "You are not authorized",
-                    instance = "/api/v1/libraries/{libraryId}/artists/lite"
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/lite"
                 },
                 new
                 {
@@ -77,7 +75,7 @@ public class GetArtistsLiteEndpointSummary : Summary<GetArtistsLiteEndpoint, Get
                     status = 401,
                     title = "Unauthorized",
                     detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
-                    instance = "/api/v1/libraries/{libraryId}/artists/lite"
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/lite"
                 },
                 new
                 {
@@ -85,7 +83,7 @@ public class GetArtistsLiteEndpointSummary : Summary<GetArtistsLiteEndpoint, Get
                     status = 401,
                     title = "Unauthorized",
                     detail = "The token is invalid",
-                    instance = "/api/v1/libraries/{libraryId}/artists/lite"
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/lite"
                 }
             }
         );
@@ -97,7 +95,7 @@ public class GetArtistsLiteEndpointSummary : Summary<GetArtistsLiteEndpoint, Get
                 title = "General.Unauthorized",
                 status = 403,
                 detail = "NotAuthorized",
-                instance = "/api/v1/libraries/{libraryId}/artists/lite",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/lite",
                 traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
             }
         );
@@ -109,7 +107,7 @@ public class GetArtistsLiteEndpointSummary : Summary<GetArtistsLiteEndpoint, Get
                 title = "General.Validation",
                 status = 422,
                 detail = "OneOrMoreValidationErrorsOccurred",
-                instance = "/api/v1/libraries/{libraryId}/artists/lite",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/lite",
                 errors = new Dictionary<string, string[]>
                 {
                     {

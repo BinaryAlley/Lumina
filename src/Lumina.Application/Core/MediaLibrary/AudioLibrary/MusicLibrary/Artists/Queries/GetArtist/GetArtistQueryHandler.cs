@@ -65,18 +65,28 @@ public class GetArtistQueryHandler : IQueryHandler<GetArtistQuery, Result<Artist
             return ApplicationErrors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // Admins can see all artists; for everyone else, only the artists of the libraries they own.
-        Result<ArtistEntity?> getArtistResult = await _unitOfWork.ArtistRepository.GetByIdAsync(query.ArtistId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
+        // The validator guarantees that the route identifiers are non-empty Guids before this point.
+        Guid libraryId = Guid.Parse(query.LibraryId!);
+        Guid artistId = Guid.Parse(query.ArtistId!);
+
+        Result<ArtistEntity?> getArtistResult = await _unitOfWork.ArtistRepository.GetByIdAsync(artistId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getArtistResult.IsFailure)
             return getArtistResult.Errors;
         if (getArtistResult.Value is null)
             return Errors.Music.ArtistNotFound;
+        ArtistEntity existingArtist = getArtistResult.Value;
 
+        // Resource scoping: the artist must belong to the library named by the route, so that an artist can never be read through another
+        // library's route; the mismatch is reported as not found, without disclosing that the artist exists in another library.
+        if (existingArtist.LibraryId != libraryId)
+            return Errors.Music.ArtistNotFound;
+
+        // Admins can see all artists; for everyone else, only the artists of the libraries they own.
         bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
-            userId, new LibraryOwnershipPolicyContext(getArtistResult.Value.LibraryId), cancellationToken).ConfigureAwait(false);
+            userId, new LibraryOwnershipPolicyContext(existingArtist.LibraryId), cancellationToken).ConfigureAwait(false);
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
-        return getArtistResult.Value.ToResponse();
+        return existingArtist.ToResponse();
     }
 }

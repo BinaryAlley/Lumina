@@ -619,6 +619,7 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
   ],
   "albums": [
     {
+      "albumId": "e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f",
       "metadata": {
         "title": "A Night at the Opera",
         "originalTitle": "A Night at the Opera",
@@ -680,6 +681,7 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
       ],
       "tracks": [
         {
+          "trackId": "9f0e1d2c-3b4a-4c6d-8e7f-9a0b1c2d3e4f",
           "path": "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
           "metadata": {
             "title": "Bohemian Rhapsody",
@@ -754,6 +756,7 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
           ]
         },
         {
+          "trackId": "8e1f2a3b-4c5d-4e6f-8a9b-0c1d2e3f4a5b",
           "path": "/music/queen/a-night-at-the-opera/07-youre-my-best-friend.flac",
           "metadata": {
             "title": "You're My Best Friend",

@@ -65,19 +65,29 @@ public class GetArtistAlbumsQueryHandler : IQueryHandler<GetArtistAlbumsQuery, R
             return ApplicationErrors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        Result<ArtistEntity?> getArtistResult = await _unitOfWork.ArtistRepository.GetByIdAsync(query.ArtistId, cancellationToken: cancellationToken).ConfigureAwait(false);
+        // The validator guarantees that the route identifiers are non-empty Guids before this point.
+        Guid libraryId = Guid.Parse(query.LibraryId!);
+        Guid artistId = Guid.Parse(query.ArtistId!);
+
+        Result<ArtistEntity?> getArtistResult = await _unitOfWork.ArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: false, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getArtistResult.IsFailure)
             return getArtistResult.Errors;
         if (getArtistResult.Value is null)
             return Errors.Music.ArtistNotFound;
+        ArtistEntity existingArtist = getArtistResult.Value;
+
+        // Resource scoping: the artist must belong to the library named by the route, so that the albums of an artist can never be read through
+        // another library's route; the mismatch is reported as not found, without disclosing that the artist exists in another library.
+        if (existingArtist.LibraryId != libraryId)
+            return Errors.Music.ArtistNotFound;
 
         // Admins can see the albums of the artists of all libraries; for everyone else, only of the libraries they own.
         bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
-            userId, new LibraryOwnershipPolicyContext(getArtistResult.Value.LibraryId), cancellationToken).ConfigureAwait(false);
+            userId, new LibraryOwnershipPolicyContext(existingArtist.LibraryId), cancellationToken).ConfigureAwait(false);
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
-        Result<IReadOnlyList<AlbumEntity>> getAlbumsResult = await _unitOfWork.AlbumRepository.GetByArtistIdAsync(query.ArtistId, cancellationToken).ConfigureAwait(false);
+        Result<IReadOnlyList<AlbumEntity>> getAlbumsResult = await _unitOfWork.AlbumRepository.GetByArtistIdAsync(artistId, cancellationToken).ConfigureAwait(false);
         return getAlbumsResult.Match(value => Result.From(value.ToResponses()), errors => errors);
     }
 }

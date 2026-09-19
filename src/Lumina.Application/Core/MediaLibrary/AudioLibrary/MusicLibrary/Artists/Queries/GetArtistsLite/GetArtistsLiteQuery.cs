@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
-using System;
+using Lumina.Application.Common.DTO.Pagination;
 using System.Diagnostics;
 #endregion
 
@@ -9,14 +9,12 @@ namespace Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artists
 /// <summary>
 /// Query for getting the lightweight read models of all the artists of a media library.
 /// </summary>
-/// <param name="LibraryId">The Id of the media library whose artists are retrieved.</param>
-/// <param name="CurrentPage">The page of results to retrieve.</param>
-/// <param name="PerPage">The maximum number of artists to retrieve per page.</param>
+/// <param name="LibraryId">The unique identifier of the media library whose artists are retrieved, taken from the route.</param>
+/// <param name="PaginationData">The object containing the requested pagination data.</param>
 /// <param name="SearchTerm">The search term used to filter the artists by name.</param>
 [DebuggerDisplay("LibraryId: {LibraryId}")]
 public record GetArtistsLiteQuery(
-    Guid LibraryId,
-    int? CurrentPage,
-    int? PerPage,
+    string? LibraryId,
+    PaginationDataDto? PaginationData,
     string? SearchTerm
 ) : IQuery;

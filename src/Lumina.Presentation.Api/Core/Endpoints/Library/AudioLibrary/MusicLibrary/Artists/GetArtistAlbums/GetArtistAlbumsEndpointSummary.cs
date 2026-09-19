@@ -4,7 +4,6 @@ using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
@@ -20,7 +19,7 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibra
 /// Class used for providing a textual description for the <see cref="GetArtistAlbumsEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetArtistAlbumsEndpointSummary : Summary<GetArtistAlbumsEndpoint, GetArtistAlbumsRequest>
+public class GetArtistAlbumsEndpointSummary : Summary<GetArtistAlbumsEndpoint, EmptyRequest>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="GetArtistAlbumsEndpointSummary"/> class.
@@ -28,13 +27,7 @@ public class GetArtistAlbumsEndpointSummary : Summary<GetArtistAlbumsEndpoint, G
     public GetArtistAlbumsEndpointSummary()
     {
         Summary = "Retrieves the list of albums of an artist.";
-        Description = "Returns the full details of the albums of the artist identified by the request, with the full details of each album. The list is returned to an Admin, who can see the albums of the artists of all libraries, or to the owner of the library of the artist.";
-
-        ExampleRequest = new GetArtistAlbumsRequest(
-            ArtistId: Guid.NewGuid()
-        );
-
-        RequestParam(r => r.ArtistId, "The Id of the artist whose albums are retrieved, taken from the route. Required.");
+        Description = "Returns the full details of the albums of the artist identified by the route, with the full details of each album. The list is returned to an Admin, who can see the albums of the artists of all libraries, or to the owner of the library of the artist.";
 
         ResponseParam<AlbumResponse>(r => r.Id, "The Id of the album.");
         ResponseParam<AlbumResponse>(r => r.ArtistId, "The Id of the artist the album belongs to.");
@@ -233,7 +226,7 @@ public class GetArtistAlbumsEndpointSummary : Summary<GetArtistAlbumsEndpoint, G
                     status = 401,
                     title = "Unauthorized",
                     detail = "You are not authorized",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums"
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums"
                 },
                 new
                 {
@@ -241,7 +234,7 @@ public class GetArtistAlbumsEndpointSummary : Summary<GetArtistAlbumsEndpoint, G
                     status = 401,
                     title = "Unauthorized",
                     detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums"
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums"
                 },
                 new
                 {
@@ -249,7 +242,7 @@ public class GetArtistAlbumsEndpointSummary : Summary<GetArtistAlbumsEndpoint, G
                     status = 401,
                     title = "Unauthorized",
                     detail = "The token is invalid",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums"
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums"
                 }
             }
         );
@@ -261,7 +254,7 @@ public class GetArtistAlbumsEndpointSummary : Summary<GetArtistAlbumsEndpoint, G
                 title = "General.Unauthorized",
                 status = 403,
                 detail = "NotAuthorized",
-                instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums",
                 traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
             }
         );
@@ -273,7 +266,7 @@ public class GetArtistAlbumsEndpointSummary : Summary<GetArtistAlbumsEndpoint, G
                 title = "General.NotFound",
                 status = 404,
                 detail = "ArtistNotFound",
-                instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums",
                 traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
             }
         );
@@ -285,7 +278,7 @@ public class GetArtistAlbumsEndpointSummary : Summary<GetArtistAlbumsEndpoint, G
                 title = "General.Validation",
                 status = 422,
                 detail = "OneOrMoreValidationErrorsOccurred",
-                instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums",
                 errors = new Dictionary<string, string[]>
                 {
                     {

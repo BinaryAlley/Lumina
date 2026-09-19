@@ -25,12 +25,10 @@ public class GetArtistAlbumsLiteEndpointSummary : Summary<GetArtistAlbumsLiteEnd
         Description = "Returns the lightweight read models of the albums of the artist identified by its Id, projecting only the fields needed to display the albums in a card-based grid, without loading the full album entities and their related data. The page is returned to an Admin, who can see the albums of the artists of all libraries, or to the owner of the library of the artist.";
 
         ExampleRequest = new GetArtistAlbumsLiteRequest(
-            ArtistId: Guid.NewGuid(),
             CurrentPage: 1,
             PerPage: 48
         );
 
-        RequestParam(r => r.ArtistId, "The Id of the artist whose albums are retrieved. Required.");
         RequestParam(r => r.CurrentPage, "The page of results to retrieve. Optional.");
         RequestParam(r => r.PerPage, "The maximum number of albums to retrieve per page. Optional.");
 
@@ -70,7 +68,7 @@ public class GetArtistAlbumsLiteEndpointSummary : Summary<GetArtistAlbumsLiteEnd
                     status = 401,
                     title = "Unauthorized",
                     detail = "You are not authorized",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/lite"
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/lite"
                 },
                 new
                 {
@@ -78,7 +76,7 @@ public class GetArtistAlbumsLiteEndpointSummary : Summary<GetArtistAlbumsLiteEnd
                     status = 401,
                     title = "Unauthorized",
                     detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/lite"
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/lite"
                 },
                 new
                 {
@@ -86,7 +84,7 @@ public class GetArtistAlbumsLiteEndpointSummary : Summary<GetArtistAlbumsLiteEnd
                     status = 401,
                     title = "Unauthorized",
                     detail = "The token is invalid",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/lite"
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/lite"
                 }
             }
         );
@@ -98,7 +96,7 @@ public class GetArtistAlbumsLiteEndpointSummary : Summary<GetArtistAlbumsLiteEnd
                 title = "General.Unauthorized",
                 status = 403,
                 detail = "NotAuthorized",
-                instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/lite",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/lite",
                 traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
             }
         );
@@ -110,7 +108,7 @@ public class GetArtistAlbumsLiteEndpointSummary : Summary<GetArtistAlbumsLiteEnd
                 title = "General.NotFound",
                 status = 404,
                 detail = "ArtistNotFound",
-                instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/lite",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/lite",
                 traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
             }
         );
@@ -122,7 +120,7 @@ public class GetArtistAlbumsLiteEndpointSummary : Summary<GetArtistAlbumsLiteEnd
                 title = "General.Validation",
                 status = 422,
                 detail = "OneOrMoreValidationErrorsOccurred",
-                instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/lite",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/lite",
                 errors = new Dictionary<string, string[]>
                 {
                     {

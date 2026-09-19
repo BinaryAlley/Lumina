@@ -100,6 +100,6 @@ public class DeleteArtistCommandHandler : ICommandHandler<DeleteArtistCommand, R
         if (saveChangesResult.IsFailure)
             return saveChangesResult.Errors;
 
-        return deleteArtistResult;
+        return Result.Deleted;
     }
 }

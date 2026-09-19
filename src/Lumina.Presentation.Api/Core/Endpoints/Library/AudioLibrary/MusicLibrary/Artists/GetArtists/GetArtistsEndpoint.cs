@@ -44,13 +44,15 @@ public class GetArtistsEndpoint : BaseEndpoint<GetArtistsRequest, IResult>
     }
 
     /// <summary>
-    /// Gets the list of all the artists of the media library identified by <paramref name="request"/>.
+    /// Gets the list of all the artists of the media library identified by the route.
     /// </summary>
-    /// <param name="request">The request containing the Id of the media library whose artists are retrieved.</param>
+    /// <param name="request">The request containing the pagination and filtering options of the artists to be retrieved.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(GetArtistsRequest request, CancellationToken cancellationToken)
     {
-        Result<PaginatedResponse<ArtistResponse>> result = await _getArtistsQueryHandler.HandleAsync(request.ToQuery(), cancellationToken).ConfigureAwait(false);
+        // Take unique identifiers from the route.
+        string? libraryId = HttpContext.Request.RouteValues["libraryId"]?.ToString();
+        Result<PaginatedResponse<ArtistResponse>> result = await _getArtistsQueryHandler.HandleAsync(request.ToQuery(libraryId), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

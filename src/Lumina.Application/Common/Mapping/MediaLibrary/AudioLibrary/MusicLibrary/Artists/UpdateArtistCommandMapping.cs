@@ -32,13 +32,13 @@ public static class UpdateArtistCommandMapping
     {
         // Map the media contributors that make up the artist to their domain counterparts.
         IEnumerable<Result<MusicMediaContributor>> domainContributorsResult = command.Contributors!.ToMusicDomainEntities();
-        List<Error> errors = [.. domainContributorsResult.Where(contributorResult => contributorResult.IsFailure).SelectMany(contributorResult => contributorResult.Errors) ?? []];
+        List<Error> errors = [.. domainContributorsResult.Where(contributorResult => contributorResult.IsFailure).SelectMany(contributorResult => contributorResult.Errors)];
         if (errors.Count > 0)
             return errors;
 
         // Build each album of the artist, together with its metadata, contributors, ratings and tracks.
         IEnumerable<Result<Album>> domainAlbumsResult = command.Albums!.ToDomainEntities();
-        errors = [.. domainAlbumsResult.Where(albumResult => albumResult.IsFailure).SelectMany(albumResult => albumResult.Errors) ?? []];
+        errors = [.. domainAlbumsResult.Where(albumResult => albumResult.IsFailure).SelectMany(albumResult => albumResult.Errors)];
         if (errors.Count > 0)
             return errors;
 
