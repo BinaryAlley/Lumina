@@ -136,7 +136,7 @@ public class BookTests
         Assert.Equal(sourceBook.Path, book.Path);
         Assert.Equal(sourceBook.Metadata, book.Metadata);
         Assert.Equal(createdOnUtc, book.CreatedOnUtc);
-        Assert.Equal(updatedOnUtc, book.UpdatedOnUtc);
+        Assert.Equal(Optional<DateTime>.Some(updatedOnUtc), book.UpdatedOnUtc);
         Assert.Equal(sourceBook.ISBNs, book.ISBNs);
         Assert.Equal(sourceBook.Ratings, book.Ratings);
     }

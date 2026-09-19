@@ -129,7 +129,7 @@ public class DeleteThemeEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsValidationError_ShouldReturnValidationProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsValidationErrors_ShouldReturnValidationProblemResult()
     {
         // Arrange
         DeleteThemeRequest request = _deleteThemeRequestFixture.Create();
@@ -155,7 +155,7 @@ public class DeleteThemeEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendDeleteThemeCommandToHandler()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendDeleteThemeCommandToSender()
     {
         // Arrange
         DeleteThemeRequest request = _deleteThemeRequestFixture.Create();

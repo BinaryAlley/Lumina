@@ -34,7 +34,7 @@ public class TagTests
     public void Create_WhenNameIsNullOrWhitespace_ShouldReturnError(string? name)
     {
         // Act
-        Result<Tag> result = Tag.Create(name);
+        Result<Tag> result = Tag.Create(name!);
 
         // Assert
         Assert.True(result.IsFailure);

@@ -45,18 +45,19 @@ public class LibraryScanFailedDomainEventTests
         Assert.Equal(libraryId, domainEvent.LibraryId);
         Assert.Equal(compositeId, domainEvent.MediaLibraryScanCompositeId);
         Assert.Equal(occurredOnUtc, domainEvent.OccurredOnUtc);
-        Assert.Equal(errorMessage, domainEvent.ErrorMessage);
+        Assert.True(domainEvent.ErrorMessage.HasValue);
+        Assert.Equal(errorMessage, domainEvent.ErrorMessage.Value);
         Assert.IsType<IDomainEvent>(domainEvent, exactMatch: false);
     }
 
     [Fact]
-    public void Constructor_WhenCalledWithoutErrorMessage_ShouldDefaultErrorMessageToNull()
+    public void Constructor_WhenCalledWithoutErrorMessage_ShouldLeaveErrorMessageUnset()
     {
         // Act
         LibraryScanFailedDomainEvent domainEvent = _libraryScanFailedDomainEventFixture.Create(includeErrorMessage: false);
 
         // Assert
-        Assert.Null(domainEvent.ErrorMessage);
+        Assert.False(domainEvent.ErrorMessage.HasValue);
         Assert.IsType<IDomainEvent>(domainEvent, exactMatch: false);
     }
 }

@@ -63,7 +63,7 @@ public class GetLibraryArtworkProvidersEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsNotFoundError_ShouldReturnProblemResult()
     {
         // Arrange
         GetLibraryArtworkProvidersRequest request = _getLibraryArtworkProvidersRequestFixture.Create();

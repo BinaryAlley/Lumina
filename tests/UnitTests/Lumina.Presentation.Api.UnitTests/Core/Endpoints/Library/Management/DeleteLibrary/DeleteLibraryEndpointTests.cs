@@ -53,7 +53,7 @@ public class DeleteLibraryEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsNotFoundError_ShouldReturnProblemResult()
     {
         // Arrange
         DeleteLibraryRequest request = _deleteLibraryRequestFixture.Create();

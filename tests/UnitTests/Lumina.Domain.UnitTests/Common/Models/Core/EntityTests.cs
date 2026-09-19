@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Domain.Common.Models.Core;
+using Lumina.Domain.Common.Primitives;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -109,11 +110,11 @@ public class EntityTests
 
         // Act
         entity.CreatedOnUtc = createdOnUtc;
-        entity.UpdatedOnUtc = updatedOnUtc;
+        entity.UpdatedOnUtc = Optional<DateTime>.Some(updatedOnUtc);
 
         // Assert
         Assert.Equal(createdOnUtc, entity.CreatedOnUtc);
-        Assert.Equal(updatedOnUtc, entity.UpdatedOnUtc);
+        Assert.Equal(Optional<DateTime>.Some(updatedOnUtc), entity.UpdatedOnUtc);
     }
 
     /// <summary>

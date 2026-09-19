@@ -48,7 +48,7 @@ public class CancelLibrariesScanEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsFailureError_ShouldReturnProblemResult()
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
@@ -73,7 +73,7 @@ public class CancelLibrariesScanEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendCancelLibrariesScanCommandToHandler()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendCancelLibrariesScanCommandToSender()
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;

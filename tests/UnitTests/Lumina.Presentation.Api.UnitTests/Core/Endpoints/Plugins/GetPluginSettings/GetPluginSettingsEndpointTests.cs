@@ -62,7 +62,7 @@ public class GetPluginSettingsEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsNotFoundError_ShouldReturnProblemResult()
     {
         // Arrange
         GetPluginSettingsRequest request = _getPluginSettingsRequestFixture.Create();

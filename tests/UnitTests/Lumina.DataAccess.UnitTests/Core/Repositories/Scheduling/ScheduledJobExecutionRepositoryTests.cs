@@ -46,7 +46,7 @@ public class ScheduledJobExecutionRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        Result<ScheduledJobExecutionEntity?> result = await _sut.GetByIdAsync(execution.Id, CancellationToken.None);
+        Result<ScheduledJobExecutionEntity?> result = await _sut.GetByIdAsync(execution.Id, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -59,7 +59,7 @@ public class ScheduledJobExecutionRepositoryTests
     public async Task GetByIdAsync_WhenExecutionDoesNotExist_ShouldReturnNull()
     {
         // Act
-        Result<ScheduledJobExecutionEntity?> result = await _sut.GetByIdAsync(Guid.NewGuid(), CancellationToken.None);
+        Result<ScheduledJobExecutionEntity?> result = await _sut.GetByIdAsync(Guid.NewGuid(), cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);

@@ -48,7 +48,7 @@ public class IsbnTests
     public void Create_WhenValueIsNullOrWhitespace_ShouldReturnError(string? value)
     {
         // Act
-        Result<Isbn> result = Isbn.Create(value, IsbnFormat.Isbn10);
+        Result<Isbn> result = Isbn.Create(value!, IsbnFormat.Isbn10);
 
         // Assert
         Assert.True(result.IsFailure);

@@ -56,7 +56,7 @@ public class GetDrivesEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsNotFoundError_ShouldReturnProblemResult()
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
@@ -81,7 +81,7 @@ public class GetDrivesEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendGetDrivesQueryToHandler()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendGetDrivesQueryToSender()
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;

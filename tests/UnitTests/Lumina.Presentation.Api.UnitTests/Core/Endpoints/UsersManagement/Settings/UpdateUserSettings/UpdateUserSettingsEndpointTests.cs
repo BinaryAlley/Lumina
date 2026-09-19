@@ -53,7 +53,7 @@ public class UpdateUserSettingsEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsValidationErrors_ShouldReturnValidationProblemResult()
     {
         // Arrange
         UpdateUserSettingsRequest request = _updateUserSettingsRequestFixture.Create(isPaginationEnabled: true, itemsPerPage: 0, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false);
@@ -75,7 +75,7 @@ public class UpdateUserSettingsEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendUpdateUserSettingsCommandToHandler()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendUpdateUserSettingsCommandToSender()
     {
         // Arrange
         UpdateUserSettingsRequest request = _updateUserSettingsRequestFixture.Create(isPaginationEnabled: true, itemsPerPage: 24, shouldIgnoreThePrefixForAlphaPicker: true, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false);

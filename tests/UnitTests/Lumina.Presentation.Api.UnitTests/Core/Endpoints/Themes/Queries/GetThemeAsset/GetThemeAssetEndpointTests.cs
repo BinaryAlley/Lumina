@@ -86,7 +86,7 @@ public class GetThemeAssetEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsValidationError_ShouldReturnValidationProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsValidationErrors_ShouldReturnValidationProblemResult()
     {
         // Arrange
         GetThemeAssetRequest request = _getThemeAssetRequestFixture.Create();
@@ -112,7 +112,7 @@ public class GetThemeAssetEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendGetThemeAssetQueryToHandler()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendGetThemeAssetQueryToSender()
     {
         // Arrange
         GetThemeAssetRequest request = _getThemeAssetRequestFixture.Create();

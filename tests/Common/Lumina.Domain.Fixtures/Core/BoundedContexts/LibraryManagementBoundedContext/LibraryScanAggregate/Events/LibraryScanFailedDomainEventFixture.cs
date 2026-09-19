@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
@@ -44,6 +45,6 @@ public class LibraryScanFailedDomainEventFixture
             libraryId ?? _libraryIdFixture.Create(),
             mediaLibraryScanCompositeId ?? _mediaLibraryScanCompositeIdFixture.Create(),
             occurredOnUtc ?? DateTime.UtcNow,
-            includeErrorMessage ? (errorMessage ?? _faker.Random.Words()) : null);
+            Optional<string>.FromNullable(includeErrorMessage ? (errorMessage ?? _faker.Random.Words()) : null));
     }
 }

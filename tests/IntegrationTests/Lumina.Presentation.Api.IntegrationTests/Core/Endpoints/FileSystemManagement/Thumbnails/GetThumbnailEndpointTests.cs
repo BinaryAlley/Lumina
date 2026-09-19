@@ -25,7 +25,6 @@ public class GetThumbnailEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
-        ReferenceHandler = ReferenceHandler.Preserve,
         PropertyNameCaseInsensitive = true,
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };

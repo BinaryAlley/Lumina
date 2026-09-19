@@ -65,7 +65,7 @@ public class UpdateRoleEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsFailureError_ShouldReturnProblemResult()
     {
         // Arrange
         UpdateRoleRequest request = _updateRoleRequestFixture.Create(roleName: "UpdatedAdmin");

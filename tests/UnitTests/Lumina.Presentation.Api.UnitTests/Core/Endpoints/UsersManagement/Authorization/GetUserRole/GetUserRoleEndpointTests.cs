@@ -58,7 +58,7 @@ public class GetUserRoleEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsFailureError_ShouldReturnProblemResult()
     {
         // Arrange
         GetUserRoleRequest request = _getUserRoleRequestFixture.Create();

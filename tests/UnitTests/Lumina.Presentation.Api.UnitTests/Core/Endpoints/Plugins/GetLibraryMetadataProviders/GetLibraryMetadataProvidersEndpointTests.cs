@@ -63,7 +63,7 @@ public class GetLibraryMetadataProvidersEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsNotFoundError_ShouldReturnProblemResult()
     {
         // Arrange
         GetLibraryMetadataProvidersRequest request = _getLibraryMetadataProvidersRequestFixture.Create();

@@ -60,7 +60,7 @@ public class GetThumbnailEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsNotFoundError_ShouldReturnProblemResult()
     {
         // Arrange
         GetThumbnailRequest request = _getThumbnailRequestFixture.Create("/path/to/nonexistent/file.jpg", 80);
@@ -86,7 +86,7 @@ public class GetThumbnailEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsValidationError_ShouldReturnValidationProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsValidationErrors_ShouldReturnValidationProblemResult()
     {
         // Arrange
         GetThumbnailRequest request = _getThumbnailRequestFixture.Create("/path/to/nonexistent/file.jpg", 80);

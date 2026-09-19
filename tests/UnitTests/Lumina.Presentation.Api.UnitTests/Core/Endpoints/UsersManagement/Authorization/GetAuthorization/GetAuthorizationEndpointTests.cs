@@ -65,7 +65,7 @@ public class GetAuthorizationEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsUnauthorizedError_ShouldReturnProblemResult()
     {
         // Arrange
         GetAuthorizationRequest request = _getAuthorizationRequestFixture.Create();

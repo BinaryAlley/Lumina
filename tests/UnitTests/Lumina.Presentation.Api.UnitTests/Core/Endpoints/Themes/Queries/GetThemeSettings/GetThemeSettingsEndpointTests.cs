@@ -79,7 +79,7 @@ public class GetThemeSettingsEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendGetThemeSettingsQueryToHandler()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendGetThemeSettingsQueryToSender()
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;

@@ -81,7 +81,7 @@ public class UserSettingsRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        Result<UserSettingsEntity?> result = await _sut.GetByIdAsync(settings.Id, CancellationToken.None);
+        Result<UserSettingsEntity?> result = await _sut.GetByIdAsync(settings.Id, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -94,7 +94,7 @@ public class UserSettingsRepositoryTests
     public async Task GetByIdAsync_WhenSettingsDoNotExist_ShouldReturnNull()
     {
         // Act
-        Result<UserSettingsEntity?> result = await _sut.GetByIdAsync(Guid.NewGuid(), CancellationToken.None);
+        Result<UserSettingsEntity?> result = await _sut.GetByIdAsync(Guid.NewGuid(), cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);

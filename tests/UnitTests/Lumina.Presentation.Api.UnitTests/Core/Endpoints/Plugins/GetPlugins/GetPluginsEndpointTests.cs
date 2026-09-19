@@ -56,7 +56,7 @@ public class GetPluginsEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsFailureError_ShouldReturnProblemResult()
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
@@ -81,7 +81,7 @@ public class GetPluginsEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendGetPluginsQueryToHandler()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendGetPluginsQueryToSender()
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;

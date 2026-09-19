@@ -57,7 +57,7 @@ public class ChangePasswordEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsValidationErrors_ShouldReturnValidationProblemResult()
     {
         // Arrange
         ChangePasswordRequest request = _changePasswordRequestFixture.Create();

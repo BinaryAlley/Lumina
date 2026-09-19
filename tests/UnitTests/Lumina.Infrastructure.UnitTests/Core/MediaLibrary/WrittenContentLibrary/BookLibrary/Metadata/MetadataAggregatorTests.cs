@@ -5,12 +5,13 @@ using Lumina.Contracts.Fixtures.Core.DTO.MediaContributors;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
-using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Lumina.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Metadata;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.MediaLibrary.Management.Scanning.Jobs.Common;
+namespace Lumina.Infrastructure.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Metadata;
 
 /// <summary>
 /// Contains unit tests for the <see cref="MetadataAggregator"/> class.
@@ -31,7 +32,7 @@ public class MetadataAggregatorTests
     public void Merge_WhenBothMetadataHaveScalarValues_ShouldKeepTheFirstValues()
     {
         // Arrange
-        BookMetadataDto first = _bookMetadataDtoFixture.Create(includeOptionalProperties: false, 
+        BookMetadataDto first = _bookMetadataDtoFixture.Create(includeOptionalProperties: false,
             title: "First Title",
             originalTitle: "First Original Title",
             description: "First Description",
@@ -50,7 +51,7 @@ public class MetadataAggregatorTests
             barnesAndNobleId: "FIRST-BN",
             appleBooksId: "FIRST-APPLE",
             coverImagePath: "First Cover");
-        BookMetadataDto second = _bookMetadataDtoFixture.Create(includeOptionalProperties: false, 
+        BookMetadataDto second = _bookMetadataDtoFixture.Create(includeOptionalProperties: false,
             title: "Second Title",
             originalTitle: "Second Original Title",
             description: "Second Description",
@@ -235,8 +236,8 @@ public class MetadataAggregatorTests
     public void Merge_WhenBothHaveContributors_ShouldUnionAndDeDuplicateByDisplayNameAndRole()
     {
         // Arrange
-        BookMetadataDto first = _bookMetadataDtoFixture.Create(title: "Title", coverImagePath: "First Cover", includeOptionalProperties: false) with { Contributors = [_mediaContributorDtoFixture.Create("Author A", "Author")] };
-        BookMetadataDto second = _bookMetadataDtoFixture.Create(title: "Title", coverImagePath: "First Cover", includeOptionalProperties: false) with { Contributors = [_mediaContributorDtoFixture.Create("Author A", "Author"), _mediaContributorDtoFixture.Create("Translator B", "Translator")] };
+        BookMetadataDto first = _bookMetadataDtoFixture.Create(title: "Title", coverImagePath: "First Cover", includeOptionalProperties: false) with { Contributors = [_mediaContributorDtoFixture.Create("Author A", MediaContributorRole.Author)] };
+        BookMetadataDto second = _bookMetadataDtoFixture.Create(title: "Title", coverImagePath: "First Cover", includeOptionalProperties: false) with { Contributors = [_mediaContributorDtoFixture.Create("Author A", MediaContributorRole.Author), _mediaContributorDtoFixture.Create("Translator B", MediaContributorRole.Translator)] };
 
         // Act
         BookMetadataDto result = MetadataAggregator.Merge(first, second);
@@ -267,7 +268,7 @@ public class MetadataAggregatorTests
     public void Merge_WhenOnlyFirstHasCollections_ShouldReturnTheFirstCollections()
     {
         // Arrange
-        BookMetadataDto first = _bookMetadataDtoFixture.Create(title: "Title", coverImagePath: "First Cover", includeOptionalProperties: false) with { Tags = [_tagDtoFixture.Create(name: "Tag A")], Genres = [_genreDtoFixture.Create(name: "Genre A")], Isbns = [_isbnDtoFixture.Create(value: "9780306406157", format: IsbnFormat.Isbn13)], Contributors = [_mediaContributorDtoFixture.Create("Author A", "Author")], Ratings = [_bookRatingDtoFixture.Create(value: 8m, maxValue: 10m, source: BookRatingSource.Calibre, voteCount: null)] };
+        BookMetadataDto first = _bookMetadataDtoFixture.Create(title: "Title", coverImagePath: "First Cover", includeOptionalProperties: false) with { Tags = [_tagDtoFixture.Create(name: "Tag A")], Genres = [_genreDtoFixture.Create(name: "Genre A")], Isbns = [_isbnDtoFixture.Create(value: "9780306406157", format: IsbnFormat.Isbn13)], Contributors = [_mediaContributorDtoFixture.Create("Author A", MediaContributorRole.Author)], Ratings = [_bookRatingDtoFixture.Create(value: 8m, maxValue: 10m, source: BookRatingSource.Calibre, voteCount: null)] };
         BookMetadataDto second = _bookMetadataDtoFixture.Create(title: "Title", coverImagePath: "First Cover", includeOptionalProperties: false) with { Tags = null, Genres = null, Isbns = null, Contributors = null, Ratings = null };
 
         // Act
@@ -286,7 +287,7 @@ public class MetadataAggregatorTests
     {
         // Arrange
         BookMetadataDto first = _bookMetadataDtoFixture.Create(title: "Title", coverImagePath: "First Cover", includeOptionalProperties: false) with { Tags = null, Genres = null, Isbns = null, Contributors = null, Ratings = null };
-        BookMetadataDto second = _bookMetadataDtoFixture.Create(title: "Title", coverImagePath: "First Cover", includeOptionalProperties: false) with { Tags = [_tagDtoFixture.Create(name: "Tag B")], Genres = [_genreDtoFixture.Create(name: "Genre B")], Isbns = [_isbnDtoFixture.Create(value: "0306406152", format: IsbnFormat.Isbn10)], Contributors = [_mediaContributorDtoFixture.Create("Author B", "Author")], Ratings = [_bookRatingDtoFixture.Create(value: 4.2m, maxValue: 5m, source: BookRatingSource.OpenLibrary, voteCount: 100)] };
+        BookMetadataDto second = _bookMetadataDtoFixture.Create(title: "Title", coverImagePath: "First Cover", includeOptionalProperties: false) with { Tags = [_tagDtoFixture.Create(name: "Tag B")], Genres = [_genreDtoFixture.Create(name: "Genre B")], Isbns = [_isbnDtoFixture.Create(value: "0306406152", format: IsbnFormat.Isbn10)], Contributors = [_mediaContributorDtoFixture.Create("Author B", MediaContributorRole.Author)], Ratings = [_bookRatingDtoFixture.Create(value: 4.2m, maxValue: 5m, source: BookRatingSource.OpenLibrary, voteCount: 100)] };
 
         // Act
         BookMetadataDto result = MetadataAggregator.Merge(first, second);

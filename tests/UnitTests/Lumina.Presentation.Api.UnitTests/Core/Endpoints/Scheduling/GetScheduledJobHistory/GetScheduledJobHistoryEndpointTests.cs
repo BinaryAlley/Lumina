@@ -61,7 +61,7 @@ public class GetScheduledJobHistoryEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsUnauthorizedError_ShouldReturnProblemResult()
     {
         // Arrange
         GetScheduledJobHistoryRequest request = _getScheduledJobHistoryRequestFixture.Create();
@@ -78,7 +78,7 @@ public class GetScheduledJobHistoryEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendMappedQueryToHandler()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendMappedQueryToSender()
     {
         // Arrange
         GetScheduledJobHistoryRequest request = _getScheduledJobHistoryRequestFixture.Create();

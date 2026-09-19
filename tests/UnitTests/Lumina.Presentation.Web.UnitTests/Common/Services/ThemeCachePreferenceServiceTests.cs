@@ -37,7 +37,7 @@ public class ThemeCachePreferenceServiceTests
         Guid userId = Guid.NewGuid();
 
         // Act
-        bool result = await _sut.GetAsync(userId, defaultValue: true, CancellationToken.None);
+        bool result = await _sut.GetAsync(userId, isCachingEnabledByDefault: true, CancellationToken.None);
 
         // Assert
         Assert.True(result);
@@ -50,7 +50,7 @@ public class ThemeCachePreferenceServiceTests
         Guid userId = Guid.NewGuid();
 
         // Act
-        bool result = await _sut.GetAsync(userId, defaultValue: false, CancellationToken.None);
+        bool result = await _sut.GetAsync(userId, isCachingEnabledByDefault: false, CancellationToken.None);
 
         // Assert
         Assert.False(result);
@@ -64,7 +64,7 @@ public class ThemeCachePreferenceServiceTests
 
         // Act
         await _sut.SetAsync(userId, isEnabled: true, CancellationToken.None);
-        bool result = await _sut.GetAsync(userId, defaultValue: false, CancellationToken.None);
+        bool result = await _sut.GetAsync(userId, isCachingEnabledByDefault: false, CancellationToken.None);
 
         // Assert
         Assert.True(result);
@@ -79,7 +79,7 @@ public class ThemeCachePreferenceServiceTests
         // Act
         await _sut.SetAsync(userId, isEnabled: true, CancellationToken.None);
         await _sut.SetAsync(userId, isEnabled: false, CancellationToken.None);
-        bool result = await _sut.GetAsync(userId, defaultValue: true, CancellationToken.None);
+        bool result = await _sut.GetAsync(userId, isCachingEnabledByDefault: true, CancellationToken.None);
 
         // Assert
         Assert.False(result);
@@ -94,8 +94,8 @@ public class ThemeCachePreferenceServiceTests
 
         // Act
         await _sut.SetAsync(firstUserId, isEnabled: true, CancellationToken.None);
-        bool firstUserResult = await _sut.GetAsync(firstUserId, defaultValue: false, CancellationToken.None);
-        bool secondUserResult = await _sut.GetAsync(secondUserId, defaultValue: false, CancellationToken.None);
+        bool firstUserResult = await _sut.GetAsync(firstUserId, isCachingEnabledByDefault: false, CancellationToken.None);
+        bool secondUserResult = await _sut.GetAsync(secondUserId, isCachingEnabledByDefault: false, CancellationToken.None);
 
         // Assert
         Assert.True(firstUserResult);

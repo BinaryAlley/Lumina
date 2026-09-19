@@ -61,7 +61,7 @@ public class StopScheduledJobEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsFailureError_ShouldReturnProblemResult()
     {
         // Arrange
         StopScheduledJobRequest request = _stopScheduledJobRequestFixture.Create();
@@ -79,7 +79,7 @@ public class StopScheduledJobEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsNotAuthorized_ShouldReturnForbiddenProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsNotAuthorizedError_ShouldReturnProblemResult()
     {
         // Arrange
         StopScheduledJobRequest request = _stopScheduledJobRequestFixture.Create();
@@ -96,7 +96,7 @@ public class StopScheduledJobEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendMappedCommandToHandler()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendMappedCommandToSender()
     {
         // Arrange
         StopScheduledJobRequest request = _stopScheduledJobRequestFixture.Create();

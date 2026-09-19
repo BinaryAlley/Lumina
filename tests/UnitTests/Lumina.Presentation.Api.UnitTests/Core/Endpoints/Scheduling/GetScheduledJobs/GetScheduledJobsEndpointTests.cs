@@ -56,7 +56,7 @@ public class GetScheduledJobsEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsUnauthorizedError_ShouldReturnProblemResult()
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
@@ -72,7 +72,7 @@ public class GetScheduledJobsEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendQueryToHandler()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendQueryToSender()
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;

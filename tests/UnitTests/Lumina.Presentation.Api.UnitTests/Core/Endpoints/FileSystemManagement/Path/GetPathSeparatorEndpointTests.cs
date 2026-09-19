@@ -53,7 +53,7 @@ public class GetPathSeparatorEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendGetPathSeparatorQueryToHandler()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendGetPathSeparatorQueryToSender()
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;

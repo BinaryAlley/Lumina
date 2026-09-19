@@ -55,7 +55,7 @@ public class RemoveScheduledJobEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsNotFoundError_ShouldReturnProblemResult()
     {
         // Arrange
         RemoveScheduledJobRequest request = _removeScheduledJobRequestFixture.Create();
@@ -73,7 +73,7 @@ public class RemoveScheduledJobEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsNotAuthorized_ShouldReturnForbiddenProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsNotAuthorizedError_ShouldReturnProblemResult()
     {
         // Arrange
         RemoveScheduledJobRequest request = _removeScheduledJobRequestFixture.Create();
@@ -90,7 +90,7 @@ public class RemoveScheduledJobEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendMappedCommandToHandler()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendMappedCommandToSender()
     {
         // Arrange
         RemoveScheduledJobRequest request = _removeScheduledJobRequestFixture.Create();

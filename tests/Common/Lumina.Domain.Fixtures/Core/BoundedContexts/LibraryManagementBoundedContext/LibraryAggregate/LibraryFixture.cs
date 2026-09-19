@@ -37,7 +37,7 @@ public class LibraryFixture
     /// <param name="libraryType">Optional. The library type.</param>
     /// <param name="contentLocations">Optional. The content locations of the library.</param>
     /// <param name="coverImage">Optional. The cover image of the library.</param>
-    /// <param name="includeCoverImage">Whether the cover image should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeCoverImage">Whether the cover image should be included, or left unset, meaning the library has no cover.</param>
     /// <param name="isEnabled">Whether the library is enabled.</param>
     /// <param name="isLocked">Whether the library is locked.</param>
     /// <param name="canDownloadMetadataFromWeb">Whether metadata download from the web is enabled.</param>
@@ -78,7 +78,7 @@ public class LibraryFixture
                 title ?? _faker.Random.String2(_faker.Random.Number(1, 50)),
                 libraryType ?? _faker.PickRandom<LibraryType>(),
                 contentLocations ?? validPaths.Take(_random.Next(1, validPaths.Count)),
-                resolvedCoverImage,
+                Optional<string>.FromNullable(resolvedCoverImage),
                 isEnabled,
                 isLocked,
                 canDownloadMetadataFromWeb,
@@ -92,7 +92,7 @@ public class LibraryFixture
                 title ?? _faker.Random.String2(_faker.Random.Number(1, 50)),
                 libraryType ?? _faker.PickRandom<LibraryType>(),
                 contentLocations ?? validPaths.Take(_random.Next(1, validPaths.Count)),
-                resolvedCoverImage,
+                Optional<string>.FromNullable(resolvedCoverImage),
                 isEnabled,
                 isLocked,
                 canDownloadMetadataFromWeb,

@@ -129,7 +129,7 @@ public class RestoreThemeEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsValidationError_ShouldReturnValidationProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsValidationErrors_ShouldReturnValidationProblemResult()
     {
         // Arrange
         RestoreThemeRequest request = _restoreThemeRequestFixture.Create();
@@ -155,7 +155,7 @@ public class RestoreThemeEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendRestoreThemeCommandToHandler()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendRestoreThemeCommandToSender()
     {
         // Arrange
         RestoreThemeRequest request = _restoreThemeRequestFixture.Create();

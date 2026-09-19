@@ -63,7 +63,7 @@ public class UpdateUserRoleAndPermissionsEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsFailureError_ShouldReturnProblemResult()
     {
         // Arrange
         UpdateUserRoleAndPermissionsRequest request = _updateUserRoleAndPermissionsRequestFixture.Create();
