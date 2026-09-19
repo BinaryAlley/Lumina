@@ -30,12 +30,12 @@ public static class WrittenContentMetadataDtoMapping
             return domainReleaseInfoResult.Value.Errors;
 
         IEnumerable<Result<Genre>> domainGenresResult = dto.Genres!.ToDomainEntities();
-        List<Error> errors = [.. domainGenresResult.Where(genreResult => genreResult.IsFailure).SelectMany(genreResult => genreResult.Errors) ?? []];
+        List<Error> errors = [.. domainGenresResult.Where(genreResult => genreResult.IsFailure).SelectMany(genreResult => genreResult.Errors)];
         if (errors.Count > 0)
             return errors;
 
         IEnumerable<Result<Tag>> domainTagsResult = dto.Tags!.ToDomainEntities();
-        errors = [.. domainTagsResult.Where(tagResult => tagResult.IsFailure).SelectMany(tagResult => tagResult.Errors) ?? []];
+        errors = [.. domainTagsResult.Where(tagResult => tagResult.IsFailure).SelectMany(tagResult => tagResult.Errors)];
         if (errors.Count > 0)
             return errors;
 

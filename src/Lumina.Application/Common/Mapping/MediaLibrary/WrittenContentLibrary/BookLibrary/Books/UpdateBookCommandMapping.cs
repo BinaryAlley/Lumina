@@ -34,12 +34,12 @@ public static class UpdateBookCommandMapping
     public static Result<Book> ToDomainEntity(this UpdateBookCommand command, BookEntity existingBook)
     {
         IEnumerable<Result<BookRating>> domainRatingsResult = command.Ratings!.ToDomainEntities();
-        List<Error> errors = [.. domainRatingsResult.Where(ratingResult => ratingResult.IsFailure).SelectMany(ratingResult => ratingResult.Errors) ?? []];
+        List<Error> errors = [.. domainRatingsResult.Where(ratingResult => ratingResult.IsFailure).SelectMany(ratingResult => ratingResult.Errors)];
         if (errors.Count > 0)
             return errors;
 
         IEnumerable<Result<Isbn>> domainIsbnsResult = command.ISBNs!.ToDomainEntities();
-        errors = [.. domainIsbnsResult.Where(isbnResult => isbnResult.IsFailure).SelectMany(isbnResult => isbnResult.Errors) ?? []];
+        errors = [.. domainIsbnsResult.Where(isbnResult => isbnResult.IsFailure).SelectMany(isbnResult => isbnResult.Errors)];
         if (errors.Count > 0)
             return errors;
 
@@ -57,7 +57,7 @@ public static class UpdateBookCommandMapping
 
         // Map the media contributors referenced by the user to their domain counterparts; a contributor is identified by its id and carries the role it played.
         IEnumerable<Result<BookMediaContributor>> domainContributorsResult = command.Contributors!.ToBookDomainEntities();
-        errors = [.. domainContributorsResult.Where(domainContributor => domainContributor.IsFailure).SelectMany(domainContributor => domainContributor.Errors) ?? []];
+        errors = [.. domainContributorsResult.Where(domainContributor => domainContributor.IsFailure).SelectMany(domainContributor => domainContributor.Errors)];
         if (errors.Count > 0)
             return errors;
 

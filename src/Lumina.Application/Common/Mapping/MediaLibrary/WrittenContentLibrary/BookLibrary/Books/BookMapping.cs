@@ -71,8 +71,9 @@ public static class BookMapping
             Ratings = [.. domainEntity.Ratings.ToRepositoryEntities()],
             CreatedOnUtc = domainEntity.CreatedOnUtc,
             CreatedBy = Guid.Empty,
-            UpdatedOnUtc = domainEntity.UpdatedOnUtc.HasValue ? domainEntity.UpdatedOnUtc : null,
-            UpdatedBy = domainEntity.UpdatedOnUtc.HasValue ? Guid.NewGuid() : null,
+            // The audit columns are owned by the auditing interceptor, which stamps only the rows that actually changed, so they are never mapped here.
+            UpdatedOnUtc = null,
+            UpdatedBy = null,
         };
     }
 

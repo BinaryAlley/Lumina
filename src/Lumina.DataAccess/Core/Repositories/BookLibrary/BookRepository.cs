@@ -7,6 +7,7 @@ using Lumina.Application.Common.DTO.Filtering;
 using Lumina.Application.Common.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Specifications;
+using Lumina.DataAccess.Common.Persistence;
 using Lumina.DataAccess.Core.Repositories.BookLibrary.Specifications;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Errors;
@@ -100,7 +101,8 @@ internal sealed class BookRepository : IBookRepository
                 .Include(book => book.ISBNs)
                 .Include(book => book.Ratings)
                 .Include(book => book.Contributors)
-                .Include(book => book.Artwork);
+                .Include(book => book.Artwork)
+                .AsSplitQuery();
         }
         return await query.FirstOrDefaultAsync(book => book.Id == id, cancellationToken).ConfigureAwait(false);
     }
@@ -130,7 +132,8 @@ internal sealed class BookRepository : IBookRepository
                 .Include(book => book.ISBNs)
                 .Include(book => book.Ratings)
                 .Include(book => book.Contributors)
-                .Include(book => book.Artwork);
+                .Include(book => book.Artwork)
+                .AsSplitQuery();
         }
 
         // Books should always be retrieved only per owning libraries.
@@ -283,6 +286,7 @@ internal sealed class BookRepository : IBookRepository
             .Include(book => book.ISBNs)
             .Include(book => book.Contributors)
             .Include(book => book.Artwork)
+            .AsSplitQuery()
             .Where(book => book.LibraryId == libraryId)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
     }
@@ -301,6 +305,7 @@ internal sealed class BookRepository : IBookRepository
             .Include(book => book.Genres)
             .Include(book => book.ISBNs)
             .Include(book => book.Artwork)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(book => book.LibraryId == libraryId && book.Path == path, cancellationToken).ConfigureAwait(false);
     }
 
@@ -320,6 +325,7 @@ internal sealed class BookRepository : IBookRepository
             .Include(book => book.Genres)
             .Include(book => book.ISBNs)
             .Include(book => book.Contributors)
+            .AsSplitQuery()
             .Where(book => book.LibraryId == libraryId
                         && book.MetadataStatus != MetadataStatus.Enriched
                         && (lastPath == null || book.Path.CompareTo(lastPath) > 0))
@@ -356,6 +362,7 @@ internal sealed class BookRepository : IBookRepository
             .Include(book => book.Genres)
             .Include(book => book.ISBNs)
             .Include(book => book.Artwork)
+            .AsSplitQuery()
             .Where(book => book.LibraryId == libraryId
                         && !book.Artwork.Any(artwork => artwork.ArtworkType == ArtworkType.Cover && artwork.Status == ArtworkStatus.Enriched)
                         && (lastPath == null || book.Path.CompareTo(lastPath) > 0))
@@ -483,7 +490,7 @@ internal sealed class BookRepository : IBookRepository
     }
 
     /// <summary>
-    /// Updates a book, replacing its editable data while preserving its identity, enrichment and audit columns.
+    /// Updates a book, replacing only the editable data that actually changed, while preserving its identity, the identity of its children, its enrichment columns and its audit columns.
     /// </summary>
     /// <param name="data">The book whose editable data is applied to the stored book.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
@@ -500,47 +507,88 @@ internal sealed class BookRepository : IBookRepository
         if (foundBook is null)
             return Errors.WrittenContent.BookNotFound;
 
-        // The stored enrichment and identity columns are never overwritten by an edit: they are owned by the scan and by the record itself.
+        // The stored enrichment and identity columns are never overwritten by an edit: they are owned by the scan and by the record itself. The audit columns are
+        // only ever written by the auditing interceptor, which is why the copier restores them after copying the editable values.
         Guid libraryId = foundBook.LibraryId;
         string path = foundBook.Path;
         MetadataStatus metadataStatus = foundBook.MetadataStatus;
         DateTime? lastMetadataUpdateUtc = foundBook.LastMetadataUpdateUtc;
         string? metadataProvider = foundBook.MetadataProvider;
-        DateTime createdOnUtc = foundBook.CreatedOnUtc;
-        Guid createdBy = foundBook.CreatedBy;
-
-        // Copy the editable scalar properties of the book, ignoring the unchanged collection and enrichment columns.
-        _luminaDbContext.Entry(foundBook).CurrentValues.SetValues(data);
+        EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundBook, data);
         foundBook.LibraryId = libraryId;
         foundBook.Path = path;
         foundBook.MetadataStatus = metadataStatus;
         foundBook.LastMetadataUpdateUtc = lastMetadataUpdateUtc;
         foundBook.MetadataProvider = metadataProvider;
-        foundBook.CreatedOnUtc = createdOnUtc;
-        foundBook.CreatedBy = createdBy;
 
-        // Reuse the stored tags and genres whose names already exist, so that the shared tables are not duplicated.
-        List<TagEntity> existingTags = await _luminaDbContext.Set<TagEntity>()
-            .Where(tag => data.Tags.Select(bookTag => bookTag.Name).Contains(tag.Name))
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
-        List<GenreEntity> existingGenres = await _luminaDbContext.Set<GenreEntity>()
-            .Where(genre => data.Genres.Select(bookGenre => bookGenre.Name).Contains(genre.Name))
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
+        await ReconcileTagsAndGenresAsync(foundBook, data, cancellationToken).ConfigureAwait(false);
 
-        foundBook.Tags.Clear();
-        foundBook.Tags.UnionWith(data.Tags.Select(tag => existingTags.FirstOrDefault(existingTag => existingTag.Name == tag.Name) ?? tag));
-        foundBook.Genres.Clear();
-        foundBook.Genres.UnionWith(data.Genres.Select(genre => existingGenres.FirstOrDefault(existingGenre => existingGenre.Name == genre.Name) ?? genre));
+        // ISBNs are owned value objects with no identity anyone could reference, so an ISBN whose format changed is replaced as a whole, while the ones that did not
+        // change are left exactly as they are stored. Matching by the ISBN value keeps an update in place instead of recreating every ISBN of the book.
+        CollectionReconciler.Reconcile(
+            foundBook.ISBNs,
+            data.ISBNs,
+            existingIsbn => existingIsbn.Value ?? string.Empty,
+            incomingIsbn => incomingIsbn.Value ?? string.Empty,
+            shouldReplace: (existingIsbn, incomingIsbn) => !existingIsbn.Equals(incomingIsbn),
+            createNew: incomingIsbn => incomingIsbn);
 
-        // Replace the owned collections of the book, so that removed entries are deleted and new entries are inserted.
-        foundBook.ISBNs.Clear();
-        foundBook.ISBNs.AddRange(data.ISBNs);
-        foundBook.Ratings.Clear();
-        foundBook.Ratings.AddRange(data.Ratings);
-        foundBook.Contributors.Clear();
-        foundBook.Contributors.AddRange(data.Contributors);
+        // Ratings are owned value objects with no identity anyone could reference, so a changed rating is replaced as a whole, while the ratings that did not change
+        // are left exactly as they are stored. Matching by the rating source keeps an update in place instead of recreating every rating of the book.
+        CollectionReconciler.Reconcile(
+            foundBook.Ratings,
+            data.Ratings,
+            existingRating => existingRating.Source?.ToString() ?? string.Empty,
+            incomingRating => incomingRating.Source?.ToString() ?? string.Empty,
+            shouldReplace: (existingRating, incomingRating) => !existingRating.Equals(incomingRating),
+            createNew: incomingRating => incomingRating);
+
+        // A contributor participation is matched by the contributor and the role they played. Matched participations keep their identity and their audit columns, so a
+        // contributor that is displayed or linked elsewhere is never deleted and re-inserted just because another field of the book was edited.
+        CollectionReconciler.Reconcile(
+            foundBook.Contributors,
+            data.Contributors,
+            existingContributor => (existingContributor.MediaContributorId, existingContributor.Role),
+            incomingContributor => (incomingContributor.MediaContributorId, incomingContributor.Role),
+            shouldReplace: (existingContributor, incomingContributor) => false,
+            createNew: incomingContributor => incomingContributor);
 
         return Result.Updated;
+    }
+
+    /// <summary>
+    /// Reconciles the tags and genres of <paramref name="foundBook"/> against the ones carried by <paramref name="data"/>, reusing the stored tags and genres whose names already exist.
+    /// </summary>
+    /// <param name="foundBook">The tracked book whose tags and genres are reconciled.</param>
+    /// <param name="data">The book carrying the desired tags and genres.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    private async Task ReconcileTagsAndGenresAsync(BookEntity foundBook, BookEntity data, CancellationToken cancellationToken)
+    {
+        // Tags and genres are shared across the whole database, so the ones whose names are already stored are reused, and only the missing names are inserted.
+        List<string> tagNames = [.. data.Tags.Select(tag => tag.Name!)];
+        List<string> genreNames = [.. data.Genres.Select(genre => genre.Name!)];
+        List<TagEntity> existingTags = await _luminaDbContext.Set<TagEntity>()
+            .Where(tag => tagNames.Contains(tag.Name!))
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+        List<GenreEntity> existingGenres = await _luminaDbContext.Set<GenreEntity>()
+            .Where(genre => genreNames.Contains(genre.Name!))
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+
+        CollectionReconciler.Reconcile(
+            foundBook.Tags,
+            data.Tags.Select(tag => existingTags.FirstOrDefault(existingTag => existingTag.Name == tag.Name) ?? tag),
+            existingTag => existingTag.Name!,
+            incomingTag => incomingTag.Name!,
+            shouldReplace: (existingTag, incomingTag) => false,
+            createNew: incomingTag => incomingTag);
+
+        CollectionReconciler.Reconcile(
+            foundBook.Genres,
+            data.Genres.Select(genre => existingGenres.FirstOrDefault(existingGenre => existingGenre.Name == genre.Name) ?? genre),
+            existingGenre => existingGenre.Name!,
+            incomingGenre => incomingGenre.Name!,
+            shouldReplace: (existingGenre, incomingGenre) => false,
+            createNew: incomingGenre => incomingGenre);
     }
 
     /// <summary>

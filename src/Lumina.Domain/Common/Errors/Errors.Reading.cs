@@ -11,7 +11,6 @@ public static partial class Errors
 {
     public static class Reading
     {
-        public static Error BookIdCannotBeEmpty => Error.Validation(description: nameof(BookIdCannotBeEmpty));
         public static Error LocationRefCannotBeEmpty => Error.Validation(description: nameof(LocationRefCannotBeEmpty));
         public static Error ResourceKeyCannotBeEmpty => Error.Validation(description: nameof(ResourceKeyCannotBeEmpty));
         public static Error BookNotFound => Error.NotFound(description: nameof(BookNotFound));
