@@ -37,6 +37,7 @@ public static class UpdateTrackRequestMapping
             request.MusicBrainzRecordingId,
             request.MusicBrainzTrackId,
             request.MusicBrainzWorkId,
+            request.Contributors,
             request.Ratings,
             request.Moods,
             request.Isrcs);

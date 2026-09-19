@@ -77,22 +77,47 @@ public static class AddTrackCommandMapping
             musicBrainzWorkId = musicBrainzWorkIdResult.Value;
         }
 
+        List<Isrc> isrcs = [.. domainIsrcsResult.Select(isrcResult => isrcResult.Value)];
+        List<Mood> moods = [.. domainMoodsResult.Select(moodResult => moodResult.Value)];
+        List<MusicMediaContributor> contributors = [.. domainContributorsResult.Select(contributorResult => contributorResult.Value)];
+        List<AudioRating> ratings = [.. domainRatingsResult.Select(ratingResult => ratingResult.Value)];
+
+        // A track carries an Id only when it already exists; otherwise a new one is minted.
+        if (command.TrackId.HasValue)
+            return Track.Create(
+                TrackId.Create(command.TrackId.Value),
+                command.Path!,
+                metadataResult.Value,
+                command.TrackNumber ?? 1,
+                Optional<int>.FromNullable(command.DiscNumber),
+                isrcs,
+                Optional<string>.FromNullable(command.Script),
+                Optional<MusicKey>.FromNullable(command.Key),
+                Optional<int>.FromNullable(command.Bpm),
+                moods,
+                Optional<string>.FromNullable(command.Work),
+                musicBrainzRecordingId,
+                musicBrainzTrackId,
+                musicBrainzWorkId,
+                contributors,
+                ratings);
+
         return Track.Create(
             command.Path!,
             metadataResult.Value,
             command.TrackNumber ?? 1,
             Optional<int>.FromNullable(command.DiscNumber),
-            [.. domainIsrcsResult.Select(isrcResult => isrcResult.Value)],
+            isrcs,
             Optional<string>.FromNullable(command.Script),
             Optional<MusicKey>.FromNullable(command.Key),
             Optional<int>.FromNullable(command.Bpm),
-            [.. domainMoodsResult.Select(moodResult => moodResult.Value)],
+            moods,
             Optional<string>.FromNullable(command.Work),
             musicBrainzRecordingId,
             musicBrainzTrackId,
             musicBrainzWorkId,
-            [.. domainContributorsResult.Select(contributorResult => contributorResult.Value)],
-            [.. domainRatingsResult.Select(ratingResult => ratingResult.Value)]);
+            contributors,
+            ratings);
     }
 
     /// <summary>

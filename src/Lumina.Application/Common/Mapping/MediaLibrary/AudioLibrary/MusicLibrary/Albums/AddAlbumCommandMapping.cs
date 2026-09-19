@@ -83,6 +83,28 @@ public static class AddAlbumCommandMapping
             musicBrainzReleaseArtistId = musicBrainzReleaseArtistIdResult.Value;
         }
 
+        List<MusicMediaContributor> contributors = [.. domainContributorsResult.Select(contributorResult => contributorResult.Value)];
+        List<AudioRating> ratings = [.. domainRatingsResult.Select(ratingResult => ratingResult.Value)];
+        List<Track> tracks = [.. domainTracksResult.Select(trackResult => trackResult.Value)];
+
+        // An album carries an Id only when it already exists; otherwise a new one is minted. The repository preserves the stored
+        // creation audit when it merges an existing album, so a transient value is used here.
+        if (command.AlbumId.HasValue)
+            return Album.Create(
+                AlbumId.Create(command.AlbumId.Value),
+                metadataResult.Value,
+                Optional<MusicMediaFormat>.FromNullable(command.MediaFormat),
+                barcode,
+                Optional<string>.FromNullable(command.CatalogNumber),
+                musicBrainzReleaseId,
+                musicBrainzReleaseGroupId,
+                musicBrainzReleaseArtistId,
+                contributors,
+                ratings,
+                tracks,
+                DateTime.UtcNow,
+                Optional<DateTime>.None());
+
         return Album.Create(
             metadataResult.Value,
             Optional<MusicMediaFormat>.FromNullable(command.MediaFormat),
@@ -91,9 +113,9 @@ public static class AddAlbumCommandMapping
             musicBrainzReleaseId,
             musicBrainzReleaseGroupId,
             musicBrainzReleaseArtistId,
-            [.. domainContributorsResult.Select(contributorResult => contributorResult.Value)],
-            [.. domainRatingsResult.Select(ratingResult => ratingResult.Value)],
-            [.. domainTracksResult.Select(trackResult => trackResult.Value)]);
+            contributors,
+            ratings,
+            tracks);
     }
 
     /// <summary>

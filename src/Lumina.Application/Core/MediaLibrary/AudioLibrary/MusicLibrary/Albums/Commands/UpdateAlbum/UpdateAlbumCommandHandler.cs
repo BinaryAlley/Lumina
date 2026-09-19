@@ -12,6 +12,7 @@ using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary;
 using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
+using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Common;
 using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaContributors;
@@ -21,6 +22,7 @@ using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.Common.ValueObjects;
+using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
@@ -85,21 +87,23 @@ public class UpdateAlbumCommandHandler : ICommandHandler<UpdateAlbumCommand, Res
         Guid artistId = Guid.Parse(command.ArtistId!);
         Guid albumId = Guid.Parse(command.AlbumId!);
 
-        Result<AlbumEntity?> getAlbumResult = await _unitOfWork.AlbumRepository.GetByIdAsync(albumId, cancellationToken: cancellationToken).ConfigureAwait(false);
-        if (getAlbumResult.IsFailure)
-            return getAlbumResult.Errors;
-        if (getAlbumResult.Value is null)
-            return Errors.Music.AlbumNotFound;
-        AlbumEntity existingAlbum = getAlbumResult.Value;
+        // An album is a child of the artist aggregate, so the whole aggregate is loaded and the album is edited within it.
+        Result<ArtistEntity?> getArtistResult = await _unitOfWork.ArtistRepository.GetByIdAsync(artistId, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (getArtistResult.IsFailure)
+            return getArtistResult.Errors;
 
         // Resource scoping: the album must belong to the library and the artist named by the route, so that an album can never be edited
         // through another library's or artist's route; the mismatch is reported as not found, without disclosing that the album exists elsewhere.
-        if (existingAlbum.LibraryId != libraryId || existingAlbum.ArtistId != artistId)
+        if (getArtistResult.Value is null || getArtistResult.Value.LibraryId != libraryId)
+            return Errors.Music.AlbumNotFound;
+        ArtistEntity existingArtist = getArtistResult.Value;
+        AlbumEntity? existingAlbum = existingArtist.Albums.FirstOrDefault(album => album.Id == albumId);
+        if (existingAlbum is null)
             return Errors.Music.AlbumNotFound;
 
         // Admins can update the albums of all libraries; for everyone else, only the albums of the libraries they own.
         bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
-            userId, new LibraryOwnershipPolicyContext(existingAlbum.LibraryId), cancellationToken).ConfigureAwait(false);
+            userId, new LibraryOwnershipPolicyContext(existingArtist.LibraryId), cancellationToken).ConfigureAwait(false);
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
@@ -115,23 +119,31 @@ public class UpdateAlbumCommandHandler : ICommandHandler<UpdateAlbumCommand, Res
         if (getContributorsResult.IsFailure)
             return getContributorsResult.Errors;
 
-        Result<Album> updateAlbumResult = command.ToDomainEntity(existingAlbum);
+        // The write path goes through the aggregate root: an album is a child entity of the artist aggregate, unlike Book and Artist,
+        // which are aggregate roots and are reconstituted directly with their own Create method. This difference is intentional.
+        Result<Artist> artistResult = existingArtist.ToDomainEntity();
+        if (artistResult.IsFailure)
+            return artistResult.Errors;
+
+        Result<Artist> updateAlbumResult = command.ToDomainEntity(artistResult.Value);
         if (updateAlbumResult.IsFailure)
             return updateAlbumResult.Errors;
 
-        // Map the updated domain album onto a fresh repository entity, ready for the repository to replace the stored data.
-        AlbumEntity persistenceAlbum = updateAlbumResult.Value.ToRepositoryEntity(existingAlbum.ArtistId, existingAlbum.LibraryId);
-
-        Result<Updated> updateResult = await _unitOfWork.AlbumRepository.UpdateAsync(persistenceAlbum, cancellationToken).ConfigureAwait(false);
+        Result<Updated> updateResult = await _unitOfWork.ArtistRepository.UpdateAsync(updateAlbumResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
         if (updateResult.IsFailure)
             return updateResult.Errors;
         Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         if (saveChangesResult.IsFailure)
             return saveChangesResult.Errors;
 
-        // The repository merges the fresh entity into the tracked stored album and the audit interceptor stamps the update columns, so the
-        // stored album carries the persisted values, including the audit ones.
-        return existingAlbum.ToResponse();
+        // Reading does not need the aggregate: the album is read directly and mapped to the response.
+        Result<AlbumEntity?> getPersistedAlbumResult = await _unitOfWork.AlbumRepository.GetByIdAsync(albumId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (getPersistedAlbumResult.IsFailure)
+            return getPersistedAlbumResult.Errors;
+        if (getPersistedAlbumResult.Value is null)
+            return Errors.Music.AlbumNotFound;
+
+        return getPersistedAlbumResult.Value.ToResponse();
     }
 
     /// <summary>

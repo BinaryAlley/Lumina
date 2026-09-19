@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaContributors;
@@ -28,7 +28,41 @@ public class UpdateAlbumEndpointSummary : Summary<UpdateAlbumEndpoint, UpdateAlb
     public UpdateAlbumEndpointSummary()
     {
         Summary = "Updates an existing album.";
-        Description = "Updates the details of the album identified by the request, returning the full details of the updated album. The tracks of the album are left untouched. The album is updated by an Admin, who can update the albums of all libraries, or by the owner of the library of the album.";
+        Description = "Updates the details of the album identified by the request, returning the full details of the updated album. The album is updated by an Admin, who can update the albums of all libraries, or by the owner of the library of the album.";
+
+        RequestParam(r => r.Metadata, "The album metadata of the album. Required.");
+        RequestParam(r => r.Metadata!.Title, "The title of the album. Required.");
+        RequestParam(r => r.Metadata!.OriginalTitle, "The original title of the album. Optional.");
+        RequestParam(r => r.Metadata!.Description, "The description of the album. Optional.");
+        RequestParam(r => r.Metadata!.ReleaseInfo, "The release information, including release date and other relevant details. Optional.");
+        RequestParam(r => r.Metadata!.ReleaseInfo!.OriginalReleaseDate, "The original release date of the album. Optional.");
+        RequestParam(r => r.Metadata!.ReleaseInfo!.OriginalReleaseYear, "The original release year of the album. Optional.");
+        RequestParam(r => r.Metadata!.ReleaseInfo!.ReReleaseDate, "The re-release or reissue date of the album. Optional.");
+        RequestParam(r => r.Metadata!.ReleaseInfo!.ReReleaseYear, "The re-release or reissue year of the album. Optional.");
+        RequestParam(r => r.Metadata!.ReleaseInfo!.ReleaseCountry, "The country or region of the release of the album. Optional.");
+        RequestParam(r => r.Metadata!.ReleaseInfo!.ReleaseVersion, "The version or edition of the release of the album. Optional.");
+        RequestParam(r => r.Metadata!.ReleaseType, "The type of the release. Optional.");
+        RequestParam(r => r.Metadata!.ReleaseStatus, "The status of the release. Optional.");
+        RequestParam(r => r.Metadata!.TotalDiscs, "The number of discs of the release. Optional.");
+        RequestParam(r => r.Metadata!.TotalTracks, "The number of tracks of the release. Optional.");
+        RequestParam(r => r.Metadata!.Language, "The language of the album. Optional.");
+        RequestParam(r => r.Metadata!.Language!.LanguageCode, "The ISO 639-1 two-letter language code of the album. Optional.");
+        RequestParam(r => r.Metadata!.Language!.LanguageName, "The full name of the language of the album in English. Optional.");
+        RequestParam(r => r.Metadata!.Language!.NativeName, "The native name of the language of the album. Optional.");
+        RequestParam(r => r.Metadata!.OriginalLanguage, "The original language of the album, if it has been translated. Optional.");
+        RequestParam(r => r.Metadata!.OriginalLanguage!.LanguageCode, "The ISO 639-1 two-letter original language code of the album. Optional.");
+        RequestParam(r => r.Metadata!.OriginalLanguage!.LanguageName, "The full name of the original language of the album in English. Optional.");
+        RequestParam(r => r.Metadata!.OriginalLanguage!.NativeName, "The native name of the original language of the album. Optional.");
+        RequestParam(r => r.Metadata!.Genres, "The list of genres associated with the album. Optional.");
+        RequestParam(r => r.Metadata!.Tags, "The list of tags that further describe or categorize the album. Optional.");
+        RequestParam(r => r.MediaFormat, "The physical or digital medium of the album. Optional.");
+        RequestParam(r => r.Barcode, "The barcode of the album. Optional.");
+        RequestParam(r => r.CatalogNumber, "The catalog number of the album. Optional.");
+        RequestParam(r => r.MusicBrainzReleaseId, "The MusicBrainz identifier of the release. Optional.");
+        RequestParam(r => r.MusicBrainzReleaseGroupId, "The MusicBrainz identifier of the release group. Optional.");
+        RequestParam(r => r.MusicBrainzReleaseArtistId, "The MusicBrainz identifier of the release artist. Optional.");
+        RequestParam(r => r.Contributors, "The list of media contributors that performed on the album. Required.");
+        RequestParam(r => r.Ratings, "The list of ratings for this album. Required.");
 
         ExampleRequest = new UpdateAlbumRequest(
             Metadata: new AlbumMetadataDto(
@@ -101,40 +135,6 @@ public class UpdateAlbumEndpointSummary : Summary<UpdateAlbumEndpoint, UpdateAlb
                 )
             ]
         );
-
-        RequestParam(r => r.Metadata, "The album metadata of the album. Required.");
-        RequestParam(r => r.Metadata!.Title, "The title of the album. Required.");
-        RequestParam(r => r.Metadata!.OriginalTitle, "The original title of the album. Optional.");
-        RequestParam(r => r.Metadata!.Description, "The description of the album. Optional.");
-        RequestParam(r => r.Metadata!.ReleaseInfo, "The release information, including release date and other relevant details. Optional.");
-        RequestParam(r => r.Metadata!.ReleaseInfo!.OriginalReleaseDate, "The original release date of the album. Optional.");
-        RequestParam(r => r.Metadata!.ReleaseInfo!.OriginalReleaseYear, "The original release year of the album. Optional.");
-        RequestParam(r => r.Metadata!.ReleaseInfo!.ReReleaseDate, "The re-release or reissue date of the album. Optional.");
-        RequestParam(r => r.Metadata!.ReleaseInfo!.ReReleaseYear, "The re-release or reissue year of the album. Optional.");
-        RequestParam(r => r.Metadata!.ReleaseInfo!.ReleaseCountry, "The country or region of the release of the album. Optional.");
-        RequestParam(r => r.Metadata!.ReleaseInfo!.ReleaseVersion, "The version or edition of the release of the album. Optional.");
-        RequestParam(r => r.Metadata!.ReleaseType, "The type of the release. Optional.");
-        RequestParam(r => r.Metadata!.ReleaseStatus, "The status of the release. Optional.");
-        RequestParam(r => r.Metadata!.TotalDiscs, "The number of discs of the release. Optional.");
-        RequestParam(r => r.Metadata!.TotalTracks, "The number of tracks of the release. Optional.");
-        RequestParam(r => r.Metadata!.Language, "The language of the album. Optional.");
-        RequestParam(r => r.Metadata!.Language!.LanguageCode, "The ISO 639-1 two-letter language code of the album. Optional.");
-        RequestParam(r => r.Metadata!.Language!.LanguageName, "The full name of the language of the album in English. Optional.");
-        RequestParam(r => r.Metadata!.Language!.NativeName, "The native name of the language of the album. Optional.");
-        RequestParam(r => r.Metadata!.OriginalLanguage, "The original language of the album, if it has been translated. Optional.");
-        RequestParam(r => r.Metadata!.OriginalLanguage!.LanguageCode, "The ISO 639-1 two-letter original language code of the album. Optional.");
-        RequestParam(r => r.Metadata!.OriginalLanguage!.LanguageName, "The full name of the original language of the album in English. Optional.");
-        RequestParam(r => r.Metadata!.OriginalLanguage!.NativeName, "The native name of the original language of the album. Optional.");
-        RequestParam(r => r.Metadata!.Genres, "The list of genres associated with the album. Optional.");
-        RequestParam(r => r.Metadata!.Tags, "The list of tags that further describe or categorize the album. Optional.");
-        RequestParam(r => r.MediaFormat, "The physical or digital medium of the album. Optional.");
-        RequestParam(r => r.Barcode, "The barcode of the album. Optional.");
-        RequestParam(r => r.CatalogNumber, "The catalog number of the album. Optional.");
-        RequestParam(r => r.MusicBrainzReleaseId, "The MusicBrainz identifier of the release. Optional.");
-        RequestParam(r => r.MusicBrainzReleaseGroupId, "The MusicBrainz identifier of the release group. Optional.");
-        RequestParam(r => r.MusicBrainzReleaseArtistId, "The MusicBrainz identifier of the release artist. Optional.");
-        RequestParam(r => r.Contributors, "The list of media contributors that performed on the album. Required.");
-        RequestParam(r => r.Ratings, "The list of ratings for this album. Required.");
 
         ResponseParam<AlbumResponse>(r => r.Id, "The Id of the album.");
         ResponseParam<AlbumResponse>(r => r.ArtistId, "The Id of the artist the album belongs to.");
@@ -256,16 +256,16 @@ public class UpdateAlbumEndpointSummary : Summary<UpdateAlbumEndpoint, UpdateAlb
                     type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                     status = 401,
                     title = "Unauthorized",
-                    detail = "You are not authorized",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}"
+                    detail = "Authentication failed",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}"
                 },
                 new
                 {
                     type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                     status = 401,
                     title = "Unauthorized",
-                    detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}"
+                    detail = "The token has expired",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}"
                 },
                 new
                 {
@@ -273,7 +273,7 @@ public class UpdateAlbumEndpointSummary : Summary<UpdateAlbumEndpoint, UpdateAlb
                     status = 401,
                     title = "Unauthorized",
                     detail = "The token is invalid",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}"
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}"
                 }
             }
         );
@@ -285,7 +285,7 @@ public class UpdateAlbumEndpointSummary : Summary<UpdateAlbumEndpoint, UpdateAlb
                 title = "General.Unauthorized",
                 status = 403,
                 detail = "NotAuthorized",
-                instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}",
                 traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
             }
         );
@@ -299,7 +299,7 @@ public class UpdateAlbumEndpointSummary : Summary<UpdateAlbumEndpoint, UpdateAlb
                     title = "General.NotFound",
                     status = 404,
                     detail = "AlbumNotFound",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}",
                     traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
                 },
                 new
@@ -308,7 +308,7 @@ public class UpdateAlbumEndpointSummary : Summary<UpdateAlbumEndpoint, UpdateAlb
                     title = "General.NotFound",
                     status = 404,
                     detail = "LibraryNotFound",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}",
                     traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
                 },
                 new
@@ -317,7 +317,7 @@ public class UpdateAlbumEndpointSummary : Summary<UpdateAlbumEndpoint, UpdateAlb
                     title = "General.NotFound",
                     status = 404,
                     detail = "MediaContributorNotFound",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}",
                     traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
                 }
             }
@@ -330,7 +330,7 @@ public class UpdateAlbumEndpointSummary : Summary<UpdateAlbumEndpoint, UpdateAlb
                 title = "General.Validation",
                 status = 422,
                 detail = "OneOrMoreValidationErrorsOccurred",
-                instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}",
                 errors = new Dictionary<string, string[]>
                 {
                     {
@@ -369,6 +369,8 @@ public class UpdateAlbumEndpointSummary : Summary<UpdateAlbumEndpoint, UpdateAlb
                             "LanguageNativeNameMustBeMaximum50CharactersLong",
                             "UnknownMusicMediaFormat",
                             "CatalogNumberMustBeMaximum50CharactersLong",
+                            "BarcodeValueCannotBeEmpty",
+                            "InvalidFormatForBarcode",
                             "MusicBrainzIdInvalidFormat",
                             "ContributorsListCannotBeNull",
                             "MediaContributorIdCannotBeEmpty",

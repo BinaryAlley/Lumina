@@ -40,5 +40,6 @@ public record AddAlbumCommand(
     Guid? MusicBrainzReleaseArtistId,
     List<MediaContributorReferenceDto>? Contributors,
     List<AudioRatingDto>? Ratings,
-    List<AddTrackCommand>? Tracks
+    List<AddTrackCommand>? Tracks,
+    Guid? AlbumId = null
 ) : ICommand;

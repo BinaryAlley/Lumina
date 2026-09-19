@@ -5,6 +5,7 @@ using Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
 using Lumina.Application.Common.DTO.Filtering;
 using Lumina.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 using Lumina.Application.Common.DTO.Pagination;
+using Lumina.DataAccess.Common.Persistence;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
@@ -25,14 +26,20 @@ namespace Lumina.DataAccess.Core.Repositories.MusicLibrary;
 internal sealed class ArtistRepository : IArtistRepository
 {
     private readonly LuminaDbContext _luminaDbContext;
+    private readonly IAlbumRepository _albumRepository;
+    private readonly ITrackRepository _trackRepository;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ArtistRepository"/> class.
     /// </summary>
     /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
-    public ArtistRepository(LuminaDbContext luminaDbContext)
+    /// <param name="albumRepository">Injected repository for albums.</param>
+    /// <param name="trackRepository">Injected repository for tracks.</param>
+    public ArtistRepository(LuminaDbContext luminaDbContext, IAlbumRepository albumRepository, ITrackRepository trackRepository)
     {
         _luminaDbContext = luminaDbContext;
+        _albumRepository = albumRepository;
+        _trackRepository = trackRepository;
     }
 
     /// <summary>
@@ -87,37 +94,96 @@ internal sealed class ArtistRepository : IArtistRepository
     }
 
     /// <summary>
-    /// Updates an existing artist.
+    /// Updates an existing artist, replacing only the editable data that actually changed, while preserving its identity, the identity of its children, and its audit columns.
     /// </summary>
-    /// <param name="artist">The artist to update.</param>
+    /// <param name="data">The artist whose editable data is applied to the stored artist.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<Result<Updated>> UpdateAsync(ArtistEntity artist, CancellationToken cancellationToken)
+    public async Task<Result<Updated>> UpdateAsync(ArtistEntity data, CancellationToken cancellationToken)
     {
         ArtistEntity? foundArtist = await _luminaDbContext.Artists
             .Include(repositoryArtist => repositoryArtist.Contributors)
             .Include(repositoryArtist => repositoryArtist.Albums)
                 .ThenInclude(album => album.Tracks)
-            .FirstOrDefaultAsync(repositoryArtist => repositoryArtist.Id == artist.Id, cancellationToken).ConfigureAwait(false);
+            .FirstOrDefaultAsync(repositoryArtist => repositoryArtist.Id == data.Id, cancellationToken).ConfigureAwait(false);
         if (foundArtist is null)
             return Errors.Music.ArtistNotFound;
 
-        // The stored identity and audit columns are never overwritten by an edit.
+        // The stored identity is never overwritten by an edit, and the audit columns are only ever written by the auditing interceptor.
         Guid libraryId = foundArtist.LibraryId;
-        DateTime createdOnUtc = foundArtist.CreatedOnUtc;
-        Guid createdBy = foundArtist.CreatedBy;
-
-        // Copy the editable scalar properties of the artist, ignoring the unchanged collection columns.
-        _luminaDbContext.Entry(foundArtist).CurrentValues.SetValues(artist);
+        EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundArtist, data);
         foundArtist.LibraryId = libraryId;
-        foundArtist.CreatedOnUtc = createdOnUtc;
-        foundArtist.CreatedBy = createdBy;
 
-        // Replace the owned collections of the artist, so that removed entries are deleted and new entries are inserted.
-        foundArtist.Contributors.Clear();
-        foundArtist.Contributors.AddRange(artist.Contributors);
-        foundArtist.Albums.Clear();
-        foundArtist.Albums.AddRange(artist.Albums);
+        // A contributor participation is matched by the contributor and the role they played. Matched participations keep their identity and their audit columns, so a
+        // contributor that is displayed or linked elsewhere is never deleted and re-inserted just because another field of the artist was edited.
+        CollectionReconciler.Reconcile(
+            foundArtist.Contributors,
+            data.Contributors,
+            existingContributor => (existingContributor.MediaContributorId, existingContributor.Role),
+            incomingContributor => (incomingContributor.MediaContributorId, incomingContributor.Role),
+            shouldReplace: (existingContributor, incomingContributor) => false,
+            createNew: incomingContributor => incomingContributor);
+
+        // Reconcile the albums by their Id: albums that are no longer present are removed, new albums are inserted, and existing
+        // albums and their tracks are updated in place, so that persisted entities keep their identity across an edit. An album whose data did
+        // not change produces no write statement, because its own repository only applies the values that actually changed.
+        List<Guid> incomingAlbumIds = [.. data.Albums.Select(album => album.Id)];
+        foreach (AlbumEntity removedAlbum in foundArtist.Albums.Where(album => !incomingAlbumIds.Contains(album.Id)).ToList())
+            foundArtist.Albums.Remove(removedAlbum);
+
+        foreach (AlbumEntity incomingAlbum in data.Albums)
+        {
+            AlbumEntity? existingAlbum = foundArtist.Albums.FirstOrDefault(album => album.Id == incomingAlbum.Id);
+            if (existingAlbum is null)
+            {
+                Result<Created> insertAlbumResult = await _albumRepository.InsertAsync(incomingAlbum, cancellationToken).ConfigureAwait(false);
+                if (insertAlbumResult.IsFailure)
+                    return insertAlbumResult.Errors;
+                continue;
+            }
+
+            Result<Updated> updateAlbumResult = await _albumRepository.UpdateAsync(incomingAlbum, cancellationToken).ConfigureAwait(false);
+            if (updateAlbumResult.IsFailure)
+                return updateAlbumResult.Errors;
+
+            Result<Updated> updateTracksResult = await ReconcileTracksAsync(existingAlbum, incomingAlbum, cancellationToken).ConfigureAwait(false);
+            if (updateTracksResult.IsFailure)
+                return updateTracksResult.Errors;
+        }
+
+        return Result.Updated;
+    }
+
+    /// <summary>
+    /// Reconciles the tracks of an existing album against the provided tracks, by their Id.
+    /// </summary>
+    /// <param name="existingAlbum">The tracked album whose tracks are reconciled.</param>
+    /// <param name="incomingAlbum">The album carrying the tracks to reconcile with.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    private async Task<Result<Updated>> ReconcileTracksAsync(AlbumEntity existingAlbum, AlbumEntity incomingAlbum, CancellationToken cancellationToken)
+    {
+        List<Guid> incomingTrackIds = [.. incomingAlbum.Tracks.Select(track => track.Id)];
+        foreach (TrackEntity removedTrack in existingAlbum.Tracks.Where(track => !incomingTrackIds.Contains(track.Id)).ToList())
+            existingAlbum.Tracks.Remove(removedTrack);
+
+        foreach (TrackEntity incomingTrack in incomingAlbum.Tracks)
+        {
+            incomingTrack.AlbumId = existingAlbum.Id;
+            incomingTrack.LibraryId = existingAlbum.LibraryId;
+            TrackEntity? existingTrack = existingAlbum.Tracks.FirstOrDefault(track => track.Id == incomingTrack.Id);
+            if (existingTrack is null)
+            {
+                Result<Created> insertTrackResult = await _trackRepository.InsertAsync(incomingTrack, cancellationToken).ConfigureAwait(false);
+                if (insertTrackResult.IsFailure)
+                    return insertTrackResult.Errors;
+                continue;
+            }
+
+            Result<Updated> updateTrackResult = await _trackRepository.UpdateAsync(incomingTrack, cancellationToken).ConfigureAwait(false);
+            if (updateTrackResult.IsFailure)
+                return updateTrackResult.Errors;
+        }
 
         return Result.Updated;
     }

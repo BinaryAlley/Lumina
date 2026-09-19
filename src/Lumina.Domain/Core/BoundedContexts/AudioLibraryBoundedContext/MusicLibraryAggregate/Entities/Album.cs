@@ -217,7 +217,7 @@ public sealed class Album : Entity<AlbumId>
     /// </summary>
     /// <param name="track">The track to be added.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
-    public Result<Created> AddTrack(Track track)
+    internal Result<Created> AddTrack(Track track)
     {
         if (_tracks.Contains(track))
             return Errors.Music.TheTrackIsAlreadyInTheAlbum;
@@ -230,7 +230,7 @@ public sealed class Album : Entity<AlbumId>
     /// </summary>
     /// <param name="track">The track to be removed.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
-    public Result<Deleted> RemoveTrack(Track track)
+    internal Result<Deleted> RemoveTrack(Track track)
     {
         if (!_tracks.Contains(track))
             return Errors.Music.TheTrackIsNotInTheAlbum;
@@ -242,7 +242,7 @@ public sealed class Album : Entity<AlbumId>
     /// Replaces the media contributors of the album with the provided <paramref name="contributors"/>.
     /// </summary>
     /// <param name="contributors">The media contributors of the album.</param>
-    public void UpdateContributors(IReadOnlyCollection<MusicMediaContributor> contributors)
+    internal void UpdateContributors(IReadOnlyCollection<MusicMediaContributor> contributors)
     {
         // replace the contents of the collection in place, preserving the readonly reference invariants of the entity
         _contributors.Clear();
@@ -253,7 +253,7 @@ public sealed class Album : Entity<AlbumId>
     /// Replaces the ratings of the album with the provided <paramref name="ratings"/>.
     /// </summary>
     /// <param name="ratings">The ratings of the album.</param>
-    public void UpdateRatings(IReadOnlyCollection<AudioRating> ratings)
+    internal void UpdateRatings(IReadOnlyCollection<AudioRating> ratings)
     {
         // replace the contents of the collection in place, preserving the readonly reference invariants of the entity
         _ratings.Clear();
@@ -271,7 +271,7 @@ public sealed class Album : Entity<AlbumId>
     /// <param name="musicBrainzReleaseGroupId">The optional MusicBrainz identifier of the release group.</param>
     /// <param name="musicBrainzReleaseArtistId">The optional MusicBrainz identifier of the release artist.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
-    public Result<Updated> UpdateDetails(
+    internal Result<Updated> UpdateDetails(
         AlbumMetadata metadata,
         Optional<MusicMediaFormat> mediaFormat,
         Optional<Barcode> barcode,

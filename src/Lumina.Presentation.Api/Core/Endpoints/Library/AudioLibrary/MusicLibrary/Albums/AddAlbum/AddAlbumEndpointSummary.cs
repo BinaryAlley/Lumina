@@ -746,6 +746,8 @@ public class AddAlbumEndpointSummary : Summary<AddAlbumEndpoint, AddAlbumRequest
                             "LanguageNativeNameMustBeMaximum50CharactersLong",
                             "UnknownMusicMediaFormat",
                             "CatalogNumberMustBeMaximum50CharactersLong",
+                            "BarcodeValueCannotBeEmpty",
+                            "InvalidFormatForBarcode",
                             "MusicBrainzIdInvalidFormat",
                             "ContributorsListCannotBeNull",
                             "MediaContributorIdCannotBeEmpty",

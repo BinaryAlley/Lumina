@@ -28,7 +28,7 @@ public class UpdateTrackEndpointSummary : Summary<UpdateTrackEndpoint, UpdateTra
     public UpdateTrackEndpointSummary()
     {
         Summary = "Updates an existing track.";
-        Description = "Updates the details of the track identified by the request, returning the full details of the updated track. The media contributors of the track are left untouched. The track is updated by an Admin, who can update the tracks of all libraries, or by the owner of the library of the track.";
+        Description = "Updates the details of the track identified by the request, returning the full details of the updated track. The track is updated by an Admin, who can update the tracks of all libraries, or by the owner of the library of the track.";
 
         ExampleRequest = new UpdateTrackRequest(
             Path: "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
@@ -154,7 +154,7 @@ public class UpdateTrackEndpointSummary : Summary<UpdateTrackEndpoint, UpdateTra
         RequestParam(r => r.MusicBrainzRecordingId, "The MusicBrainz identifier of the recording. Optional.");
         RequestParam(r => r.MusicBrainzTrackId, "The MusicBrainz identifier of the track. Optional.");
         RequestParam(r => r.MusicBrainzWorkId, "The MusicBrainz identifier of the work. Optional.");
-        RequestParam(r => r.Contributors, "The list of media contributors that performed on the track. Optional.");
+        RequestParam(r => r.Contributors, "The list of media contributors that performed on the track. Required.");
         RequestParam(r => r.Ratings, "The list of ratings for this track. Required.");
         RequestParam(r => r.Moods, "The list of moods of the track. Optional.");
         RequestParam(r => r.Isrcs, "The list of ISRC (International Standard Recording Code) of the track. Optional.");
@@ -298,16 +298,16 @@ public class UpdateTrackEndpointSummary : Summary<UpdateTrackEndpoint, UpdateTra
                     type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                     status = 401,
                     title = "Unauthorized",
-                    detail = "You are not authorized",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}"
+                    detail = "Authentication failed",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks/{Guid.NewGuid()}"
                 },
                 new
                 {
                     type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                     status = 401,
                     title = "Unauthorized",
-                    detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}"
+                    detail = "The token has expired",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks/{Guid.NewGuid()}"
                 },
                 new
                 {
@@ -315,7 +315,7 @@ public class UpdateTrackEndpointSummary : Summary<UpdateTrackEndpoint, UpdateTra
                     status = 401,
                     title = "Unauthorized",
                     detail = "The token is invalid",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}"
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks/{Guid.NewGuid()}"
                 }
             }
         );
@@ -327,7 +327,7 @@ public class UpdateTrackEndpointSummary : Summary<UpdateTrackEndpoint, UpdateTra
                 title = "General.Unauthorized",
                 status = 403,
                 detail = "NotAuthorized",
-                instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks/{Guid.NewGuid()}",
                 traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
             }
         );
@@ -341,7 +341,7 @@ public class UpdateTrackEndpointSummary : Summary<UpdateTrackEndpoint, UpdateTra
                     title = "General.NotFound",
                     status = 404,
                     detail = "TrackNotFound",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks/{Guid.NewGuid()}",
                     traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
                 },
                 new
@@ -350,7 +350,7 @@ public class UpdateTrackEndpointSummary : Summary<UpdateTrackEndpoint, UpdateTra
                     title = "General.NotFound",
                     status = 404,
                     detail = "LibraryNotFound",
-                    instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks/{Guid.NewGuid()}",
                     traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
                 }
             }
@@ -363,7 +363,7 @@ public class UpdateTrackEndpointSummary : Summary<UpdateTrackEndpoint, UpdateTra
                 title = "General.Validation",
                 status = 422,
                 detail = "OneOrMoreValidationErrorsOccurred",
-                instance = "/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks/{Guid.NewGuid()}",
                 errors = new Dictionary<string, string[]>
                 {
                     {
@@ -375,6 +375,9 @@ public class UpdateTrackEndpointSummary : Summary<UpdateTrackEndpoint, UpdateTra
                             "TrackIdCannotBeEmpty",
                             "TrackPathCannotBeEmpty",
                             "TrackNumberMustBeGreaterThanZero",
+                            "ContributorsListCannotBeNull",
+                            "MediaContributorIdCannotBeEmpty",
+                            "UnknownMediaContributorRole",
                             "MusicBrainzIdInvalidFormat"
                         }
                     }

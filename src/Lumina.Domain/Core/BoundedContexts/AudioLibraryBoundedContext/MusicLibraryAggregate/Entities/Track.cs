@@ -274,7 +274,7 @@ public sealed class Track : Entity<TrackId>
     /// Replaces the media contributors of the track with the provided <paramref name="contributors"/>.
     /// </summary>
     /// <param name="contributors">The media contributors of the track.</param>
-    public void UpdateContributors(IReadOnlyCollection<MusicMediaContributor> contributors)
+    internal void UpdateContributors(IReadOnlyCollection<MusicMediaContributor> contributors)
     {
         // replace the contents of the collection in place, preserving the readonly reference invariants of the entity
         _contributors.Clear();
@@ -285,11 +285,33 @@ public sealed class Track : Entity<TrackId>
     /// Replaces the ratings of the track with the provided <paramref name="ratings"/>.
     /// </summary>
     /// <param name="ratings">The ratings of the track.</param>
-    public void UpdateRatings(IReadOnlyCollection<AudioRating> ratings)
+    internal void UpdateRatings(IReadOnlyCollection<AudioRating> ratings)
     {
         // replace the contents of the collection in place, preserving the readonly reference invariants of the entity
         _ratings.Clear();
         _ratings.AddRange(ratings);
+    }
+
+    /// <summary>
+    /// Replaces the moods of the track with the provided <paramref name="moods"/>.
+    /// </summary>
+    /// <param name="moods">The moods of the track.</param>
+    internal void UpdateMoods(IReadOnlyCollection<Mood> moods)
+    {
+        // replace the contents of the collection in place, preserving the readonly reference invariants of the entity
+        _moods.Clear();
+        _moods.AddRange(moods);
+    }
+
+    /// <summary>
+    /// Replaces the ISRCs of the track with the provided <paramref name="isrcs"/>.
+    /// </summary>
+    /// <param name="isrcs">The ISRCs of the track.</param>
+    internal void UpdateIsrcs(IReadOnlyCollection<Isrc> isrcs)
+    {
+        // replace the contents of the collection in place, preserving the readonly reference invariants of the entity
+        _isrcs.Clear();
+        _isrcs.AddRange(isrcs);
     }
 
     /// <summary>
@@ -307,7 +329,7 @@ public sealed class Track : Entity<TrackId>
     /// <param name="musicBrainzTrackId">The optional MusicBrainz identifier of the track.</param>
     /// <param name="musicBrainzWorkId">The optional MusicBrainz identifier of the work.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
-    public Result<Updated> UpdateDetails(
+    internal Result<Updated> UpdateDetails(
         string path,
         AudioMetadata metadata,
         int trackNumber,

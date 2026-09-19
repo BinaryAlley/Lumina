@@ -21,7 +21,7 @@ namespace Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Album
 /// <param name="MusicBrainzReleaseId">The MusicBrainz identifier of the release. Optional.</param>
 /// <param name="MusicBrainzReleaseGroupId">The MusicBrainz identifier of the release group. Optional.</param>
 /// <param name="MusicBrainzReleaseArtistId">The MusicBrainz identifier of the release artist. Optional.</param>
-/// <param name="Contributors">The list of media contributors that performed on the album. Optional.</param>
+/// <param name="Contributors">The list of media contributors that performed on the album. Required.</param>
 /// <param name="Ratings">The list of ratings for this album. Required.</param>
 [DebuggerDisplay("Title: {Metadata.Title}")]
 public record UpdateAlbumRequest(

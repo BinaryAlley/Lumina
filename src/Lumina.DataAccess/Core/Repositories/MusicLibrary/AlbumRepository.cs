@@ -4,6 +4,7 @@ using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.Mu
 using Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
 using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
+using Lumina.DataAccess.Common.Persistence;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
@@ -75,54 +76,87 @@ internal sealed class AlbumRepository : IAlbumRepository
     }
 
     /// <summary>
-    /// Updates an existing album, replacing its editable data while preserving its identity and audit columns.
+    /// Updates an existing album, replacing only the editable data that actually changed, while preserving its identity, the identity of its children, and its audit columns.
     /// </summary>
-    /// <param name="album">The album whose editable data is applied to the stored album.</param>
+    /// <param name="data">The album whose editable data is applied to the stored album.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<Result<Updated>> UpdateAsync(AlbumEntity album, CancellationToken cancellationToken)
+    public async Task<Result<Updated>> UpdateAsync(AlbumEntity data, CancellationToken cancellationToken)
     {
         AlbumEntity? foundAlbum = await _luminaDbContext.Albums
             .Include(repositoryAlbum => repositoryAlbum.Tags)
             .Include(repositoryAlbum => repositoryAlbum.Genres)
+            .Include(repositoryAlbum => repositoryAlbum.Ratings)
             .Include(repositoryAlbum => repositoryAlbum.Contributors)
-            .FirstOrDefaultAsync(repositoryAlbum => repositoryAlbum.Id == album.Id, cancellationToken).ConfigureAwait(false);
+            .FirstOrDefaultAsync(repositoryAlbum => repositoryAlbum.Id == data.Id, cancellationToken).ConfigureAwait(false);
         if (foundAlbum is null)
             return Errors.Music.AlbumNotFound;
 
-        // The stored identity and audit columns are never overwritten by an edit.
+        // The stored identity is never overwritten by an edit, and the audit columns are only ever written by the auditing interceptor.
         Guid artistId = foundAlbum.ArtistId;
         Guid libraryId = foundAlbum.LibraryId;
-        DateTime createdOnUtc = foundAlbum.CreatedOnUtc;
-        Guid createdBy = foundAlbum.CreatedBy;
-
-        // Copy the editable scalar properties of the album, ignoring the unchanged collection columns.
-        _luminaDbContext.Entry(foundAlbum).CurrentValues.SetValues(album);
+        EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundAlbum, data);
         foundAlbum.ArtistId = artistId;
         foundAlbum.LibraryId = libraryId;
-        foundAlbum.CreatedOnUtc = createdOnUtc;
-        foundAlbum.CreatedBy = createdBy;
 
-        // Reuse the stored tags and genres whose names already exist, so that the shared tables are not duplicated.
-        List<TagEntity> existingTags = await _luminaDbContext.Set<TagEntity>()
-            .Where(tag => album.Tags.Select(albumTag => albumTag.Name).Contains(tag.Name))
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
-        List<GenreEntity> existingGenres = await _luminaDbContext.Set<GenreEntity>()
-            .Where(genre => album.Genres.Select(albumGenre => albumGenre.Name).Contains(genre.Name))
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
+        await ReconcileTagsAndGenresAsync(foundAlbum, data, cancellationToken).ConfigureAwait(false);
 
-        foundAlbum.Tags.Clear();
-        foundAlbum.Tags.UnionWith(album.Tags.Select(tag => existingTags.FirstOrDefault(existingTag => existingTag.Name == tag.Name) ?? tag));
-        foundAlbum.Genres.Clear();
-        foundAlbum.Genres.UnionWith(album.Genres.Select(genre => existingGenres.FirstOrDefault(existingGenre => existingGenre.Name == genre.Name) ?? genre));
+        // Ratings are owned value objects with no identity anyone could reference, so a changed rating is replaced as a whole, while the ratings that did not change
+        // are left exactly as they are stored. Matching by the rating source keeps an update in place instead of recreating every rating of the album.
+        CollectionReconciler.Reconcile(
+            foundAlbum.Ratings,
+            data.Ratings,
+            existingRating => existingRating.Source?.ToString() ?? string.Empty,
+            incomingRating => incomingRating.Source?.ToString() ?? string.Empty,
+            shouldReplace: (existingRating, incomingRating) => !existingRating.Equals(incomingRating),
+            createNew: incomingRating => incomingRating);
 
-        // Replace the owned ratings and contributors collections of the album, so that removed entries are deleted and new entries are inserted.
-        foundAlbum.Ratings.Clear();
-        foundAlbum.Ratings.AddRange(album.Ratings);
-        foundAlbum.Contributors.Clear();
-        foundAlbum.Contributors.AddRange(album.Contributors);
+        // A contributor participation is matched by the contributor and the role they played. Matched participations keep their identity and their audit columns, so a
+        // contributor that is displayed or linked elsewhere is never deleted and re-inserted just because another album of the same artist was edited.
+        CollectionReconciler.Reconcile(
+            foundAlbum.Contributors,
+            data.Contributors,
+            existingContributor => (existingContributor.MediaContributorId, existingContributor.Role),
+            incomingContributor => (incomingContributor.MediaContributorId, incomingContributor.Role),
+            shouldReplace: (existingContributor, incomingContributor) => false,
+            createNew: incomingContributor => incomingContributor);
 
         return Result.Updated;
+    }
+
+    /// <summary>
+    /// Reconciles the tags and genres of <paramref name="foundAlbum"/> against the ones carried by <paramref name="data"/>, reusing the stored tags and genres whose names already exist.
+    /// </summary>
+    /// <param name="foundAlbum">The tracked album whose tags and genres are reconciled.</param>
+    /// <param name="data">The album carrying the desired tags and genres.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    private async Task ReconcileTagsAndGenresAsync(AlbumEntity foundAlbum, AlbumEntity data, CancellationToken cancellationToken)
+    {
+        // Tags and genres are shared across the whole database, so the ones whose names are already stored are reused, and only the missing names are inserted.
+        List<string> tagNames = [.. data.Tags.Select(tag => tag.Name!)];
+        List<string> genreNames = [.. data.Genres.Select(genre => genre.Name!)];
+        List<TagEntity> existingTags = await _luminaDbContext.Set<TagEntity>()
+            .Where(tag => tagNames.Contains(tag.Name!))
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+        List<GenreEntity> existingGenres = await _luminaDbContext.Set<GenreEntity>()
+            .Where(genre => genreNames.Contains(genre.Name!))
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+
+        CollectionReconciler.Reconcile(
+            foundAlbum.Tags,
+            data.Tags.Select(tag => existingTags.FirstOrDefault(existingTag => existingTag.Name == tag.Name) ?? tag),
+            existingTag => existingTag.Name!,
+            incomingTag => incomingTag.Name!,
+            shouldReplace: (existingTag, incomingTag) => false,
+            createNew: incomingTag => incomingTag);
+
+        CollectionReconciler.Reconcile(
+            foundAlbum.Genres,
+            data.Genres.Select(genre => existingGenres.FirstOrDefault(existingGenre => existingGenre.Name == genre.Name) ?? genre),
+            existingGenre => existingGenre.Name!,
+            incomingGenre => incomingGenre.Name!,
+            shouldReplace: (existingGenre, incomingGenre) => false,
+            createNew: incomingGenre => incomingGenre);
     }
 
     /// <summary>

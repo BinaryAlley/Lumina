@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
 using Lumina.Contracts.DTO.Common;
+using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
@@ -29,6 +30,7 @@ namespace Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.
 /// <param name="MusicBrainzRecordingId">The MusicBrainz identifier of the recording, if applicable.</param>
 /// <param name="MusicBrainzTrackId">The MusicBrainz identifier of the track, if applicable.</param>
 /// <param name="MusicBrainzWorkId">The MusicBrainz identifier of the work, if applicable.</param>
+/// <param name="Contributors">The list of media contributors that performed on the track.</param>
 /// <param name="Ratings">The list of ratings for this track.</param>
 /// <param name="Moods">The list of moods of the track.</param>
 /// <param name="Isrcs">The list of ISRC of the track.</param>
@@ -49,6 +51,7 @@ public record UpdateTrackCommand(
     Guid? MusicBrainzRecordingId,
     Guid? MusicBrainzTrackId,
     Guid? MusicBrainzWorkId,
+    List<MediaContributorReferenceDto>? Contributors,
     List<AudioRatingDto>? Ratings,
     List<MoodDto>? Moods,
     List<IsrcDto>? Isrcs

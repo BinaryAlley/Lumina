@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.Mapping.MediaContributors;
 using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Common;
 using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Commands.UpdateTrack;
 using Lumina.Contracts.DTO.Common;
@@ -6,11 +7,13 @@ using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.Common.ValueObjects;
+using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 #endregion
 
 namespace Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
@@ -21,20 +24,28 @@ namespace Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibra
 public static class UpdateTrackCommandMapping
 {
     /// <summary>
-    /// Converts <paramref name="command"/> to a domain <see cref="Track"/>, preserving the provided <paramref name="id"/>.
+    /// Applies the editable data of <paramref name="command"/> to the track of <paramref name="artist"/> identified by the command, through the aggregate root.
     /// </summary>
-    /// <param name="command">The command whose data is used to create the track.</param>
-    /// <param name="id">The unique identifier of the track.</param>
-    /// <param name="libraryId">The Id of the media library the track belongs to.</param>
-    /// <param name="ratings">The list of ratings of the track.</param>
+    /// <param name="command">The command whose data is applied to the track.</param>
+    /// <param name="artist">The artist aggregate that owns the track.</param>
     /// <returns>
-    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="Track"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either the successfully updated <see cref="Artist"/>, or an error message.
     /// </returns>
-    public static Result<Track> ToDomainEntity(this UpdateTrackCommand command, TrackId id, Guid libraryId, List<AudioRating> ratings)
+    public static Result<Artist> ToDomainEntity(this UpdateTrackCommand command, Artist artist)
     {
         Result<AudioMetadata> metadataResult = command.Metadata!.ToDomainEntity();
         if (metadataResult.IsFailure)
             return metadataResult.Errors;
+
+        IEnumerable<Result<MusicMediaContributor>> domainContributorsResult = command.Contributors!.ToMusicDomainEntities();
+        List<Error> errors = [.. domainContributorsResult.Where(contributorResult => contributorResult.IsFailure).SelectMany(contributorResult => contributorResult.Errors)];
+        if (errors.Count > 0)
+            return errors;
+
+        IEnumerable<Result<AudioRating>> domainRatingsResult = command.Ratings!.ToDomainEntities();
+        errors = [.. domainRatingsResult.Where(ratingResult => ratingResult.IsFailure).SelectMany(ratingResult => ratingResult.Errors)];
+        if (errors.Count > 0)
+            return errors;
 
         Optional<MusicBrainzId> musicBrainzRecordingId = Optional<MusicBrainzId>.None();
         if (command.MusicBrainzRecordingId is not null)
@@ -79,22 +90,27 @@ public static class UpdateTrackCommandMapping
             domainMoods.Add(moodResult.Value);
         }
 
-        return Track.Create(
-            id,
+        Result<Updated> updateResult = artist.UpdateTrackInAlbum(
+            AlbumId.Create(Guid.Parse(command.AlbumId!)),
+            TrackId.Create(Guid.Parse(command.TrackId!)),
             command.Path!,
             metadataResult.Value,
             command.TrackNumber ?? 1,
             Optional<int>.FromNullable(command.DiscNumber),
-            domainIsrcs,
             Optional<string>.FromNullable(command.Script),
             Optional<MusicKey>.FromNullable(command.Key),
             Optional<int>.FromNullable(command.Bpm),
-            domainMoods,
             Optional<string>.FromNullable(command.Work),
             musicBrainzRecordingId,
             musicBrainzTrackId,
             musicBrainzWorkId,
-            [],
-            ratings);
+            [.. domainContributorsResult.Select(contributorResult => contributorResult.Value)],
+            [.. domainRatingsResult.Select(ratingResult => ratingResult.Value)],
+            domainMoods,
+            domainIsrcs);
+        if (updateResult.IsFailure)
+            return updateResult.Errors;
+
+        return artist;
     }
 }

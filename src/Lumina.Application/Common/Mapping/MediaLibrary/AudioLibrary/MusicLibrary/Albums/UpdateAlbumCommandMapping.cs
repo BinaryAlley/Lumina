@@ -1,11 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Application.Common.Mapping.MediaContributors;
 using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Common;
 using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Albums.Commands.UpdateAlbum;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.Common.ValueObjects;
-using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Entities;
+using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using System;
@@ -21,25 +20,25 @@ namespace Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibra
 public static class UpdateAlbumCommandMapping
 {
     /// <summary>
-    /// Converts <paramref name="command"/> to a domain <see cref="Album"/>, preserving the identity and creation metadata of the stored album identified by <paramref name="existingAlbum"/>.
+    /// Applies the editable data of <paramref name="command"/> to the album of <paramref name="artist"/> identified by the command, through the aggregate root.
     /// </summary>
-    /// <param name="command">The command whose data is used to create the album.</param>
-    /// <param name="existingAlbum">The stored album whose identity and creation metadata are preserved.</param>
+    /// <param name="command">The command whose data is applied to the album.</param>
+    /// <param name="artist">The artist aggregate that owns the album.</param>
     /// <returns>
-    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="Album"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either the successfully updated <see cref="Artist"/>, or an error message.
     /// </returns>
-    public static Result<Album> ToDomainEntity(this UpdateAlbumCommand command, AlbumEntity existingAlbum)
+    public static Result<Artist> ToDomainEntity(this UpdateAlbumCommand command, Artist artist)
     {
         Result<AlbumMetadata> metadataResult = command.Metadata!.ToDomainEntity();
         if (metadataResult.IsFailure)
             return metadataResult.Errors;
 
-        IEnumerable<Result<MusicMediaContributor>> domainContributorsResult = (command.Contributors ?? []).ToMusicDomainEntities();
+        IEnumerable<Result<MusicMediaContributor>> domainContributorsResult = command.Contributors!.ToMusicDomainEntities();
         List<Error> errors = [.. domainContributorsResult.Where(contributorResult => contributorResult.IsFailure).SelectMany(contributorResult => contributorResult.Errors)];
         if (errors.Count > 0)
             return errors;
 
-        IEnumerable<Result<AudioRating>> domainRatingsResult = (command.Ratings ?? []).ToDomainEntities();
+        IEnumerable<Result<AudioRating>> domainRatingsResult = command.Ratings!.ToDomainEntities();
         errors = [.. domainRatingsResult.Where(ratingResult => ratingResult.IsFailure).SelectMany(ratingResult => ratingResult.Errors)];
         if (errors.Count > 0)
             return errors;
@@ -78,8 +77,8 @@ public static class UpdateAlbumCommandMapping
             musicBrainzReleaseArtistId = musicBrainzReleaseArtistIdResult.Value;
         }
 
-        return Album.Create(
-            AlbumId.Create(existingAlbum.Id),
+        Result<Updated> updateResult = artist.UpdateAlbum(
+            AlbumId.Create(Guid.Parse(command.AlbumId!)),
             metadataResult.Value,
             Optional<MusicMediaFormat>.FromNullable(command.MediaFormat),
             barcode,
@@ -88,9 +87,10 @@ public static class UpdateAlbumCommandMapping
             musicBrainzReleaseGroupId,
             musicBrainzReleaseArtistId,
             [.. domainContributorsResult.Select(contributorResult => contributorResult.Value)],
-            [.. domainRatingsResult.Select(ratingResult => ratingResult.Value)],
-            [],
-            existingAlbum.CreatedOnUtc,
-            Optional<DateTime>.FromNullable(existingAlbum.UpdatedOnUtc));
+            [.. domainRatingsResult.Select(ratingResult => ratingResult.Value)]);
+        if (updateResult.IsFailure)
+            return updateResult.Errors;
+
+        return artist;
     }
 }

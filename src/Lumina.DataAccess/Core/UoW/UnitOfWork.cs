@@ -1,21 +1,27 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
-using Lumina.Application.Common.DataAccess.Repositories.Books;
+using Lumina.Application.Common.DataAccess.Repositories.BookLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.MediaContributors;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
+using Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Scheduling;
 using Lumina.Application.Common.DataAccess.Repositories.Themes;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.Errors;
 using Lumina.DataAccess.Core.Repositories.Authorization;
-using Lumina.DataAccess.Core.Repositories.Books;
+using Lumina.DataAccess.Core.Repositories.BookLibrary;
 using Lumina.DataAccess.Core.Repositories.Libraries;
 using Lumina.DataAccess.Core.Repositories.MediaContributors;
+using Lumina.DataAccess.Core.Repositories.MusicLibrary;
 using Lumina.DataAccess.Core.Repositories.Plugins;
 using Lumina.DataAccess.Core.Repositories.Scheduling;
 using Lumina.DataAccess.Core.Repositories.Themes;
 using Lumina.DataAccess.Core.Repositories.Users;
+using Lumina.Domain.Common.Primitives;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Threading;
@@ -37,6 +43,9 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     private IRoleRepository? _roleRepository;
     private IUserRoleRepository? _userRoleRepository;
     private IBookRepository? _bookRepository;
+    private IArtistRepository? _artistRepository;
+    private IAlbumRepository? _albumRepository;
+    private ITrackRepository? _trackRepository;
     private IMediaContributorRepository? _mediaContributorRepository;
     private IDirectoryScanFingerprintRepository? _directoryScanFingerprintRepository;
     private ILibraryRepository? _libraryRepository;
@@ -111,6 +120,42 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         {
             _bookRepository ??= new BookRepository(_luminaDbContext);
             return _bookRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the artist repository.
+    /// </summary>
+    public IArtistRepository ArtistRepository
+    {
+        get
+        {
+            _artistRepository ??= new ArtistRepository(_luminaDbContext, AlbumRepository, TrackRepository);
+            return _artistRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the album repository.
+    /// </summary>
+    public IAlbumRepository AlbumRepository
+    {
+        get
+        {
+            _albumRepository ??= new AlbumRepository(_luminaDbContext);
+            return _albumRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the track repository.
+    /// </summary>
+    public ITrackRepository TrackRepository
+    {
+        get
+        {
+            _trackRepository ??= new TrackRepository(_luminaDbContext);
+            return _trackRepository;
         }
     }
 
@@ -316,9 +361,33 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     /// Saves the changes made to the database.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    public async Task SaveChangesAsync(CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Success>> SaveChangesAsync(CancellationToken cancellationToken)
     {
-        await _luminaDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await _luminaDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            return Result.Success;
+        }
+        // A unique constraint violation is an expected persistence conflict, so it is reported as a failure result instead of bubbling up
+        // as an unhandled exception and being turned into a generic internal server error. Any other exception is unexpected and is left
+        // to propagate to the centralized exception handling middleware.
+        catch (DbUpdateException exception) when (IsUniqueConstraintViolation(exception))
+        {
+            return Errors.Persistence.UniqueConstraintViolation;
+        }
+    }
+
+    /// <summary>
+    /// Determines whether the provided <paramref name="exception"/> was caused by a unique constraint violation of the storage medium.
+    /// </summary>
+    /// <param name="exception">The exception to inspect.</param>
+    /// <returns><see langword="true"/> if the exception was caused by a unique constraint violation, <see langword="false"/> otherwise.</returns>
+    private static bool IsUniqueConstraintViolation(DbUpdateException exception)
+    {
+        // SQLite reports a generic constraint failure code for several constraints, so the extended code is used to tell a unique violation apart.
+        return exception.InnerException is SqliteException sqliteException
+            && sqliteException.SqliteExtendedErrorCode == 2067; // SQLITE_CONSTRAINT_UNIQUE
     }
 
     /// <summary>

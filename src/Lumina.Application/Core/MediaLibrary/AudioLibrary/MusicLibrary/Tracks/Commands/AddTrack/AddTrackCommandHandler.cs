@@ -10,6 +10,7 @@ using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwn
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary;
+using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Common;
 using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Contracts.DTO.Common;
@@ -22,6 +23,7 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.Common.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.ExternalIdentifiers.LibraryManagementBoundedContext.LibraryAggregate;
+using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
@@ -90,9 +92,20 @@ public class AddTrackCommandHandler : ICommandHandler<AddTrackCommand, Result<Tr
         Guid artistId = Guid.Parse(command.ArtistId!);
         Guid albumId = Guid.Parse(command.AlbumId!);
 
+        // A track is a child of the artist aggregate, so the whole aggregate is loaded and the track is added within it.
+        Result<ArtistEntity?> getArtistResult = await _unitOfWork.ArtistRepository.GetByIdAsync(artistId, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (getArtistResult.IsFailure)
+            return getArtistResult.Errors;
+        if (getArtistResult.Value is null || getArtistResult.Value.LibraryId != libraryId)
+            return Errors.Music.AlbumNotFound;
+        ArtistEntity existingArtist = getArtistResult.Value;
+        AlbumEntity? existingAlbum = existingArtist.Albums.FirstOrDefault(album => album.Id == albumId);
+        if (existingAlbum is null)
+            return Errors.Music.AlbumNotFound;
+
         // Admins can add tracks to the albums of all libraries; for everyone else, only to the albums of the libraries they own.
         bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
-            userId, new LibraryOwnershipPolicyContext(libraryId), cancellationToken).ConfigureAwait(false);
+            userId, new LibraryOwnershipPolicyContext(existingArtist.LibraryId), cancellationToken).ConfigureAwait(false);
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
@@ -102,17 +115,6 @@ public class AddTrackCommandHandler : ICommandHandler<AddTrackCommand, Result<Tr
             return getLibraryResult.Errors;
         if (getLibraryResult.Value is null)
             return Errors.Library.LibraryNotFound;
-
-        Result<AlbumEntity?> getAlbumResult = await _unitOfWork.AlbumRepository.GetByIdAsync(albumId, cancellationToken: cancellationToken).ConfigureAwait(false);
-        if (getAlbumResult.IsFailure)
-            return getAlbumResult.Errors;
-        if (getAlbumResult.Value is null)
-            return Errors.Music.AlbumNotFound;
-
-        // Resource scoping: the track must belong to an album of the artist and library named by the route, so that a track can never be added
-        // through another library's or artist's route; the mismatch is reported as not found, without disclosing that the album exists elsewhere.
-        if (getAlbumResult.Value.LibraryId != libraryId || getAlbumResult.Value.ArtistId != artistId)
-            return Errors.Music.AlbumNotFound;
 
         // A track is only readable if it is stored inside one of the content locations of its library, so a client can never register an entry
         // that points the reading pipeline at an arbitrary file of the host.
@@ -124,20 +126,28 @@ public class AddTrackCommandHandler : ICommandHandler<AddTrackCommand, Result<Tr
         if (getContributorsResult.IsFailure)
             return getContributorsResult.Errors;
 
+        // The write path goes through the aggregate root: a track is a child entity of the artist aggregate, unlike Book and Artist,
+        // which are aggregate roots and are created directly with their own Create method. This difference is intentional.
+        Result<Artist> artistResult = existingArtist.ToDomainEntity();
+        if (artistResult.IsFailure)
+            return artistResult.Errors;
+
         Result<Track> createTrackResult = command.ToDomainEntity();
         if (createTrackResult.IsFailure)
             return createTrackResult.Errors;
+        Result<Created> addTrackResult = artistResult.Value.AddTrackToAlbum(AlbumId.Create(albumId), createTrackResult.Value);
+        if (addTrackResult.IsFailure)
+            return addTrackResult.Errors;
 
-        TrackEntity persistenceTrack = createTrackResult.Value.ToRepositoryEntity(albumId, libraryId);
-        Result<Created> insertTrackResult = await _unitOfWork.TrackRepository.InsertAsync(persistenceTrack, cancellationToken).ConfigureAwait(false);
-        if (insertTrackResult.IsFailure)
-            return insertTrackResult.Errors;
+        Result<Updated> updateResult = await _unitOfWork.ArtistRepository.UpdateAsync(artistResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
+        if (updateResult.IsFailure)
+            return updateResult.Errors;
         Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         if (saveChangesResult.IsFailure)
             return saveChangesResult.Errors;
 
-        // Returns the track as it was actually persisted, instead of the in-memory aggregate, so the response reflects every value the database applied on save.
-        Result<TrackEntity?> getPersistedTrackResult = await _unitOfWork.TrackRepository.GetByIdAsync(persistenceTrack.Id, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
+        // Reading does not need the aggregate: the track is read directly and mapped to the response.
+        Result<TrackEntity?> getPersistedTrackResult = await _unitOfWork.TrackRepository.GetByIdAsync(createTrackResult.Value.Id.Value, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getPersistedTrackResult.IsFailure)
             return getPersistedTrackResult.Errors;
         if (getPersistedTrackResult.Value is null)

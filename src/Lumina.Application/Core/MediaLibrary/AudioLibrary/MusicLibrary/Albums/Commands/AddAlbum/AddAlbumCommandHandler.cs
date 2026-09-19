@@ -9,10 +9,12 @@ using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
+using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Commands.AddTrack;
 using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using System;
@@ -78,20 +80,8 @@ public class AddAlbumCommandHandler : ICommandHandler<AddAlbumCommand, Result<Al
         Guid libraryId = Guid.Parse(command.LibraryId!);
         Guid artistId = Guid.Parse(command.ArtistId!);
 
-        // Admins can add albums to the artists of all libraries; for everyone else, only to the artists of the libraries they own.
-        bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
-            userId, new LibraryOwnershipPolicyContext(libraryId), cancellationToken).ConfigureAwait(false);
-        if (!canAccessLibrary)
-            return ApplicationErrors.Authorization.NotAuthorized;
-
-        // An album can only belong to a library that exists, so a client can never register an entry that points to a library of the host that is not there.
-        Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(libraryId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
-        if (getLibraryResult.IsFailure)
-            return getLibraryResult.Errors;
-        if (getLibraryResult.Value is null)
-            return DomainErrors.Library.LibraryNotFound;
-
-        Result<ArtistEntity?> getArtistResult = await _unitOfWork.ArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: false, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
+        // An album is a child of the artist aggregate, so the whole aggregate is loaded and the album is added within it.
+        Result<ArtistEntity?> getArtistResult = await _unitOfWork.ArtistRepository.GetByIdAsync(artistId, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getArtistResult.IsFailure)
             return getArtistResult.Errors;
         if (getArtistResult.Value is null)
@@ -103,6 +93,19 @@ public class AddAlbumCommandHandler : ICommandHandler<AddAlbumCommand, Result<Al
         if (existingArtist.LibraryId != libraryId)
             return DomainErrors.Music.ArtistNotFound;
 
+        // Admins can add albums to the artists of all libraries; for everyone else, only to the artists of the libraries they own.
+        bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
+            userId, new LibraryOwnershipPolicyContext(existingArtist.LibraryId), cancellationToken).ConfigureAwait(false);
+        if (!canAccessLibrary)
+            return ApplicationErrors.Authorization.NotAuthorized;
+
+        // An album can only belong to a library that exists, so a client can never register an entry that points to a library of the host that is not there.
+        Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(libraryId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (getLibraryResult.IsFailure)
+            return getLibraryResult.Errors;
+        if (getLibraryResult.Value is null)
+            return DomainErrors.Library.LibraryNotFound;
+
         // An album's tracks are only readable if they are stored inside one of the content locations of their library, so a client can never
         // register an entry that points the reading pipeline at an arbitrary file of the host.
         if (!AreTrackPathsWithinLibraryContentLocations(getLibraryResult.Value, command))
@@ -113,22 +116,27 @@ public class AddAlbumCommandHandler : ICommandHandler<AddAlbumCommand, Result<Al
         if (getContributorsResult.IsFailure)
             return getContributorsResult.Errors;
 
+        // The write path goes through the aggregate root: an album is a child entity of the artist aggregate, unlike Book and Artist,
+        // which are aggregate roots and are created directly with their own Create method. This difference is intentional.
+        Result<Artist> artistResult = existingArtist.ToDomainEntity();
+        if (artistResult.IsFailure)
+            return artistResult.Errors;
+
         Result<Album> createAlbumResult = command.ToDomainEntity();
         if (createAlbumResult.IsFailure)
             return createAlbumResult.Errors;
+        Result<Created> addAlbumResult = artistResult.Value.AddAlbum(createAlbumResult.Value);
+        if (addAlbumResult.IsFailure)
+            return addAlbumResult.Errors;
 
-        AlbumEntity persistenceAlbum = createAlbumResult.Value.ToRepositoryEntity(artistId, libraryId);
-        Result<Created> insertAlbumResult = await _unitOfWork.AlbumRepository.InsertAsync(persistenceAlbum, cancellationToken).ConfigureAwait(false);
-        if (insertAlbumResult.IsFailure)
-            return insertAlbumResult.Errors;
-
-        // The pre-insert checks handle the common cases; a concurrent request could still persist an album with the same identity between them
-        // and the save, in which case the persistence medium reports the unique constraint violation as a conflict.
+        Result<Updated> updateResult = await _unitOfWork.ArtistRepository.UpdateAsync(artistResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
+        if (updateResult.IsFailure)
+            return updateResult.Errors;
         Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         if (saveChangesResult.IsFailure)
             return saveChangesResult.Errors;
 
-        // Returns the album as it was actually persisted, instead of the in-memory aggregate, so the response reflects every value the database applied on save.
+        // Reading does not need the aggregate: the album is read directly and mapped to the response.
         Result<AlbumEntity?> getPersistedAlbumResult = await _unitOfWork.AlbumRepository.GetByIdAsync(createAlbumResult.Value.Id.Value, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getPersistedAlbumResult.IsFailure)
             return getPersistedAlbumResult.Errors;

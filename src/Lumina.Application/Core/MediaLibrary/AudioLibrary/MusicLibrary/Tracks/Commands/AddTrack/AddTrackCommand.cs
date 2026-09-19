@@ -52,5 +52,6 @@ public record AddTrackCommand(
     List<MoodDto>? Moods,
     List<IsrcDto>? Isrcs,
     List<MediaContributorReferenceDto>? Contributors,
-    List<AudioRatingDto>? Ratings
+    List<AudioRatingDto>? Ratings,
+    Guid? TrackId = null
 ) : ICommand;

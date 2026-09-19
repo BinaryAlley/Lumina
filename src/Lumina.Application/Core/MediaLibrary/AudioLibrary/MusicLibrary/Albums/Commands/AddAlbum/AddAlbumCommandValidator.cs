@@ -207,6 +207,16 @@ public class AddAlbumCommandValidator : AbstractValidator<AddAlbumCommand>
             .When(command => command.CatalogNumber is not null)
             .WithError(Errors.Music.CatalogNumberMustBeMaximum50CharactersLong);
 
+        RuleFor(command => command.Barcode)
+            .NotEmpty()
+            .When(command => command.Barcode is not null)
+            .WithError(Errors.Music.BarcodeValueCannotBeEmpty);
+
+        RuleFor(command => command.Barcode)
+            .Matches(@"^\d{12,13}$")
+            .When(command => command.Barcode is not null && command.Barcode.Length > 0)
+            .WithError(Errors.Music.InvalidFormatForBarcode);
+
         RuleFor(command => command.MusicBrainzReleaseId)
             .Must(musicBrainzReleaseId => musicBrainzReleaseId != Guid.Empty)
             .When(command => command.MusicBrainzReleaseId.HasValue)
@@ -221,6 +231,25 @@ public class AddAlbumCommandValidator : AbstractValidator<AddAlbumCommand>
             .Must(musicBrainzReleaseArtistId => musicBrainzReleaseArtistId != Guid.Empty)
             .When(command => command.MusicBrainzReleaseArtistId.HasValue)
             .WithError(Errors.Music.MusicBrainzIdInvalidFormat);
+
+        // Validates the media contributors that performed on the album.
+        RuleFor(command => command.Contributors)
+            .NotNull()
+            .WithError(Errors.MediaContributor.ContributorsListCannotBeNull);
+
+        RuleForEach(command => command.Contributors)
+            .ChildRules(contributor =>
+            {
+                contributor.RuleFor(c => c.ContributorId)
+                    .NotEmpty()
+                    .WithError(Errors.MediaContributor.MediaContributorIdCannotBeEmpty)
+                    .Must(contributorId => contributorId != Guid.Empty)
+                    .WithError(Errors.MediaContributor.MediaContributorIdCannotBeEmpty);
+
+                contributor.RuleFor(c => c.Role)
+                    .IsInEnum()
+                    .WithError(Errors.MediaContributor.UnknownMediaContributorRole);
+            });
 
         // Validates the ratings of the album.
         RuleFor(command => command.Ratings)
@@ -244,25 +273,6 @@ public class AddAlbumCommandValidator : AbstractValidator<AddAlbumCommand>
                     .GreaterThanOrEqualTo(0)
                     .When(r => r.VoteCount.HasValue)
                     .WithError(Errors.Metadata.RatingVoteCountMustBePositive);
-            });
-
-        // Validates the media contributors that performed on the album.
-        RuleFor(command => command.Contributors)
-            .NotNull()
-            .WithError(Errors.MediaContributor.ContributorsListCannotBeNull);
-
-        RuleForEach(command => command.Contributors)
-            .ChildRules(contributor =>
-            {
-                contributor.RuleFor(c => c.ContributorId)
-                    .NotEmpty()
-                    .WithError(Errors.MediaContributor.MediaContributorIdCannotBeEmpty)
-                    .Must(contributorId => contributorId != Guid.Empty)
-                    .WithError(Errors.MediaContributor.MediaContributorIdCannotBeEmpty);
-
-                contributor.RuleFor(c => c.Role)
-                    .IsInEnum()
-                    .WithError(Errors.MediaContributor.UnknownMediaContributorRole);
             });
 
         // Validates the tracks of the album.

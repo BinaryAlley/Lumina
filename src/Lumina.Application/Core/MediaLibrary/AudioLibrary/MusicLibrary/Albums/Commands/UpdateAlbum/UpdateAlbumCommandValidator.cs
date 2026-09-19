@@ -47,7 +47,7 @@ public class UpdateAlbumCommandValidator : AbstractValidator<UpdateAlbumCommand>
             .When(command => command.AlbumId is not null && command.AlbumId.Length > 0)
             .WithError(Errors.Music.AlbumIdCannotBeEmpty);
 
-        // Validates the metadata of the album: title, lengths, release information, release type and status, disc and track counts, languages, genres and tags.
+        // Validates the metadata of the album: title, lengths, release type and status, disc and track counts, release information, languages, genres and tags.
         RuleFor(command => command.Metadata)
             .NotNull()
             .WithError(Errors.Metadata.MetadataCannotBeNull)
@@ -69,6 +69,26 @@ public class UpdateAlbumCommandValidator : AbstractValidator<UpdateAlbumCommand>
                     .MaximumLength(2000)
                     .When(m => m!.Description is not null)
                     .WithError(Errors.Metadata.DescriptionMustBeMaximum2000CharactersLong);
+
+                metadata.RuleFor(m => m!.ReleaseType)
+                    .IsInEnum()
+                    .When(m => m!.ReleaseType is not null)
+                    .WithError(Errors.Music.UnknownMusicReleaseType);
+
+                metadata.RuleFor(m => m!.ReleaseStatus)
+                    .IsInEnum()
+                    .When(m => m!.ReleaseStatus is not null)
+                    .WithError(Errors.Music.UnknownMusicReleaseStatus);
+
+                metadata.RuleFor(m => m!.TotalDiscs)
+                    .GreaterThan(0)
+                    .When(m => m!.TotalDiscs.HasValue)
+                    .WithError(Errors.Music.TotalDiscsMustBeGreaterThanZero);
+
+                metadata.RuleFor(m => m!.TotalTracks)
+                    .GreaterThan(0)
+                    .When(m => m!.TotalTracks.HasValue)
+                    .WithError(Errors.Music.TotalTracksMustBeGreaterThanZero);
 
                 metadata.RuleFor(m => m!.ReleaseInfo)
                     .NotNull()
@@ -184,26 +204,6 @@ public class UpdateAlbumCommandValidator : AbstractValidator<UpdateAlbumCommand>
                     .MaximumLength(50)
                     .WithError(Errors.Metadata.LanguageNativeNameMustBeMaximum50CharactersLong)
                     .When(m => m!.OriginalLanguage is not null);
-
-                metadata.RuleFor(m => m!.ReleaseType)
-                    .IsInEnum()
-                    .When(m => m!.ReleaseType is not null)
-                    .WithError(Errors.Music.UnknownMusicReleaseType);
-
-                metadata.RuleFor(m => m!.ReleaseStatus)
-                    .IsInEnum()
-                    .When(m => m!.ReleaseStatus is not null)
-                    .WithError(Errors.Music.UnknownMusicReleaseStatus);
-
-                metadata.RuleFor(m => m!.TotalDiscs)
-                    .GreaterThan(0)
-                    .When(m => m!.TotalDiscs.HasValue)
-                    .WithError(Errors.Music.TotalDiscsMustBeGreaterThanZero);
-
-                metadata.RuleFor(m => m!.TotalTracks)
-                    .GreaterThan(0)
-                    .When(m => m!.TotalTracks.HasValue)
-                    .WithError(Errors.Music.TotalTracksMustBeGreaterThanZero);
             });
 
         // Validates the physical characteristics of the album: format and catalog number.
@@ -216,6 +216,16 @@ public class UpdateAlbumCommandValidator : AbstractValidator<UpdateAlbumCommand>
             .MaximumLength(50)
             .When(command => command.CatalogNumber is not null)
             .WithError(Errors.Music.CatalogNumberMustBeMaximum50CharactersLong);
+
+        RuleFor(command => command.Barcode)
+            .NotEmpty()
+            .When(command => command.Barcode is not null)
+            .WithError(Errors.Music.BarcodeValueCannotBeEmpty);
+
+        RuleFor(command => command.Barcode)
+            .Matches(@"^\d{12,13}$")
+            .When(command => command.Barcode is not null && command.Barcode.Length > 0)
+            .WithError(Errors.Music.InvalidFormatForBarcode);
 
         RuleFor(command => command.MusicBrainzReleaseId)
             .Must(musicBrainzReleaseId => musicBrainzReleaseId != Guid.Empty)

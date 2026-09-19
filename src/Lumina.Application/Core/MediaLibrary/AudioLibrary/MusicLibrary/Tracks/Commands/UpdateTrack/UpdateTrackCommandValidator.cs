@@ -248,6 +248,25 @@ public class UpdateTrackCommandValidator : AbstractValidator<UpdateTrackCommand>
             .When(command => command.Work is not null)
             .WithError(Errors.Music.WorkMustBeMaximum255CharactersLong);
 
+        // Validates the media contributors that performed on the track.
+        RuleFor(command => command.Contributors)
+            .NotNull()
+            .WithError(Errors.MediaContributor.ContributorsListCannotBeNull);
+
+        RuleForEach(command => command.Contributors)
+            .ChildRules(contributor =>
+            {
+                contributor.RuleFor(c => c.ContributorId)
+                    .NotEmpty()
+                    .WithError(Errors.MediaContributor.MediaContributorIdCannotBeEmpty)
+                    .Must(contributorId => contributorId != Guid.Empty)
+                    .WithError(Errors.MediaContributor.MediaContributorIdCannotBeEmpty);
+
+                contributor.RuleFor(c => c.Role)
+                    .IsInEnum()
+                    .WithError(Errors.MediaContributor.UnknownMediaContributorRole);
+            });
+
         // Validates the ratings of the track.
         RuleFor(command => command.Ratings)
             .NotNull()
