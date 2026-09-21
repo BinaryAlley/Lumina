@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
+namespace Lumina.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Metadata;
 
 /// <summary>
 /// Merges the book metadata returned by multiple metadata providers into a single book metadata, giving priority to the first provider that provides a value for each field.
@@ -45,7 +45,7 @@ internal static class MetadataAggregator
             FirstOrDefaultReference(first.BarnesAndNobleId, second.BarnesAndNobleId),
             FirstOrDefaultReference(first.AppleBooksId, second.AppleBooksId),
             Union(first.Isbns, second.Isbns, isbn => isbn.Value),
-            Union(first.Contributors, second.Contributors, contributor => $"{contributor.Name?.DisplayName}|{contributor.Role?.Name}"),
+            Union(first.Contributors, second.Contributors, contributor => $"{contributor.Name?.DisplayName}|{contributor.Role}"),
             Union(first.Ratings, second.Ratings, rating => rating.Source?.ToString()),
             FirstOrDefaultReference(first.CoverImagePath, second.CoverImagePath));
     }
