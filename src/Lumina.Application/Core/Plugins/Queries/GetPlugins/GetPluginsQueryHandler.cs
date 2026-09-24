@@ -4,6 +4,8 @@ using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Mapping.Plugins;
 using Lumina.Contracts.Responses.Plugins;
 using System.Collections.Generic;
@@ -40,7 +42,7 @@ public class GetPluginsQueryHandler : IQueryHandler<GetPluginsQuery, Result<IRea
     /// </returns>
     public async Task<Result<IReadOnlyList<PluginResponse>>> HandleAsync(GetPluginsQuery query, CancellationToken cancellationToken)
     {
-        Result<IEnumerable<PluginEntity>> getPluginsResult = await _unitOfWork.PluginRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
-        return getPluginsResult.Match(plugins => Result.From<IReadOnlyList<PluginResponse>>([.. plugins.Select(plugin => plugin.ToResponse())]), errors => errors);
+        Result<PaginatedResultDto<PluginEntity>> getPluginsResult = await _unitOfWork.PluginRepository.GetAllAsync<BaseFilterDto>(cancellationToken: cancellationToken).ConfigureAwait(false);
+        return getPluginsResult.Match(plugins => Result.From<IReadOnlyList<PluginResponse>>([.. plugins.Data.Select(plugin => plugin.ToResponse())]), errors => errors);
     }
 }

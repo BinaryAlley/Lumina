@@ -2,6 +2,8 @@
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Scheduling;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Mapping.Scheduling;
@@ -63,10 +65,10 @@ public class GetScheduledJobsQueryHandler : IQueryHandler<GetScheduledJobsQuery,
             return ApplicationErrors.Authorization.NotAuthorized;
 
         // Get the scheduled jobs from the storage medium.
-        Result<IEnumerable<ScheduledJobEntity>> getScheduledJobsResult = await _unitOfWork.ScheduledJobRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        Result<PaginatedResultDto<ScheduledJobEntity>> getScheduledJobsResult = await _unitOfWork.ScheduledJobRepository.GetAllAsync<BaseFilterDto>(cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getScheduledJobsResult.IsFailure)
             return getScheduledJobsResult.Errors;
 
-        return Result.From(getScheduledJobsResult.Value.Select(scheduledJob => scheduledJob.ToResponse()));
+        return Result.From(getScheduledJobsResult.Value.Data.Select(scheduledJob => scheduledJob.ToResponse()));
     }
 }

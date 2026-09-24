@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
 using Lumina.DataAccess.Core.Repositories.Authorization;
@@ -111,25 +113,25 @@ public class RoleRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        Result<IEnumerable<RoleEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
+        Result<PaginatedResultDto<RoleEntity>> result = await _sut.GetAllAsync<BaseFilterDto>(cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
-        Assert.Equal(2, result.Value.Count());
-        Assert.Equal(roles, result.Value);
+        Assert.Equal(2, result.Value.Data.Count);
+        Assert.Equal(roles, result.Value.Data);
     }
 
     [Fact]
     public async Task GetAllAsync_WhenNoRolesExist_ShouldReturnEmptyList()
     {
         // Act
-        Result<IEnumerable<RoleEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
+        Result<PaginatedResultDto<RoleEntity>> result = await _sut.GetAllAsync<BaseFilterDto>(cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
-        Assert.Empty(result.Value);
+        Assert.Empty(result.Value.Data);
     }
 
     [Fact]
@@ -172,7 +174,7 @@ public class RoleRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        Result<RoleEntity?> result = await _sut.GetByIdAsync(role.Id, CancellationToken.None);
+        Result<RoleEntity?> result = await _sut.GetByIdAsync(role.Id, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -190,7 +192,7 @@ public class RoleRepositoryTests
         Guid nonExistentId = Guid.NewGuid();
 
         // Act
-        Result<RoleEntity?> result = await _sut.GetByIdAsync(nonExistentId, CancellationToken.None);
+        Result<RoleEntity?> result = await _sut.GetByIdAsync(nonExistentId, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);

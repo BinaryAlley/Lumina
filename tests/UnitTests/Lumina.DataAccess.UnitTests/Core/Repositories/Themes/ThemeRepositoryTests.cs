@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
 using Lumina.Application.Common.DataAccess.Entities.Themes;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Themes;
 using Lumina.DataAccess.Core.Repositories.Themes;
 using Lumina.DataAccess.Core.UoW;
@@ -82,25 +84,25 @@ public class ThemeRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        Result<IEnumerable<ThemeEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
+        Result<PaginatedResultDto<ThemeEntity>> result = await _sut.GetAllAsync<BaseFilterDto>(cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
-        Assert.Equal(3, result.Value.Count());
-        Assert.Equal(themes, result.Value);
+        Assert.Equal(3, result.Value.Data.Count);
+        Assert.Equal(themes, result.Value.Data);
     }
 
     [Fact]
     public async Task GetAllAsync_WhenNoThemesExist_ShouldReturnEmptyList()
     {
         // Act
-        Result<IEnumerable<ThemeEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
+        Result<PaginatedResultDto<ThemeEntity>> result = await _sut.GetAllAsync<BaseFilterDto>(cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
-        Assert.Empty(result.Value);
+        Assert.Empty(result.Value.Data);
     }
 
     [Fact]

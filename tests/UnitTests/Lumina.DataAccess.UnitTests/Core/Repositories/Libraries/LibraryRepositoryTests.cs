@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.DataAccess.Core.Repositories.Libraries;
 using Lumina.DataAccess.Core.UoW;
@@ -81,7 +83,7 @@ public class LibraryRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        Result<LibraryEntity?> result = await _sut.GetByIdAsync(library.Id, CancellationToken.None);
+        Result<LibraryEntity?> result = await _sut.GetByIdAsync(library.Id, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -94,7 +96,7 @@ public class LibraryRepositoryTests
     public async Task GetByIdAsync_WhenLibraryDoesNotExist_ShouldReturnNull()
     {
         // Act
-        Result<LibraryEntity?> result = await _sut.GetByIdAsync(Guid.NewGuid(), CancellationToken.None);
+        Result<LibraryEntity?> result = await _sut.GetByIdAsync(Guid.NewGuid(), cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -147,12 +149,12 @@ public class LibraryRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        Result<IEnumerable<LibraryEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
+        Result<PaginatedResultDto<LibraryEntity>> result = await _sut.GetAllAsync<BaseFilterDto>(cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Equal(3, result.Value.Count());
-        Assert.Equal(libraries, result.Value);
+        Assert.Equal(3, result.Value.Data.Count);
+        Assert.Equal(libraries, result.Value.Data);
     }
 
     [Fact]

@@ -2,6 +2,8 @@
 using EntityFrameworkCore.Testing.NSubstitute;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.DataAccess.Core.Repositories.Users;
@@ -88,25 +90,25 @@ public class UserRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        Result<IEnumerable<UserEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
+        Result<PaginatedResultDto<UserEntity>> result = await _sut.GetAllAsync<BaseFilterDto>(cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
-        Assert.Equal(3, result.Value.Count());
-        Assert.Equal(users, result.Value);
+        Assert.Equal(3, result.Value.Data.Count);
+        Assert.Equal(users, result.Value.Data);
     }
 
     [Fact]
     public async Task GetAllAsync_WhenNoUsersExist_ShouldReturnEmptyList()
     {
         // Act
-        Result<IEnumerable<UserEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
+        Result<PaginatedResultDto<UserEntity>> result = await _sut.GetAllAsync<BaseFilterDto>(cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
-        Assert.Empty(result.Value);
+        Assert.Empty(result.Value.Data);
     }
 
     [Fact]
@@ -189,7 +191,7 @@ public class UserRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        Result<UserEntity?> result = await _sut.GetByIdAsync(userModel.Id, CancellationToken.None);
+        Result<UserEntity?> result = await _sut.GetByIdAsync(userModel.Id, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -209,7 +211,7 @@ public class UserRepositoryTests
         Guid nonExistentId = Guid.NewGuid();
 
         // Act
-        Result<UserEntity?> result = await _sut.GetByIdAsync(nonExistentId, CancellationToken.None);
+        Result<UserEntity?> result = await _sut.GetByIdAsync(nonExistentId, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
