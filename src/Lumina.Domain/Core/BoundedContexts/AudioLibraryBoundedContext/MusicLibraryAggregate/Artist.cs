@@ -23,6 +23,8 @@ namespace Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLib
 /// An artist is the entity that produced a musical work, whatever or whoever that might be. An artist is a single person, like Freddie Mercury, a group of people,
 /// like Queen, or a collaboration between artists, like Queen and David Bowie. The media contributors that make up the artist, together with the roles they play,
 /// are tracked as contributors.
+/// The albums of the artist, and the tracks of those albums, are entities inside this aggregate, not aggregate roots, so they are referenced by object, as DDD prescribes
+/// for entities within the same consistency boundary. The methods that mutate them therefore take the album, respectively the track, itself, rather than its id.
 /// </remarks>
 [DebuggerDisplay("Id: {Id} Name: {Name}")]
 public sealed class Artist : AggregateRoot<ArtistId>
@@ -91,7 +93,7 @@ public sealed class Artist : AggregateRoot<ArtistId>
         _contributors = [.. contributors];
         _albums = albums;
         CreatedOnUtc = createdOnUtc;
-        UpdatedOnUtc = updatedOnUtc.HasValue ? updatedOnUtc.Value : null;
+        UpdatedOnUtc = updatedOnUtc;
     }
 
     /// <summary>
@@ -127,7 +129,7 @@ public sealed class Artist : AggregateRoot<ArtistId>
             musicBrainzArtistId,
             contributors,
             albums,
-            DateTime.UtcNow, // TODO: should be IDateTimeProvider
+            DateTime.UtcNow, // TODO: should be IDateTimeProvider.
             Optional<DateTime>.None());
     }
 
@@ -208,7 +210,7 @@ public sealed class Artist : AggregateRoot<ArtistId>
     /// <param name="contributors">The media contributors that make up the artist.</param>
     public void UpdateContributors(IReadOnlyCollection<MusicMediaContributor> contributors)
     {
-        // replace the contents of the collection in place, preserving the readonly reference invariants of the aggregate
+        // Replace the contents of the collection in place, preserving the readonly reference invariants of the aggregate.
         _contributors.Clear();
         _contributors.UnionWith(contributors);
     }
@@ -231,7 +233,7 @@ public sealed class Artist : AggregateRoot<ArtistId>
         Name = name;
         Website = website;
         MusicBrainzArtistId = musicBrainzArtistId;
-        UpdatedOnUtc = DateTime.UtcNow;
+        UpdatedOnUtc = Optional<DateTime>.Some(DateTime.UtcNow);
         return Result.Updated;
     }
 
@@ -240,10 +242,10 @@ public sealed class Artist : AggregateRoot<ArtistId>
     /// </summary>
     /// <remarks>
     /// An album is a child entity of the artist aggregate, not an aggregate root, so it is mutated through its owning artist,
-    /// which is the consistency boundary. Book and Artist are themselves aggregate roots, so their update flows reconstitute them
-    /// directly with their own Create method instead. This difference is intentional.
+    /// which is the consistency boundary. Book is itself an aggregate root, so its update flow reconstitutes it directly
+    /// with its own Create method instead. This difference is intentional.
     /// </remarks>
-    /// <param name="albumId">The Id of the album to update.</param>
+    /// <param name="album">The album to update.</param>
     /// <param name="metadata">The album metadata of the album.</param>
     /// <param name="mediaFormat">The optional physical or digital medium of the album.</param>
     /// <param name="barcode">The optional barcode of the album.</param>
@@ -255,7 +257,7 @@ public sealed class Artist : AggregateRoot<ArtistId>
     /// <param name="ratings">The ratings of the album.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public Result<Updated> UpdateAlbum(
-        AlbumId albumId,
+        Album album,
         AlbumMetadata metadata,
         Optional<MusicMediaFormat> mediaFormat,
         Optional<Barcode> barcode,
@@ -266,14 +268,14 @@ public sealed class Artist : AggregateRoot<ArtistId>
         IReadOnlyCollection<MusicMediaContributor> contributors,
         IReadOnlyCollection<AudioRating> ratings)
     {
-        Album? album = _albums.FirstOrDefault(album => album.Id == albumId);
-        if (album is null)
+        // The album is an entity inside this aggregate, referenced by object, so it must be one of the albums of the artist.
+        if (!_albums.Contains(album))
             return Errors.Music.AlbumNotFound;
 
         album.UpdateDetails(metadata, mediaFormat, barcode, catalogNumber, musicBrainzReleaseId, musicBrainzReleaseGroupId, musicBrainzReleaseArtistId);
         album.UpdateContributors(contributors);
         album.UpdateRatings(ratings);
-        UpdatedOnUtc = DateTime.UtcNow;
+        UpdatedOnUtc = Optional<DateTime>.Some(DateTime.UtcNow);
         return Result.Updated;
     }
 
@@ -282,11 +284,11 @@ public sealed class Artist : AggregateRoot<ArtistId>
     /// </summary>
     /// <remarks>
     /// A track is a child entity of the artist aggregate, not an aggregate root, so it is mutated through its owning artist,
-    /// which is the consistency boundary. Book and Artist are themselves aggregate roots, so their update flows reconstitute them
-    /// directly with their own Create method instead. This difference is intentional.
+    /// which is the consistency boundary. Book is itself an aggregate root, so its update flow reconstitutes it directly
+    /// with its own Create method instead. This difference is intentional.
     /// </remarks>
-    /// <param name="albumId">The Id of the album the track belongs to.</param>
-    /// <param name="trackId">The Id of the track to update.</param>
+    /// <param name="album">The album the track belongs to.</param>
+    /// <param name="track">The track to update.</param>
     /// <param name="path">The file system path of the track.</param>
     /// <param name="metadata">The audio metadata of the track.</param>
     /// <param name="trackNumber">The number of the track on its disc.</param>
@@ -298,14 +300,14 @@ public sealed class Artist : AggregateRoot<ArtistId>
     /// <param name="musicBrainzRecordingId">The optional MusicBrainz identifier of the recording.</param>
     /// <param name="musicBrainzTrackId">The optional MusicBrainz identifier of the track.</param>
     /// <param name="musicBrainzWorkId">The optional MusicBrainz identifier of the work.</param>
-    /// <param name="contributors">The media contributors of the track.</param>
-    /// <param name="ratings">The ratings of the track.</param>
     /// <param name="moods">The moods of the track.</param>
     /// <param name="isrcs">The ISRCs of the track.</param>
+    /// <param name="contributors">The media contributors of the track.</param>
+    /// <param name="ratings">The ratings of the track.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public Result<Updated> UpdateTrackInAlbum(
-        AlbumId albumId,
-        TrackId trackId,
+        Album album,
+        Track track,
         string path,
         AudioMetadata metadata,
         int trackNumber,
@@ -317,14 +319,15 @@ public sealed class Artist : AggregateRoot<ArtistId>
         Optional<MusicBrainzId> musicBrainzRecordingId,
         Optional<MusicBrainzId> musicBrainzTrackId,
         Optional<MusicBrainzId> musicBrainzWorkId,
-        IReadOnlyCollection<MusicMediaContributor> contributors,
-        IReadOnlyCollection<AudioRating> ratings,
         IReadOnlyCollection<Mood> moods,
-        IReadOnlyCollection<Isrc> isrcs)
+        IReadOnlyCollection<Isrc> isrcs,
+        IReadOnlyCollection<MusicMediaContributor> contributors,
+        IReadOnlyCollection<AudioRating> ratings)
     {
-        Album? album = _albums.FirstOrDefault(album => album.Id == albumId);
-        Track? track = album?.Tracks.FirstOrDefault(track => track.Id == trackId);
-        if (track is null)
+        // The album and the track are entities inside this aggregate, referenced by object, so they must belong to the artist, respectively to the album.
+        if (!_albums.Contains(album))
+            return Errors.Music.AlbumNotFound;
+        if (!album.Tracks.Contains(track))
             return Errors.Music.TrackNotFound;
 
         track.UpdateDetails(
@@ -339,18 +342,18 @@ public sealed class Artist : AggregateRoot<ArtistId>
             musicBrainzRecordingId,
             musicBrainzTrackId,
             musicBrainzWorkId);
-        track.UpdateContributors(contributors);
-        track.UpdateRatings(ratings);
         track.UpdateMoods(moods);
         track.UpdateIsrcs(isrcs);
-        UpdatedOnUtc = DateTime.UtcNow;
+        track.UpdateContributors(contributors);
+        track.UpdateRatings(ratings);
+        UpdatedOnUtc = Optional<DateTime>.Some(DateTime.UtcNow);
         return Result.Updated;
     }
 
     /// <summary>
     /// Adds a track to an album of the artist.
     /// </summary>
-    /// <param name="albumId">The Id of the album the track is added to.</param>
+    /// <param name="album">The album the track is added to.</param>
     /// <param name="track">The track to be added.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     /// <remarks>
@@ -358,10 +361,10 @@ public sealed class Artist : AggregateRoot<ArtistId>
     /// which is the consistency boundary. Book and Artist are themselves aggregate roots, so they are created directly instead.
     /// This difference is intentional.
     /// </remarks>
-    public Result<Created> AddTrackToAlbum(AlbumId albumId, Track track)
+    public Result<Created> AddTrackToAlbum(Album album, Track track)
     {
-        Album? album = _albums.FirstOrDefault(album => album.Id == albumId);
-        if (album is null)
+        // The album is an entity inside this aggregate, referenced by object, so it must be one of the albums of the artist.
+        if (!_albums.Contains(album))
             return Errors.Music.AlbumNotFound;
 
         Result<Created> addResult = album.AddTrack(track);
@@ -374,21 +377,19 @@ public sealed class Artist : AggregateRoot<ArtistId>
     /// <summary>
     /// Removes a track from an album of the artist.
     /// </summary>
-    /// <param name="albumId">The Id of the album the track is removed from.</param>
-    /// <param name="trackId">The Id of the track to remove.</param>
+    /// <param name="album">The album the track is removed from.</param>
+    /// <param name="track">The track to remove.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     /// <remarks>
     /// A track is a child entity of the artist aggregate, not an aggregate root, so it is removed through its owning artist,
     /// which is the consistency boundary. This difference is intentional.
     /// </remarks>
-    public Result<Deleted> RemoveTrackFromAlbum(AlbumId albumId, TrackId trackId)
+    public Result<Deleted> RemoveTrackFromAlbum(Album album, Track track)
     {
-        Album? album = _albums.FirstOrDefault(album => album.Id == albumId);
-        if (album is null)
+        // The album and the track are entities inside this aggregate, referenced by object, so they must belong to the artist, respectively to the album.
+        if (!_albums.Contains(album))
             return Errors.Music.AlbumNotFound;
-
-        Track? track = album.Tracks.FirstOrDefault(track => track.Id == trackId);
-        if (track is null)
+        if (!album.Tracks.Contains(track))
             return Errors.Music.TrackNotFound;
 
         return album.RemoveTrack(track);

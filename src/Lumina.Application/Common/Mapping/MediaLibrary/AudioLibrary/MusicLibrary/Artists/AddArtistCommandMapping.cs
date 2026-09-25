@@ -44,12 +44,7 @@ public static class AddArtistCommandMapping
         Optional<string> website = Optional<string>.FromNullable(command.Website);
         Optional<MusicBrainzId> musicBrainzArtistId = Optional<MusicBrainzId>.None();
         if (command.MusicBrainzArtistId is not null)
-        {
-            Result<MusicBrainzId> musicBrainzArtistIdResult = MusicBrainzId.Create(command.MusicBrainzArtistId.Value);
-            if (musicBrainzArtistIdResult.IsFailure)
-                return musicBrainzArtistIdResult.Errors;
-            musicBrainzArtistId = musicBrainzArtistIdResult.Value;
-        }
+            musicBrainzArtistId = MusicBrainzId.Create(command.MusicBrainzArtistId.Value);
 
         return Artist.Create(
             LibraryId.Create(libraryId),

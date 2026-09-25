@@ -59,6 +59,13 @@ internal sealed class ArtistRepository : IArtistRepository
         if (doesArtistNameExist)
             return Errors.Music.ArtistAlreadyExists;
 
+        // A track is unique within its library by its file system path, so the same file can never be registered twice, neither twice in the same request,
+        // nor once when it is already registered in the library. The check runs here, for the whole artist, because the insert of the artist inserts its albums and their tracks as well.
+        List<string> trackPaths = [.. artist.Albums.SelectMany(album => album.Tracks).Select(track => track.Path!)];
+        Result<Success> checkTrackPathsResult = await CheckTrackPathsAsync(artist.LibraryId, trackPaths, cancellationToken).ConfigureAwait(false);
+        if (checkTrackPathsResult.IsFailure)
+            return checkTrackPathsResult.Errors;
+
         // Fetch the tags and genres referenced anywhere in the aggregate, so that the shared tables are not duplicated.
         List<string> tagNames = [.. artist.Albums
             .SelectMany(album => album.Tags.Select(tag => tag.Name!))
@@ -124,6 +131,13 @@ internal sealed class ArtistRepository : IArtistRepository
             shouldReplace: (existingContributor, incomingContributor) => false,
             createNew: incomingContributor => incomingContributor);
 
+        // A track is unique within its library by its file system path, so a track that is about to be inserted during this update can never reference a file
+        // that is already registered, nor a file that another track of the same update already references. The check runs before anything is written.
+        List<string> newTrackPaths = [.. GetNewTrackPaths(foundArtist, data)];
+        Result<Success> checkNewTrackPathsResult = await CheckTrackPathsAsync(foundArtist.LibraryId, newTrackPaths, cancellationToken).ConfigureAwait(false);
+        if (checkNewTrackPathsResult.IsFailure)
+            return checkNewTrackPathsResult.Errors;
+
         // Reconcile the albums by their Id: albums that are no longer present are removed, new albums are inserted, and existing
         // albums and their tracks are updated in place, so that persisted entities keep their identity across an edit. An album whose data did
         // not change produces no write statement, because its own repository only applies the values that actually changed.
@@ -152,6 +166,54 @@ internal sealed class ArtistRepository : IArtistRepository
         }
 
         return Result.Updated;
+    }
+
+    /// <summary>
+    /// Gets the file system paths of the tracks that are not yet stored and will therefore be inserted when <paramref name="data"/> is applied over <paramref name="foundArtist"/>.
+    /// </summary>
+    /// <param name="foundArtist">The tracked artist that is being updated.</param>
+    /// <param name="data">The artist carrying the desired albums and tracks.</param>
+    /// <returns>The file system paths of the tracks that are about to be inserted.</returns>
+    private static IEnumerable<string> GetNewTrackPaths(ArtistEntity foundArtist, ArtistEntity data)
+    {
+        foreach (AlbumEntity incomingAlbum in data.Albums)
+        {
+            AlbumEntity? existingAlbum = foundArtist.Albums.FirstOrDefault(album => album.Id == incomingAlbum.Id);
+            if (existingAlbum is null)
+            {
+                foreach (TrackEntity incomingTrack in incomingAlbum.Tracks)
+                    yield return incomingTrack.Path!;
+                continue;
+            }
+
+            foreach (TrackEntity incomingTrack in incomingAlbum.Tracks)
+                if (existingAlbum.Tracks.All(existingTrack => existingTrack.Id != incomingTrack.Id))
+                    yield return incomingTrack.Path!;
+        }
+    }
+
+    /// <summary>
+    /// Checks whether any of <paramref name="trackPaths"/> is referenced more than once, or is already used by a track of the library identified by <paramref name="libraryId"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the library whose tracks are searched.</param>
+    /// <param name="trackPaths">The file system paths of the tracks that are about to be inserted.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful check, or an error.</returns>
+    private async Task<Result<Success>> CheckTrackPathsAsync(Guid libraryId, IReadOnlyCollection<string> trackPaths, CancellationToken cancellationToken)
+    {
+        if (trackPaths.Count == 0)
+            return Result.Success;
+
+        // The same path cannot be referenced by two tracks of the request itself, not only by a track that is already stored.
+        if (trackPaths.Count != trackPaths.Distinct(StringComparer.Ordinal).Count())
+            return Errors.Music.TrackAlreadyExists;
+
+        Result<IReadOnlyCollection<string>> getExistingPathsResult = await _trackRepository.GetExistingPathsAsync(libraryId, trackPaths, cancellationToken).ConfigureAwait(false);
+        if (getExistingPathsResult.IsFailure)
+            return getExistingPathsResult.Errors;
+        if (getExistingPathsResult.Value.Count > 0)
+            return Errors.Music.TrackAlreadyExists;
+        return Result.Success;
     }
 
     /// <summary>

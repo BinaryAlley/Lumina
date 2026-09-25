@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.AddArtist;
 
 /// <summary>
-/// API endpoint for the <c>/{libraryId}/artists</c> route.
+/// API endpoint for the <c>/libraries/{libraryId}/artists</c> route.
 /// </summary>
 public class AddArtistEndpoint : BaseEndpoint<AddArtistRequest, IResult>
 {

@@ -458,10 +458,10 @@ public class AddArtistEndpointSummary : Summary<AddArtistEndpoint, AddArtistRequ
         ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].MusicBrainzWorkId, "The MusicBrainz identifier of the work, if applicable.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].CreatedOnUtc, "The date and time when the track was created.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].UpdatedOnUtc, "The date and time when the track was last updated, if applicable.");
-        ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].Contributors, "The list of references to the media contributors that performed on the track, each with the role they played.");
-        ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].Ratings, "The list of ratings for the track.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].Moods, "The list of moods of the track.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].Isrcs, "The list of ISRC (International Standard Recording Code) of the track.");
+        ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].Contributors, "The list of references to the media contributors that performed on the track, each with the role they played.");
+        ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].Ratings, "The list of ratings for the track.");
         ResponseParam<ArtistResponse>(r => r.CreatedOnUtc, "The date and time when the artist was created.");
         ResponseParam<ArtistResponse>(r => r.UpdatedOnUtc, "The date and time when the artist was last updated, if applicable.");
 
@@ -610,6 +610,15 @@ public class AddArtistEndpointSummary : Summary<AddArtistEndpoint, AddArtistRequ
                                 MusicBrainzWorkId: Guid.NewGuid(),
                                 CreatedOnUtc: DateTime.UtcNow,
                                 UpdatedOnUtc: default,
+                                Moods:
+                                [
+                                    new(Name: "dramatic"),
+                                    new(Name: "anxious")
+                                ],
+                                Isrcs:
+                                [
+                                    new(Value: "GBUM71029604")
+                                ],
                                 Contributors:
                                 [
                                     new(
@@ -635,15 +644,6 @@ public class AddArtistEndpointSummary : Summary<AddArtistEndpoint, AddArtistRequ
                                         Source: AudioRatingSource.LastFm,
                                         VoteCount: 1234
                                     )
-                                ],
-                                Moods:
-                                [
-                                    new(Name: "dramatic"),
-                                    new(Name: "anxious")
-                                ],
-                                Isrcs:
-                                [
-                                    new(Value: "GBUM71029604")
                                 ]
                             ),
                             new(
@@ -701,6 +701,15 @@ public class AddArtistEndpointSummary : Summary<AddArtistEndpoint, AddArtistRequ
                                 MusicBrainzWorkId: Guid.NewGuid(),
                                 CreatedOnUtc: DateTime.UtcNow,
                                 UpdatedOnUtc: default,
+                                Moods:
+                                [
+                                    new(Name: "happy"),
+                                    new(Name: "warm")
+                                ],
+                                Isrcs:
+                                [
+                                    new(Value: "GBUM71029609")
+                                ],
                                 Contributors:
                                 [
                                     new(
@@ -726,15 +735,6 @@ public class AddArtistEndpointSummary : Summary<AddArtistEndpoint, AddArtistRequ
                                         Source: AudioRatingSource.LastFm,
                                         VoteCount: 567
                                     )
-                                ],
-                                Moods:
-                                [
-                                    new(Name: "happy"),
-                                    new(Name: "warm")
-                                ],
-                                Isrcs:
-                                [
-                                    new(Value: "GBUM71029609")
                                 ]
                             )
                         ]

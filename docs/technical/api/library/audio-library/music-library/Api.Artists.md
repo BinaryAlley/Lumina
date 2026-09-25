@@ -324,20 +324,20 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists
       "catalogNumber": "EMC 4008",
       "musicBrainzReleaseId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
       "musicBrainzReleaseGroupId": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
-  "musicBrainzReleaseArtistId": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f",
-  "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
-  "updatedOnUtc": null,
-  "contributors": [
-    {
-      "contributorId": "0e7b4a6c-5f8d-6b9e-ca0b-3c4d5e6f7a8b",
-      "role": "Producer"
-    },
-    {
-      "contributorId": "1a8c5b7d-6a9e-7c0f-db1c-4d5e6f7a8b9c",
-      "role": "Engineer"
-    }
-  ],
-  "ratings": [
+      "musicBrainzReleaseArtistId": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f",
+      "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
+      "updatedOnUtc": null,
+      "contributors": [
+        {
+          "contributorId": "0e7b4a6c-5f8d-6b9e-ca0b-3c4d5e6f7a8b",
+          "role": "Producer"
+        },
+        {
+          "contributorId": "1a8c5b7d-6a9e-7c0f-db1c-4d5e6f7a8b9c",
+          "role": "Engineer"
+        }
+      ],
+      "ratings": [
         {
           "value": 4.5,
           "maxValue": 5,
@@ -384,6 +384,13 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists
           "musicBrainzWorkId": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
           "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
           "updatedOnUtc": null,
+          "moods": [
+            { "name": "dramatic" },
+            { "name": "anxious" }
+          ],
+          "isrcs": [
+            { "value": "GBUM71029604" }
+          ],
           "contributors": [
             {
               "contributorId": "6a3f0c2d-1b4e-4f5a-8c6d-9e0f1a2b3c4d",
@@ -407,13 +414,6 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists
               "source": "LastFm",
               "voteCount": 1234
             }
-          ],
-          "moods": [
-            { "name": "dramatic" },
-            { "name": "anxious" }
-          ],
-          "isrcs": [
-            { "value": "GBUM71029604" }
           ]
         },
         {
@@ -448,6 +448,13 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists
           "musicBrainzWorkId": "2b3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d6e",
           "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
           "updatedOnUtc": null,
+          "moods": [
+            { "name": "happy" },
+            { "name": "warm" }
+          ],
+          "isrcs": [
+            { "value": "GBUM71029609" }
+          ],
           "contributors": [
             {
               "contributorId": "6a3f0c2d-1b4e-4f5a-8c6d-9e0f1a2b3c4d",
@@ -471,13 +478,6 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists
               "source": "LastFm",
               "voteCount": 567
             }
-          ],
-          "moods": [
-            { "name": "happy" },
-            { "name": "warm" }
-          ],
-          "isrcs": [
-            { "value": "GBUM71029609" }
           ]
         }
       ]
@@ -906,20 +906,20 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
       "catalogNumber": "EMC 4008",
       "musicBrainzReleaseId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
       "musicBrainzReleaseGroupId": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
-  "musicBrainzReleaseArtistId": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f",
-  "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
-  "updatedOnUtc": null,
-  "contributors": [
-    {
-      "contributorId": "0e7b4a6c-5f8d-6b9e-ca0b-3c4d5e6f7a8b",
-      "role": "Producer"
-    },
-    {
-      "contributorId": "1a8c5b7d-6a9e-7c0f-db1c-4d5e6f7a8b9c",
-      "role": "Engineer"
-    }
-  ],
-  "ratings": [
+      "musicBrainzReleaseArtistId": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f",
+      "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
+      "updatedOnUtc": null,
+      "contributors": [
+        {
+          "contributorId": "0e7b4a6c-5f8d-6b9e-ca0b-3c4d5e6f7a8b",
+          "role": "Producer"
+        },
+        {
+          "contributorId": "1a8c5b7d-6a9e-7c0f-db1c-4d5e6f7a8b9c",
+          "role": "Engineer"
+        }
+      ],
+      "ratings": [
         {
           "value": 4.5,
           "maxValue": 5,
@@ -966,6 +966,13 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
           "musicBrainzWorkId": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
           "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
           "updatedOnUtc": null,
+          "moods": [
+            { "name": "dramatic" },
+            { "name": "anxious" }
+          ],
+          "isrcs": [
+            { "value": "GBUM71029604" }
+          ],
           "contributors": [
             {
               "contributorId": "6a3f0c2d-1b4e-4f5a-8c6d-9e0f1a2b3c4d",
@@ -989,13 +996,6 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
               "source": "LastFm",
               "voteCount": 1234
             }
-          ],
-          "moods": [
-            { "name": "dramatic" },
-            { "name": "anxious" }
-          ],
-          "isrcs": [
-            { "value": "GBUM71029604" }
           ]
         },
         {
@@ -1030,6 +1030,13 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
           "musicBrainzWorkId": "2b3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d6e",
           "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
           "updatedOnUtc": null,
+          "moods": [
+            { "name": "happy" },
+            { "name": "warm" }
+          ],
+          "isrcs": [
+            { "value": "GBUM71029609" }
+          ],
           "contributors": [
             {
               "contributorId": "6a3f0c2d-1b4e-4f5a-8c6d-9e0f1a2b3c4d",
@@ -1053,13 +1060,6 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
               "source": "LastFm",
               "voteCount": 567
             }
-          ],
-          "moods": [
-            { "name": "happy" },
-            { "name": "warm" }
-          ],
-          "isrcs": [
-            { "value": "GBUM71029609" }
           ]
         }
       ]
@@ -1081,5 +1081,5 @@ DELETE api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
 200 Ok
 ```
 
-Deletes the artist identified by the path, together with its albums and tracks.
+Deletes the artist identified by the route, together with its albums and tracks.
 

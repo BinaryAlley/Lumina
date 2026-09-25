@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.GetArtistAlbumsLite;
 
 /// <summary>
-/// API endpoint for the <c>/artists/{artistId}/albums/lite</c> route.
+/// API endpoint for the <c>/libraries/{libraryId}/artists/{artistId}/albums/lite</c> route.
 /// </summary>
 public class GetArtistAlbumsLiteEndpoint : BaseEndpoint<GetArtistAlbumsLiteRequest, IResult>
 {

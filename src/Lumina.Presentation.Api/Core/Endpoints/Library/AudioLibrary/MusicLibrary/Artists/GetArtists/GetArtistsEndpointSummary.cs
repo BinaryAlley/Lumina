@@ -22,7 +22,7 @@ public class GetArtistsEndpointSummary : Summary<GetArtistsEndpoint, GetArtistsR
     public GetArtistsEndpointSummary()
     {
         Summary = "Retrieves the list of artists of a media library.";
-        Description = "Returns the paginated list of the artists of the media library identified by the request, with the full details of each artist. The page is returned to an Admin, who can see the artists of all libraries, or to the owner of the library.";
+        Description = "Returns the paginated list of the artists of the media library identified by the route, with the full details of each artist. The page is returned to an Admin, who can see the artists of all libraries, or to the owner of the library.";
 
         ExampleRequest = new GetArtistsRequest(
             CurrentPage: 1,
@@ -87,7 +87,7 @@ public class GetArtistsEndpointSummary : Summary<GetArtistsEndpoint, GetArtistsR
                     type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                     status = 401,
                     title = "Unauthorized",
-                    detail = "You are not authorized",
+                    detail = "Authentication failed",
                     instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists"
                 },
                 new
@@ -95,7 +95,7 @@ public class GetArtistsEndpointSummary : Summary<GetArtistsEndpoint, GetArtistsR
                     type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                     status = 401,
                     title = "Unauthorized",
-                    detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
+                    detail = "The token has expired",
                     instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists"
                 },
                 new

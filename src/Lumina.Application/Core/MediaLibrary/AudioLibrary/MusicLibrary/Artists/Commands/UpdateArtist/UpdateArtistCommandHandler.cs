@@ -79,8 +79,8 @@ public class UpdateArtistCommandHandler : ICommandHandler<UpdateArtistCommand, R
         Guid libraryId = Guid.Parse(command.LibraryId!);
         Guid artistId = Guid.Parse(command.ArtistId!);
 
-        // Get the existing artist, only for its identity and creation metadata; the repository reloads and tracks the whole aggregate when it applies the update.
-        Result<ArtistEntity?> getArtistResult = await _unitOfWork.ArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: false, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
+        // An artist is an aggregate root, so the whole aggregate is loaded and the artist is edited within it.
+        Result<ArtistEntity?> getArtistResult = await _unitOfWork.ArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: true, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getArtistResult.IsFailure)
             return getArtistResult.Errors;
         if (getArtistResult.Value is null)
@@ -115,8 +115,12 @@ public class UpdateArtistCommandHandler : ICommandHandler<UpdateArtistCommand, R
         if (getContributorsResult.IsFailure)
             return getContributorsResult.Errors;
 
-        // Convert the command to a domain aggregate to enforce invariants, preserving the identity and creation metadata of the stored artist.
-        Result<Artist> updateArtistResult = command.ToDomainEntity(existingArtist);
+        // The write path goes through the aggregate root, which is mutated in place, preserving its identity and the identity of its children.
+        Result<Artist> artistResult = existingArtist.ToDomainEntity();
+        if (artistResult.IsFailure)
+            return artistResult.Errors;
+
+        Result<Artist> updateArtistResult = command.ToDomainEntity(artistResult.Value);
         if (updateArtistResult.IsFailure)
             return updateArtistResult.Errors;
 

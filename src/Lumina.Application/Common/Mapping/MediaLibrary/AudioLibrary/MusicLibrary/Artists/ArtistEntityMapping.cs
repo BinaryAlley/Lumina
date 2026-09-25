@@ -34,12 +34,7 @@ public static class ArtistEntityMapping
     {
         Optional<MusicBrainzId> musicBrainzArtistId = Optional<MusicBrainzId>.None();
         if (repositoryEntity.MusicBrainzArtistId is not null)
-        {
-            Result<MusicBrainzId> musicBrainzArtistIdResult = MusicBrainzId.Create(repositoryEntity.MusicBrainzArtistId.Value);
-            if (musicBrainzArtistIdResult.IsFailure)
-                return musicBrainzArtistIdResult.Errors;
-            musicBrainzArtistId = musicBrainzArtistIdResult.Value;
-        }
+            musicBrainzArtistId = MusicBrainzId.Create(repositoryEntity.MusicBrainzArtistId.Value);
 
         List<MusicMediaContributor> domainContributors = [];
         foreach (ArtistContributorEntity contributorEntity in repositoryEntity.Contributors)

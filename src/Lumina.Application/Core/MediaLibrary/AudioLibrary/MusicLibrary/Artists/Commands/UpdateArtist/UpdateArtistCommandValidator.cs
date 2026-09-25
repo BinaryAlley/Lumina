@@ -487,7 +487,27 @@ public class UpdateArtistCommandValidator : AbstractValidator<UpdateArtistComman
                                     .When(m => m!.OriginalLanguage is not null);
                             });
 
+                        // Validates the MusicBrainz identifiers of the track.
+                        track.RuleFor(t => t!.MusicBrainzRecordingId)
+                            .Must(musicBrainzRecordingId => musicBrainzRecordingId != Guid.Empty)
+                            .When(t => t!.MusicBrainzRecordingId.HasValue)
+                            .WithError(Errors.Music.MusicBrainzIdInvalidFormat);
+
+                        track.RuleFor(t => t!.MusicBrainzTrackId)
+                            .Must(musicBrainzTrackId => musicBrainzTrackId != Guid.Empty)
+                            .When(t => t!.MusicBrainzTrackId.HasValue)
+                            .WithError(Errors.Music.MusicBrainzIdInvalidFormat);
+
+                        track.RuleFor(t => t!.MusicBrainzWorkId)
+                            .Must(musicBrainzWorkId => musicBrainzWorkId != Guid.Empty)
+                            .When(t => t!.MusicBrainzWorkId.HasValue)
+                            .WithError(Errors.Music.MusicBrainzIdInvalidFormat);
+
                         // Validates the ordering and performance characteristics of the track.
+                        track.RuleFor(t => t!.TrackNumber)
+                            .NotNull()
+                            .WithError(Errors.Music.TrackNumberMustBeGreaterThanZero);
+
                         track.RuleFor(t => t!.TrackNumber)
                             .GreaterThan(0)
                             .When(t => t!.TrackNumber.HasValue)
@@ -518,6 +538,19 @@ public class UpdateArtistCommandValidator : AbstractValidator<UpdateArtistComman
                             .When(t => t!.Work is not null)
                             .WithError(Errors.Music.WorkMustBeMaximum255CharactersLong);
 
+                        // Validates the moods and the ISRC codes of the track.
+                        track.RuleForEach(t => t!.Moods)
+                            .ChildRules(mood =>
+                                mood.RuleFor(m => m.Name)
+                                    .NotEmpty()
+                                    .WithError(Errors.Metadata.MoodNameCannotBeEmpty));
+
+                        track.RuleForEach(t => t!.Isrcs)
+                            .ChildRules(isrc =>
+                                isrc.RuleFor(i => i.Value)
+                                    .NotEmpty()
+                                    .WithError(Errors.Music.IsrcValueCannotBeEmpty));
+
                         // Validates the media contributors that performed on the track.
                         track.RuleFor(t => t!.Contributors)
                             .NotNull()
@@ -536,19 +569,6 @@ public class UpdateArtistCommandValidator : AbstractValidator<UpdateArtistComman
                                     .IsInEnum()
                                     .WithError(Errors.MediaContributor.UnknownMediaContributorRole);
                             });
-
-                        // Validates the moods and the ISRC codes of the track.
-                        track.RuleForEach(t => t!.Moods)
-                            .ChildRules(mood =>
-                                mood.RuleFor(m => m.Name)
-                                    .NotEmpty()
-                                    .WithError(Errors.Metadata.MoodNameCannotBeEmpty));
-
-                        track.RuleForEach(t => t!.Isrcs)
-                            .ChildRules(isrc =>
-                                isrc.RuleFor(i => i.Value)
-                                    .NotEmpty()
-                                    .WithError(Errors.Music.IsrcValueCannotBeEmpty));
 
                         // Validates the ratings of the track.
                         track.RuleFor(t => t!.Ratings)

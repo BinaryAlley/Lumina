@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaContributors;
@@ -30,7 +30,7 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
     public UpdateArtistEndpointSummary()
     {
         Summary = "Updates an existing artist.";
-        Description = "Updates the details of the artist identified by the request, together with its contributors and albums, returning the full details of the updated artist. The artist is updated by an Admin, who can update the artists of all libraries, or by the owner of the library of the artist.";
+        Description = "Updates the details of the artist identified by the route, together with its contributors and albums, returning the full details of the updated artist. The artist is updated by an Admin, who can update the artists of all libraries, or by the owner of the library of the artist.";
 
         RequestParam(r => r.Name, "The name of the artist. Required.");
         RequestParam(r => r.Website, "The website of the artist. Optional.");
@@ -457,10 +457,10 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
         ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].MusicBrainzWorkId, "The MusicBrainz identifier of the work, if applicable.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].CreatedOnUtc, "The date and time when the track was created.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].UpdatedOnUtc, "The date and time when the track was last updated, if applicable.");
-        ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].Contributors, "The list of references to the media contributors that performed on the track, each with the role they played.");
-        ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].Ratings, "The list of ratings for the track.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].Moods, "The list of moods of the track.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].Isrcs, "The list of ISRC (International Standard Recording Code) of the track.");
+        ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].Contributors, "The list of references to the media contributors that performed on the track, each with the role they played.");
+        ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].Ratings, "The list of ratings for the track.");
         ResponseParam<ArtistResponse>(r => r.CreatedOnUtc, "The date and time when the artist was created.");
         ResponseParam<ArtistResponse>(r => r.UpdatedOnUtc, "The date and time when the artist was last updated, if applicable.");
 
@@ -614,6 +614,15 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                                 MusicBrainzWorkId: Guid.NewGuid(),
                                 CreatedOnUtc: DateTime.UtcNow,
                                 UpdatedOnUtc: DateTime.UtcNow,
+                                Moods:
+                                [
+                                    new MoodDto(Name: "dramatic"),
+                                    new MoodDto(Name: "anxious")
+                                ],
+                                Isrcs:
+                                [
+                                    new IsrcDto(Value: "GBUM71029604")
+                                ],
                                 Contributors:
                                 [
                                     new MediaContributorReferenceDto(
@@ -639,15 +648,6 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                                         Source: AudioRatingSource.LastFm,
                                         VoteCount: 1234
                                     )
-                                ],
-                                Moods:
-                                [
-                                    new MoodDto(Name: "dramatic"),
-                                    new MoodDto(Name: "anxious")
-                                ],
-                                Isrcs:
-                                [
-                                    new IsrcDto(Value: "GBUM71029604")
                                 ]
                             ),
                             new TrackResponse(
@@ -705,6 +705,15 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                                 MusicBrainzWorkId: Guid.NewGuid(),
                                 CreatedOnUtc: DateTime.UtcNow,
                                 UpdatedOnUtc: DateTime.UtcNow,
+                                Moods:
+                                [
+                                    new MoodDto(Name: "happy"),
+                                    new MoodDto(Name: "warm")
+                                ],
+                                Isrcs:
+                                [
+                                    new IsrcDto(Value: "GBUM71029609")
+                                ],
                                 Contributors:
                                 [
                                     new MediaContributorReferenceDto(
@@ -730,15 +739,6 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                                         Source: AudioRatingSource.LastFm,
                                         VoteCount: 567
                                     )
-                                ],
-                                Moods:
-                                [
-                                    new MoodDto(Name: "happy"),
-                                    new MoodDto(Name: "warm")
-                                ],
-                                Isrcs:
-                                [
-                                    new IsrcDto(Value: "GBUM71029609")
                                 ]
                             )
                         ]
@@ -836,6 +836,18 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
             }
         );
 
+        Response(409, "The request failed because the new artist name is already used in the library, or because a unique constraint was violated.", "application/problem+json",
+            example: new
+            {
+                type = "https://tools.ietf.org/html/rfc9110#section-15.5.10",
+                title = "General.Conflict",
+                status = 409,
+                detail = "UniqueConstraintViolation",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}",
+                traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
+            }
+        );
+
         Response(422, "The request did not pass validation checks.", "application/problem+json",
             example: new
             {
@@ -910,7 +922,8 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                             "BpmMustBeGreaterThanZero",
                             "WorkMustBeMaximum255CharactersLong",
                             "MoodNameCannotBeEmpty",
-                            "IsrcValueCannotBeEmpty"
+                            "IsrcValueCannotBeEmpty",
+                            "TrackPathMustBeWithinLibraryContentLocations"
                         }
                     }
                 },
