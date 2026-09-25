@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.AddTrack;
 
 /// <summary>
-/// API endpoint for the <c>/{libraryId}/artists/{artistId}/albums/{albumId}/tracks</c> route.
+/// API endpoint for the <c>/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks</c> route.
 /// </summary>
 public class AddTrackEndpoint : BaseEndpoint<AddTrackRequest, IResult>
 {
@@ -36,7 +36,7 @@ public class AddTrackEndpoint : BaseEndpoint<AddTrackRequest, IResult>
     public override void Configure()
     {
         Verbs(FastEndpoints.Http.POST);
-        Routes(ApiRoutes.Albums.ADD_TRACK);
+        Routes(ApiRoutes.Tracks.ADD_TRACK);
         Version(1);
         DontCatchExceptions();
     }

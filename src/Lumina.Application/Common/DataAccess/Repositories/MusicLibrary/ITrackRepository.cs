@@ -22,6 +22,15 @@ public interface ITrackRepository : IRepository<TrackEntity>,
                                     IGetByIdRepositoryAction<TrackEntity, Guid>
 {
     /// <summary>
+    /// Gets the subset of <paramref name="paths"/> that is already used by a track of the library identified by <paramref name="libraryId"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the library whose tracks are searched.</param>
+    /// <param name="paths">The track paths to check.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the paths that are already used, or an error.</returns>
+    Task<Result<IReadOnlyCollection<string>>> GetExistingPathsAsync(Guid libraryId, IReadOnlyCollection<string> paths, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Gets all the tracks of the album identified by <paramref name="albumId"/>.
     /// </summary>
     /// <param name="albumId">The Id of the album whose tracks are retrieved.</param>

@@ -50,6 +50,13 @@ Content-Type: application/json
   "musicBrainzRecordingId": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
   "musicBrainzTrackId": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
   "musicBrainzWorkId": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+  "moods": [
+    { "name": "dramatic" },
+    { "name": "anxious" }
+  ],
+  "isrcs": [
+    { "value": "GBUM71029604" }
+  ],
   "contributors": [
     { "contributorId": "6a3f0c2d-1b4e-4f5a-8c6d-9e0f1a2b3c4d", "role": "Vocals" },
     { "contributorId": "7b4e1d3f-2c5a-4e6b-9d7e-0f1a2b3c4d5e", "role": "Guitar" }
@@ -67,12 +74,5 @@ Content-Type: application/json
       "source": "LastFm",
       "voteCount": 1234
     }
-  ],
-  "moods": [
-    { "name": "dramatic" },
-    { "name": "anxious" }
-  ],
-  "isrcs": [
-    { "value": "GBUM71029604" }
   ]
 }

@@ -38,7 +38,7 @@ public sealed class Barcode : ValueObject
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="Barcode"/>, or an error message.
     /// </returns>
-    public static Result<Barcode> Create(string? value)
+    public static Result<Barcode> Create(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
             return Errors.Music.BarcodeValueCannotBeEmpty;

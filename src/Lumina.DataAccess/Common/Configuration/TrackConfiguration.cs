@@ -157,37 +157,6 @@ public class TrackConfiguration : IEntityTypeConfiguration<TrackEntity>
                     j.ToTable("TrackGenres");
                 });
 
-        builder.OwnsMany(track => track.Ratings, ratingBuilder =>
-        {
-            ratingBuilder.ToTable("TrackRatings");
-            ratingBuilder.WithOwner()
-                .HasForeignKey("TrackId");
-            ratingBuilder.Property<Guid>("Id")
-                .ValueGeneratedOnAdd();
-            ratingBuilder.HasKey("Id");
-
-            ratingBuilder.Property(rating => rating.Value)
-                .HasColumnType("decimal(3,2)")
-                .IsRequired();
-
-            ratingBuilder.Property(rating => rating.MaxValue)
-                .HasColumnType("decimal(3,2)")
-                .IsRequired();
-
-            ratingBuilder.Property(rating => rating.VoteCount)
-                .IsRequired(false);
-
-            ratingBuilder.Property(rating => rating.Source)
-                .HasConversion<string>()
-                .HasMaxLength(50)
-                .IsRequired(false);
-        });
-
-        builder.HasMany(track => track.Contributors)
-            .WithOne()
-            .HasForeignKey(contributor => contributor.TrackId)
-            .OnDelete(DeleteBehavior.Cascade);
-
         builder.OwnsMany(track => track.Moods, moodBuilder =>
         {
             moodBuilder.ToTable("TrackMoods");
@@ -215,6 +184,37 @@ public class TrackConfiguration : IEntityTypeConfiguration<TrackEntity>
                 .HasColumnName("ISRC")
                 .HasMaxLength(12)
                 .IsRequired();
+        });
+
+        builder.HasMany(track => track.Contributors)
+            .WithOne()
+            .HasForeignKey(contributor => contributor.TrackId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.OwnsMany(track => track.Ratings, ratingBuilder =>
+        {
+            ratingBuilder.ToTable("TrackRatings");
+            ratingBuilder.WithOwner()
+                .HasForeignKey("TrackId");
+            ratingBuilder.Property<Guid>("Id")
+                .ValueGeneratedOnAdd();
+            ratingBuilder.HasKey("Id");
+
+            ratingBuilder.Property(rating => rating.Value)
+                .HasColumnType("decimal(3,2)")
+                .IsRequired();
+
+            ratingBuilder.Property(rating => rating.MaxValue)
+                .HasColumnType("decimal(3,2)")
+                .IsRequired();
+
+            ratingBuilder.Property(rating => rating.VoteCount)
+                .IsRequired(false);
+
+            ratingBuilder.Property(rating => rating.Source)
+                .HasConversion<string>()
+                .HasMaxLength(50)
+                .IsRequired(false);
         });
 
         builder.HasIndex(track => new { track.AlbumId, track.TrackNumber });

@@ -10,6 +10,7 @@ public static partial class ApiRoutes
     /// </summary>
     public static class Tracks
     {
+        public const string ADD_TRACK = "/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks";
         public const string GET_TRACK_BY_ID = "/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}";
         public const string UPDATE_TRACK = "/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}";
         public const string DELETE_TRACK = "/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}";

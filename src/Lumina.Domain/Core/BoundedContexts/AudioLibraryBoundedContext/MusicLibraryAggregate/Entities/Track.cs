@@ -19,8 +19,8 @@ namespace Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLib
 [DebuggerDisplay("{Id}: {Metadata.Title}")]
 public sealed class Track : Entity<TrackId>
 {
-    private readonly List<Isrc> _isrcs;
     private readonly List<Mood> _moods;
+    private readonly List<Isrc> _isrcs;
     private readonly List<MusicMediaContributor> _contributors;
     private readonly List<AudioRating> _ratings;
 
@@ -107,42 +107,46 @@ public sealed class Track : Entity<TrackId>
     /// <param name="metadata">The audio metadata of the track.</param>
     /// <param name="trackNumber">The number of the track on its disc.</param>
     /// <param name="discNumber">The optional number of the disc the track belongs to.</param>
-    /// <param name="isrcs">The list of ISRC of the track.</param>
+    /// <param name="moods">The list of moods of the track.</param>
     /// <param name="script">The optional script used by the language of the track.</param>
     /// <param name="key">The optional musical key of the track.</param>
     /// <param name="bpm">The optional tempo of the track in beats per minute.</param>
-    /// <param name="moods">The list of moods of the track.</param>
+    /// <param name="isrcs">The list of ISRC of the track.</param>
     /// <param name="work">The optional title of the work the track is a recording of.</param>
     /// <param name="musicBrainzRecordingId">The optional MusicBrainz identifier of the recording.</param>
     /// <param name="musicBrainzTrackId">The optional MusicBrainz identifier of the track.</param>
     /// <param name="musicBrainzWorkId">The optional MusicBrainz identifier of the work.</param>
     /// <param name="contributors">The list of the media contributors of the track.</param>
     /// <param name="ratings">The list of ratings for the track.</param>
+    /// <param name="createdOnUtc">The date and time when the entity was created.</param>
+    /// <param name="updatedOnUtc">The date and time when the entity was last updated.</param>
     private Track(
         TrackId id,
         string path,
         AudioMetadata metadata,
         int trackNumber,
         Optional<int> discNumber,
-        List<Isrc> isrcs,
+        List<Mood> moods,
         Optional<string> script,
         Optional<MusicKey> key,
         Optional<int> bpm,
-        List<Mood> moods,
+        List<Isrc> isrcs,
         Optional<string> work,
         Optional<MusicBrainzId> musicBrainzRecordingId,
         Optional<MusicBrainzId> musicBrainzTrackId,
         Optional<MusicBrainzId> musicBrainzWorkId,
         List<MusicMediaContributor> contributors,
-        List<AudioRating> ratings) : base(id)
+        List<AudioRating> ratings,
+        DateTime createdOnUtc,
+        Optional<DateTime> updatedOnUtc) : base(id)
     {
         Id = id;
         Path = path;
         Metadata = metadata;
         TrackNumber = trackNumber;
         DiscNumber = discNumber;
-        _isrcs = isrcs;
         _moods = moods;
+        _isrcs = isrcs;
         Script = script;
         Key = key;
         Bpm = bpm;
@@ -152,6 +156,8 @@ public sealed class Track : Entity<TrackId>
         MusicBrainzWorkId = musicBrainzWorkId;
         _contributors = contributors;
         _ratings = ratings;
+        CreatedOnUtc = createdOnUtc;
+        UpdatedOnUtc = updatedOnUtc;
     }
 
     /// <summary>
@@ -161,11 +167,11 @@ public sealed class Track : Entity<TrackId>
     /// <param name="metadata">The audio metadata of the track.</param>
     /// <param name="trackNumber">The number of the track on its disc.</param>
     /// <param name="discNumber">The optional number of the disc the track belongs to.</param>
-    /// <param name="isrcs">The list of ISRC of the track.</param>
+    /// <param name="moods">The list of moods of the track.</param>
     /// <param name="script">The optional script used by the language of the track.</param>
     /// <param name="key">The optional musical key of the track.</param>
     /// <param name="bpm">The optional tempo of the track in beats per minute.</param>
-    /// <param name="moods">The list of moods of the track.</param>
+    /// <param name="isrcs">The list of ISRC of the track.</param>
     /// <param name="work">The optional title of the work the track is a recording of.</param>
     /// <param name="musicBrainzRecordingId">The optional MusicBrainz identifier of the recording.</param>
     /// <param name="musicBrainzTrackId">The optional MusicBrainz identifier of the track.</param>
@@ -180,11 +186,11 @@ public sealed class Track : Entity<TrackId>
         AudioMetadata metadata,
         int trackNumber,
         Optional<int> discNumber,
-        List<Isrc> isrcs,
+        List<Mood> moods,
         Optional<string> script,
         Optional<MusicKey> key,
         Optional<int> bpm,
-        List<Mood> moods,
+        List<Isrc> isrcs,
         Optional<string> work,
         Optional<MusicBrainzId> musicBrainzRecordingId,
         Optional<MusicBrainzId> musicBrainzTrackId,
@@ -198,17 +204,19 @@ public sealed class Track : Entity<TrackId>
             metadata,
             trackNumber,
             discNumber,
-            isrcs,
+            moods,
             script,
             key,
             bpm,
-            moods,
+            isrcs,
             work,
             musicBrainzRecordingId,
             musicBrainzTrackId,
             musicBrainzWorkId,
             contributors,
-            ratings);
+            ratings,
+            DateTime.UtcNow, // TODO: should be IDateTimeProvider
+            Optional<DateTime>.None());
     }
 
     /// <summary>
@@ -219,17 +227,19 @@ public sealed class Track : Entity<TrackId>
     /// <param name="metadata">The audio metadata of the track.</param>
     /// <param name="trackNumber">The number of the track on its disc.</param>
     /// <param name="discNumber">The optional number of the disc the track belongs to.</param>
-    /// <param name="isrcs">The list of ISRC of the track.</param>
+    /// <param name="moods">The list of moods of the track.</param>
     /// <param name="script">The optional script used by the language of the track.</param>
     /// <param name="key">The optional musical key of the track.</param>
     /// <param name="bpm">The optional tempo of the track in beats per minute.</param>
-    /// <param name="moods">The list of moods of the track.</param>
+    /// <param name="isrcs">The list of ISRC of the track.</param>
     /// <param name="work">The optional title of the work the track is a recording of.</param>
     /// <param name="musicBrainzRecordingId">The optional MusicBrainz identifier of the recording.</param>
     /// <param name="musicBrainzTrackId">The optional MusicBrainz identifier of the track.</param>
     /// <param name="musicBrainzWorkId">The optional MusicBrainz identifier of the work.</param>
     /// <param name="contributors">The list of the media contributors of the track.</param>
     /// <param name="ratings">The list of ratings for the track.</param>
+    /// <param name="createdOnUtc">The date and time when the entity was created.</param>
+    /// <param name="updatedOnUtc">The date and time when the entity was last updated.</param>
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="Track"/>, or an error message.
     /// </returns>
@@ -239,17 +249,19 @@ public sealed class Track : Entity<TrackId>
         AudioMetadata metadata,
         int trackNumber,
         Optional<int> discNumber,
-        List<Isrc> isrcs,
+        List<Mood> moods,
         Optional<string> script,
         Optional<MusicKey> key,
         Optional<int> bpm,
-        List<Mood> moods,
+        List<Isrc> isrcs,
         Optional<string> work,
         Optional<MusicBrainzId> musicBrainzRecordingId,
         Optional<MusicBrainzId> musicBrainzTrackId,
         Optional<MusicBrainzId> musicBrainzWorkId,
         List<MusicMediaContributor> contributors,
-        List<AudioRating> ratings)
+        List<AudioRating> ratings,
+        DateTime createdOnUtc,
+        Optional<DateTime> updatedOnUtc)
     {
         return new Track(
             id,
@@ -257,39 +269,19 @@ public sealed class Track : Entity<TrackId>
             metadata,
             trackNumber,
             discNumber,
-            isrcs,
+            moods,
             script,
             key,
             bpm,
-            moods,
+            isrcs,
             work,
             musicBrainzRecordingId,
             musicBrainzTrackId,
             musicBrainzWorkId,
             contributors,
-            ratings);
-    }
-
-    /// <summary>
-    /// Replaces the media contributors of the track with the provided <paramref name="contributors"/>.
-    /// </summary>
-    /// <param name="contributors">The media contributors of the track.</param>
-    internal void UpdateContributors(IReadOnlyCollection<MusicMediaContributor> contributors)
-    {
-        // replace the contents of the collection in place, preserving the readonly reference invariants of the entity
-        _contributors.Clear();
-        _contributors.AddRange(contributors);
-    }
-
-    /// <summary>
-    /// Replaces the ratings of the track with the provided <paramref name="ratings"/>.
-    /// </summary>
-    /// <param name="ratings">The ratings of the track.</param>
-    internal void UpdateRatings(IReadOnlyCollection<AudioRating> ratings)
-    {
-        // replace the contents of the collection in place, preserving the readonly reference invariants of the entity
-        _ratings.Clear();
-        _ratings.AddRange(ratings);
+            ratings,
+            createdOnUtc,
+            updatedOnUtc);
     }
 
     /// <summary>
@@ -312,6 +304,28 @@ public sealed class Track : Entity<TrackId>
         // replace the contents of the collection in place, preserving the readonly reference invariants of the entity
         _isrcs.Clear();
         _isrcs.AddRange(isrcs);
+    }
+
+    /// <summary>
+    /// Replaces the media contributors of the track with the provided <paramref name="contributors"/>.
+    /// </summary>
+    /// <param name="contributors">The media contributors of the track.</param>
+    internal void UpdateContributors(IReadOnlyCollection<MusicMediaContributor> contributors)
+    {
+        // replace the contents of the collection in place, preserving the readonly reference invariants of the entity
+        _contributors.Clear();
+        _contributors.AddRange(contributors);
+    }
+
+    /// <summary>
+    /// Replaces the ratings of the track with the provided <paramref name="ratings"/>.
+    /// </summary>
+    /// <param name="ratings">The ratings of the track.</param>
+    internal void UpdateRatings(IReadOnlyCollection<AudioRating> ratings)
+    {
+        // replace the contents of the collection in place, preserving the readonly reference invariants of the entity
+        _ratings.Clear();
+        _ratings.AddRange(ratings);
     }
 
     /// <summary>
@@ -353,7 +367,7 @@ public sealed class Track : Entity<TrackId>
         MusicBrainzRecordingId = musicBrainzRecordingId;
         MusicBrainzTrackId = musicBrainzTrackId;
         MusicBrainzWorkId = musicBrainzWorkId;
-        UpdatedOnUtc = DateTime.UtcNow;
+        UpdatedOnUtc = Optional<DateTime>.Some(DateTime.UtcNow);
         return Result.Updated;
     }
 }

@@ -47,8 +47,10 @@ internal sealed class TrackRepository : ITrackRepository
             return Errors.Music.TrackAlreadyExists;
 
         // A track is unique within its library by its file system path, so the same file can never be registered twice in the same library.
-        bool doesTrackPathExist = await _luminaDbContext.Tracks.AnyAsync(repositoryTrack => repositoryTrack.LibraryId == track.LibraryId && repositoryTrack.Path == track.Path, cancellationToken: cancellationToken).ConfigureAwait(false);
-        if (doesTrackPathExist)
+        Result<IReadOnlyCollection<string>> getExistingPathsResult = await GetExistingPathsAsync(track.LibraryId, [track.Path], cancellationToken).ConfigureAwait(false);
+        if (getExistingPathsResult.IsFailure)
+            return getExistingPathsResult.Errors;
+        if (getExistingPathsResult.Value.Count > 0)
             return Errors.Music.TrackAlreadyExists;
 
         // Fetch existing tags and genres.
@@ -65,6 +67,27 @@ internal sealed class TrackRepository : ITrackRepository
 
         _luminaDbContext.Tracks.Add(track);
         return Result.Created;
+    }
+
+    /// <summary>
+    /// Gets the subset of <paramref name="paths"/> that is already used by a track of the library identified by <paramref name="libraryId"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the library whose tracks are searched.</param>
+    /// <param name="paths">The track paths to check.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the paths that are already used, or an error.</returns>
+    public async Task<Result<IReadOnlyCollection<string>>> GetExistingPathsAsync(Guid libraryId, IReadOnlyCollection<string> paths, CancellationToken cancellationToken)
+    {
+        if (paths.Count == 0)
+            return Result.From<IReadOnlyCollection<string>>([]);
+
+        // The stored paths are compared ordinally, matching the case sensitive comparison used by the unique index of the storage medium.
+        List<string> distinctPaths = [.. paths.Distinct(StringComparer.Ordinal)];
+        List<string> existingPaths = await _luminaDbContext.Tracks
+            .Where(repositoryTrack => repositoryTrack.LibraryId == libraryId && distinctPaths.Contains(repositoryTrack.Path))
+            .Select(repositoryTrack => repositoryTrack.Path)
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+        return Result.From<IReadOnlyCollection<string>>(existingPaths);
     }
 
     /// <summary>

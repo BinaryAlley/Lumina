@@ -25,10 +25,10 @@ namespace Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Track
 /// <param name="MusicBrainzRecordingId">The MusicBrainz identifier of the recording. Optional.</param>
 /// <param name="MusicBrainzTrackId">The MusicBrainz identifier of the track. Optional.</param>
 /// <param name="MusicBrainzWorkId">The MusicBrainz identifier of the work. Optional.</param>
-/// <param name="Contributors">The list of media contributors that performed on the track. Required.</param>
-/// <param name="Ratings">The list of ratings for this track. Required.</param>
 /// <param name="Moods">The list of moods of the track. Optional.</param>
 /// <param name="Isrcs">The list of ISRC (International Standard Recording Code) of the track. Optional.</param>
+/// <param name="Contributors">The list of media contributors that performed on the track. Required.</param>
+/// <param name="Ratings">The list of ratings for this track. Required.</param>
 [DebuggerDisplay("Title: {Metadata.Title}")]
 public record UpdateTrackRequest(
     string? Path,
@@ -42,8 +42,8 @@ public record UpdateTrackRequest(
     Guid? MusicBrainzRecordingId,
     Guid? MusicBrainzTrackId,
     Guid? MusicBrainzWorkId,
-    List<MediaContributorReferenceDto>? Contributors,
-    List<AudioRatingDto>? Ratings,
     List<MoodDto>? Moods,
-    List<IsrcDto>? Isrcs
+    List<IsrcDto>? Isrcs,
+    List<MediaContributorReferenceDto>? Contributors,
+    List<AudioRatingDto>? Ratings
 );

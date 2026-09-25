@@ -19,7 +19,7 @@ public class DeleteTrackEndpointSummary : Summary<DeleteTrackEndpoint, EmptyRequ
     public DeleteTrackEndpointSummary()
     {
         Summary = "Deletes an existing track.";
-        Description = "Deletes the track identified by the request. The track is deleted by an Admin, who can delete the tracks of all libraries, or by the owner of the library of the track.";
+        Description = "Deletes the track identified by the route. The track is deleted by an Admin, who can delete the tracks of all libraries, or by the owner of the library of the track.";
 
         Response(200, "The track was successfully deleted.");
 

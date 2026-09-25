@@ -30,10 +30,10 @@ namespace Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Trac
 /// <param name="MusicBrainzWorkId">The MusicBrainz identifier of the work, if applicable.</param>
 /// <param name="CreatedOnUtc">The date and time when the track was created.</param>
 /// <param name="UpdatedOnUtc">The optional date and time when the track was updated.</param>
-/// <param name="Contributors">The list of references to the media contributors that performed on the track, each with the role they played.</param>
-/// <param name="Ratings">The list of ratings for this track.</param>
 /// <param name="Moods">The list of moods of the track.</param>
 /// <param name="Isrcs">The list of ISRC (International Standard Recording Code) of the track.</param>
+/// <param name="Contributors">The list of references to the media contributors that performed on the track, each with the role they played.</param>
+/// <param name="Ratings">The list of ratings for this track.</param>
 [DebuggerDisplay("Title: {Metadata.Title}")]
 public record TrackResponse(
     Guid Id,
@@ -52,8 +52,8 @@ public record TrackResponse(
     Guid? MusicBrainzWorkId,
     DateTime CreatedOnUtc,
     DateTime? UpdatedOnUtc,
-    List<MediaContributorReferenceDto>? Contributors,
-    List<AudioRatingDto>? Ratings,
     List<MoodDto>? Moods,
-    List<IsrcDto>? Isrcs
+    List<IsrcDto>? Isrcs,
+    List<MediaContributorReferenceDto>? Contributors,
+    List<AudioRatingDto>? Ratings
 );

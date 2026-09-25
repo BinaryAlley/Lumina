@@ -47,6 +47,8 @@ public class GetTrackEndpointSummary : Summary<GetTrackEndpoint, EmptyRequest>
         ResponseParam<TrackResponse>(r => r.MusicBrainzWorkId, "The MusicBrainz identifier of the work, if applicable.");
         ResponseParam<TrackResponse>(r => r.CreatedOnUtc, "The date and time when the track was created.");
         ResponseParam<TrackResponse>(r => r.UpdatedOnUtc, "The date and time when the track was last updated, if applicable.");
+        ResponseParam<TrackResponse>(r => r.Moods, "The list of moods of the track.");
+        ResponseParam<TrackResponse>(r => r.Isrcs, "The list of ISRC (International Standard Recording Code) of the track.");
         ResponseParam<TrackResponse>(r => r.Contributors, "The list of references to the media contributors that performed on the track, each with the role they played.");
         ResponseParam<TrackResponse>(r => r.Ratings, "The list of ratings for this track.");
         ResponseParam<TrackResponse>(r => r.Metadata!.DurationInSeconds, "The duration of the audio of the track in seconds.");
@@ -69,8 +71,6 @@ public class GetTrackEndpointSummary : Summary<GetTrackEndpoint, EmptyRequest>
         ResponseParam<TrackResponse>(r => r.Metadata!.OriginalLanguage!.NativeName, "The native name of the original language of the track, if applicable.");
         ResponseParam<TrackResponse>(r => r.Metadata!.Genres, "The list of genres associated with the track.");
         ResponseParam<TrackResponse>(r => r.Metadata!.Tags, "The list of tags that further describe or categorize the track.");
-        ResponseParam<TrackResponse>(r => r.Moods, "The list of moods of the track.");
-        ResponseParam<TrackResponse>(r => r.Isrcs, "The list of ISRC (International Standard Recording Code) of the track.");
 
         Response(200, "The requested track is returned.",
             example: new TrackResponse(
@@ -126,6 +126,13 @@ public class GetTrackEndpointSummary : Summary<GetTrackEndpoint, EmptyRequest>
                 MusicBrainzWorkId: Guid.NewGuid(),
                 CreatedOnUtc: DateTime.UtcNow,
                 UpdatedOnUtc: DateTime.UtcNow,
+                Moods: [
+                    new MoodDto(Name: "dramatic"),
+                    new MoodDto(Name: "anxious")
+                ],
+                Isrcs: [
+                    new IsrcDto(Value: "GBUM71029604")
+                ],
                 Contributors: [
                     new MediaContributorReferenceDto(
                         ContributorId: Guid.NewGuid(),
@@ -149,13 +156,6 @@ public class GetTrackEndpointSummary : Summary<GetTrackEndpoint, EmptyRequest>
                         Source: AudioRatingSource.LastFm,
                         VoteCount: 1234
                     )
-                ],
-                Moods: [
-                    new MoodDto(Name: "dramatic"),
-                    new MoodDto(Name: "anxious")
-                ],
-                Isrcs: [
-                    new IsrcDto(Value: "GBUM71029604")
                 ]
             )
         );
@@ -168,7 +168,7 @@ public class GetTrackEndpointSummary : Summary<GetTrackEndpoint, EmptyRequest>
                     type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                     status = 401,
                     title = "Unauthorized",
-                    detail = "You are not authorized",
+                    detail = "Authentication failed",
                     instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks/{Guid.NewGuid()}"
                 },
                 new
@@ -176,7 +176,7 @@ public class GetTrackEndpointSummary : Summary<GetTrackEndpoint, EmptyRequest>
                     type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                     status = 401,
                     title = "Unauthorized",
-                    detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
+                    detail = "The token has expired",
                     instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks/{Guid.NewGuid()}"
                 },
                 new
@@ -202,15 +202,27 @@ public class GetTrackEndpointSummary : Summary<GetTrackEndpoint, EmptyRequest>
             }
         );
 
-        Response(404, "The request failed because the requested track does not exist.", "application/problem+json",
-            example: new
+        Response(404, "The request failed because the requested album or track does not exist.", "application/problem+json",
+            example: new[]
             {
-                type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
-                title = "General.NotFound",
-                status = 404,
-                detail = "TrackNotFound",
-                instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks/{Guid.NewGuid()}",
-                traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+                    title = "General.NotFound",
+                    status = 404,
+                    detail = "AlbumNotFound",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks/{Guid.NewGuid()}",
+                    traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+                    title = "General.NotFound",
+                    status = 404,
+                    detail = "TrackNotFound",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks/{Guid.NewGuid()}",
+                    traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+                }
             }
         );
 
@@ -227,6 +239,9 @@ public class GetTrackEndpointSummary : Summary<GetTrackEndpoint, EmptyRequest>
                     {
                         "General.Validation", new[]
                         {
+                            "LibraryIdCannotBeEmpty",
+                            "ArtistIdCannotBeEmpty",
+                            "AlbumIdCannotBeEmpty",
                             "TrackIdCannotBeEmpty"
                         }
                     }

@@ -2,6 +2,9 @@
 
 - [Lumina API](#lumina-api)
   - [Track](#track)
+    - [Add Track](#add-track)
+      - [Add Track Request](#add-track-request)
+      - [Add Track Response](#add-track-response)
     - [Get Track](#get-track)
       - [Get Track Request](#get-track-request)
       - [Get Track Response](#get-track-response)
@@ -11,6 +14,171 @@
     - [Delete Track](#delete-track)
 
 ## Track
+
+### Add Track
+
+#### Add Track Request
+
+```js
+POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/albums/e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f/tracks
+```
+
+```json
+{
+  "path": "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
+  "metadata": {
+    "title": "Bohemian Rhapsody",
+    "originalTitle": "Bohemian Rhapsody",
+    "description": "A song by the British rock band Queen. It was written by Freddie Mercury and originally released on the album A Night at the Opera in 1975.",
+    "durationInSeconds": 354,
+    "sampleRate": 44100,
+    "channels": 2,
+    "bitDepth": 16,
+    "audioCodec": "FLAC",
+    "bitrate": 980,
+    "releaseInfo": {
+      "originalReleaseDate": "1975-10-31",
+      "originalReleaseYear": 1975,
+      "reReleaseDate": null,
+      "reReleaseYear": null,
+      "releaseCountry": "GB",
+      "releaseVersion": "Original"
+    },
+    "language": {
+      "languageCode": "en",
+      "languageName": "English",
+      "nativeName": "English"
+    },
+    "originalLanguage": {
+      "languageCode": "en",
+      "languageName": "English",
+      "nativeName": "English"
+    },
+    "genres": [
+      { "name": "Rock" },
+      { "name": "Progressive Rock" }
+    ],
+    "tags": [
+      { "name": "classic" },
+      { "name": "epic" }
+    ]
+  },
+  "trackNumber": 1,
+  "discNumber": 1,
+  "script": "Latn",
+  "key": "CMajor",
+  "bpm": 72,
+  "work": "Bohemian Rhapsody",
+  "musicBrainzRecordingId": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
+  "musicBrainzTrackId": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
+  "musicBrainzWorkId": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+  "moods": [
+    { "name": "dramatic" },
+    { "name": "anxious" }
+  ],
+  "isrcs": [
+    { "value": "GBUM71029604" }
+  ],
+  "contributors": [
+    { "contributorId": "6a3f0c2d-1b4e-4f5a-8c6d-9e0f1a2b3c4d", "role": "Vocals" },
+    { "contributorId": "7b4e1d3f-2c5a-4e6b-9d7e-0f1a2b3c4d5e", "role": "Guitar" }
+  ],
+  "ratings": [
+    {
+      "value": 4.5,
+      "maxValue": 5,
+      "source": "MusicBrainz",
+      "voteCount": 2345
+    },
+    {
+      "value": 4.8,
+      "maxValue": 5,
+      "source": "LastFm",
+      "voteCount": 1234
+    }
+  ]
+}
+```
+
+#### Add Track Response
+
+```js
+201 Created
+```
+
+```json
+{
+  "id": "9f0e1d2c-3b4a-4c6d-8e7f-9a0b1c2d3e4f",
+  "albumId": "e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f",
+  "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
+  "path": "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
+  "metadata": {
+    "title": "Bohemian Rhapsody",
+    "originalTitle": "Bohemian Rhapsody",
+    "description": "A song by the British rock band Queen. It was written by Freddie Mercury and originally released on the album A Night at the Opera in 1975.",
+    "releaseInfo": { "originalReleaseDate": "1975-10-31", "originalReleaseYear": 1975, "reReleaseDate": null, "reReleaseYear": null, "releaseCountry": "GB", "releaseVersion": "Original" },
+    "language": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
+    "originalLanguage": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
+    "tags": [ { "name": "classic" }, { "name": "epic" } ],
+    "genres": [ { "name": "Rock" }, { "name": "Progressive Rock" } ],
+    "durationInSeconds": 354,
+    "sampleRate": 44100,
+    "channels": 2,
+    "bitDepth": 16,
+    "audioCodec": "FLAC",
+    "bitrate": 980
+  },
+  "trackNumber": 1,
+  "discNumber": 1,
+  "script": "Latn",
+  "key": "CMajor",
+  "bpm": 72,
+  "work": "Bohemian Rhapsody",
+  "musicBrainzRecordingId": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
+  "musicBrainzTrackId": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
+  "musicBrainzWorkId": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+  "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
+  "updatedOnUtc": null,
+  "moods": [
+    {
+      "name": "dramatic"
+    },
+    {
+      "name": "anxious"
+    }
+  ],
+  "isrcs": [
+    {
+      "value": "GBUM71029604"
+    }
+  ],
+  "contributors": [
+    {
+      "contributorId": "6a3f0c2d-1b4e-4f5a-8c6d-9e0f1a2b3c4d",
+      "role": "Vocals"
+    },
+    {
+      "contributorId": "7b4e1d3f-2c5a-4e6b-9d7e-0f1a2b3c4d5e",
+      "role": "Guitar"
+    }
+  ],
+  "ratings": [
+    {
+      "value": 4.5,
+      "maxValue": 5,
+      "source": "MusicBrainz",
+      "voteCount": 2345
+    },
+    {
+      "value": 4.8,
+      "maxValue": 5,
+      "source": "LastFm",
+      "voteCount": 1234
+    }
+  ]
+}
+```
+
 
 ### Get Track
 
@@ -59,6 +227,19 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
   "musicBrainzWorkId": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
   "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
   "updatedOnUtc": null,
+  "moods": [
+    {
+      "name": "dramatic"
+    },
+    {
+      "name": "anxious"
+    }
+  ],
+  "isrcs": [
+    {
+      "value": "GBUM71029604"
+    }
+  ],
   "contributors": [
     {
       "contributorId": "6a3f0c2d-1b4e-4f5a-8c6d-9e0f1a2b3c4d",
@@ -81,19 +262,6 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
       "maxValue": 5,
       "source": "LastFm",
       "voteCount": 1234
-    }
-  ],
-  "moods": [
-    {
-      "name": "dramatic"
-    },
-    {
-      "name": "anxious"
-    }
-  ],
-  "isrcs": [
-    {
-      "value": "GBUM71029604"
     }
   ]
 }
@@ -157,6 +325,13 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
   "musicBrainzRecordingId": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
   "musicBrainzTrackId": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
   "musicBrainzWorkId": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+  "moods": [
+    { "name": "dramatic" },
+    { "name": "anxious" }
+  ],
+  "isrcs": [
+    { "value": "GBUM71029604" }
+  ],
   "contributors": [
     { "contributorId": "6a3f0c2d-1b4e-4f5a-8c6d-9e0f1a2b3c4d", "role": "Vocals" },
     { "contributorId": "7b4e1d3f-2c5a-4e6b-9d7e-0f1a2b3c4d5e", "role": "Guitar" }
@@ -174,13 +349,6 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
       "source": "LastFm",
       "voteCount": 1234
     }
-  ],
-  "moods": [
-    { "name": "dramatic" },
-    { "name": "anxious" }
-  ],
-  "isrcs": [
-    { "value": "GBUM71029604" }
   ]
 }
 ```
@@ -191,7 +359,78 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
 200 Ok
 ```
 
-The response carries the full details of the updated track, using the same shape as the [Get Track Response](#get-track-response).
+```json
+{
+  "id": "9f0e1d2c-3b4a-4c6d-8e7f-9a0b1c2d3e4f",
+  "albumId": "e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f",
+  "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
+  "path": "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
+  "metadata": {
+    "title": "Bohemian Rhapsody",
+    "originalTitle": "Bohemian Rhapsody",
+    "description": "A song by the British rock band Queen. It was written by Freddie Mercury and originally released on the album A Night at the Opera in 1975.",
+    "releaseInfo": { "originalReleaseDate": "1975-10-31", "originalReleaseYear": 1975, "reReleaseDate": null, "reReleaseYear": null, "releaseCountry": "GB", "releaseVersion": "Original" },
+    "language": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
+    "originalLanguage": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
+    "tags": [ { "name": "classic" }, { "name": "epic" } ],
+    "genres": [ { "name": "Rock" }, { "name": "Progressive Rock" } ],
+    "durationInSeconds": 354,
+    "sampleRate": 44100,
+    "channels": 2,
+    "bitDepth": 16,
+    "audioCodec": "FLAC",
+    "bitrate": 980
+  },
+  "trackNumber": 1,
+  "discNumber": 1,
+  "script": "Latn",
+  "key": "CMajor",
+  "bpm": 72,
+  "work": "Bohemian Rhapsody",
+  "musicBrainzRecordingId": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
+  "musicBrainzTrackId": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
+  "musicBrainzWorkId": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+  "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
+  "updatedOnUtc": null,
+  "moods": [
+    {
+      "name": "dramatic"
+    },
+    {
+      "name": "anxious"
+    }
+  ],
+  "isrcs": [
+    {
+      "value": "GBUM71029604"
+    }
+  ],
+  "contributors": [
+    {
+      "contributorId": "6a3f0c2d-1b4e-4f5a-8c6d-9e0f1a2b3c4d",
+      "role": "Vocals"
+    },
+    {
+      "contributorId": "7b4e1d3f-2c5a-4e6b-9d7e-0f1a2b3c4d5e",
+      "role": "Guitar"
+    }
+  ],
+  "ratings": [
+    {
+      "value": 4.5,
+      "maxValue": 5,
+      "source": "MusicBrainz",
+      "voteCount": 2345
+    },
+    {
+      "value": 4.8,
+      "maxValue": 5,
+      "source": "LastFm",
+      "voteCount": 1234
+    }
+  ]
+}
+```
 
 
 ### Delete Track
@@ -204,4 +443,4 @@ DELETE api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f
 200 Ok
 ```
 
-Deletes the track identified by the path.
+Deletes the track identified by the route.

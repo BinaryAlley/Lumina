@@ -8,6 +8,7 @@ using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.Common.Value
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 #endregion
@@ -32,53 +33,38 @@ public static class AddTrackCommandMapping
         if (metadataResult.IsFailure)
             return metadataResult.Errors;
 
-        IEnumerable<Result<Isrc>> domainIsrcsResult = (command.Isrcs ?? []).ToDomainEntities();
-        List<Error> errors = [.. domainIsrcsResult.Where(isrcResult => isrcResult.IsFailure).SelectMany(isrcResult => isrcResult.Errors)];
-        if (errors.Count > 0)
-            return errors;
-
         IEnumerable<Result<Mood>> domainMoodsResult = (command.Moods ?? []).ToDomainEntities();
-        errors = [.. domainMoodsResult.Where(moodResult => moodResult.IsFailure).SelectMany(moodResult => moodResult.Errors)];
+        List<Error> errors = [.. domainMoodsResult.Where(moodResult => moodResult.IsFailure).SelectMany(moodResult => moodResult.Errors)];
         if (errors.Count > 0)
             return errors;
 
-        IEnumerable<Result<MusicMediaContributor>> domainContributorsResult = (command.Contributors ?? []).ToMusicDomainEntities();
+        IEnumerable<Result<Isrc>> domainIsrcsResult = (command.Isrcs ?? []).ToDomainEntities();
+        errors = [.. domainIsrcsResult.Where(isrcResult => isrcResult.IsFailure).SelectMany(isrcResult => isrcResult.Errors)];
+        if (errors.Count > 0)
+            return errors;
+
+        IEnumerable<Result<MusicMediaContributor>> domainContributorsResult = command.Contributors!.ToMusicDomainEntities();
         errors = [.. domainContributorsResult.Where(contributorResult => contributorResult.IsFailure).SelectMany(contributorResult => contributorResult.Errors)];
         if (errors.Count > 0)
             return errors;
 
-        IEnumerable<Result<AudioRating>> domainRatingsResult = (command.Ratings ?? []).ToDomainEntities();
+        IEnumerable<Result<AudioRating>> domainRatingsResult = command.Ratings!.ToDomainEntities();
         errors = [.. domainRatingsResult.Where(ratingResult => ratingResult.IsFailure).SelectMany(ratingResult => ratingResult.Errors)];
         if (errors.Count > 0)
             return errors;
 
         Optional<MusicBrainzId> musicBrainzRecordingId = Optional<MusicBrainzId>.None();
         if (command.MusicBrainzRecordingId is not null)
-        {
-            Result<MusicBrainzId> musicBrainzRecordingIdResult = MusicBrainzId.Create(command.MusicBrainzRecordingId.Value);
-            if (musicBrainzRecordingIdResult.IsFailure)
-                return musicBrainzRecordingIdResult.Errors;
-            musicBrainzRecordingId = musicBrainzRecordingIdResult.Value;
-        }
+            musicBrainzRecordingId = MusicBrainzId.Create(command.MusicBrainzRecordingId.Value);
         Optional<MusicBrainzId> musicBrainzTrackId = Optional<MusicBrainzId>.None();
         if (command.MusicBrainzTrackId is not null)
-        {
-            Result<MusicBrainzId> musicBrainzTrackIdResult = MusicBrainzId.Create(command.MusicBrainzTrackId.Value);
-            if (musicBrainzTrackIdResult.IsFailure)
-                return musicBrainzTrackIdResult.Errors;
-            musicBrainzTrackId = musicBrainzTrackIdResult.Value;
-        }
+            musicBrainzTrackId = MusicBrainzId.Create(command.MusicBrainzTrackId.Value);
         Optional<MusicBrainzId> musicBrainzWorkId = Optional<MusicBrainzId>.None();
         if (command.MusicBrainzWorkId is not null)
-        {
-            Result<MusicBrainzId> musicBrainzWorkIdResult = MusicBrainzId.Create(command.MusicBrainzWorkId.Value);
-            if (musicBrainzWorkIdResult.IsFailure)
-                return musicBrainzWorkIdResult.Errors;
-            musicBrainzWorkId = musicBrainzWorkIdResult.Value;
-        }
+            musicBrainzWorkId = MusicBrainzId.Create(command.MusicBrainzWorkId.Value);
 
-        List<Isrc> isrcs = [.. domainIsrcsResult.Select(isrcResult => isrcResult.Value)];
         List<Mood> moods = [.. domainMoodsResult.Select(moodResult => moodResult.Value)];
+        List<Isrc> isrcs = [.. domainIsrcsResult.Select(isrcResult => isrcResult.Value)];
         List<MusicMediaContributor> contributors = [.. domainContributorsResult.Select(contributorResult => contributorResult.Value)];
         List<AudioRating> ratings = [.. domainRatingsResult.Select(ratingResult => ratingResult.Value)];
 
@@ -88,30 +74,32 @@ public static class AddTrackCommandMapping
                 TrackId.Create(command.TrackId.Value),
                 command.Path!,
                 metadataResult.Value,
-                command.TrackNumber ?? 1,
+                command.TrackNumber!.Value,
                 Optional<int>.FromNullable(command.DiscNumber),
-                isrcs,
+                moods,
                 Optional<string>.FromNullable(command.Script),
                 Optional<MusicKey>.FromNullable(command.Key),
                 Optional<int>.FromNullable(command.Bpm),
-                moods,
+                isrcs,
                 Optional<string>.FromNullable(command.Work),
                 musicBrainzRecordingId,
                 musicBrainzTrackId,
                 musicBrainzWorkId,
                 contributors,
-                ratings);
+                ratings,
+                DateTime.UtcNow,
+                Optional<DateTime>.None());
 
         return Track.Create(
             command.Path!,
             metadataResult.Value,
-            command.TrackNumber ?? 1,
+            command.TrackNumber!.Value,
             Optional<int>.FromNullable(command.DiscNumber),
-            isrcs,
+            moods,
             Optional<string>.FromNullable(command.Script),
             Optional<MusicKey>.FromNullable(command.Key),
             Optional<int>.FromNullable(command.Bpm),
-            moods,
+            isrcs,
             Optional<string>.FromNullable(command.Work),
             musicBrainzRecordingId,
             musicBrainzTrackId,

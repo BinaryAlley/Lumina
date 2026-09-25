@@ -68,15 +68,18 @@ public static class TrackMapping
                 TrackId = domainEntity.Id.Value,
                 MediaContributorId = contributor.ContributorId.Value,
                 Role = contributor.Role,
-                CreatedOnUtc = default,
-                CreatedBy = default
+                CreatedOnUtc = domainEntity.CreatedOnUtc,
+                CreatedBy = Guid.Empty,
+                UpdatedBy = null
             })],
             Moods = [.. domainEntity.Moods.ToRepositoryEntities()],
             Isrcs = [.. domainEntity.Isrcs.ToRepositoryEntities()],
             Ratings = [.. domainEntity.Ratings.ToRepositoryEntities()],
-            CreatedOnUtc = default,
-            CreatedBy = default,
-            UpdatedBy = default
+            CreatedOnUtc = domainEntity.CreatedOnUtc,
+            CreatedBy = Guid.Empty,
+            // The audit columns are owned by the auditing interceptor, which stamps only the rows that actually changed, so they are never mapped here.
+            UpdatedOnUtc = null,
+            UpdatedBy = null
         };
     }
 }

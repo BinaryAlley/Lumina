@@ -96,18 +96,24 @@ public class AddTrackCommandHandler : ICommandHandler<AddTrackCommand, Result<Tr
         Result<ArtistEntity?> getArtistResult = await _unitOfWork.ArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: true, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getArtistResult.IsFailure)
             return getArtistResult.Errors;
-        if (getArtistResult.Value is null || getArtistResult.Value.LibraryId != libraryId)
-            return Errors.Music.AlbumNotFound;
+        if (getArtistResult.Value is null)
+            return Errors.Music.ArtistNotFound;
         ArtistEntity existingArtist = getArtistResult.Value;
-        AlbumEntity? existingAlbum = existingArtist.Albums.FirstOrDefault(album => album.Id == albumId);
-        if (existingAlbum is null)
-            return Errors.Music.AlbumNotFound;
+
+        // Resource scoping: the track must belong to an artist of the library named by the route, so that a track can never be added through
+        // another library's route; the mismatch is reported as not found, without disclosing that the artist exists in another library.
+        if (existingArtist.LibraryId != libraryId)
+            return Errors.Music.ArtistNotFound;
 
         // Admins can add tracks to the albums of all libraries; for everyone else, only to the albums of the libraries they own.
         bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
             userId, new LibraryOwnershipPolicyContext(existingArtist.LibraryId), cancellationToken).ConfigureAwait(false);
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
+
+        AlbumEntity? existingAlbum = existingArtist.Albums.FirstOrDefault(album => album.Id == albumId);
+        if (existingAlbum is null)
+            return Errors.Music.AlbumNotFound;
 
         // A track can only belong to a library that exists, so a client can never register an entry that points to a library of the host that is not there.
         Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(libraryId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -135,7 +141,11 @@ public class AddTrackCommandHandler : ICommandHandler<AddTrackCommand, Result<Tr
         Result<Track> createTrackResult = command.ToDomainEntity();
         if (createTrackResult.IsFailure)
             return createTrackResult.Errors;
-        Result<Created> addTrackResult = artistResult.Value.AddTrackToAlbum(AlbumId.Create(albumId), createTrackResult.Value);
+        // The album is an entity inside the artist aggregate, so it is referenced by object, not by id; the aggregate member is located here and passed through.
+        Album? domainAlbum = artistResult.Value.Albums.FirstOrDefault(album => album.Id.Value == albumId);
+        if (domainAlbum is null)
+            return Errors.Music.AlbumNotFound;
+        Result<Created> addTrackResult = artistResult.Value.AddTrackToAlbum(domainAlbum, createTrackResult.Value);
         if (addTrackResult.IsFailure)
             return addTrackResult.Errors;
 

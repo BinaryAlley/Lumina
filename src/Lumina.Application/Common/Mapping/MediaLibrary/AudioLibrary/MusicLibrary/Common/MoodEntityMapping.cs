@@ -45,7 +45,7 @@ public static class MoodEntityMapping
     /// </returns>
     public static Result<Mood> ToDomainEntity(this TrackMoodEntity repositoryEntity)
     {
-        return Mood.Create(repositoryEntity.Name);
+        return Mood.Create(repositoryEntity.Name!);
     }
 
     /// <summary>

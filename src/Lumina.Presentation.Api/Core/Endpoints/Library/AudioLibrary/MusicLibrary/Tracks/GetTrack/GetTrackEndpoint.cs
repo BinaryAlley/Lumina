@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetTrack;
 
 /// <summary>
-/// API endpoint for the <c>/artists/{artistId}/albums/{albumId}/tracks/{trackId}</c> route.
+/// API endpoint for the <c>/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}</c> route.
 /// </summary>
 public class GetTrackEndpoint : BaseEndpoint<FastEndpoints.EmptyRequest, IResult>
 {

@@ -28,7 +28,7 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
     public AddTrackEndpointSummary()
     {
         Summary = "Adds a new track to an album.";
-        Description = "Adds a new track to the album identified by the request, returning the full details of the newly created track. The track is added by an Admin, who can add tracks to the albums of all libraries, or by the owner of the library of the album the track is added to.";
+        Description = "Creates a new track in the album identified by the route and returns its details, including the location of the newly created resource. The request is handled by an Admin, who can add tracks to the albums of all libraries, or by the owner of the library.";
 
         ExampleRequest = new AddTrackRequest(
             Path: "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
@@ -80,6 +80,15 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
             MusicBrainzRecordingId: Guid.NewGuid(),
             MusicBrainzTrackId: Guid.NewGuid(),
             MusicBrainzWorkId: Guid.NewGuid(),
+            Moods:
+            [
+                new MoodDto(Name: "dramatic"),
+                new MoodDto(Name: "anxious")
+            ],
+            Isrcs:
+            [
+                new IsrcDto(Value: "GBUM71029604")
+            ],
             Contributors:
             [
                 new MediaContributorReferenceDto(
@@ -105,15 +114,6 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
                     Source: AudioRatingSource.LastFm,
                     VoteCount: 1234
                 )
-            ],
-            Moods:
-            [
-                new MoodDto(Name: "dramatic"),
-                new MoodDto(Name: "anxious")
-            ],
-            Isrcs:
-            [
-                new IsrcDto(Value: "GBUM71029604")
             ]
         );
 
@@ -128,7 +128,7 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
         RequestParam(r => r.Metadata!.BitDepth, "The bit depth of the audio of the track. Optional.");
         RequestParam(r => r.Metadata!.AudioCodec, "The audio codec used by the track. Optional.");
         RequestParam(r => r.Metadata!.Bitrate, "The bitrate of the audio of the track in kbps. Optional.");
-        RequestParam(r => r.Metadata!.ReleaseInfo, "The release information, including release date and other relevant details. Optional.");
+        RequestParam(r => r.Metadata!.ReleaseInfo, "The release information, including release date and other relevant details. Required.");
         RequestParam(r => r.Metadata!.ReleaseInfo!.OriginalReleaseDate, "The original release date of the track. Optional.");
         RequestParam(r => r.Metadata!.ReleaseInfo!.OriginalReleaseYear, "The original release year of the track. Optional.");
         RequestParam(r => r.Metadata!.ReleaseInfo!.ReReleaseDate, "The re-release or reissue date of the track. Optional.");
@@ -136,15 +136,15 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
         RequestParam(r => r.Metadata!.ReleaseInfo!.ReleaseCountry, "The country or region of the release of the track. Optional.");
         RequestParam(r => r.Metadata!.ReleaseInfo!.ReleaseVersion, "The version or edition of the release of the track. Optional.");
         RequestParam(r => r.Metadata!.Language, "The language of the track. Optional.");
-        RequestParam(r => r.Metadata!.Language!.LanguageCode, "The ISO 639-1 two-letter language code of the track. Optional.");
-        RequestParam(r => r.Metadata!.Language!.LanguageName, "The full name of the language of the track in English. Optional.");
+        RequestParam(r => r.Metadata!.Language!.LanguageCode, "The ISO 639-1 two-letter language code of the track. Required.");
+        RequestParam(r => r.Metadata!.Language!.LanguageName, "The full name of the language of the track in English. Required.");
         RequestParam(r => r.Metadata!.Language!.NativeName, "The native name of the language of the track. Optional.");
         RequestParam(r => r.Metadata!.OriginalLanguage, "The original language of the track, if it has been translated. Optional.");
-        RequestParam(r => r.Metadata!.OriginalLanguage!.LanguageCode, "The ISO 639-1 two-letter original language code of the track. Optional.");
-        RequestParam(r => r.Metadata!.OriginalLanguage!.LanguageName, "The full name of the original language of the track in English. Optional.");
+        RequestParam(r => r.Metadata!.OriginalLanguage!.LanguageCode, "The ISO 639-1 two-letter original language code of the track. Required.");
+        RequestParam(r => r.Metadata!.OriginalLanguage!.LanguageName, "The full name of the original language of the track in English. Required.");
         RequestParam(r => r.Metadata!.OriginalLanguage!.NativeName, "The native name of the original language of the track. Optional.");
-        RequestParam(r => r.Metadata!.Genres, "The list of genres associated with the track. Optional.");
-        RequestParam(r => r.Metadata!.Tags, "The list of tags that further describe or categorize the track. Optional.");
+        RequestParam(r => r.Metadata!.Genres, "The list of genres associated with the track. Required.");
+        RequestParam(r => r.Metadata!.Tags, "The list of tags that further describe or categorize the track. Required.");
         RequestParam(r => r.TrackNumber, "The number of the track on its disc. Required.");
         RequestParam(r => r.DiscNumber, "The number of the disc the track belongs to. Optional.");
         RequestParam(r => r.Script, "The script used by the language of the track. Optional.");
@@ -154,10 +154,10 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
         RequestParam(r => r.MusicBrainzRecordingId, "The MusicBrainz identifier of the recording. Optional.");
         RequestParam(r => r.MusicBrainzTrackId, "The MusicBrainz identifier of the track. Optional.");
         RequestParam(r => r.MusicBrainzWorkId, "The MusicBrainz identifier of the work. Optional.");
-        RequestParam(r => r.Contributors, "The list of media contributors that performed on the track. Optional.");
-        RequestParam(r => r.Ratings, "The list of ratings for this track. Required.");
         RequestParam(r => r.Moods, "The list of moods of the track. Optional.");
         RequestParam(r => r.Isrcs, "The list of ISRC (International Standard Recording Code) of the track. Optional.");
+        RequestParam(r => r.Contributors, "The list of media contributors that performed on the track. Required.");
+        RequestParam(r => r.Ratings, "The list of ratings for this track. Required.");
 
         ResponseParam<TrackResponse>(r => r.Id, "The Id of the track.");
         ResponseParam<TrackResponse>(r => r.AlbumId, "The Id of the album the track belongs to.");
@@ -177,6 +177,8 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
         ResponseParam<TrackResponse>(r => r.MusicBrainzWorkId, "The MusicBrainz identifier of the work, if applicable.");
         ResponseParam<TrackResponse>(r => r.CreatedOnUtc, "The date and time when the track was created.");
         ResponseParam<TrackResponse>(r => r.UpdatedOnUtc, "The date and time when the track was last updated, if applicable.");
+        ResponseParam<TrackResponse>(r => r.Moods, "The list of moods of the track.");
+        ResponseParam<TrackResponse>(r => r.Isrcs, "The list of ISRC (International Standard Recording Code) of the track.");
         ResponseParam<TrackResponse>(r => r.Contributors, "The list of references to the media contributors that performed on the track, each with the role they played.");
         ResponseParam<TrackResponse>(r => r.Ratings, "The list of ratings for this track.");
         ResponseParam<TrackResponse>(r => r.Metadata!.DurationInSeconds, "The duration of the audio of the track in seconds.");
@@ -199,8 +201,6 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
         ResponseParam<TrackResponse>(r => r.Metadata!.OriginalLanguage!.NativeName, "The native name of the original language of the track, if applicable.");
         ResponseParam<TrackResponse>(r => r.Metadata!.Genres, "The list of genres associated with the track.");
         ResponseParam<TrackResponse>(r => r.Metadata!.Tags, "The list of tags that further describe or categorize the track.");
-        ResponseParam<TrackResponse>(r => r.Moods, "The list of moods of the track.");
-        ResponseParam<TrackResponse>(r => r.Isrcs, "The list of ISRC (International Standard Recording Code) of the track.");
 
         Response(201, "The newly created track is returned.",
             example: new TrackResponse(
@@ -256,6 +256,13 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
                 MusicBrainzWorkId: Guid.NewGuid(),
                 CreatedOnUtc: DateTime.UtcNow,
                 UpdatedOnUtc: default,
+                Moods: [
+                    new MoodDto(Name: "dramatic"),
+                    new MoodDto(Name: "anxious")
+                ],
+                Isrcs: [
+                    new IsrcDto(Value: "GBUM71029604")
+                ],
                 Contributors: [
                     new MediaContributorReferenceDto(
                         ContributorId: Guid.NewGuid(),
@@ -279,13 +286,6 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
                         Source: AudioRatingSource.LastFm,
                         VoteCount: 1234
                     )
-                ],
-                Moods: [
-                    new MoodDto(Name: "dramatic"),
-                    new MoodDto(Name: "anxious")
-                ],
-                Isrcs: [
-                    new IsrcDto(Value: "GBUM71029604")
                 ]
             )
         );
@@ -298,7 +298,7 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
                     type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                     status = 401,
                     title = "Unauthorized",
-                    detail = "You are not authorized",
+                    detail = "Authentication failed",
                     instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks"
                 },
                 new
@@ -306,7 +306,7 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
                     type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                     status = 401,
                     title = "Unauthorized",
-                    detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
+                    detail = "The token has expired",
                     instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks"
                 },
                 new
@@ -332,9 +332,18 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
             }
         );
 
-        Response(404, "The request failed because the requested album, its media library, or one of the referenced media contributors does not exist.", "application/problem+json",
+        Response(404, "The request failed because the requested artist or album, its media library, or one of the referenced media contributors does not exist.", "application/problem+json",
             example: new[]
             {
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+                    title = "General.NotFound",
+                    status = 404,
+                    detail = "ArtistNotFound",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks",
+                    traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+                },
                 new
                 {
                     type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
@@ -438,6 +447,8 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
                             "UnknownMusicKey",
                             "BpmMustBeGreaterThanZero",
                             "WorkMustBeMaximum255CharactersLong",
+                            "MoodNameCannotBeEmpty",
+                            "IsrcValueCannotBeEmpty",
                             "ContributorsListCannotBeNull",
                             "MediaContributorIdCannotBeEmpty",
                             "UnknownMediaContributorRole",

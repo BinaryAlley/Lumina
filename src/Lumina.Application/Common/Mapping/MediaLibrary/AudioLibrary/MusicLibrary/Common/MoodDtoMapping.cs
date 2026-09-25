@@ -22,7 +22,7 @@ public static class MoodDtoMapping
     /// </returns>
     public static Result<Mood> ToDomainEntity(this MoodDto dto)
     {
-        return Mood.Create(dto.Name);
+        return Mood.Create(dto.Name!);
     }
 
     /// <summary>

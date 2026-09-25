@@ -11,7 +11,6 @@ using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.A
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Entities;
-using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -81,20 +80,23 @@ public class DeleteTrackCommandHandler : ICommandHandler<DeleteTrackCommand, Res
             return DomainErrors.Music.ArtistNotFound;
         ArtistEntity existingArtist = getArtistResult.Value;
 
-        // Resource scoping: the track must belong to an album of the artist of the library named by the route, so that a track can never be
-        // deleted through another library's, artist's or album's route; the mismatch is reported as not found.
+        // Resource scoping: the track must belong to an artist of the library named by the route, so that a track can never be deleted through
+        // another library's route; the mismatch is reported as not found, without disclosing that the artist exists in another library.
         if (existingArtist.LibraryId != libraryId)
-            return DomainErrors.Music.TrackNotFound;
-        AlbumEntity? existingAlbum = existingArtist.Albums.FirstOrDefault(album => album.Id == albumId);
-        TrackEntity? existingTrack = existingAlbum?.Tracks.FirstOrDefault(track => track.Id == trackId);
-        if (existingTrack is null)
-            return DomainErrors.Music.TrackNotFound;
+            return DomainErrors.Music.ArtistNotFound;
 
         // Admins can delete the tracks of all libraries; for everyone else, only the tracks of the libraries they own.
         bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
             userId, new LibraryOwnershipPolicyContext(existingArtist.LibraryId), cancellationToken).ConfigureAwait(false);
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
+
+        AlbumEntity? existingAlbum = existingArtist.Albums.FirstOrDefault(album => album.Id == albumId);
+        if (existingAlbum is null)
+            return DomainErrors.Music.AlbumNotFound;
+        TrackEntity? existingTrack = existingAlbum.Tracks.FirstOrDefault(track => track.Id == trackId);
+        if (existingTrack is null)
+            return DomainErrors.Music.TrackNotFound;
 
         // A track can only belong to a library that exists, so a client can never delete a track of a library of the host that is not there.
         Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository
@@ -109,14 +111,21 @@ public class DeleteTrackCommandHandler : ICommandHandler<DeleteTrackCommand, Res
         Result<Artist> artistResult = existingArtist.ToDomainEntity();
         if (artistResult.IsFailure)
             return artistResult.Errors;
-        Result<Deleted> removeTrackResult = artistResult.Value.RemoveTrackFromAlbum(AlbumId.Create(albumId), TrackId.Create(trackId));
+        // The album and the track are entities inside the artist aggregate, so they are referenced by object, not by id; the aggregate members are located here and passed through.
+        Album? domainAlbum = artistResult.Value.Albums.FirstOrDefault(album => album.Id.Value == albumId);
+        if (domainAlbum is null)
+            return DomainErrors.Music.AlbumNotFound;
+        Track? domainTrack = domainAlbum.Tracks.FirstOrDefault(track => track.Id.Value == trackId);
+        if (domainTrack is null)
+            return DomainErrors.Music.TrackNotFound;
+        Result<Deleted> removeTrackResult = artistResult.Value.RemoveTrackFromAlbum(domainAlbum, domainTrack);
         if (removeTrackResult.IsFailure)
             return removeTrackResult.Errors;
 
-        Result<Updated> updateResult = await _unitOfWork.ArtistRepository
-            .UpdateAsync(artistResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
+        Result<Updated> updateResult = await _unitOfWork.ArtistRepository.UpdateAsync(artistResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
         if (updateResult.IsFailure)
             return updateResult.Errors;
+
         Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         if (saveChangesResult.IsFailure)
             return saveChangesResult.Errors;

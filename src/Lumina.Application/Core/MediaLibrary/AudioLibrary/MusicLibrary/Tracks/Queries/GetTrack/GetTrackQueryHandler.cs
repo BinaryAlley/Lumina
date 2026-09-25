@@ -6,7 +6,6 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Domain.Common.Errors;
@@ -76,13 +75,13 @@ public class GetTrackQueryHandler : IQueryHandler<GetTrackQuery, Result<TrackRes
         if (getAlbumResult.IsFailure)
             return getAlbumResult.Errors;
         if (getAlbumResult.Value is null)
-            return Errors.Music.TrackNotFound;
+            return Errors.Music.AlbumNotFound;
         AlbumEntity existingAlbum = getAlbumResult.Value;
 
-        // Resource scoping: the album must belong to the library and the artist named by the route, so that a track can never be read through
-        // another library's or artist's route; the mismatch is reported as not found, without disclosing that the track exists elsewhere.
+        // Resource scoping: the album must belong to the artist and the library named by the route, so that a track can never be read through
+        // another library's or artist's route; the mismatch is reported as not found, without disclosing that the album exists elsewhere.
         if (existingAlbum.LibraryId != libraryId || existingAlbum.ArtistId != artistId)
-            return Errors.Music.TrackNotFound;
+            return Errors.Music.AlbumNotFound;
 
         Result<TrackEntity?> getTrackResult = await _unitOfWork.TrackRepository.GetByIdAsync(trackId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getTrackResult.IsFailure)

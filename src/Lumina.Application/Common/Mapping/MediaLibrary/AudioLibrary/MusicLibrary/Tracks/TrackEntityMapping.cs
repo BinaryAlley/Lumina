@@ -91,27 +91,20 @@ public static class TrackEntityMapping
 
         Optional<MusicBrainzId> musicBrainzRecordingId = Optional<MusicBrainzId>.None();
         if (repositoryEntity.MusicBrainzRecordingId is not null)
-        {
-            Result<MusicBrainzId> musicBrainzRecordingIdResult = MusicBrainzId.Create(repositoryEntity.MusicBrainzRecordingId.Value);
-            if (musicBrainzRecordingIdResult.IsFailure)
-                return musicBrainzRecordingIdResult.Errors;
-            musicBrainzRecordingId = musicBrainzRecordingIdResult.Value;
-        }
+            musicBrainzRecordingId = MusicBrainzId.Create(repositoryEntity.MusicBrainzRecordingId.Value);
         Optional<MusicBrainzId> musicBrainzTrackId = Optional<MusicBrainzId>.None();
         if (repositoryEntity.MusicBrainzTrackId is not null)
-        {
-            Result<MusicBrainzId> musicBrainzTrackIdResult = MusicBrainzId.Create(repositoryEntity.MusicBrainzTrackId.Value);
-            if (musicBrainzTrackIdResult.IsFailure)
-                return musicBrainzTrackIdResult.Errors;
-            musicBrainzTrackId = musicBrainzTrackIdResult.Value;
-        }
+            musicBrainzTrackId = MusicBrainzId.Create(repositoryEntity.MusicBrainzTrackId.Value);
         Optional<MusicBrainzId> musicBrainzWorkId = Optional<MusicBrainzId>.None();
         if (repositoryEntity.MusicBrainzWorkId is not null)
+            musicBrainzWorkId = MusicBrainzId.Create(repositoryEntity.MusicBrainzWorkId.Value);
+
+        List<Mood> domainMoods = [];
+        foreach (Result<Mood> moodResult in repositoryEntity.Moods.ToDomainEntities())
         {
-            Result<MusicBrainzId> musicBrainzWorkIdResult = MusicBrainzId.Create(repositoryEntity.MusicBrainzWorkId.Value);
-            if (musicBrainzWorkIdResult.IsFailure)
-                return musicBrainzWorkIdResult.Errors;
-            musicBrainzWorkId = musicBrainzWorkIdResult.Value;
+            if (moodResult.IsFailure)
+                return moodResult.Errors;
+            domainMoods.Add(moodResult.Value);
         }
 
         List<Isrc> domainIsrcs = [];
@@ -120,14 +113,6 @@ public static class TrackEntityMapping
             if (isrcResult.IsFailure)
                 return isrcResult.Errors;
             domainIsrcs.Add(isrcResult.Value);
-        }
-
-        List<Mood> domainMoods = [];
-        foreach (Result<Mood> moodResult in repositoryEntity.Moods.ToDomainEntities())
-        {
-            if (moodResult.IsFailure)
-                return moodResult.Errors;
-            domainMoods.Add(moodResult.Value);
         }
 
         List<AudioRating> domainRatings = [];
@@ -153,17 +138,19 @@ public static class TrackEntityMapping
             metadataResult.Value,
             repositoryEntity.TrackNumber,
             Optional<int>.FromNullable(repositoryEntity.DiscNumber),
-            domainIsrcs,
+            domainMoods,
             Optional<string>.FromNullable(repositoryEntity.Script),
             Optional<MusicKey>.FromNullable(repositoryEntity.Key),
             Optional<int>.FromNullable(repositoryEntity.Bpm),
-            domainMoods,
+            domainIsrcs,
             Optional<string>.FromNullable(repositoryEntity.Work),
             musicBrainzRecordingId,
             musicBrainzTrackId,
             musicBrainzWorkId,
             domainContributors,
-            domainRatings);
+            domainRatings,
+            repositoryEntity.CreatedOnUtc,
+            Optional<DateTime>.FromNullable(repositoryEntity.UpdatedOnUtc));
     }
 
     /// <summary>
@@ -231,10 +218,10 @@ public static class TrackEntityMapping
             repositoryEntity.MusicBrainzWorkId,
             repositoryEntity.CreatedOnUtc,
             repositoryEntity.UpdatedOnUtc,
-            [.. repositoryEntity.Contributors.Select(contributor => new MediaContributorReferenceDto(contributor.MediaContributorId, contributor.Role))],
-            [.. repositoryEntity.Ratings.ToResponses()],
             [.. repositoryEntity.Moods.ToResponses()],
-            [.. repositoryEntity.Isrcs.ToResponses()]);
+            [.. repositoryEntity.Isrcs.ToResponses()],
+            [.. repositoryEntity.Contributors.Select(contributor => new MediaContributorReferenceDto(contributor.MediaContributorId, contributor.Role))],
+            [.. repositoryEntity.Ratings.ToResponses()]);
     }
 
     /// <summary>

@@ -2,8 +2,6 @@
 using Lumina.Application.Common.Mapping.MediaContributors;
 using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Common;
 using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Commands.UpdateTrack;
-using Lumina.Contracts.DTO.Common;
-using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.Common.ValueObjects;
@@ -14,6 +12,7 @@ using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DomainErrors = Lumina.Domain.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
@@ -37,8 +36,18 @@ public static class UpdateTrackCommandMapping
         if (metadataResult.IsFailure)
             return metadataResult.Errors;
 
+        IEnumerable<Result<Mood>> domainMoodsResult = (command.Moods ?? []).ToDomainEntities();
+        List<Error> errors = [.. domainMoodsResult.Where(moodResult => moodResult.IsFailure).SelectMany(moodResult => moodResult.Errors)];
+        if (errors.Count > 0)
+            return errors;
+
+        IEnumerable<Result<Isrc>> domainIsrcsResult = (command.Isrcs ?? []).ToDomainEntities();
+        errors = [.. domainIsrcsResult.Where(isrcResult => isrcResult.IsFailure).SelectMany(isrcResult => isrcResult.Errors)];
+        if (errors.Count > 0)
+            return errors;
+
         IEnumerable<Result<MusicMediaContributor>> domainContributorsResult = command.Contributors!.ToMusicDomainEntities();
-        List<Error> errors = [.. domainContributorsResult.Where(contributorResult => contributorResult.IsFailure).SelectMany(contributorResult => contributorResult.Errors)];
+        errors = [.. domainContributorsResult.Where(contributorResult => contributorResult.IsFailure).SelectMany(contributorResult => contributorResult.Errors)];
         if (errors.Count > 0)
             return errors;
 
@@ -49,53 +58,28 @@ public static class UpdateTrackCommandMapping
 
         Optional<MusicBrainzId> musicBrainzRecordingId = Optional<MusicBrainzId>.None();
         if (command.MusicBrainzRecordingId is not null)
-        {
-            Result<MusicBrainzId> musicBrainzRecordingIdResult = MusicBrainzId.Create(command.MusicBrainzRecordingId.Value);
-            if (musicBrainzRecordingIdResult.IsFailure)
-                return musicBrainzRecordingIdResult.Errors;
-            musicBrainzRecordingId = musicBrainzRecordingIdResult.Value;
-        }
+            musicBrainzRecordingId = MusicBrainzId.Create(command.MusicBrainzRecordingId.Value);
         Optional<MusicBrainzId> musicBrainzTrackId = Optional<MusicBrainzId>.None();
         if (command.MusicBrainzTrackId is not null)
-        {
-            Result<MusicBrainzId> musicBrainzTrackIdResult = MusicBrainzId.Create(command.MusicBrainzTrackId.Value);
-            if (musicBrainzTrackIdResult.IsFailure)
-                return musicBrainzTrackIdResult.Errors;
-            musicBrainzTrackId = musicBrainzTrackIdResult.Value;
-        }
+            musicBrainzTrackId = MusicBrainzId.Create(command.MusicBrainzTrackId.Value);
         Optional<MusicBrainzId> musicBrainzWorkId = Optional<MusicBrainzId>.None();
         if (command.MusicBrainzWorkId is not null)
-        {
-            Result<MusicBrainzId> musicBrainzWorkIdResult = MusicBrainzId.Create(command.MusicBrainzWorkId.Value);
-            if (musicBrainzWorkIdResult.IsFailure)
-                return musicBrainzWorkIdResult.Errors;
-            musicBrainzWorkId = musicBrainzWorkIdResult.Value;
-        }
+            musicBrainzWorkId = MusicBrainzId.Create(command.MusicBrainzWorkId.Value);
 
-        List<Isrc> domainIsrcs = [];
-        foreach (IsrcDto isrc in command.Isrcs ?? [])
-        {
-            Result<Isrc> isrcResult = isrc.ToDomainEntity();
-            if (isrcResult.IsFailure)
-                return isrcResult.Errors;
-            domainIsrcs.Add(isrcResult.Value);
-        }
-
-        List<Mood> domainMoods = [];
-        foreach (MoodDto mood in command.Moods ?? [])
-        {
-            Result<Mood> moodResult = mood.ToDomainEntity();
-            if (moodResult.IsFailure)
-                return moodResult.Errors;
-            domainMoods.Add(moodResult.Value);
-        }
+        // The album and the track are entities inside the artist aggregate, so they are referenced by object, not by id; the aggregate members are located here and passed through.
+        Album? album = artist.Albums.FirstOrDefault(album => album.Id.Value == Guid.Parse(command.AlbumId!));
+        if (album is null)
+            return DomainErrors.Music.AlbumNotFound;
+        Track? track = album.Tracks.FirstOrDefault(track => track.Id.Value == Guid.Parse(command.TrackId!));
+        if (track is null)
+            return DomainErrors.Music.TrackNotFound;
 
         Result<Updated> updateResult = artist.UpdateTrackInAlbum(
-            AlbumId.Create(Guid.Parse(command.AlbumId!)),
-            TrackId.Create(Guid.Parse(command.TrackId!)),
+            album,
+            track,
             command.Path!,
             metadataResult.Value,
-            command.TrackNumber ?? 1,
+            command.TrackNumber!.Value,
             Optional<int>.FromNullable(command.DiscNumber),
             Optional<string>.FromNullable(command.Script),
             Optional<MusicKey>.FromNullable(command.Key),
@@ -104,10 +88,10 @@ public static class UpdateTrackCommandMapping
             musicBrainzRecordingId,
             musicBrainzTrackId,
             musicBrainzWorkId,
+            [.. domainMoodsResult.Select(moodResult => moodResult.Value)],
+            [.. domainIsrcsResult.Select(isrcResult => isrcResult.Value)],
             [.. domainContributorsResult.Select(contributorResult => contributorResult.Value)],
-            [.. domainRatingsResult.Select(ratingResult => ratingResult.Value)],
-            domainMoods,
-            domainIsrcs);
+            [.. domainRatingsResult.Select(ratingResult => ratingResult.Value)]);
         if (updateResult.IsFailure)
             return updateResult.Errors;
 

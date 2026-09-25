@@ -30,10 +30,10 @@ namespace Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.
 /// <param name="MusicBrainzRecordingId">The MusicBrainz identifier of the recording, if applicable.</param>
 /// <param name="MusicBrainzTrackId">The MusicBrainz identifier of the track, if applicable.</param>
 /// <param name="MusicBrainzWorkId">The MusicBrainz identifier of the work, if applicable.</param>
-/// <param name="Contributors">The list of media contributors that performed on the track.</param>
-/// <param name="Ratings">The list of ratings for this track.</param>
 /// <param name="Moods">The list of moods of the track.</param>
 /// <param name="Isrcs">The list of ISRC of the track.</param>
+/// <param name="Contributors">The list of media contributors that performed on the track.</param>
+/// <param name="Ratings">The list of ratings for this track.</param>
 [DebuggerDisplay("Title: {Metadata.Title}")]
 public record UpdateTrackCommand(
     string? LibraryId,
@@ -51,8 +51,8 @@ public record UpdateTrackCommand(
     Guid? MusicBrainzRecordingId,
     Guid? MusicBrainzTrackId,
     Guid? MusicBrainzWorkId,
-    List<MediaContributorReferenceDto>? Contributors,
-    List<AudioRatingDto>? Ratings,
     List<MoodDto>? Moods,
-    List<IsrcDto>? Isrcs
+    List<IsrcDto>? Isrcs,
+    List<MediaContributorReferenceDto>? Contributors,
+    List<AudioRatingDto>? Ratings
 ) : ICommand;

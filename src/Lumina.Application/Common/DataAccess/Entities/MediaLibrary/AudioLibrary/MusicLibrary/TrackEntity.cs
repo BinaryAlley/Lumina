@@ -191,16 +191,6 @@ public class TrackEntity : IStorageEntity, IAuditableEntity
     public AlbumEntity? Album { get; set; }
 
     /// <summary>
-    /// Gets or sets the list of ratings for this track.
-    /// </summary>
-    public List<AudioRatingEntity> Ratings { get; set; } = [];
-
-    /// <summary>
-    /// Gets or sets the list of the media contributors of the track.
-    /// </summary>
-    public List<TrackContributorEntity> Contributors { get; set; } = [];
-
-    /// <summary>
     /// Gets or sets the list of moods of the track.
     /// </summary>
     public List<TrackMoodEntity> Moods { get; set; } = [];
@@ -209,6 +199,16 @@ public class TrackEntity : IStorageEntity, IAuditableEntity
     /// Gets or sets the list of ISRC (International Standard Recording Code) of the track.
     /// </summary>
     public List<TrackIsrcEntity> Isrcs { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the list of the media contributors of the track.
+    /// </summary>
+    public List<TrackContributorEntity> Contributors { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the list of ratings for this track.
+    /// </summary>
+    public List<AudioRatingEntity> Ratings { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the genres of the track.

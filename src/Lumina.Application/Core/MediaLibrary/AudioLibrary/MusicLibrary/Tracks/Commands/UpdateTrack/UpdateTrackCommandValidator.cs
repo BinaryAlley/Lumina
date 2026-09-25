@@ -202,6 +202,7 @@ public class UpdateTrackCommandValidator : AbstractValidator<UpdateTrackCommand>
                     .When(m => m!.OriginalLanguage is not null);
             });
 
+        // Validates the MusicBrainz identifiers of the track.
         RuleFor(command => command.MusicBrainzRecordingId)
             .Must(musicBrainzRecordingId => musicBrainzRecordingId != Guid.Empty)
             .When(command => command.MusicBrainzRecordingId.HasValue)
@@ -218,6 +219,10 @@ public class UpdateTrackCommandValidator : AbstractValidator<UpdateTrackCommand>
             .WithError(Errors.Music.MusicBrainzIdInvalidFormat);
 
         // Validates the ordering and performance characteristics of the track.
+        RuleFor(command => command.TrackNumber)
+            .NotNull()
+            .WithError(Errors.Music.TrackNumberMustBeGreaterThanZero);
+
         RuleFor(command => command.TrackNumber)
             .GreaterThan(0)
             .When(command => command.TrackNumber.HasValue)
@@ -247,6 +252,19 @@ public class UpdateTrackCommandValidator : AbstractValidator<UpdateTrackCommand>
             .MaximumLength(255)
             .When(command => command.Work is not null)
             .WithError(Errors.Music.WorkMustBeMaximum255CharactersLong);
+
+        // Validates the moods and the ISRC codes of the track.
+        RuleForEach(command => command.Moods)
+            .ChildRules(mood =>
+                mood.RuleFor(m => m.Name)
+                    .NotEmpty()
+                    .WithError(Errors.Metadata.MoodNameCannotBeEmpty));
+
+        RuleForEach(command => command.Isrcs)
+            .ChildRules(isrc =>
+                isrc.RuleFor(i => i.Value)
+                    .NotEmpty()
+                    .WithError(Errors.Music.IsrcValueCannotBeEmpty));
 
         // Validates the media contributors that performed on the track.
         RuleFor(command => command.Contributors)

@@ -45,7 +45,7 @@ public static class IsrcEntityMapping
     /// </returns>
     public static Result<Isrc> ToDomainEntity(this TrackIsrcEntity repositoryEntity)
     {
-        return Isrc.Create(repositoryEntity.Value);
+        return Isrc.Create(repositoryEntity.Value!);
     }
 
     /// <summary>

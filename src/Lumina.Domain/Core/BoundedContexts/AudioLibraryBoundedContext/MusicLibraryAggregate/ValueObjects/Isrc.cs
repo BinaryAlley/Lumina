@@ -38,7 +38,7 @@ public sealed class Isrc : ValueObject
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="Isrc"/>, or an error message.
     /// </returns>
-    public static Result<Isrc> Create(string? value)
+    public static Result<Isrc> Create(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
             return Errors.Music.IsrcValueCannotBeEmpty;

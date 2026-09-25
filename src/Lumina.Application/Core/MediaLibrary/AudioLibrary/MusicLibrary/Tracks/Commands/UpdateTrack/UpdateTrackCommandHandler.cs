@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
+using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -13,6 +14,7 @@ using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.A
 using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Common;
 using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Contracts.DTO.Common;
+using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
@@ -24,6 +26,7 @@ using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.ExternalIden
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.ValueObjects;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using System;
@@ -45,6 +48,7 @@ public class UpdateTrackCommandHandler : ICommandHandler<UpdateTrackCommand, Res
     private readonly IAuthorizationService _authorizationService;
     private readonly ICurrentUserService _currentUserService;
     private readonly IValidator<UpdateTrackCommand> _validator;
+    private readonly IPathService _pathService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdateTrackCommandHandler"/> class.
@@ -53,12 +57,14 @@ public class UpdateTrackCommandHandler : ICommandHandler<UpdateTrackCommand, Res
     /// <param name="authorizationService">Injected service for authorization related functionality.</param>
     /// <param name="currentUserService">Injected service to retrieve the current user information.</param>
     /// <param name="validator">Injected validator for application validation rules.</param>
-    public UpdateTrackCommandHandler(IUnitOfWork unitOfWork, IAuthorizationService authorizationService, ICurrentUserService currentUserService, IValidator<UpdateTrackCommand> validator)
+    /// <param name="pathService">Injected service for file system path related functionality.</param>
+    public UpdateTrackCommandHandler(IUnitOfWork unitOfWork, IAuthorizationService authorizationService, ICurrentUserService currentUserService, IValidator<UpdateTrackCommand> validator, IPathService pathService)
     {
         _unitOfWork = unitOfWork;
         _authorizationService = authorizationService;
         _currentUserService = currentUserService;
         _validator = validator;
+        _pathService = pathService;
     }
 
     /// <summary>
@@ -92,21 +98,27 @@ public class UpdateTrackCommandHandler : ICommandHandler<UpdateTrackCommand, Res
         if (getArtistResult.IsFailure)
             return getArtistResult.Errors;
 
-        // Resource scoping: the track must belong to the library, the artist and the album named by the route, so that a track can never be
-        // edited through another library's, artist's or album's route; the mismatch is reported as not found.
-        if (getArtistResult.Value is null || getArtistResult.Value.LibraryId != libraryId)
-            return Errors.Music.TrackNotFound;
+        if (getArtistResult.Value is null)
+            return Errors.Music.ArtistNotFound;
         ArtistEntity existingArtist = getArtistResult.Value;
-        AlbumEntity? existingAlbum = existingArtist.Albums.FirstOrDefault(album => album.Id == albumId);
-        TrackEntity? existingTrack = existingAlbum?.Tracks.FirstOrDefault(track => track.Id == trackId);
-        if (existingTrack is null)
-            return Errors.Music.TrackNotFound;
+
+        // Resource scoping: the track must belong to an artist of the library named by the route, so that a track can never be edited through
+        // another library's route; the mismatch is reported as not found, without disclosing that the artist exists in another library.
+        if (existingArtist.LibraryId != libraryId)
+            return Errors.Music.ArtistNotFound;
 
         // Admins can update the tracks of all libraries; for everyone else, only the tracks of the libraries they own.
         bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
             userId, new LibraryOwnershipPolicyContext(existingArtist.LibraryId), cancellationToken).ConfigureAwait(false);
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
+
+        AlbumEntity? existingAlbum = existingArtist.Albums.FirstOrDefault(album => album.Id == albumId);
+        if (existingAlbum is null)
+            return Errors.Music.AlbumNotFound;
+        TrackEntity? existingTrack = existingAlbum.Tracks.FirstOrDefault(track => track.Id == trackId);
+        if (existingTrack is null)
+            return Errors.Music.TrackNotFound;
 
         // A track can only belong to a library that exists, so a client can never update a track of a library of the host that is not there.
         Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(libraryId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -115,8 +127,18 @@ public class UpdateTrackCommandHandler : ICommandHandler<UpdateTrackCommand, Res
         if (getLibraryResult.Value is null)
             return Errors.Library.LibraryNotFound;
 
-        // The write path goes through the aggregate root: a track is a child entity of the artist aggregate, unlike Book and Artist,
-        // which are aggregate roots and are reconstituted directly with their own Create method. This difference is intentional.
+        // A track is only readable if it is stored inside one of the content locations of its library, so a client can never edit an entry
+        // that points the reading pipeline at an arbitrary file of the host.
+        if (!AreTrackPathsWithinLibraryContentLocations(getLibraryResult.Value, command))
+            return Errors.Music.TrackPathMustBeWithinLibraryContentLocations;
+
+        // Media contributors are referenced by Id and are never created implicitly by editing a track, so each one must already exist.
+        Result<IReadOnlyList<MediaContributorEntity>> getContributorsResult = await GetExistingContributorsAsync(command, cancellationToken).ConfigureAwait(false);
+        if (getContributorsResult.IsFailure)
+            return getContributorsResult.Errors;
+
+        // The write path goes through the aggregate root: a track is a child entity of the artist aggregate, so it is mutated through its owning
+        // artist. Book is itself an aggregate root, so its update flow reconstitutes it directly with its own Create method instead.
         Result<Artist> artistResult = existingArtist.ToDomainEntity();
         if (artistResult.IsFailure)
             return artistResult.Errors;
@@ -140,5 +162,50 @@ public class UpdateTrackCommandHandler : ICommandHandler<UpdateTrackCommand, Res
             return Errors.Music.TrackNotFound;
 
         return getPersistedTrackResult.Value.ToResponse();
+    }
+
+    /// <summary>
+    /// Determines whether the track path referenced by <paramref name="command"/> is stored inside one of the content locations of <paramref name="library"/>.
+    /// </summary>
+    /// <param name="library">The media library that owns the track.</param>
+    /// <param name="command">The command carrying the referenced track.</param>
+    /// <returns><see langword="true"/> when the referenced track path is within a content location of the library; otherwise, <see langword="false"/>.</returns>
+    private bool AreTrackPathsWithinLibraryContentLocations(LibraryEntity library, UpdateTrackCommand command)
+    {
+        return library.ContentLocations.Any(contentLocation => _pathService.IsPathWithin(command.Path!, contentLocation.Path));
+    }
+
+    /// <summary>
+    /// Gets the media contributors referenced by <paramref name="command"/>, requiring each referenced Id to already exist.
+    /// </summary>
+    /// <param name="command">The command carrying the referenced media contributors.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>
+    /// An <see cref="Result{TValue}"/> containing either the existing media contributors, or an error when at least one referenced contributor does not exist.
+    /// </returns>
+    private async Task<Result<IReadOnlyList<MediaContributorEntity>>> GetExistingContributorsAsync(UpdateTrackCommand command, CancellationToken cancellationToken)
+    {
+        List<Guid> contributorIds = [.. CollectContributorIds(command).Distinct()];
+        if (contributorIds.Count == 0)
+            return Result.From<IReadOnlyList<MediaContributorEntity>>([]);
+
+        Result<IReadOnlyList<MediaContributorEntity>> getContributorsResult = await _unitOfWork.MediaContributorRepository
+            .GetByIdsAsync(contributorIds, cancellationToken).ConfigureAwait(false);
+        if (getContributorsResult.IsFailure)
+            return getContributorsResult.Errors;
+        if (getContributorsResult.Value.Count != contributorIds.Count)
+            return Errors.MediaContributor.MediaContributorNotFound;
+        return Result.From(getContributorsResult.Value);
+    }
+
+    /// <summary>
+    /// Collects the unique identifiers of every media contributor referenced by <paramref name="command"/>.
+    /// </summary>
+    /// <param name="command">The command carrying the referenced media contributors.</param>
+    /// <returns>The collected media contributor identifiers.</returns>
+    private static IEnumerable<Guid> CollectContributorIds(UpdateTrackCommand command)
+    {
+        foreach (MediaContributorReferenceDto contributor in command.Contributors!)
+            yield return contributor.ContributorId;
     }
 }

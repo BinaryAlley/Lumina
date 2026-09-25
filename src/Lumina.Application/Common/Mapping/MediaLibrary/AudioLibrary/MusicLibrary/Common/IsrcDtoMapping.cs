@@ -22,7 +22,7 @@ public static class IsrcDtoMapping
     /// </returns>
     public static Result<Isrc> ToDomainEntity(this IsrcDto dto)
     {
-        return Isrc.Create(dto.Value);
+        return Isrc.Create(dto.Value!);
     }
 
     /// <summary>
