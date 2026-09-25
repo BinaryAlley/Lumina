@@ -18,6 +18,5 @@ public static partial class ApiRoutes
         public const string DELETE_ALBUM = "/libraries/{libraryId}/artists/{artistId}/albums/{albumId}";
         public const string GET_ALBUM_TRACKS = "/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks";
         public const string GET_ALBUM_TRACKS_LITE = "/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/lite";
-        public const string ADD_TRACK = "/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks";
     }
 }

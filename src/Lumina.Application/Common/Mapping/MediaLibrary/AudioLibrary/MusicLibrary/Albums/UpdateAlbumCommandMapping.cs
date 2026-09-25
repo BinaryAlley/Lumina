@@ -5,11 +5,13 @@ using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Albums.Comm
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.Common.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate;
+using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DomainErrors = Lumina.Domain.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
@@ -54,31 +56,21 @@ public static class UpdateAlbumCommandMapping
 
         Optional<MusicBrainzId> musicBrainzReleaseId = Optional<MusicBrainzId>.None();
         if (command.MusicBrainzReleaseId is not null)
-        {
-            Result<MusicBrainzId> musicBrainzReleaseIdResult = MusicBrainzId.Create(command.MusicBrainzReleaseId.Value);
-            if (musicBrainzReleaseIdResult.IsFailure)
-                return musicBrainzReleaseIdResult.Errors;
-            musicBrainzReleaseId = musicBrainzReleaseIdResult.Value;
-        }
+            musicBrainzReleaseId = MusicBrainzId.Create(command.MusicBrainzReleaseId.Value);
         Optional<MusicBrainzId> musicBrainzReleaseGroupId = Optional<MusicBrainzId>.None();
         if (command.MusicBrainzReleaseGroupId is not null)
-        {
-            Result<MusicBrainzId> musicBrainzReleaseGroupIdResult = MusicBrainzId.Create(command.MusicBrainzReleaseGroupId.Value);
-            if (musicBrainzReleaseGroupIdResult.IsFailure)
-                return musicBrainzReleaseGroupIdResult.Errors;
-            musicBrainzReleaseGroupId = musicBrainzReleaseGroupIdResult.Value;
-        }
+            musicBrainzReleaseGroupId = MusicBrainzId.Create(command.MusicBrainzReleaseGroupId.Value);
         Optional<MusicBrainzId> musicBrainzReleaseArtistId = Optional<MusicBrainzId>.None();
         if (command.MusicBrainzReleaseArtistId is not null)
-        {
-            Result<MusicBrainzId> musicBrainzReleaseArtistIdResult = MusicBrainzId.Create(command.MusicBrainzReleaseArtistId.Value);
-            if (musicBrainzReleaseArtistIdResult.IsFailure)
-                return musicBrainzReleaseArtistIdResult.Errors;
-            musicBrainzReleaseArtistId = musicBrainzReleaseArtistIdResult.Value;
-        }
+            musicBrainzReleaseArtistId = MusicBrainzId.Create(command.MusicBrainzReleaseArtistId.Value);
+
+        // The album is an entity inside the artist aggregate, so it is referenced by object, not by id; the aggregate member is located here and passed through.
+        Album? album = artist.Albums.FirstOrDefault(album => album.Id.Value == Guid.Parse(command.AlbumId!));
+        if (album is null)
+            return DomainErrors.Music.AlbumNotFound;
 
         Result<Updated> updateResult = artist.UpdateAlbum(
-            AlbumId.Create(Guid.Parse(command.AlbumId!)),
+            album,
             metadataResult.Value,
             Optional<MusicMediaFormat>.FromNullable(command.MediaFormat),
             barcode,

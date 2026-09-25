@@ -115,7 +115,7 @@ public sealed class Album : Entity<AlbumId>
         _ratings = ratings;
         _tracks = tracks;
         CreatedOnUtc = createdOnUtc;
-        UpdatedOnUtc = updatedOnUtc.HasValue ? updatedOnUtc.Value : null;
+        UpdatedOnUtc = updatedOnUtc;
     }
 
     /// <summary>
@@ -287,7 +287,7 @@ public sealed class Album : Entity<AlbumId>
         MusicBrainzReleaseId = musicBrainzReleaseId;
         MusicBrainzReleaseGroupId = musicBrainzReleaseGroupId;
         MusicBrainzReleaseArtistId = musicBrainzReleaseArtistId;
-        UpdatedOnUtc = DateTime.UtcNow;
+        UpdatedOnUtc = Optional<DateTime>.Some(DateTime.UtcNow);
         return Result.Updated;
     }
 }

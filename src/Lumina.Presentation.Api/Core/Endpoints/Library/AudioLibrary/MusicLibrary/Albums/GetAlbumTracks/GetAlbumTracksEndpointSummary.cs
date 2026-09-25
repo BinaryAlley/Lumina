@@ -47,6 +47,8 @@ public class GetAlbumTracksEndpointSummary : Summary<GetAlbumTracksEndpoint, Emp
         ResponseParam<TrackResponse>(r => r.MusicBrainzWorkId, "The MusicBrainz identifier of the work, if applicable.");
         ResponseParam<TrackResponse>(r => r.CreatedOnUtc, "The date and time when the track was created.");
         ResponseParam<TrackResponse>(r => r.UpdatedOnUtc, "The date and time when the track was last updated, if applicable.");
+        ResponseParam<TrackResponse>(r => r.Moods, "The list of moods of the track.");
+        ResponseParam<TrackResponse>(r => r.Isrcs, "The list of ISRC (International Standard Recording Code) of the track.");
         ResponseParam<TrackResponse>(r => r.Contributors, "The list of references to the media contributors that performed on the track, each with the role they played.");
         ResponseParam<TrackResponse>(r => r.Ratings, "The list of ratings for this track.");
         ResponseParam<TrackResponse>(r => r.Metadata!.DurationInSeconds, "The duration of the audio of the track in seconds.");
@@ -69,8 +71,6 @@ public class GetAlbumTracksEndpointSummary : Summary<GetAlbumTracksEndpoint, Emp
         ResponseParam<TrackResponse>(r => r.Metadata!.OriginalLanguage!.NativeName, "The native name of the original language of the track, if applicable.");
         ResponseParam<TrackResponse>(r => r.Metadata!.Genres, "The list of genres associated with the track.");
         ResponseParam<TrackResponse>(r => r.Metadata!.Tags, "The list of tags that further describe or categorize the track.");
-        ResponseParam<TrackResponse>(r => r.Moods, "The list of moods of the track.");
-        ResponseParam<TrackResponse>(r => r.Isrcs, "The list of ISRC (International Standard Recording Code) of the track.");
 
         Response(200, "The list of tracks of the album is returned.",
             example: new TrackResponse[]
@@ -256,7 +256,7 @@ public class GetAlbumTracksEndpointSummary : Summary<GetAlbumTracksEndpoint, Emp
                     type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                     status = 401,
                     title = "Unauthorized",
-                    detail = "You are not authorized",
+                    detail = "Authentication failed",
                     instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks"
                 },
                 new
@@ -264,7 +264,7 @@ public class GetAlbumTracksEndpointSummary : Summary<GetAlbumTracksEndpoint, Emp
                     type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                     status = 401,
                     title = "Unauthorized",
-                    detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
+                    detail = "The token has expired",
                     instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks"
                 },
                 new
@@ -315,6 +315,8 @@ public class GetAlbumTracksEndpointSummary : Summary<GetAlbumTracksEndpoint, Emp
                     {
                         "General.Validation", new[]
                         {
+                            "LibraryIdCannotBeEmpty",
+                            "ArtistIdCannotBeEmpty",
                             "AlbumIdCannotBeEmpty"
                         }
                     }

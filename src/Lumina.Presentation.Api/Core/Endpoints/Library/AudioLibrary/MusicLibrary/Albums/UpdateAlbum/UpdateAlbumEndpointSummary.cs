@@ -28,13 +28,13 @@ public class UpdateAlbumEndpointSummary : Summary<UpdateAlbumEndpoint, UpdateAlb
     public UpdateAlbumEndpointSummary()
     {
         Summary = "Updates an existing album.";
-        Description = "Updates the details of the album identified by the request, returning the full details of the updated album. The album is updated by an Admin, who can update the albums of all libraries, or by the owner of the library of the album.";
+        Description = "Updates the details of the album identified by the route, returning the full details of the updated album. The album is updated by an Admin, who can update the albums of all libraries, or by the owner of the library of the album.";
 
         RequestParam(r => r.Metadata, "The album metadata of the album. Required.");
         RequestParam(r => r.Metadata!.Title, "The title of the album. Required.");
         RequestParam(r => r.Metadata!.OriginalTitle, "The original title of the album. Optional.");
         RequestParam(r => r.Metadata!.Description, "The description of the album. Optional.");
-        RequestParam(r => r.Metadata!.ReleaseInfo, "The release information, including release date and other relevant details. Optional.");
+        RequestParam(r => r.Metadata!.ReleaseInfo, "The release information, including release date and other relevant details. Required.");
         RequestParam(r => r.Metadata!.ReleaseInfo!.OriginalReleaseDate, "The original release date of the album. Optional.");
         RequestParam(r => r.Metadata!.ReleaseInfo!.OriginalReleaseYear, "The original release year of the album. Optional.");
         RequestParam(r => r.Metadata!.ReleaseInfo!.ReReleaseDate, "The re-release or reissue date of the album. Optional.");
@@ -46,15 +46,15 @@ public class UpdateAlbumEndpointSummary : Summary<UpdateAlbumEndpoint, UpdateAlb
         RequestParam(r => r.Metadata!.TotalDiscs, "The number of discs of the release. Optional.");
         RequestParam(r => r.Metadata!.TotalTracks, "The number of tracks of the release. Optional.");
         RequestParam(r => r.Metadata!.Language, "The language of the album. Optional.");
-        RequestParam(r => r.Metadata!.Language!.LanguageCode, "The ISO 639-1 two-letter language code of the album. Optional.");
-        RequestParam(r => r.Metadata!.Language!.LanguageName, "The full name of the language of the album in English. Optional.");
+        RequestParam(r => r.Metadata!.Language!.LanguageCode, "The ISO 639-1 two-letter language code of the album. Required.");
+        RequestParam(r => r.Metadata!.Language!.LanguageName, "The full name of the language of the album in English. Required.");
         RequestParam(r => r.Metadata!.Language!.NativeName, "The native name of the language of the album. Optional.");
         RequestParam(r => r.Metadata!.OriginalLanguage, "The original language of the album, if it has been translated. Optional.");
-        RequestParam(r => r.Metadata!.OriginalLanguage!.LanguageCode, "The ISO 639-1 two-letter original language code of the album. Optional.");
-        RequestParam(r => r.Metadata!.OriginalLanguage!.LanguageName, "The full name of the original language of the album in English. Optional.");
+        RequestParam(r => r.Metadata!.OriginalLanguage!.LanguageCode, "The ISO 639-1 two-letter original language code of the album. Required.");
+        RequestParam(r => r.Metadata!.OriginalLanguage!.LanguageName, "The full name of the original language of the album in English. Required.");
         RequestParam(r => r.Metadata!.OriginalLanguage!.NativeName, "The native name of the original language of the album. Optional.");
-        RequestParam(r => r.Metadata!.Genres, "The list of genres associated with the album. Optional.");
-        RequestParam(r => r.Metadata!.Tags, "The list of tags that further describe or categorize the album. Optional.");
+        RequestParam(r => r.Metadata!.Genres, "The list of genres associated with the album. Required.");
+        RequestParam(r => r.Metadata!.Tags, "The list of tags that further describe or categorize the album. Required.");
         RequestParam(r => r.MediaFormat, "The physical or digital medium of the album. Optional.");
         RequestParam(r => r.Barcode, "The barcode of the album. Optional.");
         RequestParam(r => r.CatalogNumber, "The catalog number of the album. Optional.");
@@ -290,9 +290,18 @@ public class UpdateAlbumEndpointSummary : Summary<UpdateAlbumEndpoint, UpdateAlb
             }
         );
 
-        Response(404, "The request failed because the requested album, its media library, or one of the referenced media contributors does not exist.", "application/problem+json",
+        Response(404, "The request failed because the requested artist or album, its media library, or one of the referenced media contributors does not exist.", "application/problem+json",
             example: new[]
             {
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+                    title = "General.NotFound",
+                    status = 404,
+                    detail = "ArtistNotFound",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}",
+                    traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+                },
                 new
                 {
                     type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
@@ -320,6 +329,18 @@ public class UpdateAlbumEndpointSummary : Summary<UpdateAlbumEndpoint, UpdateAlb
                     instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}",
                     traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
                 }
+            }
+        );
+
+        Response(409, "The request failed because a unique constraint was violated.", "application/problem+json",
+            example: new
+            {
+                type = "https://tools.ietf.org/html/rfc9110#section-15.5.10",
+                title = "General.Conflict",
+                status = 409,
+                detail = "UniqueConstraintViolation",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}",
+                traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
             }
         );
 

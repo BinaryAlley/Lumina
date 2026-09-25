@@ -99,28 +99,13 @@ public static class AlbumEntityMapping
 
         Optional<MusicBrainzId> musicBrainzReleaseId = Optional<MusicBrainzId>.None();
         if (repositoryEntity.MusicBrainzReleaseId is not null)
-        {
-            Result<MusicBrainzId> musicBrainzReleaseIdResult = MusicBrainzId.Create(repositoryEntity.MusicBrainzReleaseId.Value);
-            if (musicBrainzReleaseIdResult.IsFailure)
-                return musicBrainzReleaseIdResult.Errors;
-            musicBrainzReleaseId = musicBrainzReleaseIdResult.Value;
-        }
+            musicBrainzReleaseId = MusicBrainzId.Create(repositoryEntity.MusicBrainzReleaseId.Value);
         Optional<MusicBrainzId> musicBrainzReleaseGroupId = Optional<MusicBrainzId>.None();
         if (repositoryEntity.MusicBrainzReleaseGroupId is not null)
-        {
-            Result<MusicBrainzId> musicBrainzReleaseGroupIdResult = MusicBrainzId.Create(repositoryEntity.MusicBrainzReleaseGroupId.Value);
-            if (musicBrainzReleaseGroupIdResult.IsFailure)
-                return musicBrainzReleaseGroupIdResult.Errors;
-            musicBrainzReleaseGroupId = musicBrainzReleaseGroupIdResult.Value;
-        }
+            musicBrainzReleaseGroupId = MusicBrainzId.Create(repositoryEntity.MusicBrainzReleaseGroupId.Value);
         Optional<MusicBrainzId> musicBrainzReleaseArtistId = Optional<MusicBrainzId>.None();
         if (repositoryEntity.MusicBrainzReleaseArtistId is not null)
-        {
-            Result<MusicBrainzId> musicBrainzReleaseArtistIdResult = MusicBrainzId.Create(repositoryEntity.MusicBrainzReleaseArtistId.Value);
-            if (musicBrainzReleaseArtistIdResult.IsFailure)
-                return musicBrainzReleaseArtistIdResult.Errors;
-            musicBrainzReleaseArtistId = musicBrainzReleaseArtistIdResult.Value;
-        }
+            musicBrainzReleaseArtistId = MusicBrainzId.Create(repositoryEntity.MusicBrainzReleaseArtistId.Value);
 
         List<AudioRating> domainRatings = [];
         foreach (Result<AudioRating> ratingResult in repositoryEntity.Ratings.ToDomainEntities())

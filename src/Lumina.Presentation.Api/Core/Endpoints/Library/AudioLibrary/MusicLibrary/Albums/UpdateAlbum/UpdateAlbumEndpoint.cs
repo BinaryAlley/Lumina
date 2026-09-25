@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Albums.UpdateAlbum;
 
 /// <summary>
-/// API endpoint for the <c>/{libraryId}/artists/{artistId}/albums/{albumId}</c> route.
+/// API endpoint for the <c>/libraries/{libraryId}/artists/{artistId}/albums/{albumId}</c> route.
 /// </summary>
 public class UpdateAlbumEndpoint : BaseEndpoint<UpdateAlbumRequest, IResult>
 {

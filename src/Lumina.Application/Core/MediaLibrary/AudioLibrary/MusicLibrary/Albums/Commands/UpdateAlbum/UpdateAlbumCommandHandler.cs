@@ -92,20 +92,24 @@ public class UpdateAlbumCommandHandler : ICommandHandler<UpdateAlbumCommand, Res
         if (getArtistResult.IsFailure)
             return getArtistResult.Errors;
 
-        // Resource scoping: the album must belong to the library and the artist named by the route, so that an album can never be edited
-        // through another library's or artist's route; the mismatch is reported as not found, without disclosing that the album exists elsewhere.
-        if (getArtistResult.Value is null || getArtistResult.Value.LibraryId != libraryId)
-            return Errors.Music.AlbumNotFound;
+        if (getArtistResult.Value is null)
+            return Errors.Music.ArtistNotFound;
         ArtistEntity existingArtist = getArtistResult.Value;
-        AlbumEntity? existingAlbum = existingArtist.Albums.FirstOrDefault(album => album.Id == albumId);
-        if (existingAlbum is null)
-            return Errors.Music.AlbumNotFound;
+
+        // Resource scoping: the album must belong to an artist of the library named by the route, so that an album can never be edited through
+        // another library's route; the mismatch is reported as not found, without disclosing that the artist exists in another library.
+        if (existingArtist.LibraryId != libraryId)
+            return Errors.Music.ArtistNotFound;
 
         // Admins can update the albums of all libraries; for everyone else, only the albums of the libraries they own.
         bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
             userId, new LibraryOwnershipPolicyContext(existingArtist.LibraryId), cancellationToken).ConfigureAwait(false);
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
+
+        AlbumEntity? existingAlbum = existingArtist.Albums.FirstOrDefault(album => album.Id == albumId);
+        if (existingAlbum is null)
+            return Errors.Music.AlbumNotFound;
 
         // An album can only belong to a library that exists, so a client can never update an album of a library of the host that is not there.
         Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(libraryId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -119,8 +123,8 @@ public class UpdateAlbumCommandHandler : ICommandHandler<UpdateAlbumCommand, Res
         if (getContributorsResult.IsFailure)
             return getContributorsResult.Errors;
 
-        // The write path goes through the aggregate root: an album is a child entity of the artist aggregate, unlike Book and Artist,
-        // which are aggregate roots and are reconstituted directly with their own Create method. This difference is intentional.
+        // The write path goes through the aggregate root: an album is a child entity of the artist aggregate, so it is mutated through its owning
+        // artist. Book is itself an aggregate root, so its update flow reconstitutes it directly with its own Create method instead.
         Result<Artist> artistResult = existingArtist.ToDomainEntity();
         if (artistResult.IsFailure)
             return artistResult.Errors;

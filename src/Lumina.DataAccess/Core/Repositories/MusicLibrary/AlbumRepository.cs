@@ -24,14 +24,17 @@ namespace Lumina.DataAccess.Core.Repositories.MusicLibrary;
 internal sealed class AlbumRepository : IAlbumRepository
 {
     private readonly LuminaDbContext _luminaDbContext;
+    private readonly ITrackRepository _trackRepository;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AlbumRepository"/> class.
     /// </summary>
     /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
-    public AlbumRepository(LuminaDbContext luminaDbContext)
+    /// <param name="trackRepository">Injected repository for tracks.</param>
+    public AlbumRepository(LuminaDbContext luminaDbContext, ITrackRepository trackRepository)
     {
         _luminaDbContext = luminaDbContext;
+        _trackRepository = trackRepository;
     }
 
     /// <summary>
@@ -45,6 +48,12 @@ internal sealed class AlbumRepository : IAlbumRepository
         bool doesAlbumExist = await _luminaDbContext.Albums.AnyAsync(repositoryAlbum => repositoryAlbum.Id == album.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (doesAlbumExist)
             return Errors.Music.AlbumAlreadyExists;
+
+        // A track is unique within its library by its file system path, so the same file can never be registered twice, neither twice in the same request,
+        // nor once when it is already registered in the library. The check runs here, for the whole album, because the insert of the album inserts its tracks as well.
+        Result<Success> checkTrackPathsResult = await CheckTrackPathsAsync(album, cancellationToken).ConfigureAwait(false);
+        if (checkTrackPathsResult.IsFailure)
+            return checkTrackPathsResult.Errors;
 
         // Fetch the tags and genres referenced anywhere in the aggregate, so that the shared tables are not duplicated.
         List<string> tagNames = [.. album.Tags.Select(tag => tag.Name!)
@@ -73,6 +82,30 @@ internal sealed class AlbumRepository : IAlbumRepository
 
         _luminaDbContext.Albums.Add(album);
         return Result.Created;
+    }
+
+    /// <summary>
+    /// Checks whether the tracks carried by <paramref name="album"/> reference a file system path that is already used by a track of the same library.
+    /// </summary>
+    /// <param name="album">The album whose track paths are checked.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful check, or an error.</returns>
+    private async Task<Result<Success>> CheckTrackPathsAsync(AlbumEntity album, CancellationToken cancellationToken)
+    {
+        List<string> trackPaths = [.. album.Tracks.Select(track => track.Path!)];
+        if (trackPaths.Count == 0)
+            return Result.Success;
+
+        // The same path cannot be referenced by two tracks of the request itself, not only by a track that is already stored.
+        if (trackPaths.Count != trackPaths.Distinct(StringComparer.Ordinal).Count())
+            return Errors.Music.TrackAlreadyExists;
+
+        Result<IReadOnlyCollection<string>> getExistingPathsResult = await _trackRepository.GetExistingPathsAsync(album.LibraryId, trackPaths, cancellationToken).ConfigureAwait(false);
+        if (getExistingPathsResult.IsFailure)
+            return getExistingPathsResult.Errors;
+        if (getExistingPathsResult.Value.Count > 0)
+            return Errors.Music.TrackAlreadyExists;
+        return Result.Success;
     }
 
     /// <summary>

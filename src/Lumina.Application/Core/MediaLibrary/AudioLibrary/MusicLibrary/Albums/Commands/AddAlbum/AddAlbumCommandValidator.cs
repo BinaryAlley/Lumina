@@ -429,7 +429,27 @@ public class AddAlbumCommandValidator : AbstractValidator<AddAlbumCommand>
                             .When(m => m!.OriginalLanguage is not null);
                     });
 
+                // Validates the MusicBrainz identifiers of the track.
+                track.RuleFor(t => t!.MusicBrainzRecordingId)
+                    .Must(musicBrainzRecordingId => musicBrainzRecordingId != Guid.Empty)
+                    .When(t => t!.MusicBrainzRecordingId.HasValue)
+                    .WithError(Errors.Music.MusicBrainzIdInvalidFormat);
+
+                track.RuleFor(t => t!.MusicBrainzTrackId)
+                    .Must(musicBrainzTrackId => musicBrainzTrackId != Guid.Empty)
+                    .When(t => t!.MusicBrainzTrackId.HasValue)
+                    .WithError(Errors.Music.MusicBrainzIdInvalidFormat);
+
+                track.RuleFor(t => t!.MusicBrainzWorkId)
+                    .Must(musicBrainzWorkId => musicBrainzWorkId != Guid.Empty)
+                    .When(t => t!.MusicBrainzWorkId.HasValue)
+                    .WithError(Errors.Music.MusicBrainzIdInvalidFormat);
+
                 // Validates the ordering and performance characteristics of the track.
+                track.RuleFor(t => t!.TrackNumber)
+                    .NotNull()
+                    .WithError(Errors.Music.TrackNumberMustBeGreaterThanZero);
+
                 track.RuleFor(t => t!.TrackNumber)
                     .GreaterThan(0)
                     .When(t => t!.TrackNumber.HasValue)

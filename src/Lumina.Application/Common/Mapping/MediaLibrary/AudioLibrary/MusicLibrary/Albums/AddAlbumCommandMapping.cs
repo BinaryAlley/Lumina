@@ -60,28 +60,13 @@ public static class AddAlbumCommandMapping
 
         Optional<MusicBrainzId> musicBrainzReleaseId = Optional<MusicBrainzId>.None();
         if (command.MusicBrainzReleaseId is not null)
-        {
-            Result<MusicBrainzId> musicBrainzReleaseIdResult = MusicBrainzId.Create(command.MusicBrainzReleaseId.Value);
-            if (musicBrainzReleaseIdResult.IsFailure)
-                return musicBrainzReleaseIdResult.Errors;
-            musicBrainzReleaseId = musicBrainzReleaseIdResult.Value;
-        }
+            musicBrainzReleaseId = MusicBrainzId.Create(command.MusicBrainzReleaseId.Value);
         Optional<MusicBrainzId> musicBrainzReleaseGroupId = Optional<MusicBrainzId>.None();
         if (command.MusicBrainzReleaseGroupId is not null)
-        {
-            Result<MusicBrainzId> musicBrainzReleaseGroupIdResult = MusicBrainzId.Create(command.MusicBrainzReleaseGroupId.Value);
-            if (musicBrainzReleaseGroupIdResult.IsFailure)
-                return musicBrainzReleaseGroupIdResult.Errors;
-            musicBrainzReleaseGroupId = musicBrainzReleaseGroupIdResult.Value;
-        }
+            musicBrainzReleaseGroupId = MusicBrainzId.Create(command.MusicBrainzReleaseGroupId.Value);
         Optional<MusicBrainzId> musicBrainzReleaseArtistId = Optional<MusicBrainzId>.None();
         if (command.MusicBrainzReleaseArtistId is not null)
-        {
-            Result<MusicBrainzId> musicBrainzReleaseArtistIdResult = MusicBrainzId.Create(command.MusicBrainzReleaseArtistId.Value);
-            if (musicBrainzReleaseArtistIdResult.IsFailure)
-                return musicBrainzReleaseArtistIdResult.Errors;
-            musicBrainzReleaseArtistId = musicBrainzReleaseArtistIdResult.Value;
-        }
+            musicBrainzReleaseArtistId = MusicBrainzId.Create(command.MusicBrainzReleaseArtistId.Value);
 
         List<MusicMediaContributor> contributors = [.. domainContributorsResult.Select(contributorResult => contributorResult.Value)];
         List<AudioRating> ratings = [.. domainRatingsResult.Select(ratingResult => ratingResult.Value)];

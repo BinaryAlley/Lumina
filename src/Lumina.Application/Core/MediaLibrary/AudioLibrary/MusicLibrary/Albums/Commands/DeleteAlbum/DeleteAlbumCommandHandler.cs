@@ -79,19 +79,20 @@ public class DeleteAlbumCommandHandler : ICommandHandler<DeleteAlbumCommand, Res
             return DomainErrors.Music.ArtistNotFound;
         ArtistEntity existingArtist = getArtistResult.Value;
 
-        // Resource scoping: the album must belong to an artist of the library named by the route, so that an album can never be deleted
-        // through another library's or artist's route; the mismatch is reported as not found, without disclosing that the album exists elsewhere.
+        // Resource scoping: the album must belong to an artist of the library named by the route, so that an album can never be deleted through
+        // another library's route; the mismatch is reported as not found, without disclosing that the artist exists in another library.
         if (existingArtist.LibraryId != libraryId)
-            return DomainErrors.Music.AlbumNotFound;
-        AlbumEntity? existingAlbum = existingArtist.Albums.FirstOrDefault(album => album.Id == albumId);
-        if (existingAlbum is null)
-            return DomainErrors.Music.AlbumNotFound;
+            return DomainErrors.Music.ArtistNotFound;
 
         // Admins can delete the albums of all libraries; for everyone else, only the albums of the libraries they own.
         bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
             userId, new LibraryOwnershipPolicyContext(existingArtist.LibraryId), cancellationToken).ConfigureAwait(false);
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
+
+        AlbumEntity? existingAlbum = existingArtist.Albums.FirstOrDefault(album => album.Id == albumId);
+        if (existingAlbum is null)
+            return DomainErrors.Music.AlbumNotFound;
 
         // An album can only belong to a library that exists, so a client can never delete an album of a library of the host that is not there.
         Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository
@@ -106,6 +107,7 @@ public class DeleteAlbumCommandHandler : ICommandHandler<DeleteAlbumCommand, Res
         Result<Artist> artistResult = existingArtist.ToDomainEntity();
         if (artistResult.IsFailure)
             return artistResult.Errors;
+        // The album is an entity inside the artist aggregate, so it is referenced by object, not by id; the aggregate member is located here and passed through.
         Album? domainAlbum = artistResult.Value.Albums.FirstOrDefault(album => album.Id.Value == albumId);
         if (domainAlbum is null)
             return DomainErrors.Music.AlbumNotFound;

@@ -19,7 +19,7 @@ public class DeleteAlbumEndpointSummary : Summary<DeleteAlbumEndpoint, EmptyRequ
     public DeleteAlbumEndpointSummary()
     {
         Summary = "Deletes an existing album.";
-        Description = "Deletes the album identified by the path, together with its tracks. An artist must always keep at least one album. The album is deleted by an Admin, who can delete the albums of all libraries, or by the owner of the library of the album.";
+        Description = "Deletes the album identified by the route, together with its tracks. An artist must always keep at least one album. The album is deleted by an Admin, who can delete the albums of all libraries, or by the owner of the library of the album.";
 
         Response(200, "The album was successfully deleted.");
 
