@@ -27,13 +27,13 @@ public class AudioMetadataTests
     {
         // Act
         Result<AudioMetadata> result = AudioMetadata.Create(
-            "Abbey Road",
+            "Bohemian Rhapsody",
             Optional<string>.None(),
             durationInSeconds: 2826,
             sampleRate: 44100,
             channels: 2,
             _releaseInfoFixture.Create(),
-            Optional<string>.Some("The last recorded album by the Beatles."),
+            Optional<string>.Some("A song by the British rock band Queen."),
             [_genreFixture.Create(name: "Rock")],
             [_tagFixture.Create(name: "classic")],
             Optional<LanguageInfo>.None(),
@@ -44,11 +44,11 @@ public class AudioMetadataTests
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Equal("Abbey Road", result.Value.Title);
+        Assert.Equal("Bohemian Rhapsody", result.Value.Title);
         Assert.Equal(2826, result.Value.DurationInSeconds);
         Assert.Equal(44100, result.Value.SampleRate);
         Assert.Equal(2, result.Value.Channels);
-        Assert.Equal("The last recorded album by the Beatles.", result.Value.Description.Value);
+        Assert.Equal("A song by the British rock band Queen.", result.Value.Description.Value);
         Assert.Equal(16, result.Value.BitDepth.Value);
         Assert.Equal("PCM", result.Value.AudioCodec.Value);
         Assert.Equal(1411, result.Value.Bitrate.Value);
@@ -61,7 +61,7 @@ public class AudioMetadataTests
     {
         // Act
         Result<AudioMetadata> result = AudioMetadata.Create(
-            "Abbey Road",
+            "Bohemian Rhapsody",
             Optional<string>.None(),
             durationInSeconds: 2826,
             sampleRate: 44100,
@@ -91,7 +91,7 @@ public class AudioMetadataTests
 
         // Act
         AudioMetadata firstResult = _audioMetadataFixture.Create(
-            title: "Abbey Road",
+            title: "Bohemian Rhapsody",
             originalTitle: Optional<string>.None(),
             durationInSeconds: 2826,
             sampleRate: 44100,
@@ -106,7 +106,7 @@ public class AudioMetadataTests
             audioCodec: Optional<string>.None(),
             bitrate: Optional<int>.None());
         AudioMetadata secondResult = _audioMetadataFixture.Create(
-            title: "Abbey Road",
+            title: "Bohemian Rhapsody",
             originalTitle: Optional<string>.None(),
             durationInSeconds: 2826,
             sampleRate: 44100,
@@ -133,7 +133,7 @@ public class AudioMetadataTests
 
         // Act
         AudioMetadata firstResult = _audioMetadataFixture.Create(
-            title: "Abbey Road",
+            title: "Bohemian Rhapsody",
             originalTitle: Optional<string>.None(),
             durationInSeconds: 2826,
             sampleRate: 44100,
@@ -148,7 +148,7 @@ public class AudioMetadataTests
             audioCodec: Optional<string>.None(),
             bitrate: Optional<int>.None());
         AudioMetadata secondResult = _audioMetadataFixture.Create(
-            title: "Abbey Road",
+            title: "Bohemian Rhapsody",
             originalTitle: Optional<string>.None(),
             durationInSeconds: 2826,
             sampleRate: 48000,
