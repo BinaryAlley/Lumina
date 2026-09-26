@@ -38,12 +38,26 @@ public class ReleaseInfoFixture
         Optional<ReleaseCountry>? releaseCountry = null,
         Optional<string>? releaseVersion = null)
     {
-        int generatedYear = _random.Next(1900, 2000);
+        Optional<DateOnly> resolvedReReleaseDate = reReleaseDate ?? Optional<DateOnly>.None();
+        Optional<int> resolvedReReleaseYear = reReleaseYear ?? Optional<int>.None();
+        if (resolvedReReleaseDate.HasValue && !resolvedReReleaseYear.HasValue)
+            resolvedReReleaseYear = Optional<int>.Some(resolvedReReleaseDate.Value.Year);
+        else if (!resolvedReReleaseDate.HasValue && resolvedReReleaseYear.HasValue)
+            resolvedReReleaseDate = Optional<DateOnly>.Some(new DateOnly(resolvedReReleaseYear.Value, 1, 1));
 
         Optional<DateOnly> resolvedOriginalDate = originalReleaseDate ?? Optional<DateOnly>.None();
         Optional<int> resolvedOriginalYear = originalReleaseYear ?? Optional<int>.None();
         if (!resolvedOriginalDate.HasValue && !resolvedOriginalYear.HasValue)
         {
+            // The generated original year must never exceed the re-release year, otherwise the domain invariant is violated.
+            int lowerBound = 1900;
+            int upperBoundExclusive = 2000;
+            if (resolvedReReleaseYear.HasValue)
+            {
+                lowerBound = Math.Min(lowerBound, resolvedReReleaseYear.Value);
+                upperBoundExclusive = Math.Min(upperBoundExclusive, resolvedReReleaseYear.Value + 1);
+            }
+            int generatedYear = _random.Next(lowerBound, Math.Max(upperBoundExclusive, lowerBound + 1));
             resolvedOriginalDate = Optional<DateOnly>.Some(new DateOnly(generatedYear, 1, 1));
             resolvedOriginalYear = Optional<int>.Some(generatedYear);
         }
@@ -51,13 +65,6 @@ public class ReleaseInfoFixture
             resolvedOriginalDate = Optional<DateOnly>.Some(new DateOnly(resolvedOriginalYear.Value, 1, 1));
         else if (!resolvedOriginalYear.HasValue)
             resolvedOriginalYear = Optional<int>.Some(resolvedOriginalDate.Value.Year);
-
-        Optional<DateOnly> resolvedReReleaseDate = reReleaseDate ?? Optional<DateOnly>.None();
-        Optional<int> resolvedReReleaseYear = reReleaseYear ?? Optional<int>.None();
-        if (resolvedReReleaseDate.HasValue && !resolvedReReleaseYear.HasValue)
-            resolvedReReleaseYear = Optional<int>.Some(resolvedReReleaseDate.Value.Year);
-        else if (!resolvedReReleaseDate.HasValue && resolvedReReleaseYear.HasValue)
-            resolvedReReleaseDate = Optional<DateOnly>.Some(new DateOnly(resolvedReReleaseYear.Value, 1, 1));
 
         Optional<ReleaseCountry> resolvedReleaseCountry = releaseCountry ?? Optional<ReleaseCountry>.Some(Enum.GetValues<ReleaseCountry>()[_random.Next(Enum.GetValues<ReleaseCountry>().Length)]);
 
