@@ -18,9 +18,9 @@ public class CheckPathExistsQueryFixture
     /// Creates a random valid query to check if paths exist.
     /// </summary>
     /// <param name="path">Optional. The file system path.</param>
-    /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
+    /// <param name="shouldIncludeHiddenElements">Whether to include hidden file system elements or not.</param>
     /// <returns>The created query.</returns>
-    public CheckPathExistsQuery Create(string? path = null, bool includeHiddenElements = true)
+    public CheckPathExistsQuery Create(string? path = null, bool shouldIncludeHiddenElements = true)
     {
         return new Faker<CheckPathExistsQuery>()
             .CustomInstantiator(f => new CheckPathExistsQuery(
@@ -28,7 +28,7 @@ public class CheckPathExistsQueryFixture
                 default
             ))
             .RuleFor(x => x.Path, f => path ?? f.System.FilePath())
-            .RuleFor(x => x.IncludeHiddenElements, includeHiddenElements);
+            .RuleFor(x => x.ShouldIncludeHiddenElements, shouldIncludeHiddenElements);
     }
 
     /// <summary>

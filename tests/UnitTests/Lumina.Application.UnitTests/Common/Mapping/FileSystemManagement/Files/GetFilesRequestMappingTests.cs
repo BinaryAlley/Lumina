@@ -28,6 +28,6 @@ public class GetFilesRequestMappingTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal(request.Path, result.Path);
-        Assert.Equal(request.IncludeHiddenElements, result.IncludeHiddenElements);
+        Assert.Equal(request.ShouldIncludeHiddenElements, result.ShouldIncludeHiddenElements);
     }
 }

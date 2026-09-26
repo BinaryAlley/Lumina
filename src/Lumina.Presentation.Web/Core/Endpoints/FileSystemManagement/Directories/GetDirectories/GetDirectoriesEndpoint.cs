@@ -49,7 +49,7 @@ public class GetDirectoriesEndpoint : BaseEndpoint<GetDirectoriesRequest, IResul
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(GetDirectoriesRequest request, CancellationToken cancellationToken)
     {
-        DirectoryDto[] response = await _apiHttpClient.GetAsync<DirectoryDto[]>($"{ApiRoutes.Directories.GET_DIRECTORIES}?path={Uri.EscapeDataString(request.Path!)}&includeHiddenElements={request.IncludeHiddenElements}", cancellationToken).ConfigureAwait(false);
+        DirectoryDto[] response = await _apiHttpClient.GetAsync<DirectoryDto[]>($"{ApiRoutes.Directories.GET_DIRECTORIES}?path={Uri.EscapeDataString(request.Path!)}&shouldIncludeHiddenElements={request.ShouldIncludeHiddenElements}", cancellationToken).ConfigureAwait(false);
         return JsonSuccess(response);
     }
 }

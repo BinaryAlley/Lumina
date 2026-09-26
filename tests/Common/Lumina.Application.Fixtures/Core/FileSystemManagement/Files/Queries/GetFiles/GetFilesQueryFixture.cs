@@ -18,9 +18,9 @@ public class GetFilesQueryFixture
     /// Creates a random valid query to get files.
     /// </summary>
     /// <param name="path">Optional. The file system path.</param>
-    /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
+    /// <param name="shouldIncludeHiddenElements">Whether to include hidden file system elements or not.</param>
     /// <returns>The created query to get files.</returns>
-    public GetFilesQuery Create(string? path = null, bool includeHiddenElements = false)
+    public GetFilesQuery Create(string? path = null, bool shouldIncludeHiddenElements = false)
     {
         return new Faker<GetFilesQuery>()
             .CustomInstantiator(f => new GetFilesQuery(
@@ -28,7 +28,7 @@ public class GetFilesQueryFixture
                 default
             ))
             .RuleFor(x => x.Path, f => path ?? f.System.FilePath())
-            .RuleFor(x => x.IncludeHiddenElements, f => includeHiddenElements);
+            .RuleFor(x => x.ShouldIncludeHiddenElements, f => shouldIncludeHiddenElements);
     }
 
     /// <summary>

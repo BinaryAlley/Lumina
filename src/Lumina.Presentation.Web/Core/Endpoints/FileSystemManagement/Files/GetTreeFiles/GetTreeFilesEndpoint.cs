@@ -49,7 +49,7 @@ public class GetTreeFilesEndpoint : BaseEndpoint<GetTreeFilesRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(GetTreeFilesRequest request, CancellationToken cancellationToken)
     {
-        FileSystemTreeNodeDto[] response = await _apiHttpClient.GetAsync<FileSystemTreeNodeDto[]>($"{ApiRoutes.Files.GET_TREE_FILES}?path={Uri.EscapeDataString(request.Path!)}&includeHiddenElements={request.IncludeHiddenElements}", cancellationToken).ConfigureAwait(false);
+        FileSystemTreeNodeDto[] response = await _apiHttpClient.GetAsync<FileSystemTreeNodeDto[]>($"{ApiRoutes.Files.GET_TREE_FILES}?path={Uri.EscapeDataString(request.Path!)}&shouldIncludeHiddenElements={request.ShouldIncludeHiddenElements}", cancellationToken).ConfigureAwait(false);
         return JsonSuccess(response);
     }
 }

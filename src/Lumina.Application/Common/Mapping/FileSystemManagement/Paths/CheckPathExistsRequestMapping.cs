@@ -19,7 +19,7 @@ public static class CheckPathExistsRequestMapping
     {
         return new CheckPathExistsQuery(
             request.Path,
-            request.IncludeHiddenElements
+            request.ShouldIncludeHiddenElements
         );
     }
 }

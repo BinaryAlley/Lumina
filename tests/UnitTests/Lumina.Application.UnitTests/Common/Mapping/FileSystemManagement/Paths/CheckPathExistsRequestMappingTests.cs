@@ -30,17 +30,17 @@ public class CheckPathExistsRequestMappingTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal(request.Path, result.Path);
-        Assert.Equal(request.IncludeHiddenElements, result.IncludeHiddenElements);
+        Assert.Equal(request.ShouldIncludeHiddenElements, result.ShouldIncludeHiddenElements);
     }
 
     [Theory]
     [InlineData("/home/user/documents", true)]
     [InlineData("C:\\Users\\Documents", false)]
     [InlineData("/var/www/html", true)]
-    public void ToQuery_WhenMappingWithDifferentPathsAndHiddenElementsFlag_ShouldMapCorrectly(string path, bool includeHiddenElements)
+    public void ToQuery_WhenMappingWithDifferentPathsAndHiddenElementsFlag_ShouldMapCorrectly(string path, bool shouldIncludeHiddenElements)
     {
         // Arrange
-        CheckPathExistsRequest request = new(path, includeHiddenElements);
+        CheckPathExistsRequest request = new(path, shouldIncludeHiddenElements);
 
         // Act
         CheckPathExistsQuery result = request.ToQuery();
@@ -48,7 +48,7 @@ public class CheckPathExistsRequestMappingTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal(path, result.Path);
-        Assert.Equal(includeHiddenElements, result.IncludeHiddenElements);
+        Assert.Equal(shouldIncludeHiddenElements, result.ShouldIncludeHiddenElements);
     }
 
     [Fact]
@@ -66,7 +66,7 @@ public class CheckPathExistsRequestMappingTests
         for (int i = 0; i < requests.Count; i++)
         {
             Assert.Equal(requests[i].Path, results[i].Path);
-            Assert.Equal(requests[i].IncludeHiddenElements, results[i].IncludeHiddenElements);
+            Assert.Equal(requests[i].ShouldIncludeHiddenElements, results[i].ShouldIncludeHiddenElements);
         }
     }
 }

@@ -64,7 +64,7 @@ public class FileServiceTests
     {
         // Arrange
         string path = _pathTestDir;
-        bool includeHiddenElements = false;
+        bool shouldIncludeHiddenElements = false;
         FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
         FileSystemPathId[] filePaths =
         [
@@ -72,7 +72,7 @@ public class FileServiceTests
             _fileSystemPathIdFixture.Create(_pathTestDirFile2)
         ];
 
-        _mockEnvironmentContext.FileProviderService.GetFilePaths(pathId, includeHiddenElements)
+        _mockEnvironmentContext.FileProviderService.GetFilePaths(pathId, shouldIncludeHiddenElements)
             .Returns(Result.From(filePaths.AsEnumerable()));
 
         foreach (FileSystemPathId filePath in filePaths)
@@ -88,7 +88,7 @@ public class FileServiceTests
         }
 
         // Act
-        Result<IEnumerable<File>> result = _sut.GetFiles(path, includeHiddenElements);
+        Result<IEnumerable<File>> result = _sut.GetFiles(path, shouldIncludeHiddenElements);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -101,10 +101,10 @@ public class FileServiceTests
     {
         // Arrange
         string invalidPath = string.Empty;
-        bool includeHiddenElements = false;
+        bool shouldIncludeHiddenElements = false;
 
         // Act
-        Result<IEnumerable<File>> result = _sut.GetFiles(invalidPath, includeHiddenElements);
+        Result<IEnumerable<File>> result = _sut.GetFiles(invalidPath, shouldIncludeHiddenElements);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -116,14 +116,14 @@ public class FileServiceTests
     {
         // Arrange
         string path = _pathTestDir;
-        bool includeHiddenElements = false;
+        bool shouldIncludeHiddenElements = false;
         FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
 
-        _mockEnvironmentContext.FileProviderService.GetFilePaths(pathId, includeHiddenElements)
+        _mockEnvironmentContext.FileProviderService.GetFilePaths(pathId, shouldIncludeHiddenElements)
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        Result<IEnumerable<File>> result = _sut.GetFiles(path, includeHiddenElements);
+        Result<IEnumerable<File>> result = _sut.GetFiles(path, shouldIncludeHiddenElements);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -135,11 +135,11 @@ public class FileServiceTests
     {
         // Arrange
         string path = _pathTestDir;
-        bool includeHiddenElements = false;
+        bool shouldIncludeHiddenElements = false;
         FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
         FileSystemPathId filePath = _fileSystemPathIdFixture.Create(_pathTestDirInaccessible);
 
-        _mockEnvironmentContext.FileProviderService.GetFilePaths(pathId, includeHiddenElements)
+        _mockEnvironmentContext.FileProviderService.GetFilePaths(pathId, shouldIncludeHiddenElements)
             .Returns(Result.From(new[] { filePath }.AsEnumerable()));
 
         _mockEnvironmentContext.FileProviderService.GetFileName(filePath)
@@ -152,7 +152,7 @@ public class FileServiceTests
             .Returns(Result.From((long?)null));
 
         // Act
-        Result<IEnumerable<File>> result = _sut.GetFiles(path, includeHiddenElements);
+        Result<IEnumerable<File>> result = _sut.GetFiles(path, shouldIncludeHiddenElements);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -165,14 +165,14 @@ public class FileServiceTests
     {
         // Arrange
         File parentFile = _fileFixture.Create();
-        bool includeHiddenElements = false;
+        bool shouldIncludeHiddenElements = false;
         FileSystemPathId[] filePaths =
         [
             _fileSystemPathIdFixture.Create(_pathTestDirFile1),
             _fileSystemPathIdFixture.Create(_pathTestDirFile2)
         ];
 
-        _mockEnvironmentContext.FileProviderService.GetFilePaths(parentFile.Id, includeHiddenElements)
+        _mockEnvironmentContext.FileProviderService.GetFilePaths(parentFile.Id, shouldIncludeHiddenElements)
             .Returns(Result.From(filePaths.AsEnumerable()));
 
         foreach (FileSystemPathId filePath in filePaths)
@@ -188,7 +188,7 @@ public class FileServiceTests
         }
 
         // Act
-        Result<IEnumerable<File>> result = _sut.GetFiles(parentFile, includeHiddenElements);
+        Result<IEnumerable<File>> result = _sut.GetFiles(parentFile, shouldIncludeHiddenElements);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -201,13 +201,13 @@ public class FileServiceTests
     {
         // Arrange
         File parentFile = _fileFixture.Create();
-        bool includeHiddenElements = false;
+        bool shouldIncludeHiddenElements = false;
 
-        _mockEnvironmentContext.FileProviderService.GetFilePaths(parentFile.Id, includeHiddenElements)
+        _mockEnvironmentContext.FileProviderService.GetFilePaths(parentFile.Id, shouldIncludeHiddenElements)
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        Result<IEnumerable<File>> result = _sut.GetFiles(parentFile, includeHiddenElements);
+        Result<IEnumerable<File>> result = _sut.GetFiles(parentFile, shouldIncludeHiddenElements);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -219,10 +219,10 @@ public class FileServiceTests
     {
         // Arrange
         File parentFile = _fileFixture.Create();
-        bool includeHiddenElements = false;
+        bool shouldIncludeHiddenElements = false;
         FileSystemPathId filePath = _fileSystemPathIdFixture.Create(_pathTestDirInaccessible);
 
-        _mockEnvironmentContext.FileProviderService.GetFilePaths(parentFile.Id, includeHiddenElements)
+        _mockEnvironmentContext.FileProviderService.GetFilePaths(parentFile.Id, shouldIncludeHiddenElements)
             .Returns(Result.From(new[] { filePath }.AsEnumerable()));
 
         _mockEnvironmentContext.FileProviderService.GetFileName(filePath)
@@ -235,7 +235,7 @@ public class FileServiceTests
             .Returns(Result.From((long?)null));
 
         // Act
-        Result<IEnumerable<File>> result = _sut.GetFiles(parentFile, includeHiddenElements);
+        Result<IEnumerable<File>> result = _sut.GetFiles(parentFile, shouldIncludeHiddenElements);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -248,14 +248,14 @@ public class FileServiceTests
     {
         // Arrange
         FileSystemPathId pathId = _fileSystemPathIdFixture.Create(_pathTestDir);
-        bool includeHiddenElements = false;
+        bool shouldIncludeHiddenElements = false;
         FileSystemPathId[] filePaths =
         [
             _fileSystemPathIdFixture.Create(_pathTestDirFile1),
             _fileSystemPathIdFixture.Create(_pathTestDirFile2)
         ];
 
-        _mockEnvironmentContext.FileProviderService.GetFilePaths(pathId, includeHiddenElements)
+        _mockEnvironmentContext.FileProviderService.GetFilePaths(pathId, shouldIncludeHiddenElements)
             .Returns(Result.From(filePaths.AsEnumerable()));
 
         foreach (FileSystemPathId filePath in filePaths)
@@ -271,7 +271,7 @@ public class FileServiceTests
         }
 
         // Act
-        Result<IEnumerable<File>> result = _sut.GetFiles(pathId, includeHiddenElements);
+        Result<IEnumerable<File>> result = _sut.GetFiles(pathId, shouldIncludeHiddenElements);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -284,13 +284,13 @@ public class FileServiceTests
     {
         // Arrange
         FileSystemPathId pathId = _fileSystemPathIdFixture.Create(_pathTestDir);
-        bool includeHiddenElements = false;
+        bool shouldIncludeHiddenElements = false;
 
-        _mockEnvironmentContext.FileProviderService.GetFilePaths(pathId, includeHiddenElements)
+        _mockEnvironmentContext.FileProviderService.GetFilePaths(pathId, shouldIncludeHiddenElements)
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        Result<IEnumerable<File>> result = _sut.GetFiles(pathId, includeHiddenElements);
+        Result<IEnumerable<File>> result = _sut.GetFiles(pathId, shouldIncludeHiddenElements);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -302,10 +302,10 @@ public class FileServiceTests
     {
         // Arrange
         FileSystemPathId pathId = _fileSystemPathIdFixture.Create(_pathTestDir);
-        bool includeHiddenElements = false;
+        bool shouldIncludeHiddenElements = false;
         FileSystemPathId filePath = _fileSystemPathIdFixture.Create(_pathTestDirInaccessible);
 
-        _mockEnvironmentContext.FileProviderService.GetFilePaths(pathId, includeHiddenElements)
+        _mockEnvironmentContext.FileProviderService.GetFilePaths(pathId, shouldIncludeHiddenElements)
             .Returns(Result.From(new[] { filePath }.AsEnumerable()));
 
         _mockEnvironmentContext.FileProviderService.GetFileName(filePath)
@@ -318,7 +318,7 @@ public class FileServiceTests
             .Returns(Result.From((long?)null));
 
         // Act
-        Result<IEnumerable<File>> result = _sut.GetFiles(pathId, includeHiddenElements);
+        Result<IEnumerable<File>> result = _sut.GetFiles(pathId, shouldIncludeHiddenElements);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -331,10 +331,10 @@ public class FileServiceTests
     {
         // Arrange
         FileSystemPathId pathId = _fileSystemPathIdFixture.Create(_pathTestDir);
-        bool includeHiddenElements = false;
+        bool shouldIncludeHiddenElements = false;
         FileSystemPathId filePath = _fileSystemPathIdFixture.Create(_pathTestDirFile1);
 
-        _mockEnvironmentContext.FileProviderService.GetFilePaths(pathId, includeHiddenElements)
+        _mockEnvironmentContext.FileProviderService.GetFilePaths(pathId, shouldIncludeHiddenElements)
             .Returns(Result.From(new[] { filePath }.AsEnumerable()));
         _mockEnvironmentContext.FileProviderService.GetFileName(filePath)
             .Returns(Result.From("File1.txt"));
@@ -346,7 +346,7 @@ public class FileServiceTests
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        Result<IEnumerable<File>> result = _sut.GetFiles(pathId, includeHiddenElements);
+        Result<IEnumerable<File>> result = _sut.GetFiles(pathId, shouldIncludeHiddenElements);
 
         // Assert
         Assert.False(result.IsFailure);

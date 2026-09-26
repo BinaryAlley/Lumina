@@ -50,13 +50,13 @@ public class CheckPathExistsRequestTests
     public void Deconstruct_WhenCalled_ShouldReturnAllProperties()
     {
         // Arrange
-        CheckPathExistsRequest sut = _checkPathExistsRequestFixture.Create(path: @"C:\Media\Books", includeHiddenElements: true);
+        CheckPathExistsRequest sut = _checkPathExistsRequestFixture.Create(path: @"C:\Media\Books", shouldIncludeHiddenElements: true);
 
         // Act
-        (string? path, bool includeHiddenElements) = sut;
+        (string? path, bool shouldIncludeHiddenElements) = sut;
 
         // Assert
         Assert.Equal(sut.Path, path);
-        Assert.Equal(sut.IncludeHiddenElements, includeHiddenElements);
+        Assert.Equal(sut.ShouldIncludeHiddenElements, shouldIncludeHiddenElements);
     }
 }

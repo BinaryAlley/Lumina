@@ -16,7 +16,7 @@
 ##### Get Directories Request
 
 ```js
-GET api/v1/directories/get-directories?path=C%3A%5CUsers%5C&includeHiddenElements=true
+GET api/v1/directories/get-directories?path=C%3A%5CUsers%5C&shouldIncludeHiddenElements=true
 ```
 
 ##### Get Directories Response

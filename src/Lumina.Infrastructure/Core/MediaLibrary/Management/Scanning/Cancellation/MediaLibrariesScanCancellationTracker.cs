@@ -14,7 +14,7 @@ namespace Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Cancellati
 internal class MediaLibrariesScanCancellationTracker : IMediaLibrariesScanCancellationTracker, IDisposable
 {
     private readonly ConcurrentDictionary<MediaLibraryScanCompositeId, CancellationTokenSource> _runningScans = new();
-    private bool _disposed;
+    private bool _isDisposed;
 
     /// <summary>
     /// Registers a new scan operation for tracking.
@@ -72,7 +72,7 @@ internal class MediaLibrariesScanCancellationTracker : IMediaLibrariesScanCancel
     /// </summary>
     public void Dispose()
     {
-        if (!_disposed)
+        if (!_isDisposed)
         {
             foreach (CancellationTokenSource scan in _runningScans.Values)
             {
@@ -80,7 +80,7 @@ internal class MediaLibrariesScanCancellationTracker : IMediaLibrariesScanCancel
                 scan.Dispose();
             }
             _runningScans.Clear();
-            _disposed = true;
+            _isDisposed = true;
         }
     }
 }

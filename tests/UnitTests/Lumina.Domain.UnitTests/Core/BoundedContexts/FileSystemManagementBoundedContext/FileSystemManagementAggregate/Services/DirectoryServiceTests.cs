@@ -55,7 +55,7 @@ public class DirectoryServiceTests
     {
         // Arrange
         string path = _pathDirTest;
-        bool includeHiddenElements = false;
+        bool shouldIncludeHiddenElements = false;
         FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
         FileSystemPathId[] subPaths =
         [
@@ -63,7 +63,7 @@ public class DirectoryServiceTests
             _fileSystemPathIdFixture.Create(_pathDirTestSubDir2)
         ];
 
-        _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(pathId, includeHiddenElements)
+        _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(pathId, shouldIncludeHiddenElements)
             .Returns(Result.From(subPaths.AsEnumerable()));
 
         foreach (FileSystemPathId subPath in subPaths)
@@ -77,7 +77,7 @@ public class DirectoryServiceTests
         }
 
         // Act
-        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(path, includeHiddenElements);
+        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(path, shouldIncludeHiddenElements);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -90,10 +90,10 @@ public class DirectoryServiceTests
     {
         // Arrange
         string invalidPath = string.Empty;
-        bool includeHiddenElements = false;
+        bool shouldIncludeHiddenElements = false;
 
         // Act
-        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(invalidPath, includeHiddenElements);
+        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(invalidPath, shouldIncludeHiddenElements);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -105,14 +105,14 @@ public class DirectoryServiceTests
     {
         // Arrange
         string path = _pathDirTest;
-        bool includeHiddenElements = false;
+        bool shouldIncludeHiddenElements = false;
         FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
 
-        _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(pathId, includeHiddenElements)
+        _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(pathId, shouldIncludeHiddenElements)
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(path, includeHiddenElements);
+        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(path, shouldIncludeHiddenElements);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -124,13 +124,13 @@ public class DirectoryServiceTests
     {
         // Arrange
         string path = _pathDirTest;
-        bool includeHiddenElements = false;
+        bool shouldIncludeHiddenElements = false;
         FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
         FileSystemPathId subPath = _fileSystemPathIdFixture.Create(
             s_isUnix ? "/TestDir/InaccessibleSub" : @"C:\TestDir\InaccessibleSub"
         );
 
-        _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(pathId, includeHiddenElements)
+        _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(pathId, shouldIncludeHiddenElements)
             .Returns(Result.From(new[] { subPath }.AsEnumerable()));
 
         _mockEnvironmentContext.DirectoryProviderService.GetFileName(subPath)
@@ -141,7 +141,7 @@ public class DirectoryServiceTests
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(path, includeHiddenElements);
+        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(path, shouldIncludeHiddenElements);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -154,14 +154,14 @@ public class DirectoryServiceTests
     {
         // Arrange
         Directory parentDirectory = _directoryFixture.Create();
-        bool includeHiddenElements = false;
+        bool shouldIncludeHiddenElements = false;
         FileSystemPathId[] subPaths =
         [
             _fileSystemPathIdFixture.Create(_pathDirTestSubDir1),
         _fileSystemPathIdFixture.Create(_pathDirTestSubDir2)
         ];
 
-        _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(parentDirectory.Id, includeHiddenElements)
+        _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(parentDirectory.Id, shouldIncludeHiddenElements)
             .Returns(Result.From(subPaths.AsEnumerable()));
 
         foreach (FileSystemPathId subPath in subPaths)
@@ -175,7 +175,7 @@ public class DirectoryServiceTests
         }
 
         // Act
-        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(parentDirectory, includeHiddenElements);
+        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(parentDirectory, shouldIncludeHiddenElements);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -188,13 +188,13 @@ public class DirectoryServiceTests
     {
         // Arrange
         Directory parentDirectory = _directoryFixture.Create();
-        bool includeHiddenElements = false;
+        bool shouldIncludeHiddenElements = false;
 
-        _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(parentDirectory.Id, includeHiddenElements)
+        _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(parentDirectory.Id, shouldIncludeHiddenElements)
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(parentDirectory, includeHiddenElements);
+        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(parentDirectory, shouldIncludeHiddenElements);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -206,12 +206,12 @@ public class DirectoryServiceTests
     {
         // Arrange
         Directory parentDirectory = _directoryFixture.Create();
-        bool includeHiddenElements = false;
+        bool shouldIncludeHiddenElements = false;
         FileSystemPathId subPath = _fileSystemPathIdFixture.Create(
             s_isUnix ? "/TestDir/InaccessibleSub" : @"C:\TestDir\InaccessibleSub"
         );
 
-        _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(parentDirectory.Id, includeHiddenElements)
+        _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(parentDirectory.Id, shouldIncludeHiddenElements)
             .Returns(Result.From(new[] { subPath }.AsEnumerable()));
 
         _mockEnvironmentContext.DirectoryProviderService.GetFileName(subPath)
@@ -222,7 +222,7 @@ public class DirectoryServiceTests
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(parentDirectory, includeHiddenElements);
+        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(parentDirectory, shouldIncludeHiddenElements);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -235,14 +235,14 @@ public class DirectoryServiceTests
     {
         // Arrange
         FileSystemPathId pathId = _fileSystemPathIdFixture.Create(_pathDirTest);
-        bool includeHiddenElements = false;
+        bool shouldIncludeHiddenElements = false;
         FileSystemPathId[] subPaths =
         [
             _fileSystemPathIdFixture.Create(_pathDirTestSubDir1),
             _fileSystemPathIdFixture.Create(_pathDirTestSubDir2)
         ];
 
-        _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(pathId, includeHiddenElements)
+        _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(pathId, shouldIncludeHiddenElements)
             .Returns(Result.From(subPaths.AsEnumerable()));
 
         foreach (FileSystemPathId subPath in subPaths)
@@ -256,7 +256,7 @@ public class DirectoryServiceTests
         }
 
         // Act
-        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(pathId, includeHiddenElements);
+        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(pathId, shouldIncludeHiddenElements);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -269,13 +269,13 @@ public class DirectoryServiceTests
     {
         // Arrange
         FileSystemPathId pathId = _fileSystemPathIdFixture.Create(_pathDirTest);
-        bool includeHiddenElements = false;
+        bool shouldIncludeHiddenElements = false;
 
-        _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(pathId, includeHiddenElements)
+        _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(pathId, shouldIncludeHiddenElements)
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(pathId, includeHiddenElements);
+        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(pathId, shouldIncludeHiddenElements);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -287,12 +287,12 @@ public class DirectoryServiceTests
     {
         // Arrange
         FileSystemPathId pathId = _fileSystemPathIdFixture.Create(_pathDirTest);
-        bool includeHiddenElements = false;
+        bool shouldIncludeHiddenElements = false;
         FileSystemPathId subPath = _fileSystemPathIdFixture.Create(
             s_isUnix ? "/TestDir/InaccessibleSub" : @"C:\TestDir\InaccessibleSub"
         );
 
-        _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(pathId, includeHiddenElements)
+        _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(pathId, shouldIncludeHiddenElements)
             .Returns(Result.From(new[] { subPath }.AsEnumerable()));
 
         _mockEnvironmentContext.DirectoryProviderService.GetFileName(subPath)
@@ -303,7 +303,7 @@ public class DirectoryServiceTests
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(pathId, includeHiddenElements);
+        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(pathId, shouldIncludeHiddenElements);
 
         // Assert
         Assert.False(result.IsFailure);

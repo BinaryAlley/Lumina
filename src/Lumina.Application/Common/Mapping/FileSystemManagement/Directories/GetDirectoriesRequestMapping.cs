@@ -17,6 +17,6 @@ public static class GetDirectoriesRequestMapping
     /// <returns>The converted query.</returns>
     public static GetDirectoriesQuery ToQuery(this GetDirectoriesRequest request)
     {
-        return new GetDirectoriesQuery(request.Path, request.IncludeHiddenElements);
+        return new GetDirectoriesQuery(request.Path, request.ShouldIncludeHiddenElements);
     }
 }

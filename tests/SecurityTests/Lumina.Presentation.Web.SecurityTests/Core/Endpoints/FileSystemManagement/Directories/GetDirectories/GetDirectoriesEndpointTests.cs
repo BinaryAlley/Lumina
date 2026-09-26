@@ -50,10 +50,10 @@ public class GetDirectoriesEndpointTests : IClassFixture<LuminaWebFactory>
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
-        string expectedEndpoint = $"directories/get-directories?path={Uri.EscapeDataString(maliciousPath)}&includeHiddenElements=False";
+        string expectedEndpoint = $"directories/get-directories?path={Uri.EscapeDataString(maliciousPath)}&shouldIncludeHiddenElements=False";
         _apiFactory.ApiClientStub.RegisterGetResponse(expectedEndpoint, Array.Empty<DirectoryDto>());
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
-        HttpRequestMessage getRequest = new(HttpMethod.Get, $"/directories/api-get-directories?path={Uri.EscapeDataString(maliciousPath)}&includeHiddenElements=false");
+        HttpRequestMessage getRequest = new(HttpMethod.Get, $"/directories/api-get-directories?path={Uri.EscapeDataString(maliciousPath)}&shouldIncludeHiddenElements=false");
         getRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
         // Act

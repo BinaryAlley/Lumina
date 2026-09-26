@@ -46,7 +46,7 @@ public class GetFilesQueryHandler : IQueryHandler<GetFilesQuery, Result<IEnumera
         if (validationResult.Count > 0)
             return Task.FromResult<Result<IEnumerable<FileResponse>>>(validationResult);
 
-        Result<IEnumerable<File>> getFilesResult = _fileService.GetFiles(query.Path!, query.IncludeHiddenElements);
+        Result<IEnumerable<File>> getFilesResult = _fileService.GetFiles(query.Path!, query.ShouldIncludeHiddenElements);
         return Task.FromResult(getFilesResult.Match(values => Result.From(values.ToResponses()), errors => errors));
     }
 }

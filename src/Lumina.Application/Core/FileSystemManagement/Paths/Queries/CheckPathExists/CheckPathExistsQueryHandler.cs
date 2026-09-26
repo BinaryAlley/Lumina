@@ -44,6 +44,6 @@ public class CheckPathExistsQueryHandler : IQueryHandler<CheckPathExistsQuery, R
         if (validationResult.Count > 0)
             return Task.FromResult<Result<PathExistsResponse>>(validationResult);
 
-        return Task.FromResult(Result.From(new PathExistsResponse(_pathService.Exists(query.Path!, query.IncludeHiddenElements))));
+        return Task.FromResult(Result.From(new PathExistsResponse(_pathService.Exists(query.Path!, query.ShouldIncludeHiddenElements))));
     }
 }

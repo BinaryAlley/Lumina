@@ -50,13 +50,13 @@ public class GetFilesRequestTests
     public void Deconstruct_WhenCalled_ShouldReturnAllProperties()
     {
         // Arrange
-        GetFilesRequest sut = _getFilesRequestFixture.Create(path: @"C:\Media", includeHiddenElements: true);
+        GetFilesRequest sut = _getFilesRequestFixture.Create(path: @"C:\Media", shouldIncludeHiddenElements: true);
 
         // Act
-        (string? path, bool includeHiddenElements) = sut;
+        (string? path, bool shouldIncludeHiddenElements) = sut;
 
         // Assert
         Assert.Equal(sut.Path, path);
-        Assert.Equal(sut.IncludeHiddenElements, includeHiddenElements);
+        Assert.Equal(sut.ShouldIncludeHiddenElements, shouldIncludeHiddenElements);
     }
 }

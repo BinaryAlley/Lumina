@@ -17,6 +17,6 @@ public static class GetFilesRequestMapping
     /// <returns>The converted query.</returns>
     public static GetFilesQuery ToQuery(this GetFilesRequest request)
     {
-        return new GetFilesQuery(request.Path, request.IncludeHiddenElements);
+        return new GetFilesQuery(request.Path, request.ShouldIncludeHiddenElements);
     }
 }
