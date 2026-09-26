@@ -40,13 +40,32 @@ public class SetLibraryBookReaderEnabledEndpointSummary : Summary<SetLibraryBook
         );
 
         Response(401, "Authentication required.", "application/problem+json",
-            example: new
+            example: new[]
             {
-                type = "https://tools.ietf.org/html/rfc7235#section-3.1",
-                status = 401,
-                title = "Unauthorized",
-                detail = "You are not authorized",
-                instance = "/api/v1/libraries/{libraryId}/book-readers/{pluginId}/enabled"
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    status = 401,
+                    title = "Unauthorized",
+                    detail = "Authentication failed",
+                    instance = "/api/v1/libraries/{libraryId}/book-readers/{pluginId}/enabled"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    status = 401,
+                    title = "Unauthorized",
+                    detail = "The token has expired",
+                    instance = "/api/v1/libraries/{libraryId}/book-readers/{pluginId}/enabled"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    status = 401,
+                    title = "Unauthorized",
+                    detail = "The token is invalid",
+                    instance = "/api/v1/libraries/{libraryId}/book-readers/{pluginId}/enabled"
+                }
             }
         );
 

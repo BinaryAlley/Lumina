@@ -59,7 +59,23 @@ public class GetLibraryBookReadersEndpointSummary : Summary<GetLibraryBookReader
                     type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                     status = 401,
                     title = "Unauthorized",
-                    detail = "You are not authorized",
+                    detail = "Authentication failed",
+                    instance = "/api/v1/libraries/{libraryId}/book-readers"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    status = 401,
+                    title = "Unauthorized",
+                    detail = "The token has expired",
+                    instance = "/api/v1/libraries/{libraryId}/book-readers"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    status = 401,
+                    title = "Unauthorized",
+                    detail = "The token is invalid",
                     instance = "/api/v1/libraries/{libraryId}/book-readers"
                 }
             }
