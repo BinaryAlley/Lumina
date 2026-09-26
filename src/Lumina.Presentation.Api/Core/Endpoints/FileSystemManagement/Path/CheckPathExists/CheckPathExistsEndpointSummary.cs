@@ -25,15 +25,15 @@ public class CheckPathExistsEndpointSummary : Summary<CheckPathExistsEndpoint, C
 
         ExampleRequest = new CheckPathExistsRequest(
             Path: "/media/movies/",
-            IncludeHiddenElements: true
+            ShouldIncludeHiddenElements: true
         );
         RequestExamples.Add(new RequestExample(new CheckPathExistsRequest(
             Path: "/media/movies/",
-            IncludeHiddenElements: false
+            ShouldIncludeHiddenElements: false
         )));
 
         RequestParam(r => r.Path, "The file system path to check the exitence of. Required.");
-        RequestParam(r => r.IncludeHiddenElements, "Whether to include hidden elements in the search results, or not. Optional.");
+        RequestParam(r => r.ShouldIncludeHiddenElements, "Whether to include hidden elements in the search results, or not. Optional.");
 
         Response(200, "Indicates whether the file system path exists.",
             example: new PathExistsResponse(
@@ -48,7 +48,7 @@ public class CheckPathExistsEndpointSummary : Summary<CheckPathExistsEndpoint, C
                     type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                     status = 401,
                     title = "Unauthorized",
-                    detail = "You are not authorized",
+                    detail = "Authentication failed",
                     instance = "/api/v1/path/check-path-exists"
                 },
                 new
@@ -56,7 +56,7 @@ public class CheckPathExistsEndpointSummary : Summary<CheckPathExistsEndpoint, C
                     type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                     status = 401,
                     title = "Unauthorized",
-                    detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
+                    detail = "The token has expired",
                     instance = "/api/v1/path/check-path-exists"
                 },
                 new

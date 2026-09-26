@@ -69,7 +69,7 @@ public class GetLibraryEndpointSummary : Summary<GetLibraryEndpoint, GetLibraryR
                     type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                     status = 401,
                     title = "Unauthorized",
-                    detail = "You are not authorized",
+                    detail = "Authentication failed",
                     instance = "/api/v1/libraries/{id}"
                 },
                 new
@@ -77,7 +77,7 @@ public class GetLibraryEndpointSummary : Summary<GetLibraryEndpoint, GetLibraryR
                     type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                     status = 401,
                     title = "Unauthorized",
-                    detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
+                    detail = "The token has expired",
                     instance = "/api/v1/libraries/{id}"
                 },
                 new

@@ -25,15 +25,15 @@ public class GetDirectoriesEndpointSummary : Summary<GetDirectoriesEndpoint, Get
 
         ExampleRequest = new GetDirectoriesRequest(
             Path: "/media/movies/",
-            IncludeHiddenElements: true
+            ShouldIncludeHiddenElements: true
         );
         RequestExamples.Add(new RequestExample(new GetDirectoriesRequest(
             Path: "/media/movies/",
-            IncludeHiddenElements: false
+            ShouldIncludeHiddenElements: false
         )));
 
         RequestParam(r => r.Path, "The file system path for which to get the directories. Required.");
-        RequestParam(r => r.IncludeHiddenElements, "Whether to include hidden file system elements or not. Optional.");
+        RequestParam(r => r.ShouldIncludeHiddenElements, "Whether to include hidden file system elements or not. Optional.");
 
         Response(200, "The list of directories for the specified path is returned.",
             example: new DirectoryResponse[] {
@@ -49,7 +49,7 @@ public class GetDirectoriesEndpointSummary : Summary<GetDirectoriesEndpoint, Get
                     type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                     status = 401,
                     title = "Unauthorized",
-                    detail = "You are not authorized",
+                    detail = "Authentication failed",
                     instance = "/api/v1/directories/get-directories"
                 },
                 new
@@ -57,7 +57,7 @@ public class GetDirectoriesEndpointSummary : Summary<GetDirectoriesEndpoint, Get
                     type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                     status = 401,
                     title = "Unauthorized",
-                    detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
+                    detail = "The token has expired",
                     instance = "/api/v1/directories/get-directories"
                 },
                 new

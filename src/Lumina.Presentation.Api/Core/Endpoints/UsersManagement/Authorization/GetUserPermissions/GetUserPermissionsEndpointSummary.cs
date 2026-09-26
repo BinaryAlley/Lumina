@@ -45,16 +45,16 @@ public class GetUserPermissionsEndpointSummary : Summary<GetUserPermissionsEndpo
                     type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                     status = 401,
                     title = "Unauthorized",
-                    detail = "You are not authorized",
-                    instance = "/auth/users/{userId}/permissions"
+                    detail = "Authentication failed",
+                    instance = "/api/v1/auth/users/{userId}/permissions"
                 },
                 new
                 {
                     type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                     status = 401,
                     title = "Unauthorized",
-                    detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
-                    instance = "/auth/users/{userId}/permissions"
+                    detail = "The token has expired",
+                    instance = "/api/v1/auth/users/{userId}/permissions"
                 },
                 new
                 {
@@ -62,7 +62,7 @@ public class GetUserPermissionsEndpointSummary : Summary<GetUserPermissionsEndpo
                     status = 401,
                     title = "Unauthorized",
                     detail = "The token is invalid",
-                    instance = "/auth/users/{userId}/permissions"
+                    instance = "/api/v1/auth/users/{userId}/permissions"
                 }
             }
         );
@@ -74,7 +74,7 @@ public class GetUserPermissionsEndpointSummary : Summary<GetUserPermissionsEndpo
                 title = "General.Failure",
                 status = 403,
                 detail = "NotAuthorized",
-                instance = "/auth/users/{userId}/permissions",
+                instance = "/api/v1/auth/users/{userId}/permissions",
                 traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
             }
         );
@@ -86,7 +86,7 @@ public class GetUserPermissionsEndpointSummary : Summary<GetUserPermissionsEndpo
                 title = "General.NotFound",
                 status = 404,
                 detail = "UsernameDoesNotExist",
-                instance = "/auth/users/{userId}/permissions",
+                instance = "/api/v1/auth/users/{userId}/permissions",
                 traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
             }
         );
@@ -98,7 +98,7 @@ public class GetUserPermissionsEndpointSummary : Summary<GetUserPermissionsEndpo
                 title = "General.Validation",
                 status = 422,
                 detail = "OneOrMoreValidationErrorsOccurred",
-                instance = "/auth/users/{userId}/permissions",
+                instance = "/api/v1/auth/users/{userId}/permissions",
                 errors = new Dictionary<string, string[]>
                 {
                     {
