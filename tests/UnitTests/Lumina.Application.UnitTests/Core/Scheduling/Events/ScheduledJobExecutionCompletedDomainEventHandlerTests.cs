@@ -2,6 +2,8 @@
 using Lumina.Application.Common.DataAccess.Entities.Scheduling;
 using Lumina.Application.Common.DataAccess.Repositories.Scheduling;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Core.Scheduling.Events;
 using Lumina.Application.Core.Scheduling.Notifications;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Scheduling;
@@ -43,6 +45,7 @@ public class ScheduledJobExecutionCompletedDomainEventHandlerTests
     public ScheduledJobExecutionCompletedDomainEventHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockScheduledJobNotifier = Substitute.For<IScheduledJobNotifier>();
         _mockScheduledJobRepository = Substitute.For<IScheduledJobRepository>();
         _mockScheduledJobExecutionRepository = Substitute.For<IScheduledJobExecutionRepository>();
@@ -51,7 +54,7 @@ public class ScheduledJobExecutionCompletedDomainEventHandlerTests
         _mockUnitOfWork.ScheduledJobExecutionRepository.Returns(_mockScheduledJobExecutionRepository);
         _mockScheduledJobRepository.UpdateAsync(Arg.Any<ScheduledJobEntity>(), Arg.Any<CancellationToken>()).Returns(Result.Updated);
         _mockScheduledJobExecutionRepository.UpdateAsync(Arg.Any<ScheduledJobExecutionEntity>(), Arg.Any<CancellationToken>()).Returns(Result.Updated);
-        _mockScheduledJobRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(Result.From<IEnumerable<ScheduledJobEntity>>([]));
+        _mockScheduledJobRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<ScheduledJobEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
 
         _sut = new ScheduledJobExecutionCompletedDomainEventHandler(_mockScheduledJobNotifier, _mockUnitOfWork);
     }
@@ -68,14 +71,14 @@ public class ScheduledJobExecutionCompletedDomainEventHandlerTests
             id: domainEvent.ScheduledJobId.Value,
             status: ScheduledJobStatus.Running,
             lastStartedOnUtc: completedOnUtc.AddMinutes(-5));
-        _mockScheduledJobRepository.GetByIdAsync(domainEvent.ScheduledJobId.Value, Arg.Any<CancellationToken>())
+        _mockScheduledJobRepository.GetByIdAsync(domainEvent.ScheduledJobId.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<ScheduledJobEntity?>(scheduledJob));
         ScheduledJobExecutionEntity execution = _scheduledJobExecutionEntityFixture.Create(
             id: domainEvent.RunId,
             scheduledJobId: scheduledJob.Id,
             isCycleRun: isCycleRun,
             completedOnUtc: null);
-        _mockScheduledJobExecutionRepository.GetByIdAsync(domainEvent.RunId, Arg.Any<CancellationToken>())
+        _mockScheduledJobExecutionRepository.GetByIdAsync(domainEvent.RunId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<ScheduledJobExecutionEntity?>(execution));
 
         // Act
@@ -100,7 +103,7 @@ public class ScheduledJobExecutionCompletedDomainEventHandlerTests
     {
         // Arrange
         ScheduledJobExecutionCompletedDomainEvent domainEvent = _scheduledJobExecutionCompletedDomainEventFixture.Create(isCycleRun: true);
-        _mockScheduledJobRepository.GetByIdAsync(domainEvent.ScheduledJobId.Value, Arg.Any<CancellationToken>())
+        _mockScheduledJobRepository.GetByIdAsync(domainEvent.ScheduledJobId.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<ScheduledJobEntity?>(null));
 
         // Act
@@ -109,7 +112,7 @@ public class ScheduledJobExecutionCompletedDomainEventHandlerTests
 
         // Assert
         Assert.Equal(Errors.Scheduling.ScheduledJobNotFound, exception.EventualConsistencyError);
-        await _mockScheduledJobExecutionRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockScheduledJobExecutionRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -118,7 +121,7 @@ public class ScheduledJobExecutionCompletedDomainEventHandlerTests
         // Arrange
         ScheduledJobExecutionCompletedDomainEvent domainEvent = _scheduledJobExecutionCompletedDomainEventFixture.Create(isCycleRun: true);
         ScheduledJobEntity scheduledJob = _scheduledJobEntityFixture.Create(id: domainEvent.ScheduledJobId.Value, status: ScheduledJobStatus.Running);
-        _mockScheduledJobRepository.GetByIdAsync(domainEvent.ScheduledJobId.Value, Arg.Any<CancellationToken>())
+        _mockScheduledJobRepository.GetByIdAsync(domainEvent.ScheduledJobId.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<ScheduledJobEntity?>(scheduledJob));
         Error error = Error.Failure("Database.Error", "Failed to update the scheduled job");
         _mockScheduledJobRepository.UpdateAsync(Arg.Any<ScheduledJobEntity>(), Arg.Any<CancellationToken>()).Returns(error);
@@ -129,7 +132,7 @@ public class ScheduledJobExecutionCompletedDomainEventHandlerTests
 
         // Assert
         Assert.Equal(error, exception.EventualConsistencyError);
-        await _mockScheduledJobExecutionRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockScheduledJobExecutionRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -138,9 +141,9 @@ public class ScheduledJobExecutionCompletedDomainEventHandlerTests
         // Arrange
         ScheduledJobExecutionCompletedDomainEvent domainEvent = _scheduledJobExecutionCompletedDomainEventFixture.Create(isCycleRun: true);
         ScheduledJobEntity scheduledJob = _scheduledJobEntityFixture.Create(id: domainEvent.ScheduledJobId.Value, status: ScheduledJobStatus.Running);
-        _mockScheduledJobRepository.GetByIdAsync(domainEvent.ScheduledJobId.Value, Arg.Any<CancellationToken>())
+        _mockScheduledJobRepository.GetByIdAsync(domainEvent.ScheduledJobId.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<ScheduledJobEntity?>(scheduledJob));
-        _mockScheduledJobExecutionRepository.GetByIdAsync(domainEvent.RunId, Arg.Any<CancellationToken>())
+        _mockScheduledJobExecutionRepository.GetByIdAsync(domainEvent.RunId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<ScheduledJobExecutionEntity?>(null));
 
         // Act
@@ -158,10 +161,10 @@ public class ScheduledJobExecutionCompletedDomainEventHandlerTests
         // Arrange
         ScheduledJobExecutionCompletedDomainEvent domainEvent = _scheduledJobExecutionCompletedDomainEventFixture.Create(isCycleRun: true);
         ScheduledJobEntity scheduledJob = _scheduledJobEntityFixture.Create(id: domainEvent.ScheduledJobId.Value, status: ScheduledJobStatus.Running);
-        _mockScheduledJobRepository.GetByIdAsync(domainEvent.ScheduledJobId.Value, Arg.Any<CancellationToken>())
+        _mockScheduledJobRepository.GetByIdAsync(domainEvent.ScheduledJobId.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<ScheduledJobEntity?>(scheduledJob));
         ScheduledJobExecutionEntity execution = _scheduledJobExecutionEntityFixture.Create(id: domainEvent.RunId);
-        _mockScheduledJobExecutionRepository.GetByIdAsync(domainEvent.RunId, Arg.Any<CancellationToken>())
+        _mockScheduledJobExecutionRepository.GetByIdAsync(domainEvent.RunId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<ScheduledJobExecutionEntity?>(execution));
         Error error = Error.Failure("Database.Error", "Failed to update the execution");
         _mockScheduledJobExecutionRepository.UpdateAsync(Arg.Any<ScheduledJobExecutionEntity>(), Arg.Any<CancellationToken>()).Returns(error);
@@ -181,13 +184,13 @@ public class ScheduledJobExecutionCompletedDomainEventHandlerTests
         // Arrange
         ScheduledJobExecutionCompletedDomainEvent domainEvent = _scheduledJobExecutionCompletedDomainEventFixture.Create(isCycleRun: true);
         ScheduledJobEntity scheduledJob = _scheduledJobEntityFixture.Create(id: domainEvent.ScheduledJobId.Value, status: ScheduledJobStatus.Running);
-        _mockScheduledJobRepository.GetByIdAsync(domainEvent.ScheduledJobId.Value, Arg.Any<CancellationToken>())
+        _mockScheduledJobRepository.GetByIdAsync(domainEvent.ScheduledJobId.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<ScheduledJobEntity?>(scheduledJob));
         ScheduledJobExecutionEntity execution = _scheduledJobExecutionEntityFixture.Create(id: domainEvent.RunId);
-        _mockScheduledJobExecutionRepository.GetByIdAsync(domainEvent.RunId, Arg.Any<CancellationToken>())
+        _mockScheduledJobExecutionRepository.GetByIdAsync(domainEvent.RunId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<ScheduledJobExecutionEntity?>(execution));
         Error error = Error.Failure("Database.Error", "Failed to get the scheduled jobs");
-        _mockScheduledJobRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(error);
+        _mockScheduledJobRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(error);
 
         // Act
         EventualConsistencyException exception = await Assert.ThrowsAsync<EventualConsistencyException>(

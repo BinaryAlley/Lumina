@@ -48,6 +48,7 @@ public class ScanLibrariesCommandHandlerTests
     public ScanLibrariesCommandHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockLibraryRepository = Substitute.For<ILibraryRepository>();
         _mockLibraryScanRepository = Substitute.For<ILibraryScanRepository>();
         _mockUnitOfWork.LibraryRepository.Returns(_mockLibraryRepository);

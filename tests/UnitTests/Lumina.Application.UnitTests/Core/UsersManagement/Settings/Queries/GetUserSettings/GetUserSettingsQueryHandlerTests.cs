@@ -38,6 +38,7 @@ public class GetUserSettingsQueryHandlerTests
     public GetUserSettingsQueryHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockUserSettingsRepository = Substitute.For<IUserSettingsRepository>();
 

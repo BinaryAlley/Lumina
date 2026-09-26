@@ -4,6 +4,8 @@ using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Validation;
@@ -54,6 +56,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     public UpdateUserRoleAndPermissionsCommandHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockUserRepository = Substitute.For<IUserRepository>();
@@ -107,7 +110,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
         await _mockAuthorizationService.DidNotReceive().IsInRoleAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
-        await _mockUserRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockUserRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -117,7 +120,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
         UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create();
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
-        _mockUserRepository.GetByIdAsync(command.UserId, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(command.UserId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns((UserEntity?)null);
 
         // Act
@@ -137,9 +140,9 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
-        _mockUserRepository.GetByIdAsync(command.UserId, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(command.UserId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(user);
-        _mockRoleRepository.GetByIdAsync(command.RoleId!.Value, Arg.Any<CancellationToken>())
+        _mockRoleRepository.GetByIdAsync(command.RoleId!.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns((RoleEntity?)null);
 
         // Act
@@ -167,16 +170,16 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
             includeUserRole: true);
 
         RoleEntity newRole = _roleEntityFixture.Create(roleName: "User");
-        IEnumerable<UserEntity> users = [user];
+        List<UserEntity> users = [user];
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
-        _mockUserRepository.GetByIdAsync(command.UserId, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(command.UserId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(user);
-        _mockRoleRepository.GetByIdAsync(command.RoleId!.Value, Arg.Any<CancellationToken>())
+        _mockRoleRepository.GetByIdAsync(command.RoleId!.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(newRole);
-        _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(Result.From(users));
+        _mockUserRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(new PaginatedResultDto<UserEntity> { Data = users, CurrentPage = 1, PerPage = users.Count, Count = users.Count, NumberOfPages = 1 }));
 
         // Act
         Result<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
@@ -199,9 +202,9 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
-        _mockUserRepository.GetByIdAsync(command.UserId, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(command.UserId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(user);
-        _mockRoleRepository.GetByIdAsync(command.RoleId!.Value, Arg.Any<CancellationToken>())
+        _mockRoleRepository.GetByIdAsync(command.RoleId!.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(role);
         _mockPermissionRepository.GetByIdsAsync(command.Permissions, Arg.Any<CancellationToken>())
             .Returns(Result.From(permissions));
@@ -237,9 +240,9 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
-        _mockUserRepository.GetByIdAsync(command.UserId, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(command.UserId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(user);
-        _mockRoleRepository.GetByIdAsync(command.RoleId!.Value, Arg.Any<CancellationToken>())
+        _mockRoleRepository.GetByIdAsync(command.RoleId!.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(role);
         _mockPermissionRepository.GetByIdsAsync(command.Permissions, Arg.Any<CancellationToken>())
             .Returns(Result.From(permissions));
@@ -276,11 +279,11 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
-        _mockUserRepository.GetByIdAsync(command.UserId, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(command.UserId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(user);
-        _mockRoleRepository.GetByIdAsync(command.RoleId!.Value, Arg.Any<CancellationToken>())
+        _mockRoleRepository.GetByIdAsync(command.RoleId!.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(_roleEntityFixture.Create(roleName: "User"));
-        _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
+        _mockUserRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
             .Returns(error);
 
         // Act
@@ -301,9 +304,9 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
-        _mockUserRepository.GetByIdAsync(command.UserId, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(command.UserId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(user);
-        _mockRoleRepository.GetByIdAsync(command.RoleId!.Value, Arg.Any<CancellationToken>())
+        _mockRoleRepository.GetByIdAsync(command.RoleId!.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(_roleEntityFixture.Create(roleName: "User"));
         _mockPermissionRepository.GetByIdsAsync(command.Permissions, Arg.Any<CancellationToken>())
             .Returns(error);

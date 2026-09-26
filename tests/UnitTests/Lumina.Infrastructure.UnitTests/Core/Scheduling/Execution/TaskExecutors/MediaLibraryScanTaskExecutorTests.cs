@@ -44,7 +44,7 @@ public class MediaLibraryScanTaskExecutorTests
         _mockLibraryRepository.GetAllEnabledAndUnlockedAsync(Arg.Any<CancellationToken>())
             .Returns(Result.From<IEnumerable<LibraryEntity>>([]));
         _mockUnitOfWork.LibraryRepository.Returns(_mockLibraryRepository);
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockDomainEventPublisher = Substitute.For<IDomainEventPublisher>();
         _sut = new MediaLibraryScanTaskExecutor(_mockDomainEventPublisher, Substitute.For<ILogger<MediaLibraryScanTaskExecutor>>(), _mockUnitOfWork);
     }

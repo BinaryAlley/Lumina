@@ -74,11 +74,11 @@ public class InstallThemeCommandHandler : ICommandHandler<InstallThemeCommand, R
             return ApplicationErrors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // only admins can install themes
+        // Only admins can install themes.
         if (!await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false))
             return ApplicationErrors.Authorization.NotAuthorized;
 
-        // store the theme pack files on the server, replacing the files of an existing theme with the same manifest id
+        // Store the theme pack files on the server, replacing the files of an existing theme with the same manifest id.
         Result<ThemeManifestDto> installResult = await _themeService.InstallAsync(command.Archive!, cancellationToken).ConfigureAwait(false);
         if (installResult.IsFailure)
             return installResult.Errors;
@@ -103,7 +103,7 @@ public class InstallThemeCommandHandler : ICommandHandler<InstallThemeCommand, R
                 PreviewPath = manifest.Preview,
                 InstallSource = existingTheme.InstallSource,
                 IsCurrent = existingTheme.IsCurrent,
-                // reinstalling a theme must bring it back even if it was soft deleted before, so the uploaded pack becomes visible again
+                // Reinstalling a theme must bring it back even if it was soft deleted before, so the uploaded pack becomes visible again.
                 IsDeleted = false,
                 InstalledAtUtc = DateTime.UtcNow,
                 CreatedOnUtc = existingTheme.CreatedOnUtc,
@@ -137,13 +137,15 @@ public class InstallThemeCommandHandler : ICommandHandler<InstallThemeCommand, R
             Result<Created> insertResult = await _unitOfWork.ThemeRepository.InsertAsync(themeEntity, cancellationToken).ConfigureAwait(false);
             if (insertResult.IsFailure)
             {
-                // roll back the stored files so a failed install leaves no orphaned theme pack behind
+                // Roll back the stored files so a failed install leaves no orphaned theme pack behind.
                 await _themeService.DeleteAsync(manifest.Id, cancellationToken).ConfigureAwait(false);
                 return insertResult.Errors;
             }
         }
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
         return themeEntity.ToResponse();
     }
 }

@@ -47,6 +47,7 @@ public class GetUserPermissionsQueryHandlerTests
     public GetUserPermissionsQueryHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockUserRepository = Substitute.For<IUserRepository>();
@@ -79,7 +80,7 @@ public class GetUserPermissionsQueryHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authorization.NotAuthorized, result.FirstError);
-        await _mockUserRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockUserRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -96,7 +97,7 @@ public class GetUserPermissionsQueryHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authorization.NotAuthorized, result.FirstError);
         await _mockAuthorizationService.DidNotReceive().IsInRoleAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
-        await _mockUserRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockUserRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -108,7 +109,7 @@ public class GetUserPermissionsQueryHandlerTests
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
-        _mockUserRepository.GetByIdAsync(query.UserId!.Value, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(query.UserId!.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(error);
 
         // Act
@@ -127,7 +128,7 @@ public class GetUserPermissionsQueryHandlerTests
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
-        _mockUserRepository.GetByIdAsync(query.UserId!.Value, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(query.UserId!.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns((UserEntity?)null);
 
         // Act
@@ -157,7 +158,7 @@ public class GetUserPermissionsQueryHandlerTests
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
-        _mockUserRepository.GetByIdAsync(query.UserId!.Value, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(query.UserId!.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(user);
 
         // Act

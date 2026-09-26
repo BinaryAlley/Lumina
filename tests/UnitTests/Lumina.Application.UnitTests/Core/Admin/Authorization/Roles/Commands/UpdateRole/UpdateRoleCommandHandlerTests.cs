@@ -49,6 +49,7 @@ public class UpdateRoleCommandHandlerTests
         mockValidator.Validate(Arg.Any<UpdateRoleCommand>())
             .Returns([]);
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockRoleRepository = Substitute.For<IRoleRepository>();
@@ -130,7 +131,7 @@ public class UpdateRoleCommandHandlerTests
             .Returns(true);
         _mockRoleRepository.UpdateAsync(Arg.Any<RoleEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Updated);
-        _mockRoleRepository.GetByIdAsync(command.RoleId, Arg.Any<CancellationToken>())
+        _mockRoleRepository.GetByIdAsync(command.RoleId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(error);
 
         // Act
@@ -151,7 +152,7 @@ public class UpdateRoleCommandHandlerTests
             .Returns(true);
         _mockRoleRepository.UpdateAsync(Arg.Any<RoleEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Updated);
-        _mockRoleRepository.GetByIdAsync(command.RoleId, Arg.Any<CancellationToken>())
+        _mockRoleRepository.GetByIdAsync(command.RoleId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns((RoleEntity?)null);
 
         // Act
@@ -178,7 +179,7 @@ public class UpdateRoleCommandHandlerTests
             .Returns(true);
         _mockRoleRepository.UpdateAsync(Arg.Any<RoleEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Updated);
-        _mockRoleRepository.GetByIdAsync(command.RoleId, Arg.Any<CancellationToken>())
+        _mockRoleRepository.GetByIdAsync(command.RoleId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(role);
 
         // Act

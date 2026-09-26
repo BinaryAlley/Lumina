@@ -43,6 +43,7 @@ public class LibraryScanQueuedDomainEventHandlerTests
     public LibraryScanQueuedDomainEventHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockLibraryScanRepository = Substitute.For<ILibraryScanRepository>();
         _mockUnitOfWork.LibraryScanRepository.Returns(_mockLibraryScanRepository);
         _mockMediaLibraryScanningService = Substitute.For<IMediaLibraryScanningService>();
@@ -63,7 +64,7 @@ public class LibraryScanQueuedDomainEventHandlerTests
         LibraryScanEntity scan = _libraryScanEntityFixture.Create(
             id: domainEvent.ScanId.Value,
             libraryId: domainEvent.LibraryId.Value);
-        _mockLibraryScanRepository.GetByIdAsync(scan.Id, Arg.Any<CancellationToken>())
+        _mockLibraryScanRepository.GetByIdAsync(scan.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryScanEntity?>(scan));
 
         // Act
@@ -82,7 +83,7 @@ public class LibraryScanQueuedDomainEventHandlerTests
         // Arrange
         LibraryScanQueuedDomainEvent domainEvent = _libraryScanQueuedDomainEventFixture.Create();
         Error error = Error.Failure(description: "Failed to get library scan");
-        _mockLibraryScanRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+        _mockLibraryScanRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(error);
 
         // Act
@@ -99,7 +100,7 @@ public class LibraryScanQueuedDomainEventHandlerTests
     {
         // Arrange
         LibraryScanQueuedDomainEvent domainEvent = _libraryScanQueuedDomainEventFixture.Create();
-        _mockLibraryScanRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+        _mockLibraryScanRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result<LibraryScanEntity?>.Success(null));
 
         // Act
@@ -119,7 +120,7 @@ public class LibraryScanQueuedDomainEventHandlerTests
         LibraryScanEntity scan = _libraryScanEntityFixture.Create(
             id: domainEvent.ScanId.Value,
             libraryId: domainEvent.LibraryId.Value);
-        _mockLibraryScanRepository.GetByIdAsync(scan.Id, Arg.Any<CancellationToken>())
+        _mockLibraryScanRepository.GetByIdAsync(scan.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryScanEntity?>(scan));
         Error error = Error.Failure(description: "Failed to start scan");
         _mockMediaLibraryScanningService.StartScanAsync(Arg.Any<LibraryScan>(), Arg.Any<LibraryType>(), Arg.Any<CancellationToken>())

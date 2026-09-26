@@ -6,6 +6,8 @@ using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Validation;
@@ -60,52 +62,54 @@ public class UpdateUserRoleAndPermissionsCommandHandler : ICommandHandler<Update
         if (validationResult.Count > 0)
             return validationResult;
 
-        // an authenticated request must always carry a user identity
+        // An authenticated request must always carry a user identity.
         Guid? currentUserId = _currentUserService.UserId;
         if (currentUserId is null)
             return ApplicationErrors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // only admins can update user authorizations
+        // Only admins can update user authorizations.
         bool isAdmin = await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false);
         if (!isAdmin)
             return ApplicationErrors.Authorization.NotAuthorized;
 
-        // get the user to update
-        Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByIdAsync(command.UserId, cancellationToken).ConfigureAwait(false);
+        // Get the user to update.
+        Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByIdAsync(command.UserId, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getUserResult.IsFailure || getUserResult.Value is null)
             return DomainErrors.Users.UserDoesNotExist;
 
         Result<RoleEntity?> getRoleResult = default;
         if (command.RoleId is not null)
         {
-            // get the new role
-            getRoleResult = await _unitOfWork.RoleRepository.GetByIdAsync(command.RoleId!.Value, cancellationToken).ConfigureAwait(false);
+            // Get the new role.
+            getRoleResult = await _unitOfWork.RoleRepository.GetByIdAsync(command.RoleId!.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
             if (getRoleResult.IsFailure || getRoleResult.Value is null)
                 return ApplicationErrors.Authorization.RoleNotFound;
 
-            // check if we're changing an admin's role and if this would leave us without admins
+            // Check if changing the role of an admin would leave the application without any admin.
             if (getUserResult.Value.UserRole?.Role.RoleName == "Admin" && getRoleResult.Value.RoleName != "Admin")
             {
-                // count how many admins we have
-                Result<IEnumerable<UserEntity>> getAllUsersResult = await _unitOfWork.UserRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+                // Count how many admins exist, so the last one is never demoted.
+                Result<PaginatedResultDto<UserEntity>> getAllUsersResult = await _unitOfWork.UserRepository.GetAllAsync<BaseFilterDto>(cancellationToken: cancellationToken).ConfigureAwait(false);
                 if (getAllUsersResult.IsFailure)
                     return getAllUsersResult.Errors;
 
-                int adminCount = getAllUsersResult.Value.Count(user => user.UserRole?.Role.RoleName == "Admin");
+                int adminCount = getAllUsersResult.Value.Data.Count(user => user.UserRole?.Role.RoleName == "Admin");
                 if (adminCount <= 1)
                     return ApplicationErrors.Authorization.CannotRemoveLastAdmin;
             }
         }
-        // get the permissions to assign
+
+        // Get the permissions to assign.
         Result<IEnumerable<PermissionEntity>> getPermissionsResult =
             await _unitOfWork.PermissionRepository.GetByIdsAsync(command.Permissions, cancellationToken).ConfigureAwait(false);
         if (getPermissionsResult.IsFailure)
             return getPermissionsResult.Errors;
 
-        // update the user
+        // Update the user.
         UserEntity userToUpdate = getUserResult.Value;
 
+        // Build the role link for the requested role, leaving the current role untouched when no role was provided.
         UserRoleEntity? userRole = default!;
         if (command.RoleId is not null)
         {
@@ -118,6 +122,7 @@ public class UpdateUserRoleAndPermissionsCommandHandler : ICommandHandler<Update
             };
         }
         
+        // Build the updated user by copying the unchanged fields and replacing the role and permissions with the requested ones.
         UserEntity updatedUser = new()
         {
             Id = userToUpdate.Id,
@@ -138,12 +143,14 @@ public class UpdateUserRoleAndPermissionsCommandHandler : ICommandHandler<Update
             LibraryScans = userToUpdate.LibraryScans
         };
 
-        // save changes and return result
+        // Save the changes and return the result.
         Result<Updated> updateResult = await _unitOfWork.UserRepository.UpdateAsync(updatedUser, cancellationToken).ConfigureAwait(false);
         if (updateResult.IsFailure)
             return updateResult.Errors;
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
 
         return new AuthorizationResponse(
             userToUpdate.Id,

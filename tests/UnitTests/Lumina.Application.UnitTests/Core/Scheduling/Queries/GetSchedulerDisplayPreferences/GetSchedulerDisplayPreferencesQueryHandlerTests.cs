@@ -42,6 +42,7 @@ public class GetSchedulerDisplayPreferencesQueryHandlerTests
     public GetSchedulerDisplayPreferencesQueryHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockSchedulerDisplayPreferencesRepository = Substitute.For<ISchedulerDisplayPreferencesRepository>();

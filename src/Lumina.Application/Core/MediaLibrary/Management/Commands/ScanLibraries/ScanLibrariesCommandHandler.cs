@@ -61,46 +61,46 @@ public class ScanLibrariesCommandHandler : ICommandHandler<ScanLibrariesCommand,
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<IEnumerable<MediaLibraryScanResponse>>> HandleAsync(ScanLibrariesCommand command, CancellationToken cancellationToken)
     {
-        // an authenticated request must always carry a user identity
+        // An authenticated request must always carry a user identity.
         Guid? currentUserId = _currentUserService.UserId;
         if (currentUserId is null)
             return Errors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // get all media libraries that are enabled and unlocked from the persistence medium
+        // Get all media libraries that are enabled and unlocked from the persistence medium.
         Result<IEnumerable<LibraryEntity>> getLibrariesResult = await _unitOfWork.LibraryRepository.GetAllEnabledAndUnlockedAsync(cancellationToken).ConfigureAwait(false);
         if (getLibrariesResult.IsFailure)
             return getLibrariesResult.Errors;
 
-        // convert persistence libraries to domain entities
+        // Convert persistence libraries to domain entities.
         IEnumerable<Result<Library>> domainEntitiesResult = getLibrariesResult.Value.ToDomainEntities();
 
-        // if the current user is not an admin, they can only scan the libraries that belong to them
+        // If the current user is not an admin, they can only scan the libraries that belong to them.
         if (!await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false))
             domainEntitiesResult = domainEntitiesResult.Where(libraryResult => libraryResult.Value.UserId.Value == userId);
 
         List<MediaLibraryScanResponse> responses = [];
         List<IDomainEvent> domainEvents = [];
 
-        // for each library, start the scan
+        // For each library, start the scan.
         foreach (Result<Library> domainLibraryResult in domainEntitiesResult)
         {
             if (domainLibraryResult.IsFailure)
                 return domainLibraryResult.Errors;
 
-            // get the past month's scans for this library
+            // Get the past month's scans for this library.
             Result<IEnumerable<LibraryScanEntity>> pastLibraryScansResult = 
                 await _unitOfWork.LibraryScanRepository.GetPastMonthScansByLibraryIdAsync(domainLibraryResult.Value.Id.Value, cancellationToken).ConfigureAwait(false);
             if (pastLibraryScansResult.IsFailure)
                 return pastLibraryScansResult.Errors;
 
-            // convert the repository scans history to domain objects
+            // Convert the repository scans history to domain objects.
             IEnumerable<Result<LibraryScan>> pastLibraryScansDomainResult = pastLibraryScansResult.Value.ToDomainEntities();
             foreach (Result<LibraryScan> pastLibraryScanDomainResult in pastLibraryScansDomainResult)
                 if (pastLibraryScanDomainResult.IsFailure)
                     return pastLibraryScanDomainResult.Errors;
 
-            // start the media library scan
+            // Start the media library scan.
             Result<LibraryScan> libraryScanResult = LibraryScan.Create(
                 LibraryId.Create(domainLibraryResult.Value.Id.Value),
                 UserId.Create(userId),
@@ -110,25 +110,27 @@ public class ScanLibrariesCommandHandler : ICommandHandler<ScanLibrariesCommand,
                 return libraryScanResult.Errors;
 
             Result<Success> startScanResult = libraryScanResult.Value.QueueScan();
-            // when the user demands a "scan all libraries" action, it would be annoying to receive an error if a library is already being scanned.
-            // instead, just don't start the scan on such a library, and start it on the others that can be started
+            // When the user demands a "scan all libraries" action, it would be annoying to receive an error if a library is already being scanned.
+            // Instead, just don't start the scan on such a library, and start it on the others that can be started.
             if (startScanResult.IsFailure)
                 continue; 
 
-            // add the library scan to the persistence medium
+            // Add the library scan to the persistence medium.
             Result<Created> insertLibraryScanResult = await _unitOfWork.LibraryScanRepository.InsertAsync(libraryScanResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
             if (insertLibraryScanResult.IsFailure)
                 return insertLibraryScanResult.Errors;
 
-            // collect all the domain events created during this library scan start
+            // Collect all the domain events created during this library scan start.
             domainEvents.AddRange(libraryScanResult.Value.GetDomainEvents());
            
             responses.Add(new MediaLibraryScanResponse(libraryScanResult.Value.Id.Value, domainLibraryResult.Value.Id.Value));
         }
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
 
-        // queue any domain events
+        // Queue any domain events.
         foreach (IDomainEvent domainEvent in domainEvents)
             _domainEventsQueue.Enqueue(domainEvent);
 

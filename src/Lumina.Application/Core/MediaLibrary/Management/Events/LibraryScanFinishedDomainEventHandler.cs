@@ -54,36 +54,38 @@ public class LibraryScanFinishedDomainEventHandler : IDomainEventHandler<Library
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public async ValueTask HandleAsync(LibraryScanFinishedDomainEvent domainEvent, CancellationToken cancellationToken)
     {
-        // get the library scan from the repository
+        // Get the library scan from the repository.
         Result<LibraryScanEntity?> getLibraryScansResult = await _unitOfWork.LibraryScanRepository.GetByIdAsync(
-            domainEvent.MediaLibraryScanCompositeId.ScanId.Value, cancellationToken).ConfigureAwait(false);
+            domainEvent.MediaLibraryScanCompositeId.ScanId.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getLibraryScansResult.IsFailure)
             throw new EventualConsistencyException(getLibraryScansResult.FirstError, getLibraryScansResult.Errors);
         if (getLibraryScansResult.Value is null)
             throw new EventualConsistencyException(Errors.LibraryScanning.LibraryScanNotFound);
 
-        // convert the repository scan to a domain object
+        // Convert the repository scan to a domain object.
         Result<LibraryScan> libraryScanDomainResult = getLibraryScansResult.Value.ToDomainEntity();
         if (libraryScanDomainResult.IsFailure)
             throw new EventualConsistencyException(libraryScanDomainResult.FirstError, libraryScanDomainResult.Errors);
 
-        // mark the media library scan as finished
+        // Mark the media library scan as finished.
         Result<Success> finishScanResult = libraryScanDomainResult.Value.FinishScan();
         if (finishScanResult.IsFailure)
             throw new EventualConsistencyException(finishScanResult.FirstError, finishScanResult.Errors);
 
-        // update the library scan in the repository
+        // Update the library scan in the repository.
         Result<Updated> updateLibraryScanResult = await _unitOfWork.LibraryScanRepository.UpdateAsync(libraryScanDomainResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
         if (updateLibraryScanResult.IsFailure)
             throw new EventualConsistencyException(updateLibraryScanResult.FirstError, updateLibraryScanResult.Errors);
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            throw new EventualConsistencyException(saveChangesResult.FirstError, saveChangesResult.Errors);
 
-        // mark the scan progress as finished
+        // Mark the scan progress as finished.
         _mediaLibrariesScanProgressTracker.UpdateScanProgress(libraryScanDomainResult.Value.LibraryId, domainEvent.MediaLibraryScanCompositeId);
-        // notify SignalR clients that the library scan finished
+        // Notify SignalR clients that the library scan finished.
         await _debouncedLibraryScanProgressNotifier.SendLibraryScanFinishedEventAsync(domainEvent.MediaLibraryScanCompositeId, cancellationToken).ConfigureAwait(false);
-        // only when everything is done, this needs to be called in order to dispose cancellation token sources, etc
+        // Only when everything is done, this needs to be called in order to dispose cancellation token sources, etc.
         _mediaLibrariesScanCancellationTracker.RemoveScan(domainEvent.MediaLibraryScanCompositeId);
     }
 }

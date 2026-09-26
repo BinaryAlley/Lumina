@@ -34,6 +34,7 @@ public class LibraryScanStartedDomainEventHandlerTests
     public LibraryScanStartedDomainEventHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockLibraryScanRepository = Substitute.For<ILibraryScanRepository>();
         _mockUnitOfWork.LibraryScanRepository.Returns(_mockLibraryScanRepository);
         _mockLibraryScanRepository.UpdateAsync(Arg.Any<LibraryScanEntity>(), Arg.Any<CancellationToken>())

@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Common.DataAccess.Repositories.Books;
+using Lumina.Application.Common.DataAccess.Repositories.BookLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Core.MediaLibrary.Management.Events;
@@ -68,15 +68,15 @@ public class LibraryMediaItemDeletedDomainEventHandlerTests
         LibraryEntity library = _libraryEntityFixture.Create(id: libraryId.Value, title: "My Library");
         _mockBookRepository.GetByPathAsync(libraryId.Value, book.Path, Arg.Any<CancellationToken>())
             .Returns(Result.From<BookEntity?>(book));
-        _mockLibraryRepository.GetByIdAsync(libraryId.Value, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(libraryId.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
         _mockBookRepository.GetAuthorsDisplayNamesByBookIdsAsync(Arg.Any<IReadOnlyCollection<Guid>>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyDictionary<Guid, string?>>(new Dictionary<Guid, string?> { [book.Id] = "Frank Herbert" }));
-        _mockBookRepository.DeleteAsync(book.Id, Arg.Any<CancellationToken>())
+        _mockBookRepository.DeleteByIdAsync(book.Id, Arg.Any<CancellationToken>())
             .Returns(Result.From(Result.Deleted));
         _mockBookArtworkService.DeleteBookArtwork(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>())
             .Returns(Result.Deleted);
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
 
         LibraryMediaItemDeletedDomainEvent domainEvent = _libraryMediaItemDeletedDomainEventFixture.Create(libraryId: libraryId, path: book.Path);
 
@@ -85,7 +85,7 @@ public class LibraryMediaItemDeletedDomainEventHandlerTests
 
         // Assert
         _mockBookArtworkService.Received(1).DeleteBookArtwork(libraryId.Value, book.Id, "My Library", "Frank Herbert", book.Title);
-        await _mockBookRepository.Received(1).DeleteAsync(book.Id, Arg.Any<CancellationToken>());
+        await _mockBookRepository.Received(1).DeleteByIdAsync(book.Id, Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -104,7 +104,7 @@ public class LibraryMediaItemDeletedDomainEventHandlerTests
 
         // Assert
         _mockBookArtworkService.DidNotReceive().DeleteBookArtwork(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>());
-        await _mockBookRepository.DidNotReceive().DeleteAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockBookRepository.DidNotReceive().DeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -117,15 +117,15 @@ public class LibraryMediaItemDeletedDomainEventHandlerTests
         LibraryEntity library = _libraryEntityFixture.Create(id: libraryId.Value, title: "My Library");
         _mockBookRepository.GetByPathAsync(libraryId.Value, book.Path, Arg.Any<CancellationToken>())
             .Returns(Result.From<BookEntity?>(book));
-        _mockLibraryRepository.GetByIdAsync(libraryId.Value, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(libraryId.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
         _mockBookRepository.GetAuthorsDisplayNamesByBookIdsAsync(Arg.Any<IReadOnlyCollection<Guid>>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyDictionary<Guid, string?>>(new Dictionary<Guid, string?> { [book.Id] = "Frank Herbert" }));
         _mockBookArtworkService.DeleteBookArtwork(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>())
             .Returns(Error.Failure("Artwork.DeleteFailed", "Failed to delete the stored artwork"));
-        _mockBookRepository.DeleteAsync(book.Id, Arg.Any<CancellationToken>())
+        _mockBookRepository.DeleteByIdAsync(book.Id, Arg.Any<CancellationToken>())
             .Returns(Result.From(Result.Deleted));
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
 
         LibraryMediaItemDeletedDomainEvent domainEvent = _libraryMediaItemDeletedDomainEventFixture.Create(libraryId: libraryId, path: book.Path);
 
@@ -134,7 +134,7 @@ public class LibraryMediaItemDeletedDomainEventHandlerTests
 
         // Assert
         // a failing artwork deletion must not prevent the book from being removed, so the deletion is only logged
-        await _mockBookRepository.Received(1).DeleteAsync(book.Id, Arg.Any<CancellationToken>());
+        await _mockBookRepository.Received(1).DeleteByIdAsync(book.Id, Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -155,7 +155,7 @@ public class LibraryMediaItemDeletedDomainEventHandlerTests
 
         // Assert
         Assert.Equal(error, exception.EventualConsistencyError);
-        await _mockBookRepository.DidNotReceive().DeleteAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockBookRepository.DidNotReceive().DeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -167,14 +167,14 @@ public class LibraryMediaItemDeletedDomainEventHandlerTests
         LibraryEntity library = _libraryEntityFixture.Create(id: libraryId.Value, title: "My Library");
         _mockBookRepository.GetByPathAsync(libraryId.Value, book.Path, Arg.Any<CancellationToken>())
             .Returns(Result.From<BookEntity?>(book));
-        _mockLibraryRepository.GetByIdAsync(libraryId.Value, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(libraryId.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
         _mockBookRepository.GetAuthorsDisplayNamesByBookIdsAsync(Arg.Any<IReadOnlyCollection<Guid>>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyDictionary<Guid, string?>>(new Dictionary<Guid, string?> { [book.Id] = "Frank Herbert" }));
         _mockBookArtworkService.DeleteBookArtwork(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>())
             .Returns(Result.Deleted);
         Error error = Error.Failure("Database.Error", "Failed to delete the book");
-        _mockBookRepository.DeleteAsync(book.Id, Arg.Any<CancellationToken>())
+        _mockBookRepository.DeleteByIdAsync(book.Id, Arg.Any<CancellationToken>())
             .Returns(error);
 
         LibraryMediaItemDeletedDomainEvent domainEvent = _libraryMediaItemDeletedDomainEventFixture.Create(libraryId: libraryId, path: book.Path);

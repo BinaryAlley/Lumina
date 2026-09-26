@@ -87,21 +87,21 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
         if (validationResult.Count > 0)
             return validationResult;
 
-        // an authenticated request must always carry a user identity
+        // An authenticated request must always carry a user identity.
         Guid? currentUserId = _currentUserService.UserId;
         if (currentUserId is null)
             return ApplicationErrors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // get a library repository and retrieve the library to update
-        Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
+        // Get a library repository and retrieve the library to update.
+        Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(command.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getLibraryResult.IsFailure)
             return getLibraryResult.Errors;
         else if (getLibraryResult.Value is null)
             return DomainErrors.Library.LibraryNotFound;
 
-        // make sure the file is an actual supported image, but only when a new cover image was chosen; the stored cover image is
-        // relative to the application base directory and is already validated, so it must not block saving unrelated changes
+        // Make sure the file is an actual supported image, but only when a new cover image was chosen; the stored cover image is
+        // relative to the application base directory and is already validated, so it must not block saving unrelated changes.
         if (command.CoverImage is not null && command.CoverImage != getLibraryResult.Value.CoverImage)
         {
             Result<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(command.CoverImage);
@@ -115,14 +115,14 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
                 return DomainErrors.Library.CoverFileMustBeAnImage;
         }
 
-        // admins or users with the permission to manage media libraries can update any library; other users can only update the libraries they own
+        // Admins or users with the permission to manage media libraries can update any library; other users can only update the libraries they own.
         bool hasManagePermission = await _authorizationService.HasPermissionAsync(userId, AuthorizationPermission.CanCreateLibraries, cancellationToken).ConfigureAwait(false);
         bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
             userId, new LibraryOwnershipPolicyContext(command.Id), cancellationToken).ConfigureAwait(false);
         if (!hasManagePermission && !canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
-        // create a domain library object
+        // Create a domain library object.
         LibraryType newLibraryType = Enum.Parse<LibraryType>(command.LibraryType!);
         Result<Library> createLibraryResult = Library.Create(
             LibraryId.Create(command.Id),
@@ -130,7 +130,7 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
             command.Title!,
             newLibraryType,
             command.ContentLocations!,
-            command.CoverImage,
+            Optional<string>.FromNullable(command.CoverImage),
             command.IsEnabled,
             command.IsLocked,
             command.CanDownloadMetadataFromWeb,
@@ -140,11 +140,11 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
         );
         if (createLibraryResult.IsFailure)
             return createLibraryResult.Errors;
-        // convert the domain library entity to a repository library entity
+        // Convert the domain library entity to a repository library entity.
         LibraryEntity persistenceLibrary = createLibraryResult.Value.ToRepositoryEntity();
 
-        // update the repository entity, and when the library type changed, reconcile the provider configurations so that
-        // they match the plugins supporting the new type, and save the changes
+        // Update the repository entity, and when the library type changed, reconcile the provider configurations so that
+        // they match the plugins supporting the new type, and save the changes.
         Result<Updated> updateLibraryResult = await _unitOfWork.LibraryRepository.UpdateAsync(persistenceLibrary, cancellationToken).ConfigureAwait(false);
         if (updateLibraryResult.IsFailure)
             return updateLibraryResult.Errors;
@@ -154,19 +154,21 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
             if (reconcileResult.IsFailure)
                 return reconcileResult.Errors;
         }
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
 
-        // retrieve the updated media library from the persistence medium and return it
-        Result<LibraryEntity?> getCreatedLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(createLibraryResult.Value.Id.Value, cancellationToken).ConfigureAwait(false);
+        // Retrieve the updated media library from the persistence medium and return it.
+        Result<LibraryEntity?> getCreatedLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(createLibraryResult.Value.Id.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getCreatedLibraryResult.IsFailure)
             return getCreatedLibraryResult.Errors;
         if (getCreatedLibraryResult.Value is null)
             return ApplicationErrors.Persistence.ErrorPersistingMediaLibrary;
 
-        // mark the media library as saved
+        // Mark the media library as saved.
         createLibraryResult.Value.Save();
 
-        // queue any domain events
+        // Queue any domain events.
         foreach (IDomainEvent domainEvent in createLibraryResult.Value.GetDomainEvents())
             _domainEventsQueue.Enqueue(domainEvent);
 

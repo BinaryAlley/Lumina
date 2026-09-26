@@ -8,6 +8,7 @@ using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.DataAccess.Common.DependencyInjection;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.DataAccess.UnitTests.Common.Setup;
+using Lumina.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
@@ -96,9 +97,11 @@ public class UnitOfWorkTests
         CancellationToken cancellationToken = new();
 
         // Act
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+        Result<Success> result = await unitOfWork.SaveChangesAsync(cancellationToken);
 
         // Assert
+        Assert.True(result.IsSuccess);
+        Assert.Equal(Result.Success, result.Value);
         await dbContext.Received(1).SaveChangesAsync(cancellationToken);
     }
 

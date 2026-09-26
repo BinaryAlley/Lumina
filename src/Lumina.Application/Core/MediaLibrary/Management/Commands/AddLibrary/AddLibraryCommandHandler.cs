@@ -83,18 +83,18 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Resul
         if (validationResult.Count > 0)
             return validationResult;
 
-        // an authenticated request must always carry a user identity
+        // An authenticated request must always carry a user identity.
         Guid? currentUserId = _currentUserService.UserId;
         if (currentUserId is null)
             return ApplicationErrors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // only admins or users with the permission to manage media libraries can create them
+        // Only admins or users with the permission to manage media libraries can create them.
         if (!await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false) &&
             !await _authorizationService.HasPermissionAsync(userId, AuthorizationPermission.CanCreateLibraries, cancellationToken).ConfigureAwait(false))
             return ApplicationErrors.Authorization.NotAuthorized;
 
-        // make sure the file is an actual supported image
+        // Make sure the file is an actual supported image.
         if (command.CoverImage is not null)
         {
             Result<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(command.CoverImage);
@@ -108,13 +108,13 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Resul
                 return DomainErrors.Library.CoverFileMustBeAnImage;
         }
 
-        // create a domain library object
+        // Create a domain library object.
         Result<Library> createLibraryResult = Library.Create(
             UserId.Create(userId),
             command.Title!,
             Enum.Parse<LibraryType>(command.LibraryType!),
             command.ContentLocations!,
-            command.CoverImage,
+            Optional<string>.FromNullable(command.CoverImage),
             command.IsEnabled,
             command.IsLocked,
             command.CanDownloadMetadataFromWeb,
@@ -126,10 +126,10 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Resul
         if (createLibraryResult.IsFailure)
             return createLibraryResult.Errors;
 
-        // convert the domain library entity to a repository library entity
+        // Convert the domain library entity to a repository library entity.
         LibraryEntity persistenceLibrary = createLibraryResult.Value.ToRepositoryEntity();
-        // insert the repository entity, seed the provider configurations of the new library so that it lists the plugins
-        // providing metadata or artwork for its type, and save the changes
+        // Insert the repository entity, seed the provider configurations of the new library so that it lists the plugins
+        // providing metadata or artwork for its type, and save the changes.
         Result<Created> insertLibraryResult = await _unitOfWork.LibraryRepository.InsertAsync(persistenceLibrary, cancellationToken).ConfigureAwait(false);
         if (insertLibraryResult.IsFailure)
             return insertLibraryResult.Errors;
@@ -137,19 +137,22 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Resul
             createLibraryResult.Value.Id.Value, Enum.Parse<LibraryType>(command.LibraryType!), cancellationToken).ConfigureAwait(false);
         if (ensureProviderConfigurationsResult.IsFailure)
             return ensureProviderConfigurationsResult.Errors;
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
-        // retrieve the newly saved media library from the persistence medium and return it
-        Result<LibraryEntity?> getCreatedLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(createLibraryResult.Value.Id.Value, cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
+
+        // Retrieve the newly saved media library from the persistence medium and return it.
+        Result<LibraryEntity?> getCreatedLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(createLibraryResult.Value.Id.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getCreatedLibraryResult.IsFailure)
             return getCreatedLibraryResult.Errors;
         if (getCreatedLibraryResult.Value is null)
             return ApplicationErrors.Persistence.ErrorPersistingMediaLibrary;
 
-        // mark the media library as saved
+        // Mark the media library as saved.
         createLibraryResult.Value.Save();
         
-        // queue any domain events
+        // Queue any domain events.
         foreach (IDomainEvent domainEvent in createLibraryResult.Value.GetDomainEvents())
             _domainEventsQueue.Enqueue(domainEvent);
 

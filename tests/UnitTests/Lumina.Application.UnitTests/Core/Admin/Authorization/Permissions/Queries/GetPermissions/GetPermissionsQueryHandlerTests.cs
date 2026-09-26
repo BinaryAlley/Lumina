@@ -2,6 +2,8 @@
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
@@ -46,6 +48,7 @@ public class GetPermissionsQueryHandlerTests
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockPermissionRepository = Substitute.For<IPermissionRepository>();
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _userId = Guid.NewGuid();
 
         _mockCurrentUserService.UserId.Returns(_userId);
@@ -62,7 +65,7 @@ public class GetPermissionsQueryHandlerTests
     {
         // Arrange
         GetPermissionsQuery query = _getPermissionsQueryFixture.Create();
-        IEnumerable<PermissionEntity> permissions =
+        List<PermissionEntity> permissions =
         [
             _permissionEntityFixture.Create(permissionName: AuthorizationPermission.CanViewUsers),
             _permissionEntityFixture.Create(permissionName: AuthorizationPermission.CanDeleteUsers)
@@ -70,8 +73,8 @@ public class GetPermissionsQueryHandlerTests
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
-        _mockPermissionRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(Result.From(permissions));
+        _mockPermissionRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(new PaginatedResultDto<PermissionEntity> { Data = permissions, CurrentPage = 1, PerPage = permissions.Count, Count = permissions.Count, NumberOfPages = 1 }));
 
         // Act
         Result<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
@@ -80,7 +83,7 @@ public class GetPermissionsQueryHandlerTests
         Assert.False(result.IsFailure);
         Assert.Equal(2, result.Value.Count());
         await _mockAuthorizationService.Received(1).IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>());
-        await _mockPermissionRepository.Received(1).GetAllAsync(Arg.Any<CancellationToken>());
+        await _mockPermissionRepository.Received(1).GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -99,7 +102,7 @@ public class GetPermissionsQueryHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authorization.NotAuthorized, result.FirstError);
         await _mockAuthorizationService.Received(1).IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>());
-        await _mockPermissionRepository.DidNotReceive().GetAllAsync(Arg.Any<CancellationToken>());
+        await _mockPermissionRepository.DidNotReceive().GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -116,7 +119,7 @@ public class GetPermissionsQueryHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authorization.NotAuthorized, result.FirstError);
         await _mockAuthorizationService.DidNotReceive().IsInRoleAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
-        await _mockPermissionRepository.DidNotReceive().GetAllAsync(Arg.Any<CancellationToken>());
+        await _mockPermissionRepository.DidNotReceive().GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -128,7 +131,7 @@ public class GetPermissionsQueryHandlerTests
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
-        _mockPermissionRepository.GetAllAsync(Arg.Any<CancellationToken>())
+        _mockPermissionRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
             .Returns(error);
 
         // Act
@@ -138,7 +141,7 @@ public class GetPermissionsQueryHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
         await _mockAuthorizationService.Received(1).IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>());
-        await _mockPermissionRepository.Received(1).GetAllAsync(Arg.Any<CancellationToken>());
+        await _mockPermissionRepository.Received(1).GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -146,7 +149,7 @@ public class GetPermissionsQueryHandlerTests
     {
         // Arrange
         GetPermissionsQuery query = _getPermissionsQueryFixture.Create();
-        IEnumerable<PermissionEntity> permissions =
+        List<PermissionEntity> permissions =
         [
             _permissionEntityFixture.Create(permissionName: AuthorizationPermission.CanViewUsers)
         ];
@@ -154,8 +157,8 @@ public class GetPermissionsQueryHandlerTests
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
-        _mockPermissionRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(Result.From(permissions));
+        _mockPermissionRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(new PaginatedResultDto<PermissionEntity> { Data = permissions, CurrentPage = 1, PerPage = permissions.Count, Count = permissions.Count, NumberOfPages = 1 }));
 
         // Act
         Result<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, cancellationToken);
@@ -164,6 +167,6 @@ public class GetPermissionsQueryHandlerTests
         Assert.False(result.IsFailure);
         Assert.Single(result.Value);
         await _mockAuthorizationService.Received(1).IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>());
-        await _mockPermissionRepository.Received(1).GetAllAsync(Arg.Any<CancellationToken>());
+        await _mockPermissionRepository.Received(1).GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>());
     }
 }

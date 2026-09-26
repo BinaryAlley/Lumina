@@ -58,18 +58,18 @@ public class AddRoleCommandHandler : ICommandHandler<AddRoleCommand, Result<Role
         if (validationResult.Count > 0)
             return validationResult;
 
-        // an authenticated request must always carry a user identity
+        // An authenticated request must always carry a user identity.
         Guid? currentUserId = _currentUserService.UserId;
         if (currentUserId is null)
             return Errors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // only admins can create authorization roles
+        // Only admins can create authorization roles.
         bool isAdmin = await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false);
         if (!isAdmin)
             return Errors.Authorization.NotAuthorized;
 
-        // create the new role, with its permissions
+        // Create the new role, with its permissions.
         RoleEntity newRole = new()
         {
             RoleName = request.RoleName,
@@ -81,12 +81,16 @@ public class AddRoleCommandHandler : ICommandHandler<AddRoleCommand, Result<Role
                 RoleId = default
             })]
         };
-        // save the new role in the repository
+        // Save the new role in the repository.
         Result<Created> insertRoleResult = await _unitOfWork.RoleRepository.InsertAsync(newRole, cancellationToken).ConfigureAwait(false);
         if (insertRoleResult.IsFailure)
             return insertRoleResult.Errors;
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        // retrieve the newly saved authorization role from the persistence medium and return it
+
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
+
+        // Retrieve the newly saved authorization role from the persistence medium and return it.
         Result<RoleEntity?> getRoleResult = await _unitOfWork.RoleRepository.GetByNameAsync(request.RoleName, cancellationToken).ConfigureAwait(false);
         if (getRoleResult.IsFailure)
             return getRoleResult.Errors;

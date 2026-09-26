@@ -73,12 +73,14 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, R
         if (validationResult.Count > 0)
             return validationResult;
 
-        // check if any users already exists (admin account is only set once!)
+        // Check if a user with this username already exists, since the admin account can only be created once.
         Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByUsernameAsync(command.Username!, cancellationToken).ConfigureAwait(false);
         if (getUserResult.IsFailure)
             return getUserResult.Errors;
         else if (getUserResult.Value is not null)
             return Errors.Authentication.UsernameAlreadyExists;
+
+        // Build the account, hashing the password and URI escaping it the same way as the stored form.
         string? totpSecret = null;
         Guid id = Guid.NewGuid();
         UserEntity user = new()
@@ -93,23 +95,29 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, R
             CreatedBy = id,
             LibraryScans = [],
         };
-        // if the user enabled two factor auth, include a QR with the totp secret
+
+        // If the user enabled two factor authentication, include a QR code with the TOTP secret.
         if (command.Use2fa)
         {
-            // generate a TOTP secret
+            // Generate a TOTP secret.
             byte[] secret = _totpTokenGenerator.GenerateSecret();
-            // convert the secret into a QR code for the user to scan
+            // Convert the secret into a QR code for the user to scan.
             totpSecret = _qRCodeGenerator.GenerateQrCodeDataUri(command.Username!, secret);
-            // store the TOTP secret in the repository, encrypted
+            // Store the TOTP secret in the repository, encrypted.
             user.TotpSecret = _cryptographyService.Encrypt(Convert.ToBase64String(secret));
         }
-        // insert the user
+
+        // Insert the user and persist the change.
         Result<Created> insertUserResult = await _unitOfWork.UserRepository.InsertAsync(user, cancellationToken).ConfigureAwait(false);
         if (insertUserResult.IsFailure)
             return insertUserResult.Errors;
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        // TODO: insert the default admin profile preferences when they are implemented
-        // if 2FA was enabled, the TOTP secret needs to be delivered to the client unhashed, so it can be displayed 
+
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
+
+        // TODO: Insert the default admin profile preferences when they are implemented.
+        // If 2FA was enabled, the TOTP secret needs to be delivered to the client unencrypted, so it can be displayed.
         return new RegistrationResponse(user.Id, user.Username, totpSecret);
     }
 }

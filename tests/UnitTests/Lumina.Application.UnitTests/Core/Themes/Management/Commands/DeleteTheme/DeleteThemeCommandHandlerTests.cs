@@ -2,6 +2,8 @@
 using Lumina.Application.Common.DataAccess.Entities.Themes;
 using Lumina.Application.Common.DataAccess.Repositories.Themes;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Themes;
@@ -47,6 +49,7 @@ public class DeleteThemeCommandHandlerTests
     public DeleteThemeCommandHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockThemeService = Substitute.For<IThemeService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
@@ -185,7 +188,7 @@ public class DeleteThemeCommandHandlerTests
         Error error = Error.Failure("Database.Error", "Failed to get all themes");
         _mockThemeRepository.GetByThemeIdAsync(command.ThemeId!, Arg.Any<CancellationToken>())
             .Returns(Result.From<ThemeEntity?>(theme));
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>())
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
             .Returns(error);
 
         // Act
@@ -206,8 +209,8 @@ public class DeleteThemeCommandHandlerTests
         ThemeEntity userTheme = _themeEntityFixture.Create(installSource: ThemeInstallSource.Uploaded, isDeleted: false);
         _mockThemeRepository.GetByThemeIdAsync(command.ThemeId!, Arg.Any<CancellationToken>())
             .Returns(Result.From<ThemeEntity?>(theme));
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(Result.From<IEnumerable<ThemeEntity>>([theme, userTheme]));
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [theme, userTheme], CurrentPage = 1, PerPage = 2, Count = 2, NumberOfPages = 1 }));
 
         // Act
         Result<Success> result = await _sut.HandleAsync(command, CancellationToken.None);
@@ -228,8 +231,8 @@ public class DeleteThemeCommandHandlerTests
         ThemeEntity theme = _themeEntityFixture.Create(themeId: command.ThemeId, installSource: ThemeInstallSource.Uploaded, isCurrent: true, includeIsCurrent: true, isDeleted: false);
         _mockThemeRepository.GetByThemeIdAsync(command.ThemeId!, Arg.Any<CancellationToken>())
             .Returns(Result.From<ThemeEntity?>(theme));
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(Result.From<IEnumerable<ThemeEntity>>([theme]));
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [theme], CurrentPage = 1, PerPage = 1, Count = 1, NumberOfPages = 1 }));
 
         // Act
         Result<Success> result = await _sut.HandleAsync(command, CancellationToken.None);
@@ -251,8 +254,8 @@ public class DeleteThemeCommandHandlerTests
         ThemeEntity otherBundledTheme = _themeEntityFixture.Create(installSource: ThemeInstallSource.Bundled, isDeleted: false);
         _mockThemeRepository.GetByThemeIdAsync(command.ThemeId!, Arg.Any<CancellationToken>())
             .Returns(Result.From<ThemeEntity?>(theme));
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(Result.From<IEnumerable<ThemeEntity>>([theme, otherBundledTheme]));
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [theme, otherBundledTheme], CurrentPage = 1, PerPage = 2, Count = 2, NumberOfPages = 1 }));
         _mockThemeRepository.UpdateAsync(Arg.Any<ThemeEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Updated);
 
@@ -278,8 +281,8 @@ public class DeleteThemeCommandHandlerTests
         ThemeEntity bundledTheme = _themeEntityFixture.Create(installSource: ThemeInstallSource.Bundled, isDeleted: false);
         _mockThemeRepository.GetByThemeIdAsync(command.ThemeId!, Arg.Any<CancellationToken>())
             .Returns(Result.From<ThemeEntity?>(theme));
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(Result.From<IEnumerable<ThemeEntity>>([theme, bundledTheme]));
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [theme, bundledTheme], CurrentPage = 1, PerPage = 2, Count = 2, NumberOfPages = 1 }));
         _mockThemeRepository.DeleteByIdAsync(theme.Id, Arg.Any<CancellationToken>())
             .Returns(Result.Deleted);
 
@@ -304,8 +307,8 @@ public class DeleteThemeCommandHandlerTests
         Error error = Error.Failure("Database.Error", "Failed to delete theme");
         _mockThemeRepository.GetByThemeIdAsync(command.ThemeId!, Arg.Any<CancellationToken>())
             .Returns(Result.From<ThemeEntity?>(theme));
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(Result.From<IEnumerable<ThemeEntity>>([theme, bundledTheme]));
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [theme, bundledTheme], CurrentPage = 1, PerPage = 2, Count = 2, NumberOfPages = 1 }));
         _mockThemeRepository.DeleteByIdAsync(theme.Id, Arg.Any<CancellationToken>())
             .Returns(error);
 
@@ -329,8 +332,8 @@ public class DeleteThemeCommandHandlerTests
         _mockThemeService.DefaultThemeId.Returns(replacementTheme.ThemeId);
         _mockThemeRepository.GetByThemeIdAsync(command.ThemeId!, Arg.Any<CancellationToken>())
             .Returns(Result.From<ThemeEntity?>(theme));
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(Result.From<IEnumerable<ThemeEntity>>([theme, replacementTheme]));
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [theme, replacementTheme], CurrentPage = 1, PerPage = 2, Count = 2, NumberOfPages = 1 }));
         _mockThemeRepository.UpdateAsync(Arg.Any<ThemeEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Updated);
 
@@ -360,8 +363,8 @@ public class DeleteThemeCommandHandlerTests
         _mockThemeService.DefaultThemeId.Returns("no-such-default");
         _mockThemeRepository.GetByThemeIdAsync(command.ThemeId!, Arg.Any<CancellationToken>())
             .Returns(Result.From<ThemeEntity?>(theme));
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(Result.From<IEnumerable<ThemeEntity>>([theme, betaTheme, alphaTheme]));
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [theme, betaTheme, alphaTheme], CurrentPage = 1, PerPage = 3, Count = 3, NumberOfPages = 1 }));
         _mockThemeRepository.UpdateAsync(Arg.Any<ThemeEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Updated);
 
@@ -388,8 +391,8 @@ public class DeleteThemeCommandHandlerTests
         Error error = Error.Failure("Theme.DeleteFailed", "Failed to delete theme files");
         _mockThemeRepository.GetByThemeIdAsync(command.ThemeId!, Arg.Any<CancellationToken>())
             .Returns(Result.From<ThemeEntity?>(theme));
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(Result.From<IEnumerable<ThemeEntity>>([theme, bundledTheme]));
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [theme, bundledTheme], CurrentPage = 1, PerPage = 2, Count = 2, NumberOfPages = 1 }));
         _mockThemeRepository.DeleteByIdAsync(theme.Id, Arg.Any<CancellationToken>())
             .Returns(Result.Deleted);
         _mockThemeService.DeleteAsync(theme.ThemeId, Arg.Any<CancellationToken>())

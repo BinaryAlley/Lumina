@@ -49,7 +49,11 @@ public class UpdatePluginSettingsCommandHandler : ICommandHandler<UpdatePluginSe
         Result<Updated> updateResult = await _unitOfWork.PluginRepository.UpdateSettingsAsync(command.PluginId, settingsJson, cancellationToken).ConfigureAwait(false);
         if (updateResult.IsFailure)
             return updateResult.Errors;
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
+
         return Result.Success;
     }
 }

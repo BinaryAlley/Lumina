@@ -58,53 +58,55 @@ public class CancelLibrariesScanCommandHandler : ICommandHandler<CancelLibraries
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Success>> HandleAsync(CancelLibrariesScanCommand command, CancellationToken cancellationToken)
     {
-        // an authenticated request must always carry a user identity
+        // An authenticated request must always carry a user identity.
         Guid? currentUserId = _currentUserService.UserId;
         if (currentUserId is null)
             return Errors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // get the running library scans of the current user from the repository
+        // Get the running library scans of the current user from the repository.
         Result<IEnumerable<LibraryScanEntity>> getRunningLibraryScansResult = await _unitOfWork.LibraryScanRepository.GetRunningScansAsync(cancellationToken).ConfigureAwait(false);
         if (getRunningLibraryScansResult.IsFailure)
             return getRunningLibraryScansResult.Errors;
 
-        // filter the library scans to process
+        // Filter the library scans to process.
         List<LibraryScanEntity> authorizedLibraryScans = [];
-        // admins can see all library scans
+        // Admins can see all library scans.
         if (await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false))
             authorizedLibraryScans.AddRange(getRunningLibraryScansResult.Value);
-        else // for regular users, only take the library scans that belong to them
+        else // For regular users, only take the library scans that belong to them.
             authorizedLibraryScans.AddRange(getRunningLibraryScansResult.Value.Where(libraryScan => libraryScan.UserId == userId));
 
-        // convert persistence library scans to domain entities
+        // Convert persistence library scans to domain entities.
         IEnumerable<Result<LibraryScan>> libraryScansDomainResult = authorizedLibraryScans.ToDomainEntities();
 
         List<IDomainEvent> domainEvents = [];
 
-        // for each library scan, perform the cancellation
+        // For each library scan, perform the cancellation.
         foreach (Result<LibraryScan> libraryScanDomainResult in libraryScansDomainResult)
         {
             if (libraryScanDomainResult.IsFailure)
                 return libraryScanDomainResult.Errors;
 
-            // cancel the media library scan
+            // Cancel the media library scan.
             Result<Success> cancelScanResult = libraryScanDomainResult.Value.CancelScan();
             if (cancelScanResult.IsFailure)
                 return cancelScanResult.Errors;
 
-            // update the status of the library scan in the repository
+            // Update the status of the library scan in the repository.
             Result<Updated> updateLibraryScanResult = await _unitOfWork.LibraryScanRepository.UpdateAsync(libraryScanDomainResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
             if (updateLibraryScanResult.IsFailure)
                 return updateLibraryScanResult.Errors;
 
-            // collect all the domain events created during this library scan start
+            // Collect all the domain events created during this library scan start.
             domainEvents.AddRange(libraryScanDomainResult.Value.GetDomainEvents());
         }
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
 
-        // queue any domain events
+        // Queue any domain events.
         foreach (IDomainEvent domainEvent in domainEvents)
             _domainEventsQueue.Enqueue(domainEvent);
 

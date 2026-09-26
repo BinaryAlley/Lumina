@@ -1,20 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
+using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Contracts.Responses.Authorization;
+using Lumina.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Lumina.Application.Common.Mapping.Authorization;
-using Lumina.Application.Common.Infrastructure.Authorization;
 #endregion
 
 namespace Lumina.Application.Core.Admin.Authorization.Roles.Commands.DeleteRole;
@@ -56,7 +52,7 @@ public class DeleteRoleCommandHandler : ICommandHandler<DeleteRoleCommand, Resul
         if (validationResult.Count > 0)
             return validationResult;
 
-        // an authenticated request must always carry a user identity
+        // An authenticated request must always carry a user identity.
         Guid? currentUserId = _currentUserService.UserId;
         if (currentUserId is null)
             return Errors.Authorization.NotAuthorized;
@@ -67,19 +63,24 @@ public class DeleteRoleCommandHandler : ICommandHandler<DeleteRoleCommand, Resul
         if (!isAdmin)
             return Errors.Authorization.NotAuthorized;
 
-        // check if a role with the requested Id exists
-        Result<RoleEntity?> getExistingRoleResult = await _unitOfWork.RoleRepository.GetByIdAsync(command.RoleId, cancellationToken).ConfigureAwait(false);
+        // Check if a role with the requested Id exists.
+        Result<RoleEntity?> getExistingRoleResult = await _unitOfWork.RoleRepository.GetByIdAsync(command.RoleId, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getExistingRoleResult.IsFailure)
             return getExistingRoleResult.Errors;
         else if (getExistingRoleResult.Value is null)
             return Errors.Authorization.RoleNotFound;
         else if (getExistingRoleResult.Value.RoleName == "Admin")
             return Errors.Authorization.AdminRoleCannotBeDeleted;
-        // delete the role and its permissions
+
+        // Delete the role and its permissions.
         Result<Deleted> deleteRoleResult = await _unitOfWork.RoleRepository.DeleteByIdAsync(command.RoleId, cancellationToken).ConfigureAwait(false);
         if (deleteRoleResult.IsFailure)
             return deleteRoleResult.Errors;
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        return deleteRoleResult.Value;
+
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
+
+        return Result.Deleted;
     }
 }

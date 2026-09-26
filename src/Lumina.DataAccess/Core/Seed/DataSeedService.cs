@@ -4,6 +4,8 @@ using Lumina.Application.Common.DataAccess.Entities.Scheduling;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Seed;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Domain.Common.Primitives;
@@ -58,7 +60,9 @@ public class DataSeedService : IDataSeedService
             if (insertPermissionResult.IsFailure)
                 return insertPermissionResult.Errors;
         }
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
         return Result.Created;
     }
 
@@ -81,7 +85,9 @@ public class DataSeedService : IDataSeedService
             if (insertRoleResult.IsFailure)
                 return insertRoleResult.Errors;
         }
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
         return Result.Created;
     }
 
@@ -102,12 +108,12 @@ public class DataSeedService : IDataSeedService
             return Errors.Authorization.AdminAccountNotFound;
 
         // Get all permissions.
-        Result<IEnumerable<PermissionEntity>> getPermissionsResult = await _unitOfWork.PermissionRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        Result<PaginatedResultDto<PermissionEntity>> getPermissionsResult = await _unitOfWork.PermissionRepository.GetAllAsync<BaseFilterDto>(cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getPermissionsResult.IsFailure)
             return getPermissionsResult.Errors;
 
         // Add each permission to the admin role.
-        foreach (PermissionEntity permission in getPermissionsResult.Value)
+        foreach (PermissionEntity permission in getPermissionsResult.Value.Data)
         {
             RolePermissionEntity rolePermissionEntity = new()
             {
@@ -122,7 +128,9 @@ public class DataSeedService : IDataSeedService
             if (insertRolePermissionResult.IsFailure)
                 return insertRolePermissionResult.Errors;
         }
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
         return Result.Created;
     }
 
@@ -143,7 +151,7 @@ public class DataSeedService : IDataSeedService
             return Errors.Authorization.AdminRoleNotFound;
 
         // Get admin user.
-        Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByIdAsync(userId, cancellationToken).ConfigureAwait(false);
+        Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByIdAsync(userId, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getUserResult.IsFailure)
             return getUserResult.Errors;
 
@@ -164,7 +172,9 @@ public class DataSeedService : IDataSeedService
         if (insertUserRoleResult.IsFailure)
             return insertUserRoleResult.Errors;
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
         return Result.Created;
     }
 
@@ -196,7 +206,9 @@ public class DataSeedService : IDataSeedService
             if (insertScheduledJobResult.IsFailure)
                 return insertScheduledJobResult.Errors;
         }
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
         return Result.Created;
     }
 

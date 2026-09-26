@@ -67,43 +67,45 @@ public class CancelLibraryScanCommandHandler : ICommandHandler<CancelLibraryScan
         if (validationResult.Count > 0)
             return validationResult;
 
-        // an authenticated request must always carry a user identity
+        // An authenticated request must always carry a user identity.
         Guid? currentUserId = _currentUserService.UserId;
         if (currentUserId is null)
             return ApplicationErrors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // get the library scan from the repository
-        Result<LibraryScanEntity?> getLibraryScansResult = await _unitOfWork.LibraryScanRepository.GetByIdAsync(command.ScanId, cancellationToken).ConfigureAwait(false);
+        // Get the library scan from the repository.
+        Result<LibraryScanEntity?> getLibraryScansResult = await _unitOfWork.LibraryScanRepository.GetByIdAsync(command.ScanId, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getLibraryScansResult.IsFailure)
             return getLibraryScansResult.Errors;
         if (getLibraryScansResult.Value is null)
             return DomainErrors.LibraryScanning.LibraryScanNotFound;
 
-        // admins can cancel any library scan; for everyone else, only the ones of the libraries they own
+        // Admins can cancel any library scan; for everyone else, only the ones of the libraries they own.
         bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
             userId, new LibraryOwnershipPolicyContext(getLibraryScansResult.Value.LibraryId), cancellationToken).ConfigureAwait(false);
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
-        // convert the repository scan to a domain object
+        // Convert the repository scan to a domain object.
         Result<LibraryScan> libraryScanDomainResult = getLibraryScansResult.Value.ToDomainEntity();
         if (libraryScanDomainResult.IsFailure)
             return libraryScanDomainResult.Errors;
 
-        // cancel the media library scan
+        // Cancel the media library scan.
         Result<Success> cancelScanResult = libraryScanDomainResult.Value.CancelScan();
         if (cancelScanResult.IsFailure)
             return cancelScanResult.Errors;
 
-        // update the status of the library scan in the repository
+        // Update the status of the library scan in the repository.
         Result<Updated> updateLibraryScanResult = await _unitOfWork.LibraryScanRepository.UpdateAsync(libraryScanDomainResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
         if (updateLibraryScanResult.IsFailure)
             return updateLibraryScanResult.Errors;
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
 
-        // queue any domain events
+        // Queue any domain events.
         foreach (IDomainEvent domainEvent in libraryScanDomainResult.Value.GetDomainEvents())
             _domainEventsQueue.Enqueue(domainEvent);
 

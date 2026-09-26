@@ -43,6 +43,7 @@ public class DeleteRoleCommandHandlerTests
         mockValidator.Validate(Arg.Any<DeleteRoleCommand>())
             .Returns([]);
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockRoleRepository = Substitute.For<IRoleRepository>();
@@ -89,7 +90,7 @@ public class DeleteRoleCommandHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authorization.NotAuthorized, result.FirstError);
         await _mockAuthorizationService.DidNotReceive().IsInRoleAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
-        await _mockRoleRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockRoleRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -100,7 +101,7 @@ public class DeleteRoleCommandHandlerTests
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
-        _mockRoleRepository.GetByIdAsync(command.RoleId, Arg.Any<CancellationToken>())
+        _mockRoleRepository.GetByIdAsync(command.RoleId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns((RoleEntity?)null);
 
         // Act
@@ -121,7 +122,7 @@ public class DeleteRoleCommandHandlerTests
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
-        _mockRoleRepository.GetByIdAsync(command.RoleId, Arg.Any<CancellationToken>())
+        _mockRoleRepository.GetByIdAsync(command.RoleId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(adminRole);
 
         // Act
@@ -142,7 +143,7 @@ public class DeleteRoleCommandHandlerTests
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
-        _mockRoleRepository.GetByIdAsync(command.RoleId, Arg.Any<CancellationToken>())
+        _mockRoleRepository.GetByIdAsync(command.RoleId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(error);
 
         // Act
@@ -164,7 +165,7 @@ public class DeleteRoleCommandHandlerTests
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
-        _mockRoleRepository.GetByIdAsync(command.RoleId, Arg.Any<CancellationToken>())
+        _mockRoleRepository.GetByIdAsync(command.RoleId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(role);
         _mockRoleRepository.DeleteByIdAsync(command.RoleId, Arg.Any<CancellationToken>())
             .Returns(error);
@@ -187,7 +188,7 @@ public class DeleteRoleCommandHandlerTests
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
-        _mockRoleRepository.GetByIdAsync(command.RoleId, Arg.Any<CancellationToken>())
+        _mockRoleRepository.GetByIdAsync(command.RoleId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(role);
         _mockRoleRepository.DeleteByIdAsync(command.RoleId, Arg.Any<CancellationToken>())
             .Returns(Result.Deleted);

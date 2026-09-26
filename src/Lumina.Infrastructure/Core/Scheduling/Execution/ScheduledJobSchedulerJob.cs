@@ -68,7 +68,7 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
     /// <returns>A task that represents the asynchronous operation.</returns>
     public Task StartCycleAsync(ScheduledJobId scheduledJobId, CancellationToken cancellationToken)
     {
-        RunCycleWorkerAsync(scheduledJobId, runImmediately: true, cancellationToken).FireAndForgetSafeAsync();
+        RunCycleWorkerAsync(scheduledJobId, shouldRunImmediately: true, cancellationToken).FireAndForgetSafeAsync();
         return Task.CompletedTask;
     }
 
@@ -174,8 +174,8 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
                     continue;
             }
             // A once at startup scheduled job fires immediately when its cycle is resumed at startup; the other scheduled jobs wait for their next scheduled execution.
-            bool runImmediately = scheduledJob.ScheduleType == ScheduleType.OnceAtStartup;
-            RunCycleWorkerAsync(scheduledJobId, runImmediately, cancellationToken).FireAndForgetSafeAsync();
+            bool shouldRunImmediately = scheduledJob.ScheduleType == ScheduleType.OnceAtStartup;
+            RunCycleWorkerAsync(scheduledJobId, shouldRunImmediately, cancellationToken).FireAndForgetSafeAsync();
         }
     }
 
@@ -183,9 +183,9 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
     /// Runs the execution cycle worker of the scheduled job identified by <paramref name="scheduledJobId"/>.
     /// </summary>
     /// <param name="scheduledJobId">The object representing the unique identifier of the scheduled job whose cycle is run.</param>
-    /// <param name="runImmediately">Whether the task of the scheduled job is run immediately when the cycle starts.</param>
+    /// <param name="shouldRunImmediately">Whether the task of the scheduled job is run immediately when the cycle starts.</param>
     /// <param name="stoppingToken">Cancellation token that can be used to stop the execution.</param>
-    private async Task RunCycleWorkerAsync(ScheduledJobId scheduledJobId, bool runImmediately, CancellationToken stoppingToken)
+    private async Task RunCycleWorkerAsync(ScheduledJobId scheduledJobId, bool shouldRunImmediately, CancellationToken stoppingToken)
     {
         // Each cycle owns its own cancellation token source: it is the handle the runtime registry stores, so stopping one
         // scheduled job cancels exactly this cycle and no other job's cycle, even though the cycle worker itself runs "fire and forget" on another thread.
@@ -203,7 +203,7 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
             CancellationToken cycleToken = linkedCancellationTokenSource.Token;
             // An immediate run is executed as a cycle run, so it completes the scheduled job back to its active state and is
             // recorded as part of the cycle; this is the path taken by an admin start, by the resume at startup and by the seed of the default jobs.
-            if (runImmediately)
+            if (shouldRunImmediately)
                 await RunScheduledJobAsync(scheduledJobId, isCycleRun: true, cycleToken).ConfigureAwait(false);
 
             // The schedule is read from the storage medium for every cycle, so the delay until the next run is always
@@ -320,7 +320,7 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
         IDomainEventPublisher domainEventPublisher = services.GetRequiredService<IDomainEventPublisher>();
 
         // Load the scheduled job, and mark its task as started.
-        Result<ScheduledJobEntity?> getScheduledJobResult = await unitOfWork.ScheduledJobRepository.GetByIdAsync(scheduledJobId.Value, cancellationToken).ConfigureAwait(false);
+        Result<ScheduledJobEntity?> getScheduledJobResult = await unitOfWork.ScheduledJobRepository.GetByIdAsync(scheduledJobId.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getScheduledJobResult.IsFailure || getScheduledJobResult.Value is null)
             return;
         Result<ScheduledJob> scheduledJobDomainResult = getScheduledJobResult.Value.ToDomainEntity();
@@ -383,8 +383,8 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
             // A one time execution returns the scheduled job to its active state when its execution cycle is still running, so the
             // running cycle keeps scheduling executions and the job can still be stopped; the same applies to a once at startup job,
             // whose active state is what makes it fire again at the next application startup.
-            bool completesTheCycleRun = isCycleRun || _runtimeRegistry.HasActiveCycle(scheduledJob.Id) || scheduledJob.Schedule.ScheduleType == ScheduleType.OnceAtStartup;
-            Result<Success> completeExecutionResult = scheduledJob.MarkExecutionCompleted(completesTheCycleRun);
+            bool doesCompleteTheCycleRun = isCycleRun || _runtimeRegistry.HasActiveCycle(scheduledJob.Id) || scheduledJob.Schedule.ScheduleType == ScheduleType.OnceAtStartup;
+            Result<Success> completeExecutionResult = scheduledJob.MarkExecutionCompleted(doesCompleteTheCycleRun);
             if (completeExecutionResult.IsFailure)
                 return;
             foreach (IDomainEvent domainEvent in scheduledJob.GetDomainEvents())
@@ -412,7 +412,7 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
         {
             await using AsyncServiceScope scope = _serviceScopeFactory.CreateAsyncScope();
             IUnitOfWork unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-            Result<ScheduledJobEntity?> getScheduledJobResult = await unitOfWork.ScheduledJobRepository.GetByIdAsync(scheduledJobId.Value, cancellationToken).ConfigureAwait(false);
+            Result<ScheduledJobEntity?> getScheduledJobResult = await unitOfWork.ScheduledJobRepository.GetByIdAsync(scheduledJobId.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
             if (getScheduledJobResult.IsFailure || getScheduledJobResult.Value is null)
                 return ScheduledJobStatus.Added;
             ScheduledJobEntity scheduledJob = getScheduledJobResult.Value;
@@ -433,17 +433,19 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
             ScheduledJobStatus reconciledStatus = (openExecution?.WasCycleActive ?? true) ? ScheduledJobStatus.Active : ScheduledJobStatus.Added;
 
             Result<Updated> updateScheduledJobResult = await unitOfWork.ScheduledJobRepository.UpdateAsync(
-                CreateUpdatedScheduledJob(scheduledJob, reconciledStatus, scheduledJob.LastStartedOnUtc, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                scheduledJob.ToUpdatedRepositoryEntity(reconciledStatus, scheduledJob.LastStartedOnUtc, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
             if (updateScheduledJobResult.IsFailure)
                 return ScheduledJobStatus.Added;
             if (openExecution is not null)
             {
                 Result<Updated> updateExecutionResult = await unitOfWork.ScheduledJobExecutionRepository.UpdateAsync(
-                    CreateClosedExecution(openExecution, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                    openExecution.ToUpdatedRepositoryEntity(DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                 if (updateExecutionResult.IsFailure)
                     return ScheduledJobStatus.Added;
             }
-            await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            Result<Success> saveChangesResult = await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            if (saveChangesResult.IsFailure)
+                throw new InvalidOperationException(saveChangesResult.FirstError.Description);
             _logger.LogInformation("The interrupted execution of the scheduled job '{ScheduledJobName}' was closed.", scheduledJob.Name);
             return reconciledStatus;
         }
@@ -468,7 +470,7 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
     {
         await using AsyncServiceScope scope = _serviceScopeFactory.CreateAsyncScope();
         IUnitOfWork unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-        Result<ScheduledJobEntity?> getScheduledJobResult = await unitOfWork.ScheduledJobRepository.GetByIdAsync(scheduledJobId.Value, cancellationToken).ConfigureAwait(false);
+        Result<ScheduledJobEntity?> getScheduledJobResult = await unitOfWork.ScheduledJobRepository.GetByIdAsync(scheduledJobId.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getScheduledJobResult.IsFailure || getScheduledJobResult.Value is null)
             return null;
         Result<ScheduledJob> scheduledJobDomainResult = getScheduledJobResult.Value.ToDomainEntity();
@@ -488,57 +490,4 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
         return schedule.GetDelayUntilNextExecution(dateTimeProvider.UtcNow, TimeZoneInfo.Local);
     }
 
-    /// <summary>
-    /// Creates a copy of <paramref name="scheduledJob"/> with the provided status and timestamps.
-    /// </summary>
-    /// <param name="scheduledJob">The scheduled job to copy.</param>
-    /// <param name="status">The status of the copy.</param>
-    /// <param name="lastStartedOnUtc">The last start time of the copy.</param>
-    /// <param name="lastCompletedOnUtc">The last completion time of the copy.</param>
-    /// <returns>The copy of the scheduled job.</returns>
-    private static ScheduledJobEntity CreateUpdatedScheduledJob(ScheduledJobEntity scheduledJob, ScheduledJobStatus status, DateTime? lastStartedOnUtc, DateTime? lastCompletedOnUtc)
-    {
-        return new ScheduledJobEntity
-        {
-            Id = scheduledJob.Id,
-            Name = scheduledJob.Name,
-            TaskType = scheduledJob.TaskType,
-            ScheduleType = scheduledJob.ScheduleType,
-            IntervalMinutes = scheduledJob.IntervalMinutes,
-            Hour = scheduledJob.Hour,
-            Minute = scheduledJob.Minute,
-            Status = status,
-            OwnerUserId = scheduledJob.OwnerUserId,
-            LastStartedOnUtc = lastStartedOnUtc,
-            LastCompletedOnUtc = lastCompletedOnUtc,
-            CreatedOnUtc = scheduledJob.CreatedOnUtc,
-            CreatedBy = scheduledJob.CreatedBy,
-            UpdatedOnUtc = scheduledJob.UpdatedOnUtc,
-            UpdatedBy = scheduledJob.UpdatedBy
-        };
-    }
-
-    /// <summary>
-    /// Creates a copy of <paramref name="execution"/> with the provided completion time.
-    /// </summary>
-    /// <param name="execution">The execution to copy.</param>
-    /// <param name="completedOnUtc">The completion time of the copy.</param>
-    /// <returns>The copy of the execution.</returns>
-    private static ScheduledJobExecutionEntity CreateClosedExecution(ScheduledJobExecutionEntity execution, DateTime? completedOnUtc)
-    {
-        return new ScheduledJobExecutionEntity
-        {
-            Id = execution.Id,
-            ScheduledJobId = execution.ScheduledJobId,
-            TaskType = execution.TaskType,
-            IsCycleRun = execution.IsCycleRun,
-            WasCycleActive = execution.WasCycleActive,
-            StartedOnUtc = execution.StartedOnUtc,
-            CompletedOnUtc = completedOnUtc,
-            CreatedOnUtc = execution.CreatedOnUtc,
-            CreatedBy = execution.CreatedBy,
-            UpdatedOnUtc = execution.UpdatedOnUtc,
-            UpdatedBy = execution.UpdatedBy
-        };
-    }
 }

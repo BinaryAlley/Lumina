@@ -2,6 +2,8 @@
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
@@ -47,6 +49,7 @@ public class GetLibraryArtworkProvidersQueryHandlerTests
     public GetLibraryArtworkProvidersQueryHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockArtworkProviderConfigurationRepository = Substitute.For<IArtworkProviderConfigurationRepository>();
         _mockPluginRepository = Substitute.For<IPluginRepository>();
         _mockUnitOfWork.ArtworkProviderConfigurationRepository.Returns(_mockArtworkProviderConfigurationRepository);
@@ -100,7 +103,8 @@ public class GetLibraryArtworkProvidersQueryHandlerTests
             _pluginEntityFixture.Create(firstPluginId),
             _pluginEntityFixture.Create(secondPluginId)
         ];
-        _mockPluginRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(plugins);
+        _mockPluginRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(new PaginatedResultDto<PluginEntity> { Data = plugins, CurrentPage = 1, PerPage = plugins.Count, Count = plugins.Count, NumberOfPages = 1 }));
 
         // Act
         Result<IReadOnlyList<LibraryArtworkProviderResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
@@ -127,8 +131,8 @@ public class GetLibraryArtworkProvidersQueryHandlerTests
         ];
         _mockArtworkProviderConfigurationRepository.GetByLibraryIdAsync(query.LibraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryArtworkProviderConfigurationEntity>>(configurations));
-        _mockPluginRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(Result.From<IEnumerable<PluginEntity>>([_pluginEntityFixture.Create()]));
+        _mockPluginRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(new PaginatedResultDto<PluginEntity> { Data = [_pluginEntityFixture.Create()], CurrentPage = 1, PerPage = 1, Count = 1, NumberOfPages = 1 }));
 
         // Act
         Result<IReadOnlyList<LibraryArtworkProviderResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
@@ -147,8 +151,8 @@ public class GetLibraryArtworkProvidersQueryHandlerTests
         GetLibraryArtworkProvidersQuery query = _getLibraryArtworkProvidersQueryFixture.Create();
         _mockArtworkProviderConfigurationRepository.GetByLibraryIdAsync(query.LibraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryArtworkProviderConfigurationEntity>>([]));
-        _mockPluginRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(Result.From<IEnumerable<PluginEntity>>([]));
+        _mockPluginRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(new PaginatedResultDto<PluginEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
 
         // Act
         Result<IReadOnlyList<LibraryArtworkProviderResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
@@ -172,7 +176,7 @@ public class GetLibraryArtworkProvidersQueryHandlerTests
 
         // Assert
         Assert.True(result.IsFailure);
-        await _mockPluginRepository.DidNotReceive().GetAllAsync(Arg.Any<CancellationToken>());
+        await _mockPluginRepository.DidNotReceive().GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -182,7 +186,7 @@ public class GetLibraryArtworkProvidersQueryHandlerTests
         GetLibraryArtworkProvidersQuery query = _getLibraryArtworkProvidersQueryFixture.Create();
         _mockArtworkProviderConfigurationRepository.GetByLibraryIdAsync(query.LibraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryArtworkProviderConfigurationEntity>>([]));
-        _mockPluginRepository.GetAllAsync(Arg.Any<CancellationToken>())
+        _mockPluginRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Error.Failure(description: "Failed to get plugins"));
 
         // Act
@@ -209,7 +213,7 @@ public class GetLibraryArtworkProvidersQueryHandlerTests
         await _mockAuthorizationService.Received(1).EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
             _userId, Arg.Is<LibraryOwnershipPolicyContext>(context => context.LibraryId == query.LibraryId), Arg.Any<CancellationToken>());
         await _mockArtworkProviderConfigurationRepository.DidNotReceive().GetByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
-        await _mockPluginRepository.DidNotReceive().GetAllAsync(Arg.Any<CancellationToken>());
+        await _mockPluginRepository.DidNotReceive().GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]

@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Common.DataAccess.Repositories.Books;
+using Lumina.Application.Common.DataAccess.Repositories.BookLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Domain.Common.Events;
@@ -106,7 +106,7 @@ public class MediaLibraryScanResultsSaveJobTests
             .Returns(Result.From<BookEntity?>(null));
         _mockBookRepository.InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(Result.Created));
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
 
         // Act
         await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
@@ -133,7 +133,7 @@ public class MediaLibraryScanResultsSaveJobTests
             .Returns(Result.From(Result.Updated));
         _mockSnapshotRepository.GetPathsAsync(_libraryId.Value, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<string>>([]));
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
 
         // Act
         await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
@@ -158,7 +158,7 @@ public class MediaLibraryScanResultsSaveJobTests
             .Returns(Result.From<IReadOnlyList<string>>(["existing.pdf"]));
         _mockBookRepository.GetByPathAsync(_libraryId.Value, "existing.pdf", Arg.Any<CancellationToken>())
             .Returns(Result.From<BookEntity?>(_bookEntityFixture.Create(path: "existing.pdf")));
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
 
         // Act
         await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
@@ -356,7 +356,7 @@ public class MediaLibraryScanResultsSaveJobTests
             .Returns(Result.From(Result.Updated));
         _mockSnapshotRepository.GetPathsAsync(_libraryId.Value, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<string>>([]));
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
 
         IMediaLibraryScanJob mockChild = Substitute.For<IMediaLibraryScanJob>();
         mockChild.ExecuteAsync(Arg.Any<Guid>(), Arg.Any<object>(), Arg.Any<CancellationToken>())
@@ -389,7 +389,7 @@ public class MediaLibraryScanResultsSaveJobTests
             .Returns(Result.From<BookEntity?>(null));
         _mockBookRepository.InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(Result.Created));
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
 
         // Act
         await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);

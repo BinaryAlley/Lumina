@@ -66,7 +66,7 @@ public class SetCurrentThemeCommandHandler : ICommandHandler<SetCurrentThemeComm
             return ApplicationErrors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // only admins can change the active theme
+        // Only admins can change the active theme.
         if (!await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false))
             return ApplicationErrors.Authorization.NotAuthorized;
 
@@ -78,9 +78,11 @@ public class SetCurrentThemeCommandHandler : ICommandHandler<SetCurrentThemeComm
         if (theme is null || theme.IsDeleted)
             return DomainErrors.Themes.ThemeNotFound;
 
+        // The theme is already active, so no change is needed.
         if (theme.IsCurrent == true)
             return theme.ToResponse();
 
+        // Only one theme can be active at a time, so the currently active theme must be deactivated before the requested one is activated.
         Result<ThemeEntity?> getCurrentResult = await _unitOfWork.ThemeRepository.GetCurrentAsync(cancellationToken).ConfigureAwait(false);
         if (getCurrentResult.IsFailure)
             return getCurrentResult.Errors;
@@ -92,12 +94,16 @@ public class SetCurrentThemeCommandHandler : ICommandHandler<SetCurrentThemeComm
             await _unitOfWork.ThemeRepository.UpdateAsync(currentTheme, cancellationToken).ConfigureAwait(false);
         }
 
+        // Activate the requested theme and persist its update.
         theme.IsCurrent = true;
         theme.UpdatedOnUtc = DateTime.UtcNow;
         theme.UpdatedBy = userId;
         await _unitOfWork.ThemeRepository.UpdateAsync(theme, cancellationToken).ConfigureAwait(false);
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
+
         return theme.ToResponse();
     }
 }

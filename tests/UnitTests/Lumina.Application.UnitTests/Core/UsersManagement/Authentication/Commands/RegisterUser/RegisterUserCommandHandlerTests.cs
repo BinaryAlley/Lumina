@@ -44,6 +44,7 @@ public class RegisterUserCommandHandlerTests
     public RegisterUserCommandHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockHashService = Substitute.For<IPasswordHashService>();
         _mockCryptographyService = Substitute.For<ICryptographyService>();
         _mockTotpTokenGenerator = Substitute.For<ITotpTokenGenerator>();

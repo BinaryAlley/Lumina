@@ -55,6 +55,7 @@ public class LibrarySavedDomainEventHandlerTests
     public LibrarySavedDomainEventHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockLibraryRepository = Substitute.For<ILibraryRepository>();
         _mockUnitOfWork.LibraryRepository.Returns(_mockLibraryRepository);
         _mockEnvironmentContext = Substitute.For<IEnvironmentContext>();
@@ -106,7 +107,7 @@ public class LibrarySavedDomainEventHandlerTests
         await _sut.HandleAsync(domainEvent, CancellationToken.None);
 
         // Assert
-        Assert.NotNull(domainEvent.Library.CoverImage);
+        Assert.True(domainEvent.Library.CoverImage.HasValue);
         await _mockLibraryRepository.Received(1).UpdateAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
@@ -177,7 +178,7 @@ public class LibrarySavedDomainEventHandlerTests
         await _sut.HandleAsync(domainEvent, CancellationToken.None);
 
         // Assert
-        Assert.Equal("/Media/Libraries/guid/cover.png", domainEvent.Library.CoverImage);
+        Assert.Equal("/Media/Libraries/guid/cover.png", domainEvent.Library.CoverImage.Value);
         _mockFileProviderService.DidNotReceive().CopyFile(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>(), Arg.Any<bool>());
         await _mockLibraryRepository.Received(1).UpdateAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
     }

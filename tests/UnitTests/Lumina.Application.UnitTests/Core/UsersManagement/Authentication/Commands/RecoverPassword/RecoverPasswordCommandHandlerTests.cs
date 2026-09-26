@@ -39,6 +39,7 @@ public class RecoverPasswordCommandHandlerTests
     public RecoverPasswordCommandHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockHashService = Substitute.For<IPasswordHashService>();
         _mockTotpTokenGenerator = Substitute.For<ITotpTokenGenerator>();
         _mockCryptographyService = Substitute.For<ICryptographyService>();

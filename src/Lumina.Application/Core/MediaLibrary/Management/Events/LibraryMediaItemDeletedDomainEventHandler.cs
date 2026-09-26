@@ -48,7 +48,7 @@ public class LibraryMediaItemDeletedDomainEventHandler : IDomainEventHandler<Lib
     {
         Guid libraryId = domainEvent.LibraryId.Value;
 
-        // load the book stored at the deleted path, which might have been already removed
+        // Load the book stored at the deleted path, which might have been already removed.
         Result<BookEntity?> getBookResult = await _unitOfWork.BookRepository.GetByPathAsync(libraryId, domainEvent.Path, cancellationToken).ConfigureAwait(false);
         if (getBookResult.IsFailure)
             throw new EventualConsistencyException(getBookResult.FirstError, getBookResult.Errors);
@@ -56,8 +56,8 @@ public class LibraryMediaItemDeletedDomainEventHandler : IDomainEventHandler<Lib
         if (book is null)
             return;
 
-        // delete the stored artwork of the book, best-effort, since a stale cover must not prevent the book from being removed
-        Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(libraryId, cancellationToken).ConfigureAwait(false);
+        // Delete the stored artwork of the book, best-effort, since a stale cover must not prevent the book from being removed.
+        Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(libraryId, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getLibraryResult.IsFailure || getLibraryResult.Value is null)
             throw new EventualConsistencyException(getLibraryResult.FirstError, getLibraryResult.Errors);
         LibraryEntity library = getLibraryResult.Value;
@@ -71,11 +71,13 @@ public class LibraryMediaItemDeletedDomainEventHandler : IDomainEventHandler<Lib
         if (deleteArtworkResult.IsFailure)
             _logger.LogWarning("Failed to delete the stored artwork of the book with Id '{BookId}' at path '{BookPath}', the artwork might remain orphaned.", book.Id, book.Path);
 
-        // delete the book, whose stored artwork and participations are removed by the database cascade
-        Result<Deleted> deleteBookResult = await _unitOfWork.BookRepository.DeleteAsync(book.Id, cancellationToken).ConfigureAwait(false);
+        // Delete the book, whose stored artwork and participations are removed by the database cascade.
+        Result<Deleted> deleteBookResult = await _unitOfWork.BookRepository.DeleteByIdAsync(book.Id, cancellationToken).ConfigureAwait(false);
         if (deleteBookResult.IsFailure)
             throw new EventualConsistencyException(deleteBookResult.FirstError, deleteBookResult.Errors);
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            throw new EventualConsistencyException(saveChangesResult.FirstError, saveChangesResult.Errors);
     }
 }

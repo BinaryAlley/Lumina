@@ -2,6 +2,8 @@
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Fixtures.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
@@ -10,7 +12,6 @@ using Lumina.Domain.Common.Primitives;
 using NSubstitute;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -35,6 +36,7 @@ public class CheckInitializationQueryHandlerTests
     public CheckInitializationQueryHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockUserRepository = Substitute.For<IUserRepository>();
 
         _mockUnitOfWork.UserRepository.Returns(_mockUserRepository);
@@ -47,30 +49,30 @@ public class CheckInitializationQueryHandlerTests
     {
         // Arrange
         List<UserEntity> users = _userEntityFixture.CreateMany();
-        _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(Result.From(users.AsEnumerable()));
+        _mockUserRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(new PaginatedResultDto<UserEntity> { Data = users, CurrentPage = 1, PerPage = users.Count, Count = users.Count, NumberOfPages = 1 }));
 
         // Act
         InitializationResponse result = await _sut.HandleAsync(_checkInitializationQueryFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsInitialized);
-        await _mockUserRepository.Received(1).GetAllAsync(Arg.Any<CancellationToken>());
+        await _mockUserRepository.Received(1).GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task HandleAsync_WhenNoUsersExist_ShouldReturnNotInitialized()
     {
         // Arrange
-        _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(Result.From(Enumerable.Empty<UserEntity>()));
+        _mockUserRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(new PaginatedResultDto<UserEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
 
         // Act
         InitializationResponse result = await _sut.HandleAsync(_checkInitializationQueryFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.False(result.IsInitialized);
-        await _mockUserRepository.Received(1).GetAllAsync(Arg.Any<CancellationToken>());
+        await _mockUserRepository.Received(1).GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -78,7 +80,7 @@ public class CheckInitializationQueryHandlerTests
     {
         // Arrange
         Error error = Error.Failure("Database.Error", "Failed to retrieve users");
-        _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
+        _mockUserRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
             .Returns(error);
 
         // Act
@@ -86,6 +88,6 @@ public class CheckInitializationQueryHandlerTests
 
         // Assert
         Assert.False(result.IsInitialized);
-        await _mockUserRepository.Received(1).GetAllAsync(Arg.Any<CancellationToken>());
+        await _mockUserRepository.Received(1).GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>());
     }
 }

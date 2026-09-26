@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Scheduling;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Mapping.Scheduling;
 using Lumina.Application.Core.Scheduling.Notifications;
 using Lumina.Contracts.Responses.Scheduling;
@@ -10,7 +12,6 @@ using Lumina.Domain.Common.Exceptions;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.Events;
 using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -46,7 +47,7 @@ public class ScheduledJobExecutionStartedDomainEventHandler : IDomainEventHandle
     public async ValueTask HandleAsync(ScheduledJobExecutionStartedDomainEvent domainEvent, CancellationToken cancellationToken)
     {
         // Get the scheduled job from the repository.
-        Result<ScheduledJobEntity?> getScheduledJobResult = await _unitOfWork.ScheduledJobRepository.GetByIdAsync(domainEvent.ScheduledJobId.Value, cancellationToken).ConfigureAwait(false);
+        Result<ScheduledJobEntity?> getScheduledJobResult = await _unitOfWork.ScheduledJobRepository.GetByIdAsync(domainEvent.ScheduledJobId.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getScheduledJobResult.IsFailure)
             throw new EventualConsistencyException(getScheduledJobResult.FirstError, getScheduledJobResult.Errors);
         if (getScheduledJobResult.Value is null)
@@ -57,7 +58,7 @@ public class ScheduledJobExecutionStartedDomainEventHandler : IDomainEventHandle
         bool wasCycleActive = scheduledJob.Status == ScheduledJobStatus.Active;
 
         // Update the scheduled job with its running status and the start time of the execution.
-        ScheduledJobEntity updatedScheduledJob = CreateUpdatedScheduledJob(scheduledJob, ScheduledJobStatus.Running, domainEvent.StartedOnUtc, scheduledJob.LastCompletedOnUtc);
+        ScheduledJobEntity updatedScheduledJob = scheduledJob.ToUpdatedRepositoryEntity(ScheduledJobStatus.Running, domainEvent.StartedOnUtc, scheduledJob.LastCompletedOnUtc);
         Result<Updated> updateScheduledJobResult = await _unitOfWork.ScheduledJobRepository.UpdateAsync(updatedScheduledJob, cancellationToken).ConfigureAwait(false);
         if (updateScheduledJobResult.IsFailure)
             throw new EventualConsistencyException(updateScheduledJobResult.FirstError, updateScheduledJobResult.Errors);
@@ -81,41 +82,13 @@ public class ScheduledJobExecutionStartedDomainEventHandler : IDomainEventHandle
         if (insertExecutionResult.IsFailure)
             throw new EventualConsistencyException(insertExecutionResult.FirstError, insertExecutionResult.Errors);
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            throw new EventualConsistencyException(saveChangesResult.FirstError, saveChangesResult.Errors);
 
         // Notify the SignalR clients about the current scheduled jobs and the started execution.
         await NotifyCurrentScheduledJobsAsync(cancellationToken).ConfigureAwait(false);
         await _scheduledJobNotifier.SendScheduledJobExecutionStartedAsync(execution.ToResponse(), cancellationToken).ConfigureAwait(false);
-    }
-
-    /// <summary>
-    /// Creates a copy of <paramref name="scheduledJob"/> with the provided status and timestamps.
-    /// </summary>
-    /// <param name="scheduledJob">The scheduled job to copy.</param>
-    /// <param name="status">The status of the copy.</param>
-    /// <param name="lastStartedOnUtc">The last start time of the copy.</param>
-    /// <param name="lastCompletedOnUtc">The last completion time of the copy.</param>
-    /// <returns>The copy of the scheduled job.</returns>
-    private static ScheduledJobEntity CreateUpdatedScheduledJob(ScheduledJobEntity scheduledJob, ScheduledJobStatus status, DateTime? lastStartedOnUtc, DateTime? lastCompletedOnUtc)
-    {
-        return new ScheduledJobEntity
-        {
-            Id = scheduledJob.Id,
-            Name = scheduledJob.Name,
-            TaskType = scheduledJob.TaskType,
-            ScheduleType = scheduledJob.ScheduleType,
-            IntervalMinutes = scheduledJob.IntervalMinutes,
-            Hour = scheduledJob.Hour,
-            Minute = scheduledJob.Minute,
-            Status = status,
-            OwnerUserId = scheduledJob.OwnerUserId,
-            LastStartedOnUtc = lastStartedOnUtc,
-            LastCompletedOnUtc = lastCompletedOnUtc,
-            CreatedOnUtc = scheduledJob.CreatedOnUtc,
-            CreatedBy = scheduledJob.CreatedBy,
-            UpdatedOnUtc = scheduledJob.UpdatedOnUtc,
-            UpdatedBy = scheduledJob.UpdatedBy
-        };
     }
 
     /// <summary>
@@ -124,10 +97,10 @@ public class ScheduledJobExecutionStartedDomainEventHandler : IDomainEventHandle
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     private async Task NotifyCurrentScheduledJobsAsync(CancellationToken cancellationToken)
     {
-        Result<IEnumerable<ScheduledJobEntity>> getScheduledJobsResult = await _unitOfWork.ScheduledJobRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        Result<PaginatedResultDto<ScheduledJobEntity>> getScheduledJobsResult = await _unitOfWork.ScheduledJobRepository.GetAllAsync<BaseFilterDto>(cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getScheduledJobsResult.IsFailure)
             throw new EventualConsistencyException(getScheduledJobsResult.FirstError, getScheduledJobsResult.Errors);
-        IReadOnlyList<ScheduledJobResponse> scheduledJobResponses = [.. getScheduledJobsResult.Value.Select(scheduledJob => scheduledJob.ToResponse())];
+        IReadOnlyList<ScheduledJobResponse> scheduledJobResponses = [.. getScheduledJobsResult.Value.Data.Select(scheduledJob => scheduledJob.ToResponse())];
         await _scheduledJobNotifier.SendScheduledJobsAsync(scheduledJobResponses, cancellationToken).ConfigureAwait(false);
     }
 }

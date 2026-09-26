@@ -53,6 +53,7 @@ public class GetLibraryScanProgressQueryHandlerTests
     public GetLibraryScanProgressQueryHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockLibraryRepository = Substitute.For<ILibraryRepository>();
         _mockUnitOfWork.LibraryRepository.Returns(_mockLibraryRepository);
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
@@ -82,7 +83,7 @@ public class GetLibraryScanProgressQueryHandlerTests
         // Arrange
         GetLibraryScanProgressQuery query = _getLibraryScanProgressQueryFixture.Create();
         LibraryEntity library = _libraryEntityFixture.Create(id: query.LibraryId, userId: _userId);
-        _mockLibraryRepository.GetByIdAsync(query.LibraryId, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(query.LibraryId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
 
         // Act
@@ -100,7 +101,7 @@ public class GetLibraryScanProgressQueryHandlerTests
     {
         // Arrange
         GetLibraryScanProgressQuery query = _getLibraryScanProgressQueryFixture.Create();
-        _mockLibraryRepository.GetByIdAsync(query.LibraryId, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(query.LibraryId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result<LibraryEntity?>.Success(null));
 
         // Act
@@ -117,7 +118,7 @@ public class GetLibraryScanProgressQueryHandlerTests
     {
         // Arrange
         GetLibraryScanProgressQuery query = _getLibraryScanProgressQueryFixture.Create();
-        _mockLibraryRepository.GetByIdAsync(query.LibraryId, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(query.LibraryId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Error.Failure(description: "Failed to get library"));
 
         // Act
@@ -134,7 +135,7 @@ public class GetLibraryScanProgressQueryHandlerTests
         // Arrange
         GetLibraryScanProgressQuery query = _getLibraryScanProgressQueryFixture.Create();
         LibraryEntity library = _libraryEntityFixture.Create(id: query.LibraryId, userId: _userId);
-        _mockLibraryRepository.GetByIdAsync(query.LibraryId, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(query.LibraryId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
         _mockAuthorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(_userId, Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>())
             .Returns(false);
@@ -161,7 +162,7 @@ public class GetLibraryScanProgressQueryHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
-        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -170,7 +171,7 @@ public class GetLibraryScanProgressQueryHandlerTests
         // Arrange
         GetLibraryScanProgressQuery query = _getLibraryScanProgressQueryFixture.Create();
         LibraryEntity library = _libraryEntityFixture.Create(id: query.LibraryId, userId: _userId);
-        _mockLibraryRepository.GetByIdAsync(query.LibraryId, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(query.LibraryId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
         _mockMediaLibrariesScanProgressTracker.GetScanProgress(Arg.Any<MediaLibraryScanCompositeId>())
             .Returns(Error.Failure(description: "Failed to get scan progress"));
@@ -195,7 +196,7 @@ public class GetLibraryScanProgressQueryHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(DomainErrors.Library.LibraryIdCannotBeEmpty, result.FirstError);
-        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
         _mockMediaLibrariesScanProgressTracker.DidNotReceive().GetScanProgress(Arg.Any<MediaLibraryScanCompositeId>());
     }
 }

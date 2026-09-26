@@ -2,6 +2,8 @@
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
@@ -41,6 +43,7 @@ public class GetRolesQueryHandlerTests
     public GetRolesQueryHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockRoleRepository = Substitute.For<IRoleRepository>();
@@ -69,7 +72,7 @@ public class GetRolesQueryHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authorization.NotAuthorized, result.FirstError);
-        await _mockRoleRepository.DidNotReceive().GetAllAsync(Arg.Any<CancellationToken>());
+        await _mockRoleRepository.DidNotReceive().GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -86,7 +89,7 @@ public class GetRolesQueryHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authorization.NotAuthorized, result.FirstError);
         await _mockAuthorizationService.DidNotReceive().IsInRoleAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
-        await _mockRoleRepository.DidNotReceive().GetAllAsync(Arg.Any<CancellationToken>());
+        await _mockRoleRepository.DidNotReceive().GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -98,7 +101,7 @@ public class GetRolesQueryHandlerTests
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
-        _mockRoleRepository.GetAllAsync(Arg.Any<CancellationToken>())
+        _mockRoleRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
             .Returns(error);
 
         // Act
@@ -114,7 +117,7 @@ public class GetRolesQueryHandlerTests
     {
         // Arrange
         GetRolesQuery query = _getRolesQueryFixture.Create();
-        IEnumerable<RoleEntity> roles =
+        List<RoleEntity> roles =
         [
             _roleEntityFixture.Create(roleName: "Admin"),
             _roleEntityFixture.Create(roleName: "User")
@@ -122,8 +125,8 @@ public class GetRolesQueryHandlerTests
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
-        _mockRoleRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(Result.From(roles));
+        _mockRoleRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(new PaginatedResultDto<RoleEntity> { Data = roles, CurrentPage = 1, PerPage = roles.Count, Count = roles.Count, NumberOfPages = 1 }));
 
         // Act
         Result<IEnumerable<RoleResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);

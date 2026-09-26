@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -45,6 +45,7 @@ public class MediaLibraryProviderConfigurationStoreTests
     public MediaLibraryProviderConfigurationStoreTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockMetadataConfigurationRepository = Substitute.For<ILibraryMetadataProviderConfigurationRepository>();
         _mockArtworkConfigurationRepository = Substitute.For<IArtworkProviderConfigurationRepository>();
         _mockBookReaderConfigurationRepository = Substitute.For<ILibraryBookReaderConfigurationRepository>();

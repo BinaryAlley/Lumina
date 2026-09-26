@@ -2,6 +2,8 @@
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Infrastructure.Plugins;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
@@ -109,12 +111,12 @@ internal sealed class PluginDetectionSyncJob : BackgroundService
         // Remove the rows of the plugins that are no longer detected, so that each plugin assembly has exactly one row regardless of its load status,
         // and delete the provider configurations of the removed plugins, since their configuration only makes sense while the plugin is installed.
         IMediaLibraryProviderConfigurationStore providerConfigurationStore = asyncServiceScope.ServiceProvider.GetRequiredService<IMediaLibraryProviderConfigurationStore>();
-        Result<IEnumerable<PluginEntity>> getPluginsResult = await unitOfWork.PluginRepository.GetAllAsync(stoppingToken).ConfigureAwait(false);
+        Result<PaginatedResultDto<PluginEntity>> getPluginsResult = await unitOfWork.PluginRepository.GetAllAsync<BaseFilterDto>(cancellationToken: stoppingToken).ConfigureAwait(false);
         if (getPluginsResult.IsFailure)
             _logger.LogError("Failed to get the detected plugins while reconciling the plugin rows.");
         else
         {
-            foreach (PluginEntity plugin in getPluginsResult.Value)
+            foreach (PluginEntity plugin in getPluginsResult.Value.Data)
             {
                 if (detectedPluginIds.Contains(plugin.Id))
                     continue;
@@ -128,12 +130,12 @@ internal sealed class PluginDetectionSyncJob : BackgroundService
         }
 
         // Seed the provider configurations of the media libraries, so that every library lists the plugins providing metadata or artwork for its type.
-        Result<IEnumerable<LibraryEntity>> getLibrariesResult = await unitOfWork.LibraryRepository.GetAllAsync(stoppingToken).ConfigureAwait(false);
+        Result<PaginatedResultDto<LibraryEntity>> getLibrariesResult = await unitOfWork.LibraryRepository.GetAllAsync<BaseFilterDto>(cancellationToken: stoppingToken).ConfigureAwait(false);
         if (getLibrariesResult.IsFailure)
             _logger.LogError("Failed to get the media libraries while seeding the provider configurations.");
         else
         {
-            foreach (LibraryEntity library in getLibrariesResult.Value)
+            foreach (LibraryEntity library in getLibrariesResult.Value.Data)
             {
                 Result<Success> ensureResult = await providerConfigurationStore.EnsureProviderConfigurationsAsync(library.Id, library.LibraryType, stoppingToken).ConfigureAwait(false);
                 if (ensureResult.IsFailure)
@@ -144,7 +146,9 @@ internal sealed class PluginDetectionSyncJob : BackgroundService
             }
         }
 
-        await unitOfWork.SaveChangesAsync(stoppingToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await unitOfWork.SaveChangesAsync(stoppingToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            throw new InvalidOperationException(saveChangesResult.FirstError.Description);
     }
 
     /// <summary>

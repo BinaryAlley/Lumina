@@ -32,6 +32,7 @@ public class Over18PolicyTests
     public Over18PolicyTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockUserRepository = Substitute.For<IUserRepository>();
         _mockUnitOfWork.UserRepository.Returns(_mockUserRepository);
 
@@ -43,7 +44,7 @@ public class Over18PolicyTests
     {
         // Arrange
         UserEntity user = _userEntityFixture.Create();
-        _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
 
         // Act
@@ -58,7 +59,7 @@ public class Over18PolicyTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
-        _mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(null));
 
         // Act
@@ -73,7 +74,7 @@ public class Over18PolicyTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
-        _mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Error.Failure("Database.Error", "Failed to retrieve user"));
 
         // Act
@@ -88,7 +89,7 @@ public class Over18PolicyTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
-        _mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result<UserEntity?>.Success(null));
 
         // Act

@@ -36,6 +36,7 @@ public class ChangePasswordCommandHandlerTests
     public ChangePasswordCommandHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockHashService = Substitute.For<IPasswordHashService>();
         _mockUserRepository = Substitute.For<IUserRepository>();
 

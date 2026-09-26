@@ -50,6 +50,7 @@ public class StopScheduledJobCommandHandlerTests
     public StopScheduledJobCommandHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockDomainEventsQueue = Substitute.For<IDomainEventsQueue>();
@@ -75,7 +76,7 @@ public class StopScheduledJobCommandHandlerTests
             id: command.ScheduledJobId,
             scheduleType: ScheduleType.WithIntervalInMinutes,
             status: ScheduledJobStatus.Active);
-        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, Arg.Any<CancellationToken>())
+        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<ScheduledJobEntity?>(scheduledJob));
         _mockScheduledJobRepository.UpdateAsync(Arg.Any<ScheduledJobEntity>(), Arg.Any<CancellationToken>()).Returns(Result.Updated);
 
@@ -105,7 +106,7 @@ public class StopScheduledJobCommandHandlerTests
             scheduleType: ScheduleType.WithIntervalInMinutes,
             status: ScheduledJobStatus.Running,
             lastStartedOnUtc: DateTime.UtcNow.AddMinutes(-10));
-        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, Arg.Any<CancellationToken>())
+        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<ScheduledJobEntity?>(scheduledJob));
         _mockScheduledJobRepository.UpdateAsync(Arg.Any<ScheduledJobEntity>(), Arg.Any<CancellationToken>()).Returns(Result.Updated);
 
@@ -132,7 +133,7 @@ public class StopScheduledJobCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(DomainErrors.Scheduling.ScheduledJobNotFound, result.FirstError);
-        await _mockScheduledJobRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockScheduledJobRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
         await _mockScheduledJobScheduler.DidNotReceive().StopCycleAsync(Arg.Any<Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects.ScheduledJobId>(), Arg.Any<CancellationToken>());
     }
 
@@ -149,7 +150,7 @@ public class StopScheduledJobCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
-        await _mockScheduledJobRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockScheduledJobRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -165,7 +166,7 @@ public class StopScheduledJobCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
-        await _mockScheduledJobRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockScheduledJobRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -173,7 +174,7 @@ public class StopScheduledJobCommandHandlerTests
     {
         // Arrange
         StopScheduledJobCommand command = _stopScheduledJobCommandFixture.Create();
-        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, Arg.Any<CancellationToken>())
+        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<ScheduledJobEntity?>(null));
 
         // Act
@@ -194,7 +195,7 @@ public class StopScheduledJobCommandHandlerTests
             id: command.ScheduledJobId,
             scheduleType: ScheduleType.WithIntervalInMinutes,
             status: ScheduledJobStatus.Added);
-        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, Arg.Any<CancellationToken>())
+        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<ScheduledJobEntity?>(scheduledJob));
 
         // Act
@@ -216,7 +217,7 @@ public class StopScheduledJobCommandHandlerTests
             id: command.ScheduledJobId,
             scheduleType: ScheduleType.WithIntervalInMinutes,
             status: ScheduledJobStatus.Active);
-        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, Arg.Any<CancellationToken>())
+        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<ScheduledJobEntity?>(scheduledJob));
         _mockScheduledJobRepository.UpdateAsync(Arg.Any<ScheduledJobEntity>(), Arg.Any<CancellationToken>())
             .Returns(DomainErrors.Scheduling.ScheduledJobNotFound);
@@ -237,7 +238,7 @@ public class StopScheduledJobCommandHandlerTests
         // Arrange
         StopScheduledJobCommand command = _stopScheduledJobCommandFixture.Create();
         Error repositoryError = DomainErrors.Scheduling.ScheduledJobNotFound;
-        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, Arg.Any<CancellationToken>())
+        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(repositoryError);
 
         // Act
@@ -260,7 +261,7 @@ public class StopScheduledJobCommandHandlerTests
             scheduleType: ScheduleType.WithIntervalInMinutes,
             intervalMinutes: 0,
             status: ScheduledJobStatus.Active);
-        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, Arg.Any<CancellationToken>())
+        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<ScheduledJobEntity?>(invalidScheduledJob));
 
         // Act
