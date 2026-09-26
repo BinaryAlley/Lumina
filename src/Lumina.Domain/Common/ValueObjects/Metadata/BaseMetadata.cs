@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Common.Primitives;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
@@ -68,7 +67,6 @@ public abstract class BaseMetadata : ValueObject
     /// <param name="tags">The list of tags of the element to which this metadata object belongs to.</param>
     /// <param name="language">The optional language of the element to which this metadata object belongs to, if applicable.</param>
     /// <param name="originalLanguage">The optional original language of the element to which this metadata object belongs to, if applicable.</param>
-    /// <exception cref="ArgumentNullException">Thrown when the <see cref="title"/> value is <see langword="null"/></exception>
     protected BaseMetadata(
         string title,
         Optional<string> originalTitle,
@@ -79,7 +77,7 @@ public abstract class BaseMetadata : ValueObject
         Optional<LanguageInfo> language,
         Optional<LanguageInfo> originalLanguage)
     {
-        Title = title ?? throw new ArgumentNullException(nameof(title));
+        Title = title;
         OriginalTitle = originalTitle;
         Description = description;
         ReleaseInfo = releaseInfo;

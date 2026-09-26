@@ -2,7 +2,6 @@
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using Lumina.Domain.Fixtures.Common.ValueObjects.Metadata;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -49,21 +48,6 @@ public class BaseMetadataTests
         Assert.Single(metadata.Tags);
         Assert.True(metadata.Language.HasValue);
         Assert.False(metadata.OriginalLanguage.HasValue);
-    }
-
-    [Fact]
-    public void Constructor_WhenTitleIsNull_ShouldThrowArgumentNullException()
-    {
-        // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => new TestMetadata(
-            null!,
-            Optional<string>.None(),
-            Optional<string>.None(),
-            _releaseInfoFixture.Create(),
-            [],
-            [],
-            Optional<LanguageInfo>.None(),
-            Optional<LanguageInfo>.None()));
     }
 
     [Fact]

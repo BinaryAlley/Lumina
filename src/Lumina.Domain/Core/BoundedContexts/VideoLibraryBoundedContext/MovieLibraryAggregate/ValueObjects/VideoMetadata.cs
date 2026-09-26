@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
@@ -72,7 +71,7 @@ public class VideoMetadata : BaseMetadata
         : base(title, originalTitle, description, releaseInfo, genres, tags, language, originalLanguage)
     {
         DurationInSeconds = durationInSeconds;
-        Resolution = resolution ?? throw new ArgumentNullException(nameof(resolution));
+        Resolution = resolution;
         FrameRate = frameRate;
         VideoCodec = videoCodec;
         AudioCodec = audioCodec;
