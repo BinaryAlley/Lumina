@@ -45,6 +45,8 @@ public class AudioRating : Rating
     /// </returns>
     public static Result<AudioRating> Create(decimal value, decimal maxValue, Optional<AudioRatingSource> source, Optional<int> voteCount)
     {
+        if (maxValue < 0 || value < 0)
+            return Errors.Metadata.RatingValueMustBePositive;
         if (value > maxValue)
             return Errors.Metadata.RatingValueCannotBeGreaterThanMaxValue;
 
