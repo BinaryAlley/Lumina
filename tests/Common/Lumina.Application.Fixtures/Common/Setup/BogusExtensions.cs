@@ -35,4 +35,18 @@ public static class BogusExtensions
         DateTime endDateTime = end.ToDateTime(TimeOnly.MinValue);
         return System.DateOnly.FromDateTime(faker.Date.Between(startDateTime, endDateTime));
     }
+
+    /// <summary>
+    /// Adds unique name generation support to the <see cref="Faker"/> class, so that shared lookup tables never receive duplicate primary keys.
+    /// </summary>
+    /// <param name="faker">The faker instance to extend.</param>
+    /// <returns>A unique name of at most 50 characters.</returns>
+    public static string UniqueName(this Faker faker)
+    {
+        string uniqueSuffix = Guid.NewGuid().ToString("N")[..12];
+        int maximumWordLength = 50 - uniqueSuffix.Length - 1;
+        string word = faker.Lorem.Word();
+        string truncatedWord = word.Length > maximumWordLength ? word[..maximumWordLength] : word;
+        return $"{truncatedWord}-{uniqueSuffix}";
+    }
 }
