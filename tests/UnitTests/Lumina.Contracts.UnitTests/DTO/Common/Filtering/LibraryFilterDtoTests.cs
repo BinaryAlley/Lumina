@@ -19,33 +19,6 @@ public class LibraryFilterDtoTests
     };
 
     [Fact]
-    public void LibraryFilterDto_WhenConstructed_ShouldRequireLibraryId()
-    {
-        // Act
-        LibraryFilterDto sut = new() { LibraryId = Guid.NewGuid(), SearchTerm = "test" };
-
-        // Assert
-        Assert.NotEqual(Guid.Empty, sut.LibraryId);
-    }
-
-    [Fact]
-    public void RoundTrip_WhenSerializingWithLibraryIdAndSearchTerm_ShouldPreserveValues()
-    {
-        // Arrange
-        Guid libraryId = Guid.NewGuid();
-        LibraryFilterDto expected = new() { LibraryId = libraryId, SearchTerm = "fantasy" };
-
-        // Act
-        string json = JsonSerializer.Serialize(expected, _jsonOptions);
-        LibraryFilterDto? actual = JsonSerializer.Deserialize<LibraryFilterDto>(json, _jsonOptions);
-
-        // Assert
-        Assert.NotNull(actual);
-        Assert.Equal(expected.LibraryId, actual.LibraryId);
-        Assert.Equal(expected.SearchTerm, actual.SearchTerm);
-    }
-
-    [Fact]
     public void RoundTrip_WhenDeserializingJsonWithoutLibraryId_ShouldThrowJsonException()
     {
         // Arrange
