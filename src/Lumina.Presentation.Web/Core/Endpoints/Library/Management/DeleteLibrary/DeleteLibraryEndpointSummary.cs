@@ -20,7 +20,7 @@ public class DeleteLibraryEndpointSummary : Summary<DeleteLibraryEndpoint, Delet
     public DeleteLibraryEndpointSummary()
     {
         Summary = "Deletes a media library.";
-        Description = "Deletes the media library identified by the request.";
+        Description = "Deletes the media library identified by the route.";
 
         RequestParam(r => r.Id, "The unique identifier of the media library to delete. Required.");
 

@@ -19,7 +19,7 @@ public class EditBookViewEndpointSummary : Summary<EditBookViewEndpoint, GetBook
     public EditBookViewEndpointSummary()
     {
         Summary = "Renders the edit book view.";
-        Description = "Renders the view for editing the book identified by the request.";
+        Description = "Renders the view for editing the book identified by the route.";
 
         RequestParam(r => r.BookId, "The unique identifier of the book to edit. Required.");
         RequestParam(r => r.LibraryId, "The Id of the media library the book belongs to. Required.");

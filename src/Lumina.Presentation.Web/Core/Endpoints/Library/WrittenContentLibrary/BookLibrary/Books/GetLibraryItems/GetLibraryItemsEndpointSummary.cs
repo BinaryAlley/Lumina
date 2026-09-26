@@ -22,7 +22,7 @@ public class GetLibraryItemsEndpointSummary : Summary<GetLibraryItemsEndpoint, G
     public GetLibraryItemsEndpointSummary()
     {
         Summary = "Retrieves the lightweight details of the books of a media library.";
-        Description = "Retrieves the lightweight details of the books of the media library identified by the request.";
+        Description = "Retrieves the lightweight details of the books of the media library identified by the route.";
 
         RequestParam(r => r.LibraryId, "The Id of the media library whose books are retrieved. Required.");
         RequestParam(r => r.CurrentPage, "The page of results to retrieve. Optional.");

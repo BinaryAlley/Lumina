@@ -21,7 +21,7 @@ public class ScanLibraryEndpointSummary : Summary<ScanLibraryEndpoint, ScanLibra
     public ScanLibraryEndpointSummary()
     {
         Summary = "Starts the scan of a media library.";
-        Description = "Initiates the scan of the media library identified by the request.";
+        Description = "Initiates the scan of the media library identified by the route.";
 
         RequestParam(r => r.Id, "The unique identifier of the media library to scan. Required.");
 

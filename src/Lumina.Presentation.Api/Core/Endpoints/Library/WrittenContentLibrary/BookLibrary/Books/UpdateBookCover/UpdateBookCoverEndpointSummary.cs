@@ -20,7 +20,7 @@ public class UpdateBookCoverEndpointSummary : Summary<UpdateBookCoverEndpoint, E
     public UpdateBookCoverEndpointSummary()
     {
         Summary = "Updates the cover image of a book.";
-        Description = "Updates the cover image of the book identified by the request, with the image uploaded in the multipart form of the request.";
+        Description = "Updates the cover image of the book identified by the route, with the image uploaded in the multipart form of the request.";
 
         Response(200, "The relative path of the stored cover image is returned.",
             example: new UpdateBookCoverResponse(

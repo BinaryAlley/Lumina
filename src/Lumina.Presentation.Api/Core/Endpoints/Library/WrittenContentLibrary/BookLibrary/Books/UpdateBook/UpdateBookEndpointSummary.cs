@@ -28,7 +28,7 @@ public class UpdateBookEndpointSummary : Summary<UpdateBookEndpoint, UpdateBookR
     public UpdateBookEndpointSummary()
     {
         Summary = "Updates an existing book.";
-        Description = "Updates the details of the book identified by the request, returning the full details of the updated book. The book is updated by an Admin, who can update the books of all libraries, or by the owner of the library of the book.";
+        Description = "Updates the details of the book identified by the route, returning the full details of the updated book. The book is updated by an Admin, who can update the books of all libraries, or by the owner of the library of the book.";
 
         RequestParam(r => r.Metadata, "The written content metadata of the book. Required.");
         RequestParam(r => r.Metadata!.Title, "The title of the book. Required.");

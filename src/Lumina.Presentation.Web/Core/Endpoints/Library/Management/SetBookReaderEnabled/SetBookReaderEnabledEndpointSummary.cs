@@ -20,7 +20,7 @@ public class SetBookReaderEnabledEndpointSummary : Summary<SetBookReaderEnabledE
     public SetBookReaderEnabledEndpointSummary()
     {
         Summary = "Enables or disables a book reader of a media library.";
-        Description = "Enables or disables the book reader of the media library identified by the request.";
+        Description = "Enables or disables the book reader of the media library identified by the route.";
         RequestParam(r => r.LibraryId, "The Id of the media library whose book reader is enabled or disabled. Required.");
         RequestParam(r => r.PluginId, "The unique identifier of the plugin providing the book reader. Required.");
         RequestParam(r => r.IsEnabled, "Whether the book reader should be enabled for the media library, or not. Required.");

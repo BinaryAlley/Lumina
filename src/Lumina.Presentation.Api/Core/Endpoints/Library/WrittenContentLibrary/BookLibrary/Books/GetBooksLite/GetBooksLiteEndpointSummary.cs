@@ -23,7 +23,7 @@ public class GetBooksLiteEndpointSummary : Summary<GetBooksLiteEndpoint, GetBook
     public GetBooksLiteEndpointSummary()
     {
         Summary = "Retrieves the list of lightweight book details of a media library.";
-        Description = "Returns the paginated, filterable list of the lightweight details of the books of the media library identified by the request, suitable for card-style navigation. The page is returned to an Admin, who can see the books of all libraries, or to the owner of the library.";
+        Description = "Returns the paginated, filterable list of the lightweight details of the books of the media library identified by the route, suitable for card-style navigation. The page is returned to an Admin, who can see the books of all libraries, or to the owner of the library.";
 
         ExampleRequest = new GetBooksLiteRequest(
             CurrentPage: 1,

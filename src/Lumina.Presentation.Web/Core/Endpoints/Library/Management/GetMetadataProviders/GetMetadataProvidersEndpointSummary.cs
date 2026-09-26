@@ -21,7 +21,7 @@ public class GetMetadataProvidersEndpointSummary : Summary<GetMetadataProvidersE
     public GetMetadataProvidersEndpointSummary()
     {
         Summary = "Retrieves the metadata providers of a media library.";
-        Description = "Retrieves the metadata providers of the media library identified by the request.";
+        Description = "Retrieves the metadata providers of the media library identified by the route.";
 
         RequestParam(r => r.LibraryId, "The unique identifier of the media library whose metadata providers are retrieved. Required.");
 

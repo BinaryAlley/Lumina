@@ -27,7 +27,7 @@ public class SaveBookEndpointSummary : Summary<SaveBookEndpoint, UpdateBookReque
     public SaveBookEndpointSummary()
     {
         Summary = "Updates a book.";
-        Description = "Updates the details of the book identified by the request.";
+        Description = "Updates the details of the book identified by the route.";
 
         RequestParam(r => r.BookId, "The unique identifier of the book to update. Required.");
         RequestParam(r => r.LibraryId, "The Id of the media library the book belongs to. Required.");

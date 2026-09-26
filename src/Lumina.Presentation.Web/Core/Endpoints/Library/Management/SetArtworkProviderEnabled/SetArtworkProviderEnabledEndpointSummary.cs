@@ -20,7 +20,7 @@ public class SetArtworkProviderEnabledEndpointSummary : Summary<SetArtworkProvid
     public SetArtworkProviderEnabledEndpointSummary()
     {
         Summary = "Enables or disables an artwork provider of a media library.";
-        Description = "Enables or disables the artwork provider of the media library identified by the request.";
+        Description = "Enables or disables the artwork provider of the media library identified by the route.";
         RequestParam(r => r.LibraryId, "The Id of the media library whose artwork provider is enabled or disabled. Required.");
         RequestParam(r => r.PluginId, "The unique identifier of the plugin providing the artwork. Required.");
         RequestParam(r => r.IsEnabled, "Whether the artwork provider should be enabled for the media library, or not. Required.");

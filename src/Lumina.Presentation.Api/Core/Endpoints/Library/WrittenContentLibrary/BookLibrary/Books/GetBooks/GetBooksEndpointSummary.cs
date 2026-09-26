@@ -28,7 +28,7 @@ public class GetBooksEndpointSummary : Summary<GetBooksEndpoint, GetBooksRequest
     public GetBooksEndpointSummary()
     {
         Summary = "Retrieves the list of books of a media library.";
-        Description = "Returns the paginated, filterable list of the books of the media library identified by the request, with the full details of each book. The page is returned to an Admin, who can see the books of all libraries, or to the owner of the library.";
+        Description = "Returns the paginated, filterable list of the books of the media library identified by the route, with the full details of each book. The page is returned to an Admin, who can see the books of all libraries, or to the owner of the library.";
 
         ExampleRequest = new GetBooksRequest(
             CurrentPage: 1,

@@ -19,7 +19,7 @@ public class BooksIndexViewEndpointSummary : Summary<BooksIndexViewEndpoint, Get
     public BooksIndexViewEndpointSummary()
     {
         Summary = "Renders the books browsing view.";
-        Description = "Renders the view for browsing the books of the media library identified by the request.";
+        Description = "Renders the view for browsing the books of the media library identified by the route.";
 
         RequestParam(r => r.LibraryId, "The unique identifier of the media library whose books are browsed. Optional.");
 
