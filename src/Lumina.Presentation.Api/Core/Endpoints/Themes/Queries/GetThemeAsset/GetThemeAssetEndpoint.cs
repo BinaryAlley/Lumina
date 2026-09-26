@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Themes.Queries.GetThemeAsset;
 
 /// <summary>
-/// API endpoint for the <c>/themes/{themeId}/assets/{assetPath}</c> route.
+/// API endpoint for the <c>/themes/{themeId}/assets/{*assetPath}</c> route.
 /// </summary>
 public class GetThemeAssetEndpoint : BaseEndpoint<GetThemeAssetRequest, IResult>
 {
@@ -39,7 +39,7 @@ public class GetThemeAssetEndpoint : BaseEndpoint<GetThemeAssetRequest, IResult>
         Verbs(Http.GET);
         Routes(ApiRoutes.Themes.GET_THEME_ASSET);
         Version(1);
-        // theme content is public, since the web renders themed pages for anonymous visitors too (i.e.: login page); only install and manage operations are admin-gated
+        // Theme content is public, since the web renders themed pages for anonymous visitors too (i.e.: login page); only install and manage operations are admin-gated.
         AllowAnonymous();
         DontCatchExceptions();
     }

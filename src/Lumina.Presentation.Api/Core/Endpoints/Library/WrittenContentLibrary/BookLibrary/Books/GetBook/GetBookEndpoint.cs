@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetBook;
 
 /// <summary>
-/// API endpoint for the <c>/{libraryId}/books/{bookId}</c> route.
+/// API endpoint for the <c>/libraries/{libraryId}/books/{bookId}</c> route.
 /// </summary>
 public class GetBookEndpoint : BaseEndpoint<EmptyRequest, IResult>
 {

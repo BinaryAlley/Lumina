@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.Reading.GetReadingAvailability;
 
 /// <summary>
-/// API endpoint for the <c>/{libraryId}/books/{bookId}/reading/availability</c> route.
+/// API endpoint for the <c>/libraries/{libraryId}/books/{bookId}/reading/availability</c> route.
 /// </summary>
 public class GetReadingAvailabilityEndpoint : BaseEndpoint<FastEndpoints.EmptyRequest, IResult>
 {

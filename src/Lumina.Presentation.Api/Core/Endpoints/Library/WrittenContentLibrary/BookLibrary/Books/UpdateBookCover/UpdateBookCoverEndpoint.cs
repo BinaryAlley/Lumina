@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.UpdateBookCover;
 
 /// <summary>
-/// API endpoint for the <c>/books/{bookId}/cover</c> route.
+/// API endpoint for the <c>/libraries/{libraryId}/books/{bookId}/cover</c> route.
 /// </summary>
 public class UpdateBookCoverEndpoint : BaseEndpoint<FastEndpoints.EmptyRequest, IResult>
 {

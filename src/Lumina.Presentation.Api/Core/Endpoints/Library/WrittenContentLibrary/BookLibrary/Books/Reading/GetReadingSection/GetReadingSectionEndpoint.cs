@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.Reading.GetReadingSection;
 
 /// <summary>
-/// API endpoint for the <c>/{libraryId}/books/{bookId}/reading/sections/{locationRef}</c> route.
+/// API endpoint for the <c>/libraries/{libraryId}/books/{bookId}/reading/sections/{locationRef}</c> route.
 /// </summary>
 public class GetReadingSectionEndpoint : BaseEndpoint<FastEndpoints.EmptyRequest, IResult>
 {
