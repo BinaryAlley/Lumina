@@ -141,8 +141,26 @@
   <data name="BitrateMustBeAPositiveNumber" xml:space="preserve">
     <value>يجب أن يكون معدل البت رقمًا موجبًا!</value>
   </data>
+  <data name="An unexpected error occurred while processing the request." xml:space="preserve">
+    <value>حدث خطأ غير متوقع أثناء معالجة الطلب!</value>
+  </data>
+  <data name="InternalServerError" xml:space="preserve">
+    <value>خطأ داخلي في الخادم!</value>
+  </data>
+  <data name="UniqueConstraintViolation" xml:space="preserve">
+    <value>قيمة مكررة تنتهك قيد التفرد!</value>
+  </data>
   <data name="BookAlreadyExists" xml:space="preserve">
     <value>الكتاب موجود بالفعل!</value>
+  </data>
+  <data name="BookCoverCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن يكون غلاف الكتاب فارغًا!</value>
+  </data>
+  <data name="BookFileNotFound" xml:space="preserve">
+    <value>لم يتم العثور على ملف الكتاب!</value>
+  </data>
+  <data name="BookIdCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون معرّف الكتاب فارغًا!</value>
   </data>
   <data name="BookLibraryCannotBeNull" xml:space="preserve">
     <value>لا يمكن أن تكون مكتبة الكتب فارغة!</value>
@@ -152,6 +170,12 @@
   </data>
   <data name="BookPathCannotBeEmpty" xml:space="preserve">
     <value>لا يمكن أن يكون مسار الكتاب فارغًا!</value>
+  </data>
+  <data name="BookPathMustBeMaximum2048CharactersLong" xml:space="preserve">
+    <value>يجب ألا يتجاوز مسار الكتاب 2048 حرفًا!</value>
+  </data>
+  <data name="BookPathMustBeWithinLibraryContentLocations" xml:space="preserve">
+    <value>يجب أن يكون مسار الكتاب داخل أحد مواقع محتوى المكتبة!</value>
   </data>
   <data name="CannotNavigateUp" xml:space="preserve">
     <value>لا يمكن التنقل إلى مستوى أعلى!</value>
@@ -273,6 +297,9 @@
   <data name="FileMoveError" xml:space="preserve">
     <value>خطأ في نقل الملف!</value>
   </data>
+  <data name="FileNameCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون اسم الملف فارغًا!</value>
+  </data>
   <data name="FileNotFound" xml:space="preserve">
     <value>لم يتم العثور على الملف!</value>
   </data>
@@ -323,9 +350,6 @@
   </data>
   <data name="InvalidIsbn13Format" xml:space="preserve">
     <value>تنسيق ISBN13 غير صالح!</value>
-  </data>
-  <data name="InvalidIsoCode" xml:space="preserve">
-    <value>رمز ISO غير صالح!</value>
   </data>
   <data name="InvalidLccnFormat" xml:space="preserve">
     <value>تنسيق LCCN غير صالح!</value>
@@ -422,6 +446,12 @@
   </data>
   <data name="LibraryTypeCannotBeNull" xml:space="preserve">
     <value>لا يمكن أن يكون نوع المكتبة فارغًا!</value>
+  </data>
+  <data name="MediaContributorIdCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون معرّف المساهم الإعلامي فارغًا!</value>
+  </data>
+  <data name="MediaContributorNotFound" xml:space="preserve">
+    <value>لم يتم العثور على المساهم الإعلامي!</value>
   </data>
   <data name="MediaLibrariesDirectoryCannotBeEmpty" xml:space="preserve">
     <value>لا يمكن أن يكون دليل مكتبات الوسائط فارغًا!</value>
@@ -731,6 +761,9 @@
   </data>
   <data name="PluginFileNameCannotBeEmpty" xml:space="preserve">
     <value>لا يمكن أن يكون اسم ملف المكوّن الإضافي فارغاً!</value>
+  </data>
+  <data name="UnknownMediaContributorRole" xml:space="preserve">
+    <value>دور المساهم الإعلامي غير معروف!</value>
   </data>
   <data name="UnsupportedPluginFileType" xml:space="preserve">
     <value>نوع ملف المكوّن الإضافي المرفوع غير مدعوم!</value>

@@ -141,8 +141,26 @@
   <data name="BitrateMustBeAPositiveNumber" xml:space="preserve">
     <value>Бітрейт має бути додатним числом!</value>
   </data>
+  <data name="An unexpected error occurred while processing the request." xml:space="preserve">
+    <value>Під час обробки запиту сталася неочікувана помилка!</value>
+  </data>
+  <data name="InternalServerError" xml:space="preserve">
+    <value>Внутрішня помилка сервера!</value>
+  </data>
+  <data name="UniqueConstraintViolation" xml:space="preserve">
+    <value>Дублікат значення порушує обмеження унікальності!</value>
+  </data>
   <data name="BookAlreadyExists" xml:space="preserve">
     <value>Книга вже існує!</value>
+  </data>
+  <data name="BookCoverCannotBeNull" xml:space="preserve">
+    <value>Обкладинка книги не може бути null!</value>
+  </data>
+  <data name="BookFileNotFound" xml:space="preserve">
+    <value>Файл книги не знайдено!</value>
+  </data>
+  <data name="BookIdCannotBeEmpty" xml:space="preserve">
+    <value>Ідентифікатор книги не може бути порожнім!</value>
   </data>
   <data name="BookLibraryCannotBeNull" xml:space="preserve">
     <value>Бібліотека книг не може бути порожньою!</value>
@@ -152,6 +170,12 @@
   </data>
   <data name="BookPathCannotBeEmpty" xml:space="preserve">
     <value>Шлях до книги не може бути порожнім!</value>
+  </data>
+  <data name="BookPathMustBeMaximum2048CharactersLong" xml:space="preserve">
+    <value>Шлях до книги має містити щонайбільше 2048 символів!</value>
+  </data>
+  <data name="BookPathMustBeWithinLibraryContentLocations" xml:space="preserve">
+    <value>Шлях книги має знаходитися в одному з розташувань вмісту бібліотеки!</value>
   </data>
   <data name="CannotNavigateUp" xml:space="preserve">
     <value>Неможливо перейти на рівень вище!</value>
@@ -273,6 +297,9 @@
   <data name="FileMoveError" xml:space="preserve">
     <value>Помилка переміщення файлу!</value>
   </data>
+  <data name="FileNameCannotBeEmpty" xml:space="preserve">
+    <value>Ім'я файлу не може бути порожнім!</value>
+  </data>
   <data name="FileNotFound" xml:space="preserve">
     <value>Файл не знайдено!</value>
   </data>
@@ -323,9 +350,6 @@
   </data>
   <data name="InvalidIsbn13Format" xml:space="preserve">
     <value>Недійсний формат ISBN13!</value>
-  </data>
-  <data name="InvalidIsoCode" xml:space="preserve">
-    <value>Недійсний ISO-код!</value>
   </data>
   <data name="InvalidLccnFormat" xml:space="preserve">
     <value>Недійсний формат LCCN!</value>
@@ -422,6 +446,12 @@
   </data>
   <data name="LibraryTypeCannotBeNull" xml:space="preserve">
     <value>Тип бібліотеки не може бути порожнім!</value>
+  </data>
+  <data name="MediaContributorIdCannotBeEmpty" xml:space="preserve">
+    <value>Ідентифікатор медіаспівавтора не може бути порожнім!</value>
+  </data>
+  <data name="MediaContributorNotFound" xml:space="preserve">
+    <value>Медіа-учасника не знайдено!</value>
   </data>
   <data name="MediaLibrariesDirectoryCannotBeEmpty" xml:space="preserve">
     <value>Каталог медіатек не може бути порожнім!</value>
@@ -731,6 +761,9 @@
   </data>
   <data name="PluginFileNameCannotBeEmpty" xml:space="preserve">
     <value>Ім'я файлу плагіна не може бути порожнім!</value>
+  </data>
+  <data name="UnknownMediaContributorRole" xml:space="preserve">
+    <value>Невідома роль медіаспівавтора!</value>
   </data>
   <data name="UnsupportedPluginFileType" xml:space="preserve">
     <value>Тип файлу завантаженого плагіна не підтримується!</value>

@@ -141,8 +141,26 @@
   <data name="BitrateMustBeAPositiveNumber" xml:space="preserve">
     <value>Bitrate must be a positive number!</value>
   </data>
+  <data name="An unexpected error occurred while processing the request." xml:space="preserve">
+    <value>An unexpected error occurred while processing the request!</value>
+  </data>
+  <data name="InternalServerError" xml:space="preserve">
+    <value>Internal server error!</value>
+  </data>
+  <data name="UniqueConstraintViolation" xml:space="preserve">
+    <value>A duplicate value violates a unique constraint!</value>
+  </data>
   <data name="BookAlreadyExists" xml:space="preserve">
     <value>Book already exists!</value>
+  </data>
+  <data name="BookCoverCannotBeNull" xml:space="preserve">
+    <value>The book cover cannot be null!</value>
+  </data>
+  <data name="BookFileNotFound" xml:space="preserve">
+    <value>The book file was not found!</value>
+  </data>
+  <data name="BookIdCannotBeEmpty" xml:space="preserve">
+    <value>The book Id cannot be empty!</value>
   </data>
   <data name="BookLibraryCannotBeNull" xml:space="preserve">
     <value>The book library cannot be null!</value>
@@ -152,6 +170,12 @@
   </data>
   <data name="BookPathCannotBeEmpty" xml:space="preserve">
     <value>The book path cannot be empty!</value>
+  </data>
+  <data name="BookPathMustBeMaximum2048CharactersLong" xml:space="preserve">
+    <value>The book path must be maximum 2048 characters long!</value>
+  </data>
+  <data name="BookPathMustBeWithinLibraryContentLocations" xml:space="preserve">
+    <value>The book path must be inside one of the library content locations!</value>
   </data>
   <data name="CannotNavigateUp" xml:space="preserve">
     <value>Cannot navigate up!</value>
@@ -273,6 +297,9 @@
   <data name="FileMoveError" xml:space="preserve">
     <value>Error moving the file!</value>
   </data>
+  <data name="FileNameCannotBeEmpty" xml:space="preserve">
+    <value>File name cannot be empty!</value>
+  </data>
   <data name="FileNotFound" xml:space="preserve">
     <value>File not found!</value>
   </data>
@@ -323,9 +350,6 @@
   </data>
   <data name="InvalidIsbn13Format" xml:space="preserve">
     <value>Invalid ISBN13 format!</value>
-  </data>
-  <data name="InvalidIsoCode" xml:space="preserve">
-    <value>Invalid ISO code!</value>
   </data>
   <data name="InvalidLccnFormat" xml:space="preserve">
     <value>Invalid LCCN format!</value>
@@ -422,6 +446,12 @@
   </data>
   <data name="LibraryTypeCannotBeNull" xml:space="preserve">
     <value>Library type cannot be null!</value>
+  </data>
+  <data name="MediaContributorIdCannotBeEmpty" xml:space="preserve">
+    <value>The media contributor Id cannot be empty!</value>
+  </data>
+  <data name="MediaContributorNotFound" xml:space="preserve">
+    <value>The media contributor was not found!</value>
   </data>
   <data name="MediaLibrariesDirectoryCannotBeEmpty" xml:space="preserve">
     <value>The media libraries directory cannot be empty!</value>
@@ -731,6 +761,9 @@
   </data>
   <data name="PluginFileNameCannotBeEmpty" xml:space="preserve">
     <value>The plugin file name cannot be empty!</value>
+  </data>
+  <data name="UnknownMediaContributorRole" xml:space="preserve">
+    <value>Unknown media contributor role!</value>
   </data>
   <data name="UnsupportedPluginFileType" xml:space="preserve">
     <value>The uploaded plugin file type is not supported!</value>

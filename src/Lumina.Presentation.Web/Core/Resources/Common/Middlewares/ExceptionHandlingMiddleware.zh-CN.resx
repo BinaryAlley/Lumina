@@ -141,8 +141,26 @@
   <data name="BitrateMustBeAPositiveNumber" xml:space="preserve">
     <value>比特率必须是正数！</value>
   </data>
+  <data name="An unexpected error occurred while processing the request." xml:space="preserve">
+    <value>处理请求时发生意外错误！</value>
+  </data>
+  <data name="InternalServerError" xml:space="preserve">
+    <value>服务器内部错误！</value>
+  </data>
+  <data name="UniqueConstraintViolation" xml:space="preserve">
+    <value>重复的值违反了唯一约束！</value>
+  </data>
   <data name="BookAlreadyExists" xml:space="preserve">
     <value>图书已存在！</value>
+  </data>
+  <data name="BookCoverCannotBeNull" xml:space="preserve">
+    <value>书籍封面不能为 null！</value>
+  </data>
+  <data name="BookFileNotFound" xml:space="preserve">
+    <value>未找到书籍文件！</value>
+  </data>
+  <data name="BookIdCannotBeEmpty" xml:space="preserve">
+    <value>书籍 Id 不能为空！</value>
   </data>
   <data name="BookLibraryCannotBeNull" xml:space="preserve">
     <value>图书库不能为 null！</value>
@@ -152,6 +170,12 @@
   </data>
   <data name="BookPathCannotBeEmpty" xml:space="preserve">
     <value>图书路径不能为空！</value>
+  </data>
+  <data name="BookPathMustBeMaximum2048CharactersLong" xml:space="preserve">
+    <value>书籍路径长度最多为 2048 个字符！</value>
+  </data>
+  <data name="BookPathMustBeWithinLibraryContentLocations" xml:space="preserve">
+    <value>书籍路径必须位于媒体库内容位置之一内！</value>
   </data>
   <data name="CannotNavigateUp" xml:space="preserve">
     <value>无法向上导航！</value>
@@ -273,6 +297,9 @@
   <data name="FileMoveError" xml:space="preserve">
     <value>移动文件时出错！</value>
   </data>
+  <data name="FileNameCannotBeEmpty" xml:space="preserve">
+    <value>文件名不能为空！</value>
+  </data>
   <data name="FileNotFound" xml:space="preserve">
     <value>找不到文件！</value>
   </data>
@@ -323,9 +350,6 @@
   </data>
   <data name="InvalidIsbn13Format" xml:space="preserve">
     <value>无效的ISBN13格式！</value>
-  </data>
-  <data name="InvalidIsoCode" xml:space="preserve">
-    <value>无效的ISO代码！</value>
   </data>
   <data name="InvalidLccnFormat" xml:space="preserve">
     <value>无效的LCCN格式！</value>
@@ -422,6 +446,12 @@
   </data>
   <data name="LibraryTypeCannotBeNull" xml:space="preserve">
     <value>库类型不能为空！</value>
+  </data>
+  <data name="MediaContributorIdCannotBeEmpty" xml:space="preserve">
+    <value>媒体贡献者 Id 不能为空！</value>
+  </data>
+  <data name="MediaContributorNotFound" xml:space="preserve">
+    <value>未找到媒体贡献者！</value>
   </data>
   <data name="MediaLibrariesDirectoryCannotBeEmpty" xml:space="preserve">
     <value>媒体库目录不能为空！</value>
@@ -731,6 +761,9 @@
   </data>
   <data name="PluginFileNameCannotBeEmpty" xml:space="preserve">
     <value>插件文件名不能为空!</value>
+  </data>
+  <data name="UnknownMediaContributorRole" xml:space="preserve">
+    <value>未知的媒体贡献者角色！</value>
   </data>
   <data name="UnsupportedPluginFileType" xml:space="preserve">
     <value>不支持上传的插件文件类型!</value>

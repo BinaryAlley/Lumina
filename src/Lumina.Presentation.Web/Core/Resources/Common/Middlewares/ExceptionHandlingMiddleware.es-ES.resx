@@ -141,8 +141,26 @@
   <data name="BitrateMustBeAPositiveNumber" xml:space="preserve">
     <value>¡La tasa de bits debe ser un número positivo!</value>
   </data>
+  <data name="An unexpected error occurred while processing the request." xml:space="preserve">
+    <value>¡Se produjo un error inesperado al procesar la solicitud!</value>
+  </data>
+  <data name="InternalServerError" xml:space="preserve">
+    <value>¡Error interno del servidor!</value>
+  </data>
+  <data name="UniqueConstraintViolation" xml:space="preserve">
+    <value>¡Un valor duplicado infringe una restricción de unicidad!</value>
+  </data>
   <data name="BookAlreadyExists" xml:space="preserve">
     <value>¡El libro ya existe!</value>
+  </data>
+  <data name="BookCoverCannotBeNull" xml:space="preserve">
+    <value>¡La portada del libro no puede ser nula!</value>
+  </data>
+  <data name="BookFileNotFound" xml:space="preserve">
+    <value>¡No se encontró el archivo del libro!</value>
+  </data>
+  <data name="BookIdCannotBeEmpty" xml:space="preserve">
+    <value>¡El Id del libro no puede estar vacío!</value>
   </data>
   <data name="BookLibraryCannotBeNull" xml:space="preserve">
     <value>¡La biblioteca de libros no puede ser nula!</value>
@@ -152,6 +170,12 @@
   </data>
   <data name="BookPathCannotBeEmpty" xml:space="preserve">
     <value>¡La ruta del libro no puede estar vacía!</value>
+  </data>
+  <data name="BookPathMustBeMaximum2048CharactersLong" xml:space="preserve">
+    <value>¡La ruta del libro debe tener como máximo 2048 caracteres!</value>
+  </data>
+  <data name="BookPathMustBeWithinLibraryContentLocations" xml:space="preserve">
+    <value>¡La ruta del libro debe estar dentro de una de las ubicaciones de contenido de la biblioteca!</value>
   </data>
   <data name="CannotNavigateUp" xml:space="preserve">
     <value>¡No se puede navegar hacia arriba!</value>
@@ -273,6 +297,9 @@
   <data name="FileMoveError" xml:space="preserve">
     <value>¡Error al mover el archivo!</value>
   </data>
+  <data name="FileNameCannotBeEmpty" xml:space="preserve">
+    <value>¡El nombre del archivo no puede estar vacío!</value>
+  </data>
   <data name="FileNotFound" xml:space="preserve">
     <value>¡Archivo no encontrado!</value>
   </data>
@@ -323,9 +350,6 @@
   </data>
   <data name="InvalidIsbn13Format" xml:space="preserve">
     <value>¡Formato ISBN13 inválido!</value>
-  </data>
-  <data name="InvalidIsoCode" xml:space="preserve">
-    <value>¡Código ISO inválido!</value>
   </data>
   <data name="InvalidLccnFormat" xml:space="preserve">
     <value>¡Formato LCCN inválido!</value>
@@ -422,6 +446,12 @@
   </data>
   <data name="LibraryTypeCannotBeNull" xml:space="preserve">
     <value>¡El tipo de biblioteca no puede ser nulo!</value>
+  </data>
+  <data name="MediaContributorIdCannotBeEmpty" xml:space="preserve">
+    <value>¡El Id del colaborador de medios no puede estar vacío!</value>
+  </data>
+  <data name="MediaContributorNotFound" xml:space="preserve">
+    <value>¡No se encontró el colaborador de medios!</value>
   </data>
   <data name="MediaLibrariesDirectoryCannotBeEmpty" xml:space="preserve">
     <value>¡El directorio de bibliotecas multimedia no puede estar vacío!</value>
@@ -731,6 +761,9 @@
   </data>
   <data name="PluginFileNameCannotBeEmpty" xml:space="preserve">
     <value>El nombre del archivo del plugin no puede estar vacío!</value>
+  </data>
+  <data name="UnknownMediaContributorRole" xml:space="preserve">
+    <value>¡Rol de colaborador de medios desconocido!</value>
   </data>
   <data name="UnsupportedPluginFileType" xml:space="preserve">
     <value>El tipo de archivo del plugin subido no es compatible!</value>
