@@ -127,7 +127,7 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         string content = await response.Content.ReadAsStringAsync();
 
         // Assert
-        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         Assert.DoesNotContain("SQL", content);
         Assert.DoesNotContain("Exception", content);
         Assert.DoesNotContain("password", content);
@@ -156,7 +156,7 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         string content = await response.Content.ReadAsStringAsync();
 
         // Assert
-        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         Assert.DoesNotContain(weakPassword, content); // shouldn't leak the actual password
     }
 

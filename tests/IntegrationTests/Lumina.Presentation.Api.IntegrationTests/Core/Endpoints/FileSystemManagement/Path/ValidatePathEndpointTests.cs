@@ -92,7 +92,7 @@ public class ValidatePathEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/path/validate?path={Uri.EscapeDataString(path)}");
 
         // Assert
-        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
         string content = await response.Content.ReadAsStringAsync();
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);

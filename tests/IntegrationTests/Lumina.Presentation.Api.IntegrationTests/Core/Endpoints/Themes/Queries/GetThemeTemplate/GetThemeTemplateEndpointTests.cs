@@ -102,7 +102,7 @@ public class GetThemeTemplateEndpointTests : IClassFixture<AuthenticatedLuminaAp
         HttpResponseMessage response = await anonymousClient.GetAsync("/api/v1/themes/editorial-paper/templates/");
 
         // Assert
-        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
         string content = await response.Content.ReadAsStringAsync();
 

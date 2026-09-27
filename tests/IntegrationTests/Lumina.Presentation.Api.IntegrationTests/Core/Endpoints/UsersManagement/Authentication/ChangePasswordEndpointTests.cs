@@ -95,7 +95,7 @@ public class ChangePasswordEndpointTests : IClassFixture<AuthenticatedLuminaApiF
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/change-password", request);
 
         // Assert
-        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
@@ -182,7 +182,7 @@ public class ChangePasswordEndpointTests : IClassFixture<AuthenticatedLuminaApiF
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/change-password", request);
 
         // Assert
-        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);

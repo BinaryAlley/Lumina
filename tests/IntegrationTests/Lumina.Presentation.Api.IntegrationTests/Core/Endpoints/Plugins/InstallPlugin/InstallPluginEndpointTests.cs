@@ -156,7 +156,7 @@ public class InstallPluginEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
         HttpResponseMessage response = await _client.PostAsync("/api/v1/plugins", multipartContent);
 
         // Assert
-        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
         string content = await response.Content.ReadAsStringAsync();
 
@@ -184,7 +184,7 @@ public class InstallPluginEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
         HttpResponseMessage response = await _client.PostAsync("/api/v1/plugins", multipartContent);
 
         // Assert
-        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
         string content = await response.Content.ReadAsStringAsync();
 

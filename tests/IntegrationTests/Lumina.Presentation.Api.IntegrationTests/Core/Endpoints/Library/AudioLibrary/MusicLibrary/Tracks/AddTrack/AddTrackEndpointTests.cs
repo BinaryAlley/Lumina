@@ -1239,7 +1239,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     /// <param name="expectedErrorCodes">The validation error codes that must all be present.</param>
     private async Task AssertUnprocessableEntityWithValidationErrors(HttpResponseMessage response, string expectedInstance, params string[] expectedErrorCodes)
     {
-        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
 
         string content = await response.Content.ReadAsStringAsync();

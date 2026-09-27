@@ -184,7 +184,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/recover-password", request);
 
         // Assert
-        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
@@ -219,7 +219,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/recover-password", request);
 
         // Assert
-        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);

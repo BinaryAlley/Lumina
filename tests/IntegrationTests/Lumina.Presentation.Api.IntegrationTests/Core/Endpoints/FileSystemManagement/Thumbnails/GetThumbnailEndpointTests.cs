@@ -102,7 +102,7 @@ public class GetThumbnailEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/thumbnails/get-thumbnail?path={Uri.EscapeDataString(invalidImagePath)}&quality={quality}");
 
         // Assert
-        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
         string content = await response.Content.ReadAsStringAsync();
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
@@ -131,7 +131,7 @@ public class GetThumbnailEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/thumbnails/get-thumbnail?path={Uri.EscapeDataString(_testImagePath)}&quality={invalidQuality}");
 
         // Assert
-        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
         string content = await response.Content.ReadAsStringAsync();
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
