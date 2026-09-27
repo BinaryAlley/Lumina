@@ -120,6 +120,53 @@ public class UpdateRoleEndpointTests : IClassFixture<LuminaApiFactory>, IAsyncDi
         Assert.Equal(maliciousRoleName, updatedRole!.RoleName);
     }
 
+    [Fact]
+    public async Task UpdateRole_WhenAuthenticatedNonAdmin_ShouldReturnForbiddenResult()
+    {
+        // Arrange
+        HttpClient client = _apiFactory.CreateClient();
+        (Guid _, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(client);
+        _seededPermissionId = Guid.NewGuid();
+        _seededRoleId = Guid.NewGuid();
+        RoleEntity seededRole = _roleEntityFixture.Create(id: _seededRoleId, roleName: "ExistingRole");
+        using (IServiceScope seedScope = _apiFactory.Services.CreateScope())
+        {
+            LuminaDbContext seedDbContext = seedScope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            seedDbContext.Permissions.Add(_permissionEntityFixture.Create(id: _seededPermissionId, permissionName: AuthorizationPermission.CanDeleteUsers));
+            seedDbContext.Roles.Add(seededRole);
+            await seedDbContext.SaveChangesAsync();
+        }
+        UpdateRoleRequest requestBody = _updateRoleRequestFixture.Create(
+            roleId: seededRole.Id,
+            roleName: "Hijacked",
+            permissions: [_seededPermissionId]
+        );
+        StringContent content = new(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
+
+        // Act
+        HttpResponseMessage response = await client.PutAsync("/api/v1/auth/roles", content);
+        string responseContent = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(responseContent, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemDetails!["status"].GetInt32());
+        Assert.Equal("General.Unauthorized", problemDetails["title"].GetString());
+        Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
+        Assert.DoesNotContain("password", responseContent, StringComparison.OrdinalIgnoreCase);
+
+        // The role is untouched.
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        RoleEntity? storedRole = await dbContext.Roles.FirstOrDefaultAsync(role => role.Id == seededRole.Id);
+        Assert.NotNull(storedRole);
+        Assert.Equal("ExistingRole", storedRole!.RoleName);
+
+        await _apiFactory.RemoveTestUserAsync(username);
+    }
+
     /// <summary>
     /// Disposes API factory resources.
     /// </summary>

@@ -37,6 +37,7 @@ public class AddTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly ArtistEntityFixture _artistEntityFixture = new();
     private readonly AlbumEntityFixture _albumEntityFixture = new();
+    private readonly List<string> _seededUsernames = [];
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
@@ -103,9 +104,11 @@ public class AddTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         // Arrange
         HttpClient ownerClient = _apiFactory.CreateClient();
         (Guid ownerId, string ownerUsername) = await _apiFactory.CreateAndAuthenticateUserAsync(ownerClient);
+        _seededUsernames.Add(ownerUsername);
         (Guid libraryId, Guid artistId, Guid albumId) = await SeedLibraryArtistAndAlbumAsync(ownerId);
 
         (Guid _, string requesterUsername) = await _apiFactory.CreateAndAuthenticateUserAsync(_client);
+        _seededUsernames.Add(requesterUsername);
         AddTrackRequest request = _addTrackRequestFixture.Create(contributors: []);
 
         // Act
@@ -119,11 +122,10 @@ public class AddTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
         Assert.NotNull(problemDetails);
         Assert.Equal(StatusCodes.Status403Forbidden, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
         Assert.Equal("General.Unauthorized", problemDetails["title"].GetString());
         Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
 
-        await _apiFactory.RemoveTestUserAsync(ownerUsername);
-        await _apiFactory.RemoveTestUserAsync(requesterUsername);
     }
 
     [Fact]
@@ -132,9 +134,11 @@ public class AddTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         // Arrange
         HttpClient ownerClient = _apiFactory.CreateClient();
         (Guid ownerId, string ownerUsername) = await _apiFactory.CreateAndAuthenticateUserAsync(ownerClient);
+        _seededUsernames.Add(ownerUsername);
         (Guid ownerLibraryId, Guid artistId, Guid albumId) = await SeedLibraryArtistAndAlbumAsync(ownerId);
 
         (Guid attackerId, string attackerUsername) = await _apiFactory.CreateAndAuthenticateUserAsync(_client);
+        _seededUsernames.Add(attackerUsername);
         Guid attackerLibraryId = Guid.NewGuid();
         using (IServiceScope seedScope = _apiFactory.Services.CreateScope())
         {
@@ -155,8 +159,6 @@ public class AddTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         Assert.DoesNotContain(ownerLibraryId.ToString(), content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
 
-        await _apiFactory.RemoveTestUserAsync(ownerUsername);
-        await _apiFactory.RemoveTestUserAsync(attackerUsername);
     }
 
     [Theory]
@@ -166,6 +168,7 @@ public class AddTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     {
         // Arrange
         (Guid userId, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(_client);
+        _seededUsernames.Add(username);
         (Guid libraryId, Guid artistId, Guid albumId) = await SeedLibraryArtistAndAlbumAsync(userId);
         string injectedPath = Path.Combine(_libraryContentLocation, $"{maliciousPath}.flac");
         AddTrackRequest request = _addTrackRequestFixture.Create(path: injectedPath, contributors: []);
@@ -185,7 +188,6 @@ public class AddTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         TrackEntity storedTrack = await dbContext.Tracks.SingleAsync(track => track.LibraryId == libraryId);
         Assert.Equal(injectedPath, storedTrack.Path);
 
-        await _apiFactory.RemoveTestUserAsync(username);
     }
 
     [Theory]
@@ -195,6 +197,7 @@ public class AddTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     {
         // Arrange
         (Guid userId, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(_client);
+        _seededUsernames.Add(username);
         (Guid libraryId, Guid artistId, Guid albumId) = await SeedLibraryArtistAndAlbumAsync(userId);
         AddTrackRequest request = _addTrackRequestFixture.Create(
             path: Path.Combine(_libraryContentLocation, $"{Guid.NewGuid():N}.flac"),
@@ -215,7 +218,6 @@ public class AddTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         TrackEntity storedTrack = await dbContext.Tracks.SingleAsync(track => track.LibraryId == libraryId);
         Assert.Equal(maliciousTitle, storedTrack.Title);
 
-        await _apiFactory.RemoveTestUserAsync(username);
     }
 
     [Theory]
@@ -225,6 +227,7 @@ public class AddTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     {
         // Arrange
         (Guid _, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(_client);
+        _seededUsernames.Add(username);
         AddTrackRequest request = _addTrackRequestFixture.Create(contributors: []);
 
         // Act
@@ -243,7 +246,6 @@ public class AddTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
         Assert.Contains("LibraryIdCannotBeEmpty", content, StringComparison.OrdinalIgnoreCase);
 
-        await _apiFactory.RemoveTestUserAsync(username);
     }
 
     /// <summary>
@@ -270,6 +272,8 @@ public class AddTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     /// </summary>
     public void Dispose()
     {
-        // Nothing to clean up: each test removes its own seeded rows.
+        _client.Dispose();
+        foreach (string username in _seededUsernames)
+            _apiFactory.RemoveTestUser(username);
     }
 }

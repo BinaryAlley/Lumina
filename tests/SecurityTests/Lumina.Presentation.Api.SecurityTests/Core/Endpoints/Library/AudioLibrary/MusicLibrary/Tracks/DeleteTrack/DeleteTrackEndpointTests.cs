@@ -9,9 +9,11 @@ using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.DeleteTrack;
 using Lumina.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
@@ -37,6 +39,7 @@ public class DeleteTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
     private readonly AlbumEntityFixture _albumEntityFixture = new();
     private readonly TrackEntityFixture _trackEntityFixture = new();
     private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly List<string> _seededUsernames = [];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DeleteTrackEndpointTests"/> class.
@@ -82,6 +85,7 @@ public class DeleteTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         // Arrange
         HttpClient client = _apiFactory.CreateClient();
         (_, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(client);
+        _seededUsernames.Add(username);
 
         // Act
         HttpResponseMessage response = await client.DeleteAsync($"/api/v1/libraries/{Uri.EscapeDataString(maliciousLibraryId)}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks/{Guid.NewGuid()}");
@@ -98,7 +102,6 @@ public class DeleteTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         using JsonDocument problemDetails = JsonDocument.Parse(content);
         Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
 
-        await _apiFactory.RemoveTestUserAsync(username);
     }
 
     [Theory]
@@ -110,6 +113,7 @@ public class DeleteTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         // Arrange
         HttpClient client = _apiFactory.CreateClient();
         (_, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(client);
+        _seededUsernames.Add(username);
 
         // Act
         HttpResponseMessage response = await client.DeleteAsync($"/api/v1/libraries/{Guid.NewGuid()}/artists/{Uri.EscapeDataString(maliciousArtistId)}/albums/{Guid.NewGuid()}/tracks/{Guid.NewGuid()}");
@@ -124,7 +128,6 @@ public class DeleteTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         using JsonDocument problemDetails = JsonDocument.Parse(content);
         Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
 
-        await _apiFactory.RemoveTestUserAsync(username);
     }
 
     [Theory]
@@ -136,6 +139,7 @@ public class DeleteTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         // Arrange
         HttpClient client = _apiFactory.CreateClient();
         (_, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(client);
+        _seededUsernames.Add(username);
 
         // Act
         HttpResponseMessage response = await client.DeleteAsync($"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Uri.EscapeDataString(maliciousAlbumId)}/tracks/{Guid.NewGuid()}");
@@ -150,7 +154,6 @@ public class DeleteTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         using JsonDocument problemDetails = JsonDocument.Parse(content);
         Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
 
-        await _apiFactory.RemoveTestUserAsync(username);
     }
 
     [Theory]
@@ -162,6 +165,7 @@ public class DeleteTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         // Arrange
         HttpClient client = _apiFactory.CreateClient();
         (_, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(client);
+        _seededUsernames.Add(username);
 
         // Act
         HttpResponseMessage response = await client.DeleteAsync($"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks/{Uri.EscapeDataString(maliciousTrackId)}");
@@ -176,7 +180,6 @@ public class DeleteTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         using JsonDocument problemDetails = JsonDocument.Parse(content);
         Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
 
-        await _apiFactory.RemoveTestUserAsync(username);
     }
 
     [Theory]
@@ -188,7 +191,8 @@ public class DeleteTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
     {
         // Arrange
         HttpClient client = _apiFactory.CreateClient();
-        await _apiFactory.CreateAndAuthenticateUserAsync(client);
+        (_, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(client);
+        _seededUsernames.Add(username);
 
         // Act
         HttpResponseMessage response = await client.DeleteAsync($"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks/{maliciousTrackId}");
@@ -201,13 +205,17 @@ public class DeleteTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
 
-        // Note: some payloads are normalized away by the server before routing, producing an empty-body 404;
-        // when the value reaches the handler, the failure must still be a clean, generic problem.
+        // Some payloads are normalized away by the server before routing, producing an empty-body response, while others reach the handler and
+        // produce a clean problem details; either way, the status is asserted unconditionally, so an empty-bodied 500 cannot satisfy the test.
+        Assert.True(response.StatusCode == HttpStatusCode.NotFound || response.StatusCode == HttpStatusCode.UnprocessableEntity,
+            $"Unexpected status code {response.StatusCode}.");
+        Assert.NotEqual(StatusCodes.Status500InternalServerError, (int)response.StatusCode);
+
+        // When the payload reaches the handler, the failure must still be a clean, generic problem.
         if (!string.IsNullOrWhiteSpace(content))
         {
             using JsonDocument problemDetails = JsonDocument.Parse(content);
-            Assert.True(response.StatusCode == HttpStatusCode.NotFound || response.StatusCode == HttpStatusCode.UnprocessableEntity);
-            Assert.NotEqual(StatusCodes.Status500InternalServerError, (int)response.StatusCode);
+            Assert.NotEmpty(problemDetails.RootElement.ToString());
         }
     }
 
@@ -217,6 +225,7 @@ public class DeleteTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         // Arrange
         HttpClient client = _apiFactory.CreateClient();
         (_, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(client);
+        _seededUsernames.Add(username);
         Guid otherUserId = await SeedOtherUserAsync();
         (Guid libraryId, Guid artistId, Guid albumId, Guid trackId) = await SeedLibraryArtistAlbumAndTrackAsync(otherUserId);
 
@@ -239,7 +248,40 @@ public class DeleteTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         Assert.DoesNotContain("hash", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("salt", content, StringComparison.OrdinalIgnoreCase);
 
-        await _apiFactory.RemoveTestUserAsync(username);
+    }
+
+    [Fact]
+    public async Task DeleteTrack_WhenTrackBelongsToAnotherUsersLibrary_ShouldReturnNotFoundWithoutDeletingIt()
+    {
+        // Arrange
+        HttpClient client = _apiFactory.CreateClient();
+        (Guid actingUserId, string actingUsername) = await _apiFactory.CreateAndAuthenticateUserAsync(client);
+        _seededUsernames.Add(actingUsername);
+        (Guid ownLibraryId, _, _, _) = await SeedLibraryArtistAlbumAndTrackAsync(actingUserId);
+
+        // The track lives in a library owned by another user, and is referenced through the acting user's own library route.
+        HttpClient victimClient = _apiFactory.CreateClient();
+        (Guid victimUserId, string victimUsername) = await _apiFactory.CreateAndAuthenticateUserAsync(victimClient);
+        _seededUsernames.Add(victimUsername);
+        (_, Guid victimArtistId, Guid victimAlbumId, Guid victimTrackId) = await SeedLibraryArtistAlbumAndTrackAsync(victimUserId);
+
+        // Act
+        HttpResponseMessage response = await client.DeleteAsync($"/api/v1/libraries/{ownLibraryId}/artists/{victimArtistId}/albums/{victimAlbumId}/tracks/{victimTrackId}");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("password", content, StringComparison.OrdinalIgnoreCase);
+        using JsonDocument problemDetails = JsonDocument.Parse(content);
+        Assert.Equal("General.NotFound", problemDetails.RootElement.GetProperty("title").GetString());
+        Assert.Equal("ArtistNotFound", problemDetails.RootElement.GetProperty("detail").GetString());
+
+        // The other user's track is untouched.
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        Assert.NotNull(await dbContext.Tracks.FirstOrDefaultAsync(track => track.Id == victimTrackId));
+
     }
 
     /// <summary>
@@ -251,8 +293,10 @@ public class DeleteTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         Guid userId = Guid.NewGuid();
-        dbContext.Users.Add(_userEntityFixture.Create(id: userId, username: $"otheruser_{Guid.NewGuid()}", password: "TestPass123!"));
+        string username = $"otheruser_{Guid.NewGuid()}";
+        dbContext.Users.Add(_userEntityFixture.Create(id: userId, username: username, password: "TestPass123!"));
         await dbContext.SaveChangesAsync();
+        _seededUsernames.Add(username);
         return userId;
     }
 
@@ -306,5 +350,7 @@ public class DeleteTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
     public void Dispose()
     {
         _client.Dispose();
+        foreach (string username in _seededUsernames)
+            _apiFactory.RemoveTestUser(username);
     }
 }

@@ -75,6 +75,7 @@ public class GetBooksEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         response.EnsureSuccessStatusCode();
         string content = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(maliciousSearchTerm, content, StringComparison.Ordinal);
 
         // the injected statement must never be executed: the Books table and the seeded rows must still be there
         using IServiceScope scope = _apiFactory.Services.CreateScope();
@@ -106,6 +107,8 @@ public class GetBooksEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
         Assert.NotNull(problemDetails);
         Assert.Equal(StatusCodes.Status403Forbidden, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
+        Assert.Equal("General.Unauthorized", problemDetails["title"].GetString());
         Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
 
         await _apiFactory.RemoveTestUserAsync(ownerUsername);

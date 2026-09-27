@@ -63,6 +63,7 @@ public class GetBookEndpointTests : IClassFixture<LuminaApiFactory>
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(maliciousBookId, content, StringComparison.Ordinal);
         using JsonDocument problemDetails = JsonDocument.Parse(content);
         Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
 

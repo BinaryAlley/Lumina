@@ -10,6 +10,8 @@ using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.UpdateTrack;
 using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -86,25 +88,33 @@ public class UpdateTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
     {
         // Arrange
         HttpClient client = _apiFactory.CreateClient();
-        (Guid _, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(client);
+        (Guid userId, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(client);
         _seededUsernames.Add(username);
         Guid libraryId = Guid.NewGuid();
-        Guid artistId = Guid.NewGuid();
-        Guid albumId = Guid.NewGuid();
-        Guid trackId = Guid.NewGuid();
-        UpdateTrackRequest request = _updateTrackRequestFixture.Create(metadata: _audioMetadataDtoFixture.Create(title: maliciousTitle));
+        SeedLibrary(libraryId, userId);
+        (Guid artistId, Guid albumId, Guid trackId) = SeedArtistGraph(libraryId);
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(
+            path: Path.Combine(s_contentRootPath, $"injected-{Guid.NewGuid():N}.flac"),
+            metadata: _audioMetadataDtoFixture.Create(title: maliciousTitle),
+            moods: [],
+            isrcs: [],
+            contributors: [],
+            ratings: []);
 
         // Act
         HttpResponseMessage response = await client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}", request);
 
         // Assert
-        // The injected title is validated and handled by the parameterized update flow: the route artist does not exist, so the
-        // request fails with a clean not found response and the injected payload is never executed as SQL.
-        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-        string content = await response.Content.ReadAsStringAsync();
-        Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(maliciousTitle, content, StringComparison.Ordinal);
+        // The malicious title passes validation, reaches the parameterized update, and is persisted verbatim: if it were
+        // concatenated into raw SQL, the update would fail and the track would not be updated.
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.DoesNotContain("SqliteException", await response.Content.ReadAsStringAsync(), StringComparison.OrdinalIgnoreCase);
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        TrackEntity? storedTrack = await dbContext.Tracks.FirstOrDefaultAsync(track => track.Id == trackId);
+        Assert.NotNull(storedTrack);
+        Assert.Equal(maliciousTitle, storedTrack!.Title);
     }
 
     [Theory]
@@ -230,8 +240,48 @@ public class UpdateTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content);
         Assert.NotNull(problemDetails);
-        Assert.Equal(403, problemDetails!["status"].GetInt32());
+        Assert.Equal(StatusCodes.Status403Forbidden, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
+        Assert.Equal("General.Unauthorized", problemDetails["title"].GetString());
         Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
+    }
+
+    [Fact]
+    public async Task UpdateTrack_WhenTrackBelongsToAnotherUsersLibrary_ShouldReturnNotFoundWithoutLeakingOrModifyingIt()
+    {
+        // Arrange
+        HttpClient client = _apiFactory.CreateClient();
+        (Guid actingUserId, string actingUsername) = await _apiFactory.CreateAndAuthenticateUserAsync(client);
+        _seededUsernames.Add(actingUsername);
+        Guid ownLibraryId = Guid.NewGuid();
+        SeedLibrary(ownLibraryId, actingUserId);
+
+        // The track lives in a library owned by another user, and is referenced through the acting user's own library route.
+        HttpClient victimClient = _apiFactory.CreateClient();
+        (Guid victimUserId, string victimUsername) = await _apiFactory.CreateAndAuthenticateUserAsync(victimClient);
+        _seededUsernames.Add(victimUsername);
+        Guid victimLibraryId = Guid.NewGuid();
+        SeedLibrary(victimLibraryId, victimUserId);
+        (Guid victimArtistId, Guid victimAlbumId, Guid victimTrackId) = SeedArtistGraph(victimLibraryId);
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(metadata: _audioMetadataDtoFixture.Create(title: "Hijacked"));
+
+        // Act
+        HttpResponseMessage response = await client.PutAsJsonAsync($"/api/v1/libraries/{ownLibraryId}/artists/{victimArtistId}/albums/{victimAlbumId}/tracks/{victimTrackId}", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("password", content, StringComparison.OrdinalIgnoreCase);
+        using JsonDocument problemDetails = JsonDocument.Parse(content);
+        Assert.Equal("General.NotFound", problemDetails.RootElement.GetProperty("title").GetString());
+        Assert.Equal("ArtistNotFound", problemDetails.RootElement.GetProperty("detail").GetString());
+
+        // The other user's track is untouched.
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        Assert.NotNull(await dbContext.Tracks.FirstOrDefaultAsync(track => track.Id == victimTrackId));
     }
 
     /// <summary>
@@ -301,6 +351,6 @@ public class UpdateTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         }
 
         foreach (string username in _seededUsernames)
-            _apiFactory.RemoveTestUserAsync(username).GetAwaiter().GetResult();
+            _apiFactory.RemoveTestUser(username);
     }
 }

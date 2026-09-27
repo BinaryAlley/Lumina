@@ -221,6 +221,24 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
     }
 
     /// <summary>
+    /// Removes a test user and its owned libraries from the database.
+    /// </summary>
+    /// <param name="username">The username of the test user to remove.</param>
+    public void RemoveTestUser(string username)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+
+        UserEntity? user = dbContext.Users.Include(candidate => candidate.Libraries).FirstOrDefault(candidate => candidate.Username == username);
+        if (user is not null)
+        {
+            dbContext.Libraries.RemoveRange(user.Libraries);
+            dbContext.Users.Remove(user);
+            dbContext.SaveChanges();
+        }
+    }
+
+    /// <summary>
     /// Removes a test admin user, its role, and its user-role link from the database.
     /// </summary>
     /// <param name="userId">The Id of the admin test user to remove.</param>

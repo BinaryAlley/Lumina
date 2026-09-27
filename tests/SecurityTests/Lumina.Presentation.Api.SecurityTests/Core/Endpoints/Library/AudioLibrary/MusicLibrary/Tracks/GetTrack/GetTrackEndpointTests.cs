@@ -37,6 +37,7 @@ public class GetTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     private readonly AlbumEntityFixture _albumEntityFixture = new();
     private readonly TrackEntityFixture _trackEntityFixture = new();
     private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly List<string> _seededUsernames = [];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetTrackEndpointTests"/> class.
@@ -81,6 +82,7 @@ public class GetTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     {
         // Arrange
         (_, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(_client);
+        _seededUsernames.Add(username);
 
         // Act
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{Uri.EscapeDataString(maliciousLibraryId)}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks/{Guid.NewGuid()}");
@@ -92,11 +94,11 @@ public class GetTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(maliciousLibraryId, content, StringComparison.Ordinal);
         Assert.DoesNotContain("testuser_", content, StringComparison.OrdinalIgnoreCase);
         using JsonDocument problemDetails = JsonDocument.Parse(content);
         Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
 
-        await _apiFactory.RemoveTestUserAsync(username);
     }
 
     [Theory]
@@ -107,6 +109,7 @@ public class GetTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     {
         // Arrange
         (_, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(_client);
+        _seededUsernames.Add(username);
 
         // Act
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{Guid.NewGuid()}/artists/{Uri.EscapeDataString(maliciousArtistId)}/albums/{Guid.NewGuid()}/tracks/{Guid.NewGuid()}");
@@ -118,11 +121,11 @@ public class GetTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(maliciousArtistId, content, StringComparison.Ordinal);
         Assert.DoesNotContain("testuser_", content, StringComparison.OrdinalIgnoreCase);
         using JsonDocument problemDetails = JsonDocument.Parse(content);
         Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
 
-        await _apiFactory.RemoveTestUserAsync(username);
     }
 
     [Theory]
@@ -133,6 +136,7 @@ public class GetTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     {
         // Arrange
         (_, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(_client);
+        _seededUsernames.Add(username);
 
         // Act
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Uri.EscapeDataString(maliciousAlbumId)}/tracks/{Guid.NewGuid()}");
@@ -145,11 +149,11 @@ public class GetTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(maliciousAlbumId, content, StringComparison.Ordinal);
         Assert.DoesNotContain("testuser_", content, StringComparison.OrdinalIgnoreCase);
         using JsonDocument problemDetails = JsonDocument.Parse(content);
         Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
 
-        await _apiFactory.RemoveTestUserAsync(username);
     }
 
     [Theory]
@@ -160,6 +164,7 @@ public class GetTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     {
         // Arrange
         (_, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(_client);
+        _seededUsernames.Add(username);
 
         // Act
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{Guid.NewGuid()}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks/{Uri.EscapeDataString(maliciousTrackId)}");
@@ -171,11 +176,11 @@ public class GetTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(maliciousTrackId, content, StringComparison.Ordinal);
         Assert.DoesNotContain("testuser_", content, StringComparison.OrdinalIgnoreCase);
         using JsonDocument problemDetails = JsonDocument.Parse(content);
         Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
 
-        await _apiFactory.RemoveTestUserAsync(username);
     }
 
     [Fact]
@@ -183,6 +188,7 @@ public class GetTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     {
         // Arrange
         (_, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(_client);
+        _seededUsernames.Add(username);
         Guid otherUserId = await SeedOtherUserAsync();
         (Guid libraryId, Guid artistId, Guid albumId, Guid trackId) = await SeedLibraryArtistAlbumAndTrackAsync(otherUserId);
 
@@ -205,7 +211,6 @@ public class GetTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         Assert.DoesNotContain("hash", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("salt", content, StringComparison.OrdinalIgnoreCase);
 
-        await _apiFactory.RemoveTestUserAsync(username);
     }
 
     /// <summary>
@@ -217,8 +222,10 @@ public class GetTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         Guid userId = Guid.NewGuid();
-        dbContext.Users.Add(_userEntityFixture.Create(id: userId, username: $"otheruser_{Guid.NewGuid()}", password: "TestPass123!"));
+        string username = $"otheruser_{Guid.NewGuid()}";
+        dbContext.Users.Add(_userEntityFixture.Create(id: userId, username: username, password: "TestPass123!"));
         await dbContext.SaveChangesAsync();
+        _seededUsernames.Add(username);
         return userId;
     }
 
@@ -272,5 +279,7 @@ public class GetTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     public void Dispose()
     {
         _client.Dispose();
+        foreach (string username in _seededUsernames)
+            _apiFactory.RemoveTestUser(username);
     }
 }
