@@ -95,4 +95,29 @@ public class IsrcTests
         // Assert
         Assert.False(result);
     }
+
+    [Fact]
+    public void Create_WhenRegistrantCodeContainsOnlyLetters_ShouldCreateIsrc()
+    {
+        // Act
+        Result<Isrc> result = Isrc.Create("GBAAA0000001");
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal("GBAAA0000001", result.Value.Value);
+    }
+
+    [Fact]
+    public void Equals_WhenValuesDifferOnlyByCase_ShouldNormalizeThemBeforeComparing()
+    {
+        // Arrange
+        Isrc firstIsrc = _isrcFixture.Create(value: "USRC17607839");
+        Isrc secondIsrc = _isrcFixture.Create(value: "usrc17607839");
+
+        // Act
+        bool result = firstIsrc.Equals(secondIsrc);
+
+        // Assert
+        Assert.True(result);
+    }
 }

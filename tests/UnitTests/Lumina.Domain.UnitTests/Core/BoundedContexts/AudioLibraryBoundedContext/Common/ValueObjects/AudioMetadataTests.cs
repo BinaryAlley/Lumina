@@ -20,6 +20,7 @@ public class AudioMetadataTests
     private readonly GenreFixture _genreFixture = new();
     private readonly TagFixture _tagFixture = new();
     private readonly ReleaseInfoFixture _releaseInfoFixture = new();
+    private readonly LanguageInfoFixture _languageInfoFixture = new();
     private readonly AudioMetadataFixture _audioMetadataFixture = new();
 
     [Fact]
@@ -156,6 +157,194 @@ public class AudioMetadataTests
             releaseInfo: releaseInfo,
             description: Optional<string>.None(),
             genres: [],
+            tags: [],
+            language: Optional<LanguageInfo>.None(),
+            originalLanguage: Optional<LanguageInfo>.None(),
+            bitDepth: Optional<int>.None(),
+            audioCodec: Optional<string>.None(),
+            bitrate: Optional<int>.None());
+
+        // Assert
+        Assert.NotEqual(firstResult, secondResult);
+    }
+
+    [Fact]
+    public void Create_WhenOptionalBaseValuesArePresent_ShouldSetThem()
+    {
+        // Arrange
+        LanguageInfo language = _languageInfoFixture.Create(languageCode: "en", languageName: "English");
+        LanguageInfo originalLanguage = _languageInfoFixture.Create(languageCode: "fr", languageName: "French");
+
+        // Act
+        Result<AudioMetadata> result = AudioMetadata.Create(
+            "Bohemian Rhapsody",
+            Optional<string>.Some("Bohemian Rhapsody (original)"),
+            durationInSeconds: 355,
+            sampleRate: 44100,
+            channels: 2,
+            _releaseInfoFixture.Create(),
+            Optional<string>.Some("A song by the British rock band Queen."),
+            [_genreFixture.Create(name: "Rock")],
+            [_tagFixture.Create(name: "classic")],
+            Optional<LanguageInfo>.Some(language),
+            Optional<LanguageInfo>.Some(originalLanguage),
+            Optional<int>.Some(16),
+            Optional<string>.Some("PCM"),
+            Optional<int>.Some(1411));
+
+        // Assert
+        Assert.False(result.IsFailure);
+        AudioMetadata metadata = result.Value;
+        Assert.Equal("Bohemian Rhapsody", metadata.Title);
+        Assert.Equal(Optional<string>.Some("Bohemian Rhapsody (original)"), metadata.OriginalTitle);
+        Assert.Equal(Optional<string>.Some("A song by the British rock band Queen."), metadata.Description);
+        Assert.Equal(Optional<LanguageInfo>.Some(language), metadata.Language);
+        Assert.Equal(Optional<LanguageInfo>.Some(originalLanguage), metadata.OriginalLanguage);
+        Assert.Single(metadata.Genres);
+        Assert.Single(metadata.Tags);
+    }
+
+    [Fact]
+    public void Create_WhenCollectionsAreEmpty_ShouldCreateMetadataWithEmptyCollections()
+    {
+        // Act
+        Result<AudioMetadata> result = AudioMetadata.Create(
+            "Bohemian Rhapsody",
+            Optional<string>.None(),
+            durationInSeconds: 355,
+            sampleRate: 44100,
+            channels: 2,
+            _releaseInfoFixture.Create(),
+            Optional<string>.None(),
+            [],
+            [],
+            Optional<LanguageInfo>.None(),
+            Optional<LanguageInfo>.None(),
+            Optional<int>.None(),
+            Optional<string>.None(),
+            Optional<int>.None());
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Empty(result.Value.Genres);
+        Assert.Empty(result.Value.Tags);
+    }
+
+    [Fact]
+    public void Equals_WithDifferentTitle_ShouldReturnFalse()
+    {
+        // Arrange
+        ReleaseInfo releaseInfo = _releaseInfoFixture.Create();
+
+        // Act
+        AudioMetadata firstResult = _audioMetadataFixture.Create(
+            title: "Bohemian Rhapsody",
+            originalTitle: Optional<string>.None(),
+            durationInSeconds: 355,
+            sampleRate: 44100,
+            channels: 2,
+            releaseInfo: releaseInfo,
+            description: Optional<string>.None(),
+            genres: [],
+            tags: [],
+            language: Optional<LanguageInfo>.None(),
+            originalLanguage: Optional<LanguageInfo>.None(),
+            bitDepth: Optional<int>.None(),
+            audioCodec: Optional<string>.None(),
+            bitrate: Optional<int>.None());
+        AudioMetadata secondResult = _audioMetadataFixture.Create(
+            title: "Love of My Life",
+            originalTitle: Optional<string>.None(),
+            durationInSeconds: 355,
+            sampleRate: 44100,
+            channels: 2,
+            releaseInfo: releaseInfo,
+            description: Optional<string>.None(),
+            genres: [],
+            tags: [],
+            language: Optional<LanguageInfo>.None(),
+            originalLanguage: Optional<LanguageInfo>.None(),
+            bitDepth: Optional<int>.None(),
+            audioCodec: Optional<string>.None(),
+            bitrate: Optional<int>.None());
+
+        // Assert
+        Assert.NotEqual(firstResult, secondResult);
+    }
+
+    [Fact]
+    public void Equals_WithDifferentAudioCodec_ShouldReturnFalse()
+    {
+        // Arrange
+        ReleaseInfo releaseInfo = _releaseInfoFixture.Create();
+
+        // Act
+        AudioMetadata firstResult = _audioMetadataFixture.Create(
+            title: "Bohemian Rhapsody",
+            originalTitle: Optional<string>.None(),
+            durationInSeconds: 355,
+            sampleRate: 44100,
+            channels: 2,
+            releaseInfo: releaseInfo,
+            description: Optional<string>.None(),
+            genres: [],
+            tags: [],
+            language: Optional<LanguageInfo>.None(),
+            originalLanguage: Optional<LanguageInfo>.None(),
+            bitDepth: Optional<int>.None(),
+            audioCodec: Optional<string>.Some("PCM"),
+            bitrate: Optional<int>.None());
+        AudioMetadata secondResult = _audioMetadataFixture.Create(
+            title: "Bohemian Rhapsody",
+            originalTitle: Optional<string>.None(),
+            durationInSeconds: 355,
+            sampleRate: 44100,
+            channels: 2,
+            releaseInfo: releaseInfo,
+            description: Optional<string>.None(),
+            genres: [],
+            tags: [],
+            language: Optional<LanguageInfo>.None(),
+            originalLanguage: Optional<LanguageInfo>.None(),
+            bitDepth: Optional<int>.None(),
+            audioCodec: Optional<string>.Some("FLAC"),
+            bitrate: Optional<int>.None());
+
+        // Assert
+        Assert.NotEqual(firstResult, secondResult);
+    }
+
+    [Fact]
+    public void Equals_WithDifferentGenres_ShouldReturnFalse()
+    {
+        // Arrange
+        ReleaseInfo releaseInfo = _releaseInfoFixture.Create();
+
+        // Act
+        AudioMetadata firstResult = _audioMetadataFixture.Create(
+            title: "Bohemian Rhapsody",
+            originalTitle: Optional<string>.None(),
+            durationInSeconds: 355,
+            sampleRate: 44100,
+            channels: 2,
+            releaseInfo: releaseInfo,
+            description: Optional<string>.None(),
+            genres: [_genreFixture.Create(name: "Rock")],
+            tags: [],
+            language: Optional<LanguageInfo>.None(),
+            originalLanguage: Optional<LanguageInfo>.None(),
+            bitDepth: Optional<int>.None(),
+            audioCodec: Optional<string>.None(),
+            bitrate: Optional<int>.None());
+        AudioMetadata secondResult = _audioMetadataFixture.Create(
+            title: "Bohemian Rhapsody",
+            originalTitle: Optional<string>.None(),
+            durationInSeconds: 355,
+            sampleRate: 44100,
+            channels: 2,
+            releaseInfo: releaseInfo,
+            description: Optional<string>.None(),
+            genres: [_genreFixture.Create(name: "Jazz")],
             tags: [],
             language: Optional<LanguageInfo>.None(),
             originalLanguage: Optional<LanguageInfo>.None(),

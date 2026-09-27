@@ -67,7 +67,7 @@ public class ApiHttpClientTests
         Assert.Equal(HttpStatusCode.UnprocessableEntity, exception.HttpStatusCode);
         Assert.NotNull(exception.ProblemDetails);
         Assert.Equal("General.Validation", exception.ProblemDetails!.Title);
-        Assert.Equal(422, exception.ProblemDetails.Status);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, exception.ProblemDetails.Status);
         Assert.Equal("OneOrMoreValidationErrorsOccurred", exception.ProblemDetails.Detail);
     }
 

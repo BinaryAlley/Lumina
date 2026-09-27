@@ -131,4 +131,82 @@ public class AudioRatingTests
         // Assert
         Assert.False(result);
     }
+
+    [Fact]
+    public void Create_WhenValueIsZero_ShouldCreateRating()
+    {
+        // Act
+        Result<AudioRating> result = AudioRating.Create(0m, 5m, Optional<AudioRatingSource>.None(), Optional<int>.None());
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(0m, result.Value.Value);
+    }
+
+    [Fact]
+    public void Create_WhenValueEqualsMaxValue_ShouldCreateRating()
+    {
+        // Act
+        Result<AudioRating> result = AudioRating.Create(5m, 5m, Optional<AudioRatingSource>.None(), Optional<int>.None());
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(5m, result.Value.Value);
+        Assert.Equal(5m, result.Value.MaxValue);
+    }
+
+    [Fact]
+    public void Equals_WithDifferentMaxValue_ShouldReturnFalse()
+    {
+        // Arrange
+        AudioRating firstRating = _audioRatingFixture.Create(value: 4m, maxValue: 5m, source: Optional<AudioRatingSource>.None(), voteCount: Optional<int>.None());
+        AudioRating secondRating = _audioRatingFixture.Create(value: 4m, maxValue: 10m, source: Optional<AudioRatingSource>.None(), voteCount: Optional<int>.None());
+
+        // Act
+        bool result = firstRating.Equals(secondRating);
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void Equals_WithDifferentSource_ShouldReturnFalse()
+    {
+        // Arrange
+        AudioRating firstRating = _audioRatingFixture.Create(value: 4m, maxValue: 5m, source: Optional<AudioRatingSource>.Some(AudioRatingSource.User), voteCount: Optional<int>.None());
+        AudioRating secondRating = _audioRatingFixture.Create(value: 4m, maxValue: 5m, source: Optional<AudioRatingSource>.Some(AudioRatingSource.Discogs), voteCount: Optional<int>.None());
+
+        // Act
+        bool result = firstRating.Equals(secondRating);
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void Equals_WithDifferentVoteCount_ShouldReturnFalse()
+    {
+        // Arrange
+        AudioRating firstRating = _audioRatingFixture.Create(value: 4m, maxValue: 5m, source: Optional<AudioRatingSource>.None(), voteCount: Optional<int>.Some(10));
+        AudioRating secondRating = _audioRatingFixture.Create(value: 4m, maxValue: 5m, source: Optional<AudioRatingSource>.None(), voteCount: Optional<int>.Some(20));
+
+        // Act
+        bool result = firstRating.Equals(secondRating);
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void AsPercentage_WhenCalled_ShouldReturnTheValueAsPercentageOfMaxValue()
+    {
+        // Arrange
+        AudioRating rating = _audioRatingFixture.Create(value: 4m, maxValue: 5m);
+
+        // Act
+        decimal result = rating.AsPercentage();
+
+        // Assert
+        Assert.Equal(80m, result);
+    }
 }

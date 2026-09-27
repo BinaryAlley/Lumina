@@ -35,7 +35,7 @@ public class DeleteTrackCommandValidatorTests
     [Theory]
     [InlineData(null)] // missing route value
     [InlineData("")] // empty route value
-    [InlineData("   ")] // whitespace route value, which the format rule skips but the not empty rule rejects
+    [InlineData("   ")] // whitespace route value, which both the not empty rule and the format rule reject
     [InlineData("not-a-library-guid")] // non-Guid route value
     [InlineData("00000000-0000-0000-0000-000000000000")] // empty Guid route value
     public void Validate_WhenLibraryIdIsEmptyOrInvalid_ShouldHaveValidationError(string? libraryId)
@@ -53,7 +53,7 @@ public class DeleteTrackCommandValidatorTests
     [Theory]
     [InlineData(null)] // missing route value
     [InlineData("")] // empty route value
-    [InlineData("   ")] // whitespace route value, which the format rule skips but the not empty rule rejects
+    [InlineData("   ")] // whitespace route value, which both the not empty rule and the format rule reject
     [InlineData("not-an-artist-guid")] // non-Guid route value
     [InlineData("00000000-0000-0000-0000-000000000000")] // empty Guid route value
     public void Validate_WhenArtistIdIsEmptyOrInvalid_ShouldHaveValidationError(string? artistId)
@@ -71,7 +71,7 @@ public class DeleteTrackCommandValidatorTests
     [Theory]
     [InlineData(null)] // missing route value
     [InlineData("")] // empty route value
-    [InlineData("   ")] // whitespace route value, which the format rule skips but the not empty rule rejects
+    [InlineData("   ")] // whitespace route value, which both the not empty rule and the format rule reject
     [InlineData("not-an-album-guid")] // non-Guid route value
     [InlineData("00000000-0000-0000-0000-000000000000")] // empty Guid route value
     public void Validate_WhenAlbumIdIsEmptyOrInvalid_ShouldHaveValidationError(string? albumId)
@@ -89,7 +89,7 @@ public class DeleteTrackCommandValidatorTests
     [Theory]
     [InlineData(null)] // missing route value
     [InlineData("")] // empty route value
-    [InlineData("   ")] // whitespace route value, which the format rule skips but the not empty rule rejects
+    [InlineData("   ")] // whitespace route value, which both the not empty rule and the format rule reject
     [InlineData("not-a-track-guid")] // non-Guid route value
     [InlineData("00000000-0000-0000-0000-000000000000")] // empty Guid route value
     public void Validate_WhenTrackIdIsEmptyOrInvalid_ShouldHaveValidationError(string? trackId)

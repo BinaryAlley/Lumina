@@ -67,4 +67,18 @@ public class TrackIdTests
         // Assert
         Assert.False(result);
     }
+
+    [Fact]
+    public void ToString_WhenCalled_ShouldReturnTheStringRepresentationOfTheValue()
+    {
+        // Arrange
+        Guid value = Guid.NewGuid();
+        TrackId trackId = _trackIdFixture.Create(value);
+
+        // Act
+        string? result = trackId.ToString();
+
+        // Assert
+        Assert.Equal(value.ToString(), result);
+    }
 }

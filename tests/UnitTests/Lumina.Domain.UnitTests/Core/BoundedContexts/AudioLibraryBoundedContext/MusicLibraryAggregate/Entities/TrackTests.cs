@@ -34,6 +34,9 @@ public class TrackTests
     [Fact]
     public void Create_WhenCalledWithValidData_ShouldCreateTrackWithAllPropertiesPopulated()
     {
+        // Arrange
+        DateTime beforeCreate = DateTime.UtcNow;
+
         // Act
         Track track = _trackFixture.Create();
 
@@ -56,7 +59,7 @@ public class TrackTests
         Assert.True(track.MusicBrainzWorkId.HasValue);
         Assert.NotEmpty(track.Contributors);
         Assert.NotEmpty(track.Ratings);
-        Assert.True(track.CreatedOnUtc > DateTime.MinValue);
+        Assert.InRange(track.CreatedOnUtc, beforeCreate, DateTime.UtcNow);
         Assert.False(track.UpdatedOnUtc.HasValue);
     }
 
@@ -229,5 +232,168 @@ public class TrackTests
         Assert.True(track.UpdatedOnUtc.Value >= beforeUpdate);
         // the collections are not part of the details update
         Assert.Equal(originalMoods, track.Moods);
+    }
+
+    [Fact]
+    public void Create_WhenOptionalValuesAndCollectionsAreEmpty_ShouldCreateTrackWithoutThem()
+    {
+        // Act
+        Track track = _trackFixture.Create(
+            discNumber: Optional<int>.None(),
+            moods: [],
+            script: Optional<string>.None(),
+            key: Optional<MusicKey>.None(),
+            bpm: Optional<int>.None(),
+            isrcs: [],
+            work: Optional<string>.None(),
+            musicBrainzRecordingId: Optional<MusicBrainzId>.None(),
+            musicBrainzTrackId: Optional<MusicBrainzId>.None(),
+            musicBrainzWorkId: Optional<MusicBrainzId>.None(),
+            contributors: [],
+            ratings: []);
+
+        // Assert
+        Assert.False(track.DiscNumber.HasValue);
+        Assert.False(track.Script.HasValue);
+        Assert.False(track.Key.HasValue);
+        Assert.False(track.Bpm.HasValue);
+        Assert.False(track.Work.HasValue);
+        Assert.False(track.MusicBrainzRecordingId.HasValue);
+        Assert.False(track.MusicBrainzTrackId.HasValue);
+        Assert.False(track.MusicBrainzWorkId.HasValue);
+        Assert.Empty(track.Moods);
+        Assert.Empty(track.Isrcs);
+        Assert.Empty(track.Contributors);
+        Assert.Empty(track.Ratings);
+    }
+
+    [Fact]
+    public void CreateWithId_WhenCalledWithPreExistingIdAndTimestamps_ShouldPreserveAllOptionalProperties()
+    {
+        // Arrange
+        Track sourceTrack = _trackFixture.Create();
+        DateTime createdOnUtc = DateTime.UtcNow.AddDays(-1);
+        DateTime updatedOnUtc = DateTime.UtcNow;
+
+        // Act
+        Result<Track> result = Track.Create(
+            sourceTrack.Id,
+            sourceTrack.Path,
+            sourceTrack.Metadata,
+            sourceTrack.TrackNumber,
+            sourceTrack.DiscNumber,
+            [.. sourceTrack.Moods],
+            sourceTrack.Script,
+            sourceTrack.Key,
+            sourceTrack.Bpm,
+            [.. sourceTrack.Isrcs],
+            sourceTrack.Work,
+            sourceTrack.MusicBrainzRecordingId,
+            sourceTrack.MusicBrainzTrackId,
+            sourceTrack.MusicBrainzWorkId,
+            [.. sourceTrack.Contributors],
+            [.. sourceTrack.Ratings],
+            createdOnUtc,
+            Optional<DateTime>.Some(updatedOnUtc));
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Track track = result.Value;
+        Assert.Equal(sourceTrack.Script, track.Script);
+        Assert.Equal(sourceTrack.Key, track.Key);
+        Assert.Equal(sourceTrack.Bpm, track.Bpm);
+        Assert.Equal(sourceTrack.Work, track.Work);
+        Assert.Equal(sourceTrack.MusicBrainzRecordingId, track.MusicBrainzRecordingId);
+        Assert.Equal(sourceTrack.MusicBrainzTrackId, track.MusicBrainzTrackId);
+        Assert.Equal(sourceTrack.MusicBrainzWorkId, track.MusicBrainzWorkId);
+        // The pre-existing identity and the provided timestamps must survive the rehydration.
+        Assert.Equal(sourceTrack.Id, track.Id);
+        Assert.Equal(createdOnUtc, track.CreatedOnUtc);
+        Assert.True(track.UpdatedOnUtc.HasValue);
+        Assert.Equal(updatedOnUtc, track.UpdatedOnUtc.Value);
+    }
+
+    [Fact]
+    public void UpdateMoods_WhenCalledWithEmptyCollection_ShouldClearTheMoods()
+    {
+        // Arrange
+        Track track = _trackFixture.Create(moods: [_moodFixture.Create(name: "calm")]);
+
+        // Act
+        track.UpdateMoods([]);
+
+        // Assert
+        Assert.Empty(track.Moods);
+    }
+
+    [Fact]
+    public void UpdateIsrcs_WhenCalledWithEmptyCollection_ShouldClearTheIsrcs()
+    {
+        // Arrange
+        Track track = _trackFixture.Create(isrcs: [_isrcFixture.Create(value: "USRC17607839")]);
+
+        // Act
+        track.UpdateIsrcs([]);
+
+        // Assert
+        Assert.Empty(track.Isrcs);
+    }
+
+    [Fact]
+    public void UpdateContributors_WhenCalledWithEmptyCollection_ShouldClearTheContributors()
+    {
+        // Arrange
+        Track track = _trackFixture.Create(contributors: [.. _musicMediaContributorFixture.CreateMany()]);
+
+        // Act
+        track.UpdateContributors([]);
+
+        // Assert
+        Assert.Empty(track.Contributors);
+    }
+
+    [Fact]
+    public void UpdateRatings_WhenCalledWithEmptyCollection_ShouldClearTheRatings()
+    {
+        // Arrange
+        Track track = _trackFixture.Create(ratings: [_audioRatingFixture.Create(value: 4m, maxValue: 5m)]);
+
+        // Act
+        track.UpdateRatings([]);
+
+        // Assert
+        Assert.Empty(track.Ratings);
+    }
+
+    [Fact]
+    public void UpdateDetails_WhenOptionalValuesAreAbsent_ShouldClearTheOptionalProperties()
+    {
+        // Arrange
+        Track track = _trackFixture.Create();
+
+        // Act
+        Result<Updated> result = track.UpdateDetails(
+            "C:\\Music\\queen\\bohemian-rhapsody.flac",
+            _audioMetadataFixture.Create(),
+            11,
+            Optional<int>.None(),
+            Optional<string>.None(),
+            Optional<MusicKey>.None(),
+            Optional<int>.None(),
+            Optional<string>.None(),
+            Optional<MusicBrainzId>.None(),
+            Optional<MusicBrainzId>.None(),
+            Optional<MusicBrainzId>.None());
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.False(track.DiscNumber.HasValue);
+        Assert.False(track.Script.HasValue);
+        Assert.False(track.Key.HasValue);
+        Assert.False(track.Bpm.HasValue);
+        Assert.False(track.Work.HasValue);
+        Assert.False(track.MusicBrainzRecordingId.HasValue);
+        Assert.False(track.MusicBrainzTrackId.HasValue);
+        Assert.False(track.MusicBrainzWorkId.HasValue);
     }
 }
