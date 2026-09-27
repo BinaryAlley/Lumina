@@ -247,7 +247,7 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         string content = await response.Content.ReadAsStringAsync();
 
         // Assert
-        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         Assert.DoesNotContain("SQL", content);
         Assert.DoesNotContain("Exception", content);
     }

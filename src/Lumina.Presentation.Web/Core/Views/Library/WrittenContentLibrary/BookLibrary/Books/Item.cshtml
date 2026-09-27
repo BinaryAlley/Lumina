@@ -10,7 +10,7 @@
     the page, edit the theme files. This fallback keeps every feature working without styling, so that a
     broken theme is obvious to the user while the page still functions.
 
-/library/written-content-library/books-library/books/{id}
+/library/written-content-library/books-library/books/{bookId}
 *@
 
 @using Lumina.Presentation.Web.Common.DTO.WrittenContentLibrary.BookLibrary
@@ -34,18 +34,23 @@
     var genres = metadata?.Genres ?? [];
     var tags = metadata?.Tags ?? [];
     var isbns = Model.ISBNs ?? [];
-    var contributors = Model.Contributors ?? [];
+            var contributors = Model.Contributors ?? [];
     var ratings = Model.Ratings ?? [];
-    // Resolves the localized label of a contributor role category, keyed by its domain value.
-    Func<string?, string> categoryLabel = category => category switch
+    // The full set of canonical media contributor roles, mirroring the MediaContributorRole enum members, offered by the role combobox.
+    var contributorRoles = new[]
+    {
+        "Other", "Author", "Translator", "Illustrator", "Publisher", "Narrator", "Actor", "Director", "Screenwriter",
+        "Composer", "Lyricist", "Arranger", "Conductor", "Producer", "ExecutiveProducer", "Engineer", "Mixer", "Remixer",
+        "RecordLabel", "Vocals", "BackingVocals", "Guitar", "BassGuitar", "Drums", "Percussion", "Keyboards", "Piano",
+        "Synthesizer", "Strings", "Woodwinds", "Brass", "Choir", "Orchestrator"
+    };
+    // Resolves the localized label of a contributor role, keyed by its canonical value.
+    Func<string?, string> roleLabel = role => role switch
     {
         "Publisher" => _localizer["PublisherRole"].Value,
         "Other" => _localizer["OtherRole"].Value,
-        "Author" => _localizer["Author"].Value,
-        "Translator" => _localizer["Translator"].Value,
-        "Illustrator" => _localizer["Illustrator"].Value,
-        "Narrator" => _localizer["Narrator"].Value,
-        _ => category ?? string.Empty
+        _ when !string.IsNullOrWhiteSpace(role) => _localizer[role].Value,
+        _ => string.Empty
     };
     // The country of release carried by the book, keyed by its ISO code.
     var currentReleaseCountry = releaseInfo?.ReleaseCountry?.ToString() ?? string.Empty;
@@ -408,9 +413,8 @@
                     <table class="w-100 form-table book-list-table">
                         <thead>
                             <tr>
-                                <th class="w-35">@_localizer["ContributorName"]</th>
-                                <th class="w-25">@_localizer["RoleName"]</th>
-                                <th class="w-30">@_localizer["RoleCategory"]</th>
+                                <th class="w-55">@_localizer["ContributorName"]</th>
+                                <th class="w-35">@_localizer["Role"]</th>
                                 <th class="w-10"></th>
                             </tr>
                         </thead>
@@ -419,22 +423,19 @@
                             @foreach (var contributor in contributors)
                             {
                                 <tr class="contributor-row">
-                                    <td><input type="text" class="enlightenment-input contributor-name" value="@(contributor.Name?.DisplayName ?? string.Empty)" /></td>
-                                    <td><input type="text" class="enlightenment-input contributor-role" value="@(contributor.Role?.Name ?? string.Empty)" /></td>
+                                    <td><input type="text" class="enlightenment-input contributor-name w-100" value="@(contributor.Name?.DisplayName ?? string.Empty)" /></td>
                                     <td>
-                                        <div class="enlightenment-combobox inline-block w-100 contributor-category-combobox">
+                                        <div class="enlightenment-combobox inline-block w-100 contributor-role-combobox">
                                             <div class="shine-effect" style="top: 1px;"></div>
-                                            <input type="checkbox" class="enlightenment-toggle-checkbox" id="contributor-category-toggle-@contributorIndex" />
-                                            <label class="enlightenment-toggle" for="contributor-category-toggle-@contributorIndex">
-                                                <span class="enlightenment-selected-text" data-value="@(contributor.Role?.Category?.ToString() ?? "Other")">@categoryLabel(contributor.Role?.Category?.ToString())</span>
+                                            <input type="checkbox" class="enlightenment-toggle-checkbox" id="contributor-role-toggle-@contributorIndex" />
+                                            <label class="enlightenment-toggle" for="contributor-role-toggle-@contributorIndex">
+                                                <span class="enlightenment-selected-text" data-value="@(contributor.Role?.ToString() ?? "Other")">@roleLabel(contributor.Role?.ToString() ?? "Other")</span>
                                             </label>
                                             <div class="enlightenment-dropdown">
-                                                <div class="enlightenment-option" data-value="Other">@_localizer["OtherRole"]</div>
-                                                <div class="enlightenment-option" data-value="Author">@_localizer["Author"]</div>
-                                                <div class="enlightenment-option" data-value="Translator">@_localizer["Translator"]</div>
-                                                <div class="enlightenment-option" data-value="Illustrator">@_localizer["Illustrator"]</div>
-                                                <div class="enlightenment-option" data-value="Publisher">@_localizer["PublisherRole"]</div>
-                                                <div class="enlightenment-option" data-value="Narrator">@_localizer["Narrator"]</div>
+                                                @foreach (string role in contributorRoles)
+                                                {
+                                                    <div class="enlightenment-option" data-value="@role">@roleLabel(role)</div>
+                                                }
                                             </div>
                                         </div>
                                     </td>
@@ -515,8 +516,8 @@
         const bookId = '@bookId';
         const libraryId = '@libraryId';
         const libraryIndexUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.INDEX)';
-        const saveUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.SAVE_BOOK, new { id = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`);
-        const coverUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.UPDATE_BOOK_COVER, new { id = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`);
+        const saveUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.SAVE_BOOK, new { bookId = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`);
+        const coverUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.UPDATE_BOOK_COVER, new { bookId = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`) + `?libraryId=${libraryId}`;
 
         // The element references are captured once, so that the cleanup can unbind their listeners even after the AJAX navigator has swapped the content out of the document.
         const coverImage = document.getElementById('book-cover-image');
@@ -577,6 +578,7 @@
         function buildPayload() {
             return {
                 Id: bookId,
+                LibraryId: libraryId,
                 Format: readComboboxValue('format-combobox') || null,
                 Edition: readValue('edition-input') || null,
                 VolumeNumber: readNumber('volume-number-input'),
@@ -595,10 +597,7 @@
                 })),
                 Contributors: Array.from(contributorsBody.querySelectorAll('.contributor-row')).map(row => ({
                     Name: { DisplayName: row.querySelector('.contributor-name').value.trim() || null },
-                    Role: {
-                        Name: row.querySelector('.contributor-role').value.trim() || null,
-                        Category: readRowComboboxValue(row, '.contributor-category-combobox') || null
-                    }
+                    Role: readRowComboboxValue(row, '.contributor-role-combobox') || null
                 })),
                 Ratings: Array.from(ratingsBody.querySelectorAll('.rating-row')).map(row => ({
                     Value: parseOptionalDecimal(row.querySelector('.rating-value').value),
@@ -763,9 +762,9 @@
             const isbn = isbnOptions.find(option => option.value === value);
             if (isbn)
                 return isbn.label;
-            const category = contributorCategoryOptions.find(option => option.value === value);
-            if (category)
-                return category.label;
+            const role = contributorRoleOptions.find(option => option.value === value);
+            if (role)
+                return role.label;
             const source = ratingSourceOptions.find(option => option.value === value);
             if (source)
                 return source.label;
@@ -776,14 +775,9 @@
             { value: 'Isbn10', label: @Json.Serialize(_localizer["Isbn10"].Value) },
             { value: 'Isbn13', label: @Json.Serialize(_localizer["Isbn13"].Value) }
         ];
-        const contributorCategoryOptions = [
-            { value: 'Other', label: @Json.Serialize(_localizer["OtherRole"].Value) },
-            { value: 'Author', label: @Json.Serialize(_localizer["Author"].Value) },
-            { value: 'Translator', label: @Json.Serialize(_localizer["Translator"].Value) },
-            { value: 'Illustrator', label: @Json.Serialize(_localizer["Illustrator"].Value) },
-            { value: 'Publisher', label: @Json.Serialize(_localizer["PublisherRole"].Value) },
-            { value: 'Narrator', label: @Json.Serialize(_localizer["Narrator"].Value) }
-        ];
+        const contributorRoleOptions = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            contributorRoles.Select(role => new { value = role, label = roleLabel(role) }),
+            new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase }));
         const ratingSourceOptions = [
             { value: 'User', label: @Json.Serialize(_localizer["User"].Value) },
             { value: 'OpenLibrary', label: @Json.Serialize(_localizer["OpenLibrary"].Value) },
@@ -807,9 +801,8 @@
         function addContributorRow() {
             contributorsBody.insertAdjacentHTML('beforeend', `
                 <tr class="contributor-row">
-                    <td><input type="text" class="enlightenment-input contributor-name" /></td>
-                    <td><input type="text" class="enlightenment-input contributor-role" value="Author" /></td>
-                    <td>${buildRowCombobox(contributorCategoryOptions, 'Author')}</td>
+                    <td><input type="text" class="enlightenment-input contributor-name w-100" /></td>
+                    <td>${buildRowCombobox(contributorRoleOptions, 'Author')}</td>
                     <td><img src="/images/ui/delete.svg" alt="${jsLocalizedStrings.remove}" title="${jsLocalizedStrings.remove}" class="remove-form-table-row-icon" /></td>
                 </tr>`);
         }

@@ -62,7 +62,7 @@ public class AddRoleEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsFailureError_ShouldReturnProblemResult()
     {
         // Arrange
         AddRoleRequest request = _addRoleRequestFixture.Create(roleName: "Admin", permissions: [Guid.NewGuid()]);

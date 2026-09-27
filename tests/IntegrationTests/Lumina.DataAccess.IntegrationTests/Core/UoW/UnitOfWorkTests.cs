@@ -1,7 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.DataAccess.Core.UoW;
+using Lumina.Domain.Common.Primitives;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -9,6 +12,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.DataAccess.IntegrationTests.Core.UoW;
@@ -20,6 +24,7 @@ namespace Lumina.DataAccess.IntegrationTests.Core.UoW;
 public class UnitOfWorkTests
 {
     private readonly RoleEntityFixture _roleEntityFixture = new();
+    private readonly BookEntityFixture _bookEntityFixture = new();
 
     [Fact]
     public async Task BeginTransactionAsync_WhenCalled_ShouldBeginTransactionOnTheDatabase()
@@ -173,6 +178,40 @@ public class UnitOfWorkTests
 
                 // Assert
                 Assert.Throws<ObjectDisposedException>(() => dbContext.Roles.Count());
+            }
+        }
+    }
+
+    [Fact]
+    public async Task SaveChangesAsync_WhenInsertingTwoBooksWithTheSameLibraryAndPath_ShouldReturnUniqueConstraintViolationError()
+    {
+        // Arrange
+        (SqliteConnection anchorConnection, LuminaDbContext dbContext) = CreateSqliteContext();
+        using (anchorConnection)
+        {
+            using (dbContext)
+            {
+                UnitOfWork sut = new(dbContext);
+                Guid libraryId = Guid.NewGuid();
+                BookEntity firstBook = _bookEntityFixture.Create();
+                firstBook.LibraryId = libraryId;
+                firstBook.Path = "/books/duplicate.epub";
+                _ = await sut.BookRepository.InsertAsync(firstBook, CancellationToken.None);
+                Result<Success> firstSaveResult = await sut.SaveChangesAsync(CancellationToken.None);
+                Assert.False(firstSaveResult.IsFailure);
+
+                // stage a second book with the same library and path directly, bypassing the application level pre-check, so that the unique index of the storage medium is the one that rejects it
+                BookEntity secondBook = _bookEntityFixture.Create();
+                secondBook.LibraryId = libraryId;
+                secondBook.Path = "/books/duplicate.epub";
+                dbContext.Books.Add(secondBook);
+
+                // Act
+                Result<Success> result = await sut.SaveChangesAsync(CancellationToken.None);
+
+                // Assert
+                Assert.True(result.IsFailure);
+                Assert.Equal(ApplicationErrors.Persistence.UniqueConstraintViolation, result.FirstError);
             }
         }
     }

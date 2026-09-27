@@ -18,11 +18,13 @@ public class GetBookReadingAvailabilityRequestFixture
     /// Creates a random valid <see cref="GetBookReadingAvailabilityRequest"/>.
     /// </summary>
     /// <param name="bookId">Optional. The Id of the book whose reading availability is checked.</param>
+    /// <param name="libraryId">Optional. The Id of the media library the book belongs to.</param>
     /// <returns>The created <see cref="GetBookReadingAvailabilityRequest"/>.</returns>
     public GetBookReadingAvailabilityRequest Create(
-        Guid? bookId = null)
+        Guid? bookId = null,
+        Guid? libraryId = null)
     {
-        return new GetBookReadingAvailabilityRequest(bookId ?? Guid.NewGuid());
+        return new GetBookReadingAvailabilityRequest(bookId ?? Guid.NewGuid(), libraryId ?? Guid.NewGuid());
     }
 
     /// <summary>

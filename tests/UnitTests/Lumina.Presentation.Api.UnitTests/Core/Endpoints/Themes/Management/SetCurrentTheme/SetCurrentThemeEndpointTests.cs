@@ -110,7 +110,7 @@ public class SetCurrentThemeEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsValidationError_ShouldReturnValidationProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsValidationErrors_ShouldReturnValidationProblemResult()
     {
         // Arrange
         SetCurrentThemeRequest request = _setCurrentThemeRequestFixture.Create();
@@ -136,7 +136,7 @@ public class SetCurrentThemeEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendSetCurrentThemeCommandToHandler()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendSetCurrentThemeCommandToSender()
     {
         // Arrange
         SetCurrentThemeRequest request = _setCurrentThemeRequestFixture.Create();

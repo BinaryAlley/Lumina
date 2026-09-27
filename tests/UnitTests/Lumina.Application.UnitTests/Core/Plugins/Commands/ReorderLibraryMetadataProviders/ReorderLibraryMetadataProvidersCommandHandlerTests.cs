@@ -44,6 +44,7 @@ public class ReorderLibraryMetadataProvidersCommandHandlerTests
     public ReorderLibraryMetadataProvidersCommandHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockConfigurationRepository = Substitute.For<ILibraryMetadataProviderConfigurationRepository>();
         _mockUnitOfWork.LibraryMetadataProviderConfigurationRepository.Returns(_mockConfigurationRepository);
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();

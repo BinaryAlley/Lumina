@@ -1,6 +1,9 @@
-#region ========================================================================= USING =====================================================================================
-using FastEndpoints;
+﻿#region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Commands.UpdateBookCover;
+using Lumina.Contracts.Fixtures.Core.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.UpdateBookCover;
 using Microsoft.AspNetCore.Http;
@@ -22,110 +25,178 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Library.WrittenConten
 [ExcludeFromCodeCoverage]
 public class UpdateBookCoverEndpointTests
 {
-    private readonly Application.Common.CQRS.ICommandHandler<UpdateBookCoverCommand, Result<string>> _mockHandler;
+    private readonly ICommandHandler<UpdateBookCoverCommand, Result<UpdateBookCoverResponse>> _mockHandler;
     private readonly UpdateBookCoverEndpoint _sut;
+    private readonly UpdateBookCoverResponseFixture _updateBookCoverResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdateBookCoverEndpointTests"/> class.
     /// </summary>
     public UpdateBookCoverEndpointTests()
     {
-        _mockHandler = Substitute.For<Application.Common.CQRS.ICommandHandler<UpdateBookCoverCommand, Result<string>>>();
-        _sut = Factory.Create<UpdateBookCoverEndpoint>(_mockHandler);
+        _mockHandler = Substitute.For<ICommandHandler<UpdateBookCoverCommand, Result<UpdateBookCoverResponse>>>();
+        _sut = FastEndpoints.Factory.Create<UpdateBookCoverEndpoint>(_mockHandler);
     }
 
     [Fact]
     public async Task ExecuteAsync_WhenSuccessful_ShouldReturnOkResultWithCoverPath()
     {
         // Arrange
+        Guid libraryId = Guid.NewGuid();
         Guid bookId = Guid.NewGuid();
         CancellationToken cancellationToken = CancellationToken.None;
         string expectedPath = "/media/books/cover.jpg";
         _mockHandler.HandleAsync(Arg.Any<UpdateBookCoverCommand>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From(expectedPath));
-        ConfigureRequest(bookId, [1, 2, 3], "cover.jpg");
+            .Returns(Result.From(_updateBookCoverResponseFixture.Create(coverPath: expectedPath)));
+        _sut.HttpContext.Request.RouteValues["libraryId"] = libraryId.ToString();
+        _sut.HttpContext.Request.RouteValues["bookId"] = bookId.ToString();
+        ConfigureForm([1, 2, 3], "cover.jpg");
 
         // Act
-        IResult result = await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
+        IResult result = await _sut.ExecuteAsync(FastEndpoints.EmptyRequest.Instance, cancellationToken);
 
         // Assert
-        Ok<string> okResult = Assert.IsType<Ok<string>>(result);
-        Assert.Equal(expectedPath, okResult.Value);
+        Ok<UpdateBookCoverResponse> okResult = Assert.IsType<Ok<UpdateBookCoverResponse>>(result);
+        Assert.Equal(expectedPath, okResult.Value.CoverPath);
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidRouteIdAndFile_ShouldSendUpdateBookCoverCommand()
+    public async Task ExecuteAsync_WhenCalledWithValidRouteIdsAndFile_ShouldSendUpdateBookCoverCommandToSender()
     {
         // Arrange
+        Guid libraryId = Guid.NewGuid();
         Guid bookId = Guid.NewGuid();
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<UpdateBookCoverCommand>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From("/media/books/cover.jpg"));
-        ConfigureRequest(bookId, [1, 2, 3], "cover.jpg");
+            .Returns(Result.From(_updateBookCoverResponseFixture.Create(coverPath: "/media/books/cover.jpg")));
+        _sut.HttpContext.Request.RouteValues["libraryId"] = libraryId.ToString();
+        _sut.HttpContext.Request.RouteValues["bookId"] = bookId.ToString();
+        ConfigureForm([1, 2, 3], "cover.jpg");
 
         // Act
-        await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
+        await _sut.ExecuteAsync(FastEndpoints.EmptyRequest.Instance, cancellationToken);
 
         // Assert
         await _mockHandler.Received(1).HandleAsync(
             Arg.Is<UpdateBookCoverCommand>(command =>
-                command.BookId == bookId &&
+                command.LibraryId == libraryId.ToString() &&
+                command.BookId == bookId.ToString() &&
                 command.Cover != null &&
                 command.FileName == "cover.jpg"),
             Arg.Is(cancellationToken));
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenRouteIdIsNotParseable_ShouldSendCommandWithEmptyBookId()
+    public async Task ExecuteAsync_WhenRouteValuesAreNotParseable_ShouldSendCommandWithRawRouteValues()
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<UpdateBookCoverCommand>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From("/media/books/cover.jpg"));
-        ConfigureRequest("not-a-guid", [1, 2, 3], "cover.jpg");
+            .Returns(Result.From(_updateBookCoverResponseFixture.Create(coverPath: "/media/books/cover.jpg")));
+        _sut.HttpContext.Request.RouteValues["libraryId"] = "not-a-library-guid";
+        _sut.HttpContext.Request.RouteValues["bookId"] = "not-a-guid";
+        ConfigureForm([1, 2, 3], "cover.jpg");
 
         // Act
-        await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
+        await _sut.ExecuteAsync(FastEndpoints.EmptyRequest.Instance, cancellationToken);
 
         // Assert
         await _mockHandler.Received(1).HandleAsync(
-            Arg.Is<UpdateBookCoverCommand>(command => command.BookId == Guid.Empty && command.Cover != null),
-            Arg.Any<CancellationToken>());
+            Arg.Is<UpdateBookCoverCommand>(command => command.LibraryId == "not-a-library-guid" && command.BookId == "not-a-guid"),
+            Arg.Is(cancellationToken));
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenRouteValuesAreMissing_ShouldSendCommandWithNullIds()
+    {
+        // Arrange
+        CancellationToken cancellationToken = CancellationToken.None;
+        _mockHandler.HandleAsync(Arg.Any<UpdateBookCoverCommand>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(_updateBookCoverResponseFixture.Create(coverPath: "/media/books/cover.jpg")));
+        _sut.HttpContext.Request.RouteValues.Remove("libraryId");
+        _sut.HttpContext.Request.RouteValues.Remove("bookId");
+        ConfigureForm([1, 2, 3], "cover.jpg");
+
+        // Act
+        await _sut.ExecuteAsync(FastEndpoints.EmptyRequest.Instance, cancellationToken);
+
+        // Assert
+        await _mockHandler.Received(1).HandleAsync(
+            Arg.Is<UpdateBookCoverCommand>(command => command.LibraryId == null && command.BookId == null),
+            Arg.Is(cancellationToken));
     }
 
     [Fact]
     public async Task ExecuteAsync_WhenFormHasNoFiles_ShouldSendCommandWithNullCover()
     {
         // Arrange
+        Guid libraryId = Guid.NewGuid();
         Guid bookId = Guid.NewGuid();
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<UpdateBookCoverCommand>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From("/media/books/cover.jpg"));
-        ConfigureRequestWithoutFiles(bookId);
+            .Returns(Result.From(_updateBookCoverResponseFixture.Create(coverPath: "/media/books/cover.jpg")));
+        _sut.HttpContext.Request.RouteValues["libraryId"] = libraryId.ToString();
+        _sut.HttpContext.Request.RouteValues["bookId"] = bookId.ToString();
+        IFormCollection form = new FormCollection([]);
+        _sut.HttpContext.Request.ContentType = "multipart/form-data; boundary=----test";
+        _sut.HttpContext.Features.Set<IFormFeature>(new FormFeature(form));
 
         // Act
-        IResult result = await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
+        IResult result = await _sut.ExecuteAsync(FastEndpoints.EmptyRequest.Instance, cancellationToken);
 
         // Assert
-        Assert.IsType<Ok<string>>(result);
+        Assert.IsType<Ok<UpdateBookCoverResponse>>(result);
         await _mockHandler.Received(1).HandleAsync(
-            Arg.Is<UpdateBookCoverCommand>(command => command.BookId == bookId && command.Cover == null && command.FileName == null),
+            Arg.Is<UpdateBookCoverCommand>(command => command.BookId == bookId.ToString() && command.Cover == null && command.FileName == null),
             Arg.Any<CancellationToken>());
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsValidationErrors_ShouldReturnValidationProblemResult()
     {
         // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid bookId = Guid.NewGuid();
+        CancellationToken cancellationToken = CancellationToken.None;
+        Error validationError = Errors.WrittenContent.BookIdCannotBeEmpty;
+        _mockHandler.HandleAsync(Arg.Any<UpdateBookCoverCommand>(), Arg.Any<CancellationToken>())
+            .Returns(validationError);
+        _sut.HttpContext.Request.RouteValues["libraryId"] = libraryId.ToString();
+        _sut.HttpContext.Request.RouteValues["bookId"] = bookId.ToString();
+        ConfigureForm([1, 2, 3], "cover.jpg");
+
+        // Act
+        IResult result = await _sut.ExecuteAsync(FastEndpoints.EmptyRequest.Instance, cancellationToken);
+
+        // Assert
+        ProblemHttpResult problemDetails = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemDetails.StatusCode);
+        Assert.Equal("application/problem+json", problemDetails.ContentType);
+        HttpValidationProblemDetails validationProblemDetails = Assert.IsType<HttpValidationProblemDetails>(problemDetails.ProblemDetails);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, validationProblemDetails.Status);
+        Assert.Equal("General.Validation", validationProblemDetails.Title);
+        Assert.Equal("OneOrMoreValidationErrorsOccurred", validationProblemDetails.Detail);
+        Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", validationProblemDetails.Type);
+        Assert.Single(validationProblemDetails.Errors);
+        Assert.Equal(new[] { "BookIdCannotBeEmpty" }, validationProblemDetails.Errors["General.Validation"]);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenHandlerReturnsNotFoundError_ShouldReturnProblemResult()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
         Guid bookId = Guid.NewGuid();
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.NotFound("Book.NotFound", "BookNotFound");
         _mockHandler.HandleAsync(Arg.Any<UpdateBookCoverCommand>(), Arg.Any<CancellationToken>())
             .Returns(expectedError);
-        ConfigureRequest(bookId, [1, 2, 3], "cover.jpg");
+        _sut.HttpContext.Request.RouteValues["libraryId"] = libraryId.ToString();
+        _sut.HttpContext.Request.RouteValues["bookId"] = bookId.ToString();
+        ConfigureForm([1, 2, 3], "cover.jpg");
 
         // Act
-        IResult result = await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
+        IResult result = await _sut.ExecuteAsync(FastEndpoints.EmptyRequest.Instance, cancellationToken);
 
         // Assert
         ProblemHttpResult problemDetails = Assert.IsType<ProblemHttpResult>(result);
@@ -138,26 +209,12 @@ public class UpdateBookCoverEndpointTests
         Assert.NotNull(problemDetailsBody.Extensions["traceId"]);
     }
 
-    private void ConfigureRequest(Guid bookId, byte[] content, string fileName)
+    private void ConfigureForm(byte[] content, string fileName)
     {
-        ConfigureRequest(bookId.ToString(), content, fileName);
-    }
-
-    private void ConfigureRequest(string bookId, byte[] content, string fileName)
-    {
-        _sut.HttpContext.Request.RouteValues["id"] = bookId;
         MemoryStream coverStream = new(content);
         IFormFile formFile = new FormFile(coverStream, 0, content.Length, "cover", fileName);
         FormFileCollection files = [formFile];
         IFormCollection form = new FormCollection([], files);
-        _sut.HttpContext.Request.ContentType = "multipart/form-data; boundary=----test";
-        _sut.HttpContext.Features.Set<IFormFeature>(new FormFeature(form));
-    }
-
-    private void ConfigureRequestWithoutFiles(Guid bookId)
-    {
-        _sut.HttpContext.Request.RouteValues["id"] = bookId.ToString();
-        IFormCollection form = new FormCollection([]);
         _sut.HttpContext.Request.ContentType = "multipart/form-data; boundary=----test";
         _sut.HttpContext.Features.Set<IFormFeature>(new FormFeature(form));
     }

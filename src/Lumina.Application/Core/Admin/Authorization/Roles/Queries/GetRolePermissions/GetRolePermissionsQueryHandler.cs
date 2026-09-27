@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
@@ -10,6 +9,7 @@ using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Contracts.Responses.Authorization;
+using Lumina.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -57,18 +57,19 @@ public class GetRolePermissionsQueryHandler : IQueryHandler<GetRolePermissionsQu
         if (validationResult.Count > 0)
             return validationResult;
 
-        // an authenticated request must always carry a user identity
+        // An authenticated request must always carry a user identity.
         Guid? currentUserId = _currentUserService.UserId;
         if (currentUserId is null)
             return Errors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // only admins can see the list of authorization roles
+        // Only admins can see the list of authorization roles.
         bool isAdmin = await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false);
         if (!isAdmin)
             return Errors.Authorization.NotAuthorized;
-        // get the role from the repository and return its role permissions
-        Result<RoleEntity?> getRoleResult = await _roleRepository.GetByIdAsync(request.RoleId, cancellationToken).ConfigureAwait(false);
+
+        // Get the role from the repository and return its role permissions.
+        Result<RoleEntity?> getRoleResult = await _roleRepository.GetByIdAsync(request.RoleId, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getRoleResult.IsFailure)
             return getRoleResult.Errors;
         else if (getRoleResult.Value is null)

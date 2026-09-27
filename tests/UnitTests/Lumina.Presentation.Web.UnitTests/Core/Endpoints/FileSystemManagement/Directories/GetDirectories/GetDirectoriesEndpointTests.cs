@@ -43,7 +43,7 @@ public class GetDirectoriesEndpointTests
     public async Task ExecuteAsync_WhenApiReturnsDirectories_ShouldReturnSuccessJsonWithDirectories()
     {
         // Arrange
-        GetDirectoriesRequest request = _getDirectoriesRequestFixture.Create(path: "/media", includeHiddenElements: true);
+        GetDirectoriesRequest request = _getDirectoriesRequestFixture.Create(path: "/media", shouldIncludeHiddenElements: true);
         DirectoryDto[] expectedDirectories = [_directoryDtoFixture.Create(path: "/media/books", name: "books")];
         _mockApiHttpClient.GetAsync<DirectoryDto[]>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(expectedDirectories);
@@ -53,7 +53,7 @@ public class GetDirectoriesEndpointTests
         string body = await JsonResultTestHelper.GetResponseBodyAsync(result);
 
         // Assert
-        string expectedEndpoint = $"{ApiRoutes.Directories.GET_DIRECTORIES}?path={Uri.EscapeDataString(request.Path!)}&includeHiddenElements=True";
+        string expectedEndpoint = $"{ApiRoutes.Directories.GET_DIRECTORIES}?path={Uri.EscapeDataString(request.Path!)}&shouldIncludeHiddenElements=True";
         await _mockApiHttpClient.Received(1).GetAsync<DirectoryDto[]>(expectedEndpoint, Arg.Any<CancellationToken>());
         using JsonDocument jsonDocument = JsonDocument.Parse(body);
         Assert.True(jsonDocument.RootElement.GetProperty("success").GetBoolean());
@@ -64,7 +64,7 @@ public class GetDirectoriesEndpointTests
     public async Task ExecuteAsync_WhenCalledWithoutHiddenElements_ShouldRequestWithoutHiddenElementsFlag()
     {
         // Arrange
-        GetDirectoriesRequest request = _getDirectoriesRequestFixture.Create(path: "/media", includeHiddenElements: false);
+        GetDirectoriesRequest request = _getDirectoriesRequestFixture.Create(path: "/media", shouldIncludeHiddenElements: false);
         _mockApiHttpClient.GetAsync<DirectoryDto[]>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns([]);
 
@@ -72,7 +72,7 @@ public class GetDirectoriesEndpointTests
         await _sut.ExecuteAsync(request, CancellationToken.None);
 
         // Assert
-        string expectedEndpoint = $"{ApiRoutes.Directories.GET_DIRECTORIES}?path={Uri.EscapeDataString(request.Path!)}&includeHiddenElements=False";
+        string expectedEndpoint = $"{ApiRoutes.Directories.GET_DIRECTORIES}?path={Uri.EscapeDataString(request.Path!)}&shouldIncludeHiddenElements=False";
         await _mockApiHttpClient.Received(1).GetAsync<DirectoryDto[]>(expectedEndpoint, Arg.Any<CancellationToken>());
     }
 }

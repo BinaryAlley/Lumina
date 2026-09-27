@@ -80,7 +80,7 @@ public class StartScheduledJobCommandHandler : ICommandHandler<StartScheduledJob
             return ApplicationErrors.Authorization.NotAuthorized;
 
         // Get the scheduled job from the storage medium.
-        Result<ScheduledJobEntity?> getScheduledJobResult = await _unitOfWork.ScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, cancellationToken).ConfigureAwait(false);
+        Result<ScheduledJobEntity?> getScheduledJobResult = await _unitOfWork.ScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getScheduledJobResult.IsFailure)
             return getScheduledJobResult.Errors;
         if (getScheduledJobResult.Value is null)
@@ -98,7 +98,10 @@ public class StartScheduledJobCommandHandler : ICommandHandler<StartScheduledJob
         Result<Updated> updateScheduledJobResult = await _unitOfWork.ScheduledJobRepository.UpdateAsync(scheduledJobDomainResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
         if (updateScheduledJobResult.IsFailure)
             return updateScheduledJobResult.Errors;
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
 
         // Queue any domain events.
         foreach (IDomainEvent domainEvent in scheduledJobDomainResult.Value.GetDomainEvents())

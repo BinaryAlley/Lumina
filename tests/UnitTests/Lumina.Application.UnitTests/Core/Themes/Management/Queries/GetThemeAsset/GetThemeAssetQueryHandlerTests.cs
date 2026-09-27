@@ -42,6 +42,7 @@ public class GetThemeAssetQueryHandlerTests
     public GetThemeAssetQueryHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockThemeService = Substitute.For<IThemeService>();
         _mockValidator = Substitute.For<IValidator<GetThemeAssetQuery>>();
         _mockThemeRepository = Substitute.For<IThemeRepository>();

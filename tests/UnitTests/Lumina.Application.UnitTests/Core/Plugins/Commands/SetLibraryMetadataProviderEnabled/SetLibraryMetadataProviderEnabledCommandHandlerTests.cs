@@ -48,6 +48,7 @@ public class SetLibraryMetadataProviderEnabledCommandHandlerTests
     public SetLibraryMetadataProviderEnabledCommandHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockConfigurationRepository = Substitute.For<ILibraryMetadataProviderConfigurationRepository>();
         _mockUnitOfWork.LibraryMetadataProviderConfigurationRepository.Returns(_mockConfigurationRepository);
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();

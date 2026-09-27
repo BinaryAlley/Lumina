@@ -54,6 +54,7 @@ public class AddLibraryCommandHandlerTests
     public AddLibraryCommandHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockLibraryRepository = Substitute.For<ILibraryRepository>();
         _mockUnitOfWork.LibraryRepository.Returns(_mockLibraryRepository);
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
@@ -84,7 +85,7 @@ public class AddLibraryCommandHandlerTests
         // Arrange
         AddLibraryCommand command = _addLibraryCommandFixture.Create();
         LibraryEntity persistedLibrary = _libraryEntityFixture.Create(userId: _userId);
-        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(persistedLibrary));
 
         // Act
@@ -123,7 +124,7 @@ public class AddLibraryCommandHandlerTests
         AddLibraryCommand command = _addLibraryCommandFixture.Create();
         command = command with { CoverImage = null };
         LibraryEntity persistedLibrary = _libraryEntityFixture.Create(userId: _userId);
-        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(persistedLibrary));
 
         // Act
@@ -261,7 +262,7 @@ public class AddLibraryCommandHandlerTests
     {
         // Arrange
         AddLibraryCommand command = _addLibraryCommandFixture.Create();
-        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result<LibraryEntity?>.Success(null));
 
         // Act

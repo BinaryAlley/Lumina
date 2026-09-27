@@ -17,7 +17,6 @@ namespace Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
 public class ReleaseInfoDtoFixture
 {
     private readonly Faker _faker = new();
-    private readonly Random _random = new();
 
     /// <summary>
     /// Creates a new <see cref="ReleaseInfoDto"/> instance with randomized test data.
@@ -37,9 +36,9 @@ public class ReleaseInfoDtoFixture
         ReleaseCountry? releaseCountry = null,
         string? releaseVersion = null)
     {
-        int resolvedOriginalReleaseYear = originalReleaseYear ?? (originalReleaseDate?.Year ?? _random.Next(1900, 2026));
+        int resolvedOriginalReleaseYear = originalReleaseYear ?? (originalReleaseDate?.Year ?? Random.Shared.Next(1900, 2026));
         DateOnly resolvedOriginalReleaseDate = originalReleaseDate ?? new DateOnly(resolvedOriginalReleaseYear, 1, 1);
-        int resolvedReReleaseYear = reReleaseYear ?? (reReleaseDate?.Year ?? _random.Next(resolvedOriginalReleaseYear, resolvedOriginalReleaseYear + 100));
+        int resolvedReReleaseYear = reReleaseYear ?? (reReleaseDate?.Year ?? Random.Shared.Next(resolvedOriginalReleaseYear, resolvedOriginalReleaseYear + 100));
         DateOnly resolvedReReleaseDate = reReleaseDate ?? new DateOnly(resolvedReReleaseYear, 1, 1);
 
         return new ReleaseInfoDto

@@ -2,7 +2,6 @@
 using Bogus;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -21,7 +20,6 @@ public class GetBooksRequestFixture
     /// <summary>
     /// Creates a <see cref="GetBooksRequest"/> with default or random values.
     /// </summary>
-    /// <param name="libraryId">Optional. The Id of the media library whose books are retrieved.</param>
     /// <param name="currentPage">Optional. The page of results to retrieve.</param>
     /// <param name="perPage">Optional. The maximum number of books to retrieve per page.</param>
     /// <param name="searchTerm">Optional. The search term used to filter results.</param>
@@ -31,7 +29,6 @@ public class GetBooksRequestFixture
     /// <param name="includePerPage">Whether the per page count should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="GetBooksRequest"/>.</returns>
     public GetBooksRequest Create(
-        Guid? libraryId = null,
         int? currentPage = null,
         int? perPage = null,
         string? searchTerm = null,
@@ -41,7 +38,6 @@ public class GetBooksRequestFixture
         bool includePerPage = true)
     {
         return new GetBooksRequest(
-            LibraryId: libraryId ?? _faker.Random.Guid(),
             CurrentPage: includeCurrentPage ? (currentPage ?? _faker.Random.Number(1, 100)) : null,
             PerPage: includePerPage ? (perPage ?? _faker.Random.Number(1, 200)) : null,
             SearchTerm: searchTerm ?? _faker.Lorem.Word(),

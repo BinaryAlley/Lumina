@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.UpdateBook;
 
 /// <summary>
-/// API endpoint for the <c>/books/{id}</c> route.
+/// API endpoint for the <c>/libraries/{libraryId}/books/{bookId}</c> route.
 /// </summary>
 public class UpdateBookEndpoint : BaseEndpoint<UpdateBookRequest, IResult>
 {
@@ -48,12 +48,10 @@ public class UpdateBookEndpoint : BaseEndpoint<UpdateBookRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(UpdateBookRequest request, CancellationToken cancellationToken)
     {
-        // The book is identified by the {id} route value, not by the id of the request body, so that a mismatched or malicious id can never
-        // redirect the update to another book; the raw value is kept as a string, so that an unparseable id reaches the command validator,
-        // which reports it with a ProblemDetails validation error instead of failing the request binding.
-        request = request with { Id = HttpContext.Request.RouteValues["id"]?.ToString() };
-
-        Result<BookResponse> result = await _updateBookCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
+        // Take unique identifiers from the route.
+        string? libraryId = HttpContext.Request.RouteValues["libraryId"]?.ToString();
+        string? bookId = HttpContext.Request.RouteValues["bookId"]?.ToString();
+        Result<BookResponse> result = await _updateBookCommandHandler.HandleAsync(request.ToCommand(libraryId, bookId), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

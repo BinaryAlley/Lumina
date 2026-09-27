@@ -24,11 +24,11 @@ public class GetDirectoriesEndpointSummary : Summary<GetDirectoriesEndpoint, Get
         Description = "Retrieves the directories of the file system path identified by the request.";
 
         RequestParam(r => r.Path, "The file system path for which to get the directories. Required.");
-        RequestParam(r => r.IncludeHiddenElements, "Whether to include hidden file system elements or not. Optional.");
+        RequestParam(r => r.ShouldIncludeHiddenElements, "Whether to include hidden file system elements or not. Optional.");
 
         ExampleRequest = new GetDirectoriesRequest(
             Path: "/media/movies/",
-            IncludeHiddenElements: true
+            ShouldIncludeHiddenElements: true
         );
 
         Response(200, "The directories of the file system path are returned.", example: new SuccessResponse<DirectoryDto[]>(true, default));

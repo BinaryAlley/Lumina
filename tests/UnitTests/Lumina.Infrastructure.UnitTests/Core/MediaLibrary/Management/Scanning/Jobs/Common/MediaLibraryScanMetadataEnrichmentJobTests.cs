@@ -4,7 +4,7 @@ using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DataAccess.Repositories.Books;
+using Lumina.Application.Common.DataAccess.Repositories.BookLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.MediaContributors;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
@@ -127,7 +127,7 @@ public class MediaLibraryScanMetadataEnrichmentJobTests
             .Returns(Result.From(0));
         _mockBookRepository.GetBooksNeedingMetadataAsync(_libraryId.Value, Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<BookEntity>>([]));
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
 
         // Act
         await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
@@ -144,7 +144,7 @@ public class MediaLibraryScanMetadataEnrichmentJobTests
         // Arrange
         _mockConfigurationRepository.GetByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([]));
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
 
         // Act
         await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
@@ -339,8 +339,8 @@ public class MediaLibraryScanMetadataEnrichmentJobTests
         IMetadataProvider firstProvider = Substitute.For<IMetadataProvider>();
         firstProvider.Name.Returns("First Provider");
         firstProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
-        MediaContributorDto author = _mediaContributorDtoFixture.Create(displayName: "Frank Herbert", roleName: "Author", roleCategory: MediaContributorRoleCategory.Author);
-        MediaContributorDto translator = _mediaContributorDtoFixture.Create(displayName: "Jane Translator", roleName: "Translator", roleCategory: MediaContributorRoleCategory.Translator);
+        MediaContributorDto author = _mediaContributorDtoFixture.Create(displayName: "Frank Herbert", role: MediaContributorRole.Author);
+        MediaContributorDto translator = _mediaContributorDtoFixture.Create(displayName: "Jane Translator", role: MediaContributorRole.Translator);
         firstProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
             .Returns(_bookMetadataDtoFixture.Create(title: "First Title", contributors: [author, translator]));
 
@@ -362,15 +362,13 @@ public class MediaLibraryScanMetadataEnrichmentJobTests
         await _mockMediaContributorRepository.Received(1).FindOrCreateByDisplayNameAsync("Frank Herbert", Arg.Any<string?>(), Arg.Any<CancellationToken>());
         await _mockMediaContributorRepository.Received(1).FindOrCreateByDisplayNameAsync("Jane Translator", Arg.Any<string?>(), Arg.Any<CancellationToken>());
 
-        // the participation rows are replaced on the entity, carrying the role and the category of each contributor
-        Assert.Equal(2, book.BookContributors.Count);
-        BookContributorEntity linkedAuthor = Assert.Single(book.BookContributors, contributor => contributor.MediaContributorId == authorEntity.Id);
-        Assert.Equal("Author", linkedAuthor.RoleName);
-        Assert.Equal(MediaContributorRoleCategory.Author, linkedAuthor.RoleCategory);
+        // the participation rows are replaced on the entity, carrying the canonical role of each contributor
+        Assert.Equal(2, book.Contributors.Count);
+        BookContributorEntity linkedAuthor = Assert.Single(book.Contributors, contributor => contributor.MediaContributorId == authorEntity.Id);
+        Assert.Equal(MediaContributorRole.Author, linkedAuthor.Role);
         Assert.Equal(book.Id, linkedAuthor.BookId);
-        BookContributorEntity linkedTranslator = Assert.Single(book.BookContributors, contributor => contributor.MediaContributorId == translatorEntity.Id);
-        Assert.Equal("Translator", linkedTranslator.RoleName);
-        Assert.Equal(MediaContributorRoleCategory.Translator, linkedTranslator.RoleCategory);
+        BookContributorEntity linkedTranslator = Assert.Single(book.Contributors, contributor => contributor.MediaContributorId == translatorEntity.Id);
+        Assert.Equal(MediaContributorRole.Translator, linkedTranslator.Role);
         Assert.Equal(MetadataStatus.Enriched, book.MetadataStatus);
     }
 
@@ -382,7 +380,7 @@ public class MediaLibraryScanMetadataEnrichmentJobTests
         IMetadataProvider firstProvider = Substitute.For<IMetadataProvider>();
         firstProvider.Name.Returns("First Provider");
         firstProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
-        MediaContributorDto author = _mediaContributorDtoFixture.Create(displayName: "Frank Herbert", roleName: "Author", roleCategory: MediaContributorRoleCategory.Author);
+        MediaContributorDto author = _mediaContributorDtoFixture.Create(displayName: "Frank Herbert", role: MediaContributorRole.Author);
         firstProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
             .Returns(_bookMetadataDtoFixture.Create(title: "First Title", contributors: [author]));
 
@@ -396,7 +394,7 @@ public class MediaLibraryScanMetadataEnrichmentJobTests
             .Returns(Result.From(2));
         _mockBookRepository.GetBooksNeedingMetadataAsync(_libraryId.Value, Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<BookEntity>>([firstBook, secondBook]), Result.From<IReadOnlyList<BookEntity>>([]));
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
 
         MediaContributorEntity authorEntity = _mediaContributorEntityFixture.Create(displayName: "Frank Herbert");
         _mockMediaContributorRepository.FindOrCreateByDisplayNameAsync("Frank Herbert", Arg.Any<string?>(), Arg.Any<CancellationToken>())
@@ -408,10 +406,10 @@ public class MediaLibraryScanMetadataEnrichmentJobTests
         // Assert
         // the contributor cache of the page guarantees a single contributor per person, so the repository is queried only once
         await _mockMediaContributorRepository.Received(1).FindOrCreateByDisplayNameAsync("Frank Herbert", Arg.Any<string?>(), Arg.Any<CancellationToken>());
-        Assert.Single(firstBook.BookContributors);
-        Assert.Single(secondBook.BookContributors);
-        Assert.Equal(authorEntity.Id, firstBook.BookContributors[0].MediaContributorId);
-        Assert.Equal(authorEntity.Id, secondBook.BookContributors[0].MediaContributorId);
+        Assert.Single(firstBook.Contributors);
+        Assert.Single(secondBook.Contributors);
+        Assert.Equal(authorEntity.Id, firstBook.Contributors[0].MediaContributorId);
+        Assert.Equal(authorEntity.Id, secondBook.Contributors[0].MediaContributorId);
     }
 
     [Fact]
@@ -435,7 +433,7 @@ public class MediaLibraryScanMetadataEnrichmentJobTests
 
         SetupRealServiceProviderForProviders(localPluginId, localProvider, webPluginId, webProvider, shouldAggregateMetadataWhenMissing: false);
         ILibraryRepository mockLibraryRepository = Substitute.For<ILibraryRepository>();
-        mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+        mockLibraryRepository.GetByIdAsync(_libraryId.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(_libraryEntityFixture.Create(title: "My Library", canDownloadMetadataFromWeb: false)));
         _mockUnitOfWork.LibraryRepository.Returns(mockLibraryRepository);
 
@@ -473,7 +471,7 @@ public class MediaLibraryScanMetadataEnrichmentJobTests
 
         SetupRealServiceProviderForProviders(localPluginId, localProvider, webPluginId, webProvider, shouldAggregateMetadataWhenMissing: false);
         ILibraryRepository mockLibraryRepository = Substitute.For<ILibraryRepository>();
-        mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+        mockLibraryRepository.GetByIdAsync(_libraryId.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(_libraryEntityFixture.Create(title: "My Library", canDownloadMetadataFromWeb: true)));
         _mockUnitOfWork.LibraryRepository.Returns(mockLibraryRepository);
 
@@ -503,7 +501,7 @@ public class MediaLibraryScanMetadataEnrichmentJobTests
             .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([_configurationEntityFixture.Create(_libraryId.Value, firstPluginId, 1)]));
         _mockBookRepository.GetBooksNeedingMetadataCountAsync(_libraryId.Value, Arg.Any<CancellationToken>())
             .Returns(Error.Failure("Database.Error", "Failed to count the books to enrich"));
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
 
         // Act
         await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
@@ -528,7 +526,7 @@ public class MediaLibraryScanMetadataEnrichmentJobTests
             .Returns(Result.From(1));
         _mockBookRepository.GetBooksNeedingMetadataAsync(_libraryId.Value, Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(Error.Failure("Database.Error", "Failed to get the books to enrich"));
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
 
         // Act
         await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
@@ -607,7 +605,7 @@ public class MediaLibraryScanMetadataEnrichmentJobTests
         IMetadataProvider firstProvider = Substitute.For<IMetadataProvider>();
         firstProvider.Name.Returns("First Provider");
         firstProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
-        MediaContributorDto namelessContributor = _mediaContributorDtoFixture.Create(roleName: "Author", roleCategory: MediaContributorRoleCategory.Author) with { Name = null };
+        MediaContributorDto namelessContributor = _mediaContributorDtoFixture.Create(role: MediaContributorRole.Author) with { Name = null };
         firstProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
             .Returns(_bookMetadataDtoFixture.Create(title: "First Title", contributors: [namelessContributor]));
 
@@ -621,7 +619,7 @@ public class MediaLibraryScanMetadataEnrichmentJobTests
         // Assert
         // a contributor without a display name cannot be linked to the book, so no contributor is queried or created
         await _mockMediaContributorRepository.DidNotReceive().FindOrCreateByDisplayNameAsync(Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
-        Assert.Empty(book.BookContributors);
+        Assert.Empty(book.Contributors);
         Assert.Equal(MetadataStatus.Enriched, book.MetadataStatus);
         Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
     }
@@ -650,9 +648,9 @@ public class MediaLibraryScanMetadataEnrichmentJobTests
         await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
 
         // Assert
-        BookContributorEntity linkedContributor = Assert.Single(book.BookContributors);
-        Assert.Equal("Contributor", linkedContributor.RoleName);
-        Assert.Equal(MediaContributorRoleCategory.Other, linkedContributor.RoleCategory);
+        // a contributor without a role is linked with the default canonical role
+        BookContributorEntity linkedContributor = Assert.Single(book.Contributors);
+        Assert.Equal(MediaContributorRole.Author, linkedContributor.Role);
         Assert.Equal(MetadataStatus.Enriched, book.MetadataStatus);
         Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
     }
@@ -665,7 +663,7 @@ public class MediaLibraryScanMetadataEnrichmentJobTests
         IMetadataProvider firstProvider = Substitute.For<IMetadataProvider>();
         firstProvider.Name.Returns("First Provider");
         firstProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
-        MediaContributorDto author = _mediaContributorDtoFixture.Create(displayName: "Frank Herbert", roleName: "Author", roleCategory: MediaContributorRoleCategory.Author);
+        MediaContributorDto author = _mediaContributorDtoFixture.Create(displayName: "Frank Herbert", role: MediaContributorRole.Author);
         firstProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
             .Returns(_bookMetadataDtoFixture.Create(title: "First Title", contributors: [author]));
 
@@ -689,7 +687,7 @@ public class MediaLibraryScanMetadataEnrichmentJobTests
         // Arrange
         _mockConfigurationRepository.GetByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([]));
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
 
         IMediaLibraryScanJob mockChildJob = Substitute.For<IMediaLibraryScanJob>();
         mockChildJob.ExecuteAsync(Arg.Any<Guid>(), Arg.Any<object>(), Arg.Any<CancellationToken>())
@@ -747,6 +745,6 @@ public class MediaLibraryScanMetadataEnrichmentJobTests
             .Returns(Result.From(1));
         _mockBookRepository.GetBooksNeedingMetadataAsync(_libraryId.Value, Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<BookEntity>>([book]), Result.From<IReadOnlyList<BookEntity>>([]));
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
     }
 }

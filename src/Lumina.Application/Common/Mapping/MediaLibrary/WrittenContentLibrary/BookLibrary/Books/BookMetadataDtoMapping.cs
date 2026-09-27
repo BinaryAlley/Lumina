@@ -44,36 +44,32 @@ public static class BookMetadataDtoMapping
             return releaseInfoResult.Errors;
 
         List<Result<Genre>> domainGenresResult = metadata.Genres is not null
-            ? [.. metadata.Genres.Select(genre => Genre.Create(genre.Name))]
+            ? [.. metadata.Genres.Select(genre => Genre.Create(genre.Name!))]
             : [];
         List<Error> genresErrors = [.. domainGenresResult.Where(genreResult => genreResult.IsFailure).SelectMany(genreResult => genreResult.Errors)];
         if (genresErrors.Count != 0)
             return genresErrors;
 
         List<Result<Tag>> domainTagsResult = metadata.Tags is not null
-            ? [.. metadata.Tags.Select(tag => Tag.Create(tag.Name))]
+            ? [.. metadata.Tags.Select(tag => Tag.Create(tag.Name!))]
             : [];
         List<Error> tagsErrors = [.. domainTagsResult.Where(tagResult => tagResult.IsFailure).SelectMany(tagResult => tagResult.Errors)];
         if (tagsErrors.Count != 0)
             return tagsErrors;
 
         Optional<LanguageInfo> languageInfo = Optional<LanguageInfo>.None();
-        if (metadata.Language is not null)
-        {
-            Result<LanguageInfo> languageInfoResult = LanguageInfo.Create(metadata.Language.LanguageCode, metadata.Language.LanguageName, Optional<string>.FromNullable(metadata.Language.NativeName));
-            if (languageInfoResult.IsFailure)
-                return languageInfoResult.Errors;
-            languageInfo = languageInfoResult.Value;
-        }
+        if (metadata.Language is not null && metadata.Language.LanguageCode is not null && metadata.Language.LanguageName is not null)
+            languageInfo = LanguageInfo.Create(
+                metadata.Language.LanguageCode,
+                metadata.Language.LanguageName,
+                Optional<string>.FromNullable(metadata.Language.NativeName));
 
         Optional<LanguageInfo> originalLanguageInfo = Optional<LanguageInfo>.None();
-        if (metadata.OriginalLanguage is not null)
-        {
-            Result<LanguageInfo> originalLanguageInfoResult = LanguageInfo.Create(metadata.OriginalLanguage.LanguageCode, metadata.OriginalLanguage.LanguageName, Optional<string>.FromNullable(metadata.OriginalLanguage.NativeName));
-            if (originalLanguageInfoResult.IsFailure)
-                return originalLanguageInfoResult.Errors;
-            originalLanguageInfo = originalLanguageInfoResult.Value;
-        }
+        if (metadata.OriginalLanguage is not null && metadata.OriginalLanguage.LanguageCode is not null && metadata.OriginalLanguage.LanguageName is not null)
+            originalLanguageInfo = LanguageInfo.Create(
+                metadata.OriginalLanguage.LanguageCode,
+                metadata.OriginalLanguage.LanguageName,
+                Optional<string>.FromNullable(metadata.OriginalLanguage.NativeName));
 
         Result<WrittenContentMetadata> writtenContentMetadataResult = WrittenContentMetadata.Create(
             metadata.Title,
@@ -91,7 +87,7 @@ public static class BookMetadataDtoMapping
             return writtenContentMetadataResult.Errors;
 
         List<Result<Isbn>> domainIsbnsResult = metadata.Isbns is not null
-            ? [.. metadata.Isbns.Where(isbn => isbn.Value is not null && isbn.Format is not null).Select(isbn => Isbn.Create(isbn.Value, (IsbnFormat)(int)isbn.Format!.Value))]
+            ? [.. metadata.Isbns.Where(isbn => isbn.Value is not null && isbn.Format is not null).Select(isbn => Isbn.Create(isbn.Value!, (IsbnFormat)(int)isbn.Format!.Value))]
             : [];
         List<Error> isbnsErrors = [.. domainIsbnsResult.Where(isbnResult => isbnResult.IsFailure).SelectMany(isbnResult => isbnResult.Errors)];
         if (isbnsErrors.Count != 0)

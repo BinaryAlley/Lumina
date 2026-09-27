@@ -2,6 +2,8 @@
 using Lumina.Application.Common.DataAccess.Entities.Scheduling;
 using Lumina.Application.Common.DataAccess.Repositories.Scheduling;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Core.Scheduling.Queries.GetScheduledJobs;
@@ -40,6 +42,7 @@ public class GetScheduledJobsQueryHandlerTests
     public GetScheduledJobsQueryHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockScheduledJobRepository = Substitute.For<IScheduledJobRepository>();
@@ -57,8 +60,8 @@ public class GetScheduledJobsQueryHandlerTests
         // Arrange
         ScheduledJobEntity scheduledJob1 = _scheduledJobEntityFixture.Create(name: "Job 1");
         ScheduledJobEntity scheduledJob2 = _scheduledJobEntityFixture.Create(name: "Job 2");
-        _mockScheduledJobRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(Result.From<IEnumerable<ScheduledJobEntity>>([scheduledJob1, scheduledJob2]));
+        _mockScheduledJobRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(new PaginatedResultDto<ScheduledJobEntity> { Data = [scheduledJob1, scheduledJob2], CurrentPage = 1, PerPage = 2, Count = 2, NumberOfPages = 1 }));
 
         // Act
         Result<IEnumerable<ScheduledJobResponse>> result = await _sut.HandleAsync(new GetScheduledJobsQuery(), CancellationToken.None);
@@ -74,8 +77,8 @@ public class GetScheduledJobsQueryHandlerTests
     public async Task HandleAsync_WhenNoScheduledJobsExist_ShouldReturnEmptyCollection()
     {
         // Arrange
-        _mockScheduledJobRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(Result.From<IEnumerable<ScheduledJobEntity>>([]));
+        _mockScheduledJobRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(new PaginatedResultDto<ScheduledJobEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
 
         // Act
         Result<IEnumerable<ScheduledJobResponse>> result = await _sut.HandleAsync(new GetScheduledJobsQuery(), CancellationToken.None);
@@ -97,7 +100,7 @@ public class GetScheduledJobsQueryHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
-        await _mockScheduledJobRepository.DidNotReceive().GetAllAsync(Arg.Any<CancellationToken>());
+        await _mockScheduledJobRepository.DidNotReceive().GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -112,7 +115,7 @@ public class GetScheduledJobsQueryHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
-        await _mockScheduledJobRepository.DidNotReceive().GetAllAsync(Arg.Any<CancellationToken>());
+        await _mockScheduledJobRepository.DidNotReceive().GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -120,7 +123,7 @@ public class GetScheduledJobsQueryHandlerTests
     {
         // Arrange
         Error error = Error.Failure("Database.Error", "Failed to get the scheduled jobs");
-        _mockScheduledJobRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(error);
+        _mockScheduledJobRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(error);
 
         // Act
         Result<IEnumerable<ScheduledJobResponse>> result = await _sut.HandleAsync(new GetScheduledJobsQuery(), CancellationToken.None);

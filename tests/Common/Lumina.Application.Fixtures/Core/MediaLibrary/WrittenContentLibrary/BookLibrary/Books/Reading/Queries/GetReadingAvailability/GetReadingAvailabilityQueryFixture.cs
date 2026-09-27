@@ -17,12 +17,14 @@ public class GetReadingAvailabilityQueryFixture
     /// <summary>
     /// Creates a random valid query to check the reading availability of a book.
     /// </summary>
+    /// <param name="libraryId">Optional. The Id of the library the book belongs to.</param>
     /// <param name="bookId">Optional. The Id of the book whose reading availability is checked.</param>
     /// <returns>The created <see cref="GetReadingAvailabilityQuery"/>.</returns>
     public GetReadingAvailabilityQuery Create(
-        Guid? bookId = null)
+        string? libraryId = null,
+        string? bookId = null)
     {
-        return new GetReadingAvailabilityQuery(bookId ?? Guid.NewGuid());
+        return new GetReadingAvailabilityQuery(libraryId ?? Guid.NewGuid().ToString(), bookId ?? Guid.NewGuid().ToString());
     }
 
     /// <summary>

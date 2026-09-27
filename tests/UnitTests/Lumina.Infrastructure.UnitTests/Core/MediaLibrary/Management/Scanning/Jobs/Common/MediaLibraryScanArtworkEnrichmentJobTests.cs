@@ -2,7 +2,7 @@
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
-using Lumina.Application.Common.DataAccess.Repositories.Books;
+using Lumina.Application.Common.DataAccess.Repositories.BookLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -139,7 +139,7 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
             "Test Title",
             Arg.Any<ArtworkDto>(),
             Arg.Any<CancellationToken>());
-        BookArtworkEntity coverArtwork = Assert.Single(book.BookArtwork);
+        BookArtworkEntity coverArtwork = Assert.Single(book.Artwork);
         Assert.Equal(ArtworkType.Cover, coverArtwork.ArtworkType);
         Assert.Equal(0, coverArtwork.Ordinal);
         Assert.Equal(ArtworkStatus.Enriched, coverArtwork.Status);
@@ -168,7 +168,7 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
         SetupRealServiceProvider(artworkPluginId, artworkProvider, mockBookArtworkService, mockFileHashService);
         BookEntity book = _bookEntityFixture.Create(libraryId: _libraryId.Value, path: "/books/test.epub");
         // the book already has a stored cover with the same content hash as the resolved artwork
-        book.BookArtwork = [_bookArtworkEntityFixture.Create(bookId: book.Id, artworkType: ArtworkType.Cover, ordinal: 0, fileName: "existing\\cover.jpeg", contentHash: 123ul, status: ArtworkStatus.Pending, provider: "Old Provider", lastUpdateUtc: DateTime.UtcNow.AddDays(-1))];
+        book.Artwork = [_bookArtworkEntityFixture.Create(bookId: book.Id, artworkType: ArtworkType.Cover, ordinal: 0, fileName: "existing\\cover.jpeg", contentHash: 123ul, status: ArtworkStatus.Pending, provider: "Old Provider", lastUpdateUtc: DateTime.UtcNow.AddDays(-1))];
         SetupSingleBookPage(book, artworkPluginId);
         _mockBookRepository.GetAuthorsDisplayNamesByBookIdsAsync(Arg.Any<IReadOnlyCollection<Guid>>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyDictionary<Guid, string?>>(new Dictionary<Guid, string?> { [book.Id] = "Frank Herbert" }));
@@ -179,7 +179,7 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
         // Assert
         // the identical artwork is not copied again, so the artwork storage service is not called and the stored file name is kept
         await mockBookArtworkService.DidNotReceive().SaveBookArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<ArtworkDto>(), Arg.Any<CancellationToken>());
-        BookArtworkEntity coverArtwork = Assert.Single(book.BookArtwork);
+        BookArtworkEntity coverArtwork = Assert.Single(book.Artwork);
         Assert.Equal(ArtworkStatus.Enriched, coverArtwork.Status);
         Assert.Equal("existing\\cover.jpeg", coverArtwork.FileName);
         Assert.Equal("Artwork Provider", coverArtwork.Provider);
@@ -212,7 +212,7 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
 
         // Assert
         await mockBookArtworkService.DidNotReceive().SaveBookArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<ArtworkDto>(), Arg.Any<CancellationToken>());
-        BookArtworkEntity coverArtwork = Assert.Single(book.BookArtwork);
+        BookArtworkEntity coverArtwork = Assert.Single(book.Artwork);
         Assert.Equal(ArtworkType.Cover, coverArtwork.ArtworkType);
         Assert.Equal(0, coverArtwork.Ordinal);
         Assert.Equal(ArtworkStatus.Failed, coverArtwork.Status);
@@ -226,7 +226,7 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
         // Arrange
         _mockArtworkConfigurationRepository.GetByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryArtworkProviderConfigurationEntity>>([]));
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
 
         // Act
         await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
@@ -330,7 +330,7 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
         _mockServiceScopeFactory.CreateAsyncScope().Returns(asyncServiceScope);
 
         ILibraryRepository mockLibraryRepository = Substitute.For<ILibraryRepository>();
-        mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+        mockLibraryRepository.GetByIdAsync(_libraryId.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(_libraryEntityFixture.Create(id: _libraryId.Value, title: "My Library", canDownloadMetadataFromWeb: false)));
         _mockUnitOfWork.LibraryRepository.Returns(mockLibraryRepository);
 
@@ -346,7 +346,7 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
             .Returns(Result.From<IReadOnlyList<BookEntity>>([book]), Result.From<IReadOnlyList<BookEntity>>([]));
         _mockBookRepository.GetAuthorsDisplayNamesByBookIdsAsync(Arg.Any<IReadOnlyCollection<Guid>>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyDictionary<Guid, string?>>(new Dictionary<Guid, string?> { [book.Id] = "Frank Herbert" }));
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
 
         // Act
         await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
@@ -354,7 +354,7 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
         // Assert
         // the provider that requires access to the web is skipped when the library does not permit web downloads
         await webProvider.DidNotReceive().GetArtworkAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>());
-        BookArtworkEntity coverArtwork = Assert.Single(book.BookArtwork);
+        BookArtworkEntity coverArtwork = Assert.Single(book.Artwork);
         Assert.Equal(ArtworkStatus.Enriched, coverArtwork.Status);
         Assert.Equal("Local Provider", coverArtwork.Provider);
         Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
@@ -377,7 +377,7 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
             .Returns(Result.From<IReadOnlyList<LibraryArtworkProviderConfigurationEntity>>([_artworkConfigurationEntityFixture.Create(_libraryId.Value, artworkPluginId, 1)]));
         _mockBookRepository.GetBooksNeedingArtworkCountAsync(_libraryId.Value, Arg.Any<CancellationToken>())
             .Returns(Error.Failure("Database.Error", "Failed to count the books that need artwork"));
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
 
         // Act
         await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
@@ -405,7 +405,7 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
             .Returns(Result.From(1));
         _mockBookRepository.GetBooksNeedingArtworkAsync(_libraryId.Value, Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(Error.Failure("Database.Error", "Failed to get the books that need artwork"));
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
 
         // Act
         await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
@@ -429,7 +429,7 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
 
         BookEntity book = _bookEntityFixture.Create(libraryId: _libraryId.Value, path: "/books/test.epub");
         ILibraryRepository mockLibraryRepository = Substitute.For<ILibraryRepository>();
-        mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+        mockLibraryRepository.GetByIdAsync(_libraryId.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(_libraryEntityFixture.Create(id: _libraryId.Value, title: "My Library", canDownloadMetadataFromWeb: true)));
         _mockUnitOfWork.LibraryRepository.Returns(mockLibraryRepository);
         _mockArtworkConfigurationRepository.GetByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
@@ -440,7 +440,7 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
             .Returns(Result.From<IReadOnlyList<BookEntity>>([book]), Result.From<IReadOnlyList<BookEntity>>([]));
         _mockBookRepository.GetAuthorsDisplayNamesByBookIdsAsync(Arg.Any<IReadOnlyCollection<Guid>>(), Arg.Any<CancellationToken>())
             .Returns(Error.Failure("Database.Error", "Failed to get the author display names"));
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
 
         // Act
         await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
@@ -465,7 +465,7 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
 
         SetupRealServiceProvider(artworkPluginId, artworkProvider, mockBookArtworkService, mockFileHashService);
         BookEntity book = _bookEntityFixture.Create(libraryId: _libraryId.Value, path: "/books/test.epub");
-        book.BookArtwork = [_bookArtworkEntityFixture.Create(bookId: book.Id, artworkType: ArtworkType.Cover, ordinal: 0, fileName: "existing\\cover.jpeg", contentHash: 123ul, status: ArtworkStatus.Pending, provider: "Old Provider", lastUpdateUtc: DateTime.UtcNow.AddDays(-1))];
+        book.Artwork = [_bookArtworkEntityFixture.Create(bookId: book.Id, artworkType: ArtworkType.Cover, ordinal: 0, fileName: "existing\\cover.jpeg", contentHash: 123ul, status: ArtworkStatus.Pending, provider: "Old Provider", lastUpdateUtc: DateTime.UtcNow.AddDays(-1))];
         SetupSingleBookPage(book, artworkPluginId);
         _mockBookRepository.GetAuthorsDisplayNamesByBookIdsAsync(Arg.Any<IReadOnlyCollection<Guid>>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyDictionary<Guid, string?>>(new Dictionary<Guid, string?> { [book.Id] = "Frank Herbert" }));
@@ -474,7 +474,7 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
         await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
 
         // Assert
-        BookArtworkEntity coverArtwork = Assert.Single(book.BookArtwork);
+        BookArtworkEntity coverArtwork = Assert.Single(book.Artwork);
         Assert.Equal(ArtworkStatus.Failed, coverArtwork.Status);
         Assert.Equal("existing\\cover.jpeg", coverArtwork.FileName);
         Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
@@ -507,7 +507,7 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
         await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
 
         // Assert
-        BookArtworkEntity coverArtwork = Assert.Single(book.BookArtwork);
+        BookArtworkEntity coverArtwork = Assert.Single(book.Artwork);
         Assert.Equal(ArtworkStatus.Failed, coverArtwork.Status);
         Assert.Null(coverArtwork.FileName);
         Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
@@ -532,7 +532,7 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
 
         SetupRealServiceProvider(artworkPluginId, artworkProvider, mockBookArtworkService, mockFileHashService);
         BookEntity book = _bookEntityFixture.Create(libraryId: _libraryId.Value, path: "/books/test.epub");
-        book.BookArtwork = [_bookArtworkEntityFixture.Create(bookId: book.Id, artworkType: ArtworkType.Cover, ordinal: 0, fileName: "existing\\cover.jpeg", contentHash: 111ul, status: ArtworkStatus.Pending, provider: "Old Provider", lastUpdateUtc: DateTime.UtcNow.AddDays(-1))];
+        book.Artwork = [_bookArtworkEntityFixture.Create(bookId: book.Id, artworkType: ArtworkType.Cover, ordinal: 0, fileName: "existing\\cover.jpeg", contentHash: 111ul, status: ArtworkStatus.Pending, provider: "Old Provider", lastUpdateUtc: DateTime.UtcNow.AddDays(-1))];
         SetupSingleBookPage(book, artworkPluginId);
         _mockBookRepository.GetAuthorsDisplayNamesByBookIdsAsync(Arg.Any<IReadOnlyCollection<Guid>>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyDictionary<Guid, string?>>(new Dictionary<Guid, string?> { [book.Id] = "Frank Herbert" }));
@@ -541,7 +541,7 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
         await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
 
         // Assert
-        BookArtworkEntity coverArtwork = Assert.Single(book.BookArtwork);
+        BookArtworkEntity coverArtwork = Assert.Single(book.Artwork);
         Assert.Equal(ArtworkStatus.Failed, coverArtwork.Status);
         Assert.Equal("existing\\cover.jpeg", coverArtwork.FileName);
         Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
@@ -577,7 +577,7 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
         // Assert
         // for remote artwork, the content hash is computed on the stored copy, so it is only known after the artwork is stored
         await mockBookArtworkService.Received(1).SaveBookArtworkAsync(_libraryId.Value, book.Id, "My Library", "Frank Herbert", Arg.Any<string>(), Arg.Any<ArtworkDto>(), Arg.Any<CancellationToken>());
-        BookArtworkEntity coverArtwork = Assert.Single(book.BookArtwork);
+        BookArtworkEntity coverArtwork = Assert.Single(book.Artwork);
         Assert.Equal(ArtworkStatus.Enriched, coverArtwork.Status);
         Assert.Equal("\\media\\books\\Library\\Author\\Title\\cover.jpeg", coverArtwork.FileName);
         Assert.Equal(999ul, coverArtwork.ContentHash);
@@ -605,7 +605,7 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
         SetupRealServiceProvider(artworkPluginId, artworkProvider, mockBookArtworkService, mockFileHashService);
         // the book has no known ISBNs of its own, so the artwork lookup is built without an ISBN
         BookEntity book = _bookEntityFixture.Create(libraryId: _libraryId.Value, path: "/books/test.epub", title: "Test Title", includeMetadata: false);
-        book.BookArtwork = [_bookArtworkEntityFixture.Create(bookId: book.Id, artworkType: ArtworkType.Cover, ordinal: 0, fileName: "existing\\cover.jpeg", contentHash: 111ul, status: ArtworkStatus.Pending, provider: "Old Provider", lastUpdateUtc: DateTime.UtcNow.AddDays(-1))];
+        book.Artwork = [_bookArtworkEntityFixture.Create(bookId: book.Id, artworkType: ArtworkType.Cover, ordinal: 0, fileName: "existing\\cover.jpeg", contentHash: 111ul, status: ArtworkStatus.Pending, provider: "Old Provider", lastUpdateUtc: DateTime.UtcNow.AddDays(-1))];
         SetupSingleBookPage(book, artworkPluginId);
         // the author of the book is not known, so its artwork directory falls back to an empty author name
         _mockBookRepository.GetAuthorsDisplayNamesByBookIdsAsync(Arg.Any<IReadOnlyCollection<Guid>>(), Arg.Any<CancellationToken>())
@@ -623,7 +623,7 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
             "Test Title",
             Arg.Any<ArtworkDto>(),
             Arg.Any<CancellationToken>());
-        BookArtworkEntity coverArtwork = Assert.Single(book.BookArtwork);
+        BookArtworkEntity coverArtwork = Assert.Single(book.Artwork);
         Assert.Equal(ArtworkStatus.Enriched, coverArtwork.Status);
         Assert.Equal("\\media\\books\\Library\\Author\\Title\\cover.jpeg", coverArtwork.FileName);
         Assert.Equal(222ul, coverArtwork.ContentHash);
@@ -669,7 +669,7 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
 
         BookEntity book = _bookEntityFixture.Create(libraryId: _libraryId.Value, path: "/books/test.epub");
         ILibraryRepository mockLibraryRepository = Substitute.For<ILibraryRepository>();
-        mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+        mockLibraryRepository.GetByIdAsync(_libraryId.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(_libraryEntityFixture.Create(id: _libraryId.Value, title: "My Library", canDownloadMetadataFromWeb: true)));
         _mockUnitOfWork.LibraryRepository.Returns(mockLibraryRepository);
 
@@ -682,7 +682,7 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
             .Returns(Result.From(1));
         _mockBookRepository.GetBooksNeedingArtworkAsync(_libraryId.Value, Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<BookEntity>>([book]), Result.From<IReadOnlyList<BookEntity>>([]));
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockBookRepository.GetAuthorsDisplayNamesByBookIdsAsync(Arg.Any<IReadOnlyCollection<Guid>>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyDictionary<Guid, string?>>(new Dictionary<Guid, string?> { [book.Id] = "Frank Herbert" }));
 
@@ -691,7 +691,7 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
 
         // Assert
         // a failing artwork provider must not prevent the artwork of the other provider from being used
-        BookArtworkEntity coverArtwork = Assert.Single(book.BookArtwork);
+        BookArtworkEntity coverArtwork = Assert.Single(book.Artwork);
         Assert.Equal(ArtworkStatus.Enriched, coverArtwork.Status);
         Assert.Equal("Second Provider", coverArtwork.Provider);
         Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
@@ -735,7 +735,7 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
 
         BookEntity book = _bookEntityFixture.Create(libraryId: _libraryId.Value, path: "/books/test.epub");
         ILibraryRepository mockLibraryRepository = Substitute.For<ILibraryRepository>();
-        mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+        mockLibraryRepository.GetByIdAsync(_libraryId.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(_libraryEntityFixture.Create(id: _libraryId.Value, title: "My Library", canDownloadMetadataFromWeb: true)));
         _mockUnitOfWork.LibraryRepository.Returns(mockLibraryRepository);
 
@@ -748,7 +748,7 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
             .Returns(Result.From(1));
         _mockBookRepository.GetBooksNeedingArtworkAsync(_libraryId.Value, Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<BookEntity>>([book]), Result.From<IReadOnlyList<BookEntity>>([]));
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockBookRepository.GetAuthorsDisplayNamesByBookIdsAsync(Arg.Any<IReadOnlyCollection<Guid>>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyDictionary<Guid, string?>>(new Dictionary<Guid, string?> { [book.Id] = "Frank Herbert" }));
 
@@ -757,7 +757,7 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
 
         // Assert
         // a provider that returns remote artwork must require web access, so its artwork is skipped and the next provider is used
-        BookArtworkEntity coverArtwork = Assert.Single(book.BookArtwork);
+        BookArtworkEntity coverArtwork = Assert.Single(book.Artwork);
         Assert.Equal(ArtworkStatus.Enriched, coverArtwork.Status);
         Assert.Equal("Second Provider", coverArtwork.Provider);
         Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
@@ -769,7 +769,7 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
         // Arrange
         _mockArtworkConfigurationRepository.GetByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryArtworkProviderConfigurationEntity>>([]));
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
 
         IMediaLibraryScanJob mockChildJob = Substitute.For<IMediaLibraryScanJob>();
         mockChildJob.ExecuteAsync(Arg.Any<Guid>(), Arg.Any<object>(), Arg.Any<CancellationToken>())
@@ -815,7 +815,7 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
     private void SetupSingleBookPage(BookEntity book, Guid artworkPluginId)
     {
         ILibraryRepository mockLibraryRepository = Substitute.For<ILibraryRepository>();
-        mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+        mockLibraryRepository.GetByIdAsync(_libraryId.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(_libraryEntityFixture.Create(id: _libraryId.Value, title: "My Library", canDownloadMetadataFromWeb: true)));
         _mockUnitOfWork.LibraryRepository.Returns(mockLibraryRepository);
 
@@ -827,6 +827,6 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
             .Returns(Result.From(1));
         _mockBookRepository.GetBooksNeedingArtworkAsync(_libraryId.Value, Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<BookEntity>>([book]), Result.From<IReadOnlyList<BookEntity>>([]));
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
     }
 }

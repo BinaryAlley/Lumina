@@ -35,7 +35,7 @@ public static class ScheduledJobMapping
             LastCompletedOnUtc = domainEntity.LastCompletedOnUtc.HasValue ? domainEntity.LastCompletedOnUtc.Value : null,
             CreatedOnUtc = domainEntity.CreatedOnUtc,
             CreatedBy = Guid.Empty,
-            UpdatedOnUtc = domainEntity.UpdatedOnUtc,
+            UpdatedOnUtc = domainEntity.UpdatedOnUtc.HasValue ? domainEntity.UpdatedOnUtc.Value : null,
             UpdatedBy = Guid.Empty
         };
     }

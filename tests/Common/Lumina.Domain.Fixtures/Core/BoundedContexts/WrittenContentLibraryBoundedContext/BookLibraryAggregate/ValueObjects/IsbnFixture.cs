@@ -15,7 +15,6 @@ namespace Lumina.Domain.Fixtures.Core.BoundedContexts.WrittenContentLibraryBound
 [ExcludeFromCodeCoverage]
 public class IsbnFixture
 {
-    private readonly Random _random = new();
 
     /// <summary>
     /// Creates a valid <see cref="Isbn"/> with a random or explicitly requested format.
@@ -34,7 +33,7 @@ public class IsbnFixture
             return result.Value;
         }
 
-        IsbnFormat requestedFormat = format ?? (_random.Next(2) == 0 ? IsbnFormat.Isbn10 : IsbnFormat.Isbn13);
+        IsbnFormat requestedFormat = format ?? (Random.Shared.Next(2) == 0 ? IsbnFormat.Isbn10 : IsbnFormat.Isbn13);
         string isbn = requestedFormat == IsbnFormat.Isbn10 ? GenerateValidIsbn10() : GenerateValidIsbn13();
         return Isbn.Create(isbn, requestedFormat).Value;
     }
@@ -56,7 +55,7 @@ public class IsbnFixture
     {
         int[] digits = new int[9];
         for (int i = 0; i < 9; i++)
-            digits[i] = _random.Next(0, 10);
+            digits[i] = Random.Shared.Next(0, 10);
 
         int sum = 0;
         for (int i = 0; i < 9; i++)
@@ -70,10 +69,10 @@ public class IsbnFixture
 
     private string GenerateValidIsbn13()
     {
-        string prefix = _random.Next(2) == 0 ? "978" : "979";
-        string group = _random.Next(0, 99999).ToString().PadLeft(5, '0');
-        string publisher = _random.Next(0, 999999).ToString().PadLeft(6, '0');
-        string title = _random.Next(0, 99).ToString().PadLeft(2, '0');
+        string prefix = Random.Shared.Next(2) == 0 ? "978" : "979";
+        string group = Random.Shared.Next(0, 99999).ToString().PadLeft(5, '0');
+        string publisher = Random.Shared.Next(0, 999999).ToString().PadLeft(6, '0');
+        string title = Random.Shared.Next(0, 99).ToString().PadLeft(2, '0');
 
         string isbn = $"{prefix}{group[..1]}{publisher}{title}";
         int sum = 0;

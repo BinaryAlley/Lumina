@@ -40,6 +40,7 @@ public class AuthorizationServiceTests
     public AuthorizationServiceTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockUserRepository = Substitute.For<IUserRepository>();
         _mockAuthorizationPolicyFactory = Substitute.For<IAuthorizationPolicyFactory>();
 
@@ -53,7 +54,7 @@ public class AuthorizationServiceTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
-        _mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(null));
 
         // Act
@@ -61,7 +62,7 @@ public class AuthorizationServiceTests
 
         // Assert
         Assert.False(result);
-        await _mockUserRepository.Received(1).GetByIdAsync(userId, Arg.Any<CancellationToken>());
+        await _mockUserRepository.Received(1).GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -70,7 +71,7 @@ public class AuthorizationServiceTests
         // Arrange
         Guid userId = Guid.NewGuid();
         Error error = Error.Failure("Database.Error", "Failed to retrieve user");
-        _mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(error);
 
         // Act
@@ -78,7 +79,7 @@ public class AuthorizationServiceTests
 
         // Assert
         Assert.False(result);
-        await _mockUserRepository.Received(1).GetByIdAsync(userId, Arg.Any<CancellationToken>());
+        await _mockUserRepository.Received(1).GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -88,7 +89,7 @@ public class AuthorizationServiceTests
         UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions(
             directPermissions: [AuthorizationPermission.CanViewUsers]);
 
-        _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
 
         // Act
@@ -96,7 +97,7 @@ public class AuthorizationServiceTests
 
         // Assert
         Assert.True(result);
-        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, Arg.Any<CancellationToken>());
+        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -111,7 +112,7 @@ public class AuthorizationServiceTests
         UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions(
             rolePermissions: rolePermissions);
 
-        _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
 
         // Act
@@ -119,7 +120,7 @@ public class AuthorizationServiceTests
 
         // Assert
         Assert.True(result);
-        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, Arg.Any<CancellationToken>());
+        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -128,7 +129,7 @@ public class AuthorizationServiceTests
         // Arrange
         UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions();
 
-        _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
 
         // Act
@@ -136,7 +137,7 @@ public class AuthorizationServiceTests
 
         // Assert
         Assert.False(result);
-        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, Arg.Any<CancellationToken>());
+        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -146,7 +147,7 @@ public class AuthorizationServiceTests
         UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions(
             directPermissions: [AuthorizationPermission.CanDeleteUsers]);
 
-        _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
 
         // Act
@@ -154,7 +155,7 @@ public class AuthorizationServiceTests
 
         // Assert
         Assert.False(result);
-        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, Arg.Any<CancellationToken>());
+        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -170,7 +171,7 @@ public class AuthorizationServiceTests
             directPermissions: [AuthorizationPermission.CanViewUsers],
             rolePermissions: rolePermissions);
 
-        _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
 
         // Act
@@ -178,7 +179,7 @@ public class AuthorizationServiceTests
 
         // Assert
         Assert.True(result);
-        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, Arg.Any<CancellationToken>());
+        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -186,7 +187,7 @@ public class AuthorizationServiceTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
-        _mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(null));
 
         // Act
@@ -194,7 +195,7 @@ public class AuthorizationServiceTests
 
         // Assert
         Assert.False(result);
-        await _mockUserRepository.Received(1).GetByIdAsync(userId, Arg.Any<CancellationToken>());
+        await _mockUserRepository.Received(1).GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -203,7 +204,7 @@ public class AuthorizationServiceTests
         // Arrange
         Guid userId = Guid.NewGuid();
         Error error = Error.Failure("Database.Error", "Failed to retrieve user");
-        _mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(error);
 
         // Act
@@ -211,7 +212,7 @@ public class AuthorizationServiceTests
 
         // Assert
         Assert.False(result);
-        await _mockUserRepository.Received(1).GetByIdAsync(userId, Arg.Any<CancellationToken>());
+        await _mockUserRepository.Received(1).GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -226,7 +227,7 @@ public class AuthorizationServiceTests
         UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions(
             rolePermissions: rolePermissions);
 
-        _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
 
         // Act
@@ -234,7 +235,7 @@ public class AuthorizationServiceTests
 
         // Assert
         Assert.True(result);
-        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, Arg.Any<CancellationToken>());
+        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -249,7 +250,7 @@ public class AuthorizationServiceTests
         UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions(
             rolePermissions: rolePermissions);
 
-        _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
 
         // Act
@@ -257,7 +258,7 @@ public class AuthorizationServiceTests
 
         // Assert
         Assert.False(result);
-        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, Arg.Any<CancellationToken>());
+        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -266,7 +267,7 @@ public class AuthorizationServiceTests
         // Arrange
         UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions();
 
-        _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
 
         // Act
@@ -274,7 +275,7 @@ public class AuthorizationServiceTests
 
         // Assert
         Assert.False(result);
-        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, Arg.Any<CancellationToken>());
+        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -409,7 +410,7 @@ public class AuthorizationServiceTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
-        _mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(null));
 
         // Act
@@ -418,7 +419,7 @@ public class AuthorizationServiceTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Users.UserDoesNotExist, result.FirstError);
-        await _mockUserRepository.Received(1).GetByIdAsync(userId, Arg.Any<CancellationToken>());
+        await _mockUserRepository.Received(1).GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -427,7 +428,7 @@ public class AuthorizationServiceTests
         // Arrange
         Guid userId = Guid.NewGuid();
         Error error = Error.Failure("Database.Error", "Failed to retrieve user");
-        _mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(error);
 
         // Act
@@ -436,7 +437,7 @@ public class AuthorizationServiceTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
-        await _mockUserRepository.Received(1).GetByIdAsync(userId, Arg.Any<CancellationToken>());
+        await _mockUserRepository.Received(1).GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -444,7 +445,7 @@ public class AuthorizationServiceTests
     {
         // Arrange
         UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions();
-        _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
 
         // Act
@@ -455,7 +456,7 @@ public class AuthorizationServiceTests
         Assert.Equal(user.Id, result.Value.UserId);
         Assert.Null(result.Value.Role);
         Assert.Empty(result.Value.Permissions);
-        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, Arg.Any<CancellationToken>());
+        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -469,7 +470,7 @@ public class AuthorizationServiceTests
                 AuthorizationPermission.CanDeleteUsers
             ]);
 
-        _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
 
         // Act
@@ -481,7 +482,7 @@ public class AuthorizationServiceTests
         Assert.Null(result.Value.Role);
         Assert.Equal([AuthorizationPermission.CanViewUsers, AuthorizationPermission.CanDeleteUsers],
             result.Value.Permissions);
-        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, Arg.Any<CancellationToken>());
+        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -499,7 +500,7 @@ public class AuthorizationServiceTests
         UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions(
             rolePermissions: rolePermissions);
 
-        _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
 
         // Act
@@ -511,7 +512,7 @@ public class AuthorizationServiceTests
         Assert.Equal("Admin", result.Value.Role);
         Assert.Equal([AuthorizationPermission.CanViewUsers, AuthorizationPermission.CanDeleteUsers],
             result.Value.Permissions);
-        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, Arg.Any<CancellationToken>());
+        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -530,7 +531,7 @@ public class AuthorizationServiceTests
             directPermissions: [AuthorizationPermission.CanRegisterUsers],
             rolePermissions: rolePermissions);
 
-        _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
 
         // Act
@@ -549,6 +550,6 @@ public class AuthorizationServiceTests
             },
             result.Value.Permissions
         );
-        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, Arg.Any<CancellationToken>());
+        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>());
     }
 }

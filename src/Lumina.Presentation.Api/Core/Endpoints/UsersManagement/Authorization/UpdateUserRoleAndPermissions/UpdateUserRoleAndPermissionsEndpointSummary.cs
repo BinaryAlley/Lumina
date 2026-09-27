@@ -58,7 +58,7 @@ public class UpdateUserRoleAndPermissionsEndpointSummary : Summary<UpdateUserRol
                     type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                     status = 401,
                     title = "Unauthorized",
-                    detail = "You are not authorized",
+                    detail = "Authentication failed",
                     instance = "/api/v1/auth/users/{userId}/role-and-permissions"
                 },
                 new
@@ -66,7 +66,7 @@ public class UpdateUserRoleAndPermissionsEndpointSummary : Summary<UpdateUserRol
                     type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                     status = 401,
                     title = "Unauthorized",
-                    detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
+                    detail = "The token has expired",
                     instance = "/api/v1/auth/users/{userId}/role-and-permissions"
                 },
                 new
@@ -92,13 +92,13 @@ public class UpdateUserRoleAndPermissionsEndpointSummary : Summary<UpdateUserRol
             }
         );
 
-        Response(404, "The request failed because the provided role or user do not exist.", "application/problem+json",
+        Response(404, "The request failed because the provided role, user or permission do not exist.", "application/problem+json",
             example: new
             {
                 type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
                 title = "General.NotFound",
                 status = 404,
-                detail = "RoleNotFound | UserDoesNotExist",
+                detail = "RoleNotFound | UserDoesNotExist | PermissionNotFound",
                 instance = "/api/v1/auth/users/{userId}/role-and-permissions",
                 traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
             }

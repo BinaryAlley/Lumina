@@ -66,7 +66,7 @@
 
         const libraryId = '@(Model.Id ?? Guid.Empty)';
         const readUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.READ, new { bookId = default(Guid) })';
-        const detailsUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.EDIT_BOOK, new { id = default(Guid) })';
+        const detailsUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.EDIT_BOOK, new { bookId = default(Guid) })';
         const availabilityUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_READING_AVAILABILITY, new { bookId = default(Guid) })';
         // The element references are captured once, so that the cleanup can unbind their listeners even after the AJAX navigator has swapped the content out of the document.
         const booksContainer = document.getElementById('books-container');
@@ -170,7 +170,7 @@
             cardLink.style.width = '160px';
             cardLink.style.height = '240px';
             cardLink.dataset.bookId = book.id;
-            cardLink.href = readUrlTemplate.replace('/@(default(Guid))', `/${book.id}`);
+            cardLink.href = readUrlTemplate.replace('/@(default(Guid))', `/${book.id}`) + `?libraryId=${libraryId}`;
             // Opening the reader is conditional on the reader being available and enabled for the library, so the generic nav-link
             // navigation is intercepted and replaced by one that first checks the reading availability, warning instead of navigating
             // when the book cannot be read.
@@ -195,7 +195,7 @@
             cardLink.appendChild(image);
             cardLink.appendChild(titleSpan);
 
-            const detailsUrl = detailsUrlTemplate.replace('/@(default(Guid))', `/${book.id}`);
+            const detailsUrl = detailsUrlTemplate.replace('/@(default(Guid))', `/${book.id}`) + `?libraryId=${libraryId}`;
 
             const trigger = document.createElement('button');
             trigger.type = 'button';
@@ -212,7 +212,7 @@
             menu.className = 'card-actions-menu';
             menu.setAttribute('role', 'menu');
             menu.innerHTML = `
-                <a role="menuitem" href="${readUrlTemplate.replace('/@(default(Guid))', `/${book.id}`)}">${jsLocalizedStrings.read}</a>
+                                <a role="menuitem" href="${readUrlTemplate.replace('/@(default(Guid))', `/${book.id}`) + `?libraryId=${libraryId}`}">${jsLocalizedStrings.read}</a>
                 <a role="menuitem" href="${detailsUrl}">${jsLocalizedStrings.viewDetails}</a>`;
 
             // Menu entries navigate through the same AJAX navigation used by the nav-links, so that the persistent chrome keeps running.
@@ -302,7 +302,7 @@
         // Opens the reader of the book when it can be read, and warns the user otherwise; the navigation is done through the same
         // AJAX navigation used by the nav-links, so that the page is not reloaded (and the audio player is not interrupted).
         async function handleBookCardClickAsync(card) {
-            const availabilityUrl = availabilityUrlTemplate.replace('/@(default(Guid))', `/${card.dataset.bookId}`);
+            const availabilityUrl = availabilityUrlTemplate.replace('/@(default(Guid))', `/${card.dataset.bookId}`) + `?libraryId=${libraryId}`;
             const response = await fetch(availabilityUrl, {
                 headers: {
                     'Accept': 'application/json',

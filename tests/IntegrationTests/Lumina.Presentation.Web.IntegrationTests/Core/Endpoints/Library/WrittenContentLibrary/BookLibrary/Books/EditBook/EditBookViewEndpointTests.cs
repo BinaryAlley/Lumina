@@ -38,11 +38,11 @@ public class EditBookViewEndpointTests : IClassFixture<LuminaWebFactory>
         _apiFactory.ApiClientStub.Reset();
         BookDetailsDto expectedBook = _bookDetailsDtoFixture.Create();
         expectedBook.Metadata!.Title = "A book";
-        _apiFactory.ApiClientStub.RegisterGetResponse($"books/{expectedBook.Id}", expectedBook);
+        _apiFactory.ApiClientStub.RegisterGetResponse($"libraries/{expectedBook.LibraryId}/books/{expectedBook.Id}", expectedBook);
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
 
         // Act
-        HttpResponseMessage response = await webClient.Client.GetAsync($"/en-us/library/written-content-library/books-library/books/{expectedBook.Id}");
+        HttpResponseMessage response = await webClient.Client.GetAsync($"/en-us/library/written-content-library/books-library/books/{expectedBook.Id}?libraryId={expectedBook.LibraryId}");
         string content = await response.Content.ReadAsStringAsync();
 
         // Assert

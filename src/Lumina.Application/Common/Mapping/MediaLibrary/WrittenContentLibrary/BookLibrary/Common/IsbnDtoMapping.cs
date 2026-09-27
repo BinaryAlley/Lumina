@@ -24,7 +24,7 @@ public static class IsbnDtoMapping
     public static Result<Isbn> ToDomainEntity(this IsbnDto dto)
     {
         return Isbn.Create(
-            dto.Value,
+            dto.Value!,
             dto.Format ?? IsbnFormat.Isbn13
         );
     }

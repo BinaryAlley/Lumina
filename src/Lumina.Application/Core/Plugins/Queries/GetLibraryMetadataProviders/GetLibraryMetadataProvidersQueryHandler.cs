@@ -2,6 +2,8 @@
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
@@ -62,28 +64,30 @@ public class GetLibraryMetadataProvidersQueryHandler : IQueryHandler<GetLibraryM
         if (validationResult.Count > 0)
             return validationResult;
 
-        // an authenticated request must always carry a user identity
+        // An authenticated request must always carry a user identity.
         Guid? currentUserId = _currentUserService.UserId;
         if (currentUserId is null)
             return ApplicationErrors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // admins can read the metadata providers of any library; for everyone else, only their own libraries
+        // Admins can read the metadata providers of any library; for everyone else, only their own libraries.
         bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
             userId, new LibraryOwnershipPolicyContext(query.LibraryId), cancellationToken).ConfigureAwait(false);
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
+        // Load the metadata provider configurations registered for the library, so that only the providers it actually has are returned.
         Result<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>> getConfigurationsResult = await _providerConfigurationStore.GetConfigurationsAsync(query.LibraryId, cancellationToken).ConfigureAwait(false);
         if (getConfigurationsResult.IsFailure)
             return getConfigurationsResult.Errors;
 
-        // build a plugin name lookup from the detected plugins
-        Result<IEnumerable<PluginEntity>> getPluginsResult = await _unitOfWork.PluginRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        // Build a plugin name lookup from the detected plugins, so that each configuration can be returned with its provider's display name.
+        Result<PaginatedResultDto<PluginEntity>> getPluginsResult = await _unitOfWork.PluginRepository.GetAllAsync<BaseFilterDto>(cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getPluginsResult.IsFailure)
             return getPluginsResult.Errors;
-        Dictionary<Guid, string> pluginNames = getPluginsResult.Value.ToDictionary(plugin => plugin.Id, plugin => plugin.Name);
+        Dictionary<Guid, string> pluginNames = getPluginsResult.Value.Data.ToDictionary(plugin => plugin.Id, plugin => plugin.Name);
 
+        // Return the configurations ordered by their rank, so the client sees the providers in the order they are applied.
         return getConfigurationsResult.Value
             .OrderBy(configuration => configuration.Rank)
             .Select(configuration => configuration.ToResponse(pluginNames.GetValueOrDefault(configuration.PluginId) ?? string.Empty))

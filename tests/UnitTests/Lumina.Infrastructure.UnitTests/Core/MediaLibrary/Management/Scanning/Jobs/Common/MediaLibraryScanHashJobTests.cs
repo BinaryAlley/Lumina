@@ -62,6 +62,7 @@ public class MediaLibraryScanHashJobTests
         _mockServiceScope.ServiceProvider.Returns(_mockServiceProvider);
 
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockStagingResultsRepository = Substitute.For<ILibraryScanStagingResultsRepository>();
         _mockUnitOfWork.LibraryScanStagingResultsRepository.Returns(_mockStagingResultsRepository);
         _mockServiceProvider.GetService(typeof(IUnitOfWork)).Returns(_mockUnitOfWork);

@@ -15,11 +15,12 @@ public static class AddBookRequestMapping
     /// Converts <paramref name="request"/> to <see cref="AddBookCommand"/>.
     /// </summary>
     /// <param name="request">The request to be converted.</param>
+    /// <param name="libraryId">The Id of the library the book is added to, taken from the route.</param>
     /// <returns>The converted command.</returns>
-    public static AddBookCommand ToCommand(this AddBookRequest request)
+    public static AddBookCommand ToCommand(this AddBookRequest request, string? libraryId)
     {
         return new AddBookCommand(
-            request.LibraryId,
+            libraryId,
             request.Path,
             request.Metadata,
             request.Format,

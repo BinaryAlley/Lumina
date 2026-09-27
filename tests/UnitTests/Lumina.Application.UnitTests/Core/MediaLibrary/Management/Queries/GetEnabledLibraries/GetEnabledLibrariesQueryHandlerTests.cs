@@ -41,6 +41,7 @@ public class GetEnabledLibrariesQueryHandlerTests
     public GetEnabledLibrariesQueryHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockLibraryRepository = Substitute.For<ILibraryRepository>();
         _mockUnitOfWork.LibraryRepository.Returns(_mockLibraryRepository);
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();

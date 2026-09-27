@@ -49,7 +49,7 @@ public class GetFilesEndpoint : BaseEndpoint<GetFilesRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(GetFilesRequest request, CancellationToken cancellationToken)
     {
-        FileDto[] response = await _apiHttpClient.GetAsync<FileDto[]>($"{ApiRoutes.Files.GET_FILES}?path={Uri.EscapeDataString(request.Path!)}&includeHiddenElements={request.IncludeHiddenElements}", cancellationToken).ConfigureAwait(false);
+        FileDto[] response = await _apiHttpClient.GetAsync<FileDto[]>($"{ApiRoutes.Files.GET_FILES}?path={Uri.EscapeDataString(request.Path!)}&shouldIncludeHiddenElements={request.ShouldIncludeHiddenElements}", cancellationToken).ConfigureAwait(false);
         return JsonSuccess(response);
     }
 }

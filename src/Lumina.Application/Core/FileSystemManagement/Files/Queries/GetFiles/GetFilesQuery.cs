@@ -9,9 +9,9 @@ namespace Lumina.Application.Core.FileSystemManagement.Files.Queries.GetFiles;
 /// Query for retrieving the list of files at a path.
 /// </summary>
 /// <param name="Path">The path for which to retrieve the list of files.</param>
-/// <param name="IncludeHiddenElements">Whether to include hidden files and directories or not.</param>
+/// <param name="ShouldIncludeHiddenElements">Whether to include hidden files and directories or not.</param>
 [DebuggerDisplay("Path: {Path}")]
 public record GetFilesQuery(
     string? Path, 
-    bool IncludeHiddenElements
+    bool ShouldIncludeHiddenElements
 ) : IQuery;

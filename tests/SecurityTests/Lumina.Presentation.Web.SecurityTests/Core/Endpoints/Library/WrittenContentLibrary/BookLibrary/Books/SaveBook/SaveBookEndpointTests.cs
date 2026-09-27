@@ -45,10 +45,11 @@ public class SaveBookEndpointTests : IClassFixture<LuminaWebFactory>
         // Arrange
         _apiFactory.ApiClientStub.Reset();
         Guid bodyId = Guid.NewGuid();
+        Guid libraryId = Guid.NewGuid();
         string normalizedBookId = Guid.Empty.ToString();
-        _apiFactory.ApiClientStub.RegisterPutResponse($"books/{normalizedBookId}", _bookDetailsDtoFixture.Create());
+        _apiFactory.ApiClientStub.RegisterPutResponse($"libraries/{libraryId}/books/{normalizedBookId}", _bookDetailsDtoFixture.Create());
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
-        HttpRequestMessage saveRequest = CreateSaveRequest(maliciousBookId, _updateBookRequestFixture.Create(id: bodyId));
+        HttpRequestMessage saveRequest = CreateSaveRequest(maliciousBookId, _updateBookRequestFixture.Create(id: bodyId, libraryId: libraryId));
         saveRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);
 
         // Act
@@ -63,8 +64,8 @@ public class SaveBookEndpointTests : IClassFixture<LuminaWebFactory>
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("at Lumina", content, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains(_apiFactory.ApiClientStub.PutRequests, putRequest => putRequest.Endpoint == $"books/{normalizedBookId}" && putRequest.Data is UpdateBookRequest forwarded && forwarded.Id == normalizedBookId);
-        Assert.DoesNotContain(_apiFactory.ApiClientStub.PutRequests, putRequest => putRequest.Endpoint == $"books/{bodyId}");
+        Assert.Contains(_apiFactory.ApiClientStub.PutRequests, putRequest => putRequest.Endpoint == $"libraries/{libraryId}/books/{normalizedBookId}" && putRequest.Data is UpdateBookRequest forwarded && forwarded.BookId == normalizedBookId);
+        Assert.DoesNotContain(_apiFactory.ApiClientStub.PutRequests, putRequest => putRequest.Endpoint == $"libraries/{libraryId}/books/{bodyId}");
     }
 
     [Theory]
@@ -75,11 +76,12 @@ public class SaveBookEndpointTests : IClassFixture<LuminaWebFactory>
         // Arrange
         _apiFactory.ApiClientStub.Reset();
         Guid bookId = Guid.NewGuid();
-        UpdateBookRequest request = _updateBookRequestFixture.Create(id: bookId);
+        Guid libraryId = Guid.NewGuid();
+        UpdateBookRequest request = _updateBookRequestFixture.Create(id: bookId, libraryId: libraryId);
         request.Metadata!.Title = maliciousTitle;
         BookDetailsDto expectedBook = _bookDetailsDtoFixture.Create(id: bookId);
         expectedBook.Metadata!.Title = maliciousTitle;
-        _apiFactory.ApiClientStub.RegisterPutResponse($"books/{bookId}", expectedBook);
+        _apiFactory.ApiClientStub.RegisterPutResponse($"libraries/{libraryId}/books/{bookId}", expectedBook);
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage saveRequest = CreateSaveRequest(bookId.ToString(), request);
         saveRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);
@@ -93,7 +95,7 @@ public class SaveBookEndpointTests : IClassFixture<LuminaWebFactory>
         Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains(_apiFactory.ApiClientStub.PutRequests, putRequest => putRequest.Endpoint == $"books/{bookId}" && putRequest.Data is UpdateBookRequest forwarded && forwarded.Metadata!.Title == maliciousTitle);
+        Assert.Contains(_apiFactory.ApiClientStub.PutRequests, putRequest => putRequest.Endpoint == $"libraries/{libraryId}/books/{bookId}" && putRequest.Data is UpdateBookRequest forwarded && forwarded.Metadata!.Title == maliciousTitle);
     }
 
     [Fact]

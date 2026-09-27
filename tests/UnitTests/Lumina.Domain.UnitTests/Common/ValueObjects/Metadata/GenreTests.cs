@@ -34,7 +34,7 @@ public class GenreTests
     public void Create_WhenNameIsNullOrWhitespace_ShouldReturnError(string? name)
     {
         // Act
-        Result<Genre> result = Genre.Create(name);
+        Result<Genre> result = Genre.Create(name!);
 
         // Assert
         Assert.True(result.IsFailure);

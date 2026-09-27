@@ -52,6 +52,7 @@ public class ScanLibraryCommandHandlerTests
     public ScanLibraryCommandHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockLibraryRepository = Substitute.For<ILibraryRepository>();
         _mockLibraryScanRepository = Substitute.For<ILibraryScanRepository>();
         _mockUnitOfWork.LibraryRepository.Returns(_mockLibraryRepository);
@@ -81,7 +82,7 @@ public class ScanLibraryCommandHandlerTests
         // Arrange
         ScanLibraryCommand command = _scanLibraryCommandFixture.Create();
         LibraryEntity library = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
-        _mockLibraryRepository.GetByIdAsync(command.Id, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
 
         // Act
@@ -100,7 +101,7 @@ public class ScanLibraryCommandHandlerTests
     {
         // Arrange
         ScanLibraryCommand command = _scanLibraryCommandFixture.Create();
-        _mockLibraryRepository.GetByIdAsync(command.Id, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result<LibraryEntity?>.Success(null));
 
         // Act
@@ -118,7 +119,7 @@ public class ScanLibraryCommandHandlerTests
     {
         // Arrange
         ScanLibraryCommand command = _scanLibraryCommandFixture.Create();
-        _mockLibraryRepository.GetByIdAsync(command.Id, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Error.Failure(description: "Failed to get library"));
 
         // Act
@@ -136,7 +137,7 @@ public class ScanLibraryCommandHandlerTests
         // Arrange
         ScanLibraryCommand command = _scanLibraryCommandFixture.Create();
         LibraryEntity library = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
-        _mockLibraryRepository.GetByIdAsync(command.Id, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
         _mockAuthorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(_userId, Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>())
             .Returns(false);
@@ -164,7 +165,7 @@ public class ScanLibraryCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
-        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -174,7 +175,7 @@ public class ScanLibraryCommandHandlerTests
         // Arrange
         ScanLibraryCommand command = _scanLibraryCommandFixture.Create();
         LibraryEntity library = _libraryEntityFixture.Create(id: command.Id, userId: _userId, isEnabled: false);
-        _mockLibraryRepository.GetByIdAsync(command.Id, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
 
         // Act
@@ -193,7 +194,7 @@ public class ScanLibraryCommandHandlerTests
         // Arrange
         ScanLibraryCommand command = _scanLibraryCommandFixture.Create();
         LibraryEntity library = _libraryEntityFixture.Create(id: command.Id, userId: _userId, isLocked: true);
-        _mockLibraryRepository.GetByIdAsync(command.Id, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
 
         // Act
@@ -212,7 +213,7 @@ public class ScanLibraryCommandHandlerTests
         // Arrange
         ScanLibraryCommand command = _scanLibraryCommandFixture.Create();
         LibraryEntity library = _libraryEntityFixture.Create(id: command.Id, userId: _userId, contentLocations: [""]);
-        _mockLibraryRepository.GetByIdAsync(command.Id, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
 
         // Act
@@ -231,7 +232,7 @@ public class ScanLibraryCommandHandlerTests
         // Arrange
         ScanLibraryCommand command = _scanLibraryCommandFixture.Create();
         LibraryEntity library = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
-        _mockLibraryRepository.GetByIdAsync(command.Id, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
         _mockLibraryScanRepository.GetPastMonthScansByLibraryIdAsync(command.Id, Arg.Any<CancellationToken>())
             .Returns(Error.Failure(description: "Failed to get past month scans"));
@@ -251,7 +252,7 @@ public class ScanLibraryCommandHandlerTests
         // Arrange
         ScanLibraryCommand command = _scanLibraryCommandFixture.Create();
         LibraryEntity library = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
-        _mockLibraryRepository.GetByIdAsync(command.Id, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
         LibraryScanEntity runningScan = _libraryScanEntityFixture.Create(libraryId: command.Id, userId: _userId, status: LibraryScanJobStatus.Running);
         _mockLibraryScanRepository.GetPastMonthScansByLibraryIdAsync(command.Id, Arg.Any<CancellationToken>())
@@ -273,7 +274,7 @@ public class ScanLibraryCommandHandlerTests
         // Arrange
         ScanLibraryCommand command = _scanLibraryCommandFixture.Create();
         LibraryEntity library = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
-        _mockLibraryRepository.GetByIdAsync(command.Id, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
         _mockLibraryScanRepository.InsertAsync(Arg.Any<LibraryScanEntity>(), Arg.Any<CancellationToken>())
             .Returns(Error.Failure(description: "Failed to insert library scan"));
@@ -299,7 +300,7 @@ public class ScanLibraryCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(DomainErrors.Library.LibraryIdCannotBeEmpty, result.FirstError);
-        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
         await _mockLibraryScanRepository.DidNotReceive().InsertAsync(Arg.Any<LibraryScanEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }

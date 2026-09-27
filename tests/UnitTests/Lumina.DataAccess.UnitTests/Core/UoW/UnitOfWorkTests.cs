@@ -8,6 +8,7 @@ using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.DataAccess.Common.DependencyInjection;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.DataAccess.UnitTests.Common.Setup;
+using Lumina.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
@@ -55,6 +56,9 @@ public class UnitOfWorkTests
         yield return new object[] { nameof(IUnitOfWork.RoleRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.RoleRepository) };
         yield return new object[] { nameof(IUnitOfWork.UserRoleRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.UserRoleRepository) };
         yield return new object[] { nameof(IUnitOfWork.BookRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.BookRepository) };
+        yield return new object[] { nameof(IUnitOfWork.ArtistRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.ArtistRepository) };
+        yield return new object[] { nameof(IUnitOfWork.AlbumRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.AlbumRepository) };
+        yield return new object[] { nameof(IUnitOfWork.TrackRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.TrackRepository) };
         yield return new object[] { nameof(IUnitOfWork.MediaContributorRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.MediaContributorRepository) };
         yield return new object[] { nameof(IUnitOfWork.DirectoryScanFingerprintRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.DirectoryScanFingerprintRepository) };
         yield return new object[] { nameof(IUnitOfWork.LibraryRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.LibraryRepository) };
@@ -96,9 +100,11 @@ public class UnitOfWorkTests
         CancellationToken cancellationToken = new();
 
         // Act
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+        Result<Success> result = await unitOfWork.SaveChangesAsync(cancellationToken);
 
         // Assert
+        Assert.True(result.IsSuccess);
+        Assert.Equal(Result.Success, result.Value);
         await dbContext.Received(1).SaveChangesAsync(cancellationToken);
     }
 

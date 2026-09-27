@@ -1,14 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Contracts.Responses.Authorization;
+using Lumina.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -49,17 +50,17 @@ public class GetPermissionsQueryHandler : IQueryHandler<GetPermissionsQuery, Res
     /// </returns>
     public async Task<Result<IEnumerable<PermissionResponse>>> HandleAsync(GetPermissionsQuery query, CancellationToken cancellationToken)
     {
-        // an authenticated request must always carry a user identity
+        // An authenticated request must always carry a user identity.
         Guid? currentUserId = _currentUserService.UserId;
         if (currentUserId is null)
             return Errors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // only admins can see the list of authorization permissions
+        // Only admins can see the list of authorization permissions.
         bool isAdmin = await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false);
         if (!isAdmin)
             return Errors.Authorization.NotAuthorized;
-        Result<IEnumerable<PermissionEntity>> getPermissionsResult = await _unitOfWork.PermissionRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
-        return getPermissionsResult.Match(value => Result.From(value.ToResponses()), errors => errors);
+        Result<PaginatedResultDto<PermissionEntity>> getPermissionsResult = await _unitOfWork.PermissionRepository.GetAllAsync<BaseFilterDto>(cancellationToken: cancellationToken).ConfigureAwait(false);
+        return getPermissionsResult.Match(value => Result.From(value.Data.ToResponses()), errors => errors);
     }
 }

@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using System;
 using System.Runtime.InteropServices;
@@ -11,7 +12,7 @@ namespace Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.
 /// </summary>
 public class PlatformContextManager : IPlatformContextManager
 {
-    private IPlatformContext? _currentPlatformContext;
+    private Optional<IPlatformContext> _currentPlatformContext;
     private readonly IPlatformContextFactory _platformContextFactory;
     private readonly IOperatingSystemInfo _operatingSystemInfo;
 
@@ -32,13 +33,13 @@ public class PlatformContextManager : IPlatformContextManager
     /// <returns>The current platform context.</returns>
     public IPlatformContext GetCurrentContext()
     {
-        // set a default context if none is set
-        if (_currentPlatformContext is null)
+        // Set a default context if none is set.
+        if (!_currentPlatformContext.HasValue)
             if (_operatingSystemInfo.IsOSPlatform(OSPlatform.Linux) || _operatingSystemInfo.IsOSPlatform(OSPlatform.OSX))
                 SetCurrentPlatform(PlatformType.Unix);
             else
                 SetCurrentPlatform(PlatformType.Windows);
-        return _currentPlatformContext!;
+        return _currentPlatformContext.Value;
     }
 
     /// <summary>
@@ -48,12 +49,12 @@ public class PlatformContextManager : IPlatformContextManager
     /// <exception cref="ArgumentException">Thrown when an unsupported platform type is provided.</exception>
     public void SetCurrentPlatform(PlatformType platformType)
     {
-        // determine the correct context based on platformType
-        _currentPlatformContext = platformType switch
+        // Determine the correct context based on the platform type.
+        _currentPlatformContext = Optional<IPlatformContext>.Some(platformType switch
         {
             PlatformType.Unix => _platformContextFactory.CreateStrategy<IUnixPlatformContext>(),
             PlatformType.Windows => _platformContextFactory.CreateStrategy<IWindowsPlatformContext>(),
             _ => throw new ArgumentException($"Unsupported platform type: {platformType}"),
-        };
+        });
     }
 }

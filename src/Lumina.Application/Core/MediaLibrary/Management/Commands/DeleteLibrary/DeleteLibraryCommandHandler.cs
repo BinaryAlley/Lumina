@@ -72,48 +72,51 @@ public class DeleteLibraryCommandHandler : ICommandHandler<DeleteLibraryCommand,
         if (validationResult.Count > 0)
             return validationResult;
 
-        // an authenticated request must always carry a user identity
+        // An authenticated request must always carry a user identity.
         Guid? currentUserId = _currentUserService.UserId;
         if (currentUserId is null)
             return ApplicationErrors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // get the library with the specified id from the repository
-        Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
+        // Get the library with the specified id from the repository.
+        Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(command.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getLibraryResult.IsFailure)
             return getLibraryResult.Errors;
         else if (getLibraryResult.Value is null)
             return DomainErrors.Library.LibraryNotFound;
 
-        // admins can delete any library; for everyone else, only the libraries they own
+        // Admins can delete any library; for everyone else, only the libraries they own.
         bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
             userId, new LibraryOwnershipPolicyContext(command.Id), cancellationToken).ConfigureAwait(false);
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
-        // create a domain library object
+        // Create a domain library object.
         Result<Library> createLibraryResult = getLibraryResult.Value.ToDomainEntity();
         if (createLibraryResult.IsFailure)
             return createLibraryResult.Errors;
 
-        // delete the domain aggregate
+        // Delete the domain aggregate.
         Result<Deleted> deleteDomainLibraryResult = createLibraryResult.Value.Delete();
         if (deleteDomainLibraryResult.IsFailure)
             return deleteDomainLibraryResult.Errors;
 
-        // queue any domain events
+        // Queue any domain events.
         foreach (IDomainEvent domainEvent in createLibraryResult.Value.GetDomainEvents())
             _domainEventsQueue.Enqueue(domainEvent);
 
-        // remove the provider configurations of the library, so that they are not orphaned, and delete the library
+        // Remove the provider configurations of the library, so that they are not orphaned, and delete the library.
         Result<Deleted> removeProviderConfigurationsResult = await _providerConfigurationStore.RemoveProviderConfigurationsForLibraryAsync(command.Id, cancellationToken).ConfigureAwait(false);
         if (removeProviderConfigurationsResult.IsFailure)
             return removeProviderConfigurationsResult.Errors;
         Result<Deleted> deletePersistenceLibraryResult = await _unitOfWork.LibraryRepository.DeleteByIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
         if (deletePersistenceLibraryResult.IsFailure)
             return deletePersistenceLibraryResult.Errors;
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
-        return deletePersistenceLibraryResult;
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
+
+        return Result.Deleted;
     }
 }

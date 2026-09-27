@@ -10,8 +10,10 @@ namespace Lumina.Presentation.Web.Common.Requests.Library.WrittenContentLibrary.
 /// </summary>
 /// <param name="BookId">The unique identifier of the book whose resource is retrieved. Required.</param>
 /// <param name="ResourceKey">The opaque resource key of the resource. Required.</param>
+/// <param name="LibraryId">The Id of the media library the book belongs to. Required.</param>
 [DebuggerDisplay("BookId: {BookId}, ResourceKey: {ResourceKey}")]
 public record GetBookReadingResourceRequest(
     Guid BookId,
-    string ResourceKey
+    string ResourceKey,
+    Guid LibraryId
 );

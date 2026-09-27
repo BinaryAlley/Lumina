@@ -56,18 +56,19 @@ public class SetLibraryArtworkProviderEnabledCommandHandler : ICommandHandler<Se
         if (validationResult.Count > 0)
             return validationResult;
 
-        // an authenticated request must always carry a user identity
+        // An authenticated request must always carry a user identity.
         Guid? currentUserId = _currentUserService.UserId;
         if (currentUserId is null)
             return ApplicationErrors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // admins can configure the artwork providers of any library; for everyone else, only their own libraries
+        // Admins can configure the artwork providers of any library; for everyone else, only their own libraries.
         bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
             userId, new LibraryOwnershipPolicyContext(command.LibraryId), cancellationToken).ConfigureAwait(false);
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
+        // Look up the configuration of this provider for the library, so that an existing one is toggled instead of duplicated.
         Result<LibraryArtworkProviderConfigurationEntity?> getConfigurationResult = await _unitOfWork.ArtworkProviderConfigurationRepository.GetByLibraryAndPluginIdAsync(command.LibraryId, command.PluginId, cancellationToken).ConfigureAwait(false);
         if (getConfigurationResult.IsFailure)
             return getConfigurationResult.Errors;
@@ -75,12 +76,13 @@ public class SetLibraryArtworkProviderEnabledCommandHandler : ICommandHandler<Se
         LibraryArtworkProviderConfigurationEntity configuration;
         if (getConfigurationResult.Value is not null)
         {
+            // The provider is already configured for the library, so only its enabled state changes, keeping its existing rank in the display order.
             configuration = getConfigurationResult.Value;
             configuration.IsEnabled = command.IsEnabled;
         }
         else
         {
-            // compute the rank to assign to the new configuration, appending it after the existing ones
+            // Compute the rank to assign to the new configuration, appending it after the existing ones.
             Result<IReadOnlyList<LibraryArtworkProviderConfigurationEntity>> getConfigurationsResult = await _unitOfWork.ArtworkProviderConfigurationRepository.GetByLibraryIdAsync(command.LibraryId, cancellationToken).ConfigureAwait(false);
             if (getConfigurationsResult.IsFailure)
                 return getConfigurationsResult.Errors;
@@ -98,10 +100,14 @@ public class SetLibraryArtworkProviderEnabledCommandHandler : ICommandHandler<Se
             };
         }
 
+        // Insert the new configuration, or update the existing one, and persist the change.
         Result<Updated> upsertResult = await _unitOfWork.ArtworkProviderConfigurationRepository.UpsertAsync(configuration, cancellationToken).ConfigureAwait(false);
         if (upsertResult.IsFailure)
             return upsertResult.Errors;
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
         return Result.Success;
     }
 }

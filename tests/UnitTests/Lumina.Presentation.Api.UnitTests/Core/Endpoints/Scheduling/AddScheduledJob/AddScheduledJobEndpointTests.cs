@@ -66,7 +66,7 @@ public class AddScheduledJobEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsFailureError_ShouldReturnProblemResult()
     {
         // Arrange
         AddScheduledJobRequest request = _addScheduledJobRequestFixture.Create();
@@ -86,7 +86,7 @@ public class AddScheduledJobEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendMappedCommandToHandler()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendMappedCommandToSender()
     {
         // Arrange
         AddScheduledJobRequest request = _addScheduledJobRequestFixture.Create(

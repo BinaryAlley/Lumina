@@ -6,6 +6,7 @@ using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
@@ -63,19 +64,19 @@ public class UpdateBookCoverEndpointTests : IClassFixture<AuthenticatedLuminaApi
         (Guid libraryId, Guid bookId) = await SeedLibraryAndBookWithCoverAsync(userId, "/media/books/old-cover.jpg");
 
         // Act
-        HttpResponseMessage response = await _client.PutAsync($"/api/v1/books/{bookId}/cover", CreateCoverForm("cover.png"));
+        HttpResponseMessage response = await _client.PutAsync($"/api/v1/libraries/{libraryId}/books/{bookId}/cover", CreateCoverForm("cover.png"));
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        string storedPath = JsonSerializer.Deserialize<string>(content)!;
+        string storedPath = JsonSerializer.Deserialize<UpdateBookCoverResponse>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!.CoverPath;
         Assert.False(string.IsNullOrWhiteSpace(storedPath));
         Assert.Contains("cover.png", storedPath, StringComparison.OrdinalIgnoreCase);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         BookArtworkEntity coverArtwork = dbContext.Books
-            .SelectMany(book => book.BookArtwork)
+            .SelectMany(book => book.Artwork)
             .Single(artwork => artwork.BookId == bookId && artwork.ArtworkType == ArtworkType.Cover);
         Assert.Equal(storedPath, coverArtwork.FileName);
         Assert.Equal(ArtworkStatus.Enriched, coverArtwork.Status);
@@ -86,21 +87,21 @@ public class UpdateBookCoverEndpointTests : IClassFixture<AuthenticatedLuminaApi
     {
         // Arrange
         Guid userId = GetCurrentUserId();
-        (_, Guid bookId) = await SeedLibraryAndBookAsync(userId);
+        (Guid libraryId, Guid bookId) = await SeedLibraryAndBookAsync(userId);
 
         // Act
-        HttpResponseMessage response = await _client.PutAsync($"/api/v1/books/{bookId}/cover", CreateCoverForm("cover.png"));
+        HttpResponseMessage response = await _client.PutAsync($"/api/v1/libraries/{libraryId}/books/{bookId}/cover", CreateCoverForm("cover.png"));
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        string storedPath = JsonSerializer.Deserialize<string>(content)!;
+        string storedPath = JsonSerializer.Deserialize<UpdateBookCoverResponse>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!.CoverPath;
         Assert.False(string.IsNullOrWhiteSpace(storedPath));
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         BookArtworkEntity coverArtwork = dbContext.Books
-            .SelectMany(book => book.BookArtwork)
+            .SelectMany(book => book.Artwork)
             .Single(artwork => artwork.BookId == bookId && artwork.ArtworkType == ArtworkType.Cover);
         Assert.Equal(storedPath, coverArtwork.FileName);
     }
@@ -109,7 +110,7 @@ public class UpdateBookCoverEndpointTests : IClassFixture<AuthenticatedLuminaApi
     public async Task UpdateBookCover_WhenBookDoesNotExist_ShouldReturnBookNotFoundProblem()
     {
         // Act
-        HttpResponseMessage response = await _client.PutAsync($"/api/v1/books/{Guid.NewGuid()}/cover", CreateCoverForm("cover.png"));
+        HttpResponseMessage response = await _client.PutAsync($"/api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books/{Guid.NewGuid()}/cover", CreateCoverForm("cover.png"));
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -123,7 +124,7 @@ public class UpdateBookCoverEndpointTests : IClassFixture<AuthenticatedLuminaApi
     public async Task UpdateBookCover_WhenRouteIdIsNotParseable_ShouldReturnUnprocessableEntity()
     {
         // Act
-        HttpResponseMessage response = await _client.PutAsync($"/api/v1/books/not-a-guid/cover", CreateCoverForm("cover.png"));
+        HttpResponseMessage response = await _client.PutAsync($"/api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books/not-a-guid/cover", CreateCoverForm("cover.png"));
 
         // Assert
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
@@ -138,10 +139,10 @@ public class UpdateBookCoverEndpointTests : IClassFixture<AuthenticatedLuminaApi
     {
         // Arrange
         (Guid otherUserId, _) = await SeedOtherUserAsync();
-        (_, Guid bookId) = await SeedLibraryAndBookAsync(otherUserId);
+        (Guid libraryId, Guid bookId) = await SeedLibraryAndBookAsync(otherUserId);
 
         // Act
-        HttpResponseMessage response = await _client.PutAsync($"/api/v1/books/{bookId}/cover", CreateCoverForm("cover.png"));
+        HttpResponseMessage response = await _client.PutAsync($"/api/v1/libraries/{libraryId}/books/{bookId}/cover", CreateCoverForm("cover.png"));
 
         // Assert
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
@@ -152,16 +153,101 @@ public class UpdateBookCoverEndpointTests : IClassFixture<AuthenticatedLuminaApi
     }
 
     [Fact]
+    public async Task UpdateBookCover_WhenBookBelongsToAnotherLibrary_ShouldReturnBookNotFoundProblem()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        (_, Guid bookId) = await SeedLibraryAndBookAsync(userId);
+        Guid otherLibraryId = Guid.NewGuid();
+
+        // Act
+        HttpResponseMessage response = await _client.PutAsync($"/api/v1/libraries/{otherLibraryId}/books/{bookId}/cover", CreateCoverForm("cover.png"));
+
+        // Assert
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        using JsonDocument problemDetails = JsonDocument.Parse(content);
+        Assert.Equal("General.NotFound", problemDetails.RootElement.GetProperty("title").GetString());
+        Assert.Equal("BookNotFound", problemDetails.RootElement.GetProperty("detail").GetString());
+    }
+
+    [Fact]
     public async Task UpdateBookCover_WhenUnauthorized_ShouldReturnUnauthorizedResult()
     {
         // Arrange
         HttpClient unauthenticatedClient = _apiFactory.CreateClient();
 
         // Act
-        HttpResponseMessage response = await unauthenticatedClient.PutAsync($"/api/v1/books/{Guid.NewGuid()}/cover", CreateCoverForm("cover.png"));
+        HttpResponseMessage response = await unauthenticatedClient.PutAsync($"/api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books/{Guid.NewGuid()}/cover", CreateCoverForm("cover.png"));
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdateBookCover_WhenNoFileIsUploaded_ShouldReturnUnprocessableEntityWithBookCoverCannotBeNull()
+    {
+        // Arrange
+        MultipartFormDataContent form = [];
+        form.Add(new StringContent("unrelated-field"), "unrelated-field");
+
+        // Act
+        HttpResponseMessage response = await _client.PutAsync($"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/cover", form);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        using JsonDocument problemDetails = JsonDocument.Parse(content);
+        Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
+        Assert.Contains("BookCoverCannotBeNull", content, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task UpdateBookCover_WhenUploadedFileIsNotAnImage_ShouldReturnUnprocessableEntityWithCoverFileMustBeAnImage()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        (Guid libraryId, Guid bookId) = await SeedLibraryAndBookAsync(userId);
+        MultipartFormDataContent form = CreateCoverForm([1, 2, 3, 4, 5, 6, 7, 8], "cover.png");
+
+        // Act
+        HttpResponseMessage response = await _client.PutAsync($"/api/v1/libraries/{libraryId}/books/{bookId}/cover", form);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        using JsonDocument problemDetails = JsonDocument.Parse(content);
+        Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
+        Assert.Contains("CoverFileMustBeAnImage", content, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task UpdateBookCover_WhenUploadedFileIsTooLarge_ShouldReturnUnprocessableEntityWithFileTooLarge()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        (Guid libraryId, Guid bookId) = await SeedLibraryAndBookAsync(userId);
+        // The artwork size limit is 10 MiB, so the payload exceeds it by one byte.
+        byte[] payload = new byte[(10 * 1024 * 1024) + 1];
+        payload[0] = 137;
+        payload[1] = 80;
+        payload[2] = 78;
+        payload[3] = 71;
+        payload[4] = 13;
+        payload[5] = 10;
+        payload[6] = 26;
+        payload[7] = 10;
+        MultipartFormDataContent form = CreateCoverForm(payload, "cover.png");
+
+        // Act
+        HttpResponseMessage response = await _client.PutAsync($"/api/v1/libraries/{libraryId}/books/{bookId}/cover", form);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        using JsonDocument problemDetails = JsonDocument.Parse(content);
+        Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
+        Assert.Contains("FileTooLarge", content, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -181,6 +267,17 @@ public class UpdateBookCoverEndpointTests : IClassFixture<AuthenticatedLuminaApi
         payload[5] = 10;
         payload[6] = 26;
         payload[7] = 10;
+        return CreateCoverForm(payload, fileName);
+    }
+
+    /// <summary>
+    /// Creates a multipart form carrying the provided payload as an uploaded file.
+    /// </summary>
+    /// <param name="payload">The bytes of the uploaded file.</param>
+    /// <param name="fileName">The name of the uploaded file.</param>
+    /// <returns>A configured <see cref="MultipartFormDataContent"/> instance.</returns>
+    private static MultipartFormDataContent CreateCoverForm(byte[] payload, string fileName)
+    {
         MultipartFormDataContent form = [];
         ByteArrayContent fileContent = new(payload);
         fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
@@ -203,7 +300,7 @@ public class UpdateBookCoverEndpointTests : IClassFixture<AuthenticatedLuminaApi
         LibraryEntity library = _libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Test Library", libraryType: LibraryType.EBook, contentLocations: []);
         BookEntity book = _bookEntityFixture.Create(id: bookId, libraryId: libraryId, path: $"/books/{bookId:N}.epub", title: "Test Book", includeMetadata: false);
         BookArtworkEntity existingCover = _bookArtworkEntityFixture.Create(bookId: bookId, artworkType: ArtworkType.Cover, fileName: existingCoverFileName, status: ArtworkStatus.Enriched);
-        book.BookArtwork.Add(existingCover);
+        book.Artwork.Add(existingCover);
         dbContext.Libraries.Add(library);
         dbContext.Books.Add(book);
         await dbContext.SaveChangesAsync();

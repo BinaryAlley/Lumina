@@ -60,7 +60,7 @@ public class GetPathParentEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsNotFoundError_ShouldReturnProblemResult()
     {
         // Arrange
         GetPathParentRequest request = _getPathParentRequestFixture.Create(@"C:\Users\TestUser");
@@ -86,7 +86,7 @@ public class GetPathParentEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsValidationError_ShouldReturnValidationProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsValidationErrors_ShouldReturnValidationProblemResult()
     {
         // Arrange
         GetPathParentRequest request = _getPathParentRequestFixture.Create(@"InvalidPath");
@@ -112,7 +112,7 @@ public class GetPathParentEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendGetPathParentQueryToHandler()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendGetPathParentQueryToSender()
     {
         // Arrange
         GetPathParentRequest request = _getPathParentRequestFixture.Create(@"C:\Users\TestUser");

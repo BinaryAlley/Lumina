@@ -19,19 +19,22 @@ public class UpdateBookCoverCommandFixture
     /// <summary>
     /// Creates a random valid <see cref="UpdateBookCoverCommand"/>.
     /// </summary>
+    /// <param name="libraryId">Optional. The Id of the media library the book belongs to.</param>
     /// <param name="bookId">Optional. The Id of the book whose cover is updated.</param>
     /// <param name="cover">Optional. The stream of the uploaded cover image file.</param>
     /// <param name="fileName">Optional. The name of the uploaded cover image file.</param>
     /// <param name="includeCover">Whether the cover stream should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="UpdateBookCoverCommand"/>.</returns>
     public UpdateBookCoverCommand Create(
-        Guid? bookId = null,
+        string? libraryId = null,
+        string? bookId = null,
         Stream? cover = null,
         string? fileName = null,
         bool includeCover = true)
     {
         return new UpdateBookCoverCommand(
-            bookId ?? Guid.NewGuid(),
+            libraryId ?? Guid.NewGuid().ToString(),
+            bookId ?? Guid.NewGuid().ToString(),
             includeCover ? (cover ?? CreateCoverStream()) : null,
             fileName ?? "cover.jpg"
         );

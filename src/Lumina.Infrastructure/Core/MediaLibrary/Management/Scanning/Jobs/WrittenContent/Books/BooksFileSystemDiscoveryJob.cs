@@ -89,7 +89,7 @@ internal sealed class BooksFileSystemDiscoveryJob : MediaLibraryScanJob, IBooksF
                     MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
 
                     // get the library from the repository
-                    Result<LibraryEntity?> getLibraryResult = await unitOfWork.LibraryRepository.GetByIdAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                    Result<LibraryEntity?> getLibraryResult = await unitOfWork.LibraryRepository.GetByIdAsync(LibraryId.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
                     if (getLibraryResult.IsFailure || getLibraryResult.Value is null)
                         throw new InvalidOperationException(getLibraryResult.IsFailure ? getLibraryResult.FirstError.Description : "The media library was not found.");
 
@@ -188,7 +188,7 @@ internal sealed class BooksFileSystemDiscoveryJob : MediaLibraryScanJob, IBooksF
     /// Discovers the book files of a content location of the media library, using a breadth-first traversal, and writes them in batches to the staging results.
     /// </summary>
     /// <param name="rootDirectoryPath">The path of the root directory from which to start collecting files.</param>
-    /// <param name="skipUnchangedDirectories">Whether to skip the directories whose last write time has not changed since the last scan, or not.</param>
+    /// <param name="shouldSkipUnchangedDirectories">Whether to skip the directories whose last write time has not changed since the last scan, or not.</param>
     /// <param name="fingerprintsByPath">The directory scan fingerprints of the library, mapped by the directory path. Can be <see langword="null"/> when the fast skip is disabled.</param>
     /// <param name="stagingBatch">The batch of discovered files that is written to the staging results when it reaches the batch size.</param>
     /// <param name="fingerprintBatch">The batch of directory scan fingerprints that is written to the storage medium when it reaches the batch size.</param>
@@ -201,7 +201,7 @@ internal sealed class BooksFileSystemDiscoveryJob : MediaLibraryScanJob, IBooksF
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     private async Task DiscoverContentLocationAsync(
         string rootDirectoryPath,
-        bool skipUnchangedDirectories,
+        bool shouldSkipUnchangedDirectories,
         Dictionary<string, DirectoryScanFingerprintEntity>? fingerprintsByPath,
         List<LibraryScanStagingResultsEntity> stagingBatch,
         List<DirectoryScanFingerprintEntity> fingerprintBatch,
@@ -220,7 +220,7 @@ internal sealed class BooksFileSystemDiscoveryJob : MediaLibraryScanJob, IBooksF
             DirectoryInfo currentDirectory = directoryQueue.Dequeue();
 
             // when the fast skip is enabled, skip the whole subtree of a directory whose last write time has not changed since the last scan
-            if (skipUnchangedDirectories)
+            if (shouldSkipUnchangedDirectories)
             {
                 DateTime currentLastWriteTimeUtc = currentDirectory.LastWriteTimeUtc;
                 if (fingerprintsByPath is not null &&

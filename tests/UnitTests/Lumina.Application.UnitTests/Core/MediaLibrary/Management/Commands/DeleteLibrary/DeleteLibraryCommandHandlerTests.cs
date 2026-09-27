@@ -50,6 +50,7 @@ public class DeleteLibraryCommandHandlerTests
     public DeleteLibraryCommandHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockLibraryRepository = Substitute.For<ILibraryRepository>();
         _mockUnitOfWork.LibraryRepository.Returns(_mockLibraryRepository);
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
@@ -78,7 +79,7 @@ public class DeleteLibraryCommandHandlerTests
         // Arrange
         DeleteLibraryCommand command = _deleteLibraryCommandFixture.Create();
         LibraryEntity library = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
-        _mockLibraryRepository.GetByIdAsync(command.Id, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
 
         // Act
@@ -99,7 +100,7 @@ public class DeleteLibraryCommandHandlerTests
         // Arrange
         DeleteLibraryCommand command = _deleteLibraryCommandFixture.Create();
         LibraryEntity library = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
-        _mockLibraryRepository.GetByIdAsync(command.Id, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
         _mockProviderConfigurationStore.RemoveProviderConfigurationsForLibraryAsync(command.Id, Arg.Any<CancellationToken>())
             .Returns(Error.Failure(description: "Failed to remove provider configurations"));
@@ -118,7 +119,7 @@ public class DeleteLibraryCommandHandlerTests
     {
         // Arrange
         DeleteLibraryCommand command = _deleteLibraryCommandFixture.Create();
-        _mockLibraryRepository.GetByIdAsync(command.Id, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result<LibraryEntity?>.Success(null));
 
         // Act
@@ -136,7 +137,7 @@ public class DeleteLibraryCommandHandlerTests
     {
         // Arrange
         DeleteLibraryCommand command = _deleteLibraryCommandFixture.Create();
-        _mockLibraryRepository.GetByIdAsync(command.Id, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Error.Failure(description: "Failed to get library"));
 
         // Act
@@ -154,7 +155,7 @@ public class DeleteLibraryCommandHandlerTests
         // Arrange
         DeleteLibraryCommand command = _deleteLibraryCommandFixture.Create();
         LibraryEntity library = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
-        _mockLibraryRepository.GetByIdAsync(command.Id, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
         _mockAuthorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(_userId, Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>())
             .Returns(false);
@@ -182,7 +183,7 @@ public class DeleteLibraryCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
-        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -192,7 +193,7 @@ public class DeleteLibraryCommandHandlerTests
         // Arrange
         DeleteLibraryCommand command = _deleteLibraryCommandFixture.Create();
         LibraryEntity library = _libraryEntityFixture.Create(id: command.Id, userId: _userId, contentLocations: [""]);
-        _mockLibraryRepository.GetByIdAsync(command.Id, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
 
         // Act
@@ -211,7 +212,7 @@ public class DeleteLibraryCommandHandlerTests
         // Arrange
         DeleteLibraryCommand command = _deleteLibraryCommandFixture.Create();
         LibraryEntity library = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
-        _mockLibraryRepository.GetByIdAsync(command.Id, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
         _mockLibraryRepository.DeleteByIdAsync(command.Id, Arg.Any<CancellationToken>())
             .Returns(Error.Failure(description: "Failed to delete library"));
@@ -237,7 +238,7 @@ public class DeleteLibraryCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(DomainErrors.Library.LibraryIdCannotBeEmpty, result.FirstError);
-        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
         await _mockLibraryRepository.DidNotReceive().DeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }

@@ -33,7 +33,7 @@ namespace Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Commo
 /// </summary>
 internal sealed class MediaLibraryScanArtworkEnrichmentJob : MediaLibraryScanJob, IMediaLibraryScanArtworkEnrichmentJob
 {
-    private const int ENRICHMENT_PAGE_SIZE = 1000; // the number of books that are enriched in a single batch, keeping the peak memory bounded regardless of the library size
+    private const int ENRICHMENT_PAGE_SIZE = 1000; // The number of books that are enriched in a single batch, keeping the peak memory bounded regardless of the library size.
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly ILogger<MediaLibraryScanArtworkEnrichmentJob> _logger;
 
@@ -62,30 +62,30 @@ internal sealed class MediaLibraryScanArtworkEnrichmentJob : MediaLibraryScanJob
     {
         try
         {
-            // increment the number of parents that finished their execution and called this job (beware race conditions, jobs run in parallel)
+            // Increment the number of parents that finished their execution and called this job (beware race conditions, jobs run in parallel).
             int parentsCompleted = Interlocked.Increment(ref parentsPayloadsExecuted);
-            // only execute this job's payload when it has no parents, or when all the parents finished their execution
+            // Only execute this job's payload when it has no parents, or when all the parents finished their execution.
             if (Parents.Count == 0 || parentsCompleted == Parents.Count)
             {
-                // this needs to be wrapped in a task because even though this job is processed in a "fire and forget" async manner, it still does synchronous
-                // processing that takes time, and would block the processing of scan jobs in the in-memory queue
+                // This needs to be wrapped in a task because even though this job is processed in a "fire and forget" async manner, it still does synchronous
+                // processing that takes time, and would block the processing of scan jobs in the in-memory queue.
                 await Task.Run(async () =>
                 {
                     Status = LibraryScanJobStatus.Running;
-                    // see docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details:
+                    // See docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details.
                     await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
                     IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
                     IDomainEventPublisher domainEventPublisher = asyncServiceScope.ServiceProvider.GetService<IDomainEventPublisher>()!;
 
                     MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
 
-                    // load the media library, whose name is used to build the directory of the book artwork, and whose setting determines
-                    // whether the providers that require access to the web are used during the enrichment
+                    // Load the media library, whose name is used to build the directory of the book artwork, and whose setting determines
+                    // whether the providers that require access to the web are used during the enrichment.
                     string libraryName = string.Empty;
                     bool canDownloadMetadataFromWeb = false;
                     if (unitOfWork.LibraryRepository is not null)
                     {
-                        Result<LibraryEntity?> getLibraryResult = await unitOfWork.LibraryRepository.GetByIdAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                        Result<LibraryEntity?> getLibraryResult = await unitOfWork.LibraryRepository.GetByIdAsync(LibraryId.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
                         if (getLibraryResult.IsFailure || getLibraryResult.Value is null)
                             _logger.LogWarning("Failed to read the media library, the book artwork will not be stored and the providers requiring the web will not be used.");
                         else
@@ -95,8 +95,8 @@ internal sealed class MediaLibraryScanArtworkEnrichmentJob : MediaLibraryScanJob
                         }
                     }
 
-                    // get the artwork providers configured for the media library, in their configured order, that support the media library type.
-                    // the artwork resolution is best-effort, so a failure to read the artwork configurations must not prevent the enrichment from proceeding
+                    // Get the artwork providers configured for the media library, in their configured order, that support the media library type.
+                    // The artwork resolution is best-effort, so a failure to read the artwork configurations must not prevent the enrichment from proceeding.
                     List<IArtworkProvider> artworkProviders = [];
                     if (unitOfWork.ArtworkProviderConfigurationRepository is not null)
                     {
@@ -118,7 +118,7 @@ internal sealed class MediaLibraryScanArtworkEnrichmentJob : MediaLibraryScanJob
                         }
                     }
 
-                    // when no artwork provider is available, the books must not be marked as failed to resolve, so the enrichment is skipped entirely
+                    // When no artwork provider is available, the books must not be marked as failed to resolve, so the enrichment is skipped entirely.
                     if (artworkProviders.Count > 0)
                     {
                         IBookArtworkService? bookArtworkService = asyncServiceScope.ServiceProvider.GetService<IBookArtworkService>();
@@ -129,7 +129,7 @@ internal sealed class MediaLibraryScanArtworkEnrichmentJob : MediaLibraryScanJob
                             throw new InvalidOperationException(getBooksToEnrichCountResult.FirstError.Description);
                         int totalBooksToEnrich = getBooksToEnrichCountResult.Value;
 
-                        // set the initial progress of the scan job
+                        // Set the initial progress of the scan job.
                         Result<Success> publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 0, totalBooksToEnrich, cancellationToken).ConfigureAwait(false);
                         if (publishJobProgressResult.IsFailure)
                             throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
@@ -138,7 +138,7 @@ internal sealed class MediaLibraryScanArtworkEnrichmentJob : MediaLibraryScanJob
                         int minUpdateIntervalMs = 100;
                         int processedBooksCount = 0;
 
-                        // process the books that need their artwork resolved in pages, keeping the peak memory bounded regardless of the library size
+                        // Process the books that need their artwork resolved in pages, keeping the peak memory bounded regardless of the library size.
                         string? lastPath = null;
                         while (true)
                         {
@@ -151,7 +151,7 @@ internal sealed class MediaLibraryScanArtworkEnrichmentJob : MediaLibraryScanJob
                             if (booksPage.Count == 0)
                                 break;
 
-                            // load the display names of the authors of the books of this page, in one query, since they are used to build the artwork directory
+                            // Load the display names of the authors of the books of this page, in one query, since they are used to build the artwork directory.
                             Result<IReadOnlyDictionary<Guid, string?>> getAuthorsResult = await unitOfWork.BookRepository.GetAuthorsDisplayNamesByBookIdsAsync([.. booksPage.Select(bookEntity => bookEntity.Id)], cancellationToken).ConfigureAwait(false);
                             if (getAuthorsResult.IsFailure)
                                 throw new InvalidOperationException(getAuthorsResult.FirstError.Description);
@@ -162,11 +162,11 @@ internal sealed class MediaLibraryScanArtworkEnrichmentJob : MediaLibraryScanJob
 
                                 await EnrichBookArtworkAsync(bookEntity, artworkProviders, bookArtworkService, fileHashService, libraryName, getAuthorsResult.Value, cancellationToken).ConfigureAwait(false);
 
-                                // check if enough time has passed since last update
+                                // Check if enough time has passed since the last update.
                                 DateTime now = DateTime.UtcNow;
                                 if ((now - lastUpdateTime).TotalMilliseconds >= minUpdateIntervalMs)
                                 {
-                                    // increment the number of processed elements progress
+                                    // Increment the number of processed elements progress.
                                     publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, Interlocked.Increment(ref processedBooksCount), totalBooksToEnrich, cancellationToken).ConfigureAwait(false);
                                     if (publishJobProgressResult.IsFailure)
                                         throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
@@ -174,24 +174,24 @@ internal sealed class MediaLibraryScanArtworkEnrichmentJob : MediaLibraryScanJob
                                 }
                             }
 
-                            // persist the enriched books of this page, then detach them from the change tracker, keeping the peak memory bounded regardless of the library size
-                            await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                            // Persist the enriched books of this page, then detach them from the change tracker, keeping the peak memory bounded regardless of the library size.
+                            Result<Success> saveChangesResult = await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                            if (saveChangesResult.IsFailure)
+                                throw new InvalidOperationException(saveChangesResult.FirstError.Description);
                             unitOfWork.ClearTrackedEntities();
 
                             lastPath = booksPage[^1].Path;
                         }
                     }
                     else
-                    {
                         _logger.LogWarning("No artwork provider is configured for the media library with Id '{LibraryId}', the artwork enrichment will be skipped.", LibraryId.Value);
-                    }
-
+               
                     Status = LibraryScanJobStatus.Completed;
-                    // when this job has no linked children, it's the last job in the directed acyclic job graph, and the scan is completed
+                    // When this job has no linked children, it is the last job in the directed acyclic job graph, and the scan is completed.
                     if (Children.Count == 0)
                         await domainEventPublisher.PublishAsync(new LibraryScanFinishedDomainEvent(Guid.NewGuid(), compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
 
-                    // call each linked child with the obtained payload
+                    // Call each linked child with the obtained payload.
                     foreach (IMediaLibraryScanJob child in Children)
                         await child.ExecuteAsync(id, input, cancellationToken).ConfigureAwait(false);
                 }, cancellationToken).ConfigureAwait(false);
@@ -222,19 +222,17 @@ internal sealed class MediaLibraryScanArtworkEnrichmentJob : MediaLibraryScanJob
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     private async Task EnrichBookArtworkAsync(BookEntity bookEntity, IReadOnlyList<IArtworkProvider> artworkProviders, IBookArtworkService? bookArtworkService, IFileHashService fileHashService, string libraryName, IReadOnlyDictionary<Guid, string?> authorsDisplayNamesByBookId, CancellationToken cancellationToken)
     {
-        // when no artwork provider is available, the book must not be marked as failed to resolve, so the enrichment is skipped
+        // When no artwork provider is available, the book must not be marked as failed to resolve, so the enrichment is skipped.
         if (bookArtworkService is null || artworkProviders.Count == 0)
             return;
 
         ResolvedArtwork? resolvedArtwork = await ResolveArtworkAsync(bookEntity, artworkProviders, cancellationToken).ConfigureAwait(false);
         if (resolvedArtwork is null)
         {
-            // no artwork provider returned usable artwork, mark the cover artwork of the book as failed to resolve
-            BookArtworkEntity? coverArtwork = bookEntity.BookArtwork.FirstOrDefault(artwork => artwork.ArtworkType == ArtworkType.Cover && artwork.Ordinal == 0);
+            // No artwork provider returned usable artwork, so the cover artwork of the book is marked as failed to resolve.
+            BookArtworkEntity? coverArtwork = bookEntity.Artwork.FirstOrDefault(artwork => artwork.ArtworkType == ArtworkType.Cover && artwork.Ordinal == 0);
             if (coverArtwork is null)
-            {
-                bookEntity.BookArtwork.Add(CreateCoverArtworkEntity(bookEntity.Id, ArtworkStatus.Failed, null, 0, null, null));
-            }
+                bookEntity.Artwork.Add(CreateCoverArtworkEntity(bookEntity.Id, ArtworkStatus.Failed, null, 0, null, null));
             else
             {
                 coverArtwork.Status = ArtworkStatus.Failed;
@@ -244,9 +242,9 @@ internal sealed class MediaLibraryScanArtworkEnrichmentJob : MediaLibraryScanJob
             return;
         }
 
-        BookArtworkEntity? existingCoverArtwork = bookEntity.BookArtwork.FirstOrDefault(artwork => artwork.ArtworkType == ArtworkType.Cover && artwork.Ordinal == 0);
+        BookArtworkEntity? existingCoverArtwork = bookEntity.Artwork.FirstOrDefault(artwork => artwork.ArtworkType == ArtworkType.Cover && artwork.Ordinal == 0);
 
-        // when the artwork comes from a local file, its content hash can be computed before storing it, so that an artwork identical to the stored one
+        // When the artwork comes from a local file, its content hash can be computed before storing it, so that an artwork identical to the stored one
         // is not copied again. For remote artwork, the content hash of the stored artwork is computed after storing it.
         ulong contentHash = 0;
         bool shouldStoreArtwork = true;
@@ -262,11 +260,9 @@ internal sealed class MediaLibraryScanArtworkEnrichmentJob : MediaLibraryScanJob
             Result<string> saveArtworkResult = await bookArtworkService.SaveBookArtworkAsync(bookEntity.LibraryId, bookEntity.Id, libraryName, authorName, bookEntity.Title, resolvedArtwork.Artwork, cancellationToken).ConfigureAwait(false);
             if (saveArtworkResult.IsFailure)
             {
-                // a failing artwork storage must not prevent the book from being tracked as failed to resolve
+                // A failing artwork storage must not prevent the book from being tracked as failed to resolve.
                 if (existingCoverArtwork is null)
-                {
-                    bookEntity.BookArtwork.Add(CreateCoverArtworkEntity(bookEntity.Id, ArtworkStatus.Failed, null, 0, null, null));
-                }
+                    bookEntity.Artwork.Add(CreateCoverArtworkEntity(bookEntity.Id, ArtworkStatus.Failed, null, 0, null, null));
                 else
                 {
                     existingCoverArtwork.Status = ArtworkStatus.Failed;
@@ -276,7 +272,7 @@ internal sealed class MediaLibraryScanArtworkEnrichmentJob : MediaLibraryScanJob
                 return;
             }
 
-            // for remote artwork, compute the content hash of the stored artwork, which is a copy of the resolved one
+            // For remote artwork, compute the content hash of the stored artwork, which is a copy of the resolved one.
             if (contentHash == 0)
             {
                 string storedArtworkPath = Path.Combine(AppContext.BaseDirectory, saveArtworkResult.Value.TrimStart('/', '\\'));
@@ -284,9 +280,7 @@ internal sealed class MediaLibraryScanArtworkEnrichmentJob : MediaLibraryScanJob
             }
 
             if (existingCoverArtwork is null)
-            {
-                bookEntity.BookArtwork.Add(CreateCoverArtworkEntity(bookEntity.Id, ArtworkStatus.Enriched, saveArtworkResult.Value, contentHash, resolvedArtwork.ProviderName, DateTime.UtcNow));
-            }
+                bookEntity.Artwork.Add(CreateCoverArtworkEntity(bookEntity.Id, ArtworkStatus.Enriched, saveArtworkResult.Value, contentHash, resolvedArtwork.ProviderName, DateTime.UtcNow));
             else
             {
                 existingCoverArtwork.FileName = saveArtworkResult.Value;
@@ -300,7 +294,7 @@ internal sealed class MediaLibraryScanArtworkEnrichmentJob : MediaLibraryScanJob
         }
         else
         {
-            // the resolved artwork is identical to the stored one, so the stored artwork is kept and the book is marked as enriched
+            // The resolved artwork is identical to the stored one, so the stored artwork is kept and the book is marked as enriched.
             existingCoverArtwork!.Status = ArtworkStatus.Enriched;
             existingCoverArtwork.Provider = resolvedArtwork.ProviderName;
             existingCoverArtwork.LastUpdateUtc = DateTime.UtcNow;
@@ -338,13 +332,13 @@ internal sealed class MediaLibraryScanArtworkEnrichmentJob : MediaLibraryScanJob
             }
             catch (Exception)
             {
-                // a failing artwork provider must not prevent the other providers from being tried
+                // A failing artwork provider must not prevent the other providers from being tried.
             }
 
             if (artwork is null)
                 continue;
 
-            // a provider that returns remote artwork must declare that it requires web access, otherwise downloading it would contradict the provider's contract
+            // A provider that returns remote artwork must declare that it requires web access, otherwise downloading it would contradict the provider's contract.
             if (!string.IsNullOrWhiteSpace(artwork.RemoteUrl) && !provider.RequiresWebAccess)
                 continue;
 

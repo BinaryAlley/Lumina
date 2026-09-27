@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Maintenance;
 
 /// <summary>
-/// API endpoint for the <c>/directories/get-directories</c> route.
+/// API endpoint for the <c>/check-health</c> route.
 /// </summary>
 public class CheckHealthEndpoint : BaseEndpoint<EmptyRequest, IResult>
 {
@@ -32,7 +32,7 @@ public class CheckHealthEndpoint : BaseEndpoint<EmptyRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(EmptyRequest _, CancellationToken cancellationToken)
     {
-        // TODO: to be implemented
+        // TODO: to be implemented.
         return await Task.FromResult(TypedResults.Ok());
     }
 }

@@ -49,7 +49,7 @@ public sealed class ThemeTemplateEngine
         ThemeSectionNodeDto? scriptsSection = null;
         foreach (ThemeTemplateNodeDto node in parseResult.Value)
         {
-            if (node is ThemeSectionNodeDto { Inverted: false } section
+            if (node is ThemeSectionNodeDto { IsInverted: false } section
                 && scriptsSection is null
                 && string.Equals(section.Expression, "scripts", StringComparison.OrdinalIgnoreCase))
             {
@@ -146,7 +146,7 @@ public sealed class ThemeTemplateEngine
                         if (childrenResult.IsFailure)
                             return childrenResult.Errors;
 
-                        nodes.Add(new ThemeSectionNodeDto(expression, Inverted: tag[0] == '^', Children: childrenResult.Value));
+                        nodes.Add(new ThemeSectionNodeDto(expression, IsInverted: tag[0] == '^', Children: childrenResult.Value));
                         break;
                     }
                 case '/':
@@ -247,16 +247,16 @@ public sealed class ThemeTemplateEngine
     private static Result<Success> RenderSection(ThemeSectionNodeDto section, ThemeRenderScopeDto scope, StringBuilder output)
     {
         object? value = Resolve(section.Expression, scope);
-        bool truthy = IsTruthy(value);
-        if (section.Inverted)
+        bool isTruthy = IsTruthy(value);
+        if (section.IsInverted)
         {
-            if (!truthy)
+            if (!isTruthy)
                 return RenderNodes(section.Children, scope, output);
 
             return Result.Success;
         }
 
-        if (!truthy)
+        if (!isTruthy)
             return Result.Success;
 
         if (value is bool)
@@ -425,7 +425,7 @@ public sealed class ThemeTemplateEngine
         return value switch
         {
             null => string.Empty,
-            bool boolean => boolean ? "true" : "false",
+            bool isBoolean => isBoolean ? "true" : "false",
             DateTime dateTime => dateTime.ToString("O", CultureInfo.InvariantCulture),
             DateTimeOffset dateTimeOffset => dateTimeOffset.ToString("O", CultureInfo.InvariantCulture),
             IFormattable formattable => formattable.ToString(null, CultureInfo.InvariantCulture) ?? string.Empty,

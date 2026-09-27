@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
-using System;
 #endregion
 
 namespace Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Reading.Queries.GetReadingManifest;
@@ -8,7 +7,9 @@ namespace Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary
 /// <summary>
 /// Query for getting the reading manifest of a book.
 /// </summary>
-/// <param name="BookId">The Id of the book whose reading manifest is retrieved.</param>
+/// <param name="LibraryId">The unique identifier of the media library the book belongs to, taken from the route.</param>
+/// <param name="BookId">The unique identifier of the book whose reading manifest is retrieved, taken from the route.</param>
 public record GetReadingManifestQuery(
-    Guid BookId
+    string? LibraryId,
+    string? BookId
 ) : IQuery;

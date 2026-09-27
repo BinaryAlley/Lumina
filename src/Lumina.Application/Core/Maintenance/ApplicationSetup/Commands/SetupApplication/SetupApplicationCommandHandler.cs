@@ -1,18 +1,19 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Scheduling;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.Seed;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.DomainEvents;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Security;
 using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Contracts.Responses.Authentication;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
@@ -89,12 +90,12 @@ public class SetupApplicationCommandHandler : ICommandHandler<SetupApplicationCo
             return validationResult;
 
         // Check if any users already exists (admin account is only set once!).
-        Result<IEnumerable<UserEntity>> selectUsersResult = await _unitOfWork.UserRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        Result<PaginatedResultDto<UserEntity>> selectUsersResult = await _unitOfWork.UserRepository.GetAllAsync<BaseFilterDto>(cancellationToken: cancellationToken).ConfigureAwait(false);
         if (selectUsersResult.IsFailure)
             return selectUsersResult.Errors;
-        else if (selectUsersResult.Value.Any())
+        else if (selectUsersResult.Value.Data.Any())
             return Errors.Authorization.AdminAccountAlreadyCreated;
-        // no users are present, register the admin one
+        // No users are present, register the admin one.
         string? totpSecret = null;
         Guid id = Guid.NewGuid();
         UserEntity user = new()
@@ -123,7 +124,9 @@ public class SetupApplicationCommandHandler : ICommandHandler<SetupApplicationCo
         Result<Created> insertUserResult = await _unitOfWork.UserRepository.InsertAsync(user, cancellationToken).ConfigureAwait(false);
         if (insertUserResult.IsFailure)
             return insertUserResult.Errors;
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
 
         // Set the default permissions, roles, roles permissions.
         Result<Created> setPermissionsResult = await _dataSeedService.SetDefaultAuthorizationPermissionsAsync(id, cancellationToken).ConfigureAwait(false);
@@ -150,15 +153,15 @@ public class SetupApplicationCommandHandler : ICommandHandler<SetupApplicationCo
         // The default jobs were seeded with an active execution cycle, so a cycle started event is queued for each of them; the
         // queued events are published only after the setup transaction commits, because a cycle worker started inside the request
         // would try to read the scheduled jobs while the still open setup transaction locks the storage medium.
-        Result<IEnumerable<ScheduledJobEntity>> getScheduledJobsResult = await _unitOfWork.ScheduledJobRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        Result<PaginatedResultDto<ScheduledJobEntity>> getScheduledJobsResult = await _unitOfWork.ScheduledJobRepository.GetAllAsync<BaseFilterDto>(cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getScheduledJobsResult.IsFailure)
             return getScheduledJobsResult.Errors;
-        foreach (ScheduledJobEntity scheduledJob in getScheduledJobsResult.Value)
+        foreach (ScheduledJobEntity scheduledJob in getScheduledJobsResult.Value.Data)
             if (scheduledJob.Status == ScheduledJobStatus.Active)
                 _domainEventsQueue.Enqueue(new ScheduledJobCycleStartedDomainEvent(Guid.NewGuid(), ScheduledJobId.Create(scheduledJob.Id), DateTime.UtcNow));
 
         // TODO: insert the default admin profile preferences when they are implemented.
-        // If 2FA was enabled during registration, the TOTP secret needs to be delivered to the client unhashed, so it can be displayed 
+        // If 2FA was enabled during registration, the TOTP secret needs to be delivered to the client unhashed, so it can be displayed.
         return new RegistrationResponse(user.Id, user.Username, totpSecret);
     }
 }

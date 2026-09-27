@@ -19,7 +19,7 @@
 ##### Get Files Request
 
 ```js
-GET api/v1/files/get-files?path=C%3A%5CUsers%5C&includeHiddenElements=true
+GET api/v1/files/get-files?path=C%3A%5CUsers%5C&shouldIncludeHiddenElements=true
 ```
 
 ##### Get Files Response
@@ -52,7 +52,7 @@ GET api/v1/files/get-files?path=C%3A%5CUsers%5C&includeHiddenElements=true
 ##### Get Tree Files Request
 
 ```js
-GET api/v1/files/get-tree-files?path=C%3A%5CUsers%5C&includeHiddenElements=true
+GET api/v1/files/get-tree-files?path=C%3A%5CUsers%5C&shouldIncludeHiddenElements=true
 ```
 
 ##### Get Tree Files Response

@@ -1,10 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Common.DTO.Filtering;
 using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Queries.GetBooks;
+using Lumina.Application.Fixtures.Common.DTO.Pagination;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -19,36 +18,32 @@ namespace Lumina.Application.Fixtures.Core.MediaLibrary.WrittenContentLibrary.Bo
 public class GetBooksQueryFixture
 {
     private readonly Faker _faker = new();
+    private readonly PaginationDataDtoFixture _paginationDataDtoFixture = new();
 
     /// <summary>
     /// Creates a random valid query to get books.
     /// </summary>
-    /// <param name="libraryId">Optional. The Id of the media library whose books are retrieved.</param>
+    /// <param name="libraryId">Optional. The Id of the media library whose books are retrieved, taken from the route.</param>
     /// <param name="paginationData">Optional. The pagination data of the query.</param>
     /// <param name="searchTerm">Optional. The search term used to filter results.</param>
     /// <param name="sortBy">Optional. The name of the field by which to sort the results.</param>
     /// <param name="sortOrder">Optional. The direction in which to sort the results.</param>
+    /// <param name="includeLibraryId">Whether the library Id should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includePaginationData">Whether the pagination data should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created query to get books.</returns>
     public GetBooksQuery Create(
-        Guid? libraryId = null,
+        string? libraryId = null,
         PaginationDataDto? paginationData = null,
         string? searchTerm = null,
         string? sortBy = null,
         SortOrder? sortOrder = null,
+        bool includeLibraryId = true,
         bool includePaginationData = true)
     {
         return new GetBooksQuery(
-            includePaginationData ? paginationData ?? new PaginationDataDto
-            {
-                CurrentPage = _faker.Random.Number(1, 100),
-                PerPage = _faker.Random.Number(1, 200)
-            } : null,
-            new LibraryFilterDto
-            {
-                LibraryId = libraryId ?? _faker.Random.Guid(),
-                SearchTerm = searchTerm
-            },
+            includeLibraryId ? (libraryId ?? _faker.Random.Guid().ToString()) : null,
+            includePaginationData ? (paginationData ?? _paginationDataDtoFixture.Create()) : null,
+            searchTerm,
             sortBy,
             sortOrder ?? _faker.PickRandom<SortOrder>()
         );

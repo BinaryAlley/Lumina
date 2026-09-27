@@ -1,11 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Reading.Queries.GetReadingSection;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
-using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Reading;
-using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Reading;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.Reading.GetReadingSection;
 using Microsoft.AspNetCore.Http;
@@ -27,7 +25,6 @@ public class GetReadingSectionEndpointTests
 {
     private readonly IQueryHandler<GetReadingSectionQuery, Result<ReadingSectionDto>> _mockHandler;
     private readonly GetReadingSectionEndpoint _sut;
-    private readonly GetReadingSectionRequestFixture _getReadingSectionRequestFixture = new();
     private readonly ReadingSectionDtoFixture _readingSectionDtoFixture = new();
 
     /// <summary>
@@ -36,21 +33,25 @@ public class GetReadingSectionEndpointTests
     public GetReadingSectionEndpointTests()
     {
         _mockHandler = Substitute.For<IQueryHandler<GetReadingSectionQuery, Result<ReadingSectionDto>>>();
-        _sut = Factory.Create<GetReadingSectionEndpoint>(_mockHandler);
+        _sut = FastEndpoints.Factory.Create<GetReadingSectionEndpoint>(_mockHandler);
     }
 
     [Fact]
     public async Task ExecuteAsync_WhenSuccessful_ShouldReturnOkResultWithReadingSection()
     {
         // Arrange
-        GetReadingSectionRequest request = _getReadingSectionRequestFixture.Create();
+        Guid libraryId = Guid.NewGuid();
+        Guid bookId = Guid.NewGuid();
         CancellationToken cancellationToken = CancellationToken.None;
-        ReadingSectionDto expectedResponse = _readingSectionDtoFixture.Create(locationRef: request.LocationRef);
+        ReadingSectionDto expectedResponse = _readingSectionDtoFixture.Create(locationRef: "chapter-1");
         _mockHandler.HandleAsync(Arg.Any<GetReadingSectionQuery>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(expectedResponse));
+        _sut.HttpContext.Request.RouteValues["libraryId"] = libraryId.ToString();
+        _sut.HttpContext.Request.RouteValues["bookId"] = bookId.ToString();
+        _sut.HttpContext.Request.RouteValues["locationRef"] = "chapter-1";
 
         // Act
-        IResult result = await _sut.ExecuteAsync(request, cancellationToken);
+        IResult result = await _sut.ExecuteAsync(FastEndpoints.EmptyRequest.Instance, cancellationToken);
 
         // Assert
         Ok<ReadingSectionDto> okResult = Assert.IsType<Ok<ReadingSectionDto>>(result);
@@ -58,17 +59,21 @@ public class GetReadingSectionEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsNotFoundError_ShouldReturnProblemResult()
     {
         // Arrange
-        GetReadingSectionRequest request = _getReadingSectionRequestFixture.Create();
+        Guid libraryId = Guid.NewGuid();
+        Guid bookId = Guid.NewGuid();
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.NotFound("Reading.SectionNotFound", "SectionNotFound");
         _mockHandler.HandleAsync(Arg.Any<GetReadingSectionQuery>(), Arg.Any<CancellationToken>())
             .Returns(expectedError);
+        _sut.HttpContext.Request.RouteValues["libraryId"] = libraryId.ToString();
+        _sut.HttpContext.Request.RouteValues["bookId"] = bookId.ToString();
+        _sut.HttpContext.Request.RouteValues["locationRef"] = "chapter-1";
 
         // Act
-        IResult result = await _sut.ExecuteAsync(request, cancellationToken);
+        IResult result = await _sut.ExecuteAsync(FastEndpoints.EmptyRequest.Instance, cancellationToken);
 
         // Assert
         ProblemHttpResult problemResult = Assert.IsType<ProblemHttpResult>(result);
@@ -79,21 +84,100 @@ public class GetReadingSectionEndpointTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_WhenHandlerReturnsValidationErrors_ShouldReturnValidationProblemResult()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid bookId = Guid.NewGuid();
+        CancellationToken cancellationToken = CancellationToken.None;
+        Error validationError = Errors.WrittenContent.BookIdCannotBeEmpty;
+        _mockHandler.HandleAsync(Arg.Any<GetReadingSectionQuery>(), Arg.Any<CancellationToken>())
+            .Returns(validationError);
+        _sut.HttpContext.Request.RouteValues["libraryId"] = libraryId.ToString();
+        _sut.HttpContext.Request.RouteValues["bookId"] = bookId.ToString();
+        _sut.HttpContext.Request.RouteValues["locationRef"] = "chapter-1";
+
+        // Act
+        IResult result = await _sut.ExecuteAsync(FastEndpoints.EmptyRequest.Instance, cancellationToken);
+
+        // Assert
+        ProblemHttpResult problemDetails = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemDetails.StatusCode);
+        Assert.Equal("application/problem+json", problemDetails.ContentType);
+        HttpValidationProblemDetails validationProblemDetails = Assert.IsType<HttpValidationProblemDetails>(problemDetails.ProblemDetails);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, validationProblemDetails.Status);
+        Assert.Equal("General.Validation", validationProblemDetails.Title);
+        Assert.Equal("OneOrMoreValidationErrorsOccurred", validationProblemDetails.Detail);
+        Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", validationProblemDetails.Type);
+        Assert.Single(validationProblemDetails.Errors);
+        Assert.Equal(new[] { "BookIdCannotBeEmpty" }, validationProblemDetails.Errors["General.Validation"]);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_WhenCalled_ShouldSendGetReadingSectionQueryToSender()
     {
         // Arrange
-        GetReadingSectionRequest request = _getReadingSectionRequestFixture.Create();
+        Guid libraryId = Guid.NewGuid();
+        Guid bookId = Guid.NewGuid();
         CancellationToken cancellationToken = CancellationToken.None;
-        ReadingSectionDto response = _readingSectionDtoFixture.Create(locationRef: request.LocationRef);
         _mockHandler.HandleAsync(Arg.Any<GetReadingSectionQuery>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From(response));
+            .Returns(Result.From(_readingSectionDtoFixture.Create(locationRef: "chapter-1")));
+        _sut.HttpContext.Request.RouteValues["libraryId"] = libraryId.ToString();
+        _sut.HttpContext.Request.RouteValues["bookId"] = bookId.ToString();
+        _sut.HttpContext.Request.RouteValues["locationRef"] = "chapter-1";
 
         // Act
-        await _sut.ExecuteAsync(request, cancellationToken);
+        await _sut.ExecuteAsync(FastEndpoints.EmptyRequest.Instance, cancellationToken);
 
         // Assert
         await _mockHandler.Received(1).HandleAsync(
-            Arg.Is<GetReadingSectionQuery>(query => query.BookId == request.BookId && query.LocationRef == request.LocationRef),
+            Arg.Is<GetReadingSectionQuery>(query =>
+                query.LibraryId == libraryId.ToString() &&
+                query.BookId == bookId.ToString() &&
+                query.LocationRef == "chapter-1"),
+            Arg.Is(cancellationToken));
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenRouteValuesAreNotParseable_ShouldSendQueryWithRawRouteValues()
+    {
+        // Arrange
+        CancellationToken cancellationToken = CancellationToken.None;
+        _mockHandler.HandleAsync(Arg.Any<GetReadingSectionQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(_readingSectionDtoFixture.Create()));
+        _sut.HttpContext.Request.RouteValues["libraryId"] = "not-a-library-guid";
+        _sut.HttpContext.Request.RouteValues["bookId"] = "not-a-guid";
+        _sut.HttpContext.Request.RouteValues["locationRef"] = "chapter-1";
+
+        // Act
+        await _sut.ExecuteAsync(FastEndpoints.EmptyRequest.Instance, cancellationToken);
+
+        // Assert
+        await _mockHandler.Received(1).HandleAsync(
+            Arg.Is<GetReadingSectionQuery>(query =>
+                query.LibraryId == "not-a-library-guid" &&
+                query.BookId == "not-a-guid" &&
+                query.LocationRef == "chapter-1"),
+            Arg.Is(cancellationToken));
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenRouteValuesAreMissing_ShouldSendQueryWithNullValues()
+    {
+        // Arrange
+        CancellationToken cancellationToken = CancellationToken.None;
+        _mockHandler.HandleAsync(Arg.Any<GetReadingSectionQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(_readingSectionDtoFixture.Create()));
+        _sut.HttpContext.Request.RouteValues.Remove("libraryId");
+        _sut.HttpContext.Request.RouteValues.Remove("bookId");
+        _sut.HttpContext.Request.RouteValues.Remove("locationRef");
+
+        // Act
+        await _sut.ExecuteAsync(FastEndpoints.EmptyRequest.Instance, cancellationToken);
+
+        // Assert
+        await _mockHandler.Received(1).HandleAsync(
+            Arg.Is<GetReadingSectionQuery>(query => query.LibraryId == null && query.BookId == null && query.LocationRef == null),
             Arg.Is(cancellationToken));
     }
 
@@ -101,7 +185,8 @@ public class GetReadingSectionEndpointTests
     public async Task ExecuteAsync_WhenCancellationRequested_ShouldCancelOperation()
     {
         // Arrange
-        GetReadingSectionRequest request = _getReadingSectionRequestFixture.Create();
+        Guid libraryId = Guid.NewGuid();
+        Guid bookId = Guid.NewGuid();
         CancellationTokenSource cts = new();
         TaskCompletionSource<bool> operationStarted = new();
         TaskCompletionSource<bool> cancellationRequested = new();
@@ -112,11 +197,14 @@ public class GetReadingSectionEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 info.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return Result.From(_readingSectionDtoFixture.Create(locationRef: request.LocationRef));
+                return Result.From(_readingSectionDtoFixture.Create());
             }, info.Arg<CancellationToken>()));
+        _sut.HttpContext.Request.RouteValues["libraryId"] = libraryId.ToString();
+        _sut.HttpContext.Request.RouteValues["bookId"] = bookId.ToString();
+        _sut.HttpContext.Request.RouteValues["locationRef"] = "chapter-1";
 
         // Act
-        Task<IResult> operationTask = _sut.ExecuteAsync(request, cts.Token);
+        Task<IResult> operationTask = _sut.ExecuteAsync(FastEndpoints.EmptyRequest.Instance, cts.Token);
         await operationStarted.Task;
         cts.Cancel();
         cancellationRequested.SetResult(true);

@@ -24,7 +24,7 @@ public class BookResponseFixture
     private readonly Faker _faker = new();
     private readonly WrittenContentMetadataDtoFixture _writtenContentMetadataDtoFixture = new();
     private readonly IsbnDtoFixture _isbnDtoFixture = new();
-    private readonly MediaContributorDtoFixture _mediaContributorDtoFixture = new();
+    private readonly MediaContributorReferenceDtoFixture _mediaContributorReferenceDtoFixture = new();
     private readonly BookRatingDtoFixture _bookRatingDtoFixture = new();
     private readonly BookSeriesDtoFixture _bookSeriesDtoFixture = new();
 
@@ -70,7 +70,7 @@ public class BookResponseFixture
             _faker.Random.AlphaNumeric(10),
             _faker.Random.AlphaNumeric(8),
             _isbnDtoFixture.CreateMany(1),
-            _mediaContributorDtoFixture.CreateMany(1),
+            _mediaContributorReferenceDtoFixture.CreateMany(1),
             _bookRatingDtoFixture.CreateMany(1),
             metadataStatus ?? _faker.PickRandom<MetadataStatus>(),
             _faker.Date.Recent().ToUniversalTime(),

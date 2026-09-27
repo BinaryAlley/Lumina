@@ -18,9 +18,9 @@ public class GetDirectoriesQueryFixture
     /// Creates a random valid query to get directories.
     /// </summary>
     /// <param name="path">Optional. The file system path.</param>
-    /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
+    /// <param name="shouldIncludeHiddenElements">Whether to include hidden file system elements or not.</param>
     /// <returns>The created query to get directories.</returns>
-    public GetDirectoriesQuery Create(string? path = null, bool includeHiddenElements = false)
+    public GetDirectoriesQuery Create(string? path = null, bool shouldIncludeHiddenElements = false)
     {
         return new Faker<GetDirectoriesQuery>()
             .CustomInstantiator(f => new GetDirectoriesQuery(
@@ -28,7 +28,7 @@ public class GetDirectoriesQueryFixture
                 default
             ))
             .RuleFor(x => x.Path, f => path ?? f.System.DirectoryPath())
-            .RuleFor(x => x.IncludeHiddenElements, f => includeHiddenElements);
+            .RuleFor(x => x.ShouldIncludeHiddenElements, f => shouldIncludeHiddenElements);
     }
 
     /// <summary>

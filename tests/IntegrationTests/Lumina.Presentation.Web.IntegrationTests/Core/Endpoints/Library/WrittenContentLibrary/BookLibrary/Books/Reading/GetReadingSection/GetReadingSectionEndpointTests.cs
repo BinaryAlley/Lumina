@@ -38,12 +38,13 @@ public class GetReadingSectionEndpointTests : IClassFixture<LuminaWebFactory>
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
+        Guid libraryId = Guid.NewGuid();
         Guid bookId = Guid.NewGuid();
         string locationRef = "chapter-1";
         ReadingSectionDto section = _readingSectionDtoFixture.Create(locationRef: locationRef, contentHtml: "<p>Content</p>");
-        _apiFactory.ApiClientStub.RegisterGetResponse($"books/{bookId}/reading/sections/{locationRef}", section);
+        _apiFactory.ApiClientStub.RegisterGetResponse($"libraries/{libraryId}/books/{bookId}/reading/sections/{locationRef}", section);
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
-        HttpRequestMessage getRequest = new(HttpMethod.Get, $"/en-us/library/written-content-library/books-library/books/{bookId}/api-get-reading-section?locationRef={locationRef}");
+        HttpRequestMessage getRequest = new(HttpMethod.Get, $"/en-us/library/written-content-library/books-library/books/{bookId}/api-get-reading-section?locationRef={locationRef}&libraryId={libraryId}");
         getRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
         // Act

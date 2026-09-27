@@ -78,6 +78,36 @@ public static class ScheduledJobEntityMapping
     }
 
     /// <summary>
+    /// Converts <paramref name="repositoryEntity"/> to a copy that carries the provided status and execution timestamps.
+    /// </summary>
+    /// <param name="repositoryEntity">The repository entity to be converted.</param>
+    /// <param name="status">The status to assign to the converted entity.</param>
+    /// <param name="lastStartedOnUtc">The last start time to assign to the converted entity.</param>
+    /// <param name="lastCompletedOnUtc">The last completion time to assign to the converted entity.</param>
+    /// <returns>The converted repository entity.</returns>
+    public static ScheduledJobEntity ToUpdatedRepositoryEntity(this ScheduledJobEntity repositoryEntity, ScheduledJobStatus status, DateTime? lastStartedOnUtc, DateTime? lastCompletedOnUtc)
+    {
+        return new ScheduledJobEntity
+        {
+            Id = repositoryEntity.Id,
+            Name = repositoryEntity.Name,
+            TaskType = repositoryEntity.TaskType,
+            ScheduleType = repositoryEntity.ScheduleType,
+            IntervalMinutes = repositoryEntity.IntervalMinutes,
+            Hour = repositoryEntity.Hour,
+            Minute = repositoryEntity.Minute,
+            Status = status,
+            OwnerUserId = repositoryEntity.OwnerUserId,
+            LastStartedOnUtc = lastStartedOnUtc,
+            LastCompletedOnUtc = lastCompletedOnUtc,
+            CreatedOnUtc = repositoryEntity.CreatedOnUtc,
+            CreatedBy = repositoryEntity.CreatedBy,
+            UpdatedOnUtc = repositoryEntity.UpdatedOnUtc,
+            UpdatedBy = repositoryEntity.UpdatedBy
+        };
+    }
+
+    /// <summary>
     /// Creates the schedule of <paramref name="repositoryEntity"/> from its flattened schedule properties.
     /// </summary>
     /// <param name="repositoryEntity">The repository entity whose schedule is created.</param>

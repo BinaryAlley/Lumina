@@ -73,28 +73,31 @@ public class LoginUserQueryHandler : IQueryHandler<LoginUserQuery, Result<LoginR
         if (validationResult.Count > 0)
             return validationResult;
 
-        // check if any users already exists
+        // Load the account by its username, so the password and two factor state can be verified.
         Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByUsernameAsync(query.Username!, cancellationToken).ConfigureAwait(false);
         if (getUserResult.IsFailure)
             return getUserResult.Errors;
         else if (getUserResult.Value is null)
             return Errors.Authentication.InvalidUsernameOrPassword;
-        // validate that the password is correct
+
+        // Validate that the password matches the stored hash.
         if (!_hashService.CheckStringAgainstHash(query.Password!, Uri.UnescapeDataString(getUserResult.Value.Password!)))
         {
-            // if a password reset was requested, a temp password is being used - if the hash check failed against the regular password, try against the temp one too
+            // If a password reset was requested, a temporary password is in use; when the check against the regular password failed, try the temporary one too.
             if (getUserResult.Value.TempPassword is not null)
             {
-                // the temporary password should only be valid for 15 minutes, if its obsolete, remove it and return error
+                // The temporary password is only valid for 15 minutes; when it is obsolete, remove it and return an error.
                 if (getUserResult.Value.TempPasswordCreated!.Value.AddMinutes(15) < _dateTimeProvider.UtcNow)
                 {
                     getUserResult.Value.TempPassword = null;
                     getUserResult.Value.TempPasswordCreated = null;
                     await _unitOfWork.UserRepository.UpdateAsync(getUserResult.Value, cancellationToken);
-                    await _unitOfWork.SaveChangesAsync(cancellationToken);
+                    Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                    if (saveChangesResult.IsFailure)
+                        return saveChangesResult.Errors;
                     return Errors.Authentication.TempPasswordExpired;
                 }
-                else // temporary password is still valid, validate password against it
+                else // The temporary password is still valid, so validate the password against it.
                 {
                     if (!_hashService.CheckStringAgainstHash(query.Password!, Uri.UnescapeDataString(getUserResult.Value.TempPassword!)))
                         return Errors.Authentication.InvalidUsernameOrPassword;
@@ -103,15 +106,17 @@ public class LoginUserQueryHandler : IQueryHandler<LoginUserQuery, Result<LoginR
             else
                 return Errors.Authentication.InvalidUsernameOrPassword;
         }
-        // create the JWT token
+
+        // Create the JWT token.
         string token = _jwtTokenGenerator.GenerateToken(getUserResult.Value.Id.ToString(), getUserResult.Value.Username);
-        // check if the user uses TOTP
-        bool usesTotp = !string.IsNullOrEmpty(getUserResult.Value.TotpSecret);
-        if (usesTotp && string.IsNullOrEmpty(query.TotpCode)) 
+
+        // Check if the user uses TOTP.
+        bool doesUseTotp = !string.IsNullOrEmpty(getUserResult.Value.TotpSecret);
+        if (doesUseTotp && string.IsNullOrEmpty(query.TotpCode))
             return Errors.Authentication.InvalidTotpCode;
-        else if (usesTotp && !string.IsNullOrEmpty(query.TotpCode)) // and if they do, validate it
+        else if (doesUseTotp && !string.IsNullOrEmpty(query.TotpCode)) // When the user uses TOTP, validate the provided code.
             if (!_totpTokenGenerator.ValidateToken(Convert.FromBase64String(_cryptographyService.Decrypt(getUserResult.Value.TotpSecret!)), query.TotpCode))
                 return Errors.Authentication.InvalidTotpCode;
-        return new LoginResponse(getUserResult.Value.Id, getUserResult.Value.Username, token, usesTotp);
+        return new LoginResponse(getUserResult.Value.Id, getUserResult.Value.Username, token, doesUseTotp);
     }
 }

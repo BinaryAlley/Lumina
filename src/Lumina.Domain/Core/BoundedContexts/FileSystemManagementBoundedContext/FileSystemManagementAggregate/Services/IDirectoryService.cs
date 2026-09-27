@@ -16,25 +16,25 @@ public interface IDirectoryService
     /// Retrieves subdirectories for the specified string path.
     /// </summary>
     /// <param name="path">String representation of the file path.</param>
-    /// <param name="includeHiddenElements">Whether to include hidden subdirectories or not.</param>
+    /// <param name="shouldIncludeHiddenElements">Whether to include hidden subdirectories or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of subdirectories or an error.</returns>
-    Result<IEnumerable<Directory>> GetSubdirectories(string path, bool includeHiddenElements);
+    Result<IEnumerable<Directory>> GetSubdirectories(string path, bool shouldIncludeHiddenElements);
 
     /// <summary>
     /// Retrieves subdirectories for the given directory.
     /// </summary>
     /// <param name="directory">Directory object to retrieve subdirectories for.</param>
-    /// <param name="includeHiddenElements">Whether to include hidden subdirectories or not.</param>
+    /// <param name="shouldIncludeHiddenElements">Whether to include hidden subdirectories or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of subdirectories or an error.</returns>
-    Result<IEnumerable<Directory>> GetSubdirectories(Directory directory, bool includeHiddenElements);
+    Result<IEnumerable<Directory>> GetSubdirectories(Directory directory, bool shouldIncludeHiddenElements);
 
     /// <summary>
     /// Retrieves subdirectories for the specified file system path.
     /// </summary>
     /// <param name="path">Identifier for the file path.</param>
-    /// <param name="includeHiddenElements">Whether to include hidden subdirectories or not.</param>
+    /// <param name="shouldIncludeHiddenElements">Whether to include hidden subdirectories or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of subdirectories or an error.</returns>
-    Result<IEnumerable<Directory>> GetSubdirectories(FileSystemPathId path, bool includeHiddenElements);
+    Result<IEnumerable<Directory>> GetSubdirectories(FileSystemPathId path, bool shouldIncludeHiddenElements);
 
     /// <summary>
     /// Creates a directory with the specified <paramref name="name"/>, at the specified <paramref name="path"/>.
@@ -49,18 +49,18 @@ public interface IDirectoryService
     /// </summary>
     /// <param name="sourcePath">String representation of the path where the directory to be copied is located.</param>
     /// <param name="destinationPath">String representation of the path where the directory will be copied.</param>
-    /// <param name="overrideExisting">Whether to override existing directories, or not.</param>
+    /// <param name="shouldOverrideExisting">Whether to override existing directories, or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a copied directory, or an error.</returns>
-    Result<Directory> CopyDirectory(string sourcePath, string destinationPath, bool? overrideExisting);
+    Result<Directory> CopyDirectory(string sourcePath, string destinationPath, Optional<bool> shouldOverrideExisting);
 
     /// <summary>
     /// Moves a directory located at <paramref name="sourcePath"/> to <paramref name="destinationPath"/>.
     /// </summary>
     /// <param name="sourcePath">String representation of the path where the directory to be moved is located.</param>
     /// <param name="destinationPath">String representation of the path where the directory will be moved.</param>
-    /// <param name="overrideExisting">Whether to override existing directories, or not.</param>
+    /// <param name="shouldOverrideExisting">Whether to override existing directories, or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a moved directory, or an error.</returns>
-    Result<Directory> MoveDirectory(string sourcePath, string destinationPath, bool? overrideExisting);
+    Result<Directory> MoveDirectory(string sourcePath, string destinationPath, Optional<bool> shouldOverrideExisting);
 
     /// <summary>
     /// Renames a directory with the specified <paramref name="name"/>, at the specified <paramref name="path"/>.

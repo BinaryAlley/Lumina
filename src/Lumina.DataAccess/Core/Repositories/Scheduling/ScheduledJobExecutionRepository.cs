@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Scheduling;
 using Lumina.Application.Common.DataAccess.Repositories.Scheduling;
+using Lumina.DataAccess.Common.Persistence;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
@@ -36,11 +37,14 @@ internal sealed class ScheduledJobExecutionRepository : IScheduledJobExecutionRe
     /// <param name="id">The id of the execution to get.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="ScheduledJobExecutionEntity"/> identified by <paramref name="id"/>, or an error.</returns>
-    public async Task<Result<ScheduledJobExecutionEntity?>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<Result<ScheduledJobExecutionEntity?>> GetByIdAsync(Guid id, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default)
     {
-        // FindAsync returns an entity that was already loaded in the current unit of work from the change tracker, and only
-        // reads it from the storage medium when it is not tracked, so an entity loaded earlier is not read again.
-        return await _luminaDbContext.ScheduledJobExecutions.FindAsync([id], cancellationToken).ConfigureAwait(false);
+        // The execution is read with a query instead of FindAsync so that it can be retrieved without tracking when requested.
+        // When the entity is tracked, the change tracker still returns the already loaded instance instead of a new one.
+        IQueryable<ScheduledJobExecutionEntity> query = _luminaDbContext.ScheduledJobExecutions;
+        if (!shouldTrackEntities)
+            query = query.AsNoTracking();
+        return await query.FirstOrDefaultAsync(execution => execution.Id == id, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -72,8 +76,8 @@ internal sealed class ScheduledJobExecutionRepository : IScheduledJobExecutionRe
             ?? await _luminaDbContext.ScheduledJobExecutions.FirstOrDefaultAsync(execution => execution.Id == data.Id, cancellationToken).ConfigureAwait(false);
         if (foundExecution is null)
             return Errors.Scheduling.ScheduledJobExecutionNotFound;
-        // Update scalar properties.
-        _luminaDbContext.Entry(foundExecution).CurrentValues.SetValues(data);
+        // The stored identity is never overwritten by an edit, and the audit columns are only ever written by the auditing interceptor.
+        EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundExecution, data);
         return Result.Updated;
     }
 

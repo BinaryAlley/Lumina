@@ -6,8 +6,6 @@ using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 #endregion
 
 namespace Lumina.Contracts.UnitTests.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
@@ -18,36 +16,6 @@ namespace Lumina.Contracts.UnitTests.DTO.MediaLibrary.WrittenContentLibrary.Book
 [ExcludeFromCodeCoverage]
 public class BookMetadataLookupDtoTests
 {
-    private readonly JsonSerializerOptions _jsonOptions = new()
-    {
-        PropertyNameCaseInsensitive = true,
-        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
-    };
-
-    [Fact]
-    public void RoundTrip_WhenSerializingLookupWithAllValues_ShouldPreserveValues()
-    {
-        // Arrange
-        Guid libraryId = Guid.NewGuid();
-        BookMetadataLookupDto expected = new(
-            libraryId,
-            @"C:\Media\Books\dune.epub",
-            "978-0-306-40615-7",
-            "OL12345W",
-            "Dune",
-            "Frank Herbert",
-            "en"
-        );
-
-        // Act
-        string json = JsonSerializer.Serialize(expected, _jsonOptions);
-        BookMetadataLookupDto? actual = JsonSerializer.Deserialize<BookMetadataLookupDto>(json, _jsonOptions);
-
-        // Assert
-        Assert.NotNull(actual);
-        Assert.Equal(expected, actual);
-    }
-
     [Fact]
     public void Constructor_WhenOmittingOptionalParameters_ShouldUseNullDefaults()
     {

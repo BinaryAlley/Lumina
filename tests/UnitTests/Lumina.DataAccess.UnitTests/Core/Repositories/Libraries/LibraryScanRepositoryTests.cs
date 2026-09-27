@@ -83,7 +83,7 @@ public class LibraryScanRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        Result<LibraryScanEntity?> result = await _sut.GetByIdAsync(libraryScan.Id, CancellationToken.None);
+        Result<LibraryScanEntity?> result = await _sut.GetByIdAsync(libraryScan.Id, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -95,7 +95,7 @@ public class LibraryScanRepositoryTests
     public async Task GetByIdAsync_WhenLibraryScanDoesNotExist_ShouldReturnNull()
     {
         // Act
-        Result<LibraryScanEntity?> result = await _sut.GetByIdAsync(Guid.NewGuid(), CancellationToken.None);
+        Result<LibraryScanEntity?> result = await _sut.GetByIdAsync(Guid.NewGuid(), cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);

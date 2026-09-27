@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Domain.Common.Events;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using System;
@@ -22,5 +23,5 @@ public record LibraryScanFailedDomainEvent(
     LibraryId LibraryId,
     MediaLibraryScanCompositeId MediaLibraryScanCompositeId,
     DateTime OccurredOnUtc,
-    string? ErrorMessage = null
+    Optional<string> ErrorMessage
 ) : IDomainEvent;

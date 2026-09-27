@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using Lumina.Domain.Fixtures.Common.ValueObjects.Metadata;
@@ -20,56 +19,25 @@ public class LanguageInfoTests
     public void Create_WhenCalledWithValidValues_ShouldCreateLanguageInfoWithLowercaseCode()
     {
         // Act
-        Result<LanguageInfo> result = LanguageInfo.Create("EN", "English", Optional<string>.Some("English"));
+        LanguageInfo result = LanguageInfo.Create("EN", "English", Optional<string>.Some("English"));
 
         // Assert
-        Assert.False(result.IsFailure);
-        Assert.Equal("en", result.Value.LanguageCode);
-        Assert.Equal("English", result.Value.LanguageName);
-        Assert.True(result.Value.NativeName.HasValue);
-        Assert.Equal("English", result.Value.NativeName.Value);
+        Assert.Equal("en", result.LanguageCode);
+        Assert.Equal("English", result.LanguageName);
+        Assert.True(result.NativeName.HasValue);
+        Assert.Equal("English", result.NativeName.Value);
     }
 
-    [Theory]
-    [InlineData(null)] // null language code
-    [InlineData("")] // empty language code
-    [InlineData("   ")] // whitespace language code
-    public void Create_WhenLanguageCodeIsNullOrWhitespace_ShouldReturnError(string? languageCode)
+    [Fact]
+    public void Create_WhenNativeNameIsMissing_ShouldCreateLanguageInfoWithoutNativeName()
     {
         // Act
-        Result<LanguageInfo> result = LanguageInfo.Create(languageCode, "English", Optional<string>.None());
+        LanguageInfo result = LanguageInfo.Create("en", "English", Optional<string>.None());
 
         // Assert
-        Assert.True(result.IsFailure);
-        Assert.Equal(DomainErrors.Metadata.LanguageCodeCannotBeEmpty, result.FirstError);
-    }
-
-    [Theory]
-    [InlineData(null)] // null language name
-    [InlineData("")] // empty language name
-    [InlineData("   ")] // whitespace language name
-    public void Create_WhenLanguageNameIsNullOrWhitespace_ShouldReturnError(string? languageName)
-    {
-        // Act
-        Result<LanguageInfo> result = LanguageInfo.Create("en", languageName, Optional<string>.None());
-
-        // Assert
-        Assert.True(result.IsFailure);
-        Assert.Equal(DomainErrors.Metadata.LanguageNameCannotBeEmpty, result.FirstError);
-    }
-
-    [Theory]
-    [InlineData("e")] // single character code
-    [InlineData("eng")] // three character code
-    [InlineData("english")] // long code
-    public void Create_WhenLanguageCodeIsNotTwoCharactersLong_ShouldReturnError(string languageCode)
-    {
-        // Act
-        Result<LanguageInfo> result = LanguageInfo.Create(languageCode, "English", Optional<string>.None());
-
-        // Assert
-        Assert.True(result.IsFailure);
-        Assert.Equal(DomainErrors.Metadata.InvalidIsoCode, result.FirstError);
+        Assert.Equal("en", result.LanguageCode);
+        Assert.Equal("English", result.LanguageName);
+        Assert.False(result.NativeName.HasValue);
     }
 
     [Fact]

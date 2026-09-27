@@ -54,7 +54,7 @@ public class ReorderLibraryArtworkProvidersEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsNotFoundError_ShouldReturnProblemResult()
     {
         // Arrange
         ReorderLibraryArtworkProvidersRequest request = _reorderLibraryArtworkProvidersRequestFixture.Create();

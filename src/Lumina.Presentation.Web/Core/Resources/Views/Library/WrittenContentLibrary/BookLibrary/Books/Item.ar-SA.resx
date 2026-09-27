@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -966,5 +966,89 @@
   </data>
   <data name="Country.ZW" xml:space="preserve">
     <value>زيمبابوي</value>
+  </data>
+  <data name="Role" xml:space="preserve">
+    <value>الدور</value>
+  </data>
+  <data name="Actor" xml:space="preserve">
+    <value>ممثل</value>
+  </data>
+  <data name="Director" xml:space="preserve">
+    <value>مخرج</value>
+  </data>
+  <data name="Screenwriter" xml:space="preserve">
+    <value>كاتب سيناريو</value>
+  </data>
+  <data name="Composer" xml:space="preserve">
+    <value>ملحن</value>
+  </data>
+  <data name="Lyricist" xml:space="preserve">
+    <value>كاتب كلمات</value>
+  </data>
+  <data name="Arranger" xml:space="preserve">
+    <value>موزع موسيقي</value>
+  </data>
+  <data name="Conductor" xml:space="preserve">
+    <value>قائد أوركسترا</value>
+  </data>
+  <data name="Producer" xml:space="preserve">
+    <value>منتج</value>
+  </data>
+  <data name="ExecutiveProducer" xml:space="preserve">
+    <value>منتج تنفيذي</value>
+  </data>
+  <data name="Engineer" xml:space="preserve">
+    <value>مهندس صوت</value>
+  </data>
+  <data name="Mixer" xml:space="preserve">
+    <value>مهندس مكساج</value>
+  </data>
+  <data name="Remixer" xml:space="preserve">
+    <value>ريمكس</value>
+  </data>
+  <data name="RecordLabel" xml:space="preserve">
+    <value>شركة إنتاج</value>
+  </data>
+  <data name="Vocals" xml:space="preserve">
+    <value>غناء</value>
+  </data>
+  <data name="BackingVocals" xml:space="preserve">
+    <value>غناء مساند</value>
+  </data>
+  <data name="Guitar" xml:space="preserve">
+    <value>غيتار</value>
+  </data>
+  <data name="BassGuitar" xml:space="preserve">
+    <value>غيتار باس</value>
+  </data>
+  <data name="Drums" xml:space="preserve">
+    <value>طبول</value>
+  </data>
+  <data name="Percussion" xml:space="preserve">
+    <value>إيقاع</value>
+  </data>
+  <data name="Keyboards" xml:space="preserve">
+    <value>آلات مفاتيح</value>
+  </data>
+  <data name="Piano" xml:space="preserve">
+    <value>بيانو</value>
+  </data>
+  <data name="Synthesizer" xml:space="preserve">
+    <value>سينثسيزر</value>
+  </data>
+  <data name="Strings" xml:space="preserve">
+    <value>آلات وترية</value>
+  </data>
+  <data name="Woodwinds" xml:space="preserve">
+    <value>آلات نفخ خشبية</value>
+  </data>
+  <data name="Brass" xml:space="preserve">
+    <value>آلات نفخ نحاسية</value>
+  </data>
+  <data name="Choir" xml:space="preserve">
+    <value>جوقة</value>
+  </data>
+  <data name="Orchestrator" xml:space="preserve">
+    <value>منسق الأوركسترا</value>
   </data>
 </root>

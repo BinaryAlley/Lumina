@@ -43,9 +43,10 @@ public class SaveBookEndpointTests : IClassFixture<LuminaWebFactory>
         // Arrange
         _apiFactory.ApiClientStub.Reset();
         Guid bookId = Guid.NewGuid();
-        UpdateBookRequest request = _updateBookRequestFixture.Create(id: bookId);
+        Guid libraryId = Guid.NewGuid();
+        UpdateBookRequest request = _updateBookRequestFixture.Create(id: bookId, libraryId: libraryId);
         BookDetailsDto expectedBook = _bookDetailsDtoFixture.Create(id: bookId);
-        _apiFactory.ApiClientStub.RegisterPutResponse($"books/{bookId}", expectedBook);
+        _apiFactory.ApiClientStub.RegisterPutResponse($"libraries/{libraryId}/books/{bookId}", expectedBook);
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage saveRequest = CreateSaveRequest(bookId, request);
         saveRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);
@@ -60,7 +61,7 @@ public class SaveBookEndpointTests : IClassFixture<LuminaWebFactory>
         using JsonDocument json = JsonDocument.Parse(content);
         Assert.True(json.RootElement.GetProperty("success").GetBoolean());
         Assert.Equal(bookId, json.RootElement.GetProperty("data").GetProperty("id").GetGuid());
-        Assert.Contains(_apiFactory.ApiClientStub.PutRequests, putRequest => putRequest.Endpoint == $"books/{bookId}" && putRequest.Data is UpdateBookRequest forwarded && forwarded.Id == bookId.ToString());
+        Assert.Contains(_apiFactory.ApiClientStub.PutRequests, putRequest => putRequest.Endpoint == $"libraries/{libraryId}/books/{bookId}" && putRequest.Data is UpdateBookRequest forwarded && forwarded.BookId == bookId.ToString());
     }
 
     [Fact]
@@ -70,9 +71,10 @@ public class SaveBookEndpointTests : IClassFixture<LuminaWebFactory>
         _apiFactory.ApiClientStub.Reset();
         Guid routeId = Guid.NewGuid();
         Guid bodyId = Guid.NewGuid();
-        UpdateBookRequest request = _updateBookRequestFixture.Create(id: bodyId);
+        Guid libraryId = Guid.NewGuid();
+        UpdateBookRequest request = _updateBookRequestFixture.Create(id: bodyId, libraryId: libraryId);
         BookDetailsDto expectedBook = _bookDetailsDtoFixture.Create(id: routeId);
-        _apiFactory.ApiClientStub.RegisterPutResponse($"books/{routeId}", expectedBook);
+        _apiFactory.ApiClientStub.RegisterPutResponse($"libraries/{libraryId}/books/{routeId}", expectedBook);
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage saveRequest = CreateSaveRequest(routeId, request);
         saveRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);
@@ -84,8 +86,8 @@ public class SaveBookEndpointTests : IClassFixture<LuminaWebFactory>
         // Assert
         response.EnsureSuccessStatusCode();
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Contains(_apiFactory.ApiClientStub.PutRequests, putRequest => putRequest.Endpoint == $"books/{routeId}" && putRequest.Data is UpdateBookRequest forwarded && forwarded.Id == routeId.ToString());
-        Assert.DoesNotContain(_apiFactory.ApiClientStub.PutRequests, putRequest => putRequest.Endpoint == $"books/{bodyId}");
+        Assert.Contains(_apiFactory.ApiClientStub.PutRequests, putRequest => putRequest.Endpoint == $"libraries/{libraryId}/books/{routeId}" && putRequest.Data is UpdateBookRequest forwarded && forwarded.BookId == routeId.ToString());
+        Assert.DoesNotContain(_apiFactory.ApiClientStub.PutRequests, putRequest => putRequest.Endpoint == $"libraries/{libraryId}/books/{bodyId}");
     }
 
     [Fact]
@@ -103,7 +105,7 @@ public class SaveBookEndpointTests : IClassFixture<LuminaWebFactory>
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        Assert.DoesNotContain(_apiFactory.ApiClientStub.PutRequests, putRequest => putRequest.Endpoint == $"books/{bookId}");
+        Assert.DoesNotContain(_apiFactory.ApiClientStub.PutRequests, putRequest => putRequest.Endpoint == $"libraries/{request.LibraryId}/books/{bookId}");
     }
 
     [Fact]

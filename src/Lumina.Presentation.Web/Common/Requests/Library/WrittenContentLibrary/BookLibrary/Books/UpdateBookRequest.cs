@@ -3,6 +3,7 @@ using Lumina.Presentation.Web.Common.DTO.MediaContributors;
 using Lumina.Presentation.Web.Common.DTO.WrittenContentLibrary;
 using Lumina.Presentation.Web.Common.DTO.WrittenContentLibrary.BookLibrary;
 using Lumina.Presentation.Web.Common.Enums.BookLibrary;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
@@ -18,7 +19,12 @@ public class UpdateBookRequest
     /// <summary>
     /// Gets or sets the Id of the book to update, taken from the route.
     /// </summary>
-    public string? Id { get; set; }
+    public string? BookId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Id of the media library the book belongs to.
+    /// </summary>
+    public Guid LibraryId { get; set; }
 
     /// <summary>
     /// Gets or sets the written content metadata of the book.
@@ -96,7 +102,7 @@ public class UpdateBookRequest
     public List<IsbnDto>? ISBNs { get; set; }
 
     /// <summary>
-    /// Gets or sets the list of media contributors of the book.
+    /// Gets or sets the list of media contributors of the book. Required.
     /// </summary>
     public List<MediaContributorDto>? Contributors { get; set; }
 

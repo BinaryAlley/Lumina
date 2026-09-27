@@ -51,10 +51,10 @@ public class CheckPathExistsEndpointTests : IClassFixture<LuminaWebFactory>
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
-        string expectedEndpoint = $"path/check-path-exists?path={Uri.EscapeDataString(maliciousPath)}&includeHiddenElements=False";
+        string expectedEndpoint = $"path/check-path-exists?path={Uri.EscapeDataString(maliciousPath)}&shouldIncludeHiddenElements=False";
         _apiFactory.ApiClientStub.RegisterGetResponse(expectedEndpoint, _pathExistsDtoFixture.Create());
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
-        HttpRequestMessage getRequest = new(HttpMethod.Get, $"/path/api-check-path-exists?path={Uri.EscapeDataString(maliciousPath)}&includeHiddenElements=false");
+        HttpRequestMessage getRequest = new(HttpMethod.Get, $"/path/api-check-path-exists?path={Uri.EscapeDataString(maliciousPath)}&shouldIncludeHiddenElements=false");
         getRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
         // Act

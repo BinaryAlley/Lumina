@@ -1,1 +1,0 @@
-GET {{host}}/api/v1/books?libraryId={{$guid}}

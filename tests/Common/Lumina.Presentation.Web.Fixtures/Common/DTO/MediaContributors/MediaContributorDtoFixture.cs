@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
 using Lumina.Presentation.Web.Common.DTO.MediaContributors;
+using Lumina.Presentation.Web.Common.Enums.MediaContributors;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -14,7 +15,6 @@ namespace Lumina.Presentation.Web.Fixtures.Common.DTO.MediaContributors;
 [ExcludeFromCodeCoverage]
 public class MediaContributorDtoFixture
 {
-    private static readonly string[] RoleCategories = ["Author", "Translator", "Illustrator", "Editor", "Narrator"];
     private readonly Faker _faker = new();
 
     /// <summary>
@@ -22,16 +22,13 @@ public class MediaContributorDtoFixture
     /// </summary>
     /// <param name="displayName">Optional. The name by which the contributor is popularly known.</param>
     /// <param name="legalName">Optional. The legal name of the contributor.</param>
-    /// <param name="roleName">Optional. The name of the role of the contributor.</param>
-    /// <param name="roleCategory">Optional. The category of the role of the contributor.</param>
+    /// <param name="role">Optional. The canonical role of the contributor.</param>
     /// <returns>A configured <see cref="MediaContributorDto"/> instance.</returns>
     public MediaContributorDto Create(
         string? displayName = null,
         string? legalName = null,
-        string? roleName = null,
-        string? roleCategory = null)
+        MediaContributorRole? role = null)
     {
-        string resolvedRoleCategory = roleCategory ?? _faker.Random.ArrayElement(RoleCategories);
         return new MediaContributorDto
         {
             Name = new MediaContributorNameDto
@@ -39,11 +36,7 @@ public class MediaContributorDtoFixture
                 DisplayName = displayName ?? _faker.Name.FullName(),
                 LegalName = legalName ?? _faker.Name.FullName()
             },
-            Role = new MediaContributorRoleDto
-            {
-                Name = roleName ?? resolvedRoleCategory.ToLowerInvariant(),
-                Category = resolvedRoleCategory
-            }
+            Role = role ?? MediaContributorRole.Author
         };
     }
 

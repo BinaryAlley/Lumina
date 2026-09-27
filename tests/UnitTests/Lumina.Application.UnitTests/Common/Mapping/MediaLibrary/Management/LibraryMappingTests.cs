@@ -48,9 +48,9 @@ public class LibraryMappingTests
         Assert.Equal(library.Title, result.Title);
         Assert.Equal(library.LibraryType, result.LibraryType);
         Assert.Equal(library.ContentLocations.Select(l => l.Path), result.ContentLocations.Select(l => l.Path));
-        Assert.Equal(library.CoverImage, result.CoverImage);
+        Assert.Equal(library.CoverImage.HasValue ? library.CoverImage.Value : null, result.CoverImage);
         Assert.Equal(library.CreatedOnUtc, result.CreatedOnUtc);
-        Assert.Equal(library.UpdatedOnUtc, result.UpdatedOnUtc);
+        Assert.Equal(library.UpdatedOnUtc.HasValue ? library.UpdatedOnUtc.Value : null, result.UpdatedOnUtc);
         Assert.True(result.IsEnabled);
         Assert.False(result.IsLocked);
         Assert.True(result.CanDownloadMetadataFromWeb);
@@ -74,7 +74,7 @@ public class LibraryMappingTests
         // Assert
         Assert.NotNull(result);
         Assert.Empty(result.ContentLocations);
-        Assert.Equal(library.CoverImage, result.CoverImage);
+        Assert.Equal(library.CoverImage.HasValue ? library.CoverImage.Value : null, result.CoverImage);
     }
 
     [Theory]
@@ -101,7 +101,7 @@ public class LibraryMappingTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal(libraryType, result.LibraryType);
-        Assert.Equal(library.CoverImage, result.CoverImage);
+        Assert.Equal(library.CoverImage.HasValue ? library.CoverImage.Value : null, result.CoverImage);
         Assert.True(result.IsEnabled);
         Assert.False(result.IsLocked);
         Assert.True(result.CanDownloadMetadataFromWeb);
@@ -132,7 +132,7 @@ public class LibraryMappingTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal(library.ContentLocations.Select(l => l.Path), result.ContentLocations.Select(l => l.Path));
-        Assert.Equal(library.CoverImage, result.CoverImage);
+        Assert.Equal(library.CoverImage.HasValue ? library.CoverImage.Value : null, result.CoverImage);
     }
 
     [Fact]

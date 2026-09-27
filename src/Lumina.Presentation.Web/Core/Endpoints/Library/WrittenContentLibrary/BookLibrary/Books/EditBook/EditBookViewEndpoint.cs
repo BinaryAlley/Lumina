@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.EditBook;
 
 /// <summary>
-/// API endpoint for the <c>/{culture}/library/written-content-library/books-library/books/{id}</c> route.
+/// API endpoint for the <c>/{culture}/library/written-content-library/books-library/books/{bookId}</c> route.
 /// </summary>
 public class EditBookViewEndpoint : BaseEndpoint<GetBookRequest, IResult>
 {
@@ -85,8 +85,8 @@ public class EditBookViewEndpoint : BaseEndpoint<GetBookRequest, IResult>
         // The view needs the full details of the book to show its current values, so they are fetched from the API up front; the route
         // value is normalized to a Guid before it is substituted into the upstream URL, so that a crafted route value can never escape
         // its URL segment, and an unparseable id is reported by the API as a missing book id.
-        request = request with { Id = Guid.TryParse(request.Id, out Guid bookId) ? bookId.ToString() : Guid.Empty.ToString() };
-        BookDetailsDto book = await _apiHttpClient.GetAsync<BookDetailsDto>(ApiRoutes.Books.GET_BOOK.Replace("{id}", request.Id), cancellationToken).ConfigureAwait(false);
+        request = request with { BookId = Guid.TryParse(request.BookId, out Guid bookId) ? bookId.ToString() : Guid.Empty.ToString() };
+        BookDetailsDto book = await _apiHttpClient.GetAsync<BookDetailsDto>(ApiRoutes.Books.GET_BOOK.Replace("{libraryId}", request.LibraryId.ToString()).Replace("{bookId}", request.BookId), cancellationToken).ConfigureAwait(false);
         string title = book.Metadata?.Title ?? string.Empty;
 
         // The themed view is a regular page that submits its own requests, so a fresh anti-forgery token must be issued for it.
@@ -104,8 +104,8 @@ public class EditBookViewEndpoint : BaseEndpoint<GetBookRequest, IResult>
                 ["bookId"] = book.Id.ToString(),
                 ["libraryId"] = book.LibraryId.ToString(),
                 ["antiforgeryToken"] = antiforgeryTokens.RequestToken,
-                ["saveUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Books.SAVE_BOOK, new { id = default(Guid) }) ?? string.Empty,
-                ["coverUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Books.UPDATE_BOOK_COVER, new { id = default(Guid) }) ?? string.Empty,
+                ["saveUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Books.SAVE_BOOK, new { bookId = default(Guid) }) ?? string.Empty,
+                ["coverUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Books.UPDATE_BOOK_COVER, new { bookId = default(Guid) }) ?? string.Empty,
                 ["backUrl"] = (_urlService.GetAbsoluteUrl(WebRoutes.Books.INDEX) ?? string.Empty) + "?libraryId=" + book.LibraryId,
                 ["bookJson"] = JsonSerializer.Serialize(book, s_camelCaseJsonOptions),
                 ["strings"] = ThemePageDataFactory.CreateLocalizedStrings(_localizer),

@@ -98,7 +98,9 @@ public class MediaLibraryScanTaskExecutor : IScheduledTaskExecutor
             domainEvents.AddRange(libraryScanResult.Value.GetDomainEvents());
         }
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            throw new InvalidOperationException(saveChangesResult.FirstError.Description);
 
         // Publish the domain events of the queued media library scans.
         foreach (IDomainEvent domainEvent in domainEvents)

@@ -59,7 +59,8 @@ public class LibraryTests
         Assert.Equal(title, result.Value.Title);
         Assert.Equal(libraryType, result.Value.LibraryType);
         Assert.Equal(2, result.Value.ContentLocations.Count);
-        Assert.Equal(coverImageSourcePath, result.Value.CoverImage);
+        Assert.True(result.Value.CoverImage.HasValue);
+        Assert.Equal(coverImageSourcePath, result.Value.CoverImage.Value);
         Assert.False(result.Value.IsEnabled);
         Assert.True(result.Value.IsLocked);
         Assert.False(result.Value.CanDownloadMetadataFromWeb);
@@ -82,7 +83,7 @@ public class LibraryTests
             "My Library",
             LibraryType.Movie,
             ["C:/Media"],
-            null,
+            Optional<string>.None(),
             isEnabled: true,
             isLocked: false,
             canDownloadMetadataFromWeb: true,
@@ -108,7 +109,7 @@ public class LibraryTests
             "My Library",
             LibraryType.Book,
             [""],
-            null,
+            Optional<string>.None(),
             isEnabled: true,
             isLocked: false,
             canDownloadMetadataFromWeb: true,
@@ -128,10 +129,10 @@ public class LibraryTests
         Library library = _libraryFixture.Create();
 
         // Act
-        string? coverImageSourcePath = library.CoverImageSourcePath;
+        Optional<string> coverImageSourcePath = library.CoverImageSourcePath;
 
         // Assert
-        Assert.Null(coverImageSourcePath);
+        Assert.False(coverImageSourcePath.HasValue);
     }
 
     [Fact]
@@ -143,7 +144,7 @@ public class LibraryTests
             "My Library",
             LibraryType.Book,
             ["C:/Media/Books", "D:/Books"],
-            null,
+            Optional<string>.None(),
             isEnabled: true,
             isLocked: false,
             canDownloadMetadataFromWeb: true,
@@ -170,7 +171,7 @@ public class LibraryTests
             "My Library",
             LibraryType.Book,
             [contentLocation!],
-            null,
+            Optional<string>.None(),
             isEnabled: true,
             isLocked: false,
             canDownloadMetadataFromWeb: true,
@@ -260,6 +261,7 @@ public class LibraryTests
         library.SetInternalLibraryCoverImagePath(internalPath);
 
         // Assert
-        Assert.Equal(internalPath, library.CoverImage);
+        Assert.True(library.CoverImage.HasValue);
+        Assert.Equal(internalPath, library.CoverImage.Value);
     }
 }

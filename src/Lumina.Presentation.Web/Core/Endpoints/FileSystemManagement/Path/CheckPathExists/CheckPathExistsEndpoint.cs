@@ -49,7 +49,7 @@ public class CheckPathExistsEndpoint : BaseEndpoint<CheckPathExistsRequest, IRes
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(CheckPathExistsRequest request, CancellationToken cancellationToken)
     {
-        PathExistsDto response = await _apiHttpClient.GetAsync<PathExistsDto>($"{ApiRoutes.Path.CHECK_PATH_EXISTS}?path={Uri.EscapeDataString(request.Path!)}&includeHiddenElements={request.IncludeHiddenElements}", cancellationToken).ConfigureAwait(false);
+        PathExistsDto response = await _apiHttpClient.GetAsync<PathExistsDto>($"{ApiRoutes.Path.CHECK_PATH_EXISTS}?path={Uri.EscapeDataString(request.Path!)}&shouldIncludeHiddenElements={request.ShouldIncludeHiddenElements}", cancellationToken).ConfigureAwait(false);
         return JsonSuccess(new { exists = response.Exists });
     }
 }

@@ -51,6 +51,7 @@ public class InstallThemeCommandHandlerTests
     public InstallThemeCommandHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockThemeService = Substitute.For<IThemeService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();

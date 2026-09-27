@@ -46,12 +46,12 @@ public sealed class Isbn : ValueObject
     /// <param name="value">The value representing this object.</param>
     /// <param name="format">The format of the ISBN representing this object.</param>
     /// <returns>The created <see cref="Isbn"/> instance.</returns>
-    public static Result<Isbn> Create(string? value, IsbnFormat format)
+    public static Result<Isbn> Create(string value, IsbnFormat format)
     {
-        // enforce invariants
+        // Enforce invariants.
         if (string.IsNullOrWhiteSpace(value))
             return Errors.WrittenContent.IsbnValueCannotBeEmpty;
-        // remove hyphens and spaces, for validation
+        // Remove hyphens and spaces, for validation.
         string cleanedValue = Regex.Replace(value, @"[-\s]", string.Empty);
         switch (format)
         {
@@ -78,7 +78,7 @@ public sealed class Isbn : ValueObject
     {
         if (!s_isbn10Regex.IsMatch(isbn))
             return false;
-        // remove any hyphens or spaces
+        // Remove any hyphens or spaces.
         isbn = isbn.Replace("-", "").Replace(" ", "").ToUpper();
         int sum = 0;
         for (int i = 0; i < 9; i++)
@@ -100,7 +100,7 @@ public sealed class Isbn : ValueObject
     {
         if (!s_isbn13Regex.IsMatch(isbn))
             return false;
-        // remove any hyphens or spaces
+        // Remove any hyphens or spaces.
         isbn = isbn.Replace("-", "").Replace(" ", "");
         int sum = 0;
         for (int i = 0; i < 12; i++)

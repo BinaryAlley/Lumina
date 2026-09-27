@@ -131,7 +131,7 @@ public class PathServiceTests
     }
 
     [Fact]
-    public void Exists_WhenPathIsHiddenAndIncludeHiddenElementsIsTrue_ShouldReturnTrue()
+    public void Exists_WhenPathIsHiddenAndShouldIncludeHiddenElementsIsTrue_ShouldReturnTrue()
     {
         // Arrange
         string existingPath = @"C:\ExistingPath";
@@ -147,7 +147,7 @@ public class PathServiceTests
     }
 
     [Fact]
-    public void Exists_WhenPathIsHiddenAndIncludeHiddenElementsIsFalse_ShouldReturnFalse()
+    public void Exists_WhenPathIsHiddenAndShouldIncludeHiddenElementsIsFalse_ShouldReturnFalse()
     {
         // Arrange
         string existingPath = @"C:\ExistingPath";
@@ -770,5 +770,51 @@ public class PathServiceTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.Equal(100, result.Value.Name.Length);
+    }
+
+    [Fact]
+    public void IsPathWithin_WhenBothPathsAreValid_ShouldCreatePathIdsAndDelegateToTheStrategy()
+    {
+        // Arrange
+        string path = @"C:\Media\Books\book.epub";
+        string parentPath = @"C:\Media\Books";
+        _mockPathStrategy.IsPathWithin(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>()).Returns(true);
+
+        // Act
+        bool result = _sut.IsPathWithin(path, parentPath);
+
+        // Assert
+        Assert.True(result);
+        _mockPathStrategy.Received(1).IsPathWithin(
+            Arg.Is<FileSystemPathId>(pathId => pathId.Path == path),
+            Arg.Is<FileSystemPathId>(pathId => pathId.Path == parentPath));
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData(" ")]
+    public void IsPathWithin_WhenPathIsNotValid_ShouldReturnFalseWithoutCallingTheStrategy(string? invalidPath)
+    {
+        // Act
+        bool result = _sut.IsPathWithin(invalidPath!, @"C:\Media");
+
+        // Assert
+        Assert.False(result);
+        _mockPathStrategy.DidNotReceive().IsPathWithin(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>());
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData(" ")]
+    public void IsPathWithin_WhenParentPathIsNotValid_ShouldReturnFalseWithoutCallingTheStrategy(string? invalidParentPath)
+    {
+        // Act
+        bool result = _sut.IsPathWithin(@"C:\Media\Books\book.epub", invalidParentPath!);
+
+        // Assert
+        Assert.False(result);
+        _mockPathStrategy.DidNotReceive().IsPathWithin(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>());
     }
 }

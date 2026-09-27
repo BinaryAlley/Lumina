@@ -105,7 +105,7 @@ public class DirectoryProviderServiceTests
     }
 
     [Fact]
-    public void GetSubdirectoryPaths_WhenIncludeHiddenElementsIsFalse_ShouldExcludeHiddenDirectories()
+    public void GetSubdirectoryPaths_WhenShouldIncludeHiddenElementsIsFalse_ShouldExcludeHiddenDirectories()
     {
         // Arrange
         FileSystemPathId path = _fileSystemPathIdFixture.Create();
@@ -126,7 +126,7 @@ public class DirectoryProviderServiceTests
     }
 
     [Fact]
-    public void GetSubdirectoryPaths_WhenIncludeHiddenElementsIsTrue_ShouldIncludeHiddenDirectories()
+    public void GetSubdirectoryPaths_WhenShouldIncludeHiddenElementsIsTrue_ShouldIncludeHiddenDirectories()
     {
         // Arrange
         FileSystemPathId path = _fileSystemPathIdFixture.Create();

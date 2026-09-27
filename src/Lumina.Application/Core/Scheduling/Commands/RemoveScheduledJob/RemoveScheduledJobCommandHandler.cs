@@ -83,7 +83,7 @@ public class RemoveScheduledJobCommandHandler : ICommandHandler<RemoveScheduledJ
             return ApplicationErrors.Authorization.NotAuthorized;
 
         // Get the scheduled job from the storage medium.
-        Result<ScheduledJobEntity?> getScheduledJobResult = await _unitOfWork.ScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, cancellationToken).ConfigureAwait(false);
+        Result<ScheduledJobEntity?> getScheduledJobResult = await _unitOfWork.ScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getScheduledJobResult.IsFailure)
             return getScheduledJobResult.Errors;
         if (getScheduledJobResult.Value is null)
@@ -102,7 +102,10 @@ public class RemoveScheduledJobCommandHandler : ICommandHandler<RemoveScheduledJ
         Result<Deleted> deleteScheduledJobResult = await _unitOfWork.ScheduledJobRepository.DeleteByIdAsync(command.ScheduledJobId, cancellationToken).ConfigureAwait(false);
         if (deleteScheduledJobResult.IsFailure)
             return deleteScheduledJobResult.Errors;
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
 
         // Queue any domain events.
         scheduledJobDomainResult.Value.Remove();

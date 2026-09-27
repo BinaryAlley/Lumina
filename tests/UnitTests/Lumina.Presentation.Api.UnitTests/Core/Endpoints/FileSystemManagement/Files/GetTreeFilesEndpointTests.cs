@@ -60,7 +60,7 @@ public class GetTreeFilesEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsNotFoundError_ShouldReturnProblemResult()
     {
         // Arrange
         GetTreeFilesRequest request = _getTreeFilesRequestFixture.Create();
@@ -86,7 +86,7 @@ public class GetTreeFilesEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsValidationError_ShouldReturnValidationProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsValidationErrors_ShouldReturnValidationProblemResult()
     {
         // Arrange
         GetTreeFilesRequest request = _getTreeFilesRequestFixture.Create();
@@ -126,7 +126,7 @@ public class GetTreeFilesEndpointTests
         // Assert
         await _mockHandler.Received(1).HandleAsync(Arg.Is<GetTreeFilesQuery>(q =>
             q.Path == request.Path &&
-            q.IncludeHiddenElements == request.IncludeHiddenElements),
+            q.ShouldIncludeHiddenElements == request.ShouldIncludeHiddenElements),
             Arg.Is(cancellationToken));
     }
 

@@ -57,7 +57,7 @@ public class GetUsersEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsFailureError_ShouldReturnProblemResult()
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;

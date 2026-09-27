@@ -2,6 +2,8 @@
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Core.Plugins.Queries.GetPlugins;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Fixtures.Core.Plugins.Queries.GetPlugins;
@@ -34,6 +36,7 @@ public class GetPluginsQueryHandlerTests
     public GetPluginsQueryHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockPluginRepository = Substitute.For<IPluginRepository>();
         _mockUnitOfWork.PluginRepository.Returns(_mockPluginRepository);
         _sut = new GetPluginsQueryHandler(_mockUnitOfWork);
@@ -44,7 +47,8 @@ public class GetPluginsQueryHandlerTests
     {
         // Arrange
         List<PluginEntity> plugins = [_pluginEntityFixture.Create(), _pluginEntityFixture.Create()];
-        _mockPluginRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(plugins);
+        _mockPluginRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(new PaginatedResultDto<PluginEntity> { Data = plugins, CurrentPage = 1, PerPage = plugins.Count, Count = plugins.Count, NumberOfPages = 1 }));
 
         // Act
         Result<IReadOnlyList<PluginResponse>> result = await _sut.HandleAsync(_getPluginsQueryFixture.Create(), CancellationToken.None);
@@ -60,7 +64,7 @@ public class GetPluginsQueryHandlerTests
     public async Task HandleAsync_WhenRepositoryReturnsError_ShouldReturnError()
     {
         // Arrange
-        _mockPluginRepository.GetAllAsync(Arg.Any<CancellationToken>())
+        _mockPluginRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Error.Failure(description: "Failed to get plugins"));
 
         // Act

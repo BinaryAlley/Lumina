@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.DeleteLibrary;
 
 /// <summary>
-/// API endpoint for the <c>//libraries/{id}</c> route.
+/// API endpoint for the <c>/libraries/{id}</c> route.
 /// </summary>
 public class DeleteLibraryEndpoint : BaseEndpoint<DeleteLibraryRequest, IResult>
 {

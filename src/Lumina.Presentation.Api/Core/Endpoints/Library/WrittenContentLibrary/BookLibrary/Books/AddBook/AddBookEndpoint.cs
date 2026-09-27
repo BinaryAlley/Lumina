@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.AddBook;
 
 /// <summary>
-/// API endpoint for the <c>/books</c> route.
+/// API endpoint for the <c>/libraries/{libraryId}/books</c> route.
 /// </summary>
 public class AddBookEndpoint : BaseEndpoint<AddBookRequest, IResult>
 {
@@ -48,7 +48,9 @@ public class AddBookEndpoint : BaseEndpoint<AddBookRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(AddBookRequest request, CancellationToken cancellationToken)
     {
-        Result<BookResponse> result = await _addBookCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
-        return result.Match(success => TypedResults.Created($"{BaseURL}api/v1{ApiRoutes.Books.ADD_BOOK}/{result.Value.Id}", result.Value), Problem);
+        // Take unique identifiers from the route.
+        string? libraryId = HttpContext.Request.RouteValues["libraryId"]?.ToString();
+        Result<BookResponse> result = await _addBookCommandHandler.HandleAsync(request.ToCommand(libraryId), cancellationToken).ConfigureAwait(false);
+        return result.Match(success => TypedResults.Created($"{BaseURL}api/v1/libraries/{libraryId}/books/{result.Value.Id}", result.Value), Problem);
     }
 }

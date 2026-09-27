@@ -26,7 +26,7 @@ public static class LibraryMapping
             LibraryType = domainEntity.LibraryType,
             UserId = domainEntity.UserId.Value,
             ContentLocations = [.. domainEntity.ContentLocations.Select(path => new LibraryContentLocationEntity() { Path = path.Path })],
-            CoverImage = domainEntity.CoverImage,
+            CoverImage = domainEntity.CoverImage.HasValue ? domainEntity.CoverImage.Value : null,
             IsEnabled = domainEntity.IsEnabled,
             IsLocked = domainEntity.IsLocked,
             CanDownloadMetadataFromWeb = domainEntity.CanDownloadMetadataFromWeb,
@@ -46,8 +46,9 @@ public static class LibraryMapping
             })],
             CreatedOnUtc = domainEntity.CreatedOnUtc,
             CreatedBy = Guid.Empty,
-            UpdatedOnUtc = domainEntity.UpdatedOnUtc.HasValue ? domainEntity.UpdatedOnUtc : null,
-            UpdatedBy = Guid.Empty
+            // The audit columns are owned by the auditing interceptor, which stamps only the rows that actually changed, so they are never mapped here.
+            UpdatedOnUtc = null,
+            UpdatedBy = null
         };
     }
 }

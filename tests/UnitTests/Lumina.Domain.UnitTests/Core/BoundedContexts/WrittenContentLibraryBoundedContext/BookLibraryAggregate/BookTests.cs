@@ -1,9 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate.ValueObjects;
+using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
+using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.ExternalIdentifiers.MediaContributorBoundedContext.MediaContributorAggregate;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -18,7 +19,6 @@ namespace Lumina.Domain.UnitTests.Core.BoundedContexts.WrittenContentLibraryBoun
 public class BookTests
 {
     private readonly BookFixture _bookFixture = new();
-    private readonly MediaContributorIdFixture _mediaContributorIdFixture = new();
 
     [Fact]
     public void Create_WhenCalledWithValidData_ShouldCreateBook()
@@ -38,16 +38,16 @@ public class BookTests
     {
         // Arrange
         Book book = _bookFixture.Create();
-        MediaContributorId firstContributorId = _mediaContributorIdFixture.Create();
-        MediaContributorId secondContributorId = _mediaContributorIdFixture.Create();
+        BookMediaContributor firstContributor = CreateAuthorContributor();
+        BookMediaContributor secondContributor = CreateAuthorContributor();
 
         // Act
-        book.UpdateContributors([firstContributorId, secondContributorId]);
+        book.UpdateContributors([firstContributor, secondContributor]);
 
         // Assert
         Assert.Equal(2, book.Contributors.Count);
-        Assert.Contains(book.Contributors, contributorId => contributorId == firstContributorId);
-        Assert.Contains(book.Contributors, contributorId => contributorId == secondContributorId);
+        Assert.Contains(book.Contributors, contributor => contributor == firstContributor);
+        Assert.Contains(book.Contributors, contributor => contributor == secondContributor);
     }
 
     [Fact]
@@ -55,16 +55,45 @@ public class BookTests
     {
         // Arrange
         Book book = _bookFixture.Create();
-        book.UpdateContributors([_mediaContributorIdFixture.Create()]);
-        MediaContributorId replacementContributorId = _mediaContributorIdFixture.Create();
+        book.UpdateContributors([CreateAuthorContributor()]);
+        BookMediaContributor replacementContributor = CreateAuthorContributor();
 
         // Act
-        book.UpdateContributors([replacementContributorId]);
+        book.UpdateContributors([replacementContributor]);
 
         // Assert
         // the previous contributors are replaced, not appended
-        MediaContributorId contributorId = Assert.Single(book.Contributors);
-        Assert.Equal(replacementContributorId, contributorId);
+        BookMediaContributor contributor = Assert.Single(book.Contributors);
+        Assert.Equal(replacementContributor, contributor);
+    }
+
+    [Fact]
+    public void Create_WhenContributorsContainDuplicates_ShouldKeepOnlyUniqueContributors()
+    {
+        // Arrange
+        BookMediaContributor contributor = CreateAuthorContributor();
+
+        // Act
+        Book book = _bookFixture.Create(contributors: [contributor, contributor]);
+
+        // Assert
+        BookMediaContributor storedContributor = Assert.Single(book.Contributors);
+        Assert.Equal(contributor, storedContributor);
+    }
+
+    [Fact]
+    public void UpdateContributors_WhenCalledWithDuplicates_ShouldKeepOnlyUniqueContributors()
+    {
+        // Arrange
+        Book book = _bookFixture.Create();
+        BookMediaContributor contributor = CreateAuthorContributor();
+
+        // Act
+        book.UpdateContributors([contributor, contributor]);
+
+        // Assert
+        BookMediaContributor storedContributor = Assert.Single(book.Contributors);
+        Assert.Equal(contributor, storedContributor);
     }
 
     [Fact]
@@ -107,7 +136,7 @@ public class BookTests
         Assert.Equal(sourceBook.Path, book.Path);
         Assert.Equal(sourceBook.Metadata, book.Metadata);
         Assert.Equal(createdOnUtc, book.CreatedOnUtc);
-        Assert.Equal(updatedOnUtc, book.UpdatedOnUtc);
+        Assert.Equal(Optional<DateTime>.Some(updatedOnUtc), book.UpdatedOnUtc);
         Assert.Equal(sourceBook.ISBNs, book.ISBNs);
         Assert.Equal(sourceBook.Ratings, book.Ratings);
     }
@@ -228,5 +257,14 @@ public class BookTests
         Assert.False(hasLastMetadataUpdateUtc);
         Assert.False(hasMetadataProvider);
         Assert.False(hasCoverImagePath);
+    }
+
+    /// <summary>
+    /// Creates a <see cref="BookMediaContributor"/> of a random media contributor playing the Author role.
+    /// </summary>
+    /// <returns>The created <see cref="BookMediaContributor"/>.</returns>
+    private static BookMediaContributor CreateAuthorContributor()
+    {
+        return BookMediaContributor.Create(MediaContributorId.CreateUnique(), MediaContributorRole.Author).Value;
     }
 }

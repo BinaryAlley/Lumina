@@ -44,6 +44,7 @@ public class SetCurrentThemeCommandHandlerTests
     public SetCurrentThemeCommandHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockValidator = Substitute.For<IValidator<SetCurrentThemeCommand>>();

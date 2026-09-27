@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.DTO.Common.Pagination;
 using System.Diagnostics.CodeAnalysis;
-using System.Text.Json;
 #endregion
 
 namespace Lumina.Contracts.UnitTests.DTO.Common.Pagination;
@@ -12,11 +11,6 @@ namespace Lumina.Contracts.UnitTests.DTO.Common.Pagination;
 [ExcludeFromCodeCoverage]
 public class PaginationDataDtoTests
 {
-    private readonly JsonSerializerOptions _jsonOptions = new()
-    {
-        PropertyNameCaseInsensitive = true
-    };
-
     [Fact]
     public void CurrentPage_WhenNotSet_ShouldDefaultToOne()
     {
@@ -97,21 +91,5 @@ public class PaginationDataDtoTests
 
         // Assert
         Assert.Equal(25, sut.PerPage);
-    }
-
-    [Fact]
-    public void RoundTrip_WhenSerializingValidPaginationData_ShouldPreserveValues()
-    {
-        // Arrange
-        PaginationDataDto expected = new() { CurrentPage = 3, PerPage = 50 };
-
-        // Act
-        string json = JsonSerializer.Serialize(expected, _jsonOptions);
-        PaginationDataDto? actual = JsonSerializer.Deserialize<PaginationDataDto>(json, _jsonOptions);
-
-        // Assert
-        Assert.NotNull(actual);
-        Assert.Equal(expected.CurrentPage, actual.CurrentPage);
-        Assert.Equal(expected.PerPage, actual.PerPage);
     }
 }

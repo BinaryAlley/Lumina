@@ -48,6 +48,7 @@ public class FireScheduledJobCommandHandlerTests
     public FireScheduledJobCommandHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockDomainEventsQueue = Substitute.For<IDomainEventsQueue>();
@@ -72,7 +73,7 @@ public class FireScheduledJobCommandHandlerTests
             id: command.ScheduledJobId,
             scheduleType: ScheduleType.WithIntervalInMinutes,
             status: ScheduledJobStatus.Active);
-        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, Arg.Any<CancellationToken>())
+        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<ScheduledJobEntity?>(scheduledJob));
 
         // Act
@@ -98,7 +99,7 @@ public class FireScheduledJobCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(DomainErrors.Scheduling.ScheduledJobNotFound, result.FirstError);
-        await _mockScheduledJobRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockScheduledJobRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
         _mockDomainEventsQueue.DidNotReceive().Enqueue(Arg.Any<IDomainEvent>());
     }
 
@@ -115,7 +116,7 @@ public class FireScheduledJobCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
-        await _mockScheduledJobRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockScheduledJobRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -131,7 +132,7 @@ public class FireScheduledJobCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
-        await _mockScheduledJobRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockScheduledJobRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -140,7 +141,7 @@ public class FireScheduledJobCommandHandlerTests
         // Arrange
         FireScheduledJobCommand command = _fireScheduledJobCommandFixture.Create();
         Error error = Error.Failure("Database.Error", "Failed to get the scheduled job");
-        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, Arg.Any<CancellationToken>()).Returns(error);
+        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, cancellationToken: Arg.Any<CancellationToken>()).Returns(error);
 
         // Act
         Result<ScheduledJobResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
@@ -156,7 +157,7 @@ public class FireScheduledJobCommandHandlerTests
     {
         // Arrange
         FireScheduledJobCommand command = _fireScheduledJobCommandFixture.Create();
-        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, Arg.Any<CancellationToken>())
+        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<ScheduledJobEntity?>(null));
 
         // Act
@@ -179,7 +180,7 @@ public class FireScheduledJobCommandHandlerTests
             scheduleType: ScheduleType.DailyAtHourAndMinute,
             hour: 99,
             minute: 0);
-        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, Arg.Any<CancellationToken>())
+        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<ScheduledJobEntity?>(scheduledJob));
 
         // Act
@@ -199,7 +200,7 @@ public class FireScheduledJobCommandHandlerTests
             id: command.ScheduledJobId,
             scheduleType: ScheduleType.WithIntervalInMinutes,
             status: ScheduledJobStatus.Running);
-        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, Arg.Any<CancellationToken>())
+        _mockScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<ScheduledJobEntity?>(scheduledJob));
 
         // Act

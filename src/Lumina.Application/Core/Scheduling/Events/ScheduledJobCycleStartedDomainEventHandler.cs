@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Scheduling;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Infrastructure.Scheduling;
 using Lumina.Application.Common.Mapping.Scheduling;
 using Lumina.Application.Core.Scheduling.Notifications;
@@ -49,10 +51,10 @@ public class ScheduledJobCycleStartedDomainEventHandler : IDomainEventHandler<Sc
         // Start the execution cycle in the scheduler service, which runs the task of the scheduled job once immediately and then on its schedule.
         await _scheduledJobScheduler.StartCycleAsync(domainEvent.ScheduledJobId, cancellationToken).ConfigureAwait(false);
 
-        Result<IEnumerable<ScheduledJobEntity>> getScheduledJobsResult = await _unitOfWork.ScheduledJobRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        Result<PaginatedResultDto<ScheduledJobEntity>> getScheduledJobsResult = await _unitOfWork.ScheduledJobRepository.GetAllAsync<BaseFilterDto>(cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getScheduledJobsResult.IsFailure)
             throw new EventualConsistencyException(getScheduledJobsResult.FirstError, getScheduledJobsResult.Errors);
-        IReadOnlyList<ScheduledJobResponse> scheduledJobResponses = [.. getScheduledJobsResult.Value.Select(scheduledJob => scheduledJob.ToResponse())];
+        IReadOnlyList<ScheduledJobResponse> scheduledJobResponses = [.. getScheduledJobsResult.Value.Data.Select(scheduledJob => scheduledJob.ToResponse())];
         await _scheduledJobNotifier.SendScheduledJobsAsync(scheduledJobResponses, cancellationToken).ConfigureAwait(false);
     }
 }

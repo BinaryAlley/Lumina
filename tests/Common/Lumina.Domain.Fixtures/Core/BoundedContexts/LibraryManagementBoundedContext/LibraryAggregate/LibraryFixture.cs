@@ -23,7 +23,6 @@ namespace Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedCo
 public class LibraryFixture
 {
     private readonly Faker _faker = new();
-    private readonly Random _random = new();
     private readonly LibraryIdFixture _libraryIdFixture = new();
     private readonly UserIdFixture _userIdFixture = new();
     private readonly ScanIdFixture _scanIdFixture = new();
@@ -37,13 +36,13 @@ public class LibraryFixture
     /// <param name="libraryType">Optional. The library type.</param>
     /// <param name="contentLocations">Optional. The content locations of the library.</param>
     /// <param name="coverImage">Optional. The cover image of the library.</param>
-    /// <param name="includeCoverImage">Whether the cover image should be included, or forced to <see langword="null"/>.</param>
     /// <param name="isEnabled">Whether the library is enabled.</param>
     /// <param name="isLocked">Whether the library is locked.</param>
     /// <param name="canDownloadMetadataFromWeb">Whether metadata download from the web is enabled.</param>
     /// <param name="shouldSaveMetadataInMediaDirectories">Whether metadata should be saved in the media directories.</param>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether unchanged directories should be skipped during scan.</param>
     /// <param name="scanIds">Optional. The scan Ids associated with the library.</param>
+    /// <param name="includeCoverImage">Whether the cover image should be included, or left unset, meaning the library has no cover.</param>
     /// <returns>The created <see cref="Library"/>.</returns>
     public Library Create(
         Guid? id = null,
@@ -52,13 +51,13 @@ public class LibraryFixture
         LibraryType? libraryType = null,
         IEnumerable<string>? contentLocations = null,
         string? coverImage = null,
-        bool includeCoverImage = true,
         bool isEnabled = true,
         bool isLocked = false,
         bool canDownloadMetadataFromWeb = true,
         bool shouldSaveMetadataInMediaDirectories = false,
         bool shouldSkipUnchangedDirectoriesDuringScan = false,
-        IEnumerable<Guid>? scanIds = null)
+        IEnumerable<Guid>? scanIds = null,
+        bool includeCoverImage = true)
     {
         List<string> validPaths =
         [
@@ -77,8 +76,8 @@ public class LibraryFixture
                 resolvedUserId,
                 title ?? _faker.Random.String2(_faker.Random.Number(1, 50)),
                 libraryType ?? _faker.PickRandom<LibraryType>(),
-                contentLocations ?? validPaths.Take(_random.Next(1, validPaths.Count)),
-                resolvedCoverImage,
+                contentLocations ?? validPaths.Take(Random.Shared.Next(1, validPaths.Count)),
+                Optional<string>.FromNullable(resolvedCoverImage),
                 isEnabled,
                 isLocked,
                 canDownloadMetadataFromWeb,
@@ -91,8 +90,8 @@ public class LibraryFixture
                 resolvedUserId,
                 title ?? _faker.Random.String2(_faker.Random.Number(1, 50)),
                 libraryType ?? _faker.PickRandom<LibraryType>(),
-                contentLocations ?? validPaths.Take(_random.Next(1, validPaths.Count)),
-                resolvedCoverImage,
+                contentLocations ?? validPaths.Take(Random.Shared.Next(1, validPaths.Count)),
+                Optional<string>.FromNullable(resolvedCoverImage),
                 isEnabled,
                 isLocked,
                 canDownloadMetadataFromWeb,

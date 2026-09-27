@@ -79,7 +79,7 @@ public class FireScheduledJobCommandHandler : ICommandHandler<FireScheduledJobCo
             return ApplicationErrors.Authorization.NotAuthorized;
 
         // Get the scheduled job from the storage medium.
-        Result<ScheduledJobEntity?> getScheduledJobResult = await _unitOfWork.ScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, cancellationToken).ConfigureAwait(false);
+        Result<ScheduledJobEntity?> getScheduledJobResult = await _unitOfWork.ScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getScheduledJobResult.IsFailure)
             return getScheduledJobResult.Errors;
         if (getScheduledJobResult.Value is null)

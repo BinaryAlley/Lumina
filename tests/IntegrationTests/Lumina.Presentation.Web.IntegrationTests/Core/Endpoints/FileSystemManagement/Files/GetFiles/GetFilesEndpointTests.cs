@@ -40,10 +40,10 @@ public class GetFilesEndpointTests : IClassFixture<LuminaWebFactory>
         _apiFactory.ApiClientStub.Reset();
         string path = @"C:\Users\test";
         FileDto[] expectedFiles = [_fileDtoFixture.Create(path: path, name: "book.pdf")];
-        string expectedEndpoint = $"files/get-files?path={Uri.EscapeDataString(path)}&includeHiddenElements=True";
+        string expectedEndpoint = $"files/get-files?path={Uri.EscapeDataString(path)}&shouldIncludeHiddenElements=True";
         _apiFactory.ApiClientStub.RegisterGetResponse(expectedEndpoint, expectedFiles);
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
-        HttpRequestMessage getRequest = new(HttpMethod.Get, $"/files/api-get-files?path={Uri.EscapeDataString(path)}&includeHiddenElements=true");
+        HttpRequestMessage getRequest = new(HttpMethod.Get, $"/files/api-get-files?path={Uri.EscapeDataString(path)}&shouldIncludeHiddenElements=true");
         getRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
         // Act

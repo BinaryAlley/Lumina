@@ -49,11 +49,11 @@ public class GetFilesQueryHandlerTests
     public async Task HandleAsync_WhenCalledWithValidQueryWithoutHiddenFiles_ShouldReturnSuccessResult()
     {
         // Arrange
-        GetFilesQuery getFilesQuery = _getFilesQueryFixture.Create(includeHiddenElements: false);
+        GetFilesQuery getFilesQuery = _getFilesQueryFixture.Create(shouldIncludeHiddenElements: false);
 
         IEnumerable<File> files = _fileFixture.CreateMany();
 
-        _mockFileService.GetFiles(getFilesQuery.Path!, getFilesQuery.IncludeHiddenElements)
+        _mockFileService.GetFiles(getFilesQuery.Path!, getFilesQuery.ShouldIncludeHiddenElements)
             .Returns(Result.From(files));
 
         // Act
@@ -76,18 +76,18 @@ public class GetFilesQueryHandlerTests
             Assert.Equal(filesList[i].Size, resultList[i].Size);
         }
 
-        _mockFileService.Received(1).GetFiles(getFilesQuery.Path!, getFilesQuery.IncludeHiddenElements);
+        _mockFileService.Received(1).GetFiles(getFilesQuery.Path!, getFilesQuery.ShouldIncludeHiddenElements);
     }
 
     [Fact]
     public async Task HandleAsync_WhenCalledWithValidQueryWithHiddenFiles_ShouldReturnSuccessResult()
     {
         // Arrange
-        GetFilesQuery getFilesQuery = _getFilesQueryFixture.Create(includeHiddenElements: true);
+        GetFilesQuery getFilesQuery = _getFilesQueryFixture.Create(shouldIncludeHiddenElements: true);
 
         IEnumerable<File> files = _fileFixture.CreateMany();
 
-        _mockFileService.GetFiles(getFilesQuery.Path!, getFilesQuery.IncludeHiddenElements)
+        _mockFileService.GetFiles(getFilesQuery.Path!, getFilesQuery.ShouldIncludeHiddenElements)
             .Returns(Result.From(files));
 
         // Act
@@ -110,7 +110,7 @@ public class GetFilesQueryHandlerTests
             Assert.Equal(filesList[i].Size, resultList[i].Size);
         }
 
-        _mockFileService.Received(1).GetFiles(getFilesQuery.Path!, getFilesQuery.IncludeHiddenElements);
+        _mockFileService.Received(1).GetFiles(getFilesQuery.Path!, getFilesQuery.ShouldIncludeHiddenElements);
     }
 
     [Fact]
@@ -119,7 +119,7 @@ public class GetFilesQueryHandlerTests
         // Arrange
         GetFilesQuery query = _getFilesQueryFixture.Create();
         Error error = Error.Failure("FileService.Error", "An error occurred");
-        _mockFileService.GetFiles(query.Path!, query.IncludeHiddenElements)
+        _mockFileService.GetFiles(query.Path!, query.ShouldIncludeHiddenElements)
             .Returns(error);
 
         // Act
@@ -128,7 +128,7 @@ public class GetFilesQueryHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
-        _mockFileService.Received(1).GetFiles(query.Path!, query.IncludeHiddenElements);
+        _mockFileService.Received(1).GetFiles(query.Path!, query.ShouldIncludeHiddenElements);
     }
 
     [Fact]
@@ -137,7 +137,7 @@ public class GetFilesQueryHandlerTests
         // Arrange
         GetFilesQuery query = _getFilesQueryFixture.Create();
         Result<IEnumerable<File>> emptyList = Result.From(Enumerable.Empty<File>());
-        _mockFileService.GetFiles(query.Path!, query.IncludeHiddenElements)
+        _mockFileService.GetFiles(query.Path!, query.ShouldIncludeHiddenElements)
             .Returns(emptyList);
 
         // Act
@@ -146,6 +146,6 @@ public class GetFilesQueryHandlerTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.Empty(result.Value);
-        _mockFileService.Received(1).GetFiles(query.Path!, query.IncludeHiddenElements);
+        _mockFileService.Received(1).GetFiles(query.Path!, query.ShouldIncludeHiddenElements);
     }
 }

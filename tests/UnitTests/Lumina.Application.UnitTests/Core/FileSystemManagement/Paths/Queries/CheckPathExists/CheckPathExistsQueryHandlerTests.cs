@@ -52,10 +52,10 @@ public class CheckPathExistsQueryHandlerTests
     }
 
     [Fact]
-    public async Task HandleAsync_WhenPathExistsAndIsHiddenAndIncludeHiddenElementsIsTrue_ShouldReturnTrueResponse()
+    public async Task HandleAsync_WhenPathExistsAndIsHiddenAndShouldIncludeHiddenElementsIsTrue_ShouldReturnTrueResponse()
     {
         // Arrange
-        CheckPathExistsQuery query = _checkPathExistsQueryFixture.Create(includeHiddenElements: true);
+        CheckPathExistsQuery query = _checkPathExistsQueryFixture.Create(shouldIncludeHiddenElements: true);
         _mockPathService.Exists(query.Path!).Returns(true);
 
         // Act
@@ -68,10 +68,10 @@ public class CheckPathExistsQueryHandlerTests
     }
 
     [Fact]
-    public async Task HandleAsync_WhenPathExistsAndIsHiddenAndIncludeHiddenElementsIsFalse_ShouldReturnFalseResponse()
+    public async Task HandleAsync_WhenPathExistsAndIsHiddenAndShouldIncludeHiddenElementsIsFalse_ShouldReturnFalseResponse()
     {
         // Arrange
-        CheckPathExistsQuery query = _checkPathExistsQueryFixture.Create(includeHiddenElements: false);
+        CheckPathExistsQuery query = _checkPathExistsQueryFixture.Create(shouldIncludeHiddenElements: false);
         _mockPathService.Exists(query.Path!, false).Returns(false);
 
         // Act

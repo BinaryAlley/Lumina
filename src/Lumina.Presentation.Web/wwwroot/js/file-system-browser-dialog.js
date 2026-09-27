@@ -263,7 +263,7 @@
             if (addressBarInput.value !== null && !addressBarInput.value.endsWith(pathSeparator))
                 addressBarInput.value += pathSeparator;
         } else {
-            const pathExistsResponse = await callApiGetAsync(`${clientBasePath}path/api-check-path-exists?path=${encodeURIComponent(path)}&includeHiddenElements=${showHiddenElements}`);
+            const pathExistsResponse = await callApiGetAsync(`${clientBasePath}path/api-check-path-exists?path=${encodeURIComponent(path)}&shouldIncludeHiddenElements=${showHiddenElements}`);
             if (pathExistsResponse !== undefined && !pathExistsResponse.exists) {
                 notificationService.show("Specified path does not exist!", NotificationType.ERROR); // TODO: should ask error message from server when translation is implemented
                 return false;
@@ -775,7 +775,7 @@
      * @param {Function} callback - Function to call for each directory received.
      */
     async function fetchFileSystemDirectoriesAsync(path, callback) {
-        await fetchJsonDataAsync(`${clientBasePath}directories/api-get-directories?path=${encodeURIComponent(path)}&includeHiddenElements=${showHiddenElements}`, callback, 'Directory');
+        await fetchJsonDataAsync(`${clientBasePath}directories/api-get-directories?path=${encodeURIComponent(path)}&shouldIncludeHiddenElements=${showHiddenElements}`, callback, 'Directory');
     }
 
     /**
@@ -784,7 +784,7 @@
      * @param {Function} callback - Function to call for each file received.
      */
     async function fetchFileSystemFilesAsync(path, callback) {
-        await fetchJsonDataAsync(`${clientBasePath}files/api-get-tree-files?path=${encodeURIComponent(path)}&includeHiddenElements=${showHiddenElements}`, callback, 'File');
+        await fetchJsonDataAsync(`${clientBasePath}files/api-get-tree-files?path=${encodeURIComponent(path)}&shouldIncludeHiddenElements=${showHiddenElements}`, callback, 'File');
     }
 
     /**

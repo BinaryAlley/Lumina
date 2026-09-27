@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Common;
-using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using System;
@@ -185,7 +184,7 @@ public class BookEntity : IStorageEntity, IAuditableEntity
     /// <summary>
     /// Gets or sets the Barnes & Noble ID of the book.
     /// </summary>
-    public string? BarnesAndNobleId { get; set; } = null!;
+    public string? BarnesAndNobleId { get; set; }
 
     /// <summary>
     /// Gets or sets the Apple Books ID of the book.
@@ -200,12 +199,12 @@ public class BookEntity : IStorageEntity, IAuditableEntity
     /// <summary>
     /// Gets or sets the participations of the media contributors in the book, each carrying the role the contributor played.
     /// </summary>
-    public List<BookContributorEntity> BookContributors { get; set; } = [];
+    public List<BookContributorEntity> Contributors { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the pieces of artwork of the book, each tracked independently with its own enrichment state.
     /// </summary>
-    public List<BookArtworkEntity> BookArtwork { get; set; } = [];
+    public List<BookArtworkEntity> Artwork { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the list of ratings for this book.

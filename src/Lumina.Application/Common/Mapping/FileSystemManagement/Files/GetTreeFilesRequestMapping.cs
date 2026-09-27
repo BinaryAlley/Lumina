@@ -17,6 +17,6 @@ public static class GetTreeFilesRequestMapping
     /// <returns>The converted query.</returns>
     public static GetTreeFilesQuery ToQuery(this GetTreeFilesRequest request)
     {
-        return new GetTreeFilesQuery(request.Path, request.IncludeHiddenElements);
+        return new GetTreeFilesQuery(request.Path, request.ShouldIncludeHiddenElements);
     }
 }

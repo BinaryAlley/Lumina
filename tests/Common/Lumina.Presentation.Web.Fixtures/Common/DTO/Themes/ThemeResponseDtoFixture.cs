@@ -28,12 +28,12 @@ public class ThemeResponseDtoFixture
     /// <param name="author">Optional author of the theme.</param>
     /// <param name="version">Optional semantic version of the theme.</param>
     /// <param name="previewPath">Optional preview image path of the theme, or <see langword="null"/> when the theme has no preview.</param>
-    /// <param name="includePreviewPath">Whether the preview path should be included, or forced to <see langword="null"/>.</param>
     /// <param name="installSource">Optional source the theme was installed from.</param>
     /// <param name="isCurrent">Optional value indicating whether the theme is the active one.</param>
-    /// <param name="includeIsCurrent">Whether the currently active flag should be included, or forced to <see langword="null"/>.</param>
     /// <param name="installedAtUtc">Optional UTC timestamp at which the theme was installed.</param>
     /// <param name="isDeleted">Optional value indicating whether the theme was deleted by the user.</param>
+    /// <param name="includePreviewPath">Whether the preview path should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeIsCurrent">Whether the currently active flag should be included, or forced to <see langword="null"/>.</param>
     /// <returns>A configured <see cref="ThemeResponseDto"/> instance.</returns>
     public ThemeResponseDto Create(
         Guid? id = null,
@@ -43,12 +43,12 @@ public class ThemeResponseDtoFixture
         string? author = null,
         string? version = null,
         string? previewPath = null,
-        bool includePreviewPath = false,
         ThemeInstallSource? installSource = null,
         bool? isCurrent = null,
-        bool includeIsCurrent = false,
         DateTime? installedAtUtc = null,
-        bool? isDeleted = null)
+        bool? isDeleted = null,
+        bool includePreviewPath = false,
+        bool includeIsCurrent = false)
     {
         return new ThemeResponseDto(
             Id: id ?? Guid.NewGuid(),

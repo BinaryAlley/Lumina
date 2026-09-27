@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Authentication;
@@ -8,12 +9,9 @@ using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -70,13 +68,22 @@ public class UpdateBookCommandHandler : ICommandHandler<UpdateBookCommand, Resul
             return ApplicationErrors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
+        // The validator guarantees that the route identifiers are non-empty Guids before this point.
+        Guid libraryId = Guid.Parse(command.LibraryId!);
+        Guid bookId = Guid.Parse(command.BookId!);
+
         // Get the existing book with all its related data.
-        Result<BookEntity?> getBookResult = await _unitOfWork.BookRepository.GetByIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
+        Result<BookEntity?> getBookResult = await _unitOfWork.BookRepository.GetByIdAsync(bookId, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getBookResult.IsFailure)
             return getBookResult.Errors;
         if (getBookResult.Value is null)
             return DomainErrors.WrittenContent.BookNotFound;
         BookEntity existingBook = getBookResult.Value;
+
+        // Resource scoping: the book must belong to the library named by the route, so that a book can never be edited through another
+        // library's route; the mismatch is reported as not found, without disclosing that the book exists in another library.
+        if (existingBook.LibraryId != libraryId)
+            return DomainErrors.WrittenContent.BookNotFound;
 
         // Admins can update the books of all libraries; for everyone else, only the books of the libraries they own.
         bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
@@ -84,71 +91,64 @@ public class UpdateBookCommandHandler : ICommandHandler<UpdateBookCommand, Resul
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
-        // Convert the book to a domain object and apply the edited metadata to it.
-        Result<Book> getDomainBookResult = existingBook.ToDomainEntity();
-        if (getDomainBookResult.IsFailure)
-            return getDomainBookResult.Errors;
-        Book book = getDomainBookResult.Value;
+        // A book can only belong to a library that exists, so a client can never update a book that points to a library of the host that is not there.
+        Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(libraryId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (getLibraryResult.IsFailure)
+            return getLibraryResult.Errors;
+        if (getLibraryResult.Value is null)
+            return DomainErrors.Library.LibraryNotFound;
 
-        Result<Success> applyMetadataResult = book.ApplyMetadata(command.ToBookMetadataDto());
-        if (applyMetadataResult.IsFailure)
-            return applyMetadataResult.Errors;
+        // Media contributors are referenced by Id and are never created implicitly by editing a book, so each one must already exist.
+        Result<IReadOnlyList<MediaContributorEntity>> getContributorsResult = await GetExistingContributorsAsync(command, cancellationToken).ConfigureAwait(false);
+        if (getContributorsResult.IsFailure)
+            return getContributorsResult.Errors;
 
-        // Link the media contributors typed by the user to the book, finding or creating a single contributor per person.
-        List<BookContributorEntity> linkedContributors = [];
-        // A person can be credited under several roles in the same book; each distinct display name must resolve to the same media
-        // contributor row, otherwise the duplicate inserts would violate the unique display name constraint when the changes are saved.
-        Dictionary<string, MediaContributorEntity> contributorsByDisplayName = [];
-        foreach (MediaContributorDto contributor in command.Contributors!)
-        {
-            if (contributor.Name?.DisplayName is null)
-                continue;
-
-            if (!contributorsByDisplayName.TryGetValue(contributor.Name.DisplayName, out MediaContributorEntity? contributorEntity))
-            {
-                Result<MediaContributorEntity> findOrCreateResult = await _unitOfWork.MediaContributorRepository.FindOrCreateByDisplayNameAsync(contributor.Name.DisplayName, contributor.Name.LegalName, cancellationToken).ConfigureAwait(false);
-                if (findOrCreateResult.IsFailure)
-                    return findOrCreateResult.Errors;
-                contributorEntity = findOrCreateResult.Value;
-                contributorsByDisplayName.Add(contributor.Name.DisplayName, contributorEntity);
-            }
-
-            string roleName = contributor.Role?.Name ?? "Contributor";
-            MediaContributorRoleCategory roleCategory = contributor.Role?.Category ?? MediaContributorRoleCategory.Other;
-            linkedContributors.Add(new BookContributorEntity
-            {
-                Id = Guid.NewGuid(),
-                BookId = existingBook.Id,
-                MediaContributorId = contributorEntity.Id,
-                RoleName = roleName,
-                RoleCategory = roleCategory,
-                CreatedOnUtc = DateTime.UtcNow,
-                CreatedBy = userId,
-                UpdatedBy = null
-            });
-        }
-        book.UpdateContributors([.. linkedContributors.Select(linkedContributor => MediaContributorId.Create(linkedContributor.MediaContributorId))]);
+        // Convert the command to a domain aggregate to enforce invariants, preserving the identity and creation metadata of the stored book.
+        Result<Book> updateBookResult = command.ToDomainEntity(existingBook);
+        if (updateBookResult.IsFailure)
+            return updateBookResult.Errors;
 
         // Map the updated domain book onto a fresh repository entity, ready for the repository to replace the stored data.
-        BookEntity updatedBook = book.ToRepositoryEntity();
-        updatedBook.BookContributors = linkedContributors;
-        updatedBook.UpdatedOnUtc = DateTime.UtcNow;
-        updatedBook.UpdatedBy = userId;
-
-        // The identity, enrichment and artwork columns are never overwritten by an edit, so they are copied onto the fresh entity that
-        // backs the response; without this, the response would report the fresh entity defaults (Pending metadata status, no cover path).
-        updatedBook.CreatedOnUtc = existingBook.CreatedOnUtc;
-        updatedBook.MetadataStatus = existingBook.MetadataStatus;
-        updatedBook.LastMetadataUpdateUtc = existingBook.LastMetadataUpdateUtc;
-        updatedBook.MetadataProvider = existingBook.MetadataProvider;
-        updatedBook.BookArtwork = existingBook.BookArtwork;
+        BookEntity updatedBook = updateBookResult.Value.ToRepositoryEntity();
 
         Result<Updated> updateResult = await _unitOfWork.BookRepository.UpdateAsync(updatedBook, cancellationToken).ConfigureAwait(false);
         if (updateResult.IsFailure)
             return updateResult.Errors;
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
 
-        return updatedBook.ToResponse() with { Contributors = command.Contributors };
+        // Returns the book as it was actually persisted, instead of the in-memory aggregate, so the response reflects every value the persistence medium applied on save.
+        Result<BookEntity?> getPersistedBookResult = await _unitOfWork.BookRepository.GetByIdAsync(existingBook.Id, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (getPersistedBookResult.IsFailure)
+            return getPersistedBookResult.Errors;
+        if (getPersistedBookResult.Value is null)
+            return DomainErrors.WrittenContent.BookNotFound;
+
+        return getPersistedBookResult.Value.ToResponse();
+    }
+
+    /// <summary>
+    /// Gets the media contributors referenced by <paramref name="command"/>, requiring each referenced Id to already exist.
+    /// </summary>
+    /// <param name="command">The command carrying the referenced media contributors.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>
+    /// An <see cref="Result{TValue}"/> containing either the existing media contributors, or an error when at least one referenced contributor does not exist.
+    /// </returns>
+    private async Task<Result<IReadOnlyList<MediaContributorEntity>>> GetExistingContributorsAsync(UpdateBookCommand command, CancellationToken cancellationToken)
+    {
+        List<Guid> contributorIds = [.. command.Contributors!.Select(contributor => contributor.ContributorId).Distinct()];
+        if (contributorIds.Count == 0)
+            return Result.From<IReadOnlyList<MediaContributorEntity>>([]);
+
+        Result<IReadOnlyList<MediaContributorEntity>> getContributorsResult = await _unitOfWork.MediaContributorRepository
+            .GetByIdsAsync(contributorIds, cancellationToken).ConfigureAwait(false);
+        if (getContributorsResult.IsFailure)
+            return getContributorsResult.Errors;
+        if (getContributorsResult.Value.Count != contributorIds.Count)
+            return DomainErrors.MediaContributor.MediaContributorNotFound;
+        return Result.From(getContributorsResult.Value);
     }
 }

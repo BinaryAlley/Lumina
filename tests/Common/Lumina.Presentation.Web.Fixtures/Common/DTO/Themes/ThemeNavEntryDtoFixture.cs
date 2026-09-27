@@ -21,18 +21,18 @@ public class ThemeNavEntryDtoFixture
     /// </summary>
     /// <param name="label">Optional label of the entry.</param>
     /// <param name="url">Optional URL of the link, or <see langword="null"/> for a submenu.</param>
-    /// <param name="includeUrl">Whether the URL should be included, or forced to <see langword="null"/>.</param>
     /// <param name="cssClass">Optional CSS classes of the link.</param>
-    /// <param name="includeCssClass">Whether the CSS class should be included, or forced to <see langword="null"/>.</param>
     /// <param name="children">Optional child links of a submenu.</param>
+    /// <param name="includeUrl">Whether the URL should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeCssClass">Whether the CSS class should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="ThemeNavEntryDto"/>.</returns>
     public ThemeNavEntryDto Create(
         string? label = null,
         string? url = null,
-        bool includeUrl = false,
         string? cssClass = null,
-        bool includeCssClass = false,
-        IReadOnlyList<ThemeNavEntryDto>? children = null)
+        IReadOnlyList<ThemeNavEntryDto>? children = null,
+        bool includeUrl = false,
+        bool includeCssClass = false)
     {
         return new ThemeNavEntryDto(
             Label: label ?? _faker.Lorem.Word(),

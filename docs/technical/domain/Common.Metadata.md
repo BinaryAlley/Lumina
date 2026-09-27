@@ -87,7 +87,7 @@ class ReleaseInfo
 ```csharp
 class LanguageInfo
 {
-    ErrorOr<LanguageInfo> Create(string languageCode, string languageName, Optional<string> nativeName);
+    LanguageInfo Create(string languageCode, string languageName, Optional<string> nativeName);
 }
 ```
 

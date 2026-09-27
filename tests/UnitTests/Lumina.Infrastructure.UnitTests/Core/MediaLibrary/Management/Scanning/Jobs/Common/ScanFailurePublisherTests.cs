@@ -60,7 +60,7 @@ public class ScanFailurePublisherTests
             Arg.Is<LibraryScanFailedDomainEvent>(domainEvent =>
                 domainEvent.LibraryId == libraryId
                 && domainEvent.MediaLibraryScanCompositeId == compositeId
-                && domainEvent.ErrorMessage == "The scan job failed"),
+                && domainEvent.ErrorMessage.HasValue && domainEvent.ErrorMessage.Value == "The scan job failed"),
             Arg.Any<CancellationToken>());
     }
 

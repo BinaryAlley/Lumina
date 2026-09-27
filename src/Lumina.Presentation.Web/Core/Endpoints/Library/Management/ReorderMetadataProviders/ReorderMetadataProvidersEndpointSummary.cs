@@ -21,7 +21,7 @@ public class ReorderMetadataProvidersEndpointSummary : Summary<ReorderMetadataPr
     public ReorderMetadataProvidersEndpointSummary()
     {
         Summary = "Reorders the metadata providers of a media library.";
-        Description = "Reorders the metadata providers of the media library identified by the request.";
+        Description = "Reorders the metadata providers of the media library identified by the route.";
         RequestParam(r => r.LibraryId, "The Id of the media library whose metadata providers are reordered. Required.");
         RequestParam(r => r.PluginIds, "The plugin Ids in the new order, from highest to lowest rank. Required.");
 

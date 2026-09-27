@@ -19,7 +19,7 @@ public class EditLibraryViewEndpointSummary : Summary<EditLibraryViewEndpoint, E
     public EditLibraryViewEndpointSummary()
     {
         Summary = "Renders the edit library view.";
-        Description = "Renders the view for editing the media library identified by the request.";
+        Description = "Renders the view for editing the media library identified by the route.";
 
         RequestParam(r => r.Id, "The unique identifier of the media library to edit. Required.");
 

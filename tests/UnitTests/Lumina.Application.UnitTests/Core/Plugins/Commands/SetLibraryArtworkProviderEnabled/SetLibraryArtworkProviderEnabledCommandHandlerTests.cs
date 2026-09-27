@@ -48,6 +48,7 @@ public class SetLibraryArtworkProviderEnabledCommandHandlerTests
     public SetLibraryArtworkProviderEnabledCommandHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockConfigurationRepository = Substitute.For<IArtworkProviderConfigurationRepository>();
         _mockUnitOfWork.ArtworkProviderConfigurationRepository.Returns(_mockConfigurationRepository);
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();

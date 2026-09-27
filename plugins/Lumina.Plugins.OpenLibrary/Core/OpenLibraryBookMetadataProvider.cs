@@ -65,75 +65,15 @@ internal sealed class OpenLibraryBookMetadataProvider : IMetadataProvider<BookMe
 
         if (!string.IsNullOrWhiteSpace(bookMetadataLookup.Isbn) || !string.IsNullOrWhiteSpace(bookMetadataLookup.OpenLibraryId))
         {
-            AddBookRequest? exactBookRequestMatch = await GetBookAsync(bookMetadataLookup, cancellationToken).ConfigureAwait(false);
-            return exactBookRequestMatch is null ? [] : [new BookMetadataDto(
-                exactBookRequestMatch.Metadata?.Title,
-                exactBookRequestMatch.Metadata?.OriginalTitle,
-                exactBookRequestMatch.Metadata?.Description,
-                exactBookRequestMatch.Metadata?.ReleaseInfo,
-                exactBookRequestMatch.Metadata?.Genres,
-                exactBookRequestMatch.Metadata?.Tags,
-                exactBookRequestMatch.Metadata?.Language,
-                exactBookRequestMatch.Metadata?.OriginalLanguage,
-                exactBookRequestMatch.Metadata?.Publisher,
-                exactBookRequestMatch.Metadata?.PageCount,
-                exactBookRequestMatch.Format,
-                exactBookRequestMatch.Edition,
-                exactBookRequestMatch.VolumeNumber,
-                exactBookRequestMatch.Series,
-                exactBookRequestMatch.ASIN,
-                exactBookRequestMatch.GoodreadsId,
-                exactBookRequestMatch.LCCN,
-                exactBookRequestMatch.OCLCNumber,
-                exactBookRequestMatch.OpenLibraryId,
-                exactBookRequestMatch.LibraryThingId,
-                exactBookRequestMatch.GoogleBooksId,
-                exactBookRequestMatch.BarnesAndNobleId,
-                exactBookRequestMatch.AppleBooksId,
-                exactBookRequestMatch.ISBNs,
-                exactBookRequestMatch.Contributors,
-                exactBookRequestMatch.Ratings,
-                CoverImagePath: null
-            )];
+            BookMetadataDto? exactBookMatch = await GetBookAsync(bookMetadataLookup, cancellationToken).ConfigureAwait(false);
+            return exactBookMatch is null ? [] : [exactBookMatch];
         }
 
         IReadOnlyList<OpenLibrarySearchDocumentResponse> openLibrarySearchDocuments = await _openLibraryHttpClient.SearchAsync(bookMetadataLookup, settings.SearchResultLimit, cancellationToken).ConfigureAwait(false);
 
         return [.. openLibrarySearchDocuments
             .Where(openLibrarySearchDocument => !string.IsNullOrWhiteSpace(openLibrarySearchDocument.Title))
-            .Select(openLibrarySearchDocument =>
-            {
-                AddBookRequest addBookRequest = OpenLibraryMapper.MapSearchCandidate(bookMetadataLookup, openLibrarySearchDocument);
-                return new BookMetadataDto(
-                    addBookRequest.Metadata?.Title,
-                    addBookRequest.Metadata?.OriginalTitle,
-                    addBookRequest.Metadata?.Description,
-                    addBookRequest.Metadata?.ReleaseInfo,
-                    addBookRequest.Metadata?.Genres,
-                    addBookRequest.Metadata?.Tags,
-                    addBookRequest.Metadata?.Language,
-                    addBookRequest.Metadata?.OriginalLanguage,
-                    addBookRequest.Metadata?.Publisher,
-                    addBookRequest.Metadata?.PageCount,
-                    addBookRequest.Format,
-                    addBookRequest.Edition,
-                    addBookRequest.VolumeNumber,
-                    addBookRequest.Series,
-                    addBookRequest.ASIN,
-                    addBookRequest.GoodreadsId,
-                    addBookRequest.LCCN,
-                    addBookRequest.OCLCNumber,
-                    addBookRequest.OpenLibraryId,
-                    addBookRequest.LibraryThingId,
-                    addBookRequest.GoogleBooksId,
-                    addBookRequest.BarnesAndNobleId,
-                    addBookRequest.AppleBooksId,
-                    addBookRequest.ISBNs,
-                    addBookRequest.Contributors,
-                    addBookRequest.Ratings,
-                    CoverImagePath: null
-                );
-            })];
+            .Select(openLibrarySearchDocument => OpenLibraryMapper.MapSearchCandidate(bookMetadataLookup, openLibrarySearchDocument))];
     }
 
     /// <summary>
@@ -144,45 +84,16 @@ internal sealed class OpenLibraryBookMetadataProvider : IMetadataProvider<BookMe
     /// <returns>The metadata of the media item, or <see langword="null"/> when no metadata was found.</returns>
     public async Task<BookMetadataDto?> GetMetadataAsync(BookMetadataLookupDto bookMetadataLookup, CancellationToken cancellationToken)
     {
-        AddBookRequest? exactBookRequestMatch = await GetBookAsync(bookMetadataLookup, cancellationToken).ConfigureAwait(false);
-        return exactBookRequestMatch is null ? null : new BookMetadataDto(
-            exactBookRequestMatch.Metadata?.Title,
-            exactBookRequestMatch.Metadata?.OriginalTitle,
-            exactBookRequestMatch.Metadata?.Description,
-            exactBookRequestMatch.Metadata?.ReleaseInfo,
-            exactBookRequestMatch.Metadata?.Genres,
-            exactBookRequestMatch.Metadata?.Tags,
-            exactBookRequestMatch.Metadata?.Language,
-            exactBookRequestMatch.Metadata?.OriginalLanguage,
-            exactBookRequestMatch.Metadata?.Publisher,
-            exactBookRequestMatch.Metadata?.PageCount,
-            exactBookRequestMatch.Format,
-            exactBookRequestMatch.Edition,
-            exactBookRequestMatch.VolumeNumber,
-            exactBookRequestMatch.Series,
-            exactBookRequestMatch.ASIN,
-            exactBookRequestMatch.GoodreadsId,
-            exactBookRequestMatch.LCCN,
-            exactBookRequestMatch.OCLCNumber,
-            exactBookRequestMatch.OpenLibraryId,
-            exactBookRequestMatch.LibraryThingId,
-            exactBookRequestMatch.GoogleBooksId,
-            exactBookRequestMatch.BarnesAndNobleId,
-            exactBookRequestMatch.AppleBooksId,
-            exactBookRequestMatch.ISBNs,
-            exactBookRequestMatch.Contributors,
-            exactBookRequestMatch.Ratings,
-            CoverImagePath: null
-        );
+        return await GetBookAsync(bookMetadataLookup, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
-    /// Resolves the lookup into a full book request by combining edition, work, author, and rating data from Open Library.
+    /// Resolves the lookup into full book metadata by combining edition, work, author, and rating data from Open Library.
     /// </summary>
     /// <param name="bookMetadataLookup">The lookup describing the book to resolve.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>The resolved book request, or <see langword="null"/> when no matching book was found.</returns>
-    public async Task<AddBookRequest?> GetBookAsync(BookMetadataLookupDto bookMetadataLookup, CancellationToken cancellationToken = default)
+    /// <returns>The resolved book metadata, or <see langword="null"/> when no matching book was found.</returns>
+    public async Task<BookMetadataDto?> GetBookAsync(BookMetadataLookupDto bookMetadataLookup, CancellationToken cancellationToken = default)
     {
         ValidateLookup(bookMetadataLookup);
 

@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Contracts.Responses.UsersManagement;
-using System.Collections.Generic;
+using Lumina.Domain.Common.Primitives;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,10 +38,10 @@ public class CheckInitializationQueryHandler : IQueryHandler<CheckInitialization
     /// </returns>
     public async Task<InitializationResponse> HandleAsync(CheckInitializationQuery query, CancellationToken cancellationToken)
     {
-        // if the repository reports an error, or there are no users, the application has not been initialized
-        Result<IEnumerable<UserEntity>> selectUsersResult = await _unitOfWork.UserRepository.GetAllAsync(cancellationToken);
+        // If the repository reports an error, or there are no users, the application has not been initialized.
+        Result<PaginatedResultDto<UserEntity>> selectUsersResult = await _unitOfWork.UserRepository.GetAllAsync<BaseFilterDto>(cancellationToken: cancellationToken);
         if (!selectUsersResult.IsFailure)
-            return new InitializationResponse(selectUsersResult.Value.Any());
+            return new InitializationResponse(selectUsersResult.Value.Data.Any());
         return new InitializationResponse(false);
     }
 }

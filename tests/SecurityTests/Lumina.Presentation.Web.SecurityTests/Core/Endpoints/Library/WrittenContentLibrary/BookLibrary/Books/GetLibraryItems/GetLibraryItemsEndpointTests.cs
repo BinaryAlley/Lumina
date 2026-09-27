@@ -41,7 +41,7 @@ public class GetLibraryItemsEndpointTests : IClassFixture<LuminaWebFactory>
         // Assert
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
         Assert.Equal("http://localhost/en-us/auth/login", response.Headers.Location!.ToString());
-        Assert.DoesNotContain(_apiFactory.ApiClientStub.GetEndpointsCalled, endpoint => endpoint.StartsWith("books/lite", StringComparison.Ordinal));
+        Assert.DoesNotContain(_apiFactory.ApiClientStub.GetEndpointsCalled, endpoint => endpoint.StartsWith("libraries/", StringComparison.Ordinal));
     }
 
     [Theory]
@@ -52,7 +52,7 @@ public class GetLibraryItemsEndpointTests : IClassFixture<LuminaWebFactory>
         // Arrange
         _apiFactory.ApiClientStub.Reset();
         Guid libraryId = Guid.NewGuid();
-        string expectedEndpoint = $"books/lite?libraryId={libraryId}&searchTerm={Uri.EscapeDataString(maliciousSearchTerm)}&shouldIgnoreThePrefixForAlphaPicker=False";
+        string expectedEndpoint = $"libraries/{libraryId}/books/lite?searchTerm={Uri.EscapeDataString(maliciousSearchTerm)}&shouldIgnoreThePrefixForAlphaPicker=False";
         _apiFactory.ApiClientStub.RegisterGetResponse(expectedEndpoint, _paginatedBookLiteDtoFixture.Create());
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage getRequest = new(HttpMethod.Get, $"/en-us/library/written-content-library/books-library/books/api-get-library-items?libraryId={libraryId}&searchTerm={Uri.EscapeDataString(maliciousSearchTerm)}&shouldIgnoreThePrefixForAlphaPicker=false");

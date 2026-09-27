@@ -42,7 +42,7 @@ public class GetApiAccessTokenEndpoint : BaseEndpoint<EmptyRequest, IResult>
             return Task.FromResult(Results.Problem(
                 statusCode: StatusCodes.Status401Unauthorized,
                 title: "Unauthorized",
-                detail: "You are not authorized"));
+                detail: "Authentication failed"));
 
         string? token = User.FindFirst("Token")?.Value;
         if (string.IsNullOrEmpty(token))

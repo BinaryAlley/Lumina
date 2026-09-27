@@ -70,7 +70,7 @@ public class RestoreThemeCommandHandler : ICommandHandler<RestoreThemeCommand, R
             return ApplicationErrors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // only admins can restore themes
+        // Only admins can restore themes.
         if (!await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false))
             return ApplicationErrors.Authorization.NotAuthorized;
 
@@ -82,11 +82,11 @@ public class RestoreThemeCommandHandler : ICommandHandler<RestoreThemeCommand, R
         if (theme is null)
             return DomainErrors.Themes.ThemeNotFound;
 
-        // only bundled themes are soft deleted, so only a soft deleted bundled theme can be restored
+        // Only bundled themes are soft deleted, so only a soft deleted bundled theme can be restored.
         if (!theme.IsDeleted || theme.InstallSource != ThemeInstallSource.Bundled)
             return DomainErrors.Themes.ThemeCannotBeRestored;
 
-        // restore the pack files from the shipped archive before reactivating the theme
+        // Restore the pack files from the shipped archive before reactivating the theme.
         Result<Success> restoreFilesResult = await _themeService.RestoreBundledThemeAsync(theme.ThemeId, cancellationToken).ConfigureAwait(false);
         if (restoreFilesResult.IsFailure)
             return restoreFilesResult.Errors;
@@ -99,7 +99,9 @@ public class RestoreThemeCommandHandler : ICommandHandler<RestoreThemeCommand, R
         if (updateResult.IsFailure)
             return updateResult.Errors;
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
 
         return Result.Success;
     }

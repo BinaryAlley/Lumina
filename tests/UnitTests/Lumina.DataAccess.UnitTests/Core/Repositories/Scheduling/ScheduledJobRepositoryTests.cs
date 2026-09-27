@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
 using Lumina.Application.Common.DataAccess.Entities.Scheduling;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Scheduling;
 using Lumina.DataAccess.Core.Repositories.Scheduling;
 using Lumina.DataAccess.Core.UoW;
@@ -47,7 +49,7 @@ public class ScheduledJobRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        Result<ScheduledJobEntity?> result = await _sut.GetByIdAsync(scheduledJob.Id, CancellationToken.None);
+        Result<ScheduledJobEntity?> result = await _sut.GetByIdAsync(scheduledJob.Id, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -60,7 +62,7 @@ public class ScheduledJobRepositoryTests
     public async Task GetByIdAsync_WhenScheduledJobDoesNotExist_ShouldReturnNull()
     {
         // Act
-        Result<ScheduledJobEntity?> result = await _sut.GetByIdAsync(Guid.NewGuid(), CancellationToken.None);
+        Result<ScheduledJobEntity?> result = await _sut.GetByIdAsync(Guid.NewGuid(), cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -106,11 +108,11 @@ public class ScheduledJobRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        Result<IEnumerable<ScheduledJobEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
+        Result<PaginatedResultDto<ScheduledJobEntity>> result = await _sut.GetAllAsync<BaseFilterDto>(cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Equal(2, result.Value.Count());
+        Assert.Equal(2, result.Value.Data.Count);
     }
 
     [Fact]

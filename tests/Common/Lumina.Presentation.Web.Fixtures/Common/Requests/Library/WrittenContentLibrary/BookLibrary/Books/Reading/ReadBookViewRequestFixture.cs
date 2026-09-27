@@ -18,11 +18,13 @@ public class ReadBookViewRequestFixture
     /// Creates a random valid <see cref="ReadBookViewRequest"/>.
     /// </summary>
     /// <param name="bookId">Optional. The Id of the book to read.</param>
+    /// <param name="libraryId">Optional. The Id of the media library the book belongs to.</param>
     /// <returns>The created <see cref="ReadBookViewRequest"/>.</returns>
     public ReadBookViewRequest Create(
-        Guid? bookId = null)
+        Guid? bookId = null,
+        Guid? libraryId = null)
     {
-        return new ReadBookViewRequest(bookId ?? Guid.NewGuid());
+        return new ReadBookViewRequest(bookId ?? Guid.NewGuid(), libraryId ?? Guid.NewGuid());
     }
 
     /// <summary>

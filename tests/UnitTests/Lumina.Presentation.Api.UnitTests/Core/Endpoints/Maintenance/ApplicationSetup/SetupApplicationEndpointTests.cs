@@ -58,7 +58,7 @@ public class SetupApplicationEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsConflictError_ShouldReturnProblemResult()
     {
         // Arrange
         RegistrationRequest request = _registrationRequestFixture.Create();

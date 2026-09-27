@@ -19,12 +19,14 @@ public class GetBookReadingSectionRequestFixture
     /// </summary>
     /// <param name="bookId">Optional. The Id of the book whose reading section is retrieved.</param>
     /// <param name="locationRef">Optional. The opaque location reference of the reading section.</param>
+    /// <param name="libraryId">Optional. The Id of the media library the book belongs to.</param>
     /// <returns>The created <see cref="GetBookReadingSectionRequest"/>.</returns>
     public GetBookReadingSectionRequest Create(
         Guid? bookId = null,
-        string? locationRef = null)
+        string? locationRef = null,
+        Guid? libraryId = null)
     {
-        return new GetBookReadingSectionRequest(bookId ?? Guid.NewGuid(), locationRef ?? $"section-{Guid.NewGuid():N}");
+        return new GetBookReadingSectionRequest(bookId ?? Guid.NewGuid(), locationRef ?? $"section-{Guid.NewGuid():N}", libraryId ?? Guid.NewGuid());
     }
 
     /// <summary>

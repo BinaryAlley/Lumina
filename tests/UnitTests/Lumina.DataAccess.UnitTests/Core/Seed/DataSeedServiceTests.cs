@@ -6,6 +6,8 @@ using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Scheduling;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
@@ -47,6 +49,7 @@ public class DataSeedServiceTests
     public DataSeedServiceTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockDateTimeProvider = Substitute.For<IDateTimeProvider>();
         _mockPermissionRepository = Substitute.For<IPermissionRepository>();
         _fixedUtcNow = DateTime.UtcNow;
@@ -252,7 +255,15 @@ public class DataSeedServiceTests
         _mockUnitOfWork.RolePermissionRepository.Returns(mockRolePermissionRepository);
 
         mockRoleRepository.GetByNameAsync("Admin", Arg.Any<CancellationToken>()).Returns(adminRole);
-        mockPermissionRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(permissions);
+        mockPermissionRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(new PaginatedResultDto<PermissionEntity>
+            {
+                Data = permissions,
+                CurrentPage = 1,
+                PerPage = permissions.Count,
+                Count = permissions.Count,
+                NumberOfPages = 1
+            });
         mockRolePermissionRepository.InsertAsync(Arg.Any<RolePermissionEntity>(), Arg.Any<CancellationToken>()).Returns(Result.Created);
 
         // Act
@@ -310,7 +321,7 @@ public class DataSeedServiceTests
         _mockUnitOfWork.PermissionRepository.Returns(mockPermissionRepository);
 
         mockRoleRepository.GetByNameAsync("Admin", Arg.Any<CancellationToken>()).Returns(adminRole);
-        mockPermissionRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(expectedError);
+        mockPermissionRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(expectedError);
 
         // Act
         Result<Created> result = await _sut.SetAdminRolePermissionsAsync(userId, CancellationToken.None);
@@ -340,7 +351,15 @@ public class DataSeedServiceTests
         _mockUnitOfWork.RolePermissionRepository.Returns(mockRolePermissionRepository);
 
         mockRoleRepository.GetByNameAsync("Admin", Arg.Any<CancellationToken>()).Returns(adminRole);
-        mockPermissionRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(permissions);
+        mockPermissionRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(new PaginatedResultDto<PermissionEntity>
+            {
+                Data = permissions,
+                CurrentPage = 1,
+                PerPage = permissions.Count,
+                Count = permissions.Count,
+                NumberOfPages = 1
+            });
         mockRolePermissionRepository.InsertAsync(Arg.Any<RolePermissionEntity>(), Arg.Any<CancellationToken>()).Returns(expectedError);
 
         // Act
@@ -396,7 +415,7 @@ public class DataSeedServiceTests
         _mockUnitOfWork.UserRoleRepository.Returns(mockUserRoleRepository);
 
         mockRoleRepository.GetByNameAsync("Admin", Arg.Any<CancellationToken>()).Returns(adminRole);
-        mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>()).Returns(adminUser);
+        mockUserRepository.GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>()).Returns(adminUser);
         mockUserRoleRepository.InsertAsync(Arg.Any<UserRoleEntity>(), Arg.Any<CancellationToken>()).Returns(Result.Created);
 
         // Act
@@ -454,7 +473,7 @@ public class DataSeedServiceTests
         _mockUnitOfWork.UserRepository.Returns(mockUserRepository);
 
         mockRoleRepository.GetByNameAsync("Admin", Arg.Any<CancellationToken>()).Returns(adminRole);
-        mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>()).Returns((UserEntity?)null);
+        mockUserRepository.GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>()).Returns((UserEntity?)null);
 
         // Act
         Result<Created> result = await _sut.SetAdminRoleToAdministratorAccount(userId, CancellationToken.None);
@@ -485,7 +504,7 @@ public class DataSeedServiceTests
         _mockUnitOfWork.UserRoleRepository.Returns(mockUserRoleRepository);
 
         mockRoleRepository.GetByNameAsync("Admin", Arg.Any<CancellationToken>()).Returns(adminRole);
-        mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>()).Returns(adminUser);
+        mockUserRepository.GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>()).Returns(adminUser);
         mockUserRoleRepository.InsertAsync(Arg.Any<UserRoleEntity>(), Arg.Any<CancellationToken>()).Returns(expectedError);
 
         // Act
@@ -537,7 +556,7 @@ public class DataSeedServiceTests
         _mockUnitOfWork.UserRepository.Returns(mockUserRepository);
 
         mockRoleRepository.GetByNameAsync("Admin", Arg.Any<CancellationToken>()).Returns(adminRole);
-        mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>()).Returns(expectedError);
+        mockUserRepository.GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>()).Returns(expectedError);
 
         // Act
         Result<Created> result = await _sut.SetAdminRoleToAdministratorAccount(userId, CancellationToken.None);
@@ -580,7 +599,7 @@ public class DataSeedServiceTests
 
         await mockScheduledJobRepository.Received(5).InsertAsync(Arg.Any<ScheduledJobEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
-        await mockScheduledJobRepository.DidNotReceive().GetAllAsync(Arg.Any<CancellationToken>());
+        await mockScheduledJobRepository.DidNotReceive().GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]

@@ -28,8 +28,8 @@ public sealed class ThemePackFixture
     /// <param name="templates">Optional template mappings written to the manifest.</param>
     /// <param name="preview">Optional preview path written to the manifest, or <see langword="null"/> to omit the preview.</param>
     /// <param name="defaultTemplateContent">Optional content for the default template file.</param>
-    /// <param name="includePreviewAsset">Whether to include the preview asset file in the archive or not.</param>
     /// <param name="additionalFiles">Optional additional files written into the archive.</param>
+    /// <param name="includePreviewAsset">Whether to include the preview asset file in the archive or not.</param>
     /// <returns>The created theme pack ZIP archive.</returns>
     public byte[] Create(
         string themeId = "test-theme",
@@ -41,8 +41,8 @@ public sealed class ThemePackFixture
         Dictionary<string, string>? templates = null,
         string? preview = "assets/preview.png",
         string? defaultTemplateContent = null,
-        bool includePreviewAsset = true,
-        IReadOnlyDictionary<string, string>? additionalFiles = null)
+        IReadOnlyDictionary<string, string>? additionalFiles = null,
+        bool includePreviewAsset = true)
     {
         Dictionary<string, string> manifestTemplates = templates ?? new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {

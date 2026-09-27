@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.AddLibrary;
 
 /// <summary>
-/// API endpoint for the <c>/library</c> route.
+/// API endpoint for the <c>/libraries</c> route.
 /// </summary>
 public class AddLibraryEndpoint : BaseEndpoint<AddLibraryRequest, IResult>
 {

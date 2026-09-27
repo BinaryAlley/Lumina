@@ -67,6 +67,7 @@ public class BookReadingServiceTests : IDisposable
         _mockPluginManager.GetPlugins().Returns([_mockPlugin]);
 
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockConfigurationRepository = Substitute.For<ILibraryBookReaderConfigurationRepository>();
         _mockUnitOfWork.LibraryBookReaderConfigurationRepository.Returns(_mockConfigurationRepository);
         LibraryBookReaderConfigurationEntity enabledConfiguration = _configurationEntityFixture.Create(libraryId: _libraryId, pluginId: _pluginId, isEnabled: true);

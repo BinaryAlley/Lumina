@@ -49,8 +49,9 @@ public class BookMappingTests
         Assert.Equal(book.Metadata.OriginalLanguage.HasValue ? book.Metadata.OriginalLanguage.Value.LanguageCode : null, result.OriginalLanguageCode);
         Assert.Equal(book.Metadata.OriginalLanguage.HasValue ? book.Metadata.OriginalLanguage.Value.LanguageName : null, result.OriginalLanguageName);
         Assert.Equal(book.Metadata.OriginalLanguage.HasValue ? book.Metadata.OriginalLanguage.Value.NativeName.Value : null, result.OriginalLanguageNativeName);
-        Assert.Equal(book.Metadata.Tags.ToRepositoryEntities().OrderBy(tag => tag.Name), result.Tags.OrderBy(tag => tag.Name));
-        Assert.Equal(book.Metadata.Genres.ToRepositoryEntities().OrderBy(genre => genre.Name), result.Genres.OrderBy(genre => genre.Name));
+        // The repository entity stores tags and genres as sets, so duplicate names in the domain collection collapse into a single entry.
+        Assert.Equal(book.Metadata.Tags.ToRepositoryEntities().Distinct().OrderBy(tag => tag.Name), result.Tags.OrderBy(tag => tag.Name));
+        Assert.Equal(book.Metadata.Genres.ToRepositoryEntities().Distinct().OrderBy(genre => genre.Name), result.Genres.OrderBy(genre => genre.Name));
         Assert.Equal(book.Metadata.Publisher.HasValue ? book.Metadata.Publisher.Value : null, result.Publisher);
         Assert.Equal(book.Metadata.PageCount.HasValue ? book.Metadata.PageCount.Value : null, result.PageCount);
         Assert.Equal(book.Format.HasValue ? book.Format.Value : null, result.Format);

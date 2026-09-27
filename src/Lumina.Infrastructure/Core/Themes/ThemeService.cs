@@ -480,7 +480,7 @@ public sealed class ThemeService : IThemeService
             if (unixFileType == 0xA000)
                 return PackageInvalid("Symbolic links are not allowed in theme archives.");
 
-            Result<string> normalizedPathResult = NormalizeRelativePath(entry.FullName, allowTrailingSlash: true);
+            Result<string> normalizedPathResult = NormalizeRelativePath(entry.FullName, shouldAllowTrailingSlash: true);
             if (normalizedPathResult.IsFailure)
                 return normalizedPathResult.Errors;
 
@@ -732,14 +732,14 @@ public sealed class ThemeService : IThemeService
     /// Normalizes a package-relative path, rejecting paths that escape the package or violate the path rules.
     /// </summary>
     /// <param name="path">The package-relative path to normalize.</param>
-    /// <param name="allowTrailingSlash">Whether a trailing slash, used for directory entries, is permitted.</param>
+    /// <param name="shouldAllowTrailingSlash">Whether a trailing slash, used for directory entries, is permitted.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either the normalized path, or an error.</returns>
-    private Result<string> NormalizeRelativePath(string path, bool allowTrailingSlash = false)
+    private Result<string> NormalizeRelativePath(string path, bool shouldAllowTrailingSlash = false)
     {
         if (string.IsNullOrWhiteSpace(path) || path.Length > 240 || path.Contains('\\') || path.Contains('\0') || path.StartsWith('/') || path.Contains("//"))
             return PackageInvalid("The theme contains an invalid path.");
 
-        string candidate = allowTrailingSlash ? path.TrimEnd('/') : path;
+        string candidate = shouldAllowTrailingSlash ? path.TrimEnd('/') : path;
         if (string.IsNullOrWhiteSpace(candidate))
             return PackageInvalid("The theme contains an invalid path.");
 

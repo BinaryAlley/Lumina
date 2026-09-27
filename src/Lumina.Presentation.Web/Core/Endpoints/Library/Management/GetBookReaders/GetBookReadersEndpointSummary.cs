@@ -19,7 +19,7 @@ public class GetBookReadersEndpointSummary : Summary<GetBookReadersEndpoint, Get
     public GetBookReadersEndpointSummary()
     {
         Summary = "Retrieves the book readers of a media library.";
-        Description = "Retrieves the book readers of the media library identified by the request, with their supported file extensions and enabled state.";
+        Description = "Retrieves the book readers of the media library identified by the route, with their supported file extensions and enabled state.";
         RequestParam(r => r.LibraryId, "The Id of the media library whose book readers are retrieved. Required.");
 
         ExampleRequest = new GetBookReadersRequest(

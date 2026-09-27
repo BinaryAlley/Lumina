@@ -1,14 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Contracts.Responses.Authorization;
+using Lumina.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -49,17 +51,18 @@ public class GetRolesQueryHandler : IQueryHandler<GetRolesQuery, Result<IEnumera
     /// </returns>
     public async Task<Result<IEnumerable<RoleResponse>>> HandleAsync(GetRolesQuery query, CancellationToken cancellationToken)
     {
-        // an authenticated request must always carry a user identity
+        // An authenticated request must always carry a user identity.
         Guid? currentUserId = _currentUserService.UserId;
         if (currentUserId is null)
             return Errors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // only admins can see the list of authorization roles
+        // Only admins can see the list of authorization roles.
         bool isAdmin = await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false);
         if (!isAdmin)
             return Errors.Authorization.NotAuthorized;
-        Result<IEnumerable<RoleEntity>> getRolesResult = await _roleRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
-        return getRolesResult.Match(value => Result.From(value.ToResponses()), errors => errors);
+
+        Result<PaginatedResultDto<RoleEntity>> getRolesResult = await _roleRepository.GetAllAsync<BaseFilterDto>(cancellationToken: cancellationToken).ConfigureAwait(false);
+        return getRolesResult.Match(value => Result.From(value.Data.ToResponses()), errors => errors);
     }
 }

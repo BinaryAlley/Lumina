@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaContributors;
@@ -27,10 +27,9 @@ public class UpdateBookEndpointSummary : Summary<UpdateBookEndpoint, UpdateBookR
     /// </summary>
     public UpdateBookEndpointSummary()
     {
-        Summary = "Updates a book.";
-        Description = "Updates the details of the book identified by the request.";
+        Summary = "Updates an existing book.";
+        Description = "Updates the details of the book identified by the route, returning the full details of the updated book. The book is updated by an Admin, who can update the books of all libraries, or by the owner of the library of the book.";
 
-        RequestParam(r => r.Id, "The Id of the book to update. Required.");
         RequestParam(r => r.Metadata, "The written content metadata of the book. Required.");
         RequestParam(r => r.Metadata!.Title, "The title of the book. Required.");
         RequestParam(r => r.Metadata!.OriginalTitle, "The original title of the book, if different from the current title. Optional.");
@@ -45,20 +44,20 @@ public class UpdateBookEndpointSummary : Summary<UpdateBookEndpoint, UpdateBookR
         RequestParam(r => r.Metadata!.Genres, "The list of genres of the book. Required.");
         RequestParam(r => r.Metadata!.Tags, "The list of tags of the book. Required.");
         RequestParam(r => r.Metadata!.Language, "The language in which the book is written. Optional.");
-        RequestParam(r => r.Metadata!.Language!.LanguageCode, "The ISO code of the language of the book. Optional.");
-        RequestParam(r => r.Metadata!.Language!.LanguageName, "The name of the language of the book in English. Optional.");
+        RequestParam(r => r.Metadata!.Language!.LanguageCode, "The ISO code of the language of the book. Required.");
+        RequestParam(r => r.Metadata!.Language!.LanguageName, "The name of the language of the book in English. Required.");
         RequestParam(r => r.Metadata!.Language!.NativeName, "The native name of the language of the book. Optional.");
         RequestParam(r => r.Metadata!.OriginalLanguage, "The original language of the book, if it has been translated. Optional.");
-        RequestParam(r => r.Metadata!.OriginalLanguage!.LanguageCode, "The ISO code of the original language of the book. Optional.");
-        RequestParam(r => r.Metadata!.OriginalLanguage!.LanguageName, "The name of the original language of the book in English. Optional.");
+        RequestParam(r => r.Metadata!.OriginalLanguage!.LanguageCode, "The ISO code of the original language of the book. Required.");
+        RequestParam(r => r.Metadata!.OriginalLanguage!.LanguageName, "The name of the original language of the book in English. Required.");
         RequestParam(r => r.Metadata!.OriginalLanguage!.NativeName, "The native name of the original language of the book. Optional.");
         RequestParam(r => r.Metadata!.Publisher, "The publisher of the book. Optional.");
         RequestParam(r => r.Metadata!.PageCount, "The number of pages of the book. Optional.");
         RequestParam(r => r.Format, "The format of the book (e.g., Hardcover, Paperback). Optional.");
         RequestParam(r => r.Edition, "The edition of the book. Optional.");
         RequestParam(r => r.VolumeNumber, "The volume or book number in the series. Optional.");
-        RequestParam(r => r.Series, "The series the book is part of. Optional.");
-        RequestParam(r => r.Series!.Title, "The title of the series the book is part of. Optional.");
+        RequestParam(r => r.Series, "The series the book is part of. Book series are not yet supported and are ignored. Optional.");
+        RequestParam(r => r.Series!.Title, "The title of the book series. Book series are not yet supported and are ignored. Optional.");
         RequestParam(r => r.ASIN, "The ASIN (Amazon Standard Identification Number) of the book. Optional.");
         RequestParam(r => r.GoodreadsId, "The Goodreads Id of the book. Optional.");
         RequestParam(r => r.LCCN, "The Library of Congress Control Number (LCCN) of the book. Optional.");
@@ -73,7 +72,6 @@ public class UpdateBookEndpointSummary : Summary<UpdateBookEndpoint, UpdateBookR
         RequestParam(r => r.Ratings, "The list of ratings of the book. Required.");
 
         ExampleRequest = new UpdateBookRequest(
-            Id: Guid.NewGuid().ToString(),
             Metadata: new WrittenContentMetadataDto(
                 Title: "The Fellowship of the Ring",
                 OriginalTitle: "The Fellowship of the Ring",
@@ -139,25 +137,13 @@ public class UpdateBookEndpointSummary : Summary<UpdateBookEndpoint, UpdateBookR
             ],
             Contributors:
             [
-                new MediaContributorDto(
-                    Name: new MediaContributorNameDto(
-                        DisplayName: "J.R.R. Tolkien",
-                        LegalName: "John Ronald Reuel Tolkien"
-                    ),
-                    Role: new MediaContributorRoleDto(
-                        Name: "author",
-                        Category: MediaContributorRoleCategory.Author
-                    )
+                new MediaContributorReferenceDto(
+                    ContributorId: Guid.NewGuid(),
+                    Role: MediaContributorRole.Author
                 ),
-                new MediaContributorDto(
-                    Name: new MediaContributorNameDto(
-                        DisplayName: "Alan Lee",
-                        LegalName: "Alan Lee"
-                    ),
-                    Role: new MediaContributorRoleDto(
-                        Name: "illustrator",
-                        Category: MediaContributorRoleCategory.Illustrator
-                    )
+                new MediaContributorReferenceDto(
+                    ContributorId: Guid.NewGuid(),
+                    Role: MediaContributorRole.Illustrator
                 )
             ],
             Ratings:
@@ -206,8 +192,8 @@ public class UpdateBookEndpointSummary : Summary<UpdateBookEndpoint, UpdateBookR
         ResponseParam<BookResponse>(r => r.Format, "The format of the book (e.g., Hardcover, Paperback), if applicable.");
         ResponseParam<BookResponse>(r => r.Edition, "The edition of the book, if applicable.");
         ResponseParam<BookResponse>(r => r.VolumeNumber, "The volume or book number in the series, if applicable.");
-        ResponseParam<BookResponse>(r => r.Series, "The series the book is part of, if applicable.");
-        ResponseParam<BookResponse>(r => r.Series!.Title, "The title of the series the book is part of.");
+        ResponseParam<BookResponse>(r => r.Series, "The series the book is part of. Book series are not yet supported and this is always null.");
+        ResponseParam<BookResponse>(r => r.Series!.Title, "The title of the series the book is part of. Book series are not yet supported and this is always null.");
         ResponseParam<BookResponse>(r => r.ASIN, "The ASIN (Amazon Standard Identification Number) of the book, if applicable.");
         ResponseParam<BookResponse>(r => r.GoodreadsId, "The Goodreads ID of the book, if applicable.");
         ResponseParam<BookResponse>(r => r.LCCN, "The Library of Congress Control Number (LCCN) of the book, if applicable.");
@@ -218,7 +204,7 @@ public class UpdateBookEndpointSummary : Summary<UpdateBookEndpoint, UpdateBookR
         ResponseParam<BookResponse>(r => r.BarnesAndNobleId, "The Barnes & Noble ID of the book, if applicable.");
         ResponseParam<BookResponse>(r => r.AppleBooksId, "The Apple Books ID of the book, if applicable.");
         ResponseParam<BookResponse>(r => r.ISBNs, "The list of ISBN (International Standard Book Number) of the book.");
-        ResponseParam<BookResponse>(r => r.Contributors, "The list of media contributors starring in this book.");
+        ResponseParam<BookResponse>(r => r.Contributors, "The list of references to the media contributors that contributed to this book, each with the role they played.");
         ResponseParam<BookResponse>(r => r.Ratings, "The list of ratings for the book.");
         ResponseParam<BookResponse>(r => r.MetadataStatus, "The status of the metadata enrichment of the book.");
         ResponseParam<BookResponse>(r => r.LastMetadataUpdateUtc, "The date and time when the metadata of the book was last enriched, if applicable.");
@@ -272,9 +258,7 @@ public class UpdateBookEndpointSummary : Summary<UpdateBookEndpoint, UpdateBookR
                 Format: BookFormat.Paperback,
                 Edition: "50th Anniversary Edition",
                 VolumeNumber: 1,
-                Series: new BookSeriesDto(
-                    Title: "The Lord of the Rings"
-                ),
+                Series: null,
                 ASIN: "B007978NPG",
                 GoodreadsId: "3",
                 LCCN: "54009621",
@@ -297,25 +281,13 @@ public class UpdateBookEndpointSummary : Summary<UpdateBookEndpoint, UpdateBookR
                 ],
                 Contributors:
                 [
-                    new MediaContributorDto(
-                        Name: new MediaContributorNameDto(
-                            DisplayName: "J.R.R. Tolkien",
-                            LegalName: "John Ronald Reuel Tolkien"
-                        ),
-                        Role: new MediaContributorRoleDto(
-                            Name: "author",
-                            Category: MediaContributorRoleCategory.Author
-                        )
+                    new MediaContributorReferenceDto(
+                        ContributorId: Guid.NewGuid(),
+                        Role: MediaContributorRole.Author
                     ),
-                    new MediaContributorDto(
-                        Name: new MediaContributorNameDto(
-                            DisplayName: "Alan Lee",
-                            LegalName: "Alan Lee"
-                        ),
-                        Role: new MediaContributorRoleDto(
-                            Name: "illustrator",
-                            Category: MediaContributorRoleCategory.Illustrator
-                        )
+                    new MediaContributorReferenceDto(
+                        ContributorId: Guid.NewGuid(),
+                        Role: MediaContributorRole.Illustrator
                     )
                 ],
                 Ratings:
@@ -343,13 +315,32 @@ public class UpdateBookEndpointSummary : Summary<UpdateBookEndpoint, UpdateBookR
         );
 
         Response(401, "Authentication required.", "application/problem+json",
-            example: new
+            example: new[]
             {
-                type = "https://tools.ietf.org/html/rfc7235#section-3.1",
-                status = 401,
-                title = "Unauthorized",
-                detail = "You are not authorized",
-                instance = "/api/v1/books/{id}"
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    status = 401,
+                    title = "Unauthorized",
+                    detail = "Authentication failed",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    status = 401,
+                    title = "Unauthorized",
+                    detail = "The token has expired",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    status = 401,
+                    title = "Unauthorized",
+                    detail = "The token is invalid",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}"
+                }
             }
         );
 
@@ -360,20 +351,53 @@ public class UpdateBookEndpointSummary : Summary<UpdateBookEndpoint, UpdateBookR
                 title = "General.Unauthorized",
                 status = 403,
                 detail = "NotAuthorized",
-                instance = "/api/v1/books/{id}",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}",
                 traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
             }
         );
 
-        Response(404, "The request failed because the book or its media library does not exist.", "application/problem+json",
+        Response(404, "The request failed because the book, its media library, or one of the referenced media contributors does not exist.", "application/problem+json",
+            example: new[]
+            {
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+                    title = "General.NotFound",
+                    status = 404,
+                    detail = "BookNotFound",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}",
+                    traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+                    title = "General.NotFound",
+                    status = 404,
+                    detail = "LibraryNotFound",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}",
+                    traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+                    title = "General.NotFound",
+                    status = 404,
+                    detail = "MediaContributorNotFound",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}",
+                    traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+                }
+            }
+        );
+
+        Response(409, "The request failed because a unique constraint was violated.", "application/problem+json",
             example: new
             {
-                type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
-                title = "General.NotFound",
-                status = 404,
-                detail = "BookNotFound",
-                instance = "/api/v1/books/{id}",
-                traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+                type = "https://tools.ietf.org/html/rfc9110#section-15.5.10",
+                title = "General.Conflict",
+                status = 409,
+                detail = "UniqueConstraintViolation",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}",
+                traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
             }
         );
 
@@ -384,12 +408,13 @@ public class UpdateBookEndpointSummary : Summary<UpdateBookEndpoint, UpdateBookR
                 title = "General.Validation",
                 status = 422,
                 detail = "OneOrMoreValidationErrorsOccurred",
-                instance = "/api/v1/books/{id}",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}",
                 errors = new Dictionary<string, string[]>
                 {
                     {
                         "General.Validation", new[]
                         {
+                            "LibraryIdCannotBeEmpty",
                             "BookIdCannotBeEmpty",
                             "MetadataCannotBeNull",
                             "TitleCannotBeEmpty",
@@ -399,7 +424,6 @@ public class UpdateBookEndpointSummary : Summary<UpdateBookEndpoint, UpdateBookR
                             "ReleaseInfoCannotBeNull",
                             "OriginalReleaseYearMustBeBetween1And9999",
                             "ReReleaseYearMustBeBetween1And9999",
-                            "CountryCodeMustBe2CharactersLong",
                             "ReleaseVersionMustBeMaximum50CharactersLong",
                             "OriginalReleaseDateAndYearMustMatch",
                             "ReReleaseDateAndYearMustMatch",
@@ -438,14 +462,8 @@ public class UpdateBookEndpointSummary : Summary<UpdateBookEndpoint, UpdateBookR
                             "InvalidIsbn10Format",
                             "UnknownIsbnFormat",
                             "ContributorsListCannotBeNull",
-                            "ContributorNameCannotBeEmpty",
-                            "ContributorDisplayNameCannotBeEmpty",
-                            "ContributorDisplayNameMustBeMaximum100CharactersLong",
-                            "ContributorLegalNameMustBeMaximum100CharactersLong",
-                            "ContributorRoleCannotBeNull",
-                            "RoleNameCannotBeEmpty",
-                            "RoleNameMustBeMaximum50CharactersLong",
-                            "RoleCategoryCannotBeEmpty",
+                            "MediaContributorIdCannotBeEmpty",
+                            "UnknownMediaContributorRole",
                             "RatingsListCannotBeNull",
                             "RatingValueMustBePositive",
                             "RatingValueCannotBeGreaterThanMaxValue",

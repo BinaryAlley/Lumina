@@ -22,10 +22,12 @@ public class GetReadingResourceEndpointSummary : Summary<GetReadingResourceEndpo
         Description = "Retrieves the binary content of a resource of a book, such as an image or a font referenced by a reading section.";
         RequestParam(r => r.BookId, "The Id of the book whose resource is retrieved. Required.");
         RequestParam(r => r.ResourceKey, "The opaque resource key of the resource. Required.");
+        RequestParam(r => r.LibraryId, "The Id of the media library the book belongs to. Required.");
 
         ExampleRequest = new GetBookReadingResourceRequest(
             BookId: Guid.NewGuid(),
-            ResourceKey: "cover-image"
+            ResourceKey: "cover-image",
+            LibraryId: Guid.NewGuid()
         );
 
         Response(200, "The resource of the book is returned.");

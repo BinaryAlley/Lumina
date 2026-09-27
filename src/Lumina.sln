@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
@@ -29,138 +29,35 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{16E590D3
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{53B1231B-37F5-44BA-80D5-DBA979775F5C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{ACD16983-F1BD-4A92-B282-95BA8C456F6A}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{19C1EE2F-0F4C-4BF6-B677-E0EC37AB3C72}"
 	ProjectSection(SolutionItems) = preProject
-		..\docs\CONTRIBUTING.md = ..\docs\CONTRIBUTING.md
-		..\docs\INSTALL.md = ..\docs\INSTALL.md
 		..\LICENSE.md = ..\LICENSE.md
 		..\README.md = ..\README.md
+		..\docs\CONTRIBUTING.md = ..\docs\CONTRIBUTING.md
+		..\docs\INSTALL.md = ..\docs\INSTALL.md
 		..\docs\SOURCES.md = ..\docs\SOURCES.md
 		..\docs\USAGE.md = ..\docs\USAGE.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "technical", "technical", "{0C0E5A56-AD29-4D0B-AB87-E865F8B933E2}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "api", "api", "{B045C2EC-3ACB-47D3-BE62-7AC334B023D9}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "technical", "technical", "{64570222-A5AC-49EE-BEBC-25D61B989A20}"
 	ProjectSection(SolutionItems) = preProject
-		..\docs\technical\api\Api.Book.md = ..\docs\technical\api\Api.Book.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "domain", "domain", "{4F8D14A3-A465-4EC2-B175-A188B113AB99}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "api", "api", "{D78A725D-C3AE-420B-ABA8-255A000D7324}"
 	ProjectSection(SolutionItems) = preProject
-		..\docs\technical\domain\Aggregates.FileSystemManagement.md = ..\docs\technical\domain\Aggregates.FileSystemManagement.md
-		..\docs\technical\domain\Aggregates.VideoLibrary.md = ..\docs\technical\domain\Aggregates.VideoLibrary.md
-		..\docs\technical\domain\Aggregates.WrittenContentLibrary.md = ..\docs\technical\domain\Aggregates.WrittenContentLibrary.md
-		..\docs\technical\domain\Common.Metadata.md = ..\docs\technical\domain\Common.Metadata.md
-		..\docs\technical\domain\Domain.md = ..\docs\technical\domain\Domain.md
-		..\docs\technical\domain\UbiquitousLanguage.md = ..\docs\technical\domain\UbiquitousLanguage.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "requests", "requests", "{C17A1188-FA69-42BC-92E6-4F91D31B3A58}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "admin", "admin", "{459EF701-AB73-40ED-81E6-144D3587C667}"
 	ProjectSection(SolutionItems) = preProject
-		..\docs\technical\requests\http-client.env.json = ..\docs\technical\requests\http-client.env.json
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "books", "books", "{FAFD9E43-508B-4F20-8AA2-8CADA697ED2D}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "authorization", "authorization", "{08113205-695B-4DA4-8355-6C5377BBD8C0}"
 	ProjectSection(SolutionItems) = preProject
-		..\docs\technical\requests\books\Add.http = ..\docs\technical\requests\books\Add.http
-		..\docs\technical\requests\books\GetAll.http = ..\docs\technical\requests\books\GetAll.http
+		..\docs\technical\api\admin\authorization\Api.Permissions.md = ..\docs\technical\api\admin\authorization\Api.Permissions.md
+		..\docs\technical\api\admin\authorization\Api.Roles.md = ..\docs\technical\api\admin\authorization\Api.Roles.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IntegrationTests", "IntegrationTests", "{3F057926-562F-4EF4-BFC0-EE62372D4551}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumina.Presentation.Api.IntegrationTests", "..\tests\IntegrationTests\Lumina.Presentation.Api.IntegrationTests\Lumina.Presentation.Api.IntegrationTests.csproj", "{3680DAFB-10BA-4A0F-AE40-620D06DAF617}"
-EndProject
-Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{D4C61542-FC91-47FA-B1D2-11CC99617454}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumina.Contracts", "Lumina.Contracts\Lumina.Contracts.csproj", "{6BD85BA8-B3C4-4D79-8858-F6D7676FF2CC}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5DD47F82-699B-4E71-A10A-238E80EA5814}"
-	ProjectSection(SolutionItems) = preProject
-		..\.editorconfig = ..\.editorconfig
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{A0D07244-9CB2-4E30-85A5-97D520E4B9CC}"
-	ProjectSection(SolutionItems) = preProject
-		..\docs\technical\templates\PULL_REQUEST_TEMPLATE.md = ..\docs\technical\templates\PULL_REQUEST_TEMPLATE.md
-	EndProjectSection
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumina.Presentation.Web", "Lumina.Presentation.Web\Lumina.Presentation.Web.csproj", "{613C74E8-720C-4205-8BA7-85B23D2E7881}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SecurityTests", "SecurityTests", "{8B06B1D2-80B9-490C-9A36-C7748F58B705}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumina.Presentation.Api.SecurityTests", "..\tests\SecurityTests\Lumina.Presentation.Api.SecurityTests\Lumina.Presentation.Api.SecurityTests.csproj", "{F72DCA2D-0349-42F9-9614-92A38D4B1EA4}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "users-management", "users-management", "{D1B39EFF-99E7-41B9-9DA1-12AF385FFBE8}"
-	ProjectSection(SolutionItems) = preProject
-		..\docs\technical\api\users-management\Api.Authentication.md = ..\docs\technical\api\users-management\Api.Authentication.md
-		..\docs\technical\api\users-management\Api.Authorization.md = ..\docs\technical\api\users-management\Api.Authorization.md
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "users-management", "users-management", "{94C56402-0557-4941-BEB4-4AA53735CE89}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "authentication", "authentication", "{3B057D42-7179-45CE-B813-3D13A658B43C}"
-	ProjectSection(SolutionItems) = preProject
-		..\docs\technical\requests\users-management\authentication\ChangePassword.http = ..\docs\technical\requests\users-management\authentication\ChangePassword.http
-		..\docs\technical\requests\users-management\authentication\Login.http = ..\docs\technical\requests\users-management\authentication\Login.http
-		..\docs\technical\requests\users-management\authentication\RecoverPassword.http = ..\docs\technical\requests\users-management\authentication\RecoverPassword.http
-		..\docs\technical\requests\users-management\authentication\Register.http = ..\docs\technical\requests\users-management\authentication\Register.http
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "authorization", "authorization", "{CA023F42-0264-4E00-9814-76A48A811136}"
-	ProjectSection(SolutionItems) = preProject
-		..\docs\technical\requests\users-management\authorization\AddRole.http = ..\docs\technical\requests\users-management\authorization\AddRole.http
-		..\docs\technical\requests\users-management\authorization\DeleteRole.http = ..\docs\technical\requests\users-management\authorization\DeleteRole.http
-		..\docs\technical\requests\users-management\authorization\GetAuthorization.http = ..\docs\technical\requests\users-management\authorization\GetAuthorization.http
-		..\docs\technical\requests\users-management\authorization\GetPermissions.http = ..\docs\technical\requests\users-management\authorization\GetPermissions.http
-		..\docs\technical\requests\users-management\authorization\GetRolePermissions.http = ..\docs\technical\requests\users-management\authorization\GetRolePermissions.http
-		..\docs\technical\requests\users-management\authorization\GetRoles.http = ..\docs\technical\requests\users-management\authorization\GetRoles.http
-		..\docs\technical\requests\users-management\authorization\GetUserPermissions.http = ..\docs\technical\requests\users-management\authorization\GetUserPermissions.http
-		..\docs\technical\requests\users-management\authorization\GetUserRole.http = ..\docs\technical\requests\users-management\authorization\GetUserRole.http
-		..\docs\technical\requests\users-management\authorization\UpdateRole.http = ..\docs\technical\requests\users-management\authorization\UpdateRole.http
-		..\docs\technical\requests\users-management\authorization\UpdateUserRoleAndPermissions.http = ..\docs\technical\requests\users-management\authorization\UpdateUserRoleAndPermissions.http
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "file-system-management", "file-system-management", "{2C55920F-0BCB-4C64-A1E6-56053F080806}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "directories", "directories", "{FBD8915E-DFE2-4C16-8B47-64383AB0719D}"
-	ProjectSection(SolutionItems) = preProject
-		..\docs\technical\requests\file-system-management\directories\GetDirectories.http = ..\docs\technical\requests\file-system-management\directories\GetDirectories.http
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "drives", "drives", "{DB498346-5F46-49FC-B2E9-8239C56791FF}"
-	ProjectSection(SolutionItems) = preProject
-		..\docs\technical\requests\file-system-management\drives\GetDrives.http = ..\docs\technical\requests\file-system-management\drives\GetDrives.http
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "files", "files", "{DBBB9C44-F4E8-4A1B-8D00-5CACE81B8BE0}"
-	ProjectSection(SolutionItems) = preProject
-		..\docs\technical\requests\file-system-management\files\GetFiles.http = ..\docs\technical\requests\file-system-management\files\GetFiles.http
-		..\docs\technical\requests\file-system-management\files\GetTreeFiles.http = ..\docs\technical\requests\file-system-management\files\GetTreeFiles.http
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "file-system", "file-system", "{42A27269-5C57-49E8-9AF0-F162807D7A95}"
-	ProjectSection(SolutionItems) = preProject
-		..\docs\technical\requests\file-system-management\file-system\GetType.http = ..\docs\technical\requests\file-system-management\file-system\GetType.http
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "path", "path", "{7675431D-8D8A-4148-AFA1-C4C17D71891B}"
-	ProjectSection(SolutionItems) = preProject
-		..\docs\technical\requests\file-system-management\path\CheckPathExists.http = ..\docs\technical\requests\file-system-management\path\CheckPathExists.http
-		..\docs\technical\requests\file-system-management\path\CombinePath.http = ..\docs\technical\requests\file-system-management\path\CombinePath.http
-		..\docs\technical\requests\file-system-management\path\GetPathParent.http = ..\docs\technical\requests\file-system-management\path\GetPathParent.http
-		..\docs\technical\requests\file-system-management\path\GetPathRoot.http = ..\docs\technical\requests\file-system-management\path\GetPathRoot.http
-		..\docs\technical\requests\file-system-management\path\GetPathSeparator.http = ..\docs\technical\requests\file-system-management\path\GetPathSeparator.http
-		..\docs\technical\requests\file-system-management\path\SplitPath.http = ..\docs\technical\requests\file-system-management\path\SplitPath.http
-		..\docs\technical\requests\file-system-management\path\ValidatePath.http = ..\docs\technical\requests\file-system-management\path\ValidatePath.http
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "thumbnails", "thumbnails", "{FC005908-27A7-4BDA-BD2A-B749A09727E0}"
-	ProjectSection(SolutionItems) = preProject
-		..\docs\technical\requests\file-system-management\thumbnails\GetThumbnail.http = ..\docs\technical\requests\file-system-management\thumbnails\GetThumbnail.http
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "file-system-management", "file-system-management", "{4DC31AC0-D305-4718-8FE1-C023AF6A7CA6}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "file-system-management", "file-system-management", "{2FA735A6-2141-44AB-B34C-F65E4195B1EB}"
 	ProjectSection(SolutionItems) = preProject
 		..\docs\technical\api\file-system-management\Api.Directories.md = ..\docs\technical\api\file-system-management\Api.Directories.md
 		..\docs\technical\api\file-system-management\Api.Drives.md = ..\docs\technical\api\file-system-management\Api.Drives.md
@@ -170,7 +67,64 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "file-system-management", "f
 		..\docs\technical\api\file-system-management\Api.Thumbnails.md = ..\docs\technical\api\file-system-management\Api.Thumbnails.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "architecture", "architecture", "{D93CA337-37D5-4A42-86B5-0A2410594A7A}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "library", "library", "{6A5D3BED-AE4A-4D26-B12A-5DE996152A64}"
+	ProjectSection(SolutionItems) = preProject
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "audio-library", "audio-library", "{252D7F8D-991F-4C62-9BB1-D13988D7B4E2}"
+	ProjectSection(SolutionItems) = preProject
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "music-library", "music-library", "{81BD9DAE-9044-41AC-BBC4-1B09EF678D4E}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\api\library\audio-library\music-library\Api.Albums.md = ..\docs\technical\api\library\audio-library\music-library\Api.Albums.md
+		..\docs\technical\api\library\audio-library\music-library\Api.Artists.md = ..\docs\technical\api\library\audio-library\music-library\Api.Artists.md
+		..\docs\technical\api\library\audio-library\music-library\Api.Tracks.md = ..\docs\technical\api\library\audio-library\music-library\Api.Tracks.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "management", "management", "{2CC7A70F-E08F-4C4F-9B0E-237AE5620C22}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\api\library\management\Api.Libraries.md = ..\docs\technical\api\library\management\Api.Libraries.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "written-content-library", "written-content-library", "{2293B76C-F1EB-46A9-8F67-E88BAEA4FC0C}"
+	ProjectSection(SolutionItems) = preProject
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "book-library", "book-library", "{52264424-9A8F-4E12-9A14-87F306C595C7}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\api\library\written-content-library\book-library\Api.Books.md = ..\docs\technical\api\library\written-content-library\book-library\Api.Books.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "maintenance", "maintenance", "{20D6BC0D-3B1E-4521-9CD7-9679BA0DC02B}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\api\maintenance\Api.Health.md = ..\docs\technical\api\maintenance\Api.Health.md
+		..\docs\technical\api\maintenance\Api.Initialization.md = ..\docs\technical\api\maintenance\Api.Initialization.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "plugins", "plugins", "{54B8A7F4-9F61-47AA-8A33-F3B890A311BA}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\api\plugins\Api.Plugins.md = ..\docs\technical\api\plugins\Api.Plugins.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scheduling", "scheduling", "{3BDAA2C6-7D42-4279-8FBF-22F5A415D1FC}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\api\scheduling\Api.Scheduling.md = ..\docs\technical\api\scheduling\Api.Scheduling.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "themes", "themes", "{019980B6-51DB-4534-96FE-3E4DA528F4FE}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\api\themes\Api.Themes.md = ..\docs\technical\api\themes\Api.Themes.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "users-management", "users-management", "{DFF4A4CF-D736-4CA9-B970-AA85E62F4E51}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\api\users-management\Api.Authentication.md = ..\docs\technical\api\users-management\Api.Authentication.md
+		..\docs\technical\api\users-management\Api.Authorization.md = ..\docs\technical\api\users-management\Api.Authorization.md
+		..\docs\technical\api\users-management\Api.Settings.md = ..\docs\technical\api\users-management\Api.Settings.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "architecture", "architecture", "{BD7804E9-DD5D-45F9-B0CC-E0B9FFDF1B7D}"
 	ProjectSection(SolutionItems) = preProject
 		..\docs\technical\architecture\1 system-context-diagram.puml = ..\docs\technical\architecture\1 system-context-diagram.puml
 		..\docs\technical\architecture\1 system-context-diagram.svg = ..\docs\technical\architecture\1 system-context-diagram.svg
@@ -188,9 +142,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "architecture", "architectur
 		..\docs\technical\architecture\4.3 code-scheduler-diagram.svg = ..\docs\technical\architecture\4.3 code-scheduler-diagram.svg
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "architecture-knowledge-management", "architecture-knowledge-management", "{70B56088-6D3A-481E-9459-79AC6B16FEC1}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "architecture-knowledge-management", "architecture-knowledge-management", "{61E7E9B9-3C47-4E62-B49E-AFE8D6DC8B5C}"
+	ProjectSection(SolutionItems) = preProject
+	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "architecture-decision-log", "architecture-decision-log", "{788FADE4-342D-4919-8E5C-10CA8EDBE954}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "architecture-decision-log", "architecture-decision-log", "{095CFEA5-8927-4347-9048-9BE0C8DC7CD0}"
 	ProjectSection(SolutionItems) = preProject
 		..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decision-record-0001.md = ..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decision-record-0001.md
 		..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decision-record-0002.md = ..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decision-record-0002.md
@@ -204,7 +160,290 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "architecture-decision-log",
 		..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decision-record-0010.md = ..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decision-record-0010.md
 		..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decision-record-0011.md = ..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decision-record-0011.md
 		..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decision-record-0012.md = ..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decision-record-0012.md
+		..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decision-record-0013.md = ..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decision-record-0013.md
+		..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decision-record-0014.md = ..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decision-record-0014.md
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "domain", "domain", "{3EE8EFDF-4D55-4EA3-BEE2-74D00CB50570}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\domain\Aggregates.AudioLibrary.md = ..\docs\technical\domain\Aggregates.AudioLibrary.md
+		..\docs\technical\domain\Aggregates.FileSystemManagement.md = ..\docs\technical\domain\Aggregates.FileSystemManagement.md
+		..\docs\technical\domain\Aggregates.VideoLibrary.md = ..\docs\technical\domain\Aggregates.VideoLibrary.md
+		..\docs\technical\domain\Aggregates.WrittenContentLibrary.md = ..\docs\technical\domain\Aggregates.WrittenContentLibrary.md
+		..\docs\technical\domain\Common.Metadata.md = ..\docs\technical\domain\Common.Metadata.md
+		..\docs\technical\domain\Domain.md = ..\docs\technical\domain\Domain.md
+		..\docs\technical\domain\UbiquitousLanguage.md = ..\docs\technical\domain\UbiquitousLanguage.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "requests", "requests", "{B45637D3-840C-4898-A047-C6FB568FFFE6}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\http-client.env.json = ..\docs\technical\requests\http-client.env.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "admin", "admin", "{48BAE4E1-B3E7-4517-82BF-51D5B884E2E4}"
+	ProjectSection(SolutionItems) = preProject
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "authorization", "authorization", "{A9BD996E-E8E8-4C34-B792-5E6A00BD5938}"
+	ProjectSection(SolutionItems) = preProject
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "permissions", "permissions", "{7DC07C5C-4877-45DF-86C2-D93069EA7608}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\admin\authorization\permissions\GetPermissions.http = ..\docs\technical\requests\admin\authorization\permissions\GetPermissions.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "roles", "roles", "{3BCFBE37-A64D-4F3C-9D18-E37E89CB490F}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\admin\authorization\roles\AddRole.http = ..\docs\technical\requests\admin\authorization\roles\AddRole.http
+		..\docs\technical\requests\admin\authorization\roles\DeleteRole.http = ..\docs\technical\requests\admin\authorization\roles\DeleteRole.http
+		..\docs\technical\requests\admin\authorization\roles\GetRolePermissions.http = ..\docs\technical\requests\admin\authorization\roles\GetRolePermissions.http
+		..\docs\technical\requests\admin\authorization\roles\GetRoles.http = ..\docs\technical\requests\admin\authorization\roles\GetRoles.http
+		..\docs\technical\requests\admin\authorization\roles\UpdateRole.http = ..\docs\technical\requests\admin\authorization\roles\UpdateRole.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "file-system-management", "file-system-management", "{6D5C6E19-67A1-4327-A958-1EC0DA6E9D7D}"
+	ProjectSection(SolutionItems) = preProject
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "directories", "directories", "{B6A1AB2C-766F-4DC2-894A-4DF1FE102AED}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\file-system-management\directories\GetDirectories.http = ..\docs\technical\requests\file-system-management\directories\GetDirectories.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "drives", "drives", "{82D80C8B-593E-4E54-BDC2-26931EA3E2D6}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\file-system-management\drives\GetDrives.http = ..\docs\technical\requests\file-system-management\drives\GetDrives.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "files", "files", "{F6D1AE55-7A86-4854-8DA7-FD386CA4ABE5}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\file-system-management\files\GetFiles.http = ..\docs\technical\requests\file-system-management\files\GetFiles.http
+		..\docs\technical\requests\file-system-management\files\GetTreeFiles.http = ..\docs\technical\requests\file-system-management\files\GetTreeFiles.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "file-system", "file-system", "{CD047DEA-454F-41E0-AD68-396A2940E55A}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\file-system-management\file-system\GetType.http = ..\docs\technical\requests\file-system-management\file-system\GetType.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "path", "path", "{9521E177-E2FE-4449-AD59-C1167E86AE81}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\file-system-management\path\CheckPathExists.http = ..\docs\technical\requests\file-system-management\path\CheckPathExists.http
+		..\docs\technical\requests\file-system-management\path\CombinePath.http = ..\docs\technical\requests\file-system-management\path\CombinePath.http
+		..\docs\technical\requests\file-system-management\path\GetPathParent.http = ..\docs\technical\requests\file-system-management\path\GetPathParent.http
+		..\docs\technical\requests\file-system-management\path\GetPathRoot.http = ..\docs\technical\requests\file-system-management\path\GetPathRoot.http
+		..\docs\technical\requests\file-system-management\path\GetPathSeparator.http = ..\docs\technical\requests\file-system-management\path\GetPathSeparator.http
+		..\docs\technical\requests\file-system-management\path\SplitPath.http = ..\docs\technical\requests\file-system-management\path\SplitPath.http
+		..\docs\technical\requests\file-system-management\path\ValidatePath.http = ..\docs\technical\requests\file-system-management\path\ValidatePath.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "thumbnails", "thumbnails", "{09E59FC0-1E79-4908-AB53-AF6A8E1A018A}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\file-system-management\thumbnails\GetThumbnail.http = ..\docs\technical\requests\file-system-management\thumbnails\GetThumbnail.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "library", "library", "{38048ADA-6830-4575-BDA6-C6D77E6D3E09}"
+	ProjectSection(SolutionItems) = preProject
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "audio-library", "audio-library", "{48201A6C-CE2B-47EC-AEC8-C202843D2CEB}"
+	ProjectSection(SolutionItems) = preProject
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "music-library", "music-library", "{A65199DD-543E-4C18-A16A-215BD34962A5}"
+	ProjectSection(SolutionItems) = preProject
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "albums", "albums", "{B4DF8E8D-C245-4E7C-B85B-B52935EDA93B}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\library\audio-library\music-library\albums\AddAlbum.http = ..\docs\technical\requests\library\audio-library\music-library\albums\AddAlbum.http
+		..\docs\technical\requests\library\audio-library\music-library\albums\DeleteAlbum.http = ..\docs\technical\requests\library\audio-library\music-library\albums\DeleteAlbum.http
+		..\docs\technical\requests\library\audio-library\music-library\albums\GetAlbum.http = ..\docs\technical\requests\library\audio-library\music-library\albums\GetAlbum.http
+		..\docs\technical\requests\library\audio-library\music-library\albums\GetAlbumTracks.http = ..\docs\technical\requests\library\audio-library\music-library\albums\GetAlbumTracks.http
+		..\docs\technical\requests\library\audio-library\music-library\albums\GetAlbumTracksLite.http = ..\docs\technical\requests\library\audio-library\music-library\albums\GetAlbumTracksLite.http
+		..\docs\technical\requests\library\audio-library\music-library\albums\UpdateAlbum.http = ..\docs\technical\requests\library\audio-library\music-library\albums\UpdateAlbum.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "artists", "artists", "{F3818697-E304-491D-8BF3-4DAA1733B5F5}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\library\audio-library\music-library\artists\AddArtist.http = ..\docs\technical\requests\library\audio-library\music-library\artists\AddArtist.http
+		..\docs\technical\requests\library\audio-library\music-library\artists\DeleteArtist.http = ..\docs\technical\requests\library\audio-library\music-library\artists\DeleteArtist.http
+		..\docs\technical\requests\library\audio-library\music-library\artists\GetArtist.http = ..\docs\technical\requests\library\audio-library\music-library\artists\GetArtist.http
+		..\docs\technical\requests\library\audio-library\music-library\artists\GetArtistAlbums.http = ..\docs\technical\requests\library\audio-library\music-library\artists\GetArtistAlbums.http
+		..\docs\technical\requests\library\audio-library\music-library\artists\GetArtistAlbumsLite.http = ..\docs\technical\requests\library\audio-library\music-library\artists\GetArtistAlbumsLite.http
+		..\docs\technical\requests\library\audio-library\music-library\artists\GetArtists.http = ..\docs\technical\requests\library\audio-library\music-library\artists\GetArtists.http
+		..\docs\technical\requests\library\audio-library\music-library\artists\GetArtistsLite.http = ..\docs\technical\requests\library\audio-library\music-library\artists\GetArtistsLite.http
+		..\docs\technical\requests\library\audio-library\music-library\artists\UpdateArtist.http = ..\docs\technical\requests\library\audio-library\music-library\artists\UpdateArtist.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tracks", "tracks", "{B1B657B1-60DC-4E22-89D2-6212154D6BA8}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\library\audio-library\music-library\tracks\AddTrack.http = ..\docs\technical\requests\library\audio-library\music-library\tracks\AddTrack.http
+		..\docs\technical\requests\library\audio-library\music-library\tracks\DeleteTrack.http = ..\docs\technical\requests\library\audio-library\music-library\tracks\DeleteTrack.http
+		..\docs\technical\requests\library\audio-library\music-library\tracks\GetTrack.http = ..\docs\technical\requests\library\audio-library\music-library\tracks\GetTrack.http
+		..\docs\technical\requests\library\audio-library\music-library\tracks\UpdateTrack.http = ..\docs\technical\requests\library\audio-library\music-library\tracks\UpdateTrack.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "management", "management", "{FDED0D4B-3FB6-42CA-AC73-76038F9DDF5E}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\library\management\AddLibrary.http = ..\docs\technical\requests\library\management\AddLibrary.http
+		..\docs\technical\requests\library\management\CancelLibrariesScan.http = ..\docs\technical\requests\library\management\CancelLibrariesScan.http
+		..\docs\technical\requests\library\management\CancelLibraryScan.http = ..\docs\technical\requests\library\management\CancelLibraryScan.http
+		..\docs\technical\requests\library\management\DeleteLibrary.http = ..\docs\technical\requests\library\management\DeleteLibrary.http
+		..\docs\technical\requests\library\management\GetEnabledLibraries.http = ..\docs\technical\requests\library\management\GetEnabledLibraries.http
+		..\docs\technical\requests\library\management\GetLibraries.http = ..\docs\technical\requests\library\management\GetLibraries.http
+		..\docs\technical\requests\library\management\GetLibrary.http = ..\docs\technical\requests\library\management\GetLibrary.http
+		..\docs\technical\requests\library\management\GetLibraryScanProgress.http = ..\docs\technical\requests\library\management\GetLibraryScanProgress.http
+		..\docs\technical\requests\library\management\GetRunningLibraryScans.http = ..\docs\technical\requests\library\management\GetRunningLibraryScans.http
+		..\docs\technical\requests\library\management\ScanLibraries.http = ..\docs\technical\requests\library\management\ScanLibraries.http
+		..\docs\technical\requests\library\management\ScanLibrary.http = ..\docs\technical\requests\library\management\ScanLibrary.http
+		..\docs\technical\requests\library\management\UpdateLibrary.http = ..\docs\technical\requests\library\management\UpdateLibrary.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "written-content-library", "written-content-library", "{61824D19-B08C-45C6-95F8-716B5FDA183C}"
+	ProjectSection(SolutionItems) = preProject
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "book-library", "book-library", "{0C975F46-8A47-48EC-91A0-2B222032C043}"
+	ProjectSection(SolutionItems) = preProject
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "books", "books", "{299D6BD8-A7AC-4913-AA0C-EE0A7AAF5B9A}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\library\written-content-library\book-library\books\AddBook.http = ..\docs\technical\requests\library\written-content-library\book-library\books\AddBook.http
+		..\docs\technical\requests\library\written-content-library\book-library\books\GetBook.http = ..\docs\technical\requests\library\written-content-library\book-library\books\GetBook.http
+		..\docs\technical\requests\library\written-content-library\book-library\books\GetBooks.http = ..\docs\technical\requests\library\written-content-library\book-library\books\GetBooks.http
+		..\docs\technical\requests\library\written-content-library\book-library\books\GetBooksLite.http = ..\docs\technical\requests\library\written-content-library\book-library\books\GetBooksLite.http
+		..\docs\technical\requests\library\written-content-library\book-library\books\UpdateBook.http = ..\docs\technical\requests\library\written-content-library\book-library\books\UpdateBook.http
+		..\docs\technical\requests\library\written-content-library\book-library\books\UpdateBookCover.http = ..\docs\technical\requests\library\written-content-library\book-library\books\UpdateBookCover.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "reading", "reading", "{EC34148A-46DE-4A84-8365-85C951D0ED66}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\library\written-content-library\book-library\books\reading\GetReadingAvailability.http = ..\docs\technical\requests\library\written-content-library\book-library\books\reading\GetReadingAvailability.http
+		..\docs\technical\requests\library\written-content-library\book-library\books\reading\GetReadingManifest.http = ..\docs\technical\requests\library\written-content-library\book-library\books\reading\GetReadingManifest.http
+		..\docs\technical\requests\library\written-content-library\book-library\books\reading\GetReadingResource.http = ..\docs\technical\requests\library\written-content-library\book-library\books\reading\GetReadingResource.http
+		..\docs\technical\requests\library\written-content-library\book-library\books\reading\GetReadingSection.http = ..\docs\technical\requests\library\written-content-library\book-library\books\reading\GetReadingSection.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "maintenance", "maintenance", "{72755888-3D28-40BE-8A21-6529E5B8FEE4}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\maintenance\CheckHealth.http = ..\docs\technical\requests\maintenance\CheckHealth.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "application-setup", "application-setup", "{8403EFA0-9B81-4FB6-826D-A24CB7B0A27C}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\maintenance\application-setup\CheckInitialization.http = ..\docs\technical\requests\maintenance\application-setup\CheckInitialization.http
+		..\docs\technical\requests\maintenance\application-setup\SetupApplication.http = ..\docs\technical\requests\maintenance\application-setup\SetupApplication.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "plugins", "plugins", "{DA66D288-8458-4797-8E9D-57C177AE9C5F}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\plugins\GetLibraryArtworkProviders.http = ..\docs\technical\requests\plugins\GetLibraryArtworkProviders.http
+		..\docs\technical\requests\plugins\GetLibraryBookReaders.http = ..\docs\technical\requests\plugins\GetLibraryBookReaders.http
+		..\docs\technical\requests\plugins\GetLibraryMetadataProviders.http = ..\docs\technical\requests\plugins\GetLibraryMetadataProviders.http
+		..\docs\technical\requests\plugins\GetPlugins.http = ..\docs\technical\requests\plugins\GetPlugins.http
+		..\docs\technical\requests\plugins\GetPluginSettings.http = ..\docs\technical\requests\plugins\GetPluginSettings.http
+		..\docs\technical\requests\plugins\InstallPlugin.http = ..\docs\technical\requests\plugins\InstallPlugin.http
+		..\docs\technical\requests\plugins\ReorderLibraryArtworkProviders.http = ..\docs\technical\requests\plugins\ReorderLibraryArtworkProviders.http
+		..\docs\technical\requests\plugins\ReorderLibraryMetadataProviders.http = ..\docs\technical\requests\plugins\ReorderLibraryMetadataProviders.http
+		..\docs\technical\requests\plugins\SetLibraryArtworkProviderEnabled.http = ..\docs\technical\requests\plugins\SetLibraryArtworkProviderEnabled.http
+		..\docs\technical\requests\plugins\SetLibraryBookReaderEnabled.http = ..\docs\technical\requests\plugins\SetLibraryBookReaderEnabled.http
+		..\docs\technical\requests\plugins\SetLibraryMetadataProviderEnabled.http = ..\docs\technical\requests\plugins\SetLibraryMetadataProviderEnabled.http
+		..\docs\technical\requests\plugins\UpdatePluginSettings.http = ..\docs\technical\requests\plugins\UpdatePluginSettings.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scheduling", "scheduling", "{A60EE169-1FBF-4085-AE4D-811CD18EF8EC}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\scheduling\AddScheduledJob.http = ..\docs\technical\requests\scheduling\AddScheduledJob.http
+		..\docs\technical\requests\scheduling\FireScheduledJob.http = ..\docs\technical\requests\scheduling\FireScheduledJob.http
+		..\docs\technical\requests\scheduling\GetScheduledJobHistory.http = ..\docs\technical\requests\scheduling\GetScheduledJobHistory.http
+		..\docs\technical\requests\scheduling\GetScheduledJobs.http = ..\docs\technical\requests\scheduling\GetScheduledJobs.http
+		..\docs\technical\requests\scheduling\GetSchedulerDisplayPreferences.http = ..\docs\technical\requests\scheduling\GetSchedulerDisplayPreferences.http
+		..\docs\technical\requests\scheduling\RemoveScheduledJob.http = ..\docs\technical\requests\scheduling\RemoveScheduledJob.http
+		..\docs\technical\requests\scheduling\StartScheduledJob.http = ..\docs\technical\requests\scheduling\StartScheduledJob.http
+		..\docs\technical\requests\scheduling\StopScheduledJob.http = ..\docs\technical\requests\scheduling\StopScheduledJob.http
+		..\docs\technical\requests\scheduling\UpdateSchedulerDisplayPreferences.http = ..\docs\technical\requests\scheduling\UpdateSchedulerDisplayPreferences.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "themes", "themes", "{4EC0F04D-6794-429D-8306-E72C4E64B1D9}"
+	ProjectSection(SolutionItems) = preProject
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "management", "management", "{698FA5E0-7220-4A8F-9695-224890B19FC1}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\themes\management\DeleteTheme.http = ..\docs\technical\requests\themes\management\DeleteTheme.http
+		..\docs\technical\requests\themes\management\InstallTheme.http = ..\docs\technical\requests\themes\management\InstallTheme.http
+		..\docs\technical\requests\themes\management\RestoreTheme.http = ..\docs\technical\requests\themes\management\RestoreTheme.http
+		..\docs\technical\requests\themes\management\SetCurrentTheme.http = ..\docs\technical\requests\themes\management\SetCurrentTheme.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "queries", "queries", "{FB8C9173-78BA-4C11-B698-4918537A5911}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\themes\queries\GetCurrentTheme.http = ..\docs\technical\requests\themes\queries\GetCurrentTheme.http
+		..\docs\technical\requests\themes\queries\GetThemeArchive.http = ..\docs\technical\requests\themes\queries\GetThemeArchive.http
+		..\docs\technical\requests\themes\queries\GetThemeAsset.http = ..\docs\technical\requests\themes\queries\GetThemeAsset.http
+		..\docs\technical\requests\themes\queries\GetThemes.http = ..\docs\technical\requests\themes\queries\GetThemes.http
+		..\docs\technical\requests\themes\queries\GetThemeSettings.http = ..\docs\technical\requests\themes\queries\GetThemeSettings.http
+		..\docs\technical\requests\themes\queries\GetThemeTemplate.http = ..\docs\technical\requests\themes\queries\GetThemeTemplate.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "users-management", "users-management", "{863E6DFF-B0F3-4CFA-8544-260346A7735A}"
+	ProjectSection(SolutionItems) = preProject
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "authentication", "authentication", "{0C679328-F15A-46A9-890C-DED45CDE4680}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\users-management\authentication\ChangePassword.http = ..\docs\technical\requests\users-management\authentication\ChangePassword.http
+		..\docs\technical\requests\users-management\authentication\GetUsers.http = ..\docs\technical\requests\users-management\authentication\GetUsers.http
+		..\docs\technical\requests\users-management\authentication\Login.http = ..\docs\technical\requests\users-management\authentication\Login.http
+		..\docs\technical\requests\users-management\authentication\RecoverPassword.http = ..\docs\technical\requests\users-management\authentication\RecoverPassword.http
+		..\docs\technical\requests\users-management\authentication\Register.http = ..\docs\technical\requests\users-management\authentication\Register.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "authorization", "authorization", "{69994895-991C-46BF-A13C-85CF62B519E5}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\users-management\authorization\GetAuthorization.http = ..\docs\technical\requests\users-management\authorization\GetAuthorization.http
+		..\docs\technical\requests\users-management\authorization\GetUserPermissions.http = ..\docs\technical\requests\users-management\authorization\GetUserPermissions.http
+		..\docs\technical\requests\users-management\authorization\GetUserRole.http = ..\docs\technical\requests\users-management\authorization\GetUserRole.http
+		..\docs\technical\requests\users-management\authorization\UpdateUserRoleAndPermissions.http = ..\docs\technical\requests\users-management\authorization\UpdateUserRoleAndPermissions.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "settings", "settings", "{240E1B2A-08A3-439D-B8B2-4D9C18B4AF8A}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\users-management\settings\GetUserSettings.http = ..\docs\technical\requests\users-management\settings\GetUserSettings.http
+		..\docs\technical\requests\users-management\settings\UpdateUserSettings.http = ..\docs\technical\requests\users-management\settings\UpdateUserSettings.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{279D354F-C362-4302-A265-A46FDB070565}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\templates\PULL_REQUEST_TEMPLATE.md = ..\docs\technical\templates\PULL_REQUEST_TEMPLATE.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "theming", "theming", "{F1DB0FEA-AF12-4F0E-9277-ADB024560937}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\theming\Theming.md = ..\docs\technical\theming\Theming.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IntegrationTests", "IntegrationTests", "{3F057926-562F-4EF4-BFC0-EE62372D4551}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumina.Presentation.Api.IntegrationTests", "..\tests\IntegrationTests\Lumina.Presentation.Api.IntegrationTests\Lumina.Presentation.Api.IntegrationTests.csproj", "{3680DAFB-10BA-4A0F-AE40-620D06DAF617}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{D4C61542-FC91-47FA-B1D2-11CC99617454}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumina.Contracts", "Lumina.Contracts\Lumina.Contracts.csproj", "{6BD85BA8-B3C4-4D79-8858-F6D7676FF2CC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5DD47F82-699B-4E71-A10A-238E80EA5814}"
+	ProjectSection(SolutionItems) = preProject
+		..\.editorconfig = ..\.editorconfig
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumina.Presentation.Web", "Lumina.Presentation.Web\Lumina.Presentation.Web.csproj", "{613C74E8-720C-4205-8BA7-85B23D2E7881}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SecurityTests", "SecurityTests", "{8B06B1D2-80B9-490C-9A36-C7748F58B705}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumina.Presentation.Api.SecurityTests", "..\tests\SecurityTests\Lumina.Presentation.Api.SecurityTests\Lumina.Presentation.Api.SecurityTests.csproj", "{F72DCA2D-0349-42F9-9614-92A38D4B1EA4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lumina.Plugins.Contracts", "Lumina.Plugins.Contracts\Lumina.Plugins.Contracts.csproj", "{8CF6FEA4-624C-4EC9-93D6-EB7626059D7C}"
 EndProject
@@ -255,11 +494,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lumina.Plugins.Calibre.Fixtures", "..\tests\Common\Lumina.Plugins.Calibre.Fixtures\Lumina.Plugins.Calibre.Fixtures.csproj", "{B6F9E5D2-3C4D-5E6F-9A7B-8C9D0E1F2A31}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lumina.TestPlugin", "..\tests\Common\Lumina.TestPlugin\Lumina.TestPlugin.csproj", "{65AA7896-2DE2-4F07-A1B2-C1E1774521C2}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "theming", "theming", "{2872042D-061F-4C76-8017-0A518A7E28A7}"
-	ProjectSection(SolutionItems) = preProject
-		..\docs\technical\theming\Theming.md = ..\docs\technical\theming\Theming.md
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lumina.Plugins.Epub", "..\plugins\Lumina.Plugins.Epub\Lumina.Plugins.Epub.csproj", "{EBE84E94-60C3-4D04-8802-F81ACA74DE21}"
 EndProject
@@ -882,6 +1116,62 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{64570222-A5AC-49EE-BEBC-25D61B989A20} = {19C1EE2F-0F4C-4BF6-B677-E0EC37AB3C72}
+		{D78A725D-C3AE-420B-ABA8-255A000D7324} = {64570222-A5AC-49EE-BEBC-25D61B989A20}
+		{459EF701-AB73-40ED-81E6-144D3587C667} = {D78A725D-C3AE-420B-ABA8-255A000D7324}
+		{08113205-695B-4DA4-8355-6C5377BBD8C0} = {459EF701-AB73-40ED-81E6-144D3587C667}
+		{2FA735A6-2141-44AB-B34C-F65E4195B1EB} = {D78A725D-C3AE-420B-ABA8-255A000D7324}
+		{6A5D3BED-AE4A-4D26-B12A-5DE996152A64} = {D78A725D-C3AE-420B-ABA8-255A000D7324}
+		{252D7F8D-991F-4C62-9BB1-D13988D7B4E2} = {6A5D3BED-AE4A-4D26-B12A-5DE996152A64}
+		{81BD9DAE-9044-41AC-BBC4-1B09EF678D4E} = {252D7F8D-991F-4C62-9BB1-D13988D7B4E2}
+		{2CC7A70F-E08F-4C4F-9B0E-237AE5620C22} = {6A5D3BED-AE4A-4D26-B12A-5DE996152A64}
+		{2293B76C-F1EB-46A9-8F67-E88BAEA4FC0C} = {6A5D3BED-AE4A-4D26-B12A-5DE996152A64}
+		{52264424-9A8F-4E12-9A14-87F306C595C7} = {2293B76C-F1EB-46A9-8F67-E88BAEA4FC0C}
+		{20D6BC0D-3B1E-4521-9CD7-9679BA0DC02B} = {D78A725D-C3AE-420B-ABA8-255A000D7324}
+		{54B8A7F4-9F61-47AA-8A33-F3B890A311BA} = {D78A725D-C3AE-420B-ABA8-255A000D7324}
+		{3BDAA2C6-7D42-4279-8FBF-22F5A415D1FC} = {D78A725D-C3AE-420B-ABA8-255A000D7324}
+		{019980B6-51DB-4534-96FE-3E4DA528F4FE} = {D78A725D-C3AE-420B-ABA8-255A000D7324}
+		{DFF4A4CF-D736-4CA9-B970-AA85E62F4E51} = {D78A725D-C3AE-420B-ABA8-255A000D7324}
+		{BD7804E9-DD5D-45F9-B0CC-E0B9FFDF1B7D} = {64570222-A5AC-49EE-BEBC-25D61B989A20}
+		{61E7E9B9-3C47-4E62-B49E-AFE8D6DC8B5C} = {BD7804E9-DD5D-45F9-B0CC-E0B9FFDF1B7D}
+		{095CFEA5-8927-4347-9048-9BE0C8DC7CD0} = {61E7E9B9-3C47-4E62-B49E-AFE8D6DC8B5C}
+		{3EE8EFDF-4D55-4EA3-BEE2-74D00CB50570} = {64570222-A5AC-49EE-BEBC-25D61B989A20}
+		{B45637D3-840C-4898-A047-C6FB568FFFE6} = {64570222-A5AC-49EE-BEBC-25D61B989A20}
+		{48BAE4E1-B3E7-4517-82BF-51D5B884E2E4} = {B45637D3-840C-4898-A047-C6FB568FFFE6}
+		{A9BD996E-E8E8-4C34-B792-5E6A00BD5938} = {48BAE4E1-B3E7-4517-82BF-51D5B884E2E4}
+		{7DC07C5C-4877-45DF-86C2-D93069EA7608} = {A9BD996E-E8E8-4C34-B792-5E6A00BD5938}
+		{3BCFBE37-A64D-4F3C-9D18-E37E89CB490F} = {A9BD996E-E8E8-4C34-B792-5E6A00BD5938}
+		{6D5C6E19-67A1-4327-A958-1EC0DA6E9D7D} = {B45637D3-840C-4898-A047-C6FB568FFFE6}
+		{B6A1AB2C-766F-4DC2-894A-4DF1FE102AED} = {6D5C6E19-67A1-4327-A958-1EC0DA6E9D7D}
+		{82D80C8B-593E-4E54-BDC2-26931EA3E2D6} = {6D5C6E19-67A1-4327-A958-1EC0DA6E9D7D}
+		{F6D1AE55-7A86-4854-8DA7-FD386CA4ABE5} = {6D5C6E19-67A1-4327-A958-1EC0DA6E9D7D}
+		{CD047DEA-454F-41E0-AD68-396A2940E55A} = {6D5C6E19-67A1-4327-A958-1EC0DA6E9D7D}
+		{9521E177-E2FE-4449-AD59-C1167E86AE81} = {6D5C6E19-67A1-4327-A958-1EC0DA6E9D7D}
+		{09E59FC0-1E79-4908-AB53-AF6A8E1A018A} = {6D5C6E19-67A1-4327-A958-1EC0DA6E9D7D}
+		{38048ADA-6830-4575-BDA6-C6D77E6D3E09} = {B45637D3-840C-4898-A047-C6FB568FFFE6}
+		{48201A6C-CE2B-47EC-AEC8-C202843D2CEB} = {38048ADA-6830-4575-BDA6-C6D77E6D3E09}
+		{A65199DD-543E-4C18-A16A-215BD34962A5} = {48201A6C-CE2B-47EC-AEC8-C202843D2CEB}
+		{B4DF8E8D-C245-4E7C-B85B-B52935EDA93B} = {A65199DD-543E-4C18-A16A-215BD34962A5}
+		{F3818697-E304-491D-8BF3-4DAA1733B5F5} = {A65199DD-543E-4C18-A16A-215BD34962A5}
+		{B1B657B1-60DC-4E22-89D2-6212154D6BA8} = {A65199DD-543E-4C18-A16A-215BD34962A5}
+		{FDED0D4B-3FB6-42CA-AC73-76038F9DDF5E} = {38048ADA-6830-4575-BDA6-C6D77E6D3E09}
+		{61824D19-B08C-45C6-95F8-716B5FDA183C} = {38048ADA-6830-4575-BDA6-C6D77E6D3E09}
+		{0C975F46-8A47-48EC-91A0-2B222032C043} = {61824D19-B08C-45C6-95F8-716B5FDA183C}
+		{299D6BD8-A7AC-4913-AA0C-EE0A7AAF5B9A} = {0C975F46-8A47-48EC-91A0-2B222032C043}
+		{EC34148A-46DE-4A84-8365-85C951D0ED66} = {299D6BD8-A7AC-4913-AA0C-EE0A7AAF5B9A}
+		{72755888-3D28-40BE-8A21-6529E5B8FEE4} = {B45637D3-840C-4898-A047-C6FB568FFFE6}
+		{8403EFA0-9B81-4FB6-826D-A24CB7B0A27C} = {72755888-3D28-40BE-8A21-6529E5B8FEE4}
+		{DA66D288-8458-4797-8E9D-57C177AE9C5F} = {B45637D3-840C-4898-A047-C6FB568FFFE6}
+		{A60EE169-1FBF-4085-AE4D-811CD18EF8EC} = {B45637D3-840C-4898-A047-C6FB568FFFE6}
+		{4EC0F04D-6794-429D-8306-E72C4E64B1D9} = {B45637D3-840C-4898-A047-C6FB568FFFE6}
+		{698FA5E0-7220-4A8F-9695-224890B19FC1} = {4EC0F04D-6794-429D-8306-E72C4E64B1D9}
+		{FB8C9173-78BA-4C11-B698-4918537A5911} = {4EC0F04D-6794-429D-8306-E72C4E64B1D9}
+		{863E6DFF-B0F3-4CFA-8544-260346A7735A} = {B45637D3-840C-4898-A047-C6FB568FFFE6}
+		{0C679328-F15A-46A9-890C-DED45CDE4680} = {863E6DFF-B0F3-4CFA-8544-260346A7735A}
+		{69994895-991C-46BF-A13C-85CF62B519E5} = {863E6DFF-B0F3-4CFA-8544-260346A7735A}
+		{240E1B2A-08A3-439D-B8B2-4D9C18B4AF8A} = {863E6DFF-B0F3-4CFA-8544-260346A7735A}
+		{279D354F-C362-4302-A265-A46FDB070565} = {64570222-A5AC-49EE-BEBC-25D61B989A20}
+		{F1DB0FEA-AF12-4F0E-9277-ADB024560937} = {64570222-A5AC-49EE-BEBC-25D61B989A20}
 		{7B2671B3-E9C5-41AD-BB0C-692238558197} = {3C316ABB-08D5-4450-9A4E-91059DB54254}
 		{7FEA2A01-1660-4D18-B05D-83D356FD7828} = {3C316ABB-08D5-4450-9A4E-91059DB54254}
 		{9FF9D5FA-1D0C-4743-87E3-CC8C08694CAC} = {3C316ABB-08D5-4450-9A4E-91059DB54254}
@@ -893,33 +1183,12 @@ Global
 		{3BB42EB9-A0A3-4E3F-9053-785F429714AE} = {53B1231B-37F5-44BA-80D5-DBA979775F5C}
 		{4D5E4789-8437-4F3B-883E-28BBF8A4848F} = {53B1231B-37F5-44BA-80D5-DBA979775F5C}
 		{53B1231B-37F5-44BA-80D5-DBA979775F5C} = {16E590D3-DD9F-4B45-BF19-C6E317A57D11}
-		{0C0E5A56-AD29-4D0B-AB87-E865F8B933E2} = {ACD16983-F1BD-4A92-B282-95BA8C456F6A}
-		{B045C2EC-3ACB-47D3-BE62-7AC334B023D9} = {0C0E5A56-AD29-4D0B-AB87-E865F8B933E2}
-		{4F8D14A3-A465-4EC2-B175-A188B113AB99} = {0C0E5A56-AD29-4D0B-AB87-E865F8B933E2}
-		{C17A1188-FA69-42BC-92E6-4F91D31B3A58} = {0C0E5A56-AD29-4D0B-AB87-E865F8B933E2}
-		{FAFD9E43-508B-4F20-8AA2-8CADA697ED2D} = {C17A1188-FA69-42BC-92E6-4F91D31B3A58}
 		{3F057926-562F-4EF4-BFC0-EE62372D4551} = {16E590D3-DD9F-4B45-BF19-C6E317A57D11}
 		{3680DAFB-10BA-4A0F-AE40-620D06DAF617} = {3F057926-562F-4EF4-BFC0-EE62372D4551}
 		{6BD85BA8-B3C4-4D79-8858-F6D7676FF2CC} = {3C316ABB-08D5-4450-9A4E-91059DB54254}
-		{A0D07244-9CB2-4E30-85A5-97D520E4B9CC} = {0C0E5A56-AD29-4D0B-AB87-E865F8B933E2}
 		{613C74E8-720C-4205-8BA7-85B23D2E7881} = {3C316ABB-08D5-4450-9A4E-91059DB54254}
 		{8B06B1D2-80B9-490C-9A36-C7748F58B705} = {16E590D3-DD9F-4B45-BF19-C6E317A57D11}
 		{F72DCA2D-0349-42F9-9614-92A38D4B1EA4} = {8B06B1D2-80B9-490C-9A36-C7748F58B705}
-		{D1B39EFF-99E7-41B9-9DA1-12AF385FFBE8} = {B045C2EC-3ACB-47D3-BE62-7AC334B023D9}
-		{94C56402-0557-4941-BEB4-4AA53735CE89} = {C17A1188-FA69-42BC-92E6-4F91D31B3A58}
-		{3B057D42-7179-45CE-B813-3D13A658B43C} = {94C56402-0557-4941-BEB4-4AA53735CE89}
-		{CA023F42-0264-4E00-9814-76A48A811136} = {94C56402-0557-4941-BEB4-4AA53735CE89}
-		{2C55920F-0BCB-4C64-A1E6-56053F080806} = {C17A1188-FA69-42BC-92E6-4F91D31B3A58}
-		{FBD8915E-DFE2-4C16-8B47-64383AB0719D} = {2C55920F-0BCB-4C64-A1E6-56053F080806}
-		{DB498346-5F46-49FC-B2E9-8239C56791FF} = {2C55920F-0BCB-4C64-A1E6-56053F080806}
-		{DBBB9C44-F4E8-4A1B-8D00-5CACE81B8BE0} = {2C55920F-0BCB-4C64-A1E6-56053F080806}
-		{42A27269-5C57-49E8-9AF0-F162807D7A95} = {2C55920F-0BCB-4C64-A1E6-56053F080806}
-		{7675431D-8D8A-4148-AFA1-C4C17D71891B} = {2C55920F-0BCB-4C64-A1E6-56053F080806}
-		{FC005908-27A7-4BDA-BD2A-B749A09727E0} = {2C55920F-0BCB-4C64-A1E6-56053F080806}
-		{4DC31AC0-D305-4718-8FE1-C023AF6A7CA6} = {B045C2EC-3ACB-47D3-BE62-7AC334B023D9}
-		{D93CA337-37D5-4A42-86B5-0A2410594A7A} = {0C0E5A56-AD29-4D0B-AB87-E865F8B933E2}
-		{70B56088-6D3A-481E-9459-79AC6B16FEC1} = {D93CA337-37D5-4A42-86B5-0A2410594A7A}
-		{788FADE4-342D-4919-8E5C-10CA8EDBE954} = {70B56088-6D3A-481E-9459-79AC6B16FEC1}
 		{8CF6FEA4-624C-4EC9-93D6-EB7626059D7C} = {3C316ABB-08D5-4450-9A4E-91059DB54254}
 		{EADCD78B-04D5-4FE3-855C-E3015531EC8E} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{B7C4D2E1-5A6F-4B8A-9C3D-1E2F4A5B6C7D} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
@@ -944,7 +1213,6 @@ Global
 		{A5E8D4C1-2B3C-4D5E-8F6A-7B8C9D0E1F20} = {53B1231B-37F5-44BA-80D5-DBA979775F5C}
 		{B6F9E5D2-3C4D-5E6F-9A7B-8C9D0E1F2A31} = {7E8A2D6B-3F4C-4E5F-9A6B-1C2D3E4F5A6B}
 		{65AA7896-2DE2-4F07-A1B2-C1E1774521C2} = {7E8A2D6B-3F4C-4E5F-9A6B-1C2D3E4F5A6B}
-		{2872042D-061F-4C76-8017-0A518A7E28A7} = {0C0E5A56-AD29-4D0B-AB87-E865F8B933E2}
 		{EBE84E94-60C3-4D04-8802-F81ACA74DE21} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{46E92994-64C6-44CE-8039-D930775C532A} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{A4BD890A-5959-4A9E-9FCA-CDCCE27B8662} = {53B1231B-37F5-44BA-80D5-DBA979775F5C}

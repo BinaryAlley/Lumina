@@ -2,7 +2,7 @@
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DataAccess.Repositories.Books;
+using Lumina.Application.Common.DataAccess.Repositories.BookLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -63,6 +63,7 @@ public class GetReadingManifestQueryHandlerTests
         _mockLibraryRepository = Substitute.For<ILibraryRepository>();
         _mockUserSettingsRepository = Substitute.For<IUserSettingsRepository>();
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockUnitOfWork.BookRepository.Returns(_mockBookRepository);
         _mockUnitOfWork.LibraryRepository.Returns(_mockLibraryRepository);
         _mockUnitOfWork.UserSettingsRepository.Returns(_mockUserSettingsRepository);
@@ -87,12 +88,14 @@ public class GetReadingManifestQueryHandlerTests
     {
         // Arrange
         GetReadingManifestQuery query = _getReadingManifestQueryFixture.Create();
+        Guid libraryId = Guid.Parse(query.LibraryId!);
+        Guid bookId = Guid.Parse(query.BookId!);
         CancellationToken cancellationToken = CancellationToken.None;
-        BookEntity book = _bookEntityFixture.Create(id: query.BookId);
+        BookEntity book = _bookEntityFixture.Create(id: bookId, libraryId: libraryId);
         LibraryEntity library = _libraryEntityFixture.Create(id: book.LibraryId, libraryType: LibraryType.EBook);
         ReadingManifestResponse expectedResponse = _readingManifestResponseFixture.Create();
-        _mockBookRepository.GetByIdAsync(query.BookId, cancellationToken).Returns(Result.From<BookEntity?>(book));
-        _mockLibraryRepository.GetByIdAsync(book.LibraryId, cancellationToken).Returns(Result.From<LibraryEntity?>(library));
+        _mockBookRepository.GetByIdAsync(bookId, shouldTrackEntities: false, cancellationToken: cancellationToken).Returns(Result.From<BookEntity?>(book));
+        _mockLibraryRepository.GetByIdAsync(book.LibraryId, shouldTrackEntities: false, cancellationToken: cancellationToken).Returns(Result.From<LibraryEntity?>(library));
         _mockBookReadingService.GetManifestAsync(book.Id, book.LibraryId, book.Path, library.LibraryType, shouldRenderPdfAsImages: false, cancellationToken).Returns(expectedResponse);
 
         // Act
@@ -108,14 +111,16 @@ public class GetReadingManifestQueryHandlerTests
     {
         // Arrange
         GetReadingManifestQuery query = _getReadingManifestQueryFixture.Create();
+        Guid libraryId = Guid.Parse(query.LibraryId!);
+        Guid bookId = Guid.Parse(query.BookId!);
         CancellationToken cancellationToken = CancellationToken.None;
-        BookEntity book = _bookEntityFixture.Create(id: query.BookId);
+        BookEntity book = _bookEntityFixture.Create(id: bookId, libraryId: libraryId);
         LibraryEntity library = _libraryEntityFixture.Create(id: book.LibraryId, libraryType: LibraryType.EBook);
         UserSettingsEntity settings = _userSettingsEntityFixture.Create(userId: _userId, shouldRenderPdfAsImages: true);
         ReadingManifestResponse expectedResponse = _readingManifestResponseFixture.Create();
         _mockUserSettingsRepository.GetByUserIdAsync(_userId, cancellationToken).Returns(Result.From<UserSettingsEntity?>(settings));
-        _mockBookRepository.GetByIdAsync(query.BookId, cancellationToken).Returns(Result.From<BookEntity?>(book));
-        _mockLibraryRepository.GetByIdAsync(book.LibraryId, cancellationToken).Returns(Result.From<LibraryEntity?>(library));
+        _mockBookRepository.GetByIdAsync(bookId, shouldTrackEntities: false, cancellationToken: cancellationToken).Returns(Result.From<BookEntity?>(book));
+        _mockLibraryRepository.GetByIdAsync(book.LibraryId, shouldTrackEntities: false, cancellationToken: cancellationToken).Returns(Result.From<LibraryEntity?>(library));
         _mockBookReadingService.GetManifestAsync(book.Id, book.LibraryId, book.Path, library.LibraryType, shouldRenderPdfAsImages: true, cancellationToken).Returns(expectedResponse);
 
         // Act
@@ -131,7 +136,8 @@ public class GetReadingManifestQueryHandlerTests
     {
         // Arrange
         GetReadingManifestQuery query = _getReadingManifestQueryFixture.Create();
-        _mockBookRepository.GetByIdAsync(query.BookId, Arg.Any<CancellationToken>()).Returns(Result.From<BookEntity?>(null));
+        Guid bookId = Guid.Parse(query.BookId!);
+        _mockBookRepository.GetByIdAsync(bookId, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From<BookEntity?>(null));
 
         // Act
         Result<ReadingManifestResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
@@ -143,13 +149,34 @@ public class GetReadingManifestQueryHandlerTests
     }
 
     [Fact]
+    public async Task HandleAsync_WhenBookBelongsToAnotherLibrary_ShouldReturnBookNotFoundError()
+    {
+        // Arrange
+        GetReadingManifestQuery query = _getReadingManifestQueryFixture.Create();
+        Guid bookId = Guid.Parse(query.BookId!);
+        BookEntity book = _bookEntityFixture.Create(id: bookId, libraryId: Guid.NewGuid());
+        _mockBookRepository.GetByIdAsync(bookId, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From<BookEntity?>(book));
+
+        // Act
+        Result<ReadingManifestResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(DomainErrors.Reading.BookNotFound, result.FirstError);
+        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>());
+        await _mockBookReadingService.DidNotReceive().GetManifestAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<LibraryType>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task HandleAsync_WhenLibraryDoesNotExist_ShouldReturnLibraryNotFoundError()
     {
         // Arrange
         GetReadingManifestQuery query = _getReadingManifestQueryFixture.Create();
-        BookEntity book = _bookEntityFixture.Create(id: query.BookId);
-        _mockBookRepository.GetByIdAsync(query.BookId, Arg.Any<CancellationToken>()).Returns(Result.From<BookEntity?>(book));
-        _mockLibraryRepository.GetByIdAsync(book.LibraryId, Arg.Any<CancellationToken>()).Returns(Result.From<LibraryEntity?>(null));
+        Guid libraryId = Guid.Parse(query.LibraryId!);
+        Guid bookId = Guid.Parse(query.BookId!);
+        BookEntity book = _bookEntityFixture.Create(id: bookId, libraryId: libraryId);
+        _mockBookRepository.GetByIdAsync(bookId, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From<BookEntity?>(book));
+        _mockLibraryRepository.GetByIdAsync(book.LibraryId, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From<LibraryEntity?>(null));
 
         // Act
         Result<ReadingManifestResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
@@ -165,8 +192,10 @@ public class GetReadingManifestQueryHandlerTests
     {
         // Arrange
         GetReadingManifestQuery query = _getReadingManifestQueryFixture.Create();
-        BookEntity book = _bookEntityFixture.Create(id: query.BookId);
-        _mockBookRepository.GetByIdAsync(query.BookId, Arg.Any<CancellationToken>()).Returns(Result.From<BookEntity?>(book));
+        Guid libraryId = Guid.Parse(query.LibraryId!);
+        Guid bookId = Guid.Parse(query.BookId!);
+        BookEntity book = _bookEntityFixture.Create(id: bookId, libraryId: libraryId);
+        _mockBookRepository.GetByIdAsync(bookId, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From<BookEntity?>(book));
         _mockAuthorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(_userId, Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>())
             .Returns(false);
 
@@ -176,7 +205,7 @@ public class GetReadingManifestQueryHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
-        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>());
         await _mockBookReadingService.DidNotReceive().GetManifestAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<LibraryType>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
     }
 
@@ -194,7 +223,24 @@ public class GetReadingManifestQueryHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
         await _mockAuthorizationService.DidNotReceive().EvaluatePolicyAsync<ILibraryOwnershipPolicy>(Arg.Any<Guid>(), Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>());
-        await _mockBookRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockBookRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenRepositoryReturnsError_ShouldReturnFailureResult()
+    {
+        // Arrange
+        GetReadingManifestQuery query = _getReadingManifestQueryFixture.Create();
+        Guid bookId = Guid.Parse(query.BookId!);
+        _mockBookRepository.GetByIdAsync(bookId, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Errors.Library.LibraryIdCannotBeEmpty);
+
+        // Act
+        Result<ReadingManifestResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Library.LibraryIdCannotBeEmpty, result.FirstError);
     }
 
     [Fact]
@@ -202,16 +248,16 @@ public class GetReadingManifestQueryHandlerTests
     {
         // Arrange
         GetReadingManifestQuery query = _getReadingManifestQueryFixture.Create();
-        _mockValidator.Validate(Arg.Any<GetReadingManifestQuery>()).Returns([Errors.Reading.BookIdCannotBeEmpty]);
+        _mockValidator.Validate(Arg.Any<GetReadingManifestQuery>()).Returns([Errors.WrittenContent.BookIdCannotBeEmpty]);
 
         // Act
         Result<ReadingManifestResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
-        Assert.Equal(Errors.Reading.BookIdCannotBeEmpty, result.FirstError);
+        Assert.Equal(Errors.WrittenContent.BookIdCannotBeEmpty, result.FirstError);
         await _mockAuthorizationService.DidNotReceive().EvaluatePolicyAsync<ILibraryOwnershipPolicy>(Arg.Any<Guid>(), Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>());
-        await _mockBookRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockBookRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>());
         await _mockBookReadingService.DidNotReceive().GetManifestAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<LibraryType>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
     }
 }

@@ -43,12 +43,12 @@ public class Library : AggregateRoot<LibraryId>
     /// <summary>
     /// Gets the path of the image file used as the cover for the library.
     /// </summary>
-    public string? CoverImage { get; private set; }
+    public Optional<string> CoverImage { get; private set; }
 
     /// <summary>
     /// Gets the path of the image file chosen by the user to be used as the cover for the library.
     /// </summary>
-    public string? CoverImageSourcePath { get; private set; }
+    public Optional<string> CoverImageSourcePath { get; private set; }
 
     /// <summary>
     /// Gets whether this media library is enabled or not. A disabled media library is never shown or changed.
@@ -107,7 +107,7 @@ public class Library : AggregateRoot<LibraryId>
         string title,
         LibraryType libraryType,
         List<FileSystemPathId> contentLocations,
-        string? coverImage,
+        Optional<string> coverImage,
         bool isEnabled,
         bool isLocked,
         bool canDownloadMetadataFromWeb,
@@ -150,7 +150,7 @@ public class Library : AggregateRoot<LibraryId>
         string title,
         LibraryType libraryType,
         IEnumerable<string> contentLocations,
-        string? coverImageSourcePath,
+        Optional<string> coverImageSourcePath,
         bool isEnabled,
         bool isLocked,
         bool canDownloadMetadataFromWeb,
@@ -159,7 +159,7 @@ public class Library : AggregateRoot<LibraryId>
         List<ScanId> scanIds)
     {
         List<FileSystemPathId> tempContentLocations = [];
-        // go through all the file system paths that make up the media library and create domain objects from them
+        // Go through all the file system paths that make up the media library and create domain objects from them.
         foreach (string contentLocation in contentLocations)
         {
             Result<FileSystemPathId> contentLocationResult = FileSystemPathId.Create(contentLocation);
@@ -207,7 +207,7 @@ public class Library : AggregateRoot<LibraryId>
         string title,
         LibraryType libraryType,
         IEnumerable<string> contentLocations,
-        string? coverImageSourcePath,
+        Optional<string> coverImageSourcePath,
         bool isEnabled,
         bool isLocked,
         bool canDownloadMetadataFromWeb,
@@ -216,7 +216,7 @@ public class Library : AggregateRoot<LibraryId>
         List<ScanId> scanIds)
     {
         List<FileSystemPathId> tempContentLocations = [];
-        // go through all the file system paths that make up the media library and create domain objects from them
+        // Go through all the file system paths that make up the media library and create domain objects from them.
         foreach (string contentLocation in contentLocations)
         {
             Result<FileSystemPathId> contentLocationResult = FileSystemPathId.Create(contentLocation);
@@ -254,7 +254,7 @@ public class Library : AggregateRoot<LibraryId>
     /// <param name="path">The internal libray path location of the cover image file.</param>
     public void SetInternalLibraryCoverImagePath(string path)
     {
-        CoverImage = path;
+        CoverImage = Optional<string>.Some(path);
     }
 
     /// <summary>
@@ -263,14 +263,14 @@ public class Library : AggregateRoot<LibraryId>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public Result<Deleted> Delete()
     {
-        // clear all existing events since they become irrelevant when the entity is deleted, and they dont need to be processed
+        // Clear all existing events, since they become irrelevant when the entity is deleted and do not need to be processed.
         _domainEvents.Clear();
         
-        // only add the delete event if it hasn't been added already
+        // Only add the delete event if it has not been added already.
         if (!_domainEvents.Any(domainEvent => domainEvent is LibraryDeletedDomainEvent))
             _domainEvents.Add(new LibraryDeletedDomainEvent(Guid.NewGuid(), this, DateTime.UtcNow));
 
-        // TODO: perhaps trigger events for removing contents related to the removed library (media metadata, etc)?
+        // TODO: Perhaps trigger events for removing content related to the removed library (media metadata, etc.).
         return Result.Deleted;
     }
 }

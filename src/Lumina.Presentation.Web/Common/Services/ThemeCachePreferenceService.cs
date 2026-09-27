@@ -31,20 +31,20 @@ public class ThemeCachePreferenceService
     /// Gets whether the theme cache is enabled for the user identified by <paramref name="userId"/>.
     /// </summary>
     /// <param name="userId">The unique identifier of the user whose preference is read.</param>
-    /// <param name="defaultValue">The value used when the user did not express a preference yet.</param>
+    /// <param name="isCachingEnabledByDefault">The value used when the user did not express a preference yet.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns><see langword="true"/> when the theme cache is enabled for the user, <see langword="false"/> otherwise.</returns>
-    public async Task<bool> GetAsync(Guid userId, bool defaultValue, CancellationToken cancellationToken = default)
+    public async Task<bool> GetAsync(Guid userId, bool isCachingEnabledByDefault, CancellationToken cancellationToken = default)
     {
         bool? preference = await _hybridCache.GetOrCreateAsync(
             BuildKey(userId),
-            (cancellationToken) => new ValueTask<bool?>(defaultValue),
+            (cancellationToken) => new ValueTask<bool?>(isCachingEnabledByDefault),
             new HybridCacheEntryOptions()
             {
                 Expiration = s_preferenceLifetime
             },
             cancellationToken: cancellationToken).ConfigureAwait(false);
-        return preference ?? defaultValue;
+        return preference ?? isCachingEnabledByDefault;
     }
 
     /// <summary>
@@ -56,7 +56,7 @@ public class ThemeCachePreferenceService
     /// <returns>An awaitable task representing the asynchronous operation.</returns>
     public async Task SetAsync(Guid userId, bool isEnabled, CancellationToken cancellationToken = default)
     {
-        // the value is stored as a nullable bool, matching the read type, since HybridCache keys entries by their stored type
+        // The value is stored as a nullable bool, matching the read type, since HybridCache keys entries by their stored type.
         await _hybridCache.SetAsync(BuildKey(userId), (bool?)isEnabled, new HybridCacheEntryOptions()
         {
             Expiration = s_preferenceLifetime

@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
 using Lumina.Application.Common.DataAccess.Entities.Common;
+using Lumina.Application.Fixtures.Common.Setup;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -26,7 +27,7 @@ public class GenreEntityFixture
         string? name = null, 
         bool includeName = true)
     {
-        return new GenreEntity(includeName ? name ?? _faker.Lorem.Word() : null);
+        return new GenreEntity(includeName ? name ?? _faker.UniqueName() : null);
     }
 
     /// <summary>

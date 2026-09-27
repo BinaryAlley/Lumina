@@ -46,7 +46,7 @@ public class GetDirectoriesQueryHandler : IQueryHandler<GetDirectoriesQuery, Res
         if (validationResult.Count > 0)
             return Task.FromResult<Result<IEnumerable<DirectoryResponse>>>(validationResult);
 
-        Result<IEnumerable<Directory>> getSubdirectoriesResult = _directoryService.GetSubdirectories(query.Path!, query.IncludeHiddenElements);
+        Result<IEnumerable<Directory>> getSubdirectoriesResult = _directoryService.GetSubdirectories(query.Path!, query.ShouldIncludeHiddenElements);
         return Task.FromResult(getSubdirectoriesResult.Match(values => Result.From(values.ToResponses()), errors => errors));
     }
 }

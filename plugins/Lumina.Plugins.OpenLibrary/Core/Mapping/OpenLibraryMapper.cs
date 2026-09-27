@@ -59,8 +59,8 @@ internal static partial class OpenLibraryMapper
     /// <param name="authors">The authors of the book.</param>
     /// <param name="ratings">The ratings of the book, or <see langword="null"/> when no ratings were found.</param>
     /// <param name="fallback">The search document used as a fallback source of data, or <see langword="null"/>.</param>
-    /// <returns>The mapped book request.</returns>
-    public static AddBookRequest MapDetailed(
+    /// <returns>The mapped book metadata.</returns>
+    public static BookMetadataDto MapDetailed(
         BookMetadataLookupDto lookup,
         OpenLibraryEditionResponse? edition,
         OpenLibraryWorkResponse? work,
@@ -99,26 +99,23 @@ internal static partial class OpenLibraryMapper
         string? releaseCountry = edition?.PublishPlaces.FirstOrDefault() ?? fallback?.PublishPlaces.FirstOrDefault();
         string? releaseVersion = edition?.EditionName;
 
-        return new AddBookRequest(
-            lookup.LibraryId,
-            lookup.Path,
-            new WrittenContentMetadataDto(
-                title,
-                work?.OriginalTitle,
-                description,
-                new ReleaseInfoDto(
-                    originalRelease.Date,
-                    originalYear,
-                    editionRelease.Date,
-                    editionRelease.Date?.Year ?? editionRelease.Year,
-                    MapReleaseCountry(releaseCountry),
-                    NullIfWhiteSpace(releaseVersion)),
-                [.. genreNames.Select(name => new GenreDto(name))],
-                [.. subjects.Select(name => new TagDto(name))],
-                MapLanguage(currentLanguageCode),
-                MapLanguage(originalLanguageCode),
-                edition?.Publishers.FirstOrDefault() ?? fallback?.Publishers.FirstOrDefault(),
-                edition?.NumberOfPages ?? fallback?.NumberOfPagesMedian),
+        return new BookMetadataDto(
+            title,
+            work?.OriginalTitle,
+            description,
+            new ReleaseInfoDto(
+                originalRelease.Date,
+                originalYear,
+                editionRelease.Date,
+                editionRelease.Date?.Year ?? editionRelease.Year,
+                MapReleaseCountry(releaseCountry),
+                NullIfWhiteSpace(releaseVersion)),
+            [.. genreNames.Select(name => new GenreDto(name))],
+            [.. subjects.Select(name => new TagDto(name))],
+            MapLanguage(currentLanguageCode),
+            MapLanguage(originalLanguageCode),
+            edition?.Publishers.FirstOrDefault() ?? fallback?.Publishers.FirstOrDefault(),
+            edition?.NumberOfPages ?? fallback?.NumberOfPagesMedian,
             MapFormat(edition?.PhysicalFormat),
             NullIfWhiteSpace(edition?.EditionName),
             ParseVolumeNumber(edition?.Volume, edition?.Series.FirstOrDefault()),
@@ -134,7 +131,8 @@ internal static partial class OpenLibraryMapper
             NullIfWhiteSpace(appleBooksId),
             isbns,
             contributors,
-            mappedRatings);
+            mappedRatings,
+            CoverImagePath: null);
     }
 
     /// <summary>
@@ -142,8 +140,8 @@ internal static partial class OpenLibraryMapper
     /// </summary>
     /// <param name="lookup">The lookup describing the book to map.</param>
     /// <param name="document">The search document to map.</param>
-    /// <returns>The mapped book request candidate.</returns>
-    public static AddBookRequest MapSearchCandidate(BookMetadataLookupDto lookup, OpenLibrarySearchDocumentResponse document)
+    /// <returns>The mapped book metadata candidate.</returns>
+    public static BookMetadataDto MapSearchCandidate(BookMetadataLookupDto lookup, OpenLibrarySearchDocumentResponse document)
     {
         return MapDetailed(lookup, null, null, [], null, document);
     }
@@ -274,24 +272,24 @@ internal static partial class OpenLibraryMapper
         List<MediaContributorDto> result = [];
         HashSet<string> seen = new(StringComparer.OrdinalIgnoreCase);
 
-        void Add(string? displayName, string? legalName, string role, MediaContributorRoleCategory category)
+        void Add(string? displayName, string? legalName, MediaContributorRole role)
         {
             if (string.IsNullOrWhiteSpace(displayName) || !seen.Add($"{displayName}|{role}"))
                 return;
-            result.Add(new MediaContributorDto(new MediaContributorNameDto(displayName.Trim(), NullIfWhiteSpace(legalName)), new MediaContributorRoleDto(role, category)));
+            result.Add(new MediaContributorDto(new MediaContributorNameDto(displayName.Trim(), NullIfWhiteSpace(legalName)), role));
         }
 
         foreach (OpenLibraryAuthorResponse author in authors)
-            Add(author.Name, author.PersonalName, "Author", MediaContributorRoleCategory.Author);
+            Add(author.Name, author.PersonalName, MediaContributorRole.Author);
         foreach (string authorName in fallbackAuthors ?? [])
-            Add(authorName, null, "Author", MediaContributorRoleCategory.Author);
+            Add(authorName, null, MediaContributorRole.Author);
 
         foreach (string contribution in contributions ?? [])
         {
             Match match = ContributorPattern().Match(contribution);
             string name = match.Success ? match.Groups["name"].Value.Trim() : contribution.Trim();
-            string role = match.Success ? match.Groups["role"].Value.Trim() : "Contributor";
-            Add(name, null, role, ContributorCategory(role));
+            string role = match.Success ? match.Groups["role"].Value.Trim() : string.Empty;
+            Add(name, null, ContributorRole(role));
         }
         return result;
     }
@@ -505,24 +503,24 @@ internal static partial class OpenLibraryMapper
     }
 
     /// <summary>
-    /// Maps a contribution role into the canonical category of the role.
+    /// Maps a contribution role into the canonical role.
     /// </summary>
-    /// <param name="role">The role to categorize.</param>
-    /// <returns>The canonical category of the role.</returns>
-    private static MediaContributorRoleCategory ContributorCategory(string role)
+    /// <param name="role">The role to map.</param>
+    /// <returns>The canonical role.</returns>
+    private static MediaContributorRole ContributorRole(string role)
     {
         if (role.Contains("illustr", StringComparison.OrdinalIgnoreCase) ||
             role.Contains("artist", StringComparison.OrdinalIgnoreCase))
-            return MediaContributorRoleCategory.Illustrator;
+            return MediaContributorRole.Illustrator;
         if (role.Contains("translat", StringComparison.OrdinalIgnoreCase))
-            return MediaContributorRoleCategory.Translator;
+            return MediaContributorRole.Translator;
         if (role.Contains("narrat", StringComparison.OrdinalIgnoreCase))
-            return MediaContributorRoleCategory.Narrator;
+            return MediaContributorRole.Narrator;
         if (role.Contains("edit", StringComparison.OrdinalIgnoreCase) ||
             role.Contains("author", StringComparison.OrdinalIgnoreCase) ||
             role.Contains("writer", StringComparison.OrdinalIgnoreCase))
-            return MediaContributorRoleCategory.Author;
-        return MediaContributorRoleCategory.Other;
+            return MediaContributorRole.Author;
+        return MediaContributorRole.Other;
     }
 
     /// <summary>

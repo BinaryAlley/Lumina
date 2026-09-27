@@ -2,6 +2,8 @@
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Themes;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Themes;
@@ -71,7 +73,7 @@ public class DeleteThemeCommandHandler : ICommandHandler<DeleteThemeCommand, Res
             return ApplicationErrors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // only admins can delete themes
+        // Only admins can delete themes.
         if (!await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false))
             return ApplicationErrors.Authorization.NotAuthorized;
 
@@ -83,13 +85,13 @@ public class DeleteThemeCommandHandler : ICommandHandler<DeleteThemeCommand, Res
         if (theme is null || theme.IsDeleted)
             return DomainErrors.Themes.ThemeNotFound;
 
-        Result<IEnumerable<ThemeEntity>> getAllResult = await _unitOfWork.ThemeRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        Result<PaginatedResultDto<ThemeEntity>> getAllResult = await _unitOfWork.ThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getAllResult.IsFailure)
             return getAllResult.Errors;
 
-        List<ThemeEntity> availableThemes = getAllResult.Value.Where(availableTheme => !availableTheme.IsDeleted).ToList();
+        List<ThemeEntity> availableThemes = getAllResult.Value.Data.Where(availableTheme => !availableTheme.IsDeleted).ToList();
 
-        // at least one bundled theme must always remain available, so the application never ends up without any theme
+        // At least one bundled theme must always remain available, so the application never ends up without any theme.
         if (theme.InstallSource == ThemeInstallSource.Bundled)
         {
             int availableBundledThemes = availableThemes.Count(availableTheme => availableTheme.InstallSource == ThemeInstallSource.Bundled);
@@ -97,7 +99,7 @@ public class DeleteThemeCommandHandler : ICommandHandler<DeleteThemeCommand, Res
                 return DomainErrors.Themes.LastBundledThemeCannotBeDeleted;
         }
 
-        // if the deleted theme was the active one, switch to another available theme, preferring the configured default
+        // If the deleted theme was the active one, switch to another available theme, preferring the configured default.
         if (theme.IsCurrent == true)
         {
             ThemeEntity? replacementTheme = availableThemes
@@ -114,7 +116,7 @@ public class DeleteThemeCommandHandler : ICommandHandler<DeleteThemeCommand, Res
 
         if (theme.InstallSource == ThemeInstallSource.Bundled)
         {
-            // bundled themes are soft deleted, so they can be restored automatically later, as long as the user did not delete them
+            // Bundled themes are soft deleted, so they can be restored automatically later, as long as the user did not delete them.
             theme.IsDeleted = true;
             theme.IsCurrent = null;
             theme.UpdatedOnUtc = DateTime.UtcNow;
@@ -123,13 +125,15 @@ public class DeleteThemeCommandHandler : ICommandHandler<DeleteThemeCommand, Res
         }
         else
         {
-            // user themes are removed entirely, because their files are not shipped with the application and could never be restored
+            // User themes are removed entirely, because their files are not shipped with the application and could never be restored.
             Result<Deleted> deleteResult = await _unitOfWork.ThemeRepository.DeleteByIdAsync(theme.Id, cancellationToken).ConfigureAwait(false);
             if (deleteResult.IsFailure)
                 return deleteResult.Errors;
         }
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
 
         Result<Success> deleteFilesResult = await _themeService.DeleteAsync(theme.ThemeId, cancellationToken).ConfigureAwait(false);
         if (deleteFilesResult.IsFailure)

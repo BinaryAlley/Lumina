@@ -2,7 +2,7 @@
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DataAccess.Repositories.Books;
+using Lumina.Application.Common.DataAccess.Repositories.BookLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
@@ -219,7 +219,7 @@ public class MediaLibraryScanProviderConfigurationInvalidationJobTests
     public async Task ExecuteAsync_WhenGettingTheLibraryFails_ShouldMarkJobAsFailedAndPublishFailureEvent()
     {
         // Arrange
-        _mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(_libraryId.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Error.Failure("Database.Error", "Failed to get the media library"));
         SetupConfigurations();
 
@@ -254,7 +254,7 @@ public class MediaLibraryScanProviderConfigurationInvalidationJobTests
     public async Task ExecuteAsync_WhenLibraryDoesNotExist_ShouldMarkJobAsFailedAndPublishFailureEvent()
     {
         // Arrange
-        _mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(_libraryId.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(null));
 
         // Act
@@ -413,10 +413,10 @@ public class MediaLibraryScanProviderConfigurationInvalidationJobTests
     /// <param name="artworkConfigurations">The artwork provider configurations of the media library.</param>
     private void SetupLibraryAndConfigurations(LibraryEntity library, List<LibraryMetadataProviderConfigurationEntity>? metadataConfigurations = null, List<LibraryArtworkProviderConfigurationEntity>? artworkConfigurations = null)
     {
-        _mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(_libraryId.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
         SetupConfigurations(metadataConfigurations, artworkConfigurations);
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
     }
 
     /// <summary>

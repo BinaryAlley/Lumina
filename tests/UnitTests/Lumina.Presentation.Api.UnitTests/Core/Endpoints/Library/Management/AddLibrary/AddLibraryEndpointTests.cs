@@ -57,7 +57,7 @@ public class AddLibraryEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsConflictError_ShouldReturnProblemResult()
     {
         // Arrange
         AddLibraryRequest request = _addLibraryRequestFixture.Create();

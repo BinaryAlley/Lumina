@@ -4,6 +4,7 @@ using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentL
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Reading;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
@@ -36,6 +37,7 @@ public class GetReadingAvailabilityEndpointTests : IClassFixture<AuthenticatedLu
     };
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly BookEntityFixture _bookEntityFixture = new();
+    private readonly UserEntityFixture _userEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetReadingAvailabilityEndpointTests"/> class.
@@ -63,7 +65,7 @@ public class GetReadingAvailabilityEndpointTests : IClassFixture<AuthenticatedLu
         (Guid libraryId, Guid bookId) = await SeedBookAsync(userId);
 
         // Act
-        HttpResponseMessage response = await _client.GetAsync($"/api/v1/books/{bookId}/reading/availability");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/{bookId}/reading/availability");
 
         // Assert
         response.EnsureSuccessStatusCode();
@@ -79,7 +81,7 @@ public class GetReadingAvailabilityEndpointTests : IClassFixture<AuthenticatedLu
     public async Task GetReadingAvailability_WhenBookDoesNotExist_ShouldReturnBookNotFoundProblem()
     {
         // Act
-        HttpResponseMessage response = await _client.GetAsync($"/api/v1/books/{Guid.NewGuid()}/reading/availability");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/availability");
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -92,13 +94,64 @@ public class GetReadingAvailabilityEndpointTests : IClassFixture<AuthenticatedLu
     }
 
     [Fact]
+    public async Task GetReadingAvailability_WhenBookBelongsToAnotherUser_ShouldReturnForbidden()
+    {
+        // Arrange
+        Guid otherUserId = await SeedOtherUserAsync();
+        (Guid libraryId, Guid bookId) = await SeedBookAsync(otherUserId);
+
+        // Act
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/{bookId}/reading/availability");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        using JsonDocument problemDetails = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        Assert.Equal("General.Unauthorized", problemDetails.RootElement.GetProperty("title").GetString());
+        Assert.Equal("NotAuthorized", problemDetails.RootElement.GetProperty("detail").GetString());
+        Assert.DoesNotContain("Exception", problemDetails.RootElement.GetRawText(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task GetReadingAvailability_WhenBookBelongsToAnotherLibrary_ShouldReturnBookNotFoundProblem()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        (_, Guid bookId) = await SeedBookAsync(userId);
+
+        // Act
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{Guid.NewGuid()}/books/{bookId}/reading/availability");
+
+        // Assert
+        // The route library id is enforced, so a book can never be read through another library's route, and the mismatch is
+        // reported as not found, without disclosing that the book exists in another library.
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        Assert.Contains("BookNotFound", content, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task GetReadingAvailability_WhenRouteIdsAreNotParseable_ShouldReturnUnprocessableEntity()
+    {
+        // Act
+        HttpResponseMessage response = await _client.GetAsync("/api/v1/libraries/not-a-guid/books/not-a-guid/reading/availability");
+
+        // Assert
+        // The route values are kept as raw strings, so the unparseable Ids reach the query validator, which reports clean
+        // validation errors instead of failing the request binding.
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        Assert.Contains("LibraryIdCannotBeEmpty", content, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("BookIdCannotBeEmpty", content, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public async Task GetReadingAvailability_WhenUnauthorized_ShouldReturnUnauthorizedResult()
     {
         // Arrange
         HttpClient unauthenticatedClient = _apiFactory.CreateClient();
 
         // Act
-        HttpResponseMessage response = await unauthenticatedClient.GetAsync($"/api/v1/books/{Guid.NewGuid()}/reading/availability");
+        HttpResponseMessage response = await unauthenticatedClient.GetAsync($"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/reading/availability");
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -121,6 +174,20 @@ public class GetReadingAvailabilityEndpointTests : IClassFixture<AuthenticatedLu
         dbContext.Books.Add(book);
         await dbContext.SaveChangesAsync();
         return (libraryId, bookId);
+    }
+
+    /// <summary>
+    /// Seeds a user that is not the authenticated one and returns its Id.
+    /// </summary>
+    /// <returns>The Id of the seeded user.</returns>
+    private async Task<Guid> SeedOtherUserAsync()
+    {
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        Guid userId = Guid.NewGuid();
+        dbContext.Users.Add(_userEntityFixture.Create(id: userId, username: $"otheruser_{Guid.NewGuid()}", password: "TestPass123!"));
+        await dbContext.SaveChangesAsync();
+        return userId;
     }
 
     /// <summary>

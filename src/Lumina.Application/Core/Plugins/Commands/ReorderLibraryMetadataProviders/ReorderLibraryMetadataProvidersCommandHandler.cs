@@ -56,23 +56,26 @@ public class ReorderLibraryMetadataProvidersCommandHandler : ICommandHandler<Reo
         if (validationResult.Count > 0)
             return validationResult;
 
-        // an authenticated request must always carry a user identity
+        // An authenticated request must always carry a user identity.
         Guid? currentUserId = _currentUserService.UserId;
         if (currentUserId is null)
             return ApplicationErrors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // admins can reorder the metadata providers of any library; for everyone else, only their own libraries
+        // Admins can reorder the metadata providers of any library; for everyone else, only their own libraries.
         bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
             userId, new LibraryOwnershipPolicyContext(command.LibraryId), cancellationToken).ConfigureAwait(false);
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
+        // Load the metadata provider configurations that are currently registered for the library, so that only providers it actually has are reordered.
         Result<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>> getConfigurationsResult = await _unitOfWork.LibraryMetadataProviderConfigurationRepository.GetByLibraryIdAsync(command.LibraryId, cancellationToken).ConfigureAwait(false);
         if (getConfigurationsResult.IsFailure)
             return getConfigurationsResult.Errors;
 
+        // Index the configurations by plugin id, so that each requested plugin can be matched without repeatedly searching the list.
         Dictionary<Guid, LibraryMetadataProviderConfigurationEntity> configurationsByPluginId = getConfigurationsResult.Value.ToDictionary(configuration => configuration.PluginId);
+        // Walk the requested order and assign each provider the 1-based rank that matches its position in the command, so the persisted order follows the user's choice.
         for (int rank = 0; rank < command.PluginIds.Count; rank++)
         {
             Guid pluginId = command.PluginIds[rank];
@@ -85,7 +88,10 @@ public class ReorderLibraryMetadataProvidersCommandHandler : ICommandHandler<Reo
             }
         }
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        // Persist all the rank changes in a single save, so that the reorder is applied atomically.
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
         return Result.Success;
     }
 }

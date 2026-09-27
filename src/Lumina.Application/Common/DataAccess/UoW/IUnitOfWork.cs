@@ -1,12 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
-using Lumina.Application.Common.DataAccess.Repositories.Books;
+using Lumina.Application.Common.DataAccess.Repositories.BookLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.MediaContributors;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
+using Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Scheduling;
 using Lumina.Application.Common.DataAccess.Repositories.Themes;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
+using Lumina.Domain.Common.Primitives;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -42,6 +44,21 @@ public interface IUnitOfWork
     /// Gets the book repository.
     /// </summary>
     IBookRepository BookRepository { get; }
+
+    /// <summary>
+    /// Gets the artist repository.
+    /// </summary>
+    IArtistRepository ArtistRepository { get; }
+
+    /// <summary>
+    /// Gets the album repository.
+    /// </summary>
+    IAlbumRepository AlbumRepository { get; }
+
+    /// <summary>
+    /// Gets the track repository.
+    /// </summary>
+    ITrackRepository TrackRepository { get; }
 
     /// <summary>
     /// Gets the media contributor repository.
@@ -124,10 +141,11 @@ public interface IUnitOfWork
     IUserSettingsRepository UserSettingsRepository { get; }
 
     /// <summary>
-    /// Saves all changes made to the database.
+    /// Saves the changes made to the database.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    Task SaveChangesAsync(CancellationToken cancellationToken);
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Success>> SaveChangesAsync(CancellationToken cancellationToken);
 
     /// <summary>
     /// Detaches all the entities tracked by the unit of work, freeing the memory they occupy.

@@ -37,9 +37,10 @@ public class UpdateBookCoverEndpointTests : IClassFixture<LuminaWebFactory>
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
-        _apiFactory.ApiClientStub.RegisterPutResponse($"books/{Guid.Empty}/cover", "/media/books/cover.png");
+        Guid libraryId = Guid.NewGuid();
+        _apiFactory.ApiClientStub.RegisterPutResponse($"libraries/{libraryId}/books/{Guid.Empty}/cover", "/media/books/cover.png");
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
-        HttpRequestMessage uploadRequest = CreateUploadRequest(maliciousBookId, "cover.png");
+        HttpRequestMessage uploadRequest = CreateUploadRequest(maliciousBookId, libraryId, "cover.png");
         uploadRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);
 
         // Act
@@ -51,7 +52,7 @@ public class UpdateBookCoverEndpointTests : IClassFixture<LuminaWebFactory>
         Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains(_apiFactory.ApiClientStub.PutRequests, putRequest => putRequest.Endpoint == $"books/{Guid.Empty}/cover");
+        Assert.Contains(_apiFactory.ApiClientStub.PutRequests, putRequest => putRequest.Endpoint == $"libraries/{libraryId}/books/{Guid.Empty}/cover");
     }
 
     [Fact]
@@ -59,9 +60,11 @@ public class UpdateBookCoverEndpointTests : IClassFixture<LuminaWebFactory>
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
-        _apiFactory.ApiClientStub.RegisterPutResponse($"books/{Guid.NewGuid()}/cover", "/media/books/cover.png");
+        Guid libraryId = Guid.NewGuid();
+        Guid bookId = Guid.NewGuid();
+        _apiFactory.ApiClientStub.RegisterPutResponse($"libraries/{libraryId}/books/{bookId}/cover", "/media/books/cover.png");
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
-        HttpRequestMessage uploadRequest = CreateUploadRequest(Guid.NewGuid().ToString(), "..\\..\\evil.png");
+        HttpRequestMessage uploadRequest = CreateUploadRequest(bookId.ToString(), libraryId, "..\\..\\evil.png");
         uploadRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);
 
         // Act
@@ -80,7 +83,7 @@ public class UpdateBookCoverEndpointTests : IClassFixture<LuminaWebFactory>
         // Arrange
         _apiFactory.ApiClientStub.Reset();
         HttpClient anonymousClient = WebTestHelpers.CreateAnonymousClient(_apiFactory);
-        HttpRequestMessage uploadRequest = CreateUploadRequest(Guid.NewGuid().ToString(), "cover.png");
+        HttpRequestMessage uploadRequest = CreateUploadRequest(Guid.NewGuid().ToString(), Guid.NewGuid(), "cover.png");
 
         // Act
         HttpResponseMessage response = await anonymousClient.SendAsync(uploadRequest);
@@ -94,15 +97,16 @@ public class UpdateBookCoverEndpointTests : IClassFixture<LuminaWebFactory>
     /// Builds the multipart PUT request that uploads a cover to the book identified by <paramref name="bookId"/>.
     /// </summary>
     /// <param name="bookId">The route Id of the book whose cover is uploaded.</param>
+    /// <param name="libraryId">The Id of the media library the book belongs to.</param>
     /// <param name="fileName">The name of the uploaded file.</param>
     /// <returns>The configured upload request.</returns>
-    private static HttpRequestMessage CreateUploadRequest(string bookId, string fileName)
+    private static HttpRequestMessage CreateUploadRequest(string bookId, Guid libraryId, string fileName)
     {
         MultipartFormDataContent form = [];
         ByteArrayContent fileContent = new(Encoding.UTF8.GetBytes("fake cover payload"));
         fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
         form.Add(fileContent, "cover", fileName);
-        return new HttpRequestMessage(HttpMethod.Put, $"/en-us/library/written-content-library/books-library/books/{Uri.EscapeDataString(bookId)}/api-update-cover")
+        return new HttpRequestMessage(HttpMethod.Put, $"/en-us/library/written-content-library/books-library/books/{Uri.EscapeDataString(bookId)}/api-update-cover?libraryId={libraryId}")
         {
             Content = form
         };

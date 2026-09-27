@@ -58,7 +58,7 @@ public class GetLibraryScanProgressEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsNotFoundError_ShouldReturnProblemResult()
     {
         // Arrange
         GetLibraryScanProgressRequest request = _getLibraryScanProgressRequestFixture.Create();

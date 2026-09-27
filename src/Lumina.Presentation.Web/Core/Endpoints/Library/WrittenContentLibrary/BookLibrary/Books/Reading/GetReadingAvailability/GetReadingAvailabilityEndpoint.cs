@@ -48,7 +48,7 @@ public class GetReadingAvailabilityEndpoint : BaseEndpoint<GetBookReadingAvailab
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(GetBookReadingAvailabilityRequest request, CancellationToken cancellationToken)
     {
-        ReadingAvailabilityDto response = await _apiHttpClient.GetAsync<ReadingAvailabilityDto>(ApiRoutes.Books.GET_BOOK_READING_AVAILABILITY.Replace("{bookId}", request.BookId.ToString()), cancellationToken).ConfigureAwait(false);
+        ReadingAvailabilityDto response = await _apiHttpClient.GetAsync<ReadingAvailabilityDto>(ApiRoutes.Books.GET_BOOK_READING_AVAILABILITY.Replace("{libraryId}", request.LibraryId.ToString()).Replace("{bookId}", request.BookId.ToString()), cancellationToken).ConfigureAwait(false);
         return Results.Json(new { success = response.IsAvailable, errorCode = response.ErrorCode, libraryId = response.LibraryId });
     }
 }

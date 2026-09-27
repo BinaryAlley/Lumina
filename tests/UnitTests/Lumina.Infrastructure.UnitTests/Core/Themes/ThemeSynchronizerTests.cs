@@ -2,6 +2,8 @@
 using Lumina.Application.Common.DataAccess.Entities.Themes;
 using Lumina.Application.Common.DataAccess.Repositories.Themes;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Infrastructure.Models.DTO.Themes;
 using Lumina.Application.Common.Infrastructure.Themes;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Themes;
@@ -46,12 +48,12 @@ public class ThemeSynchronizerTests : IDisposable
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
         _mockThemeRepository = Substitute.For<IThemeRepository>();
         _mockUnitOfWork.ThemeRepository.Returns(_mockThemeRepository);
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockLogger = Substitute.For<ILogger>();
         _mockThemeService.GetBundledThemeArchivePaths().Returns([]);
         _mockThemeService.HasThemePack(Arg.Any<string>()).Returns(true);
         _mockThemeService.DefaultThemeId.Returns("lumina-default");
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(Result.From(Enumerable.Empty<ThemeEntity>()));
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
         _mockThemeRepository.InsertAsync(Arg.Any<ThemeEntity>(), Arg.Any<CancellationToken>()).Returns(Result.Created);
         _mockThemeRepository.UpdateAsync(Arg.Any<ThemeEntity>(), Arg.Any<CancellationToken>()).Returns(Result.Updated);
         _mockThemeRepository.DeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(Result.Deleted);
@@ -63,7 +65,7 @@ public class ThemeSynchronizerTests : IDisposable
     public async Task SynchronizeAsync_WhenTheInstalledThemesCannotBeRead_ShouldLogAndReturn()
     {
         // Arrange
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>())
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Error.Failure("Themes.NotFound", "Failed to read the installed themes"));
         _mockThemeService.GetBundledThemeArchivePaths().Returns(["bundled.zip"]);
 
@@ -97,7 +99,7 @@ public class ThemeSynchronizerTests : IDisposable
         // Arrange
         ThemeManifestDto manifest = _themeManifestDtoFixture.Create();
         ThemeEntity installedTheme = _themeEntityFixture.Create(themeId: manifest.Id, installSource: ThemeInstallSource.Bundled, isDeleted: false, includeIsCurrent: true, isCurrent: true);
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(new[] { installedTheme });
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [installedTheme], CurrentPage = 1, PerPage = 1, Count = 1, NumberOfPages = 1 }));
         _mockThemeService.GetBundledThemeArchivePaths().Returns(["bundled.zip"]);
         _mockThemeService.ReadManifestFromArchiveAsync("bundled.zip", Arg.Any<CancellationToken>()).Returns(Result.From(manifest));
 
@@ -115,7 +117,7 @@ public class ThemeSynchronizerTests : IDisposable
         // Arrange
         ThemeManifestDto manifest = _themeManifestDtoFixture.Create();
         ThemeEntity deletedTheme = _themeEntityFixture.Create(themeId: manifest.Id, installSource: ThemeInstallSource.Bundled, isDeleted: true);
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(new[] { deletedTheme });
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [deletedTheme], CurrentPage = 1, PerPage = 1, Count = 1, NumberOfPages = 1 }));
         _mockThemeService.GetBundledThemeArchivePaths().Returns(["bundled.zip"]);
         _mockThemeService.ReadManifestFromArchiveAsync("bundled.zip", Arg.Any<CancellationToken>()).Returns(Result.From(manifest));
 
@@ -133,7 +135,7 @@ public class ThemeSynchronizerTests : IDisposable
         // Arrange
         ThemeManifestDto manifest = _themeManifestDtoFixture.Create();
         ThemeEntity damagedTheme = _themeEntityFixture.Create(themeId: manifest.Id, installSource: ThemeInstallSource.Bundled, isDeleted: false, includeIsCurrent: true, isCurrent: true);
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(new[] { damagedTheme });
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [damagedTheme], CurrentPage = 1, PerPage = 1, Count = 1, NumberOfPages = 1 }));
         string archivePath = CreateArchiveFile();
         _mockThemeService.GetBundledThemeArchivePaths().Returns([archivePath]);
         // The first pack check happens before the repair and reports the files as missing; the later checks report the files as present.
@@ -155,7 +157,7 @@ public class ThemeSynchronizerTests : IDisposable
         // Arrange
         ThemeManifestDto manifest = _themeManifestDtoFixture.Create();
         ThemeEntity damagedTheme = _themeEntityFixture.Create(themeId: manifest.Id, installSource: ThemeInstallSource.Bundled, isDeleted: false, includeIsCurrent: true, isCurrent: true);
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(new[] { damagedTheme });
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [damagedTheme], CurrentPage = 1, PerPage = 1, Count = 1, NumberOfPages = 1 }));
         string archivePath = CreateArchiveFile();
         _mockThemeService.GetBundledThemeArchivePaths().Returns([archivePath]);
         _mockThemeService.HasThemePack(damagedTheme.ThemeId).Returns(false, true);
@@ -254,7 +256,7 @@ public class ThemeSynchronizerTests : IDisposable
     {
         // Arrange
         ThemeEntity healthyTheme = _themeEntityFixture.Create(installSource: ThemeInstallSource.Bundled, isDeleted: false, includeIsCurrent: true, isCurrent: true);
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(new[] { healthyTheme });
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [healthyTheme], CurrentPage = 1, PerPage = 1, Count = 1, NumberOfPages = 1 }));
 
         // Act
         await ThemeSynchronizer.SynchronizeAsync(_mockThemeService, _mockUnitOfWork, _mockLogger, CancellationToken.None);
@@ -269,7 +271,7 @@ public class ThemeSynchronizerTests : IDisposable
     {
         // Arrange
         ThemeEntity brokenTheme = _themeEntityFixture.Create(installSource: ThemeInstallSource.Bundled, isDeleted: false, includeIsCurrent: true, isCurrent: true);
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(new[] { brokenTheme });
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [brokenTheme], CurrentPage = 1, PerPage = 1, Count = 1, NumberOfPages = 1 }));
         _mockThemeService.HasThemePack(brokenTheme.ThemeId).Returns(false);
         _mockThemeService.RestoreBundledThemeAsync(brokenTheme.ThemeId, Arg.Any<CancellationToken>()).Returns(Result.Success);
 
@@ -287,7 +289,7 @@ public class ThemeSynchronizerTests : IDisposable
     {
         // Arrange
         ThemeEntity lastBundledTheme = _themeEntityFixture.Create(installSource: ThemeInstallSource.Bundled, isDeleted: false, includeIsCurrent: true, isCurrent: true);
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(new[] { lastBundledTheme });
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [lastBundledTheme], CurrentPage = 1, PerPage = 1, Count = 1, NumberOfPages = 1 }));
         _mockThemeService.HasThemePack(lastBundledTheme.ThemeId).Returns(false);
         _mockThemeService.RestoreBundledThemeAsync(lastBundledTheme.ThemeId, Arg.Any<CancellationToken>())
             .Returns(Error.Failure("Theme.Restore", "Failed to restore the theme"));
@@ -306,7 +308,7 @@ public class ThemeSynchronizerTests : IDisposable
         // Arrange
         ThemeEntity brokenBundledTheme = _themeEntityFixture.Create(installSource: ThemeInstallSource.Bundled, isDeleted: false);
         ThemeEntity healthyBundledTheme = _themeEntityFixture.Create(installSource: ThemeInstallSource.Bundled, isDeleted: false, includeIsCurrent: true, isCurrent: true);
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(new[] { brokenBundledTheme, healthyBundledTheme });
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [brokenBundledTheme, healthyBundledTheme], CurrentPage = 1, PerPage = 2, Count = 2, NumberOfPages = 1 }));
         _mockThemeService.HasThemePack(brokenBundledTheme.ThemeId).Returns(false);
         _mockThemeService.RestoreBundledThemeAsync(brokenBundledTheme.ThemeId, Arg.Any<CancellationToken>())
             .Returns(Error.Failure("Theme.Restore", "Failed to restore the theme"));
@@ -326,7 +328,7 @@ public class ThemeSynchronizerTests : IDisposable
         // Arrange
         ThemeEntity brokenBundledTheme = _themeEntityFixture.Create(installSource: ThemeInstallSource.Bundled, isDeleted: false);
         ThemeEntity healthyBundledTheme = _themeEntityFixture.Create(installSource: ThemeInstallSource.Bundled, isDeleted: false, includeIsCurrent: true, isCurrent: true);
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(new[] { brokenBundledTheme, healthyBundledTheme });
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [brokenBundledTheme, healthyBundledTheme], CurrentPage = 1, PerPage = 2, Count = 2, NumberOfPages = 1 }));
         _mockThemeService.HasThemePack(brokenBundledTheme.ThemeId).Returns(false);
         _mockThemeService.RestoreBundledThemeAsync(brokenBundledTheme.ThemeId, Arg.Any<CancellationToken>())
             .Returns(Error.Failure("Theme.Restore", "Failed to restore the theme"));
@@ -346,7 +348,7 @@ public class ThemeSynchronizerTests : IDisposable
     {
         // Arrange
         ThemeEntity brokenUserTheme = _themeEntityFixture.Create(installSource: ThemeInstallSource.Uploaded, isDeleted: false, includeIsCurrent: true, isCurrent: true);
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(new[] { brokenUserTheme });
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [brokenUserTheme], CurrentPage = 1, PerPage = 1, Count = 1, NumberOfPages = 1 }));
         _mockThemeService.HasThemePack(brokenUserTheme.ThemeId).Returns(false);
 
         // Act
@@ -361,7 +363,7 @@ public class ThemeSynchronizerTests : IDisposable
     {
         // Arrange
         ThemeEntity brokenUserTheme = _themeEntityFixture.Create(installSource: ThemeInstallSource.Uploaded, isDeleted: false, includeIsCurrent: true, isCurrent: true);
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(new[] { brokenUserTheme });
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [brokenUserTheme], CurrentPage = 1, PerPage = 1, Count = 1, NumberOfPages = 1 }));
         _mockThemeService.HasThemePack(brokenUserTheme.ThemeId).Returns(false);
         _mockThemeRepository.DeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
             .Returns(Error.Failure("Themes.DeleteFailed", "Failed to delete the theme"));
@@ -380,7 +382,7 @@ public class ThemeSynchronizerTests : IDisposable
         // Arrange
         ThemeEntity throwingBundledTheme = _themeEntityFixture.Create(installSource: ThemeInstallSource.Bundled, isDeleted: false);
         ThemeEntity healthyBundledTheme = _themeEntityFixture.Create(installSource: ThemeInstallSource.Bundled, isDeleted: false, includeIsCurrent: true, isCurrent: true);
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(new[] { throwingBundledTheme, healthyBundledTheme });
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [throwingBundledTheme, healthyBundledTheme], CurrentPage = 1, PerPage = 2, Count = 2, NumberOfPages = 1 }));
         _mockThemeService.HasThemePack(Arg.Any<string>()).Returns(false);
         _mockThemeService.RestoreBundledThemeAsync(throwingBundledTheme.ThemeId, Arg.Any<CancellationToken>())
             .Returns(Task.FromException<Result<Success>>(new InvalidOperationException("Unexpected failure")));
@@ -401,7 +403,7 @@ public class ThemeSynchronizerTests : IDisposable
     {
         // Arrange
         ThemeEntity brokenBundledTheme = _themeEntityFixture.Create(installSource: ThemeInstallSource.Bundled, isDeleted: false);
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(new[] { brokenBundledTheme });
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [brokenBundledTheme], CurrentPage = 1, PerPage = 1, Count = 1, NumberOfPages = 1 }));
         _mockThemeService.HasThemePack(brokenBundledTheme.ThemeId).Returns(false);
         _mockThemeService.RestoreBundledThemeAsync(brokenBundledTheme.ThemeId, Arg.Any<CancellationToken>())
             .Returns(Task.FromException<Result<Success>>(new OperationCanceledException()));

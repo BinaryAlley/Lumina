@@ -5,16 +5,17 @@ using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
 using Lumina.Contracts.DTO.Common;
+using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.Responses.Common;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
-using Lumina.Domain.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.ExternalIdentifiers.LibraryManagementBoundedContext.LibraryAggregate;
+using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.ExternalIdentifiers.MediaContributorBoundedContext.MediaContributorAggregate;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
@@ -59,6 +60,16 @@ public static class BookEntityMapping
             if (bookRatingResult.IsFailure)
                 return bookRatingResult.Errors;
 
+        List<BookMediaContributor> domainContributors = [];
+        foreach (BookContributorEntity bookContributor in repositoryEntity.Contributors)
+        {
+            Result<BookMediaContributor> contributorResult = BookMediaContributor.Create(
+                MediaContributorId.Create(bookContributor.MediaContributorId), bookContributor.Role);
+            if (contributorResult.IsFailure)
+                return contributorResult.Errors;
+            domainContributors.Add(contributorResult.Value);
+        }
+
         Result<ReleaseInfo> releaseInfoResult = ReleaseInfo.Create(
                     Optional<DateOnly>.FromNullable(repositoryEntity.OriginalReleaseDate),
                     Optional<int>.FromNullable(repositoryEntity.OriginalReleaseYear),
@@ -71,30 +82,20 @@ public static class BookEntityMapping
             return releaseInfoResult.Errors;
 
         Optional<LanguageInfo> languageInfo = Optional<LanguageInfo>.None();
-        if (repositoryEntity.LanguageCode is not null)
-        {
-            Result<LanguageInfo> languageInfoResult = LanguageInfo.Create(
+        if (repositoryEntity.LanguageCode is not null && repositoryEntity.LanguageName is not null)
+            languageInfo = LanguageInfo.Create(
                     repositoryEntity.LanguageCode,
                     repositoryEntity.LanguageName,
                     Optional<string>.FromNullable(repositoryEntity.LanguageNativeName)
                 );
-            if (languageInfoResult.IsFailure)
-                return languageInfoResult.Errors;
-            languageInfo = languageInfoResult.Value;
-        }
 
         Optional<LanguageInfo> originalLanguageCode = Optional<LanguageInfo>.None();
-        if (repositoryEntity.OriginalLanguageCode is not null)
-        {
-            Result<LanguageInfo> originalLanguageInfoResult = LanguageInfo.Create(
+        if (repositoryEntity.OriginalLanguageCode is not null && repositoryEntity.OriginalLanguageName is not null)
+            originalLanguageCode = LanguageInfo.Create(
                     repositoryEntity.OriginalLanguageCode,
-                    repositoryEntity.OriginalLanguageName!,
+                    repositoryEntity.OriginalLanguageName,
                     Optional<string>.FromNullable(repositoryEntity.OriginalLanguageNativeName)
                 );
-            if (originalLanguageInfoResult.IsFailure)
-                return originalLanguageInfoResult.Errors;
-            originalLanguageCode = originalLanguageInfoResult.Value;
-        }
 
         Result<WrittenContentMetadata> writtenContentMetadataResult = WrittenContentMetadata.Create(
                 repositoryEntity.Title,
@@ -134,7 +135,7 @@ public static class BookEntityMapping
             repositoryEntity.CreatedOnUtc,
             Optional<DateTime>.FromNullable(repositoryEntity.UpdatedOnUtc),
             [.. isbnsResult.Select(isbn => isbn.Value)],
-            [.. repositoryEntity.BookContributors.Select(bookContributor => MediaContributorId.Create(bookContributor.MediaContributorId))],
+            domainContributors,
             [.. bookRatingsResult.Select(bookRating => bookRating.Value)]);
         if (bookResult.IsFailure)
             return bookResult.Errors;
@@ -218,14 +219,14 @@ public static class BookEntityMapping
             repositoryEntity.BarnesAndNobleId,
             repositoryEntity.AppleBooksId,
             [.. repositoryEntity.ISBNs.ToResponses()],
-            null,
+            [.. repositoryEntity.Contributors.Select(contributor => new MediaContributorReferenceDto(contributor.MediaContributorId, contributor.Role))],
             [.. repositoryEntity.Ratings.ToResponses()],
             repositoryEntity.MetadataStatus,
             repositoryEntity.LastMetadataUpdateUtc,
             repositoryEntity.MetadataProvider,
             repositoryEntity.CreatedOnUtc,
             repositoryEntity.UpdatedOnUtc,
-            repositoryEntity.BookArtwork.FirstOrDefault(artwork => artwork.ArtworkType == ArtworkType.Cover)?.FileName
+            repositoryEntity.Artwork.FirstOrDefault(artwork => artwork.ArtworkType == ArtworkType.Cover)?.FileName
         );
     }
 
@@ -249,48 +250,6 @@ public static class BookEntityMapping
         return new PaginatedResponse<BookResponse>
         {
             Data = repositoryEntities.Data.ToResponses(),
-            CurrentPage = repositoryEntities.CurrentPage,
-            PerPage = repositoryEntities.PerPage,
-            Count = repositoryEntities.Count,
-            NumberOfPages = repositoryEntities.NumberOfPages
-        };
-    }
-
-    /// <summary>
-    /// Converts <paramref name="repositoryEntity"/> to <see cref="BookLiteResponse"/>.
-    /// </summary>
-    /// <param name="repositoryEntity">The repository entity to be converted.</param>
-    /// <returns>The converted response entity.</returns>
-    public static BookLiteResponse ToLiteResponse(this BookEntity repositoryEntity)
-    {
-        return new BookLiteResponse(
-            repositoryEntity.Id,
-            repositoryEntity.Title,
-            repositoryEntity.ReReleaseYear ?? repositoryEntity.OriginalReleaseYear,
-            repositoryEntity.BookArtwork.FirstOrDefault(artwork => artwork.ArtworkType == ArtworkType.Cover)?.FileName
-        );
-    }
-
-    /// <summary>
-    /// Converts <paramref name="repositoryEntities"/> to a collection of <see cref="BookLiteResponse"/>.
-    /// </summary>
-    /// <param name="repositoryEntities">The repository entities to be converted.</param>
-    /// <returns>The converted reponses.</returns>
-    public static IReadOnlyList<BookLiteResponse> ToLiteResponses(this IEnumerable<BookEntity> repositoryEntities)
-    {
-        return [.. repositoryEntities.Select(repositoryEntity => repositoryEntity.ToLiteResponse())];
-    }
-
-    /// <summary>
-    /// Converts <paramref name="repositoryEntities"/> to a paginated collection of <see cref="BookLiteResponse"/>.
-    /// </summary>
-    /// <param name="repositoryEntities">The paginated repository entities to be converted.</param>
-    /// <returns>The converted paginated responses.</returns>
-    public static PaginatedResponse<BookLiteResponse> ToLiteResponses(this PaginatedResultDto<BookEntity> repositoryEntities)
-    {
-        return new PaginatedResponse<BookLiteResponse>
-        {
-            Data = repositoryEntities.Data.ToLiteResponses(),
             CurrentPage = repositoryEntities.CurrentPage,
             PerPage = repositoryEntities.PerPage,
             Count = repositoryEntities.Count,

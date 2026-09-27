@@ -141,8 +141,26 @@
   <data name="BitrateMustBeAPositiveNumber" xml:space="preserve">
     <value>ビットレートは正の数でなければなりません！</value>
   </data>
+  <data name="An unexpected error occurred while processing the request." xml:space="preserve">
+    <value>リクエストの処理中に予期しないエラーが発生しました！</value>
+  </data>
+  <data name="InternalServerError" xml:space="preserve">
+    <value>サーバー内部エラー！</value>
+  </data>
+  <data name="UniqueConstraintViolation" xml:space="preserve">
+    <value>重複した値が一意制約に違反しています！</value>
+  </data>
   <data name="BookAlreadyExists" xml:space="preserve">
     <value>本はすでに存在します！</value>
+  </data>
+  <data name="BookCoverCannotBeNull" xml:space="preserve">
+    <value>本の表紙は null にできません。</value>
+  </data>
+  <data name="BookFileNotFound" xml:space="preserve">
+    <value>本のファイルが見つかりませんでした。</value>
+  </data>
+  <data name="BookIdCannotBeEmpty" xml:space="preserve">
+    <value>本の Id は空にできません。</value>
   </data>
   <data name="BookLibraryCannotBeNull" xml:space="preserve">
     <value>本のライブラリを null にすることはできません。</value>
@@ -152,6 +170,12 @@
   </data>
   <data name="BookPathCannotBeEmpty" xml:space="preserve">
     <value>本のパスを空にすることはできません。</value>
+  </data>
+  <data name="BookPathMustBeMaximum2048CharactersLong" xml:space="preserve">
+    <value>本のパスは最大 2048 文字です。</value>
+  </data>
+  <data name="BookPathMustBeWithinLibraryContentLocations" xml:space="preserve">
+    <value>本のパスはライブラリのコンテンツの場所のいずれかにある必要があります！</value>
   </data>
   <data name="CannotNavigateUp" xml:space="preserve">
     <value>上の階層に移動できません！</value>
@@ -273,6 +297,9 @@
   <data name="FileMoveError" xml:space="preserve">
     <value>ファイルの移動に失敗しました！</value>
   </data>
+  <data name="FileNameCannotBeEmpty" xml:space="preserve">
+    <value>ファイル名を空にすることはできません！</value>
+  </data>
   <data name="FileNotFound" xml:space="preserve">
     <value>ファイルが見つかりません！</value>
   </data>
@@ -323,9 +350,6 @@
   </data>
   <data name="InvalidIsbn13Format" xml:space="preserve">
     <value>無効なISBN13形式です！</value>
-  </data>
-  <data name="InvalidIsoCode" xml:space="preserve">
-    <value>無効なISOコードです！</value>
   </data>
   <data name="InvalidLccnFormat" xml:space="preserve">
     <value>無効なLCCN形式です！</value>
@@ -422,6 +446,12 @@
   </data>
   <data name="LibraryTypeCannotBeNull" xml:space="preserve">
     <value>ライブラリタイプをnullにすることはできません！</value>
+  </data>
+  <data name="MediaContributorIdCannotBeEmpty" xml:space="preserve">
+    <value>メディア寄稿者の Id は空にできません。</value>
+  </data>
+  <data name="MediaContributorNotFound" xml:space="preserve">
+    <value>メディア寄稿者が見つかりませんでした！</value>
   </data>
   <data name="MediaLibrariesDirectoryCannotBeEmpty" xml:space="preserve">
     <value>メディアライブラリのディレクトリを空にすることはできません。</value>
@@ -731,6 +761,9 @@
   </data>
   <data name="PluginFileNameCannotBeEmpty" xml:space="preserve">
     <value>プラグインのファイル名を空にすることはできません!</value>
+  </data>
+  <data name="UnknownMediaContributorRole" xml:space="preserve">
+    <value>不明なメディア寄稿者の役割です。</value>
   </data>
   <data name="UnsupportedPluginFileType" xml:space="preserve">
     <value>アップロードされたプラグインのファイルタイプはサポートされていません!</value>

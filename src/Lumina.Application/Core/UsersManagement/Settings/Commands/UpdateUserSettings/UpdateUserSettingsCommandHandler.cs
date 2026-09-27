@@ -106,7 +106,10 @@ public class UpdateUserSettingsCommandHandler : ICommandHandler<UpdateUserSettin
                 return updateResult.Errors;
         }
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
+
         return Result.Updated;
     }
 }

@@ -42,6 +42,5 @@ public static partial class Errors
         public static Error RatingValueCannotBeGreaterThanMaxValue => Error.Validation(description: nameof(RatingValueCannotBeGreaterThanMaxValue));
         public static Error RatingVoteCountMustBePositive => Error.Validation(description: nameof(RatingVoteCountMustBePositive));
         public static Error RatingsListCannotBeNull => Error.Validation(description: nameof(RatingsListCannotBeNull));
-        public static Error InvalidIsoCode => Error.Validation(description: nameof(InvalidIsoCode));
     }
 }

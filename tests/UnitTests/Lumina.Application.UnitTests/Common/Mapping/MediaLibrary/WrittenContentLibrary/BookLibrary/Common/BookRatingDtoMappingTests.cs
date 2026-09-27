@@ -56,7 +56,7 @@ public class BookRatingDtoMappingTests
     public void ToDomainEntity_WhenMappingMinimalBookRatingDto_ShouldMapRequiredPropertiesCorrectly()
     {
         // Arrange
-        BookRatingDto dto = _bookRatingDtoFixture.Create(includeOptionalProperties: false);
+        BookRatingDto dto = _bookRatingDtoFixture.Create(includeSource: false, includeVoteCount: false);
 
         // Act
         Result<BookRating> result = dto.ToDomainEntity();
@@ -90,7 +90,7 @@ public class BookRatingDtoMappingTests
         List<BookRatingDto> dtos =
         [
             _bookRatingDtoFixture.Create(),
-            _bookRatingDtoFixture.Create(includeOptionalProperties: false)
+            _bookRatingDtoFixture.Create(includeSource: false, includeVoteCount: false)
         ];
 
         // Act
@@ -125,7 +125,7 @@ public class BookRatingDtoMappingTests
         [
             _bookRatingDtoFixture.Create(),
             _bookRatingDtoFixture.Create(value: 10, maxValue: 5),
-            _bookRatingDtoFixture.Create(includeOptionalProperties: false)
+            _bookRatingDtoFixture.Create(includeSource: false, includeVoteCount: false)
         ];
 
         // Act

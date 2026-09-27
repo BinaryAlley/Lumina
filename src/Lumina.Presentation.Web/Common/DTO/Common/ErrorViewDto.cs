@@ -5,7 +5,7 @@ namespace Lumina.Presentation.Web.Common.DTO.Common;
 /// <summary>
 /// Data transfer object for the data shown on the error page.
 /// </summary>
-[DebuggerDisplay("RequestId: {RequestId}, ShowRequestId: {ShowRequestId}")]
+[DebuggerDisplay("RequestId: {RequestId}, ShouldShowRequestId: {ShouldShowRequestId}")]
 public class ErrorViewDto
 {
     /// <summary>
@@ -16,5 +16,5 @@ public class ErrorViewDto
     /// <summary>
     /// Gets a value indicating whether the request identifier should be shown.
     /// </summary>
-    public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+    public bool ShouldShowRequestId => !string.IsNullOrEmpty(RequestId);
 }

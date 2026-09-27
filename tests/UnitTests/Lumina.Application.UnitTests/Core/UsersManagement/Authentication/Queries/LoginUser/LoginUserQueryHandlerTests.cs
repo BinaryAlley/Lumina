@@ -42,6 +42,7 @@ public class LoginUserQueryHandlerTests
     public LoginUserQueryHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockHashService = Substitute.For<IPasswordHashService>();
         _mockJwtTokenGenerator = Substitute.For<IJwtTokenGenerator>();
         _mockTotpTokenGenerator = Substitute.For<ITotpTokenGenerator>();

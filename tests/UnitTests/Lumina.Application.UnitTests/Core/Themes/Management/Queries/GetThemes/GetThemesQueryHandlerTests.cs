@@ -2,6 +2,8 @@
 using Lumina.Application.Common.DataAccess.Entities.Themes;
 using Lumina.Application.Common.DataAccess.Repositories.Themes;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Core.Themes.Management.Queries.GetThemes;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Themes;
 using Lumina.Application.Fixtures.Core.Themes.Management.Queries.GetThemes;
@@ -35,6 +37,7 @@ public class GetThemesQueryHandlerTests
     public GetThemesQueryHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockThemeRepository = Substitute.For<IThemeRepository>();
         _mockUnitOfWork.ThemeRepository.Returns(_mockThemeRepository);
         _sut = new GetThemesQueryHandler(_mockUnitOfWork);
@@ -49,8 +52,8 @@ public class GetThemesQueryHandlerTests
         ThemeEntity bundledLowerTheme = _themeEntityFixture.Create(themeId: "bundled-lower", name: "apple", installSource: ThemeInstallSource.Bundled, isDeleted: false);
         ThemeEntity bundledUpperTheme = _themeEntityFixture.Create(themeId: "bundled-upper", name: "Banana", installSource: ThemeInstallSource.Bundled, isDeleted: false);
         ThemeEntity deletedTheme = _themeEntityFixture.Create(themeId: "deleted-theme", name: "Deleted", installSource: ThemeInstallSource.Uploaded, isDeleted: true);
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(Result.From<IEnumerable<ThemeEntity>>([uploadedTheme, bundledLowerTheme, bundledUpperTheme, deletedTheme]));
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [uploadedTheme, bundledLowerTheme, bundledUpperTheme, deletedTheme], CurrentPage = 1, PerPage = 4, Count = 4, NumberOfPages = 1 }));
 
         // Act
         Result<IReadOnlyList<ThemeResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
@@ -73,8 +76,8 @@ public class GetThemesQueryHandlerTests
     {
         // Arrange
         GetThemesQuery query = _getThemesQueryFixture.Create();
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(Result.From<IEnumerable<ThemeEntity>>([]));
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
 
         // Act
         Result<IReadOnlyList<ThemeResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
@@ -90,7 +93,7 @@ public class GetThemesQueryHandlerTests
         // Arrange
         GetThemesQuery query = _getThemesQueryFixture.Create();
         Error error = Error.Failure("Database.Error", "Failed to get all themes");
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>())
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
             .Returns(error);
 
         // Act

@@ -17,9 +17,9 @@ public interface IDirectoryProviderService
     /// Retrieves a list of subdirectory paths from the specified path.
     /// </summary>
     /// <param name="path">The path from which to retrieve the subdirectory paths.</param>
-    /// <param name="includeHiddenElements">Whether to include hidden subdirectories or not.</param>
+    /// <param name="shouldIncludeHiddenElements">Whether to include hidden subdirectories or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of directory paths or an error.</returns>
-    Result<IEnumerable<FileSystemPathId>> GetSubdirectoryPaths(FileSystemPathId path, bool includeHiddenElements);
+    Result<IEnumerable<FileSystemPathId>> GetSubdirectoryPaths(FileSystemPathId path, bool shouldIncludeHiddenElements);
 
     /// <summary>
     /// Checks if a directory with the specified path exists.
@@ -63,18 +63,18 @@ public interface IDirectoryProviderService
     /// </summary>
     /// <param name="sourcePath">Identifier for the path where the directory to be copied is located.</param>
     /// <param name="destinationPath">Identifier for the path where the directory will be copied.</param>
-    /// <param name="overrideExisting">Whether to override existing directories, or not.</param>
+    /// <param name="shouldOverrideExisting">Whether to override existing directories, or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either the copied directory, or an error.</returns>
-    Result<FileSystemPathId> CopyDirectory(FileSystemPathId sourcePath, FileSystemPathId destinationPath, bool overrideExisting);
+    Result<FileSystemPathId> CopyDirectory(FileSystemPathId sourcePath, FileSystemPathId destinationPath, bool shouldOverrideExisting);
 
     /// <summary>
     /// Moves a directory located at <paramref name="sourcePath"/> to <paramref name="destinationPath"/>.
     /// </summary>
     /// <param name="sourcePath">Identifier for the path where the directory to be moved is located.</param>
     /// <param name="destinationPath">Identifier for the path where the directory will be moved.</param>
-    /// <param name="overrideExisting">Whether to override existing directories, or not.</param>
+    /// <param name="shouldOverrideExisting">Whether to override existing directories, or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a moved directory, or an error.</returns>
-    Result<FileSystemPathId> MoveDirectory(FileSystemPathId sourcePath, FileSystemPathId destinationPath, bool overrideExisting);
+    Result<FileSystemPathId> MoveDirectory(FileSystemPathId sourcePath, FileSystemPathId destinationPath, bool shouldOverrideExisting);
 
     /// <summary>
     /// Renames a directory at the specified path.

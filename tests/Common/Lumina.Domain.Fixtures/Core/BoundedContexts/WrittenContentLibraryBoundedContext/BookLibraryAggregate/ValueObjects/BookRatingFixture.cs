@@ -17,7 +17,6 @@ namespace Lumina.Domain.Fixtures.Core.BoundedContexts.WrittenContentLibraryBound
 public class BookRatingFixture
 {
     private readonly Fixture _fixture = new();
-    private readonly Random _random = new();
 
     /// <summary>
     /// Creates a random valid <see cref="BookRating"/>.
@@ -33,10 +32,10 @@ public class BookRatingFixture
         Optional<BookRatingSource>? source = null,
         Optional<int>? voteCount = null)
     {
-        maxValue ??= _random.Next(5, 10);
-        value ??= _random.Next(1, (int)maxValue.Value);
+        maxValue ??= Random.Shared.Next(5, 10);
+        value ??= Random.Shared.Next(1, (int)maxValue.Value);
         source ??= Optional<BookRatingSource>.Some(_fixture.Create<BookRatingSource>());
-        voteCount ??= Optional<int>.Some(_random.Next(1, 1000));
+        voteCount ??= Optional<int>.Some(Random.Shared.Next(1, 1000));
 
         return BookRating.Create(value.Value, maxValue.Value, source.Value, voteCount.Value).Value;
     }

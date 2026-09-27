@@ -54,7 +54,7 @@ public class GetUserSettingsEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsFailureError_ShouldReturnProblemResult()
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
@@ -76,7 +76,7 @@ public class GetUserSettingsEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendGetUserSettingsQueryToHandler()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendGetUserSettingsQueryToSender()
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;

@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Scheduling;
 using Lumina.Contracts.Responses.Scheduling;
+using System;
 #endregion
 
 namespace Lumina.Application.Common.Mapping.Scheduling;
@@ -25,5 +26,29 @@ public static class ScheduledJobExecutionEntityMapping
             repositoryEntity.StartedOnUtc,
             repositoryEntity.CompletedOnUtc
         );
+    }
+
+    /// <summary>
+    /// Converts <paramref name="repositoryEntity"/> to a copy that carries the provided completion time.
+    /// </summary>
+    /// <param name="repositoryEntity">The repository entity to be converted.</param>
+    /// <param name="completedOnUtc">The completion time to assign to the converted entity.</param>
+    /// <returns>The converted repository entity.</returns>
+    public static ScheduledJobExecutionEntity ToUpdatedRepositoryEntity(this ScheduledJobExecutionEntity repositoryEntity, DateTime? completedOnUtc)
+    {
+        return new ScheduledJobExecutionEntity
+        {
+            Id = repositoryEntity.Id,
+            ScheduledJobId = repositoryEntity.ScheduledJobId,
+            TaskType = repositoryEntity.TaskType,
+            IsCycleRun = repositoryEntity.IsCycleRun,
+            WasCycleActive = repositoryEntity.WasCycleActive,
+            StartedOnUtc = repositoryEntity.StartedOnUtc,
+            CompletedOnUtc = completedOnUtc,
+            CreatedOnUtc = repositoryEntity.CreatedOnUtc,
+            CreatedBy = repositoryEntity.CreatedBy,
+            UpdatedOnUtc = repositoryEntity.UpdatedOnUtc,
+            UpdatedBy = repositoryEntity.UpdatedBy
+        };
     }
 }

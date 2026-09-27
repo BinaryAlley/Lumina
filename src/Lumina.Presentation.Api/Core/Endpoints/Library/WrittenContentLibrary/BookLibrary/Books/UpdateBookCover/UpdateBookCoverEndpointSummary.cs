@@ -1,5 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
+using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -18,20 +20,41 @@ public class UpdateBookCoverEndpointSummary : Summary<UpdateBookCoverEndpoint, E
     public UpdateBookCoverEndpointSummary()
     {
         Summary = "Updates the cover image of a book.";
-        Description = "Updates the cover image of the book identified by the request, with the image uploaded in the multipart form of the request.";
+        Description = "Updates the cover image of the book identified by the route, with the image uploaded in the multipart form of the request.";
 
         Response(200, "The relative path of the stored cover image is returned.",
-            example: "/media/books/books-3f2504e0-4f89-41d3-9a0c-0305e82c3301/The Lord of the Rings-2b0e5f5a-0b3f-4b7e-8f4a-8c9e3d2f5a6b/cover.jpg"
+            example: new UpdateBookCoverResponse(
+                CoverPath: "/media/books/books-3f2504e0-4f89-41d3-9a0c-0305e82c3301/The Lord of the Rings-2b0e5f5a-0b3f-4b7e-8f4a-8c9e3d2f5a6b/cover.jpg"
+            )
         );
 
         Response(401, "Authentication required.", "application/problem+json",
-            example: new
+            example: new[]
             {
-                type = "https://tools.ietf.org/html/rfc7235#section-3.1",
-                status = 401,
-                title = "Unauthorized",
-                detail = "You are not authorized",
-                instance = "/api/v1/books/{id}/cover"
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    status = 401,
+                    title = "Unauthorized",
+                    detail = "Authentication failed",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/cover"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    status = 401,
+                    title = "Unauthorized",
+                    detail = "The token has expired",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/cover"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    status = 401,
+                    title = "Unauthorized",
+                    detail = "The token is invalid",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/cover"
+                }
             }
         );
 
@@ -42,38 +65,52 @@ public class UpdateBookCoverEndpointSummary : Summary<UpdateBookCoverEndpoint, E
                 title = "General.Unauthorized",
                 status = 403,
                 detail = "NotAuthorized",
-                instance = "/api/v1/books/{id}/cover",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/cover",
                 traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
             }
         );
 
         Response(404, "The request failed because the book or its media library does not exist.", "application/problem+json",
-            example: new
+            example: new[]
             {
-                type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
-                title = "General.NotFound",
-                status = 404,
-                detail = "BookNotFound",
-                instance = "/api/v1/books/{id}/cover",
-                traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+                    title = "General.NotFound",
+                    status = 404,
+                    detail = "BookNotFound",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/cover",
+                    traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+                    title = "General.NotFound",
+                    status = 404,
+                    detail = "LibraryNotFound",
+                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/cover",
+                    traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+                }
             }
         );
 
-        Response(422, "The request did not pass validation checks.", "application/problem+json",
+        Response(422, "The request did not pass validation checks, either on the request itself or while storing the uploaded cover image.", "application/problem+json",
             example: new
             {
                 type = "https://tools.ietf.org/html/rfc4918#section-11.2",
                 title = "General.Validation",
                 status = 422,
                 detail = "OneOrMoreValidationErrorsOccurred",
-                instance = "/api/v1/books/{id}/cover",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/cover",
                 errors = new Dictionary<string, string[]>
                 {
                     {
                         "General.Validation", new[]
                         {
+                            "LibraryIdCannotBeEmpty",
                             "BookIdCannotBeEmpty",
                             "BookCoverCannotBeNull",
+                            "FileNameCannotBeEmpty",
                             "FileTooLarge",
                             "CoverFileMustBeAnImage"
                         }

@@ -64,7 +64,7 @@ public class GetUserPermissionsEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsFailureError_ShouldReturnProblemResult()
     {
         // Arrange
         GetUserPermissionsRequest request = _getUserPermissionsRequestFixture.Create();

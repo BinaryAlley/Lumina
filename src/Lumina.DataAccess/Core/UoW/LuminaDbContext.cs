@@ -2,6 +2,7 @@
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Entities.Scheduling;
@@ -20,6 +21,9 @@ namespace Lumina.DataAccess.Core.UoW;
 public class LuminaDbContext : DbContext
 {
     public virtual DbSet<BookEntity> Books { get; set; } = null!;
+    public virtual DbSet<ArtistEntity> Artists { get; set; } = null!;
+    public virtual DbSet<AlbumEntity> Albums { get; set; } = null!;
+    public virtual DbSet<TrackEntity> Tracks { get; set; } = null!;
     public virtual DbSet<UserEntity> Users { get; set; } = null!;
     public virtual DbSet<UserSettingsEntity> UserSettings { get; set; } = null!;
     public virtual DbSet<LibraryEntity> Libraries { get; set; } = null!;

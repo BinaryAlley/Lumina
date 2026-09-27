@@ -139,7 +139,7 @@ public class InstallThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         HttpResponseMessage response = await _client.PostAsync("/api/v1/themes", multipartContent);
 
         // Assert
-        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
         string content = await response.Content.ReadAsStringAsync();
 

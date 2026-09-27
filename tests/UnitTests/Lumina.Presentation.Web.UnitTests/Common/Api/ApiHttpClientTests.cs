@@ -67,7 +67,7 @@ public class ApiHttpClientTests
         Assert.Equal(HttpStatusCode.UnprocessableEntity, exception.HttpStatusCode);
         Assert.NotNull(exception.ProblemDetails);
         Assert.Equal("General.Validation", exception.ProblemDetails!.Title);
-        Assert.Equal(422, exception.ProblemDetails.Status);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, exception.ProblemDetails.Status);
         Assert.Equal("OneOrMoreValidationErrorsOccurred", exception.ProblemDetails.Detail);
     }
 
@@ -111,7 +111,7 @@ public class ApiHttpClientTests
         SuccessResponse result = await sut.PostAsync<SuccessResponse, object>("auth/login", new { username = "testuser" }, CancellationToken.None);
 
         // Assert
-        Assert.True(result.Success);
+        Assert.True(result.IsSuccess);
         Assert.Equal(HttpMethod.Post, messageHandler.Requests[0].Method);
         Assert.Equal("http://localhost:5214/api/v1/auth/login", messageHandler.Requests[0].RequestUri!.ToString());
         Assert.Contains("testuser", messageHandler.RequestBodies[0]);

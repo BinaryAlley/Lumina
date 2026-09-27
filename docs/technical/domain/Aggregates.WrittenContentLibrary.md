@@ -27,7 +27,7 @@ class Book
         Optional<string> barnesAndNobleId,
         Optional<string> appleBooksId,
         List<Isbn> isbns,
-        List<MediaContributorId> contributors,
+        List<BookMediaContributor> contributors,
         List<BookRating> ratings);
 }
 ```
@@ -46,7 +46,7 @@ class Book
       "originalReleaseYear": 1954,
       "reReleaseDate": "2001-09-06",
       "reReleaseYear": 2001,
-      "releaseCountry": "uk",
+      "releaseCountry": "GB",
       "releaseVersion": "50th Anniversary Edition"
     },
     "genres": [
@@ -99,7 +99,10 @@ class Book
   ],
   "contributors": [
     {
-      "value": "00000000-0000-0000-0000-000000000000",
+      "contributorId": {
+        "value": "00000000-0000-0000-0000-000000000000"
+      },
+      "role": "Author"
     }
   ],
   "ratings": [

@@ -47,6 +47,7 @@ public class LibraryScanFailedDomainEventHandlerTests
     public LibraryScanFailedDomainEventHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockLibraryScanRepository = Substitute.For<ILibraryScanRepository>();
         _mockLibraryScanStagingResultsRepository = Substitute.For<ILibraryScanStagingResultsRepository>();
         _mockUnitOfWork.LibraryScanRepository.Returns(_mockLibraryScanRepository);
@@ -73,7 +74,7 @@ public class LibraryScanFailedDomainEventHandlerTests
         LibraryScanEntity scan = _libraryScanEntityFixture.Create(
             id: compositeId.ScanId.Value,
             userId: compositeId.UserId.Value);
-        _mockLibraryScanRepository.GetByIdAsync(scan.Id, Arg.Any<CancellationToken>())
+        _mockLibraryScanRepository.GetByIdAsync(scan.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryScanEntity?>(scan));
 
         // Act
@@ -98,7 +99,7 @@ public class LibraryScanFailedDomainEventHandlerTests
             id: compositeId.ScanId.Value,
             userId: compositeId.UserId.Value,
             status: LibraryScanJobStatus.Failed);
-        _mockLibraryScanRepository.GetByIdAsync(scan.Id, Arg.Any<CancellationToken>())
+        _mockLibraryScanRepository.GetByIdAsync(scan.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryScanEntity?>(scan));
 
         // Act
@@ -119,7 +120,7 @@ public class LibraryScanFailedDomainEventHandlerTests
         // Arrange
         LibraryScanFailedDomainEvent domainEvent = _libraryScanFailedDomainEventFixture.Create();
         Error error = Error.Failure(description: "Failed to get library scan");
-        _mockLibraryScanRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+        _mockLibraryScanRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(error);
 
         // Act
@@ -136,7 +137,7 @@ public class LibraryScanFailedDomainEventHandlerTests
     {
         // Arrange
         LibraryScanFailedDomainEvent domainEvent = _libraryScanFailedDomainEventFixture.Create();
-        _mockLibraryScanRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+        _mockLibraryScanRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result<LibraryScanEntity?>.Success(null));
 
         // Act
@@ -157,7 +158,7 @@ public class LibraryScanFailedDomainEventHandlerTests
         LibraryScanEntity scan = _libraryScanEntityFixture.Create(
             id: compositeId.ScanId.Value,
             userId: compositeId.UserId.Value);
-        _mockLibraryScanRepository.GetByIdAsync(scan.Id, Arg.Any<CancellationToken>())
+        _mockLibraryScanRepository.GetByIdAsync(scan.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryScanEntity?>(scan));
         Error error = Error.Failure(description: "Failed to update library scan");
         _mockLibraryScanRepository.UpdateAsync(Arg.Any<LibraryScanEntity>(), Arg.Any<CancellationToken>())
@@ -181,7 +182,7 @@ public class LibraryScanFailedDomainEventHandlerTests
         LibraryScanEntity scan = _libraryScanEntityFixture.Create(
             id: compositeId.ScanId.Value,
             userId: compositeId.UserId.Value);
-        _mockLibraryScanRepository.GetByIdAsync(scan.Id, Arg.Any<CancellationToken>())
+        _mockLibraryScanRepository.GetByIdAsync(scan.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryScanEntity?>(scan));
         Error error = Error.Failure(description: "Failed to clear staging results");
         _mockLibraryScanStagingResultsRepository.ClearForScanAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())

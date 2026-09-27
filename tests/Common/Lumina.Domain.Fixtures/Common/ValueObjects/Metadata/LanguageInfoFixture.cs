@@ -2,7 +2,6 @@
 using Bogus;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -32,14 +31,10 @@ public class LanguageInfoFixture
     {
         string[] languages = ["en", "es", "fr", "de", "it", "ja", "ko", "zh", "pt", "ru"];
 
-        Result<LanguageInfo> languageInfoResult = LanguageInfo.Create(
+        return LanguageInfo.Create(
             languageCode ?? _faker.PickRandom(languages),
             languageName ?? _faker.Lorem.Word(),
             nativeName ?? Optional<string>.Some(_faker.Lorem.Word()));
-
-        if (languageInfoResult.IsFailure)
-            throw new InvalidOperationException("Failed to create LanguageInfo: " + string.Join(", ", languageInfoResult.Errors));
-        return languageInfoResult.Value;
     }
 
     /// <summary>

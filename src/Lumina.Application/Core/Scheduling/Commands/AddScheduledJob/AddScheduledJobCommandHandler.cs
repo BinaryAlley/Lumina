@@ -118,7 +118,10 @@ public class AddScheduledJobCommandHandler : ICommandHandler<AddScheduledJobComm
         Result<Created> insertScheduledJobResult = await _unitOfWork.ScheduledJobRepository.InsertAsync(persistenceScheduledJob, cancellationToken).ConfigureAwait(false);
         if (insertScheduledJobResult.IsFailure)
             return insertScheduledJobResult.Errors;
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
 
         // Queue any domain events.
         foreach (IDomainEvent domainEvent in createScheduledJobResult.Value.GetDomainEvents())

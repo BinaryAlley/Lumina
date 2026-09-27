@@ -44,7 +44,7 @@ public class GetBookDetailsEndpointTests : IClassFixture<LuminaWebFactory>
 
         // Assert
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
-        Assert.DoesNotContain(_apiFactory.ApiClientStub.GetEndpointsCalled, endpoint => endpoint.StartsWith("books/", StringComparison.OrdinalIgnoreCase));
+        Assert.DoesNotContain(_apiFactory.ApiClientStub.GetEndpointsCalled, endpoint => endpoint.StartsWith("libraries/", StringComparison.OrdinalIgnoreCase));
     }
 
     [Theory]
@@ -54,13 +54,14 @@ public class GetBookDetailsEndpointTests : IClassFixture<LuminaWebFactory>
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
+        Guid libraryId = Guid.NewGuid();
         string normalizedBookId = Guid.Empty.ToString();
         BookDetailsDto expectedBook = _bookDetailsDtoFixture.Create();
-        _apiFactory.ApiClientStub.RegisterGetResponse($"books/{normalizedBookId}", expectedBook);
+        _apiFactory.ApiClientStub.RegisterGetResponse($"libraries/{libraryId}/books/{normalizedBookId}", expectedBook);
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
 
         // Act
-        HttpResponseMessage response = await webClient.Client.GetAsync($"/en-us/library/written-content-library/books-library/books/{Uri.EscapeDataString(maliciousBookId)}/api-get-book");
+        HttpResponseMessage response = await webClient.Client.GetAsync($"/en-us/library/written-content-library/books-library/books/{Uri.EscapeDataString(maliciousBookId)}/api-get-book?libraryId={libraryId}");
         string content = await response.Content.ReadAsStringAsync();
 
         // Assert
@@ -73,6 +74,6 @@ public class GetBookDetailsEndpointTests : IClassFixture<LuminaWebFactory>
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("at Lumina", content, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains(_apiFactory.ApiClientStub.GetEndpointsCalled, endpoint => endpoint == $"books/{normalizedBookId}");
+        Assert.Contains(_apiFactory.ApiClientStub.GetEndpointsCalled, endpoint => endpoint == $"libraries/{libraryId}/books/{normalizedBookId}");
     }
 }

@@ -42,6 +42,7 @@ public class GetScheduledJobHistoryQueryHandlerTests
     public GetScheduledJobHistoryQueryHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockScheduledJobExecutionRepository = Substitute.For<IScheduledJobExecutionRepository>();

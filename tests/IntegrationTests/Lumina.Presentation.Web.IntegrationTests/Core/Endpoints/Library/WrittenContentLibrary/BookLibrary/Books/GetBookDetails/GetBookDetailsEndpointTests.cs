@@ -38,11 +38,12 @@ public class GetBookDetailsEndpointTests : IClassFixture<LuminaWebFactory>
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
+        Guid libraryId = Guid.NewGuid();
         Guid bookId = Guid.NewGuid();
         BookDetailsDto expectedBook = _bookDetailsDtoFixture.Create(id: bookId);
-        _apiFactory.ApiClientStub.RegisterGetResponse($"books/{bookId}", expectedBook);
+        _apiFactory.ApiClientStub.RegisterGetResponse($"libraries/{libraryId}/books/{bookId}", expectedBook);
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
-        HttpRequestMessage getRequest = new(HttpMethod.Get, $"/en-us/library/written-content-library/books-library/books/{bookId}/api-get-book");
+        HttpRequestMessage getRequest = new(HttpMethod.Get, $"/en-us/library/written-content-library/books-library/books/{bookId}/api-get-book?libraryId={libraryId}");
         getRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
         // Act
@@ -55,7 +56,7 @@ public class GetBookDetailsEndpointTests : IClassFixture<LuminaWebFactory>
         using JsonDocument json = JsonDocument.Parse(content);
         Assert.True(json.RootElement.GetProperty("success").GetBoolean());
         Assert.Equal(bookId, json.RootElement.GetProperty("data").GetProperty("id").GetGuid());
-        Assert.Contains($"books/{bookId}", _apiFactory.ApiClientStub.GetEndpointsCalled);
+        Assert.Contains($"libraries/{libraryId}/books/{bookId}", _apiFactory.ApiClientStub.GetEndpointsCalled);
     }
 
     [Fact]
@@ -66,10 +67,10 @@ public class GetBookDetailsEndpointTests : IClassFixture<LuminaWebFactory>
         HttpClient anonymousClient = WebTestHelpers.CreateAnonymousClient(_apiFactory);
 
         // Act
-        HttpResponseMessage response = await anonymousClient.GetAsync($"/en-us/library/written-content-library/books-library/books/{Guid.NewGuid()}/api-get-book");
+        HttpResponseMessage response = await anonymousClient.GetAsync($"/en-us/library/written-content-library/books-library/books/{Guid.NewGuid()}/api-get-book?libraryId={Guid.NewGuid()}");
 
         // Assert
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
-        Assert.DoesNotContain(_apiFactory.ApiClientStub.GetEndpointsCalled, endpoint => endpoint.StartsWith("books/", StringComparison.OrdinalIgnoreCase));
+        Assert.DoesNotContain(_apiFactory.ApiClientStub.GetEndpointsCalled, endpoint => endpoint.StartsWith("libraries/", StringComparison.OrdinalIgnoreCase));
     }
 }

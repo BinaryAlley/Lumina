@@ -84,7 +84,7 @@ public class StopScheduledJobCommandHandler : ICommandHandler<StopScheduledJobCo
             return ApplicationErrors.Authorization.NotAuthorized;
 
         // Get the scheduled job from the storage medium.
-        Result<ScheduledJobEntity?> getScheduledJobResult = await _unitOfWork.ScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, cancellationToken).ConfigureAwait(false);
+        Result<ScheduledJobEntity?> getScheduledJobResult = await _unitOfWork.ScheduledJobRepository.GetByIdAsync(command.ScheduledJobId, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getScheduledJobResult.IsFailure)
             return getScheduledJobResult.Errors;
         if (getScheduledJobResult.Value is null)
@@ -102,7 +102,10 @@ public class StopScheduledJobCommandHandler : ICommandHandler<StopScheduledJobCo
         Result<Updated> updateScheduledJobResult = await _unitOfWork.ScheduledJobRepository.UpdateAsync(scheduledJobDomainResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
         if (updateScheduledJobResult.IsFailure)
             return updateScheduledJobResult.Errors;
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
 
         // Stop the execution cycle in the scheduler service.
         await _scheduledJobScheduler.StopCycleAsync(scheduledJobDomainResult.Value.Id, cancellationToken).ConfigureAwait(false);

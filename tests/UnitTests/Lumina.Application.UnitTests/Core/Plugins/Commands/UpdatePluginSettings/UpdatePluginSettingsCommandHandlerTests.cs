@@ -34,6 +34,7 @@ public class UpdatePluginSettingsCommandHandlerTests
     public UpdatePluginSettingsCommandHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockPluginRepository = Substitute.For<IPluginRepository>();
         _mockUnitOfWork.PluginRepository.Returns(_mockPluginRepository);
         _mockValidator = Substitute.For<IValidator<UpdatePluginSettingsCommand>>();

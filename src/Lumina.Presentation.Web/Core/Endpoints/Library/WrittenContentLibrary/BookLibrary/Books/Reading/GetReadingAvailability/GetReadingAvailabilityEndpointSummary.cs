@@ -21,9 +21,11 @@ public class GetReadingAvailabilityEndpointSummary : Summary<GetReadingAvailabil
         Summary = "Checks the reading availability of a book.";
         Description = "Checks whether the book can be opened for reading, resolving the book reader configured for its media library and verifying that the reader is enabled, without extracting the book.";
         RequestParam(r => r.BookId, "The Id of the book whose reading availability is checked. Required.");
+        RequestParam(r => r.LibraryId, "The Id of the media library the book belongs to. Required.");
 
         ExampleRequest = new GetBookReadingAvailabilityRequest(
-            BookId: Guid.NewGuid()
+            BookId: Guid.NewGuid(),
+            LibraryId: Guid.NewGuid()
         );
 
         Response(200, "The reading availability of the book is returned.",

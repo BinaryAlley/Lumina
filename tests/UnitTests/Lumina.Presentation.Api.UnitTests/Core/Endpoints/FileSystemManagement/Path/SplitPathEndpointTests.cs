@@ -59,7 +59,7 @@ public class SplitPathEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsValidationErrors_ShouldReturnValidationProblemResult()
     {
         // Arrange
         SplitPathRequest request = _splitPathRequestFixture.Create(@"InvalidPath");
@@ -86,7 +86,7 @@ public class SplitPathEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendSplitPathCommandToHandler()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendSplitPathCommandToSender()
     {
         // Arrange
         SplitPathRequest request = _splitPathRequestFixture.Create(@"C:\Users\TestUser\Documents");

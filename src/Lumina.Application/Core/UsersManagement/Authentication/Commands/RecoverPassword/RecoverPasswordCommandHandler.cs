@@ -64,31 +64,37 @@ public class RecoverPasswordCommandHandler : ICommandHandler<RecoverPasswordComm
         if (validationResult.Count > 0)
             return validationResult;
 
-        // check if any users already exists
+        // Load the account by its username, so its existing recovery state and TOTP configuration can be checked.
         Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByUsernameAsync(command.Username!, cancellationToken).ConfigureAwait(false);
         if (getUserResult.IsFailure)
             return getUserResult.Errors;
         else if (getUserResult.Value is null)
             return Errors.Authentication.UsernameDoesNotExist;
-        else if (getUserResult.Value.TempPassword is not null) // if a temp password is present, a password request was already requested
+        else if (getUserResult.Value.TempPassword is not null) // If a temporary password is present, a password reset was already requested.
             return Errors.Authentication.PasswordResetAlreadyRequested;
-        // check if the user uses TOTP
-        bool usesTotp = !string.IsNullOrEmpty(getUserResult.Value.TotpSecret);
-        if (!usesTotp)
+
+        // Check if the user uses TOTP.
+        bool doesUseTotp = !string.IsNullOrEmpty(getUserResult.Value.TotpSecret);
+        if (!doesUseTotp)
             return Errors.Authentication.InvalidTotpCode;
-        if (usesTotp && string.IsNullOrEmpty(command.TotpCode))
+        if (doesUseTotp && string.IsNullOrEmpty(command.TotpCode))
             return Errors.Authentication.InvalidTotpCode;
-        else if (usesTotp && !string.IsNullOrEmpty(command.TotpCode)) // and if they do, validate it
+        else if (doesUseTotp && !string.IsNullOrEmpty(command.TotpCode)) // When the user uses TOTP, validate the provided code before allowing the reset.
             if (!_totpTokenGenerator.ValidateToken(Convert.FromBase64String(_cryptographyService.Decrypt(getUserResult.Value.TotpSecret!)), command.TotpCode))
                 return Errors.Authentication.InvalidTotpCode;
-        // hash the new password and assign it to a temporary password that will be valid 15 minutes
-        getUserResult.Value.TempPassword = Uri.EscapeDataString(_hashService.HashString("Abcd123$")); // TODO: replace with random password generator
+
+        // Generate the hash of a temporary password and record when it was created, so that the reset flow can expire it after 15 minutes.
+        getUserResult.Value.TempPassword = Uri.EscapeDataString(_hashService.HashString("Abcd123$")); // TODO: Replace the hardcoded password with a randomly generated one.
         getUserResult.Value.TempPasswordCreated = DateTime.UtcNow;
-        // update the user
+
+        // Update the user and persist the temporary password.
         Result<Updated> updateUserResult = await _unitOfWork.UserRepository.UpdateAsync(getUserResult.Value, cancellationToken).ConfigureAwait(false);
         if (updateUserResult.IsFailure)
             return updateUserResult.Errors;
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
         return new RecoverPasswordResponse(true);
     }
 }

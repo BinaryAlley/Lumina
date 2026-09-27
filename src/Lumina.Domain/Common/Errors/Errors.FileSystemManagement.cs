@@ -26,6 +26,7 @@ public static partial class Errors
         public static Error BitrateMustBeAPositiveNumber => Error.Validation(description: nameof(BitrateMustBeAPositiveNumber));
         public static Error CannotNavigateUp => Error.Failure(description: nameof(CannotNavigateUp));
         public static Error NameCannotBeEmpty => Error.Validation(description: nameof(NameCannotBeEmpty));
+        public static Error FileNameCannotBeEmpty => Error.Validation(description: nameof(FileNameCannotBeEmpty));
         public static Error FileAlreadyExists => Error.Conflict(description: nameof(FileAlreadyExists));
         public static Error DirectoryNotFound => Error.NotFound(description: nameof(DirectoryNotFound));
         public static Error DirectoryAlreadyExists => Error.Conflict(description: nameof(DirectoryAlreadyExists));

@@ -21,7 +21,7 @@ public class GetArtworkProvidersEndpointSummary : Summary<GetArtworkProvidersEnd
     public GetArtworkProvidersEndpointSummary()
     {
         Summary = "Retrieves the artwork providers of a media library.";
-        Description = "Retrieves the artwork providers of the media library identified by the request.";
+        Description = "Retrieves the artwork providers of the media library identified by the route.";
 
         RequestParam(r => r.LibraryId, "The unique identifier of the media library whose artwork providers are retrieved. Required.");
 

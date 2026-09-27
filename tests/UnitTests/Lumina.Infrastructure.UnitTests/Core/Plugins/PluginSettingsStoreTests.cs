@@ -35,6 +35,7 @@ public class PluginSettingsStoreTests
     public PluginSettingsStoreTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockPluginRepository = Substitute.For<IPluginRepository>();
         _mockLogger = Substitute.For<ILogger<PluginSettingsStore>>();
         _mockUnitOfWork.PluginRepository.Returns(_mockPluginRepository);
@@ -49,7 +50,7 @@ public class PluginSettingsStoreTests
         Guid pluginId = Guid.NewGuid();
         Dictionary<string, string> expectedSettings = new() { ["ApiKey"] = "test-key", ["Enabled"] = "true" };
         PluginEntity pluginEntity = _pluginEntityFixture.Create(id: pluginId, settingsJson: JsonSerializer.Serialize(expectedSettings));
-        _mockPluginRepository.GetByIdAsync(pluginId, Arg.Any<CancellationToken>())
+        _mockPluginRepository.GetByIdAsync(pluginId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<PluginEntity?>(pluginEntity));
 
         // Act
@@ -66,7 +67,7 @@ public class PluginSettingsStoreTests
         // Arrange
         Guid pluginId = Guid.NewGuid();
         PluginEntity pluginEntity = _pluginEntityFixture.Create(id: pluginId, includeSettingsJson: false);
-        _mockPluginRepository.GetByIdAsync(pluginId, Arg.Any<CancellationToken>())
+        _mockPluginRepository.GetByIdAsync(pluginId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<PluginEntity?>(pluginEntity));
 
         // Act
@@ -81,7 +82,7 @@ public class PluginSettingsStoreTests
     {
         // Arrange
         Guid pluginId = Guid.NewGuid();
-        _mockPluginRepository.GetByIdAsync(pluginId, Arg.Any<CancellationToken>())
+        _mockPluginRepository.GetByIdAsync(pluginId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<PluginEntity?>(null));
 
         // Act
@@ -96,7 +97,7 @@ public class PluginSettingsStoreTests
     {
         // Arrange
         Guid pluginId = Guid.NewGuid();
-        _mockPluginRepository.GetByIdAsync(pluginId, Arg.Any<CancellationToken>())
+        _mockPluginRepository.GetByIdAsync(pluginId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Error.Failure("Database.Error", "Failed to retrieve the plugin"));
 
         // Act

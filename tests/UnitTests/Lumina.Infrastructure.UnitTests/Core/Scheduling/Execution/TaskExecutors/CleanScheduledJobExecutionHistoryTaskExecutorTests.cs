@@ -37,6 +37,7 @@ public class CleanScheduledJobExecutionHistoryTaskExecutorTests
     {
         _mockDateTimeProvider = Substitute.For<IDateTimeProvider>();
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockScheduledJobExecutionRepository = Substitute.For<IScheduledJobExecutionRepository>();
         _mockDateTimeProvider.UtcNow.Returns(_fixedUtcNow);
         _mockUnitOfWork.ScheduledJobExecutionRepository.Returns(_mockScheduledJobExecutionRepository);

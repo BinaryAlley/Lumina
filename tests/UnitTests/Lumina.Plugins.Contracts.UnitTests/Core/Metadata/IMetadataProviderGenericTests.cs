@@ -30,7 +30,7 @@ public class IMetadataProviderGenericTests
         // Arrange
         BookMetadataLookupDto lookup = _bookMetadataLookupDtoFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
-        BookMetadataDto expectedMetadata = _bookMetadataDtoFixture.Create(title: "Search Result", includeOptionalProperties: false);
+        BookMetadataDto expectedMetadata = _bookMetadataDtoFixture.Create(title: "Search Result", includeReleaseInfo: false, includeGenres: false, includeTags: false, includeLanguage: false, includeFormat: false, includeVolumeNumber: false);
         TestBookMetadataProvider provider = new(expectedMetadata);
         IMetadataProvider baseProvider = provider;
 
@@ -50,7 +50,7 @@ public class IMetadataProviderGenericTests
         // Arrange
         BookMetadataLookupDto lookup = _bookMetadataLookupDtoFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
-        BookMetadataDto expectedMetadata = _bookMetadataDtoFixture.Create(title: "Exact Result", includeOptionalProperties: false);
+        BookMetadataDto expectedMetadata = _bookMetadataDtoFixture.Create(title: "Exact Result", includeReleaseInfo: false, includeGenres: false, includeTags: false, includeLanguage: false, includeFormat: false, includeVolumeNumber: false);
         TestBookMetadataProvider provider = new(expectedMetadata);
         IMetadataProvider baseProvider = provider;
 
@@ -68,7 +68,7 @@ public class IMetadataProviderGenericTests
     {
         // Arrange
         MetadataLookupDto otherLookup = _otherMetadataLookupDtoFixture.Create();
-        TestBookMetadataProvider provider = new(_bookMetadataDtoFixture.Create(title: "Search Result", includeOptionalProperties: false));
+        TestBookMetadataProvider provider = new(_bookMetadataDtoFixture.Create(title: "Search Result", includeReleaseInfo: false, includeGenres: false, includeTags: false, includeLanguage: false, includeFormat: false, includeVolumeNumber: false));
         IMetadataProvider baseProvider = provider;
 
         // Act
@@ -87,7 +87,7 @@ public class IMetadataProviderGenericTests
     {
         // Arrange
         MetadataLookupDto otherLookup = _otherMetadataLookupDtoFixture.Create();
-        TestBookMetadataProvider provider = new(_bookMetadataDtoFixture.Create(title: "Exact Result", includeOptionalProperties: false));
+        TestBookMetadataProvider provider = new(_bookMetadataDtoFixture.Create(title: "Exact Result", includeReleaseInfo: false, includeGenres: false, includeTags: false, includeLanguage: false, includeFormat: false, includeVolumeNumber: false));
         IMetadataProvider baseProvider = provider;
 
         // Act

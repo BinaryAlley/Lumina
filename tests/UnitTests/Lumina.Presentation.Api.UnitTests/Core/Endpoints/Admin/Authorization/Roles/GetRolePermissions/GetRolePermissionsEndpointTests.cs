@@ -64,7 +64,7 @@ public class GetRolePermissionsEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsFailureError_ShouldReturnProblemResult()
     {
         // Arrange
         GetRolePermissionsRequest request = _getRolePermissionsRequestFixture.Create();

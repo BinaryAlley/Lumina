@@ -18,22 +18,31 @@ public class AddBookCommandValidator : AbstractValidator<AddBookCommand>
     /// </summary>
     public AddBookCommandValidator()
     {
+        // Validates the identifier of the media library that will own the book, taken from the route.
         RuleFor(command => command.LibraryId)
             .NotEmpty()
-            .WithError(Errors.WrittenContent.BookLibraryCannotBeNull)
-            .Must(id => id != Guid.Empty)
-            .WithError(Errors.WrittenContent.BookLibraryCannotBeNull);
+            .WithError(Errors.Library.LibraryIdCannotBeEmpty);
+
+        RuleFor(command => command.LibraryId)
+            .Must(libraryId => Guid.TryParse(libraryId, out Guid parsedLibraryId) && parsedLibraryId != Guid.Empty)
+            .When(command => command.LibraryId is not null && command.LibraryId.Length > 0)
+            .WithError(Errors.Library.LibraryIdCannotBeEmpty);
        
+        // Validates the file system path of the book.
         RuleFor(command => command.Path)
             .NotEmpty()
-            .WithError(Errors.WrittenContent.BookPathCannotBeEmpty);
+            .WithError(Errors.WrittenContent.BookPathCannotBeEmpty)
+            .MaximumLength(2048)
+            .WithError(Errors.WrittenContent.BookPathMustBeMaximum2048CharactersLong);
        
+        // Validates the metadata of the book: title, lengths, release information, languages, genres and tags.
         RuleFor(command => command.Metadata)
             .NotNull()
             .WithError(Errors.Metadata.MetadataCannotBeNull)
             .ChildRules(metadata =>
             {
                 metadata.RuleFor(m => m!.Title)
+                    .NotNull()
                     .NotEmpty()
                     .WithError(Errors.Metadata.TitleCannotBeEmpty)
                     .MaximumLength(255)
@@ -117,8 +126,7 @@ public class AddBookCommandValidator : AbstractValidator<AddBookCommand>
                 metadata.RuleFor(m => m!.Tags)
                     .NotNull()
                     .WithError(Errors.Metadata.TagsListCannotBeNull);
-             
-                
+
                 metadata.RuleForEach(m => m!.Tags)
                     .ChildRules(tag =>
                         tag.RuleFor(t => t.Name)
@@ -130,7 +138,7 @@ public class AddBookCommandValidator : AbstractValidator<AddBookCommand>
                 metadata.RuleFor(m => m!.Language!.LanguageCode)
                     .NotEmpty()
                     .WithError(Errors.Metadata.LanguageCodeCannotBeEmpty)
-                    .MaximumLength(2)
+                    .Length(2)
                     .WithError(Errors.Metadata.LanguageCodeMustBe2CharactersLong)
                     .When(m => m!.Language is not null);
               
@@ -147,8 +155,9 @@ public class AddBookCommandValidator : AbstractValidator<AddBookCommand>
                     .When(m => m!.Language is not null);
              
                 metadata.RuleFor(m => m!.OriginalLanguage!.LanguageCode)
-                    .NotEmpty().WithError(Errors.Metadata.LanguageCodeCannotBeEmpty)
-                    .MaximumLength(2)
+                    .NotEmpty()
+                    .WithError(Errors.Metadata.LanguageCodeCannotBeEmpty)
+                    .Length(2)
                     .WithError(Errors.Metadata.LanguageCodeMustBe2CharactersLong)
                     .When(m => m!.OriginalLanguage is not null);
             
@@ -175,6 +184,7 @@ public class AddBookCommandValidator : AbstractValidator<AddBookCommand>
                     .WithError(Errors.WrittenContent.PageCountMustBeGreaterThanZero);
             });
        
+        // Validates the physical characteristics of the book: format, edition and volume number.
         RuleFor(command => command.Format)
             .IsInEnum()
             .When(command => command.Format is not null)
@@ -190,6 +200,7 @@ public class AddBookCommandValidator : AbstractValidator<AddBookCommand>
             .When(command => command.VolumeNumber.HasValue)
             .WithError(Errors.WrittenContent.VolumeNumberMustBeGreaterThanZero);
              
+        // Validates the series the book is part of, when the request carries one.
         RuleFor(command => command.Series)
             .ChildRules(series =>
                 series.RuleFor(s => s!.Title)
@@ -199,6 +210,7 @@ public class AddBookCommandValidator : AbstractValidator<AddBookCommand>
                     .WithError(Errors.Metadata.TitleMustBeMaximum255CharactersLong))
             .When(command => command.Series is not null);
       
+        // Validates the external identifiers of the book.
         RuleFor(command => command.ASIN)
             .Length(10)
             .When(command => command.ASIN is not null)
@@ -249,6 +261,7 @@ public class AddBookCommandValidator : AbstractValidator<AddBookCommand>
             .When(command => command.AppleBooksId is not null)
             .WithError(Errors.WrittenContent.InvalidAppleBooksIdFormat);
      
+        // Validates the ISBN list of the book.
         RuleFor(command => command.ISBNs)
             .NotNull()
             .WithError(Errors.WrittenContent.IsbnListCannotBeNull);
@@ -274,49 +287,27 @@ public class AddBookCommandValidator : AbstractValidator<AddBookCommand>
                     .IsInEnum()
                     .WithError(Errors.WrittenContent.UnknownIsbnFormat);
             });
-      
+
+        // Validates the media contributors that contributed to the book.
         RuleFor(command => command.Contributors)
             .NotNull()
             .WithError(Errors.MediaContributor.ContributorsListCannotBeNull);
-      
+
         RuleForEach(command => command.Contributors)
             .ChildRules(contributor =>
             {
-                contributor.RuleFor(c => c.Name)
-                    .NotNull()
-                    .WithError(Errors.MediaContributor.ContributorNameCannotBeEmpty)
-                    .ChildRules(name =>
-                    {
-                        name.RuleFor(n => n!.DisplayName)
-                            .NotNull()
-                            .WithError(Errors.MediaContributor.ContributorDisplayNameCannotBeEmpty)
-                            .NotEmpty()
-                            .WithError(Errors.MediaContributor.ContributorDisplayNameCannotBeEmpty)
-                            .MaximumLength(100)
-                            .WithError(Errors.MediaContributor.ContributorDisplayNameMustBeMaximum100CharactersLong);
-                      
-                        name.RuleFor(n => n!.LegalName)
-                            .MaximumLength(100)
-                            .When(n => n!.LegalName is not null)
-                            .WithError(Errors.MediaContributor.ContributorLegalNameMustBeMaximum100CharactersLong);
-                    });
-               
+                contributor.RuleFor(c => c.ContributorId)
+                    .NotEmpty()
+                    .WithError(Errors.MediaContributor.MediaContributorIdCannotBeEmpty)
+                    .Must(contributorId => contributorId != Guid.Empty)
+                    .WithError(Errors.MediaContributor.MediaContributorIdCannotBeEmpty);
+
                 contributor.RuleFor(c => c.Role)
-                    .NotNull()
-                    .WithError(Errors.MediaContributor.ContributorRoleCannotBeNull)
-                    .ChildRules(role =>
-                    {
-                        role.RuleFor(r => r!.Name)
-                            .NotEmpty()
-                            .WithError(Errors.MediaContributor.RoleNameCannotBeEmpty)
-                            .MaximumLength(50)
-                            .WithError(Errors.MediaContributor.RoleNameMustBeMaximum50CharactersLong);
-                        role.RuleFor(r => r!.Category)
-                            .NotEmpty()
-                            .WithError(Errors.MediaContributor.RoleCategoryCannotBeEmpty);
-                    });
+                    .IsInEnum()
+                    .WithError(Errors.MediaContributor.UnknownMediaContributorRole);
             });
        
+        // Validates the ratings of the book.
         RuleFor(command => command.Ratings)
             .NotNull()
             .WithError(Errors.Metadata.RatingsListCannotBeNull);

@@ -46,25 +46,25 @@ public class LibraryScanQueuedDomainEventHandler : IDomainEventHandler<LibrarySc
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public async ValueTask HandleAsync(LibraryScanQueuedDomainEvent domainEvent, CancellationToken cancellationToken)
     {
-        // get the library scan that was queued, from the repository
-        Result<LibraryScanEntity?> getLibraryScanResult = await _unitOfWork.LibraryScanRepository.GetByIdAsync(domainEvent.ScanId.Value, cancellationToken).ConfigureAwait(false);
+        // Get the library scan that was queued, from the repository.
+        Result<LibraryScanEntity?> getLibraryScanResult = await _unitOfWork.LibraryScanRepository.GetByIdAsync(domainEvent.ScanId.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getLibraryScanResult.IsFailure)
             throw new EventualConsistencyException(getLibraryScanResult.FirstError, getLibraryScanResult.Errors);
         if (getLibraryScanResult.Value is null)
             throw new EventualConsistencyException(Errors.LibraryScanning.LibraryScanNotFound);
 
-        // convert the repository entity to a domain entity
+        // Convert the repository entity to a domain entity.
         Result<LibraryScan> libraryScanDomainResult = getLibraryScanResult.Value.ToDomainEntity();
         if (libraryScanDomainResult.IsFailure)
             throw new EventualConsistencyException(libraryScanDomainResult.FirstError, libraryScanDomainResult.Errors);
 
-        // start the media library scan
+        // Start the media library scan.
         Result<Success> startScanResult = await _mediaLibraryScanningService.StartScanAsync(
             libraryScanDomainResult.Value, getLibraryScanResult.Value.Library.LibraryType, cancellationToken).ConfigureAwait(false);
         if (startScanResult.IsFailure)
             throw new EventualConsistencyException(startScanResult.FirstError, startScanResult.Errors);
 
-        // queue any domain events
+        // Queue any domain events.
         foreach (IDomainEvent queuedDomainEvent in libraryScanDomainResult.Value.GetDomainEvents())
             _domainEventsQueue.Enqueue(queuedDomainEvent);
     }

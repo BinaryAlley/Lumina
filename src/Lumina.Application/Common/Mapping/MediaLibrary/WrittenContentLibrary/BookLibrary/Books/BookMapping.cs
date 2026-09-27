@@ -4,6 +4,7 @@ using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using System;
+using System.Linq;
 #endregion
 
 namespace Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
@@ -57,11 +58,22 @@ public static class BookMapping
             BarnesAndNobleId = domainEntity.BarnesAndNobleId.HasValue ? domainEntity.BarnesAndNobleId.Value : null,
             AppleBooksId = domainEntity.AppleBooksId.HasValue ? domainEntity.AppleBooksId.Value : null,
             ISBNs = [.. domainEntity.ISBNs.ToRepositoryEntities()],
+            Contributors = [.. domainEntity.Contributors.Select(contributor => new BookContributorEntity
+            {
+                Id = Guid.NewGuid(),
+                BookId = domainEntity.Id.Value,
+                MediaContributorId = contributor.ContributorId.Value,
+                Role = contributor.Role,
+                CreatedOnUtc = domainEntity.CreatedOnUtc,
+                CreatedBy = Guid.Empty,
+                UpdatedBy = null
+            })],
             Ratings = [.. domainEntity.Ratings.ToRepositoryEntities()],
             CreatedOnUtc = domainEntity.CreatedOnUtc,
-            CreatedBy = Guid.NewGuid(),
-            UpdatedOnUtc = domainEntity.UpdatedOnUtc.HasValue ? domainEntity.UpdatedOnUtc : null,
-            UpdatedBy = domainEntity.UpdatedOnUtc.HasValue ? Guid.NewGuid() : null,
+            CreatedBy = Guid.Empty,
+            // The audit columns are owned by the auditing interceptor, which stamps only the rows that actually changed, so they are never mapped here.
+            UpdatedOnUtc = null,
+            UpdatedBy = null,
         };
     }
 

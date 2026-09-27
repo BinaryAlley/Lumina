@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Themes;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Infrastructure.Models.DTO.Themes;
 using Lumina.Application.Common.Infrastructure.Themes;
 using Lumina.Domain.Common.Primitives;
@@ -30,7 +32,7 @@ internal static class ThemeSynchronizer
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     internal static async Task SynchronizeAsync(IThemeService themeService, IUnitOfWork unitOfWork, ILogger logger, CancellationToken cancellationToken)
     {
-        Result<IEnumerable<ThemeEntity>> getThemesResult = await unitOfWork.ThemeRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        Result<PaginatedResultDto<ThemeEntity>> getThemesResult = await unitOfWork.ThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getThemesResult.IsFailure)
         {
             logger.LogWarning("Failed to read the installed themes: {Error}", getThemesResult.FirstError.Description);
@@ -38,7 +40,7 @@ internal static class ThemeSynchronizer
         }
 
         // Themes that were soft deleted by the user must not be reinstalled automatically.
-        List<ThemeEntity> themes = [.. getThemesResult.Value];
+        List<ThemeEntity> themes = [.. getThemesResult.Value.Data];
 
         foreach (string archivePath in themeService.GetBundledThemeArchivePaths())
         {
@@ -107,7 +109,9 @@ internal static class ThemeSynchronizer
         await CleanUpMissingThemePacksAsync(themeService, unitOfWork, themes, logger, cancellationToken).ConfigureAwait(false);
         await EnsureCurrentThemeExistsAsync(themeService, unitOfWork, themes, cancellationToken).ConfigureAwait(false);
 
-        await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            throw new InvalidOperationException(saveChangesResult.FirstError.Description);
     }
 
     /// <summary>

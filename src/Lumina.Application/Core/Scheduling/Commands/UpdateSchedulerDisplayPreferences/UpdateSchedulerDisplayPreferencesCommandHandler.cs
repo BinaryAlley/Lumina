@@ -80,7 +80,11 @@ public class UpdateSchedulerDisplayPreferencesCommandHandler : ICommandHandler<U
         Result<Updated> upsertResult = await _unitOfWork.SchedulerDisplayPreferencesRepository.UpsertAsync(displayPreferences, cancellationToken).ConfigureAwait(false);
         if (upsertResult.IsFailure)
             return upsertResult.Errors;
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
+
         return Result.Updated;
     }
 }

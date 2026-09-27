@@ -54,41 +54,43 @@ public class LibraryScanFailedDomainEventHandler : IDomainEventHandler<LibrarySc
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public async ValueTask HandleAsync(LibraryScanFailedDomainEvent domainEvent, CancellationToken cancellationToken)
     {
-        // get the library scan from the repository
+        // Get the library scan from the repository.
         Result<LibraryScanEntity?> getLibraryScanResult = await _unitOfWork.LibraryScanRepository.GetByIdAsync(
-            domainEvent.MediaLibraryScanCompositeId.ScanId.Value, cancellationToken).ConfigureAwait(false);
+            domainEvent.MediaLibraryScanCompositeId.ScanId.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getLibraryScanResult.IsFailure)
             throw new EventualConsistencyException(getLibraryScanResult.FirstError, getLibraryScanResult.Errors);
         if (getLibraryScanResult.Value is null)
             throw new EventualConsistencyException(Errors.LibraryScanning.LibraryScanNotFound);
 
-        // convert the repository scan to a domain object
+        // Convert the repository scan to a domain object.
         Result<LibraryScan> libraryScanDomainResult = getLibraryScanResult.Value.ToDomainEntity();
         if (libraryScanDomainResult.IsFailure)
             throw new EventualConsistencyException(libraryScanDomainResult.FirstError, libraryScanDomainResult.Errors);
 
-        // mark the media library scan as failed
+        // Mark the media library scan as failed.
         Result<Success> failScanResult = libraryScanDomainResult.Value.FailScan();
-        // we're going to ignore errors in this point, because scan jobs run in parallel, and two concurrent jobs of the same scan might trigger this domain event,
-        // trying to set as failed a scan that has already been marked as failed by a concurrent job
+        // We're going to ignore errors in this point, because scan jobs run in parallel, and two concurrent jobs of the same scan might trigger this domain event,
+        // trying to set as failed a scan that has already been marked as failed by a concurrent job.
         if (!failScanResult.IsFailure)
         {
-            // update the status of the library scan in the repository
+            // Update the status of the library scan in the repository.
             Result<Updated> updateLibraryScanResult = await _unitOfWork.LibraryScanRepository.UpdateAsync(libraryScanDomainResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
             if (updateLibraryScanResult.IsFailure)
                 throw new EventualConsistencyException(updateLibraryScanResult.FirstError, updateLibraryScanResult.Errors);
 
-            await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            if (saveChangesResult.IsFailure)
+                throw new EventualConsistencyException(saveChangesResult.FirstError, saveChangesResult.Errors);
         }
 
-        // release the scan processing resources, regardless of whether the scan was already marked as failed by a concurrent job
+        // Release the scan processing resources, regardless of whether the scan was already marked as failed by a concurrent job.
         _mediaLibrariesScanCancellationTracker.RemoveScan(domainEvent.MediaLibraryScanCompositeId);
         _mediaLibrariesScanProgressTracker.RemoveScanProgress(domainEvent.MediaLibraryScanCompositeId);
         Result<Success> clearStagingResult = await _unitOfWork.LibraryScanStagingResultsRepository.ClearForScanAsync(domainEvent.MediaLibraryScanCompositeId.ScanId.Value, cancellationToken).ConfigureAwait(false);
         if (clearStagingResult.IsFailure)
             throw new EventualConsistencyException(clearStagingResult.FirstError, clearStagingResult.Errors);
 
-        // notify SignalR clients that the library scan failed
+        // Notify SignalR clients that the library scan failed.
         await _debouncedLibraryScanProgressNotifier.SendLibraryScanFailedEventAsync(domainEvent.MediaLibraryScanCompositeId, cancellationToken).ConfigureAwait(false);
     }
 }

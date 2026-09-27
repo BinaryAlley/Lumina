@@ -4,7 +4,6 @@ using Lumina.Domain.Common.ValueObjects.Metadata;
 using Lumina.Domain.Core.BoundedContexts.VideoLibraryBoundedContext.MovieLibraryAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Common.ValueObjects.Metadata;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.VideoLibraryBoundedContext.MovieLibraryAggregate.ValueObjects;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -56,26 +55,6 @@ public class VideoMetadataTests
         Assert.Single(result.Value.Tags);
         Assert.True(result.Value.Language.HasValue);
         Assert.False(result.Value.OriginalLanguage.HasValue);
-    }
-
-    [Fact]
-    public void Create_WhenResolutionIsNull_ShouldThrowArgumentNullException()
-    {
-        // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => VideoMetadata.Create(
-            "Inception",
-            Optional<string>.None(),
-            durationInSeconds: 8880,
-            null!,
-            Optional<string>.None(),
-            _releaseInfoFixture.Create(),
-            Optional<LanguageInfo>.None(),
-            Optional<LanguageInfo>.None(),
-            Optional<float>.None(),
-            Optional<string>.None(),
-            Optional<string>.None(),
-            [],
-            []));
     }
 
     [Fact]

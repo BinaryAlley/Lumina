@@ -1,8 +1,13 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.DataAccess.Core.UoW;
 using Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.UpdateBookCover;
 using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -31,19 +36,64 @@ public class UpdateBookCoverEndpointTests : IClassFixture<LuminaApiFactory>
     }
 
     [Fact]
-    public async Task UpdateBookCover_WhenCalledWithoutAuthentication_ShouldReturnUnauthorized()
+    public async Task UpdateBookCover_WhenUnauthorized_ShouldReturnUnauthorizedResult()
     {
         // Arrange
         HttpClient client = _apiFactory.CreateClient();
+        Guid libraryId = Guid.NewGuid();
+        Guid bookId = Guid.NewGuid();
         MultipartFormDataContent form = CreateCoverForm("cover.jpg");
 
         // Act
-        HttpResponseMessage response = await client.PutAsync($"/api/v1/books/{Guid.NewGuid()}/cover", form);
+        HttpResponseMessage response = await client.PutAsync($"/api/v1/libraries/{libraryId}/books/{bookId}/cover", form);
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status401Unauthorized, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc7235#section-3.1", problemDetails["type"].GetString());
+        Assert.Equal("Unauthorized", problemDetails["title"].GetString());
+        Assert.Equal("Authentication failed", problemDetails["detail"].GetString());
+        Assert.Equal($"/api/v1/libraries/{libraryId}/books/{bookId}/cover", problemDetails["instance"].GetProperty("value").GetString());
+    }
+
+    [Fact]
+    public async Task UpdateBookCover_WhenUserDoesNotOwnTheLibrary_ShouldReturnForbidden()
+    {
+        // Arrange
+        HttpClient ownerClient = _apiFactory.CreateClient();
+        (Guid ownerId, string ownerUsername) = await _apiFactory.CreateAndAuthenticateUserAsync(ownerClient);
+        Guid libraryId = Guid.NewGuid();
+        await _apiFactory.SeedLibraryAsync(libraryId, ownerId);
+        await _apiFactory.SeedBookAsync(libraryId, "Other User Book");
+        Guid bookId;
+        using (IServiceScope scope = _apiFactory.Services.CreateScope())
+        {
+            LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            bookId = dbContext.Books.Single(book => book.LibraryId == libraryId).Id;
+        }
+
+        HttpClient requesterClient = _apiFactory.CreateClient();
+        (Guid _, string requesterUsername) = await _apiFactory.CreateAndAuthenticateUserAsync(requesterClient);
+        MultipartFormDataContent form = CreateCoverForm("cover.jpg");
+
+        // Act
+        HttpResponseMessage response = await requesterClient.PutAsync($"/api/v1/libraries/{libraryId}/books/{bookId}/cover", form);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
+        Assert.Equal("General.Unauthorized", problemDetails["title"].GetString());
+        Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
+
+        await _apiFactory.RemoveTestUserAsync(ownerUsername);
+        await _apiFactory.RemoveTestUserAsync(requesterUsername);
     }
 
     [Theory]
@@ -57,7 +107,7 @@ public class UpdateBookCoverEndpointTests : IClassFixture<LuminaApiFactory>
         MultipartFormDataContent form = CreateCoverForm("cover.jpg");
 
         // Act
-        HttpResponseMessage response = await client.PutAsync($"/api/v1/books/{Uri.EscapeDataString(maliciousBookId)}/cover", form);
+        HttpResponseMessage response = await client.PutAsync($"/api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books/{Uri.EscapeDataString(maliciousBookId)}/cover", form);
 
         // Assert
         // The unparseable route value becomes an empty book Id, which the command validator reports as a missing book Id.
@@ -81,7 +131,7 @@ public class UpdateBookCoverEndpointTests : IClassFixture<LuminaApiFactory>
         MultipartFormDataContent form = CreateCoverForm("..\\..\\evil.jpg");
 
         // Act
-        HttpResponseMessage response = await client.PutAsync($"/api/v1/books/{Guid.NewGuid()}/cover", form);
+        HttpResponseMessage response = await client.PutAsync($"/api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books/{Guid.NewGuid()}/cover", form);
 
         // Assert
         // The book does not exist, so the handler returns a clean not found response before the uploaded file name is used.

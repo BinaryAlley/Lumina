@@ -24,9 +24,9 @@ public interface IPathStrategy
     /// Checks if <paramref name="path"/> exists.
     /// </summary>
     /// <param name="path">The path to be checked.</param>
-    /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
+    /// <param name="shouldIncludeHiddenElements">Whether to include hidden file system elements or not.</param>
     /// <returns><see langword="true"/> if <paramref name="path"/> exists, <see langword="false"/> otherwise.</returns>
-    bool Exists(FileSystemPathId path, bool includeHiddenElements = true);
+    bool Exists(FileSystemPathId path, bool shouldIncludeHiddenElements = true);
 
     /// <summary>
     /// Tries to combine <paramref name="path"/> with <paramref name="name"/>.
@@ -68,4 +68,12 @@ public interface IPathStrategy
     /// <param name="path">The path for which to get the root.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing the root of <paramref name="path"/>, or an error.</returns>
     Result<PathSegment> GetPathRoot(FileSystemPathId path);
+
+    /// <summary>
+    /// Checks whether <paramref name="path"/> is located inside <paramref name="parentPath"/>.
+    /// </summary>
+    /// <param name="path">The path to be checked.</param>
+    /// <param name="parentPath">The path that must contain the checked path.</param>
+    /// <returns><see langword="true"/> if the path is inside the parent path, <see langword="false"/> otherwise.</returns>
+    bool IsPathWithin(FileSystemPathId path, FileSystemPathId parentPath);
 }

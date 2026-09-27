@@ -26,15 +26,15 @@ public class GetFilesEndpointSummary : Summary<GetFilesEndpoint, GetFilesRequest
 
         ExampleRequest = new GetFilesRequest(
             Path: "/media/movies/",
-            IncludeHiddenElements: true
+            ShouldIncludeHiddenElements: true
         );
         RequestExamples.Add(new RequestExample(new GetFilesRequest(
              Path: "/media/movies/",
-            IncludeHiddenElements: false
+            ShouldIncludeHiddenElements: false
         )));
 
         RequestParam(r => r.Path, "The file system path for which to get the files. Required.");
-        RequestParam(r => r.IncludeHiddenElements, "Whether to include hidden file system elements or not. Optional.");
+        RequestParam(r => r.ShouldIncludeHiddenElements, "Whether to include hidden file system elements or not. Optional.");
 
         Response(200, "The list of files is returned.",
             example: new FileResponse[] {
@@ -50,7 +50,7 @@ public class GetFilesEndpointSummary : Summary<GetFilesEndpoint, GetFilesRequest
                     type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                     status = 401,
                     title = "Unauthorized",
-                    detail = "You are not authorized",
+                    detail = "Authentication failed",
                     instance = "/api/v1/files/get-files"
                 },
                 new
@@ -58,7 +58,7 @@ public class GetFilesEndpointSummary : Summary<GetFilesEndpoint, GetFilesRequest
                     type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                     status = 401,
                     title = "Unauthorized",
-                    detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
+                    detail = "The token has expired",
                     instance = "/api/v1/files/get-files"
                 },
                 new

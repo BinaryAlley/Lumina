@@ -53,14 +53,14 @@ public class GetPluginSettingsQueryHandler : IQueryHandler<GetPluginSettingsQuer
         if (validationResult.Count > 0)
             return validationResult;
 
-        Result<PluginEntity?> getPluginResult = await _unitOfWork.PluginRepository.GetByIdAsync(query.PluginId, cancellationToken).ConfigureAwait(false);
+        Result<PluginEntity?> getPluginResult = await _unitOfWork.PluginRepository.GetByIdAsync(query.PluginId, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getPluginResult.IsFailure)
             return getPluginResult.Errors;
         PluginEntity? pluginEntity = getPluginResult.Value;
         if (pluginEntity is null)
             return Errors.Plugins.PluginNotFound;
 
-        // the schema comes from the loaded plugin, the current values from the storage medium
+        // The schema comes from the loaded plugin, the current values from the storage medium.
         IPlugin? loadedPlugin = _pluginManager.GetPlugin(query.PluginId);
         IReadOnlyList<PluginSettingDescriptorResponse> schema = loadedPlugin is not null
             ? loadedPlugin.GetSettingsSchema().Select(setting => setting.ToResponse()).ToList()

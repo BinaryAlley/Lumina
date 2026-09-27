@@ -36,48 +36,48 @@ public class DirectoryService : IDirectoryService
     /// Retrieves subdirectories for the specified string path.
     /// </summary>
     /// <param name="path">String representation of the file path.</param>
-    /// <param name="includeHiddenElements">Whether to include hidden subdirectories or not.</param>
+    /// <param name="shouldIncludeHiddenElements">Whether to include hidden subdirectories or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of subdirectories or an error.</returns>
-    public Result<IEnumerable<Directory>> GetSubdirectories(string path, bool includeHiddenElements)
+    public Result<IEnumerable<Directory>> GetSubdirectories(string path, bool shouldIncludeHiddenElements)
     {
         Result<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(path);
         if (fileSystemPathIdResult.IsFailure)
             return fileSystemPathIdResult.Errors;
-        return GetSubdirectories(fileSystemPathIdResult.Value, includeHiddenElements);
+        return GetSubdirectories(fileSystemPathIdResult.Value, shouldIncludeHiddenElements);
     }
 
     /// <summary>
     /// Retrieves subdirectories for the given directory.
     /// </summary>
     /// <param name="directory">Directory object to retrieve subdirectories for.</param>
-    /// <param name="includeHiddenElements">Whether to include hidden subdirectories or not.</param>
+    /// <param name="shouldIncludeHiddenElements">Whether to include hidden subdirectories or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of subdirectories or an error.</returns>
-    public Result<IEnumerable<Directory>> GetSubdirectories(Directory directory, bool includeHiddenElements)
+    public Result<IEnumerable<Directory>> GetSubdirectories(Directory directory, bool shouldIncludeHiddenElements)
     {
-        return GetSubdirectories(directory.Id, includeHiddenElements);
+        return GetSubdirectories(directory.Id, shouldIncludeHiddenElements);
     }
 
     /// <summary>
     /// Retrieves subdirectories for the specified file system path.
     /// </summary>
     /// <param name="path">Identifier for the file path.</param>
-    /// <param name="includeHiddenElements">Whether to include hidden subdirectories or not.</param>
+    /// <param name="shouldIncludeHiddenElements">Whether to include hidden subdirectories or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of subdirectories or an error.</returns>
-    public Result<IEnumerable<Directory>> GetSubdirectories(FileSystemPathId path, bool includeHiddenElements)
+    public Result<IEnumerable<Directory>> GetSubdirectories(FileSystemPathId path, bool shouldIncludeHiddenElements)
     {
-        // retrieve the list of subdirectories
-        Result<IEnumerable<FileSystemPathId>> subdirectoryPathsResult = _environmentContext.DirectoryProviderService.GetSubdirectoryPaths(path, includeHiddenElements);
+        // Retrieve the list of subdirectories.
+        Result<IEnumerable<FileSystemPathId>> subdirectoryPathsResult = _environmentContext.DirectoryProviderService.GetSubdirectoryPaths(path, shouldIncludeHiddenElements);
         if (subdirectoryPathsResult.IsFailure)
             return subdirectoryPathsResult.Errors;
         List<Directory> result = [];
         foreach (FileSystemPathId subPath in subdirectoryPathsResult.Value)
         {
-            // extract directory details
+            // Extract directory details.
             Result<string> dirNameResult = _environmentContext.DirectoryProviderService.GetFileName(subPath);
             Result<Optional<DateTime>> dateModifiedResult = _environmentContext.DirectoryProviderService.GetLastWriteTime(subPath);
             Result<Optional<DateTime>> dateCreatedResult = _environmentContext.DirectoryProviderService.GetCreationTime(subPath);
 
-            // if any error occurred, mark directory as Inaccessible
+            // If any error occurred, mark the directory as inaccessible.
             if (dirNameResult.IsFailure || dateModifiedResult.IsFailure || dateCreatedResult.IsFailure)
             {
                 Result<Directory> errorDirResult = Directory.Create(subPath, !dirNameResult.IsFailure ? dirNameResult.Value : null!,
@@ -123,7 +123,7 @@ public class DirectoryService : IDirectoryService
     /// <returns>An <see cref="Result{TValue}"/> containing either the result of creating a directory, or an error.</returns>
     public Result<Directory> CreateDirectory(FileSystemPathId path, string name)
     {
-        // first, check if the directory about to be created does not already exist
+        // First, check that the target directory does not already exist.
         Result<FileSystemPathId> combinedPath = _platformContext.PathStrategy.CombinePath(path, name);
         if (combinedPath.IsFailure)
             return combinedPath.Errors;
@@ -134,14 +134,14 @@ public class DirectoryService : IDirectoryService
             return Errors.FileSystemManagement.DirectoryAlreadyExists;
         else
         {
-            // create the new directory
+            // Create the new directory.
             Result<FileSystemPathId> newDirectoryPathResult = _environmentContext.DirectoryProviderService.CreateDirectory(path, name);
             if (newDirectoryPathResult.IsFailure)
                 return newDirectoryPathResult.Errors;
             Result<string> dirNameResult = _environmentContext.DirectoryProviderService.GetFileName(newDirectoryPathResult.Value);
             Result<Optional<DateTime>> dateModifiedResult = _environmentContext.DirectoryProviderService.GetLastWriteTime(newDirectoryPathResult.Value);
             Result<Optional<DateTime>> dateCreatedResult = _environmentContext.DirectoryProviderService.GetCreationTime(newDirectoryPathResult.Value);
-            // if any error occurred, mark directory as Inaccessible
+            // If any error occurred, mark the directory as inaccessible.
             if (dirNameResult.IsFailure || dateModifiedResult.IsFailure || dateCreatedResult.IsFailure)
             {
                 Result<Directory> errorDirResult = Directory.Create(newDirectoryPathResult.Value, !dirNameResult.IsFailure ? dirNameResult.Value : null!,
@@ -164,11 +164,11 @@ public class DirectoryService : IDirectoryService
     /// </summary>
     /// <param name="sourcePath">String representation of the path where the directory to be copied is located.</param>
     /// <param name="destinationPath">String representation of the path where the directory will be copied.</param>
-    /// <param name="overrideExisting">Whether to override existing directories, or not.</param>
+    /// <param name="shouldOverrideExisting">Whether to override existing directories, or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a copied directory, or an error.</returns>
-    public Result<Directory> CopyDirectory(string sourcePath, string destinationPath, bool? overrideExisting)
+    public Result<Directory> CopyDirectory(string sourcePath, string destinationPath, Optional<bool> shouldOverrideExisting)
     {
-        // make sure the paths are in the expected format
+        // Make sure the paths are in the expected format.
         if (!sourcePath.EndsWith(_platformContext.PathStrategy.PathSeparator))
             sourcePath += _platformContext.PathStrategy.PathSeparator;
         if (!destinationPath.EndsWith(_platformContext.PathStrategy.PathSeparator))
@@ -179,7 +179,7 @@ public class DirectoryService : IDirectoryService
         Result<FileSystemPathId> fileSystemDestinationPathIdResult = FileSystemPathId.Create(destinationPath);
         if (fileSystemDestinationPathIdResult.IsFailure)
             return fileSystemDestinationPathIdResult.Errors;
-        return CopyDirectory(fileSystemSourcePathIdResult.Value, fileSystemDestinationPathIdResult.Value, overrideExisting ?? false);
+        return CopyDirectory(fileSystemSourcePathIdResult.Value, fileSystemDestinationPathIdResult.Value, shouldOverrideExisting.Value);
     }
 
     /// <summary>
@@ -187,9 +187,9 @@ public class DirectoryService : IDirectoryService
     /// </summary>
     /// <param name="sourcePath">Identifier for the path where the directory to be copied is located.</param>
     /// <param name="destinationPath">Identifier for the path where the directory will be copied.</param>
-    /// <param name="overrideExisting">Whether to override existing directories, or not.</param>
+    /// <param name="shouldOverrideExisting">Whether to override existing directories, or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either the copied directory, or an error.</returns>
-    public Result<Directory> CopyDirectory(FileSystemPathId sourcePath, FileSystemPathId destinationPath, bool overrideExisting)
+    public Result<Directory> CopyDirectory(FileSystemPathId sourcePath, FileSystemPathId destinationPath, bool shouldOverrideExisting)
     {
         Result<bool> directoryExists = _environmentContext.DirectoryProviderService.DirectoryExists(sourcePath);
         if (directoryExists.IsFailure)
@@ -198,8 +198,8 @@ public class DirectoryService : IDirectoryService
             return Errors.FileSystemManagement.DirectoryNotFound;
         else
         {
-            // copy the directory
-            Result<FileSystemPathId> newDirectory = _environmentContext.DirectoryProviderService.CopyDirectory(sourcePath, destinationPath, overrideExisting);
+            // Copy the directory.
+            Result<FileSystemPathId> newDirectory = _environmentContext.DirectoryProviderService.CopyDirectory(sourcePath, destinationPath, shouldOverrideExisting);
 
             throw new NotImplementedException();
         }
@@ -210,11 +210,11 @@ public class DirectoryService : IDirectoryService
     /// </summary>
     /// <param name="sourcePath">String representation of the path where the directory to be moved is located.</param>
     /// <param name="destinationPath">String representation of the path where the directory will be moved.</param>
-    /// <param name="overrideExisting">Whether to override existing directories, or not.</param>
+    /// <param name="shouldOverrideExisting">Whether to override existing directories, or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a moved directory, or an error.</returns>
-    public Result<Directory> MoveDirectory(string sourcePath, string destinationPath, bool? overrideExisting)
+    public Result<Directory> MoveDirectory(string sourcePath, string destinationPath, Optional<bool> shouldOverrideExisting)
     {
-        // make sure the paths are in the expected format
+        // Make sure the paths are in the expected format.
         if (!sourcePath.EndsWith(_platformContext.PathStrategy.PathSeparator))
             sourcePath += _platformContext.PathStrategy.PathSeparator;
         if (!destinationPath.EndsWith(_platformContext.PathStrategy.PathSeparator))
@@ -225,7 +225,7 @@ public class DirectoryService : IDirectoryService
         Result<FileSystemPathId> fileSystemDestinationPathIdResult = FileSystemPathId.Create(destinationPath);
         if (fileSystemDestinationPathIdResult.IsFailure)
             return fileSystemDestinationPathIdResult.Errors;
-        return MoveDirectory(fileSystemSourcePathIdResult.Value, fileSystemDestinationPathIdResult.Value, overrideExisting ?? false);
+        return MoveDirectory(fileSystemSourcePathIdResult.Value, fileSystemDestinationPathIdResult.Value, shouldOverrideExisting.Value);
     }
 
     /// <summary>
@@ -233,9 +233,9 @@ public class DirectoryService : IDirectoryService
     /// </summary>
     /// <param name="sourcePath">Identifier for the path where the directory to be moved is located.</param>
     /// <param name="destinationPath">Identifier for the path where the directory will be moved.</param>
-    /// <param name="overrideExisting">Whether to override existing directories, or not.</param>
+    /// <param name="shouldOverrideExisting">Whether to override existing directories, or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either the moved directory, or an error.</returns>
-    public Result<Directory> MoveDirectory(FileSystemPathId sourcePath, FileSystemPathId destinationPath, bool overrideExisting)
+    public Result<Directory> MoveDirectory(FileSystemPathId sourcePath, FileSystemPathId destinationPath, bool shouldOverrideExisting)
     {
         Result<bool> directoryExists = _environmentContext.DirectoryProviderService.DirectoryExists(sourcePath);
         if (directoryExists.IsFailure)
@@ -244,8 +244,8 @@ public class DirectoryService : IDirectoryService
             return Errors.FileSystemManagement.DirectoryNotFound;
         else
         {
-            // move the directory
-            Result<FileSystemPathId> newDirectory = _environmentContext.DirectoryProviderService.MoveDirectory(sourcePath, destinationPath, overrideExisting);
+            // Move the directory.
+            Result<FileSystemPathId> newDirectory = _environmentContext.DirectoryProviderService.MoveDirectory(sourcePath, destinationPath, shouldOverrideExisting);
 
             throw new NotImplementedException();
         }
@@ -273,7 +273,7 @@ public class DirectoryService : IDirectoryService
     /// <returns>An <see cref="Result{TValue}"/> containing either the renamed directory, or an error.</returns>
     public Result<Directory> RenameDirectory(FileSystemPathId path, string name)
     {
-        // first, check if the directory about to be created does not already exist
+        // First, check that the target directory does not already exist.
         Result<FileSystemPathId> combinedPath = _platformContext.PathStrategy.CombinePath(path, name);
         if (combinedPath.IsFailure)
             return combinedPath.Errors;
@@ -284,14 +284,14 @@ public class DirectoryService : IDirectoryService
             return Errors.FileSystemManagement.DirectoryAlreadyExists;
         else
         {
-            // rename the directory
+            // Rename the directory.
             Result<FileSystemPathId> newDirectoryPathResult = _environmentContext.DirectoryProviderService.RenameDirectory(path, name);
             if (newDirectoryPathResult.IsFailure)
                 return newDirectoryPathResult.Errors;
             Result<string> dirNameResult = _environmentContext.DirectoryProviderService.GetFileName(newDirectoryPathResult.Value);
             Result<Optional<DateTime>> dateModifiedResult = _environmentContext.DirectoryProviderService.GetLastWriteTime(newDirectoryPathResult.Value);
             Result<Optional<DateTime>> dateCreatedResult = _environmentContext.DirectoryProviderService.GetCreationTime(newDirectoryPathResult.Value);
-            // if any error occurred, mark directory as Inaccessible
+            // If any error occurred, mark the directory as inaccessible.
             if (dirNameResult.IsFailure || dateModifiedResult.IsFailure || dateCreatedResult.IsFailure)
             {
                 Result<Directory> errorDirResult = Directory.Create(newDirectoryPathResult.Value, !dirNameResult.IsFailure ? dirNameResult.Value : null!,

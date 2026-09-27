@@ -45,6 +45,7 @@ public class GetPluginSettingsQueryHandlerTests
     public GetPluginSettingsQueryHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockPluginRepository = Substitute.For<IPluginRepository>();
         _mockUnitOfWork.PluginRepository.Returns(_mockPluginRepository);
         _mockPluginManager = Substitute.For<IPluginManager>();
@@ -67,7 +68,7 @@ public class GetPluginSettingsQueryHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(DomainErrors.Plugins.PluginIdCannotBeEmpty, result.FirstError);
-        await _mockPluginRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockPluginRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -76,7 +77,7 @@ public class GetPluginSettingsQueryHandlerTests
         // Arrange
         GetPluginSettingsQuery query = _getPluginSettingsQueryFixture.Create();
         PluginEntity plugin = _pluginEntityFixture.Create(query.PluginId);
-        _mockPluginRepository.GetByIdAsync(query.PluginId, Arg.Any<CancellationToken>())
+        _mockPluginRepository.GetByIdAsync(query.PluginId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<PluginEntity?>(plugin));
 
         IPlugin loadedPlugin = Substitute.For<IPlugin>();
@@ -107,7 +108,7 @@ public class GetPluginSettingsQueryHandlerTests
         // Arrange
         GetPluginSettingsQuery query = _getPluginSettingsQueryFixture.Create();
         PluginEntity plugin = _pluginEntityFixture.Create(query.PluginId);
-        _mockPluginRepository.GetByIdAsync(query.PluginId, Arg.Any<CancellationToken>())
+        _mockPluginRepository.GetByIdAsync(query.PluginId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<PluginEntity?>(plugin));
         _mockPluginManager.GetPlugin(query.PluginId).Returns((IPlugin?)null);
 
@@ -125,7 +126,7 @@ public class GetPluginSettingsQueryHandlerTests
     {
         // Arrange
         GetPluginSettingsQuery query = _getPluginSettingsQueryFixture.Create();
-        _mockPluginRepository.GetByIdAsync(query.PluginId, Arg.Any<CancellationToken>())
+        _mockPluginRepository.GetByIdAsync(query.PluginId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result<PluginEntity?>.Success(null));
 
         // Act
@@ -143,7 +144,7 @@ public class GetPluginSettingsQueryHandlerTests
         // Arrange
         GetPluginSettingsQuery query = _getPluginSettingsQueryFixture.Create();
         Error error = Error.Failure(description: "Failed to get plugin");
-        _mockPluginRepository.GetByIdAsync(query.PluginId, Arg.Any<CancellationToken>())
+        _mockPluginRepository.GetByIdAsync(query.PluginId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(error);
 
         // Act

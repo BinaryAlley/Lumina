@@ -22,11 +22,11 @@ public class CheckPathExistsEndpointSummary : Summary<CheckPathExistsEndpoint, C
         Description = "Checks whether the file system path identified by the request exists.";
 
         RequestParam(r => r.Path, "The file system path to check the existence of. Required.");
-        RequestParam(r => r.IncludeHiddenElements, "Whether to include hidden elements in the search results, or not. Optional.");
+        RequestParam(r => r.ShouldIncludeHiddenElements, "Whether to include hidden elements in the search results, or not. Optional.");
 
         ExampleRequest = new CheckPathExistsRequest(
             Path: "/media/movies/",
-            IncludeHiddenElements: true
+            ShouldIncludeHiddenElements: true
         );
 
         Response(200, "Whether the file system path exists is returned.", example: new { success = true, data = new { exists = true } });

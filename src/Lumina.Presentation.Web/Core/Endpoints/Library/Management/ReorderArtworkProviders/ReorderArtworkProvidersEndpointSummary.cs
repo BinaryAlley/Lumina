@@ -20,7 +20,7 @@ public class ReorderArtworkProvidersEndpointSummary : Summary<ReorderArtworkProv
     public ReorderArtworkProvidersEndpointSummary()
     {
         Summary = "Reorders the artwork providers of a media library.";
-        Description = "Reorders the artwork providers of the media library identified by the request, in the provided order.";
+        Description = "Reorders the artwork providers of the media library identified by the route, in the provided order.";
         RequestParam(r => r.LibraryId, "The Id of the media library whose artwork providers are reordered. Required.");
 
         ExampleRequest = new ReorderLibraryArtworkProvidersRequest

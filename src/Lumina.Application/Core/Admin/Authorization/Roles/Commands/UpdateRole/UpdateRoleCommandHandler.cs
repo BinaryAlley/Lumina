@@ -1,8 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
@@ -10,6 +8,7 @@ using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Contracts.Responses.Authorization;
+using Lumina.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,37 +57,41 @@ public class UpdateRoleCommandHandler : ICommandHandler<UpdateRoleCommand, Resul
         if (validationResult.Count > 0)
             return validationResult;
 
-        // an authenticated request must always carry a user identity
+        // An authenticated request must always carry a user identity.
         Guid? currentUserId = _currentUserService.UserId;
         if (currentUserId is null)
             return Errors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // only admins can update authorization roles
+        // Only admins can update authorization roles.
         bool isAdmin = await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false);
         if (!isAdmin)
             return Errors.Authorization.NotAuthorized;
 
-        // update the role and its permissions
+        // Update the role and its permissions.
         RoleEntity newRole = new()
         {
             Id = command.RoleId,
             RoleName = command.RoleName,
-            RolePermissions = command.Permissions.Select(permissionId => new RolePermissionEntity()
+            RolePermissions = [.. command.Permissions.Select(permissionId => new RolePermissionEntity()
             {
                 PermissionId = permissionId,
                 Permission = null!,
                 Role = null!,
                 RoleId = default
-            }).ToList()
+            })]
         };
-        // save the updated role in the repository
+        // Save the updated role in the repository.
         Result<Updated> updateRoleResult = await _unitOfWork.RoleRepository.UpdateAsync(newRole, cancellationToken).ConfigureAwait(false);
         if (updateRoleResult.IsFailure)
             return updateRoleResult.Errors;
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        // retrieve the updated authorization role from the persistence medium and return it
-        Result<RoleEntity?> getRoleResult = await _unitOfWork.RoleRepository.GetByIdAsync(command.RoleId, cancellationToken).ConfigureAwait(false);
+
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
+
+        // Retrieve the updated authorization role from the persistence medium and return it.
+        Result<RoleEntity?> getRoleResult = await _unitOfWork.RoleRepository.GetByIdAsync(command.RoleId, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getRoleResult.IsFailure)
             return getRoleResult.Errors;
         if (getRoleResult.Value is null)

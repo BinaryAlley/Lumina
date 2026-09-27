@@ -32,7 +32,7 @@ internal sealed class ValidationRule<TRequest, TProperty> : IValidationRule<TReq
 
     // Tracks which list WithError() should patch, since it doesn't know on its own whether the
     // most recent Must() call went to the plain-predicate list or the instance-aware list.
-    private bool lastAddedPredicateIsInstanceAware;
+    private bool isLastAddedPredicateInstanceAware;
 
     private AbstractValidator<TProperty>? _childValidator;
 
@@ -56,7 +56,7 @@ internal sealed class ValidationRule<TRequest, TProperty> : IValidationRule<TReq
         // Every predicate is paired with whatever error is "current" at the time it's added, so that a
         // subsequent WithError() call has something concrete to overwrite via index lookup.
         _predicateErrors.Add(currentError);
-        lastAddedPredicateIsInstanceAware = false;
+        isLastAddedPredicateInstanceAware = false;
         return this;
     }
 
@@ -71,7 +71,7 @@ internal sealed class ValidationRule<TRequest, TProperty> : IValidationRule<TReq
         // the check can't be expressed from the property value alone and needs the whole request.
         _instanceAwarePredicates.Add(predicate);
         _instanceAwarePredicateErrors.Add(currentError);
-        lastAddedPredicateIsInstanceAware = true;
+        isLastAddedPredicateInstanceAware = true;
         return this;
     }
 
@@ -102,9 +102,9 @@ internal sealed class ValidationRule<TRequest, TProperty> : IValidationRule<TReq
         // WithError() is meant to apply to the predicate that was *just* added via Must(), not to all
         // predicates registered so far. Since Must() can target either parallel-list pair, we use the
         // flag set by the last Must() call to figure out which list's last slot to overwrite.
-        if (lastAddedPredicateIsInstanceAware && _instanceAwarePredicateErrors.Count > 0)
+        if (isLastAddedPredicateInstanceAware && _instanceAwarePredicateErrors.Count > 0)
             _instanceAwarePredicateErrors[^1] = validationError;
-        else if (!lastAddedPredicateIsInstanceAware && _predicateErrors.Count > 0)
+        else if (!isLastAddedPredicateInstanceAware && _predicateErrors.Count > 0)
             _predicateErrors[^1] = validationError;
         return this;
     }

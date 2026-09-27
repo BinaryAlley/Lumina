@@ -1,10 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using FastEndpoints;
 using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Reading.Queries.GetReadingResource;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
-using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Reading;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Common.Routes.Library.WrittenContentLibrary.BookLibrary;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
@@ -17,9 +14,9 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.Reading.GetReadingResource;
 
 /// <summary>
-/// API endpoint for the <c>/books/{bookId}/reading/resources/{resourceKey}</c> route.
+/// API endpoint for the <c>/libraries/{libraryId}/books/{bookId}/reading/resources/{resourceKey}</c> route.
 /// </summary>
-public class GetReadingResourceEndpoint : BaseEndpoint<GetReadingResourceRequest, IResult>
+public class GetReadingResourceEndpoint : BaseEndpoint<FastEndpoints.EmptyRequest, IResult>
 {
     private readonly IQueryHandler<GetReadingResourceQuery, Result<ReadingResourceDataDto>> _getReadingResourceQueryHandler;
 
@@ -37,20 +34,25 @@ public class GetReadingResourceEndpoint : BaseEndpoint<GetReadingResourceRequest
     /// </summary>
     public override void Configure()
     {
-        Verbs(Http.GET);
+        Verbs(FastEndpoints.Http.GET);
         Routes(ApiRoutes.Books.GET_BOOK_READING_RESOURCE);
         Version(1);
         DontCatchExceptions();
     }
 
     /// <summary>
-    /// Gets the resource of the book identified by <paramref name="request"/>.
+    /// Gets the resource of the book identified by the route.
     /// </summary>
-    /// <param name="request">The request containing the Id of the book and the resource key of the resource.</param>
+    /// <param name="request">The request object.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    public override async Task<IResult> ExecuteAsync(GetReadingResourceRequest request, CancellationToken cancellationToken)
+    public override async Task<IResult> ExecuteAsync(FastEndpoints.EmptyRequest request, CancellationToken cancellationToken)
     {
-        Result<ReadingResourceDataDto> result = await _getReadingResourceQueryHandler.HandleAsync(request.ToQuery(), cancellationToken).ConfigureAwait(false);
+        // Take unique identifiers from the route.
+        string? libraryId = HttpContext.Request.RouteValues["libraryId"]?.ToString();
+        string? bookId = HttpContext.Request.RouteValues["bookId"]?.ToString();
+        string? resourceKey = HttpContext.Request.RouteValues["resourceKey"]?.ToString();
+        GetReadingResourceQuery query = new(libraryId, bookId, resourceKey);
+        Result<ReadingResourceDataDto> result = await _getReadingResourceQueryHandler.HandleAsync(query, cancellationToken).ConfigureAwait(false);
         if (result.IsFailure)
             return Problem(result.Errors);
         // The media type of a resource is declared by the book itself, so it is not trusted: a resource whose declared media type could be

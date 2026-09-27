@@ -123,7 +123,7 @@ public class SetCurrentThemeEndpointTests : IClassFixture<AuthenticatedLuminaApi
         HttpResponseMessage response = await _client.PutAsJsonAsync("/api/v1/themes/current", request);
 
         // Assert
-        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
         string content = await response.Content.ReadAsStringAsync();
 

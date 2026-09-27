@@ -8,9 +8,10 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Application.Common.Infrastructure.Validation;
+using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Artwork;
+using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
@@ -27,7 +28,7 @@ namespace Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary
 /// <summary>
 /// Handler for the command to update the cover image of an existing book.
 /// </summary>
-public class UpdateBookCoverCommandHandler : ICommandHandler<UpdateBookCoverCommand, Result<string>>
+public class UpdateBookCoverCommandHandler : ICommandHandler<UpdateBookCoverCommand, Result<UpdateBookCoverResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IBookArtworkService _bookArtworkService;
@@ -58,9 +59,9 @@ public class UpdateBookCoverCommandHandler : ICommandHandler<UpdateBookCoverComm
     /// <param name="command">The command to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="Result{TValue}"/> containing either the relative path of the stored cover image, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either the response carrying the relative path of the stored cover image, or an error message.
     /// </returns>
-    public async Task<Result<string>> HandleAsync(UpdateBookCoverCommand command, CancellationToken cancellationToken)
+    public async Task<Result<UpdateBookCoverResponse>> HandleAsync(UpdateBookCoverCommand command, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(command);
         if (validationResult.Count > 0)
@@ -72,13 +73,22 @@ public class UpdateBookCoverCommandHandler : ICommandHandler<UpdateBookCoverComm
             return ApplicationErrors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
+        // The validator guarantees that the route identifiers are non-empty Guids before this point.
+        Guid libraryId = Guid.Parse(command.LibraryId!);
+        Guid bookId = Guid.Parse(command.BookId!);
+
         // Get the existing book with its artwork.
-        Result<BookEntity?> getBookResult = await _unitOfWork.BookRepository.GetByIdAsync(command.BookId, cancellationToken).ConfigureAwait(false);
+        Result<BookEntity?> getBookResult = await _unitOfWork.BookRepository.GetByIdAsync(bookId, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getBookResult.IsFailure)
             return getBookResult.Errors;
         if (getBookResult.Value is null)
             return DomainErrors.WrittenContent.BookNotFound;
         BookEntity existingBook = getBookResult.Value;
+
+        // Resource scoping: the book must belong to the library named by the route, so that a book can never be edited through another
+        // library's route; the mismatch is reported as not found, without disclosing that the book exists in another library.
+        if (existingBook.LibraryId != libraryId)
+            return DomainErrors.WrittenContent.BookNotFound;
 
         // Admins can update the books of all libraries; for everyone else, only the books of the libraries they own.
         bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
@@ -87,13 +97,16 @@ public class UpdateBookCoverCommandHandler : ICommandHandler<UpdateBookCoverComm
             return ApplicationErrors.Authorization.NotAuthorized;
 
         // The artwork is stored under the library and author segments, so their names are resolved to keep the location consistent with the scanned artwork.
-        Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(existingBook.LibraryId, cancellationToken).ConfigureAwait(false);
+        Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(existingBook.LibraryId, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getLibraryResult.IsFailure)
             return getLibraryResult.Errors;
         if (getLibraryResult.Value is null)
             return DomainErrors.Library.LibraryNotFound;
         string libraryName = getLibraryResult.Value.Title;
-        string authorName = await GetAuthorNameAsync(existingBook, cancellationToken).ConfigureAwait(false);
+        Result<string> authorNameResult = await GetAuthorNameAsync(existingBook, cancellationToken).ConfigureAwait(false);
+        if (authorNameResult.IsFailure)
+            return authorNameResult.Errors;
+        string authorName = authorNameResult.Value;
 
         Result<string> storeArtworkResult = await _bookArtworkService.SaveBookArtworkAsync(
             existingBook.LibraryId,
@@ -107,35 +120,17 @@ public class UpdateBookCoverCommandHandler : ICommandHandler<UpdateBookCoverComm
         if (storeArtworkResult.IsFailure)
             return storeArtworkResult.Errors;
 
-        // Update the stored cover artwork of the book with the newly stored image.
-        BookArtworkEntity? coverArtwork = existingBook.BookArtwork.FirstOrDefault(artwork => artwork.ArtworkType == ArtworkType.Cover);
-        if (coverArtwork is null)
-        {
-            existingBook.BookArtwork.Add(new BookArtworkEntity
-            {
-                Id = Guid.NewGuid(),
-                BookId = existingBook.Id,
-                ArtworkType = ArtworkType.Cover,
-                Ordinal = 0,
-                FileName = storeArtworkResult.Value,
-                Status = ArtworkStatus.Enriched,
-                CreatedOnUtc = DateTime.UtcNow,
-                CreatedBy = userId,
-                UpdatedBy = null
-            });
-        }
-        else
-        {
-            coverArtwork.FileName = storeArtworkResult.Value;
-            coverArtwork.Status = ArtworkStatus.Enriched;
-            coverArtwork.LastUpdateUtc = DateTime.UtcNow;
-            coverArtwork.UpdatedOnUtc = DateTime.UtcNow;
-            coverArtwork.UpdatedBy = userId;
-        }
+        // Map the newly stored cover image onto the artwork of the book, replacing the existing cover or adding a new one.
+        BookArtworkEntity? existingCover = existingBook.Artwork.FirstOrDefault(artwork => artwork.ArtworkType == ArtworkType.Cover);
+        BookArtworkEntity coverArtwork = command.ToRepositoryEntity(existingCover, bookId, storeArtworkResult.Value, userId);
+        if (existingCover is null)
+            existingBook.Artwork.Add(coverArtwork);
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
 
-        return storeArtworkResult.Value;
+        return new UpdateBookCoverResponse(storeArtworkResult.Value);
     }
 
     /// <summary>
@@ -143,19 +138,21 @@ public class UpdateBookCoverCommandHandler : ICommandHandler<UpdateBookCoverComm
     /// </summary>
     /// <param name="book">The book whose author is retrieved.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>The display name of the author of the book, or an empty string.</returns>
-    private async Task<string> GetAuthorNameAsync(BookEntity book, CancellationToken cancellationToken)
+    /// <returns>
+    /// An <see cref="Result{TValue}"/> containing either the display name of the author of the book, or an error when the referenced media contributors could not be retrieved.
+    /// </returns>
+    private async Task<Result<string>> GetAuthorNameAsync(BookEntity book, CancellationToken cancellationToken)
     {
-        IReadOnlyCollection<Guid> authorIds = [.. book.BookContributors
-            .Where(participation => participation.RoleCategory == MediaContributorRoleCategory.Author)
+        IReadOnlyCollection<Guid> authorIds = [.. book.Contributors
+            .Where(participation => participation.Role == MediaContributorRole.Author)
             .Select(participation => participation.MediaContributorId)
             .Distinct()];
         if (authorIds.Count == 0)
-            return string.Empty;
+            return Result.From(string.Empty);
 
         Result<IReadOnlyList<MediaContributorEntity>> getContributorsResult = await _unitOfWork.MediaContributorRepository.GetByIdsAsync(authorIds, cancellationToken).ConfigureAwait(false);
         if (getContributorsResult.IsFailure)
-            return string.Empty;
-        return getContributorsResult.Value.Select(contributor => contributor.DisplayName).FirstOrDefault() ?? string.Empty;
+            return getContributorsResult.Errors;
+        return Result.From(getContributorsResult.Value.Select(contributor => contributor.DisplayName).FirstOrDefault() ?? string.Empty);
     }
 }

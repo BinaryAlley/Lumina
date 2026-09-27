@@ -29,7 +29,6 @@ public class GetDirectoriesEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     private readonly FileSystemStructureFixture _fileSystemStructureFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
-        ReferenceHandler = ReferenceHandler.Preserve,
         PropertyNameCaseInsensitive = true,
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
@@ -54,18 +53,18 @@ public class GetDirectoriesEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     }
 
     [SkipWhenHiddenAttributeNotSupportedFact]
-    public async Task GetDirectories_WhenCalledWithValidPathAndHiddenChildrenAndNotIncludeHiddenElements_ShouldReturnNoDirectories()
+    public async Task GetDirectories_WhenCalledWithValidPathAndHiddenChildrenAndNotShouldIncludeHiddenElements_ShouldReturnNoDirectories()
     {
         // Arrange
         string testPath = _fileSystemStructureFixture.CreateFileSystemStructure();
         testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath;
         testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath; // two levels to get to the element that has a hidden element as child
         string encodedPath = Uri.EscapeDataString(testPath);
-        bool includeHiddenElements = false;
+        bool shouldIncludeHiddenElements = false;
         try
         {
             // Act
-            HttpResponseMessage response = await _client.GetAsync($"/api/v1/directories/get-directories?path={encodedPath}&includeHiddenElements={includeHiddenElements}");
+            HttpResponseMessage response = await _client.GetAsync($"/api/v1/directories/get-directories?path={encodedPath}&shouldIncludeHiddenElements={shouldIncludeHiddenElements}");
 
             // Assert
             string content = await response.Content.ReadAsStringAsync();
@@ -84,18 +83,18 @@ public class GetDirectoriesEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     }
 
     [Fact]
-    public async Task GetDirectories_WhenCalledWithValidPathAndWithIncludeHiddenElements_ShouldReturnDirectoriesWithHiddenElements()
+    public async Task GetDirectories_WhenCalledWithValidPathAndWithShouldIncludeHiddenElements_ShouldReturnDirectoriesWithHiddenElements()
     {
         // Arrange
         string testPath = _fileSystemStructureFixture.CreateFileSystemStructure();
         testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath;
         testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath; // two levels to get to the element that has a hidden element as child
         string encodedPath = Uri.EscapeDataString(testPath);
-        bool includeHiddenElements = true;
+        bool shouldIncludeHiddenElements = true;
         try
         {
             // Act
-            HttpResponseMessage response = await _client.GetAsync($"/api/v1/directories/get-directories?path={encodedPath}&includeHiddenElements={includeHiddenElements}");
+            HttpResponseMessage response = await _client.GetAsync($"/api/v1/directories/get-directories?path={encodedPath}&shouldIncludeHiddenElements={shouldIncludeHiddenElements}");
 
             // Assert
             response.EnsureSuccessStatusCode();
@@ -127,10 +126,10 @@ public class GetDirectoriesEndpointTests : IClassFixture<AuthenticatedLuminaApiF
         // Arrange
         string invalidPath = "invalid:path";
         string encodedPath = Uri.EscapeDataString(invalidPath);
-        bool includeHiddenElements = true;
+        bool shouldIncludeHiddenElements = true;
 
         // Act
-        HttpResponseMessage response = await _client.GetAsync($"/api/v1/directories/get-directories?path={encodedPath}&includeHiddenElements={includeHiddenElements}");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/directories/get-directories?path={encodedPath}&shouldIncludeHiddenElements={shouldIncludeHiddenElements}");
 
         // Assert
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
@@ -153,13 +152,13 @@ public class GetDirectoriesEndpointTests : IClassFixture<AuthenticatedLuminaApiF
         // Arrange
         string emptyPath = "";
         string encodedPath = Uri.EscapeDataString(emptyPath);
-        bool includeHiddenElements = true;
+        bool shouldIncludeHiddenElements = true;
 
         // Act
-        HttpResponseMessage response = await _client.GetAsync($"/api/v1/directories/get-directories?path={encodedPath}&includeHiddenElements={includeHiddenElements}");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/directories/get-directories?path={encodedPath}&shouldIncludeHiddenElements={shouldIncludeHiddenElements}");
 
         // Assert
-        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
         string content = await response.Content.ReadAsStringAsync();
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
@@ -184,12 +183,12 @@ public class GetDirectoriesEndpointTests : IClassFixture<AuthenticatedLuminaApiF
         // Arrange
         string testPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "testDirectory");
         string encodedPath = Uri.EscapeDataString(testPath);
-        bool includeHiddenElements = true;
+        bool shouldIncludeHiddenElements = true;
         using CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
 
         // Act & Assert
         Exception? exception = await Record.ExceptionAsync(async () =>
-            await _client.GetAsync($"/api/v1/directories/get-directories?path={encodedPath}&includeHiddenElements={includeHiddenElements}", cts.Token)
+            await _client.GetAsync($"/api/v1/directories/get-directories?path={encodedPath}&shouldIncludeHiddenElements={shouldIncludeHiddenElements}", cts.Token)
         );
         Assert.Null(exception);
     }
@@ -200,14 +199,14 @@ public class GetDirectoriesEndpointTests : IClassFixture<AuthenticatedLuminaApiF
         // Arrange
         string testPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "testDirectory");
         string encodedPath = Uri.EscapeDataString(testPath);
-        bool includeHiddenElements = true;
+        bool shouldIncludeHiddenElements = true;
         using CancellationTokenSource cts = new();
 
         // Act & Assert
         await Assert.ThrowsAsync<TaskCanceledException>(async () =>
         {
             cts.Cancel();
-            await _client.GetAsync($"/api/v1/directories/get-directories?path={encodedPath}&includeHiddenElements={includeHiddenElements}", cts.Token);
+            await _client.GetAsync($"/api/v1/directories/get-directories?path={encodedPath}&shouldIncludeHiddenElements={shouldIncludeHiddenElements}", cts.Token);
         });
     }
 

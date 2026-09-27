@@ -53,7 +53,7 @@ public class CheckInitializationEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendCheckInitializationQueryToHandler()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendCheckInitializationQueryToSender()
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;

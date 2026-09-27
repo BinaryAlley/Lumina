@@ -58,6 +58,7 @@ public class GetThemeTemplateQueryHandler : IQueryHandler<GetThemeTemplateQuery,
         if (validationResult.Count > 0)
             return validationResult;
 
+        // Load the requested theme, so that a missing or soft deleted theme is reported before its template is read.
         Result<ThemeEntity?> getThemeResult = await _unitOfWork.ThemeRepository.GetByThemeIdAsync(query.ThemeId!, cancellationToken).ConfigureAwait(false);
         if (getThemeResult.IsFailure)
             return getThemeResult.Errors;
@@ -69,10 +70,10 @@ public class GetThemeTemplateQueryHandler : IQueryHandler<GetThemeTemplateQuery,
         Result<string> templateResult = await _themeService.GetTemplateAsync(theme.ThemeId, query.PageKey!, cancellationToken).ConfigureAwait(false);
         if (templateResult.IsFailure)
         {
-            // the stored files of a bundled theme removed externally are restored, and if the broken theme was the
+            // The stored files of a bundled theme removed externally are restored, and if the broken theme was the
             // active one, the configured default theme is activated, so clients always have a renderable theme; a
             // theme that simply does not provide a template for the page is not broken, so it is not restored and the
-            // caller falls back to the application's default unstyled Razor view instead
+            // caller falls back to the application's default unstyled Razor view instead.
             if (templateResult.FirstError != DomainErrors.Themes.ThemeTemplateNotFound
                 && theme.InstallSource == ThemeInstallSource.Bundled
                 && await TryRestoreBundledThemeAsync(theme, cancellationToken).ConfigureAwait(false))
@@ -99,6 +100,7 @@ public class GetThemeTemplateQueryHandler : IQueryHandler<GetThemeTemplateQuery,
             if (restoreResult.IsFailure)
                 return false;
 
+            // When the restored theme was the active one, switch to the configured default theme, so clients always have a working theme for the next render.
             if (theme.IsCurrent == true)
             {
                 Result<ThemeEntity?> getDefaultResult = await _unitOfWork.ThemeRepository.GetByThemeIdAsync(_themeService.DefaultThemeId, cancellationToken).ConfigureAwait(false);
@@ -114,7 +116,10 @@ public class GetThemeTemplateQueryHandler : IQueryHandler<GetThemeTemplateQuery,
                     defaultTheme.IsCurrent = true;
                     await _unitOfWork.ThemeRepository.UpdateAsync(defaultTheme, cancellationToken).ConfigureAwait(false);
 
-                    await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                    // Persist both activation changes together, so the theme switch is applied atomically.
+                    Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                    if (saveChangesResult.IsFailure)
+                        return false;
                 }
             }
 
@@ -126,8 +131,8 @@ public class GetThemeTemplateQueryHandler : IQueryHandler<GetThemeTemplateQuery,
         }
         catch (Exception exception)
         {
-            // the restore is best effort: an unexpected failure must not fail the request, so the caller falls back to
-            // the application view instead of returning an error to the browser
+            // The restore is best effort: an unexpected failure must not fail the request, so the caller falls back to
+            // the application view instead of returning an error to the browser.
             _logger.LogWarning(exception, "Failed to restore the files of bundled theme '{ThemeId}'.", theme.ThemeId);
             return false;
         }

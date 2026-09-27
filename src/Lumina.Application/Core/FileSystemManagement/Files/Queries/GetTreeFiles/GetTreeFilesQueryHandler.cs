@@ -46,7 +46,7 @@ public class GetTreeFilesQueryHandler : IQueryHandler<GetTreeFilesQuery, Result<
         if (validationResult.Count > 0)
             return Task.FromResult<Result<IEnumerable<FileSystemTreeNodeResponse>>>(validationResult);
 
-        Result<IEnumerable<File>> getFilesResult = _fileService.GetFiles(query.Path!, query.IncludeHiddenElements);
+        Result<IEnumerable<File>> getFilesResult = _fileService.GetFiles(query.Path!, query.ShouldIncludeHiddenElements);
         return Task.FromResult(getFilesResult.Match(values => Result.From(values.ToFileSystemTreeNodeResponses()), errors => errors));
     }
 }

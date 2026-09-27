@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.ExternalIdentifiers.LibraryManagementBoundedContext.LibraryAggregate;
@@ -19,7 +18,7 @@ namespace Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext
 [DebuggerDisplay("Id: {Id} Title: {Title}")]
 public sealed class Book : AggregateRoot<BookId>
 {
-    private readonly List<MediaContributorId> _contributors;
+    private readonly HashSet<BookMediaContributor> _contributors;
     private readonly List<BookRating> _ratings;
     private readonly List<Isbn> _isbns;
 
@@ -109,12 +108,10 @@ public sealed class Book : AggregateRoot<BookId>
     public IReadOnlyCollection<Isbn> ISBNs => _isbns.AsReadOnly();
 
     /// <summary>
-    /// Gets the list of objects representing the unique identifiers of the media contributors (actors, directors, etc) starring in this book.
+    /// Gets the list of media contributors that contributed to this book, each carrying the role
+    /// the contributor played, used as the key of its localized display string.
     /// </summary>
-    public IReadOnlyCollection<MediaContributorId> Contributors => _contributors.AsReadOnly();
-    // TODO: the roles of the media contributors currently live only in the persistence layer (BookContributorEntity), and are lost
-    // at the domain level. To keep consistency with the Music aggregate, which models its credits as a MediaContributorCredit value
-    // object carrying both the contributor and the role, the roles should be moved into the Book aggregate as well.
+    public IReadOnlyCollection<BookMediaContributor> Contributors => _contributors.AsReadOnly();
 
     /// <summary>
     /// Gets the list of ratings for this book.
@@ -144,7 +141,7 @@ public sealed class Book : AggregateRoot<BookId>
     /// <param name="createdOnUtc">The date and time when the entity was created.</param>
     /// <param name="updatedOnUtc">The date and time when the entity was last updated.</param>
     /// <param name="isbns">The list of ISBNs of the book.</param>
-    /// <param name="contributors">The list of objects representing the unique identifiers of the media contributors of the book.</param>
+    /// <param name="contributors">The list of media contributors of the book, each carrying the role the contributor played.</param>
     /// <param name="ratings">The list of ratings for the book.</param>
     private Book(
         BookId id,
@@ -167,7 +164,7 @@ public sealed class Book : AggregateRoot<BookId>
         DateTime createdOnUtc,
         Optional<DateTime> updatedOnUtc,
         List<Isbn> isbns,
-        List<MediaContributorId> contributors,
+        IEnumerable<BookMediaContributor> contributors,
         List<BookRating> ratings) : base(id)
     {
         Id = id;
@@ -188,9 +185,9 @@ public sealed class Book : AggregateRoot<BookId>
         BarnesAndNobleId = barnesAndNobleId;
         AppleBooksId = appleBooksId;
         CreatedOnUtc = createdOnUtc;
-        UpdatedOnUtc = updatedOnUtc.HasValue ? updatedOnUtc.Value : null;
+        UpdatedOnUtc = updatedOnUtc;
         _isbns = isbns;
-        _contributors = contributors;
+        _contributors = [.. contributors];
         _ratings = ratings;
     }
 
@@ -214,7 +211,7 @@ public sealed class Book : AggregateRoot<BookId>
     /// <param name="barnesAndNobleId">The optional Barnes & Noble ID of the book.</param>
     /// <param name="appleBooksId">The optional Apple Books ID of the book.</param>
     /// <param name="isbns">The list of ISBNs of the book.</param>
-    /// <param name="contributors">The list of objects representing the unique identifiers of the media contributors of the book.</param>
+    /// <param name="contributors">The list of media contributors of the book, each carrying the role the contributor played.</param>
     /// <param name="ratings">The list of ratings for the book.</param>
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="Book"/>, or an error message.
@@ -237,10 +234,10 @@ public sealed class Book : AggregateRoot<BookId>
         Optional<string> barnesAndNobleId,
         Optional<string> appleBooksId,
         List<Isbn> isbns,
-        List<MediaContributorId> contributors,
+        IEnumerable<BookMediaContributor> contributors,
         List<BookRating> ratings)
     {
-        // TODO: enforce invariants
+        // TODO: enforce invariants.
         return new Book(
             BookId.CreateUnique(),
             libraryId,
@@ -259,7 +256,7 @@ public sealed class Book : AggregateRoot<BookId>
             googleBooksId,
             barnesAndNobleId,
             appleBooksId,
-            DateTime.UtcNow, // TODO: should be IDateTimeProvider
+            DateTime.UtcNow, // TODO: should be IDateTimeProvider.
             default,
             isbns,
             contributors,
@@ -290,7 +287,7 @@ public sealed class Book : AggregateRoot<BookId>
     /// <param name="createdOnUtc">The date and time when the entity was created.</param>
     /// <param name="updatedOnUtc">The date and time when the entity was last updated.</param>
     /// <param name="isbns">The list of ISBNs of the book.</param>
-    /// <param name="contributors">The list of objects representing the unique identifiers of the media contributors of the book.</param>
+    /// <param name="contributors">The list of media contributors of the book, each carrying the role the contributor played.</param>
     /// <param name="ratings">The list of ratings for the book.</param>
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="Book"/>, or an error message.
@@ -316,10 +313,10 @@ public sealed class Book : AggregateRoot<BookId>
         DateTime createdOnUtc,
         Optional<DateTime> updatedOnUtc,
         List<Isbn> isbns,
-        List<MediaContributorId> contributors,
+        IEnumerable<BookMediaContributor> contributors,
         List<BookRating> ratings)
     {
-        // TODO: enforce invariants
+        // TODO: enforce invariants.
         return new Book(
             id,
             libraryId,
@@ -347,14 +344,15 @@ public sealed class Book : AggregateRoot<BookId>
     }
 
     /// <summary>
-    /// Replaces the media contributors of the book with the provided <paramref name="contributors"/>, identified by their unique identifiers.
+    /// Replaces the media contributors of the book with the provided <paramref name="contributors"/>, each carrying
+    /// the media contributor and the role the contributor played in the book.
     /// </summary>
-    /// <param name="contributors">The unique identifiers of the media contributors of the book.</param>
-    public void UpdateContributors(IReadOnlyCollection<MediaContributorId> contributors)
+    /// <param name="contributors">The media contributors of the book.</param>
+    public void UpdateContributors(IReadOnlyCollection<BookMediaContributor> contributors)
     {
-        // replace the contents of the collection in place, preserving the readonly reference invariants of the aggregate
+        // Replace the contents of the collection in place, preserving the readonly reference invariants of the aggregate.
         _contributors.Clear();
-        _contributors.AddRange(contributors);
+        _contributors.UnionWith(contributors);
     }
 
     /// <summary>
@@ -408,7 +406,7 @@ public sealed class Book : AggregateRoot<BookId>
         GoogleBooksId = googleBooksId;
         BarnesAndNobleId = barnesAndNobleId;
         AppleBooksId = appleBooksId;
-        // replace the contents of the collections in place, preserving the readonly reference invariants of the aggregate
+        // Replace the contents of the collections in place, preserving the readonly reference invariants of the aggregate.
         _isbns.Clear();
         _isbns.AddRange(isbns);
         _ratings.Clear();

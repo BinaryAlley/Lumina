@@ -20,15 +20,15 @@ public class GetTreeFilesRequestFixture
     /// Creates a <see cref="GetTreeFilesRequest"/> with default or random values.
     /// </summary>
     /// <param name="path">Optional. The file system path for which to get the tree files.</param>
-    /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
+    /// <param name="shouldIncludeHiddenElements">Whether to include hidden file system elements or not.</param>
     /// <returns>The created <see cref="GetTreeFilesRequest"/>.</returns>
     public GetTreeFilesRequest Create(
         string? path = null, 
-        bool? includeHiddenElements = null)
+        bool? shouldIncludeHiddenElements = null)
     {
         return new GetTreeFilesRequest(
             Path: path ?? _faker.System.FilePath(),
-            IncludeHiddenElements: includeHiddenElements ?? _faker.Random.Bool()
+            ShouldIncludeHiddenElements: shouldIncludeHiddenElements ?? _faker.Random.Bool()
         );
     }
 

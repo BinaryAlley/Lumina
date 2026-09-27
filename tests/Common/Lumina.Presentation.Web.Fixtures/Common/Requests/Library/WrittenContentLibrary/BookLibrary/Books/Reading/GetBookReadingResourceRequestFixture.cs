@@ -19,12 +19,14 @@ public class GetBookReadingResourceRequestFixture
     /// </summary>
     /// <param name="bookId">Optional. The Id of the book whose resource is retrieved.</param>
     /// <param name="resourceKey">Optional. The opaque resource key of the resource.</param>
+    /// <param name="libraryId">Optional. The Id of the media library the book belongs to.</param>
     /// <returns>The created <see cref="GetBookReadingResourceRequest"/>.</returns>
     public GetBookReadingResourceRequest Create(
         Guid? bookId = null,
-        string? resourceKey = null)
+        string? resourceKey = null,
+        Guid? libraryId = null)
     {
-        return new GetBookReadingResourceRequest(bookId ?? Guid.NewGuid(), resourceKey ?? $"resource-{Guid.NewGuid():N}");
+        return new GetBookReadingResourceRequest(bookId ?? Guid.NewGuid(), resourceKey ?? $"resource-{Guid.NewGuid():N}", libraryId ?? Guid.NewGuid());
     }
 
     /// <summary>

@@ -52,7 +52,7 @@ public class GetReadingManifestEndpoint : BaseEndpoint<GetBookReadingManifestReq
     {
         try
         {
-            ReadingManifestDto response = await _apiHttpClient.GetAsync<ReadingManifestDto>(ApiRoutes.Books.GET_BOOK_READING_MANIFEST.Replace("{bookId}", request.BookId.ToString()), cancellationToken).ConfigureAwait(false);
+            ReadingManifestDto response = await _apiHttpClient.GetAsync<ReadingManifestDto>(ApiRoutes.Books.GET_BOOK_READING_MANIFEST.Replace("{libraryId}", request.LibraryId.ToString()).Replace("{bookId}", request.BookId.ToString()), cancellationToken).ConfigureAwait(false);
             return JsonSuccess(response);
         }
         catch (ApiException apiException)

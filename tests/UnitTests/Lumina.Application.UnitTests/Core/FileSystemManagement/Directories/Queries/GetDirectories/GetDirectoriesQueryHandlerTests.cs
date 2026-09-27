@@ -49,11 +49,11 @@ public class GetDirectoriesQueryHandlerTests
     public async Task HandleAsync_WhenCalledWithValidQueryWithoutFilesIncluded_ShouldReturnSuccessResult()
     {
         // Arrange
-        GetDirectoriesQuery getDirectoriesQuery = _getDirectoriesQueryFixture.Create(includeHiddenElements: false);
+        GetDirectoriesQuery getDirectoriesQuery = _getDirectoriesQueryFixture.Create(shouldIncludeHiddenElements: false);
 
         IEnumerable<Directory> directories = _directoryFixture.CreateMany();
 
-        _mockDirectoryService.GetSubdirectories(getDirectoriesQuery.Path!, getDirectoriesQuery.IncludeHiddenElements)
+        _mockDirectoryService.GetSubdirectories(getDirectoriesQuery.Path!, getDirectoriesQuery.ShouldIncludeHiddenElements)
             .Returns(Result.From(directories));
 
         // Act
@@ -76,18 +76,18 @@ public class GetDirectoriesQueryHandlerTests
             Assert.Empty(resultList[i].Items); // since files are not included
         }
 
-        _mockDirectoryService.Received(1).GetSubdirectories(getDirectoriesQuery.Path!, getDirectoriesQuery.IncludeHiddenElements);
+        _mockDirectoryService.Received(1).GetSubdirectories(getDirectoriesQuery.Path!, getDirectoriesQuery.ShouldIncludeHiddenElements);
     }
 
     [Fact]
     public async Task HandleAsync_WhenCalledWithValidQueryWithFilesIncluded_ShouldReturnSuccessResult()
     {
         // Arrange
-        GetDirectoriesQuery getDirectoriesQuery = _getDirectoriesQueryFixture.Create(includeHiddenElements: true);
+        GetDirectoriesQuery getDirectoriesQuery = _getDirectoriesQueryFixture.Create(shouldIncludeHiddenElements: true);
 
         IEnumerable<Directory> directories = _directoryFixture.CreateMany();
 
-        _mockDirectoryService.GetSubdirectories(getDirectoriesQuery.Path!, getDirectoriesQuery.IncludeHiddenElements)
+        _mockDirectoryService.GetSubdirectories(getDirectoriesQuery.Path!, getDirectoriesQuery.ShouldIncludeHiddenElements)
             .Returns(Result.From(directories));
 
         // Act
@@ -110,7 +110,7 @@ public class GetDirectoriesQueryHandlerTests
             Assert.Equal(directoriesList[i].Items.Count, resultList[i].Items.Count);
         }
 
-        _mockDirectoryService.Received(1).GetSubdirectories(getDirectoriesQuery.Path!, getDirectoriesQuery.IncludeHiddenElements);
+        _mockDirectoryService.Received(1).GetSubdirectories(getDirectoriesQuery.Path!, getDirectoriesQuery.ShouldIncludeHiddenElements);
     }
 
     [Fact]
@@ -119,7 +119,7 @@ public class GetDirectoriesQueryHandlerTests
         // Arrange
         GetDirectoriesQuery query = _getDirectoriesQueryFixture.Create();
         Error error = Error.Failure("DirectoryService.Error", "An error occurred");
-        _mockDirectoryService.GetSubdirectories(query.Path!, query.IncludeHiddenElements)
+        _mockDirectoryService.GetSubdirectories(query.Path!, query.ShouldIncludeHiddenElements)
             .Returns(error);
 
         // Act
@@ -128,7 +128,7 @@ public class GetDirectoriesQueryHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
-        _mockDirectoryService.Received(1).GetSubdirectories(query.Path!, query.IncludeHiddenElements);
+        _mockDirectoryService.Received(1).GetSubdirectories(query.Path!, query.ShouldIncludeHiddenElements);
     }
 
     [Fact]
@@ -137,7 +137,7 @@ public class GetDirectoriesQueryHandlerTests
         // Arrange
         GetDirectoriesQuery query = _getDirectoriesQueryFixture.Create();
         Result<IEnumerable<Directory>> emptyList = Result.From(Enumerable.Empty<Directory>());
-        _mockDirectoryService.GetSubdirectories(query.Path!, query.IncludeHiddenElements)
+        _mockDirectoryService.GetSubdirectories(query.Path!, query.ShouldIncludeHiddenElements)
             .Returns(emptyList);
 
         // Act
@@ -146,6 +146,6 @@ public class GetDirectoriesQueryHandlerTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.Empty(result.Value);
-        _mockDirectoryService.Received(1).GetSubdirectories(query.Path!, query.IncludeHiddenElements);
+        _mockDirectoryService.Received(1).GetSubdirectories(query.Path!, query.ShouldIncludeHiddenElements);
     }
 }

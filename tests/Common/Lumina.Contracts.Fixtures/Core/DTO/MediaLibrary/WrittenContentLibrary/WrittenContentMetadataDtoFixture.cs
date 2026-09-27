@@ -18,8 +18,10 @@ namespace Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary;
 [ExcludeFromCodeCoverage]
 public class WrittenContentMetadataDtoFixture
 {
+    private const int MINIMUM_RELEASE_YEAR = 1900;
+    private const int MAXIMUM_RELEASE_YEAR = 2026;
+
     private readonly Faker _faker = new();
-    private readonly Random _random = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
     private readonly TagDtoFixture _tagDtoFixture = new();
     private readonly LanguageInfoDtoFixture _languageInfoDtoFixture = new();
@@ -100,8 +102,8 @@ public class WrittenContentMetadataDtoFixture
     /// <returns>The created <see cref="ReleaseInfoDto"/>.</returns>
     private ReleaseInfoDto CreateReleaseInfo()
     {
-        int originalReleaseYear = _random.Next(1900, 2026);
-        int reReleaseYear = _random.Next(originalReleaseYear, 2026);
+        int originalReleaseYear = Random.Shared.Next(MINIMUM_RELEASE_YEAR, MAXIMUM_RELEASE_YEAR);
+        int reReleaseYear = Random.Shared.Next(originalReleaseYear, MAXIMUM_RELEASE_YEAR);
         return _releaseInfoDtoFixture.Create(
             originalReleaseDate: new DateOnly(originalReleaseYear, 1, 1),
             originalReleaseYear: originalReleaseYear,

@@ -339,12 +339,12 @@ public class OpenLibraryBookMetadataProviderTests
         OpenLibraryBookMetadataProvider sut = CreateProvider(handler);
 
         // Act
-        AddBookRequest? result = await sut.GetBookAsync(lookup);
+        BookMetadataDto? result = await sut.GetBookAsync(lookup);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal("Edition Title", result!.Metadata!.Title);
-        Assert.Equal("A work description", result.Metadata.Description);
+        Assert.Equal("Edition Title", result.Title);
+        Assert.Equal("A work description", result.Description);
         Assert.Equal("OL100M", result.OpenLibraryId);
         Assert.Equal(BookFormat.Hardcover, result.Format);
         Assert.Equal(3, result.VolumeNumber);
@@ -370,11 +370,11 @@ public class OpenLibraryBookMetadataProviderTests
         OpenLibraryBookMetadataProvider sut = CreateProvider(handler);
 
         // Act
-        AddBookRequest? result = await sut.GetBookAsync(lookup);
+        BookMetadataDto? result = await sut.GetBookAsync(lookup);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal("Work Title", result!.Metadata!.Title);
+        Assert.Equal("Work Title", result.Title);
         Assert.Equal("OL200W", result.OpenLibraryId);
     }
 
@@ -389,11 +389,11 @@ public class OpenLibraryBookMetadataProviderTests
         OpenLibraryBookMetadataProvider sut = CreateProvider(handler);
 
         // Act
-        AddBookRequest? result = await sut.GetBookAsync(lookup);
+        BookMetadataDto? result = await sut.GetBookAsync(lookup);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal("Fallback Edition", result!.Metadata!.Title);
+        Assert.Equal("Fallback Edition", result.Title);
         Assert.Equal("OL600M", result.OpenLibraryId);
         Assert.Contains(handler.Requests, request => request.RequestUri!.AbsolutePath == "/books/OL600M.json");
     }
@@ -408,7 +408,7 @@ public class OpenLibraryBookMetadataProviderTests
         OpenLibraryBookMetadataProvider sut = CreateProvider(handler);
 
         // Act
-        AddBookRequest? result = await sut.GetBookAsync(lookup);
+        BookMetadataDto? result = await sut.GetBookAsync(lookup);
 
         // Assert
         Assert.Null(result);

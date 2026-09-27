@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -966,5 +966,89 @@
   </data>
   <data name="Country.ZW" xml:space="preserve">
     <value>ジンバブエ</value>
+  </data>
+  <data name="Role" xml:space="preserve">
+    <value>役割</value>
+  </data>
+  <data name="Actor" xml:space="preserve">
+    <value>俳優</value>
+  </data>
+  <data name="Director" xml:space="preserve">
+    <value>監督</value>
+  </data>
+  <data name="Screenwriter" xml:space="preserve">
+    <value>脚本家</value>
+  </data>
+  <data name="Composer" xml:space="preserve">
+    <value>作曲家</value>
+  </data>
+  <data name="Lyricist" xml:space="preserve">
+    <value>作詞家</value>
+  </data>
+  <data name="Arranger" xml:space="preserve">
+    <value>編曲家</value>
+  </data>
+  <data name="Conductor" xml:space="preserve">
+    <value>指揮者</value>
+  </data>
+  <data name="Producer" xml:space="preserve">
+    <value>プロデューサー</value>
+  </data>
+  <data name="ExecutiveProducer" xml:space="preserve">
+    <value>エグゼクティブプロデューサー</value>
+  </data>
+  <data name="Engineer" xml:space="preserve">
+    <value>エンジニア</value>
+  </data>
+  <data name="Mixer" xml:space="preserve">
+    <value>ミキサー</value>
+  </data>
+  <data name="Remixer" xml:space="preserve">
+    <value>リミキサー</value>
+  </data>
+  <data name="RecordLabel" xml:space="preserve">
+    <value>レコードレーベル</value>
+  </data>
+  <data name="Vocals" xml:space="preserve">
+    <value>ボーカル</value>
+  </data>
+  <data name="BackingVocals" xml:space="preserve">
+    <value>バックボーカル</value>
+  </data>
+  <data name="Guitar" xml:space="preserve">
+    <value>ギター</value>
+  </data>
+  <data name="BassGuitar" xml:space="preserve">
+    <value>ベースギター</value>
+  </data>
+  <data name="Drums" xml:space="preserve">
+    <value>ドラム</value>
+  </data>
+  <data name="Percussion" xml:space="preserve">
+    <value>パーカッション</value>
+  </data>
+  <data name="Keyboards" xml:space="preserve">
+    <value>キーボード</value>
+  </data>
+  <data name="Piano" xml:space="preserve">
+    <value>ピアノ</value>
+  </data>
+  <data name="Synthesizer" xml:space="preserve">
+    <value>シンセサイザー</value>
+  </data>
+  <data name="Strings" xml:space="preserve">
+    <value>弦楽器</value>
+  </data>
+  <data name="Woodwinds" xml:space="preserve">
+    <value>木管楽器</value>
+  </data>
+  <data name="Brass" xml:space="preserve">
+    <value>金管楽器</value>
+  </data>
+  <data name="Choir" xml:space="preserve">
+    <value>合唱</value>
+  </data>
+  <data name="Orchestrator" xml:space="preserve">
+    <value>オーケストレーター</value>
   </data>
 </root>

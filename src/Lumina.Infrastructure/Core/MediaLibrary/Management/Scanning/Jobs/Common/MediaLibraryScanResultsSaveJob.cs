@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Common.DataAccess.Repositories.Books;
+using Lumina.Application.Common.DataAccess.Repositories.BookLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
@@ -52,17 +52,17 @@ internal sealed class MediaLibraryScanResultsSaveJob : MediaLibraryScanJob, IMed
     {
         try
         {
-            // increment the number of parents that finished their execution and called this job (beware race conditions, jobs run in parallel)
+            // Increment the number of parents that finished their execution and called this job (beware race conditions, jobs run in parallel).
             int parentsCompleted = Interlocked.Increment(ref parentsPayloadsExecuted);
-            // only execute this job's payload when it has no parents, or when all the parents finished their execution
+            // Only execute this job's payload when it has no parents, or when all the parents finished their execution.
             if (Parents.Count == 0 || parentsCompleted == Parents.Count)
             {
-                // this needs to be wrapped in a task because even though this job is processed in a "fire and forget" async manner, it still does synchronous
-                // processing that takes time, and would block the processing of scan jobs in the in-memory queue
+                // This needs to be wrapped in a task because even though this job is processed in a "fire and forget" async manner, it still does synchronous
+                // processing that takes time, and would block the processing of scan jobs in the in-memory queue.
                 await Task.Run(async () =>
                 {
                     Status = LibraryScanJobStatus.Running;
-                    // see docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details:
+                    // See docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details.
                     await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
                     IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
                     IDomainEventPublisher domainEventPublisher = asyncServiceScope.ServiceProvider.GetService<IDomainEventPublisher>()!;
@@ -70,27 +70,27 @@ internal sealed class MediaLibraryScanResultsSaveJob : MediaLibraryScanJob, IMed
 
                     MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
 
-                    // set the initial progress of the scan job, it's a 1 step job - applying the scan results to the storage medium
+                    // Set the initial progress of the scan job; it is a single step job, applying the scan results to the storage medium.
                     Result<Success> publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 0, 1, cancellationToken).ConfigureAwait(false);
                     if (publishJobProgressResult.IsFailure)
                         throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
 
-                    // get the paths of the media library scan snapshot items that are no longer present in the current scan, so that deletion events can be raised for them
+                    // Get the paths of the media library scan snapshot items that are no longer present in the current scan, so that deletion events can be raised for them.
                     Result<IReadOnlyList<string>> getDeletedPathsResult = await unitOfWork.LibraryScanSnapshotRepository.GetDeletedPathsAsync(LibraryId.Value, ScanId.Value, cancellationToken).ConfigureAwait(false);
                     if (getDeletedPathsResult.IsFailure)
                         throw new InvalidOperationException(getDeletedPathsResult.FirstError.Description);
 
-                    // get the paths of the media library scan staging results that changed since the previous scan, so that the books stored at those paths are re-enriched
+                    // Get the paths of the media library scan staging results that changed since the previous scan, so that the books stored at those paths are re-enriched.
                     Result<IReadOnlyList<string>> getChangedPathsResult = await unitOfWork.LibraryScanStagingResultsRepository.GetChangedPathsAsync(ScanId.Value, cancellationToken).ConfigureAwait(false);
                     if (getChangedPathsResult.IsFailure)
                         throw new InvalidOperationException(getChangedPathsResult.FirstError.Description);
 
-                    // apply the results of the current scan to the storage medium, atomically replacing the media library scan snapshot of the previous scan
+                    // Apply the results of the current scan to the storage medium, atomically replacing the media library scan snapshot of the previous scan.
                     Result<Updated> applySnapshotSwapResult = await unitOfWork.LibraryScanSnapshotRepository.ApplySnapshotSwapAsync(LibraryId.Value, ScanId.Value, UserId.Value, cancellationToken).ConfigureAwait(false);
                     if (applySnapshotSwapResult.IsFailure)
                         throw new InvalidOperationException(applySnapshotSwapResult.FirstError.Description);
 
-                    // reset the enrichment state of the books whose content changed, so that they are re-enriched by the enrichment jobs that follow
+                    // Reset the enrichment state of the books whose content changed, so that they are re-enriched by the enrichment jobs that follow.
                     if (getChangedPathsResult.Value.Count > 0)
                     {
                         Result<Updated> resetEnrichmentStateResult = await unitOfWork.BookRepository.ResetEnrichmentStateForPathsAsync(LibraryId.Value, getChangedPathsResult.Value, cancellationToken).ConfigureAwait(false);
@@ -98,14 +98,14 @@ internal sealed class MediaLibraryScanResultsSaveJob : MediaLibraryScanJob, IMed
                             throw new InvalidOperationException(resetEnrichmentStateResult.FirstError.Description);
                     }
 
-                    // raise a deletion event for every media library scan snapshot item that is no longer present on disk
+                    // Raise a deletion event for every media library scan snapshot item that is no longer present on disk.
                     foreach (string deletedPath in getDeletedPathsResult.Value)
                     {
                         cancellationToken.ThrowIfCancellationRequested();
                         await domainEventPublisher.PublishAsync(new LibraryMediaItemDeletedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, deletedPath, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                     }
 
-                    // materialize the books of the media library from the scan snapshot, so that they are browsable even without web metadata
+                    // Materialize the books of the media library from the scan snapshot, so that they are browsable even without web metadata.
                     Result<IReadOnlyList<string>> getPathsResult = await unitOfWork.LibraryScanSnapshotRepository.GetPathsAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
                     if (getPathsResult.IsFailure)
                         throw new InvalidOperationException(getPathsResult.FirstError.Description);
@@ -124,19 +124,21 @@ internal sealed class MediaLibraryScanResultsSaveJob : MediaLibraryScanJob, IMed
                         if (insertBookResult.IsFailure)
                             throw new InvalidOperationException(insertBookResult.FirstError.Description);
                     }
-                    await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                    Result<Success> saveChangesResult = await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                    if (saveChangesResult.IsFailure)
+                        throw new InvalidOperationException(saveChangesResult.FirstError.Description);
 
-                    // increment the number of processed elements progress
+                    // Increment the number of processed elements progress.
                     publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 1, 1, cancellationToken).ConfigureAwait(false);
                     if (publishJobProgressResult.IsFailure)
                         throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
 
                     Status = LibraryScanJobStatus.Completed;
-                    // when this job has no linked children, it's the last job in the directed acyclic job graph, and the scan is completed
+                    // When this job has no linked children, it is the last job in the directed acyclic job graph, and the scan is completed.
                     if (Children.Count == 0)
                         await domainEventPublisher.PublishAsync(new LibraryScanFinishedDomainEvent(Guid.NewGuid(), compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
 
-                    // call each linked child with the obtained payload
+                    // Call each linked child with the obtained payload.
                     foreach (IMediaLibraryScanJob child in Children)
                         await child.ExecuteAsync(id, input, cancellationToken).ConfigureAwait(false);
                 }, cancellationToken).ConfigureAwait(false);

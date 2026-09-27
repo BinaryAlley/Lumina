@@ -50,21 +50,21 @@ public class PathService : IPathService
     /// Checks if <paramref name="path"/> exists.
     /// </summary>
     /// <param name="path">The path to be checked.</param>
-    /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
+    /// <param name="shouldIncludeHiddenElements">Whether to include hidden file system elements or not.</param>
     /// <returns><see langword="true"/> if <paramref name="path"/> exists, <see langword="false"/> otherwise.</returns>
-    public bool Exists(string path, bool includeHiddenElements = true)
+    public bool Exists(string path, bool shouldIncludeHiddenElements = true)
     {
         Result<FileSystemPathId> newPathResult = FileSystemPathId.Create(path);
         if (newPathResult.IsFailure)
             return false;
-        return _platformContext.PathStrategy.Exists(newPathResult.Value, includeHiddenElements);
+        return _platformContext.PathStrategy.Exists(newPathResult.Value, shouldIncludeHiddenElements);
     }
 
     /// <summary>
     /// Tries to combine <paramref name="path"/> with <paramref name="name"/>.
     /// </summary>
     /// <param name="path">The path to be combined.</param>
-    /// <param name="path">The name to be combined with the path.</param>
+    /// <param name="name">The name to be combined with the path.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing the combined path, or an error.</returns>
     public Result<string> CombinePath(string path, string name)
     {
@@ -127,28 +127,28 @@ public class PathService : IPathService
         char[] invalidChars = _platformContext.PathStrategy.GetInvalidPathSegmentCharsForPlatform();
         char[] sanitizedChars = [.. name.Trim().Select(character => Array.IndexOf(invalidChars, character) >= 0 ? ' ' : character)];
 
-        // collapse the consecutive whitespace into a single space, so that the segment does not contain ragged spacing
+        // Collapse the consecutive whitespace into a single space, so that the segment does not contain ragged spacing.
         List<char> collapsedChars = [];
-        bool previousWasWhitespace = false;
+        bool wasPreviousWhitespace = false;
         foreach (char character in sanitizedChars)
         {
             if (char.IsWhiteSpace(character))
             {
-                if (!previousWasWhitespace)
+                if (!wasPreviousWhitespace)
                     collapsedChars.Add(' ');
-                previousWasWhitespace = true;
+                wasPreviousWhitespace = true;
             }
             else
             {
                 collapsedChars.Add(character);
-                previousWasWhitespace = false;
+                wasPreviousWhitespace = false;
             }
         }
 
         string sanitized = new string([.. collapsedChars]).Trim();
         if (string.Equals(sanitized, ".", StringComparison.Ordinal) || string.Equals(sanitized, "..", StringComparison.Ordinal))
             return Errors.FileSystemManagement.InvalidPath;
-        // a segment must never contain a path separator, otherwise the segment could escape its directory or nest additional directories
+        // A segment must never contain a path separator, otherwise the segment could escape its directory or nest additional directories.
         if (sanitized.Contains('/') || sanitized.Contains('\\'))
             return Errors.FileSystemManagement.InvalidPath;
         if (sanitized.Length > MAX_DIRECTORY_SEGMENT_LENGTH)
@@ -170,5 +170,22 @@ public class PathService : IPathService
         if (newPathResult.IsFailure)
             return newPathResult.Errors;
         return _platformContext.PathStrategy.GetPathRoot(newPathResult.Value);
+    }
+
+    /// <summary>
+    /// Checks whether <paramref name="path"/> is located inside <paramref name="parentPath"/>.
+    /// </summary>
+    /// <param name="path">The path to be checked.</param>
+    /// <param name="parentPath">The path that must contain the checked path.</param>
+    /// <returns><see langword="true"/> if the path is inside the parent path, <see langword="false"/> otherwise.</returns>
+    public bool IsPathWithin(string path, string parentPath)
+    {
+        Result<FileSystemPathId> newPathResult = FileSystemPathId.Create(path);
+        if (newPathResult.IsFailure)
+            return false;
+        Result<FileSystemPathId> parentPathResult = FileSystemPathId.Create(parentPath);
+        if (parentPathResult.IsFailure)
+            return false;
+        return _platformContext.PathStrategy.IsPathWithin(newPathResult.Value, parentPathResult.Value);
     }
 }

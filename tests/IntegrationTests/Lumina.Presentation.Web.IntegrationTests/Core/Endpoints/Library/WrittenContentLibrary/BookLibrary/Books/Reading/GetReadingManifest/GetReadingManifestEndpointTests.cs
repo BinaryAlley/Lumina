@@ -41,11 +41,12 @@ public class GetReadingManifestEndpointTests : IClassFixture<LuminaWebFactory>
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
+        Guid libraryId = Guid.NewGuid();
         Guid bookId = Guid.NewGuid();
         ReadingManifestDto manifest = _readingManifestDtoFixture.Create(title: "Test Book");
-        _apiFactory.ApiClientStub.RegisterGetResponse($"books/{bookId}/reading/manifest", manifest);
+        _apiFactory.ApiClientStub.RegisterGetResponse($"libraries/{libraryId}/books/{bookId}/reading/manifest", manifest);
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
-        HttpRequestMessage getRequest = new(HttpMethod.Get, $"/en-us/library/written-content-library/books-library/books/{bookId}/api-get-reading-manifest");
+        HttpRequestMessage getRequest = new(HttpMethod.Get, $"/en-us/library/written-content-library/books-library/books/{bookId}/api-get-reading-manifest?libraryId={libraryId}");
         getRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
         // Act
@@ -65,12 +66,13 @@ public class GetReadingManifestEndpointTests : IClassFixture<LuminaWebFactory>
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
+        Guid libraryId = Guid.NewGuid();
         Guid bookId = Guid.NewGuid();
-        _apiFactory.ApiClientStub.RegisterGetException($"books/{bookId}/reading/manifest", new ApiException(
+        _apiFactory.ApiClientStub.RegisterGetException($"libraries/{libraryId}/books/{bookId}/reading/manifest", new ApiException(
             _problemDetailsDtoFixture.Create(detail: "NoReaderAvailable"),
             HttpStatusCode.NotFound));
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
-        HttpRequestMessage getRequest = new(HttpMethod.Get, $"/en-us/library/written-content-library/books-library/books/{bookId}/api-get-reading-manifest");
+        HttpRequestMessage getRequest = new(HttpMethod.Get, $"/en-us/library/written-content-library/books-library/books/{bookId}/api-get-reading-manifest?libraryId={libraryId}");
         getRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
         // Act

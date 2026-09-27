@@ -107,7 +107,7 @@ public class BaseEndpointTests
 
         // Assert
         ProblemHttpResult problemResult = Assert.IsType<ProblemHttpResult>(result);
-        Assert.Equal(422, problemResult.StatusCode);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemResult.StatusCode);
         Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemResult.ProblemDetails.Status);
         Assert.Equal("General.Validation", problemResult.ProblemDetails.Title);
         Assert.Equal("OneOrMoreValidationErrorsOccurred", problemResult.ProblemDetails.Detail);

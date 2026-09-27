@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Domain.Common.Events;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
@@ -26,16 +27,16 @@ internal static class ScanFailurePublisher
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public static async Task PublishAsync(IServiceScopeFactory serviceScopeFactory, LibraryId libraryId, MediaLibraryScanCompositeId compositeKey, Exception exception, CancellationToken cancellationToken)
     {
-        // failure reporting is best-effort, a failure to report the failure must not crash the job processing
+        // Failure reporting is best-effort, a failure to report the failure must not crash the job processing.
         try
         {
             await using AsyncServiceScope asyncServiceScope = serviceScopeFactory.CreateAsyncScope();
             IDomainEventPublisher domainEventPublisher = asyncServiceScope.ServiceProvider.GetService<IDomainEventPublisher>()!;
-            await domainEventPublisher.PublishAsync(new LibraryScanFailedDomainEvent(Guid.NewGuid(), libraryId, compositeKey, DateTime.UtcNow, exception.Message), cancellationToken).ConfigureAwait(false);
+            await domainEventPublisher.PublishAsync(new LibraryScanFailedDomainEvent(Guid.NewGuid(), libraryId, compositeKey, DateTime.UtcNow, Optional<string>.FromNullable(exception.Message)), cancellationToken).ConfigureAwait(false);
         }
         catch
         {
-            // the failure reporting is best-effort, as the exception cannot be reported if the reporting itself fails
+            // The failure reporting is best-effort, as the exception cannot be reported if the reporting itself fails.
         }
     }
 }

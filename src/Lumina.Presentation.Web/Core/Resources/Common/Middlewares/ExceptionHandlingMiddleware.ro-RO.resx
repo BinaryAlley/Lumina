@@ -141,8 +141,26 @@
   <data name="BitrateMustBeAPositiveNumber" xml:space="preserve">
     <value>Rata de biți trebuie să fie un număr pozitiv!</value>
   </data>
+  <data name="An unexpected error occurred while processing the request." xml:space="preserve">
+    <value>A apărut o eroare neașteptată în timpul procesării cererii!</value>
+  </data>
+  <data name="InternalServerError" xml:space="preserve">
+    <value>Eroare internă de server!</value>
+  </data>
+  <data name="UniqueConstraintViolation" xml:space="preserve">
+    <value>O valoare duplicată încalcă o constrângere de unicitate!</value>
+  </data>
   <data name="BookAlreadyExists" xml:space="preserve">
     <value>Cartea există deja!</value>
+  </data>
+  <data name="BookCoverCannotBeNull" xml:space="preserve">
+    <value>Coperta cărții nu poate fi nulă!</value>
+  </data>
+  <data name="BookFileNotFound" xml:space="preserve">
+    <value>Fișierul cărții nu a fost găsit!</value>
+  </data>
+  <data name="BookIdCannotBeEmpty" xml:space="preserve">
+    <value>Id-ul cărții nu poate fi gol!</value>
   </data>
   <data name="BookLibraryCannotBeNull" xml:space="preserve">
     <value>Biblioteca de carti nu poate fi nula!</value>
@@ -152,6 +170,12 @@
   </data>
   <data name="BookPathCannotBeEmpty" xml:space="preserve">
     <value>Calea cartii nu poate fi goala!</value>
+  </data>
+  <data name="BookPathMustBeMaximum2048CharactersLong" xml:space="preserve">
+    <value>Calea cărții trebuie să aibă maximum 2048 de caractere!</value>
+  </data>
+  <data name="BookPathMustBeWithinLibraryContentLocations" xml:space="preserve">
+    <value>Calea cărții trebuie să fie în una dintre locațiile de conținut ale bibliotecii!</value>
   </data>
   <data name="CannotNavigateUp" xml:space="preserve">
     <value>Nu se poate naviga în sus!</value>
@@ -273,6 +297,9 @@
   <data name="FileMoveError" xml:space="preserve">
     <value>Eroare la mutarea fișierului!</value>
   </data>
+  <data name="FileNameCannotBeEmpty" xml:space="preserve">
+    <value>Numele fișierului nu poate fi gol!</value>
+  </data>
   <data name="FileNotFound" xml:space="preserve">
     <value>Fișierul nu a fost găsit!</value>
   </data>
@@ -323,9 +350,6 @@
   </data>
   <data name="InvalidIsbn13Format" xml:space="preserve">
     <value>Format ISBN13 invalid!</value>
-  </data>
-  <data name="InvalidIsoCode" xml:space="preserve">
-    <value>Cod ISO invalid!</value>
   </data>
   <data name="InvalidLccnFormat" xml:space="preserve">
     <value>Format LCCN invalid!</value>
@@ -422,6 +446,12 @@
   </data>
   <data name="LibraryTypeCannotBeNull" xml:space="preserve">
     <value>Tipul bibliotecii nu poate fi nul!</value>
+  </data>
+  <data name="MediaContributorIdCannotBeEmpty" xml:space="preserve">
+    <value>Id-ul contribuitorului media nu poate fi gol!</value>
+  </data>
+  <data name="MediaContributorNotFound" xml:space="preserve">
+    <value>Contribuitorul media nu a fost găsit!</value>
   </data>
   <data name="MediaLibrariesDirectoryCannotBeEmpty" xml:space="preserve">
     <value>Directorul bibliotecilor media nu poate fi gol!</value>
@@ -731,6 +761,9 @@
   </data>
   <data name="PluginFileNameCannotBeEmpty" xml:space="preserve">
     <value>Numele fișierului pluginului nu poate fi gol!</value>
+  </data>
+  <data name="UnknownMediaContributorRole" xml:space="preserve">
+    <value>Rol de contribuitor media necunoscut!</value>
   </data>
   <data name="UnsupportedPluginFileType" xml:space="preserve">
     <value>Tipul de fișier al pluginului încărcat nu este acceptat!</value>

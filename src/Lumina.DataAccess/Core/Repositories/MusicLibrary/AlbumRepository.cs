@@ -1,0 +1,300 @@
+#region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.DataAccess.Entities.Common;
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
+using Lumina.Application.Common.DTO.Pagination;
+using Lumina.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
+using Lumina.DataAccess.Common.Persistence;
+using Lumina.DataAccess.Core.UoW;
+using Lumina.Domain.Common.Errors;
+using Lumina.Domain.Common.Primitives;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Lumina.DataAccess.Core.Repositories.MusicLibrary;
+
+/// <summary>
+/// Repository for albums.
+/// </summary>
+internal sealed class AlbumRepository : IAlbumRepository
+{
+    private readonly LuminaDbContext _luminaDbContext;
+    private readonly ITrackRepository _trackRepository;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AlbumRepository"/> class.
+    /// </summary>
+    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
+    /// <param name="trackRepository">Injected repository for tracks.</param>
+    public AlbumRepository(LuminaDbContext luminaDbContext, ITrackRepository trackRepository)
+    {
+        _luminaDbContext = luminaDbContext;
+        _trackRepository = trackRepository;
+    }
+
+    /// <summary>
+    /// Adds a new album.
+    /// </summary>
+    /// <param name="album">The album to add.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Created>> InsertAsync(AlbumEntity album, CancellationToken cancellationToken)
+    {
+        bool doesAlbumExist = await _luminaDbContext.Albums.AnyAsync(repositoryAlbum => repositoryAlbum.Id == album.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (doesAlbumExist)
+            return Errors.Music.AlbumAlreadyExists;
+
+        // A track is unique within its library by its file system path, so the same file can never be registered twice, neither twice in the same request,
+        // nor once when it is already registered in the library. The check runs here, for the whole album, because the insert of the album inserts its tracks as well.
+        Result<Success> checkTrackPathsResult = await CheckTrackPathsAsync(album, cancellationToken).ConfigureAwait(false);
+        if (checkTrackPathsResult.IsFailure)
+            return checkTrackPathsResult.Errors;
+
+        // Resolve the tags and genres referenced by the album and its tracks to a single instance per name, replacing the stored ones where they exist, so that
+        // neither a stored row nor a name shared by the album and its tracks of the same request is tracked more than once.
+        Result<IReadOnlyDictionary<string, TagEntity>> resolveTagsResult = await SharedReferenceResolver.ResolveAsync(
+            _luminaDbContext, album.Tags.Concat(album.Tracks.SelectMany(track => track.Tags)), Errors.Metadata.TagNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+        if (resolveTagsResult.IsFailure)
+            return resolveTagsResult.Errors;
+        Result<IReadOnlyDictionary<string, GenreEntity>> resolveGenresResult = await SharedReferenceResolver.ResolveAsync(
+            _luminaDbContext, album.Genres.Concat(album.Tracks.SelectMany(track => track.Genres)), Errors.Metadata.GenreNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+        if (resolveGenresResult.IsFailure)
+            return resolveGenresResult.Errors;
+
+        album.Tags = [.. SharedReferenceResolver.Normalize(album.Tags, resolveTagsResult.Value)];
+        album.Genres = [.. SharedReferenceResolver.Normalize(album.Genres, resolveGenresResult.Value)];
+
+        foreach (TrackEntity track in album.Tracks)
+        {
+            track.Tags = [.. SharedReferenceResolver.Normalize(track.Tags, resolveTagsResult.Value)];
+            track.Genres = [.. SharedReferenceResolver.Normalize(track.Genres, resolveGenresResult.Value)];
+        }
+
+        _luminaDbContext.Albums.Add(album);
+        return Result.Created;
+    }
+
+    /// <summary>
+    /// Checks whether the tracks carried by <paramref name="album"/> reference a file system path that is already used by a track of the same library.
+    /// </summary>
+    /// <param name="album">The album whose track paths are checked.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful check, or an error.</returns>
+    private async Task<Result<Success>> CheckTrackPathsAsync(AlbumEntity album, CancellationToken cancellationToken)
+    {
+        List<string> trackPaths = [.. album.Tracks.Select(track => track.Path!)];
+        if (trackPaths.Count == 0)
+            return Result.Success;
+
+        // The same path cannot be referenced by two tracks of the request itself, not only by a track that is already stored.
+        if (trackPaths.Count != trackPaths.Distinct(StringComparer.Ordinal).Count())
+            return Errors.Music.TrackAlreadyExists;
+
+        Result<IReadOnlyCollection<string>> getExistingPathsResult = await _trackRepository.GetExistingPathsAsync(album.LibraryId, trackPaths, cancellationToken).ConfigureAwait(false);
+        if (getExistingPathsResult.IsFailure)
+            return getExistingPathsResult.Errors;
+        if (getExistingPathsResult.Value.Count > 0)
+            return Errors.Music.TrackAlreadyExists;
+        return Result.Success;
+    }
+
+    /// <summary>
+    /// Updates an existing album, replacing only the editable data that actually changed, while preserving its identity, the identity of its children, and its audit columns.
+    /// </summary>
+    /// <param name="data">The album whose editable data is applied to the stored album.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Updated>> UpdateAsync(AlbumEntity data, CancellationToken cancellationToken)
+    {
+        // Every collection that is reconciled must be loaded, so that the reconciliation can see the rows that are already stored and leave the unchanged ones alone.
+        AlbumEntity? foundAlbum = await _luminaDbContext.Albums
+            .Include(repositoryAlbum => repositoryAlbum.Tags)
+            .Include(repositoryAlbum => repositoryAlbum.Genres)
+            .Include(repositoryAlbum => repositoryAlbum.Ratings)
+            .Include(repositoryAlbum => repositoryAlbum.Contributors)
+            .AsSplitQuery()
+            .FirstOrDefaultAsync(repositoryAlbum => repositoryAlbum.Id == data.Id, cancellationToken).ConfigureAwait(false);
+        if (foundAlbum is null)
+            return Errors.Music.AlbumNotFound;
+
+        return await ApplyUpdateAsync(foundAlbum, data, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Applies the editable data of <paramref name="data"/> onto the already tracked <paramref name="foundAlbum"/>, without loading it, so that a caller that already
+    /// loaded the album graph, like the artist repository, does not make the album repository load it again.
+    /// </summary>
+    /// <param name="foundAlbum">The tracked album whose editable data is applied.</param>
+    /// <param name="data">The album carrying the desired data.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Updated>> ApplyUpdateAsync(AlbumEntity foundAlbum, AlbumEntity data, CancellationToken cancellationToken)
+    {
+        // The stored identity is never overwritten by an edit, and the audit columns are only ever written by the auditing interceptor.
+        Guid artistId = foundAlbum.ArtistId;
+        Guid libraryId = foundAlbum.LibraryId;
+        EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundAlbum, data);
+        foundAlbum.ArtistId = artistId;
+        foundAlbum.LibraryId = libraryId;
+
+        // Tags and genres are shared across the whole database, so the stored rows whose names already exist are reused, and only the missing names are inserted.
+        Result<Updated> reconcileTagsResult = await SharedReferenceResolver.ReconcileAsync(_luminaDbContext, foundAlbum.Tags, data.Tags, Errors.Metadata.TagNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+        if (reconcileTagsResult.IsFailure)
+            return reconcileTagsResult.Errors;
+        Result<Updated> reconcileGenresResult = await SharedReferenceResolver.ReconcileAsync(_luminaDbContext, foundAlbum.Genres, data.Genres, Errors.Metadata.GenreNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+        if (reconcileGenresResult.IsFailure)
+            return reconcileGenresResult.Errors;
+
+        // Ratings are owned value objects with no identity anyone could reference, so a changed rating is replaced as a whole, while the ratings that did not change
+        // are left exactly as they are stored. Matching by the rating source keeps an update in place instead of recreating every rating of the album.
+        CollectionReconciler.Reconcile(
+            foundAlbum.Ratings,
+            data.Ratings,
+            existingRating => existingRating.Source?.ToString() ?? string.Empty,
+            incomingRating => incomingRating.Source?.ToString() ?? string.Empty,
+            shouldReplace: (existingRating, incomingRating) => !existingRating.Equals(incomingRating),
+            createNew: incomingRating => incomingRating);
+
+        // A contributor participation is matched by the contributor and the role they played. Matched participations keep their identity and their audit columns, so a
+        // contributor that is displayed or linked elsewhere is never deleted and re-inserted just because another album of the same artist was edited.
+        CollectionReconciler.Reconcile(
+            foundAlbum.Contributors,
+            data.Contributors,
+            existingContributor => (existingContributor.MediaContributorId, existingContributor.Role),
+            incomingContributor => (incomingContributor.MediaContributorId, incomingContributor.Role),
+            shouldReplace: (existingContributor, incomingContributor) => false,
+            createNew: incomingContributor => incomingContributor);
+
+        return Result.Updated;
+    }
+
+    /// <summary>
+    /// Gets an album by its Id.
+    /// </summary>
+    /// <param name="id">The Id of the album to get.</param>
+    /// <param name="shouldIncludeNavigationProperties">Whether the navigation properties of the album should be loaded together with the album itself.</param>
+    /// <param name="shouldTrackEntities">Whether the retrieved album should be tracked by the persistence medium, so that changes to it can be saved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either an <see cref="AlbumEntity"/>, or an error.</returns>
+    public async Task<Result<AlbumEntity?>> GetByIdAsync(Guid id, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default)
+    {
+        IQueryable<AlbumEntity> query = _luminaDbContext.Albums;
+        if (!shouldTrackEntities)
+            query = query.AsNoTracking();
+        if (shouldIncludeNavigationProperties)
+        {
+            query = query
+                .Include(album => album.Artist)
+                .Include(album => album.Ratings)
+                .Include(album => album.Tags)
+                .Include(album => album.Genres)
+                .Include(album => album.Contributors)
+                .Include(album => album.Tracks)
+                    .ThenInclude(track => track.Ratings)
+                .Include(album => album.Tracks)
+                    .ThenInclude(track => track.Genres)
+                .Include(album => album.Tracks)
+                    .ThenInclude(track => track.Tags)
+                .Include(album => album.Tracks)
+                    .ThenInclude(track => track.Moods)
+                .Include(album => album.Tracks)
+                    .ThenInclude(track => track.Isrcs)
+                .Include(album => album.Tracks)
+                    .ThenInclude(track => track.Contributors)
+                .AsSplitQuery();
+        }
+        return await query.FirstOrDefaultAsync(album => album.Id == id, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Gets all the albums of the artist identified by <paramref name="artistId"/>.
+    /// </summary>
+    /// <param name="artistId">The Id of the artist whose albums are retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="AlbumEntity"/>, or an error.</returns>
+    public async Task<Result<IReadOnlyList<AlbumEntity>>> GetByArtistIdAsync(Guid artistId, CancellationToken cancellationToken)
+    {
+        return await _luminaDbContext.Albums
+            .Include(album => album.Ratings)
+            .Include(album => album.Tags)
+            .Include(album => album.Genres)
+            .Include(album => album.Contributors)
+            .Include(album => album.Tracks)
+                .ThenInclude(track => track.Ratings)
+            .Include(album => album.Tracks)
+                .ThenInclude(track => track.Genres)
+            .Include(album => album.Tracks)
+                .ThenInclude(track => track.Tags)
+            .Include(album => album.Tracks)
+                .ThenInclude(track => track.Moods)
+            .Include(album => album.Tracks)
+                .ThenInclude(track => track.Isrcs)
+            .Include(album => album.Tracks)
+                .ThenInclude(track => track.Contributors)
+            .AsSplitQuery()
+            .Where(album => album.ArtistId == artistId)
+            .OrderBy(album => album.Title)
+            .ThenBy(album => album.Id)
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Gets the lightweight read models of the albums of the artist identified by <paramref name="artistId"/>,
+    /// or all of them when the pagination data is <see langword="null"/>, projecting only the fields needed to display the albums in a card-based grid.
+    /// </summary>
+    /// <param name="artistId">The Id of the artist whose albums are retrieved.</param>
+    /// <param name="paginationData">The pagination data that includes the current page and the number of items per page to retrieve. If <see langword="null"/>, all matching albums are returned.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="PaginatedResultDto{AlbumLiteRow}"/>, or an error.</returns>
+    public async Task<Result<PaginatedResultDto<AlbumLiteRow>>> GetAlbumsLiteByArtistIdAsync(Guid artistId, PaginationDataDto? paginationData, CancellationToken cancellationToken)
+    {
+        // The lightweight read models are always retrieved without tracking, because they are never modified by the caller.
+        IQueryable<AlbumLiteRow> liteRowsQuery = _luminaDbContext.Albums
+            .AsNoTracking()
+            .Where(album => album.ArtistId == artistId)
+            .OrderBy(album => album.Title)
+            .ThenBy(album => album.Id)
+            .Select(album => new AlbumLiteRow
+            {
+                Id = album.Id,
+                Title = album.Title,
+                TotalTracks = album.TotalTracks
+            });
+
+        if (paginationData is null)
+        {
+            IReadOnlyList<AlbumLiteRow> allAlbums = await liteRowsQuery.ToListAsync(cancellationToken).ConfigureAwait(false);
+            return new PaginatedResultDto<AlbumLiteRow>
+            {
+                Data = allAlbums,
+                CurrentPage = 1,
+                PerPage = allAlbums.Count,
+                Count = allAlbums.Count,
+                NumberOfPages = 1
+            };
+        }
+
+        int count = await liteRowsQuery.CountAsync(cancellationToken).ConfigureAwait(false);
+        int numberOfPages = (int)Math.Ceiling((double)count / paginationData.PerPage);
+        int currentPage = Math.Min(paginationData.CurrentPage, Math.Max(1, numberOfPages));
+
+        IReadOnlyList<AlbumLiteRow> paginatedResult = await liteRowsQuery
+            .Skip((currentPage - 1) * paginationData.PerPage)
+            .Take(paginationData.PerPage)
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+
+        return new PaginatedResultDto<AlbumLiteRow>
+        {
+            Data = paginatedResult,
+            CurrentPage = currentPage,
+            PerPage = paginationData.PerPage,
+            Count = count,
+            NumberOfPages = numberOfPages
+        };
+    }
+}

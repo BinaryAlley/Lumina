@@ -40,6 +40,7 @@ public class LibraryOwnershipPolicyTests
     public LibraryOwnershipPolicyTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockUserRepository = Substitute.For<IUserRepository>();
         _mockLibraryRepository = Substitute.For<ILibraryRepository>();
         _mockUnitOfWork.UserRepository.Returns(_mockUserRepository);
@@ -59,8 +60,8 @@ public class LibraryOwnershipPolicyTests
 
         // Assert
         Assert.False(result);
-        await _mockUserRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
-        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockUserRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
+        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -69,7 +70,7 @@ public class LibraryOwnershipPolicyTests
         // Arrange
         Guid userId = Guid.NewGuid();
         LibraryOwnershipPolicyContext context = new(Guid.NewGuid());
-        _mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(null));
 
         // Act
@@ -77,7 +78,7 @@ public class LibraryOwnershipPolicyTests
 
         // Assert
         Assert.False(result);
-        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -86,7 +87,7 @@ public class LibraryOwnershipPolicyTests
         // Arrange
         Guid userId = Guid.NewGuid();
         LibraryOwnershipPolicyContext context = new(Guid.NewGuid());
-        _mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Error.Failure("Database.Error", "Failed to retrieve user"));
 
         // Act
@@ -94,7 +95,7 @@ public class LibraryOwnershipPolicyTests
 
         // Assert
         Assert.False(result);
-        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -107,7 +108,7 @@ public class LibraryOwnershipPolicyTests
                 { "Admin", [] }
             });
         LibraryOwnershipPolicyContext context = new(Guid.NewGuid());
-        _mockUserRepository.GetByIdAsync(adminUser.Id, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(adminUser.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(adminUser));
 
         // Act
@@ -115,7 +116,7 @@ public class LibraryOwnershipPolicyTests
 
         // Assert
         Assert.True(result);
-        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -125,9 +126,9 @@ public class LibraryOwnershipPolicyTests
         Guid userId = Guid.NewGuid();
         UserEntity regularUser = _authorizationServiceFixture.CreateUserWithPermissions();
         LibraryOwnershipPolicyContext context = new(Guid.NewGuid());
-        _mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(regularUser));
-        _mockLibraryRepository.GetByIdAsync(context.LibraryId, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(context.LibraryId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result<LibraryEntity?>.Success(null));
 
         // Act
@@ -144,9 +145,9 @@ public class LibraryOwnershipPolicyTests
         Guid userId = Guid.NewGuid();
         UserEntity regularUser = _authorizationServiceFixture.CreateUserWithPermissions();
         LibraryOwnershipPolicyContext context = new(Guid.NewGuid());
-        _mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(regularUser));
-        _mockLibraryRepository.GetByIdAsync(context.LibraryId, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(context.LibraryId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Error.Failure("Database.Error", "Failed to retrieve library"));
 
         // Act
@@ -164,9 +165,9 @@ public class LibraryOwnershipPolicyTests
         UserEntity regularUser = _authorizationServiceFixture.CreateUserWithPermissions();
         LibraryEntity library = _libraryEntityFixture.Create(userId: userId);
         LibraryOwnershipPolicyContext context = new(library.Id);
-        _mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(regularUser));
-        _mockLibraryRepository.GetByIdAsync(context.LibraryId, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(context.LibraryId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
 
         // Act
@@ -184,9 +185,9 @@ public class LibraryOwnershipPolicyTests
         UserEntity regularUser = _authorizationServiceFixture.CreateUserWithPermissions();
         LibraryEntity library = _libraryEntityFixture.Create(userId: Guid.NewGuid());
         LibraryOwnershipPolicyContext context = new(library.Id);
-        _mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
+        _mockUserRepository.GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(regularUser));
-        _mockLibraryRepository.GetByIdAsync(context.LibraryId, Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(context.LibraryId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
 
         // Act

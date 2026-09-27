@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Common.DataAccess.Repositories.Books;
+using Lumina.Application.Common.DataAccess.Repositories.BookLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.DTO.Filtering;
 using Lumina.Application.Common.DTO.Pagination;
@@ -52,6 +52,7 @@ public class GetBooksQueryHandlerTests
     {
         _mockBookRepository = Substitute.For<IBookRepository>();
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockUnitOfWork.BookRepository.Returns(_mockBookRepository);
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
@@ -75,12 +76,13 @@ public class GetBooksQueryHandlerTests
         CancellationToken cancellationToken = CancellationToken.None;
         List<BookEntity> bookEntities = _bookEntityFixture.CreateMany(2);
         PaginatedResultDto<BookEntity> paginatedBooks = _paginatedResultDtoFixture.Create(data: bookEntities, currentPage: 1, perPage: 10, count: 2, numberOfPages: 1);
-        _mockBookRepository.GetPaginatedAsync(
+        _mockBookRepository.GetAllAsync(
                 Arg.Any<PaginationDataDto?>(),
                 Arg.Any<string?>(),
                 Arg.Any<SortOrder?>(),
                 Arg.Any<LibraryFilterDto>(),
-                Arg.Any<CancellationToken>())
+                shouldTrackEntities: false,
+                cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From(paginatedBooks));
 
         // Act
@@ -101,12 +103,13 @@ public class GetBooksQueryHandlerTests
         // Arrange
         GetBooksQuery query = _getBooksQueryFixture.Create();
         PaginatedResultDto<BookEntity> paginatedBooks = _paginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 10, count: 0, numberOfPages: 0);
-        _mockBookRepository.GetPaginatedAsync(
+        _mockBookRepository.GetAllAsync(
                 Arg.Any<PaginationDataDto?>(),
                 Arg.Any<string?>(),
                 Arg.Any<SortOrder?>(),
                 Arg.Any<LibraryFilterDto>(),
-                Arg.Any<CancellationToken>())
+                shouldTrackEntities: false,
+                cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From(paginatedBooks));
 
         // Act
@@ -122,12 +125,13 @@ public class GetBooksQueryHandlerTests
     {
         // Arrange
         GetBooksQuery query = _getBooksQueryFixture.Create();
-        _mockBookRepository.GetPaginatedAsync(
+        _mockBookRepository.GetAllAsync(
                 Arg.Any<PaginationDataDto?>(),
                 Arg.Any<string?>(),
                 Arg.Any<SortOrder?>(),
                 Arg.Any<LibraryFilterDto>(),
-                Arg.Any<CancellationToken>())
+                shouldTrackEntities: false,
+                cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Errors.Library.FilterMustIncludeLibraryId);
 
         // Act
@@ -145,51 +149,55 @@ public class GetBooksQueryHandlerTests
         GetBooksQuery query = _getBooksQueryFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
         PaginatedResultDto<BookEntity> paginatedBooks = _paginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 10, count: 0, numberOfPages: 0);
-        _mockBookRepository.GetPaginatedAsync(
+        _mockBookRepository.GetAllAsync(
                 Arg.Any<PaginationDataDto?>(),
                 Arg.Any<string?>(),
                 Arg.Any<SortOrder?>(),
                 Arg.Any<LibraryFilterDto>(),
-                Arg.Any<CancellationToken>())
+                shouldTrackEntities: false,
+                cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From(paginatedBooks));
 
         // Act
         await _sut.HandleAsync(query, cancellationToken);
 
         // Assert
-        await _mockBookRepository.Received(1).GetPaginatedAsync(
+        await _mockBookRepository.Received(1).GetAllAsync(
             Arg.Is<PaginationDataDto>(paginationData => paginationData.CurrentPage == query.PaginationData!.CurrentPage &&
                                                         paginationData.PerPage == query.PaginationData.PerPage),
             Arg.Is(query.SortBy),
             Arg.Is(query.SortOrder),
-            Arg.Is<LibraryFilterDto>(filter => filter.LibraryId == query.Filter.LibraryId && filter.SearchTerm == query.Filter.SearchTerm),
-            Arg.Is(cancellationToken));
+            Arg.Is<LibraryFilterDto>(filter => filter.LibraryId == Guid.Parse(query.LibraryId!) && filter.SearchTerm == query.SearchTerm),
+            shouldTrackEntities: false,
+            cancellationToken: Arg.Is(cancellationToken));
     }
 
     [Fact]
     public async Task HandleAsync_WhenQueryHasNoPaginationData_ShouldQueryRepositoryWithoutPagination()
     {
         // Arrange
-        GetBooksQuery query = _getBooksQueryFixture.Create(includePaginationData: false, libraryId: Guid.NewGuid(), sortOrder: SortOrder.Ascending);
+        GetBooksQuery query = _getBooksQueryFixture.Create(includePaginationData: false, libraryId: Guid.NewGuid().ToString(), sortOrder: SortOrder.Ascending);
         PaginatedResultDto<BookEntity> paginatedBooks = _paginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 10, count: 0, numberOfPages: 0);
-        _mockBookRepository.GetPaginatedAsync(
+        _mockBookRepository.GetAllAsync(
                 Arg.Any<PaginationDataDto?>(),
                 Arg.Any<string?>(),
                 Arg.Any<SortOrder?>(),
                 Arg.Any<LibraryFilterDto>(),
-                Arg.Any<CancellationToken>())
+                shouldTrackEntities: false,
+                cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From(paginatedBooks));
 
         // Act
         await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        await _mockBookRepository.Received(1).GetPaginatedAsync(
+        await _mockBookRepository.Received(1).GetAllAsync(
             Arg.Is<PaginationDataDto?>(paginationData => paginationData == null),
             Arg.Is(query.SortBy),
             Arg.Is(query.SortOrder),
-            Arg.Is<LibraryFilterDto>(filter => filter.LibraryId == query.Filter.LibraryId && filter.SearchTerm == query.Filter.SearchTerm),
-            Arg.Any<CancellationToken>());
+            Arg.Is<LibraryFilterDto>(filter => filter.LibraryId == Guid.Parse(query.LibraryId!) && filter.SearchTerm == query.SearchTerm),
+            shouldTrackEntities: false,
+            cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -207,8 +215,8 @@ public class GetBooksQueryHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
         await _mockAuthorizationService.Received(1).EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
-            _userId, Arg.Is<LibraryOwnershipPolicyContext>(context => context.LibraryId == query.Filter.LibraryId), Arg.Any<CancellationToken>());
-        await _mockBookRepository.DidNotReceive().GetPaginatedAsync(Arg.Any<PaginationDataDto?>(), Arg.Any<string?>(), Arg.Any<SortOrder?>(), Arg.Any<LibraryFilterDto>(), Arg.Any<CancellationToken>());
+            _userId, Arg.Is<LibraryOwnershipPolicyContext>(context => context.LibraryId == Guid.Parse(query.LibraryId!)), Arg.Any<CancellationToken>());
+        await _mockBookRepository.DidNotReceive().GetAllAsync(Arg.Any<PaginationDataDto?>(), Arg.Any<string?>(), Arg.Any<SortOrder?>(), Arg.Any<LibraryFilterDto>(), shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -225,7 +233,7 @@ public class GetBooksQueryHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
         await _mockAuthorizationService.DidNotReceive().EvaluatePolicyAsync<ILibraryOwnershipPolicy>(Arg.Any<Guid>(), Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>());
-        await _mockBookRepository.DidNotReceive().GetPaginatedAsync(Arg.Any<PaginationDataDto?>(), Arg.Any<string?>(), Arg.Any<SortOrder?>(), Arg.Any<LibraryFilterDto>(), Arg.Any<CancellationToken>());
+        await _mockBookRepository.DidNotReceive().GetAllAsync(Arg.Any<PaginationDataDto?>(), Arg.Any<string?>(), Arg.Any<SortOrder?>(), Arg.Any<LibraryFilterDto>(), shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -242,6 +250,6 @@ public class GetBooksQueryHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Library.LibraryIdCannotBeEmpty, result.FirstError);
         await _mockAuthorizationService.DidNotReceive().EvaluatePolicyAsync<ILibraryOwnershipPolicy>(Arg.Any<Guid>(), Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>());
-        await _mockBookRepository.DidNotReceive().GetPaginatedAsync(Arg.Any<PaginationDataDto?>(), Arg.Any<string?>(), Arg.Any<SortOrder?>(), Arg.Any<LibraryFilterDto>(), Arg.Any<CancellationToken>());
+        await _mockBookRepository.DidNotReceive().GetAllAsync(Arg.Any<PaginationDataDto?>(), Arg.Any<string?>(), Arg.Any<SortOrder?>(), Arg.Any<LibraryFilterDto>(), shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>());
     }
 }

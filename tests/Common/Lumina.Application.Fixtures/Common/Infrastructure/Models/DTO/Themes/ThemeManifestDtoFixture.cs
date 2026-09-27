@@ -25,8 +25,8 @@ public class ThemeManifestDtoFixture
     /// <param name="author">Optional author of the theme.</param>
     /// <param name="version">Optional version of the theme.</param>
     /// <param name="preview">Optional preview image path of the theme, or <see langword="null"/> when the theme has no preview.</param>
-    /// <param name="includePreview">Whether the preview path should be included, or forced to <see langword="null"/>.</param>
     /// <param name="templates">Optional template mappings of the theme.</param>
+    /// <param name="includePreview">Whether the preview path should be included, or forced to <see langword="null"/>.</param>
     /// <returns>A configured <see cref="ThemeManifestDto"/> instance.</returns>
     public ThemeManifestDto Create(
         int? schemaVersion = null,
@@ -36,8 +36,8 @@ public class ThemeManifestDtoFixture
         string? author = null,
         string? version = null,
         string? preview = null,
-        bool includePreview = false,
-        Dictionary<string, string>? templates = null)
+        Dictionary<string, string>? templates = null,
+        bool includePreview = false)
     {
         return new Faker<ThemeManifestDto>()
             .CustomInstantiator(f => new ThemeManifestDto

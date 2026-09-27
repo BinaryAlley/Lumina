@@ -1,11 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
+using Lumina.DataAccess.Common.Persistence;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -36,8 +38,8 @@ internal sealed class UserSettingsRepository : IUserSettingsRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Created>> InsertAsync(UserSettingsEntity data, CancellationToken cancellationToken)
     {
-        bool settingsExists = await _luminaDbContext.UserSettings.AnyAsync(settings => settings.UserId == data.UserId, cancellationToken: cancellationToken).ConfigureAwait(false);
-        if (settingsExists)
+        bool doesSettingsExist = await _luminaDbContext.UserSettings.AnyAsync(settings => settings.UserId == data.UserId, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (doesSettingsExist)
             return Errors.UserSettings.UserSettingsAlreadyExists;
 
         _luminaDbContext.UserSettings.Add(data);
@@ -50,10 +52,12 @@ internal sealed class UserSettingsRepository : IUserSettingsRepository
     /// <param name="id">The Id of the user settings to get.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either the <see cref="UserSettingsEntity"/> identified by <paramref name="id"/>, or an error.</returns>
-    public async Task<Result<UserSettingsEntity?>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<Result<UserSettingsEntity?>> GetByIdAsync(Guid id, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default)
     {
-        return await _luminaDbContext.UserSettings
-            .FirstOrDefaultAsync(settings => settings.Id == id, cancellationToken)
+        IQueryable<UserSettingsEntity> query = _luminaDbContext.UserSettings;
+        if (!shouldTrackEntities)
+            query = query.AsNoTracking();
+        return await query.FirstOrDefaultAsync(settings => settings.Id == id, cancellationToken)
             .ConfigureAwait(false);
     }
 
@@ -84,7 +88,8 @@ internal sealed class UserSettingsRepository : IUserSettingsRepository
         if (foundSettings is null)
             return Errors.UserSettings.UserSettingsNotFound;
 
-        _luminaDbContext.Entry(foundSettings).CurrentValues.SetValues(data);
+        // The stored identity is never overwritten by an edit, and the audit columns are only ever written by the auditing interceptor.
+        EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundSettings, data);
         return Result.Updated;
     }
 }

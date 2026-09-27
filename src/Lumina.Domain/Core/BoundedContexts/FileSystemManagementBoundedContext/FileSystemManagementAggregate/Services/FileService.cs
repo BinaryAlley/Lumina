@@ -35,50 +35,50 @@ public class FileService : IFileService
     /// Retrieves files for the specified string path.
     /// </summary>
     /// <param name="path">String representation of the file path.</param>
-    /// <param name="includeHiddenElements">Whether to include hidden files or not.</param>
+    /// <param name="shouldIncludeHiddenElements">Whether to include hidden files or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of files or an error.</returns>
-    public Result<IEnumerable<File>> GetFiles(string path, bool includeHiddenElements)
+    public Result<IEnumerable<File>> GetFiles(string path, bool shouldIncludeHiddenElements)
     {
         Result<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(path);
         if (fileSystemPathIdResult.IsFailure)
             return fileSystemPathIdResult.Errors;
-        return GetFiles(fileSystemPathIdResult.Value, includeHiddenElements);
+        return GetFiles(fileSystemPathIdResult.Value, shouldIncludeHiddenElements);
     }
 
     /// <summary>
     /// Retrieves files associated with a given file.
     /// </summary>
     /// <param name="file">The file object.</param>
-    /// <param name="includeHiddenElements">Whether to include hidden files or not.</param>
+    /// <param name="shouldIncludeHiddenElements">Whether to include hidden files or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of files or an error.</returns>
-    public Result<IEnumerable<File>> GetFiles(File file, bool includeHiddenElements)
+    public Result<IEnumerable<File>> GetFiles(File file, bool shouldIncludeHiddenElements)
     {
-        return GetFiles(file.Id, includeHiddenElements);
+        return GetFiles(file.Id, shouldIncludeHiddenElements);
     }
 
     /// <summary>
     /// Retrieves files for a specified file path Id.
     /// </summary>
     /// <param name="path">Identifier for the file path.</param>
-    /// <param name="includeHiddenElements">Whether to include hidden files or not.</param>
+    /// <param name="shouldIncludeHiddenElements">Whether to include hidden files or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of files or an error.</returns>
-    public Result<IEnumerable<File>> GetFiles(FileSystemPathId path, bool includeHiddenElements)
+    public Result<IEnumerable<File>> GetFiles(FileSystemPathId path, bool shouldIncludeHiddenElements)
     {
-        // retrieve the list of files
-        Result<IEnumerable<FileSystemPathId>> filePathsResult = _environmentContext.FileProviderService.GetFilePaths(path, includeHiddenElements);
+        // Retrieve the list of files.
+        Result<IEnumerable<FileSystemPathId>> filePathsResult = _environmentContext.FileProviderService.GetFilePaths(path, shouldIncludeHiddenElements);
         if (filePathsResult.IsFailure)
             return filePathsResult.Errors;
         List<File> result = [];
         IEnumerable<FileSystemPathId> filePaths = filePathsResult.Value;
         foreach (FileSystemPathId filePath in filePaths)
         {
-            // extract file details and add to the result list
+            // Extract file details and add them to the result list.
             Result<string> fileNameResult = _environmentContext.FileProviderService.GetFileName(filePath);
             Result<Optional<DateTime>> dateModifiedResult = _environmentContext.FileProviderService.GetLastWriteTime(filePath);
             Result<Optional<DateTime>> dateCreatedResult = _environmentContext.FileProviderService.GetCreationTime(filePath);
             Result<long?> sizeResult = _environmentContext.FileProviderService.GetSize(filePath);
             long size = !sizeResult.IsFailure ? sizeResult.Value ?? 0 : 0;
-            // if any of the details returned an error, set inaccessible status
+            // If any of the details returned an error, set the inaccessible status.
             if (fileNameResult.IsFailure || dateModifiedResult.IsFailure || dateCreatedResult.IsFailure || sizeResult.IsFailure)
             {
                 Result<File> errorFileResult = File.Create(filePath, !fileNameResult.IsFailure ? fileNameResult.Value : null!,
@@ -107,13 +107,13 @@ public class FileService : IFileService
     /// </summary>
     /// <param name="sourceFilePath">String representation of the path where the file to be copied is located.</param>
     /// <param name="destinationDirectoryPath">String representation of the path of the directory where the file will be copied.</param>
-    /// <param name="overrideExisting">Whether to override existing files, or not.</param>
+    /// <param name="shouldOverrideExisting">Whether to override existing files, or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a copied file, or an error.</returns>
-    public Result<File> CopyFile(string sourceFilePath, string destinationDirectoryPath, bool? overrideExisting)
+    public Result<File> CopyFile(string sourceFilePath, string destinationDirectoryPath, Optional<bool> shouldOverrideExisting)
     {
         if (string.IsNullOrWhiteSpace(destinationDirectoryPath))
             return Errors.FileSystemManagement.InvalidPath;
-        // make sure the paths are in the expected format
+        // Make sure the paths are in the expected format.
         if (!destinationDirectoryPath.EndsWith(_platformContext.PathStrategy.PathSeparator))
             destinationDirectoryPath += _platformContext.PathStrategy.PathSeparator;
         Result<FileSystemPathId> fileSystemSourcePathIdResult = FileSystemPathId.Create(sourceFilePath);
@@ -122,7 +122,7 @@ public class FileService : IFileService
         Result<FileSystemPathId> fileSystemDestinationPathIdResult = FileSystemPathId.Create(destinationDirectoryPath);
         if (fileSystemDestinationPathIdResult.IsFailure)
             return fileSystemDestinationPathIdResult.Errors;
-        return CopyFile(fileSystemSourcePathIdResult.Value, fileSystemDestinationPathIdResult.Value, overrideExisting ?? false);
+        return CopyFile(fileSystemSourcePathIdResult.Value, fileSystemDestinationPathIdResult.Value, shouldOverrideExisting.Value);
     }
 
     /// <summary>
@@ -130,9 +130,9 @@ public class FileService : IFileService
     /// </summary>
     /// <param name="sourceFilePath">Identifier for the path where the file to be copied is located.</param>
     /// <param name="destinationDirectoryPath">Identifier for the path of the directory where the file will be copied.</param>
-    /// <param name="overrideExisting">Whether to override existing files, or not.</param>
+    /// <param name="shouldOverrideExisting">Whether to override existing files, or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either the copied file, or an error.</returns>
-    public Result<File> CopyFile(FileSystemPathId sourceFilePath, FileSystemPathId destinationDirectoryPath, bool overrideExisting)
+    public Result<File> CopyFile(FileSystemPathId sourceFilePath, FileSystemPathId destinationDirectoryPath, bool shouldOverrideExisting)
     {
         Result<bool> fileExists = _environmentContext.FileProviderService.FileExists(sourceFilePath);
         if (fileExists.IsFailure)
@@ -141,8 +141,8 @@ public class FileService : IFileService
             return Errors.FileSystemManagement.FileNotFound;
         else
         {
-            // copy the file
-            Result<FileSystemPathId> copyFileResult = _environmentContext.FileProviderService.CopyFile(sourceFilePath, destinationDirectoryPath, overrideExisting);
+            // Copy the file.
+            Result<FileSystemPathId> copyFileResult = _environmentContext.FileProviderService.CopyFile(sourceFilePath, destinationDirectoryPath, shouldOverrideExisting);
             if (copyFileResult.IsFailure)
                 return copyFileResult.Errors;
             Result<string> fileNameResult = _environmentContext.FileProviderService.GetFileName(copyFileResult.Value);
@@ -150,7 +150,7 @@ public class FileService : IFileService
             Result<Optional<DateTime>> dateCreatedResult = _environmentContext.FileProviderService.GetCreationTime(copyFileResult.Value);
             Result<long?> sizeResult = _environmentContext.FileProviderService.GetSize(copyFileResult.Value);
             long size = !sizeResult.IsFailure ? sizeResult.Value ?? 0 : 0;
-            // if any of the details returned an error, set inaccessible status
+            // If any of the details returned an error, set the inaccessible status.
             if (fileNameResult.IsFailure || dateModifiedResult.IsFailure || dateCreatedResult.IsFailure || sizeResult.IsFailure)
             {
                 Result<File> errorFileResult = File.Create(copyFileResult.Value, !fileNameResult.IsFailure ? fileNameResult.Value : null!,
@@ -173,13 +173,13 @@ public class FileService : IFileService
     /// </summary>
     /// <param name="sourceFilePath">String representation of the path where the file to be moved is located.</param>
     /// <param name="destinationDirectoryPath">String representation of the path of the directory where the file will be moved.</param>
-    /// <param name="overrideExisting">Whether to override existing files, or not.</param>
+    /// <param name="shouldOverrideExisting">Whether to override existing files, or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a moved file, or an error.</returns>
-    public Result<File> MoveFile(string sourceFilePath, string destinationDirectoryPath, bool? overrideExisting)
+    public Result<File> MoveFile(string sourceFilePath, string destinationDirectoryPath, Optional<bool> shouldOverrideExisting)
     {
         if (string.IsNullOrWhiteSpace(destinationDirectoryPath))
             return Errors.FileSystemManagement.InvalidPath;
-        // make sure the paths are in the expected format
+        // Make sure the paths are in the expected format.
         if (!destinationDirectoryPath.EndsWith(_platformContext.PathStrategy.PathSeparator))
             destinationDirectoryPath += _platformContext.PathStrategy.PathSeparator;
         Result<FileSystemPathId> fileSystemSourcePathIdResult = FileSystemPathId.Create(sourceFilePath);
@@ -188,7 +188,7 @@ public class FileService : IFileService
         Result<FileSystemPathId> fileSystemDestinationPathIdResult = FileSystemPathId.Create(destinationDirectoryPath);
         if (fileSystemDestinationPathIdResult.IsFailure)
             return fileSystemDestinationPathIdResult.Errors;
-        return MoveFile(fileSystemSourcePathIdResult.Value, fileSystemDestinationPathIdResult.Value, overrideExisting ?? false);
+        return MoveFile(fileSystemSourcePathIdResult.Value, fileSystemDestinationPathIdResult.Value, shouldOverrideExisting.Value);
     }
 
     /// <summary>
@@ -196,9 +196,9 @@ public class FileService : IFileService
     /// </summary>
     /// <param name="sourceFilePath">Identifier for the path where the file to be moved is located.</param>
     /// <param name="destinationDirectoryPath">Identifier for the path of the directory where the file will be moved.</param>
-    /// <param name="overrideExisting">Whether to override existing files, or not.</param>
+    /// <param name="shouldOverrideExisting">Whether to override existing files, or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either the moved file, or an error.</returns>
-    public Result<File> MoveFile(FileSystemPathId sourceFilePath, FileSystemPathId destinationDirectoryPath, bool overrideExisting)
+    public Result<File> MoveFile(FileSystemPathId sourceFilePath, FileSystemPathId destinationDirectoryPath, bool shouldOverrideExisting)
     {
         Result<bool> fileExists = _environmentContext.FileProviderService.FileExists(sourceFilePath);
         if (fileExists.IsFailure)
@@ -207,8 +207,8 @@ public class FileService : IFileService
             return Errors.FileSystemManagement.FileNotFound;
         else
         {
-            // move the file
-            Result<FileSystemPathId> moveFileResult = _environmentContext.FileProviderService.MoveFile(sourceFilePath, destinationDirectoryPath, overrideExisting);
+            // Move the file.
+            Result<FileSystemPathId> moveFileResult = _environmentContext.FileProviderService.MoveFile(sourceFilePath, destinationDirectoryPath, shouldOverrideExisting);
             if (moveFileResult.IsFailure)
                 return moveFileResult.Errors;
             Result<string> fileNameResult = _environmentContext.FileProviderService.GetFileName(moveFileResult.Value);
@@ -216,7 +216,7 @@ public class FileService : IFileService
             Result<Optional<DateTime>> dateCreatedResult = _environmentContext.FileProviderService.GetCreationTime(moveFileResult.Value);
             Result<long?> sizeResult = _environmentContext.FileProviderService.GetSize(moveFileResult.Value);
             long size = !sizeResult.IsFailure ? sizeResult.Value ?? 0 : 0;
-            // if any of the details returned an error, set inaccessible status
+            // If any of the details returned an error, set the inaccessible status.
             if (fileNameResult.IsFailure || dateModifiedResult.IsFailure || dateCreatedResult.IsFailure || sizeResult.IsFailure)
             {
                 Result<File> errorFileResult = File.Create(moveFileResult.Value, !fileNameResult.IsFailure ? fileNameResult.Value : null!,
@@ -256,7 +256,7 @@ public class FileService : IFileService
     /// <returns>An <see cref="Result{TValue}"/> containing either the renamed file, or an error.</returns>
     public Result<File> RenameFile(FileSystemPathId path, string name)
     {
-        // first, check if the directory about to be created does not already exist
+        // First, check that the target file does not already exist.
         Result<FileSystemPathId> combinedPath = _platformContext.PathStrategy.CombinePath(path, name);
         if (combinedPath.IsFailure)
             return combinedPath.Errors;
@@ -267,7 +267,7 @@ public class FileService : IFileService
             return Errors.FileSystemManagement.FileAlreadyExists;
         else
         {
-            // rename the file
+            // Rename the file.
             Result<FileSystemPathId> newFilePathResult = _environmentContext.FileProviderService.RenameFile(path, name);
             if (newFilePathResult.IsFailure)
                 return newFilePathResult.Errors;
@@ -276,7 +276,7 @@ public class FileService : IFileService
             Result<Optional<DateTime>> dateCreatedResult = _environmentContext.FileProviderService.GetCreationTime(newFilePathResult.Value);
             Result<long?> sizeResult = _environmentContext.FileProviderService.GetSize(newFilePathResult.Value);
             long size = !sizeResult.IsFailure ? sizeResult.Value ?? 0 : 0;
-            // if any of the details returned an error, set inaccessible status
+            // If any of the details returned an error, set the inaccessible status.
             if (fileNameResult.IsFailure || dateModifiedResult.IsFailure || dateCreatedResult.IsFailure || sizeResult.IsFailure)
             {
                 Result<File> errorFileResult = File.Create(newFilePathResult.Value, !fileNameResult.IsFailure ? fileNameResult.Value : null!,

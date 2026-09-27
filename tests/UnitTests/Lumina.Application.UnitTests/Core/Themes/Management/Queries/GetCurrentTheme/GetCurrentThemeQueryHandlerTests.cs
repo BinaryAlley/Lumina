@@ -35,6 +35,7 @@ public class GetCurrentThemeQueryHandlerTests
     public GetCurrentThemeQueryHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockThemeRepository = Substitute.For<IThemeRepository>();
         _mockUnitOfWork.ThemeRepository.Returns(_mockThemeRepository);
         _sut = new GetCurrentThemeQueryHandler(_mockUnitOfWork);

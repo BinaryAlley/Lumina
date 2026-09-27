@@ -20,7 +20,7 @@ internal sealed class ValidationRuleForEach<TRequest, TItem> : IValidationRule<T
     private readonly List<Error> _instanceAwarePredicateErrors = [];
     private Error currentError = Error.Validation();
     private Func<TRequest, bool>? condition;
-    private bool lastAddedPredicateIsInstanceAware;
+    private bool isLastAddedPredicateInstanceAware;
     private AbstractValidator<TItem>? _childValidator;
 
     /// <summary>
@@ -41,7 +41,7 @@ internal sealed class ValidationRuleForEach<TRequest, TItem> : IValidationRule<T
     {
         _predicates.Add(predicate);
         _predicateErrors.Add(currentError);
-        lastAddedPredicateIsInstanceAware = false;
+        isLastAddedPredicateInstanceAware = false;
         return this;
     }
 
@@ -54,7 +54,7 @@ internal sealed class ValidationRuleForEach<TRequest, TItem> : IValidationRule<T
     {
         _instanceAwarePredicates.Add(predicate);
         _instanceAwarePredicateErrors.Add(currentError);
-        lastAddedPredicateIsInstanceAware = true;
+        isLastAddedPredicateInstanceAware = true;
         return this;
     }
 
@@ -79,9 +79,9 @@ internal sealed class ValidationRuleForEach<TRequest, TItem> : IValidationRule<T
         // validation rules always produce validation errors, regardless of the error type of the source error
         Error validationError = Error.Validation(description: error.Description);
         currentError = validationError;
-        if (lastAddedPredicateIsInstanceAware && _instanceAwarePredicateErrors.Count > 0)
+        if (isLastAddedPredicateInstanceAware && _instanceAwarePredicateErrors.Count > 0)
             _instanceAwarePredicateErrors[^1] = validationError;
-        else if (!lastAddedPredicateIsInstanceAware && _predicateErrors.Count > 0)
+        else if (!isLastAddedPredicateInstanceAware && _predicateErrors.Count > 0)
             _predicateErrors[^1] = validationError;
         return this;
     }

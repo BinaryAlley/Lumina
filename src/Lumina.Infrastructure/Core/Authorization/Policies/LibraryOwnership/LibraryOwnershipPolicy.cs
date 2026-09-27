@@ -40,15 +40,15 @@ public class LibraryOwnershipPolicy : ILibraryOwnershipPolicy
         if (context is not LibraryOwnershipPolicyContext libraryContext)
             return false;
 
-        // admins can access any media library
-        Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByIdAsync(userId, cancellationToken).ConfigureAwait(false);
+        // Admins can access any media library.
+        Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByIdAsync(userId, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getUserResult.IsFailure || getUserResult.Value is null)
             return false;
         if (getUserResult.Value.UserRole?.Role.RoleName == "Admin")
             return true;
 
-        // regular users can only access the media libraries they own
-        Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(libraryContext.LibraryId, cancellationToken).ConfigureAwait(false);
+        // Regular users can only access the media libraries they own.
+        Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(libraryContext.LibraryId, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getLibraryResult.IsFailure || getLibraryResult.Value is null)
             return false;
         return getLibraryResult.Value.UserId == userId;

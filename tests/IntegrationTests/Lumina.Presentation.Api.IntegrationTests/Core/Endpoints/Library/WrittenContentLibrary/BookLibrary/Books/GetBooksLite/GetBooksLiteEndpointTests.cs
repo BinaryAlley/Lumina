@@ -18,6 +18,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
@@ -69,7 +70,7 @@ public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         await SeedBookAsync(libraryId, "Book B");
 
         // Act
-        HttpResponseMessage response = await _client.GetAsync($"/api/v1/books/lite?libraryId={libraryId}");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/lite");
 
         // Assert
         response.EnsureSuccessStatusCode();
@@ -97,7 +98,7 @@ public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         await SeedBookAsync(libraryId, "Racing");
 
         // Act
-        HttpResponseMessage response = await _client.GetAsync($"/api/v1/books/lite?libraryId={libraryId}&filterAlphaKey=q");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/lite?filterAlphaKey=q");
 
         // Assert
         response.EnsureSuccessStatusCode();
@@ -120,7 +121,7 @@ public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         await SeedBookAsync(libraryId, "Racing");
 
         // Act
-        HttpResponseMessage response = await _client.GetAsync($"/api/v1/books/lite?libraryId={libraryId}&filterAlphaKey=q&shouldIgnoreThePrefixForAlphaPicker=true");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/lite?filterAlphaKey=q&shouldIgnoreThePrefixForAlphaPicker=true");
 
         // Assert
         response.EnsureSuccessStatusCode();
@@ -143,7 +144,7 @@ public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         await SeedBookAsync(libraryId, "Brave New World");
 
         // Act
-        HttpResponseMessage response = await _client.GetAsync($"/api/v1/books/lite?libraryId={libraryId}&filterAlphaKey=%23");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/lite?filterAlphaKey=%23");
 
         // Assert
         response.EnsureSuccessStatusCode();
@@ -166,7 +167,7 @@ public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         await SeedBookAsync(libraryId, "Alpha");
 
         // Act
-        HttpResponseMessage response = await _client.GetAsync($"/api/v1/books/lite?libraryId={libraryId}&filterAlphaKey=%2A");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/lite?filterAlphaKey=%2A");
 
         // Assert
         response.EnsureSuccessStatusCode();
@@ -189,7 +190,7 @@ public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         await SeedBookAsync(libraryId, "Quiet Place");
 
         // Act
-        HttpResponseMessage response = await _client.GetAsync($"/api/v1/books/lite?libraryId={libraryId}&filterAlphaKey=r");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/lite?filterAlphaKey=r");
 
         // Assert
         response.EnsureSuccessStatusCode();
@@ -211,7 +212,7 @@ public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         await SeedBookAsync(libraryId, "The Two Towers");
 
         // Act
-        HttpResponseMessage response = await _client.GetAsync($"/api/v1/books/lite?libraryId={libraryId}&searchTerm={Uri.EscapeDataString("Fellowship")}");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/lite?searchTerm={Uri.EscapeDataString("Fellowship")}");
 
         // Assert
         response.EnsureSuccessStatusCode();
@@ -234,7 +235,7 @@ public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         await SeedBookAsync(libraryId, "Zoo");
 
         // Act
-        HttpResponseMessage response = await _client.GetAsync($"/api/v1/books/lite?libraryId={libraryId}&searchTerm={Uri.EscapeDataString("Fellowship")}&filterAlphaKey=z");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/lite?searchTerm={Uri.EscapeDataString("Fellowship")}&filterAlphaKey=z");
 
         // Assert
         response.EnsureSuccessStatusCode();
@@ -256,7 +257,7 @@ public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         await SeedBookAsync(libraryId, "Book C");
 
         // Act
-        HttpResponseMessage response = await _client.GetAsync($"/api/v1/books/lite?libraryId={libraryId}&currentPage=2&perPage=2");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/lite?currentPage=2&perPage=2");
 
         // Assert
         response.EnsureSuccessStatusCode();
@@ -279,7 +280,7 @@ public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         await SeedLibraryAsync(libraryId, userId);
 
         // Act
-        HttpResponseMessage response = await _client.GetAsync($"/api/v1/books/lite?libraryId={libraryId}");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/lite");
 
         // Assert
         response.EnsureSuccessStatusCode();
@@ -300,7 +301,7 @@ public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         await SeedBookAsync(libraryId, "Book A");
 
         // Act
-        HttpResponseMessage response = await _client.GetAsync($"/api/v1/books/lite?libraryId={libraryId}");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/lite");
 
         // Assert
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
@@ -313,7 +314,7 @@ public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         Guid libraryId = Guid.NewGuid();
 
         // Act
-        HttpResponseMessage response = await _client.GetAsync($"/api/v1/books/lite?libraryId={libraryId}");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/lite");
 
         // Assert
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
@@ -330,13 +331,205 @@ public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         await SeedBookAsync(libraryId, "Book A");
 
         // Act
-        HttpResponseMessage response = await adminClient.GetAsync($"/api/v1/books/lite?libraryId={libraryId}");
+        HttpResponseMessage response = await adminClient.GetAsync($"/api/v1/libraries/{libraryId}/books/lite");
 
         // Assert
         response.EnsureSuccessStatusCode();
         PaginatedResponse<BookLiteResponse>? paginatedBooks = await response.Content.ReadFromJsonAsync<PaginatedResponse<BookLiteResponse>>(_jsonOptions);
         Assert.NotNull(paginatedBooks);
         Assert.Equal(1, paginatedBooks!.Count);
+    }
+
+    [Fact]
+    public async Task GetBooksLite_WhenRouteIdIsNotParseable_ShouldReturnUnprocessableEntity()
+    {
+        // Act
+        HttpResponseMessage response = await _client.GetAsync("/api/v1/libraries/not-a-guid/books/lite");
+
+        // Assert
+        // The route value is kept as a raw string, so the unparseable Id reaches the query validator, which reports a clean
+        // validation error instead of failing the request binding.
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        using JsonDocument problemDetails = JsonDocument.Parse(content);
+        Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
+        Assert.Contains("LibraryIdCannotBeEmpty", content, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task GetBooksLite_WhenSortedByTitleAscending_ShouldReturnBooksInAscendingOrder()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, userId);
+        await SeedBookAsync(libraryId, "Book B");
+        await SeedBookAsync(libraryId, "Book C");
+        await SeedBookAsync(libraryId, "Book A");
+
+        // Act
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/lite?sortBy=title&sortOrder=Ascending");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        PaginatedResponse<BookLiteResponse>? paginatedBooks = await response.Content.ReadFromJsonAsync<PaginatedResponse<BookLiteResponse>>(_jsonOptions);
+        Assert.NotNull(paginatedBooks);
+        Assert.Equal(new[] { "Book A", "Book B", "Book C" }, paginatedBooks!.Data.Select(book => book.Title));
+    }
+
+    [Fact]
+    public async Task GetBooksLite_WhenSortedByTitleDescending_ShouldReturnBooksInDescendingOrder()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, userId);
+        await SeedBookAsync(libraryId, "Book B");
+        await SeedBookAsync(libraryId, "Book C");
+        await SeedBookAsync(libraryId, "Book A");
+
+        // Act
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/lite?sortBy=title&sortOrder=Descending");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        PaginatedResponse<BookLiteResponse>? paginatedBooks = await response.Content.ReadFromJsonAsync<PaginatedResponse<BookLiteResponse>>(_jsonOptions);
+        Assert.NotNull(paginatedBooks);
+        Assert.Equal(new[] { "Book C", "Book B", "Book A" }, paginatedBooks!.Data.Select(book => book.Title));
+    }
+
+    [Fact]
+    public async Task GetBooksLite_WhenSortByIsUnknown_ShouldFallBackToTitleOrder()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, userId);
+        await SeedBookAsync(libraryId, "Book B");
+        await SeedBookAsync(libraryId, "Book C");
+        await SeedBookAsync(libraryId, "Book A");
+
+        // Act
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/lite?sortBy=unknownField&sortOrder=Ascending");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        PaginatedResponse<BookLiteResponse>? paginatedBooks = await response.Content.ReadFromJsonAsync<PaginatedResponse<BookLiteResponse>>(_jsonOptions);
+        Assert.NotNull(paginatedBooks);
+        Assert.Equal(new[] { "Book A", "Book B", "Book C" }, paginatedBooks!.Data.Select(book => book.Title));
+    }
+
+    [Fact]
+    public async Task GetBooksLite_WhenCurrentPageIsZero_ShouldReturnFirstPage()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, userId);
+        await SeedBookAsync(libraryId, "Book A");
+        await SeedBookAsync(libraryId, "Book B");
+
+        // Act
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/lite?currentPage=0&perPage=1");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        PaginatedResponse<BookLiteResponse>? paginatedBooks = await response.Content.ReadFromJsonAsync<PaginatedResponse<BookLiteResponse>>(_jsonOptions);
+        Assert.NotNull(paginatedBooks);
+        Assert.Equal(1, paginatedBooks!.CurrentPage);
+        Assert.Equal(1, paginatedBooks.PerPage);
+    }
+
+    [Fact]
+    public async Task GetBooksLite_WhenPerPageIsZero_ShouldClampItToOne()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, userId);
+        await SeedBookAsync(libraryId, "Book A");
+        await SeedBookAsync(libraryId, "Book B");
+
+        // Act
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/lite?currentPage=1&perPage=0");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        PaginatedResponse<BookLiteResponse>? paginatedBooks = await response.Content.ReadFromJsonAsync<PaginatedResponse<BookLiteResponse>>(_jsonOptions);
+        Assert.NotNull(paginatedBooks);
+        Assert.Equal(1, paginatedBooks!.PerPage);
+        Assert.Equal(2, paginatedBooks.NumberOfPages);
+        Assert.Single(paginatedBooks.Data);
+    }
+
+    [Fact]
+    public async Task GetBooksLite_WhenCurrentPageExceedsNumberOfPages_ShouldReturnLastPage()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, userId);
+        await SeedBookAsync(libraryId, "Book A");
+        await SeedBookAsync(libraryId, "Book B");
+        await SeedBookAsync(libraryId, "Book C");
+
+        // Act
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/lite?currentPage=99&perPage=2");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        PaginatedResponse<BookLiteResponse>? paginatedBooks = await response.Content.ReadFromJsonAsync<PaginatedResponse<BookLiteResponse>>(_jsonOptions);
+        Assert.NotNull(paginatedBooks);
+        Assert.Equal(2, paginatedBooks!.CurrentPage);
+        Assert.Equal(2, paginatedBooks.NumberOfPages);
+    }
+
+    [Fact]
+    public async Task GetBooksLite_WhenUnauthorized_ShouldReturnUnauthorizedResult()
+    {
+        // Arrange
+        HttpClient unauthenticatedClient = _apiFactory.CreateClient();
+        Guid libraryId = Guid.NewGuid();
+
+        // Act
+        HttpResponseMessage response = await unauthenticatedClient.GetAsync($"/api/v1/libraries/{libraryId}/books/lite");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetBooksLite_WhenCalledWithCancellationToken_ShouldCompleteSuccessfully()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, userId);
+        using CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
+
+        // Act & Assert
+        Exception? exception = await Record.ExceptionAsync(async () =>
+            await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/lite", cts.Token)
+        );
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public async Task GetBooksLite_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, userId);
+        using CancellationTokenSource cts = new();
+
+        // Act & Assert
+        Exception? exception = await Record.ExceptionAsync(async () =>
+        {
+            cts.Cancel();
+            await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/lite", cts.Token);
+        });
+        Assert.IsType<TaskCanceledException>(exception);
     }
 
     /// <summary>

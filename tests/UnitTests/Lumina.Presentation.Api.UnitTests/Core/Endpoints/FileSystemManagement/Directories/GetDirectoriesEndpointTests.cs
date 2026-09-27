@@ -60,7 +60,7 @@ public class GetDirectoriesEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsNotFoundError_ShouldReturnProblemResult()
     {
         // Arrange
         GetDirectoriesRequest request = _getDirectoriesRequestFixture.Create();
@@ -86,7 +86,7 @@ public class GetDirectoriesEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsValidationError_ShouldReturnValidationProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsValidationErrors_ShouldReturnValidationProblemResult()
     {
         // Arrange
         GetDirectoriesRequest request = _getDirectoriesRequestFixture.Create();
@@ -112,7 +112,7 @@ public class GetDirectoriesEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendGetDirectoriesQueryToHandler()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendGetDirectoriesQueryToSender()
     {
         // Arrange
         GetDirectoriesRequest request = _getDirectoriesRequestFixture.Create();
@@ -125,7 +125,7 @@ public class GetDirectoriesEndpointTests
 
         // Assert
         await _mockHandler.Received(1).HandleAsync(
-            Arg.Is<GetDirectoriesQuery>(q => q.Path == request.Path && q.IncludeHiddenElements == request.IncludeHiddenElements),
+            Arg.Is<GetDirectoriesQuery>(q => q.Path == request.Path && q.ShouldIncludeHiddenElements == request.ShouldIncludeHiddenElements),
             Arg.Is(cancellationToken));
     }
 

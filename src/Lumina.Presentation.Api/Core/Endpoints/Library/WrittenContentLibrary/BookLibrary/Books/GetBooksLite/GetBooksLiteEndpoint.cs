@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetBooksLite;
 
 /// <summary>
-/// API endpoint for the <c>/books/lite</c> route.
+/// API endpoint for the <c>/libraries/{libraryId}/books/lite</c> route.
 /// </summary>
 public class GetBooksLiteEndpoint : BaseEndpoint<GetBooksLiteRequest, IResult>
 {
@@ -44,13 +44,15 @@ public class GetBooksLiteEndpoint : BaseEndpoint<GetBooksLiteRequest, IResult>
     }
 
     /// <summary>
-    /// Gets the lightweight details of all the books of the media library identified by <paramref name="request"/>.
+    /// Gets the lightweight details of all the books of the media library identified by the <c>libraryId</c> route parameter.
     /// </summary>
-    /// <param name="request">The request containing the Id of the media library whose books are retrieved.</param>
+    /// <param name="request">The request containing the filtering and pagination options of the books to be retrieved.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(GetBooksLiteRequest request, CancellationToken cancellationToken)
     {
-        Result<PaginatedResponse<BookLiteResponse>> result = await _getBooksLiteQueryHandler.HandleAsync(request.ToQuery(), cancellationToken).ConfigureAwait(false);
+        // Take unique identifiers from the route.
+        string? libraryId = HttpContext.Request.RouteValues["libraryId"]?.ToString();
+        Result<PaginatedResponse<BookLiteResponse>> result = await _getBooksLiteQueryHandler.HandleAsync(request.ToQuery(libraryId), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

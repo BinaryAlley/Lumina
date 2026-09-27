@@ -17,9 +17,9 @@ public interface IFileProviderService
     /// Retrieves a list of files at the specified path.
     /// </summary>
     /// <param name="path">The path for which to retrieve the list of files.</param>
-    /// <param name="includeHiddenElements">Whether to include hidden files or not.</param>
+    /// <param name="shouldIncludeHiddenElements">Whether to include hidden files or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of file paths, or an error.</returns>
-    Result<IEnumerable<FileSystemPathId>> GetFilePaths(FileSystemPathId path, bool includeHiddenElements);
+    Result<IEnumerable<FileSystemPathId>> GetFilePaths(FileSystemPathId path, bool shouldIncludeHiddenElements);
 
     /// <summary>
     /// Retrieves the contents of a file at the specified path.
@@ -68,18 +68,18 @@ public interface IFileProviderService
     /// </summary>
     /// <param name="sourceFilePath">Identifier for the path where the file to be copied is located.</param>
     /// <param name="destinationDirectoryPath">Identifier for the path of the directory where the file will be copied.</param>
-    /// <param name="overrideExisting">Whether to override existing files, or not.</param>
+    /// <param name="shouldOverrideExisting">Whether to override existing files, or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either the copied file, or an error.</returns>
-    Result<FileSystemPathId> CopyFile(FileSystemPathId sourceFilePath, FileSystemPathId destinationDirectoryPath, bool overrideExisting);
+    Result<FileSystemPathId> CopyFile(FileSystemPathId sourceFilePath, FileSystemPathId destinationDirectoryPath, bool shouldOverrideExisting);
 
     /// <summary>
     /// Moves a file located at <paramref name="sourceFilePath"/> to <paramref name="destinationDirectoryPath"/>.
     /// </summary>
     /// <param name="sourceFilePath">Identifier for the path where the file to be moved is located.</param>
     /// <param name="destinationDirectoryPath">Identifier for the path of the directory where the file will be moved.</param>
-    /// <param name="overrideExisting">Whether to override existing files, or not.</param>
+    /// <param name="shouldOverrideExisting">Whether to override existing files, or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a moved file, or an error.</returns>
-    Result<FileSystemPathId> MoveFile(FileSystemPathId sourceFilePath, FileSystemPathId destinationDirectoryPath, bool overrideExisting);
+    Result<FileSystemPathId> MoveFile(FileSystemPathId sourceFilePath, FileSystemPathId destinationDirectoryPath, bool shouldOverrideExisting);
 
     /// <summary>
     /// Renames a file at the specified path.

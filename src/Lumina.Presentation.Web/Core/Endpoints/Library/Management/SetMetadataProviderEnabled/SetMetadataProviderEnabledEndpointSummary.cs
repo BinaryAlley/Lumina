@@ -20,7 +20,7 @@ public class SetMetadataProviderEnabledEndpointSummary : Summary<SetMetadataProv
     public SetMetadataProviderEnabledEndpointSummary()
     {
         Summary = "Enables or disables a metadata provider of a media library.";
-        Description = "Enables or disables the metadata provider of the media library identified by the request.";
+        Description = "Enables or disables the metadata provider of the media library identified by the route.";
         RequestParam(r => r.LibraryId, "The Id of the media library whose metadata provider is enabled or disabled. Required.");
         RequestParam(r => r.PluginId, "The unique identifier of the plugin providing the metadata. Required.");
         RequestParam(r => r.IsEnabled, "Whether the metadata provider should be enabled for the media library, or not. Required.");

@@ -37,15 +37,15 @@ internal class DirectoryProviderService : IDirectoryProviderService
     /// Retrieves a list of subdirectory paths from the specified path.
     /// </summary>
     /// <param name="path">The path from which to retrieve the subdirectory paths.</param>
-    /// <param name="includeHiddenElements">Whether to include hidden subdirectories or not.</param>
+    /// <param name="shouldIncludeHiddenElements">Whether to include hidden subdirectories or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of directory paths or an error.</returns>
-    public Result<IEnumerable<FileSystemPathId>> GetSubdirectoryPaths(FileSystemPathId path, bool includeHiddenElements)
+    public Result<IEnumerable<FileSystemPathId>> GetSubdirectoryPaths(FileSystemPathId path, bool shouldIncludeHiddenElements)
     {
-        // check if the user has access permissions to the provided path
+        // Check if the user has access permissions to the provided path.
         if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ListDirectory, false))
             return Errors.Permission.UnauthorizedAccess;
         return Result.From(_fileSystem.Directory.GetDirectories(path.Path)
-                                                        .Where(path => includeHiddenElements || (GetAttributes(path) & FileAttributes.Hidden) != FileAttributes.Hidden)
+                                                        .Where(path => shouldIncludeHiddenElements || (GetAttributes(path) & FileAttributes.Hidden) != FileAttributes.Hidden)
                                                         .OrderBy(path => path)
                                                         .Select(path => path.EndsWith(_fileSystem.Path.DirectorySeparatorChar) ? path : path + _fileSystem.Path.DirectorySeparatorChar)
                                                         .Select(path => FileSystemPathId.Create(path))
@@ -63,7 +63,7 @@ internal class DirectoryProviderService : IDirectoryProviderService
     {
         try
         {
-            // File.GetAttributes is used for both directories and files
+            // File.GetAttributes is used for both directories and files.
             return _fileSystem.File.GetAttributes(path);
         }
         catch
@@ -101,7 +101,7 @@ internal class DirectoryProviderService : IDirectoryProviderService
     /// <returns>An <see cref="Result{TValue}"/> containing either the optional last write time of <paramref name="path"/> if available, or an error.</returns>
     public Result<Optional<DateTime>> GetLastWriteTime(FileSystemPathId path)
     {
-        // check if the user has access permissions to the provided path
+        // Check if the user has access permissions to the provided path.
         if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties, false))
             return Errors.Permission.UnauthorizedAccess;
         return Optional<DateTime>.FromNullable(_fileSystem.Directory.GetLastWriteTime(path.Path));
@@ -114,7 +114,7 @@ internal class DirectoryProviderService : IDirectoryProviderService
     /// <returns>An <see cref="Result{TValue}"/> containing the optional creation time of <paramref name="path"/> if available, or an error.</returns>
     public Result<Optional<DateTime>> GetCreationTime(FileSystemPathId path)
     {
-        // check if the user has access permissions to the provided path
+        // Check if the user has access permissions to the provided path.
         if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties, false))
             return Errors.Permission.UnauthorizedAccess;
         return Optional<DateTime>.FromNullable(_fileSystem.Directory.GetCreationTime(path.Path));
@@ -128,10 +128,10 @@ internal class DirectoryProviderService : IDirectoryProviderService
     /// <returns>An <see cref="Result{TValue}"/> containing either the path of a created directory, or an error.</returns>
     public Result<FileSystemPathId> CreateDirectory(FileSystemPathId path, string name)
     {
-        // to create a directory, its parent directory must be writable
+        // To create a directory, its parent directory must be writable.
         if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.Write, false))
             return Errors.Permission.UnauthorizedAccess;
-        // create the directory and return its absolute path
+        // Create the directory and return its absolute path.
         string directoryPath = _fileSystem.Directory.CreateDirectory(_fileSystem.Path.Combine(path.Path, name)).FullName;
         return FileSystemPathId.Create(directoryPath);
     }
@@ -141,28 +141,28 @@ internal class DirectoryProviderService : IDirectoryProviderService
     /// </summary>
     /// <param name="sourcePath">Identifier for the path where the directory to be copied is located.</param>
     /// <param name="destinationPath">Identifier for the path where the directory will be copied.</param>
-    /// <param name="overrideExisting">Whether to override existing directories, or not.</param>
+    /// <param name="shouldOverrideExisting">Whether to override existing directories, or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either the copied directory, or an error.</returns>
-    public Result<FileSystemPathId> CopyDirectory(FileSystemPathId sourcePath, FileSystemPathId destinationPath, bool overrideExisting)
+    public Result<FileSystemPathId> CopyDirectory(FileSystemPathId sourcePath, FileSystemPathId destinationPath, bool shouldOverrideExisting)
     {
-        // check if the source directory exists
+        // Check if the source directory exists.
         if (!_fileSystem.Directory.Exists(sourcePath.Path))
             return Errors.FileSystemManagement.DirectoryNotFound;
         string destPath = CreateUniqueDirectoryPath(destinationPath.Path);
         try
         {
-            // create the new directory
+            // Create the new directory.
             IDirectoryInfo destDirInfo = _fileSystem.DirectoryInfo.New(_fileSystem.Directory.CreateDirectory(destPath).FullName);
-            // get the information of the source directory
+            // Get the information of the source directory.
             IDirectoryInfo sourceDirInfo = _fileSystem.DirectoryInfo.New(sourcePath.Path);
-            // copy all files
+            // Copy all files.
             foreach (IFileInfo fileInfo in sourceDirInfo.GetFiles())
             {
                 string targetFilePath = _fileSystem.Path.Combine(destPath, fileInfo.Name);
-                fileInfo.CopyTo(targetFilePath, overrideExisting);
-                _fileSystem.File.SetAttributes(targetFilePath, fileInfo.Attributes); // preserve file attributes
+                fileInfo.CopyTo(targetFilePath, shouldOverrideExisting);
+                _fileSystem.File.SetAttributes(targetFilePath, fileInfo.Attributes); // Preserve file attributes.
             }
-            // copy all subdirectories
+            // Copy all subdirectories.
             foreach (IDirectoryInfo subDirInfo in sourceDirInfo.GetDirectories())
             {
                 Result<FileSystemPathId> newSourcePathResult = FileSystemPathId.Create(subDirInfo.FullName);
@@ -171,8 +171,8 @@ internal class DirectoryProviderService : IDirectoryProviderService
                 Result<FileSystemPathId> newDestinationPathResult = FileSystemPathId.Create(_fileSystem.Path.Combine(destPath, subDirInfo.Name));
                 if (newDestinationPathResult.IsFailure)
                     return newDestinationPathResult.Errors;
-                // recursive call
-                Result<FileSystemPathId> copySubDirResult = CopyDirectory(newSourcePathResult.Value, newDestinationPathResult.Value, overrideExisting);
+                // Recursive call.
+                Result<FileSystemPathId> copySubDirResult = CopyDirectory(newSourcePathResult.Value, newDestinationPathResult.Value, shouldOverrideExisting);
                 if (copySubDirResult.IsFailure)
                     return copySubDirResult.Errors;
             }
@@ -193,7 +193,7 @@ internal class DirectoryProviderService : IDirectoryProviderService
     {
         string destPath = destinationPath;
         int copyNumber = 1;
-        // check if the destination directory exists and create a unique directory name
+        // Check if the destination directory exists and create a unique directory name.
         while (_fileSystem.Directory.Exists(destPath) || _fileSystem.File.Exists(destPath))
             destPath = $"{destinationPath} - Copy ({copyNumber++})";
         return destPath;
@@ -204,20 +204,20 @@ internal class DirectoryProviderService : IDirectoryProviderService
     /// </summary>
     /// <param name="sourcePath">Identifier for the path where the directory to be moved is located.</param>
     /// <param name="destinationPath">Identifier for the path where the directory will be moved.</param>
-    /// <param name="overrideExisting">Whether to override existing directories, or not.</param>
+    /// <param name="shouldOverrideExisting">Whether to override existing directories, or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a moved directory, or an error.</returns>
-    public Result<FileSystemPathId> MoveDirectory(FileSystemPathId sourcePath, FileSystemPathId destinationPath, bool overrideExisting)
+    public Result<FileSystemPathId> MoveDirectory(FileSystemPathId sourcePath, FileSystemPathId destinationPath, bool shouldOverrideExisting)
     {
-        // check if the source directory exists
+        // Check if the source directory exists.
         if (!_fileSystem.Directory.Exists(sourcePath.Path))
             return Errors.FileSystemManagement.DirectoryNotFound;
         try
         {
-            // if the destination directory does not exist, perform a simple move
+            // If the destination directory does not exist, perform a simple move.
             if (!_fileSystem.Directory.Exists(destinationPath.Path))
                 _fileSystem.Directory.Move(sourcePath.Path, destinationPath.Path);
             else
-                MergeDirectories(sourcePath.Path, destinationPath.Path, overrideExisting); // if the destination directory exists, perform a merge based on the overwrite policy
+                MergeDirectories(sourcePath.Path, destinationPath.Path, shouldOverrideExisting); // If the destination directory exists, perform a merge based on the overwrite policy.
             return FileSystemPathId.Create(destinationPath.Path);
         }
         catch
@@ -231,39 +231,39 @@ internal class DirectoryProviderService : IDirectoryProviderService
     /// </summary>
     /// <param name="sourceDir">The source directory to be merged.</param>
     /// <param name="destDir">The destination directory to be merged.</param>
-    /// <param name="overwrite">Whether to override existing files.</param>
-    private void MergeDirectories(string sourceDir, string destDir, bool overwrite)
+    /// <param name="shouldOverwrite">Whether to override existing files.</param>
+    private void MergeDirectories(string sourceDir, string destDir, bool shouldOverwrite)
     {
-        // merge files from source directory to destination directory
+        // Merge files from source directory to destination directory.
         foreach (string sourceFilePath in _fileSystem.Directory.GetFiles(sourceDir))
         {
             string fileName = _fileSystem.Path.GetFileName(sourceFilePath);
             string destFilePath = _fileSystem.Path.Combine(destDir, fileName);
-            // if a file with the same name exists in the destination
+            // If a file with the same name exists in the destination.
             if (_fileSystem.File.Exists(destFilePath))
             {
-                if (overwrite)
+                if (shouldOverwrite)
                 {
-                    // overwrite the file in the destination directory
+                    // Overwrite the file in the destination directory.
                     _fileSystem.File.Delete(destFilePath);
                     _fileSystem.File.Move(sourceFilePath, destFilePath);
                 }
             }
             else
-                _fileSystem.File.Move(sourceFilePath, destFilePath); // move the file if it does not exist in the destination directory
+                _fileSystem.File.Move(sourceFilePath, destFilePath); // Move the file if it does not exist in the destination directory.
         }
-        // recursively merge subdirectories
+        // Recursively merge subdirectories.
         foreach (string sourceSubDirPath in _fileSystem.Directory.GetDirectories(sourceDir))
         {
             string subDirName = _fileSystem.Path.GetFileName(sourceSubDirPath);
             string destSubDirPath = _fileSystem.Path.Combine(destDir, subDirName);
-            // if the subdirectory does not exist in the destination, move it
+            // If the subdirectory does not exist in the destination, move it.
             if (!_fileSystem.Directory.Exists(destSubDirPath))
                 _fileSystem.Directory.Move(sourceSubDirPath, destSubDirPath);
             else
-                MergeDirectories(sourceSubDirPath, destSubDirPath, overwrite); // if the subdirectory exists, recursively merge its contents
+                MergeDirectories(sourceSubDirPath, destSubDirPath, shouldOverwrite); // If the subdirectory exists, recursively merge its contents.
         }
-        // after merging the contents, delete the source directory if it's now empty
+        // After merging the contents, delete the source directory if it's now empty.
         if (!_fileSystem.Directory.EnumerateFileSystemEntries(sourceDir).Any())
             _fileSystem.Directory.Delete(sourceDir);
     }
@@ -276,22 +276,22 @@ internal class DirectoryProviderService : IDirectoryProviderService
     /// <returns>An <see cref="Result{TValue}"/> containing either the absolute path of the renamed directory, or an error.</returns>
     public Result<FileSystemPathId> RenameDirectory(FileSystemPathId path, string name)
     {
-        // to rename a directory, its parent directory must be writable
-        string? parentDirectory = _fileSystem.Directory.GetParent(path.Path)?.FullName;
-        if (!string.IsNullOrEmpty(parentDirectory))
+        // To rename a directory, its parent directory must be writable.
+        Optional<string> parentDirectory = Optional<string>.FromNullable(_fileSystem.Directory.GetParent(path.Path)?.FullName);
+        if (parentDirectory.HasValue && !string.IsNullOrEmpty(parentDirectory.Value))
         {
-            Result<FileSystemPathId> parendDirectoryResult = FileSystemPathId.Create(parentDirectory);
+            Result<FileSystemPathId> parendDirectoryResult = FileSystemPathId.Create(parentDirectory.Value);
             if (parendDirectoryResult.IsFailure)
                 return parendDirectoryResult.Errors;
-            string? newDirectory = _fileSystem.Path.Combine(parentDirectory, name);
-            if (!string.IsNullOrEmpty(newDirectory))
+            Optional<string> newDirectory = Optional<string>.FromNullable(_fileSystem.Path.Combine(parentDirectory.Value, name));
+            if (newDirectory.HasValue && !string.IsNullOrEmpty(newDirectory.Value))
             {
-                Result<FileSystemPathId> newDirectoryPathResult = FileSystemPathId.Create(newDirectory);
+                Result<FileSystemPathId> newDirectoryPathResult = FileSystemPathId.Create(newDirectory.Value);
                 if (newDirectoryPathResult.IsFailure)
                     return newDirectoryPathResult.Errors;
                 if (!_fileSystemPermissionsService.CanAccessPath(parendDirectoryResult.Value, FileAccessMode.Write, false))
                     return Errors.Permission.UnauthorizedAccess;
-                // to rename a directory, it must be executable
+                // To rename a directory, it must be executable.
                 if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.Execute, false))
                     return Errors.Permission.UnauthorizedAccess;
                 _fileSystem.Directory.Move(path.Path, newDirectoryPathResult.Value.Path);
@@ -311,7 +311,7 @@ internal class DirectoryProviderService : IDirectoryProviderService
     /// <returns>An <see cref="Result{TValue}"/> containing either the result of deleting a directory, or an error.</returns>
     public Result<Deleted> DeleteDirectory(FileSystemPathId path)
     {
-        // check if the user has access permissions to the provided path
+        // Check if the user has access permissions to the provided path.
         if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.Delete, false))
             return Errors.Permission.UnauthorizedAccess;
         _fileSystem.DirectoryInfo.New(path.Path).Delete(true);

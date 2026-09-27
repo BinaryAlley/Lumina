@@ -34,7 +34,7 @@
 ##### Check Path Exists Request
 
 ```js
-GET api/v1/path/check-path-exists?path=C%3A%5CUsers%5C&includeHiddenElements=true
+GET api/v1/path/check-path-exists?path=C%3A%5CUsers%5C&shouldIncludeHiddenElements=true
 ```
 
 ##### Check Path Exists Response

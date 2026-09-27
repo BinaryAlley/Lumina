@@ -55,7 +55,7 @@ public class GetEnabledLibrariesEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsFailureError_ShouldReturnProblemResult()
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
@@ -80,7 +80,7 @@ public class GetEnabledLibrariesEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendGetEnabledLibrariesQueryToHandler()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendGetEnabledLibrariesQueryToSender()
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;

@@ -2,6 +2,8 @@
 using Lumina.Application.Common.DataAccess.Entities.Themes;
 using Lumina.Application.Common.DataAccess.Repositories.Themes;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Infrastructure.Models.DTO.Themes;
 using Lumina.Application.Common.Infrastructure.Themes;
 using Lumina.Domain.Common.Primitives;
@@ -42,7 +44,7 @@ public class RepairThemesTaskExecutorTests
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
         _mockThemeRepository = Substitute.For<IThemeRepository>();
         _mockUnitOfWork.ThemeRepository.Returns(_mockThemeRepository);
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         ILogger<RepairThemesTaskExecutor> logger = Substitute.For<ILogger<RepairThemesTaskExecutor>>();
         _sut = new RepairThemesTaskExecutor(_mockThemeService, logger, _mockUnitOfWork);
     }
@@ -53,14 +55,14 @@ public class RepairThemesTaskExecutorTests
         // Arrange
         ScheduledJob scheduledJob = _scheduledJobFixture.Create(taskType: ScheduledTaskType.RepairThemes);
         _mockThemeService.GetBundledThemeArchivePaths().Returns([]);
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(Result.From(Enumerable.Empty<ThemeEntity>()));
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
 
         // Act
         Result<Success> result = await _sut.ExecutePayloadAsync(scheduledJob, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
-        await _mockThemeRepository.Received(1).GetAllAsync(Arg.Any<CancellationToken>());
+        await _mockThemeRepository.Received(1).GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -72,14 +74,14 @@ public class RepairThemesTaskExecutorTests
         _mockThemeService.GetBundledThemeArchivePaths().Returns(["missing.zip"]);
         _mockThemeService.ReadManifestFromArchiveAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(Error.Failure("Theme.Manifest", "Failed to read the theme manifest"));
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(Result.From(Enumerable.Empty<ThemeEntity>()));
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
 
         // Act
         Result<Success> result = await _sut.ExecutePayloadAsync(scheduledJob, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
-        await _mockThemeRepository.Received(1).GetAllAsync(Arg.Any<CancellationToken>());
+        await _mockThemeRepository.Received(1).GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -88,8 +90,8 @@ public class RepairThemesTaskExecutorTests
     {
         // Arrange
         ScheduledJob scheduledJob = _scheduledJobFixture.Create(taskType: ScheduledTaskType.RepairThemes);
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(Task.FromException<Result<IEnumerable<ThemeEntity>>>(new InvalidOperationException("The database is unavailable.")));
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Task.FromException<Result<PaginatedResultDto<ThemeEntity>>>(new InvalidOperationException("The database is unavailable.")));
 
         // Act
         Result<Success> result = await _sut.ExecutePayloadAsync(scheduledJob, CancellationToken.None);
@@ -104,8 +106,8 @@ public class RepairThemesTaskExecutorTests
     {
         // Arrange
         ScheduledJob scheduledJob = _scheduledJobFixture.Create(taskType: ScheduledTaskType.RepairThemes);
-        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(Task.FromException<Result<IEnumerable<ThemeEntity>>>(new OperationCanceledException()));
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Task.FromException<Result<PaginatedResultDto<ThemeEntity>>>(new OperationCanceledException()));
 
         // Act
         async Task Act()

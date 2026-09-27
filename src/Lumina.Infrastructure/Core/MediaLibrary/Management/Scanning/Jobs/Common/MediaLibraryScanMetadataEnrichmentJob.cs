@@ -4,7 +4,7 @@ using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DataAccess.Repositories.Books;
+using Lumina.Application.Common.DataAccess.Repositories.BookLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.MediaContributors;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
@@ -17,9 +17,12 @@ using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Library
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
+using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
+using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.ExternalIdentifiers.MediaContributorBoundedContext.MediaContributorAggregate;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Lumina.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Metadata;
 using Lumina.Plugins.Contracts.Core.Metadata;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -38,7 +41,7 @@ namespace Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Commo
 /// </summary>
 internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJob, IMediaLibraryScanMetadataEnrichmentJob
 {
-    private const int ENRICHMENT_PAGE_SIZE = 1000; // the number of books that are enriched in a single batch, keeping the peak memory bounded regardless of the library size
+    private const int ENRICHMENT_PAGE_SIZE = 1000; // The number of books that are enriched in a single batch, keeping the peak memory bounded regardless of the library size.
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly ILogger<MediaLibraryScanMetadataEnrichmentJob> _logger;
 
@@ -67,36 +70,36 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
     {
         try
         {
-            // increment the number of parents that finished their execution and called this job (beware race conditions, jobs run in parallel)
+            // Increment the number of parents that finished their execution and called this job (beware race conditions, jobs run in parallel).
             int parentsCompleted = Interlocked.Increment(ref parentsPayloadsExecuted);
-            // only execute this job's payload when it has no parents, or when all the parents finished their execution
+            // Only execute this job's payload when it has no parents, or when all the parents finished their execution.
             if (Parents.Count == 0 || parentsCompleted == Parents.Count)
             {
-                // this needs to be wrapped in a task because even though this job is processed in a "fire and forget" async manner, it still does synchronous
-                // processing that takes time, and would block the processing of scan jobs in the in-memory queue
+                // This needs to be wrapped in a task because even though this job is processed in a "fire and forget" async manner, it still does synchronous
+                // processing that takes time, and would block the processing of scan jobs in the in-memory queue.
                 await Task.Run(async () =>
                 {
                     Status = LibraryScanJobStatus.Running;
-                    // see docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details:
+                    // See docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details.
                     await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
                     IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
                     IDomainEventPublisher domainEventPublisher = asyncServiceScope.ServiceProvider.GetService<IDomainEventPublisher>()!;
 
                     MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
 
-                    // load the media library, whose setting determines whether the providers that require access to the web are used during the enrichment
+                    // Load the media library, whose setting determines whether the providers that require access to the web are used during the enrichment.
                     bool canDownloadMetadataFromWeb = false;
                     if (unitOfWork.LibraryRepository is not null)
                     {
-                        Result<LibraryEntity?> getLibraryResult = await unitOfWork.LibraryRepository.GetByIdAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                        Result<LibraryEntity?> getLibraryResult = await unitOfWork.LibraryRepository.GetByIdAsync(LibraryId.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
                         if (getLibraryResult.IsFailure || getLibraryResult.Value is null)
                             _logger.LogWarning("Failed to read the media library, the providers requiring the web will not be used.");
                         else
                             canDownloadMetadataFromWeb = getLibraryResult.Value.CanDownloadMetadataFromWeb;
                     }
 
-                    // get the metadata providers configured for the media library, in their configured order, that support the media library type,
-                    // skipping the providers that require access to the web when the media library does not permit downloading data from the web
+                    // Get the metadata providers configured for the media library, in their configured order, that support the media library type,
+                    // skipping the providers that require access to the web when the media library does not permit downloading data from the web.
                     Result<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>> getConfigurationsResult = await unitOfWork.LibraryMetadataProviderConfigurationRepository.GetByLibraryIdAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
                     if (getConfigurationsResult.IsFailure)
                         throw new InvalidOperationException(getConfigurationsResult.FirstError.Description);
@@ -112,7 +115,7 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
                         providers.AddRange(configuredProviders);
                     }
 
-                    // read whether the metadata of the books of the user is aggregated from multiple providers, when fields are missing
+                    // Read whether the metadata of the books of the user is aggregated from multiple providers, when fields are missing.
                     bool shouldAggregateMetadataWhenMissing = false;
                     if (unitOfWork.UserSettingsRepository is not null)
                     {
@@ -123,7 +126,7 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
                             shouldAggregateMetadataWhenMissing = getUserSettingsResult.Value?.ShouldAggregateMetadataWhenMissing ?? false;
                     }
 
-                    // when no metadata provider is available, the books must not be marked as failed to enrich, so the enrichment is skipped entirely
+                    // When no metadata provider is available, the books must not be marked as failed to enrich, so the enrichment is skipped entirely.
                     if (providers.Count > 0)
                     {
                         Result<int> getBooksToEnrichCountResult = await unitOfWork.BookRepository.GetBooksNeedingMetadataCountAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
@@ -131,7 +134,7 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
                             throw new InvalidOperationException(getBooksToEnrichCountResult.FirstError.Description);
                         int totalBooksToEnrich = getBooksToEnrichCountResult.Value;
 
-                        // set the initial progress of the scan job
+                        // Set the initial progress of the scan job.
                         Result<Success> publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 0, totalBooksToEnrich, cancellationToken).ConfigureAwait(false);
                         if (publishJobProgressResult.IsFailure)
                             throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
@@ -140,11 +143,11 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
                         int minUpdateIntervalMs = 100;
                         int processedBooksCount = 0;
 
-                        // the contributors discovered while enriching a page are cached by normalized display name, so that a contributor is only
-                        // created once even when the same person is discovered for many books of the same page
+                        // The contributors discovered while enriching a page are cached by normalized display name, so that a contributor is only
+                        // created once even when the same person is discovered for many books of the same page.
                         Dictionary<string, MediaContributorEntity> contributorsByNormalizedName = [];
 
-                        // process the books that need their metadata enriched in pages, keeping the peak memory bounded regardless of the library size
+                        // Process the books that need their metadata enriched in pages, keeping the peak memory bounded regardless of the library size.
                         string? lastPath = null;
                         while (true)
                         {
@@ -163,11 +166,11 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
 
                                 await EnrichBookAsync(bookEntity, providers, shouldAggregateMetadataWhenMissing, unitOfWork.BookRepository, unitOfWork.MediaContributorRepository, contributorsByNormalizedName, cancellationToken).ConfigureAwait(false);
 
-                                // check if enough time has passed since last update
+                                // Check if enough time has passed since the last update.
                                 DateTime now = DateTime.UtcNow;
                                 if ((now - lastUpdateTime).TotalMilliseconds >= minUpdateIntervalMs)
                                 {
-                                    // increment the number of processed elements progress
+                                    // Increment the number of processed elements progress.
                                     publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, Interlocked.Increment(ref processedBooksCount), totalBooksToEnrich, cancellationToken).ConfigureAwait(false);
                                     if (publishJobProgressResult.IsFailure)
                                         throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
@@ -175,8 +178,10 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
                                 }
                             }
 
-                            // persist the enriched books of this page, then detach them from the change tracker, keeping the peak memory bounded regardless of the library size
-                            await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                            // Persist the enriched books of this page, then detach them from the change tracker, keeping the peak memory bounded regardless of the library size.
+                            Result<Success> saveChangesResult = await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                            if (saveChangesResult.IsFailure)
+                                throw new InvalidOperationException(saveChangesResult.FirstError.Description);
                             unitOfWork.ClearTrackedEntities();
                             contributorsByNormalizedName.Clear();
 
@@ -184,16 +189,14 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
                         }
                     }
                     else
-                    {
                         _logger.LogWarning("No metadata provider is configured for the media library with Id '{LibraryId}', the metadata enrichment will be skipped.", LibraryId.Value);
-                    }
-
+                 
                     Status = LibraryScanJobStatus.Completed;
-                    // when this job has no linked children, it's the last job in the directed acyclic job graph, and the scan is completed
+                    // When this job has no linked children, it is the last job in the directed acyclic job graph, and the scan is completed.
                     if (Children.Count == 0)
                         await domainEventPublisher.PublishAsync(new LibraryScanFinishedDomainEvent(Guid.NewGuid(), compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
 
-                    // call each linked child with the obtained payload
+                    // Call each linked child with the obtained payload.
                     foreach (IMediaLibraryScanJob child in Children)
                         await child.ExecuteAsync(id, input, cancellationToken).ConfigureAwait(false);
                 }, cancellationToken).ConfigureAwait(false);
@@ -224,7 +227,7 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     private async Task EnrichBookAsync(BookEntity bookEntity, IReadOnlyList<IMetadataProvider> metadataProviders, bool shouldAggregateMetadataWhenMissing, IBookRepository bookRepository, IMediaContributorRepository mediaContributorRepository, Dictionary<string, MediaContributorEntity> contributorsByNormalizedName, CancellationToken cancellationToken)
     {
-        // convert the book to a domain object
+        // Convert the book to a domain object.
         Result<Book> getBookResult = bookEntity.ToDomainEntity();
         if (getBookResult.IsFailure)
             return;
@@ -233,7 +236,7 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
         BookMetadataLookupDto bookMetadataLookup = new(
             LibraryId: bookEntity.LibraryId,
             Path: bookEntity.Path,
-            Isbn: bookEntity.ISBNs.Count > 0 ? bookEntity.ISBNs.Where(isbn => isbn.Value is not null).Select(isbn => isbn.Value!).First() : null, // TODO: this should not take just the first ISBN, it should ask the metadata plugin to retry with the next ISBN, if the first one returned no results
+            Isbn: bookEntity.ISBNs.Count > 0 ? bookEntity.ISBNs.Where(isbn => isbn.Value is not null).Select(isbn => isbn.Value!).First() : null, // TODO: This should not take just the first ISBN, it should ask the metadata plugin to retry with the next ISBN, if the first one returned no results.
             OpenLibraryId: bookEntity.OpenLibraryId,
             Title: bookEntity.Title,
             Author: null,
@@ -246,19 +249,20 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
 
         if (resolvedMetadata is null)
         {
-            // no metadata provider returned usable metadata, mark the book as failed to enrich, keeping its previous metadata
+            // No metadata provider returned usable metadata, so the book is marked as failed to enrich, keeping its previous metadata.
             bookEntity.MetadataStatus = MetadataStatus.Failed;
             bookEntity.UpdatedOnUtc = DateTime.UtcNow;
             bookEntity.UpdatedBy = Guid.NewGuid();
             return;
         }
 
-        // apply the enriched metadata to the book, and copy it onto the tracked entity, without touching the enrichment tracking columns
+        // Apply the enriched metadata to the book, and copy it onto the tracked entity, without touching the enrichment tracking columns.
         book.ApplyMetadata(resolvedMetadata.Metadata);
         bookEntity.ApplyMetadataToEntity(book);
 
-        // link the media contributors discovered while enriching to the book, finding or creating a single contributor per person
+        // Link the media contributors discovered while enriching to the book, finding or creating a single contributor per person.
         List<BookContributorEntity> linkedContributors = [];
+        List<BookMediaContributor> domainContributors = [];
         foreach (MediaContributorDto contributor in resolvedMetadata.Metadata.Contributors ?? [])
         {
             if (contributor.Name?.DisplayName is null)
@@ -266,25 +270,26 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
 
             MediaContributorEntity contributorEntity = await FindOrCreateContributorAsync(mediaContributorRepository, contributorsByNormalizedName, contributor, cancellationToken).ConfigureAwait(false);
 
-            string roleName = contributor.Role?.Name ?? "Contributor";
-            MediaContributorRoleCategory roleCategory = contributor.Role?.Category ?? MediaContributorRoleCategory.Other;
+            MediaContributorRole role = contributor.Role ?? MediaContributorRole.Author;
+            if (linkedContributors.Any(linkedContributor => linkedContributor.MediaContributorId == contributorEntity.Id && linkedContributor.Role == role))
+                continue;
             linkedContributors.Add(new BookContributorEntity
             {
                 Id = Guid.NewGuid(),
                 BookId = bookEntity.Id,
                 MediaContributorId = contributorEntity.Id,
-                RoleName = roleName,
-                RoleCategory = roleCategory,
+                Role = role,
                 CreatedOnUtc = DateTime.UtcNow,
                 CreatedBy = Guid.Empty,
                 UpdatedBy = null
             });
+            domainContributors.Add(BookMediaContributor.Create(MediaContributorId.Create(contributorEntity.Id), role).Value);
         }
-        bookEntity.BookContributors.Clear();
-        bookEntity.BookContributors.AddRange(linkedContributors);
-        book.UpdateContributors([.. linkedContributors.Select(linkedContributor => Lumina.Domain.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate.ValueObjects.MediaContributorId.Create(linkedContributor.MediaContributorId))]);
+        bookEntity.Contributors.Clear();
+        bookEntity.Contributors.AddRange(linkedContributors);
+        book.UpdateContributors(domainContributors);
 
-        // mark the book as enriched by the provider, directly on the tracked entity, since the enrichment state is a persistence concern
+        // Mark the book as enriched by the provider, directly on the tracked entity, since the enrichment state is a persistence concern.
         bookEntity.MetadataStatus = MetadataStatus.Enriched;
         bookEntity.MetadataProvider = resolvedMetadata.ProviderName;
         bookEntity.LastMetadataUpdateUtc = DateTime.UtcNow;
@@ -340,7 +345,7 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
             }
             catch (Exception)
             {
-                // a failing metadata provider must not prevent the other providers from being tried
+                // A failing metadata provider must not prevent the other providers from being tried.
             }
         }
         return null;
@@ -369,12 +374,12 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
 
                 mergedMetadata = mergedMetadata is null ? bookMetadata : MetadataAggregator.Merge(mergedMetadata, bookMetadata);
                 contributingProviders.Add(metadataProvider.Name);
-                // the identifiers and the title discovered by the earlier providers are fed to the later ones, so that they can look up the book precisely
+                // The identifiers and the title discovered by the earlier providers are fed to the later ones, so that they can look up the book precisely.
                 bookMetadataLookup = EnrichLookup(bookMetadataLookup, mergedMetadata);
             }
             catch (Exception)
             {
-                // a failing metadata provider must not prevent the other providers from being tried
+                // A failing metadata provider must not prevent the other providers from being tried.
             }
         }
 

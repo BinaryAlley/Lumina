@@ -1,2 +1,0 @@
-GET {{host}}/api/v1/books/{{$guid}}/reading/manifest
-Authorization: Bearer {{ACCESS_TOKEN}}

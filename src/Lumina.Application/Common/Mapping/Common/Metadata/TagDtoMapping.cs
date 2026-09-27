@@ -23,7 +23,7 @@ public static class TagDtoMapping
     public static Result<Tag> ToDomainEntity(this TagDto dto)
     {
         return Tag.Create(
-            dto.Name
+            dto.Name!
         );
     }
 

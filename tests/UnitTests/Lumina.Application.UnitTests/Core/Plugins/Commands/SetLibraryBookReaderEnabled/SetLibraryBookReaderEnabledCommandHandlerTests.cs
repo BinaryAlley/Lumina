@@ -45,6 +45,7 @@ public class SetLibraryBookReaderEnabledCommandHandlerTests
     public SetLibraryBookReaderEnabledCommandHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockLibraryBookReaderConfigurationRepository = Substitute.For<ILibraryBookReaderConfigurationRepository>();
         _mockUnitOfWork.LibraryBookReaderConfigurationRepository.Returns(_mockLibraryBookReaderConfigurationRepository);
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();

@@ -1,10 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using FastEndpoints;
 using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Reading.Queries.GetReadingSection;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
-using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Reading;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Common.Routes.Library.WrittenContentLibrary.BookLibrary;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
@@ -16,9 +13,9 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.Reading.GetReadingSection;
 
 /// <summary>
-/// API endpoint for the <c>/books/{bookId}/reading/sections/{locationRef}</c> route.
+/// API endpoint for the <c>/libraries/{libraryId}/books/{bookId}/reading/sections/{locationRef}</c> route.
 /// </summary>
-public class GetReadingSectionEndpoint : BaseEndpoint<GetReadingSectionRequest, IResult>
+public class GetReadingSectionEndpoint : BaseEndpoint<FastEndpoints.EmptyRequest, IResult>
 {
     private readonly IQueryHandler<GetReadingSectionQuery, Result<ReadingSectionDto>> _getReadingSectionQueryHandler;
 
@@ -36,20 +33,25 @@ public class GetReadingSectionEndpoint : BaseEndpoint<GetReadingSectionRequest, 
     /// </summary>
     public override void Configure()
     {
-        Verbs(Http.GET);
+        Verbs(FastEndpoints.Http.GET);
         Routes(ApiRoutes.Books.GET_BOOK_READING_SECTION);
         Version(1);
         DontCatchExceptions();
     }
 
     /// <summary>
-    /// Gets the content of the reading section of the book identified by <paramref name="request"/>.
+    /// Gets the content of the reading section of the book identified by the route.
     /// </summary>
-    /// <param name="request">The request containing the Id of the book and the location reference of the reading section.</param>
+    /// <param name="request">The request object.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    public override async Task<IResult> ExecuteAsync(GetReadingSectionRequest request, CancellationToken cancellationToken)
+    public override async Task<IResult> ExecuteAsync(FastEndpoints.EmptyRequest request, CancellationToken cancellationToken)
     {
-        Result<ReadingSectionDto> result = await _getReadingSectionQueryHandler.HandleAsync(request.ToQuery(), cancellationToken).ConfigureAwait(false);
+        // Take unique identifiers from the route.
+        string? libraryId = HttpContext.Request.RouteValues["libraryId"]?.ToString();
+        string? bookId = HttpContext.Request.RouteValues["bookId"]?.ToString();
+        string? locationRef = HttpContext.Request.RouteValues["locationRef"]?.ToString();
+        GetReadingSectionQuery query = new(libraryId, bookId, locationRef);
+        Result<ReadingSectionDto> result = await _getReadingSectionQueryHandler.HandleAsync(query, cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

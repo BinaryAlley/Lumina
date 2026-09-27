@@ -46,7 +46,7 @@ public static class GenreEntityMapping
     public static Result<Genre> ToDomainEntity(this GenreEntity repositoryEntity)
     {
         return Genre.Create(
-            repositoryEntity.Name ?? default
+            repositoryEntity.Name!
         );
     }
 

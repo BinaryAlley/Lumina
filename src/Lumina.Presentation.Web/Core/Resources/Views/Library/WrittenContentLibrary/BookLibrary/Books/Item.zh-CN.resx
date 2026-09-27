@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -966,5 +966,89 @@
   </data>
   <data name="Country.ZW" xml:space="preserve">
     <value>津巴布韦</value>
+  </data>
+  <data name="Role" xml:space="preserve">
+    <value>角色</value>
+  </data>
+  <data name="Actor" xml:space="preserve">
+    <value>演员</value>
+  </data>
+  <data name="Director" xml:space="preserve">
+    <value>导演</value>
+  </data>
+  <data name="Screenwriter" xml:space="preserve">
+    <value>编剧</value>
+  </data>
+  <data name="Composer" xml:space="preserve">
+    <value>作曲家</value>
+  </data>
+  <data name="Lyricist" xml:space="preserve">
+    <value>作词人</value>
+  </data>
+  <data name="Arranger" xml:space="preserve">
+    <value>编曲人</value>
+  </data>
+  <data name="Conductor" xml:space="preserve">
+    <value>指挥家</value>
+  </data>
+  <data name="Producer" xml:space="preserve">
+    <value>制作人</value>
+  </data>
+  <data name="ExecutiveProducer" xml:space="preserve">
+    <value>执行制片人</value>
+  </data>
+  <data name="Engineer" xml:space="preserve">
+    <value>录音工程师</value>
+  </data>
+  <data name="Mixer" xml:space="preserve">
+    <value>混音师</value>
+  </data>
+  <data name="Remixer" xml:space="preserve">
+    <value>混音师</value>
+  </data>
+  <data name="RecordLabel" xml:space="preserve">
+    <value>唱片公司</value>
+  </data>
+  <data name="Vocals" xml:space="preserve">
+    <value>主唱</value>
+  </data>
+  <data name="BackingVocals" xml:space="preserve">
+    <value>和声</value>
+  </data>
+  <data name="Guitar" xml:space="preserve">
+    <value>吉他</value>
+  </data>
+  <data name="BassGuitar" xml:space="preserve">
+    <value>贝斯</value>
+  </data>
+  <data name="Drums" xml:space="preserve">
+    <value>鼓</value>
+  </data>
+  <data name="Percussion" xml:space="preserve">
+    <value>打击乐</value>
+  </data>
+  <data name="Keyboards" xml:space="preserve">
+    <value>键盘</value>
+  </data>
+  <data name="Piano" xml:space="preserve">
+    <value>钢琴</value>
+  </data>
+  <data name="Synthesizer" xml:space="preserve">
+    <value>合成器</value>
+  </data>
+  <data name="Strings" xml:space="preserve">
+    <value>弦乐</value>
+  </data>
+  <data name="Woodwinds" xml:space="preserve">
+    <value>木管乐</value>
+  </data>
+  <data name="Brass" xml:space="preserve">
+    <value>铜管乐</value>
+  </data>
+  <data name="Choir" xml:space="preserve">
+    <value>合唱团</value>
+  </data>
+  <data name="Orchestrator" xml:space="preserve">
+    <value>配器师</value>
   </data>
 </root>

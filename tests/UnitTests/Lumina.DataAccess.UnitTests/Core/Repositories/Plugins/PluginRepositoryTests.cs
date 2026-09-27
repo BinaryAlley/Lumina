@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
 using Lumina.DataAccess.Core.Repositories.Plugins;
 using Lumina.DataAccess.Core.UoW;
@@ -46,7 +48,7 @@ public class PluginRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        Result<PluginEntity?> result = await _sut.GetByIdAsync(plugin.Id, CancellationToken.None);
+        Result<PluginEntity?> result = await _sut.GetByIdAsync(plugin.Id, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -130,26 +132,26 @@ public class PluginRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        Result<IEnumerable<PluginEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
+        Result<PaginatedResultDto<PluginEntity>> result = await _sut.GetAllAsync<BaseFilterDto>(cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
-        Assert.Equal(2, result.Value.Count());
-        Assert.Contains(result.Value, plugin => plugin.Id == plugins[0].Id);
-        Assert.Contains(result.Value, plugin => plugin.Id == plugins[1].Id);
+        Assert.Equal(2, result.Value.Data.Count);
+        Assert.Contains(result.Value.Data, plugin => plugin.Id == plugins[0].Id);
+        Assert.Contains(result.Value.Data, plugin => plugin.Id == plugins[1].Id);
     }
 
     [Fact]
     public async Task GetAllAsync_WhenNoPluginsExist_ShouldReturnEmptyList()
     {
         // Act
-        Result<IEnumerable<PluginEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
+        Result<PaginatedResultDto<PluginEntity>> result = await _sut.GetAllAsync<BaseFilterDto>(cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
-        Assert.Empty(result.Value);
+        Assert.Empty(result.Value.Data);
     }
 
     [Fact]

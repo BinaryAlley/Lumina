@@ -17,7 +17,6 @@ namespace Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.
 public class BookRatingDtoFixture
 {
     private readonly Fixture _fixture = new();
-    private readonly Random _random = new();
 
     /// <summary>
     /// Creates a <see cref="BookRatingDto"/>.
@@ -26,20 +25,22 @@ public class BookRatingDtoFixture
     /// <param name="maxValue">Optional. The maximum possible rating value.</param>
     /// <param name="source">Optional. The rating source.</param>
     /// <param name="voteCount">Optional. The number of votes.</param>
-    /// <param name="includeOptionalProperties">Whether the optional source and vote count should be randomized, or forced to <see langword="null"/>.</param>
+    /// <param name="includeSource">Whether the source should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeVoteCount">Whether the vote count should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="BookRatingDto"/>.</returns>
     public BookRatingDto Create(
         decimal? value = null,
         decimal? maxValue = null,
         BookRatingSource? source = null,
         int? voteCount = null,
-        bool includeOptionalProperties = true)
+        bool includeSource = true,
+        bool includeVoteCount = true)
     {
         return new BookRatingDto(
-            value ?? _random.Next(1, 5),
+            value ?? Random.Shared.Next(1, 5),
             maxValue ?? 5,
-            source ?? (includeOptionalProperties ? _fixture.Create<BookRatingSource>() : null),
-            voteCount ?? (includeOptionalProperties ? _random.Next(1, 1000) : null)
+            includeSource ? (source ?? _fixture.Create<BookRatingSource>()) : null,
+            includeVoteCount ? (voteCount ?? Random.Shared.Next(1, 1000)) : null
         );
     }
 

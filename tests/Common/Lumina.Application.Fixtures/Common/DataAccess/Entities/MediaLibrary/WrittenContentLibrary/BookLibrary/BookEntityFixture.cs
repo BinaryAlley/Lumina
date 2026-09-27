@@ -18,7 +18,6 @@ namespace Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Wr
 [ExcludeFromCodeCoverage]
 public class BookEntityFixture
 {
-    private readonly Random _random = new();
     private readonly Faker _faker = new();
 
     /// <summary>
@@ -39,8 +38,8 @@ public class BookEntityFixture
         string? originalTitle = null,
         bool includeMetadata = true)
     {
-        int releaseYear = _random.Next(2000, 2010);
-        int reReleaseYear = _random.Next(2010, 2020);
+        int releaseYear = Random.Shared.Next(2000, 2010);
+        int reReleaseYear = Random.Shared.Next(2010, 2020);
 
         return new Faker<BookEntity>()
             .RuleFor(x => x.Id, f => id ?? f.Random.Guid())
@@ -64,12 +63,12 @@ public class BookEntityFixture
             .RuleFor(x => x.Tags, f => includeMetadata ? [.. CreateTags(f.Random.Number(1, 5))] : [])
             .RuleFor(x => x.Genres, f => includeMetadata ? [.. CreateGenres(f.Random.Number(1, 5))] : [])
             .RuleFor(x => x.Publisher, f => f.Random.String2(f.Random.Number(1, 100)))
-            .RuleFor(x => x.PageCount, _random.Next(100, 300))
+            .RuleFor(x => x.PageCount, Random.Shared.Next(100, 300))
             .RuleFor(x => x.Format, f => f.PickRandom<BookFormat>())
             .RuleFor(x => x.Edition, f => f.Random.String2(f.Random.Number(1, 50)))
-            .RuleFor(x => x.VolumeNumber, _random.Next(1, 3))
+            .RuleFor(x => x.VolumeNumber, Random.Shared.Next(1, 3))
             .RuleFor(x => x.ASIN, f => f.Random.String2(10))
-            .RuleFor(x => x.GoodreadsId, _random.Next(100000, 500000).ToString())
+            .RuleFor(x => x.GoodreadsId, Random.Shared.Next(100000, 500000).ToString())
             .RuleFor(x => x.LCCN, CreateLCCN)
             .RuleFor(x => x.OCLCNumber, CreateOCLCNumber)
             .RuleFor(x => x.OpenLibraryId, CreateOpenLibraryId)

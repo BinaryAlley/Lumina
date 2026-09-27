@@ -4,6 +4,8 @@ using Lumina.Application.Common.DataAccess.Entities.Themes;
 using Lumina.Application.Common.DataAccess.Repositories.Scheduling;
 using Lumina.Application.Common.DataAccess.Repositories.Themes;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Infrastructure.Themes;
 using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Scheduling;
@@ -73,7 +75,7 @@ public class ScheduledJobSchedulerJobTests
         _mockScheduledJobExecutionRepository = Substitute.For<IScheduledJobExecutionRepository>();
         _mockUnitOfWork.ScheduledJobRepository.Returns(_mockScheduledJobRepository);
         _mockUnitOfWork.ScheduledJobExecutionRepository.Returns(_mockScheduledJobExecutionRepository);
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockScheduledJobRepository.UpdateAsync(Arg.Any<ScheduledJobEntity>(), Arg.Any<CancellationToken>()).Returns(Result.Updated);
         _mockScheduledJobExecutionRepository.UpdateAsync(Arg.Any<ScheduledJobExecutionEntity>(), Arg.Any<CancellationToken>()).Returns(Result.Updated);
 
@@ -132,7 +134,7 @@ public class ScheduledJobSchedulerJobTests
     {
         // Arrange
         ScheduledJobEntity runningJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Running, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(runningJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(runningJob);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(runningJob.Id);
 
         // Act
@@ -152,7 +154,7 @@ public class ScheduledJobSchedulerJobTests
         // Arrange
         ScheduledJobEntity addedJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Added, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(addedJob.Id);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(addedJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(addedJob);
         _mockScheduledJobRepository.GetByIdWithoutTrackingAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(_scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Running, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60));
 
         // Act
@@ -169,7 +171,7 @@ public class ScheduledJobSchedulerJobTests
         // Arrange
         ScheduledJobEntity activeJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Active, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(activeJob.Id);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(activeJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(activeJob);
         _mockScheduledJobRepository.GetByIdWithoutTrackingAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(_scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Running, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60));
         using CancellationTokenSource cycleCancellationTokenSource = new();
         _runtimeRegistry.TryStartCycle(scheduledJobId, cycleCancellationTokenSource);
@@ -190,7 +192,7 @@ public class ScheduledJobSchedulerJobTests
         ScheduledJobEntity addedJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Added, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobEntity runningJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Running, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(addedJob.Id);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(addedJob, runningJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(addedJob, runningJob);
         ScheduledJobExecutionEntity openExecution = _scheduledJobExecutionEntityFixture.Create(scheduledJobId: runningJob.Id, isCycleRun: false, wasCycleActive: true, completedOnUtc: null);
         _mockScheduledJobExecutionRepository.GetOpenByScheduledJobIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(openExecution);
         _mockDomainEventPublisher.When(publisher => publisher.PublishAsync(Arg.Is<ScheduledJobExecutionStartedDomainEvent>(_ => true), Arg.Any<CancellationToken>()))
@@ -213,7 +215,7 @@ public class ScheduledJobSchedulerJobTests
         // Arrange
         ScheduledJobEntity runningJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Running, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(runningJob.Id);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(runningJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(runningJob);
         ScheduledJobExecutionEntity openExecution = _scheduledJobExecutionEntityFixture.Create(scheduledJobId: runningJob.Id, isCycleRun: false, wasCycleActive: true, completedOnUtc: null);
         _mockScheduledJobExecutionRepository.GetOpenByScheduledJobIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(openExecution);
 
@@ -233,7 +235,7 @@ public class ScheduledJobSchedulerJobTests
         // Arrange
         ScheduledJobEntity runningJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Running, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(runningJob.Id);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(runningJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(runningJob);
         ScheduledJobExecutionEntity openExecution = _scheduledJobExecutionEntityFixture.Create(scheduledJobId: runningJob.Id, isCycleRun: false, wasCycleActive: false, completedOnUtc: null);
         _mockScheduledJobExecutionRepository.GetOpenByScheduledJobIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(openExecution);
 
@@ -252,7 +254,7 @@ public class ScheduledJobSchedulerJobTests
         // Arrange
         ScheduledJobEntity activeJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Active, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(activeJob.Id);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(activeJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(activeJob);
 
         // Act
         ScheduledJobStatus result = await InvokeAsync<ScheduledJobStatus>("ReconcileInterruptedRunAsync", scheduledJobId, CancellationToken.None);
@@ -269,7 +271,7 @@ public class ScheduledJobSchedulerJobTests
         // Arrange
         ScheduledJobEntity activeJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Active, scheduleType: ScheduleType.OnceAtStartup);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(activeJob.Id);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(activeJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(activeJob);
         _mockScheduledJobRepository.GetByIdWithoutTrackingAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(_scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Running, scheduleType: ScheduleType.OnceAtStartup));
 
         // Act
@@ -288,7 +290,7 @@ public class ScheduledJobSchedulerJobTests
         ScheduledJobEntity activeJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Active, scheduleType: ScheduleType.OnceAtStartup);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(activeJob.Id);
         _mockScheduledJobRepository.GetActiveOrRunningAsync(Arg.Any<CancellationToken>()).Returns(new[] { activeJob });
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(activeJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(activeJob);
         _mockScheduledJobRepository.GetByIdWithoutTrackingAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(_scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Running, scheduleType: ScheduleType.OnceAtStartup));
 
         // Act
@@ -340,7 +342,7 @@ public class ScheduledJobSchedulerJobTests
         IThemeService mockThemeService = Substitute.For<IThemeService>();
         mockThemeService.GetBundledThemeArchivePaths().Returns([]);
         IThemeRepository mockThemeRepository = Substitute.For<IThemeRepository>();
-        mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(Result.From(Enumerable.Empty<ThemeEntity>()));
+        mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
         _mockUnitOfWork.ThemeRepository.Returns(mockThemeRepository);
         _services[typeof(IThemeService)] = mockThemeService;
 
@@ -349,7 +351,7 @@ public class ScheduledJobSchedulerJobTests
 
         // Assert
         mockThemeService.Received(1).GetBundledThemeArchivePaths();
-        await mockThemeRepository.Received(1).GetAllAsync(Arg.Any<CancellationToken>());
+        await mockThemeRepository.Received(1).GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -391,7 +393,7 @@ public class ScheduledJobSchedulerJobTests
         IThemeService mockThemeService = Substitute.For<IThemeService>();
         mockThemeService.GetBundledThemeArchivePaths().Returns([]);
         IThemeRepository mockThemeRepository = Substitute.For<IThemeRepository>();
-        mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(Result.From(Enumerable.Empty<ThemeEntity>()));
+        mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
         _mockUnitOfWork.ThemeRepository.Returns(mockThemeRepository);
         _services[typeof(IThemeService)] = mockThemeService;
         using CancellationTokenSource cancellationTokenSource = new();
@@ -412,7 +414,7 @@ public class ScheduledJobSchedulerJobTests
         ScheduledJobEntity activeJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Active, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(activeJob.Id);
         Error error = Error.Failure("ScheduledJobs.NotFound", "Failed to read the scheduled job");
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(error);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(error);
 
         // Act
         await InvokeAsync("RunCycleWorkerAsync", scheduledJobId, false, CancellationToken.None);
@@ -428,7 +430,7 @@ public class ScheduledJobSchedulerJobTests
         // Arrange
         ScheduledJobEntity activeJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Active, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(activeJob.Id);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(activeJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(activeJob);
         using CancellationTokenSource cancellationTokenSource = new();
         cancellationTokenSource.Cancel();
 
@@ -445,7 +447,7 @@ public class ScheduledJobSchedulerJobTests
         // Arrange
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create();
         Error error = Error.Failure("ScheduledJobs.NotFound", "Failed to read the scheduled job");
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(error);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(error);
 
         // Act
         await InvokeAsync("ExecuteScheduledJobRunAsync", scheduledJobId, false, CancellationToken.None);
@@ -462,7 +464,7 @@ public class ScheduledJobSchedulerJobTests
         // An interval schedule whose interval is not positive cannot be converted to its domain object.
         ScheduledJobEntity invalidJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Added, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 0);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(invalidJob.Id);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(invalidJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(invalidJob);
 
         // Act
         await InvokeAsync("ExecuteScheduledJobRunAsync", scheduledJobId, false, CancellationToken.None);
@@ -478,7 +480,7 @@ public class ScheduledJobSchedulerJobTests
         // Arrange
         ScheduledJobEntity addedJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Added, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(addedJob.Id);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(addedJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(addedJob);
         using CancellationTokenSource cancellationTokenSource = new();
         _mockDomainEventPublisher.When(publisher => publisher.PublishAsync(Arg.Any<ScheduledJobExecutionStartedDomainEvent>(), Arg.Any<CancellationToken>()))
             .Do(_ => cancellationTokenSource.Cancel());
@@ -496,7 +498,7 @@ public class ScheduledJobSchedulerJobTests
         // Arrange
         ScheduledJobEntity addedJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Added, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(addedJob.Id);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(addedJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(addedJob);
         _mockScheduledJobRepository.GetByIdWithoutTrackingAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(_scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Running, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60));
         _mockTaskExecutor.ExecutePayloadAsync(Arg.Any<ScheduledJob>(), Arg.Any<CancellationToken>())
             .Returns(Error.Failure("Task.Failed", "The task of the scheduled job failed."));
@@ -515,7 +517,7 @@ public class ScheduledJobSchedulerJobTests
         // Arrange
         ScheduledJobEntity addedJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Added, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(addedJob.Id);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(addedJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(addedJob);
         _mockScheduledJobRepository.GetByIdWithoutTrackingAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(_scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Running, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60));
         _mockTaskExecutor.ExecutePayloadAsync(Arg.Any<ScheduledJob>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromException<Result<Success>>(new InvalidOperationException("The task threw.")));
@@ -533,7 +535,7 @@ public class ScheduledJobSchedulerJobTests
         // Arrange
         ScheduledJobEntity addedJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Added, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(addedJob.Id);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(addedJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(addedJob);
         _mockTaskExecutor.ExecutePayloadAsync(Arg.Any<ScheduledJob>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromException<Result<Success>>(new OperationCanceledException()));
 
@@ -550,7 +552,7 @@ public class ScheduledJobSchedulerJobTests
         // Arrange
         ScheduledJobEntity addedJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Added, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(addedJob.Id);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(addedJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(addedJob);
         using CancellationTokenSource cancellationTokenSource = new();
         _mockTaskExecutor.When(executor => executor.ExecutePayloadAsync(Arg.Any<ScheduledJob>(), Arg.Any<CancellationToken>()))
             .Do(_ => cancellationTokenSource.Cancel());
@@ -570,7 +572,7 @@ public class ScheduledJobSchedulerJobTests
         // Arrange
         ScheduledJobEntity addedJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Added, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(addedJob.Id);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(addedJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(addedJob);
         Assert.True(_runtimeRegistry.TryAcquireRunSlot(scheduledJobId));
 
         // Act
@@ -589,7 +591,7 @@ public class ScheduledJobSchedulerJobTests
         ScheduledJobEntity addedJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Added, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobEntity runningJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Running, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(addedJob.Id);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(addedJob, runningJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(addedJob, runningJob);
         _mockDomainEventPublisher.When(publisher => publisher.PublishAsync(Arg.Any<ScheduledJobExecutionStartedDomainEvent>(), Arg.Any<CancellationToken>()))
             .Do(_ => throw new OperationCanceledException());
 
@@ -659,7 +661,7 @@ public class ScheduledJobSchedulerJobTests
         // Arrange
         ScheduledJobEntity runningJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Running, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(runningJob.Id);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(runningJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(runningJob);
         _mockScheduledJobRepository.GetByIdWithoutTrackingAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(runningJob);
         ScheduledJobExecutionEntity openExecution = _scheduledJobExecutionEntityFixture.Create(scheduledJobId: runningJob.Id, isCycleRun: false, wasCycleActive: true, completedOnUtc: null);
         _mockScheduledJobExecutionRepository.GetOpenByScheduledJobIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(openExecution);
@@ -681,7 +683,7 @@ public class ScheduledJobSchedulerJobTests
     {
         // Arrange
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create();
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Error.Failure("ScheduledJobs.NotFound", "Failed to read the scheduled job"));
 
         // Act
@@ -697,7 +699,7 @@ public class ScheduledJobSchedulerJobTests
         // Arrange
         ScheduledJobEntity runningJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Running, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(runningJob.Id);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(runningJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(runningJob);
         _mockScheduledJobExecutionRepository.GetOpenByScheduledJobIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
             .Returns(Error.Failure("ScheduledJobExecutions.NotFound", "Failed to read the open execution"));
 
@@ -736,7 +738,7 @@ public class ScheduledJobSchedulerJobTests
         // Arrange
         ScheduledJobEntity runningJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Running, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(runningJob.Id);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(runningJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(runningJob);
         _mockScheduledJobExecutionRepository.GetOpenByScheduledJobIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<ScheduledJobExecutionEntity?>(null));
 
@@ -755,7 +757,7 @@ public class ScheduledJobSchedulerJobTests
         // Arrange
         ScheduledJobEntity runningJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Running, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(runningJob.Id);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(runningJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(runningJob);
         ScheduledJobExecutionEntity openExecution = _scheduledJobExecutionEntityFixture.Create(scheduledJobId: runningJob.Id, isCycleRun: false, wasCycleActive: true, completedOnUtc: null);
         _mockScheduledJobExecutionRepository.GetOpenByScheduledJobIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(openExecution);
         _mockScheduledJobRepository.UpdateAsync(Arg.Any<ScheduledJobEntity>(), Arg.Any<CancellationToken>())
@@ -775,7 +777,7 @@ public class ScheduledJobSchedulerJobTests
         // Arrange
         ScheduledJobEntity runningJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Running, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(runningJob.Id);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(runningJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(runningJob);
         ScheduledJobExecutionEntity openExecution = _scheduledJobExecutionEntityFixture.Create(scheduledJobId: runningJob.Id, isCycleRun: false, wasCycleActive: true, completedOnUtc: null);
         _mockScheduledJobExecutionRepository.GetOpenByScheduledJobIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(openExecution);
         _mockScheduledJobExecutionRepository.UpdateAsync(Arg.Any<ScheduledJobExecutionEntity>(), Arg.Any<CancellationToken>())
@@ -795,10 +797,10 @@ public class ScheduledJobSchedulerJobTests
         // Arrange
         ScheduledJobEntity runningJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Running, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(runningJob.Id);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(runningJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(runningJob);
         ScheduledJobExecutionEntity openExecution = _scheduledJobExecutionEntityFixture.Create(scheduledJobId: runningJob.Id, isCycleRun: false, wasCycleActive: true, completedOnUtc: null);
         _mockScheduledJobExecutionRepository.GetOpenByScheduledJobIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(openExecution);
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.FromException(new InvalidOperationException("Save failed")));
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.FromException<Result<Success>>(new InvalidOperationException("Save failed")));
 
         // Act
         ScheduledJobStatus result = await InvokeAsync<ScheduledJobStatus>("ReconcileInterruptedRunAsync", scheduledJobId, CancellationToken.None);
@@ -813,10 +815,10 @@ public class ScheduledJobSchedulerJobTests
         // Arrange
         ScheduledJobEntity runningJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Running, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(runningJob.Id);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(runningJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(runningJob);
         ScheduledJobExecutionEntity openExecution = _scheduledJobExecutionEntityFixture.Create(scheduledJobId: runningJob.Id, isCycleRun: false, wasCycleActive: true, completedOnUtc: null);
         _mockScheduledJobExecutionRepository.GetOpenByScheduledJobIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(openExecution);
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.FromException(new OperationCanceledException()));
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.FromException<Result<Success>>(new OperationCanceledException()));
 
         // Act
         ScheduledJobStatus result = await InvokeAsync<ScheduledJobStatus>("ReconcileInterruptedRunAsync", scheduledJobId, CancellationToken.None);
@@ -846,7 +848,7 @@ public class ScheduledJobSchedulerJobTests
         ScheduledJobEntity runningJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Running, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(runningJob.Id);
         _mockScheduledJobRepository.GetActiveOrRunningAsync(Arg.Any<CancellationToken>()).Returns(new[] { runningJob });
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(runningJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(runningJob);
         ScheduledJobExecutionEntity openExecution = _scheduledJobExecutionEntityFixture.Create(scheduledJobId: runningJob.Id, isCycleRun: false, wasCycleActive: false, completedOnUtc: null);
         _mockScheduledJobExecutionRepository.GetOpenByScheduledJobIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(openExecution);
 
@@ -868,7 +870,7 @@ public class ScheduledJobSchedulerJobTests
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(runningJob.Id);
         _mockScheduledJobRepository.GetActiveOrRunningAsync(Arg.Any<CancellationToken>()).Returns(new[] { runningJob });
         // The first read reconciles the interrupted run while the job is still running; the reads made by the resumed cycle observe the reconciled active status.
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(runningJob, activeJob, activeJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(runningJob, activeJob, activeJob);
         _mockScheduledJobRepository.GetByIdWithoutTrackingAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(_scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Running, scheduleType: ScheduleType.OnceAtStartup));
         ScheduledJobExecutionEntity openExecution = _scheduledJobExecutionEntityFixture.Create(scheduledJobId: runningJob.Id, isCycleRun: false, wasCycleActive: true, completedOnUtc: null);
         _mockScheduledJobExecutionRepository.GetOpenByScheduledJobIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(openExecution);
@@ -888,7 +890,7 @@ public class ScheduledJobSchedulerJobTests
         ScheduledJobEntity activeJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Active, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(activeJob.Id);
         _mockScheduledJobRepository.GetActiveOrRunningAsync(Arg.Any<CancellationToken>()).Returns(new[] { activeJob });
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(activeJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(activeJob);
 
         // Act
         await InvokeAsync("ResumeActiveCyclesAsync", CancellationToken.None);
@@ -907,7 +909,7 @@ public class ScheduledJobSchedulerJobTests
         ScheduledJobEntity activeJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Active, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobEntity runningJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Running, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(activeJob.Id);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(activeJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(activeJob);
         _mockScheduledJobRepository.GetByIdWithoutTrackingAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(runningJob);
         RegisterDateTimeProvider();
         IScheduledJobCycleTicker mockCycleTicker = Substitute.For<IScheduledJobCycleTicker>();
@@ -931,7 +933,7 @@ public class ScheduledJobSchedulerJobTests
         ScheduledJobEntity dailyJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Active, scheduleType: ScheduleType.DailyAtHourAndMinute, hour: 10, minute: 30);
         ScheduledJobEntity runningDailyJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Running, scheduleType: ScheduleType.DailyAtHourAndMinute, hour: 10, minute: 30);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(dailyJob.Id);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(dailyJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(dailyJob);
         _mockScheduledJobRepository.GetByIdWithoutTrackingAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(runningDailyJob);
         RegisterDateTimeProvider();
         IScheduledJobCycleTicker mockCycleTicker = Substitute.For<IScheduledJobCycleTicker>();
@@ -955,7 +957,7 @@ public class ScheduledJobSchedulerJobTests
         ScheduledJobEntity activeJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Active, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobEntity runningJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Running, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(activeJob.Id);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(activeJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(activeJob);
         _mockScheduledJobRepository.GetByIdWithoutTrackingAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(runningJob);
         RegisterDateTimeProvider();
         _mockTaskExecutor.ExecutePayloadAsync(Arg.Any<ScheduledJob>(), Arg.Any<CancellationToken>())
@@ -981,7 +983,7 @@ public class ScheduledJobSchedulerJobTests
         // Arrange
         ScheduledJobEntity activeJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Active, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(activeJob.Id);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(activeJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(activeJob);
         RegisterDateTimeProvider();
         using CancellationTokenSource cancellationTokenSource = new();
         cancellationTokenSource.Cancel();
@@ -1000,7 +1002,7 @@ public class ScheduledJobSchedulerJobTests
         // Arrange
         ScheduledJobEntity activeJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Active, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(activeJob.Id);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(activeJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(activeJob);
         RegisterDateTimeProvider();
         IScheduledJobCycleTicker mockCycleTicker = Substitute.For<IScheduledJobCycleTicker>();
         mockCycleTicker.WaitForNextTickAsync(Arg.Any<CancellationToken>())
@@ -1038,7 +1040,7 @@ public class ScheduledJobSchedulerJobTests
         // An interval schedule whose interval is not positive cannot be converted to its domain object.
         ScheduledJobEntity invalidJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Active, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 0);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(invalidJob.Id);
-        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(invalidJob);
+        _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(invalidJob);
 
         // Act
         Schedule? result = await InvokeAsync<Schedule?>("GetScheduleAsync", scheduledJobId, CancellationToken.None);

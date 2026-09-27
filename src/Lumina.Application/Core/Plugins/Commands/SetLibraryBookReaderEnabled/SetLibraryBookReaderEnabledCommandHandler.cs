@@ -97,7 +97,9 @@ public class SetLibraryBookReaderEnabledCommandHandler : ICommandHandler<SetLibr
         Result<Updated> upsertResult = await _unitOfWork.LibraryBookReaderConfigurationRepository.UpsertAsync(configuration, cancellationToken).ConfigureAwait(false);
         if (upsertResult.IsFailure)
             return upsertResult.Errors;
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
         // The reading service caches the enablement of a reader, because it consults it on every request; the cache is invalidated here,
         // so that disabling a reader cuts access to its books immediately, without waiting for the cache to expire.
         _enablementCache.Invalidate(command.LibraryId, command.PluginId);

@@ -210,33 +210,27 @@ public class CalibreMapperTests
 
         MediaContributorDto author = result.Contributors[0];
         Assert.Equal("Test Author", author.Name!.DisplayName);
-        Assert.Equal("Author", author.Role!.Name);
-        Assert.Equal(MediaContributorRoleCategory.Author, author.Role.Category);
+        Assert.Equal(MediaContributorRole.Author, author.Role);
 
         MediaContributorDto coAuthor = result.Contributors[1];
         Assert.Equal("Co Author", coAuthor.Name!.DisplayName);
-        Assert.Equal("Author", coAuthor.Role!.Name);
-        Assert.Equal(MediaContributorRoleCategory.Author, coAuthor.Role.Category);
+        Assert.Equal(MediaContributorRole.Author, coAuthor.Role);
 
         MediaContributorDto translator = result.Contributors[2];
         Assert.Equal("Test Translator", translator.Name!.DisplayName);
-        Assert.Equal("trl", translator.Role!.Name);
-        Assert.Equal(MediaContributorRoleCategory.Translator, translator.Role.Category);
+        Assert.Equal(MediaContributorRole.Translator, translator.Role);
 
         MediaContributorDto illustrator = result.Contributors[3];
         Assert.Equal("Test Illustrator", illustrator.Name!.DisplayName);
-        Assert.Equal("ill", illustrator.Role!.Name);
-        Assert.Equal(MediaContributorRoleCategory.Illustrator, illustrator.Role.Category);
+        Assert.Equal(MediaContributorRole.Illustrator, illustrator.Role);
 
         MediaContributorDto production = result.Contributors[4];
         Assert.Equal("calibre (3.48.0) [https://calibre-ebook.com]", production.Name!.DisplayName);
-        Assert.Equal("bkp", production.Role!.Name);
-        Assert.Equal(MediaContributorRoleCategory.Publisher, production.Role.Category);
+        Assert.Equal(MediaContributorRole.Publisher, production.Role);
 
         MediaContributorDto misc = result.Contributors[5];
         Assert.Equal("Misc Contributor", misc.Name!.DisplayName);
-        Assert.Equal("Contributor", misc.Role!.Name);
-        Assert.Equal(MediaContributorRoleCategory.Other, misc.Role.Category);
+        Assert.Equal(MediaContributorRole.Other, misc.Role);
     }
 
     [Fact]

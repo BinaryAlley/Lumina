@@ -40,10 +40,10 @@ public class GetTreeFilesEndpointTests : IClassFixture<LuminaWebFactory>
         _apiFactory.ApiClientStub.Reset();
         string path = @"C:\Users\test";
         FileSystemTreeNodeDto[] expectedNodes = [_fileSystemTreeNodeDtoFixture.Create(path: path, name: "test")];
-        string expectedEndpoint = $"files/get-tree-files?path={Uri.EscapeDataString(path)}&includeHiddenElements=True";
+        string expectedEndpoint = $"files/get-tree-files?path={Uri.EscapeDataString(path)}&shouldIncludeHiddenElements=True";
         _apiFactory.ApiClientStub.RegisterGetResponse(expectedEndpoint, expectedNodes);
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
-        HttpRequestMessage getRequest = new(HttpMethod.Get, $"/files/api-get-tree-files?path={Uri.EscapeDataString(path)}&includeHiddenElements=true");
+        HttpRequestMessage getRequest = new(HttpMethod.Get, $"/files/api-get-tree-files?path={Uri.EscapeDataString(path)}&shouldIncludeHiddenElements=true");
         getRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
         // Act

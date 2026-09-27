@@ -2,10 +2,15 @@
 using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Lumina.DataAccess.Core.UoW;
 using Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.UpdateBook;
 using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -35,19 +40,27 @@ public class UpdateBookEndpointTests : IClassFixture<LuminaApiFactory>
     }
 
     [Fact]
-    public async Task UpdateBook_WhenCalledWithoutAuthentication_ShouldReturnUnauthorized()
+    public async Task UpdateBook_WhenUnauthorized_ShouldReturnUnauthorizedResult()
     {
         // Arrange
         HttpClient client = _apiFactory.CreateClient();
+        Guid libraryId = Guid.NewGuid();
+        Guid bookId = Guid.NewGuid();
         UpdateBookRequest request = _updateBookRequestFixture.Create();
 
         // Act
-        HttpResponseMessage response = await client.PutAsJsonAsync($"/api/v1/books/{request.Id}", request);
+        HttpResponseMessage response = await client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}/books/{bookId}", request);
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status401Unauthorized, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc7235#section-3.1", problemDetails["type"].GetString());
+        Assert.Equal("Unauthorized", problemDetails["title"].GetString());
+        Assert.Equal("Authentication failed", problemDetails["detail"].GetString());
+        Assert.Equal($"/api/v1/libraries/{libraryId}/books/{bookId}", problemDetails["instance"].GetProperty("value").GetString());
     }
 
     [Theory]
@@ -58,10 +71,12 @@ public class UpdateBookEndpointTests : IClassFixture<LuminaApiFactory>
         // Arrange
         HttpClient client = _apiFactory.CreateClient();
         (_, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(client);
+        Guid libraryId = Guid.NewGuid();
+        Guid bookId = Guid.NewGuid();
         UpdateBookRequest request = _updateBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(title: maliciousTitle));
 
         // Act
-        HttpResponseMessage response = await client.PutAsJsonAsync($"/api/v1/books/{request.Id}", request);
+        HttpResponseMessage response = await client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}/books/{bookId}", request);
 
         // Assert
         // The injected title is validated and handled by the parameterized update flow: the route book does not exist,
@@ -83,15 +98,16 @@ public class UpdateBookEndpointTests : IClassFixture<LuminaApiFactory>
         // Arrange
         HttpClient client = _apiFactory.CreateClient();
         (_, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(client);
+        Guid libraryId = Guid.NewGuid();
         UpdateBookRequest request = _updateBookRequestFixture.Create();
 
         // Act
-        HttpResponseMessage response = await client.PutAsJsonAsync($"/api/v1/books/{Uri.EscapeDataString(maliciousBookId)}", request);
+        HttpResponseMessage response = await client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}/books/{Uri.EscapeDataString(maliciousBookId)}", request);
 
         // Assert
         // The route is authoritative and its raw value is kept as a string, so an unparseable route Id reaches the command
-        // mapping and becomes Guid.Empty, which the command validator reports as a clean validation error. The response must
-        // not leak stack traces, database details, or the injected payload, and the body Id never redirects the update.
+        // validator, which reports it as a clean validation error. The response must not leak stack traces, database details,
+        // or the injected payload.
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
@@ -105,16 +121,17 @@ public class UpdateBookEndpointTests : IClassFixture<LuminaApiFactory>
     }
 
     [Fact]
-    public async Task UpdateBook_WhenRouteBookDoesNotExistEvenIfBodyIdDiffers_ShouldReturnNotFound()
+    public async Task UpdateBook_WhenRouteBookDoesNotExist_ShouldReturnNotFound()
     {
         // Arrange
         HttpClient client = _apiFactory.CreateClient();
         (_, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(client);
+        Guid libraryId = Guid.NewGuid();
         Guid routeId = Guid.NewGuid();
         UpdateBookRequest request = _updateBookRequestFixture.Create();
 
         // Act
-        HttpResponseMessage response = await client.PutAsJsonAsync($"/api/v1/books/{routeId}", request);
+        HttpResponseMessage response = await client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}/books/{routeId}", request);
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -126,5 +143,42 @@ public class UpdateBookEndpointTests : IClassFixture<LuminaApiFactory>
         Assert.Equal("BookNotFound", problemDetails.RootElement.GetProperty("detail").GetString());
 
         await _apiFactory.RemoveTestUserAsync(username);
+    }
+
+    [Fact]
+    public async Task UpdateBook_WhenUserDoesNotOwnTheLibrary_ShouldReturnForbidden()
+    {
+        // Arrange
+        HttpClient ownerClient = _apiFactory.CreateClient();
+        (Guid ownerId, string ownerUsername) = await _apiFactory.CreateAndAuthenticateUserAsync(ownerClient);
+        Guid libraryId = Guid.NewGuid();
+        await _apiFactory.SeedLibraryAsync(libraryId, ownerId);
+        await _apiFactory.SeedBookAsync(libraryId, "Other User Book");
+        Guid bookId;
+        using (IServiceScope scope = _apiFactory.Services.CreateScope())
+        {
+            LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            bookId = dbContext.Books.Single(book => book.LibraryId == libraryId).Id;
+        }
+
+        HttpClient requesterClient = _apiFactory.CreateClient();
+        (Guid _, string requesterUsername) = await _apiFactory.CreateAndAuthenticateUserAsync(requesterClient);
+        UpdateBookRequest request = _updateBookRequestFixture.Create();
+
+        // Act
+        HttpResponseMessage response = await requesterClient.PutAsJsonAsync($"/api/v1/libraries/{libraryId}/books/{bookId}", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
+        Assert.Equal("General.Unauthorized", problemDetails["title"].GetString());
+        Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
+
+        await _apiFactory.RemoveTestUserAsync(ownerUsername);
+        await _apiFactory.RemoveTestUserAsync(requesterUsername);
     }
 }
