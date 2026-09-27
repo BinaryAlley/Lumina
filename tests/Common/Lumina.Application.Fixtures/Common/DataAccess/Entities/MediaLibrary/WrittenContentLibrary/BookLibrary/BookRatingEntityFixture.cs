@@ -16,7 +16,6 @@ namespace Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Wr
 [ExcludeFromCodeCoverage]
 public class BookRatingEntityFixture
 {
-    private readonly Random _random = new();
     private readonly Faker _faker = new();
 
     /// <summary>
@@ -36,10 +35,10 @@ public class BookRatingEntityFixture
         bool includeValues = true)
     {
         return new BookRatingEntity(
-            includeValues ? (value ?? _random.Next(1, 5)) : null,
+            includeValues ? (value ?? Random.Shared.Next(1, 5)) : null,
             includeValues ? (maxValue ?? 5) : null,
             includeValues ? (source ?? _faker.PickRandom<BookRatingSource>()) : null,
-            includeValues ? (voteCount ?? _random.Next(1, 1000)) : null
+            includeValues ? (voteCount ?? Random.Shared.Next(1, 1000)) : null
         );
     }
 

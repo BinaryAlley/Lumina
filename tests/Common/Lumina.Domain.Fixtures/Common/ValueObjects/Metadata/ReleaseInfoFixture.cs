@@ -18,7 +18,6 @@ namespace Lumina.Domain.Fixtures.Common.ValueObjects.Metadata;
 public class ReleaseInfoFixture
 {
     private readonly Faker _faker = new();
-    private readonly Random _random = new();
 
     /// <summary>
     /// Creates a random valid <see cref="ReleaseInfo"/>.
@@ -57,7 +56,7 @@ public class ReleaseInfoFixture
                 lowerBound = Math.Min(lowerBound, resolvedReReleaseYear.Value);
                 upperBoundExclusive = Math.Min(upperBoundExclusive, resolvedReReleaseYear.Value + 1);
             }
-            int generatedYear = _random.Next(lowerBound, Math.Max(upperBoundExclusive, lowerBound + 1));
+            int generatedYear = Random.Shared.Next(lowerBound, Math.Max(upperBoundExclusive, lowerBound + 1));
             resolvedOriginalDate = Optional<DateOnly>.Some(new DateOnly(generatedYear, 1, 1));
             resolvedOriginalYear = Optional<int>.Some(generatedYear);
         }
@@ -66,7 +65,7 @@ public class ReleaseInfoFixture
         else if (!resolvedOriginalYear.HasValue)
             resolvedOriginalYear = Optional<int>.Some(resolvedOriginalDate.Value.Year);
 
-        Optional<ReleaseCountry> resolvedReleaseCountry = releaseCountry ?? Optional<ReleaseCountry>.Some(Enum.GetValues<ReleaseCountry>()[_random.Next(Enum.GetValues<ReleaseCountry>().Length)]);
+        Optional<ReleaseCountry> resolvedReleaseCountry = releaseCountry ?? Optional<ReleaseCountry>.Some(Enum.GetValues<ReleaseCountry>()[Random.Shared.Next(Enum.GetValues<ReleaseCountry>().Length)]);
 
         Result<ReleaseInfo> releaseInfoResult = ReleaseInfo.Create(
             resolvedOriginalDate,
