@@ -78,16 +78,17 @@ public class UpdateUserRoleAndPermissionsCommandHandler : ICommandHandler<Update
         if (getUserResult.IsFailure || getUserResult.Value is null)
             return DomainErrors.Users.UserDoesNotExist;
 
-        Result<RoleEntity?> getRoleResult = default;
+        RoleEntity? newRole = null;
         if (command.RoleId is not null)
         {
             // Get the new role.
-            getRoleResult = await _unitOfWork.RoleRepository.GetByIdAsync(command.RoleId!.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
+            Result<RoleEntity?> getRoleResult = await _unitOfWork.RoleRepository.GetByIdAsync(command.RoleId!.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
             if (getRoleResult.IsFailure || getRoleResult.Value is null)
                 return ApplicationErrors.Authorization.RoleNotFound;
+            newRole = getRoleResult.Value;
 
             // Check if changing the role of an admin would leave the application without any admin.
-            if (getUserResult.Value.UserRole?.Role.RoleName == "Admin" && getRoleResult.Value.RoleName != "Admin")
+            if (getUserResult.Value.UserRole?.Role.RoleName == "Admin" && newRole.RoleName != "Admin")
             {
                 // Count how many admins exist, so the last one is never demoted.
                 Result<PaginatedResultDto<UserEntity>> getAllUsersResult = await _unitOfWork.UserRepository.GetAllAsync<BaseFilterDto>(cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -106,22 +107,25 @@ public class UpdateUserRoleAndPermissionsCommandHandler : ICommandHandler<Update
         if (getPermissionsResult.IsFailure)
             return getPermissionsResult.Errors;
 
+        // Every requested permission must exist, otherwise the requested permission set cannot be built and an unknown Id would throw instead of returning a result.
+        Dictionary<Guid, PermissionEntity> permissionsById = getPermissionsResult.Value.ToDictionary(permission => permission.Id);
+        if (command.Permissions.Any(permissionId => !permissionsById.ContainsKey(permissionId)))
+            return ApplicationErrors.Authorization.PermissionNotFound;
+
         // Update the user.
         UserEntity userToUpdate = getUserResult.Value;
 
-        // Build the role link for the requested role, leaving the current role untouched when no role was provided.
-        UserRoleEntity? userRole = default!;
-        if (command.RoleId is not null)
-        {
-            userRole = new()
+        // Build the role link for the requested role, keeping the current role untouched when no role was provided.
+        UserRoleEntity? userRole = command.RoleId is null
+            ? userToUpdate.UserRole
+            : new UserRoleEntity
             {
                 UserId = userToUpdate.Id,
                 RoleId = command.RoleId.Value,
-                Role = getRoleResult.Value!,
+                Role = newRole!,
                 User = userToUpdate
             };
-        }
-        
+
         // Build the updated user by copying the unchanged fields and replacing the role and permissions with the requested ones.
         UserEntity updatedUser = new()
         {
@@ -137,7 +141,7 @@ public class UpdateUserRoleAndPermissionsCommandHandler : ICommandHandler<Update
             {
                 UserId = userToUpdate.Id,
                 PermissionId = permissionId,
-                Permission = getPermissionsResult.Value.First(permission => permission.Id == permissionId),
+                Permission = permissionsById[permissionId],
                 User = userToUpdate
             })],
             LibraryScans = userToUpdate.LibraryScans
@@ -154,7 +158,7 @@ public class UpdateUserRoleAndPermissionsCommandHandler : ICommandHandler<Update
 
         return new AuthorizationResponse(
             userToUpdate.Id,
-            getRoleResult.Value?.RoleName,
+            newRole?.RoleName ?? userToUpdate.UserRole?.Role.RoleName,
             userToUpdate.UserPermissions
                 .Select(up => up.Permission.PermissionName)
                 .ToHashSet()
