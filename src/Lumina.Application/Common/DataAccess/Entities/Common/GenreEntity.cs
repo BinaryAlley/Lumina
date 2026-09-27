@@ -11,4 +11,4 @@ namespace Lumina.Application.Common.DataAccess.Entities.Common;
 [DebuggerDisplay("Name: {Name}")]
 public record GenreEntity(
     string? Name
-);
+) : ISharedReferenceEntity;

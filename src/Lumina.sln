@@ -161,6 +161,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "architecture-decision-log",
 		..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decision-record-0011.md = ..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decision-record-0011.md
 		..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decision-record-0012.md = ..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decision-record-0012.md
 		..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decision-record-0013.md = ..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decision-record-0013.md
+		..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decision-record-0014.md = ..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decision-record-0014.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "domain", "domain", "{3EE8EFDF-4D55-4EA3-BEE2-74D00CB50570}"

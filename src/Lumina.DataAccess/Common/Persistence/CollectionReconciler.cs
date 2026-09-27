@@ -60,12 +60,20 @@ internal static class CollectionReconciler
             {
                 if (shouldReplace(matchedItem, incomingItem))
                 {
+                    TExisting replacementItem = createNew(incomingItem);
                     existingItems.Remove(matchedItem);
-                    existingItems.Add(createNew(incomingItem));
+                    existingItems.Add(replacementItem);
+                    existingByKey[incomingKey] = replacementItem;
                 }
             }
-            else // The desired child has no tracked counterpart, so it is added as a new child.
-                existingItems.Add(createNew(incomingItem));
+            else
+            {
+                // The desired child has no tracked counterpart, so it is added as a new child and indexed, so that a later desired child
+                // that reuses the same key is matched against it instead of adding a second row that would break the unique index.
+                TExisting addedItem = createNew(incomingItem);
+                existingItems.Add(addedItem);
+                existingByKey[incomingKey] = addedItem;
+            }
         }
     }
 }
