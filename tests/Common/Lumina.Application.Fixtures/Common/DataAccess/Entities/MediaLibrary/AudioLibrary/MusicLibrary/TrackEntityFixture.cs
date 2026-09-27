@@ -20,7 +20,6 @@ namespace Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Au
 [ExcludeFromCodeCoverage]
 public class TrackEntityFixture
 {
-    private readonly Random _random = new();
     private readonly Faker _faker = new();
     private readonly TagEntityFixture _tagEntityFixture = new();
     private readonly GenreEntityFixture _genreEntityFixture = new();
@@ -38,11 +37,11 @@ public class TrackEntityFixture
     /// <param name="path">Optional. The file system path of the track.</param>
     /// <param name="title">Optional. The title of the track.</param>
     /// <param name="trackNumber">Optional. The number of the track on its disc.</param>
-    /// <param name="includeMetadata">Whether the owned metadata collections (Tags, Genres, Moods, ISRCs, Contributors, Ratings) should be included, or forced to empty collections.</param>
     /// <param name="originalReleaseDate">Optional. The original release date of the track.</param>
     /// <param name="originalReleaseYear">Optional. The original release year of the track.</param>
     /// <param name="reReleaseDate">Optional. The re-release date of the track.</param>
     /// <param name="reReleaseYear">Optional. The re-release year of the track.</param>
+    /// <param name="includeMetadata">Whether the owned metadata collections (Tags, Genres, Moods, ISRCs, Contributors, Ratings) should be included, or forced to empty collections.</param>
     /// <param name="includeOriginalReleaseDate">Whether the original release date should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeOriginalReleaseYear">Whether the original release year should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeReReleaseDate">Whether the re-release date should be included, or forced to <see langword="null"/>.</param>
@@ -55,11 +54,11 @@ public class TrackEntityFixture
         string? path = null,
         string? title = null,
         int? trackNumber = null,
-        bool includeMetadata = true,
         DateOnly? originalReleaseDate = null,
         int? originalReleaseYear = null,
         DateOnly? reReleaseDate = null,
         int? reReleaseYear = null,
+        bool includeMetadata = true,
         bool includeOriginalReleaseDate = true,
         bool includeOriginalReleaseYear = true,
         bool includeReReleaseDate = true,
@@ -69,9 +68,9 @@ public class TrackEntityFixture
         Guid resolvedAlbumId = albumId ?? Guid.NewGuid();
         Guid resolvedLibraryId = libraryId ?? Guid.NewGuid();
         const int MAXIMUM_RELEASE_YEAR = 2026;
-        int resolvedOriginalReleaseYear = originalReleaseYear ?? _random.Next(1900, MAXIMUM_RELEASE_YEAR);
+        int resolvedOriginalReleaseYear = originalReleaseYear ?? Random.Shared.Next(1900, MAXIMUM_RELEASE_YEAR);
         int resolvedReReleaseYearUpperBound = Math.Max(resolvedOriginalReleaseYear + 1, MAXIMUM_RELEASE_YEAR);
-        int resolvedReReleaseYear = reReleaseYear ?? _random.Next(resolvedOriginalReleaseYear, resolvedReReleaseYearUpperBound);
+        int resolvedReReleaseYear = reReleaseYear ?? Random.Shared.Next(resolvedOriginalReleaseYear, resolvedReReleaseYearUpperBound);
         DateOnly resolvedOriginalReleaseDate = originalReleaseDate ?? _faker.DateOnlyBetween(new DateOnly(resolvedOriginalReleaseYear, 1, 1), new DateOnly(resolvedOriginalReleaseYear, 12, 31));
         DateOnly resolvedReReleaseDate = reReleaseDate ?? _faker.DateOnlyBetween(resolvedReReleaseYear == resolvedOriginalReleaseYear ? resolvedOriginalReleaseDate : new DateOnly(resolvedReReleaseYear, 1, 1), new DateOnly(resolvedReReleaseYear, 12, 31));
 
@@ -103,17 +102,17 @@ public class TrackEntityFixture
             .RuleFor(x => x.OriginalLanguageCode, f => f.Random.String2(2))
             .RuleFor(x => x.OriginalLanguageName, f => f.Random.String2(f.Random.Number(1, 50)))
             .RuleFor(x => x.OriginalLanguageNativeName, f => f.Random.String2(f.Random.Number(1, 50)))
-            .RuleFor(x => x.DurationInSeconds, _random.Next(60, 7200))
+            .RuleFor(x => x.DurationInSeconds, Random.Shared.Next(60, 7200))
             .RuleFor(x => x.SampleRate, f => f.PickRandom(44100, 48000, 96000))
             .RuleFor(x => x.Channels, f => f.PickRandom(1, 2, 6))
-            .RuleFor(x => x.BitDepth, _random.Next(8, 32))
+            .RuleFor(x => x.BitDepth, Random.Shared.Next(8, 32))
             .RuleFor(x => x.AudioCodec, f => f.PickRandom("FLAC", "MP3", "AAC", "ALAC"))
-            .RuleFor(x => x.Bitrate, _random.Next(96, 1411))
+            .RuleFor(x => x.Bitrate, Random.Shared.Next(96, 1411))
             .RuleFor(x => x.TrackNumber, f => trackNumber ?? f.Random.Int(1, 20))
-            .RuleFor(x => x.DiscNumber, _random.Next(1, 3))
+            .RuleFor(x => x.DiscNumber, Random.Shared.Next(1, 3))
             .RuleFor(x => x.Script, f => f.Random.String2(f.Random.Number(1, 50)))
             .RuleFor(x => x.Key, f => f.PickRandom<MusicKey>())
-            .RuleFor(x => x.Bpm, _random.Next(40, 240))
+            .RuleFor(x => x.Bpm, Random.Shared.Next(40, 240))
             .RuleFor(x => x.Work, f => f.Music.Genre())
             .RuleFor(x => x.MusicBrainzRecordingId, f => f.Random.Guid())
             .RuleFor(x => x.MusicBrainzTrackId, f => f.Random.Guid())

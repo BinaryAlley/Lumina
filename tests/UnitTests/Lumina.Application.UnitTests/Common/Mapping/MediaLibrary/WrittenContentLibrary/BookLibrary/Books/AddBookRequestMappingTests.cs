@@ -64,7 +64,21 @@ public class AddBookRequestMappingTests
         AddBookRequest request = _requestFixture.Create(
             path: "/books/test.epub",
             metadata: _writtenContentMetadataDtoFixture.Create(title: "Test Book"),
-            includeOptionalProperties: false
+            includeFormat: false,
+            includeEdition: false,
+            includeVolumeNumber: false,
+            includeAsin: false,
+            includeGoodreadsId: false,
+            includeLccn: false,
+            includeOclcNumber: false,
+            includeOpenLibraryId: false,
+            includeLibraryThingId: false,
+            includeGoogleBooksId: false,
+            includeBarnesAndNobleId: false,
+            includeAppleBooksId: false,
+            includeIsbns: false,
+            includeRatings: false,
+            includeContributors: false
         );
 
         // Act
@@ -105,7 +119,18 @@ public class AddBookRequestMappingTests
                 _mediaContributorReferenceDtoFixture.Create(role: MediaContributorRole.Author)
             ],
             ratings: [new(4.5m, 5m, BookRatingSource.Goodreads, 1000)],
-            includeOptionalProperties: false
+            includeFormat: false,
+            includeEdition: false,
+            includeVolumeNumber: false,
+            includeAsin: false,
+            includeGoodreadsId: false,
+            includeLccn: false,
+            includeOclcNumber: false,
+            includeOpenLibraryId: false,
+            includeLibraryThingId: false,
+            includeGoogleBooksId: false,
+            includeBarnesAndNobleId: false,
+            includeAppleBooksId: false
         );
 
         // Act

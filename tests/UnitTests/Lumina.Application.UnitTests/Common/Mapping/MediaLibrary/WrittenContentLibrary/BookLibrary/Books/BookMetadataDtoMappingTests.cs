@@ -24,6 +24,7 @@ public class BookMetadataDtoMappingTests
     private readonly BookFixture _bookFixture = new();
     private readonly BookMetadataDtoFixture _bookMetadataDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
+    private readonly ReleaseInfoDtoFixture _releaseInfoDtoFixture = new();
 
     [Fact]
     public void ApplyMetadata_WhenCalledWithValidMetadata_ShouldApplyItToTheBook()
@@ -76,7 +77,7 @@ public class BookMetadataDtoMappingTests
     {
         // Arrange
         Book book = _bookFixture.Create();
-        BookMetadataDto metadata = _bookMetadataDtoFixture.Create(title: title, includeOptionalProperties: false);
+        BookMetadataDto metadata = _bookMetadataDtoFixture.Create(includeTitle: title is not null, title: title, includeReleaseInfo: false, includeGenres: false, includeTags: false, includeLanguage: false, includeFormat: false, includeVolumeNumber: false);
 
         // Act
         Result<Success> result = book.ApplyMetadata(metadata);
@@ -91,7 +92,7 @@ public class BookMetadataDtoMappingTests
     {
         // Arrange
         Book book = _bookFixture.Create();
-        BookMetadataDto metadata = _bookMetadataDtoFixture.Create(title: "A valid title", includeOptionalProperties: false);
+        BookMetadataDto metadata = _bookMetadataDtoFixture.Create(title: "A valid title", includeReleaseInfo: false, includeGenres: false, includeTags: false, includeLanguage: false, includeFormat: false, includeVolumeNumber: false);
 
         // Act
         Result<Success> result = book.ApplyMetadata(metadata);
@@ -108,7 +109,7 @@ public class BookMetadataDtoMappingTests
         Book book = _bookFixture.Create();
         BookMetadataDto metadata = _bookMetadataDtoFixture.Create(
             title: "A valid title",
-            releaseInfo: new ReleaseInfoDto(new DateOnly(2000, 1, 1), 1999, null, null, null, null));
+            releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2000, 1, 1), originalReleaseYear: 1999));
 
         // Act
         Result<Success> result = book.ApplyMetadata(metadata);
@@ -173,8 +174,12 @@ public class BookMetadataDtoMappingTests
         Book book = _bookFixture.Create();
         BookMetadataDto metadata = _bookMetadataDtoFixture.Create(
             title: "A valid title",
-            releaseInfo: new ReleaseInfoDto(new DateOnly(2000, 1, 1), 2000, null, null, null, null),
-            includeOptionalProperties: false);
+            releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2000, 1, 1), originalReleaseYear: 2000),
+            includeGenres: false,
+            includeTags: false,
+            includeLanguage: false,
+            includeFormat: false,
+            includeVolumeNumber: false);
 
         // Act
         Result<Success> result = book.ApplyMetadata(metadata);

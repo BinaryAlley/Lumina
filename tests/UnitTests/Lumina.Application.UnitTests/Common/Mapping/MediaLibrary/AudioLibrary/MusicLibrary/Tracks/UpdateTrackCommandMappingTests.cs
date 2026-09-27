@@ -84,7 +84,7 @@ public class UpdateTrackCommandMappingTests
         Guid libraryId = Guid.NewGuid();
         (Artist artist, Guid albumId, Guid trackId) = CreateDomainArtist(libraryId);
         string updatedPath = "/music/queen/a-night-at-the-opera/03-you-re-my-best-friend.flac";
-        UpdateTrackCommand command = _updateTrackCommandFixture.Create(libraryId: libraryId.ToString(), artistId: artist.Id.Value.ToString(), albumId: albumId.ToString(), trackId: trackId.ToString(), path: updatedPath, includeOptionalProperties: false, contributors: [], ratings: []);
+        UpdateTrackCommand command = _updateTrackCommandFixture.Create(libraryId: libraryId.ToString(), artistId: artist.Id.Value.ToString(), albumId: albumId.ToString(), trackId: trackId.ToString(), path: updatedPath, includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMusicBrainzWorkId: false, includeMoods: false, includeIsrcs: false, contributors: [], ratings: []);
 
         // Act
         Result<Artist> result = command.ToDomainEntity(artist);

@@ -63,7 +63,19 @@ public class UpdateTrackRequestMappingTests
         Guid artistId = Guid.NewGuid();
         Guid albumId = Guid.NewGuid();
         Guid trackId = Guid.NewGuid();
-        UpdateTrackRequest request = _updateTrackRequestFixture.Create(includeOptionalProperties: false, contributors: [], ratings: []);
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(
+            includeDiscNumber: false,
+            includeScript: false,
+            includeKey: false,
+            includeBpm: false,
+            includeWork: false,
+            includeMusicBrainzRecordingId: false,
+            includeMusicBrainzTrackId: false,
+            includeMusicBrainzWorkId: false,
+            includeMoods: false,
+            includeIsrcs: false,
+            contributors: [],
+            ratings: []);
 
         // Act
         UpdateTrackCommand result = request.ToCommand(libraryId.ToString(), artistId.ToString(), albumId.ToString(), trackId.ToString());
@@ -103,7 +115,14 @@ public class UpdateTrackRequestMappingTests
             isrcs: [new("GBUM71029604")],
             contributors: [new(Guid.NewGuid(), MediaContributorRole.Vocals)],
             ratings: [new(4.5m, 5m, AudioRatingSource.MusicBrainz, 1000)],
-            includeOptionalProperties: false);
+            includeDiscNumber: false,
+            includeScript: false,
+            includeKey: false,
+            includeBpm: false,
+            includeWork: false,
+            includeMusicBrainzRecordingId: false,
+            includeMusicBrainzTrackId: false,
+            includeMusicBrainzWorkId: false);
 
         // Act
         UpdateTrackCommand result = request.ToCommand(libraryId.ToString(), artistId.ToString(), albumId.ToString(), trackId.ToString());

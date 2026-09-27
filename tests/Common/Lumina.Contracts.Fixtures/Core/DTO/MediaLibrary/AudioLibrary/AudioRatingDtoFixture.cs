@@ -17,7 +17,6 @@ namespace Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary;
 public class AudioRatingDtoFixture
 {
     private readonly Fixture _fixture = new();
-    private readonly Random _random = new();
 
     /// <summary>
     /// Creates a random valid <see cref="AudioRatingDto"/>.
@@ -26,6 +25,8 @@ public class AudioRatingDtoFixture
     /// <param name="maxValue">Optional. The maximum possible rating value.</param>
     /// <param name="source">Optional. The rating source.</param>
     /// <param name="voteCount">Optional. The number of votes.</param>
+    /// <param name="includeValue">Whether the rating value should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeMaxValue">Whether the maximum possible rating value should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeSource">Whether the rating source should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeVoteCount">Whether the number of votes should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="AudioRatingDto"/>.</returns>
@@ -34,14 +35,16 @@ public class AudioRatingDtoFixture
         decimal? maxValue = null,
         AudioRatingSource? source = null,
         int? voteCount = null,
+        bool includeValue = true,
+        bool includeMaxValue = true,
         bool includeSource = true,
         bool includeVoteCount = true)
     {
         return new AudioRatingDto(
-            value ?? _random.Next(1, 5),
-            maxValue ?? 5,
+            includeValue ? (value ?? Random.Shared.Next(1, 5)) : null,
+            includeMaxValue ? (maxValue ?? 5) : null,
             includeSource ? (source ?? _fixture.Create<AudioRatingSource>()) : null,
-            includeVoteCount ? (voteCount ?? _random.Next(1, 1000)) : null
+            includeVoteCount ? (voteCount ?? Random.Shared.Next(1, 1000)) : null
         );
     }
 

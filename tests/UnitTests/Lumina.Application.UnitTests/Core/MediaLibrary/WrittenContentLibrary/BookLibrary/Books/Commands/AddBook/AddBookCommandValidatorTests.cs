@@ -210,7 +210,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenOriginalReleaseYearIsLessThan1_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: new ReleaseInfoDto(null, 0, null, null, null, null)));
+        AddBookCommand bookCommand = _commandBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: 0)));
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -223,7 +223,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenOriginalReleaseYearIsGreaterThan9999_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: new ReleaseInfoDto(null, 10000, null, null, null, null)));
+        AddBookCommand bookCommand = _commandBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: 10000)));
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -249,7 +249,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenReReleaseYearIsLessThan1_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: new ReleaseInfoDto(null, null, null, 0, null, null)));
+        AddBookCommand bookCommand = _commandBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(reReleaseYear: 0)));
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -262,7 +262,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenReReleaseYearIsGreaterThan9999_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: new ReleaseInfoDto(null, null, null, 10000, null, null)));
+        AddBookCommand bookCommand = _commandBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(reReleaseYear: 10000)));
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -756,7 +756,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenFormatIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create(includeOptionalProperties: false);
+        AddBookCommand bookCommand = _commandBookFixture.Create(includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false, includeIsbns: false, includeRatings: false, includeContributors: false);
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -795,7 +795,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenEditionIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create(includeOptionalProperties: false);
+        AddBookCommand bookCommand = _commandBookFixture.Create(includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false, includeIsbns: false, includeRatings: false, includeContributors: false);
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -834,7 +834,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenVolumeNumberIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create(includeOptionalProperties: false);
+        AddBookCommand bookCommand = _commandBookFixture.Create(includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false, includeIsbns: false, includeRatings: false, includeContributors: false);
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -954,7 +954,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenAsinIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create(includeOptionalProperties: false);
+        AddBookCommand bookCommand = _commandBookFixture.Create(includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false, includeIsbns: false, includeRatings: false, includeContributors: false);
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -980,7 +980,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenGoodreadsIdIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create(includeOptionalProperties: false);
+        AddBookCommand bookCommand = _commandBookFixture.Create(includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false, includeIsbns: false, includeRatings: false, includeContributors: false);
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -1045,7 +1045,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenLccnIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create(includeOptionalProperties: false);
+        AddBookCommand bookCommand = _commandBookFixture.Create(includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false, includeIsbns: false, includeRatings: false, includeContributors: false);
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -1110,7 +1110,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithEmptyOclcNumber_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create(includeOptionalProperties: false);
+        AddBookCommand bookCommand = _commandBookFixture.Create(includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false, includeIsbns: false, includeRatings: false, includeContributors: false);
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -1201,7 +1201,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenOpenLibraryIdIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create(includeOptionalProperties: false);
+        AddBookCommand bookCommand = _commandBookFixture.Create(includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false, includeIsbns: false, includeRatings: false, includeContributors: false);
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -1266,7 +1266,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithEmptyLibraryThingId_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create(includeOptionalProperties: false);
+        AddBookCommand bookCommand = _commandBookFixture.Create(includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false, includeIsbns: false, includeRatings: false, includeContributors: false);
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -1305,7 +1305,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithEmptyGoogleBooksId_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create(includeOptionalProperties: false);
+        AddBookCommand bookCommand = _commandBookFixture.Create(includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false, includeIsbns: false, includeRatings: false, includeContributors: false);
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -1357,7 +1357,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithEmptyBarnesAndNobleId_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create(includeOptionalProperties: false);
+        AddBookCommand bookCommand = _commandBookFixture.Create(includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false, includeIsbns: false, includeRatings: false, includeContributors: false);
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -1409,7 +1409,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithEmptyAppleBooksId_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create(includeOptionalProperties: false);
+        AddBookCommand bookCommand = _commandBookFixture.Create(includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false, includeIsbns: false, includeRatings: false, includeContributors: false);
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -1448,7 +1448,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithNullIsbns_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create(includeOptionalProperties: false);
+        AddBookCommand bookCommand = _commandBookFixture.Create(includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false, includeIsbns: false, includeRatings: false, includeContributors: false);
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -1591,7 +1591,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithNullRatings_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create(includeOptionalProperties: false);
+        AddBookCommand bookCommand = _commandBookFixture.Create(includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false, includeIsbns: false, includeRatings: false, includeContributors: false);
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -1669,7 +1669,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithNullVoteCount_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create(ratings: [_bookRatingDtoFixture.Create(includeOptionalProperties: false)]);
+        AddBookCommand bookCommand = _commandBookFixture.Create(ratings: [_bookRatingDtoFixture.Create(includeSource: false, includeVoteCount: false)]);
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);

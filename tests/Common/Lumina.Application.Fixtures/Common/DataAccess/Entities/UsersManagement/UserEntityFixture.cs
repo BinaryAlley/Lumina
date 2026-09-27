@@ -29,9 +29,9 @@ public class UserEntityFixture
     /// <param name="id">Optional Id to pin, or <see langword="null"/> to generate a random one.</param>
     /// <param name="userRole">Optional user role association to pin when including it.</param>
     /// <param name="userPermissions">Optional user permission associations to pin when including them.</param>
+    /// <param name="libraries">Optional collection of libraries to pin for the user, or <see langword="null"/> to generate them based on <paramref name="libraryCount"/>.</param>
     /// <param name="includeUserRole">Whether the user role association should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeUserPermissions">Whether the user permission associations should be included, or forced to an empty collection.</param>
-    /// <param name="libraries">Optional collection of libraries to pin for the user, or <see langword="null"/> to generate them based on <paramref name="libraryCount"/>.</param>
     /// <returns>The created user entity.</returns>
     public UserEntity Create(
         int libraryCount = 0,
@@ -40,9 +40,9 @@ public class UserEntityFixture
         Guid? id = null,
         UserRoleEntity? userRole = null,
         IEnumerable<UserPermissionEntity>? userPermissions = null,
+        ICollection<LibraryEntity>? libraries = null,
         bool includeUserRole = false,
-        bool includeUserPermissions = false,
-        ICollection<LibraryEntity>? libraries = null)
+        bool includeUserPermissions = false)
     {
         Guid userId = id ?? Guid.NewGuid();
         ICollection<LibraryEntity> resolvedLibraries = libraries ?? (libraryCount > 0

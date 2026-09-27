@@ -702,7 +702,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyFormat_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeOptionalProperties: false);
+        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -725,7 +725,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyEdition_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeOptionalProperties: false);
+        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -748,7 +748,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyVolumeNumber_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeOptionalProperties: false);
+        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -812,7 +812,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyAsin_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeOptionalProperties: false);
+        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -835,7 +835,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyGoodreadsId_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeOptionalProperties: false);
+        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -858,7 +858,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyLccn_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeOptionalProperties: false);
+        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -881,7 +881,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyOclcNumber_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeOptionalProperties: false);
+        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -904,7 +904,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyOpenLibraryId_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeOptionalProperties: false);
+        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -927,7 +927,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyLibraryThingId_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeOptionalProperties: false);
+        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -950,7 +950,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyGoogleBooksId_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeOptionalProperties: false);
+        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -986,7 +986,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyBarnesAndNobleId_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeOptionalProperties: false);
+        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -1022,7 +1022,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyAppleBooksId_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeOptionalProperties: false);
+        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -1045,7 +1045,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithNullIsbns_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(includeOptionalProperties: false);
+        AddBookRequest bookRequest = _requestBookFixture.Create(includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false, includeIsbns: false, includeRatings: false, includeContributors: false);
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1148,7 +1148,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithNullRatings_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(includeOptionalProperties: false);
+        AddBookRequest bookRequest = _requestBookFixture.Create(includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false, includeIsbns: false, includeRatings: false, includeContributors: false);
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1197,7 +1197,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyRatingVoteCount_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(ratings: [_bookRatingDtoFixture.Create(source: BookRatingSource.Goodreads, includeOptionalProperties: false)]);
+        AddBookRequest bookRequest = _requestBookFixture.Create(ratings: [_bookRatingDtoFixture.Create(source: BookRatingSource.Goodreads, includeVoteCount: false)]);
         // Act & Assert
         await AssertCreated(bookRequest);
     }
@@ -1838,7 +1838,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
 
     private async Task AssertUnprocessableEntityWithValidationErrors(HttpResponseMessage response, params string[] expectedErrorCodes)
     {
-        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
 
         string content = await response.Content.ReadAsStringAsync();

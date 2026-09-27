@@ -63,7 +63,16 @@ public class AddTrackRequestMappingTests
         AddTrackRequest request = _addTrackRequestFixture.Create(
             path: "/music/queen/bohemian-rhapsody.flac",
             metadata: _audioMetadataDtoFixture.Create(title: "Love of My Life"),
-            includeOptionalProperties: false);
+            includeDiscNumber: false,
+            includeScript: false,
+            includeKey: false,
+            includeBpm: false,
+            includeWork: false,
+            includeMusicBrainzRecordingId: false,
+            includeMusicBrainzTrackId: false,
+            includeMusicBrainzWorkId: false,
+            includeMoods: false,
+            includeIsrcs: false);
 
         // Act
         AddTrackCommand result = request.ToCommand(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), Guid.NewGuid().ToString());

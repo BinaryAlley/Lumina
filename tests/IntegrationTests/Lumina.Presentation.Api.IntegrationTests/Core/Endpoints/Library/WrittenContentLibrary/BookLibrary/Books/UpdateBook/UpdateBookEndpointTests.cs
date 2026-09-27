@@ -92,7 +92,7 @@ public class UpdateBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         // Arrange
         Guid userId = GetCurrentUserId();
         (Guid libraryId, Guid bookId) = await SeedLibraryAndBookAsync(userId, "Original Title");
-        UpdateBookRequest request = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(title: "Updated Title"), isbns: [], contributors: [], ratings: [], includeOptionalProperties: false);
+        UpdateBookRequest request = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(title: "Updated Title"), isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
 
         // Act
         HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}/books/{bookId}", request);
@@ -125,7 +125,7 @@ public class UpdateBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
             _mediaContributorReferenceDtoFixture.Create(contributorId: contributorId, role: MediaContributorRole.Illustrator)
         ];
         await SeedContributorsAsync(duplicatedContributors);
-        UpdateBookRequest request = _requestBookFixture.Create(contributors: duplicatedContributors, isbns: [], ratings: [], includeOptionalProperties: false);
+        UpdateBookRequest request = _requestBookFixture.Create(contributors: duplicatedContributors, isbns: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
 
         // Act
         HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}/books/{bookId}", request);
@@ -134,11 +134,10 @@ public class UpdateBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-        List<BookContributorEntity> links = dbContext.Books
+        List<BookContributorEntity> links = [.. dbContext.Books
             .Include(book => book.Contributors)
             .Single(book => book.Id == bookId)
-            .Contributors
-            .ToList();
+            .Contributors];
         Assert.Equal(2, links.Count);
         Assert.All(links, link => Assert.Equal(contributorId, link.MediaContributorId));
         Assert.Contains(links, link => link.Role == MediaContributorRole.Author);
@@ -1563,7 +1562,7 @@ public class UpdateBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
     public async Task UpdateBook_WhenCalledWithNullIsbns_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateBookRequest bookRequest = _requestBookFixture.Create(includeOptionalProperties: false);
+        UpdateBookRequest bookRequest = _requestBookFixture.Create(includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false, includeIsbns: false, includeRatings: false, includeContributors: false);
 
         // Act
         HttpResponseMessage response = await PutBookAsync(bookRequest);
@@ -1706,7 +1705,7 @@ public class UpdateBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
     public async Task UpdateBook_WhenCalledWithNullRatings_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateBookRequest bookRequest = _requestBookFixture.Create(includeOptionalProperties: false);
+        UpdateBookRequest bookRequest = _requestBookFixture.Create(includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false, includeIsbns: false, includeRatings: false, includeContributors: false);
 
         // Act
         HttpResponseMessage response = await PutBookAsync(bookRequest);
@@ -1784,7 +1783,7 @@ public class UpdateBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
     public async Task UpdateBook_WhenCalledWithNullVoteCount_ShouldUpdateBook()
     {
         // Arrange
-        UpdateBookRequest bookRequest = _requestBookFixture.Create(ratings: [_bookRatingDtoFixture.Create(source: BookRatingSource.Goodreads, includeOptionalProperties: false)]);
+        UpdateBookRequest bookRequest = _requestBookFixture.Create(ratings: [_bookRatingDtoFixture.Create(source: BookRatingSource.Goodreads, includeVoteCount: false)]);
 
         // Act
         HttpResponseMessage response = await PutBookAsync(bookRequest);
@@ -1853,7 +1852,7 @@ public class UpdateBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         string content = await response.Content.ReadAsStringAsync();
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
         Assert.NotNull(problemDetails);
-        Assert.Equal(422, problemDetails!["status"].GetInt32());
+        Assert.Equal((int)HttpStatusCode.UnprocessableEntity, problemDetails!["status"].GetInt32());
         Assert.Equal("General.Validation", problemDetails["title"].GetString());
         Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
 

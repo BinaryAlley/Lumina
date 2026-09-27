@@ -53,7 +53,16 @@ public class UpdateTrackCommandFixture
     /// <param name="isrcs">Optional. The ISRC codes of the track.</param>
     /// <param name="contributors">Optional. The media contributors that performed on the track.</param>
     /// <param name="ratings">Optional. The ratings of the track.</param>
-    /// <param name="includeOptionalProperties">Whether the optional properties that are not explicitly provided should be randomized, or forced to <see langword="null"/>.</param>
+    /// <param name="includeDiscNumber">Whether the disc number should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeScript">Whether the script should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeKey">Whether the musical key should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeBpm">Whether the tempo should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeWork">Whether the work should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeMusicBrainzRecordingId">Whether the MusicBrainz recording Id should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeMusicBrainzTrackId">Whether the MusicBrainz track Id should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeMusicBrainzWorkId">Whether the MusicBrainz work Id should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeMoods">Whether the moods should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeIsrcs">Whether the ISRC codes should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeMetadata">Whether the metadata should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeContributors">Whether the contributors list should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeRatings">Whether the ratings list should be included, or forced to <see langword="null"/>.</param>
@@ -84,7 +93,16 @@ public class UpdateTrackCommandFixture
         List<IsrcDto>? isrcs = null,
         List<MediaContributorReferenceDto>? contributors = null,
         List<AudioRatingDto>? ratings = null,
-        bool includeOptionalProperties = true,
+        bool includeDiscNumber = true,
+        bool includeScript = true,
+        bool includeKey = true,
+        bool includeBpm = true,
+        bool includeWork = true,
+        bool includeMusicBrainzRecordingId = true,
+        bool includeMusicBrainzTrackId = true,
+        bool includeMusicBrainzWorkId = true,
+        bool includeMoods = true,
+        bool includeIsrcs = true,
         bool includeMetadata = true,
         bool includeContributors = true,
         bool includeRatings = true,
@@ -103,16 +121,16 @@ public class UpdateTrackCommandFixture
             includePath ? (path ?? _faker.System.FilePath()) : null,
             includeMetadata ? (metadata ?? _audioMetadataDtoFixture.Create()) : null,
             includeTrackNumber ? (trackNumber ?? _faker.Random.Int(1, 20)) : null,
-            includeOptionalProperties ? (discNumber ?? _faker.Random.Int(1, 3)) : null,
-            includeOptionalProperties ? (script ?? _faker.Random.String2(_faker.Random.Number(1, 50))) : null,
-            includeOptionalProperties ? (key ?? _faker.PickRandom<MusicKey>()) : null,
-            includeOptionalProperties ? (bpm ?? _faker.Random.Int(40, 240)) : null,
-            includeOptionalProperties ? (work ?? _faker.Music.Genre()) : null,
-            includeOptionalProperties ? (musicBrainzRecordingId ?? _faker.Random.Guid()) : null,
-            includeOptionalProperties ? (musicBrainzTrackId ?? _faker.Random.Guid()) : null,
-            includeOptionalProperties ? (musicBrainzWorkId ?? _faker.Random.Guid()) : null,
-            includeOptionalProperties ? (moods ?? [.. _moodDtoFixture.CreateMany(_faker.Random.Int(1, 3))]) : null,
-            includeOptionalProperties ? (isrcs ?? [.. _isrcDtoFixture.CreateMany(_faker.Random.Int(1, 3))]) : null,
+            includeDiscNumber ? (discNumber ?? _faker.Random.Int(1, 3)) : null,
+            includeScript ? (script ?? _faker.Random.String2(_faker.Random.Number(1, 50))) : null,
+            includeKey ? (key ?? _faker.PickRandom<MusicKey>()) : null,
+            includeBpm ? (bpm ?? _faker.Random.Int(40, 240)) : null,
+            includeWork ? (work ?? _faker.Music.Genre()) : null,
+            includeMusicBrainzRecordingId ? (musicBrainzRecordingId ?? _faker.Random.Guid()) : null,
+            includeMusicBrainzTrackId ? (musicBrainzTrackId ?? _faker.Random.Guid()) : null,
+            includeMusicBrainzWorkId ? (musicBrainzWorkId ?? _faker.Random.Guid()) : null,
+            includeMoods ? (moods ?? [.. _moodDtoFixture.CreateMany(_faker.Random.Int(1, 3))]) : null,
+            includeIsrcs ? (isrcs ?? [.. _isrcDtoFixture.CreateMany(_faker.Random.Int(1, 3))]) : null,
             includeContributors ? (contributors ?? [.. _mediaContributorReferenceDtoFixture.CreateMany(_faker.Random.Int(1, 3))]) : null,
             includeRatings ? (ratings ?? [.. _audioRatingDtoFixture.CreateMany(_faker.Random.Int(1, 3))]) : null);
     }

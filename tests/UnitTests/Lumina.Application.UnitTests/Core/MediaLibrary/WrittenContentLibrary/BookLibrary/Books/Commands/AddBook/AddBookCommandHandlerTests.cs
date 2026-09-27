@@ -226,7 +226,7 @@ public class AddBookCommandHandlerTests
     public async Task HandleAsync_WhenCalledWithInvalidRating_ShouldReturnFailureResult()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create(ratings: [_bookRatingDtoFixture.Create(value: -1, maxValue: 5, includeOptionalProperties: false)]);
+        AddBookCommand bookCommand = _commandBookFixture.Create(ratings: [_bookRatingDtoFixture.Create(value: -1, maxValue: 5, includeSource: false, includeVoteCount: false)]);
 
         // Act
         Result<BookResponse> result = await _sut.HandleAsync(bookCommand, CancellationToken.None);

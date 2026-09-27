@@ -72,7 +72,18 @@ public class UpdateBookCommandMappingTests
             isbns: [],
             contributors: [],
             ratings: [],
-            includeOptionalProperties: false);
+            includeFormat: false,
+            includeEdition: false,
+            includeVolumeNumber: false,
+            includeAsin: false,
+            includeGoodreadsId: false,
+            includeLccn: false,
+            includeOclcNumber: false,
+            includeOpenLibraryId: false,
+            includeLibraryThingId: false,
+            includeGoogleBooksId: false,
+            includeBarnesAndNobleId: false,
+            includeAppleBooksId: false);
         BookEntity existingBook = _bookEntityFixture.Create(id: bookId, libraryId: libraryId, path: "/books/the-book.epub");
 
         // Act
@@ -104,7 +115,7 @@ public class UpdateBookCommandMappingTests
     public void ToDomainEntity_WhenRatingCreationFails_ShouldReturnError()
     {
         // Arrange
-        UpdateBookCommand command = _commandBookFixture.Create(ratings: [_bookRatingDtoFixture.Create(value: -1, maxValue: 5, includeOptionalProperties: false)]);
+        UpdateBookCommand command = _commandBookFixture.Create(ratings: [_bookRatingDtoFixture.Create(value: -1, maxValue: 5, includeSource: false, includeVoteCount: false)]);
         BookEntity existingBook = _bookEntityFixture.Create();
 
         // Act

@@ -57,7 +57,12 @@ public class BookMetadataDtoFixture
     /// <param name="ratings">Optional. The ratings of the book.</param>
     /// <param name="coverImagePath">Optional. The path of the cover image of the book.</param>
     /// <param name="includeTitle">Whether the title should be included, or forced to <see langword="null"/>.</param>
-    /// <param name="includeOptionalProperties">Whether the properties that are not explicitly provided should be randomized, or forced to <see langword="null"/>.</param>
+    /// <param name="includeReleaseInfo">Whether the release info should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeGenres">Whether the genres should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeTags">Whether the tags should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeLanguage">Whether the language should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeFormat">Whether the format should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeVolumeNumber">Whether the volume number should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="BookMetadataDto"/>.</returns>
     public BookMetadataDto Create(
         string? title = null,
@@ -88,26 +93,31 @@ public class BookMetadataDtoFixture
         List<BookRatingDto>? ratings = null,
         string? coverImagePath = null,
         bool includeTitle = true,
-        bool includeOptionalProperties = true)
+        bool includeReleaseInfo = true,
+        bool includeGenres = true,
+        bool includeTags = true,
+        bool includeLanguage = true,
+        bool includeFormat = true,
+        bool includeVolumeNumber = true)
     {
         int releaseYear = _faker.Random.Int(1900, 2024);
         return new BookMetadataDto(
-            includeTitle ? title ?? (includeOptionalProperties ? _faker.Lorem.Sentence(3) : null) : null,
+            includeTitle ? title ?? _faker.Lorem.Sentence(3) : null,
             originalTitle,
             description,
-            releaseInfo ?? (includeOptionalProperties ? _releaseInfoDtoFixture.Create(
+            includeReleaseInfo ? (releaseInfo ?? _releaseInfoDtoFixture.Create(
                 originalReleaseDate: new DateOnly(releaseYear, 1, 1),
                 originalReleaseYear: releaseYear,
-                releaseCountry: _faker.PickRandom<ReleaseCountry>()) : null),
-            genres ?? (includeOptionalProperties ? [_genreDtoFixture.Create()] : null),
-            tags ?? (includeOptionalProperties ? [_tagDtoFixture.Create()] : null),
-            language ?? (includeOptionalProperties ? _languageInfoDtoFixture.Create() : null),
+                releaseCountry: _faker.PickRandom<ReleaseCountry>())) : null,
+            includeGenres ? (genres ?? [_genreDtoFixture.Create()]) : null,
+            includeTags ? (tags ?? [_tagDtoFixture.Create()]) : null,
+            includeLanguage ? (language ?? _languageInfoDtoFixture.Create()) : null,
             originalLanguage,
             publisher,
             pageCount,
-            format ?? (includeOptionalProperties ? _faker.PickRandom<BookFormat>() : null),
+            includeFormat ? (format ?? _faker.PickRandom<BookFormat>()) : null,
             edition,
-            volumeNumber ?? (includeOptionalProperties ? _faker.Random.Int(1, 10) : null),
+            includeVolumeNumber ? (volumeNumber ?? _faker.Random.Int(1, 10)) : null,
             series,
             asin,
             goodreadsId,

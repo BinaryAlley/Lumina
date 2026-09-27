@@ -62,7 +62,18 @@ public class AddBookCommandMappingTests
             isbns: [],
             contributors: [],
             ratings: [],
-            includeOptionalProperties: false);
+            includeFormat: false,
+            includeEdition: false,
+            includeVolumeNumber: false,
+            includeAsin: false,
+            includeGoodreadsId: false,
+            includeLccn: false,
+            includeOclcNumber: false,
+            includeOpenLibraryId: false,
+            includeLibraryThingId: false,
+            includeGoogleBooksId: false,
+            includeBarnesAndNobleId: false,
+            includeAppleBooksId: false);
 
         // Act
         Result<Book> result = command.ToDomainEntity(libraryId);
@@ -92,7 +103,7 @@ public class AddBookCommandMappingTests
     public void ToDomainEntity_WhenRatingCreationFails_ShouldReturnError()
     {
         // Arrange
-        AddBookCommand command = _commandBookFixture.Create(ratings: [_bookRatingDtoFixture.Create(value: -1, maxValue: 5, includeOptionalProperties: false)]);
+        AddBookCommand command = _commandBookFixture.Create(ratings: [_bookRatingDtoFixture.Create(value: -1, maxValue: 5, includeSource: false, includeVoteCount: false)]);
 
         // Act
         Result<Book> result = command.ToDomainEntity(Guid.NewGuid());

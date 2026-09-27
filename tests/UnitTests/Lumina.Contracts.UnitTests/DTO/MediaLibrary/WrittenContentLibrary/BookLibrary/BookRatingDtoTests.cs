@@ -20,7 +20,7 @@ public class BookRatingDtoTests
     public void Create_WhenOmittingOptionalProperties_ShouldReturnNullSourceAndVoteCount()
     {
         // Act
-        BookRatingDto sut = _bookRatingDtoFixture.Create(includeOptionalProperties: false);
+        BookRatingDto sut = _bookRatingDtoFixture.Create(includeSource: false, includeVoteCount: false);
 
         // Assert
         Assert.Null(sut.Source);

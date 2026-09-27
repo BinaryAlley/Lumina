@@ -121,7 +121,14 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
             isrcs: [],
             contributors: [],
             ratings: [],
-            includeOptionalProperties: false);
+            includeDiscNumber: false,
+            includeScript: false,
+            includeKey: false,
+            includeBpm: false,
+            includeWork: false,
+            includeMusicBrainzRecordingId: false,
+            includeMusicBrainzTrackId: false,
+            includeMusicBrainzWorkId: false);
 
         // Act
         HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}", request);
@@ -157,7 +164,14 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
             isrcs: [],
             contributors: [],
             ratings: [],
-            includeOptionalProperties: false);
+            includeDiscNumber: false,
+            includeScript: false,
+            includeKey: false,
+            includeBpm: false,
+            includeWork: false,
+            includeMusicBrainzRecordingId: false,
+            includeMusicBrainzTrackId: false,
+            includeMusicBrainzWorkId: false);
         (HttpClient adminClient, _) = await CreateAdminClientAsync();
 
         // Act
@@ -1039,7 +1053,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         string content = await response.Content.ReadAsStringAsync();
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
         Assert.NotNull(problemDetails);
-        Assert.Equal(422, problemDetails!["status"].GetInt32());
+        Assert.Equal((int)HttpStatusCode.UnprocessableEntity, problemDetails!["status"].GetInt32());
         Assert.Equal("General.Validation", problemDetails["title"].GetString());
         Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
 

@@ -49,7 +49,21 @@ public class AddBookRequestFixture
     /// <param name="isbns">Optional. The ISBNs of the book.</param>
     /// <param name="contributors">Optional. The contributors of the book.</param>
     /// <param name="ratings">Optional. The ratings of the book.</param>
-    /// <param name="includeOptionalProperties">Whether the properties that are not explicitly provided should be randomized, or forced to <see langword="null"/>.</param>
+    /// <param name="includeFormat">Whether the format should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeEdition">Whether the edition should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeVolumeNumber">Whether the volume number should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeAsin">Whether the ASIN should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeGoodreadsId">Whether the Goodreads Id should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeLccn">Whether the LCCN should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeOclcNumber">Whether the OCLC number should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeOpenLibraryId">Whether the Open Library Id should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeLibraryThingId">Whether the LibraryThing Id should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeGoogleBooksId">Whether the Google Books Id should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeBarnesAndNobleId">Whether the Barnes and Noble Id should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeAppleBooksId">Whether the Apple Books Id should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeIsbns">Whether the ISBNs should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeRatings">Whether the ratings should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeContributors">Whether the contributors should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created request to add a book.</returns>
     public AddBookRequest Create(
         string? path = null,
@@ -70,7 +84,21 @@ public class AddBookRequestFixture
         List<IsbnDto>? isbns = null,
         List<MediaContributorReferenceDto>? contributors = null,
         List<BookRatingDto>? ratings = null,
-        bool includeOptionalProperties = true)
+        bool includeFormat = true,
+        bool includeEdition = true,
+        bool includeVolumeNumber = true,
+        bool includeAsin = true,
+        bool includeGoodreadsId = true,
+        bool includeLccn = true,
+        bool includeOclcNumber = true,
+        bool includeOpenLibraryId = true,
+        bool includeLibraryThingId = true,
+        bool includeGoogleBooksId = true,
+        bool includeBarnesAndNobleId = true,
+        bool includeAppleBooksId = true,
+        bool includeIsbns = true,
+        bool includeRatings = true,
+        bool includeContributors = true)
     {
         return new Faker<AddBookRequest>()
             .CustomInstantiator(f => new AddBookRequest(
@@ -95,22 +123,22 @@ public class AddBookRequestFixture
             ))
             .RuleFor(x => x.Path, f => path ?? Path.Combine(Path.GetTempPath(), "lumina-books", f.System.FileName()))
             .RuleFor(x => x.Metadata, metadata ?? _writtenContentMetadataDtoFixture.Create())
-            .RuleFor(x => x.Format, f => format ?? (includeOptionalProperties ? f.PickRandom<BookFormat>() : null))
-            .RuleFor(x => x.Edition, f => edition ?? (includeOptionalProperties ? f.Random.String2(f.Random.Number(1, 50)) : null))
-            .RuleFor(x => x.VolumeNumber, f => volumeNumber ?? (includeOptionalProperties ? (float?)f.Random.Number(1, 3) : null))
+            .RuleFor(x => x.Format, f => format ?? (includeFormat ? f.PickRandom<BookFormat>() : null))
+            .RuleFor(x => x.Edition, f => edition ?? (includeEdition ? f.Random.String2(f.Random.Number(1, 50)) : null))
+            .RuleFor(x => x.VolumeNumber, f => volumeNumber ?? (includeVolumeNumber ? (float?)f.Random.Number(1, 3) : null))
             .RuleFor(x => x.Series, series)
-            .RuleFor(x => x.ASIN, f => asin ?? (includeOptionalProperties ? f.Random.String2(10) : null))
-            .RuleFor(x => x.GoodreadsId, f => goodreadsId ?? (includeOptionalProperties ? f.Random.Number(100000, 500000).ToString() : null))
-            .RuleFor(x => x.LCCN, f => lccn ?? (includeOptionalProperties ? CreateLccn(f) : null))
-            .RuleFor(x => x.OCLCNumber, f => oclcNumber ?? (includeOptionalProperties ? CreateOclcNumber(f) : null))
-            .RuleFor(x => x.OpenLibraryId, f => openLibraryId ?? (includeOptionalProperties ? CreateOpenLibraryId(f) : null))
-            .RuleFor(x => x.LibraryThingId, f => libraryThingId ?? (includeOptionalProperties ? f.Random.String2(f.Random.Number(1, 50)) : null))
-            .RuleFor(x => x.GoogleBooksId, f => googleBooksId ?? (includeOptionalProperties ? CreateGoogleBooksId(f) : null))
-            .RuleFor(x => x.BarnesAndNobleId, f => barnesAndNobleId ?? (includeOptionalProperties ? f.Random.String2(10, "0123456789") : null))
-            .RuleFor(x => x.AppleBooksId, f => appleBooksId ?? (includeOptionalProperties ? $"id{f.Random.Number(1, 999999)}" : null))
-            .RuleFor(p => p.ISBNs, f => isbns ?? (includeOptionalProperties ? [.. _isbnDtoFixture.CreateMany(f.Random.Number(1, 3))] : null))
-            .RuleFor(p => p.Ratings, f => ratings ?? (includeOptionalProperties ? [.. _bookRatingDtoFixture.CreateMany(f.Random.Number(1, 3))] : null))
-            .RuleFor(x => x.Contributors, f => contributors ?? (includeOptionalProperties ? [.. _mediaContributorReferenceDtoFixture.CreateMany(f.Random.Number(1, 3))] : null));
+            .RuleFor(x => x.ASIN, f => asin ?? (includeAsin ? f.Random.String2(10) : null))
+            .RuleFor(x => x.GoodreadsId, f => goodreadsId ?? (includeGoodreadsId ? f.Random.Number(100000, 500000).ToString() : null))
+            .RuleFor(x => x.LCCN, f => lccn ?? (includeLccn ? CreateLccn(f) : null))
+            .RuleFor(x => x.OCLCNumber, f => oclcNumber ?? (includeOclcNumber ? CreateOclcNumber(f) : null))
+            .RuleFor(x => x.OpenLibraryId, f => openLibraryId ?? (includeOpenLibraryId ? CreateOpenLibraryId(f) : null))
+            .RuleFor(x => x.LibraryThingId, f => libraryThingId ?? (includeLibraryThingId ? f.Random.String2(f.Random.Number(1, 50)) : null))
+            .RuleFor(x => x.GoogleBooksId, f => googleBooksId ?? (includeGoogleBooksId ? CreateGoogleBooksId(f) : null))
+            .RuleFor(x => x.BarnesAndNobleId, f => barnesAndNobleId ?? (includeBarnesAndNobleId ? f.Random.String2(10, "0123456789") : null))
+            .RuleFor(x => x.AppleBooksId, f => appleBooksId ?? (includeAppleBooksId ? $"id{f.Random.Number(1, 999999)}" : null))
+            .RuleFor(p => p.ISBNs, f => isbns ?? (includeIsbns ? [.. _isbnDtoFixture.CreateMany(f.Random.Number(1, 3))] : null))
+            .RuleFor(p => p.Ratings, f => ratings ?? (includeRatings ? [.. _bookRatingDtoFixture.CreateMany(f.Random.Number(1, 3))] : null))
+            .RuleFor(x => x.Contributors, f => contributors ?? (includeContributors ? [.. _mediaContributorReferenceDtoFixture.CreateMany(f.Random.Number(1, 3))] : null));
     }
 
     /// <summary>
