@@ -56,6 +56,9 @@ public class UnitOfWorkTests
         yield return new object[] { nameof(IUnitOfWork.RoleRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.RoleRepository) };
         yield return new object[] { nameof(IUnitOfWork.UserRoleRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.UserRoleRepository) };
         yield return new object[] { nameof(IUnitOfWork.BookRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.BookRepository) };
+        yield return new object[] { nameof(IUnitOfWork.ArtistRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.ArtistRepository) };
+        yield return new object[] { nameof(IUnitOfWork.AlbumRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.AlbumRepository) };
+        yield return new object[] { nameof(IUnitOfWork.TrackRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.TrackRepository) };
         yield return new object[] { nameof(IUnitOfWork.MediaContributorRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.MediaContributorRepository) };
         yield return new object[] { nameof(IUnitOfWork.DirectoryScanFingerprintRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.DirectoryScanFingerprintRepository) };
         yield return new object[] { nameof(IUnitOfWork.LibraryRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.LibraryRepository) };

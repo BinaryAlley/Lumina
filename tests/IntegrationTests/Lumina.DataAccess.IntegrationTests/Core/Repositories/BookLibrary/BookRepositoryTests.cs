@@ -1,7 +1,9 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Time;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Common;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.DataAccess.Common.Interceptors;
 using Lumina.DataAccess.Core.Repositories.BookLibrary;
@@ -34,6 +36,8 @@ public class BookRepositoryTests
     private readonly BookContributorEntityFixture _bookContributorEntityFixture = new();
     private readonly BookRatingEntityFixture _bookRatingEntityFixture = new();
     private readonly IsbnEntityFixture _isbnEntityFixture = new();
+    private readonly TagEntityFixture _tagEntityFixture = new();
+    private readonly GenreEntityFixture _genreEntityFixture = new();
 
     [Fact]
     public async Task ResetEnrichmentStateForPathsAsync_WhenCalled_ShouldResetTheMetadataAndArtworkStatusesForThePaths()
@@ -42,7 +46,7 @@ public class BookRepositoryTests
         // The reset methods use ExecuteUpdateAsync, which is not supported by the in-memory provider, so a real SQLite database is used.
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-reset-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         BookRepository sut = new(context);
 
@@ -82,7 +86,7 @@ public class BookRepositoryTests
         // The reset methods use ExecuteUpdateAsync, which is not supported by the in-memory provider, so a real SQLite database is used.
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-reset-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         BookRepository sut = new(context);
 
@@ -117,7 +121,7 @@ public class BookRepositoryTests
         // The reset methods use ExecuteUpdateAsync, which is not supported by the in-memory provider, so a real SQLite database is used.
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-reset-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         BookRepository sut = new(context);
 
@@ -151,7 +155,7 @@ public class BookRepositoryTests
         // Arrange
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-insert-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         BookRepository sut = new(context);
 
@@ -176,7 +180,7 @@ public class BookRepositoryTests
         // Arrange
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-insert-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         BookRepository sut = new(context);
 
@@ -334,6 +338,108 @@ public class BookRepositoryTests
         Assert.Equal(2, storedContributors.Count);
         Assert.Equal(keptContributorId, storedContributors.Single(contributor => contributor.MediaContributorId == keptMediaContributorId).Id);
         Assert.Contains(storedContributors, contributor => contributor.MediaContributorId == addedMediaContributorId);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WhenNothingChanged_ShouldNotDuplicateAnyReconciledChildCollection()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-update-noop-collections-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        BookRepository sut = new(context);
+
+        BookEntity book = _bookEntityFixture.Create(includeMetadata: false);
+        book.Tags = [_tagEntityFixture.Create(name: $"noop-book-tag-{Guid.NewGuid():N}"), _tagEntityFixture.Create(name: $"noop-book-tag-two-{Guid.NewGuid():N}")];
+        book.Genres = [_genreEntityFixture.Create(name: $"noop-book-genre-{Guid.NewGuid():N}"), _genreEntityFixture.Create(name: $"noop-book-genre-two-{Guid.NewGuid():N}")];
+        book.ISBNs = [_isbnEntityFixture.Create(value: "9783161484100", format: IsbnFormat.Isbn13), _isbnEntityFixture.Create(value: "9780261102693", format: IsbnFormat.Isbn13)];
+        book.Ratings = [_bookRatingEntityFixture.Create(source: BookRatingSource.GoogleBooks), _bookRatingEntityFixture.Create(source: BookRatingSource.Goodreads)];
+        book.Contributors =
+        [
+            _bookContributorEntityFixture.Create(bookId: book.Id, mediaContributorId: Guid.NewGuid()),
+            _bookContributorEntityFixture.Create(bookId: book.Id, mediaContributorId: Guid.NewGuid())
+        ];
+        context.Books.Add(book);
+        await context.SaveChangesAsync();
+        // Detach the seeded graph, so that the update must load the tracked book through its include chain instead of returning the already populated seeded instance.
+        context.ChangeTracker.Clear();
+
+        BookEntity incoming = await LoadDetachedBookAsync(context, book.Id);
+
+        // Act
+        Result<Updated> result = await sut.UpdateAsync(incoming, CancellationToken.None);
+        await context.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        BookEntity? storedBook = await context.Books
+            .AsNoTracking()
+            .Include(candidate => candidate.Tags)
+            .Include(candidate => candidate.Genres)
+            .Include(candidate => candidate.ISBNs)
+            .Include(candidate => candidate.Ratings)
+            .Include(candidate => candidate.Contributors)
+            .FirstOrDefaultAsync(candidate => candidate.Id == book.Id);
+        Assert.NotNull(storedBook);
+        Assert.Equal(2, storedBook!.Tags.Count);
+        Assert.Equal(2, storedBook.Genres.Count);
+        Assert.Equal(2, storedBook.ISBNs.Count);
+        Assert.Equal(2, storedBook.Ratings.Count);
+        Assert.Equal(2, storedBook.Contributors.Count);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WhenOneItemIsRemovedFromEachReconciledChildCollection_ShouldRemoveOnlyThoseItems()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-update-remove-collections-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        BookRepository sut = new(context);
+
+        string keptTagName = $"remove-book-tag-{Guid.NewGuid():N}";
+        string keptGenreName = $"remove-book-genre-{Guid.NewGuid():N}";
+        BookEntity book = _bookEntityFixture.Create(includeMetadata: false);
+        book.Tags = [_tagEntityFixture.Create(name: keptTagName), _tagEntityFixture.Create(name: $"remove-book-tag-two-{Guid.NewGuid():N}")];
+        book.Genres = [_genreEntityFixture.Create(name: keptGenreName), _genreEntityFixture.Create(name: $"remove-book-genre-two-{Guid.NewGuid():N}")];
+        book.ISBNs = [_isbnEntityFixture.Create(value: "9783161484100", format: IsbnFormat.Isbn13), _isbnEntityFixture.Create(value: "9780261102693", format: IsbnFormat.Isbn13)];
+        book.Ratings = [_bookRatingEntityFixture.Create(source: BookRatingSource.GoogleBooks), _bookRatingEntityFixture.Create(source: BookRatingSource.Goodreads)];
+        BookContributorEntity keptContributor = _bookContributorEntityFixture.Create(bookId: book.Id, mediaContributorId: Guid.NewGuid());
+        book.Contributors = [keptContributor, _bookContributorEntityFixture.Create(bookId: book.Id, mediaContributorId: Guid.NewGuid())];
+        context.Books.Add(book);
+        await context.SaveChangesAsync();
+        // Detach the seeded graph, so that the update must load the tracked book through its include chain instead of returning the already populated seeded instance.
+        context.ChangeTracker.Clear();
+
+        BookEntity incoming = await LoadDetachedBookAsync(context, book.Id);
+        incoming.Tags = [incoming.Tags.Single(tag => tag.Name == keptTagName)];
+        incoming.Genres = [incoming.Genres.Single(genre => genre.Name == keptGenreName)];
+        incoming.ISBNs = [incoming.ISBNs.Single(isbn => isbn.Value == "9783161484100")];
+        incoming.Ratings = [incoming.Ratings.Single(rating => rating.Source == BookRatingSource.GoogleBooks)];
+        incoming.Contributors = [incoming.Contributors.Single(contributor => contributor.Id == keptContributor.Id)];
+
+        // Act
+        Result<Updated> result = await sut.UpdateAsync(incoming, CancellationToken.None);
+        await context.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        BookEntity? storedBook = await context.Books
+            .AsNoTracking()
+            .Include(candidate => candidate.Tags)
+            .Include(candidate => candidate.Genres)
+            .Include(candidate => candidate.ISBNs)
+            .Include(candidate => candidate.Ratings)
+            .Include(candidate => candidate.Contributors)
+            .FirstOrDefaultAsync(candidate => candidate.Id == book.Id);
+        Assert.NotNull(storedBook);
+        Assert.Equal(keptTagName, Assert.Single(storedBook!.Tags).Name);
+        Assert.Equal(keptGenreName, Assert.Single(storedBook.Genres).Name);
+        Assert.Equal("9783161484100", Assert.Single(storedBook.ISBNs).Value);
+        Assert.Equal(BookRatingSource.GoogleBooks, Assert.Single(storedBook.Ratings).Source);
+        Assert.Equal(keptContributor.Id, Assert.Single(storedBook.Contributors).Id);
     }
 
     /// <summary>

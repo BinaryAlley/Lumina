@@ -183,6 +183,35 @@ public class UserRepositoryTests
     }
 
     [Fact]
+    public async Task UpdateAsync_WhenIncomingEntityCarriesADifferentId_ShouldPreserveTheStoredIdentity()
+    {
+        // Arrange
+        UserEntity existingUser = _userEntityFixture.Create();
+        _mockContext.Users.Add(existingUser);
+        await _mockContext.SaveChangesAsync();
+
+        Guid mismatchedId = Guid.NewGuid();
+        UserEntity updatedUser = _userEntityFixture.Create(id: mismatchedId, username: existingUser.Username, password: "NewPassword123");
+        updatedUser.CreatedOnUtc = existingUser.CreatedOnUtc;
+        updatedUser.CreatedBy = existingUser.CreatedBy;
+        updatedUser.UpdatedOnUtc = DateTime.UtcNow;
+
+        // Act
+        Result<Updated> result = await _sut.UpdateAsync(updatedUser, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Updated, result.Value);
+
+        // The repository locates the row by username, so the stored identity must survive an incoming key that does not match it.
+        EntityEntry<UserEntity> trackedUser = _mockContext.ChangeTracker.Entries<UserEntity>()
+            .Single(entry => entry.Entity.Username == existingUser.Username);
+        Assert.Equal(existingUser.Id, trackedUser.Entity.Id);
+        Assert.NotEqual(mismatchedId, trackedUser.Entity.Id);
+        Assert.Equal("NewPassword123", trackedUser.Entity.Password);
+    }
+
+    [Fact]
     public async Task GetByIdAsync_WhenUserExists_ShouldReturnUserWithAllRelations()
     {
         // Arrange
@@ -256,7 +285,7 @@ public class UserRepositoryTests
     }
 
     [Fact]
-    public async Task UpdateAsync_WhenUserHasExistingPermissions_ShouldRemoveOldPermissionsAndAddNew()
+    public async Task UpdateAsync_WhenThePermissionsAreReplaced_ShouldRemoveTheOldAndAddTheNew()
     {
         // Arrange
         UserEntity existingUser = _userEntityFixture.Create();
@@ -296,6 +325,57 @@ public class UserRepositoryTests
             .FirstOrDefault(e => e.State == EntityState.Added);
         Assert.NotNull(addedPermission);
         Assert.Equal(newPermission.Id, addedPermission.Entity.PermissionId);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WhenAPermissionIsStillPresent_ShouldKeepItsIdentityAndAuditColumns()
+    {
+        // Arrange
+        UserEntity existingUser = _userEntityFixture.Create();
+        PermissionEntity keptPermission = _permissionEntityFixture.Create();
+        PermissionEntity removedPermission = _permissionEntityFixture.Create();
+
+        DateTime keptCreatedOnUtc = new(2020, 5, 6, 7, 8, 9, DateTimeKind.Utc);
+        UserPermissionEntity keptUserPermission = _userPermissionEntityFixture.Create(existingUser, keptPermission);
+        keptUserPermission.CreatedOnUtc = keptCreatedOnUtc;
+        UserPermissionEntity removedUserPermission = _userPermissionEntityFixture.Create(existingUser, removedPermission);
+
+        UserEntity userWithPermissions = _userEntityFixture.Create(id: existingUser.Id, username: existingUser.Username, password: existingUser.Password, userPermissions: [keptUserPermission, removedUserPermission], includeUserPermissions: true);
+        userWithPermissions.CreatedOnUtc = existingUser.CreatedOnUtc;
+        userWithPermissions.CreatedBy = existingUser.CreatedBy;
+
+        _mockContext.Users.Add(userWithPermissions);
+        _mockContext.Permissions.Add(keptPermission);
+        _mockContext.Permissions.Add(removedPermission);
+        await _mockContext.SaveChangesAsync();
+
+        UserPermissionEntity incomingKeptPermission = _userPermissionEntityFixture.Create(userWithPermissions, keptPermission);
+        UserEntity updatedUser = _userEntityFixture.Create(id: existingUser.Id, username: existingUser.Username, password: "NewPassword", userPermissions: [incomingKeptPermission], includeUserPermissions: true);
+        updatedUser.CreatedBy = existingUser.CreatedBy;
+        updatedUser.CreatedOnUtc = existingUser.CreatedOnUtc;
+        updatedUser.UpdatedOnUtc = DateTime.UtcNow;
+
+        // Act
+        Result<Updated> result = await _sut.UpdateAsync(updatedUser, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Updated, result.Value);
+
+        UserEntity? modifiedUser = await _mockContext.Users
+            .Include(u => u.UserPermissions)
+            .FirstOrDefaultAsync(u => u.Username == existingUser.Username);
+        Assert.NotNull(modifiedUser);
+        UserPermissionEntity retainedPermission = Assert.Single(modifiedUser.UserPermissions);
+        Assert.Equal(keptUserPermission.Id, retainedPermission.Id);
+        Assert.Equal(keptPermission.Id, retainedPermission.PermissionId);
+        Assert.Equal(keptCreatedOnUtc, retainedPermission.CreatedOnUtc);
+
+        EntityEntry<UserPermissionEntity>? removedEntry = _mockContext.ChangeTracker
+            .Entries<UserPermissionEntity>()
+            .FirstOrDefault(e => e.Entity.PermissionId == removedPermission.Id);
+        Assert.NotNull(removedEntry);
+        Assert.Equal(EntityState.Deleted, removedEntry.State);
     }
 
     [Fact]

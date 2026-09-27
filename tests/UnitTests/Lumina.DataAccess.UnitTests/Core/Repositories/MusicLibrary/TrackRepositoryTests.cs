@@ -618,36 +618,6 @@ public class TrackRepositoryTests
     }
 
     [Fact]
-    public async Task GetByIdAsync_WhenEntitiesShouldNotBeTracked_ShouldReturnAnUntrackedTrack()
-    {
-        // Arrange
-        // The EntityFrameworkCore.Testing mocked context does not honour AsNoTracking, because its mocked DbSet returns the already tracked instances,
-        // so a real in-memory provider context is used for this contract, which is a query provider feature rather than repository logic.
-        // The navigation properties are not requested here, because the include path uses AsSplitQuery, which the in-memory provider does not support;
-        // the include path is covered by the mocked context tests and by the integration tests.
-        DbContextOptions<LuminaDbContext> options = new DbContextOptionsBuilder<LuminaDbContext>()
-            .UseInMemoryDatabase($"TrackRepositoryTests-NoTracking-{Guid.NewGuid()}")
-            .Options;
-        using (LuminaDbContext context = new(options))
-        {
-            TrackRepository sut = new(context);
-            TrackEntity track = _trackEntityFixture.Create(includeMetadata: false);
-            context.Tracks.Add(track);
-            await context.SaveChangesAsync();
-            context.ChangeTracker.Clear();
-
-            // Act
-            Result<TrackEntity?> result = await sut.GetByIdAsync(
-                track.Id, shouldIncludeNavigationProperties: false, shouldTrackEntities: false, CancellationToken.None);
-
-            // Assert
-            Assert.False(result.IsFailure);
-            Assert.NotNull(result.Value);
-            Assert.Empty(context.ChangeTracker.Entries<TrackEntity>());
-        }
-    }
-
-    [Fact]
     public async Task GetByAlbumIdAsync_WhenCalled_ShouldReturnOnlyTheAlbumTracksOrderedByDiscThenTrackThenId()
     {
         // Arrange

@@ -139,6 +139,8 @@ public class RoleRepositoryTests
     {
         // Arrange
         RoleEntity role = _roleEntityFixture.Create(roleName: "Admin");
+        RolePermissionEntity rolePermission = _rolePermissionEntityFixture.Create(role: role, roleId: role.Id);
+        role.RolePermissions = [rolePermission];
 
         _mockContext.Roles.Add(role);
         await _mockContext.SaveChangesAsync();
@@ -149,7 +151,12 @@ public class RoleRepositoryTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
-        Assert.Equal(role, result.Value);
+        Assert.Equal(role.Id, result.Value!.Id);
+        Assert.Equal("Admin", result.Value.RoleName);
+        RolePermissionEntity loadedPermission = Assert.Single(result.Value.RolePermissions);
+        Assert.Equal(rolePermission.PermissionId, loadedPermission.PermissionId);
+        Assert.NotNull(loadedPermission.Permission);
+        Assert.Equal(rolePermission.Permission.Id, loadedPermission.Permission.Id);
     }
 
     [Fact]
@@ -169,6 +176,7 @@ public class RoleRepositoryTests
         // Arrange
         RolePermissionEntity rolePermission = _rolePermissionEntityFixture.Create();
         RoleEntity role = rolePermission.Role;
+        role.RolePermissions = [rolePermission];
 
         _mockContext.Roles.Add(role);
         await _mockContext.SaveChangesAsync();
@@ -179,10 +187,15 @@ public class RoleRepositoryTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
-        Assert.Equal(role.Id, result.Value.Id);
+        Assert.Equal(role.Id, result.Value!.Id);
         Assert.Equal(role.RoleName, result.Value.RoleName);
         Assert.Equal(role.CreatedOnUtc, result.Value.CreatedOnUtc);
         Assert.Equal(role.CreatedBy, result.Value.CreatedBy);
+        RolePermissionEntity loadedPermission = Assert.Single(result.Value.RolePermissions);
+        Assert.Equal(rolePermission.PermissionId, loadedPermission.PermissionId);
+        Assert.Equal(role.Id, loadedPermission.RoleId);
+        Assert.NotNull(loadedPermission.Permission);
+        Assert.Equal(rolePermission.Permission.Id, loadedPermission.Permission.Id);
     }
 
     [Fact]
@@ -265,8 +278,47 @@ public class RoleRepositoryTests
         EntityEntry<RoleEntity>? updatedEntry = _mockContext.ChangeTracker.Entries<RoleEntity>()
             .FirstOrDefault(e => e.Entity.Id == existingRole.Id);
         Assert.NotNull(updatedEntry);
-        Assert.Single(updatedEntry!.Entity.RolePermissions);
-        Assert.Equal(newRolePermission, updatedEntry.Entity.RolePermissions.First());
+        RolePermissionEntity storedPermission = Assert.Single(updatedEntry!.Entity.RolePermissions);
+        Assert.Equal(newRolePermission.PermissionId, storedPermission.PermissionId);
+        Assert.Equal(existingRole.Id, storedPermission.RoleId);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WhenAPermissionIsStillPresent_ShouldKeepItsIdentityAndAuditColumns()
+    {
+        // Arrange
+        RolePermissionEntity existingRolePermission = _rolePermissionEntityFixture.Create();
+        DateTime keptCreatedOnUtc = new(2020, 5, 6, 7, 8, 9, DateTimeKind.Utc);
+        existingRolePermission.CreatedOnUtc = keptCreatedOnUtc;
+        RoleEntity existingRole = existingRolePermission.Role;
+        existingRole.RolePermissions = [existingRolePermission];
+
+        _mockContext.Roles.Add(existingRole);
+        await _mockContext.SaveChangesAsync();
+
+        RolePermissionEntity incomingRolePermission = _rolePermissionEntityFixture.Create(
+            roleId: existingRole.Id,
+            role: existingRole,
+            permissionId: existingRolePermission.PermissionId,
+            permission: existingRolePermission.Permission);
+
+        RoleEntity updatedRole = _roleEntityFixture.Create(id: existingRole.Id, roleName: existingRole.RoleName, rolePermissions: [incomingRolePermission], includeRolePermissions: true, createdBy: existingRole.CreatedBy, createdOnUtc: existingRole.CreatedOnUtc);
+        updatedRole.UpdatedOnUtc = DateTime.UtcNow;
+        updatedRole.UpdatedBy = Guid.NewGuid();
+
+        // Act
+        Result<Updated> result = await _sut.UpdateAsync(updatedRole, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Updated, result.Value);
+
+        EntityEntry<RoleEntity>? updatedEntry = _mockContext.ChangeTracker.Entries<RoleEntity>()
+            .FirstOrDefault(e => e.Entity.Id == existingRole.Id);
+        Assert.NotNull(updatedEntry);
+        RolePermissionEntity retainedPermission = Assert.Single(updatedEntry!.Entity.RolePermissions);
+        Assert.Equal(existingRolePermission.Id, retainedPermission.Id);
+        Assert.Equal(keptCreatedOnUtc, retainedPermission.CreatedOnUtc);
     }
 
     [Fact]

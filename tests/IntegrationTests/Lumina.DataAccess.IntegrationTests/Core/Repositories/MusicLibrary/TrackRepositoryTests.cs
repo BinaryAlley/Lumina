@@ -214,6 +214,8 @@ public class TrackRepositoryTests
             [_trackContributorEntityFixture.Create(trackId: track.Id, mediaContributorId: performer.Id, role: MediaContributorRole.Vocals)];
         context.Tracks.Add(track);
         await context.SaveChangesAsync();
+        // Detach the seeded graph, so that the update must load the tracked track through its include chain instead of returning the already populated seeded instance.
+        context.ChangeTracker.Clear();
         Guid contributorId = track.Contributors[0].Id;
         DateTime contributorCreatedOnUtc = track.Contributors[0].CreatedOnUtc;
         TrackEntity incoming = await LoadDetachedTrackAsync(context, track.Id);

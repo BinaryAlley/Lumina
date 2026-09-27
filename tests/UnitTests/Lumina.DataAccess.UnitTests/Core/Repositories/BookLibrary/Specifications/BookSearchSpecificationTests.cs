@@ -101,7 +101,7 @@ public class BookSearchSpecificationTests
     }
 
     [Fact]
-    public void ToExpression_WhenTitleMatchesInDifferentCase_ShouldNotMatchCaseInsensitively()
+    public void ToExpression_WhenTitleMatchesInDifferentCase_ShouldMatchCaseInsensitively()
     {
         // Arrange
         BookEntity book = _bookEntityFixture.Create();
@@ -113,6 +113,22 @@ public class BookSearchSpecificationTests
         bool result = specification.IsSatisfiedBy(book);
 
         // Assert
-        Assert.False(result);
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void ToExpression_WhenOriginalTitleMatchesInDifferentCase_ShouldMatchCaseInsensitively()
+    {
+        // Arrange
+        BookEntity book = _bookEntityFixture.Create();
+        book.Title = "A Random Title";
+        book.OriginalTitle = "Lord of the Rings: The Fellowship";
+        BookSearchSpecification specification = new("FELLOWSHIP");
+
+        // Act
+        bool result = specification.IsSatisfiedBy(book);
+
+        // Assert
+        Assert.True(result);
     }
 }

@@ -147,4 +147,143 @@ public class CollectionReconcilerTests
         Assert.Same(keptContributor, trackedContributors.Single(contributor => contributor.MediaContributorId == keptContributor.MediaContributorId));
         Assert.Same(incomingNewContributor, trackedContributors.Single(contributor => contributor.MediaContributorId == incomingNewContributor.MediaContributorId));
     }
+
+    [Fact]
+    public void Reconcile_WhenTheIncomingSetIsEmpty_ShouldRemoveEveryTrackedItem()
+    {
+        // Arrange
+        List<TagEntity> trackedTags = [_tagEntityFixture.Create(name: "rock"), _tagEntityFixture.Create(name: "jazz")];
+        List<TagEntity> incomingTags = [];
+
+        // Act
+        CollectionReconciler.Reconcile(
+            trackedTags,
+            incomingTags,
+            trackedTag => trackedTag.Name!,
+            incomingTag => incomingTag.Name!,
+            shouldReplace: (trackedTag, incomingTag) => false,
+            createNew: incomingTag => incomingTag);
+
+        // Assert
+        Assert.Empty(trackedTags);
+    }
+
+    [Fact]
+    public void Reconcile_WhenTheTrackedCollectionIsEmpty_ShouldAddEveryIncomingItem()
+    {
+        // Arrange
+        List<TagEntity> trackedTags = [];
+        List<TagEntity> incomingTags = [_tagEntityFixture.Create(name: "rock"), _tagEntityFixture.Create(name: "jazz")];
+
+        // Act
+        CollectionReconciler.Reconcile(
+            trackedTags,
+            incomingTags,
+            trackedTag => trackedTag.Name!,
+            incomingTag => incomingTag.Name!,
+            shouldReplace: (trackedTag, incomingTag) => false,
+            createNew: incomingTag => incomingTag);
+
+        // Assert
+        Assert.Equal(2, trackedTags.Count);
+        Assert.Same(incomingTags[0], trackedTags.Single(tag => tag.Name == "rock"));
+        Assert.Same(incomingTags[1], trackedTags.Single(tag => tag.Name == "jazz"));
+    }
+
+    [Fact]
+    public void Reconcile_WhenTheTrackedCollectionHasDuplicateKeys_ShouldMatchTheFirstTrackedInstance()
+    {
+        // Arrange
+        TagEntity firstTrackedTag = _tagEntityFixture.Create(name: "rock");
+        TagEntity secondTrackedTag = _tagEntityFixture.Create(name: "rock");
+        List<TagEntity> trackedTags = [firstTrackedTag, secondTrackedTag];
+        List<TagEntity> incomingTags = [_tagEntityFixture.Create(name: "rock")];
+
+        // Act
+        CollectionReconciler.Reconcile(
+            trackedTags,
+            incomingTags,
+            trackedTag => trackedTag.Name!,
+            incomingTag => incomingTag.Name!,
+            shouldReplace: (trackedTag, incomingTag) => false,
+            createNew: incomingTag => incomingTag);
+
+        // Assert
+        Assert.Equal(2, trackedTags.Count);
+        Assert.Same(firstTrackedTag, trackedTags[0]);
+        Assert.Same(secondTrackedTag, trackedTags[1]);
+    }
+
+    [Fact]
+    public void Reconcile_WhenTheIncomingCollectionHasDuplicateNewKeys_ShouldAddOnlyOneItem()
+    {
+        // Arrange
+        List<TagEntity> trackedTags = [];
+        TagEntity firstIncomingTag = _tagEntityFixture.Create(name: "rock");
+        TagEntity secondIncomingTag = _tagEntityFixture.Create(name: "rock");
+        List<TagEntity> incomingTags = [firstIncomingTag, secondIncomingTag];
+
+        // Act
+        CollectionReconciler.Reconcile(
+            trackedTags,
+            incomingTags,
+            trackedTag => trackedTag.Name!,
+            incomingTag => incomingTag.Name!,
+            shouldReplace: (trackedTag, incomingTag) => false,
+            createNew: incomingTag => incomingTag);
+
+        // Assert
+        TagEntity addedTag = Assert.Single(trackedTags);
+        Assert.Same(firstIncomingTag, addedTag);
+    }
+
+    [Fact]
+    public void Reconcile_WhenAReplacedItemIsRematchedByALaterIncomingItem_ShouldReuseTheReplacement()
+    {
+        // Arrange
+        TagEntity trackedTag = _tagEntityFixture.Create(name: "rock");
+        List<TagEntity> trackedTags = [trackedTag];
+        TagEntity firstIncomingTag = _tagEntityFixture.Create(name: "rock");
+        TagEntity secondIncomingTag = _tagEntityFixture.Create(name: "rock");
+        List<TagEntity> incomingTags = [firstIncomingTag, secondIncomingTag];
+
+        // Act
+        CollectionReconciler.Reconcile(
+            trackedTags,
+            incomingTags,
+            existingTag => existingTag.Name!,
+            incomingTag => incomingTag.Name!,
+            shouldReplace: (existingTag, incomingTag) => !ReferenceEquals(existingTag, incomingTag),
+            createNew: incomingTag => incomingTag);
+
+        // Assert
+        TagEntity replacedTag = Assert.Single(trackedTags);
+        Assert.Same(secondIncomingTag, replacedTag);
+        Assert.DoesNotContain(trackedTags, trackedItem => ReferenceEquals(trackedItem, firstIncomingTag));
+    }
+
+    [Fact]
+    public void Reconcile_WhenANewItemIsAddedAndALaterIncomingItemReplacesIt_ShouldKeepASingleItem()
+    {
+        // Arrange
+        List<TagEntity> trackedTags = [];
+        TagEntity firstIncomingTag = _tagEntityFixture.Create(name: "rock");
+        TagEntity secondIncomingTag = _tagEntityFixture.Create(name: "rock");
+        List<TagEntity> incomingTags = [firstIncomingTag, secondIncomingTag];
+
+        // Act
+        CollectionReconciler.Reconcile(
+            trackedTags,
+            incomingTags,
+            trackedTag => trackedTag.Name!,
+            incomingTag => incomingTag.Name!,
+            shouldReplace: (trackedTag, incomingTag) => !ReferenceEquals(trackedTag, incomingTag),
+            createNew: incomingTag => incomingTag);
+
+        // Assert
+        // The item added for the first occurrence is indexed, so the second occurrence matches it instead of adding a duplicate.
+        TagEntity trackedTag = Assert.Single(trackedTags);
+        Assert.Same(secondIncomingTag, trackedTag);
+        Assert.DoesNotContain(trackedTags, trackedItem => ReferenceEquals(trackedItem, firstIncomingTag));
+    }
 }
