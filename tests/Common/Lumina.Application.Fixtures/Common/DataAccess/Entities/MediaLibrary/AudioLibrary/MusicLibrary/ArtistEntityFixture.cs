@@ -24,8 +24,12 @@ public class ArtistEntityFixture
     /// <param name="id">Optional. The Id of the artist.</param>
     /// <param name="libraryId">Optional. The Id of the media library that owns the artist.</param>
     /// <param name="name">Optional. The name of the artist.</param>
+    /// <param name="website">Optional. The website of the artist.</param>
+    /// <param name="musicBrainzArtistId">Optional. The MusicBrainz identifier of the artist.</param>
     /// <param name="albums">Optional. The albums of the artist.</param>
     /// <param name="includeAlbums">Whether the artist should own a generated album, or no album at all.</param>
+    /// <param name="includeWebsite">Whether the website should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeMusicBrainzArtistId">Whether the MusicBrainz identifier should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeContributors">Whether the artist should own a generated media contributor, or none at all.</param>
     /// <param name="includeMetadata">Whether the owned metadata collections of the generated album should be included, or forced to empty collections.</param>
     /// <returns>The created <see cref="ArtistEntity"/>.</returns>
@@ -33,8 +37,12 @@ public class ArtistEntityFixture
         Guid? id = null,
         Guid? libraryId = null,
         string? name = null,
+        string? website = null,
+        Guid? musicBrainzArtistId = null,
         List<AlbumEntity>? albums = null,
         bool includeAlbums = true,
+        bool includeWebsite = true,
+        bool includeMusicBrainzArtistId = true,
         bool includeContributors = true,
         bool includeMetadata = true)
     {
@@ -53,8 +61,8 @@ public class ArtistEntityFixture
                 UpdatedBy = null
             })
             .RuleFor(x => x.Name, f => name ?? f.Name.FullName())
-            .RuleFor(x => x.Website, f => f.Internet.Url())
-            .RuleFor(x => x.MusicBrainzArtistId, f => f.Random.Guid())
+            .RuleFor(x => x.Website, f => includeWebsite ? (website ?? f.Internet.Url()) : null)
+            .RuleFor(x => x.MusicBrainzArtistId, f => includeMusicBrainzArtistId ? (musicBrainzArtistId ?? f.Random.Guid()) : null)
             .RuleFor(x => x.Albums, resolvedAlbums)
             .RuleFor(x => x.Contributors, f => includeContributors ? _artistContributorEntityFixture.CreateMany(f.Random.Number(1, 3), artistId: resolvedId) : [])
             .RuleFor(x => x.CreatedOnUtc, f => f.Date.Past())

@@ -63,7 +63,16 @@ public class UpdateArtistTrackRequestMappingTests
         UpdateArtistTrackRequest request = _updateArtistTrackRequestFixture.Create(
             path: "/music/queen/bohemian-rhapsody.flac",
             metadata: _audioMetadataDtoFixture.Create(title: "Love of My Life"),
-            includeOptionalProperties: false,
+            includeDiscNumber: false,
+            includeScript: false,
+            includeKey: false,
+            includeBpm: false,
+            includeWork: false,
+            includeMusicBrainzRecordingId: false,
+            includeMusicBrainzTrackId: false,
+            includeMusicBrainzWorkId: false,
+            includeMoods: false,
+            includeIsrcs: false,
             includeTrackId: false);
 
         // Act
