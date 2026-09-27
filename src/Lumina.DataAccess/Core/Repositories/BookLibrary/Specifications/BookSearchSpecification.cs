@@ -29,6 +29,14 @@ internal sealed class BookSearchSpecification : FilterSpecification<BookEntity>
     /// <returns>An expression tree that can be used to evaluate whether a <see cref="BookEntity"/> satisfies the specification criteria.</returns>
     public override Expression<Func<BookEntity, bool>> ToExpression()
     {
-        return book => book.Title.Contains(_searchTerm) || (book.OriginalTitle != null && book.OriginalTitle.Contains(_searchTerm));
+        // The term is normalized with the invariant culture, so that the case folding never depends on the current culture. The columns are
+        // folded by the storage medium, which keeps the search case-insensitive.
+        string normalizedSearchTerm = _searchTerm.ToLowerInvariant();
+#pragma warning disable IDE0079 // Remove unnecessary suppression.
+#pragma warning disable CA1862 // Use the 'StringComparison' method overloads to perform case-insensitive string comparisons. This expression is translated to SQL; the StringComparison overloads are client-side only and are not translated, so they would fail at query time.
+        return book => book.Title.ToLower().Contains(normalizedSearchTerm)
+            || (book.OriginalTitle != null && book.OriginalTitle.ToLower().Contains(normalizedSearchTerm));
+#pragma warning restore CA1862 // Use the 'StringComparison' method overloads to perform case-insensitive string comparisons.
+#pragma warning restore IDE0079 // Remove unnecessary suppression.
     }
 }
