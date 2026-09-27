@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace Lumina.Application.Common.DataAccess.Repositories.Common.Actions;
 
 /// <summary>
-/// Interface defining the "delete all" action for interacting with a generic persistance medium.
+/// Interface defining the "delete all" action for interacting with a generic persistence medium.
 /// </summary>
 public interface IDeleteAllRepositoryAction
 {

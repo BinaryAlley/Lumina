@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Lumina.Application.Common.DataAccess.Repositories.Common.Actions;
 
 /// <summary>
-/// Interface defining the "insert range" action for interacting with a generic persistance medium.
+/// Interface defining the "insert range" action for interacting with a generic persistence medium.
 /// </summary>
 /// <typeparam name="TModel">The type used for the insert range action. It should implement <see cref="IStorageEntity"/>.</typeparam>
 public interface IInsertRangeRepositoryAction<TModel> where TModel : IStorageEntity

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Lumina.Application.Common.DataAccess.Repositories.Common.Actions;
 
 /// <summary>
-/// Interface defining the "delete by id" action for interacting with a generic persistance medium.
+/// Interface defining the "delete by id" action for interacting with a generic persistence medium.
 /// </summary>
 /// <typeparam name="TId">The type used for the identifier of the respository. It should not be <see langword="null"/>.</typeparam>
 public interface IDeleteByIdRepositoryAction<TId> where TId : notnull
