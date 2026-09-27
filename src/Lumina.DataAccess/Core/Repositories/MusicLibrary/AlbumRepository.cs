@@ -55,29 +55,24 @@ internal sealed class AlbumRepository : IAlbumRepository
         if (checkTrackPathsResult.IsFailure)
             return checkTrackPathsResult.Errors;
 
-        // Fetch the tags and genres referenced anywhere in the aggregate, so that the shared tables are not duplicated.
-        List<string> tagNames = [.. album.Tags.Select(tag => tag.Name!)
-            .Concat(album.Tracks.SelectMany(track => track.Tags.Select(tag => tag.Name!)))
-            .Distinct()];
-        List<string> genreNames = [.. album.Genres.Select(genre => genre.Name!)
-            .Concat(album.Tracks.SelectMany(track => track.Genres.Select(genre => genre.Name!)))
-            .Distinct()];
+        // Resolve the tags and genres referenced by the album and its tracks to a single instance per name, replacing the stored ones where they exist, so that
+        // neither a stored row nor a name shared by the album and its tracks of the same request is tracked more than once.
+        Result<IReadOnlyDictionary<string, TagEntity>> resolveTagsResult = await SharedReferenceResolver.ResolveAsync(
+            _luminaDbContext, album.Tags.Concat(album.Tracks.SelectMany(track => track.Tags)), Errors.Metadata.TagNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+        if (resolveTagsResult.IsFailure)
+            return resolveTagsResult.Errors;
+        Result<IReadOnlyDictionary<string, GenreEntity>> resolveGenresResult = await SharedReferenceResolver.ResolveAsync(
+            _luminaDbContext, album.Genres.Concat(album.Tracks.SelectMany(track => track.Genres)), Errors.Metadata.GenreNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+        if (resolveGenresResult.IsFailure)
+            return resolveGenresResult.Errors;
 
-        List<TagEntity> existingTags = await _luminaDbContext.Set<TagEntity>()
-            .Where(tag => tagNames.Contains(tag.Name!))
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
-        List<GenreEntity> existingGenres = await _luminaDbContext.Set<GenreEntity>()
-            .Where(genre => genreNames.Contains(genre.Name!))
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
-
-        // Replace the tags and genres of the album and of its tracks with the existing ones, so that the shared tables are not duplicated.
-        album.Tags = [.. album.Tags.Select(tag => existingTags.FirstOrDefault(existingTag => existingTag.Name == tag.Name) ?? tag)];
-        album.Genres = [.. album.Genres.Select(genre => existingGenres.FirstOrDefault(existingGenre => existingGenre.Name == genre.Name) ?? genre)];
+        album.Tags = [.. SharedReferenceResolver.Normalize(album.Tags, resolveTagsResult.Value)];
+        album.Genres = [.. SharedReferenceResolver.Normalize(album.Genres, resolveGenresResult.Value)];
 
         foreach (TrackEntity track in album.Tracks)
         {
-            track.Tags = [.. track.Tags.Select(tag => existingTags.FirstOrDefault(existingTag => existingTag.Name == tag.Name) ?? tag)];
-            track.Genres = [.. track.Genres.Select(genre => existingGenres.FirstOrDefault(existingGenre => existingGenre.Name == genre.Name) ?? genre)];
+            track.Tags = [.. SharedReferenceResolver.Normalize(track.Tags, resolveTagsResult.Value)];
+            track.Genres = [.. SharedReferenceResolver.Normalize(track.Genres, resolveGenresResult.Value)];
         }
 
         _luminaDbContext.Albums.Add(album);
@@ -116,15 +111,30 @@ internal sealed class AlbumRepository : IAlbumRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Updated>> UpdateAsync(AlbumEntity data, CancellationToken cancellationToken)
     {
+        // Every collection that is reconciled must be loaded, so that the reconciliation can see the rows that are already stored and leave the unchanged ones alone.
         AlbumEntity? foundAlbum = await _luminaDbContext.Albums
             .Include(repositoryAlbum => repositoryAlbum.Tags)
             .Include(repositoryAlbum => repositoryAlbum.Genres)
             .Include(repositoryAlbum => repositoryAlbum.Ratings)
             .Include(repositoryAlbum => repositoryAlbum.Contributors)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(repositoryAlbum => repositoryAlbum.Id == data.Id, cancellationToken).ConfigureAwait(false);
         if (foundAlbum is null)
             return Errors.Music.AlbumNotFound;
 
+        return await ApplyUpdateAsync(foundAlbum, data, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Applies the editable data of <paramref name="data"/> onto the already tracked <paramref name="foundAlbum"/>, without loading it, so that a caller that already
+    /// loaded the album graph, like the artist repository, does not make the album repository load it again.
+    /// </summary>
+    /// <param name="foundAlbum">The tracked album whose editable data is applied.</param>
+    /// <param name="data">The album carrying the desired data.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Updated>> ApplyUpdateAsync(AlbumEntity foundAlbum, AlbumEntity data, CancellationToken cancellationToken)
+    {
         // The stored identity is never overwritten by an edit, and the audit columns are only ever written by the auditing interceptor.
         Guid artistId = foundAlbum.ArtistId;
         Guid libraryId = foundAlbum.LibraryId;
@@ -132,7 +142,13 @@ internal sealed class AlbumRepository : IAlbumRepository
         foundAlbum.ArtistId = artistId;
         foundAlbum.LibraryId = libraryId;
 
-        await ReconcileTagsAndGenresAsync(foundAlbum, data, cancellationToken).ConfigureAwait(false);
+        // Tags and genres are shared across the whole database, so the stored rows whose names already exist are reused, and only the missing names are inserted.
+        Result<Updated> reconcileTagsResult = await SharedReferenceResolver.ReconcileAsync(_luminaDbContext, foundAlbum.Tags, data.Tags, Errors.Metadata.TagNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+        if (reconcileTagsResult.IsFailure)
+            return reconcileTagsResult.Errors;
+        Result<Updated> reconcileGenresResult = await SharedReferenceResolver.ReconcileAsync(_luminaDbContext, foundAlbum.Genres, data.Genres, Errors.Metadata.GenreNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+        if (reconcileGenresResult.IsFailure)
+            return reconcileGenresResult.Errors;
 
         // Ratings are owned value objects with no identity anyone could reference, so a changed rating is replaced as a whole, while the ratings that did not change
         // are left exactly as they are stored. Matching by the rating source keeps an update in place instead of recreating every rating of the album.
@@ -155,41 +171,6 @@ internal sealed class AlbumRepository : IAlbumRepository
             createNew: incomingContributor => incomingContributor);
 
         return Result.Updated;
-    }
-
-    /// <summary>
-    /// Reconciles the tags and genres of <paramref name="foundAlbum"/> against the ones carried by <paramref name="data"/>, reusing the stored tags and genres whose names already exist.
-    /// </summary>
-    /// <param name="foundAlbum">The tracked album whose tags and genres are reconciled.</param>
-    /// <param name="data">The album carrying the desired tags and genres.</param>
-    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    private async Task ReconcileTagsAndGenresAsync(AlbumEntity foundAlbum, AlbumEntity data, CancellationToken cancellationToken)
-    {
-        // Tags and genres are shared across the whole database, so the ones whose names are already stored are reused, and only the missing names are inserted.
-        List<string> tagNames = [.. data.Tags.Select(tag => tag.Name!)];
-        List<string> genreNames = [.. data.Genres.Select(genre => genre.Name!)];
-        List<TagEntity> existingTags = await _luminaDbContext.Set<TagEntity>()
-            .Where(tag => tagNames.Contains(tag.Name!))
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
-        List<GenreEntity> existingGenres = await _luminaDbContext.Set<GenreEntity>()
-            .Where(genre => genreNames.Contains(genre.Name!))
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
-
-        CollectionReconciler.Reconcile(
-            foundAlbum.Tags,
-            data.Tags.Select(tag => existingTags.FirstOrDefault(existingTag => existingTag.Name == tag.Name) ?? tag),
-            existingTag => existingTag.Name!,
-            incomingTag => incomingTag.Name!,
-            shouldReplace: (existingTag, incomingTag) => false,
-            createNew: incomingTag => incomingTag);
-
-        CollectionReconciler.Reconcile(
-            foundAlbum.Genres,
-            data.Genres.Select(genre => existingGenres.FirstOrDefault(existingGenre => existingGenre.Name == genre.Name) ?? genre),
-            existingGenre => existingGenre.Name!,
-            incomingGenre => incomingGenre.Name!,
-            shouldReplace: (existingGenre, incomingGenre) => false,
-            createNew: incomingGenre => incomingGenre);
     }
 
     /// <summary>

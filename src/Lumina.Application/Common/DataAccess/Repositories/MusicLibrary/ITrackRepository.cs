@@ -19,6 +19,7 @@ namespace Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
 public interface ITrackRepository : IRepository<TrackEntity>,
                                     IInsertRepositoryAction<TrackEntity>,
                                     IUpdateRepositoryAction<TrackEntity>,
+                                    IApplyUpdateRepositoryAction<TrackEntity>,
                                     IGetByIdRepositoryAction<TrackEntity, Guid>
 {
     /// <summary>

@@ -62,10 +62,9 @@ internal sealed class LibraryRepository : ILibraryRepository
         if (!shouldTrackEntities)
             query = query.AsNoTracking();
         if (shouldIncludeNavigationProperties)
-        {
             query = query
-                .Include(library => library.ContentLocations);
-        }
+                .Include(library => library.ContentLocations)
+                .AsSplitQuery();
         return await query.FirstOrDefaultAsync(library => library.Id == id, cancellationToken).ConfigureAwait(false);
     }
 
@@ -78,6 +77,7 @@ internal sealed class LibraryRepository : ILibraryRepository
     {
         return await _luminaDbContext.Libraries
             .Include(library => library.ContentLocations)
+            .AsSplitQuery()
             .Where(library => library.IsEnabled)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
     }
@@ -91,6 +91,7 @@ internal sealed class LibraryRepository : ILibraryRepository
     {
         return await _luminaDbContext.Libraries
             .Include(library => library.ContentLocations)
+            .AsSplitQuery()
             .Where(library => library.IsEnabled && !library.IsLocked)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
     }
@@ -113,10 +114,9 @@ internal sealed class LibraryRepository : ILibraryRepository
         if (!shouldTrackEntities)
             query = query.AsNoTracking();
         if (shouldIncludeNavigationProperties)
-        {
             query = query
-                .Include(library => library.ContentLocations);
-        }
+                .Include(library => library.ContentLocations)
+                .AsSplitQuery();
 
         // If no pagination was requested, return all the media libraries.
         if (paginationData is null)
@@ -161,6 +161,7 @@ internal sealed class LibraryRepository : ILibraryRepository
     {
         LibraryEntity? foundLibrary = await _luminaDbContext.Libraries
             .Include(library => library.ContentLocations)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(library => library.Id == data.Id, cancellationToken).ConfigureAwait(false);
         if (foundLibrary is null)
             return Errors.Library.LibraryNotFound;
@@ -191,6 +192,7 @@ internal sealed class LibraryRepository : ILibraryRepository
     {
         LibraryEntity? library = await _luminaDbContext.Libraries
             .Include(library => library.ContentLocations)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(library => library.Id == id, cancellationToken)
             .ConfigureAwait(false);
 

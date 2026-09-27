@@ -3,6 +3,7 @@ using Lumina.Application.Common.DataAccess.Entities.Scheduling;
 using Lumina.Application.Common.DataAccess.Repositories.Scheduling;
 using Lumina.Application.Common.DTO.Filtering;
 using Lumina.Application.Common.DTO.Pagination;
+using Lumina.DataAccess.Common.Persistence;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
@@ -156,8 +157,8 @@ internal sealed class ScheduledJobRepository : IScheduledJobRepository
             ?? await _luminaDbContext.ScheduledJobs.FirstOrDefaultAsync(scheduledJob => scheduledJob.Id == data.Id, cancellationToken).ConfigureAwait(false);
         if (foundScheduledJob is null)
             return Errors.Scheduling.ScheduledJobNotFound;
-        // Update scalar properties.
-        _luminaDbContext.Entry(foundScheduledJob).CurrentValues.SetValues(data);
+        // The stored identity is never overwritten by an edit, and the audit columns are only ever written by the auditing interceptor.
+        EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundScheduledJob, data);
         return Result.Updated;
     }
 

@@ -2,6 +2,7 @@
 using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
+using Lumina.DataAccess.Common.Persistence;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Domain.Common.Errors;
@@ -60,11 +61,10 @@ internal sealed class LibraryScanRepository : ILibraryScanRepository
         if (!shouldTrackEntities)
             query = query.AsNoTracking();
         if (shouldIncludeNavigationProperties)
-        {
             query = query
                 .Include(libraryScan => libraryScan.Library)
-                .Include(libraryScan => libraryScan.User);
-        }
+                .Include(libraryScan => libraryScan.User)
+                .AsSplitQuery();
         return await query.FirstOrDefaultAsync(libraryScan => libraryScan.Id == id, cancellationToken).ConfigureAwait(false);
     }
 
@@ -77,6 +77,7 @@ internal sealed class LibraryScanRepository : ILibraryScanRepository
     {
         return await _luminaDbContext.LibraryScans
             .Include(library => library.Library)
+            .AsSplitQuery()
             .Where(library => library.LibraryId == libraryId && library.CreatedOnUtc >= DateTime.UtcNow.AddMonths(-1))
             .ToListAsync(cancellationToken).ConfigureAwait(false);
     }
@@ -90,6 +91,7 @@ internal sealed class LibraryScanRepository : ILibraryScanRepository
     {
         return await _luminaDbContext.LibraryScans
             .Include(library => library.Library)
+            .AsSplitQuery()
             .Where(library => library.Status == LibraryScanJobStatus.Running)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
     }
@@ -104,11 +106,12 @@ internal sealed class LibraryScanRepository : ILibraryScanRepository
     {
         LibraryScanEntity? foundLibraryScan = await _luminaDbContext.LibraryScans
             .Include(libraryScan => libraryScan.Library)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(libraryScan => libraryScan.Id == data.Id, cancellationToken).ConfigureAwait(false);
         if (foundLibraryScan is null)
             return Errors.LibraryScanning.LibraryScanNotFound;
-        // Update scalar properties.
-        _luminaDbContext.Entry(foundLibraryScan).CurrentValues.SetValues(data);
+        // The stored identity is never overwritten by an edit, and the audit columns are only ever written by the auditing interceptor.
+        EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundLibraryScan, data);
         return Result.Updated;
     }
 }

@@ -53,17 +53,16 @@ internal sealed class TrackRepository : ITrackRepository
         if (getExistingPathsResult.Value.Count > 0)
             return Errors.Music.TrackAlreadyExists;
 
-        // Fetch existing tags and genres.
-        List<TagEntity> existingTags = await _luminaDbContext.Set<TagEntity>()
-            .Where(tag => track.Tags.Select(trackTag => trackTag.Name).Contains(tag.Name))
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
-        List<GenreEntity> existingGenres = await _luminaDbContext.Set<GenreEntity>()
-            .Where(genre => track.Genres.Select(trackGenre => trackGenre.Name).Contains(genre.Name))
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
+        // Resolve the tags and genres of the track to a single instance per name, replacing the stored ones where they exist, so that the shared tables are not duplicated.
+        Result<IReadOnlyDictionary<string, TagEntity>> resolveTagsResult = await SharedReferenceResolver.ResolveAsync(_luminaDbContext, track.Tags, Errors.Metadata.TagNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+        if (resolveTagsResult.IsFailure)
+            return resolveTagsResult.Errors;
+        Result<IReadOnlyDictionary<string, GenreEntity>> resolveGenresResult = await SharedReferenceResolver.ResolveAsync(_luminaDbContext, track.Genres, Errors.Metadata.GenreNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+        if (resolveGenresResult.IsFailure)
+            return resolveGenresResult.Errors;
 
-        // Replace tags and genres in the track with existing ones, so that the shared tables are not duplicated.
-        track.Tags = [.. track.Tags.Select(tag => existingTags.FirstOrDefault(existingTag => existingTag.Name == tag.Name) ?? tag)];
-        track.Genres = [.. track.Genres.Select(genre => existingGenres.FirstOrDefault(existingGenre => existingGenre.Name == genre.Name) ?? genre)];
+        track.Tags = [.. SharedReferenceResolver.Normalize(track.Tags, resolveTagsResult.Value)];
+        track.Genres = [.. SharedReferenceResolver.Normalize(track.Genres, resolveGenresResult.Value)];
 
         _luminaDbContext.Tracks.Add(track);
         return Result.Created;
@@ -106,10 +105,24 @@ internal sealed class TrackRepository : ITrackRepository
             .Include(repositoryTrack => repositoryTrack.Contributors)
             .Include(repositoryTrack => repositoryTrack.Moods)
             .Include(repositoryTrack => repositoryTrack.Isrcs)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(repositoryTrack => repositoryTrack.Id == data.Id, cancellationToken).ConfigureAwait(false);
         if (foundTrack is null)
             return Errors.Music.TrackNotFound;
 
+        return await ApplyUpdateAsync(foundTrack, data, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Applies the editable data of <paramref name="data"/> onto the already tracked <paramref name="foundTrack"/>, without loading it, so that a caller that already
+    /// loaded the track graph, like the artist repository, does not make the track repository load it again.
+    /// </summary>
+    /// <param name="foundTrack">The tracked track whose editable data is applied.</param>
+    /// <param name="data">The track carrying the desired data.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Updated>> ApplyUpdateAsync(TrackEntity foundTrack, TrackEntity data, CancellationToken cancellationToken)
+    {
         // The stored identity is never overwritten by an edit, and the audit columns are only ever written by the auditing interceptor.
         Guid albumId = foundTrack.AlbumId;
         Guid libraryId = foundTrack.LibraryId;
@@ -117,7 +130,13 @@ internal sealed class TrackRepository : ITrackRepository
         foundTrack.AlbumId = albumId;
         foundTrack.LibraryId = libraryId;
 
-        await ReconcileTagsAndGenresAsync(foundTrack, data, cancellationToken).ConfigureAwait(false);
+        // Tags and genres are shared across the whole database, so the stored rows whose names already exist are reused, and only the missing names are inserted.
+        Result<Updated> reconcileTagsResult = await SharedReferenceResolver.ReconcileAsync(_luminaDbContext, foundTrack.Tags, data.Tags, Errors.Metadata.TagNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+        if (reconcileTagsResult.IsFailure)
+            return reconcileTagsResult.Errors;
+        Result<Updated> reconcileGenresResult = await SharedReferenceResolver.ReconcileAsync(_luminaDbContext, foundTrack.Genres, data.Genres, Errors.Metadata.GenreNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+        if (reconcileGenresResult.IsFailure)
+            return reconcileGenresResult.Errors;
 
         // Ratings are owned value objects with no identity anyone could reference, so a changed rating is replaced as a whole, while the ratings that did not change
         // are left exactly as they are stored. Matching by the rating source keeps an update in place instead of recreating every rating of the track.
@@ -157,41 +176,6 @@ internal sealed class TrackRepository : ITrackRepository
             createNew: incomingIsrc => incomingIsrc);
 
         return Result.Updated;
-    }
-
-    /// <summary>
-    /// Reconciles the tags and genres of <paramref name="foundTrack"/> against the ones carried by <paramref name="data"/>, reusing the stored tags and genres whose names already exist.
-    /// </summary>
-    /// <param name="foundTrack">The tracked track whose tags and genres are reconciled.</param>
-    /// <param name="data">The track carrying the desired tags and genres.</param>
-    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    private async Task ReconcileTagsAndGenresAsync(TrackEntity foundTrack, TrackEntity data, CancellationToken cancellationToken)
-    {
-        // Tags and genres are shared across the whole database, so the ones whose names are already stored are reused, and only the missing names are inserted.
-        List<string> tagNames = [.. data.Tags.Select(tag => tag.Name!)];
-        List<string> genreNames = [.. data.Genres.Select(genre => genre.Name!)];
-        List<TagEntity> existingTags = await _luminaDbContext.Set<TagEntity>()
-            .Where(tag => tagNames.Contains(tag.Name!))
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
-        List<GenreEntity> existingGenres = await _luminaDbContext.Set<GenreEntity>()
-            .Where(genre => genreNames.Contains(genre.Name!))
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
-
-        CollectionReconciler.Reconcile(
-            foundTrack.Tags,
-            data.Tags.Select(tag => existingTags.FirstOrDefault(existingTag => existingTag.Name == tag.Name) ?? tag),
-            existingTag => existingTag.Name!,
-            incomingTag => incomingTag.Name!,
-            shouldReplace: (existingTag, incomingTag) => false,
-            createNew: incomingTag => incomingTag);
-
-        CollectionReconciler.Reconcile(
-            foundTrack.Genres,
-            data.Genres.Select(genre => existingGenres.FirstOrDefault(existingGenre => existingGenre.Name == genre.Name) ?? genre),
-            existingGenre => existingGenre.Name!,
-            incomingGenre => incomingGenre.Name!,
-            shouldReplace: (existingGenre, incomingGenre) => false,
-            createNew: incomingGenre => incomingGenre);
     }
 
     /// <summary>

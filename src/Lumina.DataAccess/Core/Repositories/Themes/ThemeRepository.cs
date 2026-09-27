@@ -4,6 +4,7 @@ using Lumina.Application.Common.DataAccess.Entities.Themes;
 using Lumina.Application.Common.DataAccess.Repositories.Themes;
 using Lumina.Application.Common.DTO.Filtering;
 using Lumina.Application.Common.DTO.Pagination;
+using Lumina.DataAccess.Common.Persistence;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
@@ -62,7 +63,8 @@ internal sealed class ThemeRepository : IThemeRepository
         if (foundTheme is null)
             return Errors.Themes.ThemeNotFound;
 
-        _luminaDbContext.Entry(foundTheme).CurrentValues.SetValues(data);
+        // The stored identity is never overwritten by an edit, and the audit columns are only ever written by the auditing interceptor.
+        EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundTheme, data);
         return Result.Updated;
     }
 

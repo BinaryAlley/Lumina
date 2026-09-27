@@ -19,6 +19,7 @@ namespace Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
 public interface IAlbumRepository : IRepository<AlbumEntity>,
                                     IInsertRepositoryAction<AlbumEntity>,
                                     IUpdateRepositoryAction<AlbumEntity>,
+                                    IApplyUpdateRepositoryAction<AlbumEntity>,
                                     IGetByIdRepositoryAction<AlbumEntity, Guid>
 {
     /// <summary>

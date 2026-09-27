@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Scheduling;
 using Lumina.Application.Common.DataAccess.Repositories.Scheduling;
+using Lumina.DataAccess.Common.Persistence;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
@@ -75,8 +76,8 @@ internal sealed class ScheduledJobExecutionRepository : IScheduledJobExecutionRe
             ?? await _luminaDbContext.ScheduledJobExecutions.FirstOrDefaultAsync(execution => execution.Id == data.Id, cancellationToken).ConfigureAwait(false);
         if (foundExecution is null)
             return Errors.Scheduling.ScheduledJobExecutionNotFound;
-        // Update scalar properties.
-        _luminaDbContext.Entry(foundExecution).CurrentValues.SetValues(data);
+        // The stored identity is never overwritten by an edit, and the audit columns are only ever written by the auditing interceptor.
+        EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundExecution, data);
         return Result.Updated;
     }
 

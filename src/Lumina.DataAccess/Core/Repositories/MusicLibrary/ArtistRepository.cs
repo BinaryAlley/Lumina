@@ -5,7 +5,9 @@ using Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
 using Lumina.Application.Common.DTO.Filtering;
 using Lumina.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 using Lumina.Application.Common.DTO.Pagination;
+using Lumina.Application.Common.Specifications;
 using Lumina.DataAccess.Common.Persistence;
+using Lumina.DataAccess.Core.Repositories.MusicLibrary.Specifications;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
@@ -66,33 +68,33 @@ internal sealed class ArtistRepository : IArtistRepository
         if (checkTrackPathsResult.IsFailure)
             return checkTrackPathsResult.Errors;
 
-        // Fetch the tags and genres referenced anywhere in the aggregate, so that the shared tables are not duplicated.
-        List<string> tagNames = [.. artist.Albums
-            .SelectMany(album => album.Tags.Select(tag => tag.Name!))
-            .Concat(artist.Albums.SelectMany(album => album.Tracks.SelectMany(track => track.Tags.Select(tag => tag.Name!))))
-            .Distinct()];
-        List<string> genreNames = [.. artist.Albums
-            .SelectMany(album => album.Genres.Select(genre => genre.Name!))
-            .Concat(artist.Albums.SelectMany(album => album.Tracks.SelectMany(track => track.Genres.Select(genre => genre.Name!))))
-            .Distinct()];
+        // Resolve the tags and genres referenced anywhere in the aggregate to a single instance per name, replacing the stored ones where they exist, so that
+        // neither a stored row nor a name shared by several albums or tracks of the same request is tracked more than once.
+        Result<IReadOnlyDictionary<string, TagEntity>> resolveTagsResult = await SharedReferenceResolver.ResolveAsync(
+            _luminaDbContext,
+            artist.Albums.SelectMany(album => album.Tags).Concat(artist.Albums.SelectMany(album => album.Tracks.SelectMany(track => track.Tags))),
+            Errors.Metadata.TagNameCannotBeEmpty,
+            cancellationToken).ConfigureAwait(false);
+        if (resolveTagsResult.IsFailure)
+            return resolveTagsResult.Errors;
 
-        List<TagEntity> existingTags = await _luminaDbContext.Set<TagEntity>()
-            .Where(tag => tagNames.Contains(tag.Name!))
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
-        List<GenreEntity> existingGenres = await _luminaDbContext.Set<GenreEntity>()
-            .Where(genre => genreNames.Contains(genre.Name!))
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
+        Result<IReadOnlyDictionary<string, GenreEntity>> resolveGenresResult = await SharedReferenceResolver.ResolveAsync(
+            _luminaDbContext,
+            artist.Albums.SelectMany(album => album.Genres).Concat(artist.Albums.SelectMany(album => album.Tracks.SelectMany(track => track.Genres))),
+            Errors.Metadata.GenreNameCannotBeEmpty,
+            cancellationToken).ConfigureAwait(false);
+        if (resolveGenresResult.IsFailure)
+            return resolveGenresResult.Errors;
 
-        // Replace the tags and genres of every album and track of the aggregate with the existing ones, so that the shared tables are not duplicated.
         foreach (AlbumEntity album in artist.Albums)
         {
-            album.Tags = [.. album.Tags.Select(tag => existingTags.FirstOrDefault(existingTag => existingTag.Name == tag.Name) ?? tag)];
-            album.Genres = [.. album.Genres.Select(genre => existingGenres.FirstOrDefault(existingGenre => existingGenre.Name == genre.Name) ?? genre)];
+            album.Tags = [.. SharedReferenceResolver.Normalize(album.Tags, resolveTagsResult.Value)];
+            album.Genres = [.. SharedReferenceResolver.Normalize(album.Genres, resolveGenresResult.Value)];
 
             foreach (TrackEntity track in album.Tracks)
             {
-                track.Tags = [.. track.Tags.Select(tag => existingTags.FirstOrDefault(existingTag => existingTag.Name == tag.Name) ?? tag)];
-                track.Genres = [.. track.Genres.Select(genre => existingGenres.FirstOrDefault(existingGenre => existingGenre.Name == genre.Name) ?? genre)];
+                track.Tags = [.. SharedReferenceResolver.Normalize(track.Tags, resolveTagsResult.Value)];
+                track.Genres = [.. SharedReferenceResolver.Normalize(track.Genres, resolveGenresResult.Value)];
             }
         }
 
@@ -108,10 +110,37 @@ internal sealed class ArtistRepository : IArtistRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Updated>> UpdateAsync(ArtistEntity data, CancellationToken cancellationToken)
     {
+        // The whole aggregate is loaded once, including every collection that the album and track repositories reconcile, so that those repositories can apply the
+        // edit to the already tracked children instead of loading each album and each track again.
         ArtistEntity? foundArtist = await _luminaDbContext.Artists
             .Include(repositoryArtist => repositoryArtist.Contributors)
             .Include(repositoryArtist => repositoryArtist.Albums)
+                .ThenInclude(album => album.Tags)
+            .Include(repositoryArtist => repositoryArtist.Albums)
+                .ThenInclude(album => album.Genres)
+            .Include(repositoryArtist => repositoryArtist.Albums)
+                .ThenInclude(album => album.Ratings)
+            .Include(repositoryArtist => repositoryArtist.Albums)
+                .ThenInclude(album => album.Contributors)
+            .Include(repositoryArtist => repositoryArtist.Albums)
                 .ThenInclude(album => album.Tracks)
+                    .ThenInclude(track => track.Tags)
+            .Include(repositoryArtist => repositoryArtist.Albums)
+                .ThenInclude(album => album.Tracks)
+                    .ThenInclude(track => track.Genres)
+            .Include(repositoryArtist => repositoryArtist.Albums)
+                .ThenInclude(album => album.Tracks)
+                    .ThenInclude(track => track.Ratings)
+            .Include(repositoryArtist => repositoryArtist.Albums)
+                .ThenInclude(album => album.Tracks)
+                    .ThenInclude(track => track.Moods)
+            .Include(repositoryArtist => repositoryArtist.Albums)
+                .ThenInclude(album => album.Tracks)
+                    .ThenInclude(track => track.Isrcs)
+            .Include(repositoryArtist => repositoryArtist.Albums)
+                .ThenInclude(album => album.Tracks)
+                    .ThenInclude(track => track.Contributors)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(repositoryArtist => repositoryArtist.Id == data.Id, cancellationToken).ConfigureAwait(false);
         if (foundArtist is null)
             return Errors.Music.ArtistNotFound;
@@ -138,6 +167,35 @@ internal sealed class ArtistRepository : IArtistRepository
         if (checkNewTrackPathsResult.IsFailure)
             return checkNewTrackPathsResult.Errors;
 
+        // Normalize the tags and genres carried by the desired aggregate, so that a name shared by several albums or tracks is represented by a single instance,
+        // and a name that is already stored is reused, before the album and track repositories reconcile their own collections.
+        Result<IReadOnlyDictionary<string, TagEntity>> resolveTagsResult = await SharedReferenceResolver.ResolveAsync(
+            _luminaDbContext,
+            data.Albums.SelectMany(album => album.Tags).Concat(data.Albums.SelectMany(album => album.Tracks.SelectMany(track => track.Tags))),
+            Errors.Metadata.TagNameCannotBeEmpty,
+            cancellationToken).ConfigureAwait(false);
+        if (resolveTagsResult.IsFailure)
+            return resolveTagsResult.Errors;
+        Result<IReadOnlyDictionary<string, GenreEntity>> resolveGenresResult = await SharedReferenceResolver.ResolveAsync(
+            _luminaDbContext,
+            data.Albums.SelectMany(album => album.Genres).Concat(data.Albums.SelectMany(album => album.Tracks.SelectMany(track => track.Genres))),
+            Errors.Metadata.GenreNameCannotBeEmpty,
+            cancellationToken).ConfigureAwait(false);
+        if (resolveGenresResult.IsFailure)
+            return resolveGenresResult.Errors;
+
+        foreach (AlbumEntity dataAlbum in data.Albums)
+        {
+            dataAlbum.Tags = [.. SharedReferenceResolver.Normalize(dataAlbum.Tags, resolveTagsResult.Value)];
+            dataAlbum.Genres = [.. SharedReferenceResolver.Normalize(dataAlbum.Genres, resolveGenresResult.Value)];
+
+            foreach (TrackEntity dataTrack in dataAlbum.Tracks)
+            {
+                dataTrack.Tags = [.. SharedReferenceResolver.Normalize(dataTrack.Tags, resolveTagsResult.Value)];
+                dataTrack.Genres = [.. SharedReferenceResolver.Normalize(dataTrack.Genres, resolveGenresResult.Value)];
+            }
+        }
+
         // Reconcile the albums by their Id: albums that are no longer present are removed, new albums are inserted, and existing
         // albums and their tracks are updated in place, so that persisted entities keep their identity across an edit. An album whose data did
         // not change produces no write statement, because its own repository only applies the values that actually changed.
@@ -156,7 +214,7 @@ internal sealed class ArtistRepository : IArtistRepository
                 continue;
             }
 
-            Result<Updated> updateAlbumResult = await _albumRepository.UpdateAsync(incomingAlbum, cancellationToken).ConfigureAwait(false);
+            Result<Updated> updateAlbumResult = await _albumRepository.ApplyUpdateAsync(existingAlbum, incomingAlbum, cancellationToken).ConfigureAwait(false);
             if (updateAlbumResult.IsFailure)
                 return updateAlbumResult.Errors;
 
@@ -242,7 +300,7 @@ internal sealed class ArtistRepository : IArtistRepository
                 continue;
             }
 
-            Result<Updated> updateTrackResult = await _trackRepository.UpdateAsync(incomingTrack, cancellationToken).ConfigureAwait(false);
+            Result<Updated> updateTrackResult = await _trackRepository.ApplyUpdateAsync(existingTrack, incomingTrack, cancellationToken).ConfigureAwait(false);
             if (updateTrackResult.IsFailure)
                 return updateTrackResult.Errors;
         }
@@ -371,10 +429,11 @@ internal sealed class ArtistRepository : IArtistRepository
 
         artistsQuery = artistsQuery.Where(artist => artist.LibraryId == libraryFilter.LibraryId);
 
-        if (!string.IsNullOrWhiteSpace(libraryFilter.SearchTerm))
-            artistsQuery = artistsQuery.Where(artist => artist.Name.ToLower().Contains(libraryFilter.SearchTerm.ToLower()));
+        FilterSpecification<ArtistEntity>? filterSpecification = BuildFilterSpecification(libraryFilter);
+        if (filterSpecification is not null)
+            artistsQuery = artistsQuery.Where(filterSpecification.ToExpression());
 
-        IQueryable<ArtistEntity> orderedArtistsQuery = artistsQuery.OrderBy(artist => artist.Name).ThenBy(artist => artist.Id);
+        IQueryable<ArtistEntity> orderedArtistsQuery = ApplySorting(artistsQuery, sortBy, sortOrder ?? SortOrder.Ascending);
 
         // If no pagination was requested, return all the artists of the library.
         if (paginationData is null)
@@ -434,20 +493,18 @@ internal sealed class ArtistRepository : IArtistRepository
         if (!shouldTrackEntities)
             artistsQuery = artistsQuery.AsNoTracking();
         if (shouldIncludeNavigationProperties)
-        {
             artistsQuery = artistsQuery
                 .Include(artist => artist.Contributors)
-                .Include(artist => artist.Albums);
-        }
+                .Include(artist => artist.Albums)
+                .AsSplitQuery();
 
         artistsQuery = artistsQuery.Where(artist => artist.LibraryId == libraryFilter.LibraryId);
 
-        if (!string.IsNullOrWhiteSpace(libraryFilter.SearchTerm))
-            artistsQuery = artistsQuery.Where(artist => artist.Name.ToLower().Contains(libraryFilter.SearchTerm.ToLower()));
+        FilterSpecification<ArtistEntity>? filterSpecification = BuildFilterSpecification(libraryFilter);
+        if (filterSpecification is not null)
+            artistsQuery = artistsQuery.Where(filterSpecification.ToExpression());
 
-        IQueryable<ArtistLiteRow> liteRowsQuery = artistsQuery
-            .OrderBy(artist => artist.Name)
-            .ThenBy(artist => artist.Id)
+        IQueryable<ArtistLiteRow> liteRowsQuery = ApplySorting(artistsQuery, sortBy, sortOrder ?? SortOrder.Ascending)
             .Select(artist => new ArtistLiteRow
             {
                 Id = artist.Id,
@@ -485,6 +542,49 @@ internal sealed class ArtistRepository : IArtistRepository
             PerPage = paginationData.PerPage,
             Count = count,
             NumberOfPages = numberOfPages
+        };
+    }
+
+    /// <summary>
+    /// Builds a filter specification for querying artists.
+    /// </summary>
+    /// <param name="libraryFilter">The model containing the parameters used to filter the results.</param>
+    /// <returns>A filter specification that can be used to query artists matching the provided criteria.</returns>
+    private static FilterSpecification<ArtistEntity>? BuildFilterSpecification(LibraryFilterDto libraryFilter)
+    {
+        // Include the search term filter, if provided.
+        if (!string.IsNullOrWhiteSpace(libraryFilter.SearchTerm))
+            return new ArtistSearchSpecification(libraryFilter.SearchTerm);
+
+        return null;
+    }
+
+    /// <summary>
+    /// Sorts an artists query by the given field name, defaulting to <see cref="ArtistEntity.Name"/>.
+    /// </summary>
+    /// <param name="artistsQuery">The query to sort.</param>
+    /// <param name="sortBy">The field to sort by (case-insensitive).</param>
+    /// <param name="sortOrder">The direction of the sorting.</param>
+    /// <returns>An ordered artists query.</returns>
+    private static IOrderedQueryable<ArtistEntity> ApplySorting(IQueryable<ArtistEntity> artistsQuery, string? sortBy, SortOrder sortOrder)
+    {
+        return sortBy?.ToLowerInvariant() switch
+        {
+            "website" => sortOrder == SortOrder.Descending
+                ? artistsQuery.OrderByDescending(artist => artist.Website).ThenBy(artist => artist.Id)
+                : artistsQuery.OrderBy(artist => artist.Website).ThenBy(artist => artist.Id),
+            "musicbrainzartistid" => sortOrder == SortOrder.Descending
+                ? artistsQuery.OrderByDescending(artist => artist.MusicBrainzArtistId).ThenBy(artist => artist.Id)
+                : artistsQuery.OrderBy(artist => artist.MusicBrainzArtistId).ThenBy(artist => artist.Id),
+            "createdonutc" => sortOrder == SortOrder.Descending
+                ? artistsQuery.OrderByDescending(artist => artist.CreatedOnUtc).ThenBy(artist => artist.Id)
+                : artistsQuery.OrderBy(artist => artist.CreatedOnUtc).ThenBy(artist => artist.Id),
+            "updatedonutc" => sortOrder == SortOrder.Descending
+                ? artistsQuery.OrderByDescending(artist => artist.UpdatedOnUtc).ThenBy(artist => artist.Id)
+                : artistsQuery.OrderBy(artist => artist.UpdatedOnUtc).ThenBy(artist => artist.Id),
+            _ => sortOrder == SortOrder.Descending
+                ? artistsQuery.OrderByDescending(artist => artist.Name).ThenBy(artist => artist.Id)
+                : artistsQuery.OrderBy(artist => artist.Name).ThenBy(artist => artist.Id),
         };
     }
 }

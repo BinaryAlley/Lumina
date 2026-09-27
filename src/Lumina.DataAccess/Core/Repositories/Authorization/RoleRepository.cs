@@ -5,6 +5,7 @@ using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.DTO.Filtering;
 using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Errors;
+using Lumina.DataAccess.Common.Persistence;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using Microsoft.EntityFrameworkCore;
@@ -114,6 +115,7 @@ internal sealed class RoleRepository : IRoleRepository
         return await _luminaDbContext.Roles
             .Include(role => role.RolePermissions)
             .ThenInclude(library => library.Permission)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(role => role.RoleName == roleType, cancellationToken)
             .ConfigureAwait(false);
     }
@@ -131,11 +133,10 @@ internal sealed class RoleRepository : IRoleRepository
         if (!shouldTrackEntities)
             query = query.AsNoTracking();
         if (shouldIncludeNavigationProperties)
-        {
             query = query
                 .Include(role => role.RolePermissions)
-                .ThenInclude(rolePermission => rolePermission.Permission);
-        }
+                .ThenInclude(rolePermission => rolePermission.Permission)
+                .AsSplitQuery();
         return await query.FirstOrDefaultAsync(role => role.Id == id, cancellationToken).ConfigureAwait(false);
     }
 
@@ -151,17 +152,29 @@ internal sealed class RoleRepository : IRoleRepository
         RoleEntity? foundRole = await _luminaDbContext.Roles
             .Include(role => role.RolePermissions)
             .ThenInclude(rolePermission => rolePermission.Permission)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(role => role.Id == data.Id, cancellationToken).ConfigureAwait(false);
         if (foundRole is null)
             return Errors.Authorization.RoleNotFound;
 
-        // Update the scalar properties.
-        _luminaDbContext.Entry(foundRole).CurrentValues.SetValues(data);
+        // The stored identity is never overwritten by an edit, and the audit columns are only ever written by the auditing interceptor.
+        EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundRole, data);
 
-        // Update the owned entities, whose changes are not tracked by EF automatically.
-        foundRole.RolePermissions.Clear();
-        foreach (RolePermissionEntity rolePermission in data.RolePermissions)
-            foundRole.RolePermissions.Add(rolePermission);
+        // A permission participation is matched by its permission. Matched participations keep their identity and their audit columns, so a permission
+        // that is referenced elsewhere is never deleted and re-inserted just because another field of the role was edited.
+        CollectionReconciler.Reconcile(
+            foundRole.RolePermissions,
+            data.RolePermissions,
+            existingRolePermission => existingRolePermission.PermissionId,
+            incomingRolePermission => incomingRolePermission.PermissionId,
+            shouldReplace: (existingRolePermission, incomingRolePermission) => false,
+            createNew: incomingRolePermission => new RolePermissionEntity
+            {
+                RoleId = foundRole.Id,
+                PermissionId = incomingRolePermission.PermissionId,
+                Permission = incomingRolePermission.Permission,
+                Role = foundRole
+            });
         return Result.Updated;
     }
 

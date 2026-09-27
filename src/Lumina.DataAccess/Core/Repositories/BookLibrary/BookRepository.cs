@@ -65,18 +65,16 @@ internal sealed class BookRepository : IBookRepository
         if (doesBookPathExist)
             return Errors.WrittenContent.BookAlreadyExists;
 
-        // Fetch existing tags and genres.
-        List<TagEntity> existingTags = await _luminaDbContext.Set<TagEntity>()
-            .Where(t => book.Tags.Select(bt => bt.Name).Contains(t.Name))
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
+        // Resolve the tags and genres of the book to a single instance per name, replacing the stored ones where they exist, so that the shared tables are not duplicated.
+        Result<IReadOnlyDictionary<string, TagEntity>> resolveTagsResult = await SharedReferenceResolver.ResolveAsync(_luminaDbContext, book.Tags, Errors.Metadata.TagNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+        if (resolveTagsResult.IsFailure)
+            return resolveTagsResult.Errors;
+        Result<IReadOnlyDictionary<string, GenreEntity>> resolveGenresResult = await SharedReferenceResolver.ResolveAsync(_luminaDbContext, book.Genres, Errors.Metadata.GenreNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+        if (resolveGenresResult.IsFailure)
+            return resolveGenresResult.Errors;
 
-        List<GenreEntity> existingGenres = await _luminaDbContext.Set<GenreEntity>()
-            .Where(g => book.Genres.Select(bg => bg.Name).Contains(g.Name))
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
-
-        // Replace tags and genres in the book with existing ones.
-        book.Tags = [.. book.Tags.Select(tag => existingTags.FirstOrDefault(existingTag => existingTag.Name == tag.Name) ?? tag)];
-        book.Genres = [.. book.Genres.Select(genre => existingGenres.FirstOrDefault(existingGenre => existingGenre.Name == genre.Name) ?? genre)];
+        book.Tags = [.. SharedReferenceResolver.Normalize(book.Tags, resolveTagsResult.Value)];
+        book.Genres = [.. SharedReferenceResolver.Normalize(book.Genres, resolveGenresResult.Value)];
 
         _luminaDbContext.Books.Add(book);
         return Result.Created;
@@ -215,7 +213,8 @@ internal sealed class BookRepository : IBookRepository
                 .Include(book => book.ISBNs)
                 .Include(book => book.Ratings)
                 .Include(book => book.Contributors)
-                .Include(book => book.Artwork);
+                .Include(book => book.Artwork)
+                .AsSplitQuery();
         }
 
         booksQuery = booksQuery.Where(book => book.LibraryId == libraryFilter.LibraryId);
@@ -503,6 +502,7 @@ internal sealed class BookRepository : IBookRepository
             .Include(book => book.ISBNs)
             .Include(book => book.Ratings)
             .Include(book => book.Contributors)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(book => book.Id == data.Id, cancellationToken).ConfigureAwait(false);
         if (foundBook is null)
             return Errors.WrittenContent.BookNotFound;
@@ -521,7 +521,13 @@ internal sealed class BookRepository : IBookRepository
         foundBook.LastMetadataUpdateUtc = lastMetadataUpdateUtc;
         foundBook.MetadataProvider = metadataProvider;
 
-        await ReconcileTagsAndGenresAsync(foundBook, data, cancellationToken).ConfigureAwait(false);
+        // Tags and genres are shared across the whole database, so the stored rows whose names already exist are reused, and only the missing names are inserted.
+        Result<Updated> reconcileTagsResult = await SharedReferenceResolver.ReconcileAsync(_luminaDbContext, foundBook.Tags, data.Tags, Errors.Metadata.TagNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+        if (reconcileTagsResult.IsFailure)
+            return reconcileTagsResult.Errors;
+        Result<Updated> reconcileGenresResult = await SharedReferenceResolver.ReconcileAsync(_luminaDbContext, foundBook.Genres, data.Genres, Errors.Metadata.GenreNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+        if (reconcileGenresResult.IsFailure)
+            return reconcileGenresResult.Errors;
 
         // ISBNs are owned value objects with no identity anyone could reference, so an ISBN whose format changed is replaced as a whole, while the ones that did not
         // change are left exactly as they are stored. Matching by the ISBN value keeps an update in place instead of recreating every ISBN of the book.
@@ -557,41 +563,6 @@ internal sealed class BookRepository : IBookRepository
     }
 
     /// <summary>
-    /// Reconciles the tags and genres of <paramref name="foundBook"/> against the ones carried by <paramref name="data"/>, reusing the stored tags and genres whose names already exist.
-    /// </summary>
-    /// <param name="foundBook">The tracked book whose tags and genres are reconciled.</param>
-    /// <param name="data">The book carrying the desired tags and genres.</param>
-    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    private async Task ReconcileTagsAndGenresAsync(BookEntity foundBook, BookEntity data, CancellationToken cancellationToken)
-    {
-        // Tags and genres are shared across the whole database, so the ones whose names are already stored are reused, and only the missing names are inserted.
-        List<string> tagNames = [.. data.Tags.Select(tag => tag.Name!)];
-        List<string> genreNames = [.. data.Genres.Select(genre => genre.Name!)];
-        List<TagEntity> existingTags = await _luminaDbContext.Set<TagEntity>()
-            .Where(tag => tagNames.Contains(tag.Name!))
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
-        List<GenreEntity> existingGenres = await _luminaDbContext.Set<GenreEntity>()
-            .Where(genre => genreNames.Contains(genre.Name!))
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
-
-        CollectionReconciler.Reconcile(
-            foundBook.Tags,
-            data.Tags.Select(tag => existingTags.FirstOrDefault(existingTag => existingTag.Name == tag.Name) ?? tag),
-            existingTag => existingTag.Name!,
-            incomingTag => incomingTag.Name!,
-            shouldReplace: (existingTag, incomingTag) => false,
-            createNew: incomingTag => incomingTag);
-
-        CollectionReconciler.Reconcile(
-            foundBook.Genres,
-            data.Genres.Select(genre => existingGenres.FirstOrDefault(existingGenre => existingGenre.Name == genre.Name) ?? genre),
-            existingGenre => existingGenre.Name!,
-            incomingGenre => incomingGenre.Name!,
-            shouldReplace: (existingGenre, incomingGenre) => false,
-            createNew: incomingGenre => incomingGenre);
-    }
-
-    /// <summary>
     /// Sorts a books query by the given field name, defaulting to <see cref="BookEntity.Title"/>.
     /// </summary>
     /// <param name="booksQuery">The query to sort.</param>
@@ -600,7 +571,7 @@ internal sealed class BookRepository : IBookRepository
     /// <param name="shouldIgnoreThePrefixForAlphaPicker">Whether a leading "the " prefix of a title is ignored when deriving the title sort key, or not.</param>
     private static IOrderedQueryable<BookEntity> ApplySorting(IQueryable<BookEntity> booksQuery, string? sortBy, SortOrder sortOrder, bool shouldIgnoreThePrefixForAlphaPicker)
     {
-        return sortBy?.ToLower() switch
+        return sortBy?.ToLowerInvariant() switch
         {
             "languagecode" => sortOrder == SortOrder.Descending
                 ? booksQuery.OrderByDescending(book => book.LanguageCode)

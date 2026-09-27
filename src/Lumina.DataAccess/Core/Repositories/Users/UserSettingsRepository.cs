@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
+using Lumina.DataAccess.Common.Persistence;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
@@ -87,7 +88,8 @@ internal sealed class UserSettingsRepository : IUserSettingsRepository
         if (foundSettings is null)
             return Errors.UserSettings.UserSettingsNotFound;
 
-        _luminaDbContext.Entry(foundSettings).CurrentValues.SetValues(data);
+        // The stored identity is never overwritten by an edit, and the audit columns are only ever written by the auditing interceptor.
+        EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundSettings, data);
         return Result.Updated;
     }
 }

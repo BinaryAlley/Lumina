@@ -5,6 +5,7 @@ using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DTO.Filtering;
 using Lumina.Application.Common.DTO.Pagination;
+using Lumina.DataAccess.Common.Persistence;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
@@ -116,6 +117,7 @@ internal sealed class UserRepository : IUserRepository
                 .ThenInclude(userPermission => userPermission.Permission)
             .Include(user => user.UserRole!.Role.RolePermissions)
                 .ThenInclude(rolePermission => rolePermission.Permission)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(user => user.Username == username, cancellationToken)
             .ConfigureAwait(false);
     }
@@ -135,35 +137,35 @@ internal sealed class UserRepository : IUserRepository
                 .ThenInclude(userPermission => userPermission.Permission)
             .Include(user => user.UserRole!.Role.RolePermissions)
                 .ThenInclude(rolePermission => rolePermission.Permission)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(user => user.Username == data.Username, cancellationToken)
             .ConfigureAwait(false);
         if (foundUser is null)
             return Errors.Users.UserDoesNotExist;
 
-        // Update scalar properties.
-        _luminaDbContext.Entry(foundUser).CurrentValues.SetValues(data);
+        // The stored identity is never overwritten by an edit, and the audit columns are only ever written by the auditing interceptor.
+        EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundUser, data);
 
-        // Update user permissions.
-        List<UserPermissionEntity> existingPermissions = [.. foundUser.UserPermissions];
-        foreach (UserPermissionEntity permission in existingPermissions)
-            _luminaDbContext.UserPermissions.Remove(permission);
-
-        foreach (UserPermissionEntity permission in data.UserPermissions)
-        {
-            _luminaDbContext.UserPermissions.Add(new UserPermissionEntity
+        // A permission participation is matched by its permission. Matched participations keep their identity and their audit columns, so a permission
+        // that is referenced elsewhere is never deleted and re-inserted just because another field of the user was edited.
+        CollectionReconciler.Reconcile(
+            foundUser.UserPermissions,
+            data.UserPermissions,
+            existingUserPermission => existingUserPermission.PermissionId,
+            incomingUserPermission => incomingUserPermission.PermissionId,
+            shouldReplace: (existingUserPermission, incomingUserPermission) => false,
+            createNew: incomingUserPermission => new UserPermissionEntity
             {
                 UserId = foundUser.Id,
-                PermissionId = permission.PermissionId,
-                Permission = permission.Permission,
+                PermissionId = incomingUserPermission.PermissionId,
+                Permission = incomingUserPermission.Permission,
                 User = foundUser
             });
-        }
 
         // Update user role.
         if (foundUser.UserRole != null)
             _luminaDbContext.UserRoles.Remove(foundUser.UserRole);
         if (data.UserRole is not null)
-        {
             _luminaDbContext.UserRoles.Add(new UserRoleEntity
             {
                 UserId = foundUser.Id,
@@ -171,7 +173,6 @@ internal sealed class UserRepository : IUserRepository
                 Role = data.UserRole.Role,
                 User = foundUser
             });
-        }
         return Result.Updated;
     }
 
@@ -187,15 +188,14 @@ internal sealed class UserRepository : IUserRepository
         if (!shouldTrackEntities)
             query = query.AsNoTracking();
         if (shouldIncludeNavigationProperties)
-        {
             query = query
                 .Include(user => user.Libraries)
                     .ThenInclude(library => library.ContentLocations)
                 .Include(user => user.UserPermissions)
                     .ThenInclude(userPermission => userPermission.Permission)
                 .Include(user => user.UserRole!.Role.RolePermissions)
-                    .ThenInclude(rolePermission => rolePermission.Permission);
-        }
+                    .ThenInclude(rolePermission => rolePermission.Permission)
+                .AsSplitQuery();
         return await query.FirstOrDefaultAsync(user => user.Id == id, cancellationToken)
             .ConfigureAwait(false);
     }
