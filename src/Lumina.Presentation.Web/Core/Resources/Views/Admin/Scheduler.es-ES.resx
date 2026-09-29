@@ -165,6 +165,9 @@
   <data name="TaskType.CleanScheduledJobExecutionHistory" xml:space="preserve">
     <value>Limpiar historial de trabajos</value>
   </data>
+  <data name="TaskType.TechnicalDataCleanup" xml:space="preserve">
+    <value>Limpieza de datos técnicos</value>
+  </data>
   <data name="StartupSchedule" xml:space="preserve">
     <value>Al inicio</value>
   </data>

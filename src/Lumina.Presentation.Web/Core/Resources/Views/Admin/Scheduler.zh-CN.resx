@@ -165,6 +165,9 @@
   <data name="TaskType.CleanScheduledJobExecutionHistory" xml:space="preserve">
     <value>清理作业历史</value>
   </data>
+  <data name="TaskType.TechnicalDataCleanup" xml:space="preserve">
+    <value>技术数据清理</value>
+  </data>
   <data name="StartupSchedule" xml:space="preserve">
     <value>启动时</value>
   </data>

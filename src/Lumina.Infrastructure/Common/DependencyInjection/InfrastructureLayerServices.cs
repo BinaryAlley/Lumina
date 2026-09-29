@@ -17,6 +17,7 @@ using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Art
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
 using Lumina.Application.Core.Scheduling.Notifications;
 using Lumina.Domain.Common.Events;
+using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Queue;
@@ -29,6 +30,7 @@ using Lumina.Infrastructure.Core.Authorization.Policies.Common.Factory;
 using Lumina.Infrastructure.Core.Authorization.Policies.LibraryOwnership;
 using Lumina.Infrastructure.Core.Authorization.Policies.Over18;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Cancellation;
+using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Audio.Music;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.WrittenContent.Books;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Progress;
@@ -104,12 +106,22 @@ public static class InfrastructureLayerServices
         services.AddHostedService<MediaLibraryScanJobProcessorJob>();
 
         services.AddTransient<IBooksFileSystemDiscoveryJob, BooksFileSystemDiscoveryJob>();
+        services.AddTransient<IMusicFileSystemDiscoveryJob, MusicFileSystemDiscoveryJob>();
+        services.AddTransient<IMusicMetadataExtractionJob, MusicMetadataExtractionJob>();
         services.AddTransient<IMediaLibraryScanDiffJob, MediaLibraryScanDiffJob>();
         services.AddTransient<IMediaLibraryScanHashJob, MediaLibraryScanHashJob>();
         services.AddTransient<IMediaLibraryScanResultsSaveJob, MediaLibraryScanResultsSaveJob>();
         services.AddTransient<IMediaLibraryScanProviderConfigurationInvalidationJob, MediaLibraryScanProviderConfigurationInvalidationJob>();
         services.AddTransient<IMediaLibraryScanMetadataEnrichmentJob, MediaLibraryScanMetadataEnrichmentJob>();
         services.AddTransient<IMediaLibraryScanArtworkEnrichmentJob, MediaLibraryScanArtworkEnrichmentJob>();
+
+        // The media library type specific behavior of the generic scan jobs is provided by the materializers and the enrichers, selected by the media library type.
+        services.AddTransient<IMediaLibraryScanItemMaterializer, BooksMediaLibraryScanItemMaterializer>();
+        services.AddTransient<IMediaLibraryScanItemMaterializer, MusicMediaLibraryScanItemMaterializer>();
+        services.AddTransient<IMediaLibraryScanMetadataEnricher, BooksMediaLibraryScanMetadataEnricher>();
+        services.AddTransient<IMediaLibraryScanMetadataEnricher, MusicMediaLibraryScanMetadataEnricher>();
+        services.AddTransient<IMediaLibraryScanArtworkEnricher, BooksMediaLibraryScanArtworkEnricher>();
+        services.AddTransient<IMediaLibraryScanArtworkEnricher, MusicMediaLibraryScanArtworkEnricher>();
 
 
         services.AddSingleton<IMediaLibraryScanProgressNotifier, DebouncedMediaLibraryScanProgressNotifier>();
@@ -153,6 +165,7 @@ public static class InfrastructureLayerServices
         services.AddScoped<TemporaryFilesCleanupTaskExecutor>();
         services.AddScoped<RepairThemesTaskExecutor>();
         services.AddScoped<CleanScheduledJobExecutionHistoryTaskExecutor>();
+        services.AddScoped<TechnicalDataCleanupTaskExecutor>();
 
         return services;
     }

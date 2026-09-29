@@ -23,5 +23,10 @@ public enum ScheduledTaskType
     /// <summary>
     /// The scheduled job cleans the execution history of the scheduled jobs, keeping only the recent executions.
     /// </summary>
-    CleanScheduledJobExecutionHistory
+    CleanScheduledJobExecutionHistory,
+
+    /// <summary>
+    /// The scheduled job cleans the technical data that is no longer valid.
+    /// </summary>
+    TechnicalDataCleanup
 }

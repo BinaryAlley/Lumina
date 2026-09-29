@@ -165,6 +165,9 @@
   <data name="TaskType.CleanScheduledJobExecutionHistory" xml:space="preserve">
     <value>Curăță istoricul proceselor</value>
   </data>
+  <data name="TaskType.TechnicalDataCleanup" xml:space="preserve">
+    <value>Curățare date tehnice</value>
+  </data>
   <data name="StartupSchedule" xml:space="preserve">
     <value>La pornire</value>
   </data>

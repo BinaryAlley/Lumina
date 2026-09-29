@@ -24,6 +24,7 @@ public class ScheduledTaskExecutorFactoryTests
     private readonly TemporaryFilesCleanupTaskExecutor _mockTemporaryFilesCleanupTaskExecutor;
     private readonly RepairThemesTaskExecutor _mockRepairThemesTaskExecutor;
     private readonly CleanScheduledJobExecutionHistoryTaskExecutor _mockCleanScheduledJobExecutionHistoryTaskExecutor;
+    private readonly TechnicalDataCleanupTaskExecutor _mockTechnicalDataCleanupTaskExecutor;
     private readonly ScheduledTaskExecutorFactory _sut;
 
     /// <summary>
@@ -46,11 +47,15 @@ public class ScheduledTaskExecutorFactoryTests
             Substitute.For<IDateTimeProvider>(),
             Substitute.For<ILogger<CleanScheduledJobExecutionHistoryTaskExecutor>>(),
             Substitute.For<IUnitOfWork>());
+        _mockTechnicalDataCleanupTaskExecutor = Substitute.For<TechnicalDataCleanupTaskExecutor>(
+            Substitute.For<ILogger<TechnicalDataCleanupTaskExecutor>>(),
+            Substitute.For<IUnitOfWork>());
 
         _mockServiceProvider.GetService(typeof(MediaLibraryScanTaskExecutor)).Returns(_mockMediaLibraryScanTaskExecutor);
         _mockServiceProvider.GetService(typeof(TemporaryFilesCleanupTaskExecutor)).Returns(_mockTemporaryFilesCleanupTaskExecutor);
         _mockServiceProvider.GetService(typeof(RepairThemesTaskExecutor)).Returns(_mockRepairThemesTaskExecutor);
         _mockServiceProvider.GetService(typeof(CleanScheduledJobExecutionHistoryTaskExecutor)).Returns(_mockCleanScheduledJobExecutionHistoryTaskExecutor);
+        _mockServiceProvider.GetService(typeof(TechnicalDataCleanupTaskExecutor)).Returns(_mockTechnicalDataCleanupTaskExecutor);
 
         _sut = new ScheduledTaskExecutorFactory(_mockServiceProvider);
     }
@@ -93,6 +98,16 @@ public class ScheduledTaskExecutorFactoryTests
 
         // Assert
         Assert.Same(_mockCleanScheduledJobExecutionHistoryTaskExecutor, result);
+    }
+
+    [Fact]
+    public void CreateExecutor_WhenTaskTypeIsTechnicalDataCleanup_ShouldReturnTechnicalDataCleanupTaskExecutor()
+    {
+        // Act
+        IScheduledTaskExecutor result = _sut.CreateExecutor(ScheduledTaskType.TechnicalDataCleanup);
+
+        // Assert
+        Assert.Same(_mockTechnicalDataCleanupTaskExecutor, result);
     }
 
     [Fact]

@@ -73,4 +73,42 @@ public class LibraryScanRepositoryTests
         Assert.Null(reloadedScan.UpdatedOnUtc);
         Assert.Null(reloadedScan.UpdatedBy);
     }
+
+    [Fact]
+    public async Task FailInterruptedScansAsync_WhenScansArePendingOrRunning_ShouldMarkThemAsFailedAndLeaveTheOthersUnchanged()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-libraryscanrepo-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        LibraryScanRepository sut = new(context);
+
+        UserEntity storedUser = _userEntityFixture.Create(username: "scan-user", password: "Password123");
+        context.Users.Add(storedUser);
+        LibraryEntity storedLibrary = _libraryEntityFixture.Create(userId: storedUser.Id);
+        context.Libraries.Add(storedLibrary);
+        await context.SaveChangesAsync();
+
+        LibraryScanEntity pendingScan = _libraryScanEntityFixture.Create(libraryId: storedLibrary.Id, userId: storedUser.Id, status: LibraryScanJobStatus.Pending, libraryEntity: storedLibrary);
+        LibraryScanEntity runningScan = _libraryScanEntityFixture.Create(libraryId: storedLibrary.Id, userId: storedUser.Id, status: LibraryScanJobStatus.Running, libraryEntity: storedLibrary);
+        LibraryScanEntity completedScan = _libraryScanEntityFixture.Create(libraryId: storedLibrary.Id, userId: storedUser.Id, status: LibraryScanJobStatus.Completed, libraryEntity: storedLibrary);
+        LibraryScanEntity canceledScan = _libraryScanEntityFixture.Create(libraryId: storedLibrary.Id, userId: storedUser.Id, status: LibraryScanJobStatus.Canceled, libraryEntity: storedLibrary);
+        LibraryScanEntity failedScan = _libraryScanEntityFixture.Create(libraryId: storedLibrary.Id, userId: storedUser.Id, status: LibraryScanJobStatus.Failed, libraryEntity: storedLibrary);
+        context.LibraryScans.AddRange(pendingScan, runningScan, completedScan, canceledScan, failedScan);
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<Updated> result = await sut.FailInterruptedScansAsync(CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Updated, result.Value);
+        context.ChangeTracker.Clear();
+        Assert.Equal(LibraryScanJobStatus.Failed, (await context.LibraryScans.AsNoTracking().FirstAsync(scan => scan.Id == pendingScan.Id)).Status);
+        Assert.Equal(LibraryScanJobStatus.Failed, (await context.LibraryScans.AsNoTracking().FirstAsync(scan => scan.Id == runningScan.Id)).Status);
+        Assert.Equal(LibraryScanJobStatus.Completed, (await context.LibraryScans.AsNoTracking().FirstAsync(scan => scan.Id == completedScan.Id)).Status);
+        Assert.Equal(LibraryScanJobStatus.Canceled, (await context.LibraryScans.AsNoTracking().FirstAsync(scan => scan.Id == canceledScan.Id)).Status);
+        Assert.Equal(LibraryScanJobStatus.Failed, (await context.LibraryScans.AsNoTracking().FirstAsync(scan => scan.Id == failedScan.Id)).Status);
+    }
 }

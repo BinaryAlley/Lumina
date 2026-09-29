@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Scheduling;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Infrastructure.Scheduling;
 using Lumina.Application.Common.Infrastructure.Themes;
 using Lumina.Application.Common.Infrastructure.Time;
@@ -103,6 +105,7 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         await SynchronizeBundledThemesIfNeededAsync(stoppingToken).ConfigureAwait(false);
+        await EnsureTechnicalDataCleanupScheduledJobAsync(stoppingToken).ConfigureAwait(false);
         await ResumeActiveCyclesAsync(stoppingToken).ConfigureAwait(false);
         try
         {
@@ -145,6 +148,74 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
         {
             // Synchronizing the themes at startup is best effort, so a failure here must never stop the scheduler.
             _logger.LogWarning(exception, "Failed to synchronize the bundled themes at startup.");
+        }
+    }
+
+    /// <summary>
+    /// Ensures that the default "Technical data cleanup at startup" scheduled job exists, so that installations created before
+    /// the job was added to the default jobs also clean up the invalid technical data at every application startup.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <remarks>
+    /// The job is only created on installations that already have scheduled jobs. On a fresh installation, before the application
+    /// setup has run, no scheduled jobs exist yet, and the setup flow seeds this job together with the other default jobs.
+    /// </remarks>
+    private async Task EnsureTechnicalDataCleanupScheduledJobAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await using AsyncServiceScope scope = _serviceScopeFactory.CreateAsyncScope();
+            IUnitOfWork unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+            Result<PaginatedResultDto<ScheduledJobEntity>> getScheduledJobsResult = await unitOfWork.ScheduledJobRepository
+                .GetAllAsync<BaseFilterDto>(cancellationToken: cancellationToken).ConfigureAwait(false);
+            if (getScheduledJobsResult.IsFailure)
+            {
+                _logger.LogWarning("Failed to read the scheduled jobs to ensure the technical data cleanup job: {Error}", getScheduledJobsResult.FirstError.Description);
+                return;
+            }
+
+            IReadOnlyList<ScheduledJobEntity> scheduledJobs = getScheduledJobsResult.Value.Data;
+            // A fresh installation has no scheduled jobs yet, and the setup flow seeds the default jobs, including this one; when the
+            // job already exists, regardless of its status, it is not created again, so a job that was stopped or removed by the user stays that way.
+            if (scheduledJobs.Count == 0 || scheduledJobs.Any(scheduledJob => scheduledJob.TaskType == ScheduledTaskType.TechnicalDataCleanup))
+                return;
+
+            // The job is owned by the same user as the other scheduled jobs, which is the administrator account.
+            Guid ownerUserId = scheduledJobs[0].OwnerUserId;
+            ScheduledJobEntity technicalDataCleanupJob = new()
+            {
+                Id = Guid.NewGuid(),
+                Name = "Technical data cleanup at startup",
+                TaskType = ScheduledTaskType.TechnicalDataCleanup,
+                ScheduleType = ScheduleType.OnceAtStartup,
+                Status = ScheduledJobStatus.Active,
+                OwnerUserId = ownerUserId,
+                LastStartedOnUtc = null,
+                LastCompletedOnUtc = null,
+                CreatedOnUtc = DateTime.UtcNow,
+                CreatedBy = ownerUserId,
+                UpdatedOnUtc = null,
+                UpdatedBy = null
+            };
+            Result<Created> insertScheduledJobResult = await unitOfWork.ScheduledJobRepository.InsertAsync(technicalDataCleanupJob, cancellationToken).ConfigureAwait(false);
+            if (insertScheduledJobResult.IsFailure)
+            {
+                _logger.LogWarning("Failed to insert the technical data cleanup scheduled job: {Error}", insertScheduledJobResult.FirstError.Description);
+                return;
+            }
+            Result<Success> saveChangesResult = await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            if (saveChangesResult.IsFailure)
+            {
+                _logger.LogWarning("Failed to save the technical data cleanup scheduled job: {Error}", saveChangesResult.FirstError.Description);
+                return;
+            }
+            _logger.LogInformation("Created the default 'Technical data cleanup at startup' scheduled job.");
+        }
+        catch (OperationCanceledException) { }
+        catch (Exception exception)
+        {
+            // Ensuring the technical data cleanup job at startup is best effort, so a failure here must never stop the scheduler.
+            _logger.LogWarning(exception, "Failed to ensure the technical data cleanup scheduled job.");
         }
     }
 
