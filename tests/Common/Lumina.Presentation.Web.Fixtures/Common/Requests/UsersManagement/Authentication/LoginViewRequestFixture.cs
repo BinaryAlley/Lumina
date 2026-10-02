@@ -9,7 +9,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.Requests.UsersManagement.Authentication;
 
 /// <summary>
-/// Fixture class for generating <see cref="LoginViewRequest"/> test data.
+/// Fixture class for the <see cref="LoginViewRequest"/> record.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class LoginViewRequestFixture

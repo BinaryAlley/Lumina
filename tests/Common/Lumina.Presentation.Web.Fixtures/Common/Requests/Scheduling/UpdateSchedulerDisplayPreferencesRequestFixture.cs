@@ -10,7 +10,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.Requests.Scheduling;
 
 /// <summary>
-/// Fixture class for generating <see cref="UpdateSchedulerDisplayPreferencesRequest"/> test data.
+/// Fixture class for the <see cref="UpdateSchedulerDisplayPreferencesRequest"/> record.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class UpdateSchedulerDisplayPreferencesRequestFixture

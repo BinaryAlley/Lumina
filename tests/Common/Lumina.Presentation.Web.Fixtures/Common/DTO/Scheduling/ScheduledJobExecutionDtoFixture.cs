@@ -11,7 +11,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.DTO.Scheduling;
 
 /// <summary>
-/// Fixture class for generating <see cref="ScheduledJobExecutionDto"/> test data.
+/// Fixture class for the <see cref="ScheduledJobExecutionDto"/> record.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ScheduledJobExecutionDtoFixture

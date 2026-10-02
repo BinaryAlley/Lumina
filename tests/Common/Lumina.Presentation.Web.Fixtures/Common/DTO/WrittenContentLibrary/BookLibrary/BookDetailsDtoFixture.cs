@@ -15,7 +15,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.DTO.WrittenContentLibrary.BookLibrary;
 
 /// <summary>
-/// Fixture class for generating <see cref="BookDetailsDto"/> test data.
+/// Fixture class for the <see cref="BookDetailsDto"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class BookDetailsDtoFixture

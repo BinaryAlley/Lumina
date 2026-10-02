@@ -10,7 +10,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.DTO.Themes;
 
 /// <summary>
-/// Fixture class for generating <see cref="ThemeNavMenuDto"/> test data.
+/// Fixture class for the <see cref="ThemeNavMenuDto"/> record.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ThemeNavMenuDtoFixture

@@ -10,7 +10,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.DTO.UsersManagement;
 
 /// <summary>
-/// Fixture class for generating <see cref="UserDto"/> test data.
+/// Fixture class for the <see cref="UserDto"/> record.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class UserDtoFixture

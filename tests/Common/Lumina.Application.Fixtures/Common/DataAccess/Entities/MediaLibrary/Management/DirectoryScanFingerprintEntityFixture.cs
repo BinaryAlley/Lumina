@@ -10,7 +10,7 @@ using System.Linq;
 namespace Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
 
 /// <summary>
-/// Fixture class for generating <see cref="DirectoryScanFingerprintEntity"/> test data.
+/// Fixture class for the <see cref="DirectoryScanFingerprintEntity"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class DirectoryScanFingerprintEntityFixture

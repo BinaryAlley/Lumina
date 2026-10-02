@@ -11,7 +11,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.DTO.WrittenContentLibrary;
 
 /// <summary>
-/// Fixture class for generating <see cref="WrittenContentMetadataDto"/> test data.
+/// Fixture class for the <see cref="WrittenContentMetadataDto"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class WrittenContentMetadataDtoFixture

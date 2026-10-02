@@ -9,7 +9,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.DTO.FileSystemManagement;
 
 /// <summary>
-/// Fixture class for generating <see cref="PathValidDto"/> test data.
+/// Fixture class for the <see cref="PathValidDto"/> record.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class PathValidDtoFixture

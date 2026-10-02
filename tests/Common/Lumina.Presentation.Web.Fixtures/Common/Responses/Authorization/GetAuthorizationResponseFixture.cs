@@ -11,7 +11,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.Responses.Authorization;
 
 /// <summary>
-/// Fixture class for generating <see cref="GetAuthorizationResponse"/> test data.
+/// Fixture class for the <see cref="GetAuthorizationResponse"/> record.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetAuthorizationResponseFixture

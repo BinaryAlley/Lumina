@@ -9,7 +9,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.DTO.Reading;
 
 /// <summary>
-/// Fixture class for generating <see cref="ReadingTocEntryDto"/> test data.
+/// Fixture class for the <see cref="ReadingTocEntryDto"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ReadingTocEntryDtoFixture

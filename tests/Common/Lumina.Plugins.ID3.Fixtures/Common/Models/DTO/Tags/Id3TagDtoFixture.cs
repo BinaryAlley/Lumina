@@ -10,7 +10,7 @@ using System.Linq;
 namespace Lumina.Plugins.ID3.Fixtures.Common.Models.DTO.Tags;
 
 /// <summary>
-/// Fixture class for generating <see cref="Id3TagDto"/> test data.
+/// Fixture class for the <see cref="Id3TagDto"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 internal sealed class Id3TagDtoFixture

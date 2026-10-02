@@ -9,7 +9,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.Requests.Tools;
 
 /// <summary>
-/// Fixture class for generating <see cref="SetLanguageRequest"/> test data.
+/// Fixture class for the <see cref="SetLanguageRequest"/> record.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class SetLanguageRequestFixture

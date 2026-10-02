@@ -11,7 +11,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.DTO.Authorization;
 
 /// <summary>
-/// Fixture class for generating <see cref="PermissionDto"/> test data.
+/// Fixture class for the <see cref="PermissionDto"/> record.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class PermissionDtoFixture

@@ -9,7 +9,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.Responses.UsersManagement;
 
 /// <summary>
-/// Fixture class for generating <see cref="RegisterResponse"/> test data.
+/// Fixture class for the <see cref="RegisterResponse"/> record.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class RegisterResponseFixture

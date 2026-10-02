@@ -11,7 +11,7 @@ using System.Linq;
 namespace Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
 
 /// <summary>
-/// Fixture class for generating <see cref="LibraryScanResultEntity"/> test data.
+/// Fixture class for the <see cref="LibraryScanResultEntity"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class LibraryScanResultEntityFixture

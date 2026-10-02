@@ -10,7 +10,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.Requests.Library.Management;
 
 /// <summary>
-/// Fixture class for generating <see cref="DeleteLibraryRequest"/> test data.
+/// Fixture class for the <see cref="DeleteLibraryRequest"/> record.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class DeleteLibraryRequestFixture

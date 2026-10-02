@@ -8,7 +8,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.Requests.FileSystemManagement.Directories;
 
 /// <summary>
-/// Fixture class for generating <see cref="GetDirectoriesRequest"/> test data.
+/// Fixture class for the <see cref="GetDirectoriesRequest"/> record.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetDirectoriesRequestFixture

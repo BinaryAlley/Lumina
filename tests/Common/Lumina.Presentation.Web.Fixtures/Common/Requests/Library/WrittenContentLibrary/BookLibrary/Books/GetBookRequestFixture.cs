@@ -9,7 +9,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.Requests.Library.WrittenContentLibrary.BookLibrary.Books;
 
 /// <summary>
-/// Fixture class for generating <see cref="GetBookRequest"/> test data.
+/// Fixture class for the <see cref="GetBookRequest"/> record.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetBookRequestFixture
