@@ -39,7 +39,7 @@ public class GetPathParentRequestMappingTests
     public void ToQuery_WhenMappingWithDifferentPaths_ShouldMapCorrectly(string path)
     {
         // Arrange
-        GetPathParentRequest request = new(path);
+        GetPathParentRequest request = _getPathParentRequestFixture.Create(path);
 
         // Act
         GetPathParentQuery result = request.ToQuery();

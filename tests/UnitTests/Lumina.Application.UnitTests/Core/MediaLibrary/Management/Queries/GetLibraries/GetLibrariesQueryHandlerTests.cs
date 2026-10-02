@@ -9,6 +9,7 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Core.MediaLibrary.Management.Queries.GetLibraries;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Lumina.Application.Fixtures.Common.DTO.Pagination;
 using Lumina.Application.Fixtures.Core.MediaLibrary.Management.Queries.GetLibraries;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Domain.Common.Primitives;
@@ -35,6 +36,7 @@ public class GetLibrariesQueryHandlerTests
     private readonly GetLibrariesQueryHandler _sut;
     private readonly GetLibrariesQueryFixture _getLibrariesQueryFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
+    private readonly PaginatedResultDtoFixture<LibraryEntity> _paginatedResultDtoFixture = new();
     private readonly Guid _userId;
 
     /// <summary>
@@ -66,7 +68,7 @@ public class GetLibrariesQueryHandlerTests
             _libraryEntityFixture.Create(userId: _userId),
             _libraryEntityFixture.Create(userId: Guid.NewGuid())
         ];
-        _mockLibraryRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<LibraryEntity> { Data = libraries, CurrentPage = 1, PerPage = libraries.Count, Count = libraries.Count, NumberOfPages = 1 }));
+        _mockLibraryRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(_paginatedResultDtoFixture.Create(data: libraries, currentPage: 1, perPage: libraries.Count, count: libraries.Count, numberOfPages: 1)));
 
         // Act
         Result<LibraryResponse[]> result = await _sut.HandleAsync(_getLibrariesQueryFixture.Create(), CancellationToken.None);
@@ -88,7 +90,7 @@ public class GetLibrariesQueryHandlerTests
             _libraryEntityFixture.Create(userId: _userId),
             _libraryEntityFixture.Create(userId: otherUserId)
         ];
-        _mockLibraryRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<LibraryEntity> { Data = libraries, CurrentPage = 1, PerPage = libraries.Count, Count = libraries.Count, NumberOfPages = 1 }));
+        _mockLibraryRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(_paginatedResultDtoFixture.Create(data: libraries, currentPage: 1, perPage: libraries.Count, count: libraries.Count, numberOfPages: 1)));
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>()).Returns(false);
 
         // Act

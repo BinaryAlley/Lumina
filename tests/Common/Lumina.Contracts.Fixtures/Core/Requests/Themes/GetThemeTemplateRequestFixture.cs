@@ -21,12 +21,19 @@ public class GetThemeTemplateRequestFixture
     /// </summary>
     /// <param name="themeId">Optional. The manifest id of the theme.</param>
     /// <param name="pageKey">Optional. The page key that selects the template.</param>
+    /// <param name="includeThemeId">Whether the theme Id should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includePageKey">Whether the page key should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="GetThemeTemplateRequest"/>.</returns>
-    public GetThemeTemplateRequest Create(string? themeId = null, string? pageKey = null)
+    public GetThemeTemplateRequest Create(
+        string? themeId = null,
+        string? pageKey = null,
+        bool includeThemeId = true,
+        bool includePageKey = true)
     {
         return new GetThemeTemplateRequest(
-            themeId ?? _faker.Lorem.Slug(2),
-            pageKey ?? _faker.Lorem.Word());
+            includeThemeId ? (themeId ?? _faker.Lorem.Slug(2)) : null,
+            includePageKey ? (pageKey ?? _faker.Lorem.Word()) : null
+        );
     }
 
     /// <summary>

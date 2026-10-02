@@ -40,7 +40,7 @@ public class CheckPathExistsRequestMappingTests
     public void ToQuery_WhenMappingWithDifferentPathsAndHiddenElementsFlag_ShouldMapCorrectly(string path, bool shouldIncludeHiddenElements)
     {
         // Arrange
-        CheckPathExistsRequest request = new(path, shouldIncludeHiddenElements);
+        CheckPathExistsRequest request = _checkPathExistsRequestFixture.Create(path, shouldIncludeHiddenElements);
 
         // Act
         CheckPathExistsQuery result = request.ToQuery();

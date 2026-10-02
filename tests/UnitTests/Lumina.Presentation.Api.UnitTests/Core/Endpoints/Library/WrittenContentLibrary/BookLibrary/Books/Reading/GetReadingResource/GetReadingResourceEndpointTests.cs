@@ -133,7 +133,7 @@ public class GetReadingResourceEndpointTests
         Guid libraryId = Guid.NewGuid();
         Guid bookId = Guid.NewGuid();
         CancellationToken cancellationToken = CancellationToken.None;
-        ReadingResourceDataDto response = new(Guid.NewGuid().ToByteArray(), mimeType);
+        ReadingResourceDataDto response = _readingResourceDataDtoFixture.Create(data: Guid.NewGuid().ToByteArray(), mimeType: mimeType);
         _mockHandler.HandleAsync(Arg.Any<GetReadingResourceQuery>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(response));
         _sut.HttpContext.Request.RouteValues["libraryId"] = libraryId.ToString();

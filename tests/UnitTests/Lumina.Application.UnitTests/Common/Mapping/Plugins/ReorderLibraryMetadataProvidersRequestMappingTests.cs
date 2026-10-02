@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.Plugins;
 using Lumina.Application.Core.Plugins.Commands.ReorderLibraryMetadataProviders;
+using Lumina.Contracts.Fixtures.Core.Requests.Plugins;
 using Lumina.Contracts.Requests.Plugins;
 using System;
 using System.Collections.Generic;
@@ -15,11 +16,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Plugins;
 [ExcludeFromCodeCoverage]
 public class ReorderLibraryMetadataProvidersRequestMappingTests
 {
+    private readonly ReorderLibraryMetadataProvidersRequestFixture _reorderLibraryMetadataProvidersRequestFixture = new();
+
     [Fact]
     public void ToCommand_WhenMappingValidRequest_ShouldMapCorrectly()
     {
         // Arrange
-        ReorderLibraryMetadataProvidersRequest request = new(LibraryId: Guid.NewGuid(), PluginIds: [Guid.NewGuid(), Guid.NewGuid()]);
+        ReorderLibraryMetadataProvidersRequest request = _reorderLibraryMetadataProvidersRequestFixture.Create(Guid.NewGuid(), [Guid.NewGuid(), Guid.NewGuid()]);
 
         // Act
         ReorderLibraryMetadataProvidersCommand result = request.ToCommand();

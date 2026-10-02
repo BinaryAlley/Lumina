@@ -7,6 +7,7 @@ using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Core.Scheduling.Events;
 using Lumina.Application.Core.Scheduling.Notifications;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Scheduling;
+using Lumina.Application.Fixtures.Common.DTO.Pagination;
 using Lumina.Contracts.Responses.Scheduling;
 using Lumina.Domain.Common.Exceptions;
 using Lumina.Domain.Common.Primitives;
@@ -35,6 +36,7 @@ public class ScheduledJobExecutionStoppedDomainEventHandlerTests
     private readonly ScheduledJobExecutionStoppedDomainEventHandler _sut;
     private readonly ScheduledJobExecutionEntityFixture _scheduledJobExecutionEntityFixture = new();
     private readonly ScheduledJobExecutionStoppedDomainEventFixture _scheduledJobExecutionStoppedDomainEventFixture = new();
+    private readonly PaginatedResultDtoFixture<ScheduledJobEntity> _paginatedResultDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ScheduledJobExecutionStoppedDomainEventHandlerTests"/> class.
@@ -50,7 +52,7 @@ public class ScheduledJobExecutionStoppedDomainEventHandlerTests
         _mockUnitOfWork.ScheduledJobRepository.Returns(_mockScheduledJobRepository);
         _mockUnitOfWork.ScheduledJobExecutionRepository.Returns(_mockScheduledJobExecutionRepository);
         _mockScheduledJobExecutionRepository.UpdateAsync(Arg.Any<ScheduledJobExecutionEntity>(), Arg.Any<CancellationToken>()).Returns(Result.Updated);
-        _mockScheduledJobRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<ScheduledJobEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
+        _mockScheduledJobRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(_paginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 0, count: 0, numberOfPages: 1)));
 
         _sut = new ScheduledJobExecutionStoppedDomainEventHandler(_mockScheduledJobNotifier, _mockUnitOfWork);
     }

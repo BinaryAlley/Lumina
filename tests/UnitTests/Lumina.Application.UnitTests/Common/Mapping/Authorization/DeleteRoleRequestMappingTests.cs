@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Application.Core.Admin.Authorization.Roles.Commands.DeleteRole;
+using Lumina.Contracts.Fixtures.Core.Requests.Authorization;
 using Lumina.Contracts.Requests.Authorization;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -14,12 +15,14 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Authorization;
 [ExcludeFromCodeCoverage]
 public class DeleteRoleRequestMappingTests
 {
+    private readonly DeleteRoleRequestFixture _deleteRoleRequestFixture = new();
+
     [Fact]
     public void ToCommand_WhenMappingValidRequest_ShouldMapCorrectly()
     {
         // Arrange
         Guid roleId = Guid.NewGuid();
-        DeleteRoleRequest request = new(roleId);
+        DeleteRoleRequest request = _deleteRoleRequestFixture.Create(roleId);
 
         // Act
         DeleteRoleCommand result = request.ToCommand();
@@ -37,7 +40,7 @@ public class DeleteRoleRequestMappingTests
     {
         // Arrange
         Guid roleId = Guid.Parse(roleIdString);
-        DeleteRoleRequest request = new(roleId);
+        DeleteRoleRequest request = _deleteRoleRequestFixture.Create(roleId);
 
         // Act
         DeleteRoleCommand result = request.ToCommand();
@@ -51,7 +54,7 @@ public class DeleteRoleRequestMappingTests
     public void ToCommand_WhenRoleIdIsNull_ShouldThrowInvalidOperationException()
     {
         // Arrange
-        DeleteRoleRequest request = new(null);
+        DeleteRoleRequest request = _deleteRoleRequestFixture.Create(includeRoleId: false);
 
         // Act & Assert
         Assert.Throws<InvalidOperationException>(() => request.ToCommand());
@@ -61,7 +64,7 @@ public class DeleteRoleRequestMappingTests
     public void ToCommand_WhenMappingEmptyGuid_ShouldMapCorrectly()
     {
         // Arrange
-        DeleteRoleRequest request = new(Guid.Empty);
+        DeleteRoleRequest request = _deleteRoleRequestFixture.Create(Guid.Empty);
 
         // Act
         DeleteRoleCommand result = request.ToCommand();

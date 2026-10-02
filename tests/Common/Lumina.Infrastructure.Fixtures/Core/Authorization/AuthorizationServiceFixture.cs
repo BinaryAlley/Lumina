@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using Lumina.Infrastructure.Core.Authorization;
 using System;
@@ -16,6 +18,13 @@ namespace Lumina.Infrastructure.Fixtures.Core.Authorization;
 [ExcludeFromCodeCoverage]
 public class AuthorizationServiceFixture
 {
+    private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly RoleEntityFixture _roleEntityFixture = new();
+    private readonly PermissionEntityFixture _permissionEntityFixture = new();
+    private readonly RolePermissionEntityFixture _rolePermissionEntityFixture = new();
+    private readonly UserRoleEntityFixture _userRoleEntityFixture = new();
+    private readonly UserPermissionEntityFixture _userPermissionEntityFixture = new();
+
     /// <summary>
     /// Creates a user entity with specified permissions and roles.
     /// </summary>
@@ -28,7 +37,6 @@ public class AuthorizationServiceFixture
     {
         Guid userId = Guid.NewGuid();
         DateTime utcNow = DateTime.UtcNow;
-        List<UserPermissionEntity> userPermissions = [];
         UserRoleEntity? userRole = null;
 
         if (rolePermissions is not null)
@@ -36,86 +44,63 @@ public class AuthorizationServiceFixture
             foreach (KeyValuePair<string, IEnumerable<AuthorizationPermission>> rolePerm in rolePermissions)
             {
                 Guid roleId = Guid.NewGuid();
-                RoleEntity role = new()
-                {
-                    Id = roleId,
-                    RoleName = rolePerm.Key,
-                    CreatedOnUtc = utcNow,
-                    CreatedBy = userId,
-                    RolePermissions = []
-                };
+                RoleEntity role = _roleEntityFixture.Create(
+                    id: roleId,
+                    roleName: rolePerm.Key,
+                    createdBy: userId,
+                    createdOnUtc: utcNow);
 
                 foreach (AuthorizationPermission permission in rolePerm.Value)
                 {
                     Guid permissionId = Guid.NewGuid();
-                    PermissionEntity permissionEntity = new()
-                    {
-                        Id = permissionId,
-                        PermissionName = permission,
-                        CreatedOnUtc = utcNow,
-                        CreatedBy = userId
-                    };
+                    PermissionEntity permissionEntity = _permissionEntityFixture.Create(
+                        id: permissionId,
+                        permissionName: permission,
+                        createdBy: userId,
+                        createdOnUtc: utcNow);
 
-                    role.RolePermissions.Add(new RolePermissionEntity
-                    {
-                        Id = Guid.NewGuid(),
-                        RoleId = roleId,
-                        Role = role,
-                        PermissionId = permissionId,
-                        Permission = permissionEntity,
-                        CreatedOnUtc = utcNow,
-                        CreatedBy = userId
-                    });
+                    role.RolePermissions.Add(_rolePermissionEntityFixture.Create(
+                        role: role,
+                        permission: permissionEntity,
+                        createdBy: userId,
+                        createdOnUtc: utcNow));
                 }
 
-                userRole = new UserRoleEntity
-                {
-                    Id = Guid.NewGuid(),
-                    UserId = userId,
-                    User = null!,
-                    RoleId = roleId,
-                    Role = role,
-                    CreatedOnUtc = utcNow,
-                    CreatedBy = userId
-                };
+                userRole = _userRoleEntityFixture.Create(
+                    userId: userId,
+                    roleId: roleId,
+                    role: role,
+                    includeUser: false,
+                    createdBy: userId,
+                    createdOnUtc: utcNow);
             }
         }
 
-        UserEntity user = new()
-        {
-            Id = userId,
-            Username = "test-user",
-            Password = "hashed-password",
-            CreatedOnUtc = utcNow,
-            CreatedBy = userId,
-            Libraries = [],
-            UserPermissions = userPermissions,
-            UserRole = userRole
-        };
+        UserEntity user = _userEntityFixture.Create(
+            username: "test-user",
+            password: "hashed-password",
+            id: userId,
+            userRole: userRole,
+            includeUserRole: true,
+            createdBy: userId,
+            createdOnUtc: utcNow);
 
         if (directPermissions is not null)
         {
             foreach (AuthorizationPermission permission in directPermissions)
             {
                 Guid permissionId = Guid.NewGuid();
-                PermissionEntity permissionEntity = new()
-                {
-                    Id = permissionId,
-                    PermissionName = permission,
-                    CreatedOnUtc = utcNow,
-                    CreatedBy = userId
-                };
+                PermissionEntity permissionEntity = _permissionEntityFixture.Create(
+                    id: permissionId,
+                    permissionName: permission,
+                    createdBy: userId,
+                    createdOnUtc: utcNow);
 
-                userPermissions.Add(new UserPermissionEntity
-                {
-                    Id = Guid.NewGuid(),
-                    UserId = userId,
-                    User = user,
-                    PermissionId = permissionId,
-                    Permission = permissionEntity,
-                    CreatedOnUtc = utcNow,
-                    CreatedBy = userId
-                });
+                user.UserPermissions.Add(_userPermissionEntityFixture.Create(
+                    user,
+                    permissionEntity,
+                    createdOnUtc: utcNow,
+                    createdBy: userId));
             }
         }
 

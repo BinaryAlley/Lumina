@@ -9,6 +9,7 @@ using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authentication.Queries.LoginUser;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Core.UsersManagement.Authentication.Queries.LoginUser;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.Domain.Common.Primitives;
 using NSubstitute;
@@ -35,6 +36,7 @@ public class LoginUserQueryHandlerTests
     private readonly IDateTimeProvider _mockDateTimeProvider;
     private readonly LoginUserQueryHandler _sut;
     private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly LoginUserQueryFixture _loginUserQueryFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LoginUserQueryHandlerTests"/> class.
@@ -78,7 +80,7 @@ public class LoginUserQueryHandlerTests
         user.Password = Uri.EscapeDataString(hashedPassword);
         user.TotpSecret = null;
 
-        LoginUserQuery query = new(user.Username, password);
+        LoginUserQuery query = _loginUserQueryFixture.Create(user.Username, password);
 
         _mockUserRepository.GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
@@ -113,7 +115,7 @@ public class LoginUserQueryHandlerTests
         user.Password = Uri.EscapeDataString(hashedPassword);
         user.TotpSecret = encryptedTotpSecret;
 
-        LoginUserQuery query = new(user.Username, password, totpCode);
+        LoginUserQuery query = _loginUserQueryFixture.Create(user.Username, password, totpCode: totpCode);
 
         _mockUserRepository.GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
@@ -141,7 +143,7 @@ public class LoginUserQueryHandlerTests
     public async Task HandleAsync_WhenUserDoesNotExist_ShouldReturnError()
     {
         // Arrange
-        LoginUserQuery query = new("nonexistentUser", "password");
+        LoginUserQuery query = _loginUserQueryFixture.Create("nonexistentUser", "password");
 
         _mockUserRepository.GetByUsernameAsync(query.Username!, Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(null));
@@ -165,7 +167,7 @@ public class LoginUserQueryHandlerTests
         user.Password = Uri.EscapeDataString(hashedPassword);
         user.TempPassword = null;
 
-        LoginUserQuery query = new(user.Username, password);
+        LoginUserQuery query = _loginUserQueryFixture.Create(user.Username, password);
 
         _mockUserRepository.GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
@@ -193,7 +195,7 @@ public class LoginUserQueryHandlerTests
         user.TempPassword = Uri.EscapeDataString(hashedTempPassword);
         user.TempPasswordCreated = DateTime.UtcNow.AddMinutes(-16); // Expired (more than 15 minutes old)
 
-        LoginUserQuery query = new(user.Username, password);
+        LoginUserQuery query = _loginUserQueryFixture.Create(user.Username, password);
 
         _mockUserRepository.GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
@@ -231,7 +233,7 @@ public class LoginUserQueryHandlerTests
         user.TempPasswordCreated = DateTime.UtcNow.AddMinutes(-10);
         user.TotpSecret = null; // Ensure no TOTP validation is needed
 
-        LoginUserQuery query = new(user.Username, password);
+        LoginUserQuery query = _loginUserQueryFixture.Create(user.Username, password);
 
         _mockUserRepository.GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
@@ -265,7 +267,7 @@ public class LoginUserQueryHandlerTests
         user.Password = Uri.EscapeDataString(hashedPassword);
         user.TotpSecret = encryptedTotpSecret;
 
-        LoginUserQuery query = new(user.Username, password);
+        LoginUserQuery query = _loginUserQueryFixture.Create(user.Username, password);
 
         _mockUserRepository.GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
@@ -294,7 +296,7 @@ public class LoginUserQueryHandlerTests
         user.Password = Uri.EscapeDataString(hashedPassword);
         user.TotpSecret = encryptedTotpSecret;
 
-        LoginUserQuery query = new(user.Username, password, totpCode);
+        LoginUserQuery query = _loginUserQueryFixture.Create(user.Username, password, totpCode: totpCode);
 
         _mockUserRepository.GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
@@ -317,7 +319,7 @@ public class LoginUserQueryHandlerTests
     public async Task HandleAsync_WhenGetByUsernameReturnsError_ShouldReturnError()
     {
         // Arrange
-        LoginUserQuery query = new("username", "password");
+        LoginUserQuery query = _loginUserQueryFixture.Create("username", "password");
         Error error = Error.Failure("Database.Error", "Failed to retrieve user");
 
         _mockUserRepository.GetByUsernameAsync(query.Username!, Arg.Any<CancellationToken>())
@@ -344,7 +346,7 @@ public class LoginUserQueryHandlerTests
         user.TempPassword = Uri.EscapeDataString(hashedTempPassword);
         user.TempPasswordCreated = DateTime.UtcNow.AddMinutes(-10); // Valid timeframe
 
-        LoginUserQuery query = new(user.Username, password);
+        LoginUserQuery query = _loginUserQueryFixture.Create(user.Username, password);
 
         _mockUserRepository.GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));

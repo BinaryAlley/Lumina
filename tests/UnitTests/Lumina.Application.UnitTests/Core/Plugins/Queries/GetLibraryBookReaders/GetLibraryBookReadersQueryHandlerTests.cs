@@ -11,6 +11,7 @@ using Lumina.Application.Common.Infrastructure.Reading;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Plugins.Queries.GetLibraryBookReaders;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
+using Lumina.Application.Fixtures.Common.DTO.Pagination;
 using Lumina.Application.Fixtures.Core.Plugins.Queries.GetLibraryBookReaders;
 using Lumina.Contracts.Responses.Plugins;
 using Lumina.Domain.Common.Errors;
@@ -43,6 +44,7 @@ public class GetLibraryBookReadersQueryHandlerTests
     private readonly GetLibraryBookReadersQueryFixture _getLibraryBookReadersQueryFixture = new();
     private readonly LibraryBookReaderConfigurationEntityFixture _configurationEntityFixture = new();
     private readonly PluginEntityFixture _pluginEntityFixture = new();
+    private readonly PaginatedResultDtoFixture<PluginEntity> _paginatedResultDtoFixture = new();
     private readonly Guid _userId;
 
     /// <summary>
@@ -108,7 +110,7 @@ public class GetLibraryBookReadersQueryHandlerTests
             _pluginEntityFixture.Create(disabledPluginId, "B Reader")
         ];
         _mockPluginRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<PluginEntity> { Data = plugins, CurrentPage = 1, PerPage = plugins.Count, Count = plugins.Count, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: plugins, currentPage: 1, perPage: plugins.Count, count: plugins.Count, numberOfPages: 1)));
         Dictionary<Guid, IReadOnlyList<string>> supportedExtensions = new()
         {
             [enabledPluginId] = [".epub"],
@@ -143,7 +145,7 @@ public class GetLibraryBookReadersQueryHandlerTests
         _mockLibraryBookReaderConfigurationRepository.GetByLibraryIdAsync(query.LibraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryBookReaderConfigurationEntity>>(configurations));
         _mockPluginRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<PluginEntity> { Data = [_pluginEntityFixture.Create()], CurrentPage = 1, PerPage = 1, Count = 1, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: [_pluginEntityFixture.Create()], currentPage: 1, perPage: 1, count: 1, numberOfPages: 1)));
 
         // Act
         Result<IReadOnlyList<LibraryBookReaderResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
@@ -164,7 +166,7 @@ public class GetLibraryBookReadersQueryHandlerTests
         _mockLibraryBookReaderConfigurationRepository.GetByLibraryIdAsync(query.LibraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryBookReaderConfigurationEntity>>([]));
         _mockPluginRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<PluginEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 0, count: 0, numberOfPages: 1)));
 
         // Act
         Result<IReadOnlyList<LibraryBookReaderResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);

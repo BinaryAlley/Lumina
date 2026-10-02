@@ -22,16 +22,22 @@ public class LoginRequestFixture
     /// <param name="username">Optional. The username for login.</param>
     /// <param name="password">Optional. The password for login.</param>
     /// <param name="totpCode">Optional. The TOTP code for two-factor authentication.</param>
+    /// <param name="includeUsername">Whether the username should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includePassword">Whether the password should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeTotpCode">Whether the TOTP code should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="LoginRequest"/>.</returns>
     public LoginRequest Create(
         string? username = null,
         string? password = null,
-        string? totpCode = null)
+        string? totpCode = null,
+        bool includeUsername = true,
+        bool includePassword = true,
+        bool includeTotpCode = true)
     {
         return new LoginRequest(
-            username ?? _faker.Internet.UserName(),
-            password ?? _faker.Internet.Password(),
-            totpCode ?? _faker.Random.Number(100000, 999999).ToString()
+            includeUsername ? (username ?? _faker.Internet.UserName()) : null,
+            includePassword ? (password ?? _faker.Internet.Password()) : null,
+            includeTotpCode ? (totpCode ?? _faker.Random.Number(100000, 999999).ToString()) : null
         );
     }
 

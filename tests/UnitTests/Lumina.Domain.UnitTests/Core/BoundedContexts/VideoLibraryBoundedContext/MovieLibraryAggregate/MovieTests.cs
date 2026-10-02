@@ -72,7 +72,7 @@ public class MovieTests
         List<Rating> ratings = [CreateRating(4.5m)];
 
         // Act
-        Movie movie = new(id, metadata, contributors, ratings);
+        Movie movie = _movieFixture.Create(id, metadata, contributors, ratings);
 
         // Assert
         Assert.Equal(id, movie.Id);

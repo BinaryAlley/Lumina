@@ -23,15 +23,17 @@ public class UpdateUserRoleAndPermissionsRequestFixture
     /// <param name="userId">Optional. The Id of the user whose role and permissions are updated.</param>
     /// <param name="roleId">Optional. The Id of the role assigned to the user.</param>
     /// <param name="permissions">Optional. The Ids of the permissions assigned to the user.</param>
+    /// <param name="includeRoleId">Whether the role Id should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="UpdateUserRoleAndPermissionsRequest"/>.</returns>
     public UpdateUserRoleAndPermissionsRequest Create(
         Guid? userId = null,
         Guid? roleId = null,
-        List<Guid>? permissions = null)
+        List<Guid>? permissions = null,
+        bool includeRoleId = true)
     {
         return new UpdateUserRoleAndPermissionsRequest(
             userId ?? Guid.NewGuid(),
-            roleId ?? Guid.NewGuid(),
+            includeRoleId ? (roleId ?? Guid.NewGuid()) : null,
             permissions ?? [Guid.NewGuid(), Guid.NewGuid()]
         );
     }

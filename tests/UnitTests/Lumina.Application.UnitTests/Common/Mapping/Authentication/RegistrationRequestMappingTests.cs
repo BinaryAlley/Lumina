@@ -15,13 +15,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Authentication;
 [ExcludeFromCodeCoverage]
 public class RegistrationRequestMappingTests
 {
-    private readonly RegistrationRequestFixture _fixture = new();
+    private readonly RegistrationRequestFixture _registrationRequestFixture = new();
 
     [Fact]
     public void ToSetupCommand_WhenMappingRequest_ShouldMapCorrectly()
     {
         // Arrange
-        RegistrationRequest request = _fixture.Create();
+        RegistrationRequest request = _registrationRequestFixture.Create();
 
         // Act
         SetupApplicationCommand result = request.ToSetupCommand();
@@ -38,7 +38,7 @@ public class RegistrationRequestMappingTests
     public void ToCommand_WhenMappingRequest_ShouldMapCorrectly()
     {
         // Arrange
-        RegistrationRequest request = _fixture.Create();
+        RegistrationRequest request = _registrationRequestFixture.Create();
 
         // Act
         RegisterUserCommand result = request.ToCommand();
@@ -55,7 +55,7 @@ public class RegistrationRequestMappingTests
     public void ToSetupCommand_WhenMappingRequestWithNullValues_ShouldMapCorrectly()
     {
         // Arrange
-        RegistrationRequest request = new();
+        RegistrationRequest request = _registrationRequestFixture.Create(includeUsername: false, includePassword: false, includePasswordConfirm: false, use2fa: true);
 
         // Act
         SetupApplicationCommand result = request.ToSetupCommand();
@@ -72,7 +72,7 @@ public class RegistrationRequestMappingTests
     public void ToCommand_WhenMappingRequestWithNullValues_ShouldMapCorrectly()
     {
         // Arrange
-        RegistrationRequest request = new();
+        RegistrationRequest request = _registrationRequestFixture.Create(includeUsername: false, includePassword: false, includePasswordConfirm: false, use2fa: true);
 
         // Act
         RegisterUserCommand result = request.ToCommand();
@@ -97,7 +97,14 @@ public class RegistrationRequestMappingTests
         bool use2fa)
     {
         // Arrange
-        RegistrationRequest request = new(username, password, passwordConfirm, use2fa);
+        RegistrationRequest request = _registrationRequestFixture.Create(
+            username,
+            password,
+            passwordConfirm,
+            use2fa,
+            includeUsername: username is not null,
+            includePassword: password is not null,
+            includePasswordConfirm: passwordConfirm is not null);
 
         // Act
         SetupApplicationCommand result = request.ToSetupCommand();
@@ -122,7 +129,14 @@ public class RegistrationRequestMappingTests
         bool use2fa)
     {
         // Arrange
-        RegistrationRequest request = new(username, password, passwordConfirm, use2fa);
+        RegistrationRequest request = _registrationRequestFixture.Create(
+            username,
+            password,
+            passwordConfirm,
+            use2fa,
+            includeUsername: username is not null,
+            includePassword: password is not null,
+            includePasswordConfirm: passwordConfirm is not null);
 
         // Act
         RegisterUserCommand result = request.ToCommand();

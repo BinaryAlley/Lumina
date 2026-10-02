@@ -230,7 +230,7 @@ public class OpenLibraryBookMetadataProviderTests
     public async Task GetSearchResultsAsync_WhenLookupHasNoPath_ShouldThrowArgumentNullException()
     {
         // Arrange
-        BookMetadataLookupDto lookup = new(Guid.NewGuid(), null!, Isbn: "978-0-306-40615-7");
+        BookMetadataLookupDto lookup = _bookMetadataLookupDtoFixture.Create(includePath: false, isbn: "978-0-306-40615-7");
         OpenLibraryBookMetadataProvider sut = CreateProvider(new StubOpenLibraryHttpMessageHandler());
 
         // Act

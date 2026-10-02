@@ -39,7 +39,7 @@ public class GetThemeArchiveRequestMappingTests
     public void ToQuery_WhenMappingDifferentThemeIds_ShouldMapCorrectly(string themeId)
     {
         // Arrange
-        GetThemeArchiveRequest request = new(themeId);
+        GetThemeArchiveRequest request = _getThemeArchiveRequestFixture.Create(themeId);
 
         // Act
         GetThemeArchiveQuery result = request.ToQuery();
@@ -53,7 +53,7 @@ public class GetThemeArchiveRequestMappingTests
     public void ToQuery_WhenThemeIdIsNull_ShouldMapNull()
     {
         // Arrange
-        GetThemeArchiveRequest request = new(null);
+        GetThemeArchiveRequest request = _getThemeArchiveRequestFixture.Create(includeThemeId: false);
 
         // Act
         GetThemeArchiveQuery result = request.ToQuery();

@@ -2,6 +2,7 @@
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Seed;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.DataAccess.Core.UoW;
@@ -32,6 +33,7 @@ public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
         PropertyNameCaseInsensitive = true
     };
     private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly LoginRequestFixture _loginRequestFixture = new();
 
     /// <summary>
     /// Gets the username of the currently created test user.
@@ -74,9 +76,10 @@ public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
         await dbContext.SaveChangesAsync();
 
         // authenticate user
-        LoginRequest loginRequest = new(
-            Username: user.Username,
-            Password: "TestPass123!"
+        LoginRequest loginRequest = _loginRequestFixture.Create(
+            username: user.Username,
+            password: "TestPass123!",
+            includeTotpCode: false
         );
 
         HttpResponseMessage loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", loginRequest);
@@ -133,9 +136,10 @@ public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
         await dataSeedService.SetAdminRoleToAdministratorAccount(user.Id, CancellationToken.None);
 
         // authenticate user
-        LoginRequest loginRequest = new(
-            Username: user.Username,
-            Password: "TestPass123!"
+        LoginRequest loginRequest = _loginRequestFixture.Create(
+            username: user.Username,
+            password: "TestPass123!",
+            includeTotpCode: false
         );
 
         HttpResponseMessage loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", loginRequest);

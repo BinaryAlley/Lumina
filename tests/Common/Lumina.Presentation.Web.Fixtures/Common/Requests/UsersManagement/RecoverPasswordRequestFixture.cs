@@ -9,7 +9,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.Requests.UsersManagement;
 
 /// <summary>
-/// Fixture class for generating <see cref="RecoverPasswordRequest"/> test data.
+/// Fixture class for the <see cref="RecoverPasswordRequest"/> record.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class RecoverPasswordRequestFixture

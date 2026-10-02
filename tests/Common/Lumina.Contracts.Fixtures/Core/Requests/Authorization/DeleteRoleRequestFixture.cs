@@ -21,11 +21,13 @@ public class DeleteRoleRequestFixture
     /// Creates a random valid <see cref="DeleteRoleRequest"/>.
     /// </summary>
     /// <param name="roleId">Optional. The Id of the role to delete.</param>
+    /// <param name="includeRoleId">Whether the role Id should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="DeleteRoleRequest"/>.</returns>
     public DeleteRoleRequest Create(
-        Guid? roleId = null)
+        Guid? roleId = null,
+        bool includeRoleId = true)
     {
-        return new DeleteRoleRequest(roleId ?? Guid.NewGuid());
+        return new DeleteRoleRequest(includeRoleId ? (roleId ?? Guid.NewGuid()) : null);
     }
 
     /// <summary>

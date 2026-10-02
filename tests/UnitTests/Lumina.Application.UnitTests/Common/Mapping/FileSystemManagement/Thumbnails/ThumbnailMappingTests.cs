@@ -53,7 +53,7 @@ public class ThumbnailMappingTests
     {
         // Arrange
         byte[] bytes = [.. _fixture.CreateMany<byte>(100)];
-        Thumbnail domainModel = new(imageType, bytes);
+        Thumbnail domainModel = _thumbnailFixture.Create(imageType, bytes);
 
         // Act
         ThumbnailResponse result = domainModel.ToResponse();
@@ -70,7 +70,7 @@ public class ThumbnailMappingTests
         // Arrange
         ImageType imageType = _fixture.Create<ImageType>();
         byte[] emptyBytes = [];
-        Thumbnail domainModel = new(imageType, emptyBytes);
+        Thumbnail domainModel = _thumbnailFixture.Create(imageType, emptyBytes);
 
         // Act
         ThumbnailResponse result = domainModel.ToResponse();

@@ -40,7 +40,7 @@ public class SplitPathRequestMappingTests
     public void ToCommand_WhenMappingWithDifferentPaths_ShouldMapCorrectly(string path)
     {
         // Arrange
-        SplitPathRequest request = new(path);
+        SplitPathRequest request = _splitPathRequestFixture.Create(path);
 
         // Act
         SplitPathCommand result = request.ToCommand();

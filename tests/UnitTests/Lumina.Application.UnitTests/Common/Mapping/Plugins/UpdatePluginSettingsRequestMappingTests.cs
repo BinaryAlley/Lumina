@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.Plugins;
 using Lumina.Application.Core.Plugins.Commands.UpdatePluginSettings;
+using Lumina.Contracts.Fixtures.Core.Requests.Plugins;
 using Lumina.Contracts.Requests.Plugins;
 using System;
 using System.Collections.Generic;
@@ -15,11 +16,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Plugins;
 [ExcludeFromCodeCoverage]
 public class UpdatePluginSettingsRequestMappingTests
 {
+    private readonly UpdatePluginSettingsRequestFixture _updatePluginSettingsRequestFixture = new();
+
     [Fact]
     public void ToCommand_WhenMappingValidRequest_ShouldMapCorrectly()
     {
         // Arrange
-        UpdatePluginSettingsRequest request = new(PluginId: Guid.NewGuid(), Settings: new Dictionary<string, string> { ["key"] = "value" });
+        UpdatePluginSettingsRequest request = _updatePluginSettingsRequestFixture.Create(Guid.NewGuid(), new Dictionary<string, string> { ["key"] = "value" });
 
         // Act
         UpdatePluginSettingsCommand result = request.ToCommand();
@@ -34,7 +37,7 @@ public class UpdatePluginSettingsRequestMappingTests
     public void ToCommand_WhenMappingRequestWithNullSettings_ShouldMapNullSettings()
     {
         // Arrange
-        UpdatePluginSettingsRequest request = new(PluginId: Guid.NewGuid(), Settings: null);
+        UpdatePluginSettingsRequest request = _updatePluginSettingsRequestFixture.Create(Guid.NewGuid(), includeSettings: false);
 
         // Act
         UpdatePluginSettingsCommand result = request.ToCommand();

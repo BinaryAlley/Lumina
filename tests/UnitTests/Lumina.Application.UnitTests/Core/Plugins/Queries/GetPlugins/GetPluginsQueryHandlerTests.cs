@@ -6,6 +6,7 @@ using Lumina.Application.Common.DTO.Filtering;
 using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Core.Plugins.Queries.GetPlugins;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
+using Lumina.Application.Fixtures.Common.DTO.Pagination;
 using Lumina.Application.Fixtures.Core.Plugins.Queries.GetPlugins;
 using Lumina.Contracts.Responses.Plugins;
 using Lumina.Domain.Common.Primitives;
@@ -29,6 +30,7 @@ public class GetPluginsQueryHandlerTests
     private readonly GetPluginsQueryHandler _sut;
     private readonly GetPluginsQueryFixture _getPluginsQueryFixture = new();
     private readonly PluginEntityFixture _pluginEntityFixture = new();
+    private readonly PaginatedResultDtoFixture<PluginEntity> _paginatedResultDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPluginsQueryHandlerTests"/> class.
@@ -48,7 +50,7 @@ public class GetPluginsQueryHandlerTests
         // Arrange
         List<PluginEntity> plugins = [_pluginEntityFixture.Create(), _pluginEntityFixture.Create()];
         _mockPluginRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<PluginEntity> { Data = plugins, CurrentPage = 1, PerPage = plugins.Count, Count = plugins.Count, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: plugins, currentPage: 1, perPage: plugins.Count, count: plugins.Count, numberOfPages: 1)));
 
         // Act
         Result<IReadOnlyList<PluginResponse>> result = await _sut.HandleAsync(_getPluginsQueryFixture.Create(), CancellationToken.None);

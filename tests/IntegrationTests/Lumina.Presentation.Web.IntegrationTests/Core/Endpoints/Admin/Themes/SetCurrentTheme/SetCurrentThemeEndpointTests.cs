@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.DTO.Themes;
-using Lumina.Presentation.Web.Common.Requests.Themes;
 using Lumina.Presentation.Web.Core.Endpoints.Admin.Themes.SetCurrentTheme;
 using Lumina.Presentation.Web.Fixtures.Common.DTO.Themes;
+using Lumina.Presentation.Web.Fixtures.Common.Requests.Themes;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
@@ -25,6 +25,7 @@ public class SetCurrentThemeEndpointTests : IClassFixture<LuminaWebFactory>
 {
     private readonly LuminaWebFactory _apiFactory;
     private readonly ThemeResponseDtoFixture _themeResponseDtoFixture = new();
+    private readonly SetCurrentThemeRequestFixture _setCurrentThemeRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SetCurrentThemeEndpointTests"/> class.
@@ -45,7 +46,7 @@ public class SetCurrentThemeEndpointTests : IClassFixture<LuminaWebFactory>
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage setCurrentThemeRequest = new(HttpMethod.Put, "/en-us/admin/themes/api-set-current-theme")
         {
-            Content = JsonContent.Create(new SetCurrentThemeRequest(THEME_ID))
+            Content = JsonContent.Create(_setCurrentThemeRequestFixture.Create(themeId: THEME_ID))
         };
         setCurrentThemeRequest.Content!.Headers.ContentType = new MediaTypeHeaderValue("application/json");
         setCurrentThemeRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

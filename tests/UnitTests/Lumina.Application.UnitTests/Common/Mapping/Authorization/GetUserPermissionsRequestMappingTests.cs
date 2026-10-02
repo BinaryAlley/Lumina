@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetUserPermissions;
+using Lumina.Contracts.Fixtures.Core.Requests.Authorization;
 using Lumina.Contracts.Requests.Authorization;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -14,12 +15,14 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Authorization;
 [ExcludeFromCodeCoverage]
 public class GetUserPermissionsRequestMappingTests
 {
+    private readonly GetUserPermissionsRequestFixture _getUserPermissionsRequestFixture = new();
+
     [Fact]
     public void ToQuery_WhenMappingValidRequest_ShouldMapCorrectly()
     {
         // Arrange
         Guid userId = Guid.NewGuid();
-        GetUserPermissionsRequest request = new(userId);
+        GetUserPermissionsRequest request = _getUserPermissionsRequestFixture.Create(userId);
 
         // Act
         GetUserPermissionsQuery result = request.ToQuery();
@@ -33,7 +36,7 @@ public class GetUserPermissionsRequestMappingTests
     public void ToQuery_WhenUserIdIsNull_ShouldMapCorrectly()
     {
         // Arrange
-        GetUserPermissionsRequest request = new(null);
+        GetUserPermissionsRequest request = _getUserPermissionsRequestFixture.Create(includeUserId: false);
 
         // Act
         GetUserPermissionsQuery result = request.ToQuery();
@@ -51,7 +54,7 @@ public class GetUserPermissionsRequestMappingTests
     {
         // Arrange
         Guid userId = Guid.Parse(userIdString);
-        GetUserPermissionsRequest request = new(userId);
+        GetUserPermissionsRequest request = _getUserPermissionsRequestFixture.Create(userId);
 
         // Act
         GetUserPermissionsQuery result = request.ToQuery();
@@ -65,7 +68,7 @@ public class GetUserPermissionsRequestMappingTests
     public void ToQuery_WhenMappingEmptyGuid_ShouldMapCorrectly()
     {
         // Arrange
-        GetUserPermissionsRequest request = new(Guid.Empty);
+        GetUserPermissionsRequest request = _getUserPermissionsRequestFixture.Create(Guid.Empty);
 
         // Act
         GetUserPermissionsQuery result = request.ToQuery();

@@ -17,6 +17,7 @@ using Lumina.Contracts.Fixtures.Core.DTO.Common;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaContributors;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
 using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
@@ -65,7 +66,9 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
     private readonly UpdateTrackRequestFixture _requestTrackFixture = new();
-    private readonly AudioMetadataDtoFixture _audioMetadataDtoFixture = new();
+    private readonly LoginRequestFixture _loginRequestFixture = new();
+    private readonly MusicTrackMetadataDtoFixture _audioMetadataDtoFixture = new();
+    private readonly MusicWorkDtoFixture _musicWorkDtoFixture = new();
     private readonly ReleaseInfoDtoFixture _releaseInfoDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
     private readonly TagDtoFixture _tagDtoFixture = new();
@@ -127,8 +130,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
             includeBpm: false,
             includeWork: false,
             includeMusicBrainzRecordingId: false,
-            includeMusicBrainzTrackId: false,
-            includeMusicBrainzWorkId: false);
+            includeMusicBrainzTrackId: false);
 
         // Act
         HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}", request);
@@ -170,8 +172,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
             includeBpm: false,
             includeWork: false,
             includeMusicBrainzRecordingId: false,
-            includeMusicBrainzTrackId: false,
-            includeMusicBrainzWorkId: false);
+            includeMusicBrainzTrackId: false);
         (HttpClient adminClient, _) = await CreateAdminClientAsync();
 
         // Act
@@ -817,7 +818,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenWorkExceeds255Characters_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(work: new Faker().Random.String2(256));
+        UpdateTrackRequest request = _requestTrackFixture.Create(work: _musicWorkDtoFixture.Create(title: new Faker().Random.String2(256)));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -856,7 +857,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenMusicBrainzWorkIdIsEmptyGuid_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(musicBrainzWorkId: Guid.Empty);
+        UpdateTrackRequest request = _requestTrackFixture.Create(work: _musicWorkDtoFixture.Create(musicBrainzWorkId: Guid.Empty));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -1160,7 +1161,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
 
         HttpClient client = _apiFactory.CreateClient();
         client.DefaultRequestHeaders.Add("X-Forwarded-For", $"192.{Random.Shared.Next(0, 255)}.{Random.Shared.Next(0, 255)}.{Random.Shared.Next(0, 255)}");
-        HttpResponseMessage loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", new LoginRequest(Username: username, Password: "TestPass123!"));
+        HttpResponseMessage loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", _loginRequestFixture.Create(username: username, password: "TestPass123!"));
         string content = await loginResponse.Content.ReadAsStringAsync();
         LoginResponse? loginResult = JsonSerializer.Deserialize<LoginResponse>(content, _jsonOptions);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResult!.Token);

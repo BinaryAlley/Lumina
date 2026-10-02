@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetUserRole;
+using Lumina.Application.Fixtures.Core.UsersManagement.Authorization.Queries.GetUserRole;
 using Lumina.Application.UnitTests.Common.Setup;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
@@ -17,12 +18,13 @@ namespace Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Querie
 public class GetUserRoleQueryValidatorTests
 {
     private readonly GetUserRoleQueryValidator _validator = new();
+    private readonly GetUserRoleQueryFixture _getUserRoleQueryFixture = new();
 
     [Fact]
     public void Validate_WhenUserIdIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        GetUserRoleQuery query = new(null);
+        GetUserRoleQuery query = _getUserRoleQueryFixture.Create(includeUserId: false);
 
         // Act
         List<Error> result = _validator.TestValidate(query);
@@ -35,7 +37,7 @@ public class GetUserRoleQueryValidatorTests
     public void Validate_WhenUserIdIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        GetUserRoleQuery query = new(Guid.Empty);
+        GetUserRoleQuery query = _getUserRoleQueryFixture.Create(Guid.Empty);
 
         // Act
         List<Error> result = _validator.TestValidate(query);
@@ -48,7 +50,7 @@ public class GetUserRoleQueryValidatorTests
     public void Validate_WhenUserIdIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        GetUserRoleQuery query = new(Guid.NewGuid());
+        GetUserRoleQuery query = _getUserRoleQueryFixture.Create(Guid.NewGuid());
 
         // Act
         List<Error> result = _validator.TestValidate(query);

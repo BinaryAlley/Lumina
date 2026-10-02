@@ -23,18 +23,24 @@ public class RegistrationRequestFixture
     /// <param name="password">Optional. The password for registration.</param>
     /// <param name="passwordConfirm">Optional. The password confirmation.</param>
     /// <param name="use2fa">Optional. Whether to use two-factor authentication.</param>
+    /// <param name="includeUsername">Whether the username should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includePassword">Whether the password should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includePasswordConfirm">Whether the password confirmation should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="RegistrationRequest"/>.</returns>
     public RegistrationRequest Create(
         string? username = null,
         string? password = null,
         string? passwordConfirm = null,
-        bool? use2fa = null)
+        bool? use2fa = null,
+        bool includeUsername = true,
+        bool includePassword = true,
+        bool includePasswordConfirm = true)
     {
         string generatedPassword = password ?? _faker.Internet.Password();
         return new RegistrationRequest(
-            username ?? _faker.Internet.UserName(),
-            generatedPassword,
-            passwordConfirm ?? generatedPassword,
+            includeUsername ? (username ?? _faker.Internet.UserName()) : null,
+            includePassword ? generatedPassword : null,
+            includePasswordConfirm ? (passwordConfirm ?? generatedPassword) : null,
             use2fa ?? _faker.Random.Bool()
         );
     }

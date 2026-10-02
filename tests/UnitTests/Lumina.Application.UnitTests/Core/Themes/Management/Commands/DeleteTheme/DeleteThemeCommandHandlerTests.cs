@@ -10,6 +10,7 @@ using Lumina.Application.Common.Infrastructure.Themes;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Themes.Management.Commands.DeleteTheme;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Themes;
+using Lumina.Application.Fixtures.Common.DTO.Pagination;
 using Lumina.Application.Fixtures.Core.Themes.Management.Commands.DeleteTheme;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
@@ -41,6 +42,7 @@ public class DeleteThemeCommandHandlerTests
     private readonly DeleteThemeCommandHandler _sut;
     private readonly DeleteThemeCommandFixture _deleteThemeCommandFixture = new();
     private readonly ThemeEntityFixture _themeEntityFixture = new();
+    private readonly PaginatedResultDtoFixture<ThemeEntity> _paginatedResultDtoFixture = new();
     private readonly Guid _userId;
 
     /// <summary>
@@ -210,7 +212,7 @@ public class DeleteThemeCommandHandlerTests
         _mockThemeRepository.GetByThemeIdAsync(command.ThemeId!, Arg.Any<CancellationToken>())
             .Returns(Result.From<ThemeEntity?>(theme));
         _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [theme, userTheme], CurrentPage = 1, PerPage = 2, Count = 2, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: [theme, userTheme], currentPage: 1, perPage: 2, count: 2, numberOfPages: 1)));
 
         // Act
         Result<Success> result = await _sut.HandleAsync(command, CancellationToken.None);
@@ -232,7 +234,7 @@ public class DeleteThemeCommandHandlerTests
         _mockThemeRepository.GetByThemeIdAsync(command.ThemeId!, Arg.Any<CancellationToken>())
             .Returns(Result.From<ThemeEntity?>(theme));
         _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [theme], CurrentPage = 1, PerPage = 1, Count = 1, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: [theme], currentPage: 1, perPage: 1, count: 1, numberOfPages: 1)));
 
         // Act
         Result<Success> result = await _sut.HandleAsync(command, CancellationToken.None);
@@ -255,7 +257,7 @@ public class DeleteThemeCommandHandlerTests
         _mockThemeRepository.GetByThemeIdAsync(command.ThemeId!, Arg.Any<CancellationToken>())
             .Returns(Result.From<ThemeEntity?>(theme));
         _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [theme, otherBundledTheme], CurrentPage = 1, PerPage = 2, Count = 2, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: [theme, otherBundledTheme], currentPage: 1, perPage: 2, count: 2, numberOfPages: 1)));
         _mockThemeRepository.UpdateAsync(Arg.Any<ThemeEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Updated);
 
@@ -282,7 +284,7 @@ public class DeleteThemeCommandHandlerTests
         _mockThemeRepository.GetByThemeIdAsync(command.ThemeId!, Arg.Any<CancellationToken>())
             .Returns(Result.From<ThemeEntity?>(theme));
         _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [theme, bundledTheme], CurrentPage = 1, PerPage = 2, Count = 2, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: [theme, bundledTheme], currentPage: 1, perPage: 2, count: 2, numberOfPages: 1)));
         _mockThemeRepository.DeleteByIdAsync(theme.Id, Arg.Any<CancellationToken>())
             .Returns(Result.Deleted);
 
@@ -308,7 +310,7 @@ public class DeleteThemeCommandHandlerTests
         _mockThemeRepository.GetByThemeIdAsync(command.ThemeId!, Arg.Any<CancellationToken>())
             .Returns(Result.From<ThemeEntity?>(theme));
         _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [theme, bundledTheme], CurrentPage = 1, PerPage = 2, Count = 2, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: [theme, bundledTheme], currentPage: 1, perPage: 2, count: 2, numberOfPages: 1)));
         _mockThemeRepository.DeleteByIdAsync(theme.Id, Arg.Any<CancellationToken>())
             .Returns(error);
 
@@ -333,7 +335,7 @@ public class DeleteThemeCommandHandlerTests
         _mockThemeRepository.GetByThemeIdAsync(command.ThemeId!, Arg.Any<CancellationToken>())
             .Returns(Result.From<ThemeEntity?>(theme));
         _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [theme, replacementTheme], CurrentPage = 1, PerPage = 2, Count = 2, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: [theme, replacementTheme], currentPage: 1, perPage: 2, count: 2, numberOfPages: 1)));
         _mockThemeRepository.UpdateAsync(Arg.Any<ThemeEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Updated);
 
@@ -364,7 +366,7 @@ public class DeleteThemeCommandHandlerTests
         _mockThemeRepository.GetByThemeIdAsync(command.ThemeId!, Arg.Any<CancellationToken>())
             .Returns(Result.From<ThemeEntity?>(theme));
         _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [theme, betaTheme, alphaTheme], CurrentPage = 1, PerPage = 3, Count = 3, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: [theme, betaTheme, alphaTheme], currentPage: 1, perPage: 3, count: 3, numberOfPages: 1)));
         _mockThemeRepository.UpdateAsync(Arg.Any<ThemeEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Updated);
 
@@ -392,7 +394,7 @@ public class DeleteThemeCommandHandlerTests
         _mockThemeRepository.GetByThemeIdAsync(command.ThemeId!, Arg.Any<CancellationToken>())
             .Returns(Result.From<ThemeEntity?>(theme));
         _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [theme, bundledTheme], CurrentPage = 1, PerPage = 2, Count = 2, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: [theme, bundledTheme], currentPage: 1, perPage: 2, count: 2, numberOfPages: 1)));
         _mockThemeRepository.DeleteByIdAsync(theme.Id, Arg.Any<CancellationToken>())
             .Returns(Result.Deleted);
         _mockThemeService.DeleteAsync(theme.ThemeId, Arg.Any<CancellationToken>())

@@ -23,19 +23,27 @@ public class ChangePasswordRequestFixture
     /// <param name="currentPassword">Optional. The current password.</param>
     /// <param name="newPassword">Optional. The new password.</param>
     /// <param name="newPasswordConfirm">Optional. The new password confirmation.</param>
+    /// <param name="includeUsername">Whether the username should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeCurrentPassword">Whether the current password should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeNewPassword">Whether the new password should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeNewPasswordConfirm">Whether the new password confirmation should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="ChangePasswordRequest"/>.</returns>
     public ChangePasswordRequest Create(
         string? username = null,
         string? currentPassword = null,
         string? newPassword = null,
-        string? newPasswordConfirm = null)
+        string? newPasswordConfirm = null,
+        bool includeUsername = true,
+        bool includeCurrentPassword = true,
+        bool includeNewPassword = true,
+        bool includeNewPasswordConfirm = true)
     {
         string generatedNewPassword = newPassword ?? _faker.Internet.Password();
         return new ChangePasswordRequest(
-            username ?? _faker.Internet.UserName(),
-            currentPassword ?? _faker.Internet.Password(),
-            generatedNewPassword,
-            newPasswordConfirm ?? generatedNewPassword
+            includeUsername ? (username ?? _faker.Internet.UserName()) : null,
+            includeCurrentPassword ? (currentPassword ?? _faker.Internet.Password()) : null,
+            includeNewPassword ? generatedNewPassword : null,
+            includeNewPasswordConfirm ? (newPasswordConfirm ?? generatedNewPassword) : null
         );
     }
 

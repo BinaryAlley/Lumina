@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.Plugins;
 using Lumina.Application.Core.Plugins.Commands.SetLibraryMetadataProviderEnabled;
+using Lumina.Contracts.Fixtures.Core.Requests.Plugins;
 using Lumina.Contracts.Requests.Plugins;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -14,11 +15,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Plugins;
 [ExcludeFromCodeCoverage]
 public class SetLibraryMetadataProviderEnabledRequestMappingTests
 {
+    private readonly SetLibraryMetadataProviderEnabledRequestFixture _setLibraryMetadataProviderEnabledRequestFixture = new();
+
     [Fact]
     public void ToCommand_WhenMappingValidRequest_ShouldMapCorrectly()
     {
         // Arrange
-        SetLibraryMetadataProviderEnabledRequest request = new(LibraryId: Guid.NewGuid(), PluginId: Guid.NewGuid(), IsEnabled: true);
+        SetLibraryMetadataProviderEnabledRequest request = _setLibraryMetadataProviderEnabledRequestFixture.Create(Guid.NewGuid(), Guid.NewGuid(), true);
 
         // Act
         SetLibraryMetadataProviderEnabledCommand result = request.ToCommand();

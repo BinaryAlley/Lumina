@@ -40,7 +40,7 @@ public class CombinePathRequestMappingTests
     public void ToCommand_WhenMappingWithDifferentPaths_ShouldMapCorrectly(string originalPath, string newPath)
     {
         // Arrange
-        CombinePathRequest request = new(originalPath, newPath);
+        CombinePathRequest request = _combinePathRequestFixture.Create(originalPath, newPath);
 
         // Act
         CombinePathCommand result = request.ToCommand();

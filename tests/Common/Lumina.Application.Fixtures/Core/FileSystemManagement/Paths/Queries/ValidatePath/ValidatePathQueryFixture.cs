@@ -18,13 +18,14 @@ public class ValidatePathQueryFixture
     /// Creates a random valid query to validate a path.
     /// </summary>
     /// <param name="path">Optional. The file system path.</param>
+    /// <param name="includePath">Whether the path should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created query.</returns>
-    public ValidatePathQuery Create(string? path = null)
+    public ValidatePathQuery Create(string? path = null, bool includePath = true)
     {
         return new Faker<ValidatePathQuery>()
             .CustomInstantiator(f => new ValidatePathQuery(
                 default!))
-            .RuleFor(x => x.Path, f => path ?? f.System.FilePath());
+            .RuleFor(x => x.Path, f => includePath ? (path ?? f.System.FilePath()) : null);
     }
 
     /// <summary>

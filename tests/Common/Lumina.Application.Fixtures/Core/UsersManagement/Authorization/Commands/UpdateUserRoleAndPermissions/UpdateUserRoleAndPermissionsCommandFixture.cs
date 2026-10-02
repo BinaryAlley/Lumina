@@ -22,19 +22,23 @@ public class UpdateUserRoleAndPermissionsCommandFixture
     /// <param name="roleId">Optional. The role Id to assign. If null, no role will be assigned.</param>
     /// <param name="permissions">Optional. The permission Ids to assign.</param>
     /// <param name="permissionCount">The number of permissions to generate when none are provided.</param>
+    /// <param name="includePermissions">Whether the permissions should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created command.</returns>
     public UpdateUserRoleAndPermissionsCommand Create(
         Guid? userId = null,
         Guid? roleId = null,
         IEnumerable<Guid>? permissions = null,
-        int permissionCount = 3)
+        int permissionCount = 3,
+        bool includePermissions = true)
     {
         return new Faker<UpdateUserRoleAndPermissionsCommand>()
             .CustomInstantiator(f => new UpdateUserRoleAndPermissionsCommand(
                 userId ?? Guid.NewGuid(),
                 roleId,
                 default!))
-            .RuleFor(x => x.Permissions, f => [.. permissions ?? Enumerable.Range(0, permissionCount).Select(_ => Guid.NewGuid())])
+            .RuleFor(x => x.Permissions, f => includePermissions
+                ? [.. permissions ?? Enumerable.Range(0, permissionCount).Select(_ => Guid.NewGuid())]
+                : null!)
             .Generate();
     }
 

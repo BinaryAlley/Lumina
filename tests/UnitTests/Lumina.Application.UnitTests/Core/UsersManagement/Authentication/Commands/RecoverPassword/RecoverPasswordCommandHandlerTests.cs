@@ -8,6 +8,7 @@ using Lumina.Application.Common.Infrastructure.Security;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.RecoverPassword;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Core.UsersManagement.Authentication.Commands.RecoverPassword;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.Domain.Common.Primitives;
 using NSubstitute;
@@ -32,6 +33,7 @@ public class RecoverPasswordCommandHandlerTests
     private readonly IUserRepository _mockUserRepository;
     private readonly RecoverPasswordCommandHandler _sut;
     private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly RecoverPasswordCommandFixture _recoverPasswordCommandFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CheckInitializationQueryHandlerTests"/> class.
@@ -71,7 +73,7 @@ public class RecoverPasswordCommandHandlerTests
         user.TotpSecret = encryptedTotpSecret;
         user.TempPassword = null;
 
-        RecoverPasswordCommand command = new(user.Username, totpCode);
+        RecoverPasswordCommand command = _recoverPasswordCommandFixture.Create(user.Username, totpCode);
 
         _mockUserRepository.GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
@@ -102,7 +104,7 @@ public class RecoverPasswordCommandHandlerTests
     public async Task HandleAsync_WhenUserDoesNotExist_ShouldReturnError()
     {
         // Arrange
-        RecoverPasswordCommand command = new("nonexistentUser", "123456");
+        RecoverPasswordCommand command = _recoverPasswordCommandFixture.Create("nonexistentUser", "123456");
 
         _mockUserRepository.GetByUsernameAsync(command.Username!, Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(null));
@@ -127,7 +129,7 @@ public class RecoverPasswordCommandHandlerTests
         user.TempPassword = "existingTempPassword";
         user.TempPasswordCreated = DateTime.UtcNow;
 
-        RecoverPasswordCommand command = new(user.Username, "123456");
+        RecoverPasswordCommand command = _recoverPasswordCommandFixture.Create(user.Username, "123456");
 
         _mockUserRepository.GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
@@ -151,7 +153,7 @@ public class RecoverPasswordCommandHandlerTests
         UserEntity user = _userEntityFixture.Create();
         user.TotpSecret = null;
 
-        RecoverPasswordCommand command = new(user.Username, "123456");
+        RecoverPasswordCommand command = _recoverPasswordCommandFixture.Create(user.Username, "123456");
 
         _mockUserRepository.GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
@@ -179,7 +181,7 @@ public class RecoverPasswordCommandHandlerTests
         UserEntity user = _userEntityFixture.Create();
         user.TotpSecret = encryptedTotpSecret;
 
-        RecoverPasswordCommand command = new(user.Username, totpCode);
+        RecoverPasswordCommand command = _recoverPasswordCommandFixture.Create(user.Username, totpCode);
 
         _mockUserRepository.GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
@@ -213,7 +215,7 @@ public class RecoverPasswordCommandHandlerTests
         UserEntity user = _userEntityFixture.Create();
         user.TotpSecret = encryptedTotpSecret;
 
-        RecoverPasswordCommand command = new(user.Username, totpCode);
+        RecoverPasswordCommand command = _recoverPasswordCommandFixture.Create(user.Username, totpCode);
 
         _mockUserRepository.GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
@@ -247,7 +249,7 @@ public class RecoverPasswordCommandHandlerTests
         UserEntity user = _userEntityFixture.Create();
         user.TotpSecret = encryptedTotpSecret;
 
-        RecoverPasswordCommand command = new(user.Username, totpCode);
+        RecoverPasswordCommand command = _recoverPasswordCommandFixture.Create(user.Username, totpCode);
         Error error = Error.Failure("Database.Error", "Failed to check username");
 
         _mockUserRepository.GetByUsernameAsync(command.Username!, Arg.Any<CancellationToken>())
@@ -274,7 +276,7 @@ public class RecoverPasswordCommandHandlerTests
         UserEntity user = _userEntityFixture.Create();
         user.TotpSecret = encryptedTotpSecret;
 
-        RecoverPasswordCommand command = new(user.Username, null);
+        RecoverPasswordCommand command = _recoverPasswordCommandFixture.Create(user.Username, includeTotpCode: false);
 
         _mockUserRepository.GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));

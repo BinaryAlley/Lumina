@@ -16,6 +16,8 @@ namespace Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Ma
 [ExcludeFromCodeCoverage]
 public class LibraryEntityFixture
 {
+    private readonly LibraryContentLocationEntityFixture _libraryContentLocationEntityFixture = new();
+
     /// <summary>
     /// Creates a random valid <see cref="LibraryEntity"/>.
     /// </summary>
@@ -76,7 +78,7 @@ public class LibraryEntityFixture
             .RuleFor(library => library.ContentLocations, f =>
             {
                 IEnumerable<string> paths = contentLocations ?? [f.System.DirectoryPath(), f.System.DirectoryPath()];
-                return [.. paths.Select(path => new LibraryContentLocationEntity() { Path = path })];
+                return [.. paths.Select(path => _libraryContentLocationEntityFixture.Create(path: path))];
             })
             .RuleFor(library => library.CreatedOnUtc, f => f.Date.Past())
             .RuleFor(library => library.CreatedBy, f => f.Random.Guid())

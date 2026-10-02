@@ -2,6 +2,7 @@
 using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,8 @@ namespace Lumina.Contracts.UnitTests.DTO.MediaLibrary.WrittenContentLibrary.Book
 [ExcludeFromCodeCoverage]
 public class BookMetadataLookupDtoTests
 {
+    private readonly BookMetadataLookupDtoFixture _bookMetadataLookupDtoFixture = new();
+
     [Fact]
     public void Constructor_WhenOmittingOptionalParameters_ShouldUseNullDefaults()
     {
@@ -23,7 +26,7 @@ public class BookMetadataLookupDtoTests
         Guid libraryId = Guid.NewGuid();
 
         // Act
-        BookMetadataLookupDto sut = new(libraryId, @"/media/books/dune.epub");
+        BookMetadataLookupDto sut = _bookMetadataLookupDtoFixture.Create(libraryId: libraryId, path: @"/media/books/dune.epub");
 
         // Assert
         Assert.Equal(libraryId, sut.LibraryId);

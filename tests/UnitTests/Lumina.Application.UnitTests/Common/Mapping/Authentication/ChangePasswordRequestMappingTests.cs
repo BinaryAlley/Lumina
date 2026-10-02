@@ -14,13 +14,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Authentication;
 [ExcludeFromCodeCoverage]
 public class ChangePasswordRequestMappingTests
 {
-    private readonly ChangePasswordRequestFixture _fixture = new();
+    private readonly ChangePasswordRequestFixture _changePasswordRequestFixture = new();
 
     [Fact]
     public void ToCommand_WhenMappingRequest_ShouldMapCorrectly()
     {
         // Arrange
-        ChangePasswordRequest request = _fixture.Create();
+        ChangePasswordRequest request = _changePasswordRequestFixture.Create();
 
         // Act
         ChangePasswordCommand result = request.ToCommand();
@@ -37,7 +37,7 @@ public class ChangePasswordRequestMappingTests
     public void ToCommand_WhenMappingRequestWithNullValues_ShouldMapCorrectly()
     {
         // Arrange
-        ChangePasswordRequest request = new(null, null, null, null);
+        ChangePasswordRequest request = _changePasswordRequestFixture.Create(includeUsername: false, includeCurrentPassword: false, includeNewPassword: false, includeNewPasswordConfirm: false);
 
         // Act
         ChangePasswordCommand result = request.ToCommand();
@@ -61,7 +61,15 @@ public class ChangePasswordRequestMappingTests
         string? newPasswordConfirm)
     {
         // Arrange
-        ChangePasswordRequest request = new(username, currentPassword, newPassword, newPasswordConfirm);
+        ChangePasswordRequest request = _changePasswordRequestFixture.Create(
+            username,
+            currentPassword,
+            newPassword,
+            newPasswordConfirm,
+            includeUsername: username is not null,
+            includeCurrentPassword: currentPassword is not null,
+            includeNewPassword: newPassword is not null,
+            includeNewPasswordConfirm: newPasswordConfirm is not null);
 
         // Act
         ChangePasswordCommand result = request.ToCommand();

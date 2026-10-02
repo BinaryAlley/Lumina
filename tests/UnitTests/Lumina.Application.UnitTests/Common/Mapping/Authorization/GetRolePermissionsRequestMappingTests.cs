@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Application.Core.Admin.Authorization.Roles.Queries.GetRolePermissions;
+using Lumina.Contracts.Fixtures.Core.Requests.Authorization;
 using Lumina.Contracts.Requests.Authorization;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -14,12 +15,14 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Authorization;
 [ExcludeFromCodeCoverage]
 public class GetRolePermissionsRequestMappingTests
 {
+    private readonly GetRolePermissionsRequestFixture _getRolePermissionsRequestFixture = new();
+
     [Fact]
     public void ToQuery_WhenMappingValidRequest_ShouldMapCorrectly()
     {
         // Arrange
         Guid roleId = Guid.NewGuid();
-        GetRolePermissionsRequest request = new(roleId);
+        GetRolePermissionsRequest request = _getRolePermissionsRequestFixture.Create(roleId);
 
         // Act
         GetRolePermissionsQuery result = request.ToQuery();
@@ -37,7 +40,7 @@ public class GetRolePermissionsRequestMappingTests
     {
         // Arrange
         Guid roleId = Guid.Parse(roleIdString);
-        GetRolePermissionsRequest request = new(roleId);
+        GetRolePermissionsRequest request = _getRolePermissionsRequestFixture.Create(roleId);
 
         // Act
         GetRolePermissionsQuery result = request.ToQuery();
@@ -51,7 +54,7 @@ public class GetRolePermissionsRequestMappingTests
     public void ToQuery_WhenMappingEmptyGuid_ShouldMapCorrectly()
     {
         // Arrange
-        GetRolePermissionsRequest request = new(Guid.Empty);
+        GetRolePermissionsRequest request = _getRolePermissionsRequestFixture.Create(Guid.Empty);
 
         // Act
         GetRolePermissionsQuery result = request.ToQuery();

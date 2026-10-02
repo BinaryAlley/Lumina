@@ -10,7 +10,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.Requests.Authorization;
 
 /// <summary>
-/// Fixture class for generating <see cref="DeleteRoleRequest"/> test data.
+/// Fixture class for the <see cref="DeleteRoleRequest"/> record.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class DeleteRoleRequestFixture

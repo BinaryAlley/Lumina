@@ -40,7 +40,7 @@ public class GetThemeTemplateRequestMappingTests
     public void ToQuery_WhenMappingDifferentThemeIdsAndPageKeys_ShouldMapCorrectly(string themeId, string pageKey)
     {
         // Arrange
-        GetThemeTemplateRequest request = new(themeId, pageKey);
+        GetThemeTemplateRequest request = _getThemeTemplateRequestFixture.Create(themeId, pageKey);
 
         // Act
         GetThemeTemplateQuery result = request.ToQuery();
@@ -55,7 +55,7 @@ public class GetThemeTemplateRequestMappingTests
     public void ToQuery_WhenFieldsAreNull_ShouldMapNull()
     {
         // Arrange
-        GetThemeTemplateRequest request = new(null, null);
+        GetThemeTemplateRequest request = _getThemeTemplateRequestFixture.Create(includeThemeId: false, includePageKey: false);
 
         // Act
         GetThemeTemplateQuery result = request.ToQuery();

@@ -418,7 +418,7 @@ public class UpdateBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
     public async Task UpdateBook_WhenOriginalReleaseYearIsLessThan1_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: new ReleaseInfoDto(null, 0, null, null, null, null)));
+        UpdateBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: 0)));
 
         // Act
         HttpResponseMessage response = await PutBookAsync(bookRequest);
@@ -431,7 +431,7 @@ public class UpdateBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
     public async Task UpdateBook_WhenOriginalReleaseYearIsGreaterThan9999_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: new ReleaseInfoDto(null, 10000, null, null, null, null)));
+        UpdateBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: 10000)));
 
         // Act
         HttpResponseMessage response = await PutBookAsync(bookRequest);
@@ -457,7 +457,7 @@ public class UpdateBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
     public async Task UpdateBook_WhenReReleaseYearIsLessThan1_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: new ReleaseInfoDto(null, null, null, 0, null, null)));
+        UpdateBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(reReleaseYear: 0)));
 
         // Act
         HttpResponseMessage response = await PutBookAsync(bookRequest);
@@ -470,7 +470,7 @@ public class UpdateBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
     public async Task UpdateBook_WhenReReleaseYearIsGreaterThan9999_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: new ReleaseInfoDto(null, null, null, 10000, null, null)));
+        UpdateBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(reReleaseYear: 10000)));
 
         // Act
         HttpResponseMessage response = await PutBookAsync(bookRequest);

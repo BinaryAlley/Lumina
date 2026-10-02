@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetAuthorization;
+using Lumina.Contracts.Fixtures.Core.Requests.Authorization;
 using Lumina.Contracts.Requests.Authorization;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -14,12 +15,14 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Authorization;
 [ExcludeFromCodeCoverage]
 public class GetAuthorizationRequestMappingTests
 {
+    private readonly GetAuthorizationRequestFixture _getAuthorizationRequestFixture = new();
+
     [Fact]
     public void ToQuery_WhenMappingValidRequest_ShouldMapCorrectly()
     {
         // Arrange
         Guid userId = Guid.NewGuid();
-        GetAuthorizationRequest request = new(userId);
+        GetAuthorizationRequest request = _getAuthorizationRequestFixture.Create(userId);
 
         // Act
         GetAuthorizationQuery result = request.ToQuery();
@@ -33,7 +36,7 @@ public class GetAuthorizationRequestMappingTests
     public void ToQuery_WhenUserIdIsNull_ShouldMapCorrectly()
     {
         // Arrange
-        GetAuthorizationRequest request = new(null);
+        GetAuthorizationRequest request = _getAuthorizationRequestFixture.Create(includeUserId: false);
 
         // Act
         GetAuthorizationQuery result = request.ToQuery();
@@ -51,7 +54,7 @@ public class GetAuthorizationRequestMappingTests
     {
         // Arrange
         Guid userId = Guid.Parse(userIdString);
-        GetAuthorizationRequest request = new(userId);
+        GetAuthorizationRequest request = _getAuthorizationRequestFixture.Create(userId);
 
         // Act
         GetAuthorizationQuery result = request.ToQuery();

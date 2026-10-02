@@ -26,7 +26,7 @@ public class ThumbnailTests
         byte[] bytes = [1, 2, 3, 4, 5];
 
         // Act
-        Thumbnail thumbnail = new(type, bytes);
+        Thumbnail thumbnail = _thumbnailFixture.Create(type, bytes);
 
         // Assert
         Assert.Equal(type, thumbnail.Type);
@@ -38,7 +38,7 @@ public class ThumbnailTests
     {
         // Arrange
         Thumbnail thumbnail1 = _thumbnailFixture.Create();
-        Thumbnail thumbnail2 = new(thumbnail1.Type, thumbnail1.Bytes);
+        Thumbnail thumbnail2 = _thumbnailFixture.Create(thumbnail1.Type, thumbnail1.Bytes);
 
         // Act
         bool result = thumbnail1.Equals(thumbnail2);
@@ -80,7 +80,7 @@ public class ThumbnailTests
     {
         // Arrange
         Thumbnail thumbnail1 = _thumbnailFixture.Create();
-        Thumbnail thumbnail2 = new(thumbnail1.Type, thumbnail1.Bytes);
+        Thumbnail thumbnail2 = _thumbnailFixture.Create(thumbnail1.Type, thumbnail1.Bytes);
 
         // Act
         int hashCode1 = thumbnail1.GetHashCode();

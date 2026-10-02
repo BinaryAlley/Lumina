@@ -2,10 +2,13 @@
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Common;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Lumina.Contracts.Fixtures.Core.DTO.MediaContributors;
+using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
@@ -26,6 +29,12 @@ public class TrackEntityMappingTests
 {
     private readonly TrackEntityFixture _trackEntityFixture = new();
     private readonly AudioRatingEntityFixture _audioRatingEntityFixture = new();
+    private readonly GenreEntityFixture _genreEntityFixture = new();
+    private readonly TagEntityFixture _tagEntityFixture = new();
+    private readonly TrackMoodEntityFixture _trackMoodEntityFixture = new();
+    private readonly TrackIsrcEntityFixture _trackIsrcEntityFixture = new();
+    private readonly MediaContributorReferenceDtoFixture _mediaContributorReferenceDtoFixture = new();
+    private readonly AudioRatingDtoFixture _audioRatingDtoFixture = new();
 
     [Fact]
     public void ToDomainEntity_WhenMappingValidTrackEntity_ShouldMapAllPropertiesCorrectly()
@@ -73,10 +82,10 @@ public class TrackEntityMappingTests
         Assert.Equal(entity.Script, track.Script.Value);
         Assert.Equal(entity.Key, track.Key.Value);
         Assert.Equal(entity.Bpm, track.Bpm.Value);
-        Assert.Equal(entity.Work, track.Work.Value);
+        Assert.Equal(entity.WorkTitle, track.Work.Value.Title);
         Assert.Equal(entity.MusicBrainzRecordingId, track.MusicBrainzRecordingId.Value.Value);
         Assert.Equal(entity.MusicBrainzTrackId, track.MusicBrainzTrackId.Value.Value);
-        Assert.Equal(entity.MusicBrainzWorkId, track.MusicBrainzWorkId.Value.Value);
+        Assert.Equal(entity.MusicBrainzWorkId, track.Work.Value.MusicBrainzWorkId.Value);
         Assert.Equal(entity.Moods.Select(mood => mood.Name), track.Moods.Select(mood => mood.Name));
         Assert.Equal(entity.Isrcs.Select(isrc => isrc.Value), track.Isrcs.Select(isrc => isrc.Value));
         Assert.Equal(entity.Ratings.Select(rating => rating.Value), track.Ratings.Select(rating => (decimal?)rating.Value));
@@ -107,7 +116,7 @@ public class TrackEntityMappingTests
     {
         // Arrange
         TrackEntity entity = _trackEntityFixture.Create();
-        entity.Genres = [new GenreEntity(string.Empty)];
+        entity.Genres = [_genreEntityFixture.Create(name: string.Empty)];
 
         // Act
         Result<Track> result = entity.ToDomainEntity();
@@ -122,7 +131,7 @@ public class TrackEntityMappingTests
     {
         // Arrange
         TrackEntity entity = _trackEntityFixture.Create();
-        entity.Tags = [new TagEntity("   ")];
+        entity.Tags = [_tagEntityFixture.Create(name: "   ")];
 
         // Act
         Result<Track> result = entity.ToDomainEntity();
@@ -137,7 +146,7 @@ public class TrackEntityMappingTests
     {
         // Arrange
         TrackEntity entity = _trackEntityFixture.Create();
-        entity.Moods = [new TrackMoodEntity(string.Empty)];
+        entity.Moods = [_trackMoodEntityFixture.Create(name: string.Empty)];
 
         // Act
         Result<Track> result = entity.ToDomainEntity();
@@ -152,7 +161,7 @@ public class TrackEntityMappingTests
     {
         // Arrange
         TrackEntity entity = _trackEntityFixture.Create();
-        entity.Isrcs = [new TrackIsrcEntity("not-an-isrc")];
+        entity.Isrcs = [_trackIsrcEntityFixture.Create(value: "not-an-isrc")];
 
         // Act
         Result<Track> result = entity.ToDomainEntity();
@@ -222,16 +231,16 @@ public class TrackEntityMappingTests
         Assert.Equal(entity.Script, result.Script);
         Assert.Equal(entity.Key, result.Key);
         Assert.Equal(entity.Bpm, result.Bpm);
-        Assert.Equal(entity.Work, result.Work);
+        Assert.Equal(entity.WorkTitle, result.Work!.Title);
         Assert.Equal(entity.MusicBrainzRecordingId, result.MusicBrainzRecordingId);
         Assert.Equal(entity.MusicBrainzTrackId, result.MusicBrainzTrackId);
-        Assert.Equal(entity.MusicBrainzWorkId, result.MusicBrainzWorkId);
+        Assert.Equal(entity.MusicBrainzWorkId, result.Work!.MusicBrainzWorkId);
         Assert.Equal(entity.CreatedOnUtc, result.CreatedOnUtc);
         Assert.Equal(entity.UpdatedOnUtc, result.UpdatedOnUtc);
         Assert.Equal(entity.Moods.Select(mood => mood.Name), result.Moods!.Select(mood => mood.Name));
         Assert.Equal(entity.Isrcs.Select(isrc => isrc.Value), result.Isrcs!.Select(isrc => isrc.Value));
-        Assert.Equal(entity.Contributors.Select(contributor => new MediaContributorReferenceDto(contributor.MediaContributorId, contributor.Role)), result.Contributors);
-        Assert.Equal(entity.Ratings.Select(rating => new AudioRatingDto(rating.Value, rating.MaxValue, rating.Source, rating.VoteCount)), result.Ratings);
+        Assert.Equal(entity.Contributors.Select(contributor => _mediaContributorReferenceDtoFixture.Create(contributorId: contributor.MediaContributorId, role: contributor.Role)), result.Contributors);
+        Assert.Equal(entity.Ratings.Select(rating => _audioRatingDtoFixture.Create(value: rating.Value, maxValue: rating.MaxValue, source: rating.Source, voteCount: rating.VoteCount)), result.Ratings);
     }
 
     [Fact]

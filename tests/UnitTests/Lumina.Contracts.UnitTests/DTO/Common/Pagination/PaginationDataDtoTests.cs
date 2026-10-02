@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.DTO.Common.Pagination;
+using Lumina.Contracts.Fixtures.Core.DTO.Common.Pagination;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -11,11 +12,13 @@ namespace Lumina.Contracts.UnitTests.DTO.Common.Pagination;
 [ExcludeFromCodeCoverage]
 public class PaginationDataDtoTests
 {
+    private readonly PaginationDataDtoFixture _paginationDataDtoFixture = new();
+
     [Fact]
     public void CurrentPage_WhenNotSet_ShouldDefaultToOne()
     {
         // Arrange
-        PaginationDataDto sut = new();
+        PaginationDataDto sut = _paginationDataDtoFixture.Create(includeCurrentPage: false, includePerPage: false);
 
         // Act
         int currentPage = sut.CurrentPage;
@@ -28,7 +31,7 @@ public class PaginationDataDtoTests
     public void PerPage_WhenNotSet_ShouldDefaultToTwoHundred()
     {
         // Arrange
-        PaginationDataDto sut = new();
+        PaginationDataDto sut = _paginationDataDtoFixture.Create(includeCurrentPage: false, includePerPage: false);
 
         // Act
         int perPage = sut.PerPage;
@@ -43,7 +46,7 @@ public class PaginationDataDtoTests
     public void CurrentPage_WhenSettingValueBelowOne_ShouldClampToOne(int value)
     {
         // Arrange
-        PaginationDataDto sut = new();
+        PaginationDataDto sut = _paginationDataDtoFixture.Create(includeCurrentPage: false, includePerPage: false);
 
         // Act
         sut.CurrentPage = value;
@@ -58,7 +61,7 @@ public class PaginationDataDtoTests
     public void PerPage_WhenSettingValueBelowOne_ShouldClampToOne(int value)
     {
         // Arrange
-        PaginationDataDto sut = new();
+        PaginationDataDto sut = _paginationDataDtoFixture.Create(includeCurrentPage: false, includePerPage: false);
 
         // Act
         sut.PerPage = value;
@@ -71,7 +74,7 @@ public class PaginationDataDtoTests
     public void CurrentPage_WhenSettingValueAboveOne_ShouldPreserveValue()
     {
         // Arrange
-        PaginationDataDto sut = new();
+        PaginationDataDto sut = _paginationDataDtoFixture.Create(includeCurrentPage: false, includePerPage: false);
 
         // Act
         sut.CurrentPage = 5;
@@ -84,7 +87,7 @@ public class PaginationDataDtoTests
     public void PerPage_WhenSettingValueAboveOne_ShouldPreserveValue()
     {
         // Arrange
-        PaginationDataDto sut = new();
+        PaginationDataDto sut = _paginationDataDtoFixture.Create(includeCurrentPage: false, includePerPage: false);
 
         // Act
         sut.PerPage = 25;

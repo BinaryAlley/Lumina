@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Contracts.Fixtures.Core.Requests.Themes;
 using Lumina.Contracts.Requests.Themes;
 using Lumina.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
@@ -18,6 +19,7 @@ public class SetCurrentThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDi
 {
     private readonly LuminaApiFactory _apiFactory;
     private readonly HttpClient _client;
+    private readonly SetCurrentThemeRequestFixture _setCurrentThemeRequestFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
@@ -39,7 +41,7 @@ public class SetCurrentThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDi
     public async Task SetCurrentTheme_WhenUnauthorized_ShouldReturnUnauthorizedResult()
     {
         // Arrange
-        SetCurrentThemeRequest request = new("some-theme");
+        SetCurrentThemeRequest request = _setCurrentThemeRequestFixture.Create(themeId: "some-theme");
 
         // Act
         HttpResponseMessage response = await _client.PutAsJsonAsync("/api/v1/themes/current", request);
@@ -64,7 +66,7 @@ public class SetCurrentThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDi
         // Arrange
         HttpClient client = _apiFactory.CreateClient();
         await _apiFactory.CreateAndAuthenticateUserAsync(client);
-        SetCurrentThemeRequest request = new("some-theme");
+        SetCurrentThemeRequest request = _setCurrentThemeRequestFixture.Create(themeId: "some-theme");
 
         // Act
         HttpResponseMessage response = await client.PutAsJsonAsync("/api/v1/themes/current", request);
@@ -96,7 +98,7 @@ public class SetCurrentThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDi
         // Arrange
         HttpClient client = _apiFactory.CreateClient();
         await _apiFactory.CreateAndAuthenticateAdminUserAsync(client);
-        SetCurrentThemeRequest request = new(maliciousThemeId);
+        SetCurrentThemeRequest request = _setCurrentThemeRequestFixture.Create(themeId: maliciousThemeId);
 
         // Act
         HttpResponseMessage response = await client.PutAsJsonAsync("/api/v1/themes/current", request);

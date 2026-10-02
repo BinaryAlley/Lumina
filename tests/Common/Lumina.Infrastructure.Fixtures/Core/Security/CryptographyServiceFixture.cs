@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
 using Lumina.Infrastructure.Common.Models.DTO.Configuration;
+using Lumina.Infrastructure.Fixtures.Common.Models.DTO.Configuration;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using System;
@@ -16,21 +17,20 @@ namespace Lumina.Infrastructure.Fixtures.Core.Security;
 [ExcludeFromCodeCoverage]
 public class CryptographyServiceFixture
 {
+    private readonly EncryptionSettingsDtoFixture _encryptionSettingsDtoFixture = new();
+
     /// <summary>
     /// Creates a valid encryption settings model for testing.
     /// </summary>
     /// <returns>The configured options.</returns>
-    public static IOptions<EncryptionSettingsDto> CreateEncryptionSettings()
+    public IOptions<EncryptionSettingsDto> CreateEncryptionSettings()
     {
         // Generate a valid 256-bit (32 byte) key for AES-256
         byte[] key = new byte[32];
         RandomNumberGenerator.Fill(key);
         string base64Key = Convert.ToBase64String(key);
 
-        EncryptionSettingsDto settings = new()
-        {
-            SecretKey = base64Key
-        };
+        EncryptionSettingsDto settings = _encryptionSettingsDtoFixture.Create(secretKey: base64Key);
 
         IOptions<EncryptionSettingsDto> options = Substitute.For<IOptions<EncryptionSettingsDto>>();
         options.Value.Returns(settings);
@@ -42,7 +42,7 @@ public class CryptographyServiceFixture
     /// Creates test data for encryption/decryption.
     /// </summary>
     /// <returns>A string to be encrypted/decrypted.</returns>
-    public static string CreateTestData()
+    public string CreateTestData()
     {
         return new Faker().Lorem.Sentence();
     }

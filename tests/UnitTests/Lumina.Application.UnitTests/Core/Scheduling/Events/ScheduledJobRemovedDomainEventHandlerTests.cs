@@ -7,6 +7,7 @@ using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Core.Scheduling.Events;
 using Lumina.Application.Core.Scheduling.Notifications;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Scheduling;
+using Lumina.Application.Fixtures.Common.DTO.Pagination;
 using Lumina.Contracts.Responses.Scheduling;
 using Lumina.Domain.Common.Exceptions;
 using Lumina.Domain.Common.Primitives;
@@ -34,6 +35,7 @@ public class ScheduledJobRemovedDomainEventHandlerTests
     private readonly ScheduledJobRemovedDomainEventHandler _sut;
     private readonly ScheduledJobEntityFixture _scheduledJobEntityFixture = new();
     private readonly ScheduledJobRemovedDomainEventFixture _scheduledJobRemovedDomainEventFixture = new();
+    private readonly PaginatedResultDtoFixture<ScheduledJobEntity> _paginatedResultDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ScheduledJobRemovedDomainEventHandlerTests"/> class.
@@ -46,7 +48,7 @@ public class ScheduledJobRemovedDomainEventHandlerTests
         _mockScheduledJobRepository = Substitute.For<IScheduledJobRepository>();
 
         _mockUnitOfWork.ScheduledJobRepository.Returns(_mockScheduledJobRepository);
-        _mockScheduledJobRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<ScheduledJobEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
+        _mockScheduledJobRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(_paginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 0, count: 0, numberOfPages: 1)));
 
         _sut = new ScheduledJobRemovedDomainEventHandler(_mockScheduledJobNotifier, _mockUnitOfWork);
     }
@@ -57,7 +59,7 @@ public class ScheduledJobRemovedDomainEventHandlerTests
         // Arrange
         ScheduledJobRemovedDomainEvent domainEvent = _scheduledJobRemovedDomainEventFixture.Create();
         ScheduledJobEntity remainingJob = _scheduledJobEntityFixture.Create(name: "Remaining job");
-        _mockScheduledJobRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<ScheduledJobEntity> { Data = [remainingJob], CurrentPage = 1, PerPage = 1, Count = 1, NumberOfPages = 1 }));
+        _mockScheduledJobRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(_paginatedResultDtoFixture.Create(data: [remainingJob], currentPage: 1, perPage: 1, count: 1, numberOfPages: 1)));
 
         // Act
         await _sut.HandleAsync(domainEvent, CancellationToken.None);

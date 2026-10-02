@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Plugins.OpenLibrary.Common.Models.DTO.Settings;
+using Lumina.Plugins.OpenLibrary.Fixtures.Common.Models.DTO.Settings;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -12,11 +13,13 @@ namespace Lumina.Plugins.OpenLibrary.UnitTests.Common.Models.DTO.Settings;
 [ExcludeFromCodeCoverage]
 public class OpenLibrarySettingsDtoTests
 {
+    private readonly OpenLibrarySettingsDtoFixture _openLibrarySettingsDtoFixture = new();
+
     [Fact]
     public void Defaults_WhenCreated_ShouldUseTheDocumentedDefaultValues()
     {
         // Arrange
-        OpenLibrarySettingsDto sut = new();
+        OpenLibrarySettingsDto sut = _openLibrarySettingsDtoFixture.Create(includeUserAgent: false, includeSearchResultLimit: false, includeWorkEditionLimit: false, includeMinimumRequestInterval: false);
 
         // Act
 
@@ -32,7 +35,7 @@ public class OpenLibrarySettingsDtoTests
     public void Setters_WhenAssigned_ShouldExposeTheAssignedValues()
     {
         // Arrange
-        OpenLibrarySettingsDto sut = new();
+        OpenLibrarySettingsDto sut = _openLibrarySettingsDtoFixture.Create();
         TimeSpan expectedInterval = TimeSpan.FromSeconds(3);
 
         // Act

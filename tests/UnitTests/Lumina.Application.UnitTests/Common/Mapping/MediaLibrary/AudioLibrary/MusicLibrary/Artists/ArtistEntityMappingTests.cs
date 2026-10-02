@@ -5,6 +5,7 @@ using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.A
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Application.Fixtures.Common.DTO.Pagination;
 using Lumina.Contracts.DTO.MediaContributors;
+using Lumina.Contracts.Fixtures.Core.DTO.MediaContributors;
 using Lumina.Contracts.Responses.Common;
 using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 using Lumina.Domain.Common.Errors;
@@ -27,6 +28,7 @@ public class ArtistEntityMappingTests
     private readonly ArtistEntityFixture _artistEntityFixture = new();
     private readonly AlbumEntityFixture _albumEntityFixture = new();
     private readonly PaginatedResultDtoFixture<ArtistEntity> _paginatedResultDtoFixture = new();
+    private readonly MediaContributorReferenceDtoFixture _mediaContributorReferenceDtoFixture = new();
 
     [Fact]
     public void ToDomainEntity_WhenMappingValidArtistEntity_ShouldMapAllPropertiesCorrectly()
@@ -111,10 +113,10 @@ public class ArtistEntityMappingTests
         Assert.NotNull(result);
         Assert.Equal(entity.Id, result.Id);
         Assert.Equal(entity.LibraryId, result.LibraryId);
-        Assert.Equal(entity.Name, result.Name);
+        Assert.Equal(entity.Name, result.Metadata.Name);
         Assert.Equal(entity.Website, result.Website);
         Assert.Equal(entity.MusicBrainzArtistId, result.MusicBrainzArtistId);
-        Assert.Equal(entity.Contributors.Select(contributor => new MediaContributorReferenceDto(contributor.MediaContributorId, contributor.Role)), result.Contributors);
+        Assert.Equal(entity.Contributors.Select(contributor => _mediaContributorReferenceDtoFixture.Create(contributorId: contributor.MediaContributorId, role: contributor.Role)), result.Contributors);
         Assert.Equal(entity.Albums.Count, result.Albums!.Count);
         Assert.Equal(entity.Albums.Select(album => album.Id), result.Albums.Select(album => album.Id));
         Assert.Equal(entity.Albums.Select(album => album.Title), result.Albums.Select(album => album.Metadata.Title));
@@ -157,7 +159,7 @@ public class ArtistEntityMappingTests
         for (int i = 0; i < entities.Count; i++)
         {
             Assert.Equal(entities[i].Id, results[i].Id);
-            Assert.Equal(entities[i].Name, results[i].Name);
+            Assert.Equal(entities[i].Name, results[i].Metadata.Name);
         }
     }
 

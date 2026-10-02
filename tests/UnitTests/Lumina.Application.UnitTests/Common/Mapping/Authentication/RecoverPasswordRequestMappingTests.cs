@@ -14,13 +14,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Authentication;
 [ExcludeFromCodeCoverage]
 public class RecoverPasswordRequestMappingTests
 {
-    private readonly RecoverPasswordRequestFixture _fixture = new();
+    private readonly RecoverPasswordRequestFixture _recoverPasswordRequestFixture = new();
 
     [Fact]
     public void ToCommand_WhenMappingRequest_ShouldMapCorrectly()
     {
         // Arrange
-        RecoverPasswordRequest request = _fixture.Create();
+        RecoverPasswordRequest request = _recoverPasswordRequestFixture.Create();
 
         // Act
         RecoverPasswordCommand result = request.ToCommand();
@@ -35,7 +35,7 @@ public class RecoverPasswordRequestMappingTests
     public void ToCommand_WhenMappingRequestWithNullValues_ShouldMapCorrectly()
     {
         // Arrange
-        RecoverPasswordRequest request = new(null, null);
+        RecoverPasswordRequest request = _recoverPasswordRequestFixture.Create(includeUsername: false, includeTotpCode: false);
 
         // Act
         RecoverPasswordCommand result = request.ToCommand();
@@ -56,7 +56,11 @@ public class RecoverPasswordRequestMappingTests
         string? totpCode)
     {
         // Arrange
-        RecoverPasswordRequest request = new(username, totpCode);
+        RecoverPasswordRequest request = _recoverPasswordRequestFixture.Create(
+            username,
+            totpCode,
+            includeUsername: username is not null,
+            includeTotpCode: totpCode is not null);
 
         // Act
         RecoverPasswordCommand result = request.ToCommand();

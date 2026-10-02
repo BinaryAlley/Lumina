@@ -65,6 +65,7 @@ public class AddBookCommandHandlerTests
     private readonly ReleaseInfoDtoFixture _releaseInfoDtoFixture = new();
     private readonly WrittenContentMetadataDtoFixture _writtenContentMetadataDtoFixture = new();
     private readonly MediaContributorReferenceDtoFixture _mediaContributorReferenceDtoFixture = new();
+    private readonly MediaContributorEntityFixture _mediaContributorEntityFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
 
     /// <summary>
@@ -104,14 +105,7 @@ public class AddBookCommandHandlerTests
             .Returns(callInfo =>
             {
                 IReadOnlyCollection<Guid> contributorIds = callInfo.Arg<IReadOnlyCollection<Guid>>();
-                return Result.From<IReadOnlyList<MediaContributorEntity>>([.. contributorIds.Select(contributorId => new MediaContributorEntity
-                {
-                    Id = contributorId,
-                    DisplayName = contributorId.ToString(),
-                    CreatedOnUtc = DateTime.UtcNow,
-                    CreatedBy = Guid.Empty,
-                    UpdatedBy = null
-                })]);
+                return Result.From<IReadOnlyList<MediaContributorEntity>>([.. contributorIds.Select(contributorId => _mediaContributorEntityFixture.Create(id: contributorId, displayName: contributorId.ToString()))]);
             });
 
         IValidator<AddBookCommand> mockValidator = Substitute.For<IValidator<AddBookCommand>>();

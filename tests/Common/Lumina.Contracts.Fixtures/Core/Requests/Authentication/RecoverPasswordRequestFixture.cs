@@ -21,14 +21,18 @@ public class RecoverPasswordRequestFixture
     /// </summary>
     /// <param name="username">Optional. The username for password recovery.</param>
     /// <param name="totpCode">Optional. The TOTP code for verification.</param>
+    /// <param name="includeUsername">Whether the username should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeTotpCode">Whether the TOTP code should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="RecoverPasswordRequest"/>.</returns>
     public RecoverPasswordRequest Create(
         string? username = null,
-        string? totpCode = null)
+        string? totpCode = null,
+        bool includeUsername = true,
+        bool includeTotpCode = true)
     {
         return new RecoverPasswordRequest(
-            username ?? _faker.Internet.UserName(),
-            totpCode ?? _faker.Random.Number(100000, 999999).ToString()
+            includeUsername ? (username ?? _faker.Internet.UserName()) : null,
+            includeTotpCode ? (totpCode ?? _faker.Random.Number(100000, 999999).ToString()) : null
         );
     }
 

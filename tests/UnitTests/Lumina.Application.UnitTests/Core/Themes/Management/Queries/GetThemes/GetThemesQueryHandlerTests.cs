@@ -6,6 +6,7 @@ using Lumina.Application.Common.DTO.Filtering;
 using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Core.Themes.Management.Queries.GetThemes;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Themes;
+using Lumina.Application.Fixtures.Common.DTO.Pagination;
 using Lumina.Application.Fixtures.Core.Themes.Management.Queries.GetThemes;
 using Lumina.Contracts.Responses.Themes;
 using Lumina.Domain.Common.Primitives;
@@ -30,6 +31,7 @@ public class GetThemesQueryHandlerTests
     private readonly GetThemesQueryHandler _sut;
     private readonly GetThemesQueryFixture _getThemesQueryFixture = new();
     private readonly ThemeEntityFixture _themeEntityFixture = new();
+    private readonly PaginatedResultDtoFixture<ThemeEntity> _paginatedResultDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetThemesQueryHandlerTests"/> class.
@@ -53,7 +55,7 @@ public class GetThemesQueryHandlerTests
         ThemeEntity bundledUpperTheme = _themeEntityFixture.Create(themeId: "bundled-upper", name: "Banana", installSource: ThemeInstallSource.Bundled, isDeleted: false);
         ThemeEntity deletedTheme = _themeEntityFixture.Create(themeId: "deleted-theme", name: "Deleted", installSource: ThemeInstallSource.Uploaded, isDeleted: true);
         _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [uploadedTheme, bundledLowerTheme, bundledUpperTheme, deletedTheme], CurrentPage = 1, PerPage = 4, Count = 4, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: [uploadedTheme, bundledLowerTheme, bundledUpperTheme, deletedTheme], currentPage: 1, perPage: 4, count: 4, numberOfPages: 1)));
 
         // Act
         Result<IReadOnlyList<ThemeResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
@@ -77,7 +79,7 @@ public class GetThemesQueryHandlerTests
         // Arrange
         GetThemesQuery query = _getThemesQueryFixture.Create();
         _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 0, count: 0, numberOfPages: 1)));
 
         // Act
         Result<IReadOnlyList<ThemeResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);

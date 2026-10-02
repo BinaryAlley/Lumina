@@ -8,7 +8,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.Requests.Themes;
 
 /// <summary>
-/// Fixture class for generating <see cref="GetThemeAssetRequest"/> test data.
+/// Fixture class for the <see cref="GetThemeAssetRequest"/> record.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetThemeAssetRequestFixture

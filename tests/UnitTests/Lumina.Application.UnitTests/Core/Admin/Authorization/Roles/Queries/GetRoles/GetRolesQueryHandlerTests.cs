@@ -9,6 +9,7 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Core.Admin.Authorization.Roles.Queries.GetRoles;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Lumina.Application.Fixtures.Common.DTO.Pagination;
 using Lumina.Application.Fixtures.Core.Admin.Authorization.Roles.Queries.GetRoles;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.Common.Primitives;
@@ -35,6 +36,7 @@ public class GetRolesQueryHandlerTests
     private readonly GetRolesQueryHandler _sut;
     private readonly GetRolesQueryFixture _getRolesQueryFixture = new();
     private readonly RoleEntityFixture _roleEntityFixture = new();
+    private readonly PaginatedResultDtoFixture<RoleEntity> _paginatedResultDtoFixture = new();
     private readonly Guid _userId;
 
     /// <summary>
@@ -126,7 +128,7 @@ public class GetRolesQueryHandlerTests
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
         _mockRoleRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<RoleEntity> { Data = roles, CurrentPage = 1, PerPage = roles.Count, Count = roles.Count, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: roles, currentPage: 1, perPage: roles.Count, count: roles.Count, numberOfPages: 1)));
 
         // Act
         Result<IEnumerable<RoleResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
