@@ -4,7 +4,9 @@ using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
@@ -21,6 +23,8 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.Management;
 public class LibraryMappingTests
 {
     private readonly LibraryFixture _libraryFixture = new();
+    private readonly LibraryPathPartFixture _libraryPathPartFixture = new();
+    private readonly LibraryPathTemplateFixture _libraryPathTemplateFixture = new();
 
     [Fact]
     public void ToRepositoryEntity_WhenMappingValidLibrary_ShouldMapCorrectly()
@@ -184,5 +188,58 @@ public class LibraryMappingTests
         Assert.NotNull(result);
         Assert.NotNull(library.ScanIds);
         Assert.NotNull(result.LibraryScans);
+    }
+
+    [Fact]
+    public void ToRepositoryEntity_WhenLibraryHasPathTemplateParts_ShouldMapPartsWithSequentialPositions()
+    {
+        // Arrange
+        LibraryPathPart literalPart = _libraryPathPartFixture.Create(
+            kind: LibraryPathPartKind.Literal,
+            representation: "Various Artists",
+            isOptional: false);
+        LibraryPathPart typedPart = _libraryPathPartFixture.Create(
+            kind: LibraryPathPartKind.Artist,
+            representation: "{0}",
+            isOptional: true);
+        LibraryPathTemplate pathTemplate = _libraryPathTemplateFixture.Create(parts: [literalPart, typedPart]);
+        Library library = _libraryFixture.Create(
+            title: "Test Library",
+            libraryType: LibraryType.Book,
+            contentLocations: ["C:/Books"],
+            pathTemplate: pathTemplate);
+
+        // Act
+        LibraryEntity result = library.ToRepositoryEntity();
+
+        // Assert
+        List<LibraryPathTemplatePartEntity> parts = [.. result.PathTemplateParts.OrderBy(part => part.Position)];
+        Assert.Equal(2, parts.Count);
+        Assert.Equal(0, parts[0].Position);
+        Assert.Equal(LibraryPathPartKind.Literal, parts[0].Kind);
+        Assert.Equal("Various Artists", parts[0].Representation);
+        Assert.False(parts[0].IsOptional);
+        Assert.Equal(1, parts[1].Position);
+        Assert.Equal(LibraryPathPartKind.Artist, parts[1].Kind);
+        Assert.Equal("{0}", parts[1].Representation);
+        Assert.True(parts[1].IsOptional);
+    }
+
+    [Fact]
+    public void ToRepositoryEntity_WhenLibraryHasNoPathTemplateParts_ShouldMapEmptyCollection()
+    {
+        // Arrange
+        LibraryPathTemplate pathTemplate = _libraryPathTemplateFixture.Create(includeParts: false);
+        Library library = _libraryFixture.Create(
+            title: "Test Library",
+            libraryType: LibraryType.Book,
+            contentLocations: ["C:/Books"],
+            pathTemplate: pathTemplate);
+
+        // Act
+        LibraryEntity result = library.ToRepositoryEntity();
+
+        // Assert
+        Assert.Empty(result.PathTemplateParts);
     }
 }

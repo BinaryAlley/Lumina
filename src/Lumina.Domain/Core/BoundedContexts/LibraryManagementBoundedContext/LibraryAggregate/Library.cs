@@ -77,7 +77,8 @@ public class Library : AggregateRoot<LibraryId>
     public bool ShouldSkipUnchangedDirectoriesDuringScan { get; private set; }
 
     /// <summary>
-    /// Gets the template describing the structure of the media library on disk, always populated, with the ideal structure of the library type as its default.
+    /// Gets the template describing the structure of the media library on disk, always populated with the effective template: the one specified by the
+    /// user, or the ideal structure of the library type when none was provided.
     /// </summary>
     public LibraryPathTemplate PathTemplate { get; private set; }
 

@@ -120,12 +120,9 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Resul
         Result<IReadOnlyList<LibraryPathPart>> pathTemplatePartsResult = command.PathTemplateParts.ToDomainParts();
         if (pathTemplatePartsResult.IsFailure)
             return pathTemplatePartsResult.Errors;
-        LibraryPathTemplate pathTemplate = command.PathTemplateParts is null
-            ? _pathTemplateService.GetDefaultTemplate(libraryType)
-            : LibraryPathTemplate.Create(pathTemplatePartsResult.Value);
-        Result<Success> validatePathTemplateResult = _pathTemplateService.Validate(libraryType, pathTemplate);
-        if (validatePathTemplateResult.IsFailure)
-            return validatePathTemplateResult.Errors;
+        Result<LibraryPathTemplate> pathTemplateResult = _pathTemplateService.ResolveTemplate(libraryType, pathTemplatePartsResult.Value);
+        if (pathTemplateResult.IsFailure)
+            return pathTemplateResult.Errors;
 
         // Create a domain library object.
         Result<Library> createLibraryResult = Library.Create(
@@ -139,7 +136,7 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Resul
             command.CanDownloadMetadataFromWeb,
             command.ShouldSaveMetadataInMediaDirectories,
             command.ShouldSkipUnchangedDirectoriesDuringScan,
-            pathTemplate,
+            pathTemplateResult.Value,
             []
         );
 

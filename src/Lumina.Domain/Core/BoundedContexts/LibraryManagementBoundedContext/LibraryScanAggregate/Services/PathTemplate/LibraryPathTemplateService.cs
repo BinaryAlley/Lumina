@@ -3,6 +3,7 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,7 @@ public sealed class LibraryPathTemplateService : ILibraryPathTemplateService
     private static readonly Regex s_placeholderRegex = new(@"\{0(?::(?<width>0+))?\}", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     private readonly IReadOnlyList<ILibraryPathPartCatalog> _catalogs;
+    private readonly ConcurrentDictionary<string, Regex> _compiledPatterns = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LibraryPathTemplateService"/> class.
@@ -41,6 +43,27 @@ public sealed class LibraryPathTemplateService : ILibraryPathTemplateService
     public LibraryPathTemplate GetDefaultTemplate(LibraryType libraryType)
     {
         return ResolveCatalog(libraryType)?.GetDefaultTemplate() ?? LibraryPathTemplate.Empty();
+    }
+
+    /// <summary>
+    /// Resolves the effective path template of a media library of the provided <paramref name="libraryType"/>: the template built from the provided
+    /// <paramref name="providedParts"/>, or the ideal structure of the library type when no parts are provided.
+    /// </summary>
+    /// <param name="libraryType">The media library type the template belongs to.</param>
+    /// <param name="providedParts">The parts provided by the user. An empty collection means no template was provided, so the library type default is used.</param>
+    /// <returns>
+    /// An <see cref="Result{TValue}"/> containing either the resolved path template, or an error.
+    /// </returns>
+    public Result<LibraryPathTemplate> ResolveTemplate(LibraryType libraryType, IReadOnlyList<LibraryPathPart> providedParts)
+    {
+        // An empty set of parts means the user did not provide a template, so the ideal structure of the library type is used.
+        LibraryPathTemplate template = providedParts.Count == 0
+            ? GetDefaultTemplate(libraryType)
+            : LibraryPathTemplate.Create(providedParts);
+        Result<Success> validationResult = Validate(libraryType, template);
+        if (validationResult.IsFailure)
+            return validationResult.Errors;
+        return template;
     }
 
     /// <summary>
@@ -88,7 +111,7 @@ public sealed class LibraryPathTemplateService : ILibraryPathTemplateService
         ILibraryPathPartCatalog catalog = ResolveCatalog(libraryType)!;
         Dictionary<LibraryPathPartKind, LibraryPathPartDefinition> definitions = catalog.GetPartDefinitions()
             .ToDictionary(definition => definition.Kind);
-        Regex pattern = BuildPattern(template, definitions, pathSeparator);
+        Regex pattern = GetCompiledPattern(template, definitions, pathSeparator);
         Match match = pattern.Match(relativePath);
         if (!match.Success)
             return Result<ParsedLibraryPath?>.Success(null);
@@ -123,13 +146,27 @@ public sealed class LibraryPathTemplateService : ILibraryPathTemplateService
     }
 
     /// <summary>
-    /// Builds the regular expression that matches the provided <paramref name="template"/>.
+    /// Gets the compiled regular expression that matches the provided <paramref name="template"/>, building and compiling it only once per distinct
+    /// pattern, so that scanning a library does not pay the cost of compiling the same pattern once per file.
     /// </summary>
     /// <param name="template">The path template to compile.</param>
     /// <param name="definitions">The available part definitions of the template's library type.</param>
     /// <param name="pathSeparator">The character used to separate path segments on the current platform.</param>
     /// <returns>The compiled regular expression.</returns>
-    private static Regex BuildPattern(LibraryPathTemplate template, IReadOnlyDictionary<LibraryPathPartKind, LibraryPathPartDefinition> definitions, char pathSeparator)
+    private Regex GetCompiledPattern(LibraryPathTemplate template, IReadOnlyDictionary<LibraryPathPartKind, LibraryPathPartDefinition> definitions, char pathSeparator)
+    {
+        string patternText = BuildPattern(template, definitions, pathSeparator);
+        return _compiledPatterns.GetOrAdd(patternText, pattern => new Regex(pattern, RegexOptions.Compiled | RegexOptions.CultureInvariant));
+    }
+
+    /// <summary>
+    /// Builds the regular expression text that matches the provided <paramref name="template"/>.
+    /// </summary>
+    /// <param name="template">The path template to compile.</param>
+    /// <param name="definitions">The available part definitions of the template's library type.</param>
+    /// <param name="pathSeparator">The character used to separate path segments on the current platform.</param>
+    /// <returns>The regular expression text.</returns>
+    private static string BuildPattern(LibraryPathTemplate template, IReadOnlyDictionary<LibraryPathPartKind, LibraryPathPartDefinition> definitions, char pathSeparator)
     {
         StringBuilder patternBuilder = new("^");
         int index = 0;
@@ -153,7 +190,7 @@ public sealed class LibraryPathTemplateService : ILibraryPathTemplateService
                 patternBuilder.Append(runBuilder);
         }
         patternBuilder.Append('$');
-        return new Regex(patternBuilder.ToString(), RegexOptions.Compiled | RegexOptions.CultureInvariant);
+        return patternBuilder.ToString();
     }
 
     /// <summary>

@@ -114,6 +114,30 @@ public class AddLibraryEndpointSummary : Summary<AddLibraryEndpoint, AddLibraryR
             }
         );
 
+        Response(403, "The request failed because the authenticated user is not allowed to manage media libraries, or because the request carried an unsupported library type.", "application/problem+json",
+            example: new[]
+            {
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.4",
+                    title = "General.Failure",
+                    status = 403,
+                    detail = "NotAuthorized",
+                    instance = "/api/v1/libraries",
+                    traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.4",
+                    title = "General.Forbidden",
+                    status = 403,
+                    detail = "UnknownLibraryType",
+                    instance = "/api/v1/libraries",
+                    traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
+                }
+            }
+        );
+
         Response(422, "The request did not pass validation checks.", "application/problem+json",
             example: new
             {
@@ -128,7 +152,6 @@ public class AddLibraryEndpointSummary : Summary<AddLibraryEndpoint, AddLibraryR
                         "General.Validation", new[]
                         {
                             "LibraryTypeCannotBeNull",
-                            "UnknownLibraryType",
                             "PathsListCannotBeNull",
                             "PathsListCannotBeEmpty",
                             "PathCannotBeEmpty",

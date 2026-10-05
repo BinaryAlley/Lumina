@@ -3,6 +3,7 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using System.Collections.Generic;
 #endregion
 
 namespace Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.PathTemplate;
@@ -18,6 +19,17 @@ public interface ILibraryPathTemplateService
     /// <param name="libraryType">The media library type whose default path template is retrieved.</param>
     /// <returns>The default path template.</returns>
     LibraryPathTemplate GetDefaultTemplate(LibraryType libraryType);
+
+    /// <summary>
+    /// Resolves the effective path template of a media library of the provided <paramref name="libraryType"/>: the template built from the provided
+    /// <paramref name="providedParts"/>, or the ideal structure of the library type when no parts are provided.
+    /// </summary>
+    /// <param name="libraryType">The media library type the template belongs to.</param>
+    /// <param name="providedParts">The parts provided by the user. An empty collection means no template was provided, so the library type default is used.</param>
+    /// <returns>
+    /// An <see cref="Result{TValue}"/> containing either the resolved path template, or an error.
+    /// </returns>
+    Result<LibraryPathTemplate> ResolveTemplate(LibraryType libraryType, IReadOnlyList<LibraryPathPart> providedParts);
 
     /// <summary>
     /// Validates the provided <paramref name="template"/> against the catalog of the provided <paramref name="libraryType"/>.

@@ -118,15 +118,27 @@ public class UpdateLibraryEndpointSummary : Summary<UpdateLibraryEndpoint, Updat
             }
         );
 
-        Response(403, "The request failed because the user making the request is not an Admin, or the owner of the media library.", "application/problem+json",
-            example: new
+        Response(403, "The request failed because the authenticated user is not allowed to manage the media library, or because the request carried an unsupported library type.", "application/problem+json",
+            example: new[]
             {
-                type = "https://tools.ietf.org/html/rfc9110#section-15.5.4",
-                title = "General.Failure",
-                status = 403,
-                detail = "NotAuthorized",
-                instance = "/api/v1/libraries/{id}",
-                traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.4",
+                    title = "General.Failure",
+                    status = 403,
+                    detail = "NotAuthorized",
+                    instance = "/api/v1/libraries/{id}",
+                    traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.4",
+                    title = "General.Forbidden",
+                    status = 403,
+                    detail = "UnknownLibraryType",
+                    instance = "/api/v1/libraries/{id}",
+                    traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
+                }
             }
         );
 
@@ -158,7 +170,6 @@ public class UpdateLibraryEndpointSummary : Summary<UpdateLibraryEndpoint, Updat
                             "LibraryIdCannotBeEmpty",
                             "UserIdCannotBeEmpty",
                             "LibraryTypeCannotBeNull",
-                            "UnknownLibraryType",
                             "PathsListCannotBeNull",
                             "PathsListCannotBeEmpty",
                             "PathCannotBeEmpty",
