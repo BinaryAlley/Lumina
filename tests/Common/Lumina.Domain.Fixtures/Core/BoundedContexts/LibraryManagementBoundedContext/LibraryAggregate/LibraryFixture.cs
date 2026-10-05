@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
@@ -42,6 +43,7 @@ public class LibraryFixture
     /// <param name="shouldSaveMetadataInMediaDirectories">Whether metadata should be saved in the media directories.</param>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether unchanged directories should be skipped during scan.</param>
     /// <param name="scanIds">Optional. The scan Ids associated with the library.</param>
+    /// <param name="pathTemplate">Optional. The path template of the library.</param>
     /// <param name="includeCoverImage">Whether the cover image should be included, or left unset, meaning the library has no cover.</param>
     /// <returns>The created <see cref="Library"/>.</returns>
     public Library Create(
@@ -57,6 +59,7 @@ public class LibraryFixture
         bool shouldSaveMetadataInMediaDirectories = false,
         bool shouldSkipUnchangedDirectoriesDuringScan = false,
         IEnumerable<Guid>? scanIds = null,
+        LibraryPathTemplate? pathTemplate = null,
         bool includeCoverImage = true)
     {
         List<string> validPaths =
@@ -83,6 +86,7 @@ public class LibraryFixture
                 canDownloadMetadataFromWeb,
                 shouldSaveMetadataInMediaDirectories,
                 shouldSkipUnchangedDirectoriesDuringScan,
+                pathTemplate ?? LibraryPathTemplate.Empty(),
                 resolvedScanIds
             ) :
             Library.Create(
@@ -97,6 +101,7 @@ public class LibraryFixture
                 canDownloadMetadataFromWeb,
                 shouldSaveMetadataInMediaDirectories,
                 shouldSkipUnchangedDirectoriesDuringScan,
+                pathTemplate ?? LibraryPathTemplate.Empty(),
                 resolvedScanIds
             );
 

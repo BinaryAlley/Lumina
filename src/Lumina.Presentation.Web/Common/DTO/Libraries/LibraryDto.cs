@@ -67,4 +67,9 @@ public class LibraryDto
     /// which does not change when the contents of an existing file are edited, and such edits could be missed while this setting is enabled.
     /// </summary>
     public bool ShouldSkipUnchangedDirectoriesDuringScan { get; set; } = false;
+
+    /// <summary>
+    /// Gets or sets the ordered parts of the template describing the structure of the media library on disk.
+    /// </summary>
+    public List<LibraryPathTemplatePartDto> PathTemplateParts { get; set; } = [];
 }

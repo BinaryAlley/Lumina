@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -350,5 +350,68 @@
   </data>
   <data name="DescriptionBookReaders" xml:space="preserve">
     <value>Les lecteurs de livres utilisés pour lire les livres de cette bibliothèque. Un lecteur désactivé indique à l'utilisateur qu'un plugin de lecture existe pour le format, mais qu'il est désactivé.</value>
+  </data>
+  <data name="PathTemplate" xml:space="preserve">
+    <value>Modèle de chemin</value>
+  </data>
+  <data name="DescriptionPathTemplate" xml:space="preserve">
+    <value>Décrit la structure des chemins de cette bibliothèque sur le disque, afin que l'application comprenne ce que signifie chaque dossier et chaque nom de fichier. Faites glisser les éléments disponibles dans le chemin, dans l'ordre où ils apparaissent sur le disque. Chaque élément peut être modifié pour correspondre à la façon dont il est écrit dans votre bibliothèque, et sa case le marque comme facultatif lorsqu'il n'est pas toujours présent. L'aperçu montre un chemin d'exemple.</value>
+  </data>
+  <data name="PathTemplatePreview" xml:space="preserve">
+    <value>Aperçu</value>
+  </data>
+  <data name="PathPartLiteral" xml:space="preserve">
+    <value>Texte</value>
+  </data>
+  <data name="PathPartSeparator" xml:space="preserve">
+    <value>Séparateur</value>
+  </data>
+  <data name="PathPartArtist" xml:space="preserve">
+    <value>Artiste</value>
+  </data>
+  <data name="PathPartReleaseType" xml:space="preserve">
+    <value>Type de sortie</value>
+  </data>
+  <data name="PathPartReleaseYear" xml:space="preserve">
+    <value>Année de sortie</value>
+  </data>
+  <data name="PathPartReleaseName" xml:space="preserve">
+    <value>Nom de la sortie</value>
+  </data>
+  <data name="PathPartTrackNumber" xml:space="preserve">
+    <value>Numéro de piste</value>
+  </data>
+  <data name="PathPartTrackName" xml:space="preserve">
+    <value>Nom de la piste</value>
+  </data>
+  <data name="PathPartExtension" xml:space="preserve">
+    <value>Extension</value>
+  </data>
+  <data name="PathPartDiscNumber" xml:space="preserve">
+    <value>Numéro de disque</value>
+  </data>
+  <data name="PathPartOptional" xml:space="preserve">
+    <value>Marquer comme facultatif</value>
+  </data>
+  <data name="PathPartLiteralPlaceholder" xml:space="preserve">
+    <value>texte</value>
+  </data>
+  <data name="PathPartDigits" xml:space="preserve">
+    <value>chiffres</value>
+  </data>
+  <data name="PathPartAuthor" xml:space="preserve">
+    <value>Auteur</value>
+  </data>
+  <data name="PathPartTitle" xml:space="preserve">
+    <value>Titre</value>
+  </data>
+  <data name="PathPartSeries" xml:space="preserve">
+    <value>Série</value>
+  </data>
+  <data name="PathPartSeriesNumber" xml:space="preserve">
+    <value>Numéro de série</value>
+  </data>
+  <data name="PathPartBookId" xml:space="preserve">
+    <value>Id du livre</value>
   </data>
 </root>

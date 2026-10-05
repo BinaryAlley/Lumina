@@ -12,6 +12,7 @@ using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.PathTemplate;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
@@ -43,6 +44,7 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
     private readonly IDomainEventsQueue _domainEventsQueue;
     private readonly IEnvironmentContext _environmentContext;
     private readonly IMediaLibraryProviderConfigurationStore _providerConfigurationStore;
+    private readonly ILibraryPathTemplateService _pathTemplateService;
     private readonly IValidator<UpdateLibraryCommand> _validator;
 
     /// <summary>
@@ -53,6 +55,7 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
     /// <param name="domainEventsQueue">Injected service for the queue of domain events.</param>
     /// <param name="environmentContext">Injected facade service for environment contextual services.</param>
     /// <param name="providerConfigurationStore">Injected store of the provider configurations of the media libraries.</param>
+    /// <param name="pathTemplateService">Injected service for validating and resolving the path templates of the media libraries.</param>
     /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
     /// <param name="validator">Injected validator for application validation rules.</param>
     public UpdateLibraryCommandHandler(
@@ -61,6 +64,7 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
         IDomainEventsQueue domainEventsQueue,
         IEnvironmentContext environmentContext,
         IMediaLibraryProviderConfigurationStore providerConfigurationStore,
+        ILibraryPathTemplateService pathTemplateService,
         IUnitOfWork unitOfWork,
         IValidator<UpdateLibraryCommand> validator)
     {
@@ -70,6 +74,7 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
         _domainEventsQueue = domainEventsQueue;
         _environmentContext = environmentContext;
         _providerConfigurationStore = providerConfigurationStore;
+        _pathTemplateService = pathTemplateService;
         _validator = validator;
     }
 
@@ -124,6 +129,18 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
 
         // Create a domain library object.
         LibraryType newLibraryType = Enum.Parse<LibraryType>(command.LibraryType!);
+
+        // A library always carries a path template: the one provided by the user, or the ideal structure of the library type as its default.
+        Result<IReadOnlyList<LibraryPathPart>> pathTemplatePartsResult = command.PathTemplateParts.ToDomainParts();
+        if (pathTemplatePartsResult.IsFailure)
+            return pathTemplatePartsResult.Errors;
+        LibraryPathTemplate pathTemplate = command.PathTemplateParts is null
+            ? _pathTemplateService.GetDefaultTemplate(newLibraryType)
+            : LibraryPathTemplate.Create(pathTemplatePartsResult.Value);
+        Result<Success> validatePathTemplateResult = _pathTemplateService.Validate(newLibraryType, pathTemplate);
+        if (validatePathTemplateResult.IsFailure)
+            return validatePathTemplateResult.Errors;
+
         Result<Library> createLibraryResult = Library.Create(
             LibraryId.Create(command.Id),
             UserId.Create(command.OwnerId),
@@ -136,6 +153,7 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
             command.CanDownloadMetadataFromWeb,
             command.ShouldSaveMetadataInMediaDirectories,
             command.ShouldSkipUnchangedDirectoriesDuringScan,
+            pathTemplate,
             [.. getLibraryResult.Value.LibraryScans.Select(libraryScan => ScanId.Create(libraryScan.Id))]
         );
         if (createLibraryResult.IsFailure)

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -350,5 +350,68 @@
   </data>
   <data name="DescriptionBookReaders" xml:space="preserve">
     <value>Cititorii de cărți folosiți pentru a citi cărțile acestei biblioteci. Un cititor dezactivat îi permite utilizatorului să știe că există un plugin de citire pentru format, dar este dezactivat.</value>
+  </data>
+  <data name="PathTemplate" xml:space="preserve">
+    <value>Șablon de cale</value>
+  </data>
+  <data name="DescriptionPathTemplate" xml:space="preserve">
+    <value>Descrie modul în care sunt structurate pe disc căile acestei biblioteci, astfel încât aplicația să înțeleagă ce înseamnă fiecare folder și fiecare nume de fișier. Trage piesele disponibile în cale, în ordinea în care apar pe disc. Fiecare piesă poate fi editată pentru a corespunde modului în care este scrisă în biblioteca ta, iar caseta ei o marchează ca opțională atunci când nu este mereu prezentă. Previzualizarea arată o cale exemplu.</value>
+  </data>
+  <data name="PathTemplatePreview" xml:space="preserve">
+    <value>Previzualizare</value>
+  </data>
+  <data name="PathPartLiteral" xml:space="preserve">
+    <value>Text</value>
+  </data>
+  <data name="PathPartSeparator" xml:space="preserve">
+    <value>Separator</value>
+  </data>
+  <data name="PathPartArtist" xml:space="preserve">
+    <value>Artist</value>
+  </data>
+  <data name="PathPartReleaseType" xml:space="preserve">
+    <value>Tip de lansare</value>
+  </data>
+  <data name="PathPartReleaseYear" xml:space="preserve">
+    <value>Anul lansării</value>
+  </data>
+  <data name="PathPartReleaseName" xml:space="preserve">
+    <value>Numele lansării</value>
+  </data>
+  <data name="PathPartTrackNumber" xml:space="preserve">
+    <value>Numărul piesei</value>
+  </data>
+  <data name="PathPartTrackName" xml:space="preserve">
+    <value>Numele piesei</value>
+  </data>
+  <data name="PathPartExtension" xml:space="preserve">
+    <value>Extensie</value>
+  </data>
+  <data name="PathPartDiscNumber" xml:space="preserve">
+    <value>Numărul discului</value>
+  </data>
+  <data name="PathPartOptional" xml:space="preserve">
+    <value>Marchează ca opțional</value>
+  </data>
+  <data name="PathPartLiteralPlaceholder" xml:space="preserve">
+    <value>text</value>
+  </data>
+  <data name="PathPartDigits" xml:space="preserve">
+    <value>cifre</value>
+  </data>
+  <data name="PathPartAuthor" xml:space="preserve">
+    <value>Autor</value>
+  </data>
+  <data name="PathPartTitle" xml:space="preserve">
+    <value>Titlu</value>
+  </data>
+  <data name="PathPartSeries" xml:space="preserve">
+    <value>Serie</value>
+  </data>
+  <data name="PathPartSeriesNumber" xml:space="preserve">
+    <value>Numărul seriei</value>
+  </data>
+  <data name="PathPartBookId" xml:space="preserve">
+    <value>Id-ul cărții</value>
   </data>
 </root>

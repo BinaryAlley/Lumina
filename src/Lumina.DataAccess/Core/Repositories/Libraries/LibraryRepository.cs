@@ -64,6 +64,7 @@ internal sealed class LibraryRepository : ILibraryRepository
         if (shouldIncludeNavigationProperties)
             query = query
                 .Include(library => library.ContentLocations)
+                .Include(library => library.PathTemplateParts)
                 .AsSplitQuery();
         return await query.FirstOrDefaultAsync(library => library.Id == id, cancellationToken).ConfigureAwait(false);
     }
@@ -77,6 +78,7 @@ internal sealed class LibraryRepository : ILibraryRepository
     {
         return await _luminaDbContext.Libraries
             .Include(library => library.ContentLocations)
+            .Include(library => library.PathTemplateParts)
             .AsSplitQuery()
             .Where(library => library.IsEnabled)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
@@ -91,6 +93,7 @@ internal sealed class LibraryRepository : ILibraryRepository
     {
         return await _luminaDbContext.Libraries
             .Include(library => library.ContentLocations)
+            .Include(library => library.PathTemplateParts)
             .AsSplitQuery()
             .Where(library => library.IsEnabled && !library.IsLocked)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
@@ -116,6 +119,7 @@ internal sealed class LibraryRepository : ILibraryRepository
         if (shouldIncludeNavigationProperties)
             query = query
                 .Include(library => library.ContentLocations)
+                .Include(library => library.PathTemplateParts)
                 .AsSplitQuery();
 
         // If no pagination was requested, return all the media libraries.
@@ -161,6 +165,7 @@ internal sealed class LibraryRepository : ILibraryRepository
     {
         LibraryEntity? foundLibrary = await _luminaDbContext.Libraries
             .Include(library => library.ContentLocations)
+            .Include(library => library.PathTemplateParts)
             .AsSplitQuery()
             .FirstOrDefaultAsync(library => library.Id == data.Id, cancellationToken).ConfigureAwait(false);
         if (foundLibrary is null)
@@ -179,6 +184,17 @@ internal sealed class LibraryRepository : ILibraryRepository
             shouldReplace: (existingContentLocation, incomingContentLocation) => false,
             createNew: incomingContentLocation => incomingContentLocation);
 
+        // A path template part is matched by its position in the template, and is replaced only when its editable values actually changed.
+        CollectionReconciler.Reconcile(
+            foundLibrary.PathTemplateParts,
+            data.PathTemplateParts,
+            existingPart => existingPart.Position,
+            incomingPart => incomingPart.Position,
+            shouldReplace: (existingPart, incomingPart) => existingPart.Kind != incomingPart.Kind
+                || existingPart.Representation != incomingPart.Representation
+                || existingPart.IsOptional != incomingPart.IsOptional,
+            createNew: incomingPart => incomingPart);
+
         return Result.Updated;
     }
 
@@ -192,6 +208,7 @@ internal sealed class LibraryRepository : ILibraryRepository
     {
         LibraryEntity? library = await _luminaDbContext.Libraries
             .Include(library => library.ContentLocations)
+            .Include(library => library.PathTemplateParts)
             .AsSplitQuery()
             .FirstOrDefaultAsync(library => library.Id == id, cancellationToken)
             .ConfigureAwait(false);

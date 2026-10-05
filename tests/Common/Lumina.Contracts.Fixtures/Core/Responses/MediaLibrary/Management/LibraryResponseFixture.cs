@@ -32,6 +32,7 @@ public class LibraryResponseFixture
     /// <param name="canDownloadMetadataFromWeb">Optional. Whether metadata should be downloaded from the web.</param>
     /// <param name="shouldSaveMetadataInMediaDirectories">Optional. Whether metadata should be saved in the media directories.</param>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Optional. Whether unchanged directories should be skipped during scan.</param>
+    /// <param name="pathTemplateParts">Optional. The ordered parts of the path template of the media library.</param>
     /// <param name="createdOnUtc">Optional. The date and time when the library was created.</param>
     /// <param name="updatedOnUtc">Optional. The date and time when the library was updated.</param>
     /// <returns>The created <see cref="LibraryResponse"/>.</returns>
@@ -47,6 +48,7 @@ public class LibraryResponseFixture
         bool? canDownloadMetadataFromWeb = null,
         bool? shouldSaveMetadataInMediaDirectories = null,
         bool? shouldSkipUnchangedDirectoriesDuringScan = null,
+        List<LibraryPathTemplatePartResponse>? pathTemplateParts = null,
         DateTime? createdOnUtc = null,
         DateTime? updatedOnUtc = null)
     {
@@ -62,6 +64,7 @@ public class LibraryResponseFixture
             canDownloadMetadataFromWeb ?? _faker.Random.Bool(),
             shouldSaveMetadataInMediaDirectories ?? _faker.Random.Bool(),
             shouldSkipUnchangedDirectoriesDuringScan ?? _faker.Random.Bool(),
+            pathTemplateParts ?? [],
             createdOnUtc ?? _faker.Date.Past().ToUniversalTime(),
             updatedOnUtc
         );

@@ -46,6 +46,11 @@ public class LibraryEntity : IStorageEntity, IAuditableEntity
     public required ICollection<LibraryContentLocationEntity> ContentLocations { get; init; } = [];
 
     /// <summary>
+    /// Gets the ordered parts of the template describing the structure of the media library on disk.
+    /// </summary>
+    public ICollection<LibraryPathTemplatePartEntity> PathTemplateParts { get; init; } = [];
+
+    /// <summary>
     /// Gets the list of scans of the media library.
     /// </summary>
     public ICollection<LibraryScanEntity> LibraryScans { get; init; } = [];
@@ -86,6 +91,12 @@ public class LibraryEntity : IStorageEntity, IAuditableEntity
     /// whether the configuration changed since the last scan, and thus whether the books need their artwork re-resolved.
     /// </summary>
     public string? ArtworkProvidersConfigurationFingerprint { get; set; }
+
+    /// <summary>
+    /// Gets or sets the fingerprint of the path template of the media library, used to detect whether the template
+    /// changed since the last scan, and thus whether the metadata needs to be derived from the paths again.
+    /// </summary>
+    public string? PathTemplateFingerprint { get; set; }
 
     /// <summary>
     /// Gets the user that owns the media library.

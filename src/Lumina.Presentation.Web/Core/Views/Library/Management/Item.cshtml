@@ -8,7 +8,7 @@
 
 @{
     var id = Context.Request.RouteValues["id"] as string;
-    // generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler
+    // Generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler.
     var scriptId = ScriptIdentifierHelper.GenerateScriptId();
 }
 
@@ -19,8 +19,8 @@
 
 @await Component.InvokeAsync("FileSystemBrowser")
 
-<div style="display: grid; grid-template-rows: auto 1fr;"><!--container with two rows, one fixed, one filling remaining space-->
-    <div style="min-height: 1rem;"></div><!--the first row is a dummy row for "margin", because setting a margin on the next row would offset the parent's position-->
+<div style="display: grid; grid-template-rows: auto 1fr;"><!-- Container with two rows, one fixed, one filling remaining space. -->
+    <div style="min-height: 1rem;"></div><!-- The first row is a dummy row for "margin", because setting a margin on the next row would offset the parent's position. -->
     <div class="enlightenment-panel shadow-effect mx-auto panel w-50 mb-10" style="min-width: 320px;">
         <div class="shine-effect"></div>
         <form method="post" id="add-media-library-form" class="inline">
@@ -34,7 +34,7 @@
             </div>
             <div class="form-container">
                 <h3 class="text-light-two">@_localizer["GeneralInformation"]</h3>
-                <!-- Title -->
+                <!-- Title. -->
                 <div class="form-row">
                     <div class="form-label">
                         <label asp-for="Title">@_localizer["Title"]</label>
@@ -45,7 +45,7 @@
                     </div>
                     <small class="form-label text-disabled form-description">@_localizer["DescriptionTitle"]</small>
                 </div>
-                <!-- Library Type -->
+                <!-- Library Type. -->
                 <div class="form-row">
                     <div class="form-label">
                         <label asp-for="LibraryType">@_localizer["LibraryType"]</label>
@@ -77,25 +77,25 @@
                                 <div class="enlightenment-option" data-value="Movie">@_localizer["Movie"]</div>
                                 <div class="enlightenment-option" data-value="FilmSeries">@_localizer["FilmSeries"]</div>
                                 <div class="enlightenment-option" data-value="FilmFranchise">@_localizer["FilmFranchise"]</div>
-                                <div class="enlightenment-option" data-value="Concert">@_localizer["Concert"]</div>
+                                <div class="enlightenment-option" data-value="ConcertVideo">@_localizer["Concert"]</div>
                                 <div class="enlightenment-option" data-value="Documentary">@_localizer["Documentary"]</div>
-                                <div class="enlightenment-option" data-value="Tutorial">@_localizer["Tutorial"]</div>
-                                <div class="enlightenment-option" data-value="Personal">@_localizer["Personal"]</div>
+                                <div class="enlightenment-option" data-value="TutorialVideo">@_localizer["Tutorial"]</div>
+                                <div class="enlightenment-option" data-value="HomeVideo">@_localizer["Personal"]</div>
                                 <div class="enlightenment-option" data-value="Anime">@_localizer["Anime"]</div>
-                                <div class="enlightenment-option" data-value="Youtube">@_localizer["Youtube"]</div>
-                                <div class="enlightenment-option" data-value="Videoclip">@_localizer["Videoclip"]</div>
+                                <div class="enlightenment-option" data-value="YouTubeVideo">@_localizer["Youtube"]</div>
+                                <div class="enlightenment-option" data-value="MusicVideo">@_localizer["Videoclip"]</div>
                                 <div class="enlightenment-option disabled">@_localizer["AudioContent"]</div>
                                 <div class="enlightenment-option" data-value="Music">@_localizer["Music"]</div>
-                                <div class="enlightenment-option" data-value="AudioBook">@_localizer["AudioBook"]</div>
-                                <div class="enlightenment-option" data-value="LivePerformance">@_localizer["LivePerformance"]</div>
-                                <div class="enlightenment-option" data-value="Interview">@_localizer["Interview"]</div>
-                                <div class="enlightenment-option" data-value="Cover">@_localizer["Cover"]</div>
+                                <div class="enlightenment-option" data-value="Audiobook">@_localizer["AudioBook"]</div>
+                                <div class="enlightenment-option" data-value="LiveRecordingAudio">@_localizer["LivePerformance"]</div>
+                                <div class="enlightenment-option" data-value="InterviewAudio">@_localizer["Interview"]</div>
+                                <div class="enlightenment-option" data-value="CoverSongAudio">@_localizer["Cover"]</div>
                                 <div class="enlightenment-option" data-value="Remix">@_localizer["Remix"]</div>
-                                <div class="enlightenment-option" data-value="Soundeffect">@_localizer["Soundeffect"]</div>
-                                <div class="enlightenment-option" data-value="Podcast">@_localizer["Podcast"]</div>
+                                <div class="enlightenment-option" data-value="SoundEffect">@_localizer["Soundeffect"]</div>
+                                <div class="enlightenment-option" data-value="PodcastAudio">@_localizer["Podcast"]</div>
                                 <div class="enlightenment-option" data-value="RadioShow">@_localizer["RadioShow"]</div>
                                 <div class="enlightenment-option disabled">@_localizer["VisualContent"]</div>
-                                <div class="enlightenment-option" data-value="PhotoAlbum">@_localizer["PhotoAlbum"]</div>
+                                <div class="enlightenment-option" data-value="Photo">@_localizer["PhotoAlbum"]</div>
                                 <div class="enlightenment-option disabled">@_localizer["MiscellaneousContent"]</div>
                                 <div class="enlightenment-option last-option" data-value="Other">@_localizer["Other"]</div>
                             </div>
@@ -103,7 +103,7 @@
                     </div>
                     <small class="form-label text-disabled form-description">@_localizer["DescriptionLibraryType"]</small>
                 </div>
-                <!-- Cover -->
+                <!-- Cover. -->
                 <div class="form-row mt-10">
                     <div class="form-label">
                         <label asp-for="CoverImage">@_localizer["CoverImage"]</label>:
@@ -122,7 +122,7 @@
                     </div>
                     <small class="form-label text-disabled form-description">@_localizer["DescriptionCover"]</small>
                 </div>
-                <!-- Directories -->
+                <!-- Directories. -->
                 <div class="form-row mt-10">
                     <div class="form-label">
                         <label asp-for="ContentLocations">@_localizer["Directories"]</label>
@@ -204,6 +204,38 @@
                     </div>
                     <small class="form-label text-disabled form-description">@_localizer["DescriptionShouldSkipUnchangedDirectoriesDuringScan"]</small>
                 </div>
+                <!-- Path template. -->
+                <style>
+                    .path-template-palette { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+                    .path-template-palette-pill { cursor: grab; padding: 4px 10px; border-radius: 12px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.18); color: #d9d9d9; font-size: 12px; user-select: none; }
+                    .path-template-dropzone { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-height: 42px; padding: 8px; border: 1px dashed rgba(255, 255, 255, 0.25); border-radius: 8px; }
+                    .path-template-pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 12px; background: rgba(255, 255, 255, 0.10); border: 1px solid rgba(255, 255, 255, 0.22); cursor: grab; }
+                    .path-template-part-label { font-size: 11px; color: #9fb3c8; white-space: nowrap; }
+                    .path-template-literal-input { width: 90px; height: 20px; font-size: 12px; padding: 0 4px; }
+                    .path-template-width { width: 42px; height: 20px; font-size: 12px; padding: 0 4px; }
+                    .path-template-separator-chip { display: inline-block; padding: 1px 7px; border-radius: 8px; background: rgba(255, 255, 255, 0.14); color: #d9d9d9; font-size: 12px; }
+                    .path-template-pill .path-template-remove { cursor: pointer; width: 12px; height: 12px; }
+                    .path-template-drop-before { box-shadow: -3px 0 0 0 #7fd6ff; }
+                    .path-template-drop-after { box-shadow: 3px 0 0 0 #7fd6ff; }
+                    .path-template-preview { margin-top: 8px; color: #d9d9d9; font-size: 13px; }
+                    .path-template-preview code { color: #7fd6ff; }
+                </style>
+                <!-- The path template editor is only relevant for library types that have a path part catalog, so it starts hidden and is shown by the script when one exists. -->
+                <div id="path-template-section" class="hidden">
+                    <div class="form-row">
+                        <div class="form-label">
+                            <label>@_localizer["PathTemplate"]:</label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div id="path-template-palette" class="path-template-palette w-100"></div>
+                        <div id="path-template-dropzone" class="path-template-dropzone w-100"></div>
+                        <div class="path-template-preview">
+                            <span>@_localizer["PathTemplatePreview"]:</span> <code id="path-template-preview-value"></code>
+                        </div>
+                        <small class="form-label text-disabled form-description">@_localizer["DescriptionPathTemplate"]</small>
+                    </div>
+                </div>
                 @if (id is not null)
                 {
                     <h3 class="text-light-two">@_localizer["MetadataProviders"]</h3>
@@ -217,7 +249,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- metadata providers will be populated here -->
+                                <!-- Metadata providers will be populated here. -->
                             </tbody>
                         </table>
                         <small class="form-label text-disabled form-description">@_localizer["DescriptionMetadataProviders"]</small>
@@ -233,7 +265,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- artwork providers will be populated here -->
+                                <!-- Artwork providers will be populated here. -->
                             </tbody>
                         </table>
                         <small class="form-label text-disabled form-description">@_localizer["DescriptionArtworkProviders"]</small>
@@ -249,7 +281,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- book readers will be populated here -->
+                                <!-- Book readers will be populated here. -->
                             </tbody>
                         </table>
                         <small class="form-label text-disabled form-description">@_localizer["DescriptionBookReaders"]</small>
@@ -260,7 +292,7 @@
                 </div>
             </div>
         </form>
-        <!-- section success -->
+        <!-- Section success. -->
         <div class="text-center w-100">
             <p id="save-success" class="text-light-one w-100 hidden">@_localizer["LibrarySaved"]</p>
             <button id="btn-back-to-libraries" type="button" class="abort-button h-22px w-180px mx-auto mt-10 hidden">@_localizer["BackToLibraries"]</button>
@@ -307,7 +339,15 @@
                 IsLocked: chkIsLocked.checked,
                 CanDownloadMetadataFromWeb: chkCanDownloadMetadataFromWeb.checked,
                 ShouldSaveMetadataInMediaDirectories: chkShouldSaveMetadataInMediaDirectories.checked,
-                ShouldSkipUnchangedDirectoriesDuringScan: chkShouldSkipUnchangedDirectoriesDuringScan.checked
+                ShouldSkipUnchangedDirectoriesDuringScan: chkShouldSkipUnchangedDirectoriesDuringScan.checked,
+                PathTemplateParts: Array.from(pathTemplateDropzone.querySelectorAll('.path-template-pill')).map(pill => {
+                    const optional = pill.querySelector('.path-template-optional');
+                    return {
+                        Kind: pill.dataset.kind,
+                        Representation: getPathTemplatePillRepresentation(pill),
+                        IsOptional: optional ? optional.checked : false
+                    };
+                })
             };
             const data = await callApiPostAsync('@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.SAVE_LIBRARY)', formData);
             if (data) {
@@ -404,7 +444,7 @@
         async function loadMetadataProvidersAsync() {
             if (!id || !metadataProvidersTbody) return;
             const url = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.GET_METADATA_PROVIDERS, new { libraryId = default(Guid) })'
-                .replace('/@(default(Guid))', `/${id}`); // libraryId needs to be replaced here, because GetAbsoluteUrl is server side, libraryId is client side.
+                .replace('/@(default(Guid))', `/${id}`); // The libraryId needs to be replaced here, because GetAbsoluteUrl is server side, libraryId is client side.
             const response = await callApiGetAsync(url);
             if (response && response.length > 0) {
                 metadataProvidersTbody.innerHTML = response.map((provider, index) => renderMetadataProviderRow(provider, index, response.length)).join('');
@@ -475,7 +515,7 @@
         async function loadArtworkProvidersAsync() {
             if (!id || !artworkProvidersTbody) return;
             const url = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.GET_ARTWORK_PROVIDERS, new { libraryId = default(Guid) })'
-                .replace('/@(default(Guid))', `/${id}`); // libraryId needs to be replaced here, because GetAbsoluteUrl is server side, libraryId is client side.
+                .replace('/@(default(Guid))', `/${id}`); // The libraryId needs to be replaced here, because GetAbsoluteUrl is server side, libraryId is client side.
             const response = await callApiGetAsync(url);
             if (response && response.length > 0) {
                 artworkProvidersTbody.innerHTML = response.map((provider, index) => renderArtworkProviderRow(provider, index, response.length)).join('');
@@ -546,7 +586,7 @@
         async function loadBookReadersAsync() {
             if (!id || !bookReadersTbody) return;
             const url = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.GET_BOOK_READERS, new { libraryId = default(Guid) })'
-                .replace('/@(default(Guid))', `/${id}`); // libraryId needs to be replaced here, because GetAbsoluteUrl is server side, libraryId is client side.
+                .replace('/@(default(Guid))', `/${id}`); // The libraryId needs to be replaced here, because GetAbsoluteUrl is server side, libraryId is client side.
             const response = await callApiGetAsync(url);
             if (response && response.length > 0) {
                 bookReadersTbody.innerHTML = response.map(reader => renderBookReaderRow(reader)).join('');
@@ -582,6 +622,340 @@
             }
         };
 
+        // Path template editor.
+        const pathTemplateSection = document.getElementById('path-template-section');
+        const pathTemplatePalette = document.getElementById('path-template-palette');
+        const pathTemplateDropzone = document.getElementById('path-template-dropzone');
+        const pathTemplatePreviewValue = document.getElementById('path-template-preview-value');
+        const libraryTypeSelectedItem = document.getElementById('library-selected-item');
+        // The type the library was loaded with, so that the saved template is only restored for it, and not when the user previews other types.
+        const initialLibraryType = libraryTypeSelectedItem ? libraryTypeSelectedItem.getAttribute('data-value') : null;
+        const libraryTypeDropdown = form.querySelector('.enlightenment-combobox .enlightenment-dropdown');
+        const pathSeparator = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(System.IO.Path.DirectorySeparatorChar.ToString()));
+        const savedPathTemplateParts = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.PathTemplateParts, new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase }));
+        // The localized strings used inside this script must be injected as JSON, not as raw HTML text: Razor HTML-encodes non-ASCII
+        // characters into numeric entities (e.g. "ă" becomes "&#x103;"), and the browser does not decode entities inside a
+        // script element, so they would show up literally. JSON escapes them as \uXXXX, which the script reads correctly.
+        const pathPartLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(new System.Collections.Generic.Dictionary<string, string>
+        {
+            ["Literal"] = _localizer["PathPartLiteral"].Value,
+            ["Separator"] = _localizer["PathPartSeparator"].Value,
+            ["Artist"] = _localizer["PathPartArtist"].Value,
+            ["ReleaseType"] = _localizer["PathPartReleaseType"].Value,
+            ["ReleaseYear"] = _localizer["PathPartReleaseYear"].Value,
+            ["ReleaseName"] = _localizer["PathPartReleaseName"].Value,
+            ["TrackNumber"] = _localizer["PathPartTrackNumber"].Value,
+            ["TrackName"] = _localizer["PathPartTrackName"].Value,
+            ["Extension"] = _localizer["PathPartExtension"].Value,
+            ["DiscNumber"] = _localizer["PathPartDiscNumber"].Value,
+            ["Author"] = _localizer["PathPartAuthor"].Value,
+            ["Title"] = _localizer["PathPartTitle"].Value,
+            ["Series"] = _localizer["PathPartSeries"].Value,
+            ["SeriesNumber"] = _localizer["PathPartSeriesNumber"].Value,
+            ["BookId"] = _localizer["PathPartBookId"].Value
+        }));
+        const pathTemplateStrings = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(new System.Collections.Generic.Dictionary<string, string>
+        {
+            ["optional"] = _localizer["PathPartOptional"].Value,
+            ["remove"] = _localizer["Remove"].Value,
+            ["literal"] = _localizer["PathPartLiteralPlaceholder"].Value,
+            ["digits"] = _localizer["PathPartDigits"].Value
+        }));
+        // The preview shows an example path built from a real example of each library type, so the user sees the effect of the template.
+        const pathTemplateSamples = {
+            Music: {
+                Artist: 'QUEEN',
+                ReleaseType: 'Album',
+                ReleaseYear: '1975',
+                ReleaseName: 'A night at the opera',
+                TrackNumber: '11',
+                TrackName: 'Bohemian rhapsody',
+                DiscNumber: '1',
+                Extension: 'mp3'
+            },
+            Book: {
+                Author: 'J. R. R. Tolkien',
+                Title: 'The Fellowship of the Ring',
+                Series: 'The Lord of the Rings',
+                SeriesNumber: '1',
+                BookId: '42',
+                Extension: 'epub'
+            }
+        };
+        let currentPathTemplateSample = {};
+        const pathTemplateCatalogCache = {};
+        const pathPartValueTypes = {};
+        let draggedPathTemplatePill = null;
+
+        // Gets the localized display name of a path part kind.
+        function pathTemplateKindLabel(kind) {
+            return pathPartLabels[kind] || kind;
+        }
+
+        // Parses a value mask like "Disc {0:00}" into its literal prefix, digit width, and literal suffix.
+        function parsePathTemplateMask(representation) {
+            const match = (representation || '').match(/^(.*)\{0(?::(0+))?\}(.*)$/);
+            if (!match)
+                return { prefix: representation || '', width: 0, suffix: '' };
+            return { prefix: match[1], width: match[2] ? match[2].length : 0, suffix: match[3] };
+        }
+
+        // Rebuilds a value mask from its literal prefix, digit width, and literal suffix.
+        function buildPathTemplateMask(prefix, width, suffix) {
+            return (prefix || '') + '{0' + (width > 0 ? ':' + '0'.repeat(width) : '') + '}' + (suffix || '');
+        }
+
+        // Creates an editable pill for one part of the path template, as it is placed in the drop zone.
+        function renderPathTemplatePill(part) {
+            const pill = document.createElement('div');
+            pill.className = 'path-template-pill';
+            pill.setAttribute('draggable', 'true');
+            pill.dataset.kind = part.kind;
+            pill.title = pathTemplateKindLabel(part.kind);
+
+            // The human readable name of the part, so the user knows what each pill means.
+            const label = document.createElement('span');
+            label.className = 'path-template-part-label';
+            label.textContent = pathTemplateKindLabel(part.kind);
+            pill.appendChild(label);
+
+            if (part.kind === 'Separator') {
+                // A folder separator is shown as its own glyph, never as a raw mask.
+                const separator = document.createElement('span');
+                separator.className = 'path-template-separator-chip';
+                separator.textContent = pathSeparator;
+                pill.appendChild(separator);
+            } else if (part.kind === 'Literal') {
+                // An arbitrary text segment, like the "Disk " glue, is edited directly.
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'enlightenment-input path-template-literal-input';
+                input.value = part.representation || '';
+                input.placeholder = pathTemplateStrings.literal;
+                input.addEventListener('input', updatePathTemplatePreview);
+                pill.appendChild(input);
+            } else {
+                // Numeric parts can be told how many digits they always use, so values like "01" are understood.
+                if (pathPartValueTypes[part.kind] === 'Integer') {
+                    const parsed = parsePathTemplateMask(part.representation);
+                    const widthInput = document.createElement('input');
+                    widthInput.type = 'number';
+                    widthInput.min = '0';
+                    widthInput.max = '10';
+                    widthInput.className = 'enlightenment-input path-template-width';
+                    widthInput.value = parsed.width;
+                    widthInput.title = pathTemplateStrings.digits;
+                    widthInput.placeholder = pathTemplateStrings.digits;
+                    widthInput.addEventListener('input', updatePathTemplatePreview);
+                    pill.appendChild(widthInput);
+                }
+            }
+
+            const optionalLabel = document.createElement('label');
+            optionalLabel.className = 'enlightenment-checkbox-label';
+            optionalLabel.title = pathTemplateStrings.optional;
+            const optionalInput = document.createElement('input');
+            optionalInput.type = 'checkbox';
+            optionalInput.className = 'enlightenment-checkbox-hidden path-template-optional';
+            optionalInput.checked = !!part.isOptional;
+            optionalInput.addEventListener('change', updatePathTemplatePreview);
+            const optionalSpan = document.createElement('span');
+            optionalSpan.className = 'enlightenment-checkbox';
+            optionalLabel.appendChild(optionalInput);
+            optionalLabel.appendChild(optionalSpan);
+            pill.appendChild(optionalLabel);
+            const remove = document.createElement('img');
+            remove.src = '/images/ui/delete.svg';
+            remove.alt = pathTemplateStrings.remove;
+            remove.title = pathTemplateStrings.remove;
+            remove.className = 'path-template-remove';
+            remove.addEventListener('click', () => { pill.remove(); updatePathTemplatePreview(); });
+            pill.appendChild(remove);
+            pill.addEventListener('dragstart', (e) => {
+                draggedPathTemplatePill = pill;
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', 'pill');
+            });
+            pill.addEventListener('dragend', () => { draggedPathTemplatePill = null; clearPathTemplateDropIndicator(); });
+            return pill;
+        }
+
+        // Builds the stored representation mask of a pill from its human friendly editors.
+        function getPathTemplatePillRepresentation(pill) {
+            const kind = pill.dataset.kind;
+            if (kind === 'Separator')
+                return '';
+            if (kind === 'Literal') {
+                const input = pill.querySelector('.path-template-literal-input');
+                return input ? input.value : '';
+            }
+            const width = pill.querySelector('.path-template-width');
+            return buildPathTemplateMask('', width ? Math.max(0, parseInt(width.value || '0', 10)) : 0, '');
+        }
+
+        // Replaces the parts in the drop zone with the provided parts.
+        function renderPathTemplateParts(parts) {
+            if (!pathTemplateDropzone) return;
+            pathTemplateDropzone.innerHTML = '';
+            (parts || []).forEach(part => pathTemplateDropzone.appendChild(renderPathTemplatePill(part)));
+            updatePathTemplatePreview();
+        }
+
+        // Renders the palette of the parts that can be added to the path template.
+        function renderPathTemplatePalette(parts) {
+            if (!pathTemplatePalette) return;
+            pathTemplatePalette.innerHTML = '';
+            (parts || []).forEach(definition => {
+                const pill = document.createElement('div');
+                pill.className = 'path-template-palette-pill';
+                pill.setAttribute('draggable', 'true');
+                pill.textContent = pathTemplateKindLabel(definition.kind);
+                pill.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.effectAllowed = 'copy';
+                    e.dataTransfer.setData('application/json', JSON.stringify({
+                        source: 'palette',
+                        kind: definition.kind,
+                        representation: definition.defaultRepresentation,
+                        isOptional: definition.isOptionalByDefault
+                    }));
+                });
+                pathTemplatePalette.appendChild(pill);
+            });
+        }
+
+        // Formats the sample value of a part according to its mask, for the preview.
+        function formatPathTemplateValue(representation, value) {
+            const match = representation.match(/\{0(?::(0+))?\}/);
+            if (!match)
+                return representation + value;
+            const formatted = match[1] ? String(value).padStart(match[1].length, '0') : value;
+            return representation.slice(0, match.index) + formatted + representation.slice(match.index + match[0].length);
+        }
+
+        // Rebuilds the preview path from the pills currently in the drop zone.
+        function updatePathTemplatePreview() {
+            if (!pathTemplatePreviewValue || !pathTemplateDropzone) return;
+            let result = '';
+            pathTemplateDropzone.querySelectorAll('.path-template-pill').forEach(pill => {
+                const kind = pill.dataset.kind;
+                if (kind === 'Separator') { result += pathSeparator; return; }
+                const representation = getPathTemplatePillRepresentation(pill);
+                if (kind === 'Literal') { result += representation; return; }
+                result += formatPathTemplateValue(representation, currentPathTemplateSample[kind] || '');
+            });
+            pathTemplatePreviewValue.textContent = result;
+        }
+
+        // Loads the path template catalog of the selected library type, and the template to display in the editor.
+        async function loadPathTemplateAsync() {
+            if (!libraryTypeSelectedItem || !pathTemplateDropzone) return;
+            const libraryType = libraryTypeSelectedItem.getAttribute('data-value');
+            if (!libraryType) return;
+            currentPathTemplateSample = pathTemplateSamples[libraryType] || {};
+            let catalog = pathTemplateCatalogCache[libraryType];
+            if (!catalog) {
+                const url = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.GET_LIBRARY_PATH_TEMPLATE_PARTS, new { libraryType = "Music" })'.replace('/Music', `/${libraryType}`);
+                catalog = await callApiGetAsync(url);
+                if (!catalog) catalog = { parts: [], defaultTemplateParts: [] };
+                pathTemplateCatalogCache[libraryType] = catalog;
+            }
+            // Only library types that define path parts get the editor; the others have no structure to describe.
+            const hasParts = (catalog.parts || []).length > 0;
+            if (pathTemplateSection) pathTemplateSection.classList.toggle('hidden', !hasParts);
+            if (!hasParts) {
+                renderPathTemplatePalette([]);
+                renderPathTemplateParts([]);
+                return;
+            }
+            (catalog.parts || []).forEach(definition => { pathPartValueTypes[definition.kind] = definition.valueType; });
+            renderPathTemplatePalette(catalog.parts);
+            // The stored template belongs to the library type it was saved for, so it is only restored for that type.
+            const parts = (savedPathTemplateParts && savedPathTemplateParts.length > 0 && libraryType === initialLibraryType)
+                ? savedPathTemplateParts
+                : catalog.defaultTemplateParts;
+            renderPathTemplateParts(parts);
+        }
+
+        // Finds the pill a drag or drop should be placed relative to, based on the pointer position. This also places a part dropped in a
+        // gap between pills, or anywhere in the drop zone, next to the nearest pill, instead of always sending it to the end.
+        function getPathTemplateInsertReference(e, excludePill) {
+            const pills = Array.from(pathTemplateDropzone.querySelectorAll('.path-template-pill')).filter(pill => pill !== excludePill);
+            if (pills.length === 0) return null;
+            let nearestPill = null;
+            let nearestRect = null;
+            let nearestDistance = Infinity;
+            for (const pill of pills) {
+                const rect = pill.getBoundingClientRect();
+                const distance = Math.hypot(e.clientX - (rect.left + rect.width / 2), e.clientY - (rect.top + rect.height / 2));
+                if (distance < nearestDistance) {
+                    nearestDistance = distance;
+                    nearestPill = pill;
+                    nearestRect = rect;
+                }
+            }
+            return { pill: nearestPill, placeAfter: e.clientX > (nearestRect.left + nearestRect.width / 2) };
+        }
+
+        // Removes the insertion indicator from all pills.
+        function clearPathTemplateDropIndicator() {
+            pathTemplateDropzone.querySelectorAll('.path-template-pill').forEach(pill => pill.classList.remove('path-template-drop-before', 'path-template-drop-after'));
+        }
+
+        // Highlights the side of the pill the dragged part would be inserted on.
+        function updatePathTemplateDropIndicator(e) {
+            clearPathTemplateDropIndicator();
+            const reference = getPathTemplateInsertReference(e, draggedPathTemplatePill);
+            if (reference)
+                reference.pill.classList.add(reference.placeAfter ? 'path-template-drop-after' : 'path-template-drop-before');
+        }
+
+        // On a drag over the path template drop zone, allows the drop and shows where the part would be inserted.
+        const handlePathTemplateDragOver = function(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = draggedPathTemplatePill ? 'move' : 'copy';
+            updatePathTemplateDropIndicator(e);
+        };
+
+        // On a drop over the path template drop zone, inserts a palette part or moves a pill at the pointer position.
+        const handlePathTemplateDrop = function(e) {
+            e.preventDefault();
+            const reference = getPathTemplateInsertReference(e, draggedPathTemplatePill);
+            clearPathTemplateDropIndicator();
+            const insertAtReference = (pill) => {
+                if (reference)
+                    reference.pill.insertAdjacentElement(reference.placeAfter ? 'afterend' : 'beforebegin', pill);
+                else
+                    pathTemplateDropzone.appendChild(pill);
+            };
+            const raw = e.dataTransfer.getData('application/json');
+            if (raw) {
+                const part = JSON.parse(raw);
+                if (part.source === 'palette') {
+                    insertAtReference(renderPathTemplatePill(part));
+                    updatePathTemplatePreview();
+                    return;
+                }
+            }
+            if (draggedPathTemplatePill) {
+                insertAtReference(draggedPathTemplatePill);
+                draggedPathTemplatePill = null;
+                updatePathTemplatePreview();
+            }
+        };
+
+        // On dragging out of the drop zone, removes the insertion indicator.
+        const handlePathTemplateDragLeave = function(e) {
+            if (!pathTemplateDropzone.contains(e.relatedTarget))
+                clearPathTemplateDropIndicator();
+        };
+
+        // On selecting another library type, the available parts and the default template change.
+        const handleLibraryTypeChange = function(e) {
+            const option = e.target.closest('.enlightenment-option');
+            if (!option || option.classList.contains('disabled') || !option.getAttribute('data-value')) return;
+            setTimeout(() => { loadPathTemplateAsync(); }, 0);
+        };
+
         // Add listeners.
         form.addEventListener('keypress', handleEnterKey);
         form.addEventListener('submit', handleSubmit);
@@ -591,6 +965,10 @@
         imgAddCover.addEventListener('click', handleImgAddCoverClick);
         mediaCoverFormTable.addEventListener('click', handleRowRemoval);
         mediaDirectoriesFormTable.addEventListener('click', handleRowRemoval);
+        pathTemplateDropzone.addEventListener('dragover', handlePathTemplateDragOver);
+        pathTemplateDropzone.addEventListener('drop', handlePathTemplateDrop);
+        pathTemplateDropzone.addEventListener('dragleave', handlePathTemplateDragLeave);
+        if (libraryTypeDropdown) libraryTypeDropdown.addEventListener('click', handleLibraryTypeChange);
         if (metadataProvidersTbody) {
             metadataProvidersTbody.addEventListener('click', handleMetadataProviderReorderAsync);
             metadataProvidersTbody.addEventListener('change', handleMetadataProviderEnabledChangeAsync);
@@ -613,6 +991,10 @@
             imgAddCover.removeEventListener('click', handleImgAddCoverClick);
             mediaCoverFormTable.removeEventListener('click', handleRowRemoval);
             mediaDirectoriesFormTable.removeEventListener('click', handleRowRemoval);
+            pathTemplateDropzone.removeEventListener('dragover', handlePathTemplateDragOver);
+            pathTemplateDropzone.removeEventListener('drop', handlePathTemplateDrop);
+            pathTemplateDropzone.removeEventListener('dragleave', handlePathTemplateDragLeave);
+            if (libraryTypeDropdown) libraryTypeDropdown.removeEventListener('click', handleLibraryTypeChange);
             if (metadataProvidersTbody) {
                 metadataProvidersTbody.removeEventListener('click', handleMetadataProviderReorderAsync);
                 metadataProvidersTbody.removeEventListener('change', handleMetadataProviderEnabledChangeAsync);
@@ -632,6 +1014,9 @@
             loadArtworkProvidersAsync();
             loadBookReadersAsync();
         }
+
+        // Load the path template of the selected library type, and its default, for both new and existing libraries.
+        loadPathTemplateAsync();
 
         // Store all cleanups for this view on window object using the scriptId.
         window.viewCleanups = window.viewCleanups || {};

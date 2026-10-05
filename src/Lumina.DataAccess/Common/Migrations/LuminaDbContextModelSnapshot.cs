@@ -47,6 +47,36 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.ToTable("AlbumTags", (string)null);
                 });
 
+            modelBuilder.Entity("ArtistGenres", b =>
+                {
+                    b.Property<Guid>("ArtistId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("GenreId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ArtistId", "GenreId");
+
+                    b.HasIndex("GenreId");
+
+                    b.ToTable("ArtistGenres", (string)null);
+                });
+
+            modelBuilder.Entity("ArtistTags", b =>
+                {
+                    b.Property<Guid>("ArtistId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TagId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ArtistId", "TagId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("ArtistTags", (string)null);
+                });
+
             modelBuilder.Entity("BookGenres", b =>
                 {
                     b.Property<Guid>("BookId")
@@ -376,6 +406,11 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(0);
 
+                    b.Property<string>("ASIN")
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(28);
+
                     b.Property<Guid>("ArtistId")
                         .HasColumnType("TEXT")
                         .HasColumnOrder(1);
@@ -383,37 +418,46 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.Property<string>("Barcode")
                         .HasMaxLength(13)
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(23);
-
-                    b.Property<string>("CatalogNumber")
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT")
-                        .HasColumnOrder(24);
+                        .HasColumnOrder(25);
 
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(29);
+                        .HasColumnOrder(33);
 
                     b.Property<DateTime>("CreatedOnUtc")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(28);
+                        .HasColumnOrder(32);
 
                     b.Property<string>("Description")
                         .HasMaxLength(2000)
                         .HasColumnType("TEXT")
                         .HasColumnOrder(5);
 
-                    b.Property<string>("LanguageCode")
+                    b.Property<string>("Disambiguation")
+                        .HasMaxLength(255)
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(12);
+                        .HasColumnOrder(6);
 
-                    b.Property<string>("LanguageName")
+                    b.Property<string>("Label")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(27);
+
+                    b.Property<string>("LanguageCode")
                         .HasColumnType("TEXT")
                         .HasColumnOrder(13);
 
-                    b.Property<string>("LanguageNativeName")
+                    b.Property<string>("LanguageName")
                         .HasColumnType("TEXT")
                         .HasColumnOrder(14);
+
+                    b.Property<string>("LanguageNativeName")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(15);
+
+                    b.Property<DateTime?>("LastMetadataUpdateUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(37);
 
                     b.Property<Guid>("LibraryId")
                         .HasColumnType("TEXT")
@@ -422,71 +466,94 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.Property<string>("MediaFormat")
                         .HasMaxLength(50)
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(22);
+                        .HasColumnOrder(23);
+
+                    b.Property<string>("MetadataProvider")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(38);
+
+                    b.Property<string>("MetadataStatus")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue("Pending")
+                        .HasColumnOrder(36);
 
                     b.Property<Guid?>("MusicBrainzReleaseArtistId")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(27);
+                        .HasColumnOrder(31);
 
                     b.Property<Guid?>("MusicBrainzReleaseGroupId")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(26);
+                        .HasColumnOrder(30);
 
                     b.Property<Guid?>("MusicBrainzReleaseId")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(25);
+                        .HasColumnOrder(29);
 
                     b.Property<string>("OriginalLanguageCode")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(15);
+                        .HasColumnOrder(16);
 
                     b.Property<string>("OriginalLanguageName")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(16);
+                        .HasColumnOrder(17);
 
                     b.Property<string>("OriginalLanguageNativeName")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(17);
+                        .HasColumnOrder(18);
 
                     b.Property<DateOnly?>("OriginalReleaseDate")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(6);
+                        .HasColumnOrder(7);
 
                     b.Property<int?>("OriginalReleaseYear")
                         .HasColumnType("INTEGER")
-                        .HasColumnOrder(7);
+                        .HasColumnOrder(8);
 
                     b.Property<string>("OriginalTitle")
                         .HasMaxLength(255)
                         .HasColumnType("TEXT")
                         .HasColumnOrder(4);
 
+                    b.Property<string>("Packaging")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(24);
+
                     b.Property<DateOnly?>("ReReleaseDate")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(8);
+                        .HasColumnOrder(9);
 
                     b.Property<int?>("ReReleaseYear")
                         .HasColumnType("INTEGER")
-                        .HasColumnOrder(9);
+                        .HasColumnOrder(10);
 
                     b.Property<string>("ReleaseCountry")
                         .HasMaxLength(2)
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(10);
+                        .HasColumnOrder(11);
 
                     b.Property<string>("ReleaseStatus")
                         .HasMaxLength(50)
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(19);
+                        .HasColumnOrder(20);
 
-                    b.Property<string>("ReleaseType")
-                        .HasMaxLength(50)
+                    b.Property<string>("ReleaseTitle")
+                        .HasMaxLength(255)
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(18);
+                        .HasColumnOrder(26);
 
                     b.Property<string>("ReleaseVersion")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(11);
+                        .HasColumnOrder(12);
+
+                    b.Property<string>("Script")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(19);
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -496,19 +563,19 @@ namespace Lumina.DataAccess.Common.Migrations
 
                     b.Property<int?>("TotalDiscs")
                         .HasColumnType("INTEGER")
-                        .HasColumnOrder(20);
+                        .HasColumnOrder(21);
 
                     b.Property<int>("TotalTracks")
                         .HasColumnType("INTEGER")
-                        .HasColumnOrder(21);
+                        .HasColumnOrder(22);
 
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(31);
+                        .HasColumnOrder(35);
 
                     b.Property<DateTime?>("UpdatedOnUtc")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(30);
+                        .HasColumnOrder(34);
 
                     b.HasKey("Id");
 
@@ -571,21 +638,65 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(0);
 
+                    b.Property<string>("Country")
+                        .HasMaxLength(2)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(7);
+
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(6);
+                        .HasColumnOrder(14);
 
                     b.Property<DateTime>("CreatedOnUtc")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(5);
+                        .HasColumnOrder(13);
+
+                    b.Property<string>("Disambiguation")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(4);
+
+                    b.Property<string>("Gender")
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(6);
+
+                    b.Property<bool>("IsEnded")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(10);
+
+                    b.Property<DateTime?>("LastMetadataUpdateUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(18);
 
                     b.Property<Guid>("LibraryId")
                         .HasColumnType("TEXT")
                         .HasColumnOrder(1);
 
+                    b.Property<DateOnly?>("LifeSpanBegin")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(8);
+
+                    b.Property<DateOnly?>("LifeSpanEnd")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(9);
+
+                    b.Property<string>("MetadataProvider")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(19);
+
+                    b.Property<string>("MetadataStatus")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue("Pending")
+                        .HasColumnOrder(17);
+
                     b.Property<Guid?>("MusicBrainzArtistId")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(4);
+                        .HasColumnOrder(12);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -593,18 +704,28 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(2);
 
+                    b.Property<string>("SortName")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(3);
+
+                    b.Property<string>("Type")
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(5);
+
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(8);
+                        .HasColumnOrder(16);
 
                     b.Property<DateTime?>("UpdatedOnUtc")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(7);
+                        .HasColumnOrder(15);
 
                     b.Property<string>("Website")
                         .HasMaxLength(2048)
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(3);
+                        .HasColumnOrder(11);
 
                     b.HasKey("Id");
 
@@ -612,6 +733,226 @@ namespace Lumina.DataAccess.Common.Migrations
                         .IsUnique();
 
                     b.ToTable("Artists", (string)null);
+                });
+
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary.MusicArtworkEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(0);
+
+                    b.Property<string>("ArtworkType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(3);
+
+                    b.Property<ulong>("ContentHash")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(6);
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(11);
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(10);
+
+                    b.Property<string>("FileName")
+                        .HasMaxLength(2048)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(5);
+
+                    b.Property<DateTime?>("LastUpdateUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(9);
+
+                    b.Property<int>("Ordinal")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(4);
+
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(2);
+
+                    b.Property<string>("OwnerType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(1);
+
+                    b.Property<string>("Provider")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(8);
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(7);
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(13);
+
+                    b.Property<DateTime?>("UpdatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(12);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("OwnerType", "OwnerId", "ArtworkType", "Ordinal")
+                        .IsUnique();
+
+                    b.ToTable("MusicArtwork", (string)null);
+                });
+
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary.MusicLibraryScanItemMetadataEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(0);
+
+                    b.Property<string>("AcoustId")
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(25);
+
+                    b.Property<string>("ArtistName")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(4);
+
+                    b.Property<string>("AudioCodec")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(15);
+
+                    b.Property<int?>("BitDepth")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(14);
+
+                    b.Property<int?>("Bitrate")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(16);
+
+                    b.Property<int>("Channels")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(13);
+
+                    b.Property<int?>("DiscNumber")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(10);
+
+                    b.Property<int>("DurationInSeconds")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(11);
+
+                    b.Property<Guid>("LibraryId")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(2);
+
+                    b.Property<Guid>("LibraryScanId")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(1);
+
+                    b.PrimitiveCollection<string>("Moods")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(30);
+
+                    b.Property<Guid?>("MusicBrainzArtistId")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(17);
+
+                    b.Property<Guid?>("MusicBrainzRecordingId")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(21);
+
+                    b.Property<Guid?>("MusicBrainzReleaseArtistId")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(18);
+
+                    b.Property<Guid?>("MusicBrainzReleaseGroupId")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(19);
+
+                    b.Property<Guid?>("MusicBrainzReleaseId")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(20);
+
+                    b.Property<Guid?>("MusicBrainzTrackId")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(22);
+
+                    b.Property<Guid?>("MusicBrainzWorkId")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(23);
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(3);
+
+                    b.Property<string>("ReleaseName")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(7);
+
+                    b.Property<string>("ReleaseType")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(5);
+
+                    b.Property<int?>("ReleaseYear")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(6);
+
+                    b.Property<decimal?>("ReplayGainAlbumGain")
+                        .HasColumnType("decimal(8,2)")
+                        .HasColumnOrder(28);
+
+                    b.Property<decimal?>("ReplayGainAlbumPeak")
+                        .HasColumnType("decimal(8,6)")
+                        .HasColumnOrder(29);
+
+                    b.Property<decimal?>("ReplayGainTrackGain")
+                        .HasColumnType("decimal(8,2)")
+                        .HasColumnOrder(26);
+
+                    b.Property<decimal?>("ReplayGainTrackPeak")
+                        .HasColumnType("decimal(8,6)")
+                        .HasColumnOrder(27);
+
+                    b.Property<int>("SampleRate")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(12);
+
+                    b.Property<int?>("TrackNumber")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(9);
+
+                    b.Property<string>("TrackTitle")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(8);
+
+                    b.Property<string>("WorkTitle")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(24);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LibraryScanId", "Path")
+                        .IsUnique();
+
+                    b.ToTable("MusicLibraryScanItemMetadata", (string)null);
                 });
 
             modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary.TrackContributorEntity", b =>
@@ -666,6 +1007,11 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(0);
 
+                    b.Property<string>("AcoustId")
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(44);
+
                     b.Property<Guid>("AlbumId")
                         .HasColumnType("TEXT")
                         .HasColumnOrder(1);
@@ -673,97 +1019,123 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.Property<string>("AudioCodec")
                         .HasMaxLength(50)
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(23);
+                        .HasColumnOrder(24);
 
                     b.Property<int?>("BitDepth")
                         .HasColumnType("INTEGER")
-                        .HasColumnOrder(22);
+                        .HasColumnOrder(23);
 
                     b.Property<int?>("Bitrate")
                         .HasColumnType("INTEGER")
-                        .HasColumnOrder(24);
+                        .HasColumnOrder(25);
 
                     b.Property<int?>("Bpm")
                         .HasColumnType("INTEGER")
-                        .HasColumnOrder(29);
+                        .HasColumnOrder(30);
 
                     b.Property<int>("Channels")
                         .HasColumnType("INTEGER")
-                        .HasColumnOrder(21);
+                        .HasColumnOrder(22);
 
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(35);
+                        .HasColumnOrder(38);
 
                     b.Property<DateTime>("CreatedOnUtc")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(34);
+                        .HasColumnOrder(37);
 
                     b.Property<string>("Description")
                         .HasMaxLength(2000)
                         .HasColumnType("TEXT")
                         .HasColumnOrder(6);
 
+                    b.Property<string>("Disambiguation")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(7);
+
                     b.Property<int?>("DiscNumber")
                         .HasColumnType("INTEGER")
-                        .HasColumnOrder(26);
+                        .HasColumnOrder(27);
 
                     b.Property<int>("DurationInSeconds")
                         .HasColumnType("INTEGER")
-                        .HasColumnOrder(19);
+                        .HasColumnOrder(20);
+
+                    b.Property<bool>("IsVideo")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(31);
 
                     b.Property<string>("Key")
                         .HasMaxLength(50)
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(28);
+                        .HasColumnOrder(29);
 
                     b.Property<string>("LanguageCode")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(13);
+                        .HasColumnOrder(14);
 
                     b.Property<string>("LanguageName")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(14);
+                        .HasColumnOrder(15);
 
                     b.Property<string>("LanguageNativeName")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(15);
+                        .HasColumnOrder(16);
+
+                    b.Property<DateTime?>("LastMetadataUpdateUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(42);
 
                     b.Property<Guid>("LibraryId")
                         .HasColumnType("TEXT")
                         .HasColumnOrder(2);
 
+                    b.Property<string>("MetadataProvider")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(43);
+
+                    b.Property<string>("MetadataStatus")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue("Pending")
+                        .HasColumnOrder(41);
+
                     b.Property<Guid?>("MusicBrainzRecordingId")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(31);
+                        .HasColumnOrder(34);
 
                     b.Property<Guid?>("MusicBrainzTrackId")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(32);
+                        .HasColumnOrder(35);
 
                     b.Property<Guid?>("MusicBrainzWorkId")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(33);
+                        .HasColumnOrder(36);
 
                     b.Property<string>("OriginalLanguageCode")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(16);
+                        .HasColumnOrder(17);
 
                     b.Property<string>("OriginalLanguageName")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(17);
+                        .HasColumnOrder(18);
 
                     b.Property<string>("OriginalLanguageNativeName")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(18);
+                        .HasColumnOrder(19);
 
                     b.Property<DateOnly?>("OriginalReleaseDate")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(7);
+                        .HasColumnOrder(8);
 
                     b.Property<int?>("OriginalReleaseYear")
                         .HasColumnType("INTEGER")
-                        .HasColumnOrder(8);
+                        .HasColumnOrder(9);
 
                     b.Property<string>("OriginalTitle")
                         .HasMaxLength(255)
@@ -778,29 +1150,45 @@ namespace Lumina.DataAccess.Common.Migrations
 
                     b.Property<DateOnly?>("ReReleaseDate")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(9);
+                        .HasColumnOrder(10);
 
                     b.Property<int?>("ReReleaseYear")
                         .HasColumnType("INTEGER")
-                        .HasColumnOrder(10);
+                        .HasColumnOrder(11);
 
                     b.Property<string>("ReleaseCountry")
                         .HasMaxLength(2)
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(11);
+                        .HasColumnOrder(12);
 
                     b.Property<string>("ReleaseVersion")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(12);
+                        .HasColumnOrder(13);
+
+                    b.Property<decimal?>("ReplayGainAlbumGain")
+                        .HasColumnType("decimal(8,2)")
+                        .HasColumnOrder(47);
+
+                    b.Property<decimal?>("ReplayGainAlbumPeak")
+                        .HasColumnType("decimal(8,6)")
+                        .HasColumnOrder(48);
+
+                    b.Property<decimal?>("ReplayGainTrackGain")
+                        .HasColumnType("decimal(8,2)")
+                        .HasColumnOrder(45);
+
+                    b.Property<decimal?>("ReplayGainTrackPeak")
+                        .HasColumnType("decimal(8,6)")
+                        .HasColumnOrder(46);
 
                     b.Property<int>("SampleRate")
                         .HasColumnType("INTEGER")
-                        .HasColumnOrder(20);
+                        .HasColumnOrder(21);
 
                     b.Property<string>("Script")
                         .HasMaxLength(50)
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(27);
+                        .HasColumnOrder(28);
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -810,20 +1198,25 @@ namespace Lumina.DataAccess.Common.Migrations
 
                     b.Property<int>("TrackNumber")
                         .HasColumnType("INTEGER")
-                        .HasColumnOrder(25);
+                        .HasColumnOrder(26);
 
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(37);
+                        .HasColumnOrder(40);
 
                     b.Property<DateTime?>("UpdatedOnUtc")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(36);
+                        .HasColumnOrder(39);
 
-                    b.Property<string>("Work")
+                    b.Property<string>("WorkTitle")
                         .HasMaxLength(255)
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(30);
+                        .HasColumnOrder(32);
+
+                    b.Property<string>("WorkType")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(33);
 
                     b.HasKey("Id");
 
@@ -884,11 +1277,11 @@ namespace Lumina.DataAccess.Common.Migrations
 
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(12);
+                        .HasColumnOrder(13);
 
                     b.Property<DateTime>("CreatedOnUtc")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(11);
+                        .HasColumnOrder(12);
 
                     b.Property<bool>("IsEnabled")
                         .ValueGeneratedOnAdd()
@@ -910,6 +1303,11 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(9);
 
+                    b.Property<string>("PathTemplateFingerprint")
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(11);
+
                     b.Property<bool>("ShouldSaveMetadataInMediaDirectories")
                         .HasColumnType("INTEGER")
                         .HasColumnOrder(7);
@@ -926,11 +1324,11 @@ namespace Lumina.DataAccess.Common.Migrations
 
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(14);
+                        .HasColumnOrder(15);
 
                     b.Property<DateTime?>("UpdatedOnUtc")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(13);
+                        .HasColumnOrder(14);
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("TEXT");
@@ -1963,6 +2361,10 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("INTEGER")
                         .HasColumnOrder(3);
 
+                    b.Property<bool>("ShouldAggregateArtworkWhenMissing")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(13);
+
                     b.Property<bool>("ShouldAggregateMetadataWhenMissing")
                         .HasColumnType("INTEGER")
                         .HasColumnOrder(10);
@@ -2049,6 +2451,36 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.HasOne("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary.AlbumEntity", null)
                         .WithMany()
                         .HasForeignKey("AlbumId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Lumina.Application.Common.DataAccess.Entities.Common.TagEntity", null)
+                        .WithMany()
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ArtistGenres", b =>
+                {
+                    b.HasOne("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary.ArtistEntity", null)
+                        .WithMany()
+                        .HasForeignKey("ArtistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Lumina.Application.Common.DataAccess.Entities.Common.GenreEntity", null)
+                        .WithMany()
+                        .HasForeignKey("GenreId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ArtistTags", b =>
+                {
+                    b.HasOne("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary.ArtistEntity", null)
+                        .WithMany()
+                        .HasForeignKey("ArtistId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -2163,6 +2595,30 @@ namespace Lumina.DataAccess.Common.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.OwnsMany("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary.AlbumCatalogNumberEntity", "CatalogNumbers", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("TEXT");
+
+                            b1.Property<Guid>("AlbumId")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("CatalogNumber")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("TEXT");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("AlbumId");
+
+                            b1.ToTable("AlbumCatalogNumbers", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("AlbumId");
+                        });
+
                     b.OwnsMany("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary.AudioRatingEntity", "Ratings", b1 =>
                         {
                             b1.Property<Guid>("Id")
@@ -2195,9 +2651,37 @@ namespace Lumina.DataAccess.Common.Migrations
                                 .HasForeignKey("AlbumId");
                         });
 
+                    b.OwnsMany("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary.AlbumReleaseTypeEntity", "ReleaseTypes", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("TEXT");
+
+                            b1.Property<Guid>("AlbumId")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("ReleaseType")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("TEXT");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("AlbumId");
+
+                            b1.ToTable("AlbumReleaseTypes", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("AlbumId");
+                        });
+
                     b.Navigation("Artist");
 
+                    b.Navigation("CatalogNumbers");
+
                     b.Navigation("Ratings");
+
+                    b.Navigation("ReleaseTypes");
                 });
 
             modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary.ArtistContributorEntity", b =>
@@ -2207,6 +2691,238 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasForeignKey("ArtistId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary.ArtistEntity", b =>
+                {
+                    b.OwnsOne("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary.MusicAreaEntity", "Area", b1 =>
+                        {
+                            b1.Property<Guid>("ArtistEntityId");
+
+                            b1.Property<string>("Disambiguation");
+
+                            b1.Property<string>("Iso3166Code");
+
+                            b1.Property<Guid>("MusicBrainzAreaId");
+
+                            b1.Property<string>("Name")
+                                .IsRequired();
+
+                            b1.Property<string>("SortName");
+
+                            b1.Property<string>("Type");
+
+                            b1.HasKey("ArtistEntityId");
+
+                            b1.ToTable("Artists");
+
+                            b1
+                                .ToJson("Area")
+                                .HasColumnType("TEXT");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ArtistEntityId");
+                        });
+
+                    b.OwnsOne("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary.MusicAreaEntity", "BeginArea", b1 =>
+                        {
+                            b1.Property<Guid>("ArtistEntityId");
+
+                            b1.Property<string>("Disambiguation");
+
+                            b1.Property<string>("Iso3166Code");
+
+                            b1.Property<Guid>("MusicBrainzAreaId");
+
+                            b1.Property<string>("Name")
+                                .IsRequired();
+
+                            b1.Property<string>("SortName");
+
+                            b1.Property<string>("Type");
+
+                            b1.HasKey("ArtistEntityId");
+
+                            b1.ToTable("Artists");
+
+                            b1
+                                .ToJson("BeginArea")
+                                .HasColumnType("TEXT");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ArtistEntityId");
+                        });
+
+                    b.OwnsOne("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary.MusicAreaEntity", "EndArea", b1 =>
+                        {
+                            b1.Property<Guid>("ArtistEntityId");
+
+                            b1.Property<string>("Disambiguation");
+
+                            b1.Property<string>("Iso3166Code");
+
+                            b1.Property<Guid>("MusicBrainzAreaId");
+
+                            b1.Property<string>("Name")
+                                .IsRequired();
+
+                            b1.Property<string>("SortName");
+
+                            b1.Property<string>("Type");
+
+                            b1.HasKey("ArtistEntityId");
+
+                            b1.ToTable("Artists");
+
+                            b1
+                                .ToJson("EndArea")
+                                .HasColumnType("TEXT");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ArtistEntityId");
+                        });
+
+                    b.OwnsMany("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary.ArtistAliasEntity", "Aliases", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("TEXT");
+
+                            b1.Property<Guid>("ArtistId")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<DateOnly?>("BeginDate")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<DateOnly?>("EndDate")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<bool>("IsEnded")
+                                .HasColumnType("INTEGER");
+
+                            b1.Property<bool>("IsPrimary")
+                                .HasColumnType("INTEGER");
+
+                            b1.Property<string>("Locale")
+                                .HasMaxLength(20)
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasMaxLength(255)
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("SortName")
+                                .HasMaxLength(255)
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("Type")
+                                .HasMaxLength(50)
+                                .HasColumnType("TEXT");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("ArtistId");
+
+                            b1.ToTable("ArtistAliases", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("ArtistId");
+                        });
+
+                    b.OwnsMany("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary.AudioRatingEntity", "Ratings", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("TEXT");
+
+                            b1.Property<Guid>("ArtistId")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<decimal>("MaxValue")
+                                .HasColumnType("decimal(3,2)");
+
+                            b1.Property<string>("Source")
+                                .HasMaxLength(50)
+                                .HasColumnType("TEXT");
+
+                            b1.Property<decimal>("Value")
+                                .HasColumnType("decimal(3,2)");
+
+                            b1.Property<int?>("VoteCount")
+                                .HasColumnType("INTEGER");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("ArtistId");
+
+                            b1.ToTable("ArtistRatings", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("ArtistId");
+                        });
+
+                    b.OwnsMany("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary.ArtistIpiEntity", "Ipis", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("TEXT");
+
+                            b1.Property<Guid>("ArtistId")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(20)
+                                .HasColumnType("TEXT");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("ArtistId");
+
+                            b1.ToTable("ArtistIpis", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("ArtistId");
+                        });
+
+                    b.OwnsMany("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary.ArtistIsniEntity", "Isnis", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("TEXT");
+
+                            b1.Property<Guid>("ArtistId")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(20)
+                                .HasColumnType("TEXT");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("ArtistId");
+
+                            b1.ToTable("ArtistIsnis", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("ArtistId");
+                        });
+
+                    b.Navigation("Aliases");
+
+                    b.Navigation("Area");
+
+                    b.Navigation("BeginArea");
+
+                    b.Navigation("EndArea");
+
+                    b.Navigation("Ipis");
+
+                    b.Navigation("Isnis");
+
+                    b.Navigation("Ratings");
                 });
 
             modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary.TrackContributorEntity", b =>
@@ -2307,6 +3023,63 @@ namespace Lumina.DataAccess.Common.Migrations
                                 .HasForeignKey("TrackId");
                         });
 
+                    b.OwnsMany("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary.TrackWorkIswcEntity", "WorkIswcs", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("TEXT");
+
+                            b1.Property<Guid>("TrackId")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(20)
+                                .HasColumnType("TEXT");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("TrackId");
+
+                            b1.ToTable("TrackWorkIswcs", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("TrackId");
+                        });
+
+                    b.OwnsMany("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary.TrackWorkLanguageEntity", "WorkLanguages", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("LanguageCode")
+                                .IsRequired()
+                                .HasMaxLength(5)
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("LanguageName")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("NativeName")
+                                .HasMaxLength(100)
+                                .HasColumnType("TEXT");
+
+                            b1.Property<Guid>("TrackId")
+                                .HasColumnType("TEXT");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("TrackId");
+
+                            b1.ToTable("TrackWorkLanguages", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("TrackId");
+                        });
+
                     b.Navigation("Album");
 
                     b.Navigation("Isrcs");
@@ -2314,6 +3087,10 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.Navigation("Moods");
 
                     b.Navigation("Ratings");
+
+                    b.Navigation("WorkIswcs");
+
+                    b.Navigation("WorkLanguages");
                 });
 
             modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.DirectoryScanFingerprintEntity", b =>
@@ -2358,7 +3135,46 @@ namespace Lumina.DataAccess.Common.Migrations
                                 .HasForeignKey("LibraryId");
                         });
 
+                    b.OwnsMany("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.LibraryPathTemplatePartEntity", "PathTemplateParts", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("TEXT");
+
+                            b1.Property<bool>("IsOptional")
+                                .HasColumnType("INTEGER");
+
+                            b1.Property<string>("Kind")
+                                .IsRequired()
+                                .HasMaxLength(32)
+                                .HasColumnType("TEXT");
+
+                            b1.Property<Guid>("LibraryId")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<int>("Position")
+                                .HasColumnType("INTEGER")
+                                .HasColumnName("Position");
+
+                            b1.Property<string>("Representation")
+                                .IsRequired()
+                                .HasMaxLength(512)
+                                .HasColumnType("TEXT");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("LibraryId", "Position")
+                                .IsUnique();
+
+                            b1.ToTable("LibraryPathTemplateParts", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("LibraryId");
+                        });
+
                     b.Navigation("ContentLocations");
+
+                    b.Navigation("PathTemplateParts");
 
                     b.Navigation("User");
                 });

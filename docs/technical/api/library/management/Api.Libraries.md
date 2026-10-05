@@ -38,6 +38,9 @@
     - [Cancel Library Scan](#cancel-library-scan)
       - [Cancel Library Scan Request](#cancel-library-scan-request)
       - [Cancel Library Scan Response](#cancel-library-scan-response)
+    - [Get Library Path Template Parts](#get-library-path-template-parts)
+      - [Get Library Path Template Parts Request](#get-library-path-template-parts-request)
+      - [Get Library Path Template Parts Response](#get-library-path-template-parts-response)
 
 ## Library
 
@@ -59,9 +62,10 @@ POST api/v1/libraries
   "coverImage": null,
   "isEnabled": true,
   "isLocked": false,
-  "downloadMetadataFromWeb": true,
+  "canDownloadMetadataFromWeb": true,
   "shouldSaveMetadataInMediaDirectories": true,
-  "shouldSkipUnchangedDirectoriesDuringScan": true
+  "shouldSkipUnchangedDirectoriesDuringScan": true,
+  "pathTemplateParts": []
 }
 ```
 
@@ -83,9 +87,10 @@ POST api/v1/libraries
   "coverImage": null,
   "isEnabled": true,
   "isLocked": false,
-  "downloadMetadataFromWeb": true,
+  "canDownloadMetadataFromWeb": true,
   "shouldSaveMetadataInMediaDirectories": true,
   "shouldSkipUnchangedDirectoriesDuringScan": true,
+  "pathTemplateParts": [],
   "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
   "updatedOnUtc": null
 }
@@ -118,9 +123,10 @@ GET api/v1/libraries
     "coverImage": null,
     "isEnabled": true,
     "isLocked": false,
-    "downloadMetadataFromWeb": true,
+    "canDownloadMetadataFromWeb": true,
     "shouldSaveMetadataInMediaDirectories": true,
     "shouldSkipUnchangedDirectoriesDuringScan": true,
+    "pathTemplateParts": [],
     "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
     "updatedOnUtc": null
   }
@@ -154,9 +160,10 @@ GET api/v1/libraries/enabled
     "coverImage": null,
     "isEnabled": true,
     "isLocked": false,
-    "downloadMetadataFromWeb": true,
+    "canDownloadMetadataFromWeb": true,
     "shouldSaveMetadataInMediaDirectories": true,
     "shouldSkipUnchangedDirectoriesDuringScan": true,
+    "pathTemplateParts": [],
     "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
     "updatedOnUtc": null
   }
@@ -189,9 +196,10 @@ GET api/v1/libraries/{id}
   "coverImage": null,
   "isEnabled": true,
   "isLocked": false,
-  "downloadMetadataFromWeb": true,
+  "canDownloadMetadataFromWeb": true,
   "shouldSaveMetadataInMediaDirectories": true,
   "shouldSkipUnchangedDirectoriesDuringScan": true,
+  "pathTemplateParts": [],
   "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
   "updatedOnUtc": null
 }
@@ -217,9 +225,10 @@ PUT api/v1/libraries/{id}
   "coverImage": null,
   "isEnabled": true,
   "isLocked": false,
-  "downloadMetadataFromWeb": true,
+  "canDownloadMetadataFromWeb": true,
   "shouldSaveMetadataInMediaDirectories": true,
-  "shouldSkipUnchangedDirectoriesDuringScan": true
+  "shouldSkipUnchangedDirectoriesDuringScan": true,
+  "pathTemplateParts": []
 }
 ```
 
@@ -241,9 +250,10 @@ PUT api/v1/libraries/{id}
   "coverImage": null,
   "isEnabled": true,
   "isLocked": false,
-  "downloadMetadataFromWeb": true,
+  "canDownloadMetadataFromWeb": true,
   "shouldSaveMetadataInMediaDirectories": true,
   "shouldSkipUnchangedDirectoriesDuringScan": true,
+  "pathTemplateParts": [],
   "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
   "updatedOnUtc": null
 }
@@ -399,4 +409,44 @@ POST api/v1/libraries/{libraryId}/scans/{scanId}/cancel
 
 ```js
 204 No Content
+```
+
+### Get Library Path Template Parts
+
+#### Get Library Path Template Parts Request
+
+```js
+GET api/v1/libraries/path-template-parts/{libraryType}
+```
+
+#### Get Library Path Template Parts Response
+
+```js
+200 Ok
+```
+
+```json
+{
+  "parts": [
+    {
+      "kind": "Artist",
+      "valueType": "Text",
+      "defaultRepresentation": "{0}",
+      "isOptionalByDefault": false
+    },
+    {
+      "kind": "DiscNumber",
+      "valueType": "Integer",
+      "defaultRepresentation": "{0:00}",
+      "isOptionalByDefault": true
+    }
+  ],
+  "defaultTemplateParts": [
+    {
+      "kind": "Artist",
+      "representation": "{0}",
+      "isOptional": false
+    }
+  ]
+}
 ```

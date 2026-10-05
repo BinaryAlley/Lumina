@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
@@ -51,6 +52,7 @@ public class LibraryTests
             canDownloadMetadataFromWeb: false,
             shouldSaveMetadataInMediaDirectories: true,
             shouldSkipUnchangedDirectoriesDuringScan: true,
+            LibraryPathTemplate.Empty(),
             scanIds);
 
         // Assert
@@ -89,6 +91,7 @@ public class LibraryTests
             canDownloadMetadataFromWeb: true,
             shouldSaveMetadataInMediaDirectories: false,
             shouldSkipUnchangedDirectoriesDuringScan: false,
+            LibraryPathTemplate.Empty(),
             scanIds);
 
         // Assert
@@ -115,6 +118,7 @@ public class LibraryTests
             canDownloadMetadataFromWeb: true,
             shouldSaveMetadataInMediaDirectories: false,
             shouldSkipUnchangedDirectoriesDuringScan: false,
+            LibraryPathTemplate.Empty(),
             []);
 
         // Assert
@@ -150,6 +154,7 @@ public class LibraryTests
             canDownloadMetadataFromWeb: true,
             shouldSaveMetadataInMediaDirectories: false,
             shouldSkipUnchangedDirectoriesDuringScan: false,
+            LibraryPathTemplate.Empty(),
             []);
 
         // Assert
@@ -177,6 +182,7 @@ public class LibraryTests
             canDownloadMetadataFromWeb: true,
             shouldSaveMetadataInMediaDirectories: false,
             shouldSkipUnchangedDirectoriesDuringScan: false,
+            LibraryPathTemplate.Empty(),
             []);
 
         // Assert

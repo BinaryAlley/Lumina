@@ -66,6 +66,11 @@ public class LibraryConfiguration : IEntityTypeConfiguration<LibraryEntity>
             .HasDefaultValue(null)
             .HasColumnOrder(10);
 
+        builder.Property(library => library.PathTemplateFingerprint)
+            .HasMaxLength(64)
+            .HasDefaultValue(null)
+            .HasColumnOrder(11);
+
         // one user with many libraries
         builder.HasOne(library => library.User)
             .WithMany(user => user.Libraries)
@@ -95,21 +100,48 @@ public class LibraryConfiguration : IEntityTypeConfiguration<LibraryEntity>
                  .IsRequired();
         });
 
+        // the path template parts are ordered, so their position is stored explicitly and part of a unique index together with the library
+        builder.OwnsMany(library => library.PathTemplateParts, partBuilder =>
+        {
+            partBuilder.ToTable("LibraryPathTemplateParts");
+            partBuilder.WithOwner()
+                .HasForeignKey("LibraryId");
+
+            partBuilder.Property<Guid>("Id")
+                .ValueGeneratedOnAdd();
+            partBuilder.HasKey("Id");
+            partBuilder.HasIndex("LibraryId", nameof(LibraryPathTemplatePartEntity.Position))
+                .IsUnique();
+
+            partBuilder.Property(part => part.Position)
+                .HasColumnName("Position")
+                .IsRequired();
+            partBuilder.Property(part => part.Kind)
+                .HasConversion<string>()
+                .HasMaxLength(32)
+                .IsRequired();
+            partBuilder.Property(part => part.Representation)
+                .HasMaxLength(512)
+                .IsRequired();
+            partBuilder.Property(part => part.IsOptional)
+                .IsRequired();
+        });
+
         // audit
         builder.Property(library => library.CreatedOnUtc)
             .IsRequired()
-            .HasColumnOrder(11);
+            .HasColumnOrder(12);
 
         builder.Property(library => library.CreatedBy)
             .IsRequired()
-            .HasColumnOrder(12);
+            .HasColumnOrder(13);
 
         builder.Property(library => library.UpdatedOnUtc)
             .HasDefaultValue(null)
-            .HasColumnOrder(13);
+            .HasColumnOrder(14);
 
         builder.Property(library => library.UpdatedBy)
             .HasDefaultValue(null)
-            .HasColumnOrder(14);
+            .HasColumnOrder(15);
     }
 }

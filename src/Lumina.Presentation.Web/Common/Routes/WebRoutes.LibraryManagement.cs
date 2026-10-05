@@ -22,6 +22,7 @@ public static partial class WebRoutes
         public const string SCAN_LIBRARY = "{culture}/libraries/manage/api-scan-library/{id}";
         public const string CANCEL_LIBRARIES_SCAN = "{culture}/libraries/manage/api-cancel-libraries-scan";
         public const string CANCEL_LIBRARY_SCAN = "{culture}/libraries/manage/{libraryId}/api-cancel-library-scan/{scanId}";
+        public const string GET_LIBRARY_PATH_TEMPLATE_PARTS = "{culture}/libraries/manage/api-get-path-template-parts/{libraryType}";
         public const string GET_METADATA_PROVIDERS = "{culture}/libraries/manage/api-get-metadata-providers/{libraryId}";
         public const string SET_METADATA_PROVIDER_ENABLED = "{culture}/libraries/manage/api-set-metadata-provider-enabled";
         public const string REORDER_METADATA_PROVIDERS = "{culture}/libraries/manage/api-reorder-metadata-providers";

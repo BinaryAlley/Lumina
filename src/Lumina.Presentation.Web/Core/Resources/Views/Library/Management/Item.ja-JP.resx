@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -350,5 +350,68 @@
   </data>
   <data name="DescriptionBookReaders" xml:space="preserve">
     <value>このライブラリの書籍を読むために使用されるリーダーです。無効なリーダーは、その形式のリーダープラグインが存在するが無効になっていることをユーザーに知らせます。</value>
+  </data>
+  <data name="PathTemplate" xml:space="preserve">
+    <value>パステンプレート</value>
+  </data>
+  <data name="DescriptionPathTemplate" xml:space="preserve">
+    <value>このライブラリのディスク上のパスの構造を記述し、各フォルダー名とファイル名が何を意味するかをアプリが理解できるようにします。利用可能な部品を、ディスク上の並び順でパスにドラッグしてください。各部品はライブラリでの表記に合わせて編集でき、チェックボックスをオンにすると、常に存在しない場合に任意としてマークされます。プレビューにはパスの例が表示されます。</value>
+  </data>
+  <data name="PathTemplatePreview" xml:space="preserve">
+    <value>プレビュー</value>
+  </data>
+  <data name="PathPartLiteral" xml:space="preserve">
+    <value>テキスト</value>
+  </data>
+  <data name="PathPartSeparator" xml:space="preserve">
+    <value>区切り</value>
+  </data>
+  <data name="PathPartArtist" xml:space="preserve">
+    <value>アーティスト</value>
+  </data>
+  <data name="PathPartReleaseType" xml:space="preserve">
+    <value>リリース種別</value>
+  </data>
+  <data name="PathPartReleaseYear" xml:space="preserve">
+    <value>リリース年</value>
+  </data>
+  <data name="PathPartReleaseName" xml:space="preserve">
+    <value>リリース名</value>
+  </data>
+  <data name="PathPartTrackNumber" xml:space="preserve">
+    <value>トラック番号</value>
+  </data>
+  <data name="PathPartTrackName" xml:space="preserve">
+    <value>トラック名</value>
+  </data>
+  <data name="PathPartExtension" xml:space="preserve">
+    <value>拡張子</value>
+  </data>
+  <data name="PathPartDiscNumber" xml:space="preserve">
+    <value>ディスク番号</value>
+  </data>
+  <data name="PathPartOptional" xml:space="preserve">
+    <value>任意としてマーク</value>
+  </data>
+  <data name="PathPartLiteralPlaceholder" xml:space="preserve">
+    <value>テキスト</value>
+  </data>
+  <data name="PathPartDigits" xml:space="preserve">
+    <value>桁数</value>
+  </data>
+  <data name="PathPartAuthor" xml:space="preserve">
+    <value>著者</value>
+  </data>
+  <data name="PathPartTitle" xml:space="preserve">
+    <value>タイトル</value>
+  </data>
+  <data name="PathPartSeries" xml:space="preserve">
+    <value>シリーズ</value>
+  </data>
+  <data name="PathPartSeriesNumber" xml:space="preserve">
+    <value>シリーズ番号</value>
+  </data>
+  <data name="PathPartBookId" xml:space="preserve">
+    <value>書籍ID</value>
   </data>
 </root>

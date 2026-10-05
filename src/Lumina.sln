@@ -294,6 +294,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "management", "management", 
 		..\docs\technical\requests\library\management\GetEnabledLibraries.http = ..\docs\technical\requests\library\management\GetEnabledLibraries.http
 		..\docs\technical\requests\library\management\GetLibraries.http = ..\docs\technical\requests\library\management\GetLibraries.http
 		..\docs\technical\requests\library\management\GetLibrary.http = ..\docs\technical\requests\library\management\GetLibrary.http
+		..\docs\technical\requests\library\management\GetLibraryPathTemplateParts.http = ..\docs\technical\requests\library\management\GetLibraryPathTemplateParts.http
 		..\docs\technical\requests\library\management\GetLibraryScanProgress.http = ..\docs\technical\requests\library\management\GetLibraryScanProgress.http
 		..\docs\technical\requests\library\management\GetRunningLibraryScans.http = ..\docs\technical\requests\library\management\GetRunningLibraryScans.http
 		..\docs\technical\requests\library\management\ScanLibraries.http = ..\docs\technical\requests\library\management\ScanLibraries.http

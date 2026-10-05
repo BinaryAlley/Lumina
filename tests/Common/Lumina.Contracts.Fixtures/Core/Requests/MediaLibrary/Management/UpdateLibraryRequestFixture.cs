@@ -31,6 +31,7 @@ public class UpdateLibraryRequestFixture
     /// <param name="canDownloadMetadataFromWeb">Optional. Whether metadata should be downloaded from the web.</param>
     /// <param name="shouldSaveMetadataInMediaDirectories">Optional. Whether metadata should be saved in the media directories.</param>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Optional. Whether unchanged directories should be skipped during scan.</param>
+    /// <param name="pathTemplateParts">Optional. The ordered parts of the path template of the media library.</param>
     /// <returns>The created <see cref="UpdateLibraryRequest"/>.</returns>
     public UpdateLibraryRequest Create(
         Guid? id = null,
@@ -43,7 +44,8 @@ public class UpdateLibraryRequestFixture
         bool? isLocked = null,
         bool? canDownloadMetadataFromWeb = null,
         bool? shouldSaveMetadataInMediaDirectories = null,
-        bool? shouldSkipUnchangedDirectoriesDuringScan = null)
+        bool? shouldSkipUnchangedDirectoriesDuringScan = null,
+        LibraryPathTemplatePartRequest[]? pathTemplateParts = null)
     {
         return new UpdateLibraryRequest(
             id ?? _faker.Random.Guid(),
@@ -56,7 +58,8 @@ public class UpdateLibraryRequestFixture
             isLocked ?? _faker.Random.Bool(),
             canDownloadMetadataFromWeb ?? _faker.Random.Bool(),
             shouldSaveMetadataInMediaDirectories ?? _faker.Random.Bool(),
-            shouldSkipUnchangedDirectoriesDuringScan ?? _faker.Random.Bool()
+            shouldSkipUnchangedDirectoriesDuringScan ?? _faker.Random.Bool(),
+            pathTemplateParts
         );
     }
 

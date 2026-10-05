@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
+using Lumina.Application.Common.DTO.MediaLibrary.Management;
 using System;
 using System.Diagnostics;
 #endregion
@@ -20,6 +21,7 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.UpdateLibrary
 /// <param name="CanDownloadMetadataFromWeb">Whether this media library should update the metadata of its elements from the web, or not.</param>
 /// <param name="ShouldSaveMetadataInMediaDirectories">Whether this media library should copy the downloaded metadata into the media library content locations, or not.</param>
 /// <param name="ShouldSkipUnchangedDirectoriesDuringScan">Whether this media library should skip the directories whose contents have not changed since the last scan, during the scan, or not.</param>
+/// <param name="PathTemplateParts">The ordered parts of the template describing the structure of the media library on disk.</param>
 [DebuggerDisplay("Title: {Title}")]
 public record UpdateLibraryCommand(
     Guid Id,
@@ -32,5 +34,6 @@ public record UpdateLibraryCommand(
     bool IsLocked,
     bool CanDownloadMetadataFromWeb,
     bool ShouldSaveMetadataInMediaDirectories,
-    bool ShouldSkipUnchangedDirectoriesDuringScan
+    bool ShouldSkipUnchangedDirectoriesDuringScan,
+    LibraryPathTemplatePartDto[]? PathTemplateParts
 ) : ICommand;

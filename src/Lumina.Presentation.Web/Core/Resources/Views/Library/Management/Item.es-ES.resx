@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -346,9 +346,72 @@
     <value>Lectores de libros</value>
   </data>
   <data name="SupportedExtensions" xml:space="preserve">
-    <value>Extensiones compatibles</value>
+    <value>Extensiónes compatibles</value>
   </data>
   <data name="DescriptionBookReaders" xml:space="preserve">
     <value>Los lectores de libros utilizados para leer los libros de esta biblioteca. Un lector deshabilitado le indica al usuario que existe un complemento de lectura para el formato, pero que está deshabilitado.</value>
+  </data>
+  <data name="PathTemplate" xml:space="preserve">
+    <value>Plantilla de ruta</value>
+  </data>
+  <data name="DescriptionPathTemplate" xml:space="preserve">
+    <value>Describe cómo están estructuradas en disco las rutas de esta biblioteca, para que la aplicación entienda qué significa cada carpeta y cada nombre de archivo. Arrastra las piezas disponibles a la ruta en el orden en que aparecen en disco. Cada pieza se puede editar para que coincida con cómo está escrita en tu biblioteca, y su casilla la marca como opcional cuando no siempre está presente. La vista previa muestra una ruta de ejemplo.</value>
+  </data>
+  <data name="PathTemplatePreview" xml:space="preserve">
+    <value>Vista previa</value>
+  </data>
+  <data name="PathPartLiteral" xml:space="preserve">
+    <value>Texto</value>
+  </data>
+  <data name="PathPartSeparator" xml:space="preserve">
+    <value>Separador</value>
+  </data>
+  <data name="PathPartArtist" xml:space="preserve">
+    <value>Artista</value>
+  </data>
+  <data name="PathPartReleaseType" xml:space="preserve">
+    <value>Tipo de lanzamiento</value>
+  </data>
+  <data name="PathPartReleaseYear" xml:space="preserve">
+    <value>Año de lanzamiento</value>
+  </data>
+  <data name="PathPartReleaseName" xml:space="preserve">
+    <value>Nombre del lanzamiento</value>
+  </data>
+  <data name="PathPartTrackNumber" xml:space="preserve">
+    <value>Número de pista</value>
+  </data>
+  <data name="PathPartTrackName" xml:space="preserve">
+    <value>Nombre de la pista</value>
+  </data>
+  <data name="PathPartExtension" xml:space="preserve">
+    <value>Extensión</value>
+  </data>
+  <data name="PathPartDiscNumber" xml:space="preserve">
+    <value>Número de disco</value>
+  </data>
+  <data name="PathPartOptional" xml:space="preserve">
+    <value>Marcar como opcional</value>
+  </data>
+  <data name="PathPartLiteralPlaceholder" xml:space="preserve">
+    <value>texto</value>
+  </data>
+  <data name="PathPartDigits" xml:space="preserve">
+    <value>dígitos</value>
+  </data>
+  <data name="PathPartAuthor" xml:space="preserve">
+    <value>Autor</value>
+  </data>
+  <data name="PathPartTitle" xml:space="preserve">
+    <value>Título</value>
+  </data>
+  <data name="PathPartSeries" xml:space="preserve">
+    <value>Serie</value>
+  </data>
+  <data name="PathPartSeriesNumber" xml:space="preserve">
+    <value>Número de serie</value>
+  </data>
+  <data name="PathPartBookId" xml:space="preserve">
+    <value>Id del libro</value>
   </data>
 </root>

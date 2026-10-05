@@ -11,7 +11,11 @@ Content-Type: application/json
   "coverImage": null,
   "isEnabled": true,
   "isLocked": false,
-  "downloadMetadataFromWeb": true,
+  "canDownloadMetadataFromWeb": true,
   "shouldSaveMetadataInMediaDirectories": true,
-  "shouldSkipUnchangedDirectoriesDuringScan": true
+  "shouldSkipUnchangedDirectoriesDuringScan": true,
+  "pathTemplateParts": [
+    { "kind": "Artist", "representation": "{0}", "isOptional": false },
+    { "kind": "Separator", "representation": "", "isOptional": false }
+  ]
 }

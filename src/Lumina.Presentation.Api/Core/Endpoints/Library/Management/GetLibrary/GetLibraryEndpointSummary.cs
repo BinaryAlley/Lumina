@@ -41,6 +41,7 @@ public class GetLibraryEndpointSummary : Summary<GetLibraryEndpoint, GetLibraryR
         ResponseParam<LibraryResponse>(r => r.CanDownloadMetadataFromWeb, "Whether this media library should update the metadata of its elements from the web, or not.");
         ResponseParam<LibraryResponse>(r => r.ShouldSaveMetadataInMediaDirectories, "Whether this media library should copy the downloaded metadata into the media library content locations, or not.");
         ResponseParam<LibraryResponse>(r => r.ShouldSkipUnchangedDirectoriesDuringScan, "Whether this media library should skip the directories whose contents have not changed since the last scan, during the scan, or not.");
+        ResponseParam<LibraryResponse>(r => r.PathTemplateParts, "The ordered parts of the template describing the structure of the media library on disk.");
         ResponseParam<LibraryResponse>(r => r.CreatedOnUtc, "The date and time when the entity was created.");
         ResponseParam<LibraryResponse>(r => r.UpdatedOnUtc, "The date and time when the entity was last updated.");
 
@@ -56,6 +57,7 @@ public class GetLibraryEndpointSummary : Summary<GetLibraryEndpoint, GetLibraryR
             CanDownloadMetadataFromWeb: true,
             ShouldSaveMetadataInMediaDirectories: false,
             ShouldSkipUnchangedDirectoriesDuringScan: false,
+            PathTemplateParts: [],
             CreatedOnUtc: DateTime.UtcNow,
             UpdatedOnUtc: default
         ));

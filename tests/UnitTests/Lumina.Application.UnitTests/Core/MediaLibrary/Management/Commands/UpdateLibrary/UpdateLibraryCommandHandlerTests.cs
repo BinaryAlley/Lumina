@@ -13,6 +13,8 @@ using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Manage
 using Lumina.Application.Fixtures.Core.MediaLibrary.Management.Commands.UpdateLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.PathTemplate;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.Events;
@@ -44,6 +46,7 @@ public class UpdateLibraryCommandHandlerTests
     private readonly IDomainEventsQueue _mockDomainEventsQueue;
     private readonly IEnvironmentContext _mockEnvironmentContext;
     private readonly IMediaLibraryProviderConfigurationStore _mockProviderConfigurationStore;
+    private readonly ILibraryPathTemplateService _mockLibraryPathTemplateService;
     private readonly IValidator<UpdateLibraryCommand> _mockValidator;
     private readonly UpdateLibraryCommandHandler _sut;
     private readonly UpdateLibraryCommandFixture _updateLibraryCommandFixture = new();
@@ -64,6 +67,7 @@ public class UpdateLibraryCommandHandlerTests
         _mockDomainEventsQueue = Substitute.For<IDomainEventsQueue>();
         _mockEnvironmentContext = Substitute.For<IEnvironmentContext>();
         _mockProviderConfigurationStore = Substitute.For<IMediaLibraryProviderConfigurationStore>();
+        _mockLibraryPathTemplateService = Substitute.For<ILibraryPathTemplateService>();
         _mockValidator = Substitute.For<IValidator<UpdateLibraryCommand>>();
         _userId = Guid.NewGuid();
 
@@ -78,8 +82,10 @@ public class UpdateLibraryCommandHandlerTests
         _mockProviderConfigurationStore.ReconcileProviderConfigurationsAsync(Arg.Any<Guid>(), Arg.Any<LibraryType>(), Arg.Any<CancellationToken>())
             .Returns(Result.Success);
         _mockValidator.Validate(Arg.Any<UpdateLibraryCommand>()).Returns([]);
+        _mockLibraryPathTemplateService.GetDefaultTemplate(Arg.Any<LibraryType>()).Returns(LibraryPathTemplate.Empty());
+        _mockLibraryPathTemplateService.Validate(Arg.Any<LibraryType>(), Arg.Any<LibraryPathTemplate>()).Returns(Result.Success);
 
-        _sut = new UpdateLibraryCommandHandler(_mockAuthorizationService, _mockCurrentUserService, _mockDomainEventsQueue, _mockEnvironmentContext, _mockProviderConfigurationStore, _mockUnitOfWork, _mockValidator);
+        _sut = new UpdateLibraryCommandHandler(_mockAuthorizationService, _mockCurrentUserService, _mockDomainEventsQueue, _mockEnvironmentContext, _mockProviderConfigurationStore, _mockLibraryPathTemplateService, _mockUnitOfWork, _mockValidator);
     }
 
     [Fact]

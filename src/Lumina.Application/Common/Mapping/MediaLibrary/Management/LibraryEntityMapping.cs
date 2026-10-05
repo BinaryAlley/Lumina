@@ -36,6 +36,9 @@ public static class LibraryEntityMapping
             repositoryEntity.CanDownloadMetadataFromWeb,
             repositoryEntity.ShouldSaveMetadataInMediaDirectories,
             repositoryEntity.ShouldSkipUnchangedDirectoriesDuringScan,
+            [.. repositoryEntity.PathTemplateParts
+                .OrderBy(part => part.Position)
+                .Select(part => new LibraryPathTemplatePartResponse(part.Kind.ToString(), part.Representation, part.IsOptional))],
             repositoryEntity.CreatedOnUtc,
             repositoryEntity.UpdatedOnUtc
         );
@@ -50,6 +53,10 @@ public static class LibraryEntityMapping
     /// </returns>
     public static Result<Library> ToDomainEntity(this LibraryEntity repositoryEntity)
     {
+        Result<LibraryPathTemplate> pathTemplateResult = BuildPathTemplate(repositoryEntity.PathTemplateParts);
+        if (pathTemplateResult.IsFailure)
+            return pathTemplateResult.Errors;
+
         return Library.Create(
             LibraryId.Create(repositoryEntity.Id),
             UserId.Create(repositoryEntity.UserId),
@@ -62,8 +69,29 @@ public static class LibraryEntityMapping
             repositoryEntity.CanDownloadMetadataFromWeb,
             repositoryEntity.ShouldSaveMetadataInMediaDirectories,
             repositoryEntity.ShouldSkipUnchangedDirectoriesDuringScan,
+            pathTemplateResult.Value,
             [.. repositoryEntity.LibraryScans.Select(libraryScan => ScanId.Create(libraryScan.Id))]
         );
+    }
+
+    /// <summary>
+    /// Builds the path template of a media library from its ordered stored parts.
+    /// </summary>
+    /// <param name="parts">The stored parts of the path template.</param>
+    /// <returns>
+    /// An <see cref="Result{TValue}"/> containing either the built <see cref="LibraryPathTemplate"/>, or an error message.
+    /// </returns>
+    private static Result<LibraryPathTemplate> BuildPathTemplate(IEnumerable<LibraryPathTemplatePartEntity> parts)
+    {
+        List<LibraryPathPart> orderedParts = [];
+        foreach (LibraryPathTemplatePartEntity part in parts.OrderBy(part => part.Position))
+        {
+            Result<LibraryPathPart> partResult = LibraryPathPart.Create(part.Kind, part.Representation, part.IsOptional);
+            if (partResult.IsFailure)
+                return partResult.Errors;
+            orderedParts.Add(partResult.Value);
+        }
+        return LibraryPathTemplate.Create(orderedParts);
     }
 
     /// <summary>

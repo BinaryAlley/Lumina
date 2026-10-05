@@ -25,5 +25,10 @@ public static partial class Errors
         public static Error PathsListCannotBeEmpty => Error.Validation(description: nameof(PathsListCannotBeEmpty));
         public static Error TitleCannotBeEmpty => Error.Validation(description: nameof(TitleCannotBeEmpty));
         public static Error TitleMustBeMaximum255CharactersLong => Error.Validation(description: nameof(TitleMustBeMaximum255CharactersLong));
+        public static Error PathTemplateLiteralCannotBeEmpty => Error.Validation(description: nameof(PathTemplateLiteralCannotBeEmpty));
+        public static Error PathTemplateValuePartMustContainSinglePlaceholder => Error.Validation(description: nameof(PathTemplateValuePartMustContainSinglePlaceholder));
+        public static Error PathTemplateCannotContainDuplicateValuePart => Error.Validation(description: nameof(PathTemplateCannotContainDuplicateValuePart));
+        public static Error PathTemplatePartKindNotSupportedForLibraryType => Error.Validation(description: nameof(PathTemplatePartKindNotSupportedForLibraryType));
+        public static Error PathTemplateIsNotSupportedForLibraryType => Error.Validation(description: nameof(PathTemplateIsNotSupportedForLibraryType));
     }
 }
