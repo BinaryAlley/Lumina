@@ -17,6 +17,10 @@ namespace Lumina.Plugins.MusicBrainz.Core.Settings;
 /// </summary>
 internal sealed class MusicBrainzSettingsProvider
 {
+    // The minimum request interval is clamped to a sane range, so a persisted value can neither be a non finite value that cannot be turned into a
+    // duration, nor be so large that waiting for it overflows the delay of the requests.
+    private const double MAXIMUM_REQUEST_INTERVAL_SECONDS = 60;
+
     private readonly IPluginSettingsStore? _settingsStore;
     private readonly Guid _pluginId;
     private readonly MusicBrainzSettingsDto _defaults;
@@ -112,9 +116,12 @@ internal sealed class MusicBrainzSettingsProvider
             int.TryParse(releaseLookupLimit, NumberStyles.Integer, CultureInfo.InvariantCulture, out int releaseLookupLimitValue))
             settings.ReleaseLookupLimit = Math.Max(1, releaseLookupLimitValue);
 
+        // A persisted value that is not a finite number is rejected, and a finite one is clamped, so that neither a NaN, nor an infinity, nor an
+        // out of range value can make the conversion to a duration or the waiting for it throw.
         if (storedSettings.TryGetValue(MusicBrainzSettingsKeys.MINIMUM_REQUEST_INTERVAL_SECONDS, out string? minimumRequestInterval) &&
-            double.TryParse(minimumRequestInterval, NumberStyles.Float, CultureInfo.InvariantCulture, out double minimumRequestIntervalValue))
-            settings.MinimumRequestInterval = TimeSpan.FromSeconds(Math.Max(0, minimumRequestIntervalValue));
+            double.TryParse(minimumRequestInterval, NumberStyles.Float, CultureInfo.InvariantCulture, out double minimumRequestIntervalValue) &&
+            double.IsFinite(minimumRequestIntervalValue))
+            settings.MinimumRequestInterval = TimeSpan.FromSeconds(Math.Clamp(minimumRequestIntervalValue, 0, MAXIMUM_REQUEST_INTERVAL_SECONDS));
     }
 
     /// <summary>
