@@ -34,6 +34,7 @@ public static partial class Errors
         public static Error UnknownMusicReleaseType => Error.Validation(description: nameof(UnknownMusicReleaseType));
         public static Error UnknownMusicReleaseStatus => Error.Validation(description: nameof(UnknownMusicReleaseStatus));
         public static Error UnknownMusicMediaFormat => Error.Validation(description: nameof(UnknownMusicMediaFormat));
+        public static Error UnknownMusicReleasePackaging => Error.Validation(description: nameof(UnknownMusicReleasePackaging));
         public static Error UnknownMusicKey => Error.Validation(description: nameof(UnknownMusicKey));
         public static Error CatalogNumberMustBeMaximum50CharactersLong => Error.Validation(description: nameof(CatalogNumberMustBeMaximum50CharactersLong));
         public static Error TrackNotFound => Error.NotFound(description: nameof(TrackNotFound));
@@ -52,5 +53,17 @@ public static partial class Errors
         public static Error TheArtistDoesNotHaveTheAlbum => Error.Forbidden(description: nameof(TheArtistDoesNotHaveTheAlbum));
         public static Error TheTrackIsAlreadyInTheAlbum => Error.Forbidden(description: nameof(TheTrackIsAlreadyInTheAlbum));
         public static Error TheTrackIsNotInTheAlbum => Error.Forbidden(description: nameof(TheTrackIsNotInTheAlbum));
+        public static Error AreaNameCannotBeEmpty => Error.Validation(description: nameof(AreaNameCannotBeEmpty));
+        public static Error ArtistAliasNameCannotBeEmpty => Error.Validation(description: nameof(ArtistAliasNameCannotBeEmpty));
+        public static Error ArtistAliasNameMustBeMaximum255CharactersLong => Error.Validation(description: nameof(ArtistAliasNameMustBeMaximum255CharactersLong));
+        public static Error AreaNameMustBeMaximum255CharactersLong => Error.Validation(description: nameof(AreaNameMustBeMaximum255CharactersLong));
+        public static Error UnknownMusicArtistType => Error.Validation(description: nameof(UnknownMusicArtistType));
+        public static Error UnknownMusicArtistGender => Error.Validation(description: nameof(UnknownMusicArtistGender));
+        public static Error CountryMustBeMaximum2CharactersLong => Error.Validation(description: nameof(CountryMustBeMaximum2CharactersLong));
+        public static Error IpiValueCannotBeEmpty => Error.Validation(description: nameof(IpiValueCannotBeEmpty));
+        public static Error IpiValueMustBeMaximum20CharactersLong => Error.Validation(description: nameof(IpiValueMustBeMaximum20CharactersLong));
+        public static Error IsniValueCannotBeEmpty => Error.Validation(description: nameof(IsniValueCannotBeEmpty));
+        public static Error IsniValueMustBeMaximum20CharactersLong => Error.Validation(description: nameof(IsniValueMustBeMaximum20CharactersLong));
+        public static Error WorkTitleCannotBeEmpty => Error.Validation(description: nameof(WorkTitleCannotBeEmpty));
     }
 }

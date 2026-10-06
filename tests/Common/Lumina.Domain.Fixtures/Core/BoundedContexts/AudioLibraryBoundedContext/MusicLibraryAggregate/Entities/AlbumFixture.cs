@@ -32,9 +32,14 @@ public class AlbumFixture
     /// Creates a random valid <see cref="Album"/> domain entity.
     /// </summary>
     /// <param name="metadata">Optional. The album metadata of the album.</param>
+    /// <param name="disambiguation">Optional. The disambiguation comment of the album.</param>
     /// <param name="mediaFormat">Optional. The physical or digital medium of the album.</param>
+    /// <param name="packaging">Optional. The outermost physical packaging of the album.</param>
+    /// <param name="script">Optional. The script used by the language of the release of the album.</param>
     /// <param name="barcode">Optional. The barcode of the album.</param>
     /// <param name="catalogNumber">Optional. The catalog number of the album.</param>
+    /// <param name="label">Optional. The name of the label that issued the album.</param>
+    /// <param name="asin">Optional. The ASIN of the album.</param>
     /// <param name="musicBrainzReleaseId">Optional. The MusicBrainz identifier of the release.</param>
     /// <param name="musicBrainzReleaseGroupId">Optional. The MusicBrainz identifier of the release group.</param>
     /// <param name="musicBrainzReleaseArtistId">Optional. The MusicBrainz identifier of the release artist.</param>
@@ -44,9 +49,14 @@ public class AlbumFixture
     /// <returns>The created <see cref="Album"/> domain entity.</returns>
     public Album Create(
         AlbumMetadata? metadata = null,
+        Optional<string>? disambiguation = null,
         Optional<MusicMediaFormat>? mediaFormat = null,
+        Optional<MusicReleasePackaging>? packaging = null,
+        Optional<string>? script = null,
         Optional<Barcode>? barcode = null,
-        Optional<string>? catalogNumber = null,
+        List<string>? catalogNumbers = null,
+        Optional<string>? label = null,
+        Optional<string>? asin = null,
         Optional<MusicBrainzId>? musicBrainzReleaseId = null,
         Optional<MusicBrainzId>? musicBrainzReleaseGroupId = null,
         Optional<MusicBrainzId>? musicBrainzReleaseArtistId = null,
@@ -56,9 +66,14 @@ public class AlbumFixture
     {
         Result<Album> albumResult = Album.Create(
             metadata ?? _albumMetadataFixture.Create(),
+            disambiguation ?? Optional<string>.Some(_faker.Lorem.Sentence()),
             mediaFormat ?? Optional<MusicMediaFormat>.Some(_faker.PickRandom<MusicMediaFormat>()),
+            packaging ?? Optional<MusicReleasePackaging>.Some(_faker.PickRandom<MusicReleasePackaging>()),
+            script ?? Optional<string>.Some(_faker.Random.String2(4)),
             barcode ?? Optional<Barcode>.Some(_barcodeFixture.Create()),
-            catalogNumber ?? Optional<string>.Some(_faker.Random.String2(_faker.Random.Int(5, 20))),
+            catalogNumbers ?? [.. Enumerable.Range(0, _faker.Random.Int(1, 2)).Select(_ => _faker.Random.String2(_faker.Random.Int(5, 20)))],
+            label ?? Optional<string>.Some(_faker.Company.CompanyName()),
+            asin ?? Optional<string>.Some(_faker.Random.AlphaNumeric(10)),
             musicBrainzReleaseId ?? Optional<MusicBrainzId>.Some(_musicBrainzIdFixture.Create()),
             musicBrainzReleaseGroupId ?? Optional<MusicBrainzId>.Some(_musicBrainzIdFixture.Create()),
             musicBrainzReleaseArtistId ?? Optional<MusicBrainzId>.Some(_musicBrainzIdFixture.Create()),

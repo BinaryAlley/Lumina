@@ -41,7 +41,12 @@ public class AudioMetadataTests
             Optional<LanguageInfo>.None(),
             Optional<int>.Some(16),
             Optional<string>.Some("PCM"),
-            Optional<int>.Some(1411));
+            Optional<int>.Some(1411),
+            Optional<string>.Some("f0e9c1a2-0000-0000-0000-000000000000"),
+            Optional<decimal>.Some(-6.53m),
+            Optional<decimal>.Some(0.988m),
+            Optional<decimal>.Some(-7.01m),
+            Optional<decimal>.Some(1.001m));
 
         // Assert
         Assert.False(result.IsFailure);
@@ -75,7 +80,12 @@ public class AudioMetadataTests
             Optional<LanguageInfo>.None(),
             Optional<int>.None(),
             Optional<string>.None(),
-            Optional<int>.None());
+            Optional<int>.None(),
+            Optional<string>.None(),
+            Optional<decimal>.None(),
+            Optional<decimal>.None(),
+            Optional<decimal>.None(),
+            Optional<decimal>.None());
 
         // Assert
         Assert.False(result.IsFailure);
@@ -190,7 +200,12 @@ public class AudioMetadataTests
             Optional<LanguageInfo>.Some(originalLanguage),
             Optional<int>.Some(16),
             Optional<string>.Some("PCM"),
-            Optional<int>.Some(1411));
+            Optional<int>.Some(1411),
+            Optional<string>.Some("f0e9c1a2-0000-0000-0000-000000000000"),
+            Optional<decimal>.Some(-6.53m),
+            Optional<decimal>.Some(0.988m),
+            Optional<decimal>.Some(-7.01m),
+            Optional<decimal>.Some(1.001m));
 
         // Assert
         Assert.False(result.IsFailure);
@@ -222,7 +237,12 @@ public class AudioMetadataTests
             Optional<LanguageInfo>.None(),
             Optional<int>.None(),
             Optional<string>.None(),
-            Optional<int>.None());
+            Optional<int>.None(),
+            Optional<string>.None(),
+            Optional<decimal>.None(),
+            Optional<decimal>.None(),
+            Optional<decimal>.None(),
+            Optional<decimal>.None());
 
         // Assert
         Assert.False(result.IsFailure);

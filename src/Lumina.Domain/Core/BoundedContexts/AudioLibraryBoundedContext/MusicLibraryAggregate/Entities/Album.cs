@@ -21,6 +21,7 @@ public sealed class Album : Entity<AlbumId>
     private readonly List<MusicMediaContributor> _contributors;
     private readonly List<AudioRating> _ratings;
     private readonly List<Track> _tracks;
+    private readonly List<string> _catalogNumbers;
 
     /// <summary>
     /// Gets the album metadata of the album.
@@ -28,9 +29,24 @@ public sealed class Album : Entity<AlbumId>
     public AlbumMetadata Metadata { get; private set; }
 
     /// <summary>
+    /// Gets the disambiguation comment of the album, used to distinguish albums with the same title, if applicable.
+    /// </summary>
+    public Optional<string> Disambiguation { get; private set; }
+
+    /// <summary>
     /// Gets the physical or digital medium of the album, if applicable.
     /// </summary>
     public Optional<MusicMediaFormat> MediaFormat { get; private set; }
+
+    /// <summary>
+    /// Gets the outermost physical packaging of the album, if applicable.
+    /// </summary>
+    public Optional<MusicReleasePackaging> Packaging { get; private set; }
+
+    /// <summary>
+    /// Gets the script used by the language of the release of the album, if applicable.
+    /// </summary>
+    public Optional<string> Script { get; private set; }
 
     /// <summary>
     /// Gets the barcode of the album, if applicable.
@@ -38,9 +54,19 @@ public sealed class Album : Entity<AlbumId>
     public Optional<Barcode> Barcode { get; private set; }
 
     /// <summary>
-    /// Gets the catalog number of the album, if applicable.
+    /// Gets the catalog numbers of the album.
     /// </summary>
-    public Optional<string> CatalogNumber { get; private set; }
+    public IReadOnlyCollection<string> CatalogNumbers => _catalogNumbers.AsReadOnly();
+
+    /// <summary>
+    /// Gets the name of the label that issued the album, if applicable.
+    /// </summary>
+    public Optional<string> Label { get; private set; }
+
+    /// <summary>
+    /// Gets the ASIN (Amazon Standard Identification Number) of the album, if applicable.
+    /// </summary>
+    public Optional<string> ASIN { get; private set; }
 
     /// <summary>
     /// Gets the MusicBrainz identifier of the release, if applicable.
@@ -77,9 +103,14 @@ public sealed class Album : Entity<AlbumId>
     /// </summary>
     /// <param name="id">The object representing the unique identifier of the album.</param>
     /// <param name="metadata">The album metadata of the album.</param>
+    /// <param name="disambiguation">The optional disambiguation comment of the album.</param>
     /// <param name="mediaFormat">The optional physical or digital medium of the album.</param>
+    /// <param name="packaging">The optional outermost physical packaging of the album.</param>
+    /// <param name="script">The optional script used by the language of the release of the album.</param>
     /// <param name="barcode">The optional barcode of the album.</param>
-    /// <param name="catalogNumber">The optional catalog number of the album.</param>
+    /// <param name="catalogNumbers">The catalog numbers of the album.</param>
+    /// <param name="label">The optional name of the label that issued the album.</param>
+    /// <param name="asin">The optional ASIN of the album.</param>
     /// <param name="musicBrainzReleaseId">The optional MusicBrainz identifier of the release.</param>
     /// <param name="musicBrainzReleaseGroupId">The optional MusicBrainz identifier of the release group.</param>
     /// <param name="musicBrainzReleaseArtistId">The optional MusicBrainz identifier of the release artist.</param>
@@ -91,9 +122,14 @@ public sealed class Album : Entity<AlbumId>
     private Album(
         AlbumId id,
         AlbumMetadata metadata,
+        Optional<string> disambiguation,
         Optional<MusicMediaFormat> mediaFormat,
+        Optional<MusicReleasePackaging> packaging,
+        Optional<string> script,
         Optional<Barcode> barcode,
-        Optional<string> catalogNumber,
+        List<string> catalogNumbers,
+        Optional<string> label,
+        Optional<string> asin,
         Optional<MusicBrainzId> musicBrainzReleaseId,
         Optional<MusicBrainzId> musicBrainzReleaseGroupId,
         Optional<MusicBrainzId> musicBrainzReleaseArtistId,
@@ -105,9 +141,14 @@ public sealed class Album : Entity<AlbumId>
     {
         Id = id;
         Metadata = metadata;
+        Disambiguation = disambiguation;
         MediaFormat = mediaFormat;
+        Packaging = packaging;
+        Script = script;
         Barcode = barcode;
-        CatalogNumber = catalogNumber;
+        _catalogNumbers = catalogNumbers;
+        Label = label;
+        ASIN = asin;
         MusicBrainzReleaseId = musicBrainzReleaseId;
         MusicBrainzReleaseGroupId = musicBrainzReleaseGroupId;
         MusicBrainzReleaseArtistId = musicBrainzReleaseArtistId;
@@ -122,9 +163,14 @@ public sealed class Album : Entity<AlbumId>
     /// Creates a new instance of the <see cref="Album"/> class.
     /// </summary>
     /// <param name="metadata">The album metadata of the album.</param>
+    /// <param name="disambiguation">The optional disambiguation comment of the album.</param>
     /// <param name="mediaFormat">The optional physical or digital medium of the album.</param>
+    /// <param name="packaging">The optional outermost physical packaging of the album.</param>
+    /// <param name="script">The optional script used by the language of the release of the album.</param>
     /// <param name="barcode">The optional barcode of the album.</param>
-    /// <param name="catalogNumber">The optional catalog number of the album.</param>
+    /// <param name="catalogNumbers">The catalog numbers of the album.</param>
+    /// <param name="label">The optional name of the label that issued the album.</param>
+    /// <param name="asin">The optional ASIN of the album.</param>
     /// <param name="musicBrainzReleaseId">The optional MusicBrainz identifier of the release.</param>
     /// <param name="musicBrainzReleaseGroupId">The optional MusicBrainz identifier of the release group.</param>
     /// <param name="musicBrainzReleaseArtistId">The optional MusicBrainz identifier of the release artist.</param>
@@ -136,9 +182,14 @@ public sealed class Album : Entity<AlbumId>
     /// </returns>
     public static Result<Album> Create(
         AlbumMetadata metadata,
+        Optional<string> disambiguation,
         Optional<MusicMediaFormat> mediaFormat,
+        Optional<MusicReleasePackaging> packaging,
+        Optional<string> script,
         Optional<Barcode> barcode,
-        Optional<string> catalogNumber,
+        List<string> catalogNumbers,
+        Optional<string> label,
+        Optional<string> asin,
         Optional<MusicBrainzId> musicBrainzReleaseId,
         Optional<MusicBrainzId> musicBrainzReleaseGroupId,
         Optional<MusicBrainzId> musicBrainzReleaseArtistId,
@@ -149,9 +200,14 @@ public sealed class Album : Entity<AlbumId>
         return new Album(
             AlbumId.CreateUnique(),
             metadata,
+            disambiguation,
             mediaFormat,
+            packaging,
+            script,
             barcode,
-            catalogNumber,
+            catalogNumbers,
+            label,
+            asin,
             musicBrainzReleaseId,
             musicBrainzReleaseGroupId,
             musicBrainzReleaseArtistId,
@@ -167,9 +223,14 @@ public sealed class Album : Entity<AlbumId>
     /// </summary>
     /// <param name="id">The object representing the unique identifier of the album.</param>
     /// <param name="metadata">The album metadata of the album.</param>
+    /// <param name="disambiguation">The optional disambiguation comment of the album.</param>
     /// <param name="mediaFormat">The optional physical or digital medium of the album.</param>
+    /// <param name="packaging">The optional outermost physical packaging of the album.</param>
+    /// <param name="script">The optional script used by the language of the release of the album.</param>
     /// <param name="barcode">The optional barcode of the album.</param>
-    /// <param name="catalogNumber">The optional catalog number of the album.</param>
+    /// <param name="catalogNumbers">The catalog numbers of the album.</param>
+    /// <param name="label">The optional name of the label that issued the album.</param>
+    /// <param name="asin">The optional ASIN of the album.</param>
     /// <param name="musicBrainzReleaseId">The optional MusicBrainz identifier of the release.</param>
     /// <param name="musicBrainzReleaseGroupId">The optional MusicBrainz identifier of the release group.</param>
     /// <param name="musicBrainzReleaseArtistId">The optional MusicBrainz identifier of the release artist.</param>
@@ -184,9 +245,14 @@ public sealed class Album : Entity<AlbumId>
     public static Result<Album> Create(
         AlbumId id,
         AlbumMetadata metadata,
+        Optional<string> disambiguation,
         Optional<MusicMediaFormat> mediaFormat,
+        Optional<MusicReleasePackaging> packaging,
+        Optional<string> script,
         Optional<Barcode> barcode,
-        Optional<string> catalogNumber,
+        List<string> catalogNumbers,
+        Optional<string> label,
+        Optional<string> asin,
         Optional<MusicBrainzId> musicBrainzReleaseId,
         Optional<MusicBrainzId> musicBrainzReleaseGroupId,
         Optional<MusicBrainzId> musicBrainzReleaseArtistId,
@@ -199,9 +265,14 @@ public sealed class Album : Entity<AlbumId>
         return new Album(
             id,
             metadata,
+            disambiguation,
             mediaFormat,
+            packaging,
+            script,
             barcode,
-            catalogNumber,
+            catalogNumbers,
+            label,
+            asin,
             musicBrainzReleaseId,
             musicBrainzReleaseGroupId,
             musicBrainzReleaseArtistId,
@@ -264,26 +335,42 @@ public sealed class Album : Entity<AlbumId>
     /// Updates the details of the album, without touching the ratings, the media contributors, and the tracks.
     /// </summary>
     /// <param name="metadata">The album metadata of the album.</param>
+    /// <param name="disambiguation">The optional disambiguation comment of the album.</param>
     /// <param name="mediaFormat">The optional physical or digital medium of the album.</param>
+    /// <param name="packaging">The optional outermost physical packaging of the album.</param>
+    /// <param name="script">The optional script used by the language of the release of the album.</param>
     /// <param name="barcode">The optional barcode of the album.</param>
-    /// <param name="catalogNumber">The optional catalog number of the album.</param>
+    /// <param name="catalogNumbers">The catalog numbers of the album.</param>
+    /// <param name="label">The optional name of the label that issued the album.</param>
+    /// <param name="asin">The optional ASIN of the album.</param>
     /// <param name="musicBrainzReleaseId">The optional MusicBrainz identifier of the release.</param>
     /// <param name="musicBrainzReleaseGroupId">The optional MusicBrainz identifier of the release group.</param>
     /// <param name="musicBrainzReleaseArtistId">The optional MusicBrainz identifier of the release artist.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     internal Result<Updated> UpdateDetails(
         AlbumMetadata metadata,
+        Optional<string> disambiguation,
         Optional<MusicMediaFormat> mediaFormat,
+        Optional<MusicReleasePackaging> packaging,
+        Optional<string> script,
         Optional<Barcode> barcode,
-        Optional<string> catalogNumber,
+        List<string> catalogNumbers,
+        Optional<string> label,
+        Optional<string> asin,
         Optional<MusicBrainzId> musicBrainzReleaseId,
         Optional<MusicBrainzId> musicBrainzReleaseGroupId,
         Optional<MusicBrainzId> musicBrainzReleaseArtistId)
     {
         Metadata = metadata;
+        Disambiguation = disambiguation;
         MediaFormat = mediaFormat;
+        Packaging = packaging;
+        Script = script;
         Barcode = barcode;
-        CatalogNumber = catalogNumber;
+        _catalogNumbers.Clear();
+        _catalogNumbers.AddRange(catalogNumbers);
+        Label = label;
+        ASIN = asin;
         MusicBrainzReleaseId = musicBrainzReleaseId;
         MusicBrainzReleaseGroupId = musicBrainzReleaseGroupId;
         MusicBrainzReleaseArtistId = musicBrainzReleaseArtistId;

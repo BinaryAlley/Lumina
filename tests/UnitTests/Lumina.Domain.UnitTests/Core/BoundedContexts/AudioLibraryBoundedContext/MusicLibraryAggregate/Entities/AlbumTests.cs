@@ -71,7 +71,7 @@ public class AlbumTests
         AlbumMetadata metadata = _albumMetadataFixture.Create(title: "A Night at the Opera");
         Optional<MusicMediaFormat> mediaFormat = Optional<MusicMediaFormat>.Some(MusicMediaFormat.Vinyl);
         Optional<Barcode> barcode = Optional<Barcode>.Some(_barcodeFixture.Create());
-        Optional<string> catalogNumber = Optional<string>.Some("CAT-001");
+        List<string> catalogNumbers = ["CAT-001"];
         Optional<MusicBrainzId> releaseId = Optional<MusicBrainzId>.Some(_musicBrainzIdFixture.Create());
         Optional<MusicBrainzId> releaseGroupId = Optional<MusicBrainzId>.Some(_musicBrainzIdFixture.Create());
         Optional<MusicBrainzId> releaseArtistId = Optional<MusicBrainzId>.Some(_musicBrainzIdFixture.Create());
@@ -83,9 +83,14 @@ public class AlbumTests
         // Act
         Result<Album> result = Album.Create(
             metadata,
+            Optional<string>.None(),
             mediaFormat,
+            Optional<MusicReleasePackaging>.Some(MusicReleasePackaging.Digipak),
+            Optional<string>.None(),
             barcode,
-            catalogNumber,
+            catalogNumbers,
+            Optional<string>.Some("Label"),
+            Optional<string>.Some("ASIN"),
             releaseId,
             releaseGroupId,
             releaseArtistId,
@@ -100,7 +105,7 @@ public class AlbumTests
         Assert.Equal(metadata, album.Metadata);
         Assert.Equal(mediaFormat, album.MediaFormat);
         Assert.Equal(barcode, album.Barcode);
-        Assert.Equal(catalogNumber, album.CatalogNumber);
+        Assert.Equal(catalogNumbers, album.CatalogNumbers);
         Assert.Equal(releaseId, album.MusicBrainzReleaseId);
         Assert.Equal(releaseGroupId, album.MusicBrainzReleaseGroupId);
         Assert.Equal(releaseArtistId, album.MusicBrainzReleaseArtistId);
@@ -117,8 +122,13 @@ public class AlbumTests
         // Act
         Result<Album> result = Album.Create(
             _albumMetadataFixture.Create(),
+            Optional<string>.None(),
             Optional<MusicMediaFormat>.None(),
+            Optional<MusicReleasePackaging>.None(),
+            Optional<string>.None(),
             Optional<Barcode>.None(),
+            [],
+            Optional<string>.None(),
             Optional<string>.None(),
             Optional<MusicBrainzId>.None(),
             Optional<MusicBrainzId>.None(),
@@ -132,7 +142,7 @@ public class AlbumTests
         Album album = result.Value;
         Assert.False(album.MediaFormat.HasValue);
         Assert.False(album.Barcode.HasValue);
-        Assert.False(album.CatalogNumber.HasValue);
+        Assert.Empty(album.CatalogNumbers);
         Assert.False(album.MusicBrainzReleaseId.HasValue);
         Assert.False(album.MusicBrainzReleaseGroupId.HasValue);
         Assert.False(album.MusicBrainzReleaseArtistId.HasValue);
@@ -144,8 +154,13 @@ public class AlbumTests
         // Act
         Result<Album> result = Album.Create(
             _albumMetadataFixture.Create(),
+            Optional<string>.None(),
             Optional<MusicMediaFormat>.None(),
+            Optional<MusicReleasePackaging>.None(),
+            Optional<string>.None(),
             Optional<Barcode>.None(),
+            [],
+            Optional<string>.None(),
             Optional<string>.None(),
             Optional<MusicBrainzId>.None(),
             Optional<MusicBrainzId>.None(),
@@ -174,9 +189,14 @@ public class AlbumTests
         Result<Album> result = Album.Create(
             albumId,
             metadata,
+            Optional<string>.None(),
             Optional<MusicMediaFormat>.Some(MusicMediaFormat.CD),
+            Optional<MusicReleasePackaging>.None(),
+            Optional<string>.None(),
             Optional<Barcode>.Some(_barcodeFixture.Create()),
-            Optional<string>.Some("CAT-002"),
+            ["CAT-002"],
+            Optional<string>.None(),
+            Optional<string>.None(),
             Optional<MusicBrainzId>.None(),
             Optional<MusicBrainzId>.None(),
             Optional<MusicBrainzId>.None(),
@@ -299,7 +319,7 @@ public class AlbumTests
         AlbumMetadata metadata = _albumMetadataFixture.Create(title: "A Day at the Races");
         Optional<MusicMediaFormat> mediaFormat = Optional<MusicMediaFormat>.Some(MusicMediaFormat.Cassette);
         Optional<Barcode> barcode = Optional<Barcode>.Some(_barcodeFixture.Create());
-        Optional<string> catalogNumber = Optional<string>.Some("CAT-003");
+        List<string> catalogNumbers = ["CAT-003"];
         Optional<MusicBrainzId> releaseId = Optional<MusicBrainzId>.Some(_musicBrainzIdFixture.Create());
         Optional<MusicBrainzId> releaseGroupId = Optional<MusicBrainzId>.Some(_musicBrainzIdFixture.Create());
         Optional<MusicBrainzId> releaseArtistId = Optional<MusicBrainzId>.Some(_musicBrainzIdFixture.Create());
@@ -308,9 +328,14 @@ public class AlbumTests
         // Act
         Result<Updated> result = album.UpdateDetails(
             metadata,
+            Optional<string>.None(),
             mediaFormat,
+            Optional<MusicReleasePackaging>.None(),
+            Optional<string>.None(),
             barcode,
-            catalogNumber,
+            catalogNumbers,
+            Optional<string>.None(),
+            Optional<string>.None(),
             releaseId,
             releaseGroupId,
             releaseArtistId);
@@ -320,7 +345,7 @@ public class AlbumTests
         Assert.Equal(metadata, album.Metadata);
         Assert.Equal(mediaFormat, album.MediaFormat);
         Assert.Equal(barcode, album.Barcode);
-        Assert.Equal(catalogNumber, album.CatalogNumber);
+        Assert.Equal(catalogNumbers, album.CatalogNumbers);
         Assert.Equal(releaseId, album.MusicBrainzReleaseId);
         Assert.Equal(releaseGroupId, album.MusicBrainzReleaseGroupId);
         Assert.Equal(releaseArtistId, album.MusicBrainzReleaseArtistId);
@@ -339,8 +364,13 @@ public class AlbumTests
         // Act
         Result<Updated> result = album.UpdateDetails(
             _albumMetadataFixture.Create(),
+            Optional<string>.None(),
             Optional<MusicMediaFormat>.None(),
+            Optional<MusicReleasePackaging>.None(),
+            Optional<string>.None(),
             Optional<Barcode>.None(),
+            [],
+            Optional<string>.None(),
             Optional<string>.None(),
             Optional<MusicBrainzId>.None(),
             Optional<MusicBrainzId>.None(),
@@ -350,7 +380,7 @@ public class AlbumTests
         Assert.False(result.IsFailure);
         Assert.False(album.MediaFormat.HasValue);
         Assert.False(album.Barcode.HasValue);
-        Assert.False(album.CatalogNumber.HasValue);
+        Assert.Empty(album.CatalogNumbers);
         Assert.False(album.MusicBrainzReleaseId.HasValue);
         Assert.False(album.MusicBrainzReleaseGroupId.HasValue);
         Assert.False(album.MusicBrainzReleaseArtistId.HasValue);

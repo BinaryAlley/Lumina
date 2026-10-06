@@ -30,13 +30,14 @@ public class AlbumMetadataFixture
     /// </summary>
     /// <param name="title">Optional. The title of the album.</param>
     /// <param name="originalTitle">Optional. The original title of the album.</param>
+    /// <param name="releaseTitle">Optional. The title of the specific release (edition) of the album.</param>
     /// <param name="description">Optional. The description of the album.</param>
     /// <param name="releaseInfo">Optional. The release information of the album.</param>
     /// <param name="genres">Optional. The genres of the album.</param>
     /// <param name="tags">Optional. The tags associated with the album.</param>
     /// <param name="language">Optional. The language of the album.</param>
     /// <param name="originalLanguage">Optional. The original language of the album.</param>
-    /// <param name="releaseType">Optional. The type of the release.</param>
+    /// <param name="releaseTypes">Optional. The types of the release.</param>
     /// <param name="releaseStatus">Optional. The status of the release.</param>
     /// <param name="totalDiscs">Optional. The number of discs of the release.</param>
     /// <param name="totalTracks">Optional. The number of tracks of the release.</param>
@@ -44,13 +45,14 @@ public class AlbumMetadataFixture
     public AlbumMetadata Create(
         string? title = null,
         Optional<string>? originalTitle = null,
+        Optional<string>? releaseTitle = null,
         Optional<string>? description = null,
         ReleaseInfo? releaseInfo = null,
         List<Genre>? genres = null,
         List<Tag>? tags = null,
         Optional<LanguageInfo>? language = null,
         Optional<LanguageInfo>? originalLanguage = null,
-        Optional<MusicReleaseType>? releaseType = null,
+        List<MusicReleaseType>? releaseTypes = null,
         Optional<MusicReleaseStatus>? releaseStatus = null,
         Optional<int>? totalDiscs = null,
         int? totalTracks = null)
@@ -58,13 +60,14 @@ public class AlbumMetadataFixture
         Result<AlbumMetadata> metadataResult = AlbumMetadata.Create(
             title ?? _faker.Commerce.ProductName(),
             originalTitle ?? Optional<string>.None(),
+            releaseTitle ?? Optional<string>.Some(_faker.Commerce.ProductName()),
             description ?? Optional<string>.Some(_faker.Lorem.Sentence()),
             releaseInfo ?? _releaseInfoFixture.Create(),
             genres ?? [_genreFixture.Create(), _genreFixture.Create()],
             tags ?? [_tagFixture.Create(), _tagFixture.Create()],
             language ?? Optional<LanguageInfo>.Some(_languageInfoFixture.Create()),
             originalLanguage ?? Optional<LanguageInfo>.None(),
-            releaseType ?? Optional<MusicReleaseType>.Some(_faker.PickRandom<MusicReleaseType>()),
+            releaseTypes ?? [_faker.PickRandom<MusicReleaseType>()],
             releaseStatus ?? Optional<MusicReleaseStatus>.Some(_faker.PickRandom<MusicReleaseStatus>()),
             totalDiscs ?? Optional<int>.Some(_faker.Random.Int(1, 4)),
             totalTracks ?? _faker.Random.Int(1, 50));
