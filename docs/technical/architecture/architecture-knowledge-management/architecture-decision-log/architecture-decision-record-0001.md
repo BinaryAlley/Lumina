@@ -36,6 +36,10 @@ internal sealed class FileSystemDiscoveryJob : MediaLibraryScanJob, IFileSystemD
     }
 }
 ```
+## Amendments
+
+- **2026-10-09**: The generic `FileSystemDiscoveryJob` / `IFileSystemDiscoveryJob` was split into per-type discovery jobs (`BooksFileSystemDiscoveryJob`, `MusicFileSystemDiscoveryJob`), and the job execution contract is now `ExecuteAsync<TInput>(Guid id, TInput input, CancellationToken token)` on `IMediaLibraryScanJob`. The `IServiceScopeFactory` decision itself is unchanged.
+
 ## Consequences
 
 ### Positive Outcomes

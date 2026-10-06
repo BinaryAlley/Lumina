@@ -26,7 +26,11 @@ private static List<FileInfo> GetFiles(...)
 ```
 
 
-## Consequences  
+## Amendments
+
+- **2026-10-09**: The single generic `FileSystemDiscoveryJob` was split into per-type discovery jobs (`BooksFileSystemDiscoveryJob`, `MusicFileSystemDiscoveryJob`). The `System.IO` guidance of this ADR applies to the books discovery job, which still traverses the file system directly. The music discovery job uses the domain file system provider services (`IFileProviderService`, `IDirectoryProviderService`) instead.
+
+## Consequences
 
 ### Performance vs Purity Tradeoff  
 | Metric               | Before (Domain) | After (System.IO) | Delta    |  

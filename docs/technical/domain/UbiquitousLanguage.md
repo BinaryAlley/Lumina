@@ -28,19 +28,10 @@
 - _**Music Video**_: A video representation of a song
 
 ## Audio Content
-- _**Song**_: An individual music track
-- _**Album**_: A collection of songs
-- _**Artist**_: The creator of music content
-- _**Audiobook**_: A narrated version of a book
-- _**Live Recording**_: Audio or video of a live performance
-- _**Interview**_: Audio or video recording of a conversation
-- _**Cover Song**_: A rendition of a song performed by an artist other than the original
-- _**Remix**_: A modified version of an original song
-- _**Sound Effect**_: A short audio clip used for specific purposes
-- _**Soundtrack**_: A collection of music used in a film or TV show
-- _**Podcast**_: A series of audio episodes
-- _**Podcast Episode**_: An individual installment of a podcast
-- _**Radio Show**_: An audio program broadcast on the radio
+- _**Track**_: An individual music track, the smallest unit of music in a music library (the entity is named Track, not Song)
+- _**Album**_: A release that gathers the tracks of an artist
+- _**Artist**_: The creator of music content, the root of the music library aggregate
+- _**MusicReleaseType**_: The set of content types a music release can carry, like Album, Single, Ep, Compilation, AudioBook, Interview, Live, Remix, Soundtrack or SpokenWord
 
 ## Written Content
 - _**Book**_: A standalone written work
@@ -79,15 +70,9 @@
 - Anime
 - YouTubeVideo
 - MusicVideo
-- Song
+- Track
 - Album
 - Artist
-- Audiobook
-- LiveRecording
-- Interview
-- CoverSong
-- Remix
-- SoundEffect
 - Podcast
 - PodcastEpisode
 - Book
@@ -118,7 +103,7 @@
 
 ## Aggregates
 - VideoLibrary (root: VideoLibrary, entities: TVShow, Season, Episode, Movie, FilmSeries, ConcertVideo, Documentary, TutorialVideo, HomeVideo, Anime, YouTubeVideo, MusicVideo)
-- AudioLibrary (root: AudioLibrary, entities: Song, Album, Artist, Audiobook, LiveRecording, Interview, CoverSong, Remix, SoundEffect)
+- MusicLibrary (root: Artist, entities: Album, Track)
 - PodcastLibrary (root: PodcastLibrary, entities: Podcast, PodcastEpisode)
 - WrittenContentLibrary (root: WrittenContentLibrary, entities: Book, EBook, BookSeries, ComicBook, ComicSeries, Magazine, MagazineIssue, Newspaper, Manga, GraphicNovel, AcademicPaper, SheetMusic, Screenplay)
 - PhotoLibrary (root: PhotoLibrary, entities: Photo, PhotoAlbum, AlbumArtwork, MoviePoster)
@@ -175,14 +160,25 @@
 - StreamInfo
 - StreamingQuality
 - UserPreferences
-- Rating
+- Rating (abstract)
+- AudioRating
 - Genre
+- Mood
 - ReleaseInfo
 - LanguageInfo
+- AlbumMetadata
+- MusicMediaContributor
+- MusicBrainzId
+- MusicArea
+- MusicArtistAlias
+- MusicWork
+- Isrc
+- Barcode
 
 ## Domain Services
-- MediaScanner (with specialized scanners for each media type)
-- MetadataFetcher (with different strategies for various media types and sources)
+- Music Library Type Scanner
+- Music File System Discovery Job
+- Music Metadata Extraction Job
 - TranscodingService
 - StreamingService
 - AudiobookPlaybackService
@@ -216,8 +212,8 @@
 ## Bounded Contexts
 
 - MediaManagement
-  - Aggregates: VideoLibrary, AudioLibrary, PodcastLibrary, WrittenContentLibrary, PhotoLibrary
-  - Services: MediaScanner, MetadataFetcher, TranscodingService
+  - Aggregates: VideoLibrary, MusicLibrary, PodcastLibrary, WrittenContentLibrary, PhotoLibrary
+  - Services: Music Library Type Scanner, Music File System Discovery Job, Music Metadata Extraction Job
 - UserExperience
   - Aggregates: UserProfile
   - Services: RecommendationEngine, ContentCurationService, UserActivityTrackingService

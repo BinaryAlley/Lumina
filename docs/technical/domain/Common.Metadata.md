@@ -4,6 +4,7 @@
       - [Genre](#genre)
       - [Tag](#tag)
       - [Rating](#rating)
+      - [Mood](#mood)
       - [Release Info](#release-info)
       - [Language Info](#language-info)
 
@@ -18,7 +19,7 @@
 ```csharp
 class Genre
 {
-    ErrorOr<Genre> Create(string name);
+    Result<Genre> Create(string name);
 }
 ```
 
@@ -33,7 +34,7 @@ class Genre
 ```csharp
 class Tag
 {
-    ErrorOr<Tag> Create(string name);
+    Result<Tag> Create(string name);
 }
 ```
 
@@ -45,19 +46,30 @@ class Tag
 
 #### [Rating](#rating)
 
+`Rating` is the abstract base of the ratings of media elements. It carries the numeric value, its maximum and an optional vote count, but no factory of its own, because the concrete ratings of each media type derive from it and add their own source. The rating of the audio library context, `AudioRating` with its `AudioRatingSource`, is documented alongside the music library aggregate.
+
 ```csharp
-class Rating
+abstract class Rating
 {
-    ErrorOr<Rating> Create(decimal value, decimal maxValue, Optional<RatingSource> source = default, Optional<int> voteCount = default);
+    decimal Value { get; }
+    decimal MaxValue { get; }
+    Optional<int> VoteCount { get; }
+    decimal AsPercentage();
+}
+```
+
+#### [Mood](#mood)
+
+```csharp
+class Mood
+{
+    Result<Mood> Create(string name);
 }
 ```
 
 ```json
 {
-    "value": 9.3,
-    "maxValue": 10.0,
-    "source": "Imdb",
-    "voteCount": 84
+    "name": "dramatic"
 }
 ```
 
@@ -66,8 +78,8 @@ class Rating
 ```csharp
 class ReleaseInfo
 {
-    ErrorOr<ReleaseInfo> Create(Optional<DateOnly> originalReleaseDate, Optional<int> originalReleaseYear,
-        Optional<DateOnly> reReleaseDate, Optional<int> reReleaseYear, Optional<string> releaseCountry, Optional<string> releaseVersion);
+    Result<ReleaseInfo> Create(Optional<DateOnly> originalReleaseDate, Optional<int> originalReleaseYear,
+        Optional<DateOnly> reReleaseDate, Optional<int> reReleaseYear, Optional<ReleaseCountry> releaseCountry, Optional<string> releaseVersion);
 }
 ```
 

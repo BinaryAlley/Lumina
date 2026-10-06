@@ -41,6 +41,7 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b
     "title": "A Night at the Opera",
     "originalTitle": "A Night at the Opera",
     "description": "The fourth studio album by the British rock band Queen, released in 1975. It was the most expensive album ever recorded at the time of its release.",
+    "disambiguation": null,
     "releaseInfo": {
       "originalReleaseDate": "1975-11-21",
       "originalReleaseYear": 1975,
@@ -49,10 +50,6 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b
       "releaseCountry": "GB",
       "releaseVersion": "Remastered"
     },
-    "releaseType": "Album",
-    "releaseStatus": "Official",
-    "totalDiscs": 1,
-    "totalTracks": 12,
     "language": {
       "languageCode": "en",
       "languageName": "English",
@@ -63,18 +60,27 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b
       "languageName": "English",
       "nativeName": "English"
     },
+    "tags": [
+      { "name": "classic" },
+      { "name": "vinyl" }
+    ],
     "genres": [
       { "name": "Rock" },
       { "name": "Progressive Rock" }
     ],
-    "tags": [
-      { "name": "classic" },
-      { "name": "vinyl" }
-    ]
+    "script": "Latn",
+    "releaseTypes": [ "Album" ],
+    "releaseStatus": "Official",
+    "totalDiscs": 1,
+    "totalTracks": 12,
+    "releaseTitle": "A Night at the Opera"
   },
   "mediaFormat": "CD",
+  "packaging": "JewelCase",
   "barcode": "0042282778329",
-  "catalogNumber": "EMC 4008",
+  "catalogNumbers": ["EMC 4008"],
+  "label": "EMI",
+  "asin": "B000000000",
   "musicBrainzReleaseId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
   "musicBrainzReleaseGroupId": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
   "musicBrainzReleaseArtistId": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f",
@@ -103,12 +109,7 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b
         "title": "Bohemian Rhapsody",
         "originalTitle": "Bohemian Rhapsody",
         "description": "A song by the British rock band Queen. It was written by Freddie Mercury and originally released on the album A Night at the Opera in 1975.",
-        "durationInSeconds": 354,
-        "sampleRate": 44100,
-        "channels": 2,
-        "bitDepth": 16,
-        "audioCodec": "FLAC",
-        "bitrate": 980,
+        "disambiguation": null,
         "releaseInfo": {
           "originalReleaseDate": "1975-10-31",
           "originalReleaseYear": 1975,
@@ -127,24 +128,50 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b
           "languageName": "English",
           "nativeName": "English"
         },
+        "tags": [
+          { "name": "classic" },
+          { "name": "epic" }
+        ],
         "genres": [
           { "name": "Rock" },
           { "name": "Progressive Rock" }
         ],
-        "tags": [
-          { "name": "classic" },
-          { "name": "epic" }
-        ]
+        "isVideo": false,
+        "durationInSeconds": 354,
+        "sampleRate": 44100,
+        "channels": 2,
+        "bitDepth": 16,
+        "audioCodec": "FLAC",
+        "bitrate": 980,
+        "acoustId": "f0e1d2c3-b4a5-4c6d-8e7f-9a0b1c2d3e4f",
+        "replayGainTrackGain": -7.5,
+        "replayGainTrackPeak": 0.9877,
+        "replayGainAlbumGain": -6.8,
+        "replayGainAlbumPeak": 0.9999
       },
       "trackNumber": 1,
       "discNumber": 1,
       "script": "Latn",
       "key": "CMajor",
       "bpm": 72,
-      "work": "Bohemian Rhapsody",
+      "work": {
+        "musicBrainzWorkId": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+        "title": "Bohemian Rhapsody",
+        "type": "Song",
+        "languages": [
+          { "languageCode": "en", "languageName": "English", "nativeName": "English" }
+        ],
+        "iswcs": []
+      },
       "musicBrainzRecordingId": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
       "musicBrainzTrackId": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
-      "musicBrainzWorkId": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+      "moods": [
+        { "name": "dramatic" },
+        { "name": "anxious" }
+      ],
+      "isrcs": [
+        { "value": "GBUM71029604" }
+      ],
       "contributors": [
         { "contributorId": "6a3f0c2d-1b4e-4f5a-8c6d-9e0f1a2b3c4d", "role": "Vocals" },
         { "contributorId": "7b4e1d3f-2c5a-4e6b-9d7e-0f1a2b3c4d5e", "role": "Guitar" }
@@ -162,13 +189,6 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b
           "source": "LastFm",
           "voteCount": 1234
         }
-      ],
-      "moods": [
-        { "name": "dramatic" },
-        { "name": "anxious" }
-      ],
-      "isrcs": [
-        { "value": "GBUM71029604" }
       ]
     },
     {
@@ -177,12 +197,7 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b
         "title": "You're My Best Friend",
         "originalTitle": "You're My Best Friend",
         "description": "A song by the British rock band Queen, written by bass guitarist John Deacon. It was originally released on the album A Night at the Opera in 1975 and as a single in 1976.",
-        "durationInSeconds": 181,
-        "sampleRate": 44100,
-        "channels": 2,
-        "bitDepth": 16,
-        "audioCodec": "FLAC",
-        "bitrate": 912,
+        "disambiguation": null,
         "releaseInfo": {
           "originalReleaseDate": "1976-06-18",
           "originalReleaseYear": 1976,
@@ -201,24 +216,50 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b
           "languageName": "English",
           "nativeName": "English"
         },
+        "tags": [
+          { "name": "classic" },
+          { "name": "love" }
+        ],
         "genres": [
           { "name": "Rock" },
           { "name": "Pop Rock" }
         ],
-        "tags": [
-          { "name": "classic" },
-          { "name": "love" }
-        ]
+        "isVideo": false,
+        "durationInSeconds": 181,
+        "sampleRate": 44100,
+        "channels": 2,
+        "bitDepth": 16,
+        "audioCodec": "FLAC",
+        "bitrate": 912,
+        "acoustId": null,
+        "replayGainTrackGain": null,
+        "replayGainTrackPeak": null,
+        "replayGainAlbumGain": null,
+        "replayGainAlbumPeak": null
       },
       "trackNumber": 7,
       "discNumber": 1,
       "script": "Latn",
       "key": "BMajor",
       "bpm": 118,
-      "work": "You're My Best Friend",
+      "work": {
+        "musicBrainzWorkId": "2b3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d6e",
+        "title": "You're My Best Friend",
+        "type": "Song",
+        "languages": [
+          { "languageCode": "en", "languageName": "English", "nativeName": "English" }
+        ],
+        "iswcs": []
+      },
       "musicBrainzRecordingId": "0f3e4d5c-6b7a-4f8e-9d0c-1b2a3c4d5e6f",
       "musicBrainzTrackId": "1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
-      "musicBrainzWorkId": "2b3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d6e",
+      "moods": [
+        { "name": "happy" },
+        { "name": "warm" }
+      ],
+      "isrcs": [
+        { "value": "GBUM71029609" }
+      ],
       "contributors": [
         { "contributorId": "6a3f0c2d-1b4e-4f5a-8c6d-9e0f1a2b3c4d", "role": "Vocals" },
         { "contributorId": "8c5f2e4a-3d6b-4f7c-ae8f-1a2b3c4d5e6f", "role": "BassGuitar" }
@@ -236,13 +277,6 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b
           "source": "LastFm",
           "voteCount": 567
         }
-      ],
-      "moods": [
-        { "name": "happy" },
-        { "name": "warm" }
-      ],
-      "isrcs": [
-        { "value": "GBUM71029609" }
       ]
     }
   ]
@@ -264,10 +298,7 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b
     "title": "A Night at the Opera",
     "originalTitle": "A Night at the Opera",
     "description": "The fourth studio album by the British rock band Queen, released in 1975. It was the most expensive album ever recorded at the time of its release.",
-    "releaseType": "Album",
-    "releaseStatus": "Official",
-    "totalDiscs": 1,
-    "totalTracks": 12,
+    "disambiguation": null,
     "releaseInfo": {
       "originalReleaseDate": "1975-11-21",
       "originalReleaseYear": 1975,
@@ -286,26 +317,27 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b
       "languageName": "English",
       "nativeName": "English"
     },
-    "genres": [
-      {
-        "name": "Rock"
-      },
-      {
-        "name": "Progressive Rock"
-      }
-    ],
     "tags": [
-      {
-        "name": "classic"
-      },
-      {
-        "name": "vinyl"
-      }
-    ]
+      { "name": "classic" },
+      { "name": "vinyl" }
+    ],
+    "genres": [
+      { "name": "Rock" },
+      { "name": "Progressive Rock" }
+    ],
+    "script": "Latn",
+    "releaseTypes": [ "Album" ],
+    "releaseStatus": "Official",
+    "totalDiscs": 1,
+    "totalTracks": 12,
+    "releaseTitle": "A Night at the Opera"
   },
   "mediaFormat": "CD",
+  "packaging": "JewelCase",
   "barcode": "0042282778329",
-  "catalogNumber": "EMC 4008",
+  "catalogNumbers": ["EMC 4008"],
+  "label": "EMI",
+  "asin": "B000000000",
   "musicBrainzReleaseId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
   "musicBrainzReleaseGroupId": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
   "musicBrainzReleaseArtistId": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f",
@@ -345,50 +377,50 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b
         "title": "Bohemian Rhapsody",
         "originalTitle": "Bohemian Rhapsody",
         "description": "A song by the British rock band Queen. It was written by Freddie Mercury and originally released on the album A Night at the Opera in 1975.",
-        "releaseInfo": {
-          "originalReleaseDate": "1975-10-31",
-          "originalReleaseYear": 1975,
-          "reReleaseDate": null,
-          "reReleaseYear": null,
-          "releaseCountry": "GB",
-          "releaseVersion": "Original"
-        },
-        "language": {
-          "languageCode": "en",
-          "languageName": "English",
-          "nativeName": "English"
-        },
-        "originalLanguage": {
-          "languageCode": "en",
-          "languageName": "English",
-          "nativeName": "English"
-        },
-        "tags": [
-          { "name": "classic" },
-          { "name": "epic" }
-        ],
-        "genres": [
-          { "name": "Rock" },
-          { "name": "Progressive Rock" }
-        ],
+        "disambiguation": null,
+        "releaseInfo": { "originalReleaseDate": "1975-10-31", "originalReleaseYear": 1975, "reReleaseDate": null, "reReleaseYear": null, "releaseCountry": "GB", "releaseVersion": "Original" },
+        "language": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
+        "originalLanguage": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
+        "tags": [ { "name": "classic" }, { "name": "epic" } ],
+        "genres": [ { "name": "Rock" }, { "name": "Progressive Rock" } ],
+        "isVideo": false,
         "durationInSeconds": 354,
         "sampleRate": 44100,
         "channels": 2,
         "bitDepth": 16,
         "audioCodec": "FLAC",
-        "bitrate": 980
+        "bitrate": 980,
+        "acoustId": "f0e1d2c3-b4a5-4c6d-8e7f-9a0b1c2d3e4f",
+        "replayGainTrackGain": -7.5,
+        "replayGainTrackPeak": 0.9877,
+        "replayGainAlbumGain": -6.8,
+        "replayGainAlbumPeak": 0.9999
       },
       "trackNumber": 1,
       "discNumber": 1,
       "script": "Latn",
       "key": "CMajor",
       "bpm": 72,
-      "work": "Bohemian Rhapsody",
+      "work": {
+        "musicBrainzWorkId": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+        "title": "Bohemian Rhapsody",
+        "type": "Song",
+        "languages": [
+          { "languageCode": "en", "languageName": "English", "nativeName": "English" }
+        ],
+        "iswcs": []
+      },
       "musicBrainzRecordingId": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
       "musicBrainzTrackId": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
-      "musicBrainzWorkId": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
       "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
       "updatedOnUtc": null,
+      "moods": [
+        { "name": "dramatic" },
+        { "name": "anxious" }
+      ],
+      "isrcs": [
+        { "value": "GBUM71029604" }
+      ],
       "contributors": [
         {
           "contributorId": "6a3f0c2d-1b4e-4f5a-8c6d-9e0f1a2b3c4d",
@@ -412,13 +444,6 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b
           "source": "LastFm",
           "voteCount": 1234
         }
-      ],
-      "moods": [
-        { "name": "dramatic" },
-        { "name": "anxious" }
-      ],
-      "isrcs": [
-        { "value": "GBUM71029604" }
       ]
     },
     {
@@ -430,50 +455,50 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b
         "title": "You're My Best Friend",
         "originalTitle": "You're My Best Friend",
         "description": "A song by the British rock band Queen, written by bass guitarist John Deacon. It was originally released on the album A Night at the Opera in 1975 and as a single in 1976.",
-        "releaseInfo": {
-          "originalReleaseDate": "1976-06-18",
-          "originalReleaseYear": 1976,
-          "reReleaseDate": null,
-          "reReleaseYear": null,
-          "releaseCountry": "GB",
-          "releaseVersion": "Original"
-        },
-        "language": {
-          "languageCode": "en",
-          "languageName": "English",
-          "nativeName": "English"
-        },
-        "originalLanguage": {
-          "languageCode": "en",
-          "languageName": "English",
-          "nativeName": "English"
-        },
-        "tags": [
-          { "name": "classic" },
-          { "name": "love" }
-        ],
-        "genres": [
-          { "name": "Rock" },
-          { "name": "Pop Rock" }
-        ],
+        "disambiguation": null,
+        "releaseInfo": { "originalReleaseDate": "1976-06-18", "originalReleaseYear": 1976, "reReleaseDate": null, "reReleaseYear": null, "releaseCountry": "GB", "releaseVersion": "Original" },
+        "language": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
+        "originalLanguage": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
+        "tags": [ { "name": "classic" }, { "name": "love" } ],
+        "genres": [ { "name": "Rock" }, { "name": "Pop Rock" } ],
+        "isVideo": false,
         "durationInSeconds": 181,
         "sampleRate": 44100,
         "channels": 2,
         "bitDepth": 16,
         "audioCodec": "FLAC",
-        "bitrate": 912
+        "bitrate": 912,
+        "acoustId": null,
+        "replayGainTrackGain": null,
+        "replayGainTrackPeak": null,
+        "replayGainAlbumGain": null,
+        "replayGainAlbumPeak": null
       },
       "trackNumber": 7,
       "discNumber": 1,
       "script": "Latn",
       "key": "BMajor",
       "bpm": 118,
-      "work": "You're My Best Friend",
+      "work": {
+        "musicBrainzWorkId": "2b3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d6e",
+        "title": "You're My Best Friend",
+        "type": "Song",
+        "languages": [
+          { "languageCode": "en", "languageName": "English", "nativeName": "English" }
+        ],
+        "iswcs": []
+      },
       "musicBrainzRecordingId": "0f3e4d5c-6b7a-4f8e-9d0c-1b2a3c4d5e6f",
       "musicBrainzTrackId": "1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
-      "musicBrainzWorkId": "2b3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d6e",
       "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
       "updatedOnUtc": null,
+      "moods": [
+        { "name": "happy" },
+        { "name": "warm" }
+      ],
+      "isrcs": [
+        { "value": "GBUM71029609" }
+      ],
       "contributors": [
         {
           "contributorId": "6a3f0c2d-1b4e-4f5a-8c6d-9e0f1a2b3c4d",
@@ -497,13 +522,6 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b
           "source": "LastFm",
           "voteCount": 567
         }
-      ],
-      "moods": [
-        { "name": "happy" },
-        { "name": "warm" }
-      ],
-      "isrcs": [
-        { "value": "GBUM71029609" }
       ]
     }
   ]
@@ -535,10 +553,7 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
       "title": "A Night at the Opera",
       "originalTitle": "A Night at the Opera",
       "description": "The fourth studio album by the British rock band Queen, released in 1975. It was the most expensive album ever recorded at the time of its release.",
-      "releaseType": "Album",
-      "releaseStatus": "Official",
-      "totalDiscs": 1,
-      "totalTracks": 12,
+      "disambiguation": null,
       "releaseInfo": {
         "originalReleaseDate": "1975-11-21",
         "originalReleaseYear": 1975,
@@ -557,26 +572,27 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
         "languageName": "English",
         "nativeName": "English"
       },
-      "genres": [
-        {
-          "name": "Rock"
-        },
-        {
-          "name": "Progressive Rock"
-        }
-      ],
       "tags": [
-        {
-          "name": "classic"
-        },
-        {
-          "name": "vinyl"
-        }
-      ]
+        { "name": "classic" },
+        { "name": "vinyl" }
+      ],
+      "genres": [
+        { "name": "Rock" },
+        { "name": "Progressive Rock" }
+      ],
+      "script": "Latn",
+      "releaseTypes": [ "Album" ],
+      "releaseStatus": "Official",
+      "totalDiscs": 1,
+      "totalTracks": 12,
+      "releaseTitle": "A Night at the Opera"
     },
     "mediaFormat": "CD",
+    "packaging": "JewelCase",
     "barcode": "0042282778329",
-    "catalogNumber": "EMC 4008",
+    "catalogNumbers": ["EMC 4008"],
+    "label": "EMI",
+    "asin": "B000000000",
     "musicBrainzReleaseId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
     "musicBrainzReleaseGroupId": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
     "musicBrainzReleaseArtistId": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f",
@@ -671,10 +687,7 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
     "title": "A Night at the Opera",
     "originalTitle": "A Night at the Opera",
     "description": "The fourth studio album by the British rock band Queen, released in 1975. It was the most expensive album ever recorded at the time of its release.",
-    "releaseType": "Album",
-    "releaseStatus": "Official",
-    "totalDiscs": 1,
-    "totalTracks": 12,
+    "disambiguation": null,
     "releaseInfo": {
       "originalReleaseDate": "1975-11-21",
       "originalReleaseYear": 1975,
@@ -693,26 +706,27 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
       "languageName": "English",
       "nativeName": "English"
     },
-    "genres": [
-      {
-        "name": "Rock"
-      },
-      {
-        "name": "Progressive Rock"
-      }
-    ],
     "tags": [
-      {
-        "name": "classic"
-      },
-      {
-        "name": "vinyl"
-      }
-    ]
+      { "name": "classic" },
+      { "name": "vinyl" }
+    ],
+    "genres": [
+      { "name": "Rock" },
+      { "name": "Progressive Rock" }
+    ],
+    "script": "Latn",
+    "releaseTypes": [ "Album" ],
+    "releaseStatus": "Official",
+    "totalDiscs": 1,
+    "totalTracks": 12,
+    "releaseTitle": "A Night at the Opera"
   },
   "mediaFormat": "CD",
+  "packaging": "JewelCase",
   "barcode": "0042282778329",
-  "catalogNumber": "EMC 4008",
+  "catalogNumbers": ["EMC 4008"],
+  "label": "EMI",
+  "asin": "B000000000",
   "musicBrainzReleaseId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
   "musicBrainzReleaseGroupId": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
   "musicBrainzReleaseArtistId": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f",
@@ -761,6 +775,7 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
     "title": "A Night at the Opera",
     "originalTitle": "A Night at the Opera",
     "description": "The fourth studio album by the British rock band Queen, released in 1975. It was the most expensive album ever recorded at the time of its release.",
+    "disambiguation": null,
     "releaseInfo": {
       "originalReleaseDate": "1975-11-21",
       "originalReleaseYear": 1975,
@@ -769,10 +784,6 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
       "releaseCountry": "GB",
       "releaseVersion": "Remastered"
     },
-    "releaseType": "Album",
-    "releaseStatus": "Official",
-    "totalDiscs": 1,
-    "totalTracks": 12,
     "language": {
       "languageCode": "en",
       "languageName": "English",
@@ -783,18 +794,27 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
       "languageName": "English",
       "nativeName": "English"
     },
+    "tags": [
+      { "name": "classic" },
+      { "name": "vinyl" }
+    ],
     "genres": [
       { "name": "Rock" },
       { "name": "Progressive Rock" }
     ],
-    "tags": [
-      { "name": "classic" },
-      { "name": "vinyl" }
-    ]
+    "script": "Latn",
+    "releaseTypes": [ "Album" ],
+    "releaseStatus": "Official",
+    "totalDiscs": 1,
+    "totalTracks": 12,
+    "releaseTitle": "A Night at the Opera"
   },
   "mediaFormat": "CD",
+  "packaging": "JewelCase",
   "barcode": "0042282778329",
-  "catalogNumber": "EMC 4008",
+  "catalogNumbers": ["EMC 4008"],
+  "label": "EMI",
+  "asin": "B000000000",
   "musicBrainzReleaseId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
   "musicBrainzReleaseGroupId": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
   "musicBrainzReleaseArtistId": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f",
@@ -834,10 +854,7 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
     "title": "A Night at the Opera",
     "originalTitle": "A Night at the Opera",
     "description": "The fourth studio album by the British rock band Queen, released in 1975. It was the most expensive album ever recorded at the time of its release.",
-    "releaseType": "Album",
-    "releaseStatus": "Official",
-    "totalDiscs": 1,
-    "totalTracks": 12,
+    "disambiguation": null,
     "releaseInfo": {
       "originalReleaseDate": "1975-11-21",
       "originalReleaseYear": 1975,
@@ -856,26 +873,27 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
       "languageName": "English",
       "nativeName": "English"
     },
-    "genres": [
-      {
-        "name": "Rock"
-      },
-      {
-        "name": "Progressive Rock"
-      }
-    ],
     "tags": [
-      {
-        "name": "classic"
-      },
-      {
-        "name": "vinyl"
-      }
-    ]
+      { "name": "classic" },
+      { "name": "vinyl" }
+    ],
+    "genres": [
+      { "name": "Rock" },
+      { "name": "Progressive Rock" }
+    ],
+    "script": "Latn",
+    "releaseTypes": [ "Album" ],
+    "releaseStatus": "Official",
+    "totalDiscs": 1,
+    "totalTracks": 12,
+    "releaseTitle": "A Night at the Opera"
   },
   "mediaFormat": "CD",
+  "packaging": "JewelCase",
   "barcode": "0042282778329",
-  "catalogNumber": "EMC 4008",
+  "catalogNumbers": ["EMC 4008"],
+  "label": "EMI",
+  "asin": "B000000000",
   "musicBrainzReleaseId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
   "musicBrainzReleaseGroupId": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
   "musicBrainzReleaseArtistId": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f",
@@ -948,27 +966,41 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
       "title": "Bohemian Rhapsody",
       "originalTitle": "Bohemian Rhapsody",
       "description": "A song by the British rock band Queen. It was written by Freddie Mercury and originally released on the album A Night at the Opera in 1975.",
+      "disambiguation": null,
       "releaseInfo": { "originalReleaseDate": "1975-10-31", "originalReleaseYear": 1975, "reReleaseDate": null, "reReleaseYear": null, "releaseCountry": "GB", "releaseVersion": "Original" },
       "language": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
       "originalLanguage": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
       "tags": [ { "name": "classic" }, { "name": "epic" } ],
       "genres": [ { "name": "Rock" }, { "name": "Progressive Rock" } ],
+      "isVideo": false,
       "durationInSeconds": 354,
       "sampleRate": 44100,
       "channels": 2,
       "bitDepth": 16,
       "audioCodec": "FLAC",
-      "bitrate": 980
+      "bitrate": 980,
+      "acoustId": "f0e1d2c3-b4a5-4c6d-8e7f-9a0b1c2d3e4f",
+      "replayGainTrackGain": -7.5,
+      "replayGainTrackPeak": 0.9877,
+      "replayGainAlbumGain": -6.8,
+      "replayGainAlbumPeak": 0.9999
     },
     "trackNumber": 1,
     "discNumber": 1,
     "script": "Latn",
     "key": "CMajor",
     "bpm": 72,
-    "work": "Bohemian Rhapsody",
+    "work": {
+      "musicBrainzWorkId": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+      "title": "Bohemian Rhapsody",
+      "type": "Song",
+      "languages": [
+        { "languageCode": "en", "languageName": "English", "nativeName": "English" }
+      ],
+      "iswcs": []
+    },
     "musicBrainzRecordingId": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
     "musicBrainzTrackId": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
-    "musicBrainzWorkId": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
     "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
     "updatedOnUtc": null,
     "moods": [
@@ -1048,7 +1080,3 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
   "numberOfPages": 1
 }
 ```
-
-
-
-
