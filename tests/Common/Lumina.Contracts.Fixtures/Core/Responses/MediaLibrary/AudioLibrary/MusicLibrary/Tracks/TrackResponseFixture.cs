@@ -25,7 +25,8 @@ namespace Lumina.Contracts.Fixtures.Core.Responses.MediaLibrary.AudioLibrary.Mus
 public class TrackResponseFixture
 {
     private readonly Faker _faker = new();
-    private readonly AudioMetadataDtoFixture _audioMetadataDtoFixture = new();
+    private readonly MusicTrackMetadataDtoFixture _musicTrackMetadataDtoFixture = new();
+    private readonly MusicWorkDtoFixture _musicWorkDtoFixture = new();
     private readonly MoodDtoFixture _moodDtoFixture = new();
     private readonly IsrcDtoFixture _isrcDtoFixture = new();
     private readonly MediaContributorReferenceDtoFixture _mediaContributorReferenceDtoFixture = new();
@@ -44,10 +45,9 @@ public class TrackResponseFixture
     /// <param name="script">Optional. The script used by the language of the track.</param>
     /// <param name="key">Optional. The musical key of the track.</param>
     /// <param name="bpm">Optional. The tempo of the track in beats per minute.</param>
-    /// <param name="work">Optional. The title of the work the track is a recording of.</param>
+    /// <param name="work">Optional. The work the track is a recording of.</param>
     /// <param name="musicBrainzRecordingId">Optional. The MusicBrainz recording Id of the track.</param>
     /// <param name="musicBrainzTrackId">Optional. The MusicBrainz track Id of the track.</param>
-    /// <param name="musicBrainzWorkId">Optional. The MusicBrainz work Id of the track.</param>
     /// <param name="createdOnUtc">Optional. The date and time when the track was created.</param>
     /// <param name="updatedOnUtc">Optional. The date and time when the track was updated.</param>
     /// <param name="moods">Optional. The list of moods of the track.</param>
@@ -56,23 +56,21 @@ public class TrackResponseFixture
     /// <param name="ratings">Optional. The list of ratings of the track.</param>
     /// <param name="includeMusicBrainzRecordingId">Whether the MusicBrainz recording Id should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeMusicBrainzTrackId">Whether the MusicBrainz track Id should be included, or forced to <see langword="null"/>.</param>
-    /// <param name="includeMusicBrainzWorkId">Whether the MusicBrainz work Id should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="TrackResponse"/>.</returns>
     public TrackResponse Create(
         Guid? id = null,
         Guid? albumId = null,
         Guid? libraryId = null,
         string? path = null,
-        AudioMetadataDto? metadata = null,
+        MusicTrackMetadataDto? metadata = null,
         int? trackNumber = null,
         int? discNumber = null,
         string? script = null,
         MusicKey? key = null,
         int? bpm = null,
-        string? work = null,
+        MusicWorkDto? work = null,
         Guid? musicBrainzRecordingId = null,
         Guid? musicBrainzTrackId = null,
-        Guid? musicBrainzWorkId = null,
         DateTime? createdOnUtc = null,
         DateTime? updatedOnUtc = null,
         List<MoodDto>? moods = null,
@@ -80,24 +78,22 @@ public class TrackResponseFixture
         List<MediaContributorReferenceDto>? contributors = null,
         List<AudioRatingDto>? ratings = null,
         bool includeMusicBrainzRecordingId = true,
-        bool includeMusicBrainzTrackId = true,
-        bool includeMusicBrainzWorkId = true)
+        bool includeMusicBrainzTrackId = true)
     {
         return new TrackResponse(
             id ?? Guid.NewGuid(),
             albumId ?? Guid.NewGuid(),
             libraryId ?? Guid.NewGuid(),
             path ?? _faker.System.FilePath(),
-            metadata ?? _audioMetadataDtoFixture.Create(),
+            metadata ?? _musicTrackMetadataDtoFixture.Create(),
             trackNumber ?? _faker.Random.Int(1, 30),
             discNumber ?? (_faker.Random.Bool() ? _faker.Random.Int(1, 3) : null),
             script ?? (_faker.Random.Bool() ? _faker.Random.AlphaNumeric(4) : null),
             key ?? (_faker.Random.Bool() ? _faker.PickRandom<MusicKey>() : null),
             bpm ?? (_faker.Random.Bool() ? _faker.Random.Int(40, 220) : null),
-            work ?? (_faker.Random.Bool() ? _faker.Lorem.Sentence() : null),
+            work ?? _musicWorkDtoFixture.Create(),
             includeMusicBrainzRecordingId ? (musicBrainzRecordingId ?? Guid.NewGuid()) : null,
             includeMusicBrainzTrackId ? (musicBrainzTrackId ?? Guid.NewGuid()) : null,
-            includeMusicBrainzWorkId ? (musicBrainzWorkId ?? Guid.NewGuid()) : null,
             createdOnUtc ?? _faker.Date.Past().ToUniversalTime(),
             updatedOnUtc ?? (_faker.Random.Bool() ? _faker.Date.Recent().ToUniversalTime() : null),
             moods ?? _moodDtoFixture.CreateMany(1),

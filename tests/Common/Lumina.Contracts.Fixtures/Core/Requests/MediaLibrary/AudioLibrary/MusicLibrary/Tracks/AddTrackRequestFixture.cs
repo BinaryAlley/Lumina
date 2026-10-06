@@ -26,7 +26,8 @@ namespace Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.AudioLibrary.Musi
 public class AddTrackRequestFixture
 {
     private readonly Faker _faker = new();
-    private readonly AudioMetadataDtoFixture _audioMetadataDtoFixture = new();
+    private readonly MusicTrackMetadataDtoFixture _musicTrackMetadataDtoFixture = new();
+    private readonly MusicWorkDtoFixture _musicWorkDtoFixture = new();
     private readonly MoodDtoFixture _moodDtoFixture = new();
     private readonly IsrcDtoFixture _isrcDtoFixture = new();
     private readonly MediaContributorReferenceDtoFixture _mediaContributorReferenceDtoFixture = new();
@@ -42,10 +43,9 @@ public class AddTrackRequestFixture
     /// <param name="script">Optional. The script used by the language of the track.</param>
     /// <param name="key">Optional. The musical key of the track.</param>
     /// <param name="bpm">Optional. The tempo of the track in beats per minute.</param>
-    /// <param name="work">Optional. The title of the work the track is a recording of.</param>
+    /// <param name="work">Optional. The work the track is a recording of.</param>
     /// <param name="musicBrainzRecordingId">Optional. The MusicBrainz identifier of the recording.</param>
     /// <param name="musicBrainzTrackId">Optional. The MusicBrainz identifier of the track.</param>
-    /// <param name="musicBrainzWorkId">Optional. The MusicBrainz identifier of the work.</param>
     /// <param name="moods">Optional. The list of moods of the track.</param>
     /// <param name="isrcs">Optional. The list of ISRC of the track.</param>
     /// <param name="contributors">Optional. The list of media contributors that performed on the track.</param>
@@ -60,7 +60,6 @@ public class AddTrackRequestFixture
     /// <param name="includeWork">Whether the work should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeMusicBrainzRecordingId">Whether the MusicBrainz recording Id should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeMusicBrainzTrackId">Whether the MusicBrainz track Id should be included, or forced to <see langword="null"/>.</param>
-    /// <param name="includeMusicBrainzWorkId">Whether the MusicBrainz work Id should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeMoods">Whether the moods should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeIsrcs">Whether the ISRC codes should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeContributors">Whether the contributors should be included, or forced to <see langword="null"/>.</param>
@@ -68,16 +67,15 @@ public class AddTrackRequestFixture
     /// <returns>The created request to add a track.</returns>
     public AddTrackRequest Create(
         string? path = null,
-        AudioMetadataDto? metadata = null,
+        MusicTrackMetadataDto? metadata = null,
         int? trackNumber = null,
         int? discNumber = null,
         string? script = null,
         MusicKey? key = null,
         int? bpm = null,
-        string? work = null,
+        MusicWorkDto? work = null,
         Guid? musicBrainzRecordingId = null,
         Guid? musicBrainzTrackId = null,
-        Guid? musicBrainzWorkId = null,
         List<MoodDto>? moods = null,
         List<IsrcDto>? isrcs = null,
         List<MediaContributorReferenceDto>? contributors = null,
@@ -92,7 +90,6 @@ public class AddTrackRequestFixture
         bool includeWork = true,
         bool includeMusicBrainzRecordingId = true,
         bool includeMusicBrainzTrackId = true,
-        bool includeMusicBrainzWorkId = true,
         bool includeMoods = true,
         bool includeIsrcs = true,
         bool includeContributors = true,
@@ -100,16 +97,15 @@ public class AddTrackRequestFixture
     {
         return new AddTrackRequest(
             includePath ? path ?? Path.Combine(Path.GetTempPath(), "lumina-tracks", _faker.System.FileName()) : null,
-            includeMetadata ? metadata ?? _audioMetadataDtoFixture.Create() : null,
+            includeMetadata ? metadata ?? _musicTrackMetadataDtoFixture.Create() : null,
             includeTrackNumber ? trackNumber ?? _faker.Random.Int(1, 30) : null,
             includeDiscNumber ? discNumber ?? _faker.Random.Int(1, 3) : null,
             includeScript ? script ?? _faker.Random.AlphaNumeric(4) : null,
             includeKey ? key ?? _faker.PickRandom<MusicKey>() : null,
             includeBpm ? bpm ?? _faker.Random.Int(40, 220) : null,
-            includeWork ? work ?? _faker.Lorem.Sentence() : null,
+            includeWork ? work ?? _musicWorkDtoFixture.Create() : null,
             includeMusicBrainzRecordingId ? musicBrainzRecordingId ?? _faker.Random.Guid() : null,
             includeMusicBrainzTrackId ? musicBrainzTrackId ?? _faker.Random.Guid() : null,
-            includeMusicBrainzWorkId ? musicBrainzWorkId ?? _faker.Random.Guid() : null,
             includeMoods ? moods ?? _moodDtoFixture.CreateMany(_faker.Random.Int(1, 3)) : null,
             includeIsrcs ? isrcs ?? _isrcDtoFixture.CreateMany(_faker.Random.Int(1, 3)) : null,
             includeContributors ? contributors ?? _mediaContributorReferenceDtoFixture.CreateMany(_faker.Random.Int(1, 3)) : null,

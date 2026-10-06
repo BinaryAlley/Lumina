@@ -24,10 +24,9 @@ namespace Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Trac
 /// <param name="Script">The script used by the language of the track, if applicable.</param>
 /// <param name="Key">The musical key of the track, if applicable.</param>
 /// <param name="Bpm">The tempo of the track in beats per minute, if applicable.</param>
-/// <param name="Work">The title of the work the track is a recording of, if applicable.</param>
+/// <param name="Work">The work the track is a recording of, if applicable.</param>
 /// <param name="MusicBrainzRecordingId">The MusicBrainz identifier of the recording, if applicable.</param>
 /// <param name="MusicBrainzTrackId">The MusicBrainz identifier of the track, if applicable.</param>
-/// <param name="MusicBrainzWorkId">The MusicBrainz identifier of the work, if applicable.</param>
 /// <param name="CreatedOnUtc">The date and time when the track was created.</param>
 /// <param name="UpdatedOnUtc">The optional date and time when the track was updated.</param>
 /// <param name="Moods">The list of moods of the track.</param>
@@ -40,16 +39,15 @@ public record TrackResponse(
     Guid AlbumId,
     Guid LibraryId,
     string Path,
-    AudioMetadataDto Metadata,
+    MusicTrackMetadataDto Metadata,
     int TrackNumber,
     int? DiscNumber,
     string? Script,
     MusicKey? Key,
     int? Bpm,
-    string? Work,
+    MusicWorkDto? Work,
     Guid? MusicBrainzRecordingId,
     Guid? MusicBrainzTrackId,
-    Guid? MusicBrainzWorkId,
     DateTime CreatedOnUtc,
     DateTime? UpdatedOnUtc,
     List<MoodDto>? Moods,

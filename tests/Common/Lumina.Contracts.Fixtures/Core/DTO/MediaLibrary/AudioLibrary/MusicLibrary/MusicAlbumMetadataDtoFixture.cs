@@ -1,12 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
 using Lumina.Contracts.DTO.Common;
-using Lumina.Contracts.DTO.MediaContributors;
-using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Contracts.Fixtures.Core.DTO.Common;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaContributors;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using System;
@@ -18,10 +14,10 @@ using System.Linq;
 namespace Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
 
 /// <summary>
-/// Fixture class for the <see cref="AlbumMetadataDto"/> record.
+/// Fixture class for the <see cref="MusicAlbumMetadataDto"/> record.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class AlbumMetadataDtoFixture
+public class MusicAlbumMetadataDtoFixture
 {
     private const int MINIMUM_RELEASE_YEAR = 1900;
     private const int MAXIMUM_RELEASE_YEAR = 2026;
@@ -31,11 +27,9 @@ public class AlbumMetadataDtoFixture
     private readonly TagDtoFixture _tagDtoFixture = new();
     private readonly LanguageInfoDtoFixture _languageInfoDtoFixture = new();
     private readonly ReleaseInfoDtoFixture _releaseInfoDtoFixture = new();
-    private readonly MediaContributorDtoFixture _mediaContributorDtoFixture = new();
-    private readonly AudioRatingDtoFixture _audioRatingDtoFixture = new();
 
     /// <summary>
-    /// Creates a random valid <see cref="AlbumMetadataDto"/>.
+    /// Creates a random valid <see cref="MusicAlbumMetadataDto"/>.
     /// </summary>
     /// <param name="title">Optional. The title of the album.</param>
     /// <param name="originalTitle">Optional. The original title of the album.</param>
@@ -50,19 +44,8 @@ public class AlbumMetadataDtoFixture
     /// <param name="script">Optional. The script used by the language of the release of the album.</param>
     /// <param name="releaseTypes">Optional. The types of the release.</param>
     /// <param name="releaseStatus">Optional. The status of the release.</param>
-    /// <param name="mediaFormat">Optional. The physical or digital medium of the album.</param>
-    /// <param name="packaging">Optional. The outermost physical packaging of the album.</param>
     /// <param name="totalDiscs">Optional. The number of discs of the release.</param>
     /// <param name="totalTracks">Optional. The number of tracks of the release.</param>
-    /// <param name="barcode">Optional. The barcode of the album.</param>
-    /// <param name="catalogNumber">Optional. The catalog number of the album.</param>
-    /// <param name="label">Optional. The name of the label that issued the album.</param>
-    /// <param name="asin">Optional. The ASIN of the album.</param>
-    /// <param name="musicBrainzReleaseId">Optional. The MusicBrainz identifier of the release.</param>
-    /// <param name="musicBrainzReleaseGroupId">Optional. The MusicBrainz identifier of the release group.</param>
-    /// <param name="musicBrainzReleaseArtistId">Optional. The MusicBrainz identifier of the release artist.</param>
-    /// <param name="contributors">Optional. The media contributors that performed on the album.</param>
-    /// <param name="ratings">Optional. The ratings of the album.</param>
     /// <param name="includeTitle">Whether the title should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeOriginalTitle">Whether the original title should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeDescription">Whether the description should be included, or forced to <see langword="null"/>.</param>
@@ -75,21 +58,10 @@ public class AlbumMetadataDtoFixture
     /// <param name="includeScript">Whether the script should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeReleaseTypes">Whether the release types should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeReleaseStatus">Whether the release status should be included, or forced to <see langword="null"/>.</param>
-    /// <param name="includeMediaFormat">Whether the media format should be included, or forced to <see langword="null"/>.</param>
-    /// <param name="includePackaging">Whether the packaging should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeTotalDiscs">Whether the total number of discs should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeTotalTracks">Whether the total number of tracks should be included, or forced to <see langword="null"/>.</param>
-    /// <param name="includeBarcode">Whether the barcode should be included, or forced to <see langword="null"/>.</param>
-    /// <param name="includeCatalogNumbers">Whether the catalog number should be included, or forced to <see langword="null"/>.</param>
-    /// <param name="includeLabel">Whether the label should be included, or forced to <see langword="null"/>.</param>
-    /// <param name="includeAsin">Whether the ASIN should be included, or forced to <see langword="null"/>.</param>
-    /// <param name="includeMusicBrainzReleaseId">Whether the MusicBrainz release Id should be included, or forced to <see langword="null"/>.</param>
-    /// <param name="includeMusicBrainzReleaseGroupId">Whether the MusicBrainz release group Id should be included, or forced to <see langword="null"/>.</param>
-    /// <param name="includeMusicBrainzReleaseArtistId">Whether the MusicBrainz release artist Id should be included, or forced to <see langword="null"/>.</param>
-    /// <param name="includeContributors">Whether the contributors should be included, or forced to <see langword="null"/>.</param>
-    /// <param name="includeRatings">Whether the ratings should be included, or forced to <see langword="null"/>.</param>
-    /// <returns>The created <see cref="AlbumMetadataDto"/>.</returns>
-    public AlbumMetadataDto Create(
+    /// <returns>The created <see cref="MusicAlbumMetadataDto"/>.</returns>
+    public MusicAlbumMetadataDto Create(
         string? title = null,
         string? originalTitle = null,
         string? releaseTitle = null,
@@ -103,19 +75,8 @@ public class AlbumMetadataDtoFixture
         string? script = null,
         List<MusicReleaseType>? releaseTypes = null,
         MusicReleaseStatus? releaseStatus = null,
-        MusicMediaFormat? mediaFormat = null,
-        MusicReleasePackaging? packaging = null,
         int? totalDiscs = null,
         int? totalTracks = null,
-        string? barcode = null,
-        List<string>? catalogNumbers = null,
-        string? label = null,
-        string? asin = null,
-        Guid? musicBrainzReleaseId = null,
-        Guid? musicBrainzReleaseGroupId = null,
-        Guid? musicBrainzReleaseArtistId = null,
-        List<MediaContributorDto>? contributors = null,
-        List<AudioRatingDto>? ratings = null,
         bool includeTitle = true,
         bool includeOriginalTitle = true,
         bool includeDescription = true,
@@ -128,22 +89,11 @@ public class AlbumMetadataDtoFixture
         bool includeScript = true,
         bool includeReleaseTypes = true,
         bool includeReleaseStatus = true,
-        bool includeMediaFormat = true,
-        bool includePackaging = true,
         bool includeTotalDiscs = true,
         bool includeTotalTracks = true,
-        bool includeBarcode = true,
-        bool includeCatalogNumbers = true,
-        bool includeLabel = true,
-        bool includeAsin = true,
-        bool includeMusicBrainzReleaseId = true,
-        bool includeMusicBrainzReleaseGroupId = true,
-        bool includeMusicBrainzReleaseArtistId = true,
-        bool includeContributors = true,
-        bool includeRatings = true,
         bool includeReleaseTitle = true)
     {
-        return new AlbumMetadataDto(
+        return new MusicAlbumMetadataDto(
             includeTitle ? (title ?? _faker.Music.Genre()) : null,
             includeOriginalTitle ? (originalTitle ?? _faker.Music.Genre()) : null,
             includeDescription ? (description ?? _faker.Lorem.Paragraph()) : null,
@@ -156,28 +106,17 @@ public class AlbumMetadataDtoFixture
             includeScript ? (script ?? _faker.Random.String2(4)) : null,
             includeReleaseTypes ? (releaseTypes ?? [_faker.PickRandom<MusicReleaseType>()]) : null,
             includeReleaseStatus ? (releaseStatus ?? _faker.PickRandom<MusicReleaseStatus>()) : null,
-            includeMediaFormat ? (mediaFormat ?? _faker.PickRandom<MusicMediaFormat>()) : null,
-            includePackaging ? (packaging ?? _faker.PickRandom<MusicReleasePackaging>()) : null,
             includeTotalDiscs ? (totalDiscs ?? _faker.Random.Int(1, 3)) : null,
             includeTotalTracks ? (totalTracks ?? _faker.Random.Int(1, 30)) : null,
-            includeBarcode ? (barcode ?? _faker.Random.String2(13, "0123456789")) : null,
-            includeCatalogNumbers ? (catalogNumbers ?? [_faker.Random.AlphaNumeric(10)]) : null,
-            includeLabel ? (label ?? _faker.Company.CompanyName()) : null,
-            includeAsin ? (asin ?? _faker.Random.AlphaNumeric(10)) : null,
-            includeMusicBrainzReleaseId ? (musicBrainzReleaseId ?? _faker.Random.Guid()) : null,
-            includeMusicBrainzReleaseGroupId ? (musicBrainzReleaseGroupId ?? _faker.Random.Guid()) : null,
-            includeMusicBrainzReleaseArtistId ? (musicBrainzReleaseArtistId ?? _faker.Random.Guid()) : null,
-            includeContributors ? (contributors ?? _mediaContributorDtoFixture.CreateMany(_faker.Random.Int(1, 3))) : null,
-            includeRatings ? (ratings ?? _audioRatingDtoFixture.CreateMany(_faker.Random.Int(1, 3))) : null,
             includeReleaseTitle ? (releaseTitle ?? _faker.Commerce.ProductName()) : null);
     }
 
     /// <summary>
-    /// Creates a list of <see cref="AlbumMetadataDto"/>.
+    /// Creates a list of <see cref="MusicAlbumMetadataDto"/>.
     /// </summary>
     /// <param name="count">The number of elements to create.</param>
     /// <returns>The created list.</returns>
-    public List<AlbumMetadataDto> CreateMany(int count = 3)
+    public List<MusicAlbumMetadataDto> CreateMany(int count = 3)
     {
         return [.. Enumerable.Range(0, count).Select(_ => Create())];
     }

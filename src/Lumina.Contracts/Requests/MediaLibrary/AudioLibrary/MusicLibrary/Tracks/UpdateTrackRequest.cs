@@ -21,10 +21,9 @@ namespace Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Track
 /// <param name="Script">The script used by the language of the track. Optional.</param>
 /// <param name="Key">The musical key of the track. Optional.</param>
 /// <param name="Bpm">The tempo of the track in beats per minute. Optional.</param>
-/// <param name="Work">The title of the work the track is a recording of. Optional.</param>
+/// <param name="Work">The work the track is a recording of. Optional.</param>
 /// <param name="MusicBrainzRecordingId">The MusicBrainz identifier of the recording. Optional.</param>
 /// <param name="MusicBrainzTrackId">The MusicBrainz identifier of the track. Optional.</param>
-/// <param name="MusicBrainzWorkId">The MusicBrainz identifier of the work. Optional.</param>
 /// <param name="Moods">The list of moods of the track. Optional.</param>
 /// <param name="Isrcs">The list of ISRC (International Standard Recording Code) of the track. Optional.</param>
 /// <param name="Contributors">The list of media contributors that performed on the track. Required.</param>
@@ -32,16 +31,15 @@ namespace Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Track
 [DebuggerDisplay("Title: {Metadata.Title}")]
 public record UpdateTrackRequest(
     string? Path,
-    AudioMetadataDto? Metadata,
+    MusicTrackMetadataDto? Metadata,
     int? TrackNumber,
     int? DiscNumber,
     string? Script,
     MusicKey? Key,
     int? Bpm,
-    string? Work,
+    MusicWorkDto? Work,
     Guid? MusicBrainzRecordingId,
     Guid? MusicBrainzTrackId,
-    Guid? MusicBrainzWorkId,
     List<MoodDto>? Moods,
     List<IsrcDto>? Isrcs,
     List<MediaContributorReferenceDto>? Contributors,
