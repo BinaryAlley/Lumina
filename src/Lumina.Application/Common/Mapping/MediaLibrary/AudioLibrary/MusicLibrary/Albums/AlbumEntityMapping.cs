@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Common;
+using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
@@ -16,10 +18,6 @@ using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
-using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Common;
-using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 #endregion
 
 namespace Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
@@ -49,7 +47,7 @@ public static class AlbumEntityMapping
             return releaseInfoResult.Errors;
 
         List<Genre> domainGenres = [];
-        foreach (Result<Genre> genreResult in repositoryEntity.Genres.ToDomainEntities())
+        foreach (Result<Genre> genreResult in repositoryEntity.Genres.ToDomainValueObjects())
         {
             if (genreResult.IsFailure)
                 return genreResult.Errors;
@@ -57,7 +55,7 @@ public static class AlbumEntityMapping
         }
 
         List<Tag> domainTags = [];
-        foreach (Result<Tag> tagResult in repositoryEntity.Tags.ToDomainEntities())
+        foreach (Result<Tag> tagResult in repositoryEntity.Tags.ToDomainValueObjects())
         {
             if (tagResult.IsFailure)
                 return tagResult.Errors;
@@ -75,13 +73,14 @@ public static class AlbumEntityMapping
         Result<AlbumMetadata> metadataResult = AlbumMetadata.Create(
             repositoryEntity.Title,
             Optional<string>.FromNullable(repositoryEntity.OriginalTitle),
+            Optional<string>.FromNullable(repositoryEntity.ReleaseTitle),
             Optional<string>.FromNullable(repositoryEntity.Description),
             releaseInfoResult.Value,
             domainGenres,
             domainTags,
             language,
             originalLanguage,
-            Optional<MusicReleaseType>.FromNullable(repositoryEntity.ReleaseType),
+            [.. repositoryEntity.ReleaseTypes.Select(releaseType => releaseType.ReleaseType)],
             Optional<MusicReleaseStatus>.FromNullable(repositoryEntity.ReleaseStatus),
             Optional<int>.FromNullable(repositoryEntity.TotalDiscs),
             repositoryEntity.TotalTracks);
@@ -108,7 +107,7 @@ public static class AlbumEntityMapping
             musicBrainzReleaseArtistId = MusicBrainzId.Create(repositoryEntity.MusicBrainzReleaseArtistId.Value);
 
         List<AudioRating> domainRatings = [];
-        foreach (Result<AudioRating> ratingResult in repositoryEntity.Ratings.ToDomainEntities())
+        foreach (Result<AudioRating> ratingResult in repositoryEntity.Ratings.ToDomainValueObjects())
         {
             if (ratingResult.IsFailure)
                 return ratingResult.Errors;
@@ -136,9 +135,14 @@ public static class AlbumEntityMapping
         return Album.Create(
             AlbumId.Create(repositoryEntity.Id),
             metadataResult.Value,
+            Optional<string>.FromNullable(repositoryEntity.Disambiguation),
             Optional<MusicMediaFormat>.FromNullable(repositoryEntity.MediaFormat),
+            Optional<MusicReleasePackaging>.FromNullable(repositoryEntity.Packaging),
+            Optional<string>.FromNullable(repositoryEntity.Script),
             barcode,
-            Optional<string>.FromNullable(repositoryEntity.CatalogNumber),
+            [.. repositoryEntity.CatalogNumbers.Select(catalogNumber => catalogNumber.CatalogNumber)],
+            Optional<string>.FromNullable(repositoryEntity.Label),
+            Optional<string>.FromNullable(repositoryEntity.ASIN),
             musicBrainzReleaseId,
             musicBrainzReleaseGroupId,
             musicBrainzReleaseArtistId,
@@ -181,19 +185,22 @@ public static class AlbumEntityMapping
                 repositoryEntity.OriginalLanguageName,
                 repositoryEntity.OriginalLanguageNativeName
             ) : null;
-        AlbumMetadataDto metadata = new(
+        MusicAlbumMetadataDto metadata = new(
             repositoryEntity.Title,
             repositoryEntity.OriginalTitle,
             repositoryEntity.Description,
+            repositoryEntity.Disambiguation,
             releaseInfo,
             languageInfo,
             originalLanguageInfo,
             [.. repositoryEntity.Tags.ToResponses()],
             [.. repositoryEntity.Genres.ToResponses()],
-            repositoryEntity.ReleaseType,
+            repositoryEntity.Script,
+            [.. repositoryEntity.ReleaseTypes.Select(releaseType => releaseType.ReleaseType)],
             repositoryEntity.ReleaseStatus,
             repositoryEntity.TotalDiscs,
-            repositoryEntity.TotalTracks
+            repositoryEntity.TotalTracks,
+            repositoryEntity.ReleaseTitle
         );
         return new AlbumResponse(
             repositoryEntity.Id,
@@ -201,8 +208,11 @@ public static class AlbumEntityMapping
             repositoryEntity.LibraryId,
             metadata,
             repositoryEntity.MediaFormat,
+            repositoryEntity.Packaging,
             repositoryEntity.Barcode,
-            repositoryEntity.CatalogNumber,
+            repositoryEntity.CatalogNumbers.Count > 0 ? [.. repositoryEntity.CatalogNumbers.Select(catalogNumber => catalogNumber.CatalogNumber)] : null,
+            repositoryEntity.Label,
+            repositoryEntity.ASIN,
             repositoryEntity.MusicBrainzReleaseId,
             repositoryEntity.MusicBrainzReleaseGroupId,
             repositoryEntity.MusicBrainzReleaseArtistId,

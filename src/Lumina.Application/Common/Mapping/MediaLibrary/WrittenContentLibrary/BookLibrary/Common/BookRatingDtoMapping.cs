@@ -22,7 +22,7 @@ public static class BookRatingDtoMapping
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully converted <see cref="BookRating"/>, or an error message.
     /// </returns>
-    public static Result<BookRating> ToDomainEntity(this BookRatingDto dto)
+    public static Result<BookRating> ToDomainValueObject(this BookRatingDto dto)
     {
         return BookRating.Create(
             dto.Value ?? default,
@@ -39,8 +39,8 @@ public static class BookRatingDtoMapping
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a collection of converted <see cref="BookRating"/>, or an error message.
     /// </returns>
-    public static IEnumerable<Result<BookRating>> ToDomainEntities(this IEnumerable<BookRatingDto> dtos)
+    public static IEnumerable<Result<BookRating>> ToDomainValueObjects(this IEnumerable<BookRatingDto> dtos)
     {
-        return dtos.Select(domainEntity => domainEntity.ToDomainEntity());
+        return dtos.Select(domainEntity => domainEntity.ToDomainValueObject());
     }
 }

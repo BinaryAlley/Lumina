@@ -70,13 +70,13 @@ public class TagEntityMappingTests
     }
 
     [Fact]
-    public void ToDomainEntity_WhenMappingValidTagEntity_ShouldMapCorrectly()
+    public void ToDomainValueObject_WhenMappingValidTagEntity_ShouldMapCorrectly()
     {
         // Arrange
         TagEntity entity = _tagEntityFixture.Create(name: "Fantasy");
 
         // Act
-        Result<Tag> result = entity.ToDomainEntity();
+        Result<Tag> result = entity.ToDomainValueObject();
 
         // Assert
         Assert.False(result.IsFailure);
@@ -88,13 +88,13 @@ public class TagEntityMappingTests
     [InlineData("")]
     [InlineData(" ")]
     [InlineData(null)]
-    public void ToDomainEntity_WhenMappingInvalidTagEntity_ShouldMapToDefault(string? invalidName)
+    public void ToDomainValueObject_WhenMappingInvalidTagEntity_ShouldMapToDefault(string? invalidName)
     {
         // Arrange
         TagEntity entity = _tagEntityFixture.Create(name: invalidName, includeName: invalidName is not null);
 
         // Act
-        Result<Tag> result = entity.ToDomainEntity();
+        Result<Tag> result = entity.ToDomainValueObject();
 
         // Assert
         Assert.True(result.IsFailure);
@@ -102,7 +102,7 @@ public class TagEntityMappingTests
     }
 
     [Fact]
-    public void ToDomainEntities_WhenMappingMultipleValidTagEntities_ShouldMapAllCorrectly()
+    public void ToDomainValueObjects_WhenMappingMultipleValidTagEntities_ShouldMapAllCorrectly()
     {
         // Arrange
         List<TagEntity> entities =
@@ -114,7 +114,7 @@ public class TagEntityMappingTests
         ];
 
         // Act
-        IEnumerable<Result<Tag>> results = entities.ToDomainEntities();
+        IEnumerable<Result<Tag>> results = entities.ToDomainValueObjects();
 
         // Assert
         Assert.NotNull(results);

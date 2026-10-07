@@ -32,7 +32,7 @@ public class UpdateTrackCommandMappingTests
     private readonly ArtistEntityFixture _artistEntityFixture = new();
     private readonly AlbumEntityFixture _albumEntityFixture = new();
     private readonly TrackEntityFixture _trackEntityFixture = new();
-    private readonly AudioMetadataDtoFixture _audioMetadataDtoFixture = new();
+    private readonly MusicTrackMetadataDtoFixture _audioMetadataDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
     private readonly MoodDtoFixture _moodDtoFixture = new();
     private readonly IsrcDtoFixture _isrcDtoFixture = new();
@@ -67,10 +67,10 @@ public class UpdateTrackCommandMappingTests
         Assert.True(updatedTrack.Bpm.HasValue);
         Assert.Equal(command.Bpm, updatedTrack.Bpm.Value);
         Assert.True(updatedTrack.Work.HasValue);
-        Assert.Equal(command.Work, updatedTrack.Work.Value);
+        Assert.Equal(command.Work!.Title, updatedTrack.Work.Value.Title);
         Assert.Equal(command.MusicBrainzRecordingId, updatedTrack.MusicBrainzRecordingId.Value.Value);
         Assert.Equal(command.MusicBrainzTrackId, updatedTrack.MusicBrainzTrackId.Value.Value);
-        Assert.Equal(command.MusicBrainzWorkId, updatedTrack.MusicBrainzWorkId.Value.Value);
+        Assert.Equal(command.Work!.MusicBrainzWorkId, updatedTrack.Work.Value.MusicBrainzWorkId.Value);
         Assert.Equal(command.Moods!.Count, updatedTrack.Moods.Count);
         Assert.Equal(command.Isrcs!.Count, updatedTrack.Isrcs.Count);
         Assert.Equal(command.Contributors!.Count, updatedTrack.Contributors.Count);
@@ -84,7 +84,7 @@ public class UpdateTrackCommandMappingTests
         Guid libraryId = Guid.NewGuid();
         (Artist artist, Guid albumId, Guid trackId) = CreateDomainArtist(libraryId);
         string updatedPath = "/music/queen/a-night-at-the-opera/03-you-re-my-best-friend.flac";
-        UpdateTrackCommand command = _updateTrackCommandFixture.Create(libraryId: libraryId.ToString(), artistId: artist.Id.Value.ToString(), albumId: albumId.ToString(), trackId: trackId.ToString(), path: updatedPath, includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMusicBrainzWorkId: false, includeMoods: false, includeIsrcs: false, contributors: [], ratings: []);
+        UpdateTrackCommand command = _updateTrackCommandFixture.Create(libraryId: libraryId.ToString(), artistId: artist.Id.Value.ToString(), albumId: albumId.ToString(), trackId: trackId.ToString(), path: updatedPath, includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMoods: false, includeIsrcs: false, contributors: [], ratings: []);
 
         // Act
         Result<Artist> result = command.ToDomainEntity(artist);
@@ -101,7 +101,6 @@ public class UpdateTrackCommandMappingTests
         Assert.False(updatedTrack.Work.HasValue);
         Assert.False(updatedTrack.MusicBrainzRecordingId.HasValue);
         Assert.False(updatedTrack.MusicBrainzTrackId.HasValue);
-        Assert.False(updatedTrack.MusicBrainzWorkId.HasValue);
         Assert.Empty(updatedTrack.Moods);
         Assert.Empty(updatedTrack.Isrcs);
         Assert.Empty(updatedTrack.Contributors);

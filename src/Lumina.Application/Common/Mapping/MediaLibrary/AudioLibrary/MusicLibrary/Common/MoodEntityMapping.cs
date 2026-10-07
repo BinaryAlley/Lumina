@@ -43,7 +43,7 @@ public static class MoodEntityMapping
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully converted <see cref="Mood"/>, or an error message.
     /// </returns>
-    public static Result<Mood> ToDomainEntity(this TrackMoodEntity repositoryEntity)
+    public static Result<Mood> ToDomainValueObject(this TrackMoodEntity repositoryEntity)
     {
         return Mood.Create(repositoryEntity.Name!);
     }
@@ -55,8 +55,8 @@ public static class MoodEntityMapping
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a collection of converted <see cref="Mood"/>, or an error message.
     /// </returns>
-    public static IEnumerable<Result<Mood>> ToDomainEntities(this IEnumerable<TrackMoodEntity> repositoryEntities)
+    public static IEnumerable<Result<Mood>> ToDomainValueObjects(this IEnumerable<TrackMoodEntity> repositoryEntities)
     {
-        return repositoryEntities.Select(repositoryEntity => repositoryEntity.ToDomainEntity());
+        return repositoryEntities.Select(repositoryEntity => repositoryEntity.ToDomainValueObject());
     }
 }

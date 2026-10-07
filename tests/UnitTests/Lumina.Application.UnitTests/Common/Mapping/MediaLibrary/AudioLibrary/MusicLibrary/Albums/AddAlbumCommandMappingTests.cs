@@ -26,7 +26,7 @@ public class AddAlbumCommandMappingTests
 {
     private readonly AddAlbumCommandFixture _addAlbumCommandFixture = new();
     private readonly AddTrackCommandFixture _addTrackCommandFixture = new();
-    private readonly AlbumMetadataDtoFixture _albumMetadataDtoFixture = new();
+    private readonly MusicAlbumMetadataDtoFixture _albumMetadataDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
     private readonly IsrcDtoFixture _isrcDtoFixture = new();
     private readonly AudioRatingDtoFixture _audioRatingDtoFixture = new();
@@ -46,7 +46,7 @@ public class AddAlbumCommandMappingTests
         Assert.Equal(command.Metadata!.Title, album.Metadata.Title);
         Assert.Equal(command.MediaFormat, album.MediaFormat.Value);
         Assert.Equal(command.Barcode, album.Barcode.Value.Value);
-        Assert.Equal(command.CatalogNumber, album.CatalogNumber.Value);
+        Assert.Equal(command.CatalogNumbers, album.CatalogNumbers);
         Assert.Equal(command.MusicBrainzReleaseId, album.MusicBrainzReleaseId.Value.Value);
         Assert.Equal(command.MusicBrainzReleaseGroupId, album.MusicBrainzReleaseGroupId.Value.Value);
         Assert.Equal(command.MusicBrainzReleaseArtistId, album.MusicBrainzReleaseArtistId.Value.Value);
@@ -95,7 +95,7 @@ public class AddAlbumCommandMappingTests
         AddAlbumCommand command = _addAlbumCommandFixture.Create(
             includeMediaFormat: false,
             includeBarcode: false,
-            includeCatalogNumber: false,
+            includeCatalogNumbers: false,
             includeMusicBrainzReleaseId: false,
             includeMusicBrainzReleaseGroupId: false,
             includeMusicBrainzReleaseArtistId: false,
@@ -112,7 +112,7 @@ public class AddAlbumCommandMappingTests
         Assert.Equal(command.Metadata!.Title, album.Metadata.Title);
         Assert.False(album.MediaFormat.HasValue);
         Assert.False(album.Barcode.HasValue);
-        Assert.False(album.CatalogNumber.HasValue);
+        Assert.Empty(album.CatalogNumbers);
         Assert.False(album.MusicBrainzReleaseId.HasValue);
         Assert.False(album.MusicBrainzReleaseGroupId.HasValue);
         Assert.False(album.MusicBrainzReleaseArtistId.HasValue);

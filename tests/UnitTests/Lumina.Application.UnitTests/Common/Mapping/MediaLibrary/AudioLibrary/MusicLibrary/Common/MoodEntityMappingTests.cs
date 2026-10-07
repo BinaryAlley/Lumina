@@ -51,13 +51,13 @@ public class MoodEntityMappingTests
     }
 
     [Fact]
-    public void ToDomainEntity_WhenMappingValidTrackMoodEntity_ShouldMapCorrectly()
+    public void ToDomainValueObject_WhenMappingValidTrackMoodEntity_ShouldMapCorrectly()
     {
         // Arrange
         TrackMoodEntity entity = _trackMoodEntityFixture.Create();
 
         // Act
-        Result<Mood> result = entity.ToDomainEntity();
+        Result<Mood> result = entity.ToDomainValueObject();
 
         // Assert
         Assert.False(result.IsFailure);
@@ -68,13 +68,13 @@ public class MoodEntityMappingTests
     [Theory]
     [InlineData("")] // empty name
     [InlineData("   ")] // whitespace name
-    public void ToDomainEntity_WhenNameIsWhitespace_ShouldReturnError(string name)
+    public void ToDomainValueObject_WhenNameIsWhitespace_ShouldReturnError(string name)
     {
         // Arrange
         TrackMoodEntity entity = _trackMoodEntityFixture.Create(name: name);
 
         // Act
-        Result<Mood> result = entity.ToDomainEntity();
+        Result<Mood> result = entity.ToDomainValueObject();
 
         // Assert
         Assert.True(result.IsFailure);
@@ -82,13 +82,13 @@ public class MoodEntityMappingTests
     }
 
     [Fact]
-    public void ToDomainEntities_WhenMappingMultipleValidTrackMoodEntities_ShouldMapAllCorrectly()
+    public void ToDomainValueObjects_WhenMappingMultipleValidTrackMoodEntities_ShouldMapAllCorrectly()
     {
         // Arrange
         List<TrackMoodEntity> entities = _trackMoodEntityFixture.CreateMany(2);
 
         // Act
-        List<Result<Mood>> results = [.. entities.ToDomainEntities()];
+        List<Result<Mood>> results = [.. entities.ToDomainValueObjects()];
 
         // Assert
         Assert.Equal(entities.Count, results.Count);
@@ -100,7 +100,7 @@ public class MoodEntityMappingTests
     }
 
     [Fact]
-    public void ToDomainEntities_WhenMappingMixedValidAndInvalidTrackMoodEntities_ShouldReturnMixedResults()
+    public void ToDomainValueObjects_WhenMappingMixedValidAndInvalidTrackMoodEntities_ShouldReturnMixedResults()
     {
         // Arrange
         List<TrackMoodEntity> entities =
@@ -111,7 +111,7 @@ public class MoodEntityMappingTests
         ];
 
         // Act
-        List<Result<Mood>> results = [.. entities.ToDomainEntities()];
+        List<Result<Mood>> results = [.. entities.ToDomainValueObjects()];
 
         // Assert
         Assert.Equal(entities.Count, results.Count);

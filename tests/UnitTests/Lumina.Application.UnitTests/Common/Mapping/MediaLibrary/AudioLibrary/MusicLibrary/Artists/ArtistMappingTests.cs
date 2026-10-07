@@ -102,7 +102,7 @@ public class ArtistMappingTests
         Album album = _albumFixture.Create(
             mediaFormat: Optional<MusicMediaFormat>.None(),
             barcode: Optional<Barcode>.None(),
-            catalogNumber: Optional<string>.None(),
+            catalogNumbers: [],
             musicBrainzReleaseId: Optional<MusicBrainzId>.None(),
             musicBrainzReleaseGroupId: Optional<MusicBrainzId>.None(),
             musicBrainzReleaseArtistId: Optional<MusicBrainzId>.None());
@@ -122,7 +122,7 @@ public class ArtistMappingTests
         Assert.Single(result.Albums);
         Assert.Null(result.Albums[0].MediaFormat);
         Assert.Null(result.Albums[0].Barcode);
-        Assert.Null(result.Albums[0].CatalogNumber);
+        Assert.Empty(result.Albums[0].CatalogNumbers);
         Assert.Null(result.Albums[0].MusicBrainzReleaseId);
         Assert.Null(result.Albums[0].MusicBrainzReleaseGroupId);
         Assert.Null(result.Albums[0].MusicBrainzReleaseArtistId);

@@ -20,7 +20,7 @@ public static class MoodDtoMapping
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully converted <see cref="Mood"/>, or an error message.
     /// </returns>
-    public static Result<Mood> ToDomainEntity(this MoodDto dto)
+    public static Result<Mood> ToDomainValueObject(this MoodDto dto)
     {
         return Mood.Create(dto.Name!);
     }
@@ -32,8 +32,8 @@ public static class MoodDtoMapping
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a collection of converted <see cref="Mood"/>, or an error message.
     /// </returns>
-    public static IEnumerable<Result<Mood>> ToDomainEntities(this IEnumerable<MoodDto> dtos)
+    public static IEnumerable<Result<Mood>> ToDomainValueObjects(this IEnumerable<MoodDto> dtos)
     {
-        return dtos.Select(dto => dto.ToDomainEntity());
+        return dtos.Select(dto => dto.ToDomainValueObject());
     }
 }

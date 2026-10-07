@@ -5,7 +5,6 @@ using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibrary
 using System;
 using System.Linq;
 using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Common;
-
 #endregion
 
 namespace Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
@@ -33,6 +32,7 @@ public static class TrackMapping
             Title = domainEntity.Metadata.Title,
             OriginalTitle = domainEntity.Metadata.OriginalTitle.HasValue ? domainEntity.Metadata.OriginalTitle.Value : null,
             Description = domainEntity.Metadata.Description.HasValue ? domainEntity.Metadata.Description.Value : null,
+            Disambiguation = domainEntity.Disambiguation.HasValue ? domainEntity.Disambiguation.Value : null,
             OriginalReleaseDate = domainEntity.Metadata.ReleaseInfo.OriginalReleaseDate.HasValue ? domainEntity.Metadata.ReleaseInfo.OriginalReleaseDate.Value : null,
             OriginalReleaseYear = domainEntity.Metadata.ReleaseInfo.OriginalReleaseYear.HasValue ? domainEntity.Metadata.ReleaseInfo.OriginalReleaseYear.Value : null,
             ReReleaseDate = domainEntity.Metadata.ReleaseInfo.ReReleaseDate.HasValue ? domainEntity.Metadata.ReleaseInfo.ReReleaseDate.Value : null,
@@ -53,15 +53,22 @@ public static class TrackMapping
             BitDepth = domainEntity.Metadata.BitDepth.HasValue ? domainEntity.Metadata.BitDepth.Value : null,
             AudioCodec = domainEntity.Metadata.AudioCodec.HasValue ? domainEntity.Metadata.AudioCodec.Value : null,
             Bitrate = domainEntity.Metadata.Bitrate.HasValue ? domainEntity.Metadata.Bitrate.Value : null,
+            AcoustId = domainEntity.Metadata.AcoustId.HasValue ? domainEntity.Metadata.AcoustId.Value : null,
+            ReplayGainTrackGain = domainEntity.Metadata.ReplayGainTrackGain.HasValue ? domainEntity.Metadata.ReplayGainTrackGain.Value : null,
+            ReplayGainTrackPeak = domainEntity.Metadata.ReplayGainTrackPeak.HasValue ? domainEntity.Metadata.ReplayGainTrackPeak.Value : null,
+            ReplayGainAlbumGain = domainEntity.Metadata.ReplayGainAlbumGain.HasValue ? domainEntity.Metadata.ReplayGainAlbumGain.Value : null,
+            ReplayGainAlbumPeak = domainEntity.Metadata.ReplayGainAlbumPeak.HasValue ? domainEntity.Metadata.ReplayGainAlbumPeak.Value : null,
             TrackNumber = domainEntity.TrackNumber,
             DiscNumber = domainEntity.DiscNumber.HasValue ? domainEntity.DiscNumber.Value : null,
             Script = domainEntity.Script.HasValue ? domainEntity.Script.Value : null,
             Key = domainEntity.Key.HasValue ? domainEntity.Key.Value : null,
             Bpm = domainEntity.Bpm.HasValue ? domainEntity.Bpm.Value : null,
-            Work = domainEntity.Work.HasValue ? domainEntity.Work.Value : null,
+            IsVideo = domainEntity.IsVideo,
+            WorkTitle = domainEntity.Work.HasValue ? domainEntity.Work.Value.Title : null,
+            WorkType = domainEntity.Work.HasValue && domainEntity.Work.Value.Type.HasValue ? domainEntity.Work.Value.Type.Value : null,
             MusicBrainzRecordingId = domainEntity.MusicBrainzRecordingId.HasValue ? domainEntity.MusicBrainzRecordingId.Value.Value : null,
             MusicBrainzTrackId = domainEntity.MusicBrainzTrackId.HasValue ? domainEntity.MusicBrainzTrackId.Value.Value : null,
-            MusicBrainzWorkId = domainEntity.MusicBrainzWorkId.HasValue ? domainEntity.MusicBrainzWorkId.Value.Value : null,
+            MusicBrainzWorkId = domainEntity.Work.HasValue ? domainEntity.Work.Value.MusicBrainzWorkId.Value : null,
             Contributors = [.. domainEntity.Contributors.Select(contributor => new TrackContributorEntity
             {
                 Id = Guid.NewGuid(),
@@ -74,6 +81,12 @@ public static class TrackMapping
             })],
             Moods = [.. domainEntity.Moods.ToRepositoryEntities()],
             Isrcs = [.. domainEntity.Isrcs.ToRepositoryEntities()],
+            WorkLanguages = domainEntity.Work.HasValue
+                ? [.. domainEntity.Work.Value.Languages.Select(language => new TrackWorkLanguageEntity(language.LanguageCode, language.LanguageName, language.NativeName.HasValue ? language.NativeName.Value : null))]
+                : [],
+            WorkIswcs = domainEntity.Work.HasValue
+                ? [.. domainEntity.Work.Value.Iswcs.Select(iswc => new TrackWorkIswcEntity(iswc))]
+                : [],
             Ratings = [.. domainEntity.Ratings.ToRepositoryEntities()],
             CreatedOnUtc = domainEntity.CreatedOnUtc,
             CreatedBy = Guid.Empty,

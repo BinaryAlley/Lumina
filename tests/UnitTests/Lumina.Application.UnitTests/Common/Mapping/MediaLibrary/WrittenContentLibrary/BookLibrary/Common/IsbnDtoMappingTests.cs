@@ -22,13 +22,13 @@ public class IsbnDtoMappingTests
     private readonly IsbnDtoFixture _isbnDtoFixture = new();
 
     [Fact]
-    public void ToDomainEntity_WhenMappingValidIsbn10Dto_ShouldMapCorrectly()
+    public void ToDomainValueObject_WhenMappingValidIsbn10Dto_ShouldMapCorrectly()
     {
         // Arrange
         IsbnDto dto = _isbnDtoFixture.Create(format: IsbnFormat.Isbn10);
 
         // Act
-        Result<Isbn> result = dto.ToDomainEntity();
+        Result<Isbn> result = dto.ToDomainValueObject();
 
         // Assert
         Assert.False(result.IsFailure);
@@ -38,13 +38,13 @@ public class IsbnDtoMappingTests
     }
 
     [Fact]
-    public void ToDomainEntity_WhenMappingValidIsbn13Dto_ShouldMapCorrectly()
+    public void ToDomainValueObject_WhenMappingValidIsbn13Dto_ShouldMapCorrectly()
     {
         // Arrange
         IsbnDto dto = _isbnDtoFixture.Create(format: IsbnFormat.Isbn13);
 
         // Act
-        Result<Isbn> result = dto.ToDomainEntity();
+        Result<Isbn> result = dto.ToDomainValueObject();
 
         // Assert
         Assert.False(result.IsFailure);
@@ -54,13 +54,13 @@ public class IsbnDtoMappingTests
     }
 
     [Fact]
-    public void ToDomainEntity_WhenMappingDtoWithoutFormat_ShouldUseDefaultFormat()
+    public void ToDomainValueObject_WhenMappingDtoWithoutFormat_ShouldUseDefaultFormat()
     {
         // Arrange
         IsbnDto dto = _isbnDtoFixture.Create();
 
         // Act
-        Result<Isbn> result = dto.ToDomainEntity();
+        Result<Isbn> result = dto.ToDomainValueObject();
 
         // Assert
         Assert.False(result.IsFailure);
@@ -70,13 +70,13 @@ public class IsbnDtoMappingTests
     }
 
     [Fact]
-    public void ToDomainEntity_WhenMappingInvalidIsbnDto_ShouldReturnError()
+    public void ToDomainValueObject_WhenMappingInvalidIsbnDto_ShouldReturnError()
     {
         // Arrange
         IsbnDto dto = _isbnDtoFixture.Create("invalid-isbn", IsbnFormat.Isbn13);
 
         // Act
-        Result<Isbn> result = dto.ToDomainEntity();
+        Result<Isbn> result = dto.ToDomainValueObject();
 
         // Assert
         Assert.True(result.IsFailure);
@@ -94,7 +94,7 @@ public class IsbnDtoMappingTests
         ];
 
         // Act
-        IEnumerable<Result<Isbn>> results = dtos.ToDomainEntities();
+        IEnumerable<Result<Isbn>> results = dtos.ToDomainValueObjects();
 
         // Assert
         Assert.NotNull(results);
@@ -125,7 +125,7 @@ public class IsbnDtoMappingTests
         ];
 
         // Act
-        IEnumerable<Result<Isbn>> results = dtos.ToDomainEntities();
+        IEnumerable<Result<Isbn>> results = dtos.ToDomainValueObjects();
 
         // Assert
         Assert.NotNull(results);

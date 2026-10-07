@@ -38,7 +38,7 @@ public class UpdateArtistAlbumRequestMappingTests
         Assert.Equal(request.Metadata, result.Metadata);
         Assert.Equal(request.MediaFormat, result.MediaFormat);
         Assert.Equal(request.Barcode, result.Barcode);
-        Assert.Equal(request.CatalogNumber, result.CatalogNumber);
+        Assert.Equal(request.CatalogNumbers, result.CatalogNumbers);
         Assert.Equal(request.MusicBrainzReleaseId, result.MusicBrainzReleaseId);
         Assert.Equal(request.MusicBrainzReleaseGroupId, result.MusicBrainzReleaseGroupId);
         Assert.Equal(request.MusicBrainzReleaseArtistId, result.MusicBrainzReleaseArtistId);
@@ -84,7 +84,7 @@ public class UpdateArtistAlbumRequestMappingTests
             includeAlbumId: false,
             includeMediaFormat: false,
             includeBarcode: false,
-            includeCatalogNumber: false,
+            includeCatalogNumbers: false,
             includeMusicBrainzReleaseId: false,
             includeMusicBrainzReleaseGroupId: false,
             includeMusicBrainzReleaseArtistId: false,
@@ -98,7 +98,7 @@ public class UpdateArtistAlbumRequestMappingTests
         Assert.Null(result.AlbumId);
         Assert.Null(result.MediaFormat);
         Assert.Null(result.Barcode);
-        Assert.Null(result.CatalogNumber);
+        Assert.Null(result.CatalogNumbers);
         Assert.Null(result.MusicBrainzReleaseId);
         Assert.Null(result.MusicBrainzReleaseGroupId);
         Assert.Null(result.MusicBrainzReleaseArtistId);

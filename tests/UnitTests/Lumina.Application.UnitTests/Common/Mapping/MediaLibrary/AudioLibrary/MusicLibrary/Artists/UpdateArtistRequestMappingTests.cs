@@ -32,7 +32,7 @@ public class UpdateArtistRequestMappingTests
         Assert.NotNull(result);
         Assert.Equal(libraryId.ToString(), result.LibraryId);
         Assert.Equal(artistId.ToString(), result.ArtistId);
-        Assert.Equal(request.Name, result.Name);
+        Assert.Equal(request.Metadata!.Name, result.Metadata!.Name);
         Assert.Equal(request.Website, result.Website);
         Assert.Equal(request.MusicBrainzArtistId, result.MusicBrainzArtistId);
         Assert.Equal(request.Contributors, result.Contributors);

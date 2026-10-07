@@ -20,7 +20,7 @@ public static class ReleaseInfoDtoMapping
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully converted <see cref="ReleaseInfo"/>, or an error message.
     /// </returns>
-    public static Result<ReleaseInfo> ToDomainEntity(this ReleaseInfoDto dto)
+    public static Result<ReleaseInfo> ToDomainValueObject(this ReleaseInfoDto dto)
     {
         return ReleaseInfo.Create(
             Optional<DateOnly>.FromNullable(dto.OriginalReleaseDate),

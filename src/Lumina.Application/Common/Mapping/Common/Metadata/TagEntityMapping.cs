@@ -43,7 +43,7 @@ public static class TagEntityMapping
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully converted <see cref="Tag"/>, or an error message.
     /// </returns>
-    public static Result<Tag> ToDomainEntity(this TagEntity repositoryEntity)
+    public static Result<Tag> ToDomainValueObject(this TagEntity repositoryEntity)
     {
         return Tag.Create(
             repositoryEntity.Name!
@@ -57,8 +57,8 @@ public static class TagEntityMapping
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a collection of converted <see cref="Tag"/>, or an error message.
     /// </returns>
-    public static IEnumerable<Result<Tag>> ToDomainEntities(this IEnumerable<TagEntity> repositoryEntities)
+    public static IEnumerable<Result<Tag>> ToDomainValueObjects(this IEnumerable<TagEntity> repositoryEntities)
     {
-        return repositoryEntities.Select(domainEntity => domainEntity.ToDomainEntity());
+        return repositoryEntities.Select(domainEntity => domainEntity.ToDomainValueObject());
     }
 }

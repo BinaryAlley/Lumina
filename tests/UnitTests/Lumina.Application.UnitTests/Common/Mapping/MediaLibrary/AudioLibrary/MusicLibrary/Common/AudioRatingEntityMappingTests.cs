@@ -75,13 +75,13 @@ public class AudioRatingEntityMappingTests
     }
 
     [Fact]
-    public void ToDomainEntity_WhenMappingValidAudioRatingEntity_ShouldMapCorrectly()
+    public void ToDomainValueObject_WhenMappingValidAudioRatingEntity_ShouldMapCorrectly()
     {
         // Arrange
         AudioRatingEntity entity = _audioRatingEntityFixture.Create();
 
         // Act
-        Result<AudioRating> result = entity.ToDomainEntity();
+        Result<AudioRating> result = entity.ToDomainValueObject();
 
         // Assert
         Assert.False(result.IsFailure);
@@ -95,13 +95,13 @@ public class AudioRatingEntityMappingTests
     }
 
     [Fact]
-    public void ToDomainEntity_WhenMappingAudioRatingEntityWithNulls_ShouldMapToDefaults()
+    public void ToDomainValueObject_WhenMappingAudioRatingEntityWithNulls_ShouldMapToDefaults()
     {
         // Arrange
         AudioRatingEntity entity = _audioRatingEntityFixture.Create(includeValue: false, includeMaxValue: false, includeSource: false, includeVoteCount: false);
 
         // Act
-        Result<AudioRating> result = entity.ToDomainEntity();
+        Result<AudioRating> result = entity.ToDomainValueObject();
 
         // Assert
         Assert.False(result.IsFailure);
@@ -112,13 +112,13 @@ public class AudioRatingEntityMappingTests
     }
 
     [Fact]
-    public void ToDomainEntity_WhenValueIsGreaterThanMaxValue_ShouldReturnError()
+    public void ToDomainValueObject_WhenValueIsGreaterThanMaxValue_ShouldReturnError()
     {
         // Arrange
         AudioRatingEntity entity = _audioRatingEntityFixture.Create(value: 6, maxValue: 5, source: AudioRatingSource.MusicBrainz, voteCount: 10);
 
         // Act
-        Result<AudioRating> result = entity.ToDomainEntity();
+        Result<AudioRating> result = entity.ToDomainValueObject();
 
         // Assert
         Assert.True(result.IsFailure);
@@ -126,13 +126,13 @@ public class AudioRatingEntityMappingTests
     }
 
     [Fact]
-    public void ToDomainEntities_WhenMappingMultipleValidAudioRatingEntities_ShouldMapAllCorrectly()
+    public void ToDomainValueObjects_WhenMappingMultipleValidAudioRatingEntities_ShouldMapAllCorrectly()
     {
         // Arrange
         List<AudioRatingEntity> entities = _audioRatingEntityFixture.CreateMany(2);
 
         // Act
-        List<Result<AudioRating>> results = [.. entities.ToDomainEntities()];
+        List<Result<AudioRating>> results = [.. entities.ToDomainValueObjects()];
 
         // Assert
         Assert.Equal(entities.Count, results.Count);
@@ -145,7 +145,7 @@ public class AudioRatingEntityMappingTests
     }
 
     [Fact]
-    public void ToDomainEntities_WhenMappingMixedValidAndInvalidAudioRatingEntities_ShouldReturnMixedResults()
+    public void ToDomainValueObjects_WhenMappingMixedValidAndInvalidAudioRatingEntities_ShouldReturnMixedResults()
     {
         // Arrange
         List<AudioRatingEntity> entities =
@@ -156,7 +156,7 @@ public class AudioRatingEntityMappingTests
         ];
 
         // Act
-        List<Result<AudioRating>> results = [.. entities.ToDomainEntities()];
+        List<Result<AudioRating>> results = [.. entities.ToDomainValueObjects()];
 
         // Assert
         Assert.Equal(entities.Count, results.Count);

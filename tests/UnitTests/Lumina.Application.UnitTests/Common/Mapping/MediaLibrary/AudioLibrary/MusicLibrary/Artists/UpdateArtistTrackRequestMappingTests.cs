@@ -19,7 +19,7 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.AudioLibrary.
 public class UpdateArtistTrackRequestMappingTests
 {
     private readonly UpdateArtistTrackRequestFixture _updateArtistTrackRequestFixture = new();
-    private readonly AudioMetadataDtoFixture _audioMetadataDtoFixture = new();
+    private readonly MusicTrackMetadataDtoFixture _audioMetadataDtoFixture = new();
 
     [Fact]
     public void ToCommand_WhenMappingCompleteRequest_ShouldMapAllPropertiesCorrectly()
@@ -48,7 +48,6 @@ public class UpdateArtistTrackRequestMappingTests
         Assert.Equal(request.Work, result.Work);
         Assert.Equal(request.MusicBrainzRecordingId, result.MusicBrainzRecordingId);
         Assert.Equal(request.MusicBrainzTrackId, result.MusicBrainzTrackId);
-        Assert.Equal(request.MusicBrainzWorkId, result.MusicBrainzWorkId);
         Assert.Equal(request.Moods, result.Moods);
         Assert.Equal(request.Isrcs, result.Isrcs);
         Assert.Equal(request.Contributors, result.Contributors);
@@ -70,7 +69,6 @@ public class UpdateArtistTrackRequestMappingTests
             includeWork: false,
             includeMusicBrainzRecordingId: false,
             includeMusicBrainzTrackId: false,
-            includeMusicBrainzWorkId: false,
             includeMoods: false,
             includeIsrcs: false,
             includeTrackId: false);
@@ -89,7 +87,6 @@ public class UpdateArtistTrackRequestMappingTests
         Assert.Null(result.Work);
         Assert.Null(result.MusicBrainzRecordingId);
         Assert.Null(result.MusicBrainzTrackId);
-        Assert.Null(result.MusicBrainzWorkId);
         Assert.Null(result.Moods);
         Assert.Null(result.Isrcs);
         Assert.Null(result.TrackId);

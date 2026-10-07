@@ -43,7 +43,7 @@ public static class IsrcEntityMapping
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully converted <see cref="Isrc"/>, or an error message.
     /// </returns>
-    public static Result<Isrc> ToDomainEntity(this TrackIsrcEntity repositoryEntity)
+    public static Result<Isrc> ToDomainValueObject(this TrackIsrcEntity repositoryEntity)
     {
         return Isrc.Create(repositoryEntity.Value!);
     }
@@ -55,8 +55,8 @@ public static class IsrcEntityMapping
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a collection of converted <see cref="Isrc"/>, or an error message.
     /// </returns>
-    public static IEnumerable<Result<Isrc>> ToDomainEntities(this IEnumerable<TrackIsrcEntity> repositoryEntities)
+    public static IEnumerable<Result<Isrc>> ToDomainValueObjects(this IEnumerable<TrackIsrcEntity> repositoryEntities)
     {
-        return repositoryEntities.Select(repositoryEntity => repositoryEntity.ToDomainEntity());
+        return repositoryEntities.Select(repositoryEntity => repositoryEntity.ToDomainValueObject());
     }
 }

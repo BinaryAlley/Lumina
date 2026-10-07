@@ -3,7 +3,7 @@ using Lumina.Application.Common.Mapping.MediaContributors;
 using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Common;
 using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Albums.Commands.AddAlbum;
-using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary;
+using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.Common.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Entities;
@@ -30,16 +30,17 @@ public static class AddAlbumCommandMapping
     /// </returns>
     public static Result<Album> ToDomainEntity(this AddAlbumCommand command)
     {
-        Result<AlbumMetadata> metadataResult = command.Metadata!.ToDomainEntity();
+        MusicAlbumMetadataDto metadata = command.Metadata!;
+        Result<AlbumMetadata> metadataResult = metadata.ToDomainValueObject();
         if (metadataResult.IsFailure)
             return metadataResult.Errors;
 
-        IEnumerable<Result<MusicMediaContributor>> domainContributorsResult = command.Contributors!.ToMusicDomainEntities();
+        IEnumerable<Result<MusicMediaContributor>> domainContributorsResult = (command.Contributors ?? []).ToMusicDomainEntities();
         List<Error> errors = [.. domainContributorsResult.Where(contributorResult => contributorResult.IsFailure).SelectMany(contributorResult => contributorResult.Errors)];
         if (errors.Count > 0)
             return errors;
 
-        IEnumerable<Result<AudioRating>> domainRatingsResult = command.Ratings!.ToDomainEntities();
+        IEnumerable<Result<AudioRating>> domainRatingsResult = (command.Ratings ?? []).ToDomainValueObjects();
         errors = [.. domainRatingsResult.Where(ratingResult => ratingResult.IsFailure).SelectMany(ratingResult => ratingResult.Errors)];
         if (errors.Count > 0)
             return errors;
@@ -78,9 +79,14 @@ public static class AddAlbumCommandMapping
             return Album.Create(
                 AlbumId.Create(command.AlbumId.Value),
                 metadataResult.Value,
+                Optional<string>.FromNullable(metadata.Disambiguation),
                 Optional<MusicMediaFormat>.FromNullable(command.MediaFormat),
+                Optional<MusicReleasePackaging>.FromNullable(command.Packaging),
+                Optional<string>.FromNullable(metadata.Script),
                 barcode,
-                Optional<string>.FromNullable(command.CatalogNumber),
+                command.CatalogNumbers ?? [],
+                Optional<string>.FromNullable(command.Label),
+                Optional<string>.FromNullable(command.ASIN),
                 musicBrainzReleaseId,
                 musicBrainzReleaseGroupId,
                 musicBrainzReleaseArtistId,
@@ -92,9 +98,14 @@ public static class AddAlbumCommandMapping
 
         return Album.Create(
             metadataResult.Value,
+            Optional<string>.FromNullable(metadata.Disambiguation),
             Optional<MusicMediaFormat>.FromNullable(command.MediaFormat),
+            Optional<MusicReleasePackaging>.FromNullable(command.Packaging),
+            Optional<string>.FromNullable(metadata.Script),
             barcode,
-            Optional<string>.FromNullable(command.CatalogNumber),
+            command.CatalogNumbers ?? [],
+            Optional<string>.FromNullable(command.Label),
+            Optional<string>.FromNullable(command.ASIN),
             musicBrainzReleaseId,
             musicBrainzReleaseGroupId,
             musicBrainzReleaseArtistId,

@@ -23,10 +23,13 @@ public static class UpdateArtistRequestMapping
         return new UpdateArtistCommand(
             libraryId,
             artistId,
-            request.Name,
+            request.Metadata,
             request.Website,
             request.MusicBrainzArtistId,
+            request.Ipis,
+            request.Isnis,
             request.Contributors,
+            request.Ratings,
             request.Albums?.ToCommands(libraryId, artistId).ToList());
     }
 }

@@ -21,7 +21,7 @@ public static class IsbnDtoMapping
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully converted <see cref="Isbn"/>, or an error message.
     /// </returns>
-    public static Result<Isbn> ToDomainEntity(this IsbnDto dto)
+    public static Result<Isbn> ToDomainValueObject(this IsbnDto dto)
     {
         return Isbn.Create(
             dto.Value!,
@@ -36,8 +36,8 @@ public static class IsbnDtoMapping
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a collection of converted <see cref="Isbn"/>, or an error message.
     /// </returns>
-    public static IEnumerable<Result<Isbn>> ToDomainEntities(this IEnumerable<IsbnDto> dtos)
+    public static IEnumerable<Result<Isbn>> ToDomainValueObjects(this IEnumerable<IsbnDto> dtos)
     {
-        return dtos.Select(domainEntity => domainEntity.ToDomainEntity());
+        return dtos.Select(domainEntity => domainEntity.ToDomainValueObject());
     }
 }

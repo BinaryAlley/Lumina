@@ -32,7 +32,7 @@ public class AddArtistRequestMappingTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal(libraryId.ToString(), result.LibraryId);
-        Assert.Equal(request.Name, result.Name);
+        Assert.Equal(request.Metadata!.Name, result.Metadata!.Name);
         Assert.Equal(request.Website, result.Website);
         Assert.Equal(request.MusicBrainzArtistId, result.MusicBrainzArtistId);
         Assert.Equal(request.Contributors, result.Contributors);
@@ -58,7 +58,7 @@ public class AddArtistRequestMappingTests
             Assert.Equal(request.Albums[i].Metadata, result.Albums[i].Metadata);
             Assert.Equal(request.Albums[i].MediaFormat, result.Albums[i].MediaFormat);
             Assert.Equal(request.Albums[i].Barcode, result.Albums[i].Barcode);
-            Assert.Equal(request.Albums[i].CatalogNumber, result.Albums[i].CatalogNumber);
+            Assert.Equal(request.Albums[i].CatalogNumbers, result.Albums[i].CatalogNumbers);
             Assert.Equal(request.Albums[i].MusicBrainzReleaseId, result.Albums[i].MusicBrainzReleaseId);
             Assert.Equal(request.Albums[i].MusicBrainzReleaseGroupId, result.Albums[i].MusicBrainzReleaseGroupId);
             Assert.Equal(request.Albums[i].MusicBrainzReleaseArtistId, result.Albums[i].MusicBrainzReleaseArtistId);

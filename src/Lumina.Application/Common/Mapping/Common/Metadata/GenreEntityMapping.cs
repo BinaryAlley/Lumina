@@ -43,7 +43,7 @@ public static class GenreEntityMapping
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully converted <see cref="Genre"/>, or an error message.
     /// </returns>
-    public static Result<Genre> ToDomainEntity(this GenreEntity repositoryEntity)
+    public static Result<Genre> ToDomainValueObject(this GenreEntity repositoryEntity)
     {
         return Genre.Create(
             repositoryEntity.Name!
@@ -57,8 +57,8 @@ public static class GenreEntityMapping
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a collection of converted <see cref="Genre"/>, or an error message.
     /// </returns>
-    public static IEnumerable<Result<Genre>> ToDomainEntities(this IEnumerable<GenreEntity> repositoryEntities)
+    public static IEnumerable<Result<Genre>> ToDomainValueObjects(this IEnumerable<GenreEntity> repositoryEntities)
     {
-        return repositoryEntities.Select(domainEntity => domainEntity.ToDomainEntity());
+        return repositoryEntities.Select(domainEntity => domainEntity.ToDomainValueObject());
     }
 }

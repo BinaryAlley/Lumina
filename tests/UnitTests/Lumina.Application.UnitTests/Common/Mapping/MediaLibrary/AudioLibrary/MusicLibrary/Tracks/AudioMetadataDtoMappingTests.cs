@@ -1,13 +1,18 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
-using Lumina.Contracts.DTO.Common;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Contracts.Fixtures.Core.DTO.Common;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.Common.ValueObjects;
+using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate;
+using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Entities;
+using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.ValueObjects;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
@@ -21,167 +26,114 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.AudioLibrary.
 public class AudioMetadataDtoMappingTests
 {
     private readonly AudioMetadataDtoFixture _audioMetadataDtoFixture = new();
-    private readonly GenreDtoFixture _genreDtoFixture = new();
-    private readonly TagDtoFixture _tagDtoFixture = new();
-    private readonly ReleaseInfoDtoFixture _releaseInfoDtoFixture = new();
-    private readonly LanguageInfoDtoFixture _languageInfoDtoFixture = new();
+    private readonly ArtistEntityFixture _artistEntityFixture = new();
+    private readonly AlbumEntityFixture _albumEntityFixture = new();
+    private readonly TrackEntityFixture _trackEntityFixture = new();
+    private readonly MusicMediaContributorFixture _musicMediaContributorFixture = new();
 
     [Fact]
-    public void ToDomainEntity_WhenMappingCompleteDto_ShouldMapAllPropertiesCorrectly()
+    public void ApplyTo_WhenMappingCompleteDto_ShouldApplyAllPropertiesCorrectly()
     {
         // Arrange
+        (Artist artist, Album album, Track track) = CreateDomainArtist();
         AudioMetadataDto dto = _audioMetadataDtoFixture.Create();
+        List<MusicMediaContributor> contributors = _musicMediaContributorFixture.CreateMany(2);
 
         // Act
-        Result<AudioMetadata> result = dto.ToDomainEntity();
+        Result<Updated> result = dto.ApplyTo(artist, album, track, contributors);
 
         // Assert
         Assert.False(result.IsFailure);
-        AudioMetadata metadata = result.Value;
-        Assert.Equal(dto.Title, metadata.Title);
-        Assert.True(metadata.OriginalTitle.HasValue);
-        Assert.Equal(dto.OriginalTitle, metadata.OriginalTitle.Value);
-        Assert.True(metadata.Description.HasValue);
-        Assert.Equal(dto.Description, metadata.Description.Value);
-        Assert.True(metadata.ReleaseInfo.OriginalReleaseDate.HasValue);
-        Assert.Equal(dto.ReleaseInfo!.OriginalReleaseDate, metadata.ReleaseInfo.OriginalReleaseDate.Value);
-        Assert.True(metadata.ReleaseInfo.OriginalReleaseYear.HasValue);
-        Assert.Equal(dto.ReleaseInfo.OriginalReleaseYear, metadata.ReleaseInfo.OriginalReleaseYear.Value);
-        Assert.True(metadata.ReleaseInfo.ReReleaseDate.HasValue);
-        Assert.Equal(dto.ReleaseInfo.ReReleaseDate, metadata.ReleaseInfo.ReReleaseDate.Value);
-        Assert.True(metadata.ReleaseInfo.ReReleaseYear.HasValue);
-        Assert.Equal(dto.ReleaseInfo.ReReleaseYear, metadata.ReleaseInfo.ReReleaseYear.Value);
-        Assert.True(metadata.ReleaseInfo.ReleaseCountry.HasValue);
-        Assert.Equal(dto.ReleaseInfo.ReleaseCountry, metadata.ReleaseInfo.ReleaseCountry.Value);
-        Assert.True(metadata.ReleaseInfo.ReleaseVersion.HasValue);
-        Assert.Equal(dto.ReleaseInfo.ReleaseVersion, metadata.ReleaseInfo.ReleaseVersion.Value);
-        Assert.True(metadata.Language.HasValue);
-        Assert.Equal(dto.Language!.LanguageCode!.ToLowerInvariant(), metadata.Language.Value.LanguageCode);
-        Assert.Equal(dto.Language.LanguageName, metadata.Language.Value.LanguageName);
-        Assert.Equal(dto.Language.NativeName, metadata.Language.Value.NativeName.Value);
-        Assert.True(metadata.OriginalLanguage.HasValue);
-        Assert.Equal(dto.OriginalLanguage!.LanguageCode!.ToLowerInvariant(), metadata.OriginalLanguage.Value.LanguageCode);
-        Assert.Equal(dto.OriginalLanguage.LanguageName, metadata.OriginalLanguage.Value.LanguageName);
-        Assert.Equal(dto.OriginalLanguage.NativeName, metadata.OriginalLanguage.Value.NativeName.Value);
-        Assert.Equal(dto.DurationInSeconds, metadata.DurationInSeconds);
-        Assert.Equal(dto.SampleRate, metadata.SampleRate);
-        Assert.Equal(dto.Channels, metadata.Channels);
-        Assert.True(metadata.BitDepth.HasValue);
-        Assert.Equal(dto.BitDepth, metadata.BitDepth.Value);
-        Assert.True(metadata.AudioCodec.HasValue);
-        Assert.Equal(dto.AudioCodec, metadata.AudioCodec.Value);
-        Assert.True(metadata.Bitrate.HasValue);
-        Assert.Equal(dto.Bitrate, metadata.Bitrate.Value);
-        Assert.Equal(dto.Genres!.Select(genre => genre.Name), metadata.Genres.Select(genre => genre.Name));
-        Assert.Equal(dto.Tags!.Select(tag => tag.Name), metadata.Tags.Select(tag => tag.Name));
+        Assert.Equal(dto.Title, track.Metadata.Title);
+        Assert.Equal(dto.DurationInSeconds, track.Metadata.DurationInSeconds);
+        Assert.Equal(dto.SampleRate, track.Metadata.SampleRate);
+        Assert.Equal(dto.Channels, track.Metadata.Channels);
+        Assert.Equal(dto.BitDepth, track.Metadata.BitDepth.Value);
+        Assert.Equal(dto.AudioCodec, track.Metadata.AudioCodec.Value);
+        Assert.Equal(dto.Bitrate, track.Metadata.Bitrate.Value);
+        Assert.True(track.Script.HasValue);
+        Assert.Equal(dto.Script, track.Script.Value);
+        Assert.True(track.Key.HasValue);
+        Assert.Equal(dto.Key, track.Key.Value);
+        Assert.True(track.Bpm.HasValue);
+        Assert.Equal(dto.Bpm, track.Bpm.Value);
+        Assert.Equal(dto.IsVideo, track.IsVideo);
+        Assert.True(track.Work.HasValue);
+        Assert.Equal(dto.Work!.MusicBrainzWorkId, track.Work.Value.MusicBrainzWorkId.Value);
+        Assert.Equal(dto.Isrcs!.Count, track.Isrcs.Count);
+        Assert.Equal(dto.Moods!.Count, track.Moods.Count);
+        Assert.True(track.MusicBrainzRecordingId.HasValue);
+        Assert.Equal(dto.MusicBrainzRecordingId, track.MusicBrainzRecordingId.Value.Value);
+        Assert.True(track.MusicBrainzTrackId.HasValue);
+        Assert.Equal(dto.MusicBrainzTrackId, track.MusicBrainzTrackId.Value.Value);
+        Assert.Equal(contributors.Count, track.Contributors.Count);
+        Assert.Equal(dto.Ratings!.Count, track.Ratings.Count);
     }
 
     [Fact]
-    public void ToDomainEntity_WhenOptionalPropertiesAreMissing_ShouldMapTheRequiredValuesAndDefaults()
+    public void ApplyTo_WhenProviderFieldsAreMissing_ShouldPreserveTheLocallyExtractedValues()
     {
         // Arrange
+        (Artist artist, Album album, Track track) = CreateDomainArtist();
+        int storedDuration = track.Metadata.DurationInSeconds;
+        int storedSampleRate = track.Metadata.SampleRate;
+        int storedChannels = track.Metadata.Channels;
+        bool hadStoredWork = track.Work.HasValue;
+        int storedIsrcCount = track.Isrcs.Count;
         AudioMetadataDto dto = _audioMetadataDtoFixture.Create(
-            includeOriginalTitle: false,
-            includeDescription: false,
-            includeReleaseInfo: false,
-            includeLanguage: false,
-            includeOriginalLanguage: false,
-            includeTags: false,
-            includeGenres: false,
             includeDurationInSeconds: false,
             includeSampleRate: false,
             includeChannels: false,
             includeBitDepth: false,
             includeAudioCodec: false,
-            includeBitrate: false);
+            includeBitrate: false,
+            includeWork: false,
+            includeIsrcs: false,
+            includeMoods: false);
 
         // Act
-        Result<AudioMetadata> result = dto.ToDomainEntity();
+        Result<Updated> result = dto.ApplyTo(artist, album, track, []);
 
         // Assert
         Assert.False(result.IsFailure);
-        AudioMetadata metadata = result.Value;
-        Assert.Equal(dto.Title, metadata.Title);
-        Assert.False(metadata.OriginalTitle.HasValue);
-        Assert.False(metadata.Description.HasValue);
-        Assert.False(metadata.ReleaseInfo.OriginalReleaseDate.HasValue);
-        Assert.False(metadata.ReleaseInfo.OriginalReleaseYear.HasValue);
-        Assert.False(metadata.ReleaseInfo.ReReleaseDate.HasValue);
-        Assert.False(metadata.ReleaseInfo.ReReleaseYear.HasValue);
-        Assert.False(metadata.ReleaseInfo.ReleaseCountry.HasValue);
-        Assert.False(metadata.ReleaseInfo.ReleaseVersion.HasValue);
-        Assert.Equal(0, metadata.DurationInSeconds);
-        Assert.Equal(0, metadata.SampleRate);
-        Assert.Equal(0, metadata.Channels);
-        Assert.False(metadata.BitDepth.HasValue);
-        Assert.False(metadata.AudioCodec.HasValue);
-        Assert.False(metadata.Bitrate.HasValue);
-        Assert.False(metadata.Language.HasValue);
-        Assert.False(metadata.OriginalLanguage.HasValue);
-        Assert.Empty(metadata.Genres);
-        Assert.Empty(metadata.Tags);
+        Assert.Equal(storedDuration, track.Metadata.DurationInSeconds);
+        Assert.Equal(storedSampleRate, track.Metadata.SampleRate);
+        Assert.Equal(storedChannels, track.Metadata.Channels);
+        Assert.Equal(hadStoredWork, track.Work.HasValue);
+        Assert.Equal(storedIsrcCount, track.Isrcs.Count);
     }
 
     [Fact]
-    public void ToDomainEntity_WhenLanguageIsMissingRequiredSubproperties_ShouldMapLanguageToNone()
+    public void ApplyTo_WhenTrackDoesNotBelongToAlbum_ShouldReturnTrackNotFound()
     {
         // Arrange
-        LanguageInfoDto incompleteLanguage = _languageInfoDtoFixture.Create(includeLanguageCode: false);
-        AudioMetadataDto dto = _audioMetadataDtoFixture.Create(
-            language: incompleteLanguage,
-            originalLanguage: _languageInfoDtoFixture.Create(includeLanguageName: false));
+        (Artist artist, Album album, Track _) = CreateDomainArtist();
+        (Artist _, Album _, Track foreignTrack) = CreateDomainArtist();
+        AudioMetadataDto dto = _audioMetadataDtoFixture.Create();
 
         // Act
-        Result<AudioMetadata> result = dto.ToDomainEntity();
-
-        // Assert
-        Assert.False(result.IsFailure);
-        Assert.False(result.Value.Language.HasValue);
-        Assert.False(result.Value.OriginalLanguage.HasValue);
-    }
-
-    [Fact]
-    public void ToDomainEntity_WhenReleaseInfoIsInvalid_ShouldReturnError()
-    {
-        // Arrange
-        ReleaseInfoDto releaseInfo = _releaseInfoDtoFixture.Create(
-            originalReleaseDate: new DateOnly(2000, 1, 1),
-            originalReleaseYear: 1999);
-        AudioMetadataDto dto = _audioMetadataDtoFixture.Create(releaseInfo: releaseInfo);
-
-        // Act
-        Result<AudioMetadata> result = dto.ToDomainEntity();
+        Result<Updated> result = dto.ApplyTo(artist, album, foreignTrack, []);
 
         // Assert
         Assert.True(result.IsFailure);
-        Assert.Equal(Errors.Metadata.OriginalReleaseDateAndYearMustMatch, result.FirstError);
+        Assert.Equal(Errors.Music.TrackNotFound, result.FirstError);
     }
 
-    [Fact]
-    public void ToDomainEntity_WhenGenreIsInvalid_ShouldReturnError()
+    /// <summary>
+    /// Creates a domain artist that owns a single album, which in turn owns a single track.
+    /// </summary>
+    /// <returns>The created domain artist, together with its album and track.</returns>
+    private (Artist artist, Album album, Track track) CreateDomainArtist()
     {
-        // Arrange
-        AudioMetadataDto dto = _audioMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]);
-
-        // Act
-        Result<AudioMetadata> result = dto.ToDomainEntity();
-
-        // Assert
-        Assert.True(result.IsFailure);
-        Assert.Equal(Errors.Metadata.GenreNameCannotBeEmpty, result.FirstError);
-    }
-
-    [Fact]
-    public void ToDomainEntity_WhenTagIsInvalid_ShouldReturnError()
-    {
-        // Arrange
-        AudioMetadataDto dto = _audioMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: "   ")]);
-
-        // Act
-        Result<AudioMetadata> result = dto.ToDomainEntity();
-
-        // Assert
-        Assert.True(result.IsFailure);
-        Assert.Equal(Errors.Metadata.TagNameCannotBeEmpty, result.FirstError);
+        Guid libraryId = Guid.NewGuid();
+        Guid albumId = Guid.NewGuid();
+        AlbumEntity albumEntity = _albumEntityFixture.Create(
+            id: albumId,
+            libraryId: libraryId,
+            tracks: [_trackEntityFixture.Create(albumId: albumId, libraryId: libraryId)]);
+        ArtistEntity artistEntity = _artistEntityFixture.Create(libraryId: libraryId, albums: [albumEntity]);
+        Artist artist = artistEntity.ToDomainEntity().Value;
+        Album album = artist.Albums.First();
+        return (artist, album, album.Tracks.First());
     }
 }

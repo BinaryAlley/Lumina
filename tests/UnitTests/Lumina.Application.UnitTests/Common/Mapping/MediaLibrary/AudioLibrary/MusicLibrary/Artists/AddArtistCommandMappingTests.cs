@@ -24,7 +24,8 @@ public class AddArtistCommandMappingTests
 {
     private readonly AddArtistCommandFixture _addArtistCommandFixture = new();
     private readonly AddAlbumCommandFixture _addAlbumCommandFixture = new();
-    private readonly AlbumMetadataDtoFixture _albumMetadataDtoFixture = new();
+    private readonly MusicArtistMetadataDtoFixture _musicArtistMetadataDtoFixture = new();
+    private readonly MusicAlbumMetadataDtoFixture _albumMetadataDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
 
     [Fact]
@@ -41,7 +42,7 @@ public class AddArtistCommandMappingTests
         Assert.False(result.IsFailure);
         Artist artist = result.Value;
         Assert.Equal(libraryId, artist.LibraryId.Value);
-        Assert.Equal(command.Name, artist.Name);
+        Assert.Equal(command.Metadata!.Name, artist.Name);
         Assert.True(artist.Website.HasValue);
         Assert.Equal(command.Website, artist.Website.Value);
         Assert.True(artist.MusicBrainzArtistId.HasValue);
@@ -94,7 +95,7 @@ public class AddArtistCommandMappingTests
     public void ToDomainEntity_WhenArtistNameIsEmpty_ShouldReturnError()
     {
         // Arrange
-        AddArtistCommand command = _addArtistCommandFixture.Create(name: string.Empty);
+        AddArtistCommand command = _addArtistCommandFixture.Create(metadata: _musicArtistMetadataDtoFixture.Create(name: string.Empty));
 
         // Act
         Result<Artist> result = command.ToDomainEntity(Guid.NewGuid());

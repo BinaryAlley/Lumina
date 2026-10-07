@@ -51,13 +51,13 @@ public class IsrcEntityMappingTests
     }
 
     [Fact]
-    public void ToDomainEntity_WhenMappingValidTrackIsrcEntity_ShouldMapCorrectly()
+    public void ToDomainValueObject_WhenMappingValidTrackIsrcEntity_ShouldMapCorrectly()
     {
         // Arrange
         TrackIsrcEntity entity = _trackIsrcEntityFixture.Create(value: "GBUM71029604");
 
         // Act
-        Result<Isrc> result = entity.ToDomainEntity();
+        Result<Isrc> result = entity.ToDomainValueObject();
 
         // Assert
         Assert.False(result.IsFailure);
@@ -68,13 +68,13 @@ public class IsrcEntityMappingTests
     [Theory]
     [InlineData("")] // empty value
     [InlineData("   ")] // whitespace value
-    public void ToDomainEntity_WhenValueIsWhitespace_ShouldReturnError(string value)
+    public void ToDomainValueObject_WhenValueIsWhitespace_ShouldReturnError(string value)
     {
         // Arrange
         TrackIsrcEntity entity = _trackIsrcEntityFixture.Create(value: value);
 
         // Act
-        Result<Isrc> result = entity.ToDomainEntity();
+        Result<Isrc> result = entity.ToDomainValueObject();
 
         // Assert
         Assert.True(result.IsFailure);
@@ -82,13 +82,13 @@ public class IsrcEntityMappingTests
     }
 
     [Fact]
-    public void ToDomainEntity_WhenValueIsMalformed_ShouldReturnError()
+    public void ToDomainValueObject_WhenValueIsMalformed_ShouldReturnError()
     {
         // Arrange
         TrackIsrcEntity entity = _trackIsrcEntityFixture.Create(value: "not-an-isrc");
 
         // Act
-        Result<Isrc> result = entity.ToDomainEntity();
+        Result<Isrc> result = entity.ToDomainValueObject();
 
         // Assert
         Assert.True(result.IsFailure);
@@ -96,13 +96,13 @@ public class IsrcEntityMappingTests
     }
 
     [Fact]
-    public void ToDomainEntities_WhenMappingMultipleValidTrackIsrcEntities_ShouldMapAllCorrectly()
+    public void ToDomainValueObjects_WhenMappingMultipleValidTrackIsrcEntities_ShouldMapAllCorrectly()
     {
         // Arrange
         List<TrackIsrcEntity> entities = _trackIsrcEntityFixture.CreateMany(2);
 
         // Act
-        List<Result<Isrc>> results = [.. entities.ToDomainEntities()];
+        List<Result<Isrc>> results = [.. entities.ToDomainValueObjects()];
 
         // Assert
         Assert.Equal(entities.Count, results.Count);
@@ -114,7 +114,7 @@ public class IsrcEntityMappingTests
     }
 
     [Fact]
-    public void ToDomainEntities_WhenMappingMixedValidAndInvalidTrackIsrcEntities_ShouldReturnMixedResults()
+    public void ToDomainValueObjects_WhenMappingMixedValidAndInvalidTrackIsrcEntities_ShouldReturnMixedResults()
     {
         // Arrange
         List<TrackIsrcEntity> entities =
@@ -125,7 +125,7 @@ public class IsrcEntityMappingTests
         ];
 
         // Act
-        List<Result<Isrc>> results = [.. entities.ToDomainEntities()];
+        List<Result<Isrc>> results = [.. entities.ToDomainValueObjects()];
 
         // Assert
         Assert.Equal(entities.Count, results.Count);

@@ -22,10 +22,13 @@ public static class AddArtistRequestMapping
     {
         return new AddArtistCommand(
             libraryId,
-            request.Name,
+            request.Metadata,
             request.Website,
             request.MusicBrainzArtistId,
+            request.Ipis,
+            request.Isnis,
             request.Contributors,
+            request.Ratings,
             request.Albums?.ToCommands(libraryId, null).ToList());
     }
 }

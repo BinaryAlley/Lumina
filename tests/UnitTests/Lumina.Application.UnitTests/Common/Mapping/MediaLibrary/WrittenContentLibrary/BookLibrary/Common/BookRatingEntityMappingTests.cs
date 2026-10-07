@@ -76,13 +76,13 @@ public class BookRatingEntityMappingTests
     }
 
     [Fact]
-    public void ToDomainEntity_WhenMappingValidBookRatingEntity_ShouldMapCorrectly()
+    public void ToDomainValueObject_WhenMappingValidBookRatingEntity_ShouldMapCorrectly()
     {
         // Arrange
         BookRatingEntity entity = _fixture.Create();
 
         // Act
-        Result<BookRating> result = entity.ToDomainEntity();
+        Result<BookRating> result = entity.ToDomainValueObject();
 
         // Assert
         Assert.False(result.IsFailure);
@@ -94,13 +94,13 @@ public class BookRatingEntityMappingTests
     }
 
     [Fact]
-    public void ToDomainEntity_WhenMappingInvalidBookRatingEntity_ShouldMapToDefaults()
+    public void ToDomainValueObject_WhenMappingInvalidBookRatingEntity_ShouldMapToDefaults()
     {
         // Arrange
         BookRatingEntity entity = _fixture.Create(includeValues: false);
 
         // Act
-        Result<BookRating> result = entity.ToDomainEntity();
+        Result<BookRating> result = entity.ToDomainValueObject();
 
         // Assert
         Assert.False(result.IsFailure);
@@ -112,13 +112,13 @@ public class BookRatingEntityMappingTests
     }
 
     [Fact]
-    public void ToDomainEntities_WhenMappingMultipleBookRatingEntities_ShouldMapAllCorrectly()
+    public void ToDomainValueObjects_WhenMappingMultipleBookRatingEntities_ShouldMapAllCorrectly()
     {
         // Arrange
         List<BookRatingEntity> entities = _fixture.CreateMany(2);
 
         // Act
-        IEnumerable<Result<BookRating>> results = entities.ToDomainEntities();
+        IEnumerable<Result<BookRating>> results = entities.ToDomainValueObjects();
 
         // Assert
         Assert.NotNull(results);

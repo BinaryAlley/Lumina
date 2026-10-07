@@ -48,7 +48,6 @@ public class UpdateTrackRequestMappingTests
         Assert.Equal(request.Work, result.Work);
         Assert.Equal(request.MusicBrainzRecordingId, result.MusicBrainzRecordingId);
         Assert.Equal(request.MusicBrainzTrackId, result.MusicBrainzTrackId);
-        Assert.Equal(request.MusicBrainzWorkId, result.MusicBrainzWorkId);
         Assert.Equal(request.Moods, result.Moods);
         Assert.Equal(request.Isrcs, result.Isrcs);
         Assert.Equal(request.Contributors, result.Contributors);
@@ -71,7 +70,6 @@ public class UpdateTrackRequestMappingTests
             includeWork: false,
             includeMusicBrainzRecordingId: false,
             includeMusicBrainzTrackId: false,
-            includeMusicBrainzWorkId: false,
             includeMoods: false,
             includeIsrcs: false,
             contributors: [],
@@ -95,7 +93,6 @@ public class UpdateTrackRequestMappingTests
         Assert.Null(result.Work);
         Assert.Null(result.MusicBrainzRecordingId);
         Assert.Null(result.MusicBrainzTrackId);
-        Assert.Null(result.MusicBrainzWorkId);
         Assert.Null(result.Moods);
         Assert.Null(result.Isrcs);
         Assert.Empty(result.Contributors!);
@@ -121,8 +118,7 @@ public class UpdateTrackRequestMappingTests
             includeBpm: false,
             includeWork: false,
             includeMusicBrainzRecordingId: false,
-            includeMusicBrainzTrackId: false,
-            includeMusicBrainzWorkId: false);
+            includeMusicBrainzTrackId: false);
 
         // Act
         UpdateTrackCommand result = request.ToCommand(libraryId.ToString(), artistId.ToString(), albumId.ToString(), trackId.ToString());

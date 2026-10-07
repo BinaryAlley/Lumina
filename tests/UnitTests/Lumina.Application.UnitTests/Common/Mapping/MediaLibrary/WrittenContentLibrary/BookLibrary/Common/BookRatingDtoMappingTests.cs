@@ -21,13 +21,13 @@ public class BookRatingDtoMappingTests
     private readonly BookRatingDtoFixture _bookRatingDtoFixture = new();
 
     [Fact]
-    public void ToDomainEntity_WhenMappingCompleteBookRatinDto_ShouldMapAllPropertiesCorrectly()
+    public void ToDomainValueObject_WhenMappingCompleteBookRatinDto_ShouldMapAllPropertiesCorrectly()
     {
         // Arrange
         BookRatingDto dto = _bookRatingDtoFixture.Create();
 
         // Act
-        Result<BookRating> result = dto.ToDomainEntity();
+        Result<BookRating> result = dto.ToDomainValueObject();
 
         // Assert
         Assert.False(result.IsFailure);
@@ -53,13 +53,13 @@ public class BookRatingDtoMappingTests
     }
 
     [Fact]
-    public void ToDomainEntity_WhenMappingMinimalBookRatingDto_ShouldMapRequiredPropertiesCorrectly()
+    public void ToDomainValueObject_WhenMappingMinimalBookRatingDto_ShouldMapRequiredPropertiesCorrectly()
     {
         // Arrange
         BookRatingDto dto = _bookRatingDtoFixture.Create(includeSource: false, includeVoteCount: false);
 
         // Act
-        Result<BookRating> result = dto.ToDomainEntity();
+        Result<BookRating> result = dto.ToDomainValueObject();
 
         // Assert
         Assert.False(result.IsFailure);
@@ -71,13 +71,13 @@ public class BookRatingDtoMappingTests
     }
 
     [Fact]
-    public void ToDomainEntity_WhenMappingInvalidBookRatingDto_ShouldReturnError()
+    public void ToDomainValueObject_WhenMappingInvalidBookRatingDto_ShouldReturnError()
     {
         // Arrange
         BookRatingDto dto = _bookRatingDtoFixture.Create(value: 10, maxValue: 5);
 
         // Act
-        Result<BookRating> result = dto.ToDomainEntity();
+        Result<BookRating> result = dto.ToDomainValueObject();
 
         // Assert
         Assert.True(result.IsFailure);
@@ -94,7 +94,7 @@ public class BookRatingDtoMappingTests
         ];
 
         // Act
-        IEnumerable<Result<BookRating>> results = dtos.ToDomainEntities();
+        IEnumerable<Result<BookRating>> results = dtos.ToDomainValueObjects();
 
         // Assert
         Assert.NotNull(results);
@@ -129,7 +129,7 @@ public class BookRatingDtoMappingTests
         ];
 
         // Act
-        IEnumerable<Result<BookRating>> results = dtos.ToDomainEntities();
+        IEnumerable<Result<BookRating>> results = dtos.ToDomainValueObjects();
 
         // Assert
         Assert.NotNull(results);

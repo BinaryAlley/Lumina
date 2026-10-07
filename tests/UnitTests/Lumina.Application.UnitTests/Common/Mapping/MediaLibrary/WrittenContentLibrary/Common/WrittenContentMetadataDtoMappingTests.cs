@@ -23,13 +23,13 @@ public class WrittenContentMetadataDtoMappingTests
     private readonly TagDtoFixture _tagDtoFixture = new();
 
     [Fact]
-    public void ToDomainEntity_WhenMappingCompleteWrittenContentMetadataDto_ShouldMapAllPropertiesCorrectly()
+    public void ToDomainValueObject_WhenMappingCompleteWrittenContentMetadataDto_ShouldMapAllPropertiesCorrectly()
     {
         // Arrange
         WrittenContentMetadataDto dto = _writtenContentMetadataDtoFixture.Create();
 
         // Act
-        Result<WrittenContentMetadata> result = dto.ToDomainEntity();
+        Result<WrittenContentMetadata> result = dto.ToDomainValueObject();
 
         // Assert
         Assert.False(result.IsFailure);
@@ -51,7 +51,7 @@ public class WrittenContentMetadataDtoMappingTests
     }
 
     [Fact]
-    public void ToDomainEntity_WhenOptionalValuesAreMissing_ShouldMapWithoutOptionalValues()
+    public void ToDomainValueObject_WhenOptionalValuesAreMissing_ShouldMapWithoutOptionalValues()
     {
         // Arrange
         WrittenContentMetadataDto dto = _writtenContentMetadataDtoFixture.Create(
@@ -63,7 +63,7 @@ public class WrittenContentMetadataDtoMappingTests
             includePageCount: false);
 
         // Act
-        Result<WrittenContentMetadata> result = dto.ToDomainEntity();
+        Result<WrittenContentMetadata> result = dto.ToDomainValueObject();
 
         // Assert
         Assert.False(result.IsFailure);
@@ -76,7 +76,7 @@ public class WrittenContentMetadataDtoMappingTests
     }
 
     [Fact]
-    public void ToDomainEntity_WhenReleaseInfoCreationFails_ShouldReturnError()
+    public void ToDomainValueObject_WhenReleaseInfoCreationFails_ShouldReturnError()
     {
         // Arrange
         WrittenContentMetadataDto dto = _writtenContentMetadataDtoFixture.Create(
@@ -85,33 +85,33 @@ public class WrittenContentMetadataDtoMappingTests
                 originalReleaseYear: 2024));
 
         // Act
-        Result<WrittenContentMetadata> result = dto.ToDomainEntity();
+        Result<WrittenContentMetadata> result = dto.ToDomainValueObject();
 
         // Assert
         Assert.True(result.IsFailure);
     }
 
     [Fact]
-    public void ToDomainEntity_WhenGenreCreationFails_ShouldReturnError()
+    public void ToDomainValueObject_WhenGenreCreationFails_ShouldReturnError()
     {
         // Arrange
         WrittenContentMetadataDto dto = _writtenContentMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: "")]);
 
         // Act
-        Result<WrittenContentMetadata> result = dto.ToDomainEntity();
+        Result<WrittenContentMetadata> result = dto.ToDomainValueObject();
 
         // Assert
         Assert.True(result.IsFailure);
     }
 
     [Fact]
-    public void ToDomainEntity_WhenTagCreationFails_ShouldReturnError()
+    public void ToDomainValueObject_WhenTagCreationFails_ShouldReturnError()
     {
         // Arrange
         WrittenContentMetadataDto dto = _writtenContentMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: "")]);
 
         // Act
-        Result<WrittenContentMetadata> result = dto.ToDomainEntity();
+        Result<WrittenContentMetadata> result = dto.ToDomainValueObject();
 
         // Assert
         Assert.True(result.IsFailure);

@@ -21,13 +21,13 @@ public class MoodDtoMappingTests
     private readonly MoodDtoFixture _moodDtoFixture = new();
 
     [Fact]
-    public void ToDomainEntity_WhenMappingValidMoodDto_ShouldMapCorrectly()
+    public void ToDomainValueObject_WhenMappingValidMoodDto_ShouldMapCorrectly()
     {
         // Arrange
         MoodDto dto = _moodDtoFixture.Create(name: "  Calm  ");
 
         // Act
-        Result<Mood> result = dto.ToDomainEntity();
+        Result<Mood> result = dto.ToDomainValueObject();
 
         // Assert
         Assert.False(result.IsFailure);
@@ -39,13 +39,13 @@ public class MoodDtoMappingTests
     [InlineData(null)] // missing name
     [InlineData("")] // empty name
     [InlineData("   ")] // whitespace name
-    public void ToDomainEntity_WhenNameIsNullOrWhitespace_ShouldReturnError(string? name)
+    public void ToDomainValueObject_WhenNameIsNullOrWhitespace_ShouldReturnError(string? name)
     {
         // Arrange
         MoodDto dto = _moodDtoFixture.Create(name: name, includeName: name is not null);
 
         // Act
-        Result<Mood> result = dto.ToDomainEntity();
+        Result<Mood> result = dto.ToDomainValueObject();
 
         // Assert
         Assert.True(result.IsFailure);
@@ -53,13 +53,13 @@ public class MoodDtoMappingTests
     }
 
     [Fact]
-    public void ToDomainEntities_WhenMappingMultipleValidMoodDtos_ShouldMapAllCorrectly()
+    public void ToDomainValueObjects_WhenMappingMultipleValidMoodDtos_ShouldMapAllCorrectly()
     {
         // Arrange
         List<MoodDto> dtos = _moodDtoFixture.CreateMany(2);
 
         // Act
-        List<Result<Mood>> results = [.. dtos.ToDomainEntities()];
+        List<Result<Mood>> results = [.. dtos.ToDomainValueObjects()];
 
         // Assert
         Assert.Equal(dtos.Count, results.Count);
@@ -71,7 +71,7 @@ public class MoodDtoMappingTests
     }
 
     [Fact]
-    public void ToDomainEntities_WhenMappingMixedValidAndInvalidMoodDtos_ShouldReturnMixedResults()
+    public void ToDomainValueObjects_WhenMappingMixedValidAndInvalidMoodDtos_ShouldReturnMixedResults()
     {
         // Arrange
         List<MoodDto> dtos =
@@ -82,7 +82,7 @@ public class MoodDtoMappingTests
         ];
 
         // Act
-        List<Result<Mood>> results = [.. dtos.ToDomainEntities()];
+        List<Result<Mood>> results = [.. dtos.ToDomainValueObjects()];
 
         // Assert
         Assert.Equal(dtos.Count, results.Count);

@@ -18,7 +18,7 @@ public static class LanguageInfoDtoMapping
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully converted <see cref="LanguageInfo"/>, or an error message.
     /// </returns>
-    public static Result<LanguageInfo> ToDomainEntity(this LanguageInfoDto dto)
+    public static Result<LanguageInfo> ToDomainValueObject(this LanguageInfoDto dto)
     {
         return LanguageInfo.Create(
             dto.LanguageCode!,
