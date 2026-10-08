@@ -8,6 +8,7 @@ using Lumina.DataAccess.Common.Persistence;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -175,6 +176,23 @@ internal sealed class TrackRepository : ITrackRepository
             shouldReplace: (existingIsrc, incomingIsrc) => false,
             createNew: incomingIsrc => incomingIsrc);
 
+        // The languages and the ISWCs of the work are owned value objects whose value is also their identity, so a match means there is nothing to change.
+        CollectionReconciler.Reconcile(
+            foundTrack.WorkLanguages,
+            data.WorkLanguages,
+            existingWorkLanguage => existingWorkLanguage.LanguageCode,
+            incomingWorkLanguage => incomingWorkLanguage.LanguageCode,
+            shouldReplace: (existingWorkLanguage, incomingWorkLanguage) => !existingWorkLanguage.Equals(incomingWorkLanguage),
+            createNew: incomingWorkLanguage => incomingWorkLanguage);
+
+        CollectionReconciler.Reconcile(
+            foundTrack.WorkIswcs,
+            data.WorkIswcs,
+            existingWorkIswc => existingWorkIswc.Value,
+            incomingWorkIswc => incomingWorkIswc.Value,
+            shouldReplace: (existingWorkIswc, incomingWorkIswc) => false,
+            createNew: incomingWorkIswc => incomingWorkIswc);
+
         return Result.Updated;
     }
 
@@ -285,5 +303,108 @@ internal sealed class TrackRepository : ITrackRepository
             Count = count,
             NumberOfPages = numberOfPages
         };
+    }
+
+    /// <summary>
+    /// Gets the track of the library identified by <paramref name="libraryId"/> that is stored at the provided <paramref name="path"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the library whose track is retrieved.</param>
+    /// <param name="path">The file system path of the track to retrieve.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the <see cref="TrackEntity"/> stored at the provided path, or an error.</returns>
+    public async Task<Result<TrackEntity?>> GetByPathAsync(Guid libraryId, string path, CancellationToken cancellationToken)
+    {
+        TrackEntity? track = await _luminaDbContext.Tracks
+            .FirstOrDefaultAsync(repositoryTrack => repositoryTrack.LibraryId == libraryId && repositoryTrack.Path == path, cancellationToken).ConfigureAwait(false);
+        return track;
+    }
+
+    /// <summary>
+    /// Deletes the track identified by <paramref name="id"/>, together with its owned collections and contributions, by the database cascade.
+    /// </summary>
+    /// <param name="id">The Id of the track to delete.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Deleted>> DeleteByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        TrackEntity? track = await _luminaDbContext.Tracks
+            .FirstOrDefaultAsync(repositoryTrack => repositoryTrack.Id == id, cancellationToken).ConfigureAwait(false);
+        if (track is null)
+            return Errors.Music.TrackNotFound;
+
+        _luminaDbContext.Tracks.Remove(track);
+        return Result.Deleted;
+    }
+
+    /// <summary>
+    /// Resets the enrichment state of the tracks stored at the provided <paramref name="paths"/> in the media library identified by
+    /// <paramref name="libraryId"/>, together with their albums and artists.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose tracks are reset.</param>
+    /// <param name="paths">The file system paths of the tracks whose enrichment state is reset.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Updated>> ResetEnrichmentStateForPathsAsync(Guid libraryId, IReadOnlyCollection<string> paths, CancellationToken cancellationToken)
+    {
+        List<string> pathList = [.. paths];
+        if (pathList.Count == 0)
+            return Result.Updated;
+
+        // The tracks stored at the changed paths are reset, together with the albums and the artists they belong to, because the metadata of the whole release is re-evaluated.
+        List<Guid> trackIds = await _luminaDbContext.Tracks
+            .Where(track => track.LibraryId == libraryId && pathList.Contains(track.Path))
+            .Select(track => track.Id)
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+        if (trackIds.Count == 0)
+            return Result.Updated;
+
+        List<Guid> albumIds = await _luminaDbContext.Tracks
+            .Where(track => trackIds.Contains(track.Id))
+            .Select(track => track.AlbumId)
+            .Distinct()
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+        List<Guid> artistIds = await _luminaDbContext.Albums
+            .Where(album => albumIds.Contains(album.Id))
+            .Select(album => album.ArtistId)
+            .Distinct()
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+
+        await _luminaDbContext.Tracks
+            .Where(track => trackIds.Contains(track.Id))
+            .ExecuteUpdateAsync(setters => setters.SetProperty(track => track.MetadataStatus, MetadataStatus.Pending), cancellationToken).ConfigureAwait(false);
+        await _luminaDbContext.Albums
+            .Where(album => albumIds.Contains(album.Id))
+            .ExecuteUpdateAsync(setters => setters.SetProperty(album => album.MetadataStatus, MetadataStatus.Pending), cancellationToken).ConfigureAwait(false);
+        await _luminaDbContext.Artists
+            .Where(artist => artistIds.Contains(artist.Id))
+            .ExecuteUpdateAsync(setters => setters.SetProperty(artist => artist.MetadataStatus, MetadataStatus.Pending), cancellationToken).ConfigureAwait(false);
+
+        return Result.Updated;
+    }
+
+    /// <summary>
+    /// Gets the number of tracks of the media library identified by <paramref name="libraryId"/> whose metadata has not been enriched yet.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose tracks are counted.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the number of tracks needing their metadata enriched, or an error.</returns>
+    public async Task<Result<int>> GetTracksNeedingMetadataCountAsync(Guid libraryId, CancellationToken cancellationToken)
+    {
+        return await _luminaDbContext.Tracks
+            .CountAsync(track => track.LibraryId == libraryId && track.MetadataStatus != MetadataStatus.Enriched, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Resets the metadata enrichment status of all the tracks of the media library identified by <paramref name="libraryId"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose tracks are reset.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Updated>> ResetMetadataStatusForLibraryAsync(Guid libraryId, CancellationToken cancellationToken)
+    {
+        await _luminaDbContext.Tracks
+            .Where(track => track.LibraryId == libraryId)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(track => track.MetadataStatus, MetadataStatus.Pending), cancellationToken).ConfigureAwait(false);
+        return Result.Updated;
     }
 }

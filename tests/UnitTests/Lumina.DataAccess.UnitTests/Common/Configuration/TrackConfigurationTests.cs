@@ -72,7 +72,7 @@ public class TrackConfigurationTests : IDisposable
         IProperty scriptProperty = entityType.GetProperty(nameof(TrackEntity.Script));
         IProperty keyProperty = entityType.GetProperty(nameof(TrackEntity.Key));
         IProperty audioCodecProperty = entityType.GetProperty(nameof(TrackEntity.AudioCodec));
-        IProperty workProperty = entityType.GetProperty(nameof(TrackEntity.Work));
+        IProperty workProperty = entityType.GetProperty(nameof(TrackEntity.WorkTitle));
 
         // Assert
         Assert.False(pathProperty.IsNullable);
@@ -118,9 +118,11 @@ public class TrackConfigurationTests : IDisposable
         List<IEntityType> ownedTypes = [.. _context.Model.GetEntityTypes().Where(ownedType => ownedType.IsOwned() && ownedType.FindOwnership()?.PrincipalEntityType.Name == entityType.Name)];
 
         // Assert
-        Assert.Equal(3, ownedTypes.Count);
+        Assert.Equal(5, ownedTypes.Count);
         Assert.Contains(ownedTypes, ownedType => ownedType.ClrType == typeof(TrackMoodEntity) && ownedType.GetTableName() == "TrackMoods");
         Assert.Contains(ownedTypes, ownedType => ownedType.ClrType == typeof(TrackIsrcEntity) && ownedType.GetTableName() == "TrackIsrcs");
+        Assert.Contains(ownedTypes, ownedType => ownedType.ClrType == typeof(TrackWorkLanguageEntity) && ownedType.GetTableName() == "TrackWorkLanguages");
+        Assert.Contains(ownedTypes, ownedType => ownedType.ClrType == typeof(TrackWorkIswcEntity) && ownedType.GetTableName() == "TrackWorkIswcs");
         Assert.Contains(ownedTypes, ownedType => ownedType.ClrType == typeof(AudioRatingEntity) && ownedType.GetTableName() == "TrackRatings");
     }
 

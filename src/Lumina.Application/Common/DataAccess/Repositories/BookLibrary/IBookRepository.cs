@@ -41,6 +41,15 @@ public interface IBookRepository : IRepository<BookEntity>,
     Task<Result<BookEntity?>> GetByPathAsync(Guid libraryId, string path, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Gets the subset of <paramref name="paths"/> that is already used by a book of the library identified by <paramref name="libraryId"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the library whose books are searched.</param>
+    /// <param name="paths">The book paths to check.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the paths that are already used, or an error.</returns>
+    Task<Result<IReadOnlyCollection<string>>> GetExistingPathsAsync(Guid libraryId, IReadOnlyCollection<string> paths, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Gets a page of the books of the media library identified by <paramref name="libraryId"/> whose metadata has not been enriched yet,
     /// ordered by path, using keyset pagination.
     /// </summary>

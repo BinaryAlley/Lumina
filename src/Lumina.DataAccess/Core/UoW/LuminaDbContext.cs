@@ -24,6 +24,8 @@ public class LuminaDbContext : DbContext
     public virtual DbSet<ArtistEntity> Artists { get; set; } = null!;
     public virtual DbSet<AlbumEntity> Albums { get; set; } = null!;
     public virtual DbSet<TrackEntity> Tracks { get; set; } = null!;
+    public virtual DbSet<MusicArtworkEntity> MusicArtwork { get; set; } = null!;
+    public virtual DbSet<MusicLibraryScanItemMetadataEntity> MusicLibraryScanItemMetadata { get; set; } = null!;
     public virtual DbSet<UserEntity> Users { get; set; } = null!;
     public virtual DbSet<UserSettingsEntity> UserSettings { get; set; } = null!;
     public virtual DbSet<LibraryEntity> Libraries { get; set; } = null!;

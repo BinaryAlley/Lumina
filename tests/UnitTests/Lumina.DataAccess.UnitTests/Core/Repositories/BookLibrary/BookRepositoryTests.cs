@@ -315,6 +315,74 @@ public class BookRepositoryTests
     }
 
     [Fact]
+    public async Task GetExistingPathsAsync_WhenPathsIsEmpty_ShouldReturnAnEmptyCollection()
+    {
+        // Arrange
+        IReadOnlyCollection<string> paths = [];
+
+        // Act
+        Result<IReadOnlyCollection<string>> result = await _sut.GetExistingPathsAsync(Guid.NewGuid(), paths, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Empty(result.Value);
+    }
+
+    [Fact]
+    public async Task GetExistingPathsAsync_WhenCalled_ShouldReturnOnlyThePathsUsedByBooksOfTheLibrary()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        BookEntity bookOfLibrary = _bookEntityFixture.Create(libraryId: libraryId, path: "/books/tolkien/the-hobbit.epub");
+        BookEntity bookOfAnotherLibrary = _bookEntityFixture.Create(libraryId: Guid.NewGuid(), path: "/books/tolkien/the-lord-of-the-rings.epub");
+        _mockContext.Books.AddRange(bookOfLibrary, bookOfAnotherLibrary);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyCollection<string>> result = await _sut.GetExistingPathsAsync(libraryId, ["/books/tolkien/the-hobbit.epub", "/books/tolkien/the-lord-of-the-rings.epub"], CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        string existingPath = Assert.Single(result.Value);
+        Assert.Equal("/books/tolkien/the-hobbit.epub", existingPath);
+    }
+
+    [Fact]
+    public async Task GetExistingPathsAsync_WhenInputContainsDuplicatePaths_ShouldDeDuplicateTheResult()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        BookEntity book = _bookEntityFixture.Create(libraryId: libraryId, path: "/books/tolkien/the-hobbit.epub");
+        _mockContext.Books.Add(book);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyCollection<string>> result = await _sut.GetExistingPathsAsync(libraryId, ["/books/tolkien/the-hobbit.epub", "/books/tolkien/the-hobbit.epub", "/books/tolkien/the-hobbit.epub"], CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Single(result.Value);
+        Assert.Equal("/books/tolkien/the-hobbit.epub", result.Value.First());
+    }
+
+    [Fact]
+    public async Task GetExistingPathsAsync_WhenPathDiffersOnlyByCase_ShouldNotReportItAsExisting()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        BookEntity book = _bookEntityFixture.Create(libraryId: libraryId, path: "/Books/Tolkien/The-Hobbit.epub");
+        _mockContext.Books.Add(book);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyCollection<string>> result = await _sut.GetExistingPathsAsync(libraryId, ["/books/tolkien/the-hobbit.epub"], CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Empty(result.Value);
+    }
+
+    [Fact]
     public async Task GetBooksNeedingMetadataAsync_WhenCalled_ShouldReturnOnlyBooksWhoseMetadataIsNotEnriched()
     {
         // Arrange

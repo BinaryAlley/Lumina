@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.DataAccess.Core.UoW;
@@ -47,7 +48,7 @@ public class LuminaDbContextTests : IDisposable
 
         // Assert
         // The count assertion fails when a table is added or removed, reminding to update the assertions below.
-        Assert.Equal(46, tableNames.Length);
+        Assert.Equal(62, tableNames.Length);
         Assert.Contains("Books", tableNames);
         Assert.Contains("Users", tableNames);
         Assert.Contains("UserSettings", tableNames);
@@ -69,6 +70,7 @@ public class LuminaDbContextTests : IDisposable
         Assert.Contains("Tags", tableNames);
         Assert.Contains("Genres", tableNames);
         Assert.Contains("LibraryContentLocations", tableNames);
+        Assert.Contains("LibraryPathTemplateParts", tableNames);
         Assert.Contains("BookTags", tableNames);
         Assert.Contains("BookGenres", tableNames);
         Assert.Contains("BookRatings", tableNames);
@@ -81,19 +83,31 @@ public class LuminaDbContextTests : IDisposable
         Assert.Contains("ScheduledJobExecutions", tableNames);
         Assert.Contains("SchedulerDisplayPreferences", tableNames);
         Assert.Contains("Artists", tableNames);
+        Assert.Contains("ArtistAliases", tableNames);
+        Assert.Contains("ArtistIpis", tableNames);
+        Assert.Contains("ArtistIsnis", tableNames);
+        Assert.Contains("ArtistTags", tableNames);
+        Assert.Contains("ArtistGenres", tableNames);
+        Assert.Contains("ArtistRatings", tableNames);
         Assert.Contains("Albums", tableNames);
-        Assert.Contains("Tracks", tableNames);
-        Assert.Contains("ArtistContributors", tableNames);
-        Assert.Contains("AlbumContributors", tableNames);
+        Assert.Contains("AlbumReleaseTypes", tableNames);
+        Assert.Contains("AlbumCatalogNumbers", tableNames);
         Assert.Contains("AlbumGenres", tableNames);
         Assert.Contains("AlbumRatings", tableNames);
         Assert.Contains("AlbumTags", tableNames);
+        Assert.Contains("Tracks", tableNames);
         Assert.Contains("TrackContributors", tableNames);
         Assert.Contains("TrackGenres", tableNames);
         Assert.Contains("TrackIsrcs", tableNames);
         Assert.Contains("TrackMoods", tableNames);
         Assert.Contains("TrackRatings", tableNames);
         Assert.Contains("TrackTags", tableNames);
+        Assert.Contains("TrackWorkLanguages", tableNames);
+        Assert.Contains("TrackWorkIswcs", tableNames);
+        Assert.Contains("ArtistContributors", tableNames);
+        Assert.Contains("AlbumContributors", tableNames);
+        Assert.Contains("MusicArtwork", tableNames);
+        Assert.Contains("MusicLibraryScanItemMetadata", tableNames);
     }
 
     [Fact]

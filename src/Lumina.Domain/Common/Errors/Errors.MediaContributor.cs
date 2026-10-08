@@ -22,6 +22,7 @@ public static partial class Errors
         public static Error ContributorsListCannotBeNull => Error.Validation(description: nameof(ContributorsListCannotBeNull));
         public static Error MediaContributorIdCannotBeEmpty => Error.Validation(description: nameof(MediaContributorIdCannotBeEmpty));
         public static Error MediaContributorNotFound => Error.NotFound(description: nameof(MediaContributorNotFound));
+        public static Error MediaContributorAlreadyExists => Error.Conflict(description: nameof(MediaContributorAlreadyExists));
         public static Error UnknownMediaContributorRole => Error.Validation(description: nameof(UnknownMediaContributorRole));
     }
 }

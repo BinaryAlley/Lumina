@@ -309,6 +309,27 @@ internal sealed class BookRepository : IBookRepository
     }
 
     /// <summary>
+    /// Gets the subset of <paramref name="paths"/> that is already used by a book of the library identified by <paramref name="libraryId"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the library whose books are searched.</param>
+    /// <param name="paths">The book paths to check.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the paths that are already used, or an error.</returns>
+    public async Task<Result<IReadOnlyCollection<string>>> GetExistingPathsAsync(Guid libraryId, IReadOnlyCollection<string> paths, CancellationToken cancellationToken)
+    {
+        if (paths.Count == 0)
+            return Result.From<IReadOnlyCollection<string>>([]);
+
+        // The stored paths are compared ordinally, matching the case sensitive comparison used by the unique index of the storage medium.
+        List<string> distinctPaths = [.. paths.Distinct(StringComparer.Ordinal)];
+        List<string> existingPaths = await _luminaDbContext.Books
+            .Where(repositoryBook => repositoryBook.LibraryId == libraryId && distinctPaths.Contains(repositoryBook.Path))
+            .Select(repositoryBook => repositoryBook.Path)
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+        return Result.From<IReadOnlyCollection<string>>(existingPaths);
+    }
+
+    /// <summary>
     /// Gets a page of the books of the media library identified by <paramref name="libraryId"/> whose metadata has not been enriched yet,
     /// ordered by path, using keyset pagination.
     /// </summary>

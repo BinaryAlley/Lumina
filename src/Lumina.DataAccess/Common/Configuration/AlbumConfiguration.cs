@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -39,73 +40,96 @@ public class AlbumConfiguration : IEntityTypeConfiguration<AlbumEntity>
         builder.Property(album => album.OriginalTitle)
             .HasMaxLength(255)
             .HasColumnOrder(4);
+        builder.Property(album => album.ReleaseTitle)
+            .HasMaxLength(255)
+            .HasColumnOrder(26);
         builder.Property(album => album.Description)
             .HasMaxLength(2000)
             .HasColumnOrder(5);
-        builder.Property(album => album.OriginalReleaseDate)
+        builder.Property(album => album.Disambiguation)
+            .HasMaxLength(255)
             .HasColumnOrder(6);
-        builder.Property(album => album.OriginalReleaseYear)
+        builder.Property(album => album.OriginalReleaseDate)
             .HasColumnOrder(7);
-        builder.Property(album => album.ReReleaseDate)
+        builder.Property(album => album.OriginalReleaseYear)
             .HasColumnOrder(8);
-        builder.Property(album => album.ReReleaseYear)
+        builder.Property(album => album.ReReleaseDate)
             .HasColumnOrder(9);
+        builder.Property(album => album.ReReleaseYear)
+            .HasColumnOrder(10);
         builder.Property(album => album.ReleaseCountry)
             .HasConversion<string>()
             .HasMaxLength(2)
-            .HasColumnOrder(10);
-        builder.Property(album => album.ReleaseVersion)
             .HasColumnOrder(11);
-        builder.Property(album => album.LanguageCode)
+        builder.Property(album => album.ReleaseVersion)
             .HasColumnOrder(12);
-        builder.Property(album => album.LanguageName)
+        builder.Property(album => album.LanguageCode)
             .HasColumnOrder(13);
-        builder.Property(album => album.LanguageNativeName)
+        builder.Property(album => album.LanguageName)
             .HasColumnOrder(14);
-        builder.Property(album => album.OriginalLanguageCode)
+        builder.Property(album => album.LanguageNativeName)
             .HasColumnOrder(15);
-        builder.Property(album => album.OriginalLanguageName)
+        builder.Property(album => album.OriginalLanguageCode)
             .HasColumnOrder(16);
-        builder.Property(album => album.OriginalLanguageNativeName)
+        builder.Property(album => album.OriginalLanguageName)
             .HasColumnOrder(17);
-        builder.Property(album => album.ReleaseType)
-            .HasConversion<string>()
-            .HasMaxLength(50)
+        builder.Property(album => album.OriginalLanguageNativeName)
             .HasColumnOrder(18);
+        builder.Property(album => album.Script)
+            .HasMaxLength(50)
+            .HasColumnOrder(19);
         builder.Property(album => album.ReleaseStatus)
             .HasConversion<string>()
             .HasMaxLength(50)
-            .HasColumnOrder(19);
-        builder.Property(album => album.TotalDiscs)
             .HasColumnOrder(20);
-        builder.Property(album => album.TotalTracks)
+        builder.Property(album => album.TotalDiscs)
             .HasColumnOrder(21);
+        builder.Property(album => album.TotalTracks)
+            .HasColumnOrder(22);
         builder.Property(album => album.MediaFormat)
             .HasConversion<string>()
             .HasMaxLength(50)
-            .HasColumnOrder(22);
-        builder.Property(album => album.Barcode)
-            .HasMaxLength(13)
             .HasColumnOrder(23);
-        builder.Property(album => album.CatalogNumber)
+        builder.Property(album => album.Packaging)
+            .HasConversion<string>()
             .HasMaxLength(50)
             .HasColumnOrder(24);
-        builder.Property(album => album.MusicBrainzReleaseId)
+        builder.Property(album => album.Barcode)
+            .HasMaxLength(13)
             .HasColumnOrder(25);
-        builder.Property(album => album.MusicBrainzReleaseGroupId)
-            .HasColumnOrder(26);
-        builder.Property(album => album.MusicBrainzReleaseArtistId)
+        builder.Property(album => album.Label)
+            .HasMaxLength(255)
             .HasColumnOrder(27);
+        builder.Property(album => album.ASIN)
+            .HasMaxLength(20)
+            .HasColumnOrder(28);
+        builder.Property(album => album.MusicBrainzReleaseId)
+            .HasColumnOrder(29);
+        builder.Property(album => album.MusicBrainzReleaseGroupId)
+            .HasColumnOrder(30);
+        builder.Property(album => album.MusicBrainzReleaseArtistId)
+            .HasColumnOrder(31);
         builder.Property(album => album.CreatedOnUtc)
             .IsRequired()
-            .HasColumnOrder(28);
+            .HasColumnOrder(32);
         builder.Property(album => album.CreatedBy)
             .IsRequired()
-            .HasColumnOrder(29);
+            .HasColumnOrder(33);
         builder.Property(album => album.UpdatedOnUtc)
-            .HasColumnOrder(30);
+            .HasColumnOrder(34);
         builder.Property(album => album.UpdatedBy)
-            .HasColumnOrder(31);
+            .HasColumnOrder(35);
+        builder.Property(album => album.MetadataStatus)
+            .HasConversion<string>()
+            .HasMaxLength(20)
+            .IsRequired()
+            .HasDefaultValue(MetadataStatus.Pending)
+            .HasColumnOrder(36);
+        builder.Property(album => album.LastMetadataUpdateUtc)
+            .HasColumnOrder(37);
+        builder.Property(album => album.MetadataProvider)
+            .HasMaxLength(100)
+            .HasColumnOrder(38);
 
         builder.HasOne(album => album.Artist)
             .WithMany(artist => artist.Albums)
@@ -145,6 +169,35 @@ public class AlbumConfiguration : IEntityTypeConfiguration<AlbumEntity>
                     j.HasKey("AlbumId", "GenreId");
                     j.ToTable("AlbumGenres");
                 });
+
+        builder.OwnsMany(album => album.ReleaseTypes, releaseTypeBuilder =>
+        {
+            releaseTypeBuilder.ToTable("AlbumReleaseTypes");
+            releaseTypeBuilder.WithOwner()
+                .HasForeignKey("AlbumId");
+            releaseTypeBuilder.Property<Guid>("Id")
+                .ValueGeneratedOnAdd();
+            releaseTypeBuilder.HasKey("Id");
+
+            releaseTypeBuilder.Property(releaseType => releaseType.ReleaseType)
+                .HasConversion<string>()
+                .HasMaxLength(50)
+                .IsRequired();
+        });
+
+        builder.OwnsMany(album => album.CatalogNumbers, catalogNumberBuilder =>
+        {
+            catalogNumberBuilder.ToTable("AlbumCatalogNumbers");
+            catalogNumberBuilder.WithOwner()
+                .HasForeignKey("AlbumId");
+            catalogNumberBuilder.Property<Guid>("Id")
+                .ValueGeneratedOnAdd();
+            catalogNumberBuilder.HasKey("Id");
+
+            catalogNumberBuilder.Property(catalogNumber => catalogNumber.CatalogNumber)
+                .HasMaxLength(50)
+                .IsRequired();
+        });
 
         builder.OwnsMany(album => album.Ratings, ratingBuilder =>
         {

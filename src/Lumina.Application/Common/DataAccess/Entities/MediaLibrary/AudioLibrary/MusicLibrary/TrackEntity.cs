@@ -2,6 +2,7 @@
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -49,6 +50,11 @@ public class TrackEntity : IStorageEntity, IAuditableEntity
     /// Gets or sets the description of the track, if applicable.
     /// </summary>
     public string? Description { get; set; }
+
+    /// <summary>
+    /// Gets or sets the disambiguation comment of the track, used to distinguish tracks with the same title, if applicable.
+    /// </summary>
+    public string? Disambiguation { get; set; }
 
     /// <summary>
     /// Gets or sets the original release date of the track, if applicable.
@@ -141,6 +147,31 @@ public class TrackEntity : IStorageEntity, IAuditableEntity
     public int? Bitrate { get; set; }
 
     /// <summary>
+    /// Gets or sets the AcoustID fingerprint identifier of the audio file, if applicable.
+    /// </summary>
+    public string? AcoustId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the ReplayGain track gain in decibels, if applicable.
+    /// </summary>
+    public decimal? ReplayGainTrackGain { get; set; }
+
+    /// <summary>
+    /// Gets or sets the ReplayGain track peak, if applicable.
+    /// </summary>
+    public decimal? ReplayGainTrackPeak { get; set; }
+
+    /// <summary>
+    /// Gets or sets the ReplayGain album gain in decibels, if applicable.
+    /// </summary>
+    public decimal? ReplayGainAlbumGain { get; set; }
+
+    /// <summary>
+    /// Gets or sets the ReplayGain album peak, if applicable.
+    /// </summary>
+    public decimal? ReplayGainAlbumPeak { get; set; }
+
+    /// <summary>
     /// Gets or sets the number of the track on its disc.
     /// </summary>
     public int TrackNumber { get; set; }
@@ -166,9 +197,19 @@ public class TrackEntity : IStorageEntity, IAuditableEntity
     public int? Bpm { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether the recording of the track is a video recording.
+    /// </summary>
+    public bool IsVideo { get; set; }
+
+    /// <summary>
     /// Gets or sets the title of the work the track is a recording of, if applicable.
     /// </summary>
-    public string? Work { get; set; }
+    public string? WorkTitle { get; set; }
+
+    /// <summary>
+    /// Gets or sets the MusicBrainz type of the work the track is a recording of, if applicable.
+    /// </summary>
+    public string? WorkType { get; set; }
 
     /// <summary>
     /// Gets or sets the MusicBrainz identifier of the recording, if applicable.
@@ -201,6 +242,16 @@ public class TrackEntity : IStorageEntity, IAuditableEntity
     public List<TrackIsrcEntity> Isrcs { get; set; } = [];
 
     /// <summary>
+    /// Gets or sets the list of the languages of the work the track is a recording of.
+    /// </summary>
+    public List<TrackWorkLanguageEntity> WorkLanguages { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the list of ISWC (International Standard Musical Work Code) of the work the track is a recording of.
+    /// </summary>
+    public List<TrackWorkIswcEntity> WorkIswcs { get; set; } = [];
+
+    /// <summary>
     /// Gets or sets the list of the media contributors of the track.
     /// </summary>
     public List<TrackContributorEntity> Contributors { get; set; } = [];
@@ -219,6 +270,21 @@ public class TrackEntity : IStorageEntity, IAuditableEntity
     /// Gets or sets the tags of the track.
     /// </summary>
     public HashSet<TagEntity> Tags { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the status of the metadata enrichment of the track.
+    /// </summary>
+    public MetadataStatus MetadataStatus { get; set; }
+
+    /// <summary>
+    /// Gets or sets the date and time when the metadata of the track was last enriched.
+    /// </summary>
+    public DateTime? LastMetadataUpdateUtc { get; set; }
+
+    /// <summary>
+    /// Gets or sets the name of the plugin that enriched the metadata of the track.
+    /// </summary>
+    public string? MetadataProvider { get; set; }
 
     /// <summary>
     /// Gets or sets the time and date when the entity was added.

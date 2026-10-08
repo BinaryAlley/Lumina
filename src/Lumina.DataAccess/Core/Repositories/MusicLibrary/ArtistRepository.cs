@@ -11,7 +11,9 @@ using Lumina.DataAccess.Core.Repositories.MusicLibrary.Specifications;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -72,7 +74,7 @@ internal sealed class ArtistRepository : IArtistRepository
         // neither a stored row nor a name shared by several albums or tracks of the same request is tracked more than once.
         Result<IReadOnlyDictionary<string, TagEntity>> resolveTagsResult = await SharedReferenceResolver.ResolveAsync(
             _luminaDbContext,
-            artist.Albums.SelectMany(album => album.Tags).Concat(artist.Albums.SelectMany(album => album.Tracks.SelectMany(track => track.Tags))),
+            artist.Tags.Concat(artist.Albums.SelectMany(album => album.Tags)).Concat(artist.Albums.SelectMany(album => album.Tracks.SelectMany(track => track.Tags))),
             Errors.Metadata.TagNameCannotBeEmpty,
             cancellationToken).ConfigureAwait(false);
         if (resolveTagsResult.IsFailure)
@@ -80,11 +82,14 @@ internal sealed class ArtistRepository : IArtistRepository
 
         Result<IReadOnlyDictionary<string, GenreEntity>> resolveGenresResult = await SharedReferenceResolver.ResolveAsync(
             _luminaDbContext,
-            artist.Albums.SelectMany(album => album.Genres).Concat(artist.Albums.SelectMany(album => album.Tracks.SelectMany(track => track.Genres))),
+            artist.Genres.Concat(artist.Albums.SelectMany(album => album.Genres)).Concat(artist.Albums.SelectMany(album => album.Tracks.SelectMany(track => track.Genres))),
             Errors.Metadata.GenreNameCannotBeEmpty,
             cancellationToken).ConfigureAwait(false);
         if (resolveGenresResult.IsFailure)
             return resolveGenresResult.Errors;
+
+        artist.Tags = [.. SharedReferenceResolver.Normalize(artist.Tags, resolveTagsResult.Value)];
+        artist.Genres = [.. SharedReferenceResolver.Normalize(artist.Genres, resolveGenresResult.Value)];
 
         foreach (AlbumEntity album in artist.Albums)
         {
@@ -113,6 +118,8 @@ internal sealed class ArtistRepository : IArtistRepository
         // The whole aggregate is loaded once, including every collection that the album and track repositories reconcile, so that those repositories can apply the
         // edit to the already tracked children instead of loading each album and each track again.
         ArtistEntity? foundArtist = await _luminaDbContext.Artists
+            .Include(repositoryArtist => repositoryArtist.Tags)
+            .Include(repositoryArtist => repositoryArtist.Genres)
             .Include(repositoryArtist => repositoryArtist.Contributors)
             .Include(repositoryArtist => repositoryArtist.Albums)
                 .ThenInclude(album => album.Tags)
@@ -160,6 +167,47 @@ internal sealed class ArtistRepository : IArtistRepository
             shouldReplace: (existingContributor, incomingContributor) => false,
             createNew: incomingContributor => incomingContributor);
 
+        // The tags and the genres of the artist are shared across the whole database, so the stored rows whose names already exist are reused.
+        Result<Updated> reconcileTagsResult = await SharedReferenceResolver.ReconcileAsync(_luminaDbContext, foundArtist.Tags, data.Tags, Errors.Metadata.TagNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+        if (reconcileTagsResult.IsFailure)
+            return reconcileTagsResult.Errors;
+        Result<Updated> reconcileGenresResult = await SharedReferenceResolver.ReconcileAsync(_luminaDbContext, foundArtist.Genres, data.Genres, Errors.Metadata.GenreNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+        if (reconcileGenresResult.IsFailure)
+            return reconcileGenresResult.Errors;
+
+        // The ratings, the aliases and the identifiers of the artist are owned value objects with no identity anyone could reference, so a changed value is replaced as a whole.
+        CollectionReconciler.Reconcile(
+            foundArtist.Ratings,
+            data.Ratings,
+            existingRating => existingRating.Source?.ToString() ?? string.Empty,
+            incomingRating => incomingRating.Source?.ToString() ?? string.Empty,
+            shouldReplace: (existingRating, incomingRating) => !existingRating.Equals(incomingRating),
+            createNew: incomingRating => incomingRating);
+
+        CollectionReconciler.Reconcile(
+            foundArtist.Aliases,
+            data.Aliases,
+            existingAlias => existingAlias.Name,
+            incomingAlias => incomingAlias.Name,
+            shouldReplace: (existingAlias, incomingAlias) => !existingAlias.Equals(incomingAlias),
+            createNew: incomingAlias => incomingAlias);
+
+        CollectionReconciler.Reconcile(
+            foundArtist.Ipis,
+            data.Ipis,
+            existingIpi => existingIpi.Value,
+            incomingIpi => incomingIpi.Value,
+            shouldReplace: (existingIpi, incomingIpi) => false,
+            createNew: incomingIpi => incomingIpi);
+
+        CollectionReconciler.Reconcile(
+            foundArtist.Isnis,
+            data.Isnis,
+            existingIsni => existingIsni.Value,
+            incomingIsni => incomingIsni.Value,
+            shouldReplace: (existingIsni, incomingIsni) => false,
+            createNew: incomingIsni => incomingIsni);
+
         // A track is unique within its library by its file system path, so a track that is about to be inserted during this update can never reference a file
         // that is already registered, nor a file that another track of the same update already references. The check runs before anything is written.
         List<string> newTrackPaths = [.. GetNewTrackPaths(foundArtist, data)];
@@ -171,18 +219,21 @@ internal sealed class ArtistRepository : IArtistRepository
         // and a name that is already stored is reused, before the album and track repositories reconcile their own collections.
         Result<IReadOnlyDictionary<string, TagEntity>> resolveTagsResult = await SharedReferenceResolver.ResolveAsync(
             _luminaDbContext,
-            data.Albums.SelectMany(album => album.Tags).Concat(data.Albums.SelectMany(album => album.Tracks.SelectMany(track => track.Tags))),
+            data.Tags.Concat(data.Albums.SelectMany(album => album.Tags)).Concat(data.Albums.SelectMany(album => album.Tracks.SelectMany(track => track.Tags))),
             Errors.Metadata.TagNameCannotBeEmpty,
             cancellationToken).ConfigureAwait(false);
         if (resolveTagsResult.IsFailure)
             return resolveTagsResult.Errors;
         Result<IReadOnlyDictionary<string, GenreEntity>> resolveGenresResult = await SharedReferenceResolver.ResolveAsync(
             _luminaDbContext,
-            data.Albums.SelectMany(album => album.Genres).Concat(data.Albums.SelectMany(album => album.Tracks.SelectMany(track => track.Genres))),
+            data.Genres.Concat(data.Albums.SelectMany(album => album.Genres)).Concat(data.Albums.SelectMany(album => album.Tracks.SelectMany(track => track.Genres))),
             Errors.Metadata.GenreNameCannotBeEmpty,
             cancellationToken).ConfigureAwait(false);
         if (resolveGenresResult.IsFailure)
             return resolveGenresResult.Errors;
+
+        data.Tags = [.. SharedReferenceResolver.Normalize(data.Tags, resolveTagsResult.Value)];
+        data.Genres = [.. SharedReferenceResolver.Normalize(data.Genres, resolveGenresResult.Value)];
 
         foreach (AlbumEntity dataAlbum in data.Albums)
         {
@@ -324,6 +375,8 @@ internal sealed class ArtistRepository : IArtistRepository
         if (shouldIncludeNavigationProperties)
         {
             query = query
+                .Include(artist => artist.Tags)
+                .Include(artist => artist.Genres)
                 .Include(artist => artist.Contributors)
                 .Include(artist => artist.Albums)
                     .ThenInclude(album => album.Ratings)
@@ -393,6 +446,8 @@ internal sealed class ArtistRepository : IArtistRepository
         if (shouldIncludeNavigationProperties)
         {
             artistsQuery = artistsQuery
+                .Include(artist => artist.Tags)
+                .Include(artist => artist.Genres)
                 .Include(artist => artist.Contributors)
                 .Include(artist => artist.Albums)
                     .ThenInclude(album => album.Ratings)
@@ -586,5 +641,156 @@ internal sealed class ArtistRepository : IArtistRepository
                 ? artistsQuery.OrderByDescending(artist => artist.Name).ThenBy(artist => artist.Id)
                 : artistsQuery.OrderBy(artist => artist.Name).ThenBy(artist => artist.Id),
         };
+    }
+
+    /// <summary>
+    /// Gets the artist of the library identified by <paramref name="libraryId"/> that has the provided <paramref name="name"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the library whose artist is retrieved.</param>
+    /// <param name="name">The name of the artist to retrieve.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the <see cref="ArtistEntity"/> with the provided name, or an error.</returns>
+    public async Task<Result<ArtistEntity?>> GetByNameAsync(Guid libraryId, string name, CancellationToken cancellationToken)
+    {
+        ArtistEntity? artist = await _luminaDbContext.Artists
+            .FirstOrDefaultAsync(repositoryArtist => repositoryArtist.LibraryId == libraryId && repositoryArtist.Name == name, cancellationToken).ConfigureAwait(false);
+        return artist;
+    }
+
+    /// <summary>
+    /// Gets a page of the artists of the media library identified by <paramref name="libraryId"/> whose metadata has not been enriched yet,
+    /// together with their albums and tracks and the collections needed to enrich them, ordered by name, using keyset pagination.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose artists are retrieved.</param>
+    /// <param name="lastName">The name of the last retrieved artist, used for keyset pagination. Pass <see langword="null"/> to get the first page.</param>
+    /// <param name="pageSize">The maximum number of artists to retrieve.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either a page of artists needing their metadata enriched, or an error.</returns>
+    public async Task<Result<IReadOnlyList<ArtistEntity>>> GetArtistsNeedingMetadataAsync(Guid libraryId, string? lastName, int pageSize, CancellationToken cancellationToken)
+    {
+        return await _luminaDbContext.Artists
+            .Include(artist => artist.Area)
+            .Include(artist => artist.BeginArea)
+            .Include(artist => artist.EndArea)
+            .Include(artist => artist.Aliases)
+            .Include(artist => artist.Ipis)
+            .Include(artist => artist.Isnis)
+            .Include(artist => artist.Genres)
+            .Include(artist => artist.Tags)
+            .Include(artist => artist.Ratings)
+            .Include(artist => artist.Contributors)
+            .Include(artist => artist.Albums)
+                .ThenInclude(album => album.ReleaseTypes)
+            .Include(artist => artist.Albums)
+                .ThenInclude(album => album.Genres)
+            .Include(artist => artist.Albums)
+                .ThenInclude(album => album.Tags)
+            .Include(artist => artist.Albums)
+                .ThenInclude(album => album.Ratings)
+            .Include(artist => artist.Albums)
+                .ThenInclude(album => album.Contributors)
+            .Include(artist => artist.Albums)
+                .ThenInclude(album => album.Tracks)
+                    .ThenInclude(track => track.Genres)
+            .Include(artist => artist.Albums)
+                .ThenInclude(album => album.Tracks)
+                    .ThenInclude(track => track.Tags)
+            .Include(artist => artist.Albums)
+                .ThenInclude(album => album.Tracks)
+                    .ThenInclude(track => track.Ratings)
+            .Include(artist => artist.Albums)
+                .ThenInclude(album => album.Tracks)
+                    .ThenInclude(track => track.Moods)
+            .Include(artist => artist.Albums)
+                .ThenInclude(album => album.Tracks)
+                    .ThenInclude(track => track.Isrcs)
+            .Include(artist => artist.Albums)
+                .ThenInclude(album => album.Tracks)
+                    .ThenInclude(track => track.Contributors)
+            .Include(artist => artist.Albums)
+                .ThenInclude(album => album.Tracks)
+                    .ThenInclude(track => track.WorkLanguages)
+            .Include(artist => artist.Albums)
+                .ThenInclude(album => album.Tracks)
+                    .ThenInclude(track => track.WorkIswcs)
+            .AsSplitQuery()
+            .Where(artist => artist.LibraryId == libraryId
+                        && (artist.MetadataStatus != MetadataStatus.Enriched
+                            || artist.Albums.Any(album => album.MetadataStatus != MetadataStatus.Enriched)
+                            || artist.Albums.Any(album => album.Tracks.Any(track => track.MetadataStatus != MetadataStatus.Enriched)))
+                        && (lastName == null || artist.Name.CompareTo(lastName) > 0))
+            .OrderBy(artist => artist.Name)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Gets the number of artists of the media library identified by <paramref name="libraryId"/> whose metadata has not been enriched yet.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose artists are counted.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the number of artists needing their metadata enriched, or an error.</returns>
+    public async Task<Result<int>> GetArtistsNeedingMetadataCountAsync(Guid libraryId, CancellationToken cancellationToken)
+    {
+        return await _luminaDbContext.Artists
+            .CountAsync(artist => artist.LibraryId == libraryId
+                        && (artist.MetadataStatus != MetadataStatus.Enriched
+                            || artist.Albums.Any(album => album.MetadataStatus != MetadataStatus.Enriched)
+                            || artist.Albums.Any(album => album.Tracks.Any(track => track.MetadataStatus != MetadataStatus.Enriched))), cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Gets the number of artists of the media library identified by <paramref name="libraryId"/> whose artwork has not been resolved yet.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose artists are counted.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the number of artists needing their artwork resolved, or an error.</returns>
+    public async Task<Result<int>> GetArtistsNeedingArtworkCountAsync(Guid libraryId, CancellationToken cancellationToken)
+    {
+        return await _luminaDbContext.Artists
+            .CountAsync(artist => artist.LibraryId == libraryId
+                        && !_luminaDbContext.MusicArtwork.Any(musicArtwork => musicArtwork.OwnerType == MusicArtworkOwnerType.Artist
+                            && musicArtwork.OwnerId == artist.Id
+                            && (musicArtwork.Status == ArtworkStatus.Enriched || musicArtwork.Status == ArtworkStatus.NotAvailable)), cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Gets a page of the artists of the media library identified by <paramref name="libraryId"/> whose artwork has not been resolved yet,
+    /// together with their albums and tracks, ordered by name, using keyset pagination.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose artists are retrieved.</param>
+    /// <param name="lastName">The name of the last retrieved artist, used for keyset pagination. Pass <see langword="null"/> to get the first page.</param>
+    /// <param name="pageSize">The maximum number of artists to retrieve.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either a page of artists needing their artwork resolved, or an error.</returns>
+    public async Task<Result<IReadOnlyList<ArtistEntity>>> GetArtistsNeedingArtworkAsync(Guid libraryId, string? lastName, int pageSize, CancellationToken cancellationToken)
+    {
+        return await _luminaDbContext.Artists
+            .AsNoTracking()
+            .Include(artist => artist.Albums)
+                .ThenInclude(album => album.Tracks)
+            .AsSplitQuery()
+            .Where(artist => artist.LibraryId == libraryId
+                        && !_luminaDbContext.MusicArtwork.Any(musicArtwork => musicArtwork.OwnerType == MusicArtworkOwnerType.Artist
+                            && musicArtwork.OwnerId == artist.Id
+                            && (musicArtwork.Status == ArtworkStatus.Enriched || musicArtwork.Status == ArtworkStatus.NotAvailable))
+                        && (lastName == null || artist.Name.CompareTo(lastName) > 0))
+            .OrderBy(artist => artist.Name)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Resets the metadata enrichment status of all the artists of the media library identified by <paramref name="libraryId"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose artists are reset.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Updated>> ResetMetadataStatusForLibraryAsync(Guid libraryId, CancellationToken cancellationToken)
+    {
+        await _luminaDbContext.Artists
+            .Where(artist => artist.LibraryId == libraryId)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(artist => artist.MetadataStatus, MetadataStatus.Pending), cancellationToken).ConfigureAwait(false);
+        return Result.Updated;
     }
 }

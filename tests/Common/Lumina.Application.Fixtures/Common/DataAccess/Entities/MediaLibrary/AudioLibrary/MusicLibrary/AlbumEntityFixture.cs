@@ -6,6 +6,7 @@ using Lumina.Application.Fixtures.Common.DataAccess.Entities.Common;
 using Lumina.Application.Fixtures.Common.Setup;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -24,6 +25,8 @@ public class AlbumEntityFixture
     private readonly TrackEntityFixture _trackEntityFixture = new();
     private readonly TagEntityFixture _tagEntityFixture = new();
     private readonly GenreEntityFixture _genreEntityFixture = new();
+    private readonly AlbumReleaseTypeEntityFixture _albumReleaseTypeEntityFixture = new();
+    private readonly AlbumCatalogNumberEntityFixture _albumCatalogNumberEntityFixture = new();
     private readonly AlbumContributorEntityFixture _albumContributorEntityFixture = new();
     private readonly AudioRatingEntityFixture _audioRatingEntityFixture = new();
 
@@ -71,10 +74,11 @@ public class AlbumEntityFixture
     /// <param name="includeReleaseStatus">Whether the release status should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeTotalDiscs">Whether the total number of discs should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeMediaFormat">Whether the media format should be included, or forced to <see langword="null"/>.</param>
-    /// <param name="includeCatalogNumber">Whether the catalog number should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeCatalogNumbers">Whether the catalog number should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeMusicBrainzReleaseId">Whether the MusicBrainz release identifier should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeMusicBrainzReleaseGroupId">Whether the MusicBrainz release group identifier should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeMusicBrainzReleaseArtistId">Whether the MusicBrainz release artist identifier should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="metadataStatus">Optional. The metadata enrichment status of the album.</param>
     /// <returns>The created <see cref="AlbumEntity"/>.</returns>
     public AlbumEntity Create(
         Guid? id = null,
@@ -99,7 +103,7 @@ public class AlbumEntityFixture
         MusicReleaseStatus? releaseStatus = null,
         int? totalDiscs = null,
         MusicMediaFormat? mediaFormat = null,
-        string? catalogNumber = null,
+        List<string>? catalogNumbers = null,
         Guid? musicBrainzReleaseId = null,
         Guid? musicBrainzReleaseGroupId = null,
         Guid? musicBrainzReleaseArtistId = null,
@@ -118,10 +122,11 @@ public class AlbumEntityFixture
         bool includeReleaseStatus = true,
         bool includeTotalDiscs = true,
         bool includeMediaFormat = true,
-        bool includeCatalogNumber = true,
+        bool includeCatalogNumbers = true,
         bool includeMusicBrainzReleaseId = true,
         bool includeMusicBrainzReleaseGroupId = true,
-        bool includeMusicBrainzReleaseArtistId = true)
+        bool includeMusicBrainzReleaseArtistId = true,
+        MetadataStatus? metadataStatus = null)
     {
         Guid resolvedId = id ?? Guid.NewGuid();
         Guid resolvedArtistId = artistId ?? Guid.NewGuid();
@@ -140,6 +145,7 @@ public class AlbumEntityFixture
                 Id = resolvedId,
                 ArtistId = resolvedArtistId,
                 LibraryId = resolvedLibraryId,
+                MetadataStatus = metadataStatus ?? MetadataStatus.Pending,
                 Title = default!,
                 CreatedOnUtc = default,
                 CreatedBy = default,
@@ -147,6 +153,7 @@ public class AlbumEntityFixture
             })
             .RuleFor(x => x.Title, f => title ?? f.Random.String2(f.Random.Number(1, 255)))
             .RuleFor(x => x.OriginalTitle, f => includeOriginalTitle ? (originalTitle ?? f.Random.String2(f.Random.Number(1, 255))) : null)
+            .RuleFor(x => x.ReleaseTitle, f => f.Random.String2(f.Random.Number(1, 255)))
             .RuleFor(x => x.Description, f => includeDescription ? (description ?? f.Random.String2(f.Random.Number(1, 2000))) : null)
             .RuleFor(x => x.OriginalReleaseDate, includeOriginalReleaseDate ? resolvedOriginalReleaseDate : (DateOnly?)null)
             .RuleFor(x => x.OriginalReleaseYear, includeOriginalReleaseYear ? resolvedOriginalReleaseYear : (int?)null)
@@ -160,13 +167,13 @@ public class AlbumEntityFixture
             .RuleFor(x => x.OriginalLanguageCode, f => includeOriginalLanguage ? (originalLanguageCode ?? f.Random.String2(2)) : null)
             .RuleFor(x => x.OriginalLanguageName, f => includeOriginalLanguage ? (originalLanguageName ?? f.Random.String2(f.Random.Number(1, 50))) : null)
             .RuleFor(x => x.OriginalLanguageNativeName, f => includeOriginalLanguage ? (originalLanguageNativeName ?? f.Random.String2(f.Random.Number(1, 50))) : null)
-            .RuleFor(x => x.ReleaseType, f => includeReleaseType ? (releaseType ?? f.PickRandom<MusicReleaseType>()) : (MusicReleaseType?)null)
+            .RuleFor(x => x.ReleaseTypes, f => includeReleaseType ? [_albumReleaseTypeEntityFixture.Create(releaseType: releaseType)] : [])
             .RuleFor(x => x.ReleaseStatus, f => includeReleaseStatus ? (releaseStatus ?? f.PickRandom<MusicReleaseStatus>()) : (MusicReleaseStatus?)null)
             .RuleFor(x => x.TotalDiscs, includeTotalDiscs ? (totalDiscs ?? Random.Shared.Next(1, 3)) : (int?)null)
             .RuleFor(x => x.TotalTracks, resolvedTracks.Count)
             .RuleFor(x => x.MediaFormat, f => includeMediaFormat ? (mediaFormat ?? f.PickRandom<MusicMediaFormat>()) : (MusicMediaFormat?)null)
             .RuleFor(x => x.Barcode, f => includeBarcode ? (barcode ?? f.Random.String2(f.Random.Number(12, 13), "0123456789")) : null)
-            .RuleFor(x => x.CatalogNumber, f => includeCatalogNumber ? (catalogNumber ?? f.Random.String2(f.Random.Number(1, 50))) : null)
+            .RuleFor(x => x.CatalogNumbers, f => includeCatalogNumbers ? [.. (catalogNumbers ?? [f.Random.String2(f.Random.Number(1, 50))]).Select(catalogNumber => _albumCatalogNumberEntityFixture.Create(catalogNumber: catalogNumber))] : [])
             .RuleFor(x => x.MusicBrainzReleaseId, f => includeMusicBrainzReleaseId ? (musicBrainzReleaseId ?? f.Random.Guid()) : (Guid?)null)
             .RuleFor(x => x.MusicBrainzReleaseGroupId, f => includeMusicBrainzReleaseGroupId ? (musicBrainzReleaseGroupId ?? f.Random.Guid()) : (Guid?)null)
             .RuleFor(x => x.MusicBrainzReleaseArtistId, f => includeMusicBrainzReleaseArtistId ? (musicBrainzReleaseArtistId ?? f.Random.Guid()) : (Guid?)null)
