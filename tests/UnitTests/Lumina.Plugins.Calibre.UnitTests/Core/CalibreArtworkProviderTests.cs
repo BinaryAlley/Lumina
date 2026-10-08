@@ -57,29 +57,29 @@ public class CalibreArtworkProviderTests
     }
 
     [Fact]
-    public async Task GetArtworkAsync_WhenLookupIsNotABookLookup_ShouldReturnNull()
+    public async Task GetArtworkAsync_WhenLookupIsNotABookLookup_ShouldReturnEmpty()
     {
         // Arrange
         MetadataLookupDto lookup = _testMetadataLookupFixture.Create();
         IArtworkProvider baseProvider = _sut;
 
         // Act
-        ArtworkDto? result = await baseProvider.GetArtworkAsync(lookup, CancellationToken.None);
+        IReadOnlyList<ArtworkDto> result = await baseProvider.GetArtworkAsync(lookup, CancellationToken.None);
 
         // Assert
-        Assert.Null(result);
+        Assert.Empty(result);
     }
 
     [Fact]
-    public async Task GetArtworkAsync_WhenLookupPathIsEmpty_ShouldReturnNull()
+    public async Task GetArtworkAsync_WhenLookupPathIsEmpty_ShouldReturnEmpty()
     {
         // Arrange
         BookMetadataLookupDto lookup = _bookMetadataLookupDtoFixture.Create(path: "   ");
 
         // Act
-        ArtworkDto? result = await _sut.GetArtworkAsync(lookup, CancellationToken.None);
+        IReadOnlyList<ArtworkDto> result = await _sut.GetArtworkAsync(lookup, CancellationToken.None);
 
         // Assert
-        Assert.Null(result);
+        Assert.Empty(result);
     }
 }

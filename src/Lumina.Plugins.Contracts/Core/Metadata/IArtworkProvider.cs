@@ -29,10 +29,10 @@ public interface IArtworkProvider
     bool RequiresWebAccess { get; }
 
     /// <summary>
-    /// Gets the artwork of the media item described by <paramref name="lookup"/>.
+    /// Gets the artworks of the media item described by <paramref name="lookup"/>.
     /// </summary>
     /// <param name="lookup">The lookup describing the media item to get the artwork for.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>The artwork of the media item, or <see langword="null"/> when no artwork was found.</returns>
-    Task<ArtworkDto?> GetArtworkAsync(MetadataLookupDto lookup, CancellationToken cancellationToken);
+    /// <returns>The artworks of the media item, or an empty collection when no artwork was found.</returns>
+    Task<IReadOnlyList<ArtworkDto>> GetArtworkAsync(MetadataLookupDto lookup, CancellationToken cancellationToken);
 }

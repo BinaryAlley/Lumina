@@ -64,7 +64,7 @@ public class IMetadataProviderGenericTests
     }
 
     [Fact]
-    public async Task GetSearchResultsAsync_WhenLookupIsOfAnotherRuntimeType_ShouldThrowInvalidCastException()
+    public async Task GetSearchResultsAsync_WhenLookupIsOfAnotherRuntimeType_ShouldReturnEmptyAndNotForward()
     {
         // Arrange
         MetadataLookupDto otherLookup = _otherMetadataLookupDtoFixture.Create();
@@ -72,18 +72,15 @@ public class IMetadataProviderGenericTests
         IMetadataProvider baseProvider = provider;
 
         // Act
-        async Task Act()
-        {
-            await baseProvider.GetSearchResultsAsync(otherLookup, CancellationToken.None);
-        }
+        IReadOnlyList<MetadataDto> result = await baseProvider.GetSearchResultsAsync(otherLookup, CancellationToken.None);
 
         // Assert
-        await Assert.ThrowsAsync<InvalidCastException>(Act);
+        Assert.Empty(result);
         Assert.Null(provider.ReceivedLookup);
     }
 
     [Fact]
-    public async Task GetMetadataAsync_WhenLookupIsOfAnotherRuntimeType_ShouldThrowInvalidCastException()
+    public async Task GetMetadataAsync_WhenLookupIsOfAnotherRuntimeType_ShouldReturnNullAndNotForward()
     {
         // Arrange
         MetadataLookupDto otherLookup = _otherMetadataLookupDtoFixture.Create();
@@ -91,14 +88,25 @@ public class IMetadataProviderGenericTests
         IMetadataProvider baseProvider = provider;
 
         // Act
-        async Task Act()
-        {
-            await baseProvider.GetMetadataAsync(otherLookup, CancellationToken.None);
-        }
+        MetadataDto? result = await baseProvider.GetMetadataAsync(otherLookup, CancellationToken.None);
 
         // Assert
-        await Assert.ThrowsAsync<InvalidCastException>(Act);
+        Assert.Null(result);
         Assert.Null(provider.ReceivedLookup);
+    }
+
+    [Fact]
+    public void LookupType_WhenReadThroughBaseInterface_ShouldReturnTypedLookupType()
+    {
+        // Arrange
+        TestBookMetadataProvider provider = new(_bookMetadataDtoFixture.Create(title: "Exact Result", includeReleaseInfo: false, includeGenres: false, includeTags: false, includeLanguage: false, includeFormat: false, includeVolumeNumber: false));
+        IMetadataProvider baseProvider = provider;
+
+        // Act
+        Type lookupType = baseProvider.LookupType;
+
+        // Assert
+        Assert.Equal(typeof(BookMetadataLookupDto), lookupType);
     }
 
     /// <summary>

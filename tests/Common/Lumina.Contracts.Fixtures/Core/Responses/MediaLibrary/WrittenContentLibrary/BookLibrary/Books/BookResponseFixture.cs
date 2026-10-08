@@ -7,6 +7,7 @@ using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;

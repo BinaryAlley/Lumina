@@ -8,8 +8,9 @@ using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.File
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
-using Lumina.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Artwork;
+using Lumina.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artwork;
 using Lumina.Infrastructure.Fixtures.Common.Setup;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -24,13 +25,13 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.IntegrationTests.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Artwork;
+namespace Lumina.Infrastructure.IntegrationTests.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artwork;
 
 /// <summary>
-/// Contains integration tests for the <see cref="BookArtworkService"/> class.
+/// Contains integration tests for the <see cref="MusicArtworkService"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class BookArtworkServiceTests
+public class MusicArtworkServiceTests
 {
     private const long MAX_ARTWORK_SIZE_BYTES = 10 * 1024 * 1024;
 
@@ -41,7 +42,7 @@ public class BookArtworkServiceTests
     private readonly IPathService _mockPathService;
     private readonly IHttpClientFactory _mockHttpClientFactory;
     private readonly IOptions<MediaSettingsDto> _mockMediaSettingsOptions;
-    private readonly BookArtworkService _sut;
+    private readonly MusicArtworkService _sut;
     private readonly FileSystemPathIdFixture _fileSystemPathIdFixture = new();
     private readonly PathSegmentFixture _pathSegmentFixture = new();
     private readonly ArtworkDtoFixture _artworkDtoFixture = new();
@@ -49,9 +50,9 @@ public class BookArtworkServiceTests
     private readonly StubHttpMessageHandler _stubHttpMessageHandler = new();
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="BookArtworkServiceTests"/> class.
+    /// Initializes a new instance of the <see cref="MusicArtworkServiceTests"/> class.
     /// </summary>
-    public BookArtworkServiceTests()
+    public MusicArtworkServiceTests()
     {
         _mockEnvironmentContext = Substitute.For<IEnvironmentContext>();
         _mockFileTypeService = Substitute.For<IFileTypeService>();
@@ -67,36 +68,35 @@ public class BookArtworkServiceTests
         _mockHttpClientFactory = Substitute.For<IHttpClientFactory>();
         _mockHttpClientFactory.CreateClient(Arg.Any<string>()).Returns(new HttpClient(_stubHttpMessageHandler));
 
-        MediaSettingsDto mediaSettings = _mediaSettingsDtoFixture.Create(rootDirectory: "media", librariesDirectory: "libraries", booksDirectory: "books");
+        MediaSettingsDto mediaSettings = _mediaSettingsDtoFixture.Create(rootDirectory: "media", librariesDirectory: "libraries", booksDirectory: "books", musicDirectory: "music");
         _mockMediaSettingsOptions = Substitute.For<IOptions<MediaSettingsDto>>();
         _mockMediaSettingsOptions.Value.Returns(mediaSettings);
 
-        _sut = new BookArtworkService(_mockEnvironmentContext, _mockPathService, _mockHttpClientFactory, _mockMediaSettingsOptions);
+        _sut = new MusicArtworkService(_mockEnvironmentContext, _mockPathService, _mockHttpClientFactory, _mockMediaSettingsOptions);
     }
 
     [Fact]
-    public async Task SaveBookArtworkAsync_WhenLocalArtworkExists_ShouldCopyItAndReturnARelativePath()
+    public async Task SaveAlbumArtworkAsync_WhenLocalArtworkExists_ShouldCopyItAndReturnARelativePath()
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
-        Guid bookId = Guid.NewGuid();
+        Guid albumId = Guid.NewGuid();
         string libraryName = "Test Library";
-        string authorName = "Test Author";
-        string bookTitle = "Test Book";
+        string artistName = "Test Artist";
+        string albumTitle = "Test Album";
 
-        string sourcePath = CreateTempImageFile(smallImageBytes: 1024);
+        string sourcePath = CreateTempImageFile();
         try
         {
             _mockFileProviderService.FileExists(Arg.Any<FileSystemPathId>()).Returns(Result.From(true));
             _mockFileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
                 .Returns(Result.From(ImageType.JPEG));
 
-            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, bookId, libraryName, authorName, bookTitle);
+            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistName, albumTitle);
             MockArtworkDirectoryStubs(artworkDirectoryPath);
 
-            FileSystemPathId copiedFileId = _fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpg"));
             _mockFileProviderService.CopyFile(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>(), true)
-                .Returns(Result.From(copiedFileId));
+                .Returns(Result.From(_fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpg"))));
 
             string renamedFilePath = Path.Combine(artworkDirectoryPath, "cover.jpg");
             FileSystemPathId renamedFileId = _fileSystemPathIdFixture.Create(renamedFilePath);
@@ -104,15 +104,11 @@ public class BookArtworkServiceTests
                 .Returns(Result.From(renamedFileId));
 
             // Act
-            Result<string> result = await _sut.SaveBookArtworkAsync(libraryId, bookId, libraryName, authorName, bookTitle, _artworkDtoFixture.Create(localPath: sourcePath), CancellationToken.None);
+            Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistName, albumTitle, _artworkDtoFixture.Create(localPath: sourcePath), CancellationToken.None);
 
             // Assert
             Assert.False(result.IsFailure);
             Assert.Equal(renamedFilePath[AppContext.BaseDirectory.Length..].Insert(0, "\\"), result.Value);
-            _mockFileProviderService.Received(1).CopyFile(
-                Arg.Is<FileSystemPathId>(pathId => pathId.Path == sourcePath),
-                Arg.Any<FileSystemPathId>(),
-                true);
             _mockFileProviderService.Received(1).RenameFile(Arg.Any<FileSystemPathId>(), "cover.jpg");
         }
         finally
@@ -121,33 +117,77 @@ public class BookArtworkServiceTests
         }
     }
 
-    [Fact]
-    public async Task SaveBookArtworkAsync_WhenAuthorNameIsMissing_ShouldUseUnknownForTheDirectorySegment()
+    [Theory]
+    [InlineData(ArtworkType.Cover, 0, "cover.jpg")] // the front cover uses the bare type name
+    [InlineData(ArtworkType.Back, 0, "back.jpg")] // the back cover uses the bare type name
+    [InlineData(ArtworkType.Medium, 0, "medium.jpg")] // a single medium uses the bare type name
+    [InlineData(ArtworkType.Booklet, 0, "booklet.jpg")] // the first booklet page uses the bare type name
+    [InlineData(ArtworkType.Booklet, 2, "booklet-2.jpg")] // a further booklet page is suffixed with its ordinal
+    [InlineData(ArtworkType.Liner, 1, "liner-1.jpg")] // a liner note page is suffixed with its ordinal
+    [InlineData(ArtworkType.Other, 0, "other.jpg")] // any other type falls back to the generic name
+    public async Task SaveAlbumArtworkAsync_WhenTheArtworkHasAType_ShouldNameTheFileAfterTheTypeAndOrdinal(ArtworkType artworkType, int ordinal, string expectedFileName)
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
-        Guid bookId = Guid.NewGuid();
+        Guid albumId = Guid.NewGuid();
         string libraryName = "Test Library";
-        string bookTitle = "Test Book";
+        string artistName = "Test Artist";
+        string albumTitle = "Test Album";
 
-        string sourcePath = CreateTempImageFile(smallImageBytes: 1024);
+        string sourcePath = CreateTempImageFile();
         try
         {
             _mockFileProviderService.FileExists(Arg.Any<FileSystemPathId>()).Returns(Result.From(true));
             _mockFileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
                 .Returns(Result.From(ImageType.JPEG));
 
-            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, bookId, libraryName, authorName: "Unknown", bookTitle);
+            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistName, albumTitle);
             MockArtworkDirectoryStubs(artworkDirectoryPath);
 
-            FileSystemPathId renamedFileId = _fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpg"));
+            _mockFileProviderService.CopyFile(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>(), true)
+                .Returns(Result.From(_fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "artwork.jpg"))));
+            _mockFileProviderService.RenameFile(Arg.Any<FileSystemPathId>(), expectedFileName)
+                .Returns(Result.From(_fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, expectedFileName))));
+
+            // Act
+            Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistName, albumTitle, _artworkDtoFixture.Create(localPath: sourcePath, type: artworkType, ordinal: ordinal), CancellationToken.None);
+
+            // Assert
+            Assert.False(result.IsFailure);
+            _mockFileProviderService.Received(1).RenameFile(Arg.Any<FileSystemPathId>(), expectedFileName);
+        }
+        finally
+        {
+            File.Delete(sourcePath);
+        }
+    }
+
+    [Fact]
+    public async Task SaveAlbumArtworkAsync_WhenArtistNameIsMissing_ShouldUseUnknownForTheDirectorySegment()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid albumId = Guid.NewGuid();
+        string libraryName = "Test Library";
+        string albumTitle = "Test Album";
+
+        string sourcePath = CreateTempImageFile();
+        try
+        {
+            _mockFileProviderService.FileExists(Arg.Any<FileSystemPathId>()).Returns(Result.From(true));
+            _mockFileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
+                .Returns(Result.From(ImageType.JPEG));
+
+            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistName: "Unknown", albumTitle);
+            MockArtworkDirectoryStubs(artworkDirectoryPath);
+
             _mockFileProviderService.CopyFile(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>(), true)
                 .Returns(Result.From(_fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpg"))));
             _mockFileProviderService.RenameFile(Arg.Any<FileSystemPathId>(), "cover.jpg")
-                .Returns(Result.From(renamedFileId));
+                .Returns(Result.From(_fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpg"))));
 
             // Act
-            Result<string> result = await _sut.SaveBookArtworkAsync(libraryId, bookId, libraryName, authorName: "   ", bookTitle, _artworkDtoFixture.Create(localPath: sourcePath), CancellationToken.None);
+            Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistName: "   ", albumTitle, _artworkDtoFixture.Create(localPath: sourcePath), CancellationToken.None);
 
             // Assert
             Assert.False(result.IsFailure);
@@ -160,7 +200,7 @@ public class BookArtworkServiceTests
     }
 
     [Fact]
-    public async Task SaveBookArtworkAsync_WhenLocalArtworkIsALink_ShouldReturnInvalidPath()
+    public async Task SaveAlbumArtworkAsync_WhenLocalArtworkIsALink_ShouldReturnInvalidPath()
     {
         // Arrange
         string targetDirectory = Path.Combine(Path.GetTempPath(), $"lumina-junction-target-{Guid.NewGuid():N}");
@@ -175,9 +215,10 @@ public class BookArtworkServiceTests
         try
         {
             _mockFileProviderService.FileExists(Arg.Any<FileSystemPathId>()).Returns(Result.From(true));
+            MockPathBuilding();
 
             // Act
-            Result<string> result = await _sut.SaveBookArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", "Author", "Title", _artworkDtoFixture.Create(localPath: linkPath), CancellationToken.None);
+            Result<string> result = await _sut.SaveAlbumArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", "Artist", "Album", _artworkDtoFixture.Create(localPath: linkPath), CancellationToken.None);
 
             // Assert
             Assert.True(result.IsFailure);
@@ -186,7 +227,6 @@ public class BookArtworkServiceTests
         }
         finally
         {
-            // Windows removes a junction with Directory.Delete, while Unix-like platforms unlink the symbolic link with File.Delete.
             if (OperatingSystem.IsWindows())
                 Directory.Delete(linkPath, true);
             else
@@ -196,16 +236,17 @@ public class BookArtworkServiceTests
     }
 
     [Fact]
-    public async Task SaveBookArtworkAsync_WhenLocalArtworkExceedsMaxSize_ShouldReturnFileTooLarge()
+    public async Task SaveAlbumArtworkAsync_WhenLocalArtworkExceedsMaxSize_ShouldReturnFileTooLarge()
     {
         // Arrange
         string sourcePath = CreateTempImageFile(smallImageBytes: (int)MAX_ARTWORK_SIZE_BYTES + 1);
         try
         {
             _mockFileProviderService.FileExists(Arg.Any<FileSystemPathId>()).Returns(Result.From(true));
+            MockPathBuilding();
 
             // Act
-            Result<string> result = await _sut.SaveBookArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", "Author", "Title", _artworkDtoFixture.Create(localPath: sourcePath), CancellationToken.None);
+            Result<string> result = await _sut.SaveAlbumArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", "Artist", "Album", _artworkDtoFixture.Create(localPath: sourcePath), CancellationToken.None);
 
             // Assert
             Assert.True(result.IsFailure);
@@ -219,18 +260,19 @@ public class BookArtworkServiceTests
     }
 
     [Fact]
-    public async Task SaveBookArtworkAsync_WhenLocalArtworkIsNotAnImage_ShouldReturnCoverFileMustBeAnImage()
+    public async Task SaveAlbumArtworkAsync_WhenLocalArtworkIsNotAnImage_ShouldReturnCoverFileMustBeAnImage()
     {
         // Arrange
-        string sourcePath = CreateTempImageFile(smallImageBytes: 1024);
+        string sourcePath = CreateTempImageFile();
         try
         {
             _mockFileProviderService.FileExists(Arg.Any<FileSystemPathId>()).Returns(Result.From(true));
             _mockFileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
                 .Returns(Result.From(ImageType.None));
+            MockPathBuilding();
 
             // Act
-            Result<string> result = await _sut.SaveBookArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", "Author", "Title", _artworkDtoFixture.Create(localPath: sourcePath), CancellationToken.None);
+            Result<string> result = await _sut.SaveAlbumArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", "Artist", "Album", _artworkDtoFixture.Create(localPath: sourcePath), CancellationToken.None);
 
             // Assert
             Assert.True(result.IsFailure);
@@ -244,32 +286,30 @@ public class BookArtworkServiceTests
     }
 
     [Fact]
-    public async Task SaveBookArtworkAsync_WhenRemoteUrlIsProvided_ShouldDownloadAndStoreTheArtwork()
+    public async Task SaveAlbumArtworkAsync_WhenRemoteUrlIsProvided_ShouldDownloadAndStoreTheArtwork()
     {
         // Arrange
-        byte[] imageBytes = new byte[1024];
-        _stubHttpMessageHandler.SetResponse(HttpStatusCode.OK, imageBytes);
+        _stubHttpMessageHandler.SetResponse(HttpStatusCode.OK, new byte[1024]);
         Guid libraryId = Guid.NewGuid();
-        Guid bookId = Guid.NewGuid();
+        Guid albumId = Guid.NewGuid();
         string libraryName = "Test Library";
-        string authorName = "Test Author";
-        string bookTitle = "Test Book";
+        string artistName = "Test Artist";
+        string albumTitle = "Test Album";
 
         _mockFileProviderService.FileExists(Arg.Any<FileSystemPathId>()).Returns(Result.From(true));
         _mockFileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(ImageType.JPEG));
 
-        string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, bookId, libraryName, authorName, bookTitle);
+        string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistName, albumTitle);
         MockArtworkDirectoryStubs(artworkDirectoryPath);
 
         _mockFileProviderService.CopyFile(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>(), true)
             .Returns(Result.From(_fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpg"))));
-        FileSystemPathId renamedFileId = _fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpg"));
         _mockFileProviderService.RenameFile(Arg.Any<FileSystemPathId>(), "cover.jpg")
-            .Returns(Result.From(renamedFileId));
+            .Returns(Result.From(_fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpg"))));
 
         // Act
-        Result<string> result = await _sut.SaveBookArtworkAsync(libraryId, bookId, libraryName, authorName, bookTitle, _artworkDtoFixture.Create(remoteUrl: "http://artwork.example/cover.jpg"), CancellationToken.None);
+        Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistName, albumTitle, _artworkDtoFixture.Create(remoteUrl: "https://coverartarchive.org/cover.jpg"), CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -280,13 +320,14 @@ public class BookArtworkServiceTests
     }
 
     [Fact]
-    public async Task SaveBookArtworkAsync_WhenRemoteDownloadReturnsAnErrorStatus_ShouldReturnFileNotFound()
+    public async Task SaveAlbumArtworkAsync_WhenRemoteDownloadReturnsAnErrorStatus_ShouldReturnFileNotFound()
     {
         // Arrange
         _stubHttpMessageHandler.SetResponse(HttpStatusCode.NotFound, []);
+        MockPathBuilding();
 
         // Act
-        Result<string> result = await _sut.SaveBookArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", "Author", "Title", _artworkDtoFixture.Create(remoteUrl: "http://artwork.example/cover.jpg"), CancellationToken.None);
+        Result<string> result = await _sut.SaveAlbumArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", "Artist", "Album", _artworkDtoFixture.Create(remoteUrl: "https://coverartarchive.org/cover.jpg"), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -294,13 +335,14 @@ public class BookArtworkServiceTests
     }
 
     [Fact]
-    public async Task SaveBookArtworkAsync_WhenRemoteDownloadExceedsMaxSize_ShouldReturnFileTooLarge()
+    public async Task SaveAlbumArtworkAsync_WhenRemoteDownloadExceedsMaxSize_ShouldReturnFileTooLarge()
     {
         // Arrange
         _stubHttpMessageHandler.SetResponse(HttpStatusCode.OK, new byte[MAX_ARTWORK_SIZE_BYTES + 1]);
+        MockPathBuilding();
 
         // Act
-        Result<string> result = await _sut.SaveBookArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", "Author", "Title", _artworkDtoFixture.Create(remoteUrl: "http://artwork.example/cover.jpg"), CancellationToken.None);
+        Result<string> result = await _sut.SaveAlbumArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", "Artist", "Album", _artworkDtoFixture.Create(remoteUrl: "https://coverartarchive.org/cover.jpg"), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -308,33 +350,32 @@ public class BookArtworkServiceTests
     }
 
     [Fact]
-    public async Task SaveBookArtworkAsync_WhenArtworkHasBothLocalPathAndRemoteUrl_ShouldUseTheLocalFileWithoutDeletingIt()
+    public async Task SaveAlbumArtworkAsync_WhenArtworkHasBothLocalPathAndRemoteUrl_ShouldUseTheLocalFileWithoutDeletingIt()
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
-        Guid bookId = Guid.NewGuid();
+        Guid albumId = Guid.NewGuid();
         string libraryName = "Test Library";
-        string authorName = "Test Author";
-        string bookTitle = "Test Book";
+        string artistName = "Test Artist";
+        string albumTitle = "Test Album";
 
-        string sourcePath = CreateTempImageFile(smallImageBytes: 1024);
+        string sourcePath = CreateTempImageFile();
         try
         {
             _mockFileProviderService.FileExists(Arg.Any<FileSystemPathId>()).Returns(Result.From(true));
             _mockFileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
                 .Returns(Result.From(ImageType.JPEG));
 
-            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, bookId, libraryName, authorName, bookTitle);
+            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistName, albumTitle);
             MockArtworkDirectoryStubs(artworkDirectoryPath);
 
-            FileSystemPathId renamedFileId = _fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpg"));
             _mockFileProviderService.CopyFile(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>(), true)
                 .Returns(Result.From(_fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpg"))));
             _mockFileProviderService.RenameFile(Arg.Any<FileSystemPathId>(), "cover.jpg")
-                .Returns(Result.From(renamedFileId));
+                .Returns(Result.From(_fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpg"))));
 
             // Act
-            Result<string> result = await _sut.SaveBookArtworkAsync(libraryId, bookId, libraryName, authorName, bookTitle, _artworkDtoFixture.Create(localPath: sourcePath, remoteUrl: "http://artwork.example/cover.jpg"), CancellationToken.None);
+            Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistName, albumTitle, _artworkDtoFixture.Create(localPath: sourcePath, remoteUrl: "https://coverartarchive.org/cover.jpg"), CancellationToken.None);
 
             // Assert
             Assert.False(result.IsFailure);
@@ -351,16 +392,17 @@ public class BookArtworkServiceTests
     }
 
     [Fact]
-    public async Task SaveBookArtworkAsync_WhenRemoteDownloadIsCancelled_ShouldRethrowCancellation()
+    public async Task SaveAlbumArtworkAsync_WhenRemoteDownloadIsCancelled_ShouldRethrowCancellation()
     {
         // Arrange
-        CancellationTokenSource cancellationTokenSource = new();
+        using CancellationTokenSource cancellationTokenSource = new();
         cancellationTokenSource.Cancel();
+        MockPathBuilding();
 
         // Act
         async Task Act()
         {
-            await _sut.SaveBookArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", "Author", "Title", _artworkDtoFixture.Create(remoteUrl: "http://artwork.example/cover.jpg"), cancellationTokenSource.Token);
+            await _sut.SaveAlbumArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", "Artist", "Album", _artworkDtoFixture.Create(remoteUrl: "https://coverartarchive.org/cover.jpg"), cancellationTokenSource.Token);
         }
 
         // Assert
@@ -368,18 +410,19 @@ public class BookArtworkServiceTests
     }
 
     [Fact]
-    public async Task SaveBookArtworkAsync_WhenImageTypeDetectionFails_ShouldReturnTheError()
+    public async Task SaveAlbumArtworkAsync_WhenImageTypeDetectionFails_ShouldReturnTheError()
     {
         // Arrange
-        string sourcePath = CreateTempImageFile(smallImageBytes: 1024);
+        string sourcePath = CreateTempImageFile();
         try
         {
             _mockFileProviderService.FileExists(Arg.Any<FileSystemPathId>()).Returns(Result.From(true));
             _mockFileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
                 .Returns(Error.Failure("FileSystem.Error", "Failed to detect the image type"));
+            MockPathBuilding();
 
             // Act
-            Result<string> result = await _sut.SaveBookArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", "Author", "Title", _artworkDtoFixture.Create(localPath: sourcePath), CancellationToken.None);
+            Result<string> result = await _sut.SaveAlbumArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", "Artist", "Album", _artworkDtoFixture.Create(localPath: sourcePath), CancellationToken.None);
 
             // Assert
             Assert.True(result.IsFailure);
@@ -393,29 +436,29 @@ public class BookArtworkServiceTests
     }
 
     [Fact]
-    public async Task SaveBookArtworkAsync_WhenCreatingTheArtworkDirectoryFails_ShouldReturnTheError()
+    public async Task SaveAlbumArtworkAsync_WhenCreatingTheArtworkDirectoryFails_ShouldReturnTheError()
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
-        Guid bookId = Guid.NewGuid();
+        Guid albumId = Guid.NewGuid();
         string libraryName = "Test Library";
-        string authorName = "Test Author";
-        string bookTitle = "Test Book";
+        string artistName = "Test Artist";
+        string albumTitle = "Test Album";
 
-        string sourcePath = CreateTempImageFile(smallImageBytes: 1024);
+        string sourcePath = CreateTempImageFile();
         try
         {
             _mockFileProviderService.FileExists(Arg.Any<FileSystemPathId>()).Returns(Result.From(true));
             _mockFileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
                 .Returns(Result.From(ImageType.JPEG));
 
-            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, bookId, libraryName, authorName, bookTitle);
+            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistName, albumTitle);
             MockArtworkDirectoryStubs(artworkDirectoryPath);
             _mockDirectoryProviderService.CreateDirectory(Arg.Any<FileSystemPathId>(), Arg.Any<string>())
                 .Returns(Error.Failure("Directory.Error", "Failed to create the artwork directory"));
 
             // Act
-            Result<string> result = await _sut.SaveBookArtworkAsync(libraryId, bookId, libraryName, authorName, bookTitle, _artworkDtoFixture.Create(localPath: sourcePath), CancellationToken.None);
+            Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistName, albumTitle, _artworkDtoFixture.Create(localPath: sourcePath), CancellationToken.None);
 
             // Assert
             Assert.True(result.IsFailure);
@@ -429,29 +472,29 @@ public class BookArtworkServiceTests
     }
 
     [Fact]
-    public async Task SaveBookArtworkAsync_WhenDirectoryExistenceCheckFails_ShouldReturnTheError()
+    public async Task SaveAlbumArtworkAsync_WhenDirectoryExistenceCheckFails_ShouldReturnTheError()
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
-        Guid bookId = Guid.NewGuid();
+        Guid albumId = Guid.NewGuid();
         string libraryName = "Test Library";
-        string authorName = "Test Author";
-        string bookTitle = "Test Book";
+        string artistName = "Test Artist";
+        string albumTitle = "Test Album";
 
-        string sourcePath = CreateTempImageFile(smallImageBytes: 1024);
+        string sourcePath = CreateTempImageFile();
         try
         {
             _mockFileProviderService.FileExists(Arg.Any<FileSystemPathId>()).Returns(Result.From(true));
             _mockFileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
                 .Returns(Result.From(ImageType.JPEG));
 
-            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, bookId, libraryName, authorName, bookTitle);
+            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistName, albumTitle);
             MockArtworkDirectoryStubs(artworkDirectoryPath);
             _mockDirectoryProviderService.DirectoryExists(Arg.Any<FileSystemPathId>())
                 .Returns(Error.Failure("Directory.Error", "Failed to check the artwork directory"));
 
             // Act
-            Result<string> result = await _sut.SaveBookArtworkAsync(libraryId, bookId, libraryName, authorName, bookTitle, _artworkDtoFixture.Create(localPath: sourcePath), CancellationToken.None);
+            Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistName, albumTitle, _artworkDtoFixture.Create(localPath: sourcePath), CancellationToken.None);
 
             // Assert
             Assert.True(result.IsFailure);
@@ -465,29 +508,29 @@ public class BookArtworkServiceTests
     }
 
     [Fact]
-    public async Task SaveBookArtworkAsync_WhenCopyingTheArtworkFails_ShouldReturnTheError()
+    public async Task SaveAlbumArtworkAsync_WhenCopyingTheArtworkFails_ShouldReturnTheError()
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
-        Guid bookId = Guid.NewGuid();
+        Guid albumId = Guid.NewGuid();
         string libraryName = "Test Library";
-        string authorName = "Test Author";
-        string bookTitle = "Test Book";
+        string artistName = "Test Artist";
+        string albumTitle = "Test Album";
 
-        string sourcePath = CreateTempImageFile(smallImageBytes: 1024);
+        string sourcePath = CreateTempImageFile();
         try
         {
             _mockFileProviderService.FileExists(Arg.Any<FileSystemPathId>()).Returns(Result.From(true));
             _mockFileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
                 .Returns(Result.From(ImageType.JPEG));
 
-            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, bookId, libraryName, authorName, bookTitle);
+            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistName, albumTitle);
             MockArtworkDirectoryStubs(artworkDirectoryPath);
             _mockFileProviderService.CopyFile(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>(), true)
                 .Returns(Error.Failure("FileSystem.Error", "Failed to copy the artwork"));
 
             // Act
-            Result<string> result = await _sut.SaveBookArtworkAsync(libraryId, bookId, libraryName, authorName, bookTitle, _artworkDtoFixture.Create(localPath: sourcePath), CancellationToken.None);
+            Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistName, albumTitle, _artworkDtoFixture.Create(localPath: sourcePath), CancellationToken.None);
 
             // Assert
             Assert.True(result.IsFailure);
@@ -501,23 +544,23 @@ public class BookArtworkServiceTests
     }
 
     [Fact]
-    public async Task SaveBookArtworkAsync_WhenRenamingTheCopiedArtworkFails_ShouldReturnTheError()
+    public async Task SaveAlbumArtworkAsync_WhenRenamingTheCopiedArtworkFails_ShouldReturnTheError()
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
-        Guid bookId = Guid.NewGuid();
+        Guid albumId = Guid.NewGuid();
         string libraryName = "Test Library";
-        string authorName = "Test Author";
-        string bookTitle = "Test Book";
+        string artistName = "Test Artist";
+        string albumTitle = "Test Album";
 
-        string sourcePath = CreateTempImageFile(smallImageBytes: 1024);
+        string sourcePath = CreateTempImageFile();
         try
         {
             _mockFileProviderService.FileExists(Arg.Any<FileSystemPathId>()).Returns(Result.From(true));
             _mockFileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
                 .Returns(Result.From(ImageType.JPEG));
 
-            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, bookId, libraryName, authorName, bookTitle);
+            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistName, albumTitle);
             MockArtworkDirectoryStubs(artworkDirectoryPath);
             _mockFileProviderService.CopyFile(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>(), true)
                 .Returns(Result.From(_fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpg"))));
@@ -525,12 +568,11 @@ public class BookArtworkServiceTests
                 .Returns(Error.Failure("FileSystem.Error", "Failed to rename the artwork"));
 
             // Act
-            Result<string> result = await _sut.SaveBookArtworkAsync(libraryId, bookId, libraryName, authorName, bookTitle, _artworkDtoFixture.Create(localPath: sourcePath), CancellationToken.None);
+            Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistName, albumTitle, _artworkDtoFixture.Create(localPath: sourcePath), CancellationToken.None);
 
             // Assert
             Assert.True(result.IsFailure);
             Assert.Equal("FileSystem.Error", result.FirstError.Code);
-            _mockFileProviderService.DidNotReceive().DeleteFile(Arg.Any<FileSystemPathId>());
         }
         finally
         {
@@ -539,16 +581,16 @@ public class BookArtworkServiceTests
     }
 
     [Fact]
-    public async Task SaveBookArtworkAsync_WhenAuthorNameCannotBeSanitized_ShouldReturnInvalidPath()
+    public async Task SaveAlbumArtworkAsync_WhenArtistNameCannotBeSanitized_ShouldReturnInvalidPath()
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
-        Guid bookId = Guid.NewGuid();
+        Guid albumId = Guid.NewGuid();
         string libraryName = "Test Library";
-        string authorName = "Test Author";
-        string bookTitle = "Test Book";
+        string artistName = "Test Artist";
+        string albumTitle = "Test Album";
 
-        string sourcePath = CreateTempImageFile(smallImageBytes: 1024);
+        string sourcePath = CreateTempImageFile();
         try
         {
             _mockFileProviderService.FileExists(Arg.Any<FileSystemPathId>()).Returns(Result.From(true));
@@ -556,9 +598,9 @@ public class BookArtworkServiceTests
                 .Returns(Result.From(ImageType.JPEG));
 
             string mediaRoot = Path.Combine(AppContext.BaseDirectory, "media");
-            string booksPath = Path.Combine(mediaRoot, "books");
+            string musicPath = Path.Combine(mediaRoot, "music");
             _mockPathService.CombinePath(AppContext.BaseDirectory, "media").Returns(Result.From(mediaRoot));
-            _mockPathService.CombinePath(mediaRoot, "books").Returns(Result.From(booksPath));
+            _mockPathService.CombinePath(mediaRoot, "music").Returns(Result.From(musicPath));
             _mockPathService.CombinePath(Arg.Any<string>(), Arg.Any<string>())
                 .Returns(callInfo => Result.From(Path.Combine(callInfo.ArgAt<string>(0), callInfo.ArgAt<string>(1))));
             _mockPathService.SanitizeSegment(Arg.Any<string>())
@@ -571,7 +613,7 @@ public class BookArtworkServiceTests
                 });
 
             // Act
-            Result<string> result = await _sut.SaveBookArtworkAsync(libraryId, bookId, libraryName, authorName, bookTitle, _artworkDtoFixture.Create(localPath: sourcePath), CancellationToken.None);
+            Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistName, albumTitle, _artworkDtoFixture.Create(localPath: sourcePath), CancellationToken.None);
 
             // Assert
             Assert.True(result.IsFailure);
@@ -584,17 +626,39 @@ public class BookArtworkServiceTests
         }
     }
 
-    /// <summary>
-    /// Stubs the path and file system services so that the artwork is stored into the given directory.
-    /// </summary>
-    /// <param name="artworkDirectoryPath">The file system path of the directory into which the artwork is stored.</param>
-    private void MockArtworkDirectoryStubs(string artworkDirectoryPath)
+    [Fact]
+    public void DeleteAlbumArtwork_WhenCalled_ShouldDeleteEveryFileInTheAlbumDirectory()
     {
-        string mediaRoot = Path.Combine(AppContext.BaseDirectory, "media");
-        string booksPath = Path.Combine(mediaRoot, "books");
-        _mockPathService.CombinePath(AppContext.BaseDirectory, "media").Returns(Result.From(mediaRoot));
-        _mockPathService.CombinePath(mediaRoot, "books").Returns(Result.From(booksPath));
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid albumId = Guid.NewGuid();
+        string libraryName = "Test Library";
+        string artistName = "Test Artist";
+        string albumTitle = "Test Album";
 
+        string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistName, albumTitle);
+        MockArtworkDirectoryStubs(artworkDirectoryPath);
+        _mockDirectoryProviderService.DirectoryExists(Arg.Any<FileSystemPathId>()).Returns(Result.From(true));
+        FileSystemPathId coverFileId = _fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpg"));
+        FileSystemPathId bookletFileId = _fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "booklet-1.jpg"));
+        _mockFileProviderService.GetFilePaths(Arg.Any<FileSystemPathId>(), true)
+            .Returns(Result.From<IEnumerable<FileSystemPathId>>([coverFileId, bookletFileId]));
+        _mockFileProviderService.DeleteFile(Arg.Any<FileSystemPathId>()).Returns(Result.Deleted);
+
+        // Act
+        Result<Deleted> result = _sut.DeleteAlbumArtwork(libraryId, albumId, libraryName, artistName, albumTitle);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        _mockFileProviderService.Received(1).DeleteFile(coverFileId);
+        _mockFileProviderService.Received(1).DeleteFile(bookletFileId);
+    }
+
+    /// <summary>
+    /// Stubs the path service so that building the artwork directory paths succeeds.
+    /// </summary>
+    private void MockPathBuilding()
+    {
         _mockPathService.SanitizeSegment(Arg.Any<string>())
             .Returns(callInfo =>
             {
@@ -604,6 +668,15 @@ public class BookArtworkServiceTests
 
         _mockPathService.CombinePath(Arg.Any<string>(), Arg.Any<string>())
             .Returns(callInfo => Result.From(Path.Combine(callInfo.ArgAt<string>(0), callInfo.ArgAt<string>(1))));
+    }
+
+    /// <summary>
+    /// Stubs the path and file system services so that the artwork is stored into the given directory.
+    /// </summary>
+    /// <param name="artworkDirectoryPath">The file system path of the directory into which the artwork is stored.</param>
+    private void MockArtworkDirectoryStubs(string artworkDirectoryPath)
+    {
+        MockPathBuilding();
 
         // Every directory except the artwork directory itself already exists, so that only the final directory is created.
         _mockDirectoryProviderService.DirectoryExists(Arg.Any<FileSystemPathId>())
@@ -616,31 +689,31 @@ public class BookArtworkServiceTests
     }
 
     /// <summary>
-    /// Builds the file system path of the directory that the artwork of the book is stored into.
+    /// Builds the file system path of the directory that the artwork of the album is stored into.
     /// </summary>
-    /// <param name="libraryId">The Id of the media library the book belongs to.</param>
-    /// <param name="bookId">The Id of the book.</param>
-    /// <param name="libraryName">The name of the media library the book belongs to.</param>
-    /// <param name="authorName">The name of the author of the book.</param>
-    /// <param name="bookTitle">The title of the book.</param>
-    /// <returns>The expected file system path of the book artwork directory.</returns>
-    private static string BuildArtworkDirectoryPath(Guid libraryId, Guid bookId, string libraryName, string authorName, string bookTitle)
+    /// <param name="libraryId">The Id of the media library the album belongs to.</param>
+    /// <param name="albumId">The Id of the album.</param>
+    /// <param name="libraryName">The name of the media library the album belongs to.</param>
+    /// <param name="artistName">The name of the artist of the album.</param>
+    /// <param name="albumTitle">The title of the album.</param>
+    /// <returns>The expected file system path of the album artwork directory.</returns>
+    private static string BuildArtworkDirectoryPath(Guid libraryId, Guid albumId, string libraryName, string artistName, string albumTitle)
     {
         return Path.Combine(
             AppContext.BaseDirectory,
             "media",
-            "books",
+            "music",
             $"{libraryName}-{libraryId}",
-            authorName,
-            $"{bookTitle}-{bookId}");
+            artistName,
+            $"{albumTitle}-{albumId}");
     }
 
     /// <summary>
-    /// Creates a temporary image file with the given size and returns its path.
+    /// Creates a temporary image file and returns its path.
     /// </summary>
     /// <param name="smallImageBytes">The size of the temporary image file, in bytes.</param>
     /// <returns>The file system path of the created temporary image file.</returns>
-    private static string CreateTempImageFile(int smallImageBytes)
+    private static string CreateTempImageFile(int smallImageBytes = 1024)
     {
         string sourcePath = Path.Combine(Path.GetTempPath(), $"lumina-artwork-source-{Guid.NewGuid():N}.jpg");
         File.WriteAllBytes(sourcePath, new byte[smallImageBytes]);

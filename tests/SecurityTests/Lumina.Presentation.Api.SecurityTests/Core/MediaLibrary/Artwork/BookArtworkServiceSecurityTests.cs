@@ -120,8 +120,8 @@ public class BookArtworkServiceSecurityTests
             string capturedDestinationPath = string.Empty;
             _mockFileProviderService.CopyFile(Arg.Any<FileSystemPathId>(), Arg.Do<FileSystemPathId>(destination => capturedDestinationPath = destination.Path), true)
                 .Returns(Result.From(_fileSystemPathIdFixture.Create(Path.Combine(AppContext.BaseDirectory, "media", "books", "cover.jpg"))));
-            _mockFileProviderService.RenameFile(Arg.Any<FileSystemPathId>(), "cover.jpeg")
-                .Returns(Result.From(_fileSystemPathIdFixture.Create(Path.Combine(AppContext.BaseDirectory, "media", "books", "cover.jpeg"))));
+            _mockFileProviderService.RenameFile(Arg.Any<FileSystemPathId>(), "cover.jpg")
+                .Returns(Result.From(_fileSystemPathIdFixture.Create(Path.Combine(AppContext.BaseDirectory, "media", "books", "cover.jpg"))));
 
             // Act
             char separator = Path.DirectorySeparatorChar;

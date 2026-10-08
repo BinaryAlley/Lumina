@@ -8,6 +8,8 @@ using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.File
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
+using Lumina.Infrastructure.Common.Utilities;
+using Lumina.Infrastructure.Common.Networking;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -240,7 +242,7 @@ internal sealed class BookArtworkService : IBookArtworkService
             return copyFileResult.Errors;
 
         // Rename the copied file to the standard naming.
-        Result<FileSystemPathId> renameFileResult = _environmentContext.FileProviderService.RenameFile(copyFileResult.Value, $"cover.{imageTypeResult.Value.ToString().ToLowerInvariant()}");
+        Result<FileSystemPathId> renameFileResult = _environmentContext.FileProviderService.RenameFile(copyFileResult.Value, $"cover.{imageTypeResult.Value.ToFileExtension()}");
         if (renameFileResult.IsFailure)
             return renameFileResult.Errors;
 
@@ -266,7 +268,7 @@ internal sealed class BookArtworkService : IBookArtworkService
             return Errors.FileSystemManagement.FileNotFound;
 
         // Download the remote artwork into a temporary file, aborting when it exceeds the maximum allowed size.
-        using HttpClient httpClient = _httpClientFactory.CreateClient();
+        using HttpClient httpClient = _httpClientFactory.CreateClient(NamedHttpClients.ARTWORK_DOWNLOAD);
         string tempPath = Path.Combine(Path.GetTempPath(), $"lumina-artwork-{Guid.NewGuid():N}");
         bool downloaded = false;
         try
