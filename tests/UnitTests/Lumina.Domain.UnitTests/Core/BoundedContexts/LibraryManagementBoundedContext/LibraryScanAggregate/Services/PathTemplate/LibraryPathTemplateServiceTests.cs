@@ -224,29 +224,29 @@ public class LibraryPathTemplateServiceTests
     public void Parse_WhenRelativePathIsEmpty_ShouldReturnNull(string relativePath)
     {
         // Act
-        Result<ParsedLibraryPath?> result = _sut.Parse(LibraryType.Music, CreateMusicTemplate(), relativePath, '/');
+        Result<Optional<ParsedLibraryPath>> result = _sut.Parse(LibraryType.Music, CreateMusicTemplate(), relativePath, '/');
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Null(result.Value);
+        Assert.False(result.Value.HasValue);
     }
 
     [Fact]
     public void Parse_WhenTemplateIsEmpty_ShouldReturnNull()
     {
         // Act
-        Result<ParsedLibraryPath?> result = _sut.Parse(LibraryType.Music, LibraryPathTemplate.Empty(), "Pink Floyd/1973 - Time.mp3", '/');
+        Result<Optional<ParsedLibraryPath>> result = _sut.Parse(LibraryType.Music, LibraryPathTemplate.Empty(), "Pink Floyd/1973 - Time.mp3", '/');
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Null(result.Value);
+        Assert.False(result.Value.HasValue);
     }
 
     [Fact]
     public void Parse_WhenTemplateIsNotSupportedForTheLibraryType_ShouldReturnError()
     {
         // Act
-        Result<ParsedLibraryPath?> result = _sut.Parse(LibraryType.Book, CreateMusicTemplate(), "Pink Floyd/1973 - Time.mp3", '/');
+        Result<Optional<ParsedLibraryPath>> result = _sut.Parse(LibraryType.Book, CreateMusicTemplate(), "Pink Floyd/1973 - Time.mp3", '/');
 
         // Assert
         Assert.True(result.IsFailure);
@@ -261,11 +261,11 @@ public class LibraryPathTemplateServiceTests
         LibraryPathTemplate template = CreateMusicTemplate();
 
         // Act
-        Result<ParsedLibraryPath?> result = _sut.Parse(LibraryType.Music, template, "Pink Floyd/1973 - Time.mp3", '/');
+        Result<Optional<ParsedLibraryPath>> result = _sut.Parse(LibraryType.Music, template, "Pink Floyd/1973 - Time.mp3", '/');
 
         // Assert
         Assert.False(result.IsFailure);
-        ParsedLibraryPath parsedPath = result.Value!;
+        ParsedLibraryPath parsedPath = result.Value.Value;
         Assert.Equal("Pink Floyd", parsedPath.GetString(LibraryPathPartKind.Artist).Value);
         Assert.Equal(1973, parsedPath.GetInt(LibraryPathPartKind.ReleaseYear).Value);
         Assert.Equal("Time", parsedPath.GetString(LibraryPathPartKind.TrackName).Value);
@@ -280,11 +280,11 @@ public class LibraryPathTemplateServiceTests
         LibraryPathTemplate template = CreateMusicTemplate();
 
         // Act
-        Result<ParsedLibraryPath?> result = _sut.Parse(LibraryType.Music, template, "Pink Floyd/no year/Time.mp3", '/');
+        Result<Optional<ParsedLibraryPath>> result = _sut.Parse(LibraryType.Music, template, "Pink Floyd/no year/Time.mp3", '/');
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Null(result.Value);
+        Assert.False(result.Value.HasValue);
     }
 
     [Fact]
@@ -305,11 +305,11 @@ public class LibraryPathTemplateServiceTests
         ]);
 
         // Act
-        Result<ParsedLibraryPath?> result = _sut.Parse(LibraryType.Music, template, "Pink Floyd/07", '/');
+        Result<Optional<ParsedLibraryPath>> result = _sut.Parse(LibraryType.Music, template, "Pink Floyd/07", '/');
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Equal(7, result.Value!.GetInt(LibraryPathPartKind.TrackNumber).Value);
+        Assert.Equal(7, result.Value.Value.GetInt(LibraryPathPartKind.TrackNumber).Value);
     }
 
     [Fact]
@@ -330,11 +330,11 @@ public class LibraryPathTemplateServiceTests
         ]);
 
         // Act
-        Result<ParsedLibraryPath?> result = _sut.Parse(LibraryType.Music, template, "Pink Floyd/007", '/');
+        Result<Optional<ParsedLibraryPath>> result = _sut.Parse(LibraryType.Music, template, "Pink Floyd/007", '/');
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Null(result.Value);
+        Assert.False(result.Value.HasValue);
     }
 
     [Fact]
@@ -351,11 +351,11 @@ public class LibraryPathTemplateServiceTests
         ]);
 
         // Act
-        Result<ParsedLibraryPath?> result = _sut.Parse(LibraryType.Music, template, "1973", '/');
+        Result<Optional<ParsedLibraryPath>> result = _sut.Parse(LibraryType.Music, template, "1973", '/');
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Equal(1973, result.Value!.GetInt(LibraryPathPartKind.ReleaseYear).Value);
+        Assert.Equal(1973, result.Value.Value.GetInt(LibraryPathPartKind.ReleaseYear).Value);
     }
 
     [Fact]
@@ -372,11 +372,11 @@ public class LibraryPathTemplateServiceTests
         ]);
 
         // Act
-        Result<ParsedLibraryPath?> result = _sut.Parse(LibraryType.Music, template, "73", '/');
+        Result<Optional<ParsedLibraryPath>> result = _sut.Parse(LibraryType.Music, template, "73", '/');
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Null(result.Value);
+        Assert.False(result.Value.HasValue);
     }
 
     [Fact]
@@ -397,12 +397,12 @@ public class LibraryPathTemplateServiceTests
         ]);
 
         // Act
-        Result<ParsedLibraryPath?> result = _sut.Parse(LibraryType.Music, template, "Pink Floyd/", '/');
+        Result<Optional<ParsedLibraryPath>> result = _sut.Parse(LibraryType.Music, template, "Pink Floyd/", '/');
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Equal("Pink Floyd", result.Value!.GetString(LibraryPathPartKind.Artist).Value);
-        Assert.False(result.Value.GetInt(LibraryPathPartKind.DiscNumber).HasValue);
+        Assert.Equal("Pink Floyd", result.Value.Value.GetString(LibraryPathPartKind.Artist).Value);
+        Assert.False(result.Value.Value.GetInt(LibraryPathPartKind.DiscNumber).HasValue);
     }
 
     [Fact]
@@ -423,12 +423,12 @@ public class LibraryPathTemplateServiceTests
         ]);
 
         // Act
-        Result<ParsedLibraryPath?> result = _sut.Parse(LibraryType.Music, template, "Pink Floyd/02", '/');
+        Result<Optional<ParsedLibraryPath>> result = _sut.Parse(LibraryType.Music, template, "Pink Floyd/02", '/');
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Equal("Pink Floyd", result.Value!.GetString(LibraryPathPartKind.Artist).Value);
-        Assert.Equal(2, result.Value.GetInt(LibraryPathPartKind.DiscNumber).Value);
+        Assert.Equal("Pink Floyd", result.Value.Value.GetString(LibraryPathPartKind.Artist).Value);
+        Assert.Equal(2, result.Value.Value.GetInt(LibraryPathPartKind.DiscNumber).Value);
     }
 
     [Fact]
@@ -452,11 +452,11 @@ public class LibraryPathTemplateServiceTests
         ]);
 
         // Act
-        Result<ParsedLibraryPath?> result = _sut.Parse(LibraryType.Music, template, "Tolkien/The Lord of the Rings - J.R.R. Tolkien", '/');
+        Result<Optional<ParsedLibraryPath>> result = _sut.Parse(LibraryType.Music, template, "Tolkien/The Lord of the Rings - J.R.R. Tolkien", '/');
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Equal("Tolkien", result.Value!.GetString(LibraryPathPartKind.Author).Value);
+        Assert.Equal("Tolkien", result.Value.Value.GetString(LibraryPathPartKind.Author).Value);
     }
 
     /// <summary>

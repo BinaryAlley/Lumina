@@ -44,6 +44,7 @@ public class FileSystemStructureSeedServiceTests
         // Arrange
         _mockPathService.CombinePath(_rootPath, "libraries").Returns(Path.Combine(_rootPath, "libraries"));
         _mockPathService.CombinePath(_rootPath, "books").Returns(Path.Combine(_rootPath, "books"));
+        _mockPathService.CombinePath(_rootPath, "music").Returns(Path.Combine(_rootPath, "music"));
         _mockDirectoryProviderService.DirectoryExists(Arg.Any<FileSystemPathId>()).Returns(false);
         _mockDirectoryProviderService.CreateDirectory(Arg.Any<FileSystemPathId>(), Arg.Any<string>())
             .Returns(callInfo => Result<FileSystemPathId>.Success(FileSystemPathId.Create(Path.Combine(_rootPath, callInfo.ArgAt<string>(1))).Value));
@@ -53,8 +54,11 @@ public class FileSystemStructureSeedServiceTests
 
         // Assert
         Assert.True(result.IsSuccess);
-        _mockDirectoryProviderService.Received(2).DirectoryExists(Arg.Any<FileSystemPathId>());
-        _mockDirectoryProviderService.Received(2).CreateDirectory(Arg.Any<FileSystemPathId>(), Arg.Any<string>());
+        _mockDirectoryProviderService.Received(3).DirectoryExists(Arg.Any<FileSystemPathId>());
+        _mockDirectoryProviderService.Received(3).CreateDirectory(Arg.Any<FileSystemPathId>(), Arg.Any<string>());
+        _mockDirectoryProviderService.Received(1).CreateDirectory(Arg.Any<FileSystemPathId>(), "libraries");
+        _mockDirectoryProviderService.Received(1).CreateDirectory(Arg.Any<FileSystemPathId>(), "books");
+        _mockDirectoryProviderService.Received(1).CreateDirectory(Arg.Any<FileSystemPathId>(), "music");
     }
 
     [Fact]
@@ -63,6 +67,7 @@ public class FileSystemStructureSeedServiceTests
         // Arrange
         _mockPathService.CombinePath(_rootPath, "libraries").Returns(Path.Combine(_rootPath, "libraries"));
         _mockPathService.CombinePath(_rootPath, "books").Returns(Path.Combine(_rootPath, "books"));
+        _mockPathService.CombinePath(_rootPath, "music").Returns(Path.Combine(_rootPath, "music"));
         _mockDirectoryProviderService.DirectoryExists(Arg.Any<FileSystemPathId>()).Returns(true);
 
         // Act
@@ -70,7 +75,7 @@ public class FileSystemStructureSeedServiceTests
 
         // Assert
         Assert.True(result.IsSuccess);
-        _mockDirectoryProviderService.Received(2).DirectoryExists(Arg.Any<FileSystemPathId>());
+        _mockDirectoryProviderService.Received(3).DirectoryExists(Arg.Any<FileSystemPathId>());
         _mockDirectoryProviderService.DidNotReceive().CreateDirectory(Arg.Any<FileSystemPathId>(), Arg.Any<string>());
     }
 

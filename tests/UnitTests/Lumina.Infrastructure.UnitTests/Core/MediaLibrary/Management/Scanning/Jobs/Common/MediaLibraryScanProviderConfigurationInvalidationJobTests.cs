@@ -12,9 +12,11 @@ using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.PathTemplate;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
@@ -22,6 +24,7 @@ using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContex
 using Lumina.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
+using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.WrittenContent.Books;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -83,6 +86,9 @@ public class MediaLibraryScanProviderConfigurationInvalidationJobTests
         _mockUnitOfWork.ArtworkProviderConfigurationRepository.Returns(_mockArtworkConfigurationRepository);
         _mockUnitOfWork.BookRepository.Returns(_mockBookRepository);
         _mockServiceProvider.GetService(typeof(IUnitOfWork)).Returns(_mockUnitOfWork);
+        // The job resolves the materializer of the loaded library type from the service scope, so the books materializer must be available.
+        _mockServiceProvider.GetService(typeof(IEnumerable<IMediaLibraryScanItemMaterializer>))
+            .Returns(new IMediaLibraryScanItemMaterializer[] { new BooksMediaLibraryScanItemMaterializer(Substitute.For<ILibraryPathTemplateService>(), Substitute.For<IPathService>()) });
 
         _mockDomainEventPublisher = Substitute.For<IDomainEventPublisher>();
         _mockDomainEventPublisher.PublishAsync(Arg.Any<IDomainEvent>(), Arg.Any<CancellationToken>())
@@ -113,11 +119,29 @@ public class MediaLibraryScanProviderConfigurationInvalidationJobTests
         await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
 
         // Assert
-        // a missing stored fingerprint means the configuration was never recorded yet, so the current state of the books is trusted
+        // A missing stored fingerprint means the configuration was never recorded yet, so the current state of the books is trusted.
         await _mockBookRepository.DidNotReceive().ResetMetadataStatusForLibraryAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockBookRepository.DidNotReceive().ResetArtworkStatusForLibraryAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockLibraryRepository.DidNotReceive().UpdateAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenFingerprintsArePersisted_ShouldPublishProgressChangedEvent()
+    {
+        // Arrange
+        LibraryEntity library = _libraryEntityFixture.Create(id: _libraryId.Value, title: "My Library");
+        SetupLibraryAndConfigurations(library);
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Is<LibraryScanProgressChangedDomainEvent>(domainEvent =>
+            domainEvent.LibraryId == _libraryId
+            && domainEvent.MediaLibraryScanCompositeId.ScanId == _scanId
+            && domainEvent.MediaLibraryScanCompositeId.UserId == _userId), Arg.Any<CancellationToken>());
         Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
     }
 
@@ -134,7 +158,7 @@ public class MediaLibraryScanProviderConfigurationInvalidationJobTests
         await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
 
         // Assert
-        // the metadata provider configuration changed, so the books must be re-enriched by the metadata enrichment job
+        // The metadata provider configuration changed, so the books must be re-enriched by the metadata enrichment job.
         await _mockBookRepository.Received(1).ResetMetadataStatusForLibraryAsync(_libraryId.Value, Arg.Any<CancellationToken>());
         await _mockBookRepository.DidNotReceive().ResetArtworkStatusForLibraryAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockLibraryRepository.DidNotReceive().UpdateAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
@@ -155,7 +179,7 @@ public class MediaLibraryScanProviderConfigurationInvalidationJobTests
         await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
 
         // Assert
-        // the artwork provider configuration changed, so the artwork of the books must be re-resolved by the artwork enrichment job
+        // The artwork provider configuration changed, so the artwork of the books must be re-resolved by the artwork enrichment job.
         await _mockBookRepository.Received(1).ResetArtworkStatusForLibraryAsync(_libraryId.Value, Arg.Any<CancellationToken>());
         await _mockBookRepository.DidNotReceive().ResetMetadataStatusForLibraryAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockLibraryRepository.DidNotReceive().UpdateAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
@@ -172,9 +196,9 @@ public class MediaLibraryScanProviderConfigurationInvalidationJobTests
         List<LibraryArtworkProviderConfigurationEntity> artworkConfigurations = _artworkConfigurationEntityFixture.CreateMany(2, _libraryId.Value, Guid.NewGuid(), 1);
         SetupLibraryAndConfigurations(library, metadataConfigurations, artworkConfigurations);
 
-        // the stored fingerprints match the ones computed from the current provider configuration
+        // The stored fingerprints match the ones computed from the current provider configuration.
         string metadataFingerprint = ProviderConfigurationFingerprint.ComputeMetadataFingerprint(metadataConfigurations, false, library.CanDownloadMetadataFromWeb);
-        string artworkFingerprint = ProviderConfigurationFingerprint.ComputeArtworkFingerprint(artworkConfigurations, library.CanDownloadMetadataFromWeb);
+        string artworkFingerprint = ProviderConfigurationFingerprint.ComputeArtworkFingerprint(artworkConfigurations, false, library.CanDownloadMetadataFromWeb);
         library.MetadataProvidersConfigurationFingerprint = metadataFingerprint;
         library.ArtworkProvidersConfigurationFingerprint = artworkFingerprint;
 
@@ -182,7 +206,7 @@ public class MediaLibraryScanProviderConfigurationInvalidationJobTests
         await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
 
         // Assert
-        // the configuration did not change, so the enrichment state of the books is trusted, and only the fingerprints are persisted
+        // The configuration did not change, so the enrichment state of the books is trusted, and only the fingerprints are persisted.
         await _mockBookRepository.DidNotReceive().ResetMetadataStatusForLibraryAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockBookRepository.DidNotReceive().ResetArtworkStatusForLibraryAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockLibraryRepository.DidNotReceive().UpdateAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
@@ -194,7 +218,7 @@ public class MediaLibraryScanProviderConfigurationInvalidationJobTests
     public async Task ExecuteAsync_WhenBothFingerprintsDiffer_ShouldPersistTheUpdatedFingerprintsViaSaveChangesOnly()
     {
         // Arrange
-        // both fingerprints are stale, so both enrichment channels must be reset and both fingerprints must be rewritten on the tracked entity
+        // Both fingerprints are stale, so both enrichment channels must be reset and both fingerprints must be rewritten on the tracked entity.
         LibraryEntity library = _libraryEntityFixture.Create(id: _libraryId.Value, title: "My Library", metadataProvidersConfigurationFingerprint: "STALE_METADATA", artworkProvidersConfigurationFingerprint: "STALE_ARTWORK");
         SetupLibraryAndConfigurations(library);
         _mockBookRepository.ResetMetadataStatusForLibraryAsync(_libraryId.Value, Arg.Any<CancellationToken>())
@@ -206,8 +230,8 @@ public class MediaLibraryScanProviderConfigurationInvalidationJobTests
         await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
 
         // Assert
-        // regression guard for the content-location data-loss bug: the fingerprints are persisted on the already-tracked entity and
-        // flushed through SaveChanges, the repository update action (which clears and re-adds the owned content locations) must never run
+        // Regression guard for the content-location data-loss bug: the fingerprints are persisted on the already-tracked entity and
+        // flushed through SaveChanges, the repository update action (which clears and re-adds the owned content locations) must never run.
         await _mockBookRepository.Received(1).ResetMetadataStatusForLibraryAsync(_libraryId.Value, Arg.Any<CancellationToken>());
         await _mockBookRepository.Received(1).ResetArtworkStatusForLibraryAsync(_libraryId.Value, Arg.Any<CancellationToken>());
         await _mockLibraryRepository.DidNotReceive().UpdateAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
@@ -359,7 +383,7 @@ public class MediaLibraryScanProviderConfigurationInvalidationJobTests
         await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
 
         // Assert
-        // reading the user settings is best effort, a failure must not prevent the fingerprints from being persisted
+        // Reading the user settings is best effort, a failure must not prevent the fingerprints from being persisted.
         Assert.NotNull(library.MetadataProvidersConfigurationFingerprint);
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
         Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
@@ -377,7 +401,7 @@ public class MediaLibraryScanProviderConfigurationInvalidationJobTests
         await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
 
         // Assert
-        // the user settings repository is optional, its absence must not prevent the fingerprints from being persisted
+        // The user settings repository is optional, its absence must not prevent the fingerprints from being persisted.
         Assert.NotNull(library.MetadataProvidersConfigurationFingerprint);
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
         Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
@@ -413,6 +437,8 @@ public class MediaLibraryScanProviderConfigurationInvalidationJobTests
     /// <param name="artworkConfigurations">The artwork provider configurations of the media library.</param>
     private void SetupLibraryAndConfigurations(LibraryEntity library, List<LibraryMetadataProviderConfigurationEntity>? metadataConfigurations = null, List<LibraryArtworkProviderConfigurationEntity>? artworkConfigurations = null)
     {
+        // The job resolves the materializer by the library type, so the fixture-provided library must be of the type the books materializer supports.
+        library.LibraryType = LibraryType.Book;
         _mockLibraryRepository.GetByIdAsync(_libraryId.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
         SetupConfigurations(metadataConfigurations, artworkConfigurations);

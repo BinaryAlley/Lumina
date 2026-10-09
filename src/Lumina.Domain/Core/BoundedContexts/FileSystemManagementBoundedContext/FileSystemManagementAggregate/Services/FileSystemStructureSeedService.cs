@@ -32,7 +32,7 @@ internal class FileSystemStructureSeedService : IFileSystemStructureSeedService
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public Result<Created> SetDefaultDirectories(string rootPath)
     {
-        // make sure the root path exists
+        // Make sure the root path exists.
         Result<FileSystemPathId> rootPathIdResult = FileSystemPathId.Create(rootPath);
         if (rootPathIdResult.IsFailure)
             return rootPathIdResult.Errors;
@@ -44,6 +44,10 @@ internal class FileSystemStructureSeedService : IFileSystemStructureSeedService
         Result<Created> createBooksDirectoryResult = EnsureDirectory(rootPathIdResult.Value, "books");
         if (createBooksDirectoryResult.IsFailure)
             return createBooksDirectoryResult.Errors;
+
+        Result<Created> createMusicDirectoryResult = EnsureDirectory(rootPathIdResult.Value, "music");
+        if (createMusicDirectoryResult.IsFailure)
+            return createMusicDirectoryResult.Errors;
 
         return Result.Created;
     }
@@ -68,7 +72,7 @@ internal class FileSystemStructureSeedService : IFileSystemStructureSeedService
         if (directoryExistsResult.IsFailure)
             return directoryExistsResult.Errors;
 
-        // only create it if it doesn't already exist
+        // Only create it if it doesn't already exist.
         if (!directoryExistsResult.Value)
         {
             Result<FileSystemPathId> createDirectoryResult = _environmentContext.DirectoryProviderService.CreateDirectory(rootPathId, directoryName);

@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Services.Scanners;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Scanners;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Services.Scanners;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
@@ -33,6 +34,23 @@ public class MediaLibraryScannerFactoryTests
         Assert.Same(expectedScanner, scanner);
     }
 
+    [Fact]
+    public void CreateLibraryScanner_WhenLibraryTypeIsMusic_ShouldReturnMusicLibraryTypeScanner()
+    {
+        // Arrange
+        IMusicLibraryTypeScanner expectedScanner = Substitute.For<IMusicLibraryTypeScanner>();
+        ServiceCollection services = new();
+        services.AddSingleton(expectedScanner);
+        using ServiceProvider serviceProvider = services.BuildServiceProvider();
+        MediaLibraryScannerFactory sut = new(serviceProvider);
+
+        // Act
+        IMediaTypeScanner scanner = sut.CreateLibraryScanner(LibraryType.Music);
+
+        // Assert
+        Assert.Same(expectedScanner, scanner);
+    }
+
     [Theory]
     [InlineData(LibraryType.EBook)] // eBook scanner is not implemented
     [InlineData(LibraryType.ComicBook)] // comic book scanner is not implemented
@@ -55,7 +73,6 @@ public class MediaLibraryScannerFactoryTests
     [InlineData(LibraryType.InterviewVideo)] // interview video scanner is not implemented
     [InlineData(LibraryType.CoverSongVideo)] // cover song video scanner is not implemented
     [InlineData(LibraryType.PodcastVideo)] // podcast video scanner is not implemented
-    [InlineData(LibraryType.Music)] // music scanner is not implemented
     [InlineData(LibraryType.Audiobook)] // audiobook scanner is not implemented
     [InlineData(LibraryType.LiveRecordingAudio)] // live recording audio scanner is not implemented
     [InlineData(LibraryType.InterviewAudio)] // interview audio scanner is not implemented

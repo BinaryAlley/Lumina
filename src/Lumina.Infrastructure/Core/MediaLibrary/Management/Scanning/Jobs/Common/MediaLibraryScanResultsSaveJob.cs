@@ -1,10 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Common.DataAccess.Repositories.BookLibrary;
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
@@ -13,9 +11,7 @@ using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Library
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -67,8 +63,19 @@ internal sealed class MediaLibraryScanResultsSaveJob : MediaLibraryScanJob, IMed
                     IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
                     IDomainEventPublisher domainEventPublisher = asyncServiceScope.ServiceProvider.GetService<IDomainEventPublisher>()!;
 
-
                     MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
+
+                    // Load the media library, whose type determines the materializer used to create the media library items.
+                    Result<LibraryEntity?> getLibraryResult = await unitOfWork.LibraryRepository.GetByIdAsync(LibraryId.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
+                    if (getLibraryResult.IsFailure || getLibraryResult.Value is null)
+                        throw new InvalidOperationException(getLibraryResult.IsFailure ? getLibraryResult.FirstError.Description : "The media library was not found.");
+                    LibraryType libraryType = getLibraryResult.Value.LibraryType;
+
+                    IMediaLibraryScanItemMaterializer? materializer = asyncServiceScope.ServiceProvider
+                        .GetServices<IMediaLibraryScanItemMaterializer>()
+                        .FirstOrDefault(candidate => candidate.SupportedLibraryType == libraryType);
+                    if (materializer is null)
+                        throw new InvalidOperationException($"No media library item materializer exists for media library type '{libraryType}'.");
 
                     // Set the initial progress of the scan job; it is a single step job, applying the scan results to the storage medium.
                     Result<Success> publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 0, 1, cancellationToken).ConfigureAwait(false);
@@ -80,7 +87,7 @@ internal sealed class MediaLibraryScanResultsSaveJob : MediaLibraryScanJob, IMed
                     if (getDeletedPathsResult.IsFailure)
                         throw new InvalidOperationException(getDeletedPathsResult.FirstError.Description);
 
-                    // Get the paths of the media library scan staging results that changed since the previous scan, so that the books stored at those paths are re-enriched.
+                    // Get the paths of the media library scan staging results that changed since the previous scan, so that the items stored at those paths are re-enriched.
                     Result<IReadOnlyList<string>> getChangedPathsResult = await unitOfWork.LibraryScanStagingResultsRepository.GetChangedPathsAsync(ScanId.Value, cancellationToken).ConfigureAwait(false);
                     if (getChangedPathsResult.IsFailure)
                         throw new InvalidOperationException(getChangedPathsResult.FirstError.Description);
@@ -90,10 +97,10 @@ internal sealed class MediaLibraryScanResultsSaveJob : MediaLibraryScanJob, IMed
                     if (applySnapshotSwapResult.IsFailure)
                         throw new InvalidOperationException(applySnapshotSwapResult.FirstError.Description);
 
-                    // Reset the enrichment state of the books whose content changed, so that they are re-enriched by the enrichment jobs that follow.
+                    // Reset the enrichment state of the media library items whose content changed, so that they are re-enriched by the enrichment jobs that follow.
                     if (getChangedPathsResult.Value.Count > 0)
                     {
-                        Result<Updated> resetEnrichmentStateResult = await unitOfWork.BookRepository.ResetEnrichmentStateForPathsAsync(LibraryId.Value, getChangedPathsResult.Value, cancellationToken).ConfigureAwait(false);
+                        Result<Updated> resetEnrichmentStateResult = await materializer.ResetEnrichmentStateForChangedPathsAsync(unitOfWork, LibraryId.Value, getChangedPathsResult.Value, cancellationToken).ConfigureAwait(false);
                         if (resetEnrichmentStateResult.IsFailure)
                             throw new InvalidOperationException(resetEnrichmentStateResult.FirstError.Description);
                     }
@@ -105,25 +112,15 @@ internal sealed class MediaLibraryScanResultsSaveJob : MediaLibraryScanJob, IMed
                         await domainEventPublisher.PublishAsync(new LibraryMediaItemDeletedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, deletedPath, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                     }
 
-                    // Materialize the books of the media library from the scan snapshot, so that they are browsable even without web metadata.
+                    // Materialize the media library items from the scan snapshot, so that they are browsable even without web metadata.
                     Result<IReadOnlyList<string>> getPathsResult = await unitOfWork.LibraryScanSnapshotRepository.GetPathsAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
                     if (getPathsResult.IsFailure)
                         throw new InvalidOperationException(getPathsResult.FirstError.Description);
 
-                    foreach (string path in getPathsResult.Value)
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
+                    Result<Success> materializeItemsResult = await materializer.MaterializeItemsAsync(unitOfWork, LibraryId.Value, ScanId.Value, getPathsResult.Value, cancellationToken).ConfigureAwait(false);
+                    if (materializeItemsResult.IsFailure)
+                        throw new InvalidOperationException(materializeItemsResult.FirstError.Description);
 
-                        Result<BookEntity?> getExistingBookResult = await unitOfWork.BookRepository.GetByPathAsync(LibraryId.Value, path, cancellationToken).ConfigureAwait(false);
-                        if (getExistingBookResult.IsFailure)
-                            throw new InvalidOperationException(getExistingBookResult.FirstError.Description);
-                        if (getExistingBookResult.Value is not null)
-                            continue;
-
-                        Result<Created> insertBookResult = await unitOfWork.BookRepository.InsertAsync(CreateShellBookEntity(LibraryId.Value, path), cancellationToken).ConfigureAwait(false);
-                        if (insertBookResult.IsFailure)
-                            throw new InvalidOperationException(insertBookResult.FirstError.Description);
-                    }
                     Result<Success> saveChangesResult = await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
                     if (saveChangesResult.IsFailure)
                         throw new InvalidOperationException(saveChangesResult.FirstError.Description);
@@ -133,6 +130,8 @@ internal sealed class MediaLibraryScanResultsSaveJob : MediaLibraryScanJob, IMed
                     if (publishJobProgressResult.IsFailure)
                         throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
 
+                    // Increment the number of completed jobs progress.
+                    await domainEventPublisher.PublishAsync(new LibraryScanProgressChangedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                     Status = LibraryScanJobStatus.Completed;
                     // When this job has no linked children, it is the last job in the directed acyclic job graph, and the scan is completed.
                     if (Children.Count == 0)
@@ -174,39 +173,5 @@ internal sealed class MediaLibraryScanResultsSaveJob : MediaLibraryScanJob, IMed
         await domainEventPublisher.PublishAsync(new LibraryScanJobProgressChangedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
 
         return Result.Success;
-    }
-
-    /// <summary>
-    /// Creates a shell book entity for the file stored at <paramref name="path"/> in the media library identified by <paramref name="libraryId"/>,
-    /// with a title derived from the file name, and no web metadata yet.
-    /// </summary>
-    /// <param name="libraryId">The Id of the media library the book belongs to.</param>
-    /// <param name="path">The file system path of the book.</param>
-    /// <returns>The created shell book entity.</returns>
-    private static BookEntity CreateShellBookEntity(Guid libraryId, string path)
-    {
-        return new BookEntity
-        {
-            Id = Guid.NewGuid(),
-            LibraryId = libraryId,
-            Path = path,
-            Title = GetTitleFromPath(path),
-            MetadataStatus = MetadataStatus.Pending,
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.Empty,
-            UpdatedBy = null
-        };
-    }
-
-    /// <summary>
-    /// Derives a book title from the file name of the provided <paramref name="path"/>, by removing the extension and replacing separators with spaces.
-    /// </summary>
-    /// <param name="path">The file system path of the book.</param>
-    /// <returns>The derived title.</returns>
-    private static string GetTitleFromPath(string path)
-    {
-        string fileName = Path.GetFileNameWithoutExtension(path);
-        string title = Regex.Replace(fileName, @"[_\-\.]+", " ").Trim();
-        return title.Length > 0 ? title : fileName;
     }
 }

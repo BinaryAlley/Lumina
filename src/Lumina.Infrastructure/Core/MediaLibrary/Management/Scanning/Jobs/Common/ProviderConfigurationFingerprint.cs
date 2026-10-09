@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using System;
 using System.Collections.Generic;
@@ -38,14 +39,30 @@ internal static class ProviderConfigurationFingerprint
     /// Computes the fingerprint of the artwork provider configuration of a media library.
     /// </summary>
     /// <param name="configurations">The artwork provider configurations of the media library.</param>
+    /// <param name="shouldAggregateArtworkWhenMissing">Whether the artwork of the media library items is aggregated from multiple providers, when it is missing.</param>
     /// <param name="canDownloadMetadataFromWeb">Whether the media library permits downloading data from the web.</param>
     /// <returns>The fingerprint of the artwork provider configuration.</returns>
-    public static string ComputeArtworkFingerprint(IReadOnlyList<LibraryArtworkProviderConfigurationEntity> configurations, bool canDownloadMetadataFromWeb)
+    public static string ComputeArtworkFingerprint(IReadOnlyList<LibraryArtworkProviderConfigurationEntity> configurations, bool shouldAggregateArtworkWhenMissing, bool canDownloadMetadataFromWeb)
     {
         StringBuilder canonicalRepresentation = new();
         foreach (LibraryArtworkProviderConfigurationEntity configuration in configurations.OrderBy(configuration => configuration.Rank))
             canonicalRepresentation.Append($"{configuration.PluginId:D}|{configuration.IsEnabled}|{configuration.Rank};");
-        canonicalRepresentation.Append($"web:{canDownloadMetadataFromWeb};");
+        canonicalRepresentation.Append($"aggregate:{shouldAggregateArtworkWhenMissing};web:{canDownloadMetadataFromWeb};");
+
+        return ComputeFingerprint(canonicalRepresentation.ToString());
+    }
+
+    /// <summary>
+    /// Computes the fingerprint of the path template of a media library, used to detect whether the template changed
+    /// since the last scan, and thus whether the metadata of the library items needs to be derived from their paths again.
+    /// </summary>
+    /// <param name="parts">The ordered parts of the path template of the media library.</param>
+    /// <returns>The fingerprint of the path template.</returns>
+    public static string ComputePathTemplateFingerprint(IReadOnlyList<LibraryPathTemplatePartEntity> parts)
+    {
+        StringBuilder canonicalRepresentation = new();
+        foreach (LibraryPathTemplatePartEntity part in parts.OrderBy(part => part.Position))
+            canonicalRepresentation.Append($"{part.Kind}|{part.Representation}|{part.IsOptional};");
 
         return ComputeFingerprint(canonicalRepresentation.ToString());
     }

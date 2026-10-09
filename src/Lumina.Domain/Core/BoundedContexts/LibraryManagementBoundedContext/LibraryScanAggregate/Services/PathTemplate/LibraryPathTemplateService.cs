@@ -96,13 +96,13 @@ public sealed class LibraryPathTemplateService : ILibraryPathTemplateService
     /// <param name="relativePath">The path of the media library item, relative to the root of its content location.</param>
     /// <param name="pathSeparator">The character used to separate path segments on the current platform.</param>
     /// <returns>
-    /// An <see cref="Result{TValue}"/> containing either the derived metadata, or an error. A successful result whose value is <see langword="null"/>
+    /// An <see cref="Result{TValue}"/> containing either the derived metadata, or an error. A successful result whose value has no value
     /// means the path does not match the template.
     /// </returns>
-    public Result<ParsedLibraryPath?> Parse(LibraryType libraryType, LibraryPathTemplate template, string relativePath, char pathSeparator)
+    public Result<Optional<ParsedLibraryPath>> Parse(LibraryType libraryType, LibraryPathTemplate template, string relativePath, char pathSeparator)
     {
         if (string.IsNullOrWhiteSpace(relativePath) || template.IsEmpty)
-            return Result<ParsedLibraryPath?>.Success(null);
+            return Result<Optional<ParsedLibraryPath>>.Success(Optional<ParsedLibraryPath>.None());
 
         Result<Success> validationResult = Validate(libraryType, template);
         if (validationResult.IsFailure)
@@ -114,14 +114,14 @@ public sealed class LibraryPathTemplateService : ILibraryPathTemplateService
         Regex pattern = GetCompiledPattern(template, definitions, pathSeparator);
         Match match = pattern.Match(relativePath);
         if (!match.Success)
-            return Result<ParsedLibraryPath?>.Success(null);
+            return Result<Optional<ParsedLibraryPath>>.Success(Optional<ParsedLibraryPath>.None());
 
         Dictionary<LibraryPathPartKind, string> values = [];
         foreach (LibraryPathPart part in template.Parts)
         {
             if (part.Kind == LibraryPathPartKind.Literal || part.Kind == LibraryPathPartKind.Separator)
                 continue;
-            // a kind can legitimately appear more than once, like the title and the author appearing both in the directory and in the file name,
+            // A kind can legitimately appear more than once, like the title and the author appearing both in the directory and in the file name,
             // so the first non-empty capture is kept.
             if (values.ContainsKey(part.Kind))
                 continue;
@@ -132,7 +132,7 @@ public sealed class LibraryPathTemplateService : ILibraryPathTemplateService
             if (!string.IsNullOrWhiteSpace(value))
                 values[part.Kind] = value;
         }
-        return Result<ParsedLibraryPath?>.Success(ParsedLibraryPath.Create(values));
+        return Result<Optional<ParsedLibraryPath>>.Success(Optional<ParsedLibraryPath>.Some(ParsedLibraryPath.Create(values)));
     }
 
     /// <summary>
@@ -212,7 +212,7 @@ public sealed class LibraryPathTemplateService : ILibraryPathTemplateService
         string prefix = part.Representation[..placeholder.Index];
         string suffix = part.Representation[(placeholder.Index + placeholder.Length)..];
         Group width = placeholder.Groups["width"];
-        // a fixed width narrows the capture to an exact number of digits, otherwise the base pattern of the value type is used.
+        // A fixed width narrows the capture to an exact number of digits, otherwise the base pattern of the value type is used.
         string valuePattern = width.Success ? $@"\d{{{width.Value.Length}}}" : GetValuePattern(definition.ValueType);
         return Regex.Escape(prefix) + $"(?<{part.Kind}>{valuePattern})" + Regex.Escape(suffix);
     }

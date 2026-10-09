@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -82,6 +83,13 @@ internal sealed class MediaLibraryScanProviderConfigurationInvalidationJob : Med
                         throw new InvalidOperationException(getLibraryResult.IsFailure ? getLibraryResult.FirstError.Description : "The media library was not found.");
                     LibraryEntity library = getLibraryResult.Value;
 
+                    // The type of the media library determines the materializer whose enrichment state is invalidated.
+                    IMediaLibraryScanItemMaterializer? materializer = asyncServiceScope.ServiceProvider
+                        .GetServices<IMediaLibraryScanItemMaterializer>()
+                        .FirstOrDefault(candidate => candidate.SupportedLibraryType == library.LibraryType);
+                    if (materializer is null)
+                        throw new InvalidOperationException($"No media library item materializer exists for media library type '{library.LibraryType}'.");
+
                     // Load the provider configurations of the media library, whose fingerprint is compared against the stored one.
                     Result<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>> getMetadataConfigurationsResult = await unitOfWork.LibraryMetadataProviderConfigurationRepository.GetByLibraryIdAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
                     if (getMetadataConfigurationsResult.IsFailure)
@@ -91,33 +99,46 @@ internal sealed class MediaLibraryScanProviderConfigurationInvalidationJob : Med
                     if (getArtworkConfigurationsResult.IsFailure)
                         throw new InvalidOperationException(getArtworkConfigurationsResult.FirstError.Description);
 
-                    // Read whether the metadata of the books of the user is aggregated from multiple providers, when fields are missing.
+                    // Read whether the metadata and the artwork of the items of the user are aggregated from multiple providers, when missing.
                     bool shouldAggregateMetadataWhenMissing = false;
+                    bool shouldAggregateArtworkWhenMissing = false;
                     if (unitOfWork.UserSettingsRepository is not null)
                     {
                         Result<UserSettingsEntity?> getUserSettingsResult = await unitOfWork.UserSettingsRepository.GetByUserIdAsync(UserId.Value, cancellationToken).ConfigureAwait(false);
                         if (getUserSettingsResult.IsFailure)
-                            _logger.LogWarning("Failed to read the user settings, the metadata provider configuration fingerprint will not include the metadata aggregation setting.");
+                            _logger.LogWarning("Failed to read the user settings, the provider configuration fingerprints will not include the aggregation settings.");
                         else
+                        {
                             shouldAggregateMetadataWhenMissing = getUserSettingsResult.Value?.ShouldAggregateMetadataWhenMissing ?? false;
+                            shouldAggregateArtworkWhenMissing = getUserSettingsResult.Value?.ShouldAggregateArtworkWhenMissing ?? false;
+                        }
                     }
 
                     // Compare the current fingerprints against the stored ones, resetting the enrichment state of the channel whose configuration
                     // changed, so that the enrichment jobs that follow re-enrich the books. A missing stored fingerprint means the configuration
                     // was never recorded yet, so the current state of the books is trusted, and only the new fingerprint is stored.
                     string metadataFingerprint = ProviderConfigurationFingerprint.ComputeMetadataFingerprint(getMetadataConfigurationsResult.Value, shouldAggregateMetadataWhenMissing, library.CanDownloadMetadataFromWeb);
-                    string artworkFingerprint = ProviderConfigurationFingerprint.ComputeArtworkFingerprint(getArtworkConfigurationsResult.Value, library.CanDownloadMetadataFromWeb);
+                    string artworkFingerprint = ProviderConfigurationFingerprint.ComputeArtworkFingerprint(getArtworkConfigurationsResult.Value, shouldAggregateArtworkWhenMissing, library.CanDownloadMetadataFromWeb);
+                    string pathTemplateFingerprint = ProviderConfigurationFingerprint.ComputePathTemplateFingerprint([.. library.PathTemplateParts]);
 
                     if (library.MetadataProvidersConfigurationFingerprint is not null && library.MetadataProvidersConfigurationFingerprint != metadataFingerprint)
                     {
-                        Result<Updated> resetMetadataResult = await unitOfWork.BookRepository.ResetMetadataStatusForLibraryAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                        Result<Updated> resetMetadataResult = await materializer.ResetMetadataStatusForLibraryAsync(unitOfWork, LibraryId.Value, cancellationToken).ConfigureAwait(false);
                         if (resetMetadataResult.IsFailure)
                             throw new InvalidOperationException(resetMetadataResult.FirstError.Description);
                     }
 
+                    // A path template change invalidates the metadata derived from the paths, so the metadata state is reset as well.
+                    if (library.PathTemplateFingerprint is not null && library.PathTemplateFingerprint != pathTemplateFingerprint)
+                    {
+                        Result<Updated> resetPathTemplateMetadataResult = await materializer.ResetMetadataStatusForLibraryAsync(unitOfWork, LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                        if (resetPathTemplateMetadataResult.IsFailure)
+                            throw new InvalidOperationException(resetPathTemplateMetadataResult.FirstError.Description);
+                    }
+
                     if (library.ArtworkProvidersConfigurationFingerprint is not null && library.ArtworkProvidersConfigurationFingerprint != artworkFingerprint)
                     {
-                        Result<Updated> resetArtworkResult = await unitOfWork.BookRepository.ResetArtworkStatusForLibraryAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                        Result<Updated> resetArtworkResult = await materializer.ResetArtworkStatusForLibraryAsync(unitOfWork, LibraryId.Value, cancellationToken).ConfigureAwait(false);
                         if (resetArtworkResult.IsFailure)
                             throw new InvalidOperationException(resetArtworkResult.FirstError.Description);
                     }
@@ -127,6 +148,7 @@ internal sealed class MediaLibraryScanProviderConfigurationInvalidationJob : Med
                     // update action, whose clearing and re-adding of the owned content locations would drop them when the same tracked instance is passed.
                     library.MetadataProvidersConfigurationFingerprint = metadataFingerprint;
                     library.ArtworkProvidersConfigurationFingerprint = artworkFingerprint;
+                    library.PathTemplateFingerprint = pathTemplateFingerprint;
                     library.UpdatedOnUtc = DateTime.UtcNow;
                     library.UpdatedBy = Guid.NewGuid();
 
@@ -139,6 +161,8 @@ internal sealed class MediaLibraryScanProviderConfigurationInvalidationJob : Med
                     if (publishJobProgressResult.IsFailure)
                         throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
 
+                    // Increment the number of completed jobs progress.
+                    await domainEventPublisher.PublishAsync(new LibraryScanProgressChangedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                     Status = LibraryScanJobStatus.Completed;
                     // When this job has no linked children, it is the last job in the directed acyclic job graph, and the scan is completed.
                     if (Children.Count == 0)

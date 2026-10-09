@@ -47,8 +47,8 @@ public interface ILibraryPathTemplateService
     /// <param name="relativePath">The path of the media library item, relative to the root of its content location.</param>
     /// <param name="pathSeparator">The character used to separate path segments on the current platform.</param>
     /// <returns>
-    /// An <see cref="Result{TValue}"/> containing either the derived metadata, or an error. A successful result whose value is <see langword="null"/>
+    /// An <see cref="Result{TValue}"/> containing either the derived metadata, or an error. A successful result whose value has no value
     /// means the path does not match the template.
     /// </returns>
-    Result<ParsedLibraryPath?> Parse(LibraryType libraryType, LibraryPathTemplate template, string relativePath, char pathSeparator);
+    Result<Optional<ParsedLibraryPath>> Parse(LibraryType libraryType, LibraryPathTemplate template, string relativePath, char pathSeparator);
 }

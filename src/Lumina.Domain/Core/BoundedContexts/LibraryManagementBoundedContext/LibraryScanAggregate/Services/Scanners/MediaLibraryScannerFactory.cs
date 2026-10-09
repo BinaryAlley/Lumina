@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Services.Scanners;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Services.Scanners;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -32,7 +33,7 @@ internal class MediaLibraryScannerFactory : IMediaLibraryScannerFactory
     {
         return libraryType switch
         {
-            // implemented scanners
+            // Implemented scanners.
             LibraryType.Book => _serviceProvider.GetRequiredService<IBookLibraryTypeScanner>(),
             LibraryType.EBook => throw new NotImplementedException("EBook scanner is not implemented."),
             LibraryType.ComicBook => throw new NotImplementedException("ComicBook scanner is not implemented."),
@@ -55,7 +56,7 @@ internal class MediaLibraryScannerFactory : IMediaLibraryScannerFactory
             LibraryType.InterviewVideo => throw new NotImplementedException("InterviewVideo scanner is not implemented."),
             LibraryType.CoverSongVideo => throw new NotImplementedException("CoverSongVideo scanner is not implemented."),
             LibraryType.PodcastVideo => throw new NotImplementedException("PodcastVideo scanner is not implemented."),
-            LibraryType.Music => throw new NotImplementedException("Music scanner is not implemented."),
+            LibraryType.Music => _serviceProvider.GetRequiredService<IMusicLibraryTypeScanner>(),
             LibraryType.Audiobook => throw new NotImplementedException("Audiobook scanner is not implemented."),
             LibraryType.LiveRecordingAudio => throw new NotImplementedException("LiveRecordingAudio scanner is not implemented."),
             LibraryType.InterviewAudio => throw new NotImplementedException("InterviewAudio scanner is not implemented."),
@@ -68,7 +69,7 @@ internal class MediaLibraryScannerFactory : IMediaLibraryScannerFactory
             LibraryType.Collection => throw new NotImplementedException("Collection scanner is not implemented."),
             LibraryType.Subtitles => throw new NotImplementedException("Subtitles scanner is not implemented."),
             LibraryType.Lyrics => throw new NotImplementedException("Lyrics scanner is not implemented."),
-            // catch-all for unknown or unsupported types
+            // Catch-all for unknown or unsupported types.
             _ => throw new ArgumentOutOfRangeException(nameof(libraryType), $"No scanner exists for library type '{libraryType}'.")
         };
     }
