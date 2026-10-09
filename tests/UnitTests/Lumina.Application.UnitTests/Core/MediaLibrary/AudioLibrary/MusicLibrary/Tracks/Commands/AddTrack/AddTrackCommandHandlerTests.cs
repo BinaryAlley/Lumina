@@ -59,7 +59,7 @@ public class AddTrackCommandHandlerTests
     private readonly TrackEntityFixture _trackEntityFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly MediaContributorEntityFixture _mediaContributorEntityFixture = new();
-    private readonly AudioMetadataDtoFixture _audioMetadataDtoFixture = new();
+    private readonly MusicTrackMetadataDtoFixture _audioMetadataDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
     private readonly MediaContributorReferenceDtoFixture _mediaContributorReferenceDtoFixture = new();
 

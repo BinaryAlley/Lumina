@@ -31,8 +31,10 @@ public class UpdateArtistCommandValidatorTests
     private readonly UpdateArtistCommandFixture _updateArtistCommandFixture = new();
     private readonly UpdateArtistCommandValidator _validator = new();
     private readonly AddAlbumCommandFixture _addAlbumCommandFixture = new();
-    private readonly AlbumMetadataDtoFixture _albumMetadataDtoFixture = new();
-    private readonly AudioMetadataDtoFixture _audioMetadataDtoFixture = new();
+    private readonly MusicAlbumMetadataDtoFixture _albumMetadataDtoFixture = new();
+    private readonly MusicTrackMetadataDtoFixture _audioMetadataDtoFixture = new();
+    private readonly MusicWorkDtoFixture _musicWorkDtoFixture = new();
+    private readonly MusicArtistMetadataDtoFixture _musicArtistMetadataDtoFixture = new();
     private readonly ReleaseInfoDtoFixture _releaseInfoDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
     private readonly TagDtoFixture _tagDtoFixture = new();
@@ -83,7 +85,7 @@ public class UpdateArtistCommandValidatorTests
     public void Validate_WhenNameIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateArtistCommand command = _updateArtistCommandFixture.Create(includeName: false);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(metadata: _musicArtistMetadataDtoFixture.Create(includeName: false));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -98,7 +100,7 @@ public class UpdateArtistCommandValidatorTests
     public void Validate_WhenNameIsEmpty_ShouldHaveValidationError(string name)
     {
         // Arrange
-        UpdateArtistCommand command = _updateArtistCommandFixture.Create(name: name);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(metadata: _musicArtistMetadataDtoFixture.Create(name: name));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -111,7 +113,7 @@ public class UpdateArtistCommandValidatorTests
     public void Validate_WhenNameExceeds255Characters_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateArtistCommand command = _updateArtistCommandFixture.Create(name: new Faker().Random.String2(256));
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(metadata: _musicArtistMetadataDtoFixture.Create(name: new Faker().Random.String2(256)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -124,7 +126,7 @@ public class UpdateArtistCommandValidatorTests
     public void Validate_WhenNameIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateArtistCommand command = _updateArtistCommandFixture.Create(name: new Faker().Random.String2(255));
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(metadata: _musicArtistMetadataDtoFixture.Create(name: new Faker().Random.String2(255)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -442,7 +444,7 @@ public class UpdateArtistCommandValidatorTests
     public void Validate_WhenAlbumReleaseTypeIsNotDefined_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(releaseType: (MusicReleaseType)999))]);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(releaseTypes: [(MusicReleaseType)999]))]);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -455,7 +457,7 @@ public class UpdateArtistCommandValidatorTests
     public void Validate_WhenAlbumReleaseTypeIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(includeReleaseType: false))]);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(includeReleaseTypes: false))]);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -468,7 +470,7 @@ public class UpdateArtistCommandValidatorTests
     public void Validate_WhenAlbumReleaseTypeIsDefined_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(releaseType: MusicReleaseType.Album))]);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(releaseTypes: [MusicReleaseType.Album]))]);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -1074,7 +1076,7 @@ public class UpdateArtistCommandValidatorTests
     public void Validate_WhenAlbumMediaFormatIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(includeMediaFormat: false, includeBarcode: false, includeCatalogNumber: false, includeMusicBrainzReleaseId: false, includeMusicBrainzReleaseGroupId: false, includeMusicBrainzReleaseArtistId: false)]);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(includeMediaFormat: false, includeBarcode: false, includeCatalogNumbers: false, includeMusicBrainzReleaseId: false, includeMusicBrainzReleaseGroupId: false, includeMusicBrainzReleaseArtistId: false)]);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -1100,7 +1102,7 @@ public class UpdateArtistCommandValidatorTests
     public void Validate_WhenAlbumCatalogNumberExceeds50Characters_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(catalogNumber: new Faker().Random.String2(51))]);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(catalogNumbers: [new Faker().Random.String2(51)])]);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -1113,7 +1115,7 @@ public class UpdateArtistCommandValidatorTests
     public void Validate_WhenAlbumCatalogNumberIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(includeMediaFormat: false, includeBarcode: false, includeCatalogNumber: false, includeMusicBrainzReleaseId: false, includeMusicBrainzReleaseGroupId: false, includeMusicBrainzReleaseArtistId: false)]);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(includeMediaFormat: false, includeBarcode: false, includeCatalogNumbers: false, includeMusicBrainzReleaseId: false, includeMusicBrainzReleaseGroupId: false, includeMusicBrainzReleaseArtistId: false)]);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -1171,7 +1173,7 @@ public class UpdateArtistCommandValidatorTests
     public void Validate_WhenAlbumBarcodeIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(includeMediaFormat: false, includeBarcode: false, includeCatalogNumber: false, includeMusicBrainzReleaseId: false, includeMusicBrainzReleaseGroupId: false, includeMusicBrainzReleaseArtistId: false)]);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(includeMediaFormat: false, includeBarcode: false, includeCatalogNumbers: false, includeMusicBrainzReleaseId: false, includeMusicBrainzReleaseGroupId: false, includeMusicBrainzReleaseArtistId: false)]);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -1223,7 +1225,7 @@ public class UpdateArtistCommandValidatorTests
     public void Validate_WhenAlbumMusicBrainzIdsAreNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(includeMediaFormat: false, includeBarcode: false, includeCatalogNumber: false, includeMusicBrainzReleaseId: false, includeMusicBrainzReleaseGroupId: false, includeMusicBrainzReleaseArtistId: false)]);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(includeMediaFormat: false, includeBarcode: false, includeCatalogNumbers: false, includeMusicBrainzReleaseId: false, includeMusicBrainzReleaseGroupId: false, includeMusicBrainzReleaseArtistId: false)]);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -1938,7 +1940,7 @@ public class UpdateArtistCommandValidatorTests
     public void Validate_WhenTrackMusicBrainzWorkIdIsEmptyGuid_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(tracks: [_addTrackCommandFixture.Create(musicBrainzWorkId: Guid.Empty)])]);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(tracks: [_addTrackCommandFixture.Create(work: _musicWorkDtoFixture.Create(musicBrainzWorkId: Guid.Empty))])]);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -2035,7 +2037,7 @@ public class UpdateArtistCommandValidatorTests
     public void Validate_WhenTrackWorkExceeds255Characters_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(tracks: [_addTrackCommandFixture.Create(work: new Faker().Random.String2(256))])]);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(tracks: [_addTrackCommandFixture.Create(work: _musicWorkDtoFixture.Create(title: new Faker().Random.String2(256)))])]);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -2314,7 +2316,7 @@ public class UpdateArtistCommandValidatorTests
     public void Validate_WhenAlbumCatalogNumberIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(catalogNumber: new Faker().Random.String2(50))]);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(catalogNumbers: [new Faker().Random.String2(50)])]);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -2632,7 +2634,7 @@ public class UpdateArtistCommandValidatorTests
     public void Validate_WhenTrackMusicBrainzIdsAreValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(tracks: [_addTrackCommandFixture.Create(musicBrainzRecordingId: Guid.NewGuid(), musicBrainzTrackId: Guid.NewGuid(), musicBrainzWorkId: Guid.NewGuid())])]);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(tracks: [_addTrackCommandFixture.Create(musicBrainzRecordingId: Guid.NewGuid(), musicBrainzTrackId: Guid.NewGuid(), work: _musicWorkDtoFixture.Create(musicBrainzWorkId: Guid.NewGuid()))])]);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -2658,7 +2660,7 @@ public class UpdateArtistCommandValidatorTests
     public void Validate_WhenDiscNumberIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(tracks: [_addTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMusicBrainzWorkId: false, includeMoods: false, includeIsrcs: false)])]);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(tracks: [_addTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMoods: false, includeIsrcs: false)])]);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -2684,7 +2686,7 @@ public class UpdateArtistCommandValidatorTests
     public void Validate_WhenTrackScriptIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(tracks: [_addTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMusicBrainzWorkId: false, includeMoods: false, includeIsrcs: false)])]);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(tracks: [_addTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMoods: false, includeIsrcs: false)])]);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -2710,7 +2712,7 @@ public class UpdateArtistCommandValidatorTests
     public void Validate_WhenTrackKeyIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(tracks: [_addTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMusicBrainzWorkId: false, includeMoods: false, includeIsrcs: false)])]);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(tracks: [_addTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMoods: false, includeIsrcs: false)])]);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -2736,7 +2738,7 @@ public class UpdateArtistCommandValidatorTests
     public void Validate_WhenTrackBpmIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(tracks: [_addTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMusicBrainzWorkId: false, includeMoods: false, includeIsrcs: false)])]);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(tracks: [_addTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMoods: false, includeIsrcs: false)])]);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -2762,7 +2764,7 @@ public class UpdateArtistCommandValidatorTests
     public void Validate_WhenTrackWorkIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(tracks: [_addTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMusicBrainzWorkId: false, includeMoods: false, includeIsrcs: false)])]);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(tracks: [_addTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMoods: false, includeIsrcs: false)])]);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -2775,7 +2777,7 @@ public class UpdateArtistCommandValidatorTests
     public void Validate_WhenTrackWorkIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(tracks: [_addTrackCommandFixture.Create(work: new Faker().Random.String2(255))])]);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(tracks: [_addTrackCommandFixture.Create(work: _musicWorkDtoFixture.Create(title: new Faker().Random.String2(255)))])]);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -2801,7 +2803,7 @@ public class UpdateArtistCommandValidatorTests
     public void Validate_WhenTrackMoodsIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(tracks: [_addTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMusicBrainzWorkId: false, includeMoods: false, includeIsrcs: false)])]);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(tracks: [_addTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMoods: false, includeIsrcs: false)])]);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -2827,7 +2829,7 @@ public class UpdateArtistCommandValidatorTests
     public void Validate_WhenTrackIsrcsIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(tracks: [_addTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMusicBrainzWorkId: false, includeMoods: false, includeIsrcs: false)])]);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(albums: [_addAlbumCommandFixture.Create(tracks: [_addTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMoods: false, includeIsrcs: false)])]);
 
         // Act
         List<Error> result = _validator.TestValidate(command);

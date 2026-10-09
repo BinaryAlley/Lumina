@@ -54,7 +54,7 @@ public class UpdateAlbumCommandHandlerTests
     private readonly AlbumEntityFixture _albumEntityFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly MediaContributorEntityFixture _mediaContributorEntityFixture = new();
-    private readonly AlbumMetadataDtoFixture _albumMetadataDtoFixture = new();
+    private readonly MusicAlbumMetadataDtoFixture _albumMetadataDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
 
     /// <summary>

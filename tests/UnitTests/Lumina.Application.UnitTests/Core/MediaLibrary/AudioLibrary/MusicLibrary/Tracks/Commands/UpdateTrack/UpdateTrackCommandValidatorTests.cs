@@ -30,7 +30,8 @@ public class UpdateTrackCommandValidatorTests
 {
     private readonly UpdateTrackCommandFixture _updateTrackCommandFixture = new();
     private readonly UpdateTrackCommandValidator _validator = new();
-    private readonly AudioMetadataDtoFixture _audioMetadataDtoFixture = new();
+    private readonly MusicTrackMetadataDtoFixture _audioMetadataDtoFixture = new();
+    private readonly MusicWorkDtoFixture _musicWorkDtoFixture = new();
     private readonly ReleaseInfoDtoFixture _releaseInfoDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
     private readonly TagDtoFixture _tagDtoFixture = new();
@@ -1175,7 +1176,7 @@ public class UpdateTrackCommandValidatorTests
     public void Validate_WhenMusicBrainzRecordingIdIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateTrackCommand command = _updateTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMusicBrainzWorkId: false, includeMoods: false, includeIsrcs: false);
+        UpdateTrackCommand command = _updateTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMoods: false, includeIsrcs: false);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -1214,7 +1215,7 @@ public class UpdateTrackCommandValidatorTests
     public void Validate_WhenMusicBrainzTrackIdIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateTrackCommand command = _updateTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMusicBrainzWorkId: false, includeMoods: false, includeIsrcs: false);
+        UpdateTrackCommand command = _updateTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMoods: false, includeIsrcs: false);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -1227,7 +1228,7 @@ public class UpdateTrackCommandValidatorTests
     public void Validate_WhenMusicBrainzWorkIdIsEmptyGuid_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateTrackCommand command = _updateTrackCommandFixture.Create(musicBrainzWorkId: Guid.Empty);
+        UpdateTrackCommand command = _updateTrackCommandFixture.Create(work: _musicWorkDtoFixture.Create(musicBrainzWorkId: Guid.Empty));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -1240,7 +1241,7 @@ public class UpdateTrackCommandValidatorTests
     public void Validate_WhenMusicBrainzWorkIdIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateTrackCommand command = _updateTrackCommandFixture.Create(musicBrainzWorkId: Guid.NewGuid());
+        UpdateTrackCommand command = _updateTrackCommandFixture.Create(work: _musicWorkDtoFixture.Create(musicBrainzWorkId: Guid.NewGuid()));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -1253,7 +1254,7 @@ public class UpdateTrackCommandValidatorTests
     public void Validate_WhenMusicBrainzWorkIdIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateTrackCommand command = _updateTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMusicBrainzWorkId: false, includeMoods: false, includeIsrcs: false);
+        UpdateTrackCommand command = _updateTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMoods: false, includeIsrcs: false);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -1357,7 +1358,7 @@ public class UpdateTrackCommandValidatorTests
     public void Validate_WhenDiscNumberIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateTrackCommand command = _updateTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMusicBrainzWorkId: false, includeMoods: false, includeIsrcs: false);
+        UpdateTrackCommand command = _updateTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMoods: false, includeIsrcs: false);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -1396,7 +1397,7 @@ public class UpdateTrackCommandValidatorTests
     public void Validate_WhenScriptIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateTrackCommand command = _updateTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMusicBrainzWorkId: false, includeMoods: false, includeIsrcs: false);
+        UpdateTrackCommand command = _updateTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMoods: false, includeIsrcs: false);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -1435,7 +1436,7 @@ public class UpdateTrackCommandValidatorTests
     public void Validate_WhenKeyIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateTrackCommand command = _updateTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMusicBrainzWorkId: false, includeMoods: false, includeIsrcs: false);
+        UpdateTrackCommand command = _updateTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMoods: false, includeIsrcs: false);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -1487,7 +1488,7 @@ public class UpdateTrackCommandValidatorTests
     public void Validate_WhenBpmIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateTrackCommand command = _updateTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMusicBrainzWorkId: false, includeMoods: false, includeIsrcs: false);
+        UpdateTrackCommand command = _updateTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMoods: false, includeIsrcs: false);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -1500,7 +1501,7 @@ public class UpdateTrackCommandValidatorTests
     public void Validate_WhenWorkExceeds255Characters_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateTrackCommand command = _updateTrackCommandFixture.Create(work: new Faker().Random.String2(256));
+        UpdateTrackCommand command = _updateTrackCommandFixture.Create(work: _musicWorkDtoFixture.Create(title: new Faker().Random.String2(256)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -1513,7 +1514,7 @@ public class UpdateTrackCommandValidatorTests
     public void Validate_WhenWorkIs255Characters_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateTrackCommand command = _updateTrackCommandFixture.Create(work: new Faker().Random.String2(255));
+        UpdateTrackCommand command = _updateTrackCommandFixture.Create(work: _musicWorkDtoFixture.Create(title: new Faker().Random.String2(255)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -1526,7 +1527,7 @@ public class UpdateTrackCommandValidatorTests
     public void Validate_WhenWorkIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateTrackCommand command = _updateTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMusicBrainzWorkId: false, includeMoods: false, includeIsrcs: false);
+        UpdateTrackCommand command = _updateTrackCommandFixture.Create(includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMoods: false, includeIsrcs: false);
 
         // Act
         List<Error> result = _validator.TestValidate(command);

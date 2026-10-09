@@ -17,7 +17,7 @@ public class UpdateArtistCommandValidator : AbstractValidator<UpdateArtistComman
     /// </summary>
     public UpdateArtistCommandValidator()
     {
-        // Validates the identifier of the media library that owns the artist, taken from the route.
+        // Validates the identifier of the media library that will own the artist, taken from the route.
         RuleFor(command => command.LibraryId)
             .NotEmpty()
             .WithError(Errors.Library.LibraryIdCannotBeEmpty);
@@ -38,13 +38,115 @@ public class UpdateArtistCommandValidator : AbstractValidator<UpdateArtistComman
             .WithError(Errors.Music.ArtistIdCannotBeEmpty);
 
         // Validates the identifying details of the artist.
-        RuleFor(command => command.Name)
+        RuleFor(command => command.Metadata)
             .NotNull()
-            .NotEmpty()
-            .WithError(Errors.Music.ArtistNameCannotBeEmpty)
-            .MaximumLength(255)
-            .WithError(Errors.Music.ArtistNameMustBeMaximum255CharactersLong);
+            .WithError(Errors.Metadata.MetadataCannotBeNull)
+            .ChildRules(metadata =>
+            {
+                metadata.RuleFor(m => m!.Name)
+                    .NotNull()
+                    .NotEmpty()
+                    .WithError(Errors.Music.ArtistNameCannotBeEmpty)
+                    .MaximumLength(255)
+                    .WithError(Errors.Music.ArtistNameMustBeMaximum255CharactersLong);
 
+                metadata.RuleFor(m => m!.SortName)
+                    .MaximumLength(255)
+                    .When(m => m!.SortName is not null)
+                    .WithError(Errors.Music.ArtistNameMustBeMaximum255CharactersLong);
+
+                metadata.RuleFor(m => m!.Disambiguation)
+                    .MaximumLength(255)
+                    .When(m => m!.Disambiguation is not null)
+                    .WithError(Errors.Music.ArtistNameMustBeMaximum255CharactersLong);
+
+                metadata.RuleFor(m => m!.Type)
+                    .IsInEnum()
+                    .When(m => m!.Type is not null)
+                    .WithError(Errors.Music.UnknownMusicArtistType);
+
+                metadata.RuleFor(m => m!.Gender)
+                    .IsInEnum()
+                    .When(m => m!.Gender is not null)
+                    .WithError(Errors.Music.UnknownMusicArtistGender);
+
+                metadata.RuleFor(m => m!.Country)
+                    .Length(2)
+                    .When(m => m!.Country is not null)
+                    .WithError(Errors.Music.CountryMustBeMaximum2CharactersLong);
+
+                metadata.RuleFor(m => m!.Area!.Name)
+                    .NotEmpty()
+                    .WithError(Errors.Music.AreaNameCannotBeEmpty)
+                    .MaximumLength(255)
+                    .WithError(Errors.Music.AreaNameMustBeMaximum255CharactersLong)
+                    .When(m => m!.Area is not null);
+
+                metadata.RuleFor(m => m!.BeginArea!.Name)
+                    .NotEmpty()
+                    .WithError(Errors.Music.AreaNameCannotBeEmpty)
+                    .MaximumLength(255)
+                    .WithError(Errors.Music.AreaNameMustBeMaximum255CharactersLong)
+                    .When(m => m!.BeginArea is not null);
+
+                metadata.RuleFor(m => m!.EndArea!.Name)
+                    .NotEmpty()
+                    .WithError(Errors.Music.AreaNameCannotBeEmpty)
+                    .MaximumLength(255)
+                    .WithError(Errors.Music.AreaNameMustBeMaximum255CharactersLong)
+                    .When(m => m!.EndArea is not null);
+
+                metadata.RuleForEach(m => m!.Aliases)
+                    .ChildRules(alias =>
+                    {
+                        alias.RuleFor(a => a.Name)
+                            .NotEmpty()
+                            .WithError(Errors.Music.ArtistAliasNameCannotBeEmpty)
+                            .MaximumLength(255)
+                            .WithError(Errors.Music.ArtistAliasNameMustBeMaximum255CharactersLong);
+
+                        alias.RuleFor(a => a.SortName)
+                            .MaximumLength(255)
+                            .When(a => a.SortName is not null)
+                            .WithError(Errors.Music.ArtistAliasNameMustBeMaximum255CharactersLong);
+
+                        alias.RuleFor(a => a.Type)
+                            .MaximumLength(50)
+                            .When(a => a.Type is not null)
+                            .WithError(Errors.Music.ScriptMustBeMaximum50CharactersLong);
+
+                        alias.RuleFor(a => a.Locale)
+                            .MaximumLength(20)
+                            .When(a => a.Locale is not null)
+                            .WithError(Errors.Music.ScriptMustBeMaximum50CharactersLong);
+                    });
+
+                metadata.RuleFor(m => m!.Genres)
+                    .NotNull()
+                    .WithError(Errors.Metadata.GenresListCannotBeNull);
+
+                metadata.RuleForEach(m => m!.Genres)
+                    .ChildRules(genre =>
+                        genre.RuleFor(g => g.Name)
+                            .NotEmpty()
+                            .WithError(Errors.Metadata.GenreNameCannotBeEmpty)
+                            .MaximumLength(50)
+                            .WithError(Errors.Metadata.GenreNameMustBeMaximum50CharactersLong));
+
+                metadata.RuleFor(m => m!.Tags)
+                    .NotNull()
+                    .WithError(Errors.Metadata.TagsListCannotBeNull);
+
+                metadata.RuleForEach(m => m!.Tags)
+                    .ChildRules(tag =>
+                        tag.RuleFor(t => t.Name)
+                            .NotEmpty()
+                            .WithError(Errors.Metadata.TagNameCannotBeEmpty)
+                            .MaximumLength(50)
+                            .WithError(Errors.Metadata.TagNameMustBeMaximum50CharactersLong));
+            });
+
+        // Validates the website and the MusicBrainz identifiers of the artist.
         RuleFor(command => command.Website)
             .MaximumLength(2048)
             .When(command => command.Website is not null)
@@ -54,6 +156,18 @@ public class UpdateArtistCommandValidator : AbstractValidator<UpdateArtistComman
             .Must(musicBrainzArtistId => musicBrainzArtistId != Guid.Empty)
             .When(command => command.MusicBrainzArtistId.HasValue)
             .WithError(Errors.Music.MusicBrainzIdInvalidFormat);
+
+        RuleForEach(command => command.Ipis)
+            .NotEmpty()
+            .WithError(Errors.Music.IpiValueCannotBeEmpty)
+            .MaximumLength(20)
+            .WithError(Errors.Music.IpiValueMustBeMaximum20CharactersLong);
+
+        RuleForEach(command => command.Isnis)
+            .NotEmpty()
+            .WithError(Errors.Music.IsniValueCannotBeEmpty)
+            .MaximumLength(20)
+            .WithError(Errors.Music.IsniValueMustBeMaximum20CharactersLong);
 
         // Validates the media contributors that make up the artist.
         RuleFor(command => command.Contributors)
@@ -74,7 +188,31 @@ public class UpdateArtistCommandValidator : AbstractValidator<UpdateArtistComman
                     .WithError(Errors.MediaContributor.UnknownMediaContributorRole);
             });
 
-        // Validates each album updated together with the artist, when the request carries albums.
+        // Validates the ratings of the artist.
+        RuleFor(command => command.Ratings)
+            .NotNull()
+            .WithError(Errors.Metadata.RatingsListCannotBeNull);
+
+        RuleForEach(command => command.Ratings)
+            .ChildRules(rating =>
+            {
+                rating.RuleFor(r => r.Value)
+                    .GreaterThan(0)
+                    .WithError(Errors.Metadata.RatingValueMustBePositive)
+                    .Must((ratingInstance, value) => value <= ratingInstance.MaxValue)
+                    .WithError(Errors.Metadata.RatingValueCannotBeGreaterThanMaxValue);
+
+                rating.RuleFor(r => r.MaxValue)
+                    .GreaterThan(0)
+                    .WithError(Errors.Metadata.RatingMaxValueMustBePositive);
+
+                rating.RuleFor(r => r.VoteCount)
+                    .GreaterThanOrEqualTo(0)
+                    .When(r => r.VoteCount.HasValue)
+                    .WithError(Errors.Metadata.RatingVoteCountMustBePositive);
+            });
+
+        // Validates each album created together with the artist, when the request carries albums.
         RuleFor(command => command.Albums)
             .NotNull()
             .WithError(Errors.Music.AlbumsListCannotBeNull);
@@ -88,7 +226,7 @@ public class UpdateArtistCommandValidator : AbstractValidator<UpdateArtistComman
                     .When(a => a!.AlbumId.HasValue)
                     .WithError(Errors.Music.AlbumIdCannotBeEmpty);
 
-                // Validates the metadata of the album: title, lengths, release type and status, and disc and track counts.
+                // Validates the metadata of the album: title, lengths, release types and status, and disc and track counts.
                 album.RuleFor(a => a!.Metadata)
                     .NotNull()
                     .WithError(Errors.Metadata.MetadataCannotBeNull)
@@ -111,9 +249,13 @@ public class UpdateArtistCommandValidator : AbstractValidator<UpdateArtistComman
                             .When(m => m!.Description is not null)
                             .WithError(Errors.Metadata.DescriptionMustBeMaximum2000CharactersLong);
 
-                        metadata.RuleFor(m => m!.ReleaseType)
+                        metadata.RuleFor(m => m!.Disambiguation)
+                            .MaximumLength(255)
+                            .When(m => m!.Disambiguation is not null)
+                            .WithError(Errors.Metadata.DescriptionMustBeMaximum2000CharactersLong);
+
+                        metadata.RuleForEach(m => m!.ReleaseTypes)
                             .IsInEnum()
-                            .When(m => m!.ReleaseType is not null)
                             .WithError(Errors.Music.UnknownMusicReleaseType);
 
                         metadata.RuleFor(m => m!.ReleaseStatus)
@@ -247,15 +389,20 @@ public class UpdateArtistCommandValidator : AbstractValidator<UpdateArtistComman
                             .When(m => m!.OriginalLanguage is not null);
                     });
 
-                // Validates the physical characteristics of the album: format and catalog number.
+                // Validates the physical characteristics of the album: format, packaging, catalog number and barcode.
                 album.RuleFor(a => a!.MediaFormat)
                     .IsInEnum()
                     .When(a => a!.MediaFormat is not null)
                     .WithError(Errors.Music.UnknownMusicMediaFormat);
 
-                album.RuleFor(a => a!.CatalogNumber)
+                album.RuleFor(a => a!.Packaging)
+                    .IsInEnum()
+                    .When(a => a!.Packaging is not null)
+                    .WithError(Errors.Music.UnknownMusicReleasePackaging);
+
+                album.RuleForEach(a => a!.CatalogNumbers)
                     .MaximumLength(50)
-                    .When(a => a!.CatalogNumber is not null)
+                    .When(a => a!.CatalogNumbers is not null)
                     .WithError(Errors.Music.CatalogNumberMustBeMaximum50CharactersLong);
 
                 album.RuleFor(a => a!.Barcode)
@@ -369,6 +516,11 @@ public class UpdateArtistCommandValidator : AbstractValidator<UpdateArtistComman
                                 trackMetadata.RuleFor(m => m!.Description)
                                     .MaximumLength(2000)
                                     .When(m => m!.Description is not null)
+                                    .WithError(Errors.Metadata.DescriptionMustBeMaximum2000CharactersLong);
+
+                                trackMetadata.RuleFor(m => m!.Disambiguation)
+                                    .MaximumLength(255)
+                                    .When(m => m!.Disambiguation is not null)
                                     .WithError(Errors.Metadata.DescriptionMustBeMaximum2000CharactersLong);
 
                                 trackMetadata.RuleFor(m => m!.ReleaseInfo)
@@ -498,11 +650,6 @@ public class UpdateArtistCommandValidator : AbstractValidator<UpdateArtistComman
                             .When(t => t!.MusicBrainzTrackId.HasValue)
                             .WithError(Errors.Music.MusicBrainzIdInvalidFormat);
 
-                        track.RuleFor(t => t!.MusicBrainzWorkId)
-                            .Must(musicBrainzWorkId => musicBrainzWorkId != Guid.Empty)
-                            .When(t => t!.MusicBrainzWorkId.HasValue)
-                            .WithError(Errors.Music.MusicBrainzIdInvalidFormat);
-
                         // Validates the ordering and performance characteristics of the track.
                         track.RuleFor(t => t!.TrackNumber)
                             .NotNull()
@@ -533,10 +680,16 @@ public class UpdateArtistCommandValidator : AbstractValidator<UpdateArtistComman
                             .When(t => t!.Bpm.HasValue)
                             .WithError(Errors.Music.BpmMustBeGreaterThanZero);
 
-                        track.RuleFor(t => t!.Work)
+                        // Validates the work the track is a recording of.
+                        track.RuleFor(t => t!.Work!.Title)
                             .MaximumLength(255)
-                            .When(t => t!.Work is not null)
+                            .When(t => t!.Work is not null && t.Work.Title is not null)
                             .WithError(Errors.Music.WorkMustBeMaximum255CharactersLong);
+
+                        track.RuleFor(t => t!.Work!.MusicBrainzWorkId)
+                            .Must(musicBrainzWorkId => musicBrainzWorkId is null || musicBrainzWorkId != Guid.Empty)
+                            .When(t => t!.Work is not null)
+                            .WithError(Errors.Music.MusicBrainzIdInvalidFormat);
 
                         // Validates the moods and the ISRC codes of the track.
                         track.RuleForEach(t => t!.Moods)
