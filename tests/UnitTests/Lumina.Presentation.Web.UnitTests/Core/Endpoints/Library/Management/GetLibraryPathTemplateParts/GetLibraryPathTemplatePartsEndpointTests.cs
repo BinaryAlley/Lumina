@@ -26,8 +26,8 @@ public class GetLibraryPathTemplatePartsEndpointTests
 {
     private readonly IApiHttpClient _mockApiHttpClient;
     private readonly GetLibraryPathTemplatePartsEndpoint _sut;
-    private readonly GetLibraryPathTemplatePartsRequestFixture _requestFixture = new();
-    private readonly LibraryPathTemplateCatalogDtoFixture _catalogDtoFixture = new();
+    private readonly GetLibraryPathTemplatePartsRequestFixture _getLibraryPathTemplatePartsRequestFixture = new();
+    private readonly LibraryPathTemplateCatalogDtoFixture _libraryPathTemplateCatalogDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetLibraryPathTemplatePartsEndpointTests"/> class.
@@ -42,8 +42,8 @@ public class GetLibraryPathTemplatePartsEndpointTests
     public async Task ExecuteAsync_WhenSuccessful_ShouldReturnSuccessJsonWithCatalog()
     {
         // Arrange
-        GetLibraryPathTemplatePartsRequest request = _requestFixture.Create();
-        LibraryPathTemplateCatalogDto catalog = _catalogDtoFixture.Create();
+        GetLibraryPathTemplatePartsRequest request = _getLibraryPathTemplatePartsRequestFixture.Create();
+        LibraryPathTemplateCatalogDto catalog = _libraryPathTemplateCatalogDtoFixture.Create();
         _mockApiHttpClient.GetAsync<LibraryPathTemplateCatalogDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(catalog);
 
@@ -77,8 +77,8 @@ public class GetLibraryPathTemplatePartsEndpointTests
     public async Task ExecuteAsync_WhenCalled_ShouldRequestCatalogFromApiWithSubstitutedLibraryType()
     {
         // Arrange
-        GetLibraryPathTemplatePartsRequest request = _requestFixture.Create(libraryType: "Music");
-        LibraryPathTemplateCatalogDto catalog = _catalogDtoFixture.Create();
+        GetLibraryPathTemplatePartsRequest request = _getLibraryPathTemplatePartsRequestFixture.Create(libraryType: "Music");
+        LibraryPathTemplateCatalogDto catalog = _libraryPathTemplateCatalogDtoFixture.Create();
         _mockApiHttpClient.GetAsync<LibraryPathTemplateCatalogDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(catalog);
 
@@ -95,8 +95,8 @@ public class GetLibraryPathTemplatePartsEndpointTests
     public async Task ExecuteAsync_WhenCalled_ShouldForwardCancellationTokenToApi()
     {
         // Arrange
-        GetLibraryPathTemplatePartsRequest request = _requestFixture.Create();
-        LibraryPathTemplateCatalogDto catalog = _catalogDtoFixture.Create();
+        GetLibraryPathTemplatePartsRequest request = _getLibraryPathTemplatePartsRequestFixture.Create();
+        LibraryPathTemplateCatalogDto catalog = _libraryPathTemplateCatalogDtoFixture.Create();
         CancellationTokenSource cancellationTokenSource = new();
         CancellationToken cancellationToken = cancellationTokenSource.Token;
         _mockApiHttpClient.GetAsync<LibraryPathTemplateCatalogDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())

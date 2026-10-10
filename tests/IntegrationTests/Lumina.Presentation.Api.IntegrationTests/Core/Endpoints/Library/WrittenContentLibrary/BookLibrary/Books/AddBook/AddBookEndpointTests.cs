@@ -51,7 +51,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
         PropertyNameCaseInsensitive = true,
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
-    private readonly AddBookRequestFixture _requestBookFixture = new();
+    private readonly AddBookRequestFixture _addBookRequestFixture = new();
     private readonly WrittenContentMetadataDtoFixture _writtenContentMetadataDtoFixture = new();
     private readonly ReleaseInfoDtoFixture _releaseInfoDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
@@ -95,7 +95,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithValidData_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create();
+        AddBookRequest bookRequest = _addBookRequestFixture.Create();
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -200,7 +200,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyTitle_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(includeTitle: false));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(includeTitle: false));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -213,7 +213,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthTitle_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(title: new Faker().Random.String2(300)));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(title: new Faker().Random.String2(300)));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -226,7 +226,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyOriginalTitle_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(includeOriginalTitle: false));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(includeOriginalTitle: false));
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -236,7 +236,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthOriginalTitle_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(originalTitle: new Faker().Random.String2(300)));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(originalTitle: new Faker().Random.String2(300)));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -249,7 +249,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyDescription_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(includeDescription: false));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(includeDescription: false));
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -259,7 +259,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthDescription_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(description: new Faker().Random.String2(2001)));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(description: new Faker().Random.String2(2001)));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -272,7 +272,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithNullReleaseInfo_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(includeReleaseInfo: false));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(includeReleaseInfo: false));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -285,7 +285,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyOriginalReleaseYear_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(includeOriginalReleaseYear: false)));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(includeOriginalReleaseYear: false)));
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -295,7 +295,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidValueOriginalReleaseYear_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: 10000)));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: 10000)));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -308,7 +308,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyReReleaseYear_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(includeReReleaseYear: false, includeReReleaseDate: false)));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(includeReReleaseYear: false, includeReReleaseDate: false)));
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -318,7 +318,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidValueReReleaseYear_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(reReleaseYear: 10000)));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(reReleaseYear: 10000)));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -331,7 +331,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyReleaseCountry_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(includeReleaseCountry: false)));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(includeReleaseCountry: false)));
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -341,7 +341,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyReleaseVersion_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(includeReleaseVersion: false)));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(includeReleaseVersion: false)));
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -351,7 +351,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidValueReleasVersion_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(releaseVersion: new Faker().Random.String2(100))));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(releaseVersion: new Faker().Random.String2(100))));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -364,7 +364,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenReReleaseYearIsAfterOriginalReleaseYear_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2000, 1, 1), originalReleaseYear: 2000, reReleaseDate: new DateOnly(2001, 1, 1), reReleaseYear: 2001)));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2000, 1, 1), originalReleaseYear: 2000, reReleaseDate: new DateOnly(2001, 1, 1), reReleaseYear: 2001)));
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -374,7 +374,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenReReleaseYearIsBeforeReleaseYear_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2001, 1, 1), originalReleaseYear: 2001, reReleaseDate: new DateOnly(2000, 1, 1), reReleaseYear: 2000)));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2001, 1, 1), originalReleaseYear: 2001, reReleaseDate: new DateOnly(2000, 1, 1), reReleaseYear: 2000)));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -387,7 +387,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenReReleaseDateIsAfterOriginalReleaseDate_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2000, 1, 1), originalReleaseYear: 2000, reReleaseDate: new DateOnly(2001, 1, 1), reReleaseYear: 2001)));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2000, 1, 1), originalReleaseYear: 2000, reReleaseDate: new DateOnly(2001, 1, 1), reReleaseYear: 2001)));
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -397,7 +397,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenReReleaseDateIsBeforeReleaseDate_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2001, 1, 1), originalReleaseYear: 2001, reReleaseDate: new DateOnly(2000, 1, 1), reReleaseYear: 2000)));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2001, 1, 1), originalReleaseYear: 2001, reReleaseDate: new DateOnly(2000, 1, 1), reReleaseYear: 2000)));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -410,7 +410,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithNullGenres_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(includeGenres: false));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(includeGenres: false));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -423,7 +423,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyGenreName_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(includeName: false)]));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(includeName: false)]));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -436,7 +436,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthGenreName_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: new Faker().Random.String2(100))]));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: new Faker().Random.String2(100))]));
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
 
@@ -448,7 +448,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithNullTags_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(includeTags: false));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(includeTags: false));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -461,7 +461,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyTagName_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(includeName: false)]));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(includeName: false)]));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -474,7 +474,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthTagName_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: new Faker().Random.String2(100))]));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: new Faker().Random.String2(100))]));
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
 
@@ -486,7 +486,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyLanguage_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(includeLanguage: false));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(includeLanguage: false));
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -496,7 +496,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyLanguageCode_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(includeLanguageCode: false)));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(includeLanguageCode: false)));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -509,7 +509,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthLanguageCode_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageCode: new Faker().Random.String2(10))));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageCode: new Faker().Random.String2(10))));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -522,7 +522,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyLanguageName_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(includeLanguageName: false)));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(includeLanguageName: false)));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -535,7 +535,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthLanguageName_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageName: new Faker().Random.String2(100))));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageName: new Faker().Random.String2(100))));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -548,7 +548,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyLanguageNativeName_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(includeNativeName: false)));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(includeNativeName: false)));
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -558,7 +558,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthNativeLanguageName_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(nativeName: new Faker().Random.String2(100))));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(nativeName: new Faker().Random.String2(100))));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -571,7 +571,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyOriginalLanguage_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(includeOriginalLanguage: false));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(includeOriginalLanguage: false));
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -581,7 +581,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyOriginalLanguageCode_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(includeLanguageCode: false)));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(includeLanguageCode: false)));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -594,7 +594,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthOriginalLanguageCode_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageCode: new Faker().Random.String2(10))));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageCode: new Faker().Random.String2(10))));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -607,7 +607,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyOriginalLanguageName_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(includeLanguageName: false)));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(includeLanguageName: false)));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -620,7 +620,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthOriginalLanguageName_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageName: new Faker().Random.String2(100))));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageName: new Faker().Random.String2(100))));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -633,7 +633,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthOriginalNativeLanguageName_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(nativeName: new Faker().Random.String2(100))));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(nativeName: new Faker().Random.String2(100))));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -646,7 +646,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyOriginalLanguageNativeName_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(includeNativeName: false)));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(includeNativeName: false)));
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -656,7 +656,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyPublisher_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(includePublisher: false));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(includePublisher: false));
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -666,7 +666,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthPublisher_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(publisher: new Faker().Random.String2(150)));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(publisher: new Faker().Random.String2(150)));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -679,7 +679,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyPageCount_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(includePageCount: false));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(includePageCount: false));
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -689,7 +689,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithNegativePageCount_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(pageCount: -1));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(pageCount: -1));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -702,7 +702,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyFormat_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -712,7 +712,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidFormat_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(format: (BookFormat)99);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(format: (BookFormat)99);
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -725,7 +725,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyEdition_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -735,7 +735,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthEdition_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(edition: new Faker().Random.String2(100));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(edition: new Faker().Random.String2(100));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -748,7 +748,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyVolumeNumber_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -758,7 +758,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithNegativeVolumeNumber_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(volumeNumber: -1);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(volumeNumber: -1);
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -771,7 +771,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptySeries_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create();
+        AddBookRequest bookRequest = _addBookRequestFixture.Create();
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -781,7 +781,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     //public async Task AddBook_WhenCalledWithEmptySeriesTitle_ShouldReturnUnprocessableEntity()
     //{
     //    // Arrange
-    //    var bookRequest = _requestBookFixture.Create();
+    //    var bookRequest = _addBookRequestFixture.Create();
     //    bookRequest = bookRequest with
     //    {
     //        Series = bookRequest.Series! with { Title = null }
@@ -798,7 +798,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     //public async Task AddBook_WhenCalledWithInvalidLengthSeriesTitle_ShouldReturnUnprocessableEntity()
     //{
     //    // Arrange
-    //    var bookRequest = _requestBookFixture.Create();
+    //    var bookRequest = _addBookRequestFixture.Create();
     //    bookRequest = bookRequest with { Series = bookRequest.Series! with { Title = new Faker().Random.String2(300) } };
 
     //    // Act
@@ -812,7 +812,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyAsin_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -822,7 +822,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthAsin_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(asin: new Faker().Random.String2(15));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(asin: new Faker().Random.String2(15));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -835,7 +835,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyGoodreadsId_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -845,7 +845,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidGoodreadsId_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(goodreadsId: new Faker().Random.String2(2));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(goodreadsId: new Faker().Random.String2(2));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -858,7 +858,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyLccn_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -868,7 +868,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLccn_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(lccn: new Faker().Random.String2(200));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(lccn: new Faker().Random.String2(200));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -881,7 +881,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyOclcNumber_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -891,7 +891,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidOclcNumber_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(oclcNumber: new Faker().Random.String2(200));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(oclcNumber: new Faker().Random.String2(200));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -904,7 +904,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyOpenLibraryId_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -914,7 +914,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidOpenLibraryId_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(openLibraryId: new Faker().Random.String2(200));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(openLibraryId: new Faker().Random.String2(200));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -927,7 +927,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyLibraryThingId_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -937,7 +937,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthLibraryThingId_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(libraryThingId: new Faker().Random.String2(200));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(libraryThingId: new Faker().Random.String2(200));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -950,7 +950,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyGoogleBooksId_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -960,7 +960,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthGoogleBooksId_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(googleBooksId: new Faker().Random.String2(20));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(googleBooksId: new Faker().Random.String2(20));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -973,7 +973,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidGoogleBooksId_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(googleBooksId: new Faker().Random.String2(11) + " ");
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(googleBooksId: new Faker().Random.String2(11) + " ");
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -986,7 +986,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyBarnesAndNobleId_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -996,7 +996,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthBarnesAndNobleId_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(barnesAndNobleId: new Faker().Random.String2(20));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(barnesAndNobleId: new Faker().Random.String2(20));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1009,7 +1009,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidBarnesAndNobleId_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(barnesAndNobleId: new Faker().Random.String2(10));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(barnesAndNobleId: new Faker().Random.String2(10));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1022,7 +1022,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyAppleBooksId_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(isbns: [], contributors: [], ratings: [], includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false);
 
         // Act & Assert
         await AssertCreated(bookRequest);
@@ -1032,7 +1032,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidAppleBooksId_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(appleBooksId: new Faker().Random.String2(10));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(appleBooksId: new Faker().Random.String2(10));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1045,7 +1045,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithNullIsbns_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false, includeIsbns: false, includeRatings: false, includeContributors: false);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false, includeIsbns: false, includeRatings: false, includeContributors: false);
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1058,7 +1058,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyIsbnValue_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [_isbnDtoFixture.Create(value: string.Empty)]);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(isbns: [_isbnDtoFixture.Create(value: string.Empty)]);
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1071,7 +1071,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidIsbn10Value_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [_isbnDtoFixture.Create(value: new Faker().Random.String2(5), format: IsbnFormat.Isbn10)]);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(isbns: [_isbnDtoFixture.Create(value: new Faker().Random.String2(5), format: IsbnFormat.Isbn10)]);
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1084,7 +1084,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidIsbn13Value_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [_isbnDtoFixture.Create(value: new Faker().Random.String2(5), format: IsbnFormat.Isbn13)]);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(isbns: [_isbnDtoFixture.Create(value: new Faker().Random.String2(5), format: IsbnFormat.Isbn13)]);
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1097,7 +1097,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidIsbnFormat_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [_isbnDtoFixture.Create(format: (IsbnFormat)99)]);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(isbns: [_isbnDtoFixture.Create(format: (IsbnFormat)99)]);
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
 
@@ -1109,7 +1109,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithNullContributors_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create() with { Contributors = null };
+        AddBookRequest bookRequest = _addBookRequestFixture.Create() with { Contributors = null };
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1122,7 +1122,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyContributorId_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(contributors: [_mediaContributorReferenceDtoFixture.Create(contributorId: Guid.Empty, role: MediaContributorRole.Author)]);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(contributors: [_mediaContributorReferenceDtoFixture.Create(contributorId: Guid.Empty, role: MediaContributorRole.Author)]);
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1135,7 +1135,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidContributorRole_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(contributors: [_mediaContributorReferenceDtoFixture.Create(contributorId: Guid.NewGuid(), role: (MediaContributorRole)999)]);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(contributors: [_mediaContributorReferenceDtoFixture.Create(contributorId: Guid.NewGuid(), role: (MediaContributorRole)999)]);
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1148,7 +1148,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithNullRatings_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false, includeIsbns: false, includeRatings: false, includeContributors: false);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false, includeIsbns: false, includeRatings: false, includeContributors: false);
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1161,7 +1161,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithNegativeRatingValue_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(ratings: [_bookRatingDtoFixture.Create(value: -3)]);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(ratings: [_bookRatingDtoFixture.Create(value: -3)]);
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
 
@@ -1173,7 +1173,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithRatingValueGreaterThanMaxValue_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(ratings: [_bookRatingDtoFixture.Create(value: 3, maxValue: 2)]);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(ratings: [_bookRatingDtoFixture.Create(value: 3, maxValue: 2)]);
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
 
@@ -1185,7 +1185,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithNegativeMaxRatingValue_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(ratings: [_bookRatingDtoFixture.Create(maxValue: -3)]);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(ratings: [_bookRatingDtoFixture.Create(maxValue: -3)]);
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
 
@@ -1197,7 +1197,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyRatingVoteCount_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(ratings: [_bookRatingDtoFixture.Create(source: BookRatingSource.Goodreads, includeVoteCount: false)]);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(ratings: [_bookRatingDtoFixture.Create(source: BookRatingSource.Goodreads, includeVoteCount: false)]);
         // Act & Assert
         await AssertCreated(bookRequest);
     }
@@ -1206,7 +1206,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithNegativeVoteCount_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(ratings: [_bookRatingDtoFixture.Create(voteCount: -3)]);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(ratings: [_bookRatingDtoFixture.Create(voteCount: -3)]);
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
 
@@ -1219,7 +1219,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     {
         // Arrange
         Guid contributorId = Guid.NewGuid();
-        AddBookRequest bookRequest = _requestBookFixture.Create(contributors:
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(contributors:
             [
                 _mediaContributorReferenceDtoFixture.Create(contributorId: contributorId, role: MediaContributorRole.Author),
                 _mediaContributorReferenceDtoFixture.Create(contributorId: contributorId, role: MediaContributorRole.Illustrator)
@@ -1251,7 +1251,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     {
         // Arrange
         string pathOutsideTheLibrary = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "..", "lumina-books-outside", $"{Guid.NewGuid():N}.epub"));
-        AddBookRequest bookRequest = _requestBookFixture.Create(path: pathOutsideTheLibrary);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(path: pathOutsideTheLibrary);
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1264,7 +1264,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenBookPathAlreadyExistsInTheLibrary_ShouldReturnConflict()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create();
+        AddBookRequest bookRequest = _addBookRequestFixture.Create();
 
         // Act
         HttpResponseMessage firstResponse = await PostBookAsync(bookRequest);
@@ -1286,7 +1286,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenAReferencedContributorDoesNotExist_ShouldReturnNotFound()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(contributors: [_mediaContributorReferenceDtoFixture.Create()]);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(contributors: [_mediaContributorReferenceDtoFixture.Create()]);
 
         // Act
         HttpResponseMessage response = await PostBookWithoutSeedingContributorsAsync(bookRequest);
@@ -1306,7 +1306,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithTooLongPath_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(path: "/" + new Faker().Random.String2(2048) + ".epub");
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(path: "/" + new Faker().Random.String2(2048) + ".epub");
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1322,7 +1322,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
         // only an admin reaches the library lookup of a library that does not exist, because a regular user is rejected by the ownership policy before it
         HttpClient adminClient = await _apiFactory.CreateAuthenticatedAdminClientAsync();
         Guid missingLibraryId = Guid.NewGuid();
-        AddBookRequest bookRequest = _requestBookFixture.Create(contributors: []);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(contributors: []);
 
         // Act
         HttpResponseMessage response = await adminClient.PostAsJsonAsync($"/api/v1/libraries/{missingLibraryId}/books", bookRequest);
@@ -1345,7 +1345,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenTitleIsValid_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(title: new Faker().Random.String2(200)));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(title: new Faker().Random.String2(200)));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1358,7 +1358,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenOriginalTitleIsValid_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(originalTitle: new Faker().Random.String2(200)));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(originalTitle: new Faker().Random.String2(200)));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1371,7 +1371,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenDescriptionIsValid_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(description: new Faker().Random.String2(1500)));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(description: new Faker().Random.String2(1500)));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1384,7 +1384,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenOriginalReleaseYearIsValid_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(includeOriginalReleaseDate: false, originalReleaseYear: new Faker().Random.Int(2000, 2005), reReleaseYear: new Faker().Random.Int(2005, 2010), includeReReleaseDate: false)));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(includeOriginalReleaseDate: false, originalReleaseYear: new Faker().Random.Int(2000, 2005), reReleaseYear: new Faker().Random.Int(2005, 2010), includeReReleaseDate: false)));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1397,7 +1397,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenReReleaseYearIsValid_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: new Faker().Random.Int(2000, 2005), reReleaseYear: new Faker().Random.Int(2005, 2010), includeReReleaseDate: false)));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: new Faker().Random.Int(2000, 2005), reReleaseYear: new Faker().Random.Int(2005, 2010), includeReReleaseDate: false)));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1410,7 +1410,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenReleaseVersionIsValid_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(releaseVersion: new Faker().Random.String2(50))));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(releaseVersion: new Faker().Random.String2(50))));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1423,7 +1423,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenGenresAreValid_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: new Faker().Random.String2(50))]));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: new Faker().Random.String2(50))]));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1436,7 +1436,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenTagsAreValid_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: new Faker().Random.String2(50))]));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: new Faker().Random.String2(50))]));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1449,7 +1449,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithValidPublisher_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(publisher: new Faker().Random.String2(100)));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(publisher: new Faker().Random.String2(100)));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1462,7 +1462,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenPageCountIsPositive_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(pageCount: 100));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(pageCount: 100));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1475,7 +1475,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenFormatIsValid_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(format: BookFormat.Hardcover);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(format: BookFormat.Hardcover);
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1488,7 +1488,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenEditionIsValid_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(edition: new Faker().Random.String2(50));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(edition: new Faker().Random.String2(50));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1501,7 +1501,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenVolumeNumberIsPositive_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(volumeNumber: 1);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(volumeNumber: 1);
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1514,7 +1514,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenAsinIsValid_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(asin: new Faker().Random.String2(10));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(asin: new Faker().Random.String2(10));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1527,7 +1527,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenGoodreadsIdIsValid_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(goodreadsId: "123456789");
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(goodreadsId: "123456789");
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1540,7 +1540,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenLccnIsValid_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(lccn: "n78890351");
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(lccn: "n78890351");
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1553,7 +1553,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithValidOclcNumberFormat1_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(oclcNumber: "ocm12345678");
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(oclcNumber: "ocm12345678");
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1566,7 +1566,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithValidOclcNumberFormat2_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(oclcNumber: "ocn123456789");
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(oclcNumber: "ocn123456789");
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1579,7 +1579,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithValidOclcNumberFormat3_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(oclcNumber: "on1234567890");
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(oclcNumber: "on1234567890");
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1592,7 +1592,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithValidOclcNumberFormat4_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(oclcNumber: "(OCoLC)1234567890");
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(oclcNumber: "(OCoLC)1234567890");
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1605,7 +1605,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithValidOclcNumberFormat5_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(oclcNumber: "12345678");
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(oclcNumber: "12345678");
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1618,7 +1618,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenOpenLibraryIdIsValid_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(openLibraryId: "OL123456M");
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(openLibraryId: "OL123456M");
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1631,7 +1631,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithValidLibraryThingId_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(libraryThingId: new Faker().Random.String2(50));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(libraryThingId: new Faker().Random.String2(50));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1644,7 +1644,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithValidGoogleBooksId_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(googleBooksId: new Faker().Random.String2(12, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-"));
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(googleBooksId: new Faker().Random.String2(12, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-"));
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1657,7 +1657,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithValidBarnesAndNobleId_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(barnesAndNobleId: new Faker().Random.Number(1000000000, 999999999).ToString());
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(barnesAndNobleId: new Faker().Random.Number(1000000000, 999999999).ToString());
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1670,7 +1670,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithValidAppleBooksId_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(appleBooksId: "id123456");
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(appleBooksId: "id123456");
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1683,7 +1683,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithValidIsbn10_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [_isbnDtoFixture.Create(value: "0-306-40615-2", format: IsbnFormat.Isbn10)]);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(isbns: [_isbnDtoFixture.Create(value: "0-306-40615-2", format: IsbnFormat.Isbn10)]);
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1696,7 +1696,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithValidIsbn13_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(isbns: [_isbnDtoFixture.Create(value: "978-3-16-148410-0", format: IsbnFormat.Isbn13)]);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(isbns: [_isbnDtoFixture.Create(value: "978-3-16-148410-0", format: IsbnFormat.Isbn13)]);
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1709,7 +1709,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenContributorsAreValid_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(contributors: [_mediaContributorReferenceDtoFixture.Create(role: MediaContributorRole.Author)]);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(contributors: [_mediaContributorReferenceDtoFixture.Create(role: MediaContributorRole.Author)]);
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1722,7 +1722,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithValidRatings_ShouldAddBook()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(ratings: [_bookRatingDtoFixture.Create(value: 4, maxValue: 5, voteCount: 100)]);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(ratings: [_bookRatingDtoFixture.Create(value: 4, maxValue: 5, voteCount: 100)]);
 
         // Act
         HttpResponseMessage response = await PostBookAsync(bookRequest);
@@ -1735,7 +1735,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenLibraryIdIsNotParseable_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(contributors: []);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(contributors: []);
 
         // Act
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/libraries/not-a-guid/books", bookRequest);
@@ -1756,7 +1756,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
         // Arrange
         HttpClient unauthenticatedClient = _apiFactory.CreateClient();
         Guid libraryId = Guid.NewGuid();
-        AddBookRequest request = _requestBookFixture.Create(contributors: []);
+        AddBookRequest request = _addBookRequestFixture.Create(contributors: []);
 
         // Act
         HttpResponseMessage response = await unauthenticatedClient.PostAsJsonAsync($"/api/v1/libraries/{libraryId}/books", request);
@@ -1769,7 +1769,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCalledWithCancellationToken_ShouldCompleteSuccessfully()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(contributors: []);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(contributors: []);
         using CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
 
         // Act & Assert
@@ -1783,7 +1783,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
     {
         // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create(contributors: []);
+        AddBookRequest bookRequest = _addBookRequestFixture.Create(contributors: []);
         using CancellationTokenSource cts = new();
 
         // Act & Assert

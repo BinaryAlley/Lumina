@@ -35,7 +35,7 @@ public class SetCurrentThemeEndpointTests : IClassFixture<AuthenticatedLuminaApi
 {
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
-    private readonly TestThemeArchiveFixture _themeArchiveFixture = new();
+    private readonly TestThemeArchiveFixture _testThemeArchiveFixture = new();
     private readonly SetCurrentThemeRequestFixture _setCurrentThemeRequestFixture = new();
     private readonly List<string> _installedThemeIds = [];
     private readonly JsonSerializerOptions _jsonOptions = new()
@@ -191,7 +191,7 @@ public class SetCurrentThemeEndpointTests : IClassFixture<AuthenticatedLuminaApi
     private async Task<string> InstallThemeAsync(string? themeId = null)
     {
         string resolvedThemeId = themeId ?? $"test-theme-{Guid.NewGuid():N}";
-        byte[] archiveBytes = _themeArchiveFixture.Create(resolvedThemeId);
+        byte[] archiveBytes = _testThemeArchiveFixture.Create(resolvedThemeId);
 
         using MultipartFormDataContent multipartContent = [];
         using ByteArrayContent fileContent = new(archiveBytes);

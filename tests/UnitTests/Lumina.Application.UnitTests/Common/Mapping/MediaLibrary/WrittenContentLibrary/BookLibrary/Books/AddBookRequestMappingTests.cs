@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Commands.AddBook;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaContributors;
@@ -19,7 +19,7 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenConten
 [ExcludeFromCodeCoverage]
 public class AddBookRequestMappingTests
 {
-    private readonly AddBookRequestFixture _requestFixture = new();
+    private readonly AddBookRequestFixture _addBookRequestFixture = new();
     private readonly WrittenContentMetadataDtoFixture _writtenContentMetadataDtoFixture = new();
     private readonly MediaContributorReferenceDtoFixture _mediaContributorReferenceDtoFixture = new();
 
@@ -28,7 +28,7 @@ public class AddBookRequestMappingTests
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
-        AddBookRequest request = _requestFixture.Create();
+        AddBookRequest request = _addBookRequestFixture.Create();
 
         // Act
         AddBookCommand result = request.ToCommand(libraryId.ToString());
@@ -61,7 +61,7 @@ public class AddBookRequestMappingTests
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
-        AddBookRequest request = _requestFixture.Create(
+        AddBookRequest request = _addBookRequestFixture.Create(
             path: "/books/test.epub",
             metadata: _writtenContentMetadataDtoFixture.Create(title: "Test Book"),
             includeFormat: false,
@@ -110,7 +110,7 @@ public class AddBookRequestMappingTests
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
-        AddBookRequest request = _requestFixture.Create(
+        AddBookRequest request = _addBookRequestFixture.Create(
             path: "/books/test.epub",
             metadata: _writtenContentMetadataDtoFixture.Create(title: "Test Book"),
             isbns: [new("978-0-123456-78-9", IsbnFormat.Isbn13)],

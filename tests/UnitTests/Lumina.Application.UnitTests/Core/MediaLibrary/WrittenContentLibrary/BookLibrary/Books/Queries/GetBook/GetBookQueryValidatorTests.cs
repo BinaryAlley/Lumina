@@ -16,14 +16,14 @@ namespace Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.B
 [ExcludeFromCodeCoverage]
 public class GetBookQueryValidatorTests
 {
-    private readonly GetBookQueryFixture _queryBookFixture = new();
+    private readonly GetBookQueryFixture _getBookQueryFixture = new();
     private readonly GetBookQueryValidator _validator = new();
 
     [Fact]
     public void Validate_WhenIdsAreValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        GetBookQuery query = _queryBookFixture.Create();
+        GetBookQuery query = _getBookQueryFixture.Create();
 
         // Act
         List<Error> result = _validator.TestValidate(query);
@@ -41,7 +41,7 @@ public class GetBookQueryValidatorTests
     public void Validate_WhenLibraryIdIsEmptyOrInvalid_ShouldHaveValidationError(string? libraryId)
     {
         // Arrange
-        GetBookQuery query = _queryBookFixture.Create() with { LibraryId = libraryId };
+        GetBookQuery query = _getBookQueryFixture.Create() with { LibraryId = libraryId };
 
         // Act
         List<Error> result = _validator.TestValidate(query);
@@ -58,7 +58,7 @@ public class GetBookQueryValidatorTests
     public void Validate_WhenBookIdIsEmptyOrInvalid_ShouldHaveValidationError(string? bookId)
     {
         // Arrange
-        GetBookQuery query = _queryBookFixture.Create() with { BookId = bookId };
+        GetBookQuery query = _getBookQueryFixture.Create() with { BookId = bookId };
 
         // Act
         List<Error> result = _validator.TestValidate(query);

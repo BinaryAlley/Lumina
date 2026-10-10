@@ -11,7 +11,7 @@ namespace Lumina.Plugins.OpenLibrary.Fixtures.Common.Models.Contracts.Responses;
 [ExcludeFromCodeCoverage]
 internal class OpenLibraryRatingsResponseFixture
 {
-    private readonly OpenLibraryRatingSummaryResponseFixture _ratingSummaryResponseFixture = new();
+    private readonly OpenLibraryRatingSummaryResponseFixture _openLibraryRatingSummaryResponseFixture = new();
 
     /// <summary>
     /// Creates a random valid <see cref="OpenLibraryRatingsResponse"/>.
@@ -22,7 +22,7 @@ internal class OpenLibraryRatingsResponseFixture
     {
         return new OpenLibraryRatingsResponse
         {
-            Summary = summary ?? _ratingSummaryResponseFixture.Create()
+            Summary = summary ?? _openLibraryRatingSummaryResponseFixture.Create()
         };
     }
 }

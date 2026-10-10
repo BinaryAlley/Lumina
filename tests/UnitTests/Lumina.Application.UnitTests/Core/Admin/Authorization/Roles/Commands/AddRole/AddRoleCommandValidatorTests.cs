@@ -18,13 +18,13 @@ namespace Lumina.Application.UnitTests.Core.Admin.Authorization.Roles.Commands.A
 public class AddRoleCommandValidatorTests
 {
     private readonly AddRoleCommandValidator _validator = new();
-    private readonly AddRoleCommandFixture _fixture = new();
+    private readonly AddRoleCommandFixture _addRoleCommandFixture = new();
 
     [Fact]
     public void Validate_WhenRoleNameIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        AddRoleCommand command = _fixture.Create();
+        AddRoleCommand command = _addRoleCommandFixture.Create();
         command = command with { RoleName = null! };
 
         // Act
@@ -38,7 +38,7 @@ public class AddRoleCommandValidatorTests
     public void Validate_WhenRoleNameIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        AddRoleCommand command = _fixture.Create();
+        AddRoleCommand command = _addRoleCommandFixture.Create();
         command = command with { RoleName = string.Empty };
 
         // Act
@@ -52,7 +52,7 @@ public class AddRoleCommandValidatorTests
     public void Validate_WhenRoleNameIsWhitespace_ShouldHaveValidationError()
     {
         // Arrange
-        AddRoleCommand command = _fixture.Create();
+        AddRoleCommand command = _addRoleCommandFixture.Create();
         command = command with { RoleName = " " };
 
         // Act
@@ -66,7 +66,7 @@ public class AddRoleCommandValidatorTests
     public void Validate_WhenPermissionsIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        AddRoleCommand command = _fixture.Create();
+        AddRoleCommand command = _addRoleCommandFixture.Create();
         command = command with { Permissions = null! };
 
         // Act
@@ -80,7 +80,7 @@ public class AddRoleCommandValidatorTests
     public void Validate_WhenPermissionsIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        AddRoleCommand command = _fixture.Create();
+        AddRoleCommand command = _addRoleCommandFixture.Create();
         command = command with { Permissions = [] };
 
         // Act
@@ -94,7 +94,7 @@ public class AddRoleCommandValidatorTests
     public void Validate_WhenPermissionContainsEmptyGuid_ShouldHaveValidationError()
     {
         // Arrange
-        AddRoleCommand command = _fixture.Create();
+        AddRoleCommand command = _addRoleCommandFixture.Create();
         command = command with { Permissions = [Guid.Empty, Guid.NewGuid()] };
 
         // Act
@@ -108,7 +108,7 @@ public class AddRoleCommandValidatorTests
     public void Validate_WhenCommandIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddRoleCommand command = _fixture.Create();
+        AddRoleCommand command = _addRoleCommandFixture.Create();
 
         // Act
         List<Error> result = _validator.TestValidate(command);

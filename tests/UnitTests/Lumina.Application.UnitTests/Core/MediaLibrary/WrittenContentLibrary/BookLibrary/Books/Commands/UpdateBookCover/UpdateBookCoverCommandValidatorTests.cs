@@ -17,14 +17,14 @@ namespace Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.B
 [ExcludeFromCodeCoverage]
 public class UpdateBookCoverCommandValidatorTests
 {
-    private readonly UpdateBookCoverCommandFixture _commandFixture = new();
+    private readonly UpdateBookCoverCommandFixture _updateBookCoverCommandFixture = new();
     private readonly UpdateBookCoverCommandValidator _validator = new();
 
     [Fact]
     public void Validate_WhenCommandIsValid_ShouldNotHaveValidationErrors()
     {
         // Arrange
-        UpdateBookCoverCommand command = _commandFixture.Create();
+        UpdateBookCoverCommand command = _updateBookCoverCommandFixture.Create();
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -37,7 +37,7 @@ public class UpdateBookCoverCommandValidatorTests
     public void Validate_WhenLibraryIdIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateBookCoverCommand command = _commandFixture.Create(libraryId: Guid.Empty.ToString());
+        UpdateBookCoverCommand command = _updateBookCoverCommandFixture.Create(libraryId: Guid.Empty.ToString());
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -50,7 +50,7 @@ public class UpdateBookCoverCommandValidatorTests
     public void Validate_WhenLibraryIdIsNotAGuid_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateBookCoverCommand command = _commandFixture.Create(libraryId: "not-a-guid");
+        UpdateBookCoverCommand command = _updateBookCoverCommandFixture.Create(libraryId: "not-a-guid");
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -63,7 +63,7 @@ public class UpdateBookCoverCommandValidatorTests
     public void Validate_WhenLibraryIdIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateBookCoverCommand command = _commandFixture.Create(libraryId: Guid.NewGuid().ToString());
+        UpdateBookCoverCommand command = _updateBookCoverCommandFixture.Create(libraryId: Guid.NewGuid().ToString());
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -76,7 +76,7 @@ public class UpdateBookCoverCommandValidatorTests
     public void Validate_WhenBookIdIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateBookCoverCommand command = _commandFixture.Create(bookId: Guid.Empty.ToString());
+        UpdateBookCoverCommand command = _updateBookCoverCommandFixture.Create(bookId: Guid.Empty.ToString());
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -89,7 +89,7 @@ public class UpdateBookCoverCommandValidatorTests
     public void Validate_WhenBookIdIsNotAGuid_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateBookCoverCommand command = _commandFixture.Create(bookId: "not-a-guid");
+        UpdateBookCoverCommand command = _updateBookCoverCommandFixture.Create(bookId: "not-a-guid");
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -102,7 +102,7 @@ public class UpdateBookCoverCommandValidatorTests
     public void Validate_WhenBookIdIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateBookCoverCommand command = _commandFixture.Create(bookId: Guid.NewGuid().ToString());
+        UpdateBookCoverCommand command = _updateBookCoverCommandFixture.Create(bookId: Guid.NewGuid().ToString());
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -115,7 +115,7 @@ public class UpdateBookCoverCommandValidatorTests
     public void Validate_WhenCoverIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateBookCoverCommand command = _commandFixture.Create(includeCover: false);
+        UpdateBookCoverCommand command = _updateBookCoverCommandFixture.Create(includeCover: false);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -128,7 +128,7 @@ public class UpdateBookCoverCommandValidatorTests
     public void Validate_WhenCoverIsPresentAndFileNameIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateBookCoverCommand command = _commandFixture.Create(fileName: string.Empty);
+        UpdateBookCoverCommand command = _updateBookCoverCommandFixture.Create(fileName: string.Empty);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -141,7 +141,7 @@ public class UpdateBookCoverCommandValidatorTests
     public void Validate_WhenCoverIsMissingAndFileNameIsEmpty_ShouldNotHaveFileNameValidationError()
     {
         // Arrange
-        UpdateBookCoverCommand command = _commandFixture.Create(fileName: string.Empty, includeCover: false);
+        UpdateBookCoverCommand command = _updateBookCoverCommandFixture.Create(fileName: string.Empty, includeCover: false);
 
         // Act
         List<Error> result = _validator.TestValidate(command);

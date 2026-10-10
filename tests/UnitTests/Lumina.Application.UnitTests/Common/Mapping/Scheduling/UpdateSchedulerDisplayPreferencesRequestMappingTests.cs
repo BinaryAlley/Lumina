@@ -15,13 +15,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Scheduling;
 [ExcludeFromCodeCoverage]
 public class UpdateSchedulerDisplayPreferencesRequestMappingTests
 {
-    private readonly UpdateSchedulerDisplayPreferencesRequestFixture _requestFixture = new();
+    private readonly UpdateSchedulerDisplayPreferencesRequestFixture _updateSchedulerDisplayPreferencesRequestFixture = new();
 
     [Fact]
     public void ToCommand_WhenMappingValidRequest_ShouldMapCorrectly()
     {
         // Arrange
-        UpdateSchedulerDisplayPreferencesRequest request = _requestFixture.Create(
+        UpdateSchedulerDisplayPreferencesRequest request = _updateSchedulerDisplayPreferencesRequestFixture.Create(
             jobTypeFilter: ScheduledTaskType.CleanTemporaryFiles,
             displayTimeSpan: 15,
             displayTimeUnit: SchedulerDisplayTimeUnit.Hours);

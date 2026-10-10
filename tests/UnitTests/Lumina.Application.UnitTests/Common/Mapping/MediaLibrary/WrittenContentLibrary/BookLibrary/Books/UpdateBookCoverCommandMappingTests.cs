@@ -18,7 +18,7 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenConten
 [ExcludeFromCodeCoverage]
 public class UpdateBookCoverCommandMappingTests
 {
-    private readonly UpdateBookCoverCommandFixture _commandFixture = new();
+    private readonly UpdateBookCoverCommandFixture _updateBookCoverCommandFixture = new();
     private readonly BookArtworkEntityFixture _bookArtworkEntityFixture = new();
 
     [Fact]
@@ -27,7 +27,7 @@ public class UpdateBookCoverCommandMappingTests
         // Arrange
         Guid userId = Guid.NewGuid();
         Guid bookId = Guid.NewGuid();
-        UpdateBookCoverCommand command = _commandFixture.Create(bookId: bookId.ToString());
+        UpdateBookCoverCommand command = _updateBookCoverCommandFixture.Create(bookId: bookId.ToString());
         string storedCoverPath = "/media/books/cover.jpg";
 
         // Act
@@ -50,7 +50,7 @@ public class UpdateBookCoverCommandMappingTests
         // Arrange
         Guid userId = Guid.NewGuid();
         Guid bookId = Guid.NewGuid();
-        UpdateBookCoverCommand command = _commandFixture.Create(bookId: bookId.ToString());
+        UpdateBookCoverCommand command = _updateBookCoverCommandFixture.Create(bookId: bookId.ToString());
         BookArtworkEntity existingCover = _bookArtworkEntityFixture.Create(bookId: bookId, artworkType: ArtworkType.Cover, fileName: "/media/books/old-cover.jpg", status: ArtworkStatus.Pending);
         string storedCoverPath = "/media/books/cover.jpg";
 

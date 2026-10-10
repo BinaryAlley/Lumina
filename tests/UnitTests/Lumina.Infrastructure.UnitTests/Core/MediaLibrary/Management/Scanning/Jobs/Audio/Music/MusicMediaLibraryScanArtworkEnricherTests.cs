@@ -71,7 +71,7 @@ public class MusicMediaLibraryScanArtworkEnricherTests
     private readonly UserId _userId;
 
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
-    private readonly LibraryArtworkProviderConfigurationEntityFixture _artworkConfigurationFixture = new();
+    private readonly LibraryArtworkProviderConfigurationEntityFixture _libraryArtworkProviderConfigurationEntityFixture = new();
     private readonly ArtistEntityFixture _artistEntityFixture = new();
     private readonly AlbumEntityFixture _albumEntityFixture = new();
     private readonly UserSettingsEntityFixture _userSettingsEntityFixture = new();
@@ -505,8 +505,8 @@ public class MusicMediaLibraryScanArtworkEnricherTests
         _mockArtworkProviderConfigurationRepository.GetByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryArtworkProviderConfigurationEntity>>(
             [
-                _artworkConfigurationFixture.Create(_libraryId.Value, _artistPluginId, 0),
-                _artworkConfigurationFixture.Create(_libraryId.Value, _albumPluginId, 1)
+                _libraryArtworkProviderConfigurationEntityFixture.Create(_libraryId.Value, _artistPluginId, 0),
+                _libraryArtworkProviderConfigurationEntityFixture.Create(_libraryId.Value, _albumPluginId, 1)
             ]));
     }
 

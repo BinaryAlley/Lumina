@@ -40,7 +40,7 @@ public class GetLibraryArtworkProvidersQueryHandlerTests
     private readonly IValidator<GetLibraryArtworkProvidersQuery> _mockValidator;
     private readonly GetLibraryArtworkProvidersQueryHandler _sut;
     private readonly GetLibraryArtworkProvidersQueryFixture _getLibraryArtworkProvidersQueryFixture = new();
-    private readonly LibraryArtworkProviderConfigurationEntityFixture _configurationEntityFixture = new();
+    private readonly LibraryArtworkProviderConfigurationEntityFixture _libraryArtworkProviderConfigurationEntityFixture = new();
     private readonly PluginEntityFixture _pluginEntityFixture = new();
     private readonly PaginatedResultDtoFixture<PluginEntity> _paginatedResultDtoFixture = new();
     private readonly Guid _userId;
@@ -95,8 +95,8 @@ public class GetLibraryArtworkProvidersQueryHandlerTests
         Guid secondPluginId = Guid.NewGuid();
         List<LibraryArtworkProviderConfigurationEntity> configurations =
         [
-            _configurationEntityFixture.Create(query.LibraryId, secondPluginId, 2),
-            _configurationEntityFixture.Create(query.LibraryId, firstPluginId, 1)
+            _libraryArtworkProviderConfigurationEntityFixture.Create(query.LibraryId, secondPluginId, 2),
+            _libraryArtworkProviderConfigurationEntityFixture.Create(query.LibraryId, firstPluginId, 1)
         ];
         _mockArtworkProviderConfigurationRepository.GetByLibraryIdAsync(query.LibraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryArtworkProviderConfigurationEntity>>(configurations));
@@ -129,7 +129,7 @@ public class GetLibraryArtworkProvidersQueryHandlerTests
         Guid unknownPluginId = Guid.NewGuid();
         List<LibraryArtworkProviderConfigurationEntity> configurations =
         [
-            _configurationEntityFixture.Create(query.LibraryId, unknownPluginId, 1)
+            _libraryArtworkProviderConfigurationEntityFixture.Create(query.LibraryId, unknownPluginId, 1)
         ];
         _mockArtworkProviderConfigurationRepository.GetByLibraryIdAsync(query.LibraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryArtworkProviderConfigurationEntity>>(configurations));

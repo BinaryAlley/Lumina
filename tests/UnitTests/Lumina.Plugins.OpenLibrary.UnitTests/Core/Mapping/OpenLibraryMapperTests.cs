@@ -27,14 +27,14 @@ namespace Lumina.Plugins.OpenLibrary.UnitTests.Core.Mapping;
 public class OpenLibraryMapperTests
 {
     private readonly BookMetadataLookupDtoFixture _bookMetadataLookupDtoFixture = new();
-    private readonly OpenLibraryEditionResponseFixture _editionResponseFixture = new();
-    private readonly OpenLibraryWorkResponseFixture _workResponseFixture = new();
-    private readonly OpenLibrarySearchDocumentResponseFixture _searchDocumentResponseFixture = new();
-    private readonly OpenLibraryAuthorResponseFixture _authorResponseFixture = new();
-    private readonly OpenLibraryRatingsResponseFixture _ratingsResponseFixture = new();
-    private readonly OpenLibraryRatingSummaryResponseFixture _ratingSummaryResponseFixture = new();
-    private readonly OpenLibraryKeyReferenceResponseFixture _keyReferenceResponseFixture = new();
-    private readonly OpenLibraryWorkAuthorResponseFixture _workAuthorResponseFixture = new();
+    private readonly OpenLibraryEditionResponseFixture _openLibraryEditionResponseFixture = new();
+    private readonly OpenLibraryWorkResponseFixture _openLibraryWorkResponseFixture = new();
+    private readonly OpenLibrarySearchDocumentResponseFixture _openLibrarySearchDocumentResponseFixture = new();
+    private readonly OpenLibraryAuthorResponseFixture _openLibraryAuthorResponseFixture = new();
+    private readonly OpenLibraryRatingsResponseFixture _openLibraryRatingsResponseFixture = new();
+    private readonly OpenLibraryRatingSummaryResponseFixture _openLibraryRatingSummaryResponseFixture = new();
+    private readonly OpenLibraryKeyReferenceResponseFixture _openLibraryKeyReferenceResponseFixture = new();
+    private readonly OpenLibraryWorkAuthorResponseFixture _openLibraryWorkAuthorResponseFixture = new();
 
     [Theory]
     [InlineData("978-0-306-40615-7", "9780306406157")]
@@ -154,7 +154,7 @@ public class OpenLibraryMapperTests
     {
         // Arrange
         BookMetadataLookupDto lookup = _bookMetadataLookupDtoFixture.Create();
-        OpenLibrarySearchDocumentResponse document = _searchDocumentResponseFixture.Create(
+        OpenLibrarySearchDocumentResponse document = _openLibrarySearchDocumentResponseFixture.Create(
             key: "/works/OL12345W",
             title: "Search Title",
             authorNames: ["Search Author"],
@@ -200,7 +200,7 @@ public class OpenLibraryMapperTests
         // Arrange
         BookMetadataLookupDto lookup = _bookMetadataLookupDtoFixture.Create(isbn: "978-0-306-40615-7");
         JsonElement identifiers = JsonDocument.Parse("""{"amazon":["B000001"],"goodreads":["12345"],"google":["gid"],"librarything":["ltid"],"barnesandnoble":["bnid"],"apple":["apid"]}""").RootElement;
-        OpenLibraryEditionResponse edition = _editionResponseFixture.Create(
+        OpenLibraryEditionResponse edition = _openLibraryEditionResponseFixture.Create(
             key: "/books/OL100M",
             title: "Edition Title",
             publishDate: "2010-05-01",
@@ -216,10 +216,10 @@ public class OpenLibraryMapperTests
             lccn: ["79042755"],
             oclcNumbers: ["1234567"],
             identifiers: identifiers,
-            languages: [_keyReferenceResponseFixture.Create(key: "/languages/eng")],
-            works: [_keyReferenceResponseFixture.Create(key: "/works/OL200W")],
+            languages: [_openLibraryKeyReferenceResponseFixture.Create(key: "/languages/eng")],
+            works: [_openLibraryKeyReferenceResponseFixture.Create(key: "/works/OL200W")],
             contributions: ["John Smith (Illustrator)"]);
-        OpenLibraryWorkResponse work = _workResponseFixture.Create(
+        OpenLibraryWorkResponse work = _openLibraryWorkResponseFixture.Create(
             key: "/works/OL200W",
             title: "Work Title",
             originalTitle: "Original Title",
@@ -227,10 +227,10 @@ public class OpenLibraryMapperTests
             firstPublishDate: "1987-06-01",
             subjects: ["Science fiction", "History", "Space"],
             genres: ["Fantasy"],
-            authors: [_workAuthorResponseFixture.Create(author: _keyReferenceResponseFixture.Create(key: "/authors/OL1A"))],
-            originalLanguages: [_keyReferenceResponseFixture.Create(key: "/languages/fre")]);
-        OpenLibraryAuthorResponse author = _authorResponseFixture.Create(key: "/authors/OL1A", name: "Test Author", personalName: "Test Personal Name");
-        OpenLibraryRatingsResponse ratings = _ratingsResponseFixture.Create(_ratingSummaryResponseFixture.Create(average: 4.2m, count: 100));
+            authors: [_openLibraryWorkAuthorResponseFixture.Create(author: _openLibraryKeyReferenceResponseFixture.Create(key: "/authors/OL1A"))],
+            originalLanguages: [_openLibraryKeyReferenceResponseFixture.Create(key: "/languages/fre")]);
+        OpenLibraryAuthorResponse author = _openLibraryAuthorResponseFixture.Create(key: "/authors/OL1A", name: "Test Author", personalName: "Test Personal Name");
+        OpenLibraryRatingsResponse ratings = _openLibraryRatingsResponseFixture.Create(_openLibraryRatingSummaryResponseFixture.Create(average: 4.2m, count: 100));
 
         // Act
         BookMetadataDto result = OpenLibraryMapper.MapDetailed(lookup, edition, work, [author], ratings);
@@ -287,7 +287,7 @@ public class OpenLibraryMapperTests
     {
         // Arrange
         BookMetadataLookupDto lookup = _bookMetadataLookupDtoFixture.Create();
-        OpenLibraryWorkResponse work = _workResponseFixture.Create(subjects: ["Science fiction", "History", "Space"]);
+        OpenLibraryWorkResponse work = _openLibraryWorkResponseFixture.Create(subjects: ["Science fiction", "History", "Space"]);
 
         // Act
         BookMetadataDto result = OpenLibraryMapper.MapDetailed(lookup, null, work, [], null);
@@ -304,7 +304,7 @@ public class OpenLibraryMapperTests
     {
         // Arrange
         BookMetadataLookupDto lookup = _bookMetadataLookupDtoFixture.Create();
-        OpenLibrarySearchDocumentResponse fallback = _searchDocumentResponseFixture.Create(firstPublishYear: 2001);
+        OpenLibrarySearchDocumentResponse fallback = _openLibrarySearchDocumentResponseFixture.Create(firstPublishYear: 2001);
 
         // Act
         BookMetadataDto result = OpenLibraryMapper.MapDetailed(lookup, null, null, [], null, fallback);
@@ -319,7 +319,7 @@ public class OpenLibraryMapperTests
     {
         // Arrange
         BookMetadataLookupDto lookup = _bookMetadataLookupDtoFixture.Create();
-        OpenLibraryEditionResponse edition = _editionResponseFixture.Create(languages: [_keyReferenceResponseFixture.Create(key: "/languages/xxq")]);
+        OpenLibraryEditionResponse edition = _openLibraryEditionResponseFixture.Create(languages: [_openLibraryKeyReferenceResponseFixture.Create(key: "/languages/xxq")]);
 
         // Act
         BookMetadataDto result = OpenLibraryMapper.MapDetailed(lookup, edition, null, [], null);
@@ -336,7 +336,7 @@ public class OpenLibraryMapperTests
     {
         // Arrange
         BookMetadataLookupDto lookup = _bookMetadataLookupDtoFixture.Create();
-        OpenLibraryWorkResponse work = _workResponseFixture.Create(description: JsonDocument.Parse("\"A plain description\"").RootElement);
+        OpenLibraryWorkResponse work = _openLibraryWorkResponseFixture.Create(description: JsonDocument.Parse("\"A plain description\"").RootElement);
 
         // Act
         BookMetadataDto result = OpenLibraryMapper.MapDetailed(lookup, null, work, [], null);
@@ -370,7 +370,7 @@ public class OpenLibraryMapperTests
     {
         // Arrange
         BookMetadataLookupDto lookup = _bookMetadataLookupDtoFixture.Create();
-        OpenLibrarySearchDocumentResponse fallback = _searchDocumentResponseFixture.Create(ratingsAverage: 3.5m, ratingsCount: 10);
+        OpenLibrarySearchDocumentResponse fallback = _openLibrarySearchDocumentResponseFixture.Create(ratingsAverage: 3.5m, ratingsCount: 10);
 
         // Act
         BookMetadataDto result = OpenLibraryMapper.MapDetailed(lookup, null, null, [], null, fallback);
@@ -386,7 +386,7 @@ public class OpenLibraryMapperTests
     {
         // Arrange
         BookMetadataLookupDto lookup = _bookMetadataLookupDtoFixture.Create();
-        OpenLibraryEditionResponse edition = _editionResponseFixture.Create(series: ["Book 2 of the trilogy"]);
+        OpenLibraryEditionResponse edition = _openLibraryEditionResponseFixture.Create(series: ["Book 2 of the trilogy"]);
 
         // Act
         BookMetadataDto result = OpenLibraryMapper.MapDetailed(lookup, edition, null, [], null);
@@ -401,11 +401,11 @@ public class OpenLibraryMapperTests
     {
         // Arrange
         BookMetadataLookupDto lookup = _bookMetadataLookupDtoFixture.Create();
-        OpenLibraryEditionResponse edition = _editionResponseFixture.Create(
+        OpenLibraryEditionResponse edition = _openLibraryEditionResponseFixture.Create(
             sourceRecords: ["amazon:B000002", "google:gid2"],
             oclcNumbers: ["999999"],
             isbn13: ["9780306406157"]);
-        OpenLibrarySearchDocumentResponse fallback = _searchDocumentResponseFixture.Create(
+        OpenLibrarySearchDocumentResponse fallback = _openLibrarySearchDocumentResponseFixture.Create(
             amazonIds: ["B000003"],
             goodreadsIds: ["777"],
             googleIds: ["gid3"],

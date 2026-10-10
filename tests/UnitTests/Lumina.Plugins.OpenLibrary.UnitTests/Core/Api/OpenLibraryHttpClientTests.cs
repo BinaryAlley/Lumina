@@ -26,7 +26,7 @@ namespace Lumina.Plugins.OpenLibrary.UnitTests.Core.Api;
 [ExcludeFromCodeCoverage]
 public class OpenLibraryHttpClientTests
 {
-    private readonly OpenLibrarySettingsDtoFixture _settingsFixture = new();
+    private readonly OpenLibrarySettingsDtoFixture _openLibrarySettingsDtoFixture = new();
     private readonly BookMetadataLookupDtoFixture _bookMetadataLookupDtoFixture = new();
 
     [Fact]
@@ -36,7 +36,7 @@ public class OpenLibraryHttpClientTests
         HttpClient httpClient = new(new StubOpenLibraryHttpMessageHandler());
 
         // Act
-        _ = new OpenLibraryHttpClient(httpClient, new OpenLibrarySettingsProvider(null, Guid.NewGuid(), _settingsFixture.Create()));
+        _ = new OpenLibraryHttpClient(httpClient, new OpenLibrarySettingsProvider(null, Guid.NewGuid(), _openLibrarySettingsDtoFixture.Create()));
 
         // Assert
         Assert.Equal(new Uri("https://openlibrary.org/"), httpClient.BaseAddress);
@@ -53,7 +53,7 @@ public class OpenLibraryHttpClientTests
         };
 
         // Act
-        _ = new OpenLibraryHttpClient(httpClient, new OpenLibrarySettingsProvider(null, Guid.NewGuid(), _settingsFixture.Create()));
+        _ = new OpenLibraryHttpClient(httpClient, new OpenLibrarySettingsProvider(null, Guid.NewGuid(), _openLibrarySettingsDtoFixture.Create()));
 
         // Assert
         Assert.Equal(existingBaseAddress, httpClient.BaseAddress);
@@ -66,7 +66,7 @@ public class OpenLibraryHttpClientTests
         StubOpenLibraryHttpMessageHandler handler = new();
         handler.MapPath("/books/OL1M.json", """{"key":"/books/OL1M","title":"Edition Title"}""");
         HttpClient httpClient = new(handler);
-        OpenLibraryHttpClient sut = new(httpClient, new OpenLibrarySettingsProvider(null, Guid.NewGuid(), _settingsFixture.Create(userAgent: "CustomAgent/2.0")));
+        OpenLibraryHttpClient sut = new(httpClient, new OpenLibrarySettingsProvider(null, Guid.NewGuid(), _openLibrarySettingsDtoFixture.Create(userAgent: "CustomAgent/2.0")));
 
         // Act
         await sut.GetEditionAsync("OL1M", CancellationToken.None);
@@ -83,7 +83,7 @@ public class OpenLibraryHttpClientTests
         handler.MapPath("/books/OL1M.json", """{"key":"/books/OL1M","title":"Edition Title"}""");
         HttpClient httpClient = new(handler);
         httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("ExistingAgent/1.0");
-        OpenLibraryHttpClient sut = new(httpClient, new OpenLibrarySettingsProvider(null, Guid.NewGuid(), _settingsFixture.Create(userAgent: "ConfiguredAgent/2.0")));
+        OpenLibraryHttpClient sut = new(httpClient, new OpenLibrarySettingsProvider(null, Guid.NewGuid(), _openLibrarySettingsDtoFixture.Create(userAgent: "ConfiguredAgent/2.0")));
 
         // Act
         await sut.GetEditionAsync("OL1M", CancellationToken.None);
@@ -99,7 +99,7 @@ public class OpenLibraryHttpClientTests
         StubOpenLibraryHttpMessageHandler handler = new();
         handler.MapPath("/books/OL1M.json", """{"key":"/books/OL1M","title":"Edition Title"}""");
         HttpClient httpClient = new(handler);
-        OpenLibraryHttpClient sut = new(httpClient, new OpenLibrarySettingsProvider(null, Guid.NewGuid(), _settingsFixture.Create(contactEmail: "contact@example.com")));
+        OpenLibraryHttpClient sut = new(httpClient, new OpenLibrarySettingsProvider(null, Guid.NewGuid(), _openLibrarySettingsDtoFixture.Create(contactEmail: "contact@example.com")));
 
         // Act
         await sut.GetEditionAsync("OL1M", CancellationToken.None);
@@ -115,7 +115,7 @@ public class OpenLibraryHttpClientTests
         StubOpenLibraryHttpMessageHandler handler = new();
         handler.MapPath("/books/OL1M.json", """{"key":"/books/OL1M","title":"Edition Title"}""");
         HttpClient httpClient = new(handler);
-        OpenLibraryHttpClient sut = new(httpClient, new OpenLibrarySettingsProvider(null, Guid.NewGuid(), _settingsFixture.Create(contactEmail: null)));
+        OpenLibraryHttpClient sut = new(httpClient, new OpenLibrarySettingsProvider(null, Guid.NewGuid(), _openLibrarySettingsDtoFixture.Create(contactEmail: null)));
 
         // Act
         await sut.GetEditionAsync("OL1M", CancellationToken.None);
@@ -434,7 +434,7 @@ public class OpenLibraryHttpClientTests
             _ => attempts++ == 0
                 ? new HttpResponseMessage(HttpStatusCode.InternalServerError)
                 : StubOpenLibraryHttpMessageHandler.CreateJsonResponse(HttpStatusCode.OK, """{"key":"/works/OL123W","title":"Work"}"""));
-        OpenLibraryHttpClient sut = CreateSut(handler, _settingsFixture.Create(minimumRequestInterval: TimeSpan.Zero));
+        OpenLibraryHttpClient sut = CreateSut(handler, _openLibrarySettingsDtoFixture.Create(minimumRequestInterval: TimeSpan.Zero));
 
         // Act
         OpenLibraryWorkResponse? result = await sut.GetWorkAsync("OL123W", CancellationToken.None);
@@ -464,7 +464,7 @@ public class OpenLibraryHttpClientTests
 
                 return StubOpenLibraryHttpMessageHandler.CreateJsonResponse(HttpStatusCode.OK, """{"key":"/works/OL123W","title":"Work"}""");
             });
-        OpenLibraryHttpClient sut = CreateSut(handler, _settingsFixture.Create(minimumRequestInterval: TimeSpan.Zero));
+        OpenLibraryHttpClient sut = CreateSut(handler, _openLibrarySettingsDtoFixture.Create(minimumRequestInterval: TimeSpan.Zero));
 
         // Act
         OpenLibraryWorkResponse? result = await sut.GetWorkAsync("OL123W", CancellationToken.None);
@@ -483,7 +483,7 @@ public class OpenLibraryHttpClientTests
         handler.AddRoute(
             request => request.RequestUri!.AbsolutePath == "/works/OL123W.json",
             _ => new HttpResponseMessage(HttpStatusCode.InternalServerError));
-        OpenLibraryHttpClient sut = CreateSut(handler, _settingsFixture.Create(minimumRequestInterval: TimeSpan.Zero));
+        OpenLibraryHttpClient sut = CreateSut(handler, _openLibrarySettingsDtoFixture.Create(minimumRequestInterval: TimeSpan.Zero));
 
         // Act
         async Task Act()
@@ -504,7 +504,7 @@ public class OpenLibraryHttpClientTests
         handler.AddRoute(
             request => request.RequestUri!.AbsolutePath == "/works/OL123W.json",
             _ => new HttpResponseMessage(HttpStatusCode.BadRequest));
-        OpenLibraryHttpClient sut = CreateSut(handler, _settingsFixture.Create(minimumRequestInterval: TimeSpan.Zero));
+        OpenLibraryHttpClient sut = CreateSut(handler, _openLibrarySettingsDtoFixture.Create(minimumRequestInterval: TimeSpan.Zero));
 
         // Act
         async Task Act()
@@ -523,7 +523,7 @@ public class OpenLibraryHttpClientTests
         // Arrange
         StubOpenLibraryHttpMessageHandler handler = new();
         handler.MapPath("/works/OL1W.json", """{"key":"/works/OL1W","title":"Work"}""");
-        OpenLibraryHttpClient sut = CreateSut(handler, _settingsFixture.Create(minimumRequestInterval: TimeSpan.FromMilliseconds(300)));
+        OpenLibraryHttpClient sut = CreateSut(handler, _openLibrarySettingsDtoFixture.Create(minimumRequestInterval: TimeSpan.FromMilliseconds(300)));
 
         // Act
         Stopwatch stopwatch = Stopwatch.StartNew();
@@ -562,7 +562,7 @@ public class OpenLibraryHttpClientTests
     private OpenLibraryHttpClient CreateSut(StubOpenLibraryHttpMessageHandler handler, OpenLibrarySettingsDto? settings = null)
     {
         HttpClient httpClient = new(handler);
-        OpenLibrarySettingsProvider settingsProvider = new(null, Guid.NewGuid(), settings ?? _settingsFixture.Create(minimumRequestInterval: TimeSpan.Zero));
+        OpenLibrarySettingsProvider settingsProvider = new(null, Guid.NewGuid(), settings ?? _openLibrarySettingsDtoFixture.Create(minimumRequestInterval: TimeSpan.Zero));
         return new OpenLibraryHttpClient(httpClient, settingsProvider);
     }
 }

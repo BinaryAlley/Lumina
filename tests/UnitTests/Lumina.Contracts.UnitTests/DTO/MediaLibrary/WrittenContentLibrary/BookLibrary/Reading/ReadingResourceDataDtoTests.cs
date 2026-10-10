@@ -13,7 +13,7 @@ namespace Lumina.Contracts.UnitTests.DTO.MediaLibrary.WrittenContentLibrary.Book
 [ExcludeFromCodeCoverage]
 public class ReadingResourceDataDtoTests
 {
-    private readonly ReadingResourceDataDtoFixture _fixture = new();
+    private readonly ReadingResourceDataDtoFixture _readingResourceDataDtoFixture = new();
 
     [Fact]
     public void Create_WhenProvidedData_ShouldPreserveIt()
@@ -22,7 +22,7 @@ public class ReadingResourceDataDtoTests
         byte[] data = Guid.NewGuid().ToByteArray();
 
         // Act
-        ReadingResourceDataDto sut = _fixture.Create(data: data);
+        ReadingResourceDataDto sut = _readingResourceDataDtoFixture.Create(data: data);
 
         // Assert
         Assert.Equal(data, sut.Data);

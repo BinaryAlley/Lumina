@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;

@@ -62,7 +62,7 @@ public class BooksMediaLibraryScanMetadataEnricherTests
     private readonly IDomainEventPublisher _mockDomainEventPublisher;
     private readonly ServiceProvider _serviceProvider;
     private readonly BooksMediaLibraryScanMetadataEnricher _sut;
-    private readonly LibraryMetadataProviderConfigurationEntityFixture _metadataConfigurationEntityFixture = new();
+    private readonly LibraryMetadataProviderConfigurationEntityFixture _libraryMetadataProviderConfigurationEntityFixture = new();
     private readonly BookEntityFixture _bookEntityFixture = new();
     private readonly BookMetadataDtoFixture _bookMetadataDtoFixture = new();
     private readonly MediaContributorDtoFixture _mediaContributorDtoFixture = new();
@@ -109,8 +109,8 @@ public class BooksMediaLibraryScanMetadataEnricherTests
         _mockMetadataConfigurationRepository.GetByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
             .Returns(Result<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>.Success(
             [
-                _metadataConfigurationEntityFixture.Create(_libraryId.Value, pluginAId, rank: 1),
-                _metadataConfigurationEntityFixture.Create(_libraryId.Value, pluginBId, rank: 2)
+                _libraryMetadataProviderConfigurationEntityFixture.Create(_libraryId.Value, pluginAId, rank: 1),
+                _libraryMetadataProviderConfigurationEntityFixture.Create(_libraryId.Value, pluginBId, rank: 2)
             ]));
 
         ServiceCollection services = new();

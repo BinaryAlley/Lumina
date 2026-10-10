@@ -59,7 +59,7 @@ public class MusicMediaLibraryScanMetadataEnricherTests
     private readonly IDomainEventPublisher _mockDomainEventPublisher;
     private readonly ServiceProvider _serviceProvider;
     private readonly MusicMediaLibraryScanMetadataEnricher _sut;
-    private readonly LibraryMetadataProviderConfigurationEntityFixture _metadataConfigurationEntityFixture = new();
+    private readonly LibraryMetadataProviderConfigurationEntityFixture _libraryMetadataProviderConfigurationEntityFixture = new();
     private readonly ArtistEntityFixture _artistEntityFixture = new();
     private readonly ArtistMetadataDtoFixture _artistMetadataDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
@@ -109,8 +109,8 @@ public class MusicMediaLibraryScanMetadataEnricherTests
         _mockMetadataConfigurationRepository.GetByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
             .Returns(Result<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>.Success(
             [
-                _metadataConfigurationEntityFixture.Create(_libraryId.Value, pluginAId, rank: 1),
-                _metadataConfigurationEntityFixture.Create(_libraryId.Value, pluginBId, rank: 2)
+                _libraryMetadataProviderConfigurationEntityFixture.Create(_libraryId.Value, pluginAId, rank: 1),
+                _libraryMetadataProviderConfigurationEntityFixture.Create(_libraryId.Value, pluginBId, rank: 2)
             ]));
 
         ServiceCollection services = new();

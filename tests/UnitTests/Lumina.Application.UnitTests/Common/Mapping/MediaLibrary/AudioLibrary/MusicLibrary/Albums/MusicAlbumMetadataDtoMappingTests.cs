@@ -20,7 +20,7 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.AudioLibrary.
 [ExcludeFromCodeCoverage]
 public class MusicAlbumMetadataDtoMappingTests
 {
-    private readonly MusicAlbumMetadataDtoFixture _albumMetadataDtoFixture = new();
+    private readonly MusicAlbumMetadataDtoFixture _musicAlbumMetadataDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
     private readonly TagDtoFixture _tagDtoFixture = new();
     private readonly ReleaseInfoDtoFixture _releaseInfoDtoFixture = new();
@@ -30,7 +30,7 @@ public class MusicAlbumMetadataDtoMappingTests
     public void ToDomainEntity_WhenMappingCompleteDto_ShouldMapAllPropertiesCorrectly()
     {
         // Arrange
-        MusicAlbumMetadataDto dto = _albumMetadataDtoFixture.Create();
+        MusicAlbumMetadataDto dto = _musicAlbumMetadataDtoFixture.Create();
 
         // Act
         Result<AlbumMetadata> result = dto.ToDomainValueObject();
@@ -78,7 +78,7 @@ public class MusicAlbumMetadataDtoMappingTests
     public void ToDomainEntity_WhenOptionalPropertiesAreMissing_ShouldMapTheRequiredValuesAndDefaults()
     {
         // Arrange
-        MusicAlbumMetadataDto dto = _albumMetadataDtoFixture.Create(
+        MusicAlbumMetadataDto dto = _musicAlbumMetadataDtoFixture.Create(
             includeOriginalTitle: false,
             includeDescription: false,
             includeReleaseInfo: false,
@@ -121,7 +121,7 @@ public class MusicAlbumMetadataDtoMappingTests
     {
         // Arrange
         LanguageInfoDto incompleteLanguage = _languageInfoDtoFixture.Create(includeLanguageCode: false);
-        MusicAlbumMetadataDto dto = _albumMetadataDtoFixture.Create(
+        MusicAlbumMetadataDto dto = _musicAlbumMetadataDtoFixture.Create(
             language: incompleteLanguage,
             originalLanguage: _languageInfoDtoFixture.Create(includeLanguageName: false));
 
@@ -141,7 +141,7 @@ public class MusicAlbumMetadataDtoMappingTests
         ReleaseInfoDto releaseInfo = _releaseInfoDtoFixture.Create(
             originalReleaseDate: new DateOnly(2000, 1, 1),
             originalReleaseYear: 1999);
-        MusicAlbumMetadataDto dto = _albumMetadataDtoFixture.Create(releaseInfo: releaseInfo);
+        MusicAlbumMetadataDto dto = _musicAlbumMetadataDtoFixture.Create(releaseInfo: releaseInfo);
 
         // Act
         Result<AlbumMetadata> result = dto.ToDomainValueObject();
@@ -155,7 +155,7 @@ public class MusicAlbumMetadataDtoMappingTests
     public void ToDomainEntity_WhenGenreIsInvalid_ShouldReturnError()
     {
         // Arrange
-        MusicAlbumMetadataDto dto = _albumMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]);
+        MusicAlbumMetadataDto dto = _musicAlbumMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]);
 
         // Act
         Result<AlbumMetadata> result = dto.ToDomainValueObject();
@@ -169,7 +169,7 @@ public class MusicAlbumMetadataDtoMappingTests
     public void ToDomainEntity_WhenTagIsInvalid_ShouldReturnError()
     {
         // Arrange
-        MusicAlbumMetadataDto dto = _albumMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: "   ")]);
+        MusicAlbumMetadataDto dto = _musicAlbumMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: "   ")]);
 
         // Act
         Result<AlbumMetadata> result = dto.ToDomainValueObject();

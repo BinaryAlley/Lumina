@@ -36,7 +36,7 @@ public class SetLibraryBookReaderEnabledCommandHandlerTests
     private readonly IValidator<SetLibraryBookReaderEnabledCommand> _mockValidator;
     private readonly SetLibraryBookReaderEnabledCommandHandler _sut;
     private readonly SetLibraryBookReaderEnabledCommandFixture _setLibraryBookReaderEnabledCommandFixture = new();
-    private readonly LibraryBookReaderConfigurationEntityFixture _configurationEntityFixture = new();
+    private readonly LibraryBookReaderConfigurationEntityFixture _libraryBookReaderConfigurationEntityFixture = new();
     private readonly Guid _userId;
 
     /// <summary>
@@ -93,7 +93,7 @@ public class SetLibraryBookReaderEnabledCommandHandlerTests
     {
         // Arrange
         SetLibraryBookReaderEnabledCommand command = _setLibraryBookReaderEnabledCommandFixture.Create(isEnabled: true);
-        LibraryBookReaderConfigurationEntity existingConfiguration = _configurationEntityFixture.Create(
+        LibraryBookReaderConfigurationEntity existingConfiguration = _libraryBookReaderConfigurationEntityFixture.Create(
             libraryId: command.LibraryId,
             pluginId: command.PluginId,
             isEnabled: false);

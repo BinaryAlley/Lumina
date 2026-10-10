@@ -15,14 +15,14 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Scheduling;
 [ExcludeFromCodeCoverage]
 public class StartScheduledJobRequestMappingTests
 {
-    private readonly StartScheduledJobRequestFixture _requestFixture = new();
+    private readonly StartScheduledJobRequestFixture _startScheduledJobRequestFixture = new();
 
     [Fact]
     public void ToCommand_WhenMappingValidRequest_ShouldMapCorrectly()
     {
         // Arrange
         Guid scheduledJobId = Guid.NewGuid();
-        StartScheduledJobRequest request = _requestFixture.Create(scheduledJobId);
+        StartScheduledJobRequest request = _startScheduledJobRequestFixture.Create(scheduledJobId);
 
         // Act
         StartScheduledJobCommand result = request.ToCommand();

@@ -27,6 +27,7 @@ public class BookMetadataLookupDtoFixture
     /// <param name="title">Optional. The title of the book.</param>
     /// <param name="author">Optional. The author of the book.</param>
     /// <param name="languageCode">Optional. The language code of the book.</param>
+    /// <param name="includePath">Whether the path should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="BookMetadataLookupDto"/>.</returns>
     public BookMetadataLookupDto Create(
         Guid? libraryId = null,
@@ -35,11 +36,12 @@ public class BookMetadataLookupDtoFixture
         string? openLibraryId = null,
         string? title = null,
         string? author = null,
-        string? languageCode = null)
+        string? languageCode = null,
+        bool includePath = true)
     {
         return new BookMetadataLookupDto(
             libraryId ?? Guid.NewGuid(),
-            path ?? _faker.System.FilePath(),
+            includePath ? (path ?? _faker.System.FilePath()) : null!,
             isbn,
             openLibraryId,
             title,

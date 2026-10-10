@@ -31,8 +31,8 @@ public class SetLibraryBookReaderEnabledEndpointTests : IClassFixture<Authentica
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
-    private readonly LibraryBookReaderConfigurationEntityFixture _configurationFixture = new();
-    private readonly SetLibraryBookReaderEnabledRequestFixture _requestFixture = new();
+    private readonly LibraryBookReaderConfigurationEntityFixture _libraryBookReaderConfigurationEntityFixture = new();
+    private readonly SetLibraryBookReaderEnabledRequestFixture _setLibraryBookReaderEnabledRequestFixture = new();
     private readonly UserEntityFixture _userEntityFixture = new();
 
     /// <summary>
@@ -61,7 +61,7 @@ public class SetLibraryBookReaderEnabledEndpointTests : IClassFixture<Authentica
         Guid libraryId = Guid.NewGuid();
         await SeedLibraryAsync(libraryId, userId);
         Guid pluginId = Guid.NewGuid();
-        SetLibraryBookReaderEnabledRequest request = _requestFixture.Create(libraryId: libraryId, pluginId: pluginId, isEnabled: true);
+        SetLibraryBookReaderEnabledRequest request = _setLibraryBookReaderEnabledRequestFixture.Create(libraryId: libraryId, pluginId: pluginId, isEnabled: true);
 
         // Act
         HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}/book-readers/{pluginId}/enabled", request);
@@ -87,7 +87,7 @@ public class SetLibraryBookReaderEnabledEndpointTests : IClassFixture<Authentica
         await SeedLibraryAsync(libraryId, userId);
         Guid pluginId = Guid.NewGuid();
         await SeedConfigurationAsync(libraryId, pluginId, isEnabled: false);
-        SetLibraryBookReaderEnabledRequest request = _requestFixture.Create(libraryId: libraryId, pluginId: pluginId, isEnabled: true);
+        SetLibraryBookReaderEnabledRequest request = _setLibraryBookReaderEnabledRequestFixture.Create(libraryId: libraryId, pluginId: pluginId, isEnabled: true);
 
         // Act
         HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}/book-readers/{pluginId}/enabled", request);
@@ -111,7 +111,7 @@ public class SetLibraryBookReaderEnabledEndpointTests : IClassFixture<Authentica
         Guid libraryId = Guid.NewGuid();
         await SeedLibraryAsync(libraryId, otherUserId);
         Guid pluginId = Guid.NewGuid();
-        SetLibraryBookReaderEnabledRequest request = _requestFixture.Create(libraryId: libraryId, pluginId: pluginId, isEnabled: true);
+        SetLibraryBookReaderEnabledRequest request = _setLibraryBookReaderEnabledRequestFixture.Create(libraryId: libraryId, pluginId: pluginId, isEnabled: true);
 
         // Act
         HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}/book-readers/{pluginId}/enabled", request);
@@ -127,7 +127,7 @@ public class SetLibraryBookReaderEnabledEndpointTests : IClassFixture<Authentica
         HttpClient unauthenticatedClient = _apiFactory.CreateClient();
         Guid libraryId = Guid.NewGuid();
         Guid pluginId = Guid.NewGuid();
-        SetLibraryBookReaderEnabledRequest request = _requestFixture.Create(libraryId: libraryId, pluginId: pluginId, isEnabled: true);
+        SetLibraryBookReaderEnabledRequest request = _setLibraryBookReaderEnabledRequestFixture.Create(libraryId: libraryId, pluginId: pluginId, isEnabled: true);
 
         // Act
         HttpResponseMessage response = await unauthenticatedClient.PutAsJsonAsync($"/api/v1/libraries/{libraryId}/book-readers/{pluginId}/enabled", request);
@@ -159,7 +159,7 @@ public class SetLibraryBookReaderEnabledEndpointTests : IClassFixture<Authentica
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-        dbContext.LibraryBookReaderConfigurations.Add(_configurationFixture.Create(libraryId: libraryId, pluginId: pluginId, isEnabled: isEnabled));
+        dbContext.LibraryBookReaderConfigurations.Add(_libraryBookReaderConfigurationEntityFixture.Create(libraryId: libraryId, pluginId: pluginId, isEnabled: isEnabled));
         await dbContext.SaveChangesAsync();
     }
 

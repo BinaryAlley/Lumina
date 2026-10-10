@@ -23,7 +23,7 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenConten
 [ExcludeFromCodeCoverage]
 public class UpdateBookCommandMappingTests
 {
-    private readonly UpdateBookCommandFixture _commandBookFixture = new();
+    private readonly UpdateBookCommandFixture _updateBookCommandFixture = new();
     private readonly BookEntityFixture _bookEntityFixture = new();
     private readonly IsbnDtoFixture _isbnDtoFixture = new();
     private readonly BookRatingDtoFixture _bookRatingDtoFixture = new();
@@ -36,7 +36,7 @@ public class UpdateBookCommandMappingTests
         // Arrange
         Guid libraryId = Guid.NewGuid();
         Guid bookId = Guid.NewGuid();
-        UpdateBookCommand command = _commandBookFixture.Create(libraryId: libraryId.ToString(), bookId: bookId.ToString());
+        UpdateBookCommand command = _updateBookCommandFixture.Create(libraryId: libraryId.ToString(), bookId: bookId.ToString());
         BookEntity existingBook = _bookEntityFixture.Create(id: bookId, libraryId: libraryId, path: "/books/the-book.epub");
         DateTime createdOnUtc = existingBook.CreatedOnUtc;
 
@@ -66,7 +66,7 @@ public class UpdateBookCommandMappingTests
         // Arrange
         Guid libraryId = Guid.NewGuid();
         Guid bookId = Guid.NewGuid();
-        UpdateBookCommand command = _commandBookFixture.Create(
+        UpdateBookCommand command = _updateBookCommandFixture.Create(
             libraryId: libraryId.ToString(),
             bookId: bookId.ToString(),
             isbns: [],
@@ -115,7 +115,7 @@ public class UpdateBookCommandMappingTests
     public void ToDomainEntity_WhenRatingCreationFails_ShouldReturnError()
     {
         // Arrange
-        UpdateBookCommand command = _commandBookFixture.Create(ratings: [_bookRatingDtoFixture.Create(value: -1, maxValue: 5, includeSource: false, includeVoteCount: false)]);
+        UpdateBookCommand command = _updateBookCommandFixture.Create(ratings: [_bookRatingDtoFixture.Create(value: -1, maxValue: 5, includeSource: false, includeVoteCount: false)]);
         BookEntity existingBook = _bookEntityFixture.Create();
 
         // Act
@@ -130,7 +130,7 @@ public class UpdateBookCommandMappingTests
     public void ToDomainEntity_WhenIsbnCreationFails_ShouldReturnError()
     {
         // Arrange
-        UpdateBookCommand command = _commandBookFixture.Create(isbns: [_isbnDtoFixture.Create(value: "invalid", format: IsbnFormat.Isbn13)]);
+        UpdateBookCommand command = _updateBookCommandFixture.Create(isbns: [_isbnDtoFixture.Create(value: "invalid", format: IsbnFormat.Isbn13)]);
         BookEntity existingBook = _bookEntityFixture.Create();
 
         // Act
@@ -145,7 +145,7 @@ public class UpdateBookCommandMappingTests
     public void ToDomainEntity_WhenMetadataCreationFails_ShouldReturnError()
     {
         // Arrange
-        UpdateBookCommand command = _commandBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: "")]));
+        UpdateBookCommand command = _updateBookCommandFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: "")]));
         BookEntity existingBook = _bookEntityFixture.Create();
 
         // Act

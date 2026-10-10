@@ -26,7 +26,7 @@ public class AddAlbumCommandMappingTests
 {
     private readonly AddAlbumCommandFixture _addAlbumCommandFixture = new();
     private readonly AddTrackCommandFixture _addTrackCommandFixture = new();
-    private readonly MusicAlbumMetadataDtoFixture _albumMetadataDtoFixture = new();
+    private readonly MusicAlbumMetadataDtoFixture _musicAlbumMetadataDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
     private readonly IsrcDtoFixture _isrcDtoFixture = new();
     private readonly AudioRatingDtoFixture _audioRatingDtoFixture = new();
@@ -123,7 +123,7 @@ public class AddAlbumCommandMappingTests
     {
         // Arrange
         AddAlbumCommand command = _addAlbumCommandFixture.Create(
-            metadata: _albumMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]));
+            metadata: _musicAlbumMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]));
 
         // Act
         Result<Album> result = command.ToDomainEntity();

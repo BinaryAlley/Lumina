@@ -33,7 +33,7 @@ public class UpdateArtistCommandMappingTests
     private readonly ArtistEntityFixture _artistEntityFixture = new();
     private readonly AlbumEntityFixture _albumEntityFixture = new();
     private readonly TrackEntityFixture _trackEntityFixture = new();
-    private readonly MusicAlbumMetadataDtoFixture _albumMetadataDtoFixture = new();
+    private readonly MusicAlbumMetadataDtoFixture _musicAlbumMetadataDtoFixture = new();
     private readonly MusicArtistMetadataDtoFixture _musicArtistMetadataDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
 
@@ -153,7 +153,7 @@ public class UpdateArtistCommandMappingTests
         (Artist artist, Guid albumId, Guid trackId) = CreateDomainArtist(libraryId);
         AddAlbumCommand invalidAlbum = _addAlbumCommandFixture.Create(
             albumId: albumId,
-            metadata: _albumMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]));
+            metadata: _musicAlbumMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]));
         UpdateArtistCommand command = _updateArtistCommandFixture.Create(
             libraryId: libraryId.ToString(),
             artistId: artist.Id.Value.ToString(),

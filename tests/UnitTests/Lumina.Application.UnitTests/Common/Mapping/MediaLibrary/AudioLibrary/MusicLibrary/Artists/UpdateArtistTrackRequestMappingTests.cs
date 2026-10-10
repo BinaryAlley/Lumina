@@ -19,7 +19,7 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.AudioLibrary.
 public class UpdateArtistTrackRequestMappingTests
 {
     private readonly UpdateArtistTrackRequestFixture _updateArtistTrackRequestFixture = new();
-    private readonly MusicTrackMetadataDtoFixture _audioMetadataDtoFixture = new();
+    private readonly MusicTrackMetadataDtoFixture _musicTrackMetadataDtoFixture = new();
 
     [Fact]
     public void ToCommand_WhenMappingCompleteRequest_ShouldMapAllPropertiesCorrectly()
@@ -61,7 +61,7 @@ public class UpdateArtistTrackRequestMappingTests
         // Arrange
         UpdateArtistTrackRequest request = _updateArtistTrackRequestFixture.Create(
             path: "/music/queen/bohemian-rhapsody.flac",
-            metadata: _audioMetadataDtoFixture.Create(title: "Love of My Life"),
+            metadata: _musicTrackMetadataDtoFixture.Create(title: "Love of My Life"),
             includeDiscNumber: false,
             includeScript: false,
             includeKey: false,

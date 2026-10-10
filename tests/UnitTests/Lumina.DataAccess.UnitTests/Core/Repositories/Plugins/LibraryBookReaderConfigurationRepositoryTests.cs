@@ -23,7 +23,7 @@ public class LibraryBookReaderConfigurationRepositoryTests
 {
     private readonly LuminaDbContext _mockContext;
     private readonly LibraryBookReaderConfigurationRepository _sut;
-    private readonly LibraryBookReaderConfigurationEntityFixture _configurationFixture = new();
+    private readonly LibraryBookReaderConfigurationEntityFixture _libraryBookReaderConfigurationEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LibraryBookReaderConfigurationRepositoryTests"/> class.
@@ -39,8 +39,8 @@ public class LibraryBookReaderConfigurationRepositoryTests
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
-        LibraryBookReaderConfigurationEntity configurationOfLibrary = _configurationFixture.Create(libraryId: libraryId);
-        LibraryBookReaderConfigurationEntity configurationOfAnotherLibrary = _configurationFixture.Create();
+        LibraryBookReaderConfigurationEntity configurationOfLibrary = _libraryBookReaderConfigurationEntityFixture.Create(libraryId: libraryId);
+        LibraryBookReaderConfigurationEntity configurationOfAnotherLibrary = _libraryBookReaderConfigurationEntityFixture.Create();
         _mockContext.LibraryBookReaderConfigurations.AddRange(configurationOfLibrary, configurationOfAnotherLibrary);
         await _mockContext.SaveChangesAsync();
 
@@ -57,7 +57,7 @@ public class LibraryBookReaderConfigurationRepositoryTests
     public async Task GetByLibraryAndPluginIdAsync_WhenConfigurationExists_ShouldReturnIt()
     {
         // Arrange
-        LibraryBookReaderConfigurationEntity configuration = _configurationFixture.Create();
+        LibraryBookReaderConfigurationEntity configuration = _libraryBookReaderConfigurationEntityFixture.Create();
         _mockContext.LibraryBookReaderConfigurations.Add(configuration);
         await _mockContext.SaveChangesAsync();
 
@@ -84,7 +84,7 @@ public class LibraryBookReaderConfigurationRepositoryTests
     public async Task UpsertAsync_WhenConfigurationDoesNotExist_ShouldInsertIt()
     {
         // Arrange
-        LibraryBookReaderConfigurationEntity configuration = _configurationFixture.Create();
+        LibraryBookReaderConfigurationEntity configuration = _libraryBookReaderConfigurationEntityFixture.Create();
 
         // Act
         Result<Updated> result = await _sut.UpsertAsync(configuration, CancellationToken.None);
@@ -99,11 +99,11 @@ public class LibraryBookReaderConfigurationRepositoryTests
     public async Task UpsertAsync_WhenConfigurationExists_ShouldUpdateIt()
     {
         // Arrange
-        LibraryBookReaderConfigurationEntity configuration = _configurationFixture.Create(isEnabled: false);
+        LibraryBookReaderConfigurationEntity configuration = _libraryBookReaderConfigurationEntityFixture.Create(isEnabled: false);
         _mockContext.LibraryBookReaderConfigurations.Add(configuration);
         await _mockContext.SaveChangesAsync();
 
-        LibraryBookReaderConfigurationEntity updatedConfiguration = _configurationFixture.Create(libraryId: configuration.LibraryId, pluginId: configuration.PluginId, isEnabled: true);
+        LibraryBookReaderConfigurationEntity updatedConfiguration = _libraryBookReaderConfigurationEntityFixture.Create(libraryId: configuration.LibraryId, pluginId: configuration.PluginId, isEnabled: true);
 
         // Act
         Result<Updated> result = await _sut.UpsertAsync(updatedConfiguration, CancellationToken.None);
@@ -121,8 +121,8 @@ public class LibraryBookReaderConfigurationRepositoryTests
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
-        LibraryBookReaderConfigurationEntity configurationOfLibrary = _configurationFixture.Create(libraryId: libraryId);
-        LibraryBookReaderConfigurationEntity configurationOfAnotherLibrary = _configurationFixture.Create();
+        LibraryBookReaderConfigurationEntity configurationOfLibrary = _libraryBookReaderConfigurationEntityFixture.Create(libraryId: libraryId);
+        LibraryBookReaderConfigurationEntity configurationOfAnotherLibrary = _libraryBookReaderConfigurationEntityFixture.Create();
         _mockContext.LibraryBookReaderConfigurations.AddRange(configurationOfLibrary, configurationOfAnotherLibrary);
         await _mockContext.SaveChangesAsync();
 
@@ -141,8 +141,8 @@ public class LibraryBookReaderConfigurationRepositoryTests
     {
         // Arrange
         Guid pluginId = Guid.NewGuid();
-        LibraryBookReaderConfigurationEntity configurationOfPlugin = _configurationFixture.Create(pluginId: pluginId);
-        LibraryBookReaderConfigurationEntity configurationOfAnotherPlugin = _configurationFixture.Create();
+        LibraryBookReaderConfigurationEntity configurationOfPlugin = _libraryBookReaderConfigurationEntityFixture.Create(pluginId: pluginId);
+        LibraryBookReaderConfigurationEntity configurationOfAnotherPlugin = _libraryBookReaderConfigurationEntityFixture.Create();
         _mockContext.LibraryBookReaderConfigurations.AddRange(configurationOfPlugin, configurationOfAnotherPlugin);
         await _mockContext.SaveChangesAsync();
 
@@ -163,8 +163,8 @@ public class LibraryBookReaderConfigurationRepositoryTests
         Guid libraryId = Guid.NewGuid();
         Guid removedPluginId = Guid.NewGuid();
         Guid keptPluginId = Guid.NewGuid();
-        LibraryBookReaderConfigurationEntity removedConfiguration = _configurationFixture.Create(libraryId: libraryId, pluginId: removedPluginId);
-        LibraryBookReaderConfigurationEntity keptConfiguration = _configurationFixture.Create(libraryId: libraryId, pluginId: keptPluginId);
+        LibraryBookReaderConfigurationEntity removedConfiguration = _libraryBookReaderConfigurationEntityFixture.Create(libraryId: libraryId, pluginId: removedPluginId);
+        LibraryBookReaderConfigurationEntity keptConfiguration = _libraryBookReaderConfigurationEntityFixture.Create(libraryId: libraryId, pluginId: keptPluginId);
         _mockContext.LibraryBookReaderConfigurations.AddRange(removedConfiguration, keptConfiguration);
         await _mockContext.SaveChangesAsync();
 

@@ -57,7 +57,7 @@ public class AddBookCommandHandlerTests
     private readonly IPathService _mockPathService;
     private readonly Guid _userId;
     private readonly AddBookCommandHandler _sut;
-    private readonly AddBookCommandFixture _commandBookFixture = new();
+    private readonly AddBookCommandFixture _addBookCommandFixture = new();
     private readonly IsbnDtoFixture _isbnDtoFixture = new();
     private readonly BookRatingDtoFixture _bookRatingDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
@@ -119,7 +119,7 @@ public class AddBookCommandHandlerTests
     public async Task HandleAsync_WhenValidatorReturnsErrors_ShouldReturnFailureResultWithoutPersisting()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create();
+        AddBookCommand bookCommand = _addBookCommandFixture.Create();
         _mockValidator.Validate(Arg.Any<AddBookCommand>())
             .Returns([Errors.WrittenContent.IsbnListCannotBeNull]);
 
@@ -138,7 +138,7 @@ public class AddBookCommandHandlerTests
     public async Task HandleAsync_WhenCalledWithValidCommand_ShouldReturnSuccessResult()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create();
+        AddBookCommand bookCommand = _addBookCommandFixture.Create();
 
         BookEntity? insertedEntity = null;
         _mockBookRepository.InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>())
@@ -164,7 +164,7 @@ public class AddBookCommandHandlerTests
     public async Task HandleAsync_WhenRepositoryInsertFails_ShouldReturnFailureResult()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create();
+        AddBookCommand bookCommand = _addBookCommandFixture.Create();
 
         _mockBookRepository.InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>())
             .Returns(Errors.WrittenContent.BookAlreadyExists);
@@ -183,7 +183,7 @@ public class AddBookCommandHandlerTests
     public async Task HandleAsync_WhenSaveChangesDetectsAConcurrentDuplicatePath_ShouldReturnThePersistenceError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create();
+        AddBookCommand bookCommand = _addBookCommandFixture.Create();
         _mockBookRepository.InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Created);
         _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>())
@@ -203,7 +203,7 @@ public class AddBookCommandHandlerTests
     public async Task HandleAsync_WhenCalledWithInvalidISBN_ShouldReturnFailureResult()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create(isbns: [_isbnDtoFixture.Create(value: "invalid", format: IsbnFormat.Isbn13)]);
+        AddBookCommand bookCommand = _addBookCommandFixture.Create(isbns: [_isbnDtoFixture.Create(value: "invalid", format: IsbnFormat.Isbn13)]);
 
         // Act
         Result<BookResponse> result = await _sut.HandleAsync(bookCommand, CancellationToken.None);
@@ -220,7 +220,7 @@ public class AddBookCommandHandlerTests
     public async Task HandleAsync_WhenCalledWithInvalidRating_ShouldReturnFailureResult()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create(ratings: [_bookRatingDtoFixture.Create(value: -1, maxValue: 5, includeSource: false, includeVoteCount: false)]);
+        AddBookCommand bookCommand = _addBookCommandFixture.Create(ratings: [_bookRatingDtoFixture.Create(value: -1, maxValue: 5, includeSource: false, includeVoteCount: false)]);
 
         // Act
         Result<BookResponse> result = await _sut.HandleAsync(bookCommand, CancellationToken.None);
@@ -237,7 +237,7 @@ public class AddBookCommandHandlerTests
     public async Task HandleAsync_WhenGenreCreationFails_ShouldReturnFailureResult()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: "")]));
+        AddBookCommand bookCommand = _addBookCommandFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: "")]));
 
         // Act
         Result<BookResponse> result = await _sut.HandleAsync(bookCommand, CancellationToken.None);
@@ -254,7 +254,7 @@ public class AddBookCommandHandlerTests
     public async Task HandleAsync_WhenTagCreationFails_ShouldReturnFailureResult()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: "")]));
+        AddBookCommand bookCommand = _addBookCommandFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: "")]));
 
         // Act
         Result<BookResponse> result = await _sut.HandleAsync(bookCommand, CancellationToken.None);
@@ -271,7 +271,7 @@ public class AddBookCommandHandlerTests
     public async Task HandleAsync_WhenReleaseInfoCreationFails_ShouldReturnFailureResult()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(
+        AddBookCommand bookCommand = _addBookCommandFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(
                     originalReleaseDate: new DateOnly(2025, 1, 1),
                     originalReleaseYear: 2025,
                     reReleaseDate: new DateOnly(2024, 1, 1),
@@ -294,7 +294,7 @@ public class AddBookCommandHandlerTests
         // Arrange
         Guid firstContributorId = Guid.NewGuid();
         Guid secondContributorId = Guid.NewGuid();
-        AddBookCommand bookCommand = _commandBookFixture.Create(contributors:
+        AddBookCommand bookCommand = _addBookCommandFixture.Create(contributors:
             [
                 _mediaContributorReferenceDtoFixture.Create(contributorId: firstContributorId, role: MediaContributorRole.Author),
                 _mediaContributorReferenceDtoFixture.Create(contributorId: secondContributorId, role: MediaContributorRole.Illustrator)
@@ -327,7 +327,7 @@ public class AddBookCommandHandlerTests
     {
         // Arrange
         Guid contributorId = Guid.NewGuid();
-        AddBookCommand bookCommand = _commandBookFixture.Create(contributors:
+        AddBookCommand bookCommand = _addBookCommandFixture.Create(contributors:
             [
                 _mediaContributorReferenceDtoFixture.Create(contributorId: contributorId, role: MediaContributorRole.Author),
                 _mediaContributorReferenceDtoFixture.Create(contributorId: contributorId, role: MediaContributorRole.Author),
@@ -360,7 +360,7 @@ public class AddBookCommandHandlerTests
     public async Task HandleAsync_WhenUserIsNotAuthenticated_ShouldReturnNotAuthorizedError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create();
+        AddBookCommand bookCommand = _addBookCommandFixture.Create();
         _mockCurrentUserService.UserId.Returns((Guid?)null);
 
         // Act
@@ -377,7 +377,7 @@ public class AddBookCommandHandlerTests
     public async Task HandleAsync_WhenUserDoesNotOwnTheLibrary_ShouldReturnNotAuthorizedError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create();
+        AddBookCommand bookCommand = _addBookCommandFixture.Create();
         _mockAuthorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(_userId, Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>())
             .Returns(false);
 
@@ -397,7 +397,7 @@ public class AddBookCommandHandlerTests
     public async Task HandleAsync_WhenLibraryDoesNotExist_ShouldReturnFailureResultWithoutPersisting()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create();
+        AddBookCommand bookCommand = _addBookCommandFixture.Create();
         _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
             .Returns(_ => Result.From<LibraryEntity?>(null));
 
@@ -415,7 +415,7 @@ public class AddBookCommandHandlerTests
     public async Task HandleAsync_WhenBookPathIsNotWithinTheLibraryContentLocations_ShouldReturnFailureResultWithoutPersisting()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create();
+        AddBookCommand bookCommand = _addBookCommandFixture.Create();
         _mockPathService.IsPathWithin(Arg.Any<string>(), Arg.Any<string>())
             .Returns(false);
 
@@ -433,7 +433,7 @@ public class AddBookCommandHandlerTests
     public async Task HandleAsync_WhenAReferencedContributorDoesNotExist_ShouldReturnFailureResultWithoutPersisting()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create(contributors: [_mediaContributorReferenceDtoFixture.Create()]);
+        AddBookCommand bookCommand = _addBookCommandFixture.Create(contributors: [_mediaContributorReferenceDtoFixture.Create()]);
         _mockMediaContributorRepository.GetByIdsAsync(Arg.Any<IReadOnlyCollection<Guid>>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<MediaContributorEntity>>([]));
 

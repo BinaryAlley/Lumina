@@ -41,7 +41,7 @@ public class GetLibraryMetadataProvidersQueryHandlerTests
     private readonly IValidator<GetLibraryMetadataProvidersQuery> _mockValidator;
     private readonly GetLibraryMetadataProvidersQueryHandler _sut;
     private readonly GetLibraryMetadataProvidersQueryFixture _getLibraryMetadataProvidersQueryFixture = new();
-    private readonly LibraryMetadataProviderConfigurationEntityFixture _configurationEntityFixture = new();
+    private readonly LibraryMetadataProviderConfigurationEntityFixture _libraryMetadataProviderConfigurationEntityFixture = new();
     private readonly PluginEntityFixture _pluginEntityFixture = new();
     private readonly PaginatedResultDtoFixture<PluginEntity> _paginatedResultDtoFixture = new();
     private readonly Guid _userId;
@@ -95,8 +95,8 @@ public class GetLibraryMetadataProvidersQueryHandlerTests
         Guid secondPluginId = Guid.NewGuid();
         List<LibraryMetadataProviderConfigurationEntity> configurations =
         [
-            _configurationEntityFixture.Create(query.LibraryId, secondPluginId, 2),
-            _configurationEntityFixture.Create(query.LibraryId, firstPluginId, 1)
+            _libraryMetadataProviderConfigurationEntityFixture.Create(query.LibraryId, secondPluginId, 2),
+            _libraryMetadataProviderConfigurationEntityFixture.Create(query.LibraryId, firstPluginId, 1)
         ];
         _mockProviderConfigurationStore.GetConfigurationsAsync(query.LibraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>(configurations));
@@ -129,7 +129,7 @@ public class GetLibraryMetadataProvidersQueryHandlerTests
         Guid unknownPluginId = Guid.NewGuid();
         List<LibraryMetadataProviderConfigurationEntity> configurations =
         [
-            _configurationEntityFixture.Create(query.LibraryId, unknownPluginId, 1)
+            _libraryMetadataProviderConfigurationEntityFixture.Create(query.LibraryId, unknownPluginId, 1)
         ];
         _mockProviderConfigurationStore.GetConfigurationsAsync(query.LibraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>(configurations));

@@ -58,8 +58,8 @@ public class MediaLibraryScanProviderConfigurationInvalidationJobTests
     private readonly UserIdFixture _userIdFixture = new();
     private readonly LibraryIdFixture _libraryIdFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
-    private readonly LibraryMetadataProviderConfigurationEntityFixture _metadataConfigurationEntityFixture = new();
-    private readonly LibraryArtworkProviderConfigurationEntityFixture _artworkConfigurationEntityFixture = new();
+    private readonly LibraryMetadataProviderConfigurationEntityFixture _libraryMetadataProviderConfigurationEntityFixture = new();
+    private readonly LibraryArtworkProviderConfigurationEntityFixture _libraryArtworkProviderConfigurationEntityFixture = new();
     private readonly UserSettingsEntityFixture _userSettingsEntityFixture = new();
     private readonly ScanId _scanId;
     private readonly UserId _userId;
@@ -192,8 +192,8 @@ public class MediaLibraryScanProviderConfigurationInvalidationJobTests
     {
         // Arrange
         LibraryEntity library = _libraryEntityFixture.Create(id: _libraryId.Value, title: "My Library");
-        List<LibraryMetadataProviderConfigurationEntity> metadataConfigurations = _metadataConfigurationEntityFixture.CreateMany(2, _libraryId.Value, Guid.NewGuid(), 1);
-        List<LibraryArtworkProviderConfigurationEntity> artworkConfigurations = _artworkConfigurationEntityFixture.CreateMany(2, _libraryId.Value, Guid.NewGuid(), 1);
+        List<LibraryMetadataProviderConfigurationEntity> metadataConfigurations = _libraryMetadataProviderConfigurationEntityFixture.CreateMany(2, _libraryId.Value, Guid.NewGuid(), 1);
+        List<LibraryArtworkProviderConfigurationEntity> artworkConfigurations = _libraryArtworkProviderConfigurationEntityFixture.CreateMany(2, _libraryId.Value, Guid.NewGuid(), 1);
         SetupLibraryAndConfigurations(library, metadataConfigurations, artworkConfigurations);
 
         // The stored fingerprints match the ones computed from the current provider configuration.
@@ -455,14 +455,14 @@ public class MediaLibraryScanProviderConfigurationInvalidationJobTests
         _mockMetadataConfigurationRepository.GetByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>(
                 metadataConfigurations ?? [
-                    _metadataConfigurationEntityFixture.Create(_libraryId.Value, Guid.NewGuid(), 1),
-                    _metadataConfigurationEntityFixture.Create(_libraryId.Value, Guid.NewGuid(), 2)
+                    _libraryMetadataProviderConfigurationEntityFixture.Create(_libraryId.Value, Guid.NewGuid(), 1),
+                    _libraryMetadataProviderConfigurationEntityFixture.Create(_libraryId.Value, Guid.NewGuid(), 2)
                 ]));
         _mockArtworkConfigurationRepository.GetByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryArtworkProviderConfigurationEntity>>(
                 artworkConfigurations ?? [
-                    _artworkConfigurationEntityFixture.Create(_libraryId.Value, Guid.NewGuid(), 1),
-                    _artworkConfigurationEntityFixture.Create(_libraryId.Value, Guid.NewGuid(), 2)
+                    _libraryArtworkProviderConfigurationEntityFixture.Create(_libraryId.Value, Guid.NewGuid(), 1),
+                    _libraryArtworkProviderConfigurationEntityFixture.Create(_libraryId.Value, Guid.NewGuid(), 2)
                 ]));
 
         IUserSettingsRepository mockUserSettingsRepository = Substitute.For<IUserSettingsRepository>();

@@ -32,7 +32,7 @@ public class UpdateTrackCommandMappingTests
     private readonly ArtistEntityFixture _artistEntityFixture = new();
     private readonly AlbumEntityFixture _albumEntityFixture = new();
     private readonly TrackEntityFixture _trackEntityFixture = new();
-    private readonly MusicTrackMetadataDtoFixture _audioMetadataDtoFixture = new();
+    private readonly MusicTrackMetadataDtoFixture _musicTrackMetadataDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
     private readonly MoodDtoFixture _moodDtoFixture = new();
     private readonly IsrcDtoFixture _isrcDtoFixture = new();
@@ -118,7 +118,7 @@ public class UpdateTrackCommandMappingTests
             artistId: artist.Id.Value.ToString(),
             albumId: albumId.ToString(),
             trackId: trackId.ToString(),
-            metadata: _audioMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]));
+            metadata: _musicTrackMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]));
 
         // Act
         Result<Artist> result = command.ToDomainEntity(artist);

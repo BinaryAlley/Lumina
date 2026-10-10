@@ -28,7 +28,7 @@ public class MusicMediaLibraryScanItemMaterializerTests
     private readonly ITrackRepository _mockTrackRepository;
     private readonly IMusicLibraryScanItemMetadataRepository _mockStagedMetadataRepository;
     private readonly MusicMediaLibraryScanItemMaterializer _sut;
-    private readonly MusicLibraryScanItemMetadataEntityFixture _stagedMetadataEntityFixture = new();
+    private readonly MusicLibraryScanItemMetadataEntityFixture _musicLibraryScanItemMetadataEntityFixture = new();
     private readonly List<ArtistEntity> _insertedArtists = [];
     private readonly Guid _libraryId = Guid.NewGuid();
     private readonly Guid _scanId = Guid.NewGuid();
@@ -75,7 +75,7 @@ public class MusicMediaLibraryScanItemMaterializerTests
         Guid secondReleaseId = Guid.NewGuid();
         Guid firstRecordingId = Guid.NewGuid();
         Guid secondRecordingId = Guid.NewGuid();
-        MusicLibraryScanItemMetadataEntity firstStagedItem = _stagedMetadataEntityFixture.Create(
+        MusicLibraryScanItemMetadataEntity firstStagedItem = _musicLibraryScanItemMetadataEntityFixture.Create(
             libraryId: _libraryId,
             artistName: "Shared Artist Name",
             releaseName: "Shared Release Title",
@@ -84,7 +84,7 @@ public class MusicMediaLibraryScanItemMaterializerTests
             musicBrainzReleaseArtistId: releaseArtistId,
             musicBrainzReleaseId: firstReleaseId,
             musicBrainzRecordingId: firstRecordingId);
-        MusicLibraryScanItemMetadataEntity secondStagedItem = _stagedMetadataEntityFixture.Create(
+        MusicLibraryScanItemMetadataEntity secondStagedItem = _musicLibraryScanItemMetadataEntityFixture.Create(
             libraryId: _libraryId,
             artistName: "Shared Artist Name",
             releaseName: "Shared Release Title",
@@ -118,7 +118,7 @@ public class MusicMediaLibraryScanItemMaterializerTests
         // Arrange
         Guid variousArtistsId = Guid.NewGuid();
         Guid compilationReleaseId = Guid.NewGuid();
-        MusicLibraryScanItemMetadataEntity firstStagedItem = _stagedMetadataEntityFixture.Create(
+        MusicLibraryScanItemMetadataEntity firstStagedItem = _musicLibraryScanItemMetadataEntityFixture.Create(
             libraryId: _libraryId,
             artistName: "Various Artists",
             releaseName: "Now That Is Music",
@@ -126,7 +126,7 @@ public class MusicMediaLibraryScanItemMaterializerTests
             musicBrainzArtistId: Guid.NewGuid(),
             musicBrainzReleaseArtistId: variousArtistsId,
             musicBrainzReleaseId: compilationReleaseId);
-        MusicLibraryScanItemMetadataEntity secondStagedItem = _stagedMetadataEntityFixture.Create(
+        MusicLibraryScanItemMetadataEntity secondStagedItem = _musicLibraryScanItemMetadataEntityFixture.Create(
             libraryId: _libraryId,
             artistName: "Various Artists",
             releaseName: "Now That Is Music",
@@ -154,13 +154,13 @@ public class MusicMediaLibraryScanItemMaterializerTests
     public async Task MaterializeItemsAsync_WhenTheTagsDoNotCarryMusicBrainzIds_ShouldGroupByTheNameAndTitle()
     {
         // Arrange
-        MusicLibraryScanItemMetadataEntity firstStagedItem = _stagedMetadataEntityFixture.Create(
+        MusicLibraryScanItemMetadataEntity firstStagedItem = _musicLibraryScanItemMetadataEntityFixture.Create(
             libraryId: _libraryId,
             artistName: "Shared Artist Name",
             releaseName: "Shared Release Title",
             path: "/music/shared-artist/shared-release/first.mp3",
             includeMusicBrainzTags: false);
-        MusicLibraryScanItemMetadataEntity secondStagedItem = _stagedMetadataEntityFixture.Create(
+        MusicLibraryScanItemMetadataEntity secondStagedItem = _musicLibraryScanItemMetadataEntityFixture.Create(
             libraryId: _libraryId,
             artistName: "Shared Artist Name",
             releaseName: "Shared Release Title",

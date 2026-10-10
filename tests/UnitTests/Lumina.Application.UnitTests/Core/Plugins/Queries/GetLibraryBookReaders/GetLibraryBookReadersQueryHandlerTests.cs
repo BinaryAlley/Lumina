@@ -42,7 +42,7 @@ public class GetLibraryBookReadersQueryHandlerTests
     private readonly IValidator<GetLibraryBookReadersQuery> _mockValidator;
     private readonly GetLibraryBookReadersQueryHandler _sut;
     private readonly GetLibraryBookReadersQueryFixture _getLibraryBookReadersQueryFixture = new();
-    private readonly LibraryBookReaderConfigurationEntityFixture _configurationEntityFixture = new();
+    private readonly LibraryBookReaderConfigurationEntityFixture _libraryBookReaderConfigurationEntityFixture = new();
     private readonly PluginEntityFixture _pluginEntityFixture = new();
     private readonly PaginatedResultDtoFixture<PluginEntity> _paginatedResultDtoFixture = new();
     private readonly Guid _userId;
@@ -99,8 +99,8 @@ public class GetLibraryBookReadersQueryHandlerTests
         Guid disabledPluginId = Guid.NewGuid();
         List<LibraryBookReaderConfigurationEntity> configurations =
         [
-            _configurationEntityFixture.Create(libraryId: query.LibraryId, pluginId: enabledPluginId, isEnabled: true),
-            _configurationEntityFixture.Create(libraryId: query.LibraryId, pluginId: disabledPluginId, isEnabled: false)
+            _libraryBookReaderConfigurationEntityFixture.Create(libraryId: query.LibraryId, pluginId: enabledPluginId, isEnabled: true),
+            _libraryBookReaderConfigurationEntityFixture.Create(libraryId: query.LibraryId, pluginId: disabledPluginId, isEnabled: false)
         ];
         _mockLibraryBookReaderConfigurationRepository.GetByLibraryIdAsync(query.LibraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryBookReaderConfigurationEntity>>(configurations));
@@ -140,7 +140,7 @@ public class GetLibraryBookReadersQueryHandlerTests
         Guid unknownPluginId = Guid.NewGuid();
         List<LibraryBookReaderConfigurationEntity> configurations =
         [
-            _configurationEntityFixture.Create(libraryId: query.LibraryId, pluginId: unknownPluginId, isEnabled: true)
+            _libraryBookReaderConfigurationEntityFixture.Create(libraryId: query.LibraryId, pluginId: unknownPluginId, isEnabled: true)
         ];
         _mockLibraryBookReaderConfigurationRepository.GetByLibraryIdAsync(query.LibraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryBookReaderConfigurationEntity>>(configurations));

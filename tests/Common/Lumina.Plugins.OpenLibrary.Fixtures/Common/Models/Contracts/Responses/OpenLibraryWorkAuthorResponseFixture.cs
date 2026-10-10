@@ -13,7 +13,7 @@ namespace Lumina.Plugins.OpenLibrary.Fixtures.Common.Models.Contracts.Responses;
 internal class OpenLibraryWorkAuthorResponseFixture
 {
     private readonly Faker _faker = new();
-    private readonly OpenLibraryKeyReferenceResponseFixture _keyReferenceResponseFixture = new();
+    private readonly OpenLibraryKeyReferenceResponseFixture _openLibraryKeyReferenceResponseFixture = new();
 
     /// <summary>
     /// Creates a random valid <see cref="OpenLibraryWorkAuthorResponse"/>.
@@ -27,7 +27,7 @@ internal class OpenLibraryWorkAuthorResponseFixture
     {
         return new OpenLibraryWorkAuthorResponse
         {
-            Author = author ?? _keyReferenceResponseFixture.Create(key: $"/authors/OL{_faker.Random.Number(1000, 9999)}A"),
+            Author = author ?? _openLibraryKeyReferenceResponseFixture.Create(key: $"/authors/OL{_faker.Random.Number(1000, 9999)}A"),
             Key = key
         };
     }

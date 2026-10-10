@@ -30,7 +30,7 @@ public class GetReadingManifestEndpointTests
 {
     private readonly IApiHttpClient _mockApiHttpClient;
     private readonly GetReadingManifestEndpoint _sut;
-    private readonly GetBookReadingManifestRequestFixture _requestFixture = new();
+    private readonly GetBookReadingManifestRequestFixture _getBookReadingManifestRequestFixture = new();
     private readonly ReadingManifestDtoFixture _readingManifestDtoFixture = new();
     private readonly ProblemDetailsDtoFixture _problemDetailsDtoFixture = new();
 
@@ -47,7 +47,7 @@ public class GetReadingManifestEndpointTests
     public async Task ExecuteAsync_WhenSuccessful_ShouldReturnSuccessJsonWithManifest()
     {
         // Arrange
-        GetBookReadingManifestRequest request = _requestFixture.Create();
+        GetBookReadingManifestRequest request = _getBookReadingManifestRequestFixture.Create();
         ReadingManifestDto manifest = _readingManifestDtoFixture.Create();
         _mockApiHttpClient.GetAsync<ReadingManifestDto>(ApiRoutes.Books.GET_BOOK_READING_MANIFEST.Replace("{libraryId}", request.LibraryId.ToString()).Replace("{bookId}", request.BookId.ToString()), Arg.Any<CancellationToken>())
             .Returns(manifest);
@@ -66,7 +66,7 @@ public class GetReadingManifestEndpointTests
     public async Task ExecuteAsync_WhenApiReturnsNoReaderAvailable_ShouldReturnDistinctErrorCodeJson()
     {
         // Arrange
-        GetBookReadingManifestRequest request = _requestFixture.Create();
+        GetBookReadingManifestRequest request = _getBookReadingManifestRequestFixture.Create();
         _mockApiHttpClient.GetAsync<ReadingManifestDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns<Task<ReadingManifestDto>>(_ => throw new ApiException(_problemDetailsDtoFixture.Create(detail: "NoReaderAvailable"), HttpStatusCode.NotFound));
 
@@ -84,7 +84,7 @@ public class GetReadingManifestEndpointTests
     public async Task ExecuteAsync_WhenApiReturnsReaderDisabled_ShouldReturnDistinctErrorCodeJson()
     {
         // Arrange
-        GetBookReadingManifestRequest request = _requestFixture.Create();
+        GetBookReadingManifestRequest request = _getBookReadingManifestRequestFixture.Create();
         _mockApiHttpClient.GetAsync<ReadingManifestDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns<Task<ReadingManifestDto>>(_ => throw new ApiException(_problemDetailsDtoFixture.Create(detail: "ReaderDisabled"), HttpStatusCode.NotFound));
 
@@ -102,7 +102,7 @@ public class GetReadingManifestEndpointTests
     public async Task ExecuteAsync_WhenApiReturnsUnrelatedError_ShouldRethrow()
     {
         // Arrange
-        GetBookReadingManifestRequest request = _requestFixture.Create();
+        GetBookReadingManifestRequest request = _getBookReadingManifestRequestFixture.Create();
         _mockApiHttpClient.GetAsync<ReadingManifestDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns<Task<ReadingManifestDto>>(_ => throw new ApiException(_problemDetailsDtoFixture.Create(detail: "BookNotFound"), HttpStatusCode.NotFound));
 
@@ -117,7 +117,7 @@ public class GetReadingManifestEndpointTests
     public async Task ExecuteAsync_WhenCalled_ShouldRequestReadingManifestFromApi()
     {
         // Arrange
-        GetBookReadingManifestRequest request = _requestFixture.Create();
+        GetBookReadingManifestRequest request = _getBookReadingManifestRequestFixture.Create();
         ReadingManifestDto manifest = _readingManifestDtoFixture.Create();
         _mockApiHttpClient.GetAsync<ReadingManifestDto>(ApiRoutes.Books.GET_BOOK_READING_MANIFEST.Replace("{libraryId}", request.LibraryId.ToString()).Replace("{bookId}", request.BookId.ToString()), Arg.Any<CancellationToken>())
             .Returns(manifest);

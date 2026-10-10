@@ -25,7 +25,7 @@ public class AddArtistCommandMappingTests
     private readonly AddArtistCommandFixture _addArtistCommandFixture = new();
     private readonly AddAlbumCommandFixture _addAlbumCommandFixture = new();
     private readonly MusicArtistMetadataDtoFixture _musicArtistMetadataDtoFixture = new();
-    private readonly MusicAlbumMetadataDtoFixture _albumMetadataDtoFixture = new();
+    private readonly MusicAlbumMetadataDtoFixture _musicAlbumMetadataDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
 
     [Fact]
@@ -80,7 +80,7 @@ public class AddArtistCommandMappingTests
         // Arrange
         Guid libraryId = Guid.NewGuid();
         AddAlbumCommand invalidAlbum = _addAlbumCommandFixture.Create(
-            metadata: _albumMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]));
+            metadata: _musicAlbumMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]));
         AddArtistCommand command = _addArtistCommandFixture.Create(albums: [invalidAlbum]);
 
         // Act

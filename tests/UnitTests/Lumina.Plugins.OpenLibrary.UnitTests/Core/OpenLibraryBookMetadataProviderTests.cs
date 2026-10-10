@@ -26,7 +26,7 @@ namespace Lumina.Plugins.OpenLibrary.UnitTests.Core;
 [ExcludeFromCodeCoverage]
 public class OpenLibraryBookMetadataProviderTests
 {
-    private readonly OpenLibrarySettingsDtoFixture _settingsFixture = new();
+    private readonly OpenLibrarySettingsDtoFixture _openLibrarySettingsDtoFixture = new();
     private readonly BookMetadataLookupDtoFixture _bookMetadataLookupDtoFixture = new();
 
     private const string EDITION_JSON = """{"key":"/books/OL100M","title":"Edition Title","publish_date":"2010-05-01","number_of_pages":320,"physical_format":"Hardcover","edition_name":"First Edition","series":["The Series"],"volume":"Vol. 3","publishers":["Publisher Co"],"isbn_13":["9780306406157"],"languages":[{"key":"/languages/eng"}],"works":[{"key":"/works/OL200W"}]}""";
@@ -438,7 +438,7 @@ public class OpenLibraryBookMetadataProviderTests
 
     private OpenLibraryBookMetadataProvider CreateProvider(StubOpenLibraryHttpMessageHandler handler, OpenLibrarySettingsDto? settings = null)
     {
-        OpenLibrarySettingsDto runtimeSettings = settings ?? _settingsFixture.Create(minimumRequestInterval: TimeSpan.Zero);
+        OpenLibrarySettingsDto runtimeSettings = settings ?? _openLibrarySettingsDtoFixture.Create(minimumRequestInterval: TimeSpan.Zero);
         OpenLibrarySettingsProvider settingsProvider = new(null, Guid.NewGuid(), runtimeSettings);
         OpenLibraryHttpClient openLibraryHttpClient = new(new HttpClient(handler), settingsProvider);
         return new OpenLibraryBookMetadataProvider(openLibraryHttpClient, settingsProvider);

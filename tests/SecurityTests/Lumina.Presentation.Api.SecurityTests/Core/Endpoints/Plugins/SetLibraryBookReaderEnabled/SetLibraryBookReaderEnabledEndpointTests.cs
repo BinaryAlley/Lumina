@@ -22,7 +22,7 @@ public class SetLibraryBookReaderEnabledEndpointTests : IClassFixture<LuminaApiF
     {
         PropertyNameCaseInsensitive = true
     };
-    private readonly SetLibraryBookReaderEnabledRequestFixture _requestFixture = new();
+    private readonly SetLibraryBookReaderEnabledRequestFixture _setLibraryBookReaderEnabledRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SetLibraryBookReaderEnabledEndpointTests"/> class.
@@ -39,7 +39,7 @@ public class SetLibraryBookReaderEnabledEndpointTests : IClassFixture<LuminaApiF
         // Arrange
         Guid libraryId = Guid.NewGuid();
         Guid pluginId = Guid.NewGuid();
-        SetLibraryBookReaderEnabledRequest request = _requestFixture.Create(libraryId: libraryId, pluginId: pluginId, isEnabled: true);
+        SetLibraryBookReaderEnabledRequest request = _setLibraryBookReaderEnabledRequestFixture.Create(libraryId: libraryId, pluginId: pluginId, isEnabled: true);
 
         // Act
         HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}/book-readers/{pluginId}/enabled", request);
@@ -62,7 +62,7 @@ public class SetLibraryBookReaderEnabledEndpointTests : IClassFixture<LuminaApiF
     public async Task SetLibraryBookReaderEnabled_WithSQLInjectionInPluginId_ShouldNotLeakDatabaseDetails(string maliciousPluginId)
     {
         // Arrange
-        SetLibraryBookReaderEnabledRequest request = _requestFixture.Create(libraryId: Guid.NewGuid(), pluginId: Guid.NewGuid(), isEnabled: true);
+        SetLibraryBookReaderEnabledRequest request = _setLibraryBookReaderEnabledRequestFixture.Create(libraryId: Guid.NewGuid(), pluginId: Guid.NewGuid(), isEnabled: true);
 
         // Act
         HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{Guid.NewGuid()}/book-readers/{Uri.EscapeDataString(maliciousPluginId)}/enabled", request);

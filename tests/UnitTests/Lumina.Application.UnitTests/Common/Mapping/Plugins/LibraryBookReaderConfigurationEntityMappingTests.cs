@@ -16,14 +16,14 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Plugins;
 [ExcludeFromCodeCoverage]
 public class LibraryBookReaderConfigurationEntityMappingTests
 {
-    private readonly LibraryBookReaderConfigurationEntityFixture _configurationEntityFixture = new();
+    private readonly LibraryBookReaderConfigurationEntityFixture _libraryBookReaderConfigurationEntityFixture = new();
 
     [Fact]
     public void ToResponse_WhenMappingValidConfiguration_ShouldMapCorrectly()
     {
         // Arrange
         Guid pluginId = Guid.NewGuid();
-        LibraryBookReaderConfigurationEntity configuration = _configurationEntityFixture.Create(pluginId: pluginId, isEnabled: false);
+        LibraryBookReaderConfigurationEntity configuration = _libraryBookReaderConfigurationEntityFixture.Create(pluginId: pluginId, isEnabled: false);
         IReadOnlyList<string> supportedExtensions = [".epub", ".pdf"];
 
         // Act

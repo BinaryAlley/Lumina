@@ -27,7 +27,7 @@ public class AddTrackCommandValidatorTests
 {
     private readonly AddTrackCommandFixture _addTrackCommandFixture = new();
     private readonly AddTrackCommandValidator _validator = new();
-    private readonly MusicTrackMetadataDtoFixture _audioMetadataDtoFixture = new();
+    private readonly MusicTrackMetadataDtoFixture _musicTrackMetadataDtoFixture = new();
     private readonly MusicWorkDtoFixture _musicWorkDtoFixture = new();
     private readonly ReleaseInfoDtoFixture _releaseInfoDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
@@ -289,7 +289,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenTitleIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(includeTitle: false));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(includeTitle: false));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -302,7 +302,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenTitleExceeds255Characters_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(title: new Faker().Random.String2(300)));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(title: new Faker().Random.String2(300)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -315,7 +315,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenTitleIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(title: new Faker().Random.String2(200)));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(title: new Faker().Random.String2(200)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -329,7 +329,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenOriginalTitleExceeds255Characters_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(originalTitle: new Faker().Random.String2(300)));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(originalTitle: new Faker().Random.String2(300)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -342,7 +342,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenOriginalTitleIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(includeOriginalTitle: false));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(includeOriginalTitle: false));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -355,7 +355,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenOriginalTitleIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(originalTitle: new Faker().Random.String2(200)));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(originalTitle: new Faker().Random.String2(200)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -368,7 +368,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenDescriptionExceeds2000Characters_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(description: new Faker().Random.String2(2001)));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(description: new Faker().Random.String2(2001)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -381,7 +381,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenDescriptionIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(includeDescription: false));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(includeDescription: false));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -394,7 +394,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenDescriptionIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(description: new Faker().Random.String2(1500)));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(description: new Faker().Random.String2(1500)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -407,7 +407,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenReleaseInfoIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(includeReleaseInfo: false));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(includeReleaseInfo: false));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -420,7 +420,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenOriginalReleaseYearIsLessThan1_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: 0)));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: 0)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -433,7 +433,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenOriginalReleaseYearIsGreaterThan9999_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: 10000)));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: 10000)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -446,7 +446,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenOriginalReleaseYearIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(includeOriginalReleaseDate: false, originalReleaseYear: new Faker().Random.Int(2000, 2005), reReleaseYear: new Faker().Random.Int(2005, 2010), includeReReleaseDate: false)));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(includeOriginalReleaseDate: false, originalReleaseYear: new Faker().Random.Int(2000, 2005), reReleaseYear: new Faker().Random.Int(2005, 2010), includeReReleaseDate: false)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -459,7 +459,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenReReleaseYearIsLessThan1_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(reReleaseYear: 0)));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(reReleaseYear: 0)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -472,7 +472,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenReReleaseYearIsGreaterThan9999_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(reReleaseYear: 10000)));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(reReleaseYear: 10000)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -485,7 +485,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenReReleaseYearIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: new Faker().Random.Int(2000, 2005), reReleaseYear: new Faker().Random.Int(2005, 2010), includeReReleaseDate: false)));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: new Faker().Random.Int(2000, 2005), reReleaseYear: new Faker().Random.Int(2005, 2010), includeReReleaseDate: false)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -498,7 +498,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenReleaseVersionExceeds50Characters_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(releaseVersion: new Faker().Random.String2(51))));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(releaseVersion: new Faker().Random.String2(51))));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -511,7 +511,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenReleaseVersionIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(releaseVersion: new Faker().Random.String2(50))));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(releaseVersion: new Faker().Random.String2(50))));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -524,7 +524,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenOriginalReleaseDateAndYearDoNotMatch_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2020, 1, 1), originalReleaseYear: 2019, includeReReleaseDate: false)));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2020, 1, 1), originalReleaseYear: 2019, includeReReleaseDate: false)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -537,7 +537,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenOriginalReleaseDateAndYearMatch_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2020, 1, 1), originalReleaseYear: 2020, includeReReleaseDate: false)));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2020, 1, 1), originalReleaseYear: 2020, includeReReleaseDate: false)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -550,7 +550,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenReReleaseDateAndYearDoNotMatch_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(reReleaseDate: new DateOnly(2021, 1, 1), reReleaseYear: 2020)));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(reReleaseDate: new DateOnly(2021, 1, 1), reReleaseYear: 2020)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -563,7 +563,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenReReleaseDateAndYearMatch_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(reReleaseDate: new DateOnly(2021, 1, 1), reReleaseYear: 2021)));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(reReleaseDate: new DateOnly(2021, 1, 1), reReleaseYear: 2021)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -576,7 +576,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenReReleaseYearIsBeforeOriginalReleaseYear_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: 2001, reReleaseYear: 2000, includeReReleaseDate: false)));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: 2001, reReleaseYear: 2000, includeReReleaseDate: false)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -589,7 +589,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenReReleaseYearIsAfterOriginalReleaseYear_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: 2000, reReleaseYear: 2001, includeReReleaseDate: false)));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: 2000, reReleaseYear: 2001, includeReReleaseDate: false)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -602,7 +602,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenReReleaseDateIsBeforeOriginalReleaseDate_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2001, 1, 1), reReleaseDate: new DateOnly(2000, 1, 1))));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2001, 1, 1), reReleaseDate: new DateOnly(2000, 1, 1))));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -615,7 +615,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenReReleaseDateIsAfterOriginalReleaseDate_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2000, 1, 1), reReleaseDate: new DateOnly(2001, 1, 1))));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2000, 1, 1), reReleaseDate: new DateOnly(2001, 1, 1))));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -628,7 +628,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenGenresIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(includeGenres: false));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(includeGenres: false));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -641,7 +641,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenGenreNameIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -654,7 +654,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenGenreNameExceeds50Characters_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: new Faker().Random.String2(51))]));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: new Faker().Random.String2(51))]));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -667,7 +667,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenGenresAreValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: new Faker().Random.String2(50))]));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: new Faker().Random.String2(50))]));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -682,7 +682,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenTagsIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(includeTags: false));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(includeTags: false));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -695,7 +695,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenTagNameIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: string.Empty)]));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: string.Empty)]));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -708,7 +708,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenTagNameExceeds50Characters_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: new Faker().Random.String2(51))]));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: new Faker().Random.String2(51))]));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -721,7 +721,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenTagsAreValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: new Faker().Random.String2(50))]));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: new Faker().Random.String2(50))]));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -736,7 +736,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenLanguageIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(includeLanguage: false));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(includeLanguage: false));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -749,7 +749,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenLanguageCodeIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageCode: string.Empty)));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageCode: string.Empty)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -762,7 +762,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenLanguageCodeIsNot2CharactersLong_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageCode: new Faker().Random.String2(3))));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageCode: new Faker().Random.String2(3))));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -775,7 +775,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenLanguageCodeIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageCode: new Faker().Random.String2(2))));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageCode: new Faker().Random.String2(2))));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -788,7 +788,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenLanguageNameIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageName: string.Empty)));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageName: string.Empty)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -801,7 +801,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenLanguageNameExceeds50Characters_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageName: new Faker().Random.String2(51))));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageName: new Faker().Random.String2(51))));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -814,7 +814,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenLanguageNativeNameIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(includeNativeName: false)));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(includeNativeName: false)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -827,7 +827,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenLanguageNativeNameExceeds50Characters_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(nativeName: new Faker().Random.String2(51))));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(nativeName: new Faker().Random.String2(51))));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -840,7 +840,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenOriginalLanguageIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(includeOriginalLanguage: false));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(includeOriginalLanguage: false));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -853,7 +853,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenOriginalLanguageCodeIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageCode: string.Empty)));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageCode: string.Empty)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -866,7 +866,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenOriginalLanguageCodeIsNot2CharactersLong_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageCode: new Faker().Random.String2(3))));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageCode: new Faker().Random.String2(3))));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -879,7 +879,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenOriginalLanguageNameIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageName: string.Empty)));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageName: string.Empty)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -892,7 +892,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenOriginalLanguageNameExceeds50Characters_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageName: new Faker().Random.String2(51))));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageName: new Faker().Random.String2(51))));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -905,7 +905,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenOriginalLanguageNativeNameIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(includeNativeName: false)));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(includeNativeName: false)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -918,7 +918,7 @@ public class AddTrackCommandValidatorTests
     public void Validate_WhenOriginalLanguageNativeNameExceeds50Characters_ShouldHaveValidationError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(nativeName: new Faker().Random.String2(51))));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(nativeName: new Faker().Random.String2(51))));
 
         // Act
         List<Error> result = _validator.TestValidate(command);

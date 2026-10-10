@@ -61,7 +61,7 @@ public class BooksMediaLibraryScanArtworkEnricherTests
     private readonly UserId _userId;
 
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
-    private readonly LibraryArtworkProviderConfigurationEntityFixture _artworkConfigurationFixture = new();
+    private readonly LibraryArtworkProviderConfigurationEntityFixture _libraryArtworkProviderConfigurationEntityFixture = new();
     private readonly BookEntityFixture _bookEntityFixture = new();
     private readonly BookArtworkEntityFixture _bookArtworkEntityFixture = new();
     private readonly ArtworkDtoFixture _artworkDtoFixture = new();
@@ -451,7 +451,7 @@ public class BooksMediaLibraryScanArtworkEnricherTests
     private void SetupConfiguration()
     {
         _mockArtworkProviderConfigurationRepository.GetByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From<IReadOnlyList<LibraryArtworkProviderConfigurationEntity>>([_artworkConfigurationFixture.Create(_libraryId.Value, _pluginId, 0)]));
+            .Returns(Result.From<IReadOnlyList<LibraryArtworkProviderConfigurationEntity>>([_libraryArtworkProviderConfigurationEntityFixture.Create(_libraryId.Value, _pluginId, 0)]));
     }
 
     /// <summary>

@@ -30,7 +30,7 @@ public class InstallPluginEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
 {
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
-    private readonly TestPluginArchiveFixture _pluginArchiveFixture = new();
+    private readonly TestPluginArchiveFixture _testPluginArchiveFixture = new();
     private readonly List<string> _installedPluginFileNames = [];
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -61,7 +61,7 @@ public class InstallPluginEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
     {
         // Arrange
         string dllName = $"test-plugin-{Guid.NewGuid():N}.dll";
-        byte[] archiveBytes = _pluginArchiveFixture.CreateZip(dllName);
+        byte[] archiveBytes = _testPluginArchiveFixture.CreateZip(dllName);
         using MultipartFormDataContent multipartContent = [];
         using ByteArrayContent fileContent = new(archiveBytes);
         multipartContent.Add(fileContent, "archive", "plugin.zip");
@@ -82,7 +82,7 @@ public class InstallPluginEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
         // Arrange
         string dllName = $"test-plugin-{Guid.NewGuid():N}.dll";
         using MultipartFormDataContent multipartContent = [];
-        using ByteArrayContent fileContent = new(_pluginArchiveFixture.CreateDll());
+        using ByteArrayContent fileContent = new(_testPluginArchiveFixture.CreateDll());
         multipartContent.Add(fileContent, "archive", dllName);
         _installedPluginFileNames.Add(dllName);
 
@@ -149,7 +149,7 @@ public class InstallPluginEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
     {
         // Arrange
         using MultipartFormDataContent multipartContent = [];
-        using ByteArrayContent fileContent = new(_pluginArchiveFixture.CreateDll());
+        using ByteArrayContent fileContent = new(_testPluginArchiveFixture.CreateDll());
         multipartContent.Add(fileContent, "archive", "plugin.txt");
 
         // Act
@@ -205,7 +205,7 @@ public class InstallPluginEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
     {
         // Arrange
         HttpClient nonAdminClient = await _apiFactory.CreateAuthenticatedClientAsync();
-        byte[] archiveBytes = _pluginArchiveFixture.CreateZip();
+        byte[] archiveBytes = _testPluginArchiveFixture.CreateZip();
         using MultipartFormDataContent multipartContent = [];
         using ByteArrayContent fileContent = new(archiveBytes);
         multipartContent.Add(fileContent, "archive", "plugin.zip");
@@ -229,7 +229,7 @@ public class InstallPluginEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
     {
         // Arrange
         HttpClient anonymousClient = _apiFactory.CreateClient();
-        byte[] archiveBytes = _pluginArchiveFixture.CreateZip();
+        byte[] archiveBytes = _testPluginArchiveFixture.CreateZip();
         using MultipartFormDataContent multipartContent = [];
         using ByteArrayContent fileContent = new(archiveBytes);
         multipartContent.Add(fileContent, "archive", "plugin.zip");

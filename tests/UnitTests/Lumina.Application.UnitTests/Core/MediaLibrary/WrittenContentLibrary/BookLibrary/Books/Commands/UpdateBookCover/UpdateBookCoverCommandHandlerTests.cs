@@ -49,7 +49,7 @@ public class UpdateBookCoverCommandHandlerTests
     private readonly IValidator<UpdateBookCoverCommand> _mockValidator;
     private readonly UpdateBookCoverCommandHandler _sut;
     private readonly Guid _userId;
-    private readonly UpdateBookCoverCommandFixture _commandFixture = new();
+    private readonly UpdateBookCoverCommandFixture _updateBookCoverCommandFixture = new();
     private readonly BookEntityFixture _bookEntityFixture = new();
     private readonly BookArtworkEntityFixture _bookArtworkEntityFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
@@ -91,7 +91,7 @@ public class UpdateBookCoverCommandHandlerTests
     public async Task HandleAsync_WhenBookHasNoExistingCover_ShouldStoreArtworkAndAddCoverArtwork()
     {
         // Arrange
-        UpdateBookCoverCommand command = _commandFixture.Create();
+        UpdateBookCoverCommand command = _updateBookCoverCommandFixture.Create();
         BookEntity existingBook = _bookEntityFixture.Create(id: Guid.Parse(command.BookId!), libraryId: Guid.Parse(command.LibraryId!));
         existingBook.Artwork = [];
         LibraryEntity library = _libraryEntityFixture.Create(id: existingBook.LibraryId);
@@ -126,7 +126,7 @@ public class UpdateBookCoverCommandHandlerTests
     public async Task HandleAsync_WhenBookHasExistingCover_ShouldReplaceTheStoredCoverFile()
     {
         // Arrange
-        UpdateBookCoverCommand command = _commandFixture.Create();
+        UpdateBookCoverCommand command = _updateBookCoverCommandFixture.Create();
         BookEntity existingBook = _bookEntityFixture.Create(id: Guid.Parse(command.BookId!), libraryId: Guid.Parse(command.LibraryId!));
         BookArtworkEntity existingCover = _bookArtworkEntityFixture.Create(bookId: Guid.Parse(command.BookId!), artworkType: ArtworkType.Cover, fileName: "/media/books/old-cover.jpg");
         existingBook.Artwork = [existingCover];
@@ -153,7 +153,7 @@ public class UpdateBookCoverCommandHandlerTests
     public async Task HandleAsync_WhenBookHasAuthorContributors_ShouldPassTheResolvedAuthorNameToArtworkService()
     {
         // Arrange
-        UpdateBookCoverCommand command = _commandFixture.Create();
+        UpdateBookCoverCommand command = _updateBookCoverCommandFixture.Create();
         BookEntity existingBook = _bookEntityFixture.Create(id: Guid.Parse(command.BookId!), libraryId: Guid.Parse(command.LibraryId!));
         MediaContributorEntity author = _mediaContributorEntityFixture.Create(displayName: "J.R.R. Tolkien");
         MediaContributorEntity illustrator = _mediaContributorEntityFixture.Create(displayName: "Alan Lee");
@@ -190,7 +190,7 @@ public class UpdateBookCoverCommandHandlerTests
     public async Task HandleAsync_WhenAuthorResolutionFails_ShouldReturnFailureResultWithoutStoringArtwork()
     {
         // Arrange
-        UpdateBookCoverCommand command = _commandFixture.Create();
+        UpdateBookCoverCommand command = _updateBookCoverCommandFixture.Create();
         BookEntity existingBook = _bookEntityFixture.Create(id: Guid.Parse(command.BookId!), libraryId: Guid.Parse(command.LibraryId!));
         existingBook.Contributors =
         [
@@ -218,7 +218,7 @@ public class UpdateBookCoverCommandHandlerTests
     public async Task HandleAsync_WhenValidatorFails_ShouldReturnValidationErrorsWithoutStoringArtwork()
     {
         // Arrange
-        UpdateBookCoverCommand command = _commandFixture.Create();
+        UpdateBookCoverCommand command = _updateBookCoverCommandFixture.Create();
         _mockValidator.Validate(Arg.Any<UpdateBookCoverCommand>()).Returns([Errors.WrittenContent.BookCoverCannotBeNull]);
 
         // Act
@@ -235,7 +235,7 @@ public class UpdateBookCoverCommandHandlerTests
     public async Task HandleAsync_WhenUserIsNotAuthenticated_ShouldReturnNotAuthorizedError()
     {
         // Arrange
-        UpdateBookCoverCommand command = _commandFixture.Create();
+        UpdateBookCoverCommand command = _updateBookCoverCommandFixture.Create();
         _mockCurrentUserService.UserId.Returns((Guid?)null);
 
         // Act
@@ -251,7 +251,7 @@ public class UpdateBookCoverCommandHandlerTests
     public async Task HandleAsync_WhenBookDoesNotExist_ShouldReturnBookNotFoundError()
     {
         // Arrange
-        UpdateBookCoverCommand command = _commandFixture.Create();
+        UpdateBookCoverCommand command = _updateBookCoverCommandFixture.Create();
         _mockBookRepository.GetByIdAsync(Guid.Parse(command.BookId!), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<BookEntity?>(null));
 
@@ -269,7 +269,7 @@ public class UpdateBookCoverCommandHandlerTests
     public async Task HandleAsync_WhenPolicyDeniesAccess_ShouldReturnNotAuthorizedErrorWithoutStoringArtwork()
     {
         // Arrange
-        UpdateBookCoverCommand command = _commandFixture.Create();
+        UpdateBookCoverCommand command = _updateBookCoverCommandFixture.Create();
         BookEntity existingBook = _bookEntityFixture.Create(id: Guid.Parse(command.BookId!), libraryId: Guid.Parse(command.LibraryId!));
         _mockBookRepository.GetByIdAsync(Guid.Parse(command.BookId!), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<BookEntity?>(existingBook));
@@ -290,7 +290,7 @@ public class UpdateBookCoverCommandHandlerTests
     public async Task HandleAsync_WhenLibraryDoesNotExist_ShouldReturnLibraryNotFoundError()
     {
         // Arrange
-        UpdateBookCoverCommand command = _commandFixture.Create();
+        UpdateBookCoverCommand command = _updateBookCoverCommandFixture.Create();
         BookEntity existingBook = _bookEntityFixture.Create(id: Guid.Parse(command.BookId!), libraryId: Guid.Parse(command.LibraryId!));
         _mockBookRepository.GetByIdAsync(Guid.Parse(command.BookId!), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<BookEntity?>(existingBook));
@@ -311,7 +311,7 @@ public class UpdateBookCoverCommandHandlerTests
     public async Task HandleAsync_WhenArtworkStorageFails_ShouldReturnFailureResultWithoutSaving()
     {
         // Arrange
-        UpdateBookCoverCommand command = _commandFixture.Create();
+        UpdateBookCoverCommand command = _updateBookCoverCommandFixture.Create();
         BookEntity existingBook = _bookEntityFixture.Create(id: Guid.Parse(command.BookId!), libraryId: Guid.Parse(command.LibraryId!));
         LibraryEntity library = _libraryEntityFixture.Create(id: existingBook.LibraryId);
         _mockBookRepository.GetByIdAsync(Guid.Parse(command.BookId!), cancellationToken: Arg.Any<CancellationToken>())
@@ -334,7 +334,7 @@ public class UpdateBookCoverCommandHandlerTests
     public async Task HandleAsync_WhenBookBelongsToAnotherLibrary_ShouldReturnBookNotFoundError()
     {
         // Arrange
-        UpdateBookCoverCommand command = _commandFixture.Create();
+        UpdateBookCoverCommand command = _updateBookCoverCommandFixture.Create();
         // The stored book belongs to a different library than the one named by the route.
         BookEntity existingBook = _bookEntityFixture.Create(id: Guid.Parse(command.BookId!), libraryId: Guid.NewGuid());
         _mockBookRepository.GetByIdAsync(Guid.Parse(command.BookId!), cancellationToken: Arg.Any<CancellationToken>())
@@ -355,7 +355,7 @@ public class UpdateBookCoverCommandHandlerTests
     public async Task HandleAsync_WhenBookRepositoryReturnsError_ShouldReturnFailureResult()
     {
         // Arrange
-        UpdateBookCoverCommand command = _commandFixture.Create();
+        UpdateBookCoverCommand command = _updateBookCoverCommandFixture.Create();
         _mockBookRepository.GetByIdAsync(Guid.Parse(command.BookId!), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Errors.Library.LibraryIdCannotBeEmpty);
 
@@ -374,7 +374,7 @@ public class UpdateBookCoverCommandHandlerTests
     public async Task HandleAsync_WhenLibraryRepositoryReturnsError_ShouldReturnFailureResult()
     {
         // Arrange
-        UpdateBookCoverCommand command = _commandFixture.Create();
+        UpdateBookCoverCommand command = _updateBookCoverCommandFixture.Create();
         BookEntity existingBook = _bookEntityFixture.Create(id: Guid.Parse(command.BookId!), libraryId: Guid.Parse(command.LibraryId!));
         _mockBookRepository.GetByIdAsync(Guid.Parse(command.BookId!), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<BookEntity?>(existingBook));
@@ -395,7 +395,7 @@ public class UpdateBookCoverCommandHandlerTests
     public async Task HandleAsync_WhenSaveChangesFails_ShouldReturnFailureResultWithoutReturningTheCoverPath()
     {
         // Arrange
-        UpdateBookCoverCommand command = _commandFixture.Create();
+        UpdateBookCoverCommand command = _updateBookCoverCommandFixture.Create();
         BookEntity existingBook = _bookEntityFixture.Create(id: Guid.Parse(command.BookId!), libraryId: Guid.Parse(command.LibraryId!));
         LibraryEntity library = _libraryEntityFixture.Create(id: existingBook.LibraryId);
         _mockBookRepository.GetByIdAsync(Guid.Parse(command.BookId!), cancellationToken: Arg.Any<CancellationToken>())

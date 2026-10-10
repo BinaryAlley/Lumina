@@ -22,7 +22,7 @@ namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.Managemen
 public class SetBookReaderEnabledEndpointTests : IClassFixture<LuminaWebFactory>
 {
     private readonly LuminaWebFactory _apiFactory;
-    private readonly SetBookReaderEnabledRequestFixture _requestFixture = new();
+    private readonly SetBookReaderEnabledRequestFixture _setBookReaderEnabledRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SetBookReaderEnabledEndpointTests"/> class.
@@ -38,7 +38,7 @@ public class SetBookReaderEnabledEndpointTests : IClassFixture<LuminaWebFactory>
     {
         // Arrange
         HttpClient client = WebTestHelpers.CreateAnonymousClient(_apiFactory);
-        SetBookReaderEnabledRequest request = _requestFixture.Create();
+        SetBookReaderEnabledRequest request = _setBookReaderEnabledRequestFixture.Create();
         HttpRequestMessage updateRequest = new(HttpMethod.Put, "/en-us/libraries/manage/api-set-book-reader-enabled")
         {
             Content = JsonContent.Create(request)
@@ -59,7 +59,7 @@ public class SetBookReaderEnabledEndpointTests : IClassFixture<LuminaWebFactory>
         // Arrange
         _apiFactory.ApiClientStub.Reset();
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
-        SetBookReaderEnabledRequest request = _requestFixture.Create();
+        SetBookReaderEnabledRequest request = _setBookReaderEnabledRequestFixture.Create();
         HttpRequestMessage updateRequest = new(HttpMethod.Put, "/en-us/libraries/manage/api-set-book-reader-enabled")
         {
             Content = JsonContent.Create(request)

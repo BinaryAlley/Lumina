@@ -24,7 +24,7 @@ namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Manage
 public class SetBookReaderEnabledEndpointTests : IClassFixture<LuminaWebFactory>
 {
     private readonly LuminaWebFactory _apiFactory;
-    private readonly SetBookReaderEnabledRequestFixture _requestFixture = new();
+    private readonly SetBookReaderEnabledRequestFixture _setBookReaderEnabledRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SetBookReaderEnabledEndpointTests"/> class.
@@ -42,7 +42,7 @@ public class SetBookReaderEnabledEndpointTests : IClassFixture<LuminaWebFactory>
         _apiFactory.ApiClientStub.Reset();
         Guid libraryId = Guid.NewGuid();
         Guid pluginId = Guid.NewGuid();
-        SetBookReaderEnabledRequest request = _requestFixture.Create(libraryId: libraryId, pluginId: pluginId, isEnabled: true);
+        SetBookReaderEnabledRequest request = _setBookReaderEnabledRequestFixture.Create(libraryId: libraryId, pluginId: pluginId, isEnabled: true);
         string expectedEndpoint = $"libraries/{libraryId}/book-readers/{pluginId}/enabled";
         _apiFactory.ApiClientStub.RegisterPutResponseFactory(expectedEndpoint, _ => new EmptyRequest());
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
@@ -71,7 +71,7 @@ public class SetBookReaderEnabledEndpointTests : IClassFixture<LuminaWebFactory>
     {
         // Arrange
         HttpClient anonymousClient = WebTestHelpers.CreateAnonymousClient(_apiFactory);
-        SetBookReaderEnabledRequest request = _requestFixture.Create();
+        SetBookReaderEnabledRequest request = _setBookReaderEnabledRequestFixture.Create();
         HttpRequestMessage updateRequest = new(HttpMethod.Put, "/en-us/libraries/manage/api-set-book-reader-enabled")
         {
             Content = JsonContent.Create(request)

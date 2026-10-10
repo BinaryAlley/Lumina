@@ -23,7 +23,7 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.AudioLibrary.
 public class AddTrackCommandMappingTests
 {
     private readonly AddTrackCommandFixture _addTrackCommandFixture = new();
-    private readonly MusicTrackMetadataDtoFixture _audioMetadataDtoFixture = new();
+    private readonly MusicTrackMetadataDtoFixture _musicTrackMetadataDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
     private readonly MoodDtoFixture _moodDtoFixture = new();
     private readonly IsrcDtoFixture _isrcDtoFixture = new();
@@ -90,7 +90,7 @@ public class AddTrackCommandMappingTests
     public void ToDomainEntity_WhenMetadataCreationFails_ShouldReturnError()
     {
         // Arrange
-        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _audioMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]));
+        AddTrackCommand command = _addTrackCommandFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]));
 
         // Act
         Result<Track> result = command.ToDomainEntity();

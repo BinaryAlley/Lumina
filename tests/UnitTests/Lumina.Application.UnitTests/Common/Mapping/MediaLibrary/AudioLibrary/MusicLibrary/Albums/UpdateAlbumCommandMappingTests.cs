@@ -28,7 +28,7 @@ public class UpdateAlbumCommandMappingTests
     private readonly UpdateAlbumCommandFixture _updateAlbumCommandFixture = new();
     private readonly ArtistEntityFixture _artistEntityFixture = new();
     private readonly AlbumEntityFixture _albumEntityFixture = new();
-    private readonly MusicAlbumMetadataDtoFixture _albumMetadataDtoFixture = new();
+    private readonly MusicAlbumMetadataDtoFixture _musicAlbumMetadataDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
     private readonly AudioRatingDtoFixture _audioRatingDtoFixture = new();
 
@@ -104,7 +104,7 @@ public class UpdateAlbumCommandMappingTests
             libraryId: libraryId.ToString(),
             artistId: artist.Id.Value.ToString(),
             albumId: albumId.ToString(),
-            metadata: _albumMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]));
+            metadata: _musicAlbumMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]));
 
         // Act
         Result<Artist> result = command.ToDomainEntity(artist);

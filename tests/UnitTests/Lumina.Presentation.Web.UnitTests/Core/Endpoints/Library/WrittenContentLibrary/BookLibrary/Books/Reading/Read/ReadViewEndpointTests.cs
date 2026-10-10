@@ -21,7 +21,7 @@ namespace Lumina.Presentation.Web.UnitTests.Core.Endpoints.Library.WrittenConten
 public class ReadViewEndpointTests
 {
     private readonly ReadViewEndpoint _sut = Factory.Create<ReadViewEndpoint>();
-    private readonly ReadBookViewRequestFixture _requestFixture = new();
+    private readonly ReadBookViewRequestFixture _readBookViewRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ReadViewEndpointTests"/> class.
@@ -36,7 +36,7 @@ public class ReadViewEndpointTests
     public async Task ExecuteAsync_WhenCalled_ShouldReturnTheReadRazorView()
     {
         // Arrange
-        ReadBookViewRequest request = _requestFixture.Create();
+        ReadBookViewRequest request = _readBookViewRequestFixture.Create();
 
         // Act
         IResult result = await _sut.ExecuteAsync(request, CancellationToken.None);

@@ -17,13 +17,13 @@ namespace Lumina.Application.UnitTests.Core.Maintenance.ApplicationSetup.Command
 public class SetupApplicationCommandValidatorTests
 {
     private readonly SetupApplicationCommandValidator _validator = new();
-    private readonly SetupApplicationCommandFixture _commandFixture = new();
+    private readonly SetupApplicationCommandFixture _setupApplicationCommandFixture = new();
 
     [Fact]
     public void Validate_WhenUsernameIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        SetupApplicationCommand command = _commandFixture.Create();
+        SetupApplicationCommand command = _setupApplicationCommandFixture.Create();
         command = command with { Username = null };
 
         // Act
@@ -37,7 +37,7 @@ public class SetupApplicationCommandValidatorTests
     public void Validate_WhenUsernameIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        SetupApplicationCommand command = _commandFixture.Create();
+        SetupApplicationCommand command = _setupApplicationCommandFixture.Create();
         command = command with { Username = string.Empty };
 
         // Act
@@ -51,7 +51,7 @@ public class SetupApplicationCommandValidatorTests
     public void Validate_WhenUsernameIsWhiteSpace_ShouldHaveValidationError()
     {
         // Arrange
-        SetupApplicationCommand command = _commandFixture.Create();
+        SetupApplicationCommand command = _setupApplicationCommandFixture.Create();
         command = command with { Username = "   " };
 
         // Act
@@ -65,7 +65,7 @@ public class SetupApplicationCommandValidatorTests
     public void Validate_WhenPasswordIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        SetupApplicationCommand command = _commandFixture.Create();
+        SetupApplicationCommand command = _setupApplicationCommandFixture.Create();
         command = command with { Password = null! };
 
         // Act
@@ -79,7 +79,7 @@ public class SetupApplicationCommandValidatorTests
     public void Validate_WhenPasswordIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        SetupApplicationCommand command = _commandFixture.Create();
+        SetupApplicationCommand command = _setupApplicationCommandFixture.Create();
         command = command with { Password = string.Empty };
 
         // Act
@@ -93,7 +93,7 @@ public class SetupApplicationCommandValidatorTests
     public void Validate_WhenPasswordIsWhiteSpace_ShouldHaveValidationError()
     {
         // Arrange
-        SetupApplicationCommand command = _commandFixture.Create();
+        SetupApplicationCommand command = _setupApplicationCommandFixture.Create();
         command = command with { Password = "   " };
 
         // Act
@@ -107,7 +107,7 @@ public class SetupApplicationCommandValidatorTests
     public void Validate_WhenPasswordConfirmIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        SetupApplicationCommand command = _commandFixture.Create();
+        SetupApplicationCommand command = _setupApplicationCommandFixture.Create();
         command = command with { PasswordConfirm = null! };
 
         // Act
@@ -121,7 +121,7 @@ public class SetupApplicationCommandValidatorTests
     public void Validate_WhenPasswordConfirmIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        SetupApplicationCommand command = _commandFixture.Create();
+        SetupApplicationCommand command = _setupApplicationCommandFixture.Create();
         command = command with { PasswordConfirm = string.Empty };
 
         // Act
@@ -135,7 +135,7 @@ public class SetupApplicationCommandValidatorTests
     public void Validate_WhenPasswordConfirmIsWhiteSpace_ShouldHaveValidationError()
     {
         // Arrange
-        SetupApplicationCommand command = _commandFixture.Create();
+        SetupApplicationCommand command = _setupApplicationCommandFixture.Create();
         command = command with { PasswordConfirm = "   " };
 
         // Act
@@ -149,7 +149,7 @@ public class SetupApplicationCommandValidatorTests
     public void Validate_WhenPasswordAndPasswordConfirmDontMatch_ShouldHaveValidationError()
     {
         // Arrange
-        SetupApplicationCommand command = _commandFixture.Create();
+        SetupApplicationCommand command = _setupApplicationCommandFixture.Create();
         command = command with { PasswordConfirm = "$321Bcda" };
 
         // Act
@@ -169,7 +169,7 @@ public class SetupApplicationCommandValidatorTests
     public void Validate_WhenPasswordDoesNotMatchPattern_ShouldHaveValidationError(string password)
     {
         // Arrange
-        SetupApplicationCommand command = _commandFixture.Create();
+        SetupApplicationCommand command = _setupApplicationCommandFixture.Create();
         command = command with { Password = password, PasswordConfirm = password };
 
         // Act
@@ -187,7 +187,7 @@ public class SetupApplicationCommandValidatorTests
     public void Validate_WhenPasswordMatchesPattern_ShouldNotHaveValidationError(string password)
     {
         // Arrange
-        SetupApplicationCommand command = _commandFixture.Create();
+        SetupApplicationCommand command = _setupApplicationCommandFixture.Create();
         command = command with { Password = password, PasswordConfirm = password };
 
         // Act
@@ -201,7 +201,7 @@ public class SetupApplicationCommandValidatorTests
     public void Validate_WhenCommandIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        SetupApplicationCommand command = _commandFixture.Create();
+        SetupApplicationCommand command = _setupApplicationCommandFixture.Create();
         command = command with { Password = "$321Bcda", PasswordConfirm = "$321Bcda" };
 
         // Act

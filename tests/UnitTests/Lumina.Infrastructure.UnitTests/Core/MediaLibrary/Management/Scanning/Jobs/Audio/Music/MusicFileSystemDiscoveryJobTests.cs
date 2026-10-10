@@ -52,7 +52,7 @@ public class MusicFileSystemDiscoveryJobTests
     private readonly IDomainEventPublisher _mockDomainEventPublisher;
     private readonly MusicFileSystemDiscoveryJob _sut;
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
-    private readonly DirectoryScanFingerprintEntityFixture _fingerprintFixture = new();
+    private readonly DirectoryScanFingerprintEntityFixture _directoryScanFingerprintEntityFixture = new();
     private readonly LibraryIdFixture _libraryIdFixture = new();
     private readonly ScanIdFixture _scanIdFixture = new();
     private readonly UserIdFixture _userIdFixture = new();
@@ -212,7 +212,7 @@ public class MusicFileSystemDiscoveryJobTests
         _mockFingerprintRepository.GetMappedByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(new Dictionary<string, DirectoryScanFingerprintEntity>
             {
-                [ROOT_PATH] = _fingerprintFixture.Create(libraryId: _libraryId.Value, path: ROOT_PATH, lastWriteTimeUtc: lastWriteTime)
+                [ROOT_PATH] = _directoryScanFingerprintEntityFixture.Create(libraryId: _libraryId.Value, path: ROOT_PATH, lastWriteTimeUtc: lastWriteTime)
             }));
 
         // Act
@@ -236,7 +236,7 @@ public class MusicFileSystemDiscoveryJobTests
         _mockFingerprintRepository.GetMappedByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(new Dictionary<string, DirectoryScanFingerprintEntity>
             {
-                [ROOT_PATH] = _fingerprintFixture.Create(libraryId: _libraryId.Value, path: ROOT_PATH, lastWriteTimeUtc: lastWriteTime.AddDays(-1))
+                [ROOT_PATH] = _directoryScanFingerprintEntityFixture.Create(libraryId: _libraryId.Value, path: ROOT_PATH, lastWriteTimeUtc: lastWriteTime.AddDays(-1))
             }));
         SetupDirectory(ROOT_PATH, files: [], subdirectories: []);
 
