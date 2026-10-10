@@ -168,7 +168,7 @@ public class ErrorsTests
     {
         // Assert
         // The count assertion fails when an error is added or removed, reminding to update the assertions below.
-        Assert.Equal(12, typeof(DomainErrors.MediaContributor).GetProperties().Length);
+        Assert.Equal(13, typeof(DomainErrors.MediaContributor).GetProperties().Length);
         AssertError(DomainErrors.MediaContributor.ContributorNameCannotBeEmpty, ErrorType.Validation);
         AssertError(DomainErrors.MediaContributor.ContributorDisplayNameCannotBeEmpty, ErrorType.Validation);
         AssertError(DomainErrors.MediaContributor.ContributorDisplayNameMustBeMaximum100CharactersLong, ErrorType.Validation);
@@ -180,6 +180,7 @@ public class ErrorsTests
         AssertError(DomainErrors.MediaContributor.ContributorsListCannotBeNull, ErrorType.Validation);
         AssertError(DomainErrors.MediaContributor.MediaContributorIdCannotBeEmpty, ErrorType.Validation);
         AssertError(DomainErrors.MediaContributor.MediaContributorNotFound, ErrorType.NotFound);
+        AssertError(DomainErrors.MediaContributor.MediaContributorAlreadyExists, ErrorType.Conflict);
         AssertError(DomainErrors.MediaContributor.UnknownMediaContributorRole, ErrorType.Validation);
     }
 
