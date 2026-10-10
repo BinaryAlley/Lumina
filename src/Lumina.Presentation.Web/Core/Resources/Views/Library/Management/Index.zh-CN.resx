@@ -189,6 +189,9 @@
   <data name="EnrichingMetadata" xml:space="preserve">
     <value>正在丰富元数据...</value>
   </data>
+  <data name="ExtractingMetadata" xml:space="preserve">
+    <value>正在提取元数据...</value>
+  </data>
   <data name="HashingFileContents" xml:space="preserve">
     <value>正在计算文件哈希...</value>
   </data>

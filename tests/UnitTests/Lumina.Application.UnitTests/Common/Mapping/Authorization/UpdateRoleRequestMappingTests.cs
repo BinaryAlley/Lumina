@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Application.Core.Admin.Authorization.Roles.Commands.UpdateRole;
+using Lumina.Contracts.Fixtures.Core.Requests.Authorization;
 using Lumina.Contracts.Requests.Authorization;
 using System;
 using System.Collections.Generic;
@@ -15,12 +16,14 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Authorization;
 [ExcludeFromCodeCoverage]
 public class UpdateRoleRequestMappingTests
 {
+    private readonly UpdateRoleRequestFixture _updateRoleRequestFixture = new();
+
     [Fact]
     public void ToCommand_WhenMappingValidRequest_ShouldMapCorrectly()
     {
         // Arrange
         List<Guid> permissions = [Guid.NewGuid(), Guid.NewGuid()];
-        UpdateRoleRequest request = new(
+        UpdateRoleRequest request = _updateRoleRequestFixture.Create(
             Guid.NewGuid(),
             "Admin",
             permissions
@@ -43,7 +46,7 @@ public class UpdateRoleRequestMappingTests
     public void ToCommand_WhenMappingDifferentRoleNames_ShouldMapCorrectly(string roleName)
     {
         // Arrange
-        UpdateRoleRequest request = new(
+        UpdateRoleRequest request = _updateRoleRequestFixture.Create(
             Guid.NewGuid(),
             roleName,
             [Guid.NewGuid()]
@@ -64,7 +67,7 @@ public class UpdateRoleRequestMappingTests
     public void ToCommand_WhenMappingDifferentRoleIds_ShouldMapCorrectly(string roleIdString)
     {
         // Arrange
-        UpdateRoleRequest request = new(
+        UpdateRoleRequest request = _updateRoleRequestFixture.Create(
             Guid.Parse(roleIdString),
             "Admin",
             [Guid.NewGuid()]
@@ -88,7 +91,7 @@ public class UpdateRoleRequestMappingTests
             Guid.Parse("00000000-0000-0000-0000-000000000002"),
             Guid.Parse("00000000-0000-0000-0000-000000000003")
         ];
-        UpdateRoleRequest request = new(Guid.NewGuid(), "Admin", permissions);
+        UpdateRoleRequest request = _updateRoleRequestFixture.Create(Guid.NewGuid(), "Admin", permissions);
 
         // Act
         UpdateRoleCommand result = request.ToCommand();

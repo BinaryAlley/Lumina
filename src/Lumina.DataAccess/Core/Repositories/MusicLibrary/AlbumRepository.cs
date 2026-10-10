@@ -8,9 +8,12 @@ using Lumina.DataAccess.Common.Persistence;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -170,6 +173,24 @@ internal sealed class AlbumRepository : IAlbumRepository
             shouldReplace: (existingContributor, incomingContributor) => false,
             createNew: incomingContributor => incomingContributor);
 
+        // The types of the release are owned value objects whose value is also their identity, so a match means there is nothing to change.
+        CollectionReconciler.Reconcile(
+            foundAlbum.ReleaseTypes,
+            data.ReleaseTypes,
+            existingReleaseType => existingReleaseType.ReleaseType,
+            incomingReleaseType => incomingReleaseType.ReleaseType,
+            shouldReplace: (existingReleaseType, incomingReleaseType) => false,
+            createNew: incomingReleaseType => incomingReleaseType);
+
+        // The catalog numbers of the release are owned value objects whose value is also their identity, so a match means there is nothing to change.
+        CollectionReconciler.Reconcile(
+            foundAlbum.CatalogNumbers,
+            data.CatalogNumbers,
+            existingCatalogNumber => existingCatalogNumber.CatalogNumber,
+            incomingCatalogNumber => incomingCatalogNumber.CatalogNumber,
+            shouldReplace: (existingCatalogNumber, incomingCatalogNumber) => false,
+            createNew: incomingCatalogNumber => incomingCatalogNumber);
+
         return Result.Updated;
     }
 
@@ -297,4 +318,152 @@ internal sealed class AlbumRepository : IAlbumRepository
             NumberOfPages = numberOfPages
         };
     }
+
+    /// <summary>
+    /// Gets the album of the artist identified by <paramref name="artistId"/> that has the provided <paramref name="title"/>.
+    /// </summary>
+    /// <param name="artistId">The Id of the artist whose album is retrieved.</param>
+    /// <param name="title">The title of the album to retrieve.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the <see cref="AlbumEntity"/> with the provided title, or an error.</returns>
+    public async Task<Result<AlbumEntity?>> GetByTitleAsync(Guid artistId, string title, CancellationToken cancellationToken)
+    {
+        AlbumEntity? album = await _luminaDbContext.Albums
+            .FirstOrDefaultAsync(repositoryAlbum => repositoryAlbum.ArtistId == artistId && repositoryAlbum.Title == title, cancellationToken).ConfigureAwait(false);
+        return album;
+    }
+
+    /// <summary>
+    /// Gets the album of the artist identified by <paramref name="artistId"/> that owns a track stored in the provided <paramref name="directoryPath"/>.
+    /// </summary>
+    /// <param name="artistId">The Id of the artist whose album is retrieved.</param>
+    /// <param name="directoryPath">The file system path of the album directory the album owns.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the <see cref="AlbumEntity"/> owning the directory, or an error.</returns>
+    public async Task<Result<AlbumEntity?>> GetByTrackDirectoryAsync(Guid artistId, string directoryPath, CancellationToken cancellationToken)
+    {
+        // The trailing separator is part of the prefix, so a directory whose name is a prefix of another directory does not match it.
+        string directoryPrefix = directoryPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
+        AlbumEntity? album = await _luminaDbContext.Albums
+            .FirstOrDefaultAsync(repositoryAlbum => repositoryAlbum.ArtistId == artistId
+                && repositoryAlbum.Tracks.Any(track => track.Path.StartsWith(directoryPrefix)), cancellationToken).ConfigureAwait(false);
+        return album;
+    }
+
+    /// <summary>
+    /// Deletes the album identified by <paramref name="id"/>, together with its tracks and its contributions, by the database cascade.
+    /// </summary>
+    /// <param name="id">The Id of the album to delete.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Deleted>> DeleteByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        AlbumEntity? album = await _luminaDbContext.Albums
+            .FirstOrDefaultAsync(repositoryAlbum => repositoryAlbum.Id == id, cancellationToken).ConfigureAwait(false);
+        if (album is null)
+            return Errors.Music.AlbumNotFound;
+
+        _luminaDbContext.Albums.Remove(album);
+        return Result.Deleted;
+    }
+
+    /// <summary>
+    /// Gets the number of albums of the media library identified by <paramref name="libraryId"/> whose metadata has not been enriched yet.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose albums are counted.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the number of albums needing their metadata enriched, or an error.</returns>
+    public async Task<Result<int>> GetAlbumsNeedingMetadataCountAsync(Guid libraryId, CancellationToken cancellationToken)
+    {
+        return await _luminaDbContext.Albums
+            .CountAsync(album => album.LibraryId == libraryId && album.MetadataStatus != MetadataStatus.Enriched, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Gets the number of albums of the media library identified by <paramref name="libraryId"/> whose artwork has not been resolved yet.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose albums are counted.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the number of albums needing their artwork resolved, or an error.</returns>
+    public async Task<Result<int>> GetAlbumsNeedingArtworkCountAsync(Guid libraryId, CancellationToken cancellationToken)
+    {
+        return await _luminaDbContext.Albums
+            .CountAsync(album => album.LibraryId == libraryId
+                        && !_luminaDbContext.MusicArtwork.Any(musicArtwork => musicArtwork.OwnerType == MusicArtworkOwnerType.Album
+                            && musicArtwork.OwnerId == album.Id
+                            && (musicArtwork.Status == ArtworkStatus.Enriched || musicArtwork.Status == ArtworkStatus.NotAvailable)), cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Gets a page of the albums of the media library identified by <paramref name="libraryId"/> whose artwork has not been resolved yet,
+    /// together with their artist, ordered by Id, excluding the provided albums.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose albums are retrieved.</param>
+    /// <param name="excludedAlbumIds">The Ids of the albums that were already processed in the current run and must not be retrieved again.</param>
+    /// <param name="pageSize">The maximum number of albums to retrieve.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either a page of albums needing their artwork resolved, or an error.</returns>
+    public async Task<Result<IReadOnlyList<AlbumEntity>>> GetAlbumsNeedingArtworkAsync(Guid libraryId, IReadOnlyCollection<Guid> excludedAlbumIds, int pageSize, CancellationToken cancellationToken)
+    {
+        List<Guid> excludedIds = [.. excludedAlbumIds];
+        return await _luminaDbContext.Albums
+            .AsNoTracking()
+            .Include(album => album.Artist)
+            .Where(album => album.LibraryId == libraryId
+                        && !excludedIds.Contains(album.Id)
+                        && !_luminaDbContext.MusicArtwork.Any(musicArtwork => musicArtwork.OwnerType == MusicArtworkOwnerType.Album
+                            && musicArtwork.OwnerId == album.Id
+                            && (musicArtwork.Status == ArtworkStatus.Enriched || musicArtwork.Status == ArtworkStatus.NotAvailable)))
+            .OrderBy(album => album.Id)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Gets the file system path of one track of each of the albums identified by <paramref name="albumIds"/>, keyed by the Id of the album.
+    /// </summary>
+    /// <param name="albumIds">The Ids of the albums whose track path is retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the file system path of a track of each album, or an error.</returns>
+    public async Task<Result<IReadOnlyDictionary<Guid, string>>> GetFirstTrackPathsByAlbumIdsAsync(IReadOnlyCollection<Guid> albumIds, CancellationToken cancellationToken)
+    {
+        List<Guid> albumIdsList = [.. albumIds];
+        if (albumIdsList.Count == 0)
+            return new Dictionary<Guid, string>();
+
+        List<AlbumTrackPathRow> rows = await _luminaDbContext.Tracks
+            .AsNoTracking()
+            .Where(track => albumIdsList.Contains(track.AlbumId))
+            .OrderBy(track => track.AlbumId)
+            .ThenBy(track => track.Path)
+            .Select(track => new AlbumTrackPathRow(track.AlbumId, track.Path))
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+
+        // Only one track path is needed per album, so the first one, in the deterministic order above, is kept for each album.
+        Dictionary<Guid, string> firstTrackPaths = [];
+        foreach (AlbumTrackPathRow row in rows)
+            firstTrackPaths.TryAdd(row.AlbumId, row.Path);
+        return firstTrackPaths;
+    }
+
+    /// <summary>
+    /// Resets the metadata enrichment status of all the albums of the media library identified by <paramref name="libraryId"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose albums are reset.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Updated>> ResetMetadataStatusForLibraryAsync(Guid libraryId, CancellationToken cancellationToken)
+    {
+        await _luminaDbContext.Albums
+            .Where(album => album.LibraryId == libraryId)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(album => album.MetadataStatus, MetadataStatus.Pending), cancellationToken).ConfigureAwait(false);
+        return Result.Updated;
+    }
+
+    /// <summary>
+    /// The file system path of one track of an album, used to describe the album in an artwork lookup.
+    /// </summary>
+    /// <param name="AlbumId">The Id of the album the track belongs to.</param>
+    /// <param name="Path">The file system path of the track.</param>
+    private sealed record AlbumTrackPathRow(Guid AlbumId, string Path);
 }

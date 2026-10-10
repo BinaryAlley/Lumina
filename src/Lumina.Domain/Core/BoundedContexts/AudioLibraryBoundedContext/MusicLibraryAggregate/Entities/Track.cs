@@ -35,6 +35,11 @@ public sealed class Track : Entity<TrackId>
     public AudioMetadata Metadata { get; private set; }
 
     /// <summary>
+    /// Gets the disambiguation comment of the track, used to distinguish tracks with the same title, if applicable.
+    /// </summary>
+    public Optional<string> Disambiguation { get; private set; }
+
+    /// <summary>
     /// Gets the number of the track on its disc.
     /// </summary>
     public int TrackNumber { get; private set; }
@@ -60,9 +65,14 @@ public sealed class Track : Entity<TrackId>
     public Optional<int> Bpm { get; private set; }
 
     /// <summary>
-    /// Gets the title of the work the track is a recording of, if applicable.
+    /// Gets a value indicating whether the recording of the track is a video recording.
     /// </summary>
-    public Optional<string> Work { get; private set; }
+    public bool IsVideo { get; private set; }
+
+    /// <summary>
+    /// Gets the work the track is a recording of, if applicable.
+    /// </summary>
+    public Optional<MusicWork> Work { get; private set; }
 
     /// <summary>
     /// Gets the MusicBrainz identifier of the recording, if applicable.
@@ -73,11 +83,6 @@ public sealed class Track : Entity<TrackId>
     /// Gets the MusicBrainz identifier of the track, if applicable.
     /// </summary>
     public Optional<MusicBrainzId> MusicBrainzTrackId { get; private set; }
-
-    /// <summary>
-    /// Gets the MusicBrainz identifier of the work, if applicable.
-    /// </summary>
-    public Optional<MusicBrainzId> MusicBrainzWorkId { get; private set; }
 
     /// <summary>
     /// Gets the list of moods of the track.
@@ -105,36 +110,38 @@ public sealed class Track : Entity<TrackId>
     /// <param name="id">The object representing the unique identifier of the track.</param>
     /// <param name="path">The file system path of the track.</param>
     /// <param name="metadata">The audio metadata of the track.</param>
+    /// <param name="disambiguation">The optional disambiguation comment of the track.</param>
     /// <param name="trackNumber">The number of the track on its disc.</param>
     /// <param name="discNumber">The optional number of the disc the track belongs to.</param>
     /// <param name="moods">The list of moods of the track.</param>
     /// <param name="script">The optional script used by the language of the track.</param>
     /// <param name="key">The optional musical key of the track.</param>
     /// <param name="bpm">The optional tempo of the track in beats per minute.</param>
+    /// <param name="isVideo">Whether the recording of the track is a video recording.</param>
     /// <param name="isrcs">The list of ISRC of the track.</param>
-    /// <param name="work">The optional title of the work the track is a recording of.</param>
+    /// <param name="work">The optional work the track is a recording of.</param>
     /// <param name="musicBrainzRecordingId">The optional MusicBrainz identifier of the recording.</param>
     /// <param name="musicBrainzTrackId">The optional MusicBrainz identifier of the track.</param>
-    /// <param name="musicBrainzWorkId">The optional MusicBrainz identifier of the work.</param>
     /// <param name="contributors">The list of the media contributors of the track.</param>
-    /// <param name="ratings">The list of ratings for the track.</param>
+    /// <param name="ratings">The list of ratings of the track.</param>
     /// <param name="createdOnUtc">The date and time when the entity was created.</param>
     /// <param name="updatedOnUtc">The date and time when the entity was last updated.</param>
     private Track(
         TrackId id,
         string path,
         AudioMetadata metadata,
+        Optional<string> disambiguation,
         int trackNumber,
         Optional<int> discNumber,
         List<Mood> moods,
         Optional<string> script,
         Optional<MusicKey> key,
         Optional<int> bpm,
+        bool isVideo,
         List<Isrc> isrcs,
-        Optional<string> work,
+        Optional<MusicWork> work,
         Optional<MusicBrainzId> musicBrainzRecordingId,
         Optional<MusicBrainzId> musicBrainzTrackId,
-        Optional<MusicBrainzId> musicBrainzWorkId,
         List<MusicMediaContributor> contributors,
         List<AudioRating> ratings,
         DateTime createdOnUtc,
@@ -143,6 +150,7 @@ public sealed class Track : Entity<TrackId>
         Id = id;
         Path = path;
         Metadata = metadata;
+        Disambiguation = disambiguation;
         TrackNumber = trackNumber;
         DiscNumber = discNumber;
         _moods = moods;
@@ -150,10 +158,10 @@ public sealed class Track : Entity<TrackId>
         Script = script;
         Key = key;
         Bpm = bpm;
+        IsVideo = isVideo;
         Work = work;
         MusicBrainzRecordingId = musicBrainzRecordingId;
         MusicBrainzTrackId = musicBrainzTrackId;
-        MusicBrainzWorkId = musicBrainzWorkId;
         _contributors = contributors;
         _ratings = ratings;
         CreatedOnUtc = createdOnUtc;
@@ -165,36 +173,38 @@ public sealed class Track : Entity<TrackId>
     /// </summary>
     /// <param name="path">The file system path of the track.</param>
     /// <param name="metadata">The audio metadata of the track.</param>
+    /// <param name="disambiguation">The optional disambiguation comment of the track.</param>
     /// <param name="trackNumber">The number of the track on its disc.</param>
     /// <param name="discNumber">The optional number of the disc the track belongs to.</param>
     /// <param name="moods">The list of moods of the track.</param>
     /// <param name="script">The optional script used by the language of the track.</param>
     /// <param name="key">The optional musical key of the track.</param>
     /// <param name="bpm">The optional tempo of the track in beats per minute.</param>
+    /// <param name="isVideo">Whether the recording of the track is a video recording.</param>
     /// <param name="isrcs">The list of ISRC of the track.</param>
-    /// <param name="work">The optional title of the work the track is a recording of.</param>
+    /// <param name="work">The optional work the track is a recording of.</param>
     /// <param name="musicBrainzRecordingId">The optional MusicBrainz identifier of the recording.</param>
     /// <param name="musicBrainzTrackId">The optional MusicBrainz identifier of the track.</param>
-    /// <param name="musicBrainzWorkId">The optional MusicBrainz identifier of the work.</param>
     /// <param name="contributors">The list of the media contributors of the track.</param>
-    /// <param name="ratings">The list of ratings for the track.</param>
+    /// <param name="ratings">The list of ratings of the track.</param>
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="Track"/>, or an error message.
     /// </returns>
     public static Result<Track> Create(
         string path,
         AudioMetadata metadata,
+        Optional<string> disambiguation,
         int trackNumber,
         Optional<int> discNumber,
         List<Mood> moods,
         Optional<string> script,
         Optional<MusicKey> key,
         Optional<int> bpm,
+        bool isVideo,
         List<Isrc> isrcs,
-        Optional<string> work,
+        Optional<MusicWork> work,
         Optional<MusicBrainzId> musicBrainzRecordingId,
         Optional<MusicBrainzId> musicBrainzTrackId,
-        Optional<MusicBrainzId> musicBrainzWorkId,
         List<MusicMediaContributor> contributors,
         List<AudioRating> ratings)
     {
@@ -202,17 +212,18 @@ public sealed class Track : Entity<TrackId>
             TrackId.CreateUnique(),
             path,
             metadata,
+            disambiguation,
             trackNumber,
             discNumber,
             moods,
             script,
             key,
             bpm,
+            isVideo,
             isrcs,
             work,
             musicBrainzRecordingId,
             musicBrainzTrackId,
-            musicBrainzWorkId,
             contributors,
             ratings,
             DateTime.UtcNow, // TODO: should be IDateTimeProvider
@@ -225,19 +236,20 @@ public sealed class Track : Entity<TrackId>
     /// <param name="id">The object representing the unique identifier of the track.</param>
     /// <param name="path">The file system path of the track.</param>
     /// <param name="metadata">The audio metadata of the track.</param>
+    /// <param name="disambiguation">The optional disambiguation comment of the track.</param>
     /// <param name="trackNumber">The number of the track on its disc.</param>
     /// <param name="discNumber">The optional number of the disc the track belongs to.</param>
     /// <param name="moods">The list of moods of the track.</param>
     /// <param name="script">The optional script used by the language of the track.</param>
     /// <param name="key">The optional musical key of the track.</param>
     /// <param name="bpm">The optional tempo of the track in beats per minute.</param>
+    /// <param name="isVideo">Whether the recording of the track is a video recording.</param>
     /// <param name="isrcs">The list of ISRC of the track.</param>
-    /// <param name="work">The optional title of the work the track is a recording of.</param>
+    /// <param name="work">The optional work the track is a recording of.</param>
     /// <param name="musicBrainzRecordingId">The optional MusicBrainz identifier of the recording.</param>
     /// <param name="musicBrainzTrackId">The optional MusicBrainz identifier of the track.</param>
-    /// <param name="musicBrainzWorkId">The optional MusicBrainz identifier of the work.</param>
     /// <param name="contributors">The list of the media contributors of the track.</param>
-    /// <param name="ratings">The list of ratings for the track.</param>
+    /// <param name="ratings">The list of ratings of the track.</param>
     /// <param name="createdOnUtc">The date and time when the entity was created.</param>
     /// <param name="updatedOnUtc">The date and time when the entity was last updated.</param>
     /// <returns>
@@ -247,17 +259,18 @@ public sealed class Track : Entity<TrackId>
         TrackId id,
         string path,
         AudioMetadata metadata,
+        Optional<string> disambiguation,
         int trackNumber,
         Optional<int> discNumber,
         List<Mood> moods,
         Optional<string> script,
         Optional<MusicKey> key,
         Optional<int> bpm,
+        bool isVideo,
         List<Isrc> isrcs,
-        Optional<string> work,
+        Optional<MusicWork> work,
         Optional<MusicBrainzId> musicBrainzRecordingId,
         Optional<MusicBrainzId> musicBrainzTrackId,
-        Optional<MusicBrainzId> musicBrainzWorkId,
         List<MusicMediaContributor> contributors,
         List<AudioRating> ratings,
         DateTime createdOnUtc,
@@ -267,17 +280,18 @@ public sealed class Track : Entity<TrackId>
             id,
             path,
             metadata,
+            disambiguation,
             trackNumber,
             discNumber,
             moods,
             script,
             key,
             bpm,
+            isVideo,
             isrcs,
             work,
             musicBrainzRecordingId,
             musicBrainzTrackId,
-            musicBrainzWorkId,
             contributors,
             ratings,
             createdOnUtc,
@@ -338,10 +352,10 @@ public sealed class Track : Entity<TrackId>
     /// <param name="script">The optional script used by the language of the track.</param>
     /// <param name="key">The optional musical key of the track.</param>
     /// <param name="bpm">The optional tempo of the track in beats per minute.</param>
-    /// <param name="work">The optional title of the work the track is a recording of.</param>
+    /// <param name="isVideo">Whether the recording of the track is a video recording.</param>
+    /// <param name="work">The optional work the track is a recording of.</param>
     /// <param name="musicBrainzRecordingId">The optional MusicBrainz identifier of the recording.</param>
     /// <param name="musicBrainzTrackId">The optional MusicBrainz identifier of the track.</param>
-    /// <param name="musicBrainzWorkId">The optional MusicBrainz identifier of the work.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     internal Result<Updated> UpdateDetails(
         string path,
@@ -351,10 +365,10 @@ public sealed class Track : Entity<TrackId>
         Optional<string> script,
         Optional<MusicKey> key,
         Optional<int> bpm,
-        Optional<string> work,
+        bool isVideo,
+        Optional<MusicWork> work,
         Optional<MusicBrainzId> musicBrainzRecordingId,
-        Optional<MusicBrainzId> musicBrainzTrackId,
-        Optional<MusicBrainzId> musicBrainzWorkId)
+        Optional<MusicBrainzId> musicBrainzTrackId)
     {
         Path = path;
         Metadata = metadata;
@@ -363,10 +377,10 @@ public sealed class Track : Entity<TrackId>
         Script = script;
         Key = key;
         Bpm = bpm;
+        IsVideo = isVideo;
         Work = work;
         MusicBrainzRecordingId = musicBrainzRecordingId;
         MusicBrainzTrackId = musicBrainzTrackId;
-        MusicBrainzWorkId = musicBrainzWorkId;
         UpdatedOnUtc = Optional<DateTime>.Some(DateTime.UtcNow);
         return Result.Updated;
     }

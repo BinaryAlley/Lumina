@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -350,5 +350,68 @@
   </data>
   <data name="DescriptionBookReaders" xml:space="preserve">
     <value>Читачі книг, які використовуються для читання книг цієї бібліотеки. Вимкнений читач повідомляє користувача про те, що для цього формату існує плагін для читання, але він вимкнений.</value>
+  </data>
+  <data name="PathTemplate" xml:space="preserve">
+    <value>Шаблон шляху</value>
+  </data>
+  <data name="DescriptionPathTemplate" xml:space="preserve">
+    <value>Описує структуру шляхів цієї бібліотеки на диску, щоб застосунок розумів, що означає кожна тека та назва файлу. Перетягніть доступні частини у шлях у тому порядку, в якому вони з'являються на диску. Кожну частину можна змінити відповідно до того, як вона записана у вашій бібліотеці, а її прапорець позначає її як необов'язкову, коли вона присутня не завжди. Попередній перегляд показує приклад шляху.</value>
+  </data>
+  <data name="PathTemplatePreview" xml:space="preserve">
+    <value>Попередній перегляд</value>
+  </data>
+  <data name="PathPartLiteral" xml:space="preserve">
+    <value>Текст</value>
+  </data>
+  <data name="PathPartSeparator" xml:space="preserve">
+    <value>Розділювач</value>
+  </data>
+  <data name="PathPartArtist" xml:space="preserve">
+    <value>Виконавець</value>
+  </data>
+  <data name="PathPartReleaseType" xml:space="preserve">
+    <value>Тип випуску</value>
+  </data>
+  <data name="PathPartReleaseYear" xml:space="preserve">
+    <value>Рік випуску</value>
+  </data>
+  <data name="PathPartReleaseName" xml:space="preserve">
+    <value>Назва випуску</value>
+  </data>
+  <data name="PathPartTrackNumber" xml:space="preserve">
+    <value>Номер треку</value>
+  </data>
+  <data name="PathPartTrackName" xml:space="preserve">
+    <value>Назва треку</value>
+  </data>
+  <data name="PathPartExtension" xml:space="preserve">
+    <value>Розширення</value>
+  </data>
+  <data name="PathPartDiscNumber" xml:space="preserve">
+    <value>Номер диска</value>
+  </data>
+  <data name="PathPartOptional" xml:space="preserve">
+    <value>Позначити як необов'язкове</value>
+  </data>
+  <data name="PathPartLiteralPlaceholder" xml:space="preserve">
+    <value>текст</value>
+  </data>
+  <data name="PathPartDigits" xml:space="preserve">
+    <value>цифри</value>
+  </data>
+  <data name="PathPartAuthor" xml:space="preserve">
+    <value>Автор</value>
+  </data>
+  <data name="PathPartTitle" xml:space="preserve">
+    <value>Назва</value>
+  </data>
+  <data name="PathPartSeries" xml:space="preserve">
+    <value>Серія</value>
+  </data>
+  <data name="PathPartSeriesNumber" xml:space="preserve">
+    <value>Номер серії</value>
+  </data>
+  <data name="PathPartBookId" xml:space="preserve">
+    <value>Ідентифікатор книги</value>
   </data>
 </root>

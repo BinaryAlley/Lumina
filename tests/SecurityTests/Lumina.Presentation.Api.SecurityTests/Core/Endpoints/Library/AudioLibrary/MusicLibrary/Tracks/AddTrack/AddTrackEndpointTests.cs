@@ -33,7 +33,7 @@ public class AddTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     private readonly LuminaApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly AddTrackRequestFixture _addTrackRequestFixture = new();
-    private readonly AudioMetadataDtoFixture _audioMetadataDtoFixture = new();
+    private readonly MusicTrackMetadataDtoFixture _musicTrackMetadataDtoFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly ArtistEntityFixture _artistEntityFixture = new();
     private readonly AlbumEntityFixture _albumEntityFixture = new();
@@ -201,7 +201,7 @@ public class AddTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         (Guid libraryId, Guid artistId, Guid albumId) = await SeedLibraryArtistAndAlbumAsync(userId);
         AddTrackRequest request = _addTrackRequestFixture.Create(
             path: Path.Combine(_libraryContentLocation, $"{Guid.NewGuid():N}.flac"),
-            metadata: _audioMetadataDtoFixture.Create(title: maliciousTitle),
+            metadata: _musicTrackMetadataDtoFixture.Create(title: maliciousTitle),
             contributors: []);
 
         // Act

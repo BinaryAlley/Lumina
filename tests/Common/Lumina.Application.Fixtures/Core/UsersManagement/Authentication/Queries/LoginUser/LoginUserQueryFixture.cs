@@ -20,13 +20,16 @@ public class LoginUserQueryFixture
     /// <param name="username">Optional. The username.</param>
     /// <param name="password">Optional. The password.</param>
     /// <param name="includeTotpCode">Whether the TOTP code should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="totpCode">Optional. The TOTP code. When provided, the TOTP code is included even if <paramref name="includeTotpCode"/> is <see langword="false"/>.</param>
     /// <returns>The created query.</returns>
     public LoginUserQuery Create(
         string? username = null,
         string? password = null,
-        bool includeTotpCode = false)
+        bool includeTotpCode = false,
+        string? totpCode = null)
     {
         string resolvedPassword = password ?? "Abcd123$";
+        bool shouldIncludeTotpCode = includeTotpCode || totpCode is not null;
         Faker<LoginUserQuery> faker = new Faker<LoginUserQuery>()
             .CustomInstantiator(f => new LoginUserQuery(
                 default!,
@@ -36,8 +39,8 @@ public class LoginUserQueryFixture
             .RuleFor(x => x.Username, f => username ?? f.Person.UserName)
             .RuleFor(x => x.Password, resolvedPassword);
 
-        if (includeTotpCode)
-            faker.RuleFor(x => x.TotpCode, f => f.Random.Replace("######")); // generates 6 random digits
+        if (shouldIncludeTotpCode)
+            faker.RuleFor(x => x.TotpCode, f => totpCode ?? f.Random.Replace("######")); // generates 6 random digits when no code is pinned
         return faker.Generate();
     }
 

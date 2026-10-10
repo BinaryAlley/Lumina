@@ -3,6 +3,7 @@ using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.Themes;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.Infrastructure.Themes;
+using Lumina.Contracts.Fixtures.Core.Requests.Themes;
 using Lumina.Contracts.Requests.Themes;
 using Lumina.Contracts.Responses.Themes;
 using Lumina.DataAccess.Core.UoW;
@@ -34,7 +35,8 @@ public class SetCurrentThemeEndpointTests : IClassFixture<AuthenticatedLuminaApi
 {
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
-    private readonly TestThemeArchiveFixture _themeArchiveFixture = new();
+    private readonly TestThemeArchiveFixture _testThemeArchiveFixture = new();
+    private readonly SetCurrentThemeRequestFixture _setCurrentThemeRequestFixture = new();
     private readonly List<string> _installedThemeIds = [];
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -66,7 +68,7 @@ public class SetCurrentThemeEndpointTests : IClassFixture<AuthenticatedLuminaApi
         // Arrange
         await ThemeTestHelpers.WaitForBundledThemeAsync(_apiFactory);
         string themeId = await InstallThemeAsync();
-        SetCurrentThemeRequest request = new(ThemeId: themeId);
+        SetCurrentThemeRequest request = _setCurrentThemeRequestFixture.Create(themeId: themeId);
 
         // Act
         HttpResponseMessage response = await _client.PutAsJsonAsync("/api/v1/themes/current", request);
@@ -93,7 +95,7 @@ public class SetCurrentThemeEndpointTests : IClassFixture<AuthenticatedLuminaApi
     {
         // Arrange
         string themeId = "nonexistent-theme";
-        SetCurrentThemeRequest request = new(ThemeId: themeId);
+        SetCurrentThemeRequest request = _setCurrentThemeRequestFixture.Create(themeId: themeId);
 
         // Act
         HttpResponseMessage response = await _client.PutAsJsonAsync("/api/v1/themes/current", request);
@@ -117,7 +119,7 @@ public class SetCurrentThemeEndpointTests : IClassFixture<AuthenticatedLuminaApi
     public async Task SetCurrentTheme_WhenThemeIdIsEmpty_ShouldReturnValidationProblem()
     {
         // Arrange
-        SetCurrentThemeRequest request = new(ThemeId: string.Empty);
+        SetCurrentThemeRequest request = _setCurrentThemeRequestFixture.Create(themeId: string.Empty);
 
         // Act
         HttpResponseMessage response = await _client.PutAsJsonAsync("/api/v1/themes/current", request);
@@ -147,7 +149,7 @@ public class SetCurrentThemeEndpointTests : IClassFixture<AuthenticatedLuminaApi
     {
         // Arrange
         HttpClient nonAdminClient = await _apiFactory.CreateAuthenticatedClientAsync();
-        SetCurrentThemeRequest request = new(ThemeId: "editorial-paper");
+        SetCurrentThemeRequest request = _setCurrentThemeRequestFixture.Create(themeId: "editorial-paper");
 
         // Act
         HttpResponseMessage response = await nonAdminClient.PutAsJsonAsync("/api/v1/themes/current", request);
@@ -172,7 +174,7 @@ public class SetCurrentThemeEndpointTests : IClassFixture<AuthenticatedLuminaApi
     {
         // Arrange
         HttpClient anonymousClient = _apiFactory.CreateClient();
-        SetCurrentThemeRequest request = new(ThemeId: "editorial-paper");
+        SetCurrentThemeRequest request = _setCurrentThemeRequestFixture.Create(themeId: "editorial-paper");
 
         // Act
         HttpResponseMessage response = await anonymousClient.PutAsJsonAsync("/api/v1/themes/current", request);
@@ -189,7 +191,7 @@ public class SetCurrentThemeEndpointTests : IClassFixture<AuthenticatedLuminaApi
     private async Task<string> InstallThemeAsync(string? themeId = null)
     {
         string resolvedThemeId = themeId ?? $"test-theme-{Guid.NewGuid():N}";
-        byte[] archiveBytes = _themeArchiveFixture.Create(resolvedThemeId);
+        byte[] archiveBytes = _testThemeArchiveFixture.Create(resolvedThemeId);
 
         using MultipartFormDataContent multipartContent = [];
         using ByteArrayContent fileContent = new(archiveBytes);

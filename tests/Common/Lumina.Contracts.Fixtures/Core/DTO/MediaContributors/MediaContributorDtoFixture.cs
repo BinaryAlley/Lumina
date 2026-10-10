@@ -16,6 +16,7 @@ namespace Lumina.Contracts.Fixtures.Core.DTO.MediaContributors;
 public class MediaContributorDtoFixture
 {
     private readonly Faker _faker = new();
+    private readonly MediaContributorNameDtoFixture _mediaContributorNameDtoFixture = new();
 
     /// <summary>
     /// Creates a random valid <see cref="MediaContributorDto"/>.
@@ -38,9 +39,12 @@ public class MediaContributorDtoFixture
         bool includeRole = true)
     {
         return new MediaContributorDto(
-            Name: includeName ? new MediaContributorNameDto(
-                DisplayName: includeDisplayName ? displayName ?? _faker.Name.FullName() : null,
-                LegalName: includeLegalName ? legalName : null) : null,
+            Name: includeName ? _mediaContributorNameDtoFixture.Create(
+                displayName: displayName,
+                legalName: legalName,
+                includeDisplayName: includeDisplayName,
+                // this fixture historically left the legal name null unless one was explicitly supplied, so the name fixture is only asked for one when a value is passed
+                includeLegalName: includeLegalName && legalName is not null) : null,
             Role: includeRole ? role ?? _faker.PickRandom<MediaContributorRole>() : null);
     }
 

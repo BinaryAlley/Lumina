@@ -32,6 +32,8 @@ public class UserEntityFixture
     /// <param name="libraries">Optional collection of libraries to pin for the user, or <see langword="null"/> to generate them based on <paramref name="libraryCount"/>.</param>
     /// <param name="includeUserRole">Whether the user role association should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeUserPermissions">Whether the user permission associations should be included, or forced to an empty collection.</param>
+    /// <param name="createdBy">Optional. The Id of the user that created the user.</param>
+    /// <param name="createdOnUtc">Optional. The time and date when the user was created.</param>
     /// <returns>The created user entity.</returns>
     public UserEntity Create(
         int libraryCount = 0,
@@ -42,7 +44,9 @@ public class UserEntityFixture
         IEnumerable<UserPermissionEntity>? userPermissions = null,
         ICollection<LibraryEntity>? libraries = null,
         bool includeUserRole = false,
-        bool includeUserPermissions = false)
+        bool includeUserPermissions = false,
+        Guid? createdBy = null,
+        DateTime? createdOnUtc = null)
     {
         Guid userId = id ?? Guid.NewGuid();
         ICollection<LibraryEntity> resolvedLibraries = libraries ?? (libraryCount > 0
@@ -60,11 +64,11 @@ public class UserEntityFixture
                 Libraries = resolvedLibraries,
                 UserPermissions = includeUserPermissions ? (userPermissions ?? []).ToList() : [],
                 UserRole = includeUserRole ? userRole : null,
-                CreatedBy = userId
+                CreatedBy = createdBy ?? userId
             })
             .RuleFor(x => x.Username, f => username ?? f.Internet.UserName())
             .RuleFor(x => x.Password, f => password ?? Uri.EscapeDataString(f.Internet.Password()))
-            .RuleFor(x => x.CreatedOnUtc, f => f.Date.Past())
+            .RuleFor(x => x.CreatedOnUtc, f => createdOnUtc ?? f.Date.Past())
             .RuleFor(x => x.TotpSecret, f => f.Random.Bool() ? f.Random.String2(32) : null)
             .Generate();
     }

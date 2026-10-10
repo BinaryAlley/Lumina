@@ -27,7 +27,7 @@ public class GetBookReadersEndpointTests
 {
     private readonly IApiHttpClient _mockApiHttpClient;
     private readonly GetBookReadersEndpoint _sut;
-    private readonly GetBookReadersRequestFixture _requestFixture = new();
+    private readonly GetBookReadersRequestFixture _getBookReadersRequestFixture = new();
     private readonly LibraryBookReaderDtoFixture _libraryBookReaderDtoFixture = new();
 
     /// <summary>
@@ -43,7 +43,7 @@ public class GetBookReadersEndpointTests
     public async Task ExecuteAsync_WhenSuccessful_ShouldReturnSuccessJsonWithBookReaders()
     {
         // Arrange
-        GetBookReadersRequest request = _requestFixture.Create();
+        GetBookReadersRequest request = _getBookReadersRequestFixture.Create();
         LibraryBookReaderDto[] readers = [.. _libraryBookReaderDtoFixture.CreateMany(2)];
         _mockApiHttpClient.GetAsync<LibraryBookReaderDto[]>(ApiRoutes.Libraries.GET_LIBRARY_BOOK_READERS.Replace("{libraryId}", request.LibraryId.ToString()), Arg.Any<CancellationToken>())
             .Returns(readers);
@@ -62,7 +62,7 @@ public class GetBookReadersEndpointTests
     public async Task ExecuteAsync_WhenCalled_ShouldRequestBookReadersFromApi()
     {
         // Arrange
-        GetBookReadersRequest request = _requestFixture.Create();
+        GetBookReadersRequest request = _getBookReadersRequestFixture.Create();
         LibraryBookReaderDto[] readers = [.. _libraryBookReaderDtoFixture.CreateMany(2)];
         _mockApiHttpClient.GetAsync<LibraryBookReaderDto[]>(ApiRoutes.Libraries.GET_LIBRARY_BOOK_READERS.Replace("{libraryId}", request.LibraryId.ToString()), Arg.Any<CancellationToken>())
             .Returns(readers);

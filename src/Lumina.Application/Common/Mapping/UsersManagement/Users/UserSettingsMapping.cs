@@ -27,6 +27,7 @@ public static class UserSettingsMapping
             ShouldIgnoreThePrefixForAlphaPicker = domainEntity.ShouldIgnoreThePrefixForAlphaPicker,
             IsThemeCachingEnabled = domainEntity.IsThemeCachingEnabled,
             ShouldAggregateMetadataWhenMissing = domainEntity.ShouldAggregateMetadataWhenMissing,
+            ShouldAggregateArtworkWhenMissing = domainEntity.ShouldAggregateArtworkWhenMissing,
             ShouldRenderPdfAsImages = domainEntity.ShouldRenderPdfAsImages,
             ShouldPreserveBookStyles = domainEntity.ShouldPreserveBookStyles
         };
@@ -46,6 +47,7 @@ public static class UserSettingsMapping
             domainEntity.ShouldIgnoreThePrefixForAlphaPicker,
             domainEntity.IsThemeCachingEnabled,
             domainEntity.ShouldAggregateMetadataWhenMissing,
+            domainEntity.ShouldAggregateArtworkWhenMissing,
             domainEntity.ShouldRenderPdfAsImages,
             domainEntity.ShouldPreserveBookStyles
         );

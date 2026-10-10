@@ -3,6 +3,7 @@ using Lumina.Application.Common.Mapping.Plugins;
 using Lumina.Contracts.Responses.Plugins;
 using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
 using Lumina.Plugins.Contracts.Common.Models.DTO.Settings;
+using Lumina.Plugins.Contracts.Fixtures.Common.Models.DTO.Settings;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -15,11 +16,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Plugins;
 [ExcludeFromCodeCoverage]
 public class PluginSettingDescriptorMappingTests
 {
+    private readonly PluginSettingDescriptorDtoFixture _pluginSettingDescriptorDtoFixture = new();
+
     [Fact]
     public void ToResponse_WhenMappingValidDescriptor_ShouldMapCorrectly()
     {
         // Arrange
-        PluginSettingDescriptorDto descriptor = new("apiKey", "API Key", PluginSettingType.Text, "default", null);
+        PluginSettingDescriptorDto descriptor = _pluginSettingDescriptorDtoFixture.Create("apiKey", "API Key", PluginSettingType.Text, "default", null);
 
         // Act
         PluginSettingDescriptorResponse result = descriptor.ToResponse();
@@ -41,7 +44,7 @@ public class PluginSettingDescriptorMappingTests
     public void ToResponse_WhenMappingDifferentSettingTypes_ShouldMapTypeCorrectly(PluginSettingType type)
     {
         // Arrange
-        PluginSettingDescriptorDto descriptor = new("key", "Label", type, null, null);
+        PluginSettingDescriptorDto descriptor = _pluginSettingDescriptorDtoFixture.Create("key", "Label", type, null, null);
 
         // Act
         PluginSettingDescriptorResponse result = descriptor.ToResponse();
@@ -54,7 +57,7 @@ public class PluginSettingDescriptorMappingTests
     public void ToResponse_WhenMappingDescriptorWithAllowedValues_ShouldMapAllowedValues()
     {
         // Arrange
-        PluginSettingDescriptorDto descriptor = new("mode", "Mode", PluginSettingType.Select, null, ["fast", "slow"]);
+        PluginSettingDescriptorDto descriptor = _pluginSettingDescriptorDtoFixture.Create("mode", "Mode", PluginSettingType.Select, null, ["fast", "slow"]);
 
         // Act
         PluginSettingDescriptorResponse result = descriptor.ToResponse();

@@ -4,6 +4,7 @@ using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Plugins.Calibre.Core;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
@@ -34,12 +35,12 @@ public class CalibreArtworkProviderTests
             BookMetadataLookupDto lookup = _bookMetadataLookupDtoFixture.Create(path: bookPath);
 
             // Act
-            ArtworkDto? result = await _sut.GetArtworkAsync(lookup, CancellationToken.None);
+            IReadOnlyList<ArtworkDto> result = await _sut.GetArtworkAsync(lookup, CancellationToken.None);
 
             // Assert
-            Assert.NotNull(result);
-            Assert.Equal(Path.Combine(bookDirectory, "cover.jpg"), result!.LocalPath);
-            Assert.Null(result.RemoteUrl);
+            ArtworkDto artwork = Assert.Single(result);
+            Assert.Equal(Path.Combine(bookDirectory, "cover.jpg"), artwork.LocalPath);
+            Assert.Null(artwork.RemoteUrl);
         }
         finally
         {
@@ -59,10 +60,10 @@ public class CalibreArtworkProviderTests
             BookMetadataLookupDto lookup = _bookMetadataLookupDtoFixture.Create(path: bookPath);
 
             // Act
-            ArtworkDto? result = await _sut.GetArtworkAsync(lookup, CancellationToken.None);
+            IReadOnlyList<ArtworkDto> result = await _sut.GetArtworkAsync(lookup, CancellationToken.None);
 
             // Assert
-            Assert.Null(result);
+            Assert.Empty(result);
         }
         finally
         {
@@ -85,10 +86,10 @@ public class CalibreArtworkProviderTests
             BookMetadataLookupDto lookup = _bookMetadataLookupDtoFixture.Create(path: bookPath);
 
             // Act
-            ArtworkDto? result = await _sut.GetArtworkAsync(lookup, CancellationToken.None);
+            IReadOnlyList<ArtworkDto> result = await _sut.GetArtworkAsync(lookup, CancellationToken.None);
 
             // Assert
-            Assert.Null(result);
+            Assert.Empty(result);
         }
         finally
         {
@@ -108,10 +109,10 @@ public class CalibreArtworkProviderTests
             BookMetadataLookupDto lookup = _bookMetadataLookupDtoFixture.Create(path: bookPath);
 
             // Act
-            ArtworkDto? result = await _sut.GetArtworkAsync(lookup, CancellationToken.None);
+            IReadOnlyList<ArtworkDto> result = await _sut.GetArtworkAsync(lookup, CancellationToken.None);
 
             // Assert
-            Assert.Null(result);
+            Assert.Empty(result);
         }
         finally
         {
@@ -130,10 +131,10 @@ public class CalibreArtworkProviderTests
             BookMetadataLookupDto lookup = _bookMetadataLookupDtoFixture.Create(path: bookPath);
 
             // Act
-            ArtworkDto? result = await _sut.GetArtworkAsync(lookup, CancellationToken.None);
+            IReadOnlyList<ArtworkDto> result = await _sut.GetArtworkAsync(lookup, CancellationToken.None);
 
             // Assert
-            Assert.Null(result);
+            Assert.Empty(result);
         }
         finally
         {
@@ -153,10 +154,10 @@ public class CalibreArtworkProviderTests
             BookMetadataLookupDto lookup = _bookMetadataLookupDtoFixture.Create(path: bookPath);
 
             // Act
-            ArtworkDto? result = await _sut.GetArtworkAsync(lookup, CancellationToken.None);
+            IReadOnlyList<ArtworkDto> result = await _sut.GetArtworkAsync(lookup, CancellationToken.None);
 
             // Assert
-            Assert.Null(result);
+            Assert.Empty(result);
         }
         finally
         {

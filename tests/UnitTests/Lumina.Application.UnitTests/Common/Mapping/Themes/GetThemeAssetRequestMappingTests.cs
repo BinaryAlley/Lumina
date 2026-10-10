@@ -40,7 +40,7 @@ public class GetThemeAssetRequestMappingTests
     public void ToQuery_WhenMappingDifferentThemeIdsAndAssetPaths_ShouldMapCorrectly(string themeId, string assetPath)
     {
         // Arrange
-        GetThemeAssetRequest request = new(themeId, assetPath);
+        GetThemeAssetRequest request = _getThemeAssetRequestFixture.Create(themeId, assetPath);
 
         // Act
         GetThemeAssetQuery result = request.ToQuery();
@@ -55,7 +55,7 @@ public class GetThemeAssetRequestMappingTests
     public void ToQuery_WhenFieldsAreNull_ShouldMapNull()
     {
         // Arrange
-        GetThemeAssetRequest request = new(null, null);
+        GetThemeAssetRequest request = _getThemeAssetRequestFixture.Create(includeThemeId: false, includeAssetPath: false);
 
         // Act
         GetThemeAssetQuery result = request.ToQuery();

@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Core.Admin.Authorization.Roles.Queries.GetRolePermissions;
+using Lumina.Application.Fixtures.Core.Admin.Authorization.Roles.Queries.GetRolePermissions;
 using Lumina.Application.UnitTests.Common.Setup;
 using Lumina.Domain.Common.Primitives;
 using System;
@@ -17,12 +18,13 @@ namespace Lumina.Application.UnitTests.Core.Admin.Authorization.Roles.Queries.Ge
 public class GetRolePermissionsQueryValidatorTests
 {
     private readonly GetRolePermissionsQueryValidator _validator = new();
+    private readonly GetRolePermissionsQueryFixture _getRolePermissionsQueryFixture = new();
 
     [Fact]
     public void Validate_WhenRoleIdIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        GetRolePermissionsQuery query = new(Guid.Empty);
+        GetRolePermissionsQuery query = _getRolePermissionsQueryFixture.Create(Guid.Empty);
 
         // Act
         List<Error> result = _validator.TestValidate(query);
@@ -35,7 +37,7 @@ public class GetRolePermissionsQueryValidatorTests
     public void Validate_WhenRoleIdIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        GetRolePermissionsQuery query = new(Guid.NewGuid());
+        GetRolePermissionsQuery query = _getRolePermissionsQueryFixture.Create(Guid.NewGuid());
 
         // Act
         List<Error> result = _validator.TestValidate(query);

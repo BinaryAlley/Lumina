@@ -18,11 +18,13 @@ public class GetUserRoleRequestFixture
     /// Creates a random valid <see cref="GetUserRoleRequest"/>.
     /// </summary>
     /// <param name="userId">Optional. The Id of the user whose role is retrieved.</param>
+    /// <param name="includeUserId">Whether the user Id should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="GetUserRoleRequest"/>.</returns>
     public GetUserRoleRequest Create(
-        Guid? userId = null)
+        Guid? userId = null,
+        bool includeUserId = true)
     {
-        return new GetUserRoleRequest(userId ?? Guid.NewGuid());
+        return new GetUserRoleRequest(includeUserId ? (userId ?? Guid.NewGuid()) : null);
     }
 
     /// <summary>

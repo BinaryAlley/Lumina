@@ -20,13 +20,13 @@ public class GenreDtoMappingTests
     private readonly GenreDtoFixture _genreDtoFixture = new();
 
     [Fact]
-    public void ToDomainEntity_WhenMappingValidGenreDto_ShouldMapCorrectly()
+    public void ToDomainValueObject_WhenMappingValidGenreDto_ShouldMapCorrectly()
     {
         // Arrange
         GenreDto genreDto = _genreDtoFixture.Create(name: "Rock");
 
         // Act
-        Result<Genre> result = genreDto.ToDomainEntity();
+        Result<Genre> result = genreDto.ToDomainValueObject();
 
         // Assert
         Assert.False(result.IsFailure);
@@ -39,13 +39,13 @@ public class GenreDtoMappingTests
     [InlineData("Jazz")]
     [InlineData("Classical")]
     [InlineData("Pop")]
-    public void ToDomainEntity_WhenMappingDifferentValidGenreDtos_ShouldMapCorrectly(string name)
+    public void ToDomainValueObject_WhenMappingDifferentValidGenreDtos_ShouldMapCorrectly(string name)
     {
         // Arrange
         GenreDto genreDto = _genreDtoFixture.Create(name: name);
 
         // Act
-        Result<Genre> result = genreDto.ToDomainEntity();
+        Result<Genre> result = genreDto.ToDomainValueObject();
 
         // Assert
         Assert.False(result.IsFailure);
@@ -57,13 +57,13 @@ public class GenreDtoMappingTests
     [InlineData("")]
     [InlineData(" ")]
     [InlineData(null)]
-    public void ToDomainEntity_WhenMappingInvalidGenreDto_ShouldReturnError(string? invalidName)
+    public void ToDomainValueObject_WhenMappingInvalidGenreDto_ShouldReturnError(string? invalidName)
     {
         // Arrange
         GenreDto genreDto = _genreDtoFixture.Create(name: invalidName, includeName: invalidName is not null);
 
         // Act
-        Result<Genre> result = genreDto.ToDomainEntity();
+        Result<Genre> result = genreDto.ToDomainValueObject();
 
         // Assert
         Assert.True(result.IsFailure);
@@ -82,7 +82,7 @@ public class GenreDtoMappingTests
         ];
 
         // Act
-        IEnumerable<Result<Genre>> results = genreDtos.ToDomainEntities();
+        IEnumerable<Result<Genre>> results = genreDtos.ToDomainValueObjects();
 
         // Assert
         Assert.NotNull(results);
@@ -109,7 +109,7 @@ public class GenreDtoMappingTests
         ];
 
         // Act
-        IEnumerable<Result<Genre>> results = genreDtos.ToDomainEntities();
+        IEnumerable<Result<Genre>> results = genreDtos.ToDomainValueObjects();
 
         // Assert
         Assert.NotNull(results);

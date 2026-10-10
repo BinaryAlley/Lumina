@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web;
-using Lumina.Presentation.Web.Common.Requests.UsersManagement;
+using Lumina.Presentation.Web.Fixtures.Common.Requests.UsersManagement;
 using Microsoft.AspNetCore.Mvc.Testing;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -28,6 +28,8 @@ public record AuthenticatedWebClient(HttpClient Client, string AntiforgeryToken)
 [ExcludeFromCodeCoverage]
 public static partial class WebTestHelpers
 {
+    private static readonly LoginRequestFixture s_loginRequestFixture = new();
+
     private const string LOGIN_PAGE_PATH = "/en-us/auth/login";
     private const string LOGIN_ENDPOINT_PATH = "/en-us/auth/api-login";
     // the change password page renders an antiforgery token for the authenticated user without calling the remote API
@@ -81,7 +83,7 @@ public static partial class WebTestHelpers
     {
         HttpRequestMessage loginRequest = new(HttpMethod.Post, LOGIN_ENDPOINT_PATH)
         {
-            Content = JsonContent.Create(new LoginRequest(Username: username, Password: password))
+            Content = JsonContent.Create(s_loginRequestFixture.Create(username: username, password: password))
         };
         // the antiforgery middleware matches the content type exactly, so the charset suffix must be omitted
         loginRequest.Content!.Headers.ContentType = new MediaTypeHeaderValue("application/json");

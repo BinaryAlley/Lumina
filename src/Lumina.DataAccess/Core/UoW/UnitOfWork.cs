@@ -46,6 +46,8 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     private IArtistRepository? _artistRepository;
     private IAlbumRepository? _albumRepository;
     private ITrackRepository? _trackRepository;
+    private IMusicArtworkRepository? _musicArtworkRepository;
+    private IMusicLibraryScanItemMetadataRepository? _musicLibraryScanItemMetadataRepository;
     private IMediaContributorRepository? _mediaContributorRepository;
     private IDirectoryScanFingerprintRepository? _directoryScanFingerprintRepository;
     private ILibraryRepository? _libraryRepository;
@@ -156,6 +158,30 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         {
             _trackRepository ??= new TrackRepository(_luminaDbContext);
             return _trackRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the repository for the artwork of the music library items.
+    /// </summary>
+    public IMusicArtworkRepository MusicArtworkRepository
+    {
+        get
+        {
+            _musicArtworkRepository ??= new MusicArtworkRepository(_luminaDbContext);
+            return _musicArtworkRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the repository for the music metadata staged during a media library scan.
+    /// </summary>
+    public IMusicLibraryScanItemMetadataRepository MusicLibraryScanItemMetadataRepository
+    {
+        get
+        {
+            _musicLibraryScanItemMetadataRepository ??= new MusicLibraryScanItemMetadataRepository(_luminaDbContext);
+            return _musicLibraryScanItemMetadataRepository;
         }
     }
 

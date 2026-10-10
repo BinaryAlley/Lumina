@@ -74,10 +74,10 @@ public class TrackMappingTests
         Assert.Equal(track.Script.HasValue ? track.Script.Value : null, result.Script);
         Assert.Equal(track.Key.HasValue ? track.Key.Value : null, result.Key);
         Assert.Equal(track.Bpm.HasValue ? track.Bpm.Value : null, result.Bpm);
-        Assert.Equal(track.Work.HasValue ? track.Work.Value : null, result.Work);
+        Assert.Equal(track.Work.HasValue ? track.Work.Value.Title : null, result.WorkTitle);
         Assert.Equal(track.MusicBrainzRecordingId.HasValue ? track.MusicBrainzRecordingId.Value.Value : null, result.MusicBrainzRecordingId);
         Assert.Equal(track.MusicBrainzTrackId.HasValue ? track.MusicBrainzTrackId.Value.Value : null, result.MusicBrainzTrackId);
-        Assert.Equal(track.MusicBrainzWorkId.HasValue ? track.MusicBrainzWorkId.Value.Value : null, result.MusicBrainzWorkId);
+        Assert.Equal(track.Work.HasValue ? track.Work.Value.MusicBrainzWorkId.Value : null, result.MusicBrainzWorkId);
         Assert.Equal(track.Moods.ToRepositoryEntities(), result.Moods);
         Assert.Equal(track.Isrcs.ToRepositoryEntities(), result.Isrcs);
         Assert.Equal(track.Ratings.ToRepositoryEntities(), result.Ratings);
@@ -141,12 +141,11 @@ public class TrackMappingTests
             script: Optional<string>.None(),
             key: Optional<MusicKey>.None(),
             bpm: Optional<int>.None(),
-            work: Optional<string>.None(),
+            work: Optional<MusicWork>.None(),
             moods: [],
             isrcs: [],
             musicBrainzRecordingId: Optional<MusicBrainzId>.None(),
             musicBrainzTrackId: Optional<MusicBrainzId>.None(),
-            musicBrainzWorkId: Optional<MusicBrainzId>.None(),
             contributors: [],
             ratings: []);
 
@@ -175,7 +174,7 @@ public class TrackMappingTests
         Assert.Null(result.Script);
         Assert.Null(result.Key);
         Assert.Null(result.Bpm);
-        Assert.Null(result.Work);
+        Assert.Null(result.WorkTitle);
         Assert.Null(result.MusicBrainzRecordingId);
         Assert.Null(result.MusicBrainzTrackId);
         Assert.Null(result.MusicBrainzWorkId);

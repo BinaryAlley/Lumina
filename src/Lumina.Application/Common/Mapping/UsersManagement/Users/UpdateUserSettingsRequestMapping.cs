@@ -23,6 +23,7 @@ public static class UpdateUserSettingsRequestMapping
             request.ShouldIgnoreThePrefixForAlphaPicker,
             request.IsThemeCachingEnabled,
             request.ShouldAggregateMetadataWhenMissing,
+            request.ShouldAggregateArtworkWhenMissing,
             request.ShouldRenderPdfAsImages,
             request.ShouldPreserveBookStyles
         );

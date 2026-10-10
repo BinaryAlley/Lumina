@@ -54,22 +54,22 @@ public class FileTypeService : IFileTypeService
     /// <returns>An <see cref="Result{TValue}"/> containing the type of image or an error.</returns>
     public async Task<Result<ImageType>> GetImageTypeAsync(FileSystemPathId path, CancellationToken cancellationToken)
     {
-        // check if the user has access permissions to the provided path
+        // Check if the user has access permissions to the provided path.
         if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadContents))
             return Errors.Permission.UnauthorizedAccess;
         Memory<byte> buffer = new byte[BUFFER_SIZE];
         using FileSystemStream stream = _fileSystem.FileStream.New(path.Path, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.ReadWrite);
-        // check if the file's length is less than the buffer size
+        // Check if the file's length is less than the buffer size.
         if (stream.Length < BUFFER_SIZE)
             return ImageType.None;
-        // read only the first bytes of the file, equal to the buffer size
+        // Read only the first bytes of the file, equal to the buffer size.
         await stream.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
         byte[] firstBytes = buffer[..BUFFER_SIZE].ToArray();
-        // check if its a known image type, based on header bytes
+        // Check if its a known image type, based on header bytes.
         ImageType type = IdentifyHeader(firstBytes);
         if (type != ImageType.None)
             return type;
-        // no known image header types were found, check other methods
+        // No known image header types were found, check other methods.
         string content = Encoding.UTF8.GetString(buffer.ToArray());
         if (IsSvg(content, path.Path))
             return ImageType.SVG;
@@ -87,20 +87,20 @@ public class FileTypeService : IFileTypeService
     /// <returns><see langword="true"/> if the file is a SVG image, <see langword="false"/> otherwise.</returns>
     private bool IsSvg(string initialContent, string path)
     {
-        // check if it starts with <svg
+        // Check if it starts with <svg.
         if (initialContent.StartsWith("<svg", StringComparison.OrdinalIgnoreCase))
             return true;
-        // check if it starts with <?xml
+        // Check if it starts with <?xml.
         if (initialContent.StartsWith("<?xml", StringComparison.OrdinalIgnoreCase))
         {
-            // Read more content from the file
+            // Read more content from the file.
             using FileSystemStream stream = _fileSystem.FileStream.New(path, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.ReadWrite);
             byte[] svgBuffer = new byte[1000];
 #pragma warning disable CA2022 // Avoid inexact read with 'Stream.Read'
             stream.Read(svgBuffer, 0, 1000);
 #pragma warning restore CA2022 // Avoid inexact read with 'Stream.Read'
             string extendedContent = Encoding.UTF8.GetString(svgBuffer);
-            // check if the extended content contains <svg
+            // Check if the extended content contains <svg.
             return extendedContent.Contains("<svg", StringComparison.OrdinalIgnoreCase);
         }
         return false;
@@ -136,10 +136,15 @@ public class FileTypeService : IFileTypeService
             return ImageType.TIFF; // TIFF
         if (new byte[] { 255, 216, 255, 224 }.SequenceEqual(firstBytes[..4]))
             return ImageType.JPEG; // JPEG
-        if (new byte[] { 255, 216, 255, 225 }.SequenceEqual(firstBytes[..4]))
-            return ImageType.JPEG_CANON; // JPEG CANON
-        if (new byte[] { 255, 216, 255, 226 }.SequenceEqual(firstBytes[..4]))
+        // Any JPEG starts with the start-of-image marker FF D8 followed by FF and a marker byte. The marker that follows varies
+        // (E0 JFIF, E1 Exif, DB quantization table, C2 progressive, EE Adobe, FE comment, ...), so every JPEG is accepted here and
+        // only classified into its known variants, rather than being rejected for using a marker that is not explicitly listed.
+        if (firstBytes[0] == 255 && firstBytes[1] == 216 && firstBytes[2] == 255)
+        {
+            if (firstBytes[3] == 225)
+                return ImageType.JPEG_CANON; // JPEG CANON
             return ImageType.JPEG_UNKNOWN; // JPEG UNKNOWN
+        }
         if (new byte[] { 0x00, 0x11, 0x02, 0xFF }.SequenceEqual(firstBytes[..4]))
             return ImageType.PICT; // PICT
         if (new byte[] { 0x00, 0x00, 0x01, 0x00 }.SequenceEqual(firstBytes[..4]))

@@ -21,13 +21,13 @@ public class AudioRatingDtoMappingTests
     private readonly AudioRatingDtoFixture _audioRatingDtoFixture = new();
 
     [Fact]
-    public void ToDomainEntity_WhenMappingCompleteAudioRatingDto_ShouldMapAllPropertiesCorrectly()
+    public void ToDomainValueObject_WhenMappingCompleteAudioRatingDto_ShouldMapAllPropertiesCorrectly()
     {
         // Arrange
         AudioRatingDto dto = _audioRatingDtoFixture.Create();
 
         // Act
-        Result<AudioRating> result = dto.ToDomainEntity();
+        Result<AudioRating> result = dto.ToDomainValueObject();
 
         // Assert
         Assert.False(result.IsFailure);
@@ -41,13 +41,13 @@ public class AudioRatingDtoMappingTests
     }
 
     [Fact]
-    public void ToDomainEntity_WhenOptionalPropertiesAreMissing_ShouldMapTheRequiredValuesAndNones()
+    public void ToDomainValueObject_WhenOptionalPropertiesAreMissing_ShouldMapTheRequiredValuesAndNones()
     {
         // Arrange
         AudioRatingDto dto = _audioRatingDtoFixture.Create(includeSource: false, includeVoteCount: false);
 
         // Act
-        Result<AudioRating> result = dto.ToDomainEntity();
+        Result<AudioRating> result = dto.ToDomainValueObject();
 
         // Assert
         Assert.False(result.IsFailure);
@@ -58,13 +58,13 @@ public class AudioRatingDtoMappingTests
     }
 
     [Fact]
-    public void ToDomainEntity_WhenValueIsGreaterThanMaxValue_ShouldReturnError()
+    public void ToDomainValueObject_WhenValueIsGreaterThanMaxValue_ShouldReturnError()
     {
         // Arrange
         AudioRatingDto dto = _audioRatingDtoFixture.Create(value: 10, maxValue: 5);
 
         // Act
-        Result<AudioRating> result = dto.ToDomainEntity();
+        Result<AudioRating> result = dto.ToDomainValueObject();
 
         // Assert
         Assert.True(result.IsFailure);
@@ -72,13 +72,13 @@ public class AudioRatingDtoMappingTests
     }
 
     [Fact]
-    public void ToDomainEntities_WhenMappingMultipleValidAudioRatingDtos_ShouldMapAllCorrectly()
+    public void ToDomainValueObjects_WhenMappingMultipleValidAudioRatingDtos_ShouldMapAllCorrectly()
     {
         // Arrange
         List<AudioRatingDto> dtos = _audioRatingDtoFixture.CreateMany(2);
 
         // Act
-        List<Result<AudioRating>> results = [.. dtos.ToDomainEntities()];
+        List<Result<AudioRating>> results = [.. dtos.ToDomainValueObjects()];
 
         // Assert
         Assert.Equal(dtos.Count, results.Count);
@@ -91,7 +91,7 @@ public class AudioRatingDtoMappingTests
     }
 
     [Fact]
-    public void ToDomainEntities_WhenMappingMixedValidAndInvalidAudioRatingDtos_ShouldReturnMixedResults()
+    public void ToDomainValueObjects_WhenMappingMixedValidAndInvalidAudioRatingDtos_ShouldReturnMixedResults()
     {
         // Arrange
         List<AudioRatingDto> dtos =
@@ -102,7 +102,7 @@ public class AudioRatingDtoMappingTests
         ];
 
         // Act
-        List<Result<AudioRating>> results = [.. dtos.ToDomainEntities()];
+        List<Result<AudioRating>> results = [.. dtos.ToDomainValueObjects()];
 
         // Assert
         Assert.Equal(dtos.Count, results.Count);

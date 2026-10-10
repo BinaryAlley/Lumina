@@ -1,8 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Fixtures.Common.Setup;using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Common;
+using Lumina.Application.Fixtures.Common.Setup;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,10 @@ namespace Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Wr
 public class BookEntityFixture
 {
     private readonly Faker _faker = new();
+    private readonly TagEntityFixture _tagEntityFixture = new();
+    private readonly GenreEntityFixture _genreEntityFixture = new();
+    private readonly IsbnEntityFixture _isbnEntityFixture = new();
+    private readonly BookRatingEntityFixture _bookRatingEntityFixture = new();
 
     /// <summary>
     /// Creates a random valid <see cref="BookEntity"/>.
@@ -60,8 +65,8 @@ public class BookEntityFixture
             .RuleFor(x => x.OriginalLanguageCode, f => f.Random.String2(2))
             .RuleFor(x => x.OriginalLanguageName, f => f.Random.String2(f.Random.Number(1, 50)))
             .RuleFor(x => x.OriginalLanguageNativeName, f => f.Random.String2(f.Random.Number(1, 50)))
-            .RuleFor(x => x.Tags, f => includeMetadata ? [.. CreateTags(f.Random.Number(1, 5))] : [])
-            .RuleFor(x => x.Genres, f => includeMetadata ? [.. CreateGenres(f.Random.Number(1, 5))] : [])
+            .RuleFor(x => x.Tags, f => includeMetadata ? [.. _tagEntityFixture.CreateMany(f.Random.Number(1, 5))] : [])
+            .RuleFor(x => x.Genres, f => includeMetadata ? [.. _genreEntityFixture.CreateMany(f.Random.Number(1, 5))] : [])
             .RuleFor(x => x.Publisher, f => f.Random.String2(f.Random.Number(1, 100)))
             .RuleFor(x => x.PageCount, Random.Shared.Next(100, 300))
             .RuleFor(x => x.Format, f => f.PickRandom<BookFormat>())
@@ -76,8 +81,8 @@ public class BookEntityFixture
             .RuleFor(x => x.GoogleBooksId, CreateGoogleBooksId)
             .RuleFor(x => x.BarnesAndNobleId, f => f.Random.String2(10, "0123456789"))
             .RuleFor(x => x.AppleBooksId, f => $"id{f.Random.Number(1, 999999)}")
-            .RuleFor(x => x.ISBNs, f => includeMetadata ? CreateIsbns(f.Random.Number(1, 5)) : [])
-            .RuleFor(x => x.Ratings, f => includeMetadata ? CreateBookRatings(f.Random.Number(1, 5)) : [])
+            .RuleFor(x => x.ISBNs, f => includeMetadata ? _isbnEntityFixture.CreateMany(f.Random.Number(1, 5)) : [])
+            .RuleFor(x => x.Ratings, f => includeMetadata ? _bookRatingEntityFixture.CreateMany(f.Random.Number(1, 5)) : [])
             .RuleFor(x => x.CreatedOnUtc, f => f.Date.Past())
             .RuleFor(x => x.UpdatedOnUtc, f => f.Date.Recent())
             .Generate();
@@ -91,30 +96,6 @@ public class BookEntityFixture
     public List<BookEntity> CreateMany(int count = 3)
     {
         return [.. Enumerable.Range(0, count).Select(_ => Create())];
-    }
-
-    /// <summary>
-    /// Creates a list of tag entities with random data.
-    /// </summary>
-    /// <param name="count">The number of tags to create.</param>
-    /// <returns>A list of randomly generated tag entities.</returns>
-    private static List<TagEntity> CreateTags(int count)
-    {
-        return new Faker<TagEntity>()
-            .CustomInstantiator(f => new TagEntity(f.Random.String2(f.Random.Number(1, 50))))
-            .Generate(count);
-    }
-
-    /// <summary>
-    /// Creates a list of genre entities with random data.
-    /// </summary>
-    /// <param name="count">The number of genres to create.</param>
-    /// <returns>A list of randomly generated genre entities.</returns>
-    private static List<GenreEntity> CreateGenres(int count)
-    {
-        return new Faker<GenreEntity>()
-            .CustomInstantiator(f => new GenreEntity(f.Random.String2(f.Random.Number(1, 50))))
-            .Generate(count);
     }
 
     /// <summary>
@@ -172,73 +153,4 @@ public class BookEntityFixture
         const string VALID_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
         return new string([.. Enumerable.Repeat(VALID_CHARS, 12).Select(s => s[f.Random.Number(VALID_CHARS.Length - 1)])]);
     }
-
-    /// <summary>
-    /// Creates a list of ISBN entities with random data.
-    /// </summary>
-    /// <param name="count">The number of ISBNs to create.</param>
-    /// <returns>A list of randomly generated ISBN entities.</returns>
-    private static List<IsbnEntity> CreateIsbns(int count)
-    {
-        return new Faker<IsbnEntity>()
-            .CustomInstantiator(f =>
-            {
-                string isbnValue = CreateIsbn(f);
-                return new IsbnEntity(isbnValue, isbnValue.Length > 13 ? IsbnFormat.Isbn13 : IsbnFormat.Isbn10);
-            })
-            .Generate(count);
-    }
-
-    /// <summary>
-    /// Creates a valid ISBN (International Standard Book Number).
-    /// </summary>
-    /// <param name="f">The Faker instance used for generating random data.</param>
-    /// <returns>A properly formatted ISBN-10 or ISBN-13 string with valid checksum.</returns>
-    private static string CreateIsbn(Faker f)
-    {
-        bool isIsbn13 = f.Random.Bool();
-        if (isIsbn13)
-        {
-            string prefix = f.Random.Bool() ? "978" : "979";
-            string group = f.Random.Number(0, 99999).ToString().PadLeft(5, '0');
-            string publisher = f.Random.Number(0, 999999).ToString().PadLeft(6, '0');
-            string title = f.Random.Number(0, 99).ToString().PadLeft(2, '0');
-            string isbn = $"{prefix}{group[..1]}{publisher}{title}";
-            int sum = 0;
-            for (int i = 0; i < 12; i++)
-                sum += (i % 2 == 0 ? 1 : 3) * int.Parse(isbn[i].ToString());
-            int checkDigit = (10 - (sum % 10)) % 10;
-            return $"{prefix}-{group[..1]}-{publisher}-{title}-{checkDigit}";
-        }
-        else
-        {
-            int[] digits = new int[9];
-            for (int i = 0; i < 9; i++)
-                digits[i] = f.Random.Number(0, 9);
-            int sum = 0;
-            for (int i = 0; i < 9; i++)
-                sum += (10 - i) * digits[i];
-            int checkDigit = (11 - (sum % 11)) % 11;
-            string checkChar = checkDigit == 10 ? "X" : checkDigit.ToString();
-            return $"{digits[0]}-{digits[1]}{digits[2]}-{digits[3]}{digits[4]}{digits[5]}{digits[6]}{digits[7]}{digits[8]}-{checkChar}";
-        }
-    }
-
-    /// <summary>
-    /// Creates a list of book rating entities with random data.
-    /// </summary>
-    /// <param name="count">The number of ratings to create.</param>
-    /// <returns>A list of randomly generated book rating entities.</returns>
-    private static List<BookRatingEntity> CreateBookRatings(int count)
-    {
-        return new Faker<BookRatingEntity>()
-            .CustomInstantiator(f => new BookRatingEntity(
-                f.Random.Decimal(1, 5),
-                5,
-                f.PickRandom<BookRatingSource>(),
-                f.Random.Number(1, 1000)
-            ))
-            .Generate(count);
-    }
-
 }

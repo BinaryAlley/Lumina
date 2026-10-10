@@ -42,7 +42,7 @@ public class ValidatePathRequestMappingTests
     public void ToQuery_WhenMappingWithDifferentPaths_ShouldMapCorrectly(string path)
     {
         // Arrange
-        ValidatePathRequest request = new(path);
+        ValidatePathRequest request = _validatePathRequestFixture.Create(path);
 
         // Act
         ValidatePathQuery result = request.ToQuery();

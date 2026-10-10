@@ -569,7 +569,7 @@ public class DataSeedServiceTests
     }
 
     [Fact]
-    public async Task SetDefaultScheduledJobsAsync_WhenCalled_ShouldInsertTheFiveDefaultJobsAndReturnCreated()
+    public async Task SetDefaultScheduledJobsAsync_WhenCalled_ShouldInsertTheSixDefaultJobsAndReturnCreated()
     {
         // Arrange
         Guid adminUserId = Guid.NewGuid();
@@ -586,7 +586,7 @@ public class DataSeedServiceTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.Equal(Result.Created, result.Value);
-        Assert.Equal(5, capturedScheduledJobs.Count);
+        Assert.Equal(6, capturedScheduledJobs.Count);
         Assert.All(capturedScheduledJobs, scheduledJob => Assert.Equal(ScheduledJobStatus.Active, scheduledJob.Status));
         Assert.All(capturedScheduledJobs, scheduledJob => Assert.Equal(adminUserId, scheduledJob.OwnerUserId));
         Assert.All(capturedScheduledJobs, scheduledJob => Assert.Equal(adminUserId, scheduledJob.CreatedBy));
@@ -596,8 +596,9 @@ public class DataSeedServiceTests
         Assert.Contains(capturedScheduledJobs, scheduledJob => scheduledJob.TaskType == ScheduledTaskType.CleanTemporaryFiles && scheduledJob.ScheduleType == ScheduleType.WithIntervalInMinutes && scheduledJob.IntervalMinutes == 720);
         Assert.Contains(capturedScheduledJobs, scheduledJob => scheduledJob.TaskType == ScheduledTaskType.RepairThemes && scheduledJob.ScheduleType == ScheduleType.OnceAtStartup);
         Assert.Contains(capturedScheduledJobs, scheduledJob => scheduledJob.TaskType == ScheduledTaskType.CleanScheduledJobExecutionHistory && scheduledJob.ScheduleType == ScheduleType.OnceAtStartup);
+        Assert.Contains(capturedScheduledJobs, scheduledJob => scheduledJob.TaskType == ScheduledTaskType.TechnicalDataCleanup && scheduledJob.ScheduleType == ScheduleType.OnceAtStartup);
 
-        await mockScheduledJobRepository.Received(5).InsertAsync(Arg.Any<ScheduledJobEntity>(), Arg.Any<CancellationToken>());
+        await mockScheduledJobRepository.Received(6).InsertAsync(Arg.Any<ScheduledJobEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
         await mockScheduledJobRepository.DidNotReceive().GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>());
     }

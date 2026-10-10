@@ -30,12 +30,7 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b
     "title": "Bohemian Rhapsody",
     "originalTitle": "Bohemian Rhapsody",
     "description": "A song by the British rock band Queen. It was written by Freddie Mercury and originally released on the album A Night at the Opera in 1975.",
-    "durationInSeconds": 354,
-    "sampleRate": 44100,
-    "channels": 2,
-    "bitDepth": 16,
-    "audioCodec": "FLAC",
-    "bitrate": 980,
+    "disambiguation": null,
     "releaseInfo": {
       "originalReleaseDate": "1975-10-31",
       "originalReleaseYear": 1975,
@@ -54,24 +49,43 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b
       "languageName": "English",
       "nativeName": "English"
     },
+    "tags": [
+      { "name": "classic" },
+      { "name": "epic" }
+    ],
     "genres": [
       { "name": "Rock" },
       { "name": "Progressive Rock" }
     ],
-    "tags": [
-      { "name": "classic" },
-      { "name": "epic" }
-    ]
+    "isVideo": false,
+    "durationInSeconds": 354,
+    "sampleRate": 44100,
+    "channels": 2,
+    "bitDepth": 16,
+    "audioCodec": "FLAC",
+    "bitrate": 980,
+    "acoustId": "f0e1d2c3-b4a5-4c6d-8e7f-9a0b1c2d3e4f",
+    "replayGainTrackGain": -7.5,
+    "replayGainTrackPeak": 0.9877,
+    "replayGainAlbumGain": -6.8,
+    "replayGainAlbumPeak": 0.9999
   },
   "trackNumber": 1,
   "discNumber": 1,
   "script": "Latn",
   "key": "CMajor",
   "bpm": 72,
-  "work": "Bohemian Rhapsody",
+  "work": {
+    "musicBrainzWorkId": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+    "title": "Bohemian Rhapsody",
+    "type": "Song",
+    "languages": [
+      { "languageCode": "en", "languageName": "English", "nativeName": "English" }
+    ],
+    "iswcs": []
+  },
   "musicBrainzRecordingId": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
   "musicBrainzTrackId": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
-  "musicBrainzWorkId": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
   "moods": [
     { "name": "dramatic" },
     { "name": "anxious" }
@@ -116,27 +130,41 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b
     "title": "Bohemian Rhapsody",
     "originalTitle": "Bohemian Rhapsody",
     "description": "A song by the British rock band Queen. It was written by Freddie Mercury and originally released on the album A Night at the Opera in 1975.",
+    "disambiguation": null,
     "releaseInfo": { "originalReleaseDate": "1975-10-31", "originalReleaseYear": 1975, "reReleaseDate": null, "reReleaseYear": null, "releaseCountry": "GB", "releaseVersion": "Original" },
     "language": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
     "originalLanguage": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
     "tags": [ { "name": "classic" }, { "name": "epic" } ],
     "genres": [ { "name": "Rock" }, { "name": "Progressive Rock" } ],
+    "isVideo": false,
     "durationInSeconds": 354,
     "sampleRate": 44100,
     "channels": 2,
     "bitDepth": 16,
     "audioCodec": "FLAC",
-    "bitrate": 980
+    "bitrate": 980,
+    "acoustId": "f0e1d2c3-b4a5-4c6d-8e7f-9a0b1c2d3e4f",
+    "replayGainTrackGain": -7.5,
+    "replayGainTrackPeak": 0.9877,
+    "replayGainAlbumGain": -6.8,
+    "replayGainAlbumPeak": 0.9999
   },
   "trackNumber": 1,
   "discNumber": 1,
   "script": "Latn",
   "key": "CMajor",
   "bpm": 72,
-  "work": "Bohemian Rhapsody",
+  "work": {
+    "musicBrainzWorkId": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+    "title": "Bohemian Rhapsody",
+    "type": "Song",
+    "languages": [
+      { "languageCode": "en", "languageName": "English", "nativeName": "English" }
+    ],
+    "iswcs": []
+  },
   "musicBrainzRecordingId": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
   "musicBrainzTrackId": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
-  "musicBrainzWorkId": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
   "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
   "updatedOnUtc": null,
   "moods": [
@@ -204,27 +232,41 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
     "title": "Bohemian Rhapsody",
     "originalTitle": "Bohemian Rhapsody",
     "description": "A song by the British rock band Queen. It was written by Freddie Mercury and originally released on the album A Night at the Opera in 1975.",
+    "disambiguation": null,
     "releaseInfo": { "originalReleaseDate": "1975-10-31", "originalReleaseYear": 1975, "reReleaseDate": null, "reReleaseYear": null, "releaseCountry": "GB", "releaseVersion": "Original" },
     "language": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
     "originalLanguage": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
     "tags": [ { "name": "classic" }, { "name": "epic" } ],
     "genres": [ { "name": "Rock" }, { "name": "Progressive Rock" } ],
+    "isVideo": false,
     "durationInSeconds": 354,
     "sampleRate": 44100,
     "channels": 2,
     "bitDepth": 16,
     "audioCodec": "FLAC",
-    "bitrate": 980
+    "bitrate": 980,
+    "acoustId": "f0e1d2c3-b4a5-4c6d-8e7f-9a0b1c2d3e4f",
+    "replayGainTrackGain": -7.5,
+    "replayGainTrackPeak": 0.9877,
+    "replayGainAlbumGain": -6.8,
+    "replayGainAlbumPeak": 0.9999
   },
   "trackNumber": 1,
   "discNumber": 1,
   "script": "Latn",
   "key": "CMajor",
   "bpm": 72,
-  "work": "Bohemian Rhapsody",
+  "work": {
+    "musicBrainzWorkId": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+    "title": "Bohemian Rhapsody",
+    "type": "Song",
+    "languages": [
+      { "languageCode": "en", "languageName": "English", "nativeName": "English" }
+    ],
+    "iswcs": []
+  },
   "musicBrainzRecordingId": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
   "musicBrainzTrackId": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
-  "musicBrainzWorkId": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
   "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
   "updatedOnUtc": null,
   "moods": [
@@ -283,12 +325,7 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
     "title": "Bohemian Rhapsody",
     "originalTitle": "Bohemian Rhapsody",
     "description": "A song by the British rock band Queen. It was written by Freddie Mercury and originally released on the album A Night at the Opera in 1975.",
-    "durationInSeconds": 354,
-    "sampleRate": 44100,
-    "channels": 2,
-    "bitDepth": 16,
-    "audioCodec": "FLAC",
-    "bitrate": 980,
+    "disambiguation": null,
     "releaseInfo": {
       "originalReleaseDate": "1975-10-31",
       "originalReleaseYear": 1975,
@@ -307,24 +344,43 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
       "languageName": "English",
       "nativeName": "English"
     },
+    "tags": [
+      { "name": "classic" },
+      { "name": "epic" }
+    ],
     "genres": [
       { "name": "Rock" },
       { "name": "Progressive Rock" }
     ],
-    "tags": [
-      { "name": "classic" },
-      { "name": "epic" }
-    ]
+    "isVideo": false,
+    "durationInSeconds": 354,
+    "sampleRate": 44100,
+    "channels": 2,
+    "bitDepth": 16,
+    "audioCodec": "FLAC",
+    "bitrate": 980,
+    "acoustId": "f0e1d2c3-b4a5-4c6d-8e7f-9a0b1c2d3e4f",
+    "replayGainTrackGain": -7.5,
+    "replayGainTrackPeak": 0.9877,
+    "replayGainAlbumGain": -6.8,
+    "replayGainAlbumPeak": 0.9999
   },
   "trackNumber": 1,
   "discNumber": 1,
   "script": "Latn",
   "key": "CMajor",
   "bpm": 72,
-  "work": "Bohemian Rhapsody",
+  "work": {
+    "musicBrainzWorkId": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+    "title": "Bohemian Rhapsody",
+    "type": "Song",
+    "languages": [
+      { "languageCode": "en", "languageName": "English", "nativeName": "English" }
+    ],
+    "iswcs": []
+  },
   "musicBrainzRecordingId": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
   "musicBrainzTrackId": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
-  "musicBrainzWorkId": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
   "moods": [
     { "name": "dramatic" },
     { "name": "anxious" }
@@ -369,27 +425,41 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
     "title": "Bohemian Rhapsody",
     "originalTitle": "Bohemian Rhapsody",
     "description": "A song by the British rock band Queen. It was written by Freddie Mercury and originally released on the album A Night at the Opera in 1975.",
+    "disambiguation": null,
     "releaseInfo": { "originalReleaseDate": "1975-10-31", "originalReleaseYear": 1975, "reReleaseDate": null, "reReleaseYear": null, "releaseCountry": "GB", "releaseVersion": "Original" },
     "language": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
     "originalLanguage": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
     "tags": [ { "name": "classic" }, { "name": "epic" } ],
     "genres": [ { "name": "Rock" }, { "name": "Progressive Rock" } ],
+    "isVideo": false,
     "durationInSeconds": 354,
     "sampleRate": 44100,
     "channels": 2,
     "bitDepth": 16,
     "audioCodec": "FLAC",
-    "bitrate": 980
+    "bitrate": 980,
+    "acoustId": "f0e1d2c3-b4a5-4c6d-8e7f-9a0b1c2d3e4f",
+    "replayGainTrackGain": -7.5,
+    "replayGainTrackPeak": 0.9877,
+    "replayGainAlbumGain": -6.8,
+    "replayGainAlbumPeak": 0.9999
   },
   "trackNumber": 1,
   "discNumber": 1,
   "script": "Latn",
   "key": "CMajor",
   "bpm": 72,
-  "work": "Bohemian Rhapsody",
+  "work": {
+    "musicBrainzWorkId": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+    "title": "Bohemian Rhapsody",
+    "type": "Song",
+    "languages": [
+      { "languageCode": "en", "languageName": "English", "nativeName": "English" }
+    ],
+    "iswcs": []
+  },
   "musicBrainzRecordingId": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
   "musicBrainzTrackId": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
-  "musicBrainzWorkId": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
   "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
   "updatedOnUtc": null,
   "moods": [

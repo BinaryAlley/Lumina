@@ -28,7 +28,7 @@ public class UpdateAlbumCommandMappingTests
     private readonly UpdateAlbumCommandFixture _updateAlbumCommandFixture = new();
     private readonly ArtistEntityFixture _artistEntityFixture = new();
     private readonly AlbumEntityFixture _albumEntityFixture = new();
-    private readonly AlbumMetadataDtoFixture _albumMetadataDtoFixture = new();
+    private readonly MusicAlbumMetadataDtoFixture _musicAlbumMetadataDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
     private readonly AudioRatingDtoFixture _audioRatingDtoFixture = new();
 
@@ -50,7 +50,7 @@ public class UpdateAlbumCommandMappingTests
         Assert.Equal(command.Metadata!.Title, updatedAlbum.Metadata.Title);
         Assert.Equal(command.MediaFormat, updatedAlbum.MediaFormat.Value);
         Assert.Equal(command.Barcode, updatedAlbum.Barcode.Value.Value);
-        Assert.Equal(command.CatalogNumber, updatedAlbum.CatalogNumber.Value);
+        Assert.Equal(command.CatalogNumbers, updatedAlbum.CatalogNumbers);
         Assert.Equal(command.MusicBrainzReleaseId, updatedAlbum.MusicBrainzReleaseId.Value.Value);
         Assert.Equal(command.MusicBrainzReleaseGroupId, updatedAlbum.MusicBrainzReleaseGroupId.Value.Value);
         Assert.Equal(command.MusicBrainzReleaseArtistId, updatedAlbum.MusicBrainzReleaseArtistId.Value.Value);
@@ -70,7 +70,7 @@ public class UpdateAlbumCommandMappingTests
             albumId: albumId.ToString(),
             includeMediaFormat: false,
             includeBarcode: false,
-            includeCatalogNumber: false,
+            includeCatalogNumbers: false,
             includeMusicBrainzReleaseId: false,
             includeMusicBrainzReleaseGroupId: false,
             includeMusicBrainzReleaseArtistId: false,
@@ -86,7 +86,7 @@ public class UpdateAlbumCommandMappingTests
         Assert.Equal(command.Metadata!.Title, updatedAlbum.Metadata.Title);
         Assert.False(updatedAlbum.MediaFormat.HasValue);
         Assert.False(updatedAlbum.Barcode.HasValue);
-        Assert.False(updatedAlbum.CatalogNumber.HasValue);
+        Assert.Empty(updatedAlbum.CatalogNumbers);
         Assert.False(updatedAlbum.MusicBrainzReleaseId.HasValue);
         Assert.False(updatedAlbum.MusicBrainzReleaseGroupId.HasValue);
         Assert.False(updatedAlbum.MusicBrainzReleaseArtistId.HasValue);
@@ -104,7 +104,7 @@ public class UpdateAlbumCommandMappingTests
             libraryId: libraryId.ToString(),
             artistId: artist.Id.Value.ToString(),
             albumId: albumId.ToString(),
-            metadata: _albumMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]));
+            metadata: _musicAlbumMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]));
 
         // Act
         Result<Artist> result = command.ToDomainEntity(artist);

@@ -38,30 +38,30 @@ internal sealed class CalibreArtworkProvider : IArtworkProvider<BookMetadataLook
     /// </summary>
     /// <param name="lookup">The lookup describing the book to get the cover for.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>The cover of the book, or <see langword="null"/> when no cover was found.</returns>
-    public Task<ArtworkDto?> GetArtworkAsync(BookMetadataLookupDto lookup, CancellationToken cancellationToken)
+    /// <returns>The cover of the book, or an empty collection when no cover was found.</returns>
+    public Task<IReadOnlyList<ArtworkDto>> GetArtworkAsync(BookMetadataLookupDto lookup, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(lookup.Path))
-            return Task.FromResult<ArtworkDto?>(null);
+            return Task.FromResult<IReadOnlyList<ArtworkDto>>([]);
 
         string bookDirectory = Path.GetDirectoryName(lookup.Path) ?? string.Empty;
         string opfFilePath = Path.Combine(bookDirectory, "metadata.opf");
         if (!File.Exists(opfFilePath))
-            return Task.FromResult<ArtworkDto?>(null);
+            return Task.FromResult<IReadOnlyList<ArtworkDto>>([]);
 
         OpfDocumentDto document = OpfReader.Read(opfFilePath);
         if (string.IsNullOrWhiteSpace(document.CoverHref))
-            return Task.FromResult<ArtworkDto?>(null);
+            return Task.FromResult<IReadOnlyList<ArtworkDto>>([]);
 
         // the cover reference must be a bare file name contained in the directory of the book, so that no file outside of it can be accessed
         string coverFileName = Path.GetFileName(document.CoverHref);
         if (coverFileName != document.CoverHref || Path.IsPathRooted(document.CoverHref))
-            return Task.FromResult<ArtworkDto?>(null);
+            return Task.FromResult<IReadOnlyList<ArtworkDto>>([]);
 
         string coverFilePath = Path.Combine(bookDirectory, coverFileName);
         if (!File.Exists(coverFilePath))
-            return Task.FromResult<ArtworkDto?>(null);
+            return Task.FromResult<IReadOnlyList<ArtworkDto>>([]);
 
-        return Task.FromResult<ArtworkDto?>(new ArtworkDto(LocalPath: coverFilePath, RemoteUrl: null));
+        return Task.FromResult<IReadOnlyList<ArtworkDto>>([new ArtworkDto(ArtworkType.Cover, Ordinal: 0, LocalPath: coverFilePath, RemoteUrl: null)]);
     }
 }

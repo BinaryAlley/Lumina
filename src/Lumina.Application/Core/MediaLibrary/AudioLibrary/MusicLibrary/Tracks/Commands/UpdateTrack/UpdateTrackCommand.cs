@@ -26,10 +26,9 @@ namespace Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.
 /// <param name="Script">The script used by the language of the track, if applicable.</param>
 /// <param name="Key">The musical key of the track, if applicable.</param>
 /// <param name="Bpm">The tempo of the track in beats per minute, if applicable.</param>
-/// <param name="Work">The title of the work the track is a recording of, if applicable.</param>
+/// <param name="Work">The work the track is a recording of, if applicable.</param>
 /// <param name="MusicBrainzRecordingId">The MusicBrainz identifier of the recording, if applicable.</param>
 /// <param name="MusicBrainzTrackId">The MusicBrainz identifier of the track, if applicable.</param>
-/// <param name="MusicBrainzWorkId">The MusicBrainz identifier of the work, if applicable.</param>
 /// <param name="Moods">The list of moods of the track.</param>
 /// <param name="Isrcs">The list of ISRC of the track.</param>
 /// <param name="Contributors">The list of media contributors that performed on the track.</param>
@@ -41,16 +40,15 @@ public record UpdateTrackCommand(
     string? AlbumId,
     string? TrackId,
     string? Path,
-    AudioMetadataDto? Metadata,
+    MusicTrackMetadataDto? Metadata,
     int? TrackNumber,
     int? DiscNumber,
     string? Script,
     MusicKey? Key,
     int? Bpm,
-    string? Work,
+    MusicWorkDto? Work,
     Guid? MusicBrainzRecordingId,
     Guid? MusicBrainzTrackId,
-    Guid? MusicBrainzWorkId,
     List<MoodDto>? Moods,
     List<IsrcDto>? Isrcs,
     List<MediaContributorReferenceDto>? Contributors,

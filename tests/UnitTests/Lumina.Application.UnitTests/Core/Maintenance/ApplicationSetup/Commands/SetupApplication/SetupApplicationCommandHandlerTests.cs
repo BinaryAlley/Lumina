@@ -16,6 +16,7 @@ using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Scheduling;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Common.DTO.Pagination;
 using Lumina.Application.Fixtures.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.Domain.Common.Primitives;
@@ -51,6 +52,8 @@ public class SetupApplicationCommandHandlerTests
     private readonly UserEntityFixture _userEntityFixture = new();
     private readonly ScheduledJobEntityFixture _scheduledJobEntityFixture = new();
     private readonly SetupApplicationCommandFixture _setupApplicationCommandFixture = new();
+    private readonly PaginatedResultDtoFixture<UserEntity> _paginatedResultDtoFixture = new();
+    private readonly PaginatedResultDtoFixture<ScheduledJobEntity> _paginatedResultDtoFixtureScheduledJob = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SetupApplicationCommandHandlerTests"/> class.
@@ -78,7 +81,7 @@ public class SetupApplicationCommandHandlerTests
         _mockDataSeedService.SetDefaultScheduledJobsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
             .Returns(Result.Created);
         _mockScheduledJobRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<ScheduledJobEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixtureScheduledJob.Create(data: [], currentPage: 1, perPage: 0, count: 0, numberOfPages: 1)));
 
         _sut = new SetupApplicationCommandHandler(
             _mockUnitOfWork,
@@ -100,7 +103,7 @@ public class SetupApplicationCommandHandlerTests
         string hashedPassword = Uri.EscapeDataString("hashedPassword");
 
         _mockUserRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<UserEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 0, count: 0, numberOfPages: 1)));
         _mockHashService.HashString(command.Password!)
             .Returns(hashedPassword);
         _mockUserRepository.InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
@@ -139,7 +142,7 @@ public class SetupApplicationCommandHandlerTests
         string encryptedSecret = "encryptedSecret";
 
         _mockUserRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<UserEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 0, count: 0, numberOfPages: 1)));
         _mockHashService.HashString(command.Password!)
             .Returns(hashedPassword);
         _mockTotpTokenGenerator.GenerateSecret()
@@ -181,7 +184,7 @@ public class SetupApplicationCommandHandlerTests
         UserEntity existingUser = _userEntityFixture.Create();
 
         _mockUserRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<UserEntity> { Data = [existingUser], CurrentPage = 1, PerPage = 1, Count = 1, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: [existingUser], currentPage: 1, perPage: 1, count: 1, numberOfPages: 1)));
 
         // Act
         Result<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
@@ -225,7 +228,7 @@ public class SetupApplicationCommandHandlerTests
         Error error = Error.Failure("Database.Error", "Failed to insert user");
 
         _mockUserRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<UserEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 0, count: 0, numberOfPages: 1)));
         _mockUserRepository.InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
             .Returns(error);
 
@@ -249,7 +252,7 @@ public class SetupApplicationCommandHandlerTests
         Error error = Error.Failure("Database.Error", "Failed to set default permissions");
 
         _mockUserRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<UserEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 0, count: 0, numberOfPages: 1)));
         _mockUserRepository.InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Created);
         _mockDataSeedService.SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
@@ -274,7 +277,7 @@ public class SetupApplicationCommandHandlerTests
         Error error = Error.Failure("Database.Error", "Failed to set default roles");
 
         _mockUserRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<UserEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 0, count: 0, numberOfPages: 1)));
         _mockUserRepository.InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Created);
         _mockDataSeedService.SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
@@ -302,7 +305,7 @@ public class SetupApplicationCommandHandlerTests
         Error error = Error.Failure("Database.Error", "Failed to set admin role permissions");
 
         _mockUserRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<UserEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 0, count: 0, numberOfPages: 1)));
         _mockUserRepository.InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Created);
         _mockDataSeedService.SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
@@ -333,7 +336,7 @@ public class SetupApplicationCommandHandlerTests
         Error error = Error.Failure("Database.Error", "Failed to set admin role to administrator account");
 
         _mockUserRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<UserEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 0, count: 0, numberOfPages: 1)));
         _mockUserRepository.InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Created);
         _mockDataSeedService.SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
@@ -367,7 +370,7 @@ public class SetupApplicationCommandHandlerTests
         Error error = Error.Failure("Database.Error", "Failed to seed default scheduled jobs");
 
         _mockUserRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<UserEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 0, count: 0, numberOfPages: 1)));
         _mockUserRepository.InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Created);
         _mockDataSeedService.SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
@@ -399,7 +402,7 @@ public class SetupApplicationCommandHandlerTests
         SetupApplicationCommand command = _setupApplicationCommandFixture.Create();
 
         _mockUserRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<UserEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 0, count: 0, numberOfPages: 1)));
         _mockUserRepository.InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Created);
         _mockDataSeedService.SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
@@ -436,7 +439,7 @@ public class SetupApplicationCommandHandlerTests
         ScheduledJobEntity addedScheduledJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Added);
 
         _mockUserRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<UserEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 0, count: 0, numberOfPages: 1)));
         _mockUserRepository.InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Created);
         _mockDataSeedService.SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
@@ -448,14 +451,7 @@ public class SetupApplicationCommandHandlerTests
         _mockDataSeedService.SetAdminRoleToAdministratorAccount(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
             .Returns(Result.Created);
         _mockScheduledJobRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<ScheduledJobEntity>
-            {
-                Data = [activeScheduledJob1, activeScheduledJob2, addedScheduledJob],
-                CurrentPage = 1,
-                PerPage = 3,
-                Count = 3,
-                NumberOfPages = 1
-            }));
+            .Returns(Result.From(_paginatedResultDtoFixtureScheduledJob.Create(data: [activeScheduledJob1, activeScheduledJob2, addedScheduledJob], currentPage: 1, perPage: 3, count: 3, numberOfPages: 1)));
 
         // Act
         Result<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
@@ -491,7 +487,7 @@ public class SetupApplicationCommandHandlerTests
         // Arrange
         SetupApplicationCommand command = _setupApplicationCommandFixture.Create();
         _mockUserRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<UserEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 0, count: 0, numberOfPages: 1)));
         _mockHashService.HashString(command.Password!)
             .Returns("hashedPassword");
         _mockUserRepository.InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())

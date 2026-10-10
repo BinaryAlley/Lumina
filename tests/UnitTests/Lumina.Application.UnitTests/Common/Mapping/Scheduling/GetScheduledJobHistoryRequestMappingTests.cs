@@ -15,7 +15,7 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Scheduling;
 [ExcludeFromCodeCoverage]
 public class GetScheduledJobHistoryRequestMappingTests
 {
-    private readonly GetScheduledJobHistoryRequestFixture _requestFixture = new();
+    private readonly GetScheduledJobHistoryRequestFixture _getScheduledJobHistoryRequestFixture = new();
 
     [Fact]
     public void ToQuery_WhenMappingValidRequest_ShouldMapCorrectly()
@@ -23,7 +23,7 @@ public class GetScheduledJobHistoryRequestMappingTests
         // Arrange
         DateTime from = new(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         DateTime to = new(2026, 1, 2, 0, 0, 0, DateTimeKind.Utc);
-        GetScheduledJobHistoryRequest request = _requestFixture.Create(from, to);
+        GetScheduledJobHistoryRequest request = _getScheduledJobHistoryRequestFixture.Create(from, to);
 
         // Act
         GetScheduledJobHistoryQuery result = request.ToQuery();

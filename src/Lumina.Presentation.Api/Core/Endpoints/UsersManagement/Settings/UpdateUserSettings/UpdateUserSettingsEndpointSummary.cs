@@ -27,6 +27,7 @@ public class UpdateUserSettingsEndpointSummary : Summary<UpdateUserSettingsEndpo
             ShouldIgnoreThePrefixForAlphaPicker: false,
             IsThemeCachingEnabled: true,
             ShouldAggregateMetadataWhenMissing: false,
+            ShouldAggregateArtworkWhenMissing: false,
             ShouldRenderPdfAsImages: false,
             ShouldPreserveBookStyles: true
         );
@@ -35,6 +36,8 @@ public class UpdateUserSettingsEndpointSummary : Summary<UpdateUserSettingsEndpo
         RequestParam(r => r.ItemsPerPage, "The number of library items displayed per page when pagination is enabled. Required.");
         RequestParam(r => r.ShouldIgnoreThePrefixForAlphaPicker, "Whether the \"The\" prefix of library item titles is ignored by the alpha picker, or not. Required.");
         RequestParam(r => r.IsThemeCachingEnabled, "Whether the theme data served to this user is cached, or not. Required.");
+        RequestParam(r => r.ShouldAggregateMetadataWhenMissing, "Whether the metadata of the media library items is aggregated from multiple providers, when fields are missing, or not. Required.");
+        RequestParam(r => r.ShouldAggregateArtworkWhenMissing, "Whether the artwork of the media library items is aggregated from multiple providers, when it is missing, or not. Required.");
         RequestParam(r => r.ShouldRenderPdfAsImages, "Whether PDF books are rendered as page images for the user, or not. Required.");
         RequestParam(r => r.ShouldPreserveBookStyles, "Whether the styles of the book content are preserved when it is rendered for the user, or not. Required.");
 

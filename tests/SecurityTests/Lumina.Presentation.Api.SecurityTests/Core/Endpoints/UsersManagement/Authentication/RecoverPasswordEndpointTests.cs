@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Infrastructure.Core.Security;
@@ -32,6 +33,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDi
     private readonly HttpClient _client;
     private readonly PasswordHashService _hashService = new();
     private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly RecoverPasswordRequestFixture _recoverPasswordRequestFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -57,9 +59,9 @@ public class RecoverPasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDi
     public async Task RecoverPassword_WhenRateLimitExceeded_ShouldReturnTooManyRequests()
     {
         // Arrange
-        RecoverPasswordRequest request = new(
-            Username: "testuser",
-            TotpCode: "123456"
+        RecoverPasswordRequest request = _recoverPasswordRequestFixture.Create(
+            username: "testuser",
+            totpCode: "123456"
         );
 
         // Act
@@ -97,9 +99,9 @@ public class RecoverPasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDi
         client.DefaultRequestHeaders.Clear();
         client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
         UserEntity legitimateUser = await CreateTestUser();
-        RecoverPasswordRequest request = new(
-            Username: maliciousUsername,
-            TotpCode: "123456"
+        RecoverPasswordRequest request = _recoverPasswordRequestFixture.Create(
+            username: maliciousUsername,
+            totpCode: "123456"
         );
 
         // Act

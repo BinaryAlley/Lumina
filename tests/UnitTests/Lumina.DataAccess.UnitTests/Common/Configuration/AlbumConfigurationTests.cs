@@ -70,11 +70,11 @@ public class AlbumConfigurationTests : IDisposable
         IProperty originalTitleProperty = entityType.GetProperty(nameof(AlbumEntity.OriginalTitle));
         IProperty descriptionProperty = entityType.GetProperty(nameof(AlbumEntity.Description));
         IProperty releaseCountryProperty = entityType.GetProperty(nameof(AlbumEntity.ReleaseCountry));
-        IProperty releaseTypeProperty = entityType.GetProperty(nameof(AlbumEntity.ReleaseType));
+        IProperty releaseTypeProperty = entityType.FindNavigation(nameof(AlbumEntity.ReleaseTypes))!.TargetEntityType.GetProperty(nameof(AlbumReleaseTypeEntity.ReleaseType));
         IProperty releaseStatusProperty = entityType.GetProperty(nameof(AlbumEntity.ReleaseStatus));
         IProperty mediaFormatProperty = entityType.GetProperty(nameof(AlbumEntity.MediaFormat));
         IProperty barcodeProperty = entityType.GetProperty(nameof(AlbumEntity.Barcode));
-        IProperty catalogNumberProperty = entityType.GetProperty(nameof(AlbumEntity.CatalogNumber));
+        IProperty catalogNumberProperty = entityType.FindNavigation(nameof(AlbumEntity.CatalogNumbers))!.TargetEntityType.GetProperty(nameof(AlbumCatalogNumberEntity.CatalogNumber));
         IProperty languageCodeProperty = entityType.GetProperty(nameof(AlbumEntity.LanguageCode));
 
         // Assert
@@ -87,7 +87,7 @@ public class AlbumConfigurationTests : IDisposable
         Assert.Equal(typeof(ReleaseCountry?), releaseCountryProperty.ClrType);
         Assert.Equal("TEXT", releaseCountryProperty.GetColumnType());
         Assert.Equal(2, releaseCountryProperty.GetMaxLength());
-        Assert.Equal(typeof(MusicReleaseType?), releaseTypeProperty.ClrType);
+        Assert.Equal(typeof(MusicReleaseType), releaseTypeProperty.ClrType);
         Assert.Equal("TEXT", releaseTypeProperty.GetColumnType());
         Assert.Equal(50, releaseTypeProperty.GetMaxLength());
         Assert.Equal(typeof(MusicReleaseStatus?), releaseStatusProperty.ClrType);

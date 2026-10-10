@@ -4,19 +4,27 @@
 **Accepted** (2026-08-09)
 
 ## Context
-ADR-0009 established that every media library scan job wraps its execution in a catch-all that marks the job as `Failed` and publishes the `LibraryScanFailedDomainEvent`. That decision applies to the mandatory scan jobs: file system discovery, scan diff, content hashing and scan results save. These jobs are transactional in nature, and a failure in any of them means the file state of the library was not committed.
+[ADR-0009](architecture-decision-record-0009.md) established that every media library scan job wraps its execution in a catch-all that marks the job as `Failed` and publishes the `LibraryScanFailedDomainEvent`. That decision applies to the mandatory scan jobs: file system discovery, scan diff, content hashing and scan results save. These jobs are transactional in nature, and a failure in any of them means the file state of the library was not committed.
 
 The metadata enrichment phase runs after the scan results save job, once the file state of the library is committed and the books are materialized. The enrichment phase is best-effort: a book whose metadata could not be retrieved is still browsable with its shell metadata (path and filename-derived title), and a crash mid-enrichment must not roll back the already committed scan results, nor hide the successfully enriched books. This was an explicit product decision: partial enrichment survives a crash, and the scan is not considered failed because a remote metadata provider was unreachable or a provider crashed.
 
 ## Decision
-The metadata enrichment job (`MediaLibraryScanMetadataEnrichmentJob`) is a best-effort job with failure semantics that differ from the mandatory jobs of ADR-0009:
+The metadata enrichment job (`MediaLibraryScanMetadataEnrichmentJob`) is a best-effort job with failure semantics that differ from the mandatory jobs of [ADR-0009](architecture-decision-record-0009.md):
 
 - Per-book failures are isolated: a metadata provider that throws, returns unusable metadata, or fails to be applied marks the book as `Failed` (`MetadataStatus.Failed`) and moves to the next book. The other providers are still tried for the same book, and the other books are still processed.
 - Per-provider failures are isolated: a crashing metadata provider does not prevent the other providers from being tried, in their configured order.
 - The scan is considered completed (`LibraryScanFinishedDomainEvent`) after the enrichment phase, even when some books failed to be enriched. The failure is recorded on the books, not on the scan.
-- Only a host-side catastrophic failure of the enrichment job itself (e.g., a storage error) fails the scan, through the existing catch-all of ADR-0009. In that case the file state is already committed, and a re-scan retries the enrichment.
+- Only a host-side catastrophic failure of the enrichment job itself (e.g., a storage error) fails the scan, through the existing catch-all of [ADR-0009](architecture-decision-record-0009.md). In that case the file state is already committed, and a re-scan retries the enrichment.
 
 The `MediaLibraryScanResultsSaveJob` no longer publishes `LibraryScanFinishedDomainEvent`. The event is published by the last job of the directed acyclic job graph: the save job when the library does not permit downloading data from the web (no enrichment phase), or the metadata enrichment job otherwise.
+
+## Amendments
+
+- **2026-10-09**: The enrichment phase is now three sequential jobs, and the last job of the graph is the artwork enrichment job.
+  - `MediaLibraryScanProviderConfigurationInvalidationJob` invalidates the enrichment state of the items whose metadata or artwork providers changed since the last scan, and the metadata derived from the paths when the path template changed.
+  - `MediaLibraryScanMetadataEnrichmentJob` enriches the metadata and links the media contributors.
+  - `MediaLibraryScanArtworkEnrichmentJob` resolves the artwork and is always the last job, publishing `LibraryScanFinishedDomainEvent` (see `MediaLibraryScanArtworkEnrichmentJob`).
+- **2026-10-09**: The `MediaLibraryScanResultsSaveJob` no longer publishes `LibraryScanFinishedDomainEvent`; it triggers the provider configuration invalidation job. The metadata enrichment semantics described below apply to both the metadata and the artwork enrichment jobs, and across every media library type with enrichers, including music (`MusicMediaLibraryScanMetadataEnricher`, `MusicMediaLibraryScanArtworkEnricher`), not only books.
 
 ## Consequences
 
@@ -37,7 +45,7 @@ The `MediaLibraryScanResultsSaveJob` no longer publishes `LibraryScanFinishedDom
 ## Alternatives Considered
 
 ### 1. Fail the scan on any enrichment failure
-Keep ADR-0009 semantics for the enrichment job.
+Keep [ADR-0009](architecture-decision-record-0009.md) semantics for the enrichment job.
 
 **Rejected**: The file state is already committed, and partial enrichment is better than failing a scan that saved the library. Failing the scan would also roll back nothing, while misleading the user about the scan outcome.
 

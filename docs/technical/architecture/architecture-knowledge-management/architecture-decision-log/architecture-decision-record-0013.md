@@ -14,7 +14,7 @@ Domain event publishing, the mechanism that fires the `IDomainEvent` objects rai
 
 3. **Publishing sites**: Mediator's `IPublisher` is used from `EventualConsistencyMiddleware` (queued events, published after the transaction commits), from `MediaLibraryScanningService` (scan start events), and from the scan jobs and `ScanFailurePublisher` (progress and failure events).
 
-The remaining publish half carries the same third-party dependency and source-generated registration that ADR-0011 removed from the dispatch half.
+The remaining publish half carries the same third-party dependency and source-generated registration that [ADR-0011](architecture-decision-record-0011.md) removed from the dispatch half.
 
 ## Decision
 
@@ -38,7 +38,7 @@ The existing assembly scan that registers `ICommandHandler<>`, `IQueryHandler<>`
 
 ### Consistency Guarantees Preserved
 
-- Commit-before-publish ordering in `EventualConsistencyMiddleware` is unchanged (see ADR-0002).
+- Commit-before-publish ordering in `EventualConsistencyMiddleware` is unchanged (see [ADR-0002](architecture-decision-record-0002.md)).
 - Re-entrant publishing (a handler publishing another event) is safe: each publish resolves handlers fresh from the scoped provider.
 - Jobs publish from their own scopes, so handlers receive a fresh unit of work and `DbContext`.
 
@@ -73,4 +73,4 @@ Introduce `IIntegrationEvent` now, with a durable outbox, for inter-bounded-cont
 
 Keep the Mediator library for the domain event publishing half.
 
-**Rejected**: for the same reason ADR-0011 rejected it for command and query dispatching - an external dependency, with source-generated registration, for functionality that is fully implementable in-house.
+**Rejected**: for the same reason [ADR-0011](architecture-decision-record-0011.md) rejected it for command and query dispatching - an external dependency, with source-generated registration, for functionality that is fully implementable in-house.

@@ -21,13 +21,13 @@ public class IsrcDtoMappingTests
     private readonly IsrcDtoFixture _isrcDtoFixture = new();
 
     [Fact]
-    public void ToDomainEntity_WhenMappingValidIsrcDto_ShouldMapCorrectly()
+    public void ToDomainValueObject_WhenMappingValidIsrcDto_ShouldMapCorrectly()
     {
         // Arrange
         IsrcDto dto = _isrcDtoFixture.Create();
 
         // Act
-        Result<Isrc> result = dto.ToDomainEntity();
+        Result<Isrc> result = dto.ToDomainValueObject();
 
         // Assert
         Assert.False(result.IsFailure);
@@ -36,13 +36,13 @@ public class IsrcDtoMappingTests
     }
 
     [Fact]
-    public void ToDomainEntity_WhenMappingLowercaseIsrcDto_ShouldNormalizeTheValue()
+    public void ToDomainValueObject_WhenMappingLowercaseIsrcDto_ShouldNormalizeTheValue()
     {
         // Arrange
         IsrcDto dto = _isrcDtoFixture.Create(value: "gbum71029604");
 
         // Act
-        Result<Isrc> result = dto.ToDomainEntity();
+        Result<Isrc> result = dto.ToDomainValueObject();
 
         // Assert
         Assert.False(result.IsFailure);
@@ -53,13 +53,13 @@ public class IsrcDtoMappingTests
     [InlineData(null)] // missing value
     [InlineData("")] // empty value
     [InlineData("   ")] // whitespace value
-    public void ToDomainEntity_WhenValueIsNullOrWhitespace_ShouldReturnError(string? value)
+    public void ToDomainValueObject_WhenValueIsNullOrWhitespace_ShouldReturnError(string? value)
     {
         // Arrange
         IsrcDto dto = _isrcDtoFixture.Create(value: value, includeValue: value is not null);
 
         // Act
-        Result<Isrc> result = dto.ToDomainEntity();
+        Result<Isrc> result = dto.ToDomainValueObject();
 
         // Assert
         Assert.True(result.IsFailure);
@@ -72,13 +72,13 @@ public class IsrcDtoMappingTests
     [InlineData("GBUM71029604X")] // too long
     [InlineData("1BUM71029604")] // country code is not two letters
     [InlineData("GBUM7102960A")] // designation code is not all digits
-    public void ToDomainEntity_WhenValueIsMalformed_ShouldReturnError(string value)
+    public void ToDomainValueObject_WhenValueIsMalformed_ShouldReturnError(string value)
     {
         // Arrange
         IsrcDto dto = _isrcDtoFixture.Create(value: value);
 
         // Act
-        Result<Isrc> result = dto.ToDomainEntity();
+        Result<Isrc> result = dto.ToDomainValueObject();
 
         // Assert
         Assert.True(result.IsFailure);
@@ -86,13 +86,13 @@ public class IsrcDtoMappingTests
     }
 
     [Fact]
-    public void ToDomainEntities_WhenMappingMultipleValidIsrcDtos_ShouldMapAllCorrectly()
+    public void ToDomainValueObjects_WhenMappingMultipleValidIsrcDtos_ShouldMapAllCorrectly()
     {
         // Arrange
         List<IsrcDto> dtos = _isrcDtoFixture.CreateMany(2);
 
         // Act
-        List<Result<Isrc>> results = [.. dtos.ToDomainEntities()];
+        List<Result<Isrc>> results = [.. dtos.ToDomainValueObjects()];
 
         // Assert
         Assert.Equal(dtos.Count, results.Count);
@@ -104,7 +104,7 @@ public class IsrcDtoMappingTests
     }
 
     [Fact]
-    public void ToDomainEntities_WhenMappingMixedValidAndInvalidIsrcDtos_ShouldReturnMixedResults()
+    public void ToDomainValueObjects_WhenMappingMixedValidAndInvalidIsrcDtos_ShouldReturnMixedResults()
     {
         // Arrange
         List<IsrcDto> dtos =
@@ -115,7 +115,7 @@ public class IsrcDtoMappingTests
         ];
 
         // Act
-        List<Result<Isrc>> results = [.. dtos.ToDomainEntities()];
+        List<Result<Isrc>> results = [.. dtos.ToDomainValueObjects()];
 
         // Assert
         Assert.Equal(dtos.Count, results.Count);

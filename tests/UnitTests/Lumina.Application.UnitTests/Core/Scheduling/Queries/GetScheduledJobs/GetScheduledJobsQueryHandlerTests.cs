@@ -8,6 +8,7 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Core.Scheduling.Queries.GetScheduledJobs;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Scheduling;
+using Lumina.Application.Fixtures.Common.DTO.Pagination;
 using Lumina.Contracts.Responses.Scheduling;
 using Lumina.Domain.Common.Primitives;
 using NSubstitute;
@@ -34,6 +35,7 @@ public class GetScheduledJobsQueryHandlerTests
     private readonly IScheduledJobRepository _mockScheduledJobRepository;
     private readonly GetScheduledJobsQueryHandler _sut;
     private readonly ScheduledJobEntityFixture _scheduledJobEntityFixture = new();
+    private readonly PaginatedResultDtoFixture<ScheduledJobEntity> _paginatedResultDtoFixture = new();
     private readonly Guid _userId = Guid.NewGuid();
 
     /// <summary>
@@ -61,7 +63,7 @@ public class GetScheduledJobsQueryHandlerTests
         ScheduledJobEntity scheduledJob1 = _scheduledJobEntityFixture.Create(name: "Job 1");
         ScheduledJobEntity scheduledJob2 = _scheduledJobEntityFixture.Create(name: "Job 2");
         _mockScheduledJobRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<ScheduledJobEntity> { Data = [scheduledJob1, scheduledJob2], CurrentPage = 1, PerPage = 2, Count = 2, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: [scheduledJob1, scheduledJob2], currentPage: 1, perPage: 2, count: 2, numberOfPages: 1)));
 
         // Act
         Result<IEnumerable<ScheduledJobResponse>> result = await _sut.HandleAsync(new GetScheduledJobsQuery(), CancellationToken.None);
@@ -78,7 +80,7 @@ public class GetScheduledJobsQueryHandlerTests
     {
         // Arrange
         _mockScheduledJobRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<ScheduledJobEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 0, count: 0, numberOfPages: 1)));
 
         // Act
         Result<IEnumerable<ScheduledJobResponse>> result = await _sut.HandleAsync(new GetScheduledJobsQuery(), CancellationToken.None);

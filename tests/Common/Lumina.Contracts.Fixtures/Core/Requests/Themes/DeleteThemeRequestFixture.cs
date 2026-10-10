@@ -20,10 +20,11 @@ public class DeleteThemeRequestFixture
     /// Creates a random valid <see cref="DeleteThemeRequest"/>.
     /// </summary>
     /// <param name="themeId">Optional. The manifest id of the theme to delete.</param>
+    /// <param name="includeThemeId">Whether the theme Id should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="DeleteThemeRequest"/>.</returns>
-    public DeleteThemeRequest Create(string? themeId = null)
+    public DeleteThemeRequest Create(string? themeId = null, bool includeThemeId = true)
     {
-        return new DeleteThemeRequest(themeId ?? _faker.Lorem.Slug(2));
+        return new DeleteThemeRequest(includeThemeId ? (themeId ?? _faker.Lorem.Slug(2)) : null);
     }
 
     /// <summary>

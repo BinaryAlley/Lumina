@@ -12,27 +12,32 @@ using Lumina.Application.Common.Infrastructure.Scheduling;
 using Lumina.Application.Common.Infrastructure.Themes;
 using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Application.Common.Infrastructure.Validation;
+using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artwork;
 using Lumina.Application.Core.MediaLibrary.Management.Progress;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Artwork;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
 using Lumina.Application.Core.Scheduling.Notifications;
 using Lumina.Domain.Common.Events;
+using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Queue;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Services.Jobs;
 using Lumina.Infrastructure.Common.DomainEvents;
 using Lumina.Infrastructure.Common.Models.DTO.Plugins;
+using Lumina.Infrastructure.Common.Networking;
 using Lumina.Infrastructure.Core.Authentication;
 using Lumina.Infrastructure.Core.Authorization;
 using Lumina.Infrastructure.Core.Authorization.Policies.Common.Factory;
 using Lumina.Infrastructure.Core.Authorization.Policies.LibraryOwnership;
 using Lumina.Infrastructure.Core.Authorization.Policies.Over18;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Cancellation;
+using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Audio.Music;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.WrittenContent.Books;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Progress;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Queue;
+using Lumina.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artwork;
 using Lumina.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Artwork;
 using Lumina.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
 using Lumina.Infrastructure.Core.Plugins;
@@ -51,6 +56,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 #endregion
 
@@ -104,6 +110,8 @@ public static class InfrastructureLayerServices
         services.AddHostedService<MediaLibraryScanJobProcessorJob>();
 
         services.AddTransient<IBooksFileSystemDiscoveryJob, BooksFileSystemDiscoveryJob>();
+        services.AddTransient<IMusicFileSystemDiscoveryJob, MusicFileSystemDiscoveryJob>();
+        services.AddTransient<IMusicMetadataExtractionJob, MusicMetadataExtractionJob>();
         services.AddTransient<IMediaLibraryScanDiffJob, MediaLibraryScanDiffJob>();
         services.AddTransient<IMediaLibraryScanHashJob, MediaLibraryScanHashJob>();
         services.AddTransient<IMediaLibraryScanResultsSaveJob, MediaLibraryScanResultsSaveJob>();
@@ -111,12 +119,32 @@ public static class InfrastructureLayerServices
         services.AddTransient<IMediaLibraryScanMetadataEnrichmentJob, MediaLibraryScanMetadataEnrichmentJob>();
         services.AddTransient<IMediaLibraryScanArtworkEnrichmentJob, MediaLibraryScanArtworkEnrichmentJob>();
 
+        // The media library type specific behavior of the generic scan jobs is provided by the materializers and the enrichers, selected by the media library type.
+        // Registering several implementations of the same interface is intentional and does not override anything: the container keeps every registration,
+        // and the scan jobs resolve them as a collection (GetServices) and pick the one whose SupportedLibraryType matches the scanned library. Resolving a
+        // single instance of one of these interfaces would instead return only the last registration, so they must always be resolved as a collection.
+        services.AddTransient<IMediaLibraryScanItemMaterializer, BooksMediaLibraryScanItemMaterializer>();
+        services.AddTransient<IMediaLibraryScanItemMaterializer, MusicMediaLibraryScanItemMaterializer>();
+        services.AddTransient<IMediaLibraryScanMetadataEnricher, BooksMediaLibraryScanMetadataEnricher>();
+        services.AddTransient<IMediaLibraryScanMetadataEnricher, MusicMediaLibraryScanMetadataEnricher>();
+        services.AddTransient<IMediaLibraryScanArtworkEnricher, BooksMediaLibraryScanArtworkEnricher>();
+        services.AddTransient<IMediaLibraryScanArtworkEnricher, MusicMediaLibraryScanArtworkEnricher>();
+
+        services.AddSingleton<MusicLibraryPathStructure>();
 
         services.AddSingleton<IMediaLibraryScanProgressNotifier, DebouncedMediaLibraryScanProgressNotifier>();
 
+        // Artwork downloads: the remote artwork of any provider is downloaded through a client that follows redirects only to public HTTPS hosts,
+        // so a URL returned by a provider, or a redirect it points at, can never reach a private, loopback or link local address of the host.
+        services.AddHttpClient(NamedHttpClients.ARTWORK_DOWNLOAD)
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false })
+            .AddHttpMessageHandler(() => new PublicHostRedirectHandler());
+
         // Book artwork: stores the artwork of the books into the internal media directory.
-        services.AddHttpClient();
         services.AddScoped<IBookArtworkService, BookArtworkService>();
+
+        // Music artwork: stores the artwork of the albums into the internal media directory.
+        services.AddScoped<IMusicArtworkService, MusicArtworkService>();
 
         // Book reading: resolves the book reader plugins, extracts the books into a temporary directory, and serves their contents.
         // The enablement cache lets the reading service skip the per-request database read of the reader configurations.
@@ -153,6 +181,7 @@ public static class InfrastructureLayerServices
         services.AddScoped<TemporaryFilesCleanupTaskExecutor>();
         services.AddScoped<RepairThemesTaskExecutor>();
         services.AddScoped<CleanScheduledJobExecutionHistoryTaskExecutor>();
+        services.AddScoped<TechnicalDataCleanupTaskExecutor>();
 
         return services;
     }

@@ -57,4 +57,16 @@
   <data name="DescriptionShouldPreserveBookStyles" xml:space="preserve">
     <value>Whether the original styling of book content is preserved when you read a book. Enabling it keeps the look of the book (fonts, colors, alignment), but book styles can load resources from external servers, which those servers could observe; disable it to strip the styles.</value>
   </data>
+  <data name="ShouldAggregateMetadataWhenMissing" xml:space="preserve">
+    <value>Aggregate metadata when missing</value>
+  </data>
+  <data name="DescriptionShouldAggregateMetadataWhenMissing" xml:space="preserve">
+    <value>When enabled, the metadata of library items that the first metadata provider does not supply is filled in from the following providers.</value>
+  </data>
+  <data name="ShouldAggregateArtworkWhenMissing" xml:space="preserve">
+    <value>Aggregate artwork when missing</value>
+  </data>
+  <data name="DescriptionShouldAggregateArtworkWhenMissing" xml:space="preserve">
+    <value>When enabled, the artwork of library items that the first artwork provider does not supply is filled in from the following providers.</value>
+  </data>
 </root>

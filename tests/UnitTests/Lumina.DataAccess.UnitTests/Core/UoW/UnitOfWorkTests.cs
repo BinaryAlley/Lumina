@@ -5,6 +5,7 @@ using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Time;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
 using Lumina.DataAccess.Common.DependencyInjection;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.DataAccess.UnitTests.Common.Setup;
@@ -29,6 +30,7 @@ namespace Lumina.DataAccess.UnitTests.Core.UoW;
 public class UnitOfWorkTests
 {
     private readonly IFixture _fixture;
+    private readonly RoleEntityFixture _roleEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UnitOfWorkTests"/> class.
@@ -117,7 +119,7 @@ public class UnitOfWorkTests
             .Options;
         LuminaDbContext dbContext = new(options);
         UnitOfWork unitOfWork = new(dbContext);
-        dbContext.Roles.Add(new RoleEntity { Id = Guid.NewGuid(), RoleName = "TestRole" });
+        dbContext.Roles.Add(_roleEntityFixture.Create(id: Guid.NewGuid(), roleName: "TestRole"));
         await dbContext.SaveChangesAsync(CancellationToken.None);
         Assert.NotEmpty(dbContext.ChangeTracker.Entries());
 

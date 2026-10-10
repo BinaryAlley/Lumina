@@ -12,6 +12,7 @@ namespace Lumina.Contracts.Requests.UsersManagement.Settings;
 /// <param name="ShouldIgnoreThePrefixForAlphaPicker">Whether the "The" prefix of library item titles is ignored by the alpha picker, or not. Required.</param>
 /// <param name="IsThemeCachingEnabled">Whether the theme data served to this user is cached, or not. Required.</param>
 /// <param name="ShouldAggregateMetadataWhenMissing">Whether the metadata of the media library items is aggregated from multiple providers, when fields are missing, or not. Required.</param>
+/// <param name="ShouldAggregateArtworkWhenMissing">Whether the artwork of the media library items is aggregated from multiple providers, when it is missing, or not. Required.</param>
 /// <param name="ShouldRenderPdfAsImages">Whether PDF books are rendered as page images for the user, or not. Required.</param>
 /// <param name="ShouldPreserveBookStyles">Whether the styles of the book content are preserved when it is rendered for the user, or not. Required.</param>
 [DebuggerDisplay("IsPaginationEnabled: {IsPaginationEnabled}; ItemsPerPage: {ItemsPerPage}")]
@@ -21,6 +22,7 @@ public sealed record UpdateUserSettingsRequest(
     bool ShouldIgnoreThePrefixForAlphaPicker,
     bool IsThemeCachingEnabled,
     bool ShouldAggregateMetadataWhenMissing,
+    bool ShouldAggregateArtworkWhenMissing,
     bool ShouldRenderPdfAsImages,
     bool ShouldPreserveBookStyles
 );

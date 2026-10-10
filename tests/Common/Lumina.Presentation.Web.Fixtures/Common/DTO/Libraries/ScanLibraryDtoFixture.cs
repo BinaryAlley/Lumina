@@ -9,7 +9,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.DTO.Libraries;
 
 /// <summary>
-/// Fixture class for generating <see cref="ScanLibraryDto"/> test data.
+/// Fixture class for the <see cref="ScanLibraryDto"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ScanLibraryDtoFixture

@@ -186,7 +186,7 @@ public class UpdateAlbumEndpointTests
                 command.Metadata == request.Metadata &&
                 command.MediaFormat == request.MediaFormat &&
                 command.Barcode == request.Barcode &&
-                command.CatalogNumber == request.CatalogNumber &&
+                command.CatalogNumbers == request.CatalogNumbers &&
                 command.MusicBrainzReleaseId == request.MusicBrainzReleaseId &&
                 command.MusicBrainzReleaseGroupId == request.MusicBrainzReleaseGroupId &&
                 command.MusicBrainzReleaseArtistId == request.MusicBrainzReleaseArtistId &&

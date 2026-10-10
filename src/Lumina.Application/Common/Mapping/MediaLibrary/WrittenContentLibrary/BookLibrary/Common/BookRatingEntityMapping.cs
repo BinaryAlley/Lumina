@@ -48,7 +48,7 @@ public static class BookRatingEntityMapping
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully converted <see cref="BookRating"/>, or an error message.
     /// </returns>
-    public static Result<BookRating> ToDomainEntity(this BookRatingEntity repositoryEntity)
+    public static Result<BookRating> ToDomainValueObject(this BookRatingEntity repositoryEntity)
     {
         return BookRating.Create(
             repositoryEntity.Value ?? default,
@@ -65,8 +65,8 @@ public static class BookRatingEntityMapping
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a collection of converted <see cref="BookRating"/>, or an error message.
     /// </returns>
-    public static IEnumerable<Result<BookRating>> ToDomainEntities(this IEnumerable<BookRatingEntity> repositoryEntities)
+    public static IEnumerable<Result<BookRating>> ToDomainValueObjects(this IEnumerable<BookRatingEntity> repositoryEntities)
     {
-        return repositoryEntities.Select(domainEntity => domainEntity.ToDomainEntity());
+        return repositoryEntities.Select(domainEntity => domainEntity.ToDomainValueObject());
     }
 }

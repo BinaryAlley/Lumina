@@ -28,7 +28,7 @@ public class GetReadingAvailabilityEndpointTests
     private readonly IApiHttpClient _mockApiHttpClient;
     private readonly GetReadingAvailabilityEndpoint _sut;
     private readonly ReadingAvailabilityDtoFixture _readingAvailabilityDtoFixture = new();
-    private readonly GetBookReadingAvailabilityRequestFixture _requestFixture = new();
+    private readonly GetBookReadingAvailabilityRequestFixture _getBookReadingAvailabilityRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetReadingAvailabilityEndpointTests"/> class.
@@ -43,7 +43,7 @@ public class GetReadingAvailabilityEndpointTests
     public async Task ExecuteAsync_WhenBookIsAvailable_ShouldReturnSuccessJson()
     {
         // Arrange
-        GetBookReadingAvailabilityRequest request = _requestFixture.Create();
+        GetBookReadingAvailabilityRequest request = _getBookReadingAvailabilityRequestFixture.Create();
         ReadingAvailabilityDto availability = _readingAvailabilityDtoFixture.Create(bookId: request.BookId, isAvailable: true);
         _mockApiHttpClient.GetAsync<ReadingAvailabilityDto>(ApiRoutes.Books.GET_BOOK_READING_AVAILABILITY.Replace("{libraryId}", request.LibraryId.ToString()).Replace("{bookId}", request.BookId.ToString()), Arg.Any<CancellationToken>())
             .Returns(availability);
@@ -62,7 +62,7 @@ public class GetReadingAvailabilityEndpointTests
     public async Task ExecuteAsync_WhenBookIsNotAvailable_ShouldReturnUnavailableJsonWithErrorCode()
     {
         // Arrange
-        GetBookReadingAvailabilityRequest request = _requestFixture.Create();
+        GetBookReadingAvailabilityRequest request = _getBookReadingAvailabilityRequestFixture.Create();
         ReadingAvailabilityDto availability = _readingAvailabilityDtoFixture.Create(bookId: request.BookId, isAvailable: false, errorCode: "ReaderDisabled");
         _mockApiHttpClient.GetAsync<ReadingAvailabilityDto>(ApiRoutes.Books.GET_BOOK_READING_AVAILABILITY.Replace("{libraryId}", request.LibraryId.ToString()).Replace("{bookId}", request.BookId.ToString()), Arg.Any<CancellationToken>())
             .Returns(availability);
@@ -81,7 +81,7 @@ public class GetReadingAvailabilityEndpointTests
     public async Task ExecuteAsync_WhenCalled_ShouldRequestReadingAvailabilityFromApi()
     {
         // Arrange
-        GetBookReadingAvailabilityRequest request = _requestFixture.Create();
+        GetBookReadingAvailabilityRequest request = _getBookReadingAvailabilityRequestFixture.Create();
         ReadingAvailabilityDto availability = _readingAvailabilityDtoFixture.Create(bookId: request.BookId, isAvailable: true);
         _mockApiHttpClient.GetAsync<ReadingAvailabilityDto>(ApiRoutes.Books.GET_BOOK_READING_AVAILABILITY.Replace("{libraryId}", request.LibraryId.ToString()).Replace("{bookId}", request.BookId.ToString()), Arg.Any<CancellationToken>())
             .Returns(availability);

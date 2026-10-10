@@ -2,6 +2,7 @@
 using Bogus;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -16,7 +17,8 @@ namespace Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
 [ExcludeFromCodeCoverage]
 public class UserRoleEntityFixture
 {
-    private readonly Faker _faker = new();
+    private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly RoleEntityFixture _roleEntityFixture = new();
 
     /// <summary>
     /// Creates a random valid <see cref="UserRoleEntity"/>.
@@ -26,44 +28,33 @@ public class UserRoleEntityFixture
     /// <param name="user">Optional. The user the role is granted to.</param>
     /// <param name="roleId">Optional. The Id of the role granted to the user.</param>
     /// <param name="role">Optional. The role granted to the user.</param>
+    /// <param name="includeUser">Whether the user should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="createdOnUtc">Optional. The time and date when the association was created.</param>
+    /// <param name="createdBy">Optional. The Id of the user that created the association.</param>
     /// <returns>The created <see cref="UserRoleEntity"/>.</returns>
     public UserRoleEntity Create(
         Guid? id = null,
         Guid? userId = null,
         UserEntity? user = null,
         Guid? roleId = null,
-        RoleEntity? role = null)
+        RoleEntity? role = null,
+        bool includeUser = true,
+        DateTime? createdOnUtc = null,
+        Guid? createdBy = null)
     {
-        UserEntity resolvedUser = user ?? new UserEntity
-        {
-            Id = userId ?? _faker.Random.Guid(),
-            Username = _faker.Internet.UserName(),
-            Password = _faker.Internet.Password(),
-            Libraries = [],
-            UserRole = null,
-            UserPermissions = [],
-            CreatedOnUtc = _faker.Date.Past(),
-            CreatedBy = _faker.Random.Guid()
-        };
-
-        RoleEntity resolvedRole = role ?? new RoleEntity
-        {
-            Id = roleId ?? _faker.Random.Guid(),
-            RoleName = _faker.Random.String2(_faker.Random.Number(1, 50)),
-            CreatedOnUtc = _faker.Date.Past(),
-            CreatedBy = _faker.Random.Guid()
-        };
+        UserEntity resolvedUser = user ?? _userEntityFixture.Create(id: userId);
+        RoleEntity resolvedRole = role ?? _roleEntityFixture.Create(id: roleId);
 
         return new Faker<UserRoleEntity>()
             .CustomInstantiator(f => new UserRoleEntity
             {
                 Id = id ?? f.Random.Guid(),
                 UserId = resolvedUser.Id,
-                User = user ?? resolvedUser,
+                User = includeUser ? (user ?? resolvedUser) : null!,
                 RoleId = resolvedRole.Id,
                 Role = role ?? resolvedRole,
-                CreatedOnUtc = f.Date.Past(),
-                CreatedBy = f.Random.Guid()
+                CreatedOnUtc = createdOnUtc ?? f.Date.Past(),
+                CreatedBy = createdBy ?? f.Random.Guid()
             })
             .Generate();
     }

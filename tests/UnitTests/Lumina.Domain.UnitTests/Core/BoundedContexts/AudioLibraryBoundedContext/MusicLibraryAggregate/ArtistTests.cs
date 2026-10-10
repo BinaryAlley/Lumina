@@ -41,6 +41,7 @@ public class ArtistTests
     private readonly AudioMetadataFixture _audioMetadataFixture = new();
     private readonly MoodFixture _moodFixture = new();
     private readonly IsrcFixture _isrcFixture = new();
+    private readonly MusicWorkFixture _musicWorkFixture = new();
 
     [Fact]
     public void AddTrackToAlbum_WhenAlbumIsOwnedByTheArtist_ShouldAddTheTrackAndReturnSuccess()
@@ -109,8 +110,25 @@ public class ArtistTests
         Result<Artist> result = Artist.Create(
             libraryId,
             "Queen",
+            Optional<string>.None(),
+            Optional<string>.None(),
+            Optional<MusicArtistType>.None(),
+            Optional<MusicArtistGender>.None(),
+            Optional<string>.None(),
+            Optional<MusicArea>.None(),
+            Optional<MusicArea>.None(),
+            Optional<MusicArea>.None(),
+            Optional<DateOnly>.None(),
+            Optional<DateOnly>.None(),
+            false,
             Optional<string>.Some("https://www.queenonline.com"),
             Optional<MusicBrainzId>.Some(musicBrainzArtistId),
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
             contributors,
             [album]);
 
@@ -141,7 +159,24 @@ public class ArtistTests
             libraryId,
             "Queen",
             Optional<string>.None(),
+            Optional<string>.None(),
+            Optional<MusicArtistType>.None(),
+            Optional<MusicArtistGender>.None(),
+            Optional<string>.None(),
+            Optional<MusicArea>.None(),
+            Optional<MusicArea>.None(),
+            Optional<MusicArea>.None(),
+            Optional<DateOnly>.None(),
+            Optional<DateOnly>.None(),
+            false,
+            Optional<string>.None(),
             Optional<MusicBrainzId>.None(),
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
             [],
             [album]);
 
@@ -165,7 +200,24 @@ public class ArtistTests
             _libraryIdFixture.Create(),
             name!,
             Optional<string>.None(),
+            Optional<string>.None(),
+            Optional<MusicArtistType>.None(),
+            Optional<MusicArtistGender>.None(),
+            Optional<string>.None(),
+            Optional<MusicArea>.None(),
+            Optional<MusicArea>.None(),
+            Optional<MusicArea>.None(),
+            Optional<DateOnly>.None(),
+            Optional<DateOnly>.None(),
+            false,
+            Optional<string>.None(),
             Optional<MusicBrainzId>.None(),
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
             [],
             [_albumFixture.Create()]);
 
@@ -182,7 +234,24 @@ public class ArtistTests
             _libraryIdFixture.Create(),
             "Queen",
             Optional<string>.None(),
+            Optional<string>.None(),
+            Optional<MusicArtistType>.None(),
+            Optional<MusicArtistGender>.None(),
+            Optional<string>.None(),
+            Optional<MusicArea>.None(),
+            Optional<MusicArea>.None(),
+            Optional<MusicArea>.None(),
+            Optional<DateOnly>.None(),
+            Optional<DateOnly>.None(),
+            false,
+            Optional<string>.None(),
             Optional<MusicBrainzId>.None(),
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
             [],
             []);
 
@@ -206,8 +275,25 @@ public class ArtistTests
             artistId,
             libraryId,
             "Queen",
+            Optional<string>.None(),
+            Optional<string>.None(),
+            Optional<MusicArtistType>.None(),
+            Optional<MusicArtistGender>.None(),
+            Optional<string>.None(),
+            Optional<MusicArea>.None(),
+            Optional<MusicArea>.None(),
+            Optional<MusicArea>.None(),
+            Optional<DateOnly>.None(),
+            Optional<DateOnly>.None(),
+            false,
             Optional<string>.Some("https://www.queenonline.com"),
             Optional<MusicBrainzId>.None(),
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
             [],
             [album],
             createdOnUtc,
@@ -236,7 +322,24 @@ public class ArtistTests
             _libraryIdFixture.Create(),
             name!,
             Optional<string>.None(),
+            Optional<string>.None(),
+            Optional<MusicArtistType>.None(),
+            Optional<MusicArtistGender>.None(),
+            Optional<string>.None(),
+            Optional<MusicArea>.None(),
+            Optional<MusicArea>.None(),
+            Optional<MusicArea>.None(),
+            Optional<DateOnly>.None(),
+            Optional<DateOnly>.None(),
+            false,
+            Optional<string>.None(),
             Optional<MusicBrainzId>.None(),
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
             [],
             [_albumFixture.Create()],
             DateTime.UtcNow,
@@ -256,7 +359,24 @@ public class ArtistTests
             _libraryIdFixture.Create(),
             "Queen",
             Optional<string>.None(),
+            Optional<string>.None(),
+            Optional<MusicArtistType>.None(),
+            Optional<MusicArtistGender>.None(),
+            Optional<string>.None(),
+            Optional<MusicArea>.None(),
+            Optional<MusicArea>.None(),
+            Optional<MusicArea>.None(),
+            Optional<DateOnly>.None(),
+            Optional<DateOnly>.None(),
+            false,
+            Optional<string>.None(),
             Optional<MusicBrainzId>.None(),
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
             [],
             [],
             DateTime.UtcNow,
@@ -394,6 +514,17 @@ public class ArtistTests
         // Act
         Result<Updated> result = artist.UpdateDetails(
             "Queen",
+            Optional<string>.None(),
+            Optional<string>.None(),
+            Optional<MusicArtistType>.None(),
+            Optional<MusicArtistGender>.None(),
+            Optional<string>.None(),
+            Optional<MusicArea>.None(),
+            Optional<MusicArea>.None(),
+            Optional<MusicArea>.None(),
+            Optional<DateOnly>.None(),
+            Optional<DateOnly>.None(),
+            false,
             Optional<string>.Some("https://www.queenonline.com"),
             Optional<MusicBrainzId>.Some(musicBrainzArtistId));
 
@@ -415,7 +546,21 @@ public class ArtistTests
         Optional<DateTime> originalUpdatedOnUtc = artist.UpdatedOnUtc;
 
         // Act
-        Result<Updated> result = artist.UpdateDetails("   ", Optional<string>.None(), Optional<MusicBrainzId>.None());
+        Result<Updated> result = artist.UpdateDetails(
+            "   ",
+            Optional<string>.None(),
+            Optional<string>.None(),
+            Optional<MusicArtistType>.None(),
+            Optional<MusicArtistGender>.None(),
+            Optional<string>.None(),
+            Optional<MusicArea>.None(),
+            Optional<MusicArea>.None(),
+            Optional<MusicArea>.None(),
+            Optional<DateOnly>.None(),
+            Optional<DateOnly>.None(),
+            false,
+            Optional<string>.None(),
+            Optional<MusicBrainzId>.None());
 
         // Assert
         Assert.True(result.IsFailure);
@@ -433,7 +578,7 @@ public class ArtistTests
         AlbumMetadata metadata = _albumMetadataFixture.Create(title: "A Night at the Opera");
         Optional<MusicMediaFormat> mediaFormat = Optional<MusicMediaFormat>.Some(MusicMediaFormat.CD);
         Optional<Barcode> barcode = Optional<Barcode>.Some(_barcodeFixture.Create());
-        Optional<string> catalogNumber = Optional<string>.Some("CAT-123456");
+        List<string> catalogNumbers = ["CAT-123456"];
         Optional<MusicBrainzId> releaseId = Optional<MusicBrainzId>.Some(_musicBrainzIdFixture.Create());
         Optional<MusicBrainzId> releaseGroupId = Optional<MusicBrainzId>.Some(_musicBrainzIdFixture.Create());
         Optional<MusicBrainzId> releaseArtistId = Optional<MusicBrainzId>.Some(_musicBrainzIdFixture.Create());
@@ -445,9 +590,14 @@ public class ArtistTests
         Result<Updated> result = artist.UpdateAlbum(
             album,
             metadata,
+            Optional<string>.None(),
             mediaFormat,
+            Optional<MusicReleasePackaging>.None(),
+            Optional<string>.None(),
             barcode,
-            catalogNumber,
+            catalogNumbers,
+            Optional<string>.None(),
+            Optional<string>.None(),
             releaseId,
             releaseGroupId,
             releaseArtistId,
@@ -459,7 +609,7 @@ public class ArtistTests
         Assert.Equal(metadata, album.Metadata);
         Assert.Equal(mediaFormat, album.MediaFormat);
         Assert.Equal(barcode, album.Barcode);
-        Assert.Equal(catalogNumber, album.CatalogNumber);
+        Assert.Equal(catalogNumbers, album.CatalogNumbers);
         Assert.Equal(releaseId, album.MusicBrainzReleaseId);
         Assert.Equal(releaseGroupId, album.MusicBrainzReleaseGroupId);
         Assert.Equal(releaseArtistId, album.MusicBrainzReleaseArtistId);
@@ -483,8 +633,13 @@ public class ArtistTests
         Result<Updated> result = artist.UpdateAlbum(
             foreignAlbum,
             _albumMetadataFixture.Create(),
+            Optional<string>.None(),
             Optional<MusicMediaFormat>.None(),
+            Optional<MusicReleasePackaging>.None(),
+            Optional<string>.None(),
             Optional<Barcode>.None(),
+            [],
+            Optional<string>.None(),
             Optional<string>.None(),
             Optional<MusicBrainzId>.None(),
             Optional<MusicBrainzId>.None(),
@@ -512,10 +667,9 @@ public class ArtistTests
         Optional<string> script = Optional<string>.Some("Latin");
         Optional<MusicKey> key = Optional<MusicKey>.Some(MusicKey.BMajor);
         Optional<int> bpm = Optional<int>.Some(72);
-        Optional<string> work = Optional<string>.Some("Bohemian Rhapsody");
+        Optional<MusicWork> work = Optional<MusicWork>.Some(_musicWorkFixture.Create(title: "Bohemian Rhapsody"));
         Optional<MusicBrainzId> recordingId = Optional<MusicBrainzId>.Some(_musicBrainzIdFixture.Create());
         Optional<MusicBrainzId> musicBrainzTrackId = Optional<MusicBrainzId>.Some(_musicBrainzIdFixture.Create());
-        Optional<MusicBrainzId> workId = Optional<MusicBrainzId>.Some(_musicBrainzIdFixture.Create());
         List<Mood> moods = [_moodFixture.Create(name: "epic")];
         List<Isrc> isrcs = [_isrcFixture.Create(value: "GBUM71029604")];
         List<MusicMediaContributor> contributors = [_musicMediaContributorFixture.Create()];
@@ -533,10 +687,10 @@ public class ArtistTests
             script,
             key,
             bpm,
+            true,
             work,
             recordingId,
             musicBrainzTrackId,
-            workId,
             moods,
             isrcs,
             contributors,
@@ -551,10 +705,10 @@ public class ArtistTests
         Assert.Equal(script, track.Script);
         Assert.Equal(key, track.Key);
         Assert.Equal(bpm, track.Bpm);
+        Assert.True(track.IsVideo);
         Assert.Equal(work, track.Work);
         Assert.Equal(recordingId, track.MusicBrainzRecordingId);
         Assert.Equal(musicBrainzTrackId, track.MusicBrainzTrackId);
-        Assert.Equal(workId, track.MusicBrainzWorkId);
         Assert.Equal(moods, track.Moods);
         Assert.Equal(isrcs, track.Isrcs);
         Assert.Equal(contributors, track.Contributors);
@@ -585,8 +739,8 @@ public class ArtistTests
             Optional<string>.None(),
             Optional<MusicKey>.None(),
             Optional<int>.None(),
-            Optional<string>.None(),
-            Optional<MusicBrainzId>.None(),
+            false,
+            Optional<MusicWork>.None(),
             Optional<MusicBrainzId>.None(),
             Optional<MusicBrainzId>.None(),
             [],
@@ -622,8 +776,8 @@ public class ArtistTests
             Optional<string>.None(),
             Optional<MusicKey>.None(),
             Optional<int>.None(),
-            Optional<string>.None(),
-            Optional<MusicBrainzId>.None(),
+            false,
+            Optional<MusicWork>.None(),
             Optional<MusicBrainzId>.None(),
             Optional<MusicBrainzId>.None(),
             [],

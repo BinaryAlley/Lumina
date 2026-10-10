@@ -20,6 +20,7 @@ using Lumina.Application.Fixtures.Core.MediaLibrary.AudioLibrary.MusicLibrary.Al
 using Lumina.Application.Fixtures.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artists.Commands.AddArtist;
 using Lumina.Application.Fixtures.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Commands.AddTrack;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaContributors;
+using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
@@ -53,6 +54,7 @@ public class AddArtistCommandHandlerTests
     private readonly AddArtistCommandHandler _sut;
     private readonly Guid _userId;
     private readonly AddArtistCommandFixture _addArtistCommandFixture = new();
+    private readonly MusicArtistMetadataDtoFixture _musicArtistMetadataDtoFixture = new();
     private readonly AddAlbumCommandFixture _addAlbumCommandFixture = new();
     private readonly AddTrackCommandFixture _addTrackCommandFixture = new();
     private readonly ArtistEntityFixture _artistEntityFixture = new();
@@ -275,7 +277,7 @@ public class AddArtistCommandHandlerTests
     public async Task HandleAsync_WhenCommandDomainConversionFails_ShouldReturnFailureResultWithoutPersisting()
     {
         // Arrange
-        AddArtistCommand command = _addArtistCommandFixture.Create(name: string.Empty);
+        AddArtistCommand command = _addArtistCommandFixture.Create(metadata: _musicArtistMetadataDtoFixture.Create(name: string.Empty));
 
         // Act
         Result<ArtistResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
@@ -384,7 +386,7 @@ public class AddArtistCommandHandlerTests
         Assert.NotNull(persistedArtist);
         Assert.Equal(insertedArtist!.Id, persistedArtist!.Id);
         Assert.Equal(persistedArtist.Id, result.Value.Id);
-        Assert.Equal(persistedArtist.Name, result.Value.Name);
+        Assert.Equal(persistedArtist.Name, result.Value.Metadata.Name);
         await _mockArtistRepository.Received(1).InsertAsync(Arg.Any<ArtistEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }

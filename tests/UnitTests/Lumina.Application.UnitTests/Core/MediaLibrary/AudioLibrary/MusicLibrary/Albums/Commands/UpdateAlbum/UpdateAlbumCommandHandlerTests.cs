@@ -54,7 +54,7 @@ public class UpdateAlbumCommandHandlerTests
     private readonly AlbumEntityFixture _albumEntityFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly MediaContributorEntityFixture _mediaContributorEntityFixture = new();
-    private readonly AlbumMetadataDtoFixture _albumMetadataDtoFixture = new();
+    private readonly MusicAlbumMetadataDtoFixture _musicAlbumMetadataDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
 
     /// <summary>
@@ -369,7 +369,7 @@ public class UpdateAlbumCommandHandlerTests
             libraryId: libraryId.ToString(),
             artistId: artistId.ToString(),
             albumId: albumId.ToString(),
-            metadata: _albumMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]));
+            metadata: _musicAlbumMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]));
 
         // Act
         Result<AlbumResponse> result = await _sut.HandleAsync(command, CancellationToken.None);

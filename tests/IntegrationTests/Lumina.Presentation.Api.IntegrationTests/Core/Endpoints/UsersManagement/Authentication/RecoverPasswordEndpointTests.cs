@@ -2,6 +2,7 @@
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.Infrastructure.Security;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.DataAccess.Core.UoW;
@@ -37,6 +38,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
     private readonly PasswordHashService _hashService = new();
     private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly RecoverPasswordRequestFixture _recoverPasswordRequestFixture = new();
     private readonly ICryptographyService _cryptographyService;
     private readonly TotpTokenGenerator _totpTokenGenerator = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
@@ -81,9 +83,9 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
         Totp totp = new(totpSecret);
         string validTotpCode = totp.ComputeTotp(DateTime.UtcNow);
 
-        RecoverPasswordRequest request = new(
-            Username: user.Username,
-            TotpCode: validTotpCode
+        RecoverPasswordRequest request = _recoverPasswordRequestFixture.Create(
+            username: user.Username,
+            totpCode: validTotpCode
         );
 
         // Act
@@ -118,9 +120,9 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
     public async Task RecoverPassword_WhenUserDoesNotExist_ShouldReturnNotFound()
     {
         // Arrange
-        RecoverPasswordRequest request = new(
-            Username: "nonexistentuser",
-            TotpCode: "123456"
+        RecoverPasswordRequest request = _recoverPasswordRequestFixture.Create(
+            username: "nonexistentuser",
+            totpCode: "123456"
         );
 
         // Act
@@ -146,9 +148,9 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
     {
         // Arrange
         UserEntity user = await CreateUserWithTotp();
-        RecoverPasswordRequest request = new(
-            Username: user.Username,
-            TotpCode: "000000"
+        RecoverPasswordRequest request = _recoverPasswordRequestFixture.Create(
+            username: user.Username,
+            totpCode: "000000"
         );
 
         // Act
@@ -210,9 +212,9 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
         // Arrange
         UserEntity user = await CreateUserWithoutTotp();
 
-        RecoverPasswordRequest request = new(
-            Username: user.Username,
-            TotpCode: "123456"
+        RecoverPasswordRequest request = _recoverPasswordRequestFixture.Create(
+            username: user.Username,
+            totpCode: "123456"
         );
 
         // Act
@@ -252,9 +254,9 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
             await dbContext.SaveChangesAsync();
         }
 
-        RecoverPasswordRequest request = new(
-            Username: "userwithoutotp2",
-            TotpCode: null
+        RecoverPasswordRequest request = _recoverPasswordRequestFixture.Create(
+            username: "userwithoutotp2",
+            includeTotpCode: false
         );
 
         // Act
@@ -284,9 +286,9 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
     public async Task RecoverPassword_WhenCancellationRequested_ShouldThrowTaskCanceledException()
     {
         // Arrange
-        RecoverPasswordRequest request = new(
-            Username: "testuser",
-            TotpCode: "123456"
+        RecoverPasswordRequest request = _recoverPasswordRequestFixture.Create(
+            username: "testuser",
+            totpCode: "123456"
         );
         using CancellationTokenSource cts = new();
 

@@ -39,7 +39,7 @@ public class SetCurrentThemeRequestMappingTests
     public void ToCommand_WhenMappingDifferentThemeIds_ShouldMapCorrectly(string themeId)
     {
         // Arrange
-        SetCurrentThemeRequest request = new(themeId);
+        SetCurrentThemeRequest request = _setCurrentThemeRequestFixture.Create(themeId);
 
         // Act
         SetCurrentThemeCommand result = request.ToCommand();
@@ -53,7 +53,7 @@ public class SetCurrentThemeRequestMappingTests
     public void ToCommand_WhenThemeIdIsNull_ShouldMapNull()
     {
         // Arrange
-        SetCurrentThemeRequest request = new(null);
+        SetCurrentThemeRequest request = _setCurrentThemeRequestFixture.Create(includeThemeId: false);
 
         // Act
         SetCurrentThemeCommand result = request.ToCommand();

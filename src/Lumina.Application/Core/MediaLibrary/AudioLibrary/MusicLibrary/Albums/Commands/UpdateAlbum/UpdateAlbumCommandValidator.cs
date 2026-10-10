@@ -47,7 +47,7 @@ public class UpdateAlbumCommandValidator : AbstractValidator<UpdateAlbumCommand>
             .When(command => command.AlbumId is not null && command.AlbumId.Length > 0)
             .WithError(Errors.Music.AlbumIdCannotBeEmpty);
 
-        // Validates the metadata of the album: title, lengths, release type and status, disc and track counts, release information, languages, genres and tags.
+        // Validates the metadata of the album: title, lengths, release types and status, disc and track counts, release information, languages, genres and tags.
         RuleFor(command => command.Metadata)
             .NotNull()
             .WithError(Errors.Metadata.MetadataCannotBeNull)
@@ -70,9 +70,13 @@ public class UpdateAlbumCommandValidator : AbstractValidator<UpdateAlbumCommand>
                     .When(m => m!.Description is not null)
                     .WithError(Errors.Metadata.DescriptionMustBeMaximum2000CharactersLong);
 
-                metadata.RuleFor(m => m!.ReleaseType)
+                metadata.RuleFor(m => m!.Disambiguation)
+                    .MaximumLength(255)
+                    .When(m => m!.Disambiguation is not null)
+                    .WithError(Errors.Metadata.DescriptionMustBeMaximum2000CharactersLong);
+
+                metadata.RuleForEach(m => m!.ReleaseTypes)
                     .IsInEnum()
-                    .When(m => m!.ReleaseType is not null)
                     .WithError(Errors.Music.UnknownMusicReleaseType);
 
                 metadata.RuleFor(m => m!.ReleaseStatus)
@@ -206,15 +210,20 @@ public class UpdateAlbumCommandValidator : AbstractValidator<UpdateAlbumCommand>
                     .When(m => m!.OriginalLanguage is not null);
             });
 
-        // Validates the physical characteristics of the album: format and catalog number.
+        // Validates the physical characteristics of the album: format, packaging, catalog number and barcode.
         RuleFor(command => command.MediaFormat)
             .IsInEnum()
             .When(command => command.MediaFormat is not null)
             .WithError(Errors.Music.UnknownMusicMediaFormat);
 
-        RuleFor(command => command.CatalogNumber)
+        RuleFor(command => command.Packaging)
+            .IsInEnum()
+            .When(command => command.Packaging is not null)
+            .WithError(Errors.Music.UnknownMusicReleasePackaging);
+
+        RuleForEach(command => command.CatalogNumbers)
             .MaximumLength(50)
-            .When(command => command.CatalogNumber is not null)
+            .When(command => command.CatalogNumbers is not null)
             .WithError(Errors.Music.CatalogNumberMustBeMaximum50CharactersLong);
 
         RuleFor(command => command.Barcode)

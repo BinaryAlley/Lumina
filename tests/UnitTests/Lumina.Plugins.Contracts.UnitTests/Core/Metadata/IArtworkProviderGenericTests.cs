@@ -34,16 +34,16 @@ public class IArtworkProviderGenericTests
         IArtworkProvider baseProvider = provider;
 
         // Act
-        ArtworkDto? result = await baseProvider.GetArtworkAsync(lookup, cancellationToken);
+        IReadOnlyList<ArtworkDto> result = await baseProvider.GetArtworkAsync(lookup, cancellationToken);
 
         // Assert
-        Assert.Equal(expectedArtwork, result);
+        Assert.Equal([expectedArtwork], result);
         Assert.Same(lookup, provider.ReceivedLookup);
         Assert.Equal(cancellationToken, provider.ReceivedCancellationToken);
     }
 
     [Fact]
-    public async Task GetArtworkAsync_WhenLookupIsOfAnotherRuntimeType_ShouldReturnNull()
+    public async Task GetArtworkAsync_WhenLookupIsOfAnotherRuntimeType_ShouldReturnEmpty()
     {
         // Arrange
         MetadataLookupDto otherLookup = _otherMetadataLookupDtoFixture.Create();
@@ -51,10 +51,10 @@ public class IArtworkProviderGenericTests
         IArtworkProvider baseProvider = provider;
 
         // Act
-        ArtworkDto? result = await baseProvider.GetArtworkAsync(otherLookup, CancellationToken.None);
+        IReadOnlyList<ArtworkDto> result = await baseProvider.GetArtworkAsync(otherLookup, CancellationToken.None);
 
         // Assert
-        Assert.Null(result);
+        Assert.Empty(result);
         Assert.Null(provider.ReceivedLookup);
     }
 
@@ -95,11 +95,11 @@ public class IArtworkProviderGenericTests
         public bool RequiresWebAccess => false;
 
         /// <inheritdoc/>
-        public Task<ArtworkDto?> GetArtworkAsync(BookMetadataLookupDto lookup, CancellationToken cancellationToken)
+        public Task<IReadOnlyList<ArtworkDto>> GetArtworkAsync(BookMetadataLookupDto lookup, CancellationToken cancellationToken)
         {
             ReceivedLookup = lookup;
             ReceivedCancellationToken = cancellationToken;
-            return Task.FromResult<ArtworkDto?>(_artwork);
+            return Task.FromResult<IReadOnlyList<ArtworkDto>>([_artwork]);
         }
     }
 }

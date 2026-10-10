@@ -26,7 +26,7 @@ public class SetBookReaderEnabledEndpointTests
 {
     private readonly IApiHttpClient _mockApiHttpClient;
     private readonly SetBookReaderEnabledEndpoint _sut;
-    private readonly SetBookReaderEnabledRequestFixture _requestFixture = new();
+    private readonly SetBookReaderEnabledRequestFixture _setBookReaderEnabledRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SetBookReaderEnabledEndpointTests"/> class.
@@ -41,7 +41,7 @@ public class SetBookReaderEnabledEndpointTests
     public async Task ExecuteAsync_WhenSuccessful_ShouldReturnSuccessJson()
     {
         // Arrange
-        SetBookReaderEnabledRequest request = _requestFixture.Create();
+        SetBookReaderEnabledRequest request = _setBookReaderEnabledRequestFixture.Create();
         _mockApiHttpClient.PutAsync<EmptyRequest, SetBookReaderEnabledRequest>(Arg.Any<string>(), Arg.Any<SetBookReaderEnabledRequest>(), Arg.Any<CancellationToken>())
             .Returns(new EmptyRequest());
 
@@ -58,7 +58,7 @@ public class SetBookReaderEnabledEndpointTests
     public async Task ExecuteAsync_WhenCalled_ShouldSendBookReaderEnabledChangeToApi()
     {
         // Arrange
-        SetBookReaderEnabledRequest request = _requestFixture.Create();
+        SetBookReaderEnabledRequest request = _setBookReaderEnabledRequestFixture.Create();
         _mockApiHttpClient.PutAsync<EmptyRequest, SetBookReaderEnabledRequest>(Arg.Any<string>(), Arg.Any<SetBookReaderEnabledRequest>(), Arg.Any<CancellationToken>())
             .Returns(new EmptyRequest());
         string expectedEndpoint = ApiRoutes.Libraries.SET_LIBRARY_BOOK_READER_ENABLED

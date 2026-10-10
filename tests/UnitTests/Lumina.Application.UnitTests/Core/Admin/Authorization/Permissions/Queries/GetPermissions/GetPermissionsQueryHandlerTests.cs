@@ -9,6 +9,7 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Core.Admin.Authorization.Permissions.Queries.GetPermissions;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Lumina.Application.Fixtures.Common.DTO.Pagination;
 using Lumina.Application.Fixtures.Core.Admin.Authorization.Permissions.Queries.GetPermissions;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.Common.Primitives;
@@ -38,6 +39,7 @@ public class GetPermissionsQueryHandlerTests
     private readonly Guid _userId;
     private readonly GetPermissionsQueryFixture _getPermissionsQueryFixture = new();
     private readonly PermissionEntityFixture _permissionEntityFixture = new();
+    private readonly PaginatedResultDtoFixture<PermissionEntity> _paginatedResultDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPermissionsQueryHandlerTests"/> class.
@@ -74,7 +76,7 @@ public class GetPermissionsQueryHandlerTests
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
         _mockPermissionRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<PermissionEntity> { Data = permissions, CurrentPage = 1, PerPage = permissions.Count, Count = permissions.Count, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: permissions, currentPage: 1, perPage: permissions.Count, count: permissions.Count, numberOfPages: 1)));
 
         // Act
         Result<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
@@ -158,7 +160,7 @@ public class GetPermissionsQueryHandlerTests
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
         _mockPermissionRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<PermissionEntity> { Data = permissions, CurrentPage = 1, PerPage = permissions.Count, Count = permissions.Count, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: permissions, currentPage: 1, perPage: permissions.Count, count: permissions.Count, numberOfPages: 1)));
 
         // Act
         Result<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, cancellationToken);

@@ -41,7 +41,7 @@ public class BookReadingServiceTests
     private readonly Guid _bookId = Guid.NewGuid();
     private readonly Guid _libraryId = Guid.NewGuid();
     private readonly string _bookPath;
-    private readonly LibraryBookReaderConfigurationEntityFixture _configurationEntityFixture = new();
+    private readonly LibraryBookReaderConfigurationEntityFixture _libraryBookReaderConfigurationEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BookReadingServiceTests"/> class.
@@ -61,7 +61,7 @@ public class BookReadingServiceTests
         _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockConfigurationRepository = Substitute.For<ILibraryBookReaderConfigurationRepository>();
         _mockUnitOfWork.LibraryBookReaderConfigurationRepository.Returns(_mockConfigurationRepository);
-        LibraryBookReaderConfigurationEntity enabledConfiguration = _configurationEntityFixture.Create(libraryId: _libraryId, pluginId: _pluginId, isEnabled: true);
+        LibraryBookReaderConfigurationEntity enabledConfiguration = _libraryBookReaderConfigurationEntityFixture.Create(libraryId: _libraryId, pluginId: _pluginId, isEnabled: true);
         _mockConfigurationRepository.GetByLibraryAndPluginIdAsync(_libraryId, _pluginId, Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryBookReaderConfigurationEntity?>(enabledConfiguration));
 

@@ -80,7 +80,7 @@ public class UserSettingsTests
         UserId userId = _userIdFixture.Create();
 
         // Act
-        Result<UserSettings> result = UserSettings.Create(userId, isPaginationEnabled: false, itemsPerPage: 24, shouldIgnoreThePrefixForAlphaPicker: true, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: true, shouldRenderPdfAsImages: true, shouldPreserveBookStyles: true);
+        Result<UserSettings> result = UserSettings.Create(userId, isPaginationEnabled: false, itemsPerPage: 24, shouldIgnoreThePrefixForAlphaPicker: true, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: true, shouldAggregateArtworkWhenMissing: true, shouldRenderPdfAsImages: true, shouldPreserveBookStyles: true);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -117,7 +117,7 @@ public class UserSettingsTests
         UserId userId = _userIdFixture.Create();
 
         // Act
-        Result<UserSettings> result = UserSettings.Create(userId, isPaginationEnabled: true, itemsPerPage: itemsPerPage, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false, shouldRenderPdfAsImages: false, shouldPreserveBookStyles: false);
+        Result<UserSettings> result = UserSettings.Create(userId, isPaginationEnabled: true, itemsPerPage: itemsPerPage, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false, shouldAggregateArtworkWhenMissing: false, shouldRenderPdfAsImages: false, shouldPreserveBookStyles: false);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -132,7 +132,7 @@ public class UserSettingsTests
         UserSettingsId id = _userSettingsIdFixture.Create();
 
         // Act
-        Result<UserSettings> result = UserSettings.Create(id, userId, isPaginationEnabled: true, itemsPerPage: 24, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false, shouldRenderPdfAsImages: false, shouldPreserveBookStyles: true);
+        Result<UserSettings> result = UserSettings.Create(id, userId, isPaginationEnabled: true, itemsPerPage: 24, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false, shouldAggregateArtworkWhenMissing: false, shouldRenderPdfAsImages: false, shouldPreserveBookStyles: true);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -149,7 +149,7 @@ public class UserSettingsTests
         UserSettingsId id = _userSettingsIdFixture.Create();
 
         // Act
-        Result<UserSettings> result = UserSettings.Create(id, userId, isPaginationEnabled: true, itemsPerPage: 0, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false, shouldRenderPdfAsImages: false, shouldPreserveBookStyles: false);
+        Result<UserSettings> result = UserSettings.Create(id, userId, isPaginationEnabled: true, itemsPerPage: 0, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false, shouldAggregateArtworkWhenMissing: false, shouldRenderPdfAsImages: false, shouldPreserveBookStyles: false);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -163,7 +163,7 @@ public class UserSettingsTests
         UserSettings userSettings = _userSettingsFixture.Create();
 
         // Act
-        Result<Updated> result = userSettings.UpdateSettings(isPaginationEnabled: false, itemsPerPage: 12, shouldIgnoreThePrefixForAlphaPicker: true, isThemeCachingEnabled: false, shouldAggregateMetadataWhenMissing: true, shouldRenderPdfAsImages: true, shouldPreserveBookStyles: true);
+        Result<Updated> result = userSettings.UpdateSettings(isPaginationEnabled: false, itemsPerPage: 12, shouldIgnoreThePrefixForAlphaPicker: true, isThemeCachingEnabled: false, shouldAggregateMetadataWhenMissing: true, shouldAggregateArtworkWhenMissing: true, shouldRenderPdfAsImages: true, shouldPreserveBookStyles: true);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -185,7 +185,7 @@ public class UserSettingsTests
         UserSettings userSettings = _userSettingsFixture.Create();
 
         // Act
-        Result<Updated> result = userSettings.UpdateSettings(isPaginationEnabled: true, itemsPerPage: itemsPerPage, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false, shouldRenderPdfAsImages: false, shouldPreserveBookStyles: false);
+        Result<Updated> result = userSettings.UpdateSettings(isPaginationEnabled: true, itemsPerPage: itemsPerPage, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false, shouldAggregateArtworkWhenMissing: false, shouldRenderPdfAsImages: false, shouldPreserveBookStyles: false);
 
         // Assert
         Assert.True(result.IsFailure);

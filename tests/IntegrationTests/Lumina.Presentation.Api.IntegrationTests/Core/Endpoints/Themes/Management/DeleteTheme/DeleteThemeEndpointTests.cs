@@ -34,7 +34,7 @@ public class DeleteThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
 {
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
-    private readonly TestThemeArchiveFixture _themeArchiveFixture = new();
+    private readonly TestThemeArchiveFixture _testThemeArchiveFixture = new();
     private readonly List<string> _installedThemeIds = [];
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -184,7 +184,7 @@ public class DeleteThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     private async Task<string> InstallThemeAsync()
     {
         string themeId = $"test-theme-{Guid.NewGuid():N}";
-        byte[] archiveBytes = _themeArchiveFixture.Create(themeId);
+        byte[] archiveBytes = _testThemeArchiveFixture.Create(themeId);
 
         using MultipartFormDataContent multipartContent = [];
         using ByteArrayContent fileContent = new(archiveBytes);

@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Requests.Themes;
 using Lumina.Presentation.Web.Core.Endpoints.Admin.Themes.SetCurrentTheme;
+using Lumina.Presentation.Web.Fixtures.Common.Requests.Themes;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.SecurityTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
@@ -18,6 +18,7 @@ namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Themes.SetC
 public class SetCurrentThemeEndpointTests : IClassFixture<LuminaWebFactory>
 {
     private readonly LuminaWebFactory _apiFactory;
+    private readonly SetCurrentThemeRequestFixture _setCurrentThemeRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SetCurrentThemeEndpointTests"/> class.
@@ -67,11 +68,11 @@ public class SetCurrentThemeEndpointTests : IClassFixture<LuminaWebFactory>
     /// Builds a PUT request for the set current theme route with the JSON content type required by the antiforgery validation.
     /// </summary>
     /// <returns>The configured PUT request.</returns>
-    private static HttpRequestMessage CreateSetCurrentThemeRequest()
+    private HttpRequestMessage CreateSetCurrentThemeRequest()
     {
         HttpRequestMessage setCurrentThemeRequest = new(HttpMethod.Put, "/en-us/admin/themes/api-set-current-theme")
         {
-            Content = JsonContent.Create(new SetCurrentThemeRequest("test-theme"))
+            Content = JsonContent.Create(_setCurrentThemeRequestFixture.Create(themeId: "test-theme"))
         };
         setCurrentThemeRequest.Content!.Headers.ContentType = new MediaTypeHeaderValue("application/json");
         setCurrentThemeRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

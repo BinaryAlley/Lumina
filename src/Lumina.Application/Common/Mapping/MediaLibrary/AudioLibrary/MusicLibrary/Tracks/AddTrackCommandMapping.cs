@@ -2,6 +2,7 @@
 using Lumina.Application.Common.Mapping.MediaContributors;
 using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Common;
 using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Commands.AddTrack;
+using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.Common.ValueObjects;
@@ -29,29 +30,39 @@ public static class AddTrackCommandMapping
     /// </returns>
     public static Result<Track> ToDomainEntity(this AddTrackCommand command)
     {
-        Result<AudioMetadata> metadataResult = command.Metadata!.ToDomainEntity();
+        MusicTrackMetadataDto metadata = command.Metadata!;
+        Result<AudioMetadata> metadataResult = metadata.ToDomainValueObject();
         if (metadataResult.IsFailure)
             return metadataResult.Errors;
 
-        IEnumerable<Result<Mood>> domainMoodsResult = (command.Moods ?? []).ToDomainEntities();
+        IEnumerable<Result<Mood>> domainMoodsResult = (command.Moods ?? []).ToDomainValueObjects();
         List<Error> errors = [.. domainMoodsResult.Where(moodResult => moodResult.IsFailure).SelectMany(moodResult => moodResult.Errors)];
         if (errors.Count > 0)
             return errors;
 
-        IEnumerable<Result<Isrc>> domainIsrcsResult = (command.Isrcs ?? []).ToDomainEntities();
+        IEnumerable<Result<Isrc>> domainIsrcsResult = (command.Isrcs ?? []).ToDomainValueObjects();
         errors = [.. domainIsrcsResult.Where(isrcResult => isrcResult.IsFailure).SelectMany(isrcResult => isrcResult.Errors)];
         if (errors.Count > 0)
             return errors;
 
-        IEnumerable<Result<MusicMediaContributor>> domainContributorsResult = command.Contributors!.ToMusicDomainEntities();
+        IEnumerable<Result<MusicMediaContributor>> domainContributorsResult = (command.Contributors ?? []).ToMusicDomainEntities();
         errors = [.. domainContributorsResult.Where(contributorResult => contributorResult.IsFailure).SelectMany(contributorResult => contributorResult.Errors)];
         if (errors.Count > 0)
             return errors;
 
-        IEnumerable<Result<AudioRating>> domainRatingsResult = command.Ratings!.ToDomainEntities();
+        IEnumerable<Result<AudioRating>> domainRatingsResult = (command.Ratings ?? []).ToDomainValueObjects();
         errors = [.. domainRatingsResult.Where(ratingResult => ratingResult.IsFailure).SelectMany(ratingResult => ratingResult.Errors)];
         if (errors.Count > 0)
             return errors;
+
+        Optional<MusicWork> work = Optional<MusicWork>.None();
+        if (command.Work is not null)
+        {
+            Result<MusicWork> workResult = command.Work.ToDomainValueObject();
+            if (workResult.IsFailure)
+                return workResult.Errors;
+            work = workResult.Value;
+        }
 
         Optional<MusicBrainzId> musicBrainzRecordingId = Optional<MusicBrainzId>.None();
         if (command.MusicBrainzRecordingId is not null)
@@ -59,9 +70,6 @@ public static class AddTrackCommandMapping
         Optional<MusicBrainzId> musicBrainzTrackId = Optional<MusicBrainzId>.None();
         if (command.MusicBrainzTrackId is not null)
             musicBrainzTrackId = MusicBrainzId.Create(command.MusicBrainzTrackId.Value);
-        Optional<MusicBrainzId> musicBrainzWorkId = Optional<MusicBrainzId>.None();
-        if (command.MusicBrainzWorkId is not null)
-            musicBrainzWorkId = MusicBrainzId.Create(command.MusicBrainzWorkId.Value);
 
         List<Mood> moods = [.. domainMoodsResult.Select(moodResult => moodResult.Value)];
         List<Isrc> isrcs = [.. domainIsrcsResult.Select(isrcResult => isrcResult.Value)];
@@ -74,17 +82,18 @@ public static class AddTrackCommandMapping
                 TrackId.Create(command.TrackId.Value),
                 command.Path!,
                 metadataResult.Value,
+                Optional<string>.FromNullable(metadata.Disambiguation),
                 command.TrackNumber!.Value,
                 Optional<int>.FromNullable(command.DiscNumber),
                 moods,
                 Optional<string>.FromNullable(command.Script),
                 Optional<MusicKey>.FromNullable(command.Key),
                 Optional<int>.FromNullable(command.Bpm),
+                metadata.IsVideo,
                 isrcs,
-                Optional<string>.FromNullable(command.Work),
+                work,
                 musicBrainzRecordingId,
                 musicBrainzTrackId,
-                musicBrainzWorkId,
                 contributors,
                 ratings,
                 DateTime.UtcNow,
@@ -93,17 +102,18 @@ public static class AddTrackCommandMapping
         return Track.Create(
             command.Path!,
             metadataResult.Value,
+            Optional<string>.FromNullable(metadata.Disambiguation),
             command.TrackNumber!.Value,
             Optional<int>.FromNullable(command.DiscNumber),
             moods,
             Optional<string>.FromNullable(command.Script),
             Optional<MusicKey>.FromNullable(command.Key),
             Optional<int>.FromNullable(command.Bpm),
+            metadata.IsVideo,
             isrcs,
-            Optional<string>.FromNullable(command.Work),
+            work,
             musicBrainzRecordingId,
             musicBrainzTrackId,
-            musicBrainzWorkId,
             contributors,
             ratings);
     }

@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using Bogus;
 using Lumina.Presentation.Web.Common.DTO.MediaContributors;
 using Lumina.Presentation.Web.Common.Enums.MediaContributors;
 using System.Collections.Generic;
@@ -10,12 +9,12 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.DTO.MediaContributors;
 
 /// <summary>
-/// Fixture class for generating <see cref="MediaContributorDto"/> test data.
+/// Fixture class for the <see cref="MediaContributorDto"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class MediaContributorDtoFixture
 {
-    private readonly Faker _faker = new();
+    private readonly MediaContributorNameDtoFixture _mediaContributorNameDtoFixture = new();
 
     /// <summary>
     /// Creates a new <see cref="MediaContributorDto"/> instance with randomized test data.
@@ -31,11 +30,7 @@ public class MediaContributorDtoFixture
     {
         return new MediaContributorDto
         {
-            Name = new MediaContributorNameDto
-            {
-                DisplayName = displayName ?? _faker.Name.FullName(),
-                LegalName = legalName ?? _faker.Name.FullName()
-            },
+            Name = _mediaContributorNameDtoFixture.Create(displayName, legalName),
             Role = role ?? MediaContributorRole.Author
         };
     }

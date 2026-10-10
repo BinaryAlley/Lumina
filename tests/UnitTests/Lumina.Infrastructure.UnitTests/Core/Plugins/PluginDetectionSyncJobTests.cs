@@ -9,6 +9,7 @@ using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Infrastructure.Plugins;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
+using Lumina.Application.Fixtures.Common.DTO.Pagination;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
@@ -51,6 +52,8 @@ public class PluginDetectionSyncJobTests
     private readonly PluginLoadErrorDtoFixture _pluginLoadErrorDtoFixture;
     private readonly PluginEntityFixture _pluginEntityFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
+    private readonly PaginatedResultDtoFixture<PluginEntity> _pluginPaginatedResultDtoFixture = new();
+    private readonly PaginatedResultDtoFixture<LibraryEntity> _libraryPaginatedResultDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PluginDetectionSyncJobTests"/> class.
@@ -191,7 +194,7 @@ public class PluginDetectionSyncJobTests
         PluginEntity loadedPluginRow = _pluginEntityFixture.Create(id: loadedPlugin.Id, name: loadedPlugin.Name, loadStatus: PluginLoadStatus.Loaded);
         PluginEntity stalePluginRow = _pluginEntityFixture.Create(name: "Stale Plugin", loadStatus: PluginLoadStatus.Loaded);
         _mockPluginRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<PluginEntity> { Data = [loadedPluginRow, stalePluginRow], CurrentPage = 1, PerPage = 2, Count = 2, NumberOfPages = 1 }));
+            .Returns(Result.From(_pluginPaginatedResultDtoFixture.Create(data: [loadedPluginRow, stalePluginRow], currentPage: 1, perPage: 2, count: 2, numberOfPages: 1)));
         _mockPluginRepository.DeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
             .Returns(Result.Deleted);
         PluginDetectionSyncJob sut = CreateSut();
@@ -217,7 +220,7 @@ public class PluginDetectionSyncJobTests
             .Returns(Result.From(Result.Updated));
         LibraryEntity bookLibrary = _libraryEntityFixture.Create(libraryType: LibraryType.Book);
         _mockLibraryRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<LibraryEntity> { Data = [bookLibrary], CurrentPage = 1, PerPage = 1, Count = 1, NumberOfPages = 1 }));
+            .Returns(Result.From(_libraryPaginatedResultDtoFixture.Create(data: [bookLibrary], currentPage: 1, perPage: 1, count: 1, numberOfPages: 1)));
         _mockProviderConfigurationStore.EnsureProviderConfigurationsAsync(Arg.Any<Guid>(), Arg.Any<LibraryType>(), Arg.Any<CancellationToken>())
             .Returns(Result.Success);
         PluginDetectionSyncJob sut = CreateSut();
@@ -244,7 +247,7 @@ public class PluginDetectionSyncJobTests
             errorMessage: "Failed to load plugin assembly 'MyPlugin.dll': unexpected error");
         PluginEntity staleLoadedRow = _pluginEntityFixture.Create(id: previouslyLoadedPlugin.Id, name: previouslyLoadedPlugin.Name, loadStatus: PluginLoadStatus.Loaded);
         _mockPluginRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<PluginEntity> { Data = [staleLoadedRow], CurrentPage = 1, PerPage = 1, Count = 1, NumberOfPages = 1 }));
+            .Returns(Result.From(_pluginPaginatedResultDtoFixture.Create(data: [staleLoadedRow], currentPage: 1, perPage: 1, count: 1, numberOfPages: 1)));
         _mockPluginRepository.DeleteByIdAsync(previouslyLoadedPlugin.Id, Arg.Any<CancellationToken>())
             .Returns(Result.Deleted);
         PluginDetectionSyncJob sut = CreateSut([loadError]);

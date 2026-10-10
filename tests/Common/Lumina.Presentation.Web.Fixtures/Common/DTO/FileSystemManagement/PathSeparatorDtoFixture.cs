@@ -9,7 +9,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.DTO.FileSystemManagement;
 
 /// <summary>
-/// Fixture class for generating <see cref="PathSeparatorDto"/> test data.
+/// Fixture class for the <see cref="PathSeparatorDto"/> record.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class PathSeparatorDtoFixture

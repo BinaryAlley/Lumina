@@ -22,7 +22,7 @@ public class ArtworkProviderConfigurationRepositoryTests
 {
     private readonly LuminaDbContext _mockContext;
     private readonly ArtworkProviderConfigurationRepository _sut;
-    private readonly LibraryArtworkProviderConfigurationEntityFixture _configurationFixture = new();
+    private readonly LibraryArtworkProviderConfigurationEntityFixture _libraryArtworkProviderConfigurationEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ArtworkProviderConfigurationRepositoryTests"/> class.
@@ -38,8 +38,8 @@ public class ArtworkProviderConfigurationRepositoryTests
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
-        LibraryArtworkProviderConfigurationEntity configurationOfLibrary = _configurationFixture.Create(libraryId, Guid.NewGuid(), 1);
-        LibraryArtworkProviderConfigurationEntity configurationOfAnotherLibrary = _configurationFixture.Create(Guid.NewGuid(), Guid.NewGuid(), 1);
+        LibraryArtworkProviderConfigurationEntity configurationOfLibrary = _libraryArtworkProviderConfigurationEntityFixture.Create(libraryId, Guid.NewGuid(), 1);
+        LibraryArtworkProviderConfigurationEntity configurationOfAnotherLibrary = _libraryArtworkProviderConfigurationEntityFixture.Create(Guid.NewGuid(), Guid.NewGuid(), 1);
         _mockContext.LibraryArtworkProviderConfigurations.AddRange(configurationOfLibrary, configurationOfAnotherLibrary);
         await _mockContext.SaveChangesAsync();
 
@@ -70,7 +70,7 @@ public class ArtworkProviderConfigurationRepositoryTests
     public async Task GetByLibraryAndPluginIdAsync_WhenConfigurationExists_ShouldReturnIt()
     {
         // Arrange
-        LibraryArtworkProviderConfigurationEntity configuration = _configurationFixture.Create(Guid.NewGuid(), Guid.NewGuid(), 1);
+        LibraryArtworkProviderConfigurationEntity configuration = _libraryArtworkProviderConfigurationEntityFixture.Create(Guid.NewGuid(), Guid.NewGuid(), 1);
         _mockContext.LibraryArtworkProviderConfigurations.Add(configuration);
         await _mockContext.SaveChangesAsync();
 
@@ -101,7 +101,7 @@ public class ArtworkProviderConfigurationRepositoryTests
     public async Task UpsertAsync_WhenConfigurationDoesNotExist_ShouldInsertIt()
     {
         // Arrange
-        LibraryArtworkProviderConfigurationEntity configuration = _configurationFixture.Create(Guid.NewGuid(), Guid.NewGuid(), 1);
+        LibraryArtworkProviderConfigurationEntity configuration = _libraryArtworkProviderConfigurationEntityFixture.Create(Guid.NewGuid(), Guid.NewGuid(), 1);
 
         // Act
         Result<Updated> result = await _sut.UpsertAsync(configuration, CancellationToken.None);
@@ -116,11 +116,11 @@ public class ArtworkProviderConfigurationRepositoryTests
     public async Task UpsertAsync_WhenConfigurationExists_ShouldUpdateIt()
     {
         // Arrange
-        LibraryArtworkProviderConfigurationEntity configuration = _configurationFixture.Create(Guid.NewGuid(), Guid.NewGuid(), 1);
+        LibraryArtworkProviderConfigurationEntity configuration = _libraryArtworkProviderConfigurationEntityFixture.Create(Guid.NewGuid(), Guid.NewGuid(), 1);
         _mockContext.LibraryArtworkProviderConfigurations.Add(configuration);
         await _mockContext.SaveChangesAsync();
 
-        LibraryArtworkProviderConfigurationEntity updatedConfiguration = _configurationFixture.Create(configuration.LibraryId, configuration.PluginId, 5);
+        LibraryArtworkProviderConfigurationEntity updatedConfiguration = _libraryArtworkProviderConfigurationEntityFixture.Create(configuration.LibraryId, configuration.PluginId, 5);
         updatedConfiguration.IsEnabled = true;
 
         // Act
@@ -140,8 +140,8 @@ public class ArtworkProviderConfigurationRepositoryTests
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
-        LibraryArtworkProviderConfigurationEntity configurationOfLibrary = _configurationFixture.Create(libraryId, Guid.NewGuid(), 1);
-        LibraryArtworkProviderConfigurationEntity configurationOfAnotherLibrary = _configurationFixture.Create(Guid.NewGuid(), Guid.NewGuid(), 1);
+        LibraryArtworkProviderConfigurationEntity configurationOfLibrary = _libraryArtworkProviderConfigurationEntityFixture.Create(libraryId, Guid.NewGuid(), 1);
+        LibraryArtworkProviderConfigurationEntity configurationOfAnotherLibrary = _libraryArtworkProviderConfigurationEntityFixture.Create(Guid.NewGuid(), Guid.NewGuid(), 1);
         _mockContext.LibraryArtworkProviderConfigurations.AddRange(configurationOfLibrary, configurationOfAnotherLibrary);
         await _mockContext.SaveChangesAsync();
 
@@ -160,8 +160,8 @@ public class ArtworkProviderConfigurationRepositoryTests
     {
         // Arrange
         Guid pluginId = Guid.NewGuid();
-        LibraryArtworkProviderConfigurationEntity configurationOfPlugin = _configurationFixture.Create(Guid.NewGuid(), pluginId, 1);
-        LibraryArtworkProviderConfigurationEntity configurationOfAnotherPlugin = _configurationFixture.Create(Guid.NewGuid(), Guid.NewGuid(), 1);
+        LibraryArtworkProviderConfigurationEntity configurationOfPlugin = _libraryArtworkProviderConfigurationEntityFixture.Create(Guid.NewGuid(), pluginId, 1);
+        LibraryArtworkProviderConfigurationEntity configurationOfAnotherPlugin = _libraryArtworkProviderConfigurationEntityFixture.Create(Guid.NewGuid(), Guid.NewGuid(), 1);
         _mockContext.LibraryArtworkProviderConfigurations.AddRange(configurationOfPlugin, configurationOfAnotherPlugin);
         await _mockContext.SaveChangesAsync();
 
@@ -182,8 +182,8 @@ public class ArtworkProviderConfigurationRepositoryTests
         Guid libraryId = Guid.NewGuid();
         Guid removedPluginId = Guid.NewGuid();
         Guid keptPluginId = Guid.NewGuid();
-        LibraryArtworkProviderConfigurationEntity removedConfiguration = _configurationFixture.Create(libraryId, removedPluginId, 1);
-        LibraryArtworkProviderConfigurationEntity keptConfiguration = _configurationFixture.Create(libraryId, keptPluginId, 2);
+        LibraryArtworkProviderConfigurationEntity removedConfiguration = _libraryArtworkProviderConfigurationEntityFixture.Create(libraryId, removedPluginId, 1);
+        LibraryArtworkProviderConfigurationEntity keptConfiguration = _libraryArtworkProviderConfigurationEntityFixture.Create(libraryId, keptPluginId, 2);
         _mockContext.LibraryArtworkProviderConfigurations.AddRange(removedConfiguration, keptConfiguration);
         await _mockContext.SaveChangesAsync();
 

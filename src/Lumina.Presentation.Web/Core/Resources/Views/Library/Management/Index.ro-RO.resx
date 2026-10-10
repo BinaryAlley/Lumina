@@ -189,6 +189,9 @@
   <data name="EnrichingMetadata" xml:space="preserve">
     <value>Se îmbogățesc metadatele...</value>
   </data>
+  <data name="ExtractingMetadata" xml:space="preserve">
+    <value>Se extrag metadatele...</value>
+  </data>
   <data name="HashingFileContents" xml:space="preserve">
     <value>Se calculează hash-urile fișierelor...</value>
   </data>

@@ -44,7 +44,7 @@ public static class IsbnEntityMapping
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully converted <see cref="Isbn"/>, or an error message.
     /// </returns>
-    public static Result<Isbn> ToDomainEntity(this IsbnEntity repositoryEntity)
+    public static Result<Isbn> ToDomainValueObject(this IsbnEntity repositoryEntity)
     {
         return Isbn.Create(
             repositoryEntity.Value!,
@@ -59,8 +59,8 @@ public static class IsbnEntityMapping
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a collection of converted <see cref="Isbn"/>, or an error message.
     /// </returns>
-    public static IEnumerable<Result<Isbn>> ToDomainEntities(this IEnumerable<IsbnEntity> repositoryEntities)
+    public static IEnumerable<Result<Isbn>> ToDomainValueObjects(this IEnumerable<IsbnEntity> repositoryEntities)
     {
-        return repositoryEntities.Select(domainEntity => domainEntity.ToDomainEntity());
+        return repositoryEntities.Select(domainEntity => domainEntity.ToDomainValueObject());
     }
 }

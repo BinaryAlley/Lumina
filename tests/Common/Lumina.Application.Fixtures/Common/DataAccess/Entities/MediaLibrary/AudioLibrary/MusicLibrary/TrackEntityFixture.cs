@@ -6,6 +6,7 @@ using Lumina.Application.Fixtures.Common.DataAccess.Entities.Common;
 using Lumina.Application.Fixtures.Common.Setup;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -46,6 +47,7 @@ public class TrackEntityFixture
     /// <param name="includeOriginalReleaseYear">Whether the original release year should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeReReleaseDate">Whether the re-release date should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeReReleaseYear">Whether the re-release year should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="metadataStatus">Optional. The metadata enrichment status of the track.</param>
     /// <returns>The created <see cref="TrackEntity"/>.</returns>
     public TrackEntity Create(
         Guid? id = null,
@@ -62,7 +64,8 @@ public class TrackEntityFixture
         bool includeOriginalReleaseDate = true,
         bool includeOriginalReleaseYear = true,
         bool includeReReleaseDate = true,
-        bool includeReReleaseYear = true)
+        bool includeReReleaseYear = true,
+        MetadataStatus? metadataStatus = null)
     {
         Guid resolvedId = id ?? Guid.NewGuid();
         Guid resolvedAlbumId = albumId ?? Guid.NewGuid();
@@ -80,6 +83,7 @@ public class TrackEntityFixture
                 Id = resolvedId,
                 AlbumId = resolvedAlbumId,
                 LibraryId = resolvedLibraryId,
+                MetadataStatus = metadataStatus ?? MetadataStatus.Pending,
                 Path = default!,
                 Title = default!,
                 CreatedOnUtc = default,
@@ -113,7 +117,9 @@ public class TrackEntityFixture
             .RuleFor(x => x.Script, f => f.Random.String2(f.Random.Number(1, 50)))
             .RuleFor(x => x.Key, f => f.PickRandom<MusicKey>())
             .RuleFor(x => x.Bpm, Random.Shared.Next(40, 240))
-            .RuleFor(x => x.Work, f => f.Music.Genre())
+            .RuleFor(x => x.IsVideo, f => f.Random.Bool())
+            .RuleFor(x => x.WorkTitle, f => f.Music.Genre())
+            .RuleFor(x => x.WorkType, f => f.Music.Genre())
             .RuleFor(x => x.MusicBrainzRecordingId, f => f.Random.Guid())
             .RuleFor(x => x.MusicBrainzTrackId, f => f.Random.Guid())
             .RuleFor(x => x.MusicBrainzWorkId, f => f.Random.Guid())

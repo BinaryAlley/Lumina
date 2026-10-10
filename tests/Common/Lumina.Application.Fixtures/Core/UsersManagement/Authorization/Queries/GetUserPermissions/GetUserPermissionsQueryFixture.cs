@@ -19,12 +19,13 @@ public class GetUserPermissionsQueryFixture
     /// Creates a random valid query to get user permissions.
     /// </summary>
     /// <param name="userId">Optional. The user Id.</param>
+    /// <param name="includeUserId">Whether the user Id should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created query.</returns>
-    public GetUserPermissionsQuery Create(Guid? userId = null)
+    public GetUserPermissionsQuery Create(Guid? userId = null, bool includeUserId = true)
     {
         return new Faker<GetUserPermissionsQuery>()
             .CustomInstantiator(f => new GetUserPermissionsQuery(
-                userId ?? Guid.NewGuid()))
+                includeUserId ? (userId ?? Guid.NewGuid()) : null))
             .Generate();
     }
 

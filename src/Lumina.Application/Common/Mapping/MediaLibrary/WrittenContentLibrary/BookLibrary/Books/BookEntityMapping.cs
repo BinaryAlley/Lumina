@@ -40,22 +40,22 @@ public static class BookEntityMapping
     /// </returns>
     public static Result<Book> ToDomainEntity(this BookEntity repositoryEntity)
     {
-        IEnumerable<Result<Tag>> tagsResult = repositoryEntity.Tags.ToDomainEntities();
+        IEnumerable<Result<Tag>> tagsResult = repositoryEntity.Tags.ToDomainValueObjects();
         foreach (Result<Tag> tagResult in tagsResult)
             if (tagResult.IsFailure)
                 return tagResult.Errors;
 
-        IEnumerable<Result<Genre>> genresResult = repositoryEntity.Genres.ToDomainEntities();
+        IEnumerable<Result<Genre>> genresResult = repositoryEntity.Genres.ToDomainValueObjects();
         foreach (Result<Genre> genreResult in genresResult)
             if (genreResult.IsFailure)
                 return genreResult.Errors;
 
-        IEnumerable<Result<Isbn>> isbnsResult = repositoryEntity.ISBNs.ToDomainEntities();
+        IEnumerable<Result<Isbn>> isbnsResult = repositoryEntity.ISBNs.ToDomainValueObjects();
         foreach (Result<Isbn> isbnResult in isbnsResult)
             if (isbnResult.IsFailure)
                 return isbnResult.Errors;
 
-        IEnumerable<Result<BookRating>> bookRatingsResult = repositoryEntity.Ratings.ToDomainEntities();
+        IEnumerable<Result<BookRating>> bookRatingsResult = repositoryEntity.Ratings.ToDomainValueObjects();
         foreach (Result<BookRating> bookRatingResult in bookRatingsResult)
             if (bookRatingResult.IsFailure)
                 return bookRatingResult.Errors;

@@ -11,7 +11,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
 
 /// <summary>
-/// Fixture class for generating <see cref="ReleaseInfoDto"/> test data.
+/// Fixture class for the <see cref="ReleaseInfoDto"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ReleaseInfoDtoFixture

@@ -20,7 +20,7 @@ public static class TagDtoMapping
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully converted <see cref="Tag"/>, or an error message.
     /// </returns>
-    public static Result<Tag> ToDomainEntity(this TagDto dto)
+    public static Result<Tag> ToDomainValueObject(this TagDto dto)
     {
         return Tag.Create(
             dto.Name!
@@ -34,8 +34,8 @@ public static class TagDtoMapping
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a collection of converted <see cref="Tag"/>, or an error message.
     /// </returns>
-    public static IEnumerable<Result<Tag>> ToDomainEntities(this IEnumerable<TagDto> dtos)
+    public static IEnumerable<Result<Tag>> ToDomainValueObjects(this IEnumerable<TagDto> dtos)
     {
-        return dtos.Select(domainEntity => domainEntity.ToDomainEntity());
+        return dtos.Select(domainEntity => domainEntity.ToDomainValueObject());
     }
 }

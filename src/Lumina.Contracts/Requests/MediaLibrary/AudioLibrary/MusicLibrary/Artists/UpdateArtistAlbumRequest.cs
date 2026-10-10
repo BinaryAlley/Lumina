@@ -16,8 +16,11 @@ namespace Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Artis
 /// <param name="AlbumId">The Id of the album, when the album already exists. Optional.</param>
 /// <param name="Metadata">The album metadata of the album. Required.</param>
 /// <param name="MediaFormat">The physical or digital medium of the album. Optional.</param>
+/// <param name="Packaging">The outermost physical packaging of the album. Optional.</param>
 /// <param name="Barcode">The barcode of the album. Optional.</param>
-/// <param name="CatalogNumber">The catalog number of the album. Optional.</param>
+/// <param name="CatalogNumbers">The catalog numbers of the album. Optional.</param>
+/// <param name="Label">The name of the label that issued the album. Optional.</param>
+/// <param name="ASIN">The ASIN (Amazon Standard Identification Number) of the album. Optional.</param>
 /// <param name="MusicBrainzReleaseId">The MusicBrainz identifier of the release. Optional.</param>
 /// <param name="MusicBrainzReleaseGroupId">The MusicBrainz identifier of the release group. Optional.</param>
 /// <param name="MusicBrainzReleaseArtistId">The MusicBrainz identifier of the release artist. Optional.</param>
@@ -27,10 +30,13 @@ namespace Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Artis
 [DebuggerDisplay("Title: {Metadata.Title}")]
 public record UpdateArtistAlbumRequest(
     Guid? AlbumId,
-    AlbumMetadataDto? Metadata,
+    MusicAlbumMetadataDto? Metadata,
     MusicMediaFormat? MediaFormat,
+    MusicReleasePackaging? Packaging,
     string? Barcode,
-    string? CatalogNumber,
+    List<string>? CatalogNumbers,
+    string? Label,
+    string? ASIN,
     Guid? MusicBrainzReleaseId,
     Guid? MusicBrainzReleaseGroupId,
     Guid? MusicBrainzReleaseArtistId,

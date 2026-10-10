@@ -15,13 +15,13 @@ namespace Lumina.Plugins.OpenLibrary.UnitTests.Core.Settings;
 [ExcludeFromCodeCoverage]
 public class OpenLibrarySettingsLoaderTests
 {
-    private readonly OpenLibrarySettingsDtoFixture _settingsFixture = new();
+    private readonly OpenLibrarySettingsDtoFixture _openLibrarySettingsDtoFixture = new();
 
     [Fact]
     public void Apply_WhenStoredSettingsContainValidValues_ShouldOverlayThemOntoTheRuntimeSettings()
     {
         // Arrange
-        OpenLibrarySettingsDto settings = _settingsFixture.Create();
+        OpenLibrarySettingsDto settings = _openLibrarySettingsDtoFixture.Create();
         Dictionary<string, string> storedSettings = new()
         {
             [OpenLibrarySettingsKeys.CONTACT_EMAIL] = "  contact@example.com  ",
@@ -44,7 +44,7 @@ public class OpenLibrarySettingsLoaderTests
     public void Apply_WhenStoredSettingsAreEmpty_ShouldKeepTheRuntimeSettingsDefaults()
     {
         // Arrange
-        OpenLibrarySettingsDto settings = _settingsFixture.Create(
+        OpenLibrarySettingsDto settings = _openLibrarySettingsDtoFixture.Create(
             userAgent: "Lumina-OpenLibrary/1.0",
             searchResultLimit: 10,
             workEditionLimit: 50,
@@ -66,7 +66,7 @@ public class OpenLibrarySettingsLoaderTests
     public void Apply_WhenStoredSettingsContainUnknownKeys_ShouldIgnoreThem()
     {
         // Arrange
-        OpenLibrarySettingsDto settings = _settingsFixture.Create(searchResultLimit: 10, workEditionLimit: 50);
+        OpenLibrarySettingsDto settings = _openLibrarySettingsDtoFixture.Create(searchResultLimit: 10, workEditionLimit: 50);
         Dictionary<string, string> storedSettings = new()
         {
             ["UnknownSetting"] = "value"
@@ -84,10 +84,32 @@ public class OpenLibrarySettingsLoaderTests
     public void Apply_WhenContactEmailIsWhiteSpace_ShouldSetItToNull()
     {
         // Arrange
-        OpenLibrarySettingsDto settings = _settingsFixture.Create();
+        OpenLibrarySettingsDto settings = _openLibrarySettingsDtoFixture.Create();
         Dictionary<string, string> storedSettings = new()
         {
             [OpenLibrarySettingsKeys.CONTACT_EMAIL] = "   "
+        };
+
+        // Act
+        OpenLibrarySettingsLoader.Apply(settings, storedSettings);
+
+        // Assert
+        Assert.Null(settings.ContactEmail);
+    }
+
+    [Theory]
+    [InlineData("user\r\n@example.com")] // carriage return and line feed injection
+    [InlineData("user@example.com\r\nX-Injected: value")] // header injection attempt
+    [InlineData("user(comment)@example.com")] // parentheses break the from header
+    [InlineData("user\"quoted\"@example.com")] // quotes break the header value
+    [InlineData("user example@example.com")] // an inner space is not a valid token character
+    public void Apply_WhenContactEmailContainsUnsafeCharacters_ShouldSetItToNull(string storedEmail)
+    {
+        // Arrange
+        OpenLibrarySettingsDto settings = _openLibrarySettingsDtoFixture.Create();
+        Dictionary<string, string> storedSettings = new()
+        {
+            [OpenLibrarySettingsKeys.CONTACT_EMAIL] = storedEmail
         };
 
         // Act
@@ -101,7 +123,7 @@ public class OpenLibrarySettingsLoaderTests
     public void Apply_WhenSearchResultLimitIsNotParsable_ShouldKeepTheCurrentValue()
     {
         // Arrange
-        OpenLibrarySettingsDto settings = _settingsFixture.Create(searchResultLimit: 10);
+        OpenLibrarySettingsDto settings = _openLibrarySettingsDtoFixture.Create(searchResultLimit: 10);
         Dictionary<string, string> storedSettings = new()
         {
             [OpenLibrarySettingsKeys.SEARCH_RESULT_LIMIT] = "not-a-number"
@@ -118,7 +140,7 @@ public class OpenLibrarySettingsLoaderTests
     public void Apply_WhenSearchResultLimitIsNotParsableAndCurrentValueWasChanged_ShouldKeepTheChangedValue()
     {
         // Arrange
-        OpenLibrarySettingsDto settings = _settingsFixture.Create(searchResultLimit: 7);
+        OpenLibrarySettingsDto settings = _openLibrarySettingsDtoFixture.Create(searchResultLimit: 7);
         Dictionary<string, string> storedSettings = new()
         {
             [OpenLibrarySettingsKeys.SEARCH_RESULT_LIMIT] = "not-a-number"
@@ -140,7 +162,7 @@ public class OpenLibrarySettingsLoaderTests
     public void Apply_WhenSearchResultLimitIsParsable_ShouldClampItToAtLeastOne(string storedValue, int expected)
     {
         // Arrange
-        OpenLibrarySettingsDto settings = _settingsFixture.Create();
+        OpenLibrarySettingsDto settings = _openLibrarySettingsDtoFixture.Create();
         Dictionary<string, string> storedSettings = new()
         {
             [OpenLibrarySettingsKeys.SEARCH_RESULT_LIMIT] = storedValue
@@ -160,7 +182,7 @@ public class OpenLibrarySettingsLoaderTests
     public void Apply_WhenWorkEditionLimitIsParsable_ShouldClampItToAtLeastOne(string storedValue, int expected)
     {
         // Arrange
-        OpenLibrarySettingsDto settings = _settingsFixture.Create();
+        OpenLibrarySettingsDto settings = _openLibrarySettingsDtoFixture.Create();
         Dictionary<string, string> storedSettings = new()
         {
             [OpenLibrarySettingsKeys.WORK_EDITION_LIMIT] = storedValue
@@ -177,7 +199,7 @@ public class OpenLibrarySettingsLoaderTests
     public void Apply_WhenMinimumRequestIntervalIsNegative_ShouldClampItToZero()
     {
         // Arrange
-        OpenLibrarySettingsDto settings = _settingsFixture.Create();
+        OpenLibrarySettingsDto settings = _openLibrarySettingsDtoFixture.Create();
         Dictionary<string, string> storedSettings = new()
         {
             [OpenLibrarySettingsKeys.MINIMUM_REQUEST_INTERVAL_SECONDS] = "-3"
@@ -197,7 +219,7 @@ public class OpenLibrarySettingsLoaderTests
     public void Apply_WhenMinimumRequestIntervalUsesInvariantCultureDecimalSeparator_ShouldParseIt(string storedValue, int expectedMilliseconds)
     {
         // Arrange
-        OpenLibrarySettingsDto settings = _settingsFixture.Create();
+        OpenLibrarySettingsDto settings = _openLibrarySettingsDtoFixture.Create();
         Dictionary<string, string> storedSettings = new()
         {
             [OpenLibrarySettingsKeys.MINIMUM_REQUEST_INTERVAL_SECONDS] = storedValue
@@ -214,7 +236,7 @@ public class OpenLibrarySettingsLoaderTests
     public void Apply_WhenMinimumRequestIntervalIsNotParsable_ShouldKeepTheCurrentValue()
     {
         // Arrange
-        OpenLibrarySettingsDto settings = _settingsFixture.Create(minimumRequestInterval: TimeSpan.FromSeconds(1.1));
+        OpenLibrarySettingsDto settings = _openLibrarySettingsDtoFixture.Create(minimumRequestInterval: TimeSpan.FromSeconds(1.1));
         Dictionary<string, string> storedSettings = new()
         {
             [OpenLibrarySettingsKeys.MINIMUM_REQUEST_INTERVAL_SECONDS] = "fast"

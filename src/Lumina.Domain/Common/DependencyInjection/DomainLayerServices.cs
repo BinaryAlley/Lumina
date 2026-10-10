@@ -6,7 +6,11 @@ using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.File
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Progress;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.PathTemplate;
+using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Services.PathTemplate;
+using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Services.Scanners;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Scanners;
+using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Services.PathTemplate;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Services.Scanners;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
@@ -49,7 +53,11 @@ public static class DomainLayerServices
         services.AddScoped<IMediaLibraryScanJobFactory, MediaLibraryScanJobFactory>();
         services.AddScoped<IMediaLibraryScanningService, MediaLibraryScanningService>();
         services.AddScoped<IBookLibraryTypeScanner, BookLibraryTypeScanner>();
+        services.AddScoped<IMusicLibraryTypeScanner, MusicLibraryTypeScanner>();
         services.AddScoped<IMediaLibraryScannerFactory, MediaLibraryScannerFactory>();
+        services.AddScoped<ILibraryPathPartCatalog, MusicLibraryPathPartCatalog>();
+        services.AddScoped<ILibraryPathPartCatalog, BookLibraryPathPartCatalog>();
+        services.AddScoped<ILibraryPathTemplateService, LibraryPathTemplateService>();
 
         services.AddSingleton<IFileSystem, FileSystem>();
         services.AddSingleton<IMediaLibrariesScanProgressTracker, MediaLibrariesScanProgressTracker>();

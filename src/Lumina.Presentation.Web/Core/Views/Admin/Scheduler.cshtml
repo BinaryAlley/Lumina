@@ -46,7 +46,8 @@ It keeps the DOM contract the client script binds to, without any images or colo
                         <div class="enlightenment-option" data-value="ScanMediaLibraries">@_localizer["TaskType.ScanMediaLibraries"]</div>
                         <div class="enlightenment-option" data-value="CleanTemporaryFiles">@_localizer["TaskType.CleanTemporaryFiles"]</div>
                         <div class="enlightenment-option" data-value="RepairThemes">@_localizer["TaskType.RepairThemes"]</div>
-                        <div class="enlightenment-option last-option" data-value="CleanScheduledJobExecutionHistory">@_localizer["TaskType.CleanScheduledJobExecutionHistory"]</div>
+                        <div class="enlightenment-option" data-value="CleanScheduledJobExecutionHistory">@_localizer["TaskType.CleanScheduledJobExecutionHistory"]</div>
+                        <div class="enlightenment-option last-option" data-value="TechnicalDataCleanup">@_localizer["TaskType.TechnicalDataCleanup"]</div>
                     </div>
                 </div>
             </div>
@@ -180,7 +181,8 @@ It keeps the DOM contract the client script binds to, without any images or colo
                 ScanMediaLibraries: '@_localizer["TaskType.ScanMediaLibraries"]',
                 CleanTemporaryFiles: '@_localizer["TaskType.CleanTemporaryFiles"]',
                 RepairThemes: '@_localizer["TaskType.RepairThemes"]',
-                CleanScheduledJobExecutionHistory: '@_localizer["TaskType.CleanScheduledJobExecutionHistory"]'
+                CleanScheduledJobExecutionHistory: '@_localizer["TaskType.CleanScheduledJobExecutionHistory"]',
+                TechnicalDataCleanup: '@_localizer["TaskType.TechnicalDataCleanup"]'
             },
             statusNames: {
                 Added: '@_localizer["Status.Added"]',
@@ -195,7 +197,8 @@ It keeps the DOM contract the client script binds to, without any images or colo
             ScanMediaLibraries: '#5aa7c7',
             CleanTemporaryFiles: '#c7a15a',
             RepairThemes: '#8bc34a',
-            CleanScheduledJobExecutionHistory: '#ba68c8'
+            CleanScheduledJobExecutionHistory: '#ba68c8',
+            TechnicalDataCleanup: '#90a4ae'
         };
 
         // The element references are captured once, so that the cleanup can unbind their listeners even after the AJAX navigator has swapped the content out of the document.
@@ -295,7 +298,7 @@ It keeps the DOM contract the client script binds to, without any images or colo
         }
 
         // Graph state.
-        const taskTypeOrder = ['ScanMediaLibraries', 'CleanTemporaryFiles', 'RepairThemes', 'CleanScheduledJobExecutionHistory'];
+        const taskTypeOrder = ['ScanMediaLibraries', 'CleanTemporaryFiles', 'RepairThemes', 'CleanScheduledJobExecutionHistory', 'TechnicalDataCleanup'];
         const graphState = {
             dataPoints: [],
             pixelsPerSecond: 0,

@@ -26,6 +26,13 @@ public static class LibraryMapping
             LibraryType = domainEntity.LibraryType,
             UserId = domainEntity.UserId.Value,
             ContentLocations = [.. domainEntity.ContentLocations.Select(path => new LibraryContentLocationEntity() { Path = path.Path })],
+            PathTemplateParts = [.. domainEntity.PathTemplate.Parts.Select((part, index) => new LibraryPathTemplatePartEntity
+            {
+                Kind = part.Kind,
+                Representation = part.Representation,
+                IsOptional = part.IsOptional,
+                Position = index
+            })],
             CoverImage = domainEntity.CoverImage.HasValue ? domainEntity.CoverImage.Value : null,
             IsEnabled = domainEntity.IsEnabled,
             IsLocked = domainEntity.IsLocked,

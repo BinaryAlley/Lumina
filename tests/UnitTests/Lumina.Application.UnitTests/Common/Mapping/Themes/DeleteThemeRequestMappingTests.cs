@@ -39,7 +39,7 @@ public class DeleteThemeRequestMappingTests
     public void ToCommand_WhenMappingDifferentThemeIds_ShouldMapCorrectly(string themeId)
     {
         // Arrange
-        DeleteThemeRequest request = new(themeId);
+        DeleteThemeRequest request = _deleteThemeRequestFixture.Create(themeId);
 
         // Act
         DeleteThemeCommand result = request.ToCommand();
@@ -53,7 +53,7 @@ public class DeleteThemeRequestMappingTests
     public void ToCommand_WhenThemeIdIsNull_ShouldMapNull()
     {
         // Arrange
-        DeleteThemeRequest request = new(null);
+        DeleteThemeRequest request = _deleteThemeRequestFixture.Create(includeThemeId: false);
 
         // Act
         DeleteThemeCommand result = request.ToCommand();

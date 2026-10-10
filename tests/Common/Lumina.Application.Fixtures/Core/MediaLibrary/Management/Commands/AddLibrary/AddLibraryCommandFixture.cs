@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
+using Lumina.Application.Common.DTO.MediaLibrary.Management;
 using Lumina.Application.Core.MediaLibrary.Management.Commands.AddLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System.Collections.Generic;
@@ -27,6 +28,7 @@ public class AddLibraryCommandFixture
     /// <param name="canDownloadMetadataFromWeb">Whether the media library should download metadata from the web or not.</param>
     /// <param name="shouldSaveMetadataInMediaDirectories">Whether the metadata should be saved in the media directories or not.</param>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether unchanged directories should be skipped during a scan or not.</param>
+    /// <param name="pathTemplateParts">Optional. The ordered parts of the path template of the media library.</param>
     /// <returns>The created command.</returns>
     public AddLibraryCommand Create(
         string? title = null,
@@ -37,7 +39,8 @@ public class AddLibraryCommandFixture
         bool isLocked = false,
         bool canDownloadMetadataFromWeb = true,
         bool shouldSaveMetadataInMediaDirectories = true,
-        bool shouldSkipUnchangedDirectoriesDuringScan = false)
+        bool shouldSkipUnchangedDirectoriesDuringScan = false,
+        LibraryPathTemplatePartDto[]? pathTemplateParts = null)
     {
         return new Faker<AddLibraryCommand>()
             .CustomInstantiator(f => new AddLibraryCommand(
@@ -49,7 +52,8 @@ public class AddLibraryCommandFixture
                 false,
                 true,
                 true,
-                false
+                false,
+                null
             ))
             .RuleFor(x => x.Title, f => title ?? f.Lorem.Word())
             .RuleFor(x => x.LibraryType, f => libraryType ?? f.Random.Enum<LibraryType>().ToString())
@@ -60,6 +64,7 @@ public class AddLibraryCommandFixture
             .RuleFor(x => x.CanDownloadMetadataFromWeb, canDownloadMetadataFromWeb)
             .RuleFor(x => x.ShouldSaveMetadataInMediaDirectories, shouldSaveMetadataInMediaDirectories)
             .RuleFor(x => x.ShouldSkipUnchangedDirectoriesDuringScan, shouldSkipUnchangedDirectoriesDuringScan)
+            .RuleFor(x => x.PathTemplateParts, pathTemplateParts)
             .Generate();
     }
 

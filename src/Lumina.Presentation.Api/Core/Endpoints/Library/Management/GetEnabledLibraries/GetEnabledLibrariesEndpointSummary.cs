@@ -22,6 +22,21 @@ public class GetEnabledLibrariesEndpointSummary : Summary<GetEnabledLibrariesEnd
         Summary = "Retrieves the list of enabled media libraries.";
         Description = "Retrieves the entire list of media libraries that are marked as enabled, if the user making the request is an Admin, or just the library owned by them, for regular users.";
 
+        ResponseParam<LibraryResponse>(r => r.Id, "The unique identifier of the entity.");
+        ResponseParam<LibraryResponse>(r => r.UserId, "The unique identifier of the user owning the media library.");
+        ResponseParam<LibraryResponse>(r => r.Title, "The title of the media library.");
+        ResponseParam<LibraryResponse>(r => r.LibraryType, "The type of the media library.");
+        ResponseParam<LibraryResponse>(r => r.ContentLocations, "The file system paths of the directories where the media library elements are located.");
+        ResponseParam<LibraryResponse>(r => r.CoverImage, "The path of the image file used as the cover for the library.");
+        ResponseParam<LibraryResponse>(r => r.IsEnabled, "Whether this media library is enabled or not. A disabled media library is never shown or changed.");
+        ResponseParam<LibraryResponse>(r => r.IsLocked, "Whether this media library is locked or not. A locked media library is displayed, but is never changed or updated.");
+        ResponseParam<LibraryResponse>(r => r.CanDownloadMetadataFromWeb, "Whether this media library should update the metadata of its elements from the web, or not.");
+        ResponseParam<LibraryResponse>(r => r.ShouldSaveMetadataInMediaDirectories, "Whether this media library should copy the downloaded metadata into the media library content locations, or not.");
+        ResponseParam<LibraryResponse>(r => r.ShouldSkipUnchangedDirectoriesDuringScan, "Whether this media library should skip the directories whose contents have not changed since the last scan, during the scan, or not.");
+        ResponseParam<LibraryResponse>(r => r.PathTemplateParts, "The ordered parts of the template describing the structure of the media library on disk.");
+        ResponseParam<LibraryResponse>(r => r.CreatedOnUtc, "The date and time when the entity was created.");
+        ResponseParam<LibraryResponse>(r => r.UpdatedOnUtc, "The date and time when the entity was last updated.");
+
         Response(200, "The media libraries are returned.",
             example: new LibraryResponse[] {
             new (
@@ -36,6 +51,7 @@ public class GetEnabledLibrariesEndpointSummary : Summary<GetEnabledLibrariesEnd
                 CanDownloadMetadataFromWeb: true,
                 ShouldSaveMetadataInMediaDirectories: false,
                 ShouldSkipUnchangedDirectoriesDuringScan: false,
+                PathTemplateParts: [],
                 CreatedOnUtc: DateTime.UtcNow,
                 UpdatedOnUtc: default
             ),
@@ -51,6 +67,7 @@ public class GetEnabledLibrariesEndpointSummary : Summary<GetEnabledLibrariesEnd
                 CanDownloadMetadataFromWeb: true,
                 ShouldSaveMetadataInMediaDirectories: true,
                 ShouldSkipUnchangedDirectoriesDuringScan: false,
+                PathTemplateParts: [],
                 CreatedOnUtc: DateTime.UtcNow,
                 UpdatedOnUtc: default
             )

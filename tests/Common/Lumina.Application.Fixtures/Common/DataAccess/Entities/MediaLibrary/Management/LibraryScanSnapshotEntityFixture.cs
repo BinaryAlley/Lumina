@@ -10,7 +10,7 @@ using System.Linq;
 namespace Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
 
 /// <summary>
-/// Fixture class for generating <see cref="LibraryScanSnapshotEntity"/> test data.
+/// Fixture class for the <see cref="LibraryScanSnapshotEntity"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class LibraryScanSnapshotEntityFixture

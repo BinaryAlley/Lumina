@@ -38,7 +38,8 @@ public class UpdateLibraryEndpointSummary : Summary<UpdateLibraryEndpoint, Updat
             IsLocked: false,
             CanDownloadMetadataFromWeb: true,
             ShouldSaveMetadataInMediaDirectories: false,
-            ShouldSkipUnchangedDirectoriesDuringScan: false
+            ShouldSkipUnchangedDirectoriesDuringScan: false,
+            PathTemplateParts: null
         );
 
         RequestParam(r => r.Id, "The unique identifier of the media library. Required.");
@@ -52,6 +53,7 @@ public class UpdateLibraryEndpointSummary : Summary<UpdateLibraryEndpoint, Updat
         RequestParam(r => r.CanDownloadMetadataFromWeb, "Whether this media library should update the metadata of its elements from the web, or not. Optional.");
         RequestParam(r => r.ShouldSaveMetadataInMediaDirectories, "Whether this media library should copy the downloaded metadata into the media library content locations, or not. Optional.");
         RequestParam(r => r.ShouldSkipUnchangedDirectoriesDuringScan, "Whether this media library should skip the directories whose contents have not changed since the last scan, during the scan, or not. Optional.");
+        RequestParam(r => r.PathTemplateParts, "The ordered parts of the template describing the structure of the media library on disk. Optional, the ideal structure of the library type is used when absent.");
 
         ResponseParam<LibraryResponse>(r => r.Id, "The unique identifier of the entity.");
         ResponseParam<LibraryResponse>(r => r.UserId, "The unique identifier of the user owning the media library.");
@@ -64,6 +66,7 @@ public class UpdateLibraryEndpointSummary : Summary<UpdateLibraryEndpoint, Updat
         ResponseParam<LibraryResponse>(r => r.CanDownloadMetadataFromWeb, "Whether this media library should update the metadata of its elements from the web, or not.");
         ResponseParam<LibraryResponse>(r => r.ShouldSaveMetadataInMediaDirectories, "Whether this media library should copy the downloaded metadata into the media library content locations, or not.");
         ResponseParam<LibraryResponse>(r => r.ShouldSkipUnchangedDirectoriesDuringScan, "Whether this media library should skip the directories whose contents have not changed since the last scan, during the scan, or not.");
+        ResponseParam<LibraryResponse>(r => r.PathTemplateParts, "The ordered parts of the template describing the structure of the media library on disk.");
         ResponseParam<LibraryResponse>(r => r.CreatedOnUtc, "The date and time when the entity was created.");
         ResponseParam<LibraryResponse>(r => r.UpdatedOnUtc, "The date and time when the entity was last updated.");
 
@@ -80,6 +83,7 @@ public class UpdateLibraryEndpointSummary : Summary<UpdateLibraryEndpoint, Updat
                 CanDownloadMetadataFromWeb: true,
                 ShouldSaveMetadataInMediaDirectories: false,
                 ShouldSkipUnchangedDirectoriesDuringScan: false,
+                PathTemplateParts: [],
                 CreatedOnUtc: DateTime.UtcNow,
                 UpdatedOnUtc: default
             ));
@@ -114,15 +118,27 @@ public class UpdateLibraryEndpointSummary : Summary<UpdateLibraryEndpoint, Updat
             }
         );
 
-        Response(403, "The request failed because the user making the request is not an Admin, or the owner of the media library.", "application/problem+json",
-            example: new
+        Response(403, "The request failed because the authenticated user is not allowed to manage the media library, or because the request carried an unsupported library type.", "application/problem+json",
+            example: new[]
             {
-                type = "https://tools.ietf.org/html/rfc9110#section-15.5.4",
-                title = "General.Failure",
-                status = 403,
-                detail = "NotAuthorized",
-                instance = "/api/v1/libraries/{id}",
-                traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.4",
+                    title = "General.Failure",
+                    status = 403,
+                    detail = "NotAuthorized",
+                    instance = "/api/v1/libraries/{id}",
+                    traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.4",
+                    title = "General.Forbidden",
+                    status = 403,
+                    detail = "UnknownLibraryType",
+                    instance = "/api/v1/libraries/{id}",
+                    traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
+                }
             }
         );
 
@@ -154,7 +170,6 @@ public class UpdateLibraryEndpointSummary : Summary<UpdateLibraryEndpoint, Updat
                             "LibraryIdCannotBeEmpty",
                             "UserIdCannotBeEmpty",
                             "LibraryTypeCannotBeNull",
-                            "UnknownLibraryType",
                             "PathsListCannotBeNull",
                             "PathsListCannotBeEmpty",
                             "PathCannotBeEmpty",

@@ -76,6 +76,11 @@ public class AddTrackCommandValidator : AbstractValidator<AddTrackCommand>
                     .When(m => m!.Description is not null)
                     .WithError(Errors.Metadata.DescriptionMustBeMaximum2000CharactersLong);
 
+                trackMetadata.RuleFor(m => m!.Disambiguation)
+                    .MaximumLength(255)
+                    .When(m => m!.Disambiguation is not null)
+                    .WithError(Errors.Metadata.DescriptionMustBeMaximum2000CharactersLong);
+
                 trackMetadata.RuleFor(m => m!.ReleaseInfo)
                     .NotNull()
                     .WithError(Errors.Metadata.ReleaseInfoCannotBeNull)
@@ -203,11 +208,6 @@ public class AddTrackCommandValidator : AbstractValidator<AddTrackCommand>
             .When(command => command.MusicBrainzTrackId.HasValue)
             .WithError(Errors.Music.MusicBrainzIdInvalidFormat);
 
-        RuleFor(command => command.MusicBrainzWorkId)
-            .Must(musicBrainzWorkId => musicBrainzWorkId != Guid.Empty)
-            .When(command => command.MusicBrainzWorkId.HasValue)
-            .WithError(Errors.Music.MusicBrainzIdInvalidFormat);
-
         // Validates the ordering and performance characteristics of the track.
         RuleFor(command => command.TrackNumber)
             .NotNull()
@@ -238,10 +238,16 @@ public class AddTrackCommandValidator : AbstractValidator<AddTrackCommand>
             .When(command => command.Bpm.HasValue)
             .WithError(Errors.Music.BpmMustBeGreaterThanZero);
 
-        RuleFor(command => command.Work)
+        // Validates the work the track is a recording of.
+        RuleFor(command => command.Work!.Title)
             .MaximumLength(255)
-            .When(command => command.Work is not null)
+            .When(command => command.Work is not null && command.Work.Title is not null)
             .WithError(Errors.Music.WorkMustBeMaximum255CharactersLong);
+
+        RuleFor(command => command.Work!.MusicBrainzWorkId)
+            .Must(musicBrainzWorkId => musicBrainzWorkId is null || musicBrainzWorkId != Guid.Empty)
+            .When(command => command.Work is not null)
+            .WithError(Errors.Music.MusicBrainzIdInvalidFormat);
 
         // Validates the moods and the ISRC codes of the track.
         RuleForEach(command => command.Moods)

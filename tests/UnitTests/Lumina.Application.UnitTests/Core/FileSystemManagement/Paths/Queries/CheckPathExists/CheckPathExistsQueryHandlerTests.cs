@@ -103,7 +103,7 @@ public class CheckPathExistsQueryHandlerTests
     public async Task HandleAsync_WhenCalledWithNullPath_ShouldStillCallPathService()
     {
         // Arrange
-        CheckPathExistsQuery query = new(null!, false);
+        CheckPathExistsQuery query = _checkPathExistsQueryFixture.Create(includePath: false, shouldIncludeHiddenElements: false);
         _mockPathService.Exists(Arg.Any<string>(), Arg.Any<bool>()).Returns(false);
 
         // Act

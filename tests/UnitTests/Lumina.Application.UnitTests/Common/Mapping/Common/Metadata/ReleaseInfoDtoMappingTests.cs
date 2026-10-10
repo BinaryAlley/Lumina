@@ -20,7 +20,7 @@ public class ReleaseInfoDtoMappingTests
     private readonly ReleaseInfoDtoFixture _releaseInfoDtoFixture = new();
 
     [Fact]
-    public void ToDomainEntity_WhenMappingCompleteReleaseInfoDto_ShouldMapAllPropertiesCorrectly()
+    public void ToDomainValueObject_WhenMappingCompleteReleaseInfoDto_ShouldMapAllPropertiesCorrectly()
     {
         // Arrange
         ReleaseInfoDto dto = _releaseInfoDtoFixture.Create(
@@ -32,7 +32,7 @@ public class ReleaseInfoDtoMappingTests
             releaseVersion: "Director's Cut");
 
         // Act
-        Result<ReleaseInfo> result = dto.ToDomainEntity();
+        Result<ReleaseInfo> result = dto.ToDomainValueObject();
 
         // Assert
         Assert.False(result.IsFailure);
@@ -51,13 +51,13 @@ public class ReleaseInfoDtoMappingTests
     }
 
     [Fact]
-    public void ToDomainEntity_WhenOptionalValuesAreMissing_ShouldMapWithoutOptionalValues()
+    public void ToDomainValueObject_WhenOptionalValuesAreMissing_ShouldMapWithoutOptionalValues()
     {
         // Arrange
         ReleaseInfoDto dto = _releaseInfoDtoFixture.Create();
 
         // Act
-        Result<ReleaseInfo> result = dto.ToDomainEntity();
+        Result<ReleaseInfo> result = dto.ToDomainValueObject();
 
         // Assert
         Assert.False(result.IsFailure);
@@ -70,7 +70,7 @@ public class ReleaseInfoDtoMappingTests
     }
 
     [Fact]
-    public void ToDomainEntity_WhenOriginalReleaseDateAndYearDoNotMatch_ShouldReturnError()
+    public void ToDomainValueObject_WhenOriginalReleaseDateAndYearDoNotMatch_ShouldReturnError()
     {
         // Arrange
         ReleaseInfoDto dto = _releaseInfoDtoFixture.Create(
@@ -78,14 +78,14 @@ public class ReleaseInfoDtoMappingTests
             originalReleaseYear: 2024);
 
         // Act
-        Result<ReleaseInfo> result = dto.ToDomainEntity();
+        Result<ReleaseInfo> result = dto.ToDomainValueObject();
 
         // Assert
         Assert.True(result.IsFailure);
     }
 
     [Fact]
-    public void ToDomainEntity_WhenReReleaseDateAndYearDoNotMatch_ShouldReturnError()
+    public void ToDomainValueObject_WhenReReleaseDateAndYearDoNotMatch_ShouldReturnError()
     {
         // Arrange
         ReleaseInfoDto dto = _releaseInfoDtoFixture.Create(
@@ -93,7 +93,7 @@ public class ReleaseInfoDtoMappingTests
             reReleaseYear: 2024);
 
         // Act
-        Result<ReleaseInfo> result = dto.ToDomainEntity();
+        Result<ReleaseInfo> result = dto.ToDomainValueObject();
 
         // Assert
         Assert.True(result.IsFailure);

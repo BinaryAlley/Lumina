@@ -37,7 +37,7 @@ public class UpdateTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
 
     private readonly LuminaApiFactory _apiFactory;
     private readonly UpdateTrackRequestFixture _updateTrackRequestFixture = new();
-    private readonly AudioMetadataDtoFixture _audioMetadataDtoFixture = new();
+    private readonly MusicTrackMetadataDtoFixture _musicTrackMetadataDtoFixture = new();
     private readonly ArtistEntityFixture _artistEntityFixture = new();
     private readonly AlbumEntityFixture _albumEntityFixture = new();
     private readonly TrackEntityFixture _trackEntityFixture = new();
@@ -95,7 +95,7 @@ public class UpdateTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         (Guid artistId, Guid albumId, Guid trackId) = SeedArtistGraph(libraryId);
         UpdateTrackRequest request = _updateTrackRequestFixture.Create(
             path: Path.Combine(s_contentRootPath, $"injected-{Guid.NewGuid():N}.flac"),
-            metadata: _audioMetadataDtoFixture.Create(title: maliciousTitle),
+            metadata: _musicTrackMetadataDtoFixture.Create(title: maliciousTitle),
             moods: [],
             isrcs: [],
             contributors: [],
@@ -263,7 +263,7 @@ public class UpdateTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         Guid victimLibraryId = Guid.NewGuid();
         SeedLibrary(victimLibraryId, victimUserId);
         (Guid victimArtistId, Guid victimAlbumId, Guid victimTrackId) = SeedArtistGraph(victimLibraryId);
-        UpdateTrackRequest request = _updateTrackRequestFixture.Create(metadata: _audioMetadataDtoFixture.Create(title: "Hijacked"));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(title: "Hijacked"));
 
         // Act
         HttpResponseMessage response = await client.PutAsJsonAsync($"/api/v1/libraries/{ownLibraryId}/artists/{victimArtistId}/albums/{victimAlbumId}/tracks/{victimTrackId}", request);

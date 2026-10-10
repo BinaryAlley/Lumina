@@ -48,6 +48,11 @@ public class UserSettingsEntity : IStorageEntity, IAuditableEntity
     public bool ShouldAggregateMetadataWhenMissing { get; set; }
 
     /// <summary>
+    /// Gets or sets whether the artwork of the media library items is aggregated from multiple providers, when it is missing, or not.
+    /// </summary>
+    public bool ShouldAggregateArtworkWhenMissing { get; set; }
+
+    /// <summary>
     /// Gets or sets whether PDF books are rendered as page images for the user, or not. Rendering PDFs as images preserves the
     /// original layout, but the pages are not selectable or searchable, unlike their text layer.
     /// </summary>

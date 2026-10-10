@@ -56,6 +56,15 @@ public interface ILibraryScanStagingResultsRepository : IRepository<LibraryScanS
     Task<Result<IReadOnlyList<string>>> GetChangedPathsAsync(Guid scanId, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Gets the paths of the media library scan staging results of the current scan that are new or changed, meaning they need their content hashed
+    /// and their metadata extracted.
+    /// </summary>
+    /// <param name="scanId">The unique identifier of the media library scan whose staging result paths are retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the paths of the staging results that need rehashing, or an error.</returns>
+    Task<Result<IReadOnlyList<string>>> GetPathsNeedingRehashAsync(Guid scanId, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Updates the content hashes of the provided media library scan staging results.
     /// </summary>
     /// <param name="scanId">The unique identifier of the media library scan whose staging results are updated.</param>

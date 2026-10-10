@@ -4,7 +4,7 @@
 **Accepted** (2026-08-08)
 
 ## Context
-Media library scan jobs are launched in a fire-and-forget manner from the background job processor (`MediaLibraryScanJobProcessorJob`), because only the root jobs are placed on the in-memory queue, and they trigger their children recursively (see ADR-0001 and ADR-0008). The launch mechanism uses `FireAndForgetSafeAsync`, which observes the launched task but does not crash the queue consumer.
+Media library scan jobs are launched in a fire-and-forget manner from the background job processor (`MediaLibraryScanJobProcessorJob`), because only the root jobs are placed on the in-memory queue, and they trigger their children recursively (see [ADR-0001](architecture-decision-record-0001.md) and [ADR-0008](architecture-decision-record-0008.md)). The launch mechanism uses `FireAndForgetSafeAsync`, which observes the launched task but does not crash the queue consumer.
 
 The scan jobs must report their failures through the existing eventual consistency mechanism, the `LibraryScanFailedDomainEvent`, whose handler marks the scan as failed, releases the scan processing resources and notifies the clients. The previous job implementations only published the failure event on a few specific error paths, so any other exception was silently swallowed, leaving the scan stuck in the `Running` state, leaking its cancellation source and progress entry.
 

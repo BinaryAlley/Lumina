@@ -12,6 +12,8 @@ using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Commands.UpdateTrack;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Common;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaContributors;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Fixtures.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Commands.UpdateTrack;
@@ -60,9 +62,11 @@ public class UpdateTrackCommandHandlerTests
     private readonly AlbumEntityFixture _albumEntityFixture = new();
     private readonly TrackEntityFixture _trackEntityFixture = new();
     private readonly MediaContributorReferenceDtoFixture _mediaContributorReferenceDtoFixture = new();
-    private readonly AudioMetadataDtoFixture _audioMetadataDtoFixture = new();
+    private readonly MusicTrackMetadataDtoFixture _musicTrackMetadataDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
+    private readonly MediaContributorEntityFixture _mediaContributorEntityFixture = new();
+    private readonly GenreEntityFixture _genreEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdateTrackCommandHandlerTests"/> class.
@@ -102,14 +106,7 @@ public class UpdateTrackCommandHandlerTests
             .Returns(callInfo =>
             {
                 IReadOnlyCollection<Guid> contributorIds = callInfo.Arg<IReadOnlyCollection<Guid>>();
-                return Result.From<IReadOnlyList<MediaContributorEntity>>([.. contributorIds.Select(contributorId => new MediaContributorEntity
-                {
-                    Id = contributorId,
-                    DisplayName = contributorId.ToString(),
-                    CreatedOnUtc = DateTime.UtcNow,
-                    CreatedBy = Guid.Empty,
-                    UpdatedBy = null
-                })]);
+                return Result.From<IReadOnlyList<MediaContributorEntity>>([.. contributorIds.Select(contributorId => _mediaContributorEntityFixture.Create(id: contributorId, displayName: contributorId.ToString()))]);
             });
 
         _sut = new UpdateTrackCommandHandler(_mockUnitOfWork, _mockAuthorizationService, _mockCurrentUserService, _mockValidator, _mockPathService);
@@ -471,7 +468,7 @@ public class UpdateTrackCommandHandlerTests
         Guid albumId = Guid.NewGuid();
         Guid trackId = Guid.NewGuid();
         AlbumEntity invalidAlbum = _albumEntityFixture.Create(id: albumId, libraryId: libraryId, tracks: [_trackEntityFixture.Create(id: trackId, albumId: albumId, libraryId: libraryId)]);
-        invalidAlbum.Genres = [new GenreEntity(string.Empty)];
+        invalidAlbum.Genres = [_genreEntityFixture.Create(name: string.Empty)];
         ArtistEntity existingArtist = _artistEntityFixture.Create(libraryId: libraryId, albums: [invalidAlbum]);
         UpdateTrackCommand command = _updateTrackCommandFixture.Create(libraryId: libraryId.ToString(), artistId: existingArtist.Id.ToString(), albumId: albumId.ToString(), trackId: trackId.ToString());
         _mockArtistRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
@@ -492,7 +489,7 @@ public class UpdateTrackCommandHandlerTests
         // Arrange
         Guid libraryId = Guid.NewGuid();
         (ArtistEntity existingArtist, Guid albumId, Guid trackId) = CreateArtistWithTrack(libraryId);
-        AudioMetadataDto invalidMetadata = _audioMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]);
+        MusicTrackMetadataDto invalidMetadata = _musicTrackMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]);
         UpdateTrackCommand command = _updateTrackCommandFixture.Create(libraryId: libraryId.ToString(), artistId: existingArtist.Id.ToString(), albumId: albumId.ToString(), trackId: trackId.ToString(), metadata: invalidMetadata);
         _mockArtistRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<ArtistEntity?>(existingArtist));

@@ -73,7 +73,7 @@ public class ValidatePathQueryHandlerTests
     public async Task HandleAsync_WhenCalledWithNullPath_ShouldReturnFalseResponse()
     {
         // Arrange
-        ValidatePathQuery query = new(null!);
+        ValidatePathQuery query = _validatePathQueryFixture.Create(includePath: false);
         _mockPathService.IsValidPath(Arg.Any<string>()).Returns(false);
 
         // Act
@@ -89,7 +89,7 @@ public class ValidatePathQueryHandlerTests
     public async Task HandleAsync_WhenCalledWithEmptyPath_ShouldReturnFalseResponse()
     {
         // Arrange
-        ValidatePathQuery query = new(string.Empty);
+        ValidatePathQuery query = _validatePathQueryFixture.Create(string.Empty);
         _mockPathService.IsValidPath(Arg.Any<string>()).Returns(false);
 
         // Act

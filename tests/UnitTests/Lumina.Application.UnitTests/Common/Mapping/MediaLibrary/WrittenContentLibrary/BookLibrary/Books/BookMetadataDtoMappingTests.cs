@@ -25,6 +25,9 @@ public class BookMetadataDtoMappingTests
     private readonly BookMetadataDtoFixture _bookMetadataDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
     private readonly ReleaseInfoDtoFixture _releaseInfoDtoFixture = new();
+    private readonly TagDtoFixture _tagDtoFixture = new();
+    private readonly IsbnDtoFixture _isbnDtoFixture = new();
+    private readonly BookRatingDtoFixture _bookRatingDtoFixture = new();
 
     [Fact]
     public void ApplyMetadata_WhenCalledWithValidMetadata_ShouldApplyItToTheBook()
@@ -126,7 +129,7 @@ public class BookMetadataDtoMappingTests
         Book book = _bookFixture.Create();
         BookMetadataDto metadata = _bookMetadataDtoFixture.Create(
             title: "A valid title",
-            tags: [new TagDto("   ")]);
+            tags: [_tagDtoFixture.Create(name: "   ")]);
 
         // Act
         Result<Success> result = book.ApplyMetadata(metadata);
@@ -142,7 +145,7 @@ public class BookMetadataDtoMappingTests
         Book book = _bookFixture.Create();
         BookMetadataDto metadata = _bookMetadataDtoFixture.Create(
             title: "A valid title",
-            isbns: [new IsbnDto("not-an-isbn", IsbnFormat.Isbn13)]);
+            isbns: [_isbnDtoFixture.Create(value: "not-an-isbn", format: IsbnFormat.Isbn13)]);
 
         // Act
         Result<Success> result = book.ApplyMetadata(metadata);
@@ -158,7 +161,7 @@ public class BookMetadataDtoMappingTests
         Book book = _bookFixture.Create();
         BookMetadataDto metadata = _bookMetadataDtoFixture.Create(
             title: "A valid title",
-            ratings: [new BookRatingDto(-1m, 5m, null, null)]);
+            ratings: [_bookRatingDtoFixture.Create(value: -1m, maxValue: 5m, includeSource: false, includeVoteCount: false)]);
 
         // Act
         Result<Success> result = book.ApplyMetadata(metadata);
@@ -196,8 +199,8 @@ public class BookMetadataDtoMappingTests
         Book book = _bookFixture.Create();
         BookMetadataDto metadata = _bookMetadataDtoFixture.Create(
             title: "A valid title",
-            isbns: [new IsbnDto("9780306406157", IsbnFormat.Isbn13)],
-            ratings: [new BookRatingDto(4m, 5m, null, 10)]);
+            isbns: [_isbnDtoFixture.Create(value: "9780306406157", format: IsbnFormat.Isbn13)],
+            ratings: [_bookRatingDtoFixture.Create(value: 4m, maxValue: 5m, voteCount: 10, includeSource: false)]);
 
         // Act
         Result<Success> result = book.ApplyMetadata(metadata);

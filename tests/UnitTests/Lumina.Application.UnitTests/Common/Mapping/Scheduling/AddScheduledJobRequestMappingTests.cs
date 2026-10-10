@@ -15,13 +15,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Scheduling;
 [ExcludeFromCodeCoverage]
 public class AddScheduledJobRequestMappingTests
 {
-    private readonly AddScheduledJobRequestFixture _requestFixture = new();
+    private readonly AddScheduledJobRequestFixture _addScheduledJobRequestFixture = new();
 
     [Fact]
     public void ToCommand_WhenMappingValidRequest_ShouldMapCorrectly()
     {
         // Arrange
-        AddScheduledJobRequest request = _requestFixture.Create(
+        AddScheduledJobRequest request = _addScheduledJobRequestFixture.Create(
             name: "Scan at 6am",
             taskType: ScheduledTaskType.ScanMediaLibraries,
             scheduleType: ScheduleType.DailyAtHourAndMinute,

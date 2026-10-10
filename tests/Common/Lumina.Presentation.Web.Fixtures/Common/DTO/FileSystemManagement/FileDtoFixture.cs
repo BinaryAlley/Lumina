@@ -10,7 +10,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.DTO.FileSystemManagement;
 
 /// <summary>
-/// Fixture class for generating <see cref="FileDto"/> test data.
+/// Fixture class for the <see cref="FileDto"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class FileDtoFixture

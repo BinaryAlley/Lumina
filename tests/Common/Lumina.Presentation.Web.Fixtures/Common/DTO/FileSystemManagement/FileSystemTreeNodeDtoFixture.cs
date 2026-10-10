@@ -11,7 +11,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.DTO.FileSystemManagement;
 
 /// <summary>
-/// Fixture class for generating <see cref="FileSystemTreeNodeDto"/> test data.
+/// Fixture class for the <see cref="FileSystemTreeNodeDto"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class FileSystemTreeNodeDtoFixture

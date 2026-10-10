@@ -33,17 +33,17 @@ public static class UpdateBookCommandMapping
     /// </returns>
     public static Result<Book> ToDomainEntity(this UpdateBookCommand command, BookEntity existingBook)
     {
-        IEnumerable<Result<BookRating>> domainRatingsResult = command.Ratings!.ToDomainEntities();
+        IEnumerable<Result<BookRating>> domainRatingsResult = command.Ratings!.ToDomainValueObjects();
         List<Error> errors = [.. domainRatingsResult.Where(ratingResult => ratingResult.IsFailure).SelectMany(ratingResult => ratingResult.Errors)];
         if (errors.Count > 0)
             return errors;
 
-        IEnumerable<Result<Isbn>> domainIsbnsResult = command.ISBNs!.ToDomainEntities();
+        IEnumerable<Result<Isbn>> domainIsbnsResult = command.ISBNs!.ToDomainValueObjects();
         errors = [.. domainIsbnsResult.Where(isbnResult => isbnResult.IsFailure).SelectMany(isbnResult => isbnResult.Errors)];
         if (errors.Count > 0)
             return errors;
 
-        Result<WrittenContentMetadata> metadataResult = command.Metadata!.ToDomainEntity();
+        Result<WrittenContentMetadata> metadataResult = command.Metadata!.ToDomainValueObject();
         if (metadataResult.IsFailure)
             return metadataResult.Errors;
 

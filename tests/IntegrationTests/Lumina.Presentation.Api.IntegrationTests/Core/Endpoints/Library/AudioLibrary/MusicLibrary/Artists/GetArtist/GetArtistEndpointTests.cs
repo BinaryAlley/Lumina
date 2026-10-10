@@ -75,7 +75,7 @@ public class GetArtistEndpointTests : IClassFixture<AuthenticatedLuminaApiFactor
         Assert.NotNull(artist);
         Assert.Equal(artistId, artist!.Id);
         Assert.Equal(libraryId, artist.LibraryId);
-        Assert.Equal("Queen", artist.Name);
+        Assert.Equal("Queen", artist.Metadata.Name);
     }
 
     [Fact]

@@ -36,7 +36,7 @@ public class InstallThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
 {
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
-    private readonly TestThemeArchiveFixture _themeArchiveFixture = new();
+    private readonly TestThemeArchiveFixture _testThemeArchiveFixture = new();
     private readonly List<string> _installedThemeIds = [];
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -67,7 +67,7 @@ public class InstallThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     {
         // Arrange
         string themeId = $"test-theme-{Guid.NewGuid():N}";
-        byte[] archiveBytes = _themeArchiveFixture.Create(themeId);
+        byte[] archiveBytes = _testThemeArchiveFixture.Create(themeId);
         using MultipartFormDataContent multipartContent = [];
         using ByteArrayContent fileContent = new(archiveBytes);
         multipartContent.Add(fileContent, "file", "theme.zip");
@@ -163,7 +163,7 @@ public class InstallThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     {
         // Arrange
         HttpClient nonAdminClient = await _apiFactory.CreateAuthenticatedClientAsync();
-        byte[] archiveBytes = _themeArchiveFixture.Create();
+        byte[] archiveBytes = _testThemeArchiveFixture.Create();
         using MultipartFormDataContent multipartContent = [];
         using ByteArrayContent fileContent = new(archiveBytes);
         multipartContent.Add(fileContent, "file", "theme.zip");
@@ -191,7 +191,7 @@ public class InstallThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     {
         // Arrange
         HttpClient anonymousClient = _apiFactory.CreateClient();
-        byte[] archiveBytes = _themeArchiveFixture.Create();
+        byte[] archiveBytes = _testThemeArchiveFixture.Create();
         using MultipartFormDataContent multipartContent = [];
         using ByteArrayContent fileContent = new(archiveBytes);
         multipartContent.Add(fileContent, "file", "theme.zip");

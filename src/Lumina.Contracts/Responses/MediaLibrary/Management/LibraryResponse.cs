@@ -21,6 +21,7 @@ namespace Lumina.Contracts.Responses.MediaLibrary.Management;
 /// <param name="CanDownloadMetadataFromWeb">Whether the media library should update the metadata of its elements from the web, or not.</param>
 /// <param name="ShouldSaveMetadataInMediaDirectories">Whether the media library should copy the downloaded metadata into the media library content locations, or not.</param>
 /// <param name="ShouldSkipUnchangedDirectoriesDuringScan">Whether the media library should skip the directories whose contents have not changed since the last scan, during the scan.</param>
+/// <param name="PathTemplateParts">The ordered parts of the template describing the structure of the media library on disk.</param>
 /// <param name="CreatedOnUtc">The date and time when the library was created.</param>
 /// <param name="UpdatedOnUtc">The optional date and time when the library was updated.</param>
 [DebuggerDisplay("Title: {Title}")]
@@ -36,6 +37,7 @@ public record LibraryResponse(
     bool CanDownloadMetadataFromWeb,
     bool ShouldSaveMetadataInMediaDirectories,
     bool ShouldSkipUnchangedDirectoriesDuringScan,
+    List<LibraryPathTemplatePartResponse> PathTemplateParts,
     DateTime CreatedOnUtc,
     DateTime? UpdatedOnUtc
 );

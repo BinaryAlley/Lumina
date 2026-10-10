@@ -2,6 +2,7 @@
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.DTO.Authentication;
+using Lumina.Contracts.Fixtures.Core.Requests.Authorization;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.DataAccess.Core.UoW;
@@ -33,6 +34,7 @@ public class AddRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
 {
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AddRoleRequestFixture _addRoleRequestFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -65,9 +67,9 @@ public class AddRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         PermissionEntity[] permissions = [.. dbContext.Permissions.Take(2)];
 
-        AddRoleRequest request = new(
-            RoleName: "Editor",
-            Permissions: permissions.Select(p => p.Id).ToList()
+        AddRoleRequest request = _addRoleRequestFixture.Create(
+            roleName: "Editor",
+            permissions: permissions.Select(p => p.Id).ToList()
         );
 
         // Act
@@ -95,9 +97,9 @@ public class AddRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     {
         // Arrange
         _client = await _apiFactory.CreateAuthenticatedClientAsync();
-        AddRoleRequest request = new(
-            RoleName: "Editor",
-            Permissions: [Guid.NewGuid()]
+        AddRoleRequest request = _addRoleRequestFixture.Create(
+            roleName: "Editor",
+            permissions: [Guid.NewGuid()]
         );
 
         // Act
@@ -122,9 +124,9 @@ public class AddRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddRole_WhenRoleAlreadyExists_ShouldReturnConflict()
     {
         // Arrange
-        AddRoleRequest request = new(
-            RoleName: "Admin",
-            Permissions: [Guid.NewGuid()]
+        AddRoleRequest request = _addRoleRequestFixture.Create(
+            roleName: "Admin",
+            permissions: [Guid.NewGuid()]
         );
 
         // Act
@@ -150,9 +152,9 @@ public class AddRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     {
         // Arrange
         using CancellationTokenSource cts = new();
-        AddRoleRequest request = new(
-            RoleName: "Editor",
-            Permissions: [Guid.NewGuid()]
+        AddRoleRequest request = _addRoleRequestFixture.Create(
+            roleName: "Editor",
+            permissions: [Guid.NewGuid()]
         );
 
         // Act & Assert

@@ -25,6 +25,7 @@ public class UserSettingsFixture
     /// <param name="shouldIgnoreThePrefixForAlphaPicker">Whether the "The" prefix of library item titles is ignored by the alpha picker.</param>
     /// <param name="isThemeCachingEnabled">Whether the theme data served to this user is cached.</param>
     /// <param name="shouldAggregateMetadataWhenMissing">Whether the metadata of the media library items is aggregated from multiple providers, when fields are missing.</param>
+    /// <param name="shouldAggregateArtworkWhenMissing">Whether the artwork of the media library items is aggregated from multiple providers, when it is missing.</param>
     /// <param name="shouldRenderPdfAsImages">Whether PDF books are rendered as page images for the user.</param>
     /// <param name="shouldPreserveBookStyles">Whether the styles of the book content are preserved when it is rendered for the user.</param>
     /// <returns>The created <see cref="UserSettings"/>.</returns>
@@ -35,6 +36,7 @@ public class UserSettingsFixture
         bool shouldIgnoreThePrefixForAlphaPicker = false,
         bool isThemeCachingEnabled = true,
         bool shouldAggregateMetadataWhenMissing = false,
+        bool shouldAggregateArtworkWhenMissing = false,
         bool shouldRenderPdfAsImages = false,
         bool shouldPreserveBookStyles = true)
     {
@@ -45,6 +47,7 @@ public class UserSettingsFixture
             shouldIgnoreThePrefixForAlphaPicker,
             isThemeCachingEnabled,
             shouldAggregateMetadataWhenMissing,
+            shouldAggregateArtworkWhenMissing,
             shouldRenderPdfAsImages,
             shouldPreserveBookStyles);
         return settings.Value;

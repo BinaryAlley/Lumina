@@ -13,6 +13,7 @@ using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
@@ -791,5 +792,25 @@ public class TrackRepositoryTests
         Assert.Equal("Killer Queen", row.Title);
         Assert.Equal(9, row.TrackNumber);
         Assert.Equal(3, row.DiscNumber);
+    }
+
+    [Fact]
+    public async Task GetTracksNeedingMetadataCountAsync_WhenTracksHaveMixedMetadataStatuses_ShouldCountOnlyTheNotEnrichedOnesOfTheLibrary()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        TrackEntity pendingTrack = _trackEntityFixture.Create(libraryId: libraryId, includeMetadata: false, metadataStatus: MetadataStatus.Pending);
+        TrackEntity failedTrack = _trackEntityFixture.Create(libraryId: libraryId, includeMetadata: false, metadataStatus: MetadataStatus.Failed);
+        TrackEntity enrichedTrack = _trackEntityFixture.Create(libraryId: libraryId, includeMetadata: false, metadataStatus: MetadataStatus.Enriched);
+        TrackEntity trackOfAnotherLibrary = _trackEntityFixture.Create(includeMetadata: false, metadataStatus: MetadataStatus.Pending);
+        _mockContext.Tracks.AddRange(pendingTrack, failedTrack, enrichedTrack, trackOfAnotherLibrary);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<int> result = await _sut.GetTracksNeedingMetadataCountAsync(libraryId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(2, result.Value);
     }
 }

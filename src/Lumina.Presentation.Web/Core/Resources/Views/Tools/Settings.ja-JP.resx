@@ -57,4 +57,16 @@
   <data name="DescriptionShouldPreserveBookStyles" xml:space="preserve">
     <value>本を読むときに、本のコンテンツの元のスタイルを保持するかどうか。有効にすると本の見た目（フォント、色、配置）が維持されますが、本のスタイルは外部サーバーからリソースを読み込むことができ、そのサーバーがアクセスを監視できる可能性があります。無効にするとスタイルが削除されます。</value>
   </data>
+  <data name="ShouldAggregateMetadataWhenMissing" xml:space="preserve">
+    <value>不足しているメタデータを集約する</value>
+  </data>
+  <data name="DescriptionShouldAggregateMetadataWhenMissing" xml:space="preserve">
+    <value>有効にすると、最初のメタデータプロバイダーが提供しないライブラリ項目のメタデータが、後続のプロバイダーから補完されます。</value>
+  </data>
+  <data name="ShouldAggregateArtworkWhenMissing" xml:space="preserve">
+    <value>不足時にアートワークを統合</value>
+  </data>
+  <data name="DescriptionShouldAggregateArtworkWhenMissing" xml:space="preserve">
+    <value>有効にすると、最初のアートワークプロバイダーが提供しないライブラリ項目のアートワークが、後続のプロバイダーから補完されます。</value>
+  </data>
 </root>

@@ -20,7 +20,8 @@ public interface ITrackRepository : IRepository<TrackEntity>,
                                     IInsertRepositoryAction<TrackEntity>,
                                     IUpdateRepositoryAction<TrackEntity>,
                                     IApplyUpdateRepositoryAction<TrackEntity>,
-                                    IGetByIdRepositoryAction<TrackEntity, Guid>
+                                    IGetByIdRepositoryAction<TrackEntity, Guid>,
+                                    IDeleteByIdRepositoryAction<Guid>
 {
     /// <summary>
     /// Gets the subset of <paramref name="paths"/> that is already used by a track of the library identified by <paramref name="libraryId"/>.
@@ -47,4 +48,40 @@ public interface ITrackRepository : IRepository<TrackEntity>,
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a paginated result of <see cref="TrackLiteRow"/>, or an error.</returns>
     Task<Result<PaginatedResultDto<TrackLiteRow>>> GetTracksLiteByAlbumIdAsync(Guid albumId, PaginationDataDto? paginationData, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets the track of the library identified by <paramref name="libraryId"/> that is stored at the provided <paramref name="path"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the library whose track is retrieved.</param>
+    /// <param name="path">The file system path of the track to retrieve.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the <see cref="TrackEntity"/> stored at the provided path, or an error.</returns>
+    Task<Result<TrackEntity?>> GetByPathAsync(Guid libraryId, string path, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Resets the enrichment state of the tracks stored at the provided <paramref name="paths"/> in the media library identified by
+    /// <paramref name="libraryId"/>, together with their albums and artists, so that they are re-enriched, because their content changed since the last scan.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose tracks are reset.</param>
+    /// <param name="paths">The file system paths of the tracks whose enrichment state is reset.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Updated>> ResetEnrichmentStateForPathsAsync(Guid libraryId, IReadOnlyCollection<string> paths, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets the number of tracks of the media library identified by <paramref name="libraryId"/> whose metadata has not been enriched yet.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose tracks are counted.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the number of tracks needing their metadata enriched, or an error.</returns>
+    Task<Result<int>> GetTracksNeedingMetadataCountAsync(Guid libraryId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Resets the metadata enrichment status of all the tracks of the media library identified by <paramref name="libraryId"/>,
+    /// so that they are re-enriched, because the metadata provider configuration of the library changed.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose tracks are reset.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Updated>> ResetMetadataStatusForLibraryAsync(Guid libraryId, CancellationToken cancellationToken);
 }

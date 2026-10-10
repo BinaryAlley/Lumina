@@ -20,13 +20,13 @@ public class TagDtoMappingTests
     private readonly TagDtoFixture _tagDtoFixture = new();
 
     [Fact]
-    public void ToDomainEntity_WhenMappingValidTagDto_ShouldMapCorrectly()
+    public void ToDomainValueObject_WhenMappingValidTagDto_ShouldMapCorrectly()
     {
         // Arrange
         TagDto tagDto = _tagDtoFixture.Create(name: "indie");
 
         // Act
-        Result<Tag> result = tagDto.ToDomainEntity();
+        Result<Tag> result = tagDto.ToDomainValueObject();
 
         // Assert
         Assert.False(result.IsFailure);
@@ -40,13 +40,13 @@ public class TagDtoMappingTests
     [InlineData("instrumental")]
     [InlineData("live")]
     [InlineData("acoustic")]
-    public void ToDomainEntity_WhenMappingDifferentValidTagDtos_ShouldMapCorrectly(string name)
+    public void ToDomainValueObject_WhenMappingDifferentValidTagDtos_ShouldMapCorrectly(string name)
     {
         // Arrange
         TagDto tagDto = _tagDtoFixture.Create(name: name);
 
         // Act
-        Result<Tag> result = tagDto.ToDomainEntity();
+        Result<Tag> result = tagDto.ToDomainValueObject();
 
         // Assert
         Assert.False(result.IsFailure);
@@ -58,13 +58,13 @@ public class TagDtoMappingTests
     [InlineData("")]
     [InlineData(" ")]
     [InlineData(null)]
-    public void ToDomainEntity_WhenMappingInvalidTagDto_ShouldReturnError(string? invalidName)
+    public void ToDomainValueObject_WhenMappingInvalidTagDto_ShouldReturnError(string? invalidName)
     {
         // Arrange
         TagDto tagDto = _tagDtoFixture.Create(name: invalidName, includeName: invalidName is not null);
 
         // Act
-        Result<Tag> result = tagDto.ToDomainEntity();
+        Result<Tag> result = tagDto.ToDomainValueObject();
 
         // Assert
         Assert.True(result.IsFailure);
@@ -83,7 +83,7 @@ public class TagDtoMappingTests
         ];
 
         // Act
-        IEnumerable<Result<Tag>> results = tagDtos.ToDomainEntities();
+        IEnumerable<Result<Tag>> results = tagDtos.ToDomainValueObjects();
 
         // Assert
         Assert.NotNull(results);
@@ -110,7 +110,7 @@ public class TagDtoMappingTests
         ];
 
         // Act
-        IEnumerable<Result<Tag>> results = tagDtos.ToDomainEntities();
+        IEnumerable<Result<Tag>> results = tagDtos.ToDomainValueObjects();
 
         // Assert
         Assert.NotNull(results);

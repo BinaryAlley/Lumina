@@ -7,6 +7,7 @@ using Lumina.Application.Common.Infrastructure.Security;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.ChangePassword;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Core.UsersManagement.Authentication.Commands.ChangePassword;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.Domain.Common.Primitives;
 using NSubstitute;
@@ -29,6 +30,7 @@ public class ChangePasswordCommandHandlerTests
     private readonly IUserRepository _mockUserRepository;
     private readonly ChangePasswordCommandHandler _sut;
     private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly ChangePasswordCommandFixture _changePasswordCommandFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ChangePasswordCommandHandlerTests"/> class.
@@ -63,7 +65,7 @@ public class ChangePasswordCommandHandlerTests
         UserEntity user = _userEntityFixture.Create();
         user.Password = escapedHashedCurrentPassword;
 
-        ChangePasswordCommand command = new(
+        ChangePasswordCommand command = _changePasswordCommandFixture.Create(
             user.Username,
             currentPassword,
             newPassword,
@@ -96,7 +98,7 @@ public class ChangePasswordCommandHandlerTests
     public async Task HandleAsync_WhenUserDoesNotExist_ShouldReturnError()
     {
         // Arrange
-        ChangePasswordCommand command = new("nonexistentUser", "oldPass", "newPass", "newPass");
+        ChangePasswordCommand command = _changePasswordCommandFixture.Create("nonexistentUser", "oldPass", "newPass", "newPass");
 
         _mockUserRepository.GetByUsernameAsync(command.Username!, Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(null));
@@ -120,7 +122,7 @@ public class ChangePasswordCommandHandlerTests
         UserEntity user = _userEntityFixture.Create();
         string incorrectPassword = "wrongPassword";
 
-        ChangePasswordCommand command = new(
+        ChangePasswordCommand command = _changePasswordCommandFixture.Create(
             user.Username,
             incorrectPassword,
             "newPass",
@@ -156,7 +158,7 @@ public class ChangePasswordCommandHandlerTests
         UserEntity user = _userEntityFixture.Create();
         user.Password = escapedHashedCurrentPassword;
 
-        ChangePasswordCommand command = new(
+        ChangePasswordCommand command = _changePasswordCommandFixture.Create(
             user.Username,
             currentPassword,
             newPassword,
@@ -189,7 +191,7 @@ public class ChangePasswordCommandHandlerTests
         string currentPassword = "currentPassword";
         string newPassword = "newPassword";
         UserEntity user = _userEntityFixture.Create();
-        ChangePasswordCommand command = new(
+        ChangePasswordCommand command = _changePasswordCommandFixture.Create(
             user.Username,
             currentPassword,
             newPassword,

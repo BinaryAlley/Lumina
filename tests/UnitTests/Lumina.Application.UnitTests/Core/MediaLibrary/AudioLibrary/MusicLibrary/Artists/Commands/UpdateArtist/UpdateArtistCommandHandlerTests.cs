@@ -19,6 +19,7 @@ using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Manage
 using Lumina.Application.Fixtures.Core.MediaLibrary.AudioLibrary.MusicLibrary.Albums.Commands.AddAlbum;
 using Lumina.Application.Fixtures.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artists.Commands.UpdateArtist;
 using Lumina.Application.Fixtures.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Commands.AddTrack;
+using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
@@ -52,6 +53,7 @@ public class UpdateArtistCommandHandlerTests
     private readonly UpdateArtistCommandHandler _sut;
     private readonly Guid _userId;
     private readonly UpdateArtistCommandFixture _updateArtistCommandFixture = new();
+    private readonly MusicArtistMetadataDtoFixture _musicArtistMetadataDtoFixture = new();
     private readonly AddAlbumCommandFixture _addAlbumCommandFixture = new();
     private readonly AddTrackCommandFixture _addTrackCommandFixture = new();
     private readonly ArtistEntityFixture _artistEntityFixture = new();
@@ -383,7 +385,7 @@ public class UpdateArtistCommandHandlerTests
         Guid artistId = Guid.NewGuid();
         Guid albumId = Guid.NewGuid();
         ArtistEntity existingArtist = CreateExistingArtist(libraryId, artistId, albumId);
-        UpdateArtistCommand command = _updateArtistCommandFixture.Create(libraryId: libraryId.ToString(), artistId: artistId.ToString(), name: string.Empty);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(libraryId: libraryId.ToString(), artistId: artistId.ToString(), metadata: _musicArtistMetadataDtoFixture.Create(name: string.Empty));
         StubArtistReads(existingArtist);
 
         // Act
@@ -530,7 +532,7 @@ public class UpdateArtistCommandHandlerTests
         Assert.False(result.IsFailure);
         Assert.NotNull(updatedArtist);
         Assert.Equal(artistId, result.Value.Id);
-        Assert.Equal(persistedArtist.Name, result.Value.Name);
+        Assert.Equal(persistedArtist.Name, result.Value.Metadata.Name);
         await _mockArtistRepository.Received(1).UpdateAsync(Arg.Any<ArtistEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }

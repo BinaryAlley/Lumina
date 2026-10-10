@@ -18,11 +18,13 @@ public class GetUserPermissionsRequestFixture
     /// Creates a random valid <see cref="GetUserPermissionsRequest"/>.
     /// </summary>
     /// <param name="userId">Optional. The Id of the user whose permissions are retrieved.</param>
+    /// <param name="includeUserId">Whether the user Id should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="GetUserPermissionsRequest"/>.</returns>
     public GetUserPermissionsRequest Create(
-        Guid? userId = null)
+        Guid? userId = null,
+        bool includeUserId = true)
     {
-        return new GetUserPermissionsRequest(userId ?? Guid.NewGuid());
+        return new GetUserPermissionsRequest(includeUserId ? (userId ?? Guid.NewGuid()) : null);
     }
 
     /// <summary>

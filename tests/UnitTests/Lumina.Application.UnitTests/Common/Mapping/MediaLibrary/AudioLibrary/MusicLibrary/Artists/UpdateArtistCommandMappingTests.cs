@@ -33,7 +33,8 @@ public class UpdateArtistCommandMappingTests
     private readonly ArtistEntityFixture _artistEntityFixture = new();
     private readonly AlbumEntityFixture _albumEntityFixture = new();
     private readonly TrackEntityFixture _trackEntityFixture = new();
-    private readonly AlbumMetadataDtoFixture _albumMetadataDtoFixture = new();
+    private readonly MusicAlbumMetadataDtoFixture _musicAlbumMetadataDtoFixture = new();
+    private readonly MusicArtistMetadataDtoFixture _musicArtistMetadataDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
 
     [Fact]
@@ -56,7 +57,7 @@ public class UpdateArtistCommandMappingTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.Same(artist, result.Value);
-        Assert.Equal(command.Name, result.Value.Name);
+        Assert.Equal(command.Metadata!.Name, result.Value.Name);
         Assert.True(result.Value.Website.HasValue);
         Assert.Equal(command.Website, result.Value.Website.Value);
         Assert.True(result.Value.MusicBrainzArtistId.HasValue);
@@ -90,7 +91,6 @@ public class UpdateArtistCommandMappingTests
             includeWork: false,
             includeMusicBrainzRecordingId: false,
             includeMusicBrainzTrackId: false,
-            includeMusicBrainzWorkId: false,
             includeMoods: false,
             includeIsrcs: false,
             contributors: [],
@@ -134,7 +134,7 @@ public class UpdateArtistCommandMappingTests
         UpdateArtistCommand command = _updateArtistCommandFixture.Create(
             libraryId: libraryId.ToString(),
             artistId: artist.Id.Value.ToString(),
-            name: string.Empty,
+            metadata: _musicArtistMetadataDtoFixture.Create(name: string.Empty),
             albums: [albumCommand]);
 
         // Act
@@ -153,7 +153,7 @@ public class UpdateArtistCommandMappingTests
         (Artist artist, Guid albumId, Guid trackId) = CreateDomainArtist(libraryId);
         AddAlbumCommand invalidAlbum = _addAlbumCommandFixture.Create(
             albumId: albumId,
-            metadata: _albumMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]));
+            metadata: _musicAlbumMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]));
         UpdateArtistCommand command = _updateArtistCommandFixture.Create(
             libraryId: libraryId.ToString(),
             artistId: artist.Id.Value.ToString(),

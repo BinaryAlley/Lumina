@@ -8,7 +8,6 @@ using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.Common.ValueObjects;
-using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.ExternalIdentifiers.LibraryManagementBoundedContext.LibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.ExternalIdentifiers.MediaContributorBoundedContext.MediaContributorAggregate;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.ValueObjects;
@@ -48,7 +47,7 @@ public static class TrackEntityMapping
             return releaseInfoResult.Errors;
 
         List<Genre> domainGenres = [];
-        foreach (Result<Genre> genreResult in repositoryEntity.Genres.ToDomainEntities())
+        foreach (Result<Genre> genreResult in repositoryEntity.Genres.ToDomainValueObjects())
         {
             if (genreResult.IsFailure)
                 return genreResult.Errors;
@@ -56,7 +55,7 @@ public static class TrackEntityMapping
         }
 
         List<Tag> domainTags = [];
-        foreach (Result<Tag> tagResult in repositoryEntity.Tags.ToDomainEntities())
+        foreach (Result<Tag> tagResult in repositoryEntity.Tags.ToDomainValueObjects())
         {
             if (tagResult.IsFailure)
                 return tagResult.Errors;
@@ -85,7 +84,12 @@ public static class TrackEntityMapping
             originalLanguage,
             Optional<int>.FromNullable(repositoryEntity.BitDepth),
             Optional<string>.FromNullable(repositoryEntity.AudioCodec),
-            Optional<int>.FromNullable(repositoryEntity.Bitrate));
+            Optional<int>.FromNullable(repositoryEntity.Bitrate),
+            Optional<string>.FromNullable(repositoryEntity.AcoustId),
+            Optional<decimal>.FromNullable(repositoryEntity.ReplayGainTrackGain),
+            Optional<decimal>.FromNullable(repositoryEntity.ReplayGainTrackPeak),
+            Optional<decimal>.FromNullable(repositoryEntity.ReplayGainAlbumGain),
+            Optional<decimal>.FromNullable(repositoryEntity.ReplayGainAlbumPeak));
         if (metadataResult.IsFailure)
             return metadataResult.Errors;
 
@@ -95,12 +99,27 @@ public static class TrackEntityMapping
         Optional<MusicBrainzId> musicBrainzTrackId = Optional<MusicBrainzId>.None();
         if (repositoryEntity.MusicBrainzTrackId is not null)
             musicBrainzTrackId = MusicBrainzId.Create(repositoryEntity.MusicBrainzTrackId.Value);
-        Optional<MusicBrainzId> musicBrainzWorkId = Optional<MusicBrainzId>.None();
-        if (repositoryEntity.MusicBrainzWorkId is not null)
-            musicBrainzWorkId = MusicBrainzId.Create(repositoryEntity.MusicBrainzWorkId.Value);
+
+        Optional<MusicWork> work = Optional<MusicWork>.None();
+        if (repositoryEntity.MusicBrainzWorkId is not null && !string.IsNullOrWhiteSpace(repositoryEntity.WorkTitle))
+        {
+            List<LanguageInfo> workLanguages = [];
+            foreach (TrackWorkLanguageEntity workLanguage in repositoryEntity.WorkLanguages)
+                workLanguages.Add(LanguageInfo.Create(workLanguage.LanguageCode, workLanguage.LanguageName, Optional<string>.FromNullable(workLanguage.NativeName)));
+
+            Result<MusicWork> workResult = MusicWork.Create(
+                MusicBrainzId.Create(repositoryEntity.MusicBrainzWorkId.Value),
+                repositoryEntity.WorkTitle,
+                Optional<string>.FromNullable(repositoryEntity.WorkType),
+                workLanguages,
+                [.. repositoryEntity.WorkIswcs.Select(workIswc => workIswc.Value)]);
+            if (workResult.IsFailure)
+                return workResult.Errors;
+            work = workResult.Value;
+        }
 
         List<Mood> domainMoods = [];
-        foreach (Result<Mood> moodResult in repositoryEntity.Moods.ToDomainEntities())
+        foreach (Result<Mood> moodResult in repositoryEntity.Moods.ToDomainValueObjects())
         {
             if (moodResult.IsFailure)
                 return moodResult.Errors;
@@ -108,7 +127,7 @@ public static class TrackEntityMapping
         }
 
         List<Isrc> domainIsrcs = [];
-        foreach (Result<Isrc> isrcResult in repositoryEntity.Isrcs.ToDomainEntities())
+        foreach (Result<Isrc> isrcResult in repositoryEntity.Isrcs.ToDomainValueObjects())
         {
             if (isrcResult.IsFailure)
                 return isrcResult.Errors;
@@ -116,7 +135,7 @@ public static class TrackEntityMapping
         }
 
         List<AudioRating> domainRatings = [];
-        foreach (Result<AudioRating> ratingResult in repositoryEntity.Ratings.ToDomainEntities())
+        foreach (Result<AudioRating> ratingResult in repositoryEntity.Ratings.ToDomainValueObjects())
         {
             if (ratingResult.IsFailure)
                 return ratingResult.Errors;
@@ -136,17 +155,18 @@ public static class TrackEntityMapping
             TrackId.Create(repositoryEntity.Id),
             repositoryEntity.Path,
             metadataResult.Value,
+            Optional<string>.FromNullable(repositoryEntity.Disambiguation),
             repositoryEntity.TrackNumber,
             Optional<int>.FromNullable(repositoryEntity.DiscNumber),
             domainMoods,
             Optional<string>.FromNullable(repositoryEntity.Script),
             Optional<MusicKey>.FromNullable(repositoryEntity.Key),
             Optional<int>.FromNullable(repositoryEntity.Bpm),
+            repositoryEntity.IsVideo,
             domainIsrcs,
-            Optional<string>.FromNullable(repositoryEntity.Work),
+            work,
             musicBrainzRecordingId,
             musicBrainzTrackId,
-            musicBrainzWorkId,
             domainContributors,
             domainRatings,
             repositoryEntity.CreatedOnUtc,
@@ -185,21 +205,40 @@ public static class TrackEntityMapping
                 repositoryEntity.OriginalLanguageName,
                 repositoryEntity.OriginalLanguageNativeName
             ) : null;
-        AudioMetadataDto metadata = new(
+        MusicWorkDto? work = null;
+        if (repositoryEntity.MusicBrainzWorkId is not null && !string.IsNullOrWhiteSpace(repositoryEntity.WorkTitle))
+            work = new MusicWorkDto(
+                repositoryEntity.MusicBrainzWorkId,
+                repositoryEntity.WorkTitle,
+                repositoryEntity.WorkType,
+                repositoryEntity.WorkLanguages.Count > 0
+                    ? [.. repositoryEntity.WorkLanguages.Select(workLanguage => new LanguageInfoDto(workLanguage.LanguageCode, workLanguage.LanguageName, workLanguage.NativeName))]
+                    : null,
+                repositoryEntity.WorkIswcs.Count > 0
+                    ? [.. repositoryEntity.WorkIswcs.Select(workIswc => workIswc.Value)]
+                    : null);
+        MusicTrackMetadataDto metadata = new(
             repositoryEntity.Title,
             repositoryEntity.OriginalTitle,
             repositoryEntity.Description,
+            repositoryEntity.Disambiguation,
             releaseInfo,
             languageInfo,
             originalLanguageInfo,
             [.. repositoryEntity.Tags.ToResponses()],
             [.. repositoryEntity.Genres.ToResponses()],
+            repositoryEntity.IsVideo,
             repositoryEntity.DurationInSeconds,
             repositoryEntity.SampleRate,
             repositoryEntity.Channels,
             repositoryEntity.BitDepth,
             repositoryEntity.AudioCodec,
-            repositoryEntity.Bitrate
+            repositoryEntity.Bitrate,
+            repositoryEntity.AcoustId,
+            repositoryEntity.ReplayGainTrackGain,
+            repositoryEntity.ReplayGainTrackPeak,
+            repositoryEntity.ReplayGainAlbumGain,
+            repositoryEntity.ReplayGainAlbumPeak
         );
         return new TrackResponse(
             repositoryEntity.Id,
@@ -212,10 +251,9 @@ public static class TrackEntityMapping
             repositoryEntity.Script,
             repositoryEntity.Key,
             repositoryEntity.Bpm,
-            repositoryEntity.Work,
+            work,
             repositoryEntity.MusicBrainzRecordingId,
             repositoryEntity.MusicBrainzTrackId,
-            repositoryEntity.MusicBrainzWorkId,
             repositoryEntity.CreatedOnUtc,
             repositoryEntity.UpdatedOnUtc,
             [.. repositoryEntity.Moods.ToResponses()],

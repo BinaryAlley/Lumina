@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
+using Lumina.Application.Common.DTO.MediaLibrary.Management;
 using Lumina.Application.Core.MediaLibrary.Management.Commands.UpdateLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
@@ -30,6 +31,7 @@ public class UpdateLibraryCommandFixture
     /// <param name="canDownloadMetadataFromWeb">Whether the media library should download metadata from the web or not.</param>
     /// <param name="shouldSaveMetadataInMediaDirectories">Whether the metadata should be saved in the media directories or not.</param>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether unchanged directories should be skipped during a scan or not.</param>
+    /// <param name="pathTemplateParts">Optional. The ordered parts of the path template of the media library.</param>
     /// <returns>The created command.</returns>
     public UpdateLibraryCommand Create(
         Guid? id = null,
@@ -42,7 +44,8 @@ public class UpdateLibraryCommandFixture
         bool isLocked = false,
         bool canDownloadMetadataFromWeb = true,
         bool shouldSaveMetadataInMediaDirectories = true,
-        bool shouldSkipUnchangedDirectoriesDuringScan = false)
+        bool shouldSkipUnchangedDirectoriesDuringScan = false,
+        LibraryPathTemplatePartDto[]? pathTemplateParts = null)
     {
         return new Faker<UpdateLibraryCommand>()
             .CustomInstantiator(f => new UpdateLibraryCommand(
@@ -56,7 +59,8 @@ public class UpdateLibraryCommandFixture
                 false,
                 true,
                 true,
-                false
+                false,
+                null
             ))
             .RuleFor(x => x.Id, id ?? Guid.NewGuid())
             .RuleFor(x => x.OwnerId, ownerId ?? Guid.NewGuid())
@@ -69,6 +73,7 @@ public class UpdateLibraryCommandFixture
             .RuleFor(x => x.CanDownloadMetadataFromWeb, canDownloadMetadataFromWeb)
             .RuleFor(x => x.ShouldSaveMetadataInMediaDirectories, shouldSaveMetadataInMediaDirectories)
             .RuleFor(x => x.ShouldSkipUnchangedDirectoriesDuringScan, shouldSkipUnchangedDirectoriesDuringScan)
+            .RuleFor(x => x.PathTemplateParts, pathTemplateParts)
             .Generate();
     }
 

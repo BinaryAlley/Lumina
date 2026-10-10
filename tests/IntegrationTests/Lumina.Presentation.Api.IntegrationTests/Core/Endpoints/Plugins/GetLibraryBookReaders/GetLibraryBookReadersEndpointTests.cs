@@ -36,7 +36,7 @@ public class GetLibraryBookReadersEndpointTests : IClassFixture<AuthenticatedLum
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
-    private readonly LibraryBookReaderConfigurationEntityFixture _configurationFixture = new();
+    private readonly LibraryBookReaderConfigurationEntityFixture _libraryBookReaderConfigurationEntityFixture = new();
     private readonly UserEntityFixture _userEntityFixture = new();
 
     /// <summary>
@@ -132,7 +132,7 @@ public class GetLibraryBookReadersEndpointTests : IClassFixture<AuthenticatedLum
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-        dbContext.LibraryBookReaderConfigurations.Add(_configurationFixture.Create(libraryId: libraryId, pluginId: pluginId, isEnabled: isEnabled));
+        dbContext.LibraryBookReaderConfigurations.Add(_libraryBookReaderConfigurationEntityFixture.Create(libraryId: libraryId, pluginId: pluginId, isEnabled: isEnabled));
         await dbContext.SaveChangesAsync();
     }
 

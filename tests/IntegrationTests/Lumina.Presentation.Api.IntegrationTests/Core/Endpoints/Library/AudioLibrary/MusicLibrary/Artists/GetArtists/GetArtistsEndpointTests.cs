@@ -79,8 +79,8 @@ public class GetArtistsEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         Assert.Equal(2, paginatedArtists!.Count);
         Assert.Equal(2, paginatedArtists.Data.Count);
         Assert.Equal(1, paginatedArtists.CurrentPage);
-        Assert.Contains(paginatedArtists.Data, artist => artist.Name == "Artist A");
-        Assert.Contains(paginatedArtists.Data, artist => artist.Name == "Artist B");
+        Assert.Contains(paginatedArtists.Data, artist => artist.Metadata.Name == "Artist A");
+        Assert.Contains(paginatedArtists.Data, artist => artist.Metadata.Name == "Artist B");
     }
 
     [Fact]
@@ -100,7 +100,7 @@ public class GetArtistsEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         PaginatedResponse<ArtistResponse>? paginatedArtists = await response.Content.ReadFromJsonAsync<PaginatedResponse<ArtistResponse>>(_jsonOptions);
         Assert.NotNull(paginatedArtists);
         ArtistResponse artist = Assert.Single(paginatedArtists!.Data);
-        Assert.Equal("Fellowship", artist.Name);
+        Assert.Equal("Fellowship", artist.Metadata.Name);
         Assert.Equal(1, paginatedArtists.Count);
     }
 
@@ -126,7 +126,7 @@ public class GetArtistsEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         Assert.Equal(2, paginatedArtists.CurrentPage);
         Assert.Equal(2, paginatedArtists.PerPage);
         ArtistResponse artist = Assert.Single(paginatedArtists.Data);
-        Assert.Equal("Artist C", artist.Name);
+        Assert.Equal("Artist C", artist.Metadata.Name);
     }
 
     [Fact]

@@ -18,13 +18,13 @@ public class LanguageInfoDtoMappingTests
     private readonly LanguageInfoDtoFixture _languageInfoDtoFixture = new();
 
     [Fact]
-    public void ToDomainEntity_WhenMappingCompleteLanguageInfoDto_ShouldMapAllPropertiesCorrectly()
+    public void ToDomainValueObject_WhenMappingCompleteLanguageInfoDto_ShouldMapAllPropertiesCorrectly()
     {
         // Arrange
         LanguageInfoDto dto = _languageInfoDtoFixture.Create(languageCode: "EN", languageName: "English", nativeName: "English");
 
         // Act
-        Result<LanguageInfo> result = dto.ToDomainEntity();
+        Result<LanguageInfo> result = dto.ToDomainValueObject();
 
         // Assert
         Assert.False(result.IsFailure);
@@ -35,13 +35,13 @@ public class LanguageInfoDtoMappingTests
     }
 
     [Fact]
-    public void ToDomainEntity_WhenNativeNameIsMissing_ShouldMapWithoutNativeName()
+    public void ToDomainValueObject_WhenNativeNameIsMissing_ShouldMapWithoutNativeName()
     {
         // Arrange
         LanguageInfoDto dto = _languageInfoDtoFixture.Create(includeNativeName: false);
 
         // Act
-        Result<LanguageInfo> result = dto.ToDomainEntity();
+        Result<LanguageInfo> result = dto.ToDomainValueObject();
 
         // Assert
         Assert.False(result.IsFailure);

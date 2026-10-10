@@ -37,13 +37,14 @@ public class AlbumMetadataTests
         Result<AlbumMetadata> result = AlbumMetadata.Create(
             "A Night at the Opera",
             Optional<string>.Some("A Night at the Opera (original)"),
+            Optional<string>.Some("A Night at the Opera (2011 remaster)"),
             Optional<string>.Some("The fourth studio album by the British rock band Queen."),
             releaseInfo,
             [genre],
             [tag],
             Optional<LanguageInfo>.Some(language),
             Optional<LanguageInfo>.Some(originalLanguage),
-            Optional<MusicReleaseType>.Some(MusicReleaseType.Album),
+            [MusicReleaseType.Album],
             Optional<MusicReleaseStatus>.Some(MusicReleaseStatus.Official),
             Optional<int>.Some(2),
             12);
@@ -53,13 +54,14 @@ public class AlbumMetadataTests
         AlbumMetadata metadata = result.Value;
         Assert.Equal("A Night at the Opera", metadata.Title);
         Assert.Equal(Optional<string>.Some("A Night at the Opera (original)"), metadata.OriginalTitle);
+        Assert.Equal(Optional<string>.Some("A Night at the Opera (2011 remaster)"), metadata.ReleaseTitle);
         Assert.Equal(Optional<string>.Some("The fourth studio album by the British rock band Queen."), metadata.Description);
         Assert.Equal(releaseInfo, metadata.ReleaseInfo);
         Assert.Equal(genre, Assert.Single(metadata.Genres));
         Assert.Equal(tag, Assert.Single(metadata.Tags));
         Assert.Equal(Optional<LanguageInfo>.Some(language), metadata.Language);
         Assert.Equal(Optional<LanguageInfo>.Some(originalLanguage), metadata.OriginalLanguage);
-        Assert.Equal(Optional<MusicReleaseType>.Some(MusicReleaseType.Album), metadata.ReleaseType);
+        Assert.Equal(new[] { MusicReleaseType.Album }, metadata.ReleaseTypes);
         Assert.Equal(Optional<MusicReleaseStatus>.Some(MusicReleaseStatus.Official), metadata.ReleaseStatus);
         Assert.Equal(Optional<int>.Some(2), metadata.TotalDiscs);
         Assert.Equal(12, metadata.TotalTracks);
@@ -73,12 +75,13 @@ public class AlbumMetadataTests
             "A Night at the Opera",
             Optional<string>.None(),
             Optional<string>.None(),
+            Optional<string>.None(),
             _releaseInfoFixture.Create(),
             [],
             [],
             Optional<LanguageInfo>.None(),
             Optional<LanguageInfo>.None(),
-            Optional<MusicReleaseType>.None(),
+            [],
             Optional<MusicReleaseStatus>.None(),
             Optional<int>.None(),
             12);
@@ -87,10 +90,11 @@ public class AlbumMetadataTests
         Assert.False(result.IsFailure);
         AlbumMetadata metadata = result.Value;
         Assert.False(metadata.OriginalTitle.HasValue);
+        Assert.False(metadata.ReleaseTitle.HasValue);
         Assert.False(metadata.Description.HasValue);
         Assert.False(metadata.Language.HasValue);
         Assert.False(metadata.OriginalLanguage.HasValue);
-        Assert.False(metadata.ReleaseType.HasValue);
+        Assert.Empty(metadata.ReleaseTypes);
         Assert.False(metadata.ReleaseStatus.HasValue);
         Assert.False(metadata.TotalDiscs.HasValue);
         Assert.Empty(metadata.Genres);
@@ -113,12 +117,13 @@ public class AlbumMetadataTests
             "A Night at the Opera",
             Optional<string>.None(),
             Optional<string>.None(),
+            Optional<string>.None(),
             _releaseInfoFixture.Create(),
             expectedGenres,
             expectedTags,
             Optional<LanguageInfo>.None(),
             Optional<LanguageInfo>.None(),
-            Optional<MusicReleaseType>.None(),
+            [],
             Optional<MusicReleaseStatus>.None(),
             Optional<int>.None(),
             12);
@@ -139,26 +144,28 @@ public class AlbumMetadataTests
         AlbumMetadata firstMetadata = _albumMetadataFixture.Create(
             title: "A Night at the Opera",
             originalTitle: Optional<string>.None(),
+            releaseTitle: Optional<string>.Some("A Night at the Opera (2011 remaster)"),
             description: Optional<string>.None(),
             releaseInfo: releaseInfo,
             genres: [_genreFixture.Create(name: "Rock")],
             tags: [_tagFixture.Create(name: "classic")],
             language: Optional<LanguageInfo>.None(),
             originalLanguage: Optional<LanguageInfo>.None(),
-            releaseType: Optional<MusicReleaseType>.Some(MusicReleaseType.Album),
+            releaseTypes: [MusicReleaseType.Album],
             releaseStatus: Optional<MusicReleaseStatus>.Some(MusicReleaseStatus.Official),
             totalDiscs: Optional<int>.Some(2),
             totalTracks: 12);
         AlbumMetadata secondMetadata = _albumMetadataFixture.Create(
             title: "A Night at the Opera",
             originalTitle: Optional<string>.None(),
+            releaseTitle: Optional<string>.Some("A Night at the Opera (2011 remaster)"),
             description: Optional<string>.None(),
             releaseInfo: releaseInfo,
             genres: [_genreFixture.Create(name: "Rock")],
             tags: [_tagFixture.Create(name: "classic")],
             language: Optional<LanguageInfo>.None(),
             originalLanguage: Optional<LanguageInfo>.None(),
-            releaseType: Optional<MusicReleaseType>.Some(MusicReleaseType.Album),
+            releaseTypes: [MusicReleaseType.Album],
             releaseStatus: Optional<MusicReleaseStatus>.Some(MusicReleaseStatus.Official),
             totalDiscs: Optional<int>.Some(2),
             totalTracks: 12);
@@ -191,11 +198,11 @@ public class AlbumMetadataTests
         AlbumMetadata firstMetadata = _albumMetadataFixture.Create(
             title: "A Night at the Opera",
             releaseInfo: releaseInfo,
-            releaseType: Optional<MusicReleaseType>.Some(MusicReleaseType.Album));
+            releaseTypes: [MusicReleaseType.Album]);
         AlbumMetadata secondMetadata = _albumMetadataFixture.Create(
             title: "A Night at the Opera",
             releaseInfo: releaseInfo,
-            releaseType: Optional<MusicReleaseType>.Some(MusicReleaseType.Single));
+            releaseTypes: [MusicReleaseType.Single]);
 
         // Assert
         Assert.NotEqual(firstMetadata, secondMetadata);

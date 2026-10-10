@@ -70,13 +70,13 @@ public class GenreEntityMappingTests
     }
 
     [Fact]
-    public void ToDomainEntity_WhenMappingValidGenreEntity_ShouldMapCorrectly()
+    public void ToDomainValueObject_WhenMappingValidGenreEntity_ShouldMapCorrectly()
     {
         // Arrange
         GenreEntity entity = _genreEntityFixture.Create(name: "Fiction");
 
         // Act
-        Result<Genre> result = entity.ToDomainEntity();
+        Result<Genre> result = entity.ToDomainValueObject();
 
         // Assert
         Assert.False(result.IsFailure);
@@ -88,13 +88,13 @@ public class GenreEntityMappingTests
     [InlineData("")]
     [InlineData(" ")]
     [InlineData(null)]
-    public void ToDomainEntity_WhenMappingInvalidGenreEntity_ShouldMapToDefault(string? invalidName)
+    public void ToDomainValueObject_WhenMappingInvalidGenreEntity_ShouldMapToDefault(string? invalidName)
     {
         // Arrange
         GenreEntity entity = _genreEntityFixture.Create(name: invalidName, includeName: invalidName is not null);
 
         // Act
-        Result<Genre> result = entity.ToDomainEntity();
+        Result<Genre> result = entity.ToDomainValueObject();
 
         // Assert
         Assert.True(result.IsFailure);
@@ -102,7 +102,7 @@ public class GenreEntityMappingTests
     }
 
     [Fact]
-    public void ToDomainEntities_WhenMappingMultipleValidGenreEntities_ShouldMapAllCorrectly()
+    public void ToDomainValueObjects_WhenMappingMultipleValidGenreEntities_ShouldMapAllCorrectly()
     {
         // Arrange
         List<GenreEntity> entities =
@@ -114,7 +114,7 @@ public class GenreEntityMappingTests
         ];
 
         // Act
-        IEnumerable<Result<Genre>> results = entities.ToDomainEntities();
+        IEnumerable<Result<Genre>> results = entities.ToDomainValueObjects();
 
         // Assert
         Assert.NotNull(results);

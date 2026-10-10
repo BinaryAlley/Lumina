@@ -9,7 +9,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.DTO.Themes;
 
 /// <summary>
-/// Fixture class for generating <see cref="ThemeFileSystemBrowserDto"/> test data.
+/// Fixture class for the <see cref="ThemeFileSystemBrowserDto"/> record.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ThemeFileSystemBrowserDtoFixture

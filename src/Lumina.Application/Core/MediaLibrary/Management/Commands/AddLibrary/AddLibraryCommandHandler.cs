@@ -11,6 +11,8 @@ using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.PathTemplate;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
@@ -39,6 +41,7 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Resul
     private readonly IEnvironmentContext _environmentContext;
     private readonly IAuthorizationService _authorizationService;
     private readonly IMediaLibraryProviderConfigurationStore _providerConfigurationStore;
+    private readonly ILibraryPathTemplateService _pathTemplateService;
     private readonly IValidator<AddLibraryCommand> _validator;
 
     /// <summary>
@@ -49,6 +52,7 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Resul
     /// <param name="domainEventsQueue">Injected service for the queue of domain events.</param>
     /// <param name="environmentContext">Injected facade service for environment contextual services.</param>
     /// <param name="providerConfigurationStore">Injected store of the provider configurations of the media libraries.</param>
+    /// <param name="pathTemplateService">Injected service for validating and resolving the path templates of the media libraries.</param>
     /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
     /// <param name="validator">Injected validator for application validation rules.</param>
     public AddLibraryCommandHandler(
@@ -57,6 +61,7 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Resul
         IDomainEventsQueue domainEventsQueue,
         IEnvironmentContext environmentContext,
         IMediaLibraryProviderConfigurationStore providerConfigurationStore,
+        ILibraryPathTemplateService pathTemplateService,
         IUnitOfWork unitOfWork,
         IValidator<AddLibraryCommand> validator)
     {
@@ -66,6 +71,7 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Resul
         _environmentContext = environmentContext;
         _authorizationService = authorizationService;
         _providerConfigurationStore = providerConfigurationStore;
+        _pathTemplateService = pathTemplateService;
         _validator = validator;
     }
 
@@ -108,11 +114,21 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Resul
                 return DomainErrors.Library.CoverFileMustBeAnImage;
         }
 
+        LibraryType libraryType = Enum.Parse<LibraryType>(command.LibraryType!);
+
+        // A library always carries a path template: the one provided by the user, or the ideal structure of the library type as its default.
+        Result<IReadOnlyList<LibraryPathPart>> pathTemplatePartsResult = command.PathTemplateParts.ToDomainParts();
+        if (pathTemplatePartsResult.IsFailure)
+            return pathTemplatePartsResult.Errors;
+        Result<LibraryPathTemplate> pathTemplateResult = _pathTemplateService.ResolveTemplate(libraryType, pathTemplatePartsResult.Value);
+        if (pathTemplateResult.IsFailure)
+            return pathTemplateResult.Errors;
+
         // Create a domain library object.
         Result<Library> createLibraryResult = Library.Create(
             UserId.Create(userId),
             command.Title!,
-            Enum.Parse<LibraryType>(command.LibraryType!),
+            libraryType,
             command.ContentLocations!,
             Optional<string>.FromNullable(command.CoverImage),
             command.IsEnabled,
@@ -120,6 +136,7 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Resul
             command.CanDownloadMetadataFromWeb,
             command.ShouldSaveMetadataInMediaDirectories,
             command.ShouldSkipUnchangedDirectoriesDuringScan,
+            pathTemplateResult.Value,
             []
         );
 
@@ -134,7 +151,7 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Resul
         if (insertLibraryResult.IsFailure)
             return insertLibraryResult.Errors;
         Result<Success> ensureProviderConfigurationsResult = await _providerConfigurationStore.EnsureProviderConfigurationsAsync(
-            createLibraryResult.Value.Id.Value, Enum.Parse<LibraryType>(command.LibraryType!), cancellationToken).ConfigureAwait(false);
+            createLibraryResult.Value.Id.Value, libraryType, cancellationToken).ConfigureAwait(false);
         if (ensureProviderConfigurationsResult.IsFailure)
             return ensureProviderConfigurationsResult.Errors;
 

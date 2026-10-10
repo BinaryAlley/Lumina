@@ -33,7 +33,7 @@ public class AddAlbumEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     private readonly LuminaApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly AddAlbumRequestFixture _addAlbumRequestFixture = new();
-    private readonly AlbumMetadataDtoFixture _albumMetadataDtoFixture = new();
+    private readonly MusicAlbumMetadataDtoFixture _musicAlbumMetadataDtoFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly ArtistEntityFixture _artistEntityFixture = new();
     private readonly AlbumEntityFixture _albumEntityFixture = new();
@@ -158,7 +158,7 @@ public class AddAlbumEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         _seededUsernames.Add(username);
         (Guid libraryId, Guid artistId) = await SeedLibraryArtistAndAlbumAsync(userId);
         AddAlbumRequest request = _addAlbumRequestFixture.Create(
-            metadata: _albumMetadataDtoFixture.Create(title: maliciousTitle),
+            metadata: _musicAlbumMetadataDtoFixture.Create(title: maliciousTitle),
             contributors: [],
             ratings: [],
             tracks: []);

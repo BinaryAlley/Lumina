@@ -10,7 +10,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.Requests.Plugins;
 
 /// <summary>
-/// Fixture class for generating <see cref="ReorderLibraryArtworkProvidersRequest"/> test data.
+/// Fixture class for the <see cref="ReorderLibraryArtworkProvidersRequest"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ReorderLibraryArtworkProvidersRequestFixture

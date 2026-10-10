@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -350,5 +350,68 @@
   </data>
   <data name="DescriptionBookReaders" xml:space="preserve">
     <value>The book readers used to read the books of this library. A disabled book reader lets the user know that a reader plugin exists for the format, but it is disabled.</value>
+  </data>
+  <data name="PathTemplate" xml:space="preserve">
+    <value>Path template</value>
+  </data>
+  <data name="DescriptionPathTemplate" xml:space="preserve">
+    <value>Describes how the paths of this library are structured on disk, so the application understands what each folder and file name means. Drag the available pieces into the path, in the order they appear on disk. Each piece can be edited to match how it is written in your library, and its checkmark marks it as optional when it is not always present. The preview shows an example path.</value>
+  </data>
+  <data name="PathTemplatePreview" xml:space="preserve">
+    <value>Preview</value>
+  </data>
+  <data name="PathPartLiteral" xml:space="preserve">
+    <value>Text</value>
+  </data>
+  <data name="PathPartSeparator" xml:space="preserve">
+    <value>Separator</value>
+  </data>
+  <data name="PathPartArtist" xml:space="preserve">
+    <value>Artist</value>
+  </data>
+  <data name="PathPartReleaseType" xml:space="preserve">
+    <value>Release type</value>
+  </data>
+  <data name="PathPartReleaseYear" xml:space="preserve">
+    <value>Release year</value>
+  </data>
+  <data name="PathPartReleaseName" xml:space="preserve">
+    <value>Release name</value>
+  </data>
+  <data name="PathPartTrackNumber" xml:space="preserve">
+    <value>Track number</value>
+  </data>
+  <data name="PathPartTrackName" xml:space="preserve">
+    <value>Track name</value>
+  </data>
+  <data name="PathPartExtension" xml:space="preserve">
+    <value>Extension</value>
+  </data>
+  <data name="PathPartDiscNumber" xml:space="preserve">
+    <value>Disc number</value>
+  </data>
+  <data name="PathPartOptional" xml:space="preserve">
+    <value>Mark as optional</value>
+  </data>
+  <data name="PathPartLiteralPlaceholder" xml:space="preserve">
+    <value>text</value>
+  </data>
+  <data name="PathPartDigits" xml:space="preserve">
+    <value>digits</value>
+  </data>
+  <data name="PathPartAuthor" xml:space="preserve">
+    <value>Author</value>
+  </data>
+  <data name="PathPartTitle" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="PathPartSeries" xml:space="preserve">
+    <value>Series</value>
+  </data>
+  <data name="PathPartSeriesNumber" xml:space="preserve">
+    <value>Series number</value>
+  </data>
+  <data name="PathPartBookId" xml:space="preserve">
+    <value>Book id</value>
   </data>
 </root>

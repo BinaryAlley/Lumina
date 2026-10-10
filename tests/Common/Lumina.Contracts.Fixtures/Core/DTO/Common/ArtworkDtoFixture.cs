@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.DTO.Common;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -18,12 +19,16 @@ public class ArtworkDtoFixture
     /// </summary>
     /// <param name="localPath">Optional. The local file system path of the artwork.</param>
     /// <param name="remoteUrl">Optional. The remote URL of the artwork.</param>
+    /// <param name="type">Optional. The type of the artwork.</param>
+    /// <param name="ordinal">Optional. The ordinal of the artwork within its type.</param>
     /// <returns>The created <see cref="ArtworkDto"/>.</returns>
     public ArtworkDto Create(
         string? localPath = null, 
-        string? remoteUrl = null)
+        string? remoteUrl = null, 
+        ArtworkType type = ArtworkType.Cover, 
+        int ordinal = 0)
     {
-        return new ArtworkDto(localPath, remoteUrl);
+        return new ArtworkDto(type, ordinal, localPath, remoteUrl);
     }
 
     /// <summary>

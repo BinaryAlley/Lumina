@@ -78,7 +78,7 @@ public class GetArtistQueryHandlerTests
         Assert.False(result.IsFailure);
         Assert.Equal(artistId, result.Value.Id);
         Assert.Equal(libraryId, result.Value.LibraryId);
-        Assert.Equal(artist.Name, result.Value.Name);
+        Assert.Equal(artist.Name, result.Value.Metadata.Name);
         Assert.Equal(artist.Website, result.Value.Website);
         Assert.NotNull(result.Value.Albums);
         Assert.Equal(artist.Albums.Count, result.Value.Albums!.Count);

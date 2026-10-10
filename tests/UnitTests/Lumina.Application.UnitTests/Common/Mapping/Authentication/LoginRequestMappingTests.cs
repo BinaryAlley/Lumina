@@ -14,13 +14,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Authentication;
 [ExcludeFromCodeCoverage]
 public class LoginRequestMappingTests
 {
-    private readonly LoginRequestFixture _fixture = new();
+    private readonly LoginRequestFixture _loginRequestFixture = new();
 
     [Fact]
     public void ToQuery_WhenMappingRequest_ShouldMapCorrectly()
     {
         // Arrange
-        LoginRequest request = _fixture.Create();
+        LoginRequest request = _loginRequestFixture.Create();
 
         // Act
         LoginUserQuery result = request.ToQuery();
@@ -36,7 +36,7 @@ public class LoginRequestMappingTests
     public void ToQuery_WhenMappingRequestWithNullValues_ShouldMapCorrectly()
     {
         // Arrange
-        LoginRequest request = new(null, null);
+        LoginRequest request = _loginRequestFixture.Create(includeUsername: false, includePassword: false, includeTotpCode: false);
 
         // Act
         LoginUserQuery result = request.ToQuery();
@@ -59,7 +59,13 @@ public class LoginRequestMappingTests
         string? totpCode)
     {
         // Arrange
-        LoginRequest request = new(username, password, totpCode);
+        LoginRequest request = _loginRequestFixture.Create(
+            username,
+            password,
+            totpCode,
+            includeUsername: username is not null,
+            includePassword: password is not null,
+            includeTotpCode: totpCode is not null);
 
         // Act
         LoginUserQuery result = request.ToQuery();

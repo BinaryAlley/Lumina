@@ -28,7 +28,7 @@ public class PluginRepositoryTests
 {
     private readonly LuminaDbContext _mockContext;
     private readonly PluginRepository _sut;
-    private readonly PluginEntityFixture _pluginFixture = new();
+    private readonly PluginEntityFixture _pluginEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PluginRepositoryTests"/> class.
@@ -43,7 +43,7 @@ public class PluginRepositoryTests
     public async Task GetByIdAsync_WhenPluginExists_ShouldReturnIt()
     {
         // Arrange
-        PluginEntity plugin = _pluginFixture.Create();
+        PluginEntity plugin = _pluginEntityFixture.Create();
         _mockContext.Plugins.Add(plugin);
         await _mockContext.SaveChangesAsync();
 
@@ -59,7 +59,7 @@ public class PluginRepositoryTests
     public async Task UpsertAsync_WhenPluginDoesNotExist_ShouldInsertIt()
     {
         // Arrange
-        PluginEntity plugin = _pluginFixture.Create();
+        PluginEntity plugin = _pluginEntityFixture.Create();
 
         // Act
         Result<Updated> result = await _sut.UpsertAsync(plugin, CancellationToken.None);
@@ -74,12 +74,12 @@ public class PluginRepositoryTests
     public async Task UpsertAsync_WhenPluginExists_ShouldUpdateDetectionFieldsAndPreserveSettings()
     {
         // Arrange
-        PluginEntity plugin = _pluginFixture.Create();
+        PluginEntity plugin = _pluginEntityFixture.Create();
         plugin.SettingsJson = """{"preferredLanguage":"en"}""";
         _mockContext.Plugins.Add(plugin);
         await _mockContext.SaveChangesAsync();
 
-        PluginEntity updatedPlugin = _pluginFixture.Create(plugin.Id);
+        PluginEntity updatedPlugin = _pluginEntityFixture.Create(plugin.Id);
         updatedPlugin.Name = "Updated Name";
         updatedPlugin.SettingsJson = null; // The stored settings must be preserved.
 
@@ -98,7 +98,7 @@ public class PluginRepositoryTests
     public async Task UpdateSettingsAsync_WhenPluginExists_ShouldUpdateItsSettings()
     {
         // Arrange
-        PluginEntity plugin = _pluginFixture.Create();
+        PluginEntity plugin = _pluginEntityFixture.Create();
         _mockContext.Plugins.Add(plugin);
         await _mockContext.SaveChangesAsync();
 
@@ -126,7 +126,7 @@ public class PluginRepositoryTests
     public async Task GetAllAsync_WhenPluginsExist_ShouldReturnAllPlugins()
     {
         // Arrange
-        List<PluginEntity> plugins = _pluginFixture.CreateMany(2);
+        List<PluginEntity> plugins = _pluginEntityFixture.CreateMany(2);
 
         _mockContext.Plugins.AddRange(plugins);
         await _mockContext.SaveChangesAsync();
@@ -158,7 +158,7 @@ public class PluginRepositoryTests
     public async Task DeleteByIdAsync_WhenPluginExists_ShouldRemovePluginAndReturnDeleted()
     {
         // Arrange
-        PluginEntity existingPlugin = _pluginFixture.Create();
+        PluginEntity existingPlugin = _pluginEntityFixture.Create();
         _mockContext.Plugins.Add(existingPlugin);
         await _mockContext.SaveChangesAsync();
 

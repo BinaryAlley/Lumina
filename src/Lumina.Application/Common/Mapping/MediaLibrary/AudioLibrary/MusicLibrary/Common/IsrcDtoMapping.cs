@@ -20,7 +20,7 @@ public static class IsrcDtoMapping
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully converted <see cref="Isrc"/>, or an error message.
     /// </returns>
-    public static Result<Isrc> ToDomainEntity(this IsrcDto dto)
+    public static Result<Isrc> ToDomainValueObject(this IsrcDto dto)
     {
         return Isrc.Create(dto.Value!);
     }
@@ -32,8 +32,8 @@ public static class IsrcDtoMapping
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a collection of converted <see cref="Isrc"/>, or an error message.
     /// </returns>
-    public static IEnumerable<Result<Isrc>> ToDomainEntities(this IEnumerable<IsrcDto> dtos)
+    public static IEnumerable<Result<Isrc>> ToDomainValueObjects(this IEnumerable<IsrcDto> dtos)
     {
-        return dtos.Select(dto => dto.ToDomainEntity());
+        return dtos.Select(dto => dto.ToDomainValueObject());
     }
 }

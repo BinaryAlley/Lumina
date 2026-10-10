@@ -14,13 +14,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Plugins;
 [ExcludeFromCodeCoverage]
 public class SetLibraryBookReaderEnabledRequestMappingTests
 {
-    private readonly SetLibraryBookReaderEnabledRequestFixture _requestFixture = new();
+    private readonly SetLibraryBookReaderEnabledRequestFixture _setLibraryBookReaderEnabledRequestFixture = new();
 
     [Fact]
     public void ToCommand_WhenMappingValidRequest_ShouldMapCorrectly()
     {
         // Arrange
-        SetLibraryBookReaderEnabledRequest request = _requestFixture.Create();
+        SetLibraryBookReaderEnabledRequest request = _setLibraryBookReaderEnabledRequestFixture.Create();
 
         // Act
         SetLibraryBookReaderEnabledCommand result = request.ToCommand();

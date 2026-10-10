@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Application.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
+using Lumina.Contracts.Fixtures.Core.Requests.Authorization;
 using Lumina.Contracts.Requests.Authorization;
 using System;
 using System.Collections.Generic;
@@ -15,12 +16,14 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Authorization;
 [ExcludeFromCodeCoverage]
 public class UpdateUserRoleAndPermissionsRequestMappingTests
 {
+    private readonly UpdateUserRoleAndPermissionsRequestFixture _updateUserRoleAndPermissionsRequestFixture = new();
+
     [Fact]
     public void ToCommand_WhenMappingValidRequest_ShouldMapCorrectly()
     {
         // Arrange
         List<Guid> permissions = [Guid.NewGuid()];
-        UpdateUserRoleAndPermissionsRequest request = new(
+        UpdateUserRoleAndPermissionsRequest request = _updateUserRoleAndPermissionsRequestFixture.Create(
             Guid.NewGuid(),
             Guid.NewGuid(),
             permissions
@@ -41,10 +44,11 @@ public class UpdateUserRoleAndPermissionsRequestMappingTests
     {
         // Arrange
         List<Guid> permissions = [Guid.NewGuid()];
-        UpdateUserRoleAndPermissionsRequest request = new(
+        UpdateUserRoleAndPermissionsRequest request = _updateUserRoleAndPermissionsRequestFixture.Create(
             Guid.NewGuid(),
-            null,
-            permissions
+            roleId: null,
+            permissions: permissions,
+            includeRoleId: false
         );
 
         // Act
@@ -64,7 +68,7 @@ public class UpdateUserRoleAndPermissionsRequestMappingTests
     public void ToCommand_WhenMappingDifferentUserIds_ShouldMapCorrectly(string userIdString)
     {
         // Arrange
-        UpdateUserRoleAndPermissionsRequest request = new(
+        UpdateUserRoleAndPermissionsRequest request = _updateUserRoleAndPermissionsRequestFixture.Create(
             Guid.Parse(userIdString),
             Guid.NewGuid(),
             [Guid.NewGuid()]
@@ -88,7 +92,7 @@ public class UpdateUserRoleAndPermissionsRequestMappingTests
             Guid.Parse("00000000-0000-0000-0000-000000000002"),
             Guid.Parse("00000000-0000-0000-0000-000000000003")
         ];
-        UpdateUserRoleAndPermissionsRequest request = new(
+        UpdateUserRoleAndPermissionsRequest request = _updateUserRoleAndPermissionsRequestFixture.Create(
             Guid.NewGuid(),
             Guid.NewGuid(),
             permissions

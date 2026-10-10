@@ -40,7 +40,7 @@ public class GetPathRootRequestMappingTests
     public void ToQuery_WhenMappingWithDifferentPaths_ShouldMapCorrectly(string path)
     {
         // Arrange
-        GetPathRootRequest request = new(path);
+        GetPathRootRequest request = _getPathRootRequestFixture.Create(path);
 
         // Act
         GetPathRootQuery result = request.ToQuery();

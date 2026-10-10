@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetUserPermissions;
+using Lumina.Application.Fixtures.Core.UsersManagement.Authorization.Queries.GetUserPermissions;
 using Lumina.Application.UnitTests.Common.Setup;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
@@ -17,12 +18,13 @@ namespace Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Querie
 public class GetUserPermissionsQueryValidatorTests
 {
     private readonly GetUserPermissionsQueryValidator _validator = new();
+    private readonly GetUserPermissionsQueryFixture _getUserPermissionsQueryFixture = new();
 
     [Fact]
     public void Validate_WhenUserIdIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        GetUserPermissionsQuery query = new(null);
+        GetUserPermissionsQuery query = _getUserPermissionsQueryFixture.Create(includeUserId: false);
 
         // Act
         List<Error> result = _validator.TestValidate(query);
@@ -35,7 +37,7 @@ public class GetUserPermissionsQueryValidatorTests
     public void Validate_WhenUserIdIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        GetUserPermissionsQuery query = new(Guid.Empty);
+        GetUserPermissionsQuery query = _getUserPermissionsQueryFixture.Create(Guid.Empty);
 
         // Act
         List<Error> result = _validator.TestValidate(query);
@@ -48,7 +50,7 @@ public class GetUserPermissionsQueryValidatorTests
     public void Validate_WhenUserIdIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        GetUserPermissionsQuery query = new(Guid.NewGuid());
+        GetUserPermissionsQuery query = _getUserPermissionsQueryFixture.Create(Guid.NewGuid());
 
         // Act
         List<Error> result = _validator.TestValidate(query);

@@ -9,6 +9,7 @@ using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Infrastructure.Themes;
 using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Scheduling;
+using Lumina.Application.Fixtures.Common.DTO.Pagination;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
@@ -56,6 +57,8 @@ public class ScheduledJobSchedulerJobTests
     private readonly ScheduledJobExecutionEntityFixture _scheduledJobExecutionEntityFixture = new();
     private readonly ScheduledJobFixture _scheduledJobFixture = new();
     private readonly IntervalScheduleFixture _intervalScheduleFixture = new();
+    private readonly PaginatedResultDtoFixture<ThemeEntity> _themePaginatedResultDtoFixture = new();
+    private readonly PaginatedResultDtoFixture<ScheduledJobEntity> _scheduledJobPaginatedResultDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ScheduledJobSchedulerJobTests"/> class.
@@ -342,7 +345,7 @@ public class ScheduledJobSchedulerJobTests
         IThemeService mockThemeService = Substitute.For<IThemeService>();
         mockThemeService.GetBundledThemeArchivePaths().Returns([]);
         IThemeRepository mockThemeRepository = Substitute.For<IThemeRepository>();
-        mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
+        mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(_themePaginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 0, count: 0, numberOfPages: 1)));
         _mockUnitOfWork.ThemeRepository.Returns(mockThemeRepository);
         _services[typeof(IThemeService)] = mockThemeService;
 
@@ -390,10 +393,12 @@ public class ScheduledJobSchedulerJobTests
     {
         // Arrange
         _mockScheduledJobRepository.GetActiveOrRunningAsync(Arg.Any<CancellationToken>()).Returns(Array.Empty<ScheduledJobEntity>());
+        _mockScheduledJobRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(_scheduledJobPaginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 0, count: 0, numberOfPages: 1)));
         IThemeService mockThemeService = Substitute.For<IThemeService>();
         mockThemeService.GetBundledThemeArchivePaths().Returns([]);
         IThemeRepository mockThemeRepository = Substitute.For<IThemeRepository>();
-        mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
+        mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(_themePaginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 0, count: 0, numberOfPages: 1)));
         _mockUnitOfWork.ThemeRepository.Returns(mockThemeRepository);
         _services[typeof(IThemeService)] = mockThemeService;
         using CancellationTokenSource cancellationTokenSource = new();
@@ -405,6 +410,61 @@ public class ScheduledJobSchedulerJobTests
         // Assert
         mockThemeService.Received(1).GetBundledThemeArchivePaths();
         await _mockScheduledJobRepository.Received(2).GetActiveOrRunningAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task EnsureTechnicalDataCleanupScheduledJobAsync_WhenTheJobAlreadyExists_ShouldNotInsertIt()
+    {
+        // Arrange
+        ScheduledJobEntity existingJob = _scheduledJobEntityFixture.Create(taskType: ScheduledTaskType.TechnicalDataCleanup, status: ScheduledJobStatus.Active, scheduleType: ScheduleType.OnceAtStartup);
+        _mockScheduledJobRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(_scheduledJobPaginatedResultDtoFixture.Create(data: [existingJob], currentPage: 1, perPage: 1, count: 1, numberOfPages: 1)));
+
+        // Act
+        await InvokeAsync("EnsureTechnicalDataCleanupScheduledJobAsync", CancellationToken.None);
+
+        // Assert
+        await _mockScheduledJobRepository.DidNotReceive().InsertAsync(Arg.Any<ScheduledJobEntity>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task EnsureTechnicalDataCleanupScheduledJobAsync_WhenThereAreNoScheduledJobs_ShouldNotInsertIt()
+    {
+        // Arrange
+        _mockScheduledJobRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(_scheduledJobPaginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 0, count: 0, numberOfPages: 1)));
+
+        // Act
+        await InvokeAsync("EnsureTechnicalDataCleanupScheduledJobAsync", CancellationToken.None);
+
+        // Assert
+        // A fresh installation seeds the default jobs, including the technical data cleanup one, during the application setup.
+        await _mockScheduledJobRepository.DidNotReceive().InsertAsync(Arg.Any<ScheduledJobEntity>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task EnsureTechnicalDataCleanupScheduledJobAsync_WhenTheJobIsMissing_ShouldInsertItOwnedByTheOtherJobsOwner()
+    {
+        // Arrange
+        Guid ownerUserId = Guid.NewGuid();
+        ScheduledJobEntity existingJob = _scheduledJobEntityFixture.Create(taskType: ScheduledTaskType.RepairThemes, status: ScheduledJobStatus.Active, scheduleType: ScheduleType.OnceAtStartup, ownerUserId: ownerUserId);
+        _mockScheduledJobRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(_scheduledJobPaginatedResultDtoFixture.Create(data: [existingJob], currentPage: 1, perPage: 1, count: 1, numberOfPages: 1)));
+        _mockScheduledJobRepository.InsertAsync(Arg.Any<ScheduledJobEntity>(), Arg.Any<CancellationToken>()).Returns(Result.Created);
+
+        // Act
+        await InvokeAsync("EnsureTechnicalDataCleanupScheduledJobAsync", CancellationToken.None);
+
+        // Assert
+        await _mockScheduledJobRepository.Received(1).InsertAsync(
+            Arg.Is<ScheduledJobEntity>(scheduledJob =>
+                scheduledJob.TaskType == ScheduledTaskType.TechnicalDataCleanup &&
+                scheduledJob.ScheduleType == ScheduleType.OnceAtStartup &&
+                scheduledJob.Status == ScheduledJobStatus.Active &&
+                scheduledJob.OwnerUserId == ownerUserId &&
+                scheduledJob.CreatedBy == ownerUserId),
+            Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]

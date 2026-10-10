@@ -65,7 +65,7 @@ public class BookArtworkServiceTests
         _mockPathService.PathSeparator.Returns('\\');
 
         _mockHttpClientFactory = Substitute.For<IHttpClientFactory>();
-        _mockHttpClientFactory.CreateClient().Returns(new HttpClient(_stubHttpMessageHandler));
+        _mockHttpClientFactory.CreateClient(Arg.Any<string>()).Returns(new HttpClient(_stubHttpMessageHandler));
 
         MediaSettingsDto mediaSettings = _mediaSettingsDtoFixture.Create(rootDirectory: "media", librariesDirectory: "libraries", booksDirectory: "books");
         _mockMediaSettingsOptions = Substitute.For<IOptions<MediaSettingsDto>>();
@@ -98,9 +98,9 @@ public class BookArtworkServiceTests
             _mockFileProviderService.CopyFile(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>(), true)
                 .Returns(Result.From(copiedFileId));
 
-            string renamedFilePath = Path.Combine(artworkDirectoryPath, "cover.jpeg");
+            string renamedFilePath = Path.Combine(artworkDirectoryPath, "cover.jpg");
             FileSystemPathId renamedFileId = _fileSystemPathIdFixture.Create(renamedFilePath);
-            _mockFileProviderService.RenameFile(Arg.Any<FileSystemPathId>(), "cover.jpeg")
+            _mockFileProviderService.RenameFile(Arg.Any<FileSystemPathId>(), "cover.jpg")
                 .Returns(Result.From(renamedFileId));
 
             // Act
@@ -113,7 +113,7 @@ public class BookArtworkServiceTests
                 Arg.Is<FileSystemPathId>(pathId => pathId.Path == sourcePath),
                 Arg.Any<FileSystemPathId>(),
                 true);
-            _mockFileProviderService.Received(1).RenameFile(Arg.Any<FileSystemPathId>(), "cover.jpeg");
+            _mockFileProviderService.Received(1).RenameFile(Arg.Any<FileSystemPathId>(), "cover.jpg");
         }
         finally
         {
@@ -140,10 +140,10 @@ public class BookArtworkServiceTests
             string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, bookId, libraryName, authorName: "Unknown", bookTitle);
             MockArtworkDirectoryStubs(artworkDirectoryPath);
 
-            FileSystemPathId renamedFileId = _fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpeg"));
+            FileSystemPathId renamedFileId = _fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpg"));
             _mockFileProviderService.CopyFile(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>(), true)
                 .Returns(Result.From(_fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpg"))));
-            _mockFileProviderService.RenameFile(Arg.Any<FileSystemPathId>(), "cover.jpeg")
+            _mockFileProviderService.RenameFile(Arg.Any<FileSystemPathId>(), "cover.jpg")
                 .Returns(Result.From(renamedFileId));
 
             // Act
@@ -264,8 +264,8 @@ public class BookArtworkServiceTests
 
         _mockFileProviderService.CopyFile(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>(), true)
             .Returns(Result.From(_fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpg"))));
-        FileSystemPathId renamedFileId = _fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpeg"));
-        _mockFileProviderService.RenameFile(Arg.Any<FileSystemPathId>(), "cover.jpeg")
+        FileSystemPathId renamedFileId = _fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpg"));
+        _mockFileProviderService.RenameFile(Arg.Any<FileSystemPathId>(), "cover.jpg")
             .Returns(Result.From(renamedFileId));
 
         // Act
@@ -327,10 +327,10 @@ public class BookArtworkServiceTests
             string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, bookId, libraryName, authorName, bookTitle);
             MockArtworkDirectoryStubs(artworkDirectoryPath);
 
-            FileSystemPathId renamedFileId = _fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpeg"));
+            FileSystemPathId renamedFileId = _fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpg"));
             _mockFileProviderService.CopyFile(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>(), true)
                 .Returns(Result.From(_fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpg"))));
-            _mockFileProviderService.RenameFile(Arg.Any<FileSystemPathId>(), "cover.jpeg")
+            _mockFileProviderService.RenameFile(Arg.Any<FileSystemPathId>(), "cover.jpg")
                 .Returns(Result.From(renamedFileId));
 
             // Act
@@ -521,7 +521,7 @@ public class BookArtworkServiceTests
             MockArtworkDirectoryStubs(artworkDirectoryPath);
             _mockFileProviderService.CopyFile(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>(), true)
                 .Returns(Result.From(_fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpg"))));
-            _mockFileProviderService.RenameFile(Arg.Any<FileSystemPathId>(), "cover.jpeg")
+            _mockFileProviderService.RenameFile(Arg.Any<FileSystemPathId>(), "cover.jpg")
                 .Returns(Error.Failure("FileSystem.Error", "Failed to rename the artwork"));
 
             // Act

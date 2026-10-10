@@ -9,7 +9,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
 
 /// <summary>
-/// Fixture class for generating <see cref="LanguageInfoDto"/> test data.
+/// Fixture class for the <see cref="LanguageInfoDto"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class LanguageInfoDtoFixture

@@ -198,7 +198,9 @@ public class DataSeedService : IDataSeedService
             // Repair the installed themes whose files are missing, at every application startup.
             CreateDefaultScheduledJob("Repair themes at startup", ScheduledTaskType.RepairThemes, ScheduleType.OnceAtStartup, intervalMinutes: null, hour: null, minute: null, adminUserId),
             // Clean the execution history of the scheduled jobs, keeping only the executions of the past month, at every application startup.
-            CreateDefaultScheduledJob("Clean scheduled job execution history at startup", ScheduledTaskType.CleanScheduledJobExecutionHistory, ScheduleType.OnceAtStartup, intervalMinutes: null, hour: null, minute: null, adminUserId)
+            CreateDefaultScheduledJob("Clean scheduled job execution history at startup", ScheduledTaskType.CleanScheduledJobExecutionHistory, ScheduleType.OnceAtStartup, intervalMinutes: null, hour: null, minute: null, adminUserId),
+            // Clean the technical data that is no longer valid, at every application startup.
+            CreateDefaultScheduledJob("Technical data cleanup at startup", ScheduledTaskType.TechnicalDataCleanup, ScheduleType.OnceAtStartup, intervalMinutes: null, hour: null, minute: null, adminUserId)
         ];
         foreach (ScheduledJobEntity defaultScheduledJob in defaultScheduledJobs)
         {

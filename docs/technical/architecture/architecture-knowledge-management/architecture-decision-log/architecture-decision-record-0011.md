@@ -12,7 +12,7 @@ Key constraints that shaped this decision:
 
 1. **Licensing Change**: MediatR became a commercial product for .NET 8+ projects, requiring a paid license for continued use in production systems.
 
-2. **Narrow Usage Scope**: MediatR is used for command and query dispatching, with a single pipeline behavior (automatic application validation) and no stream requests. Its notification publishing is used for domain event publishing, which is outside the scope of this ADR and is replaced separately (see ADR-0013).
+2. **Narrow Usage Scope**: MediatR is used for command and query dispatching, with a single pipeline behavior (automatic application validation) and no stream requests. Its notification publishing is used for domain event publishing, which is outside the scope of this ADR and is replaced separately (see [ADR-0013](architecture-decision-record-0013.md)).
 
 3. **Zero Abstraction Value at Scale**: With only a validation pipeline behavior registered, the command and query dispatching provides no runtime value beyond a dispatch indirection that can be replaced by direct handler injection. It actually hurts performance by runtime dispatching of handlers via reflection.
 

@@ -21,14 +21,18 @@ public class MediaContributorNameDtoFixture
     /// </summary>
     /// <param name="displayName">Optional. The display name of the media contributor.</param>
     /// <param name="legalName">Optional. The legal name of the media contributor.</param>
+    /// <param name="includeDisplayName">Whether the display name should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeLegalName">Whether the legal name should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="MediaContributorNameDto"/>.</returns>
     public MediaContributorNameDto Create(
         string? displayName = null, 
-        string? legalName = null)
+        string? legalName = null,
+        bool includeDisplayName = true,
+        bool includeLegalName = true)
     {
         return new MediaContributorNameDto(
-            displayName ?? _faker.Name.FullName(),
-            legalName ?? _faker.Name.FullName());
+            includeDisplayName ? displayName ?? _faker.Name.FullName() : null,
+            includeLegalName ? legalName ?? _faker.Name.FullName() : null);
     }
 
     /// <summary>

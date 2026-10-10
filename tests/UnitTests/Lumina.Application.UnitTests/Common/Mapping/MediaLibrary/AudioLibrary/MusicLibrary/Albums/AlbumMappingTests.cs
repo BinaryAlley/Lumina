@@ -58,13 +58,13 @@ public class AlbumMappingTests
         Assert.Equal(album.Metadata.OriginalLanguage.HasValue && album.Metadata.OriginalLanguage.Value.NativeName.HasValue ? album.Metadata.OriginalLanguage.Value.NativeName.Value : null, result.OriginalLanguageNativeName);
         Assert.Equal(album.Metadata.Genres.ToRepositoryEntities().Distinct().Select(genre => genre.Name).OrderBy(name => name), result.Genres.Select(genre => genre.Name).OrderBy(name => name));
         Assert.Equal(album.Metadata.Tags.ToRepositoryEntities().Distinct().Select(tag => tag.Name).OrderBy(name => name), result.Tags.Select(tag => tag.Name).OrderBy(name => name));
-        Assert.Equal(album.Metadata.ReleaseType.HasValue ? album.Metadata.ReleaseType.Value : null, result.ReleaseType);
+        Assert.Equal(album.Metadata.ReleaseTypes.OrderBy(releaseType => releaseType), result.ReleaseTypes.Select(releaseType => releaseType.ReleaseType).OrderBy(releaseType => releaseType));
         Assert.Equal(album.Metadata.ReleaseStatus.HasValue ? album.Metadata.ReleaseStatus.Value : null, result.ReleaseStatus);
         Assert.Equal(album.Metadata.TotalDiscs.HasValue ? album.Metadata.TotalDiscs.Value : null, result.TotalDiscs);
         Assert.Equal(album.Metadata.TotalTracks, result.TotalTracks);
         Assert.Equal(album.MediaFormat.HasValue ? album.MediaFormat.Value : null, result.MediaFormat);
         Assert.Equal(album.Barcode.HasValue ? album.Barcode.Value.Value : null, result.Barcode);
-        Assert.Equal(album.CatalogNumber.HasValue ? album.CatalogNumber.Value : null, result.CatalogNumber);
+        Assert.Equal(album.CatalogNumbers, result.CatalogNumbers.Select(catalogNumber => catalogNumber.CatalogNumber));
         Assert.Equal(album.MusicBrainzReleaseId.HasValue ? album.MusicBrainzReleaseId.Value.Value : null, result.MusicBrainzReleaseId);
         Assert.Equal(album.MusicBrainzReleaseGroupId.HasValue ? album.MusicBrainzReleaseGroupId.Value.Value : null, result.MusicBrainzReleaseGroupId);
         Assert.Equal(album.MusicBrainzReleaseArtistId.HasValue ? album.MusicBrainzReleaseArtistId.Value.Value : null, result.MusicBrainzReleaseArtistId);
@@ -133,7 +133,7 @@ public class AlbumMappingTests
         Album album = _albumFixture.Create(
             mediaFormat: Optional<MusicMediaFormat>.None(),
             barcode: Optional<Barcode>.None(),
-            catalogNumber: Optional<string>.None(),
+            catalogNumbers: [],
             musicBrainzReleaseId: Optional<MusicBrainzId>.None(),
             musicBrainzReleaseGroupId: Optional<MusicBrainzId>.None(),
             musicBrainzReleaseArtistId: Optional<MusicBrainzId>.None(),
@@ -147,7 +147,7 @@ public class AlbumMappingTests
         // Assert
         Assert.Null(result.MediaFormat);
         Assert.Null(result.Barcode);
-        Assert.Null(result.CatalogNumber);
+        Assert.Empty(result.CatalogNumbers);
         Assert.Null(result.MusicBrainzReleaseId);
         Assert.Null(result.MusicBrainzReleaseGroupId);
         Assert.Null(result.MusicBrainzReleaseArtistId);

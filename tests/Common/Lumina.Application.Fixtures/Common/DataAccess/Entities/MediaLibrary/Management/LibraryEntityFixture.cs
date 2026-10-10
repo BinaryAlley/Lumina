@@ -16,6 +16,9 @@ namespace Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Ma
 [ExcludeFromCodeCoverage]
 public class LibraryEntityFixture
 {
+    private readonly LibraryContentLocationEntityFixture _libraryContentLocationEntityFixture = new();
+    private readonly LibraryPathTemplatePartEntityFixture _libraryPathTemplatePartEntityFixture = new();
+
     /// <summary>
     /// Creates a random valid <see cref="LibraryEntity"/>.
     /// </summary>
@@ -32,6 +35,8 @@ public class LibraryEntityFixture
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether unchanged directories should be skipped during a scan or not.</param>
     /// <param name="metadataProvidersConfigurationFingerprint">Optional. The fingerprint of the metadata provider configuration of the media library.</param>
     /// <param name="artworkProvidersConfigurationFingerprint">Optional. The fingerprint of the artwork provider configuration of the media library.</param>
+    /// <param name="pathTemplateParts">Optional. The ordered parts of the path template of the media library.</param>
+    /// <param name="pathTemplateFingerprint">Optional. The fingerprint of the path template of the media library.</param>
     /// <returns>The created media library entity.</returns>
     public LibraryEntity Create(
         Guid? id = null,
@@ -46,7 +51,9 @@ public class LibraryEntityFixture
         bool shouldSaveMetadataInMediaDirectories = true,
         bool shouldSkipUnchangedDirectoriesDuringScan = false,
         string? metadataProvidersConfigurationFingerprint = null,
-        string? artworkProvidersConfigurationFingerprint = null)
+        string? artworkProvidersConfigurationFingerprint = null,
+        IEnumerable<LibraryPathTemplatePartEntity>? pathTemplateParts = null,
+        string? pathTemplateFingerprint = null)
     {
         return new Faker<LibraryEntity>()
             .CustomInstantiator(f => new LibraryEntity
@@ -57,6 +64,7 @@ public class LibraryEntityFixture
                 CoverImage = default,
                 LibraryType = default,
                 ContentLocations = [],
+                PathTemplateParts = [],
                 LibraryScans = [],
                 IsEnabled = isEnabled,
                 IsLocked = isLocked,
@@ -65,6 +73,7 @@ public class LibraryEntityFixture
                 ShouldSkipUnchangedDirectoriesDuringScan = shouldSkipUnchangedDirectoriesDuringScan,
                 MetadataProvidersConfigurationFingerprint = metadataProvidersConfigurationFingerprint,
                 ArtworkProvidersConfigurationFingerprint = artworkProvidersConfigurationFingerprint,
+                PathTemplateFingerprint = pathTemplateFingerprint,
                 CreatedOnUtc = default,
                 CreatedBy = default,
                 UpdatedOnUtc = null,
@@ -76,8 +85,9 @@ public class LibraryEntityFixture
             .RuleFor(library => library.ContentLocations, f =>
             {
                 IEnumerable<string> paths = contentLocations ?? [f.System.DirectoryPath(), f.System.DirectoryPath()];
-                return [.. paths.Select(path => new LibraryContentLocationEntity() { Path = path })];
+                return [.. paths.Select(path => _libraryContentLocationEntityFixture.Create(path: path))];
             })
+            .RuleFor(library => library.PathTemplateParts, f => pathTemplateParts is null ? [] : [.. pathTemplateParts])
             .RuleFor(library => library.CreatedOnUtc, f => f.Date.Past())
             .RuleFor(library => library.CreatedBy, f => f.Random.Guid())
             .Generate();

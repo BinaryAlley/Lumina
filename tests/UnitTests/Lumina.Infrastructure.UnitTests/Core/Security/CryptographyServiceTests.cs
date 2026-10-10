@@ -18,13 +18,14 @@ public class CryptographyServiceTests
 {
     private readonly CryptographyService _sut;
     private readonly IOptions<EncryptionSettingsDto> _encryptionSettings;
+    private readonly CryptographyServiceFixture _cryptographyServiceFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CryptographyServiceTests"/> class.
     /// </summary>
     public CryptographyServiceTests()
     {
-        _encryptionSettings = CryptographyServiceFixture.CreateEncryptionSettings();
+        _encryptionSettings = _cryptographyServiceFixture.CreateEncryptionSettings();
         _sut = new CryptographyService(_encryptionSettings);
     }
 
@@ -32,7 +33,7 @@ public class CryptographyServiceTests
     public void Encrypt_WhenCalledWithValidData_ShouldReturnNonEmptyString()
     {
         // Arrange
-        string plaintext = CryptographyServiceFixture.CreateTestData();
+        string plaintext = _cryptographyServiceFixture.CreateTestData();
 
         // Act
         string result = _sut.Encrypt(plaintext);
@@ -47,7 +48,7 @@ public class CryptographyServiceTests
     public void Encrypt_WhenCalledMultipleTimesWithSameInput_ShouldReturnDifferentResults()
     {
         // Arrange
-        string plaintext = CryptographyServiceFixture.CreateTestData();
+        string plaintext = _cryptographyServiceFixture.CreateTestData();
 
         // Act
         string result1 = _sut.Encrypt(plaintext);
@@ -75,7 +76,7 @@ public class CryptographyServiceTests
     public void Decrypt_WhenCalledWithValidData_ShouldReturnOriginalText()
     {
         // Arrange
-        string originalText = CryptographyServiceFixture.CreateTestData();
+        string originalText = _cryptographyServiceFixture.CreateTestData();
         string encrypted = _sut.Encrypt(originalText);
 
         // Act
@@ -129,10 +130,10 @@ public class CryptographyServiceTests
     public void Decrypt_WhenInputIsCorrupted_ShouldThrowCryptographicException()
     {
         // Arrange
-        string originalText = CryptographyServiceFixture.CreateTestData();
+        string originalText = _cryptographyServiceFixture.CreateTestData();
         string encrypted = _sut.Encrypt(originalText);
 
-        // decode the Base64 string, modify one byte, then re-encode
+        // Decode the Base64 string, modify one byte, then re-encode.
         byte[] encryptedBytes = Convert.FromBase64String(encrypted);
         encryptedBytes[^1] ^= 0xFF; // flip all bits in the last byte
         string corrupted = Convert.ToBase64String(encryptedBytes);
@@ -148,7 +149,7 @@ public class CryptographyServiceTests
     public void Dispose_WhenCalled_ShouldClearKey()
     {
         // Arrange
-        string plaintext = CryptographyServiceFixture.CreateTestData();
+        string plaintext = _cryptographyServiceFixture.CreateTestData();
         string encrypted = _sut.Encrypt(plaintext);
 
         // Act

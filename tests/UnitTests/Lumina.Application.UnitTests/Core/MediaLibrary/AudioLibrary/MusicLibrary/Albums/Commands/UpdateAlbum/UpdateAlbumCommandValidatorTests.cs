@@ -28,7 +28,7 @@ public class UpdateAlbumCommandValidatorTests
 {
     private readonly UpdateAlbumCommandFixture _updateAlbumCommandFixture = new();
     private readonly UpdateAlbumCommandValidator _validator = new();
-    private readonly AlbumMetadataDtoFixture _albumMetadataDtoFixture = new();
+    private readonly MusicAlbumMetadataDtoFixture _musicAlbumMetadataDtoFixture = new();
     private readonly ReleaseInfoDtoFixture _releaseInfoDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
     private readonly TagDtoFixture _tagDtoFixture = new();
@@ -107,7 +107,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenTitleIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(includeTitle: false));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(includeTitle: false));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -122,7 +122,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenTitleIsEmpty_ShouldHaveValidationError(string title)
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(title: title));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(title: title));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -135,7 +135,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenTitleExceeds255Characters_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(title: new Faker().Random.String2(300)));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(title: new Faker().Random.String2(300)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -148,7 +148,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenTitleIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(title: new Faker().Random.String2(200)));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(title: new Faker().Random.String2(200)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -162,7 +162,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenOriginalTitleExceeds255Characters_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(originalTitle: new Faker().Random.String2(300)));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(originalTitle: new Faker().Random.String2(300)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -175,7 +175,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenOriginalTitleIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(includeOriginalTitle: false));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(includeOriginalTitle: false));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -188,7 +188,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenOriginalTitleIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(originalTitle: new Faker().Random.String2(200)));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(originalTitle: new Faker().Random.String2(200)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -201,7 +201,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenDescriptionExceeds2000Characters_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(description: new Faker().Random.String2(2001)));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(description: new Faker().Random.String2(2001)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -214,7 +214,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenDescriptionIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(includeDescription: false));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(includeDescription: false));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -227,7 +227,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenDescriptionIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(description: new Faker().Random.String2(1500)));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(description: new Faker().Random.String2(1500)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -240,7 +240,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenReleaseTypeIsNotDefined_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(releaseType: (MusicReleaseType)999));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(releaseTypes: [(MusicReleaseType)999]));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -253,7 +253,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenReleaseTypeIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(includeReleaseType: false));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(includeReleaseTypes: false));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -266,7 +266,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenReleaseTypeIsDefined_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(releaseType: MusicReleaseType.Album));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(releaseTypes: [MusicReleaseType.Album]));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -279,7 +279,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenReleaseStatusIsNotDefined_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(releaseStatus: (MusicReleaseStatus)999));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(releaseStatus: (MusicReleaseStatus)999));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -292,7 +292,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenReleaseStatusIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(includeReleaseStatus: false));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(includeReleaseStatus: false));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -305,7 +305,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenReleaseStatusIsDefined_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(releaseStatus: MusicReleaseStatus.Official));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(releaseStatus: MusicReleaseStatus.Official));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -320,7 +320,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenTotalDiscsIsNotPositive_ShouldHaveValidationError(int totalDiscs)
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(totalDiscs: totalDiscs));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(totalDiscs: totalDiscs));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -333,7 +333,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenTotalDiscsIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(includeTotalDiscs: false));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(includeTotalDiscs: false));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -346,7 +346,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenTotalDiscsIsPositive_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(totalDiscs: 2));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(totalDiscs: 2));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -361,7 +361,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenTotalTracksIsNotPositive_ShouldHaveValidationError(int totalTracks)
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(totalTracks: totalTracks));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(totalTracks: totalTracks));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -374,7 +374,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenTotalTracksIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(includeTotalTracks: false));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(includeTotalTracks: false));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -387,7 +387,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenTotalTracksIsPositive_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(totalTracks: 10));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(totalTracks: 10));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -400,7 +400,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenReleaseInfoIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(includeReleaseInfo: false));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(includeReleaseInfo: false));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -413,7 +413,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenOriginalReleaseYearIsLessThan1_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: 0)));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: 0)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -426,7 +426,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenOriginalReleaseYearIsGreaterThan9999_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: 10000)));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: 10000)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -439,7 +439,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenOriginalReleaseYearIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(includeOriginalReleaseDate: false, originalReleaseYear: new Faker().Random.Int(2000, 2005), reReleaseYear: new Faker().Random.Int(2005, 2010), includeReReleaseDate: false)));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(includeOriginalReleaseDate: false, originalReleaseYear: new Faker().Random.Int(2000, 2005), reReleaseYear: new Faker().Random.Int(2005, 2010), includeReReleaseDate: false)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -452,7 +452,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenReReleaseYearIsLessThan1_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(reReleaseYear: 0)));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(reReleaseYear: 0)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -465,7 +465,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenReReleaseYearIsGreaterThan9999_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(reReleaseYear: 10000)));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(reReleaseYear: 10000)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -478,7 +478,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenReReleaseYearIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: new Faker().Random.Int(2000, 2005), reReleaseYear: new Faker().Random.Int(2005, 2010), includeReReleaseDate: false)));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: new Faker().Random.Int(2000, 2005), reReleaseYear: new Faker().Random.Int(2005, 2010), includeReReleaseDate: false)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -491,7 +491,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenReleaseVersionExceeds50Characters_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(releaseVersion: new Faker().Random.String2(51))));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(releaseVersion: new Faker().Random.String2(51))));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -504,7 +504,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenReleaseVersionIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(releaseVersion: new Faker().Random.String2(50))));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(releaseVersion: new Faker().Random.String2(50))));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -517,7 +517,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenOriginalReleaseDateAndYearDoNotMatch_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2020, 1, 1), originalReleaseYear: 2019, includeReReleaseDate: false)));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2020, 1, 1), originalReleaseYear: 2019, includeReReleaseDate: false)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -530,7 +530,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenOriginalReleaseDateAndYearMatch_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2020, 1, 1), originalReleaseYear: 2020, includeReReleaseDate: false)));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2020, 1, 1), originalReleaseYear: 2020, includeReReleaseDate: false)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -543,7 +543,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenReReleaseDateAndYearDoNotMatch_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(reReleaseDate: new DateOnly(2021, 1, 1), reReleaseYear: 2020)));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(reReleaseDate: new DateOnly(2021, 1, 1), reReleaseYear: 2020)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -556,7 +556,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenReReleaseDateAndYearMatch_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(reReleaseDate: new DateOnly(2021, 1, 1), reReleaseYear: 2021)));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(reReleaseDate: new DateOnly(2021, 1, 1), reReleaseYear: 2021)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -569,7 +569,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenReReleaseYearIsBeforeOriginalReleaseYear_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: 2001, reReleaseYear: 2000, includeReReleaseDate: false)));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: 2001, reReleaseYear: 2000, includeReReleaseDate: false)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -582,7 +582,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenReReleaseYearIsAfterOriginalReleaseYear_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: 2000, reReleaseYear: 2001, includeReReleaseDate: false)));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: 2000, reReleaseYear: 2001, includeReReleaseDate: false)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -595,7 +595,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenReReleaseDateIsBeforeOriginalReleaseDate_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2001, 1, 1), reReleaseDate: new DateOnly(2000, 1, 1))));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2001, 1, 1), reReleaseDate: new DateOnly(2000, 1, 1))));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -608,7 +608,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenReReleaseDateIsAfterOriginalReleaseDate_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2000, 1, 1), reReleaseDate: new DateOnly(2001, 1, 1))));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2000, 1, 1), reReleaseDate: new DateOnly(2001, 1, 1))));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -621,7 +621,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenGenresIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(includeGenres: false));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(includeGenres: false));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -634,7 +634,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenGenreNameIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -647,7 +647,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenGenreNameExceeds50Characters_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: new Faker().Random.String2(51))]));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: new Faker().Random.String2(51))]));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -660,7 +660,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenGenresAreValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: new Faker().Random.String2(50))]));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: new Faker().Random.String2(50))]));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -675,7 +675,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenTagsIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(includeTags: false));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(includeTags: false));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -688,7 +688,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenTagNameIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: string.Empty)]));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: string.Empty)]));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -701,7 +701,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenTagNameExceeds50Characters_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: new Faker().Random.String2(51))]));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: new Faker().Random.String2(51))]));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -714,7 +714,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenTagsAreValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: new Faker().Random.String2(50))]));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: new Faker().Random.String2(50))]));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -729,7 +729,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenLanguageIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(includeLanguage: false));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(includeLanguage: false));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -742,7 +742,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenLanguageCodeIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageCode: string.Empty)));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageCode: string.Empty)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -755,7 +755,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenLanguageCodeIsNot2CharactersLong_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageCode: new Faker().Random.String2(3))));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageCode: new Faker().Random.String2(3))));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -768,7 +768,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenLanguageCodeIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageCode: new Faker().Random.String2(2))));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageCode: new Faker().Random.String2(2))));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -781,7 +781,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenLanguageNameIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageName: string.Empty)));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageName: string.Empty)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -794,7 +794,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenLanguageNameExceeds50Characters_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageName: new Faker().Random.String2(51))));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageName: new Faker().Random.String2(51))));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -807,7 +807,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenLanguageNativeNameIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(includeNativeName: false)));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(includeNativeName: false)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -820,7 +820,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenLanguageNativeNameExceeds50Characters_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(nativeName: new Faker().Random.String2(51))));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(nativeName: new Faker().Random.String2(51))));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -833,7 +833,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenOriginalLanguageIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(includeOriginalLanguage: false));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(includeOriginalLanguage: false));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -846,7 +846,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenOriginalLanguageCodeIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageCode: string.Empty)));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageCode: string.Empty)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -859,7 +859,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenOriginalLanguageCodeIsNot2CharactersLong_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageCode: new Faker().Random.String2(3))));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageCode: new Faker().Random.String2(3))));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -872,7 +872,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenOriginalLanguageNameIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageName: string.Empty)));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageName: string.Empty)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -885,7 +885,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenOriginalLanguageNameExceeds50Characters_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageName: new Faker().Random.String2(51))));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageName: new Faker().Random.String2(51))));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -898,7 +898,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenOriginalLanguageNativeNameIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(includeNativeName: false)));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(includeNativeName: false)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -911,7 +911,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenOriginalLanguageNativeNameExceeds50Characters_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(nativeName: new Faker().Random.String2(51))));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(nativeName: new Faker().Random.String2(51))));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -937,7 +937,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenMediaFormatIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(includeMediaFormat: false, includeBarcode: false, includeCatalogNumber: false, includeMusicBrainzReleaseId: false, includeMusicBrainzReleaseGroupId: false, includeMusicBrainzReleaseArtistId: false);
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(includeMediaFormat: false, includeBarcode: false, includeCatalogNumbers: false, includeMusicBrainzReleaseId: false, includeMusicBrainzReleaseGroupId: false, includeMusicBrainzReleaseArtistId: false);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -963,7 +963,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenCatalogNumberExceeds50Characters_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(catalogNumber: new Faker().Random.String2(51));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(catalogNumbers: [new Faker().Random.String2(51)]);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -976,7 +976,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenCatalogNumberIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(includeMediaFormat: false, includeBarcode: false, includeCatalogNumber: false, includeMusicBrainzReleaseId: false, includeMusicBrainzReleaseGroupId: false, includeMusicBrainzReleaseArtistId: false);
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(includeMediaFormat: false, includeBarcode: false, includeCatalogNumbers: false, includeMusicBrainzReleaseId: false, includeMusicBrainzReleaseGroupId: false, includeMusicBrainzReleaseArtistId: false);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -989,7 +989,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenCatalogNumberIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(catalogNumber: new Faker().Random.String2(50));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(catalogNumbers: [new Faker().Random.String2(50)]);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -1047,7 +1047,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenBarcodeIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(includeMediaFormat: false, includeBarcode: false, includeCatalogNumber: false, includeMusicBrainzReleaseId: false, includeMusicBrainzReleaseGroupId: false, includeMusicBrainzReleaseArtistId: false);
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(includeMediaFormat: false, includeBarcode: false, includeCatalogNumbers: false, includeMusicBrainzReleaseId: false, includeMusicBrainzReleaseGroupId: false, includeMusicBrainzReleaseArtistId: false);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -1099,7 +1099,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenMusicBrainzIdsAreNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(includeMediaFormat: false, includeBarcode: false, includeCatalogNumber: false, includeMusicBrainzReleaseId: false, includeMusicBrainzReleaseGroupId: false, includeMusicBrainzReleaseArtistId: false);
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(includeMediaFormat: false, includeBarcode: false, includeCatalogNumbers: false, includeMusicBrainzReleaseId: false, includeMusicBrainzReleaseGroupId: false, includeMusicBrainzReleaseArtistId: false);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -1307,7 +1307,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenLanguageNameIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageName: new Faker().Random.String2(20))));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageName: new Faker().Random.String2(20))));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -1321,7 +1321,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenLanguageNativeNameIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(nativeName: new Faker().Random.String2(20))));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(nativeName: new Faker().Random.String2(20))));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -1334,7 +1334,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenOriginalLanguageCodeIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageCode: new Faker().Random.String2(2))));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageCode: new Faker().Random.String2(2))));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -1347,7 +1347,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenOriginalLanguageNameIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageName: new Faker().Random.String2(20))));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageName: new Faker().Random.String2(20))));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -1361,7 +1361,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenOriginalLanguageNativeNameIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(nativeName: new Faker().Random.String2(20))));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(nativeName: new Faker().Random.String2(20))));
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -1374,7 +1374,7 @@ public class UpdateAlbumCommandValidatorTests
     public void Validate_WhenReleaseVersionIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _albumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(includeReleaseVersion: false)));
+        UpdateAlbumCommand command = _updateAlbumCommandFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(includeReleaseVersion: false)));
 
         // Act
         List<Error> result = _validator.TestValidate(command);

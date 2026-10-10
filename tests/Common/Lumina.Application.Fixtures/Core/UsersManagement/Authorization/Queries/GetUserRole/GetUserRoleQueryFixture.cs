@@ -19,12 +19,13 @@ public class GetUserRoleQueryFixture
     /// Creates a random valid query to get a user's role.
     /// </summary>
     /// <param name="userId">Optional. The user Id.</param>
+    /// <param name="includeUserId">Whether the user Id should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created query.</returns>
-    public GetUserRoleQuery Create(Guid? userId = null)
+    public GetUserRoleQuery Create(Guid? userId = null, bool includeUserId = true)
     {
         return new Faker<GetUserRoleQuery>()
             .CustomInstantiator(f => new GetUserRoleQuery(
-                userId ?? Guid.NewGuid()))
+                includeUserId ? (userId ?? Guid.NewGuid()) : null))
             .Generate();
     }
 

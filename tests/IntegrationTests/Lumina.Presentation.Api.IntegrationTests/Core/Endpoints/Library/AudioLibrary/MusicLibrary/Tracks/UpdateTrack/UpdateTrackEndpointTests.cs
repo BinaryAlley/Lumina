@@ -17,6 +17,7 @@ using Lumina.Contracts.Fixtures.Core.DTO.Common;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaContributors;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
 using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
@@ -64,8 +65,10 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         PropertyNameCaseInsensitive = true,
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
-    private readonly UpdateTrackRequestFixture _requestTrackFixture = new();
-    private readonly AudioMetadataDtoFixture _audioMetadataDtoFixture = new();
+    private readonly UpdateTrackRequestFixture _updateTrackRequestFixture = new();
+    private readonly LoginRequestFixture _loginRequestFixture = new();
+    private readonly MusicTrackMetadataDtoFixture _musicTrackMetadataDtoFixture = new();
+    private readonly MusicWorkDtoFixture _musicWorkDtoFixture = new();
     private readonly ReleaseInfoDtoFixture _releaseInfoDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
     private readonly TagDtoFixture _tagDtoFixture = new();
@@ -114,9 +117,9 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         Guid libraryId = await SeedLibraryAsync(userId);
         (Guid artistId, Guid albumId, Guid trackId) = await SeedArtistGraphAsync(libraryId, Path.Combine(s_contentRootPath, "bohemian-rhapsody.flac"));
         string updatedPath = Path.Combine(s_contentRootPath, $"love-of-my-life-{Guid.NewGuid():N}.flac");
-        UpdateTrackRequest request = _requestTrackFixture.Create(
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(
             path: updatedPath,
-            metadata: _audioMetadataDtoFixture.Create(title: "Somebody to Love"),
+            metadata: _musicTrackMetadataDtoFixture.Create(title: "Somebody to Love"),
             moods: [],
             isrcs: [],
             contributors: [],
@@ -127,8 +130,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
             includeBpm: false,
             includeWork: false,
             includeMusicBrainzRecordingId: false,
-            includeMusicBrainzTrackId: false,
-            includeMusicBrainzWorkId: false);
+            includeMusicBrainzTrackId: false);
 
         // Act
         HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}", request);
@@ -157,9 +159,9 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         Guid otherUserId = await SeedOtherUserAsync();
         Guid libraryId = await SeedLibraryAsync(otherUserId);
         (Guid artistId, Guid albumId, Guid trackId) = await SeedArtistGraphAsync(libraryId, Path.Combine(s_contentRootPath, "bohemian-rhapsody.flac"));
-        UpdateTrackRequest request = _requestTrackFixture.Create(
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(
             path: Path.Combine(s_contentRootPath, "dont-stop-me-now.flac"),
-            metadata: _audioMetadataDtoFixture.Create(title: "Don't Stop Me Now"),
+            metadata: _musicTrackMetadataDtoFixture.Create(title: "Don't Stop Me Now"),
             moods: [],
             isrcs: [],
             contributors: [],
@@ -170,8 +172,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
             includeBpm: false,
             includeWork: false,
             includeMusicBrainzRecordingId: false,
-            includeMusicBrainzTrackId: false,
-            includeMusicBrainzWorkId: false);
+            includeMusicBrainzTrackId: false);
         (HttpClient adminClient, _) = await CreateAdminClientAsync();
 
         // Act
@@ -188,7 +189,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         Guid otherUserId = await SeedOtherUserAsync();
         Guid libraryId = await SeedLibraryAsync(otherUserId);
         (Guid artistId, Guid albumId, Guid trackId) = await SeedArtistGraphAsync(libraryId, Path.Combine(s_contentRootPath, "bohemian-rhapsody.flac"));
-        UpdateTrackRequest request = _requestTrackFixture.Create();
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create();
 
         // Act
         HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}", request);
@@ -210,7 +211,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         Guid artistId = Guid.NewGuid();
         Guid albumId = Guid.NewGuid();
         Guid trackId = Guid.NewGuid();
-        UpdateTrackRequest request = _requestTrackFixture.Create();
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create();
 
         // Act
         HttpResponseMessage response = await unauthenticatedClient.PutAsJsonAsync($"/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}", request);
@@ -226,7 +227,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         Guid userId = GetCurrentUserId();
         Guid libraryId = await SeedLibraryAsync(userId);
         (Guid artistId, Guid _, Guid trackId) = await SeedArtistGraphAsync(libraryId, Path.Combine(s_contentRootPath, "bohemian-rhapsody.flac"));
-        UpdateTrackRequest request = _requestTrackFixture.Create();
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create();
 
         // Act
         HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}/artists/{artistId}/albums/not-a-guid/tracks/{trackId}", request);
@@ -241,7 +242,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         // Arrange
         Guid userId = GetCurrentUserId();
         Guid libraryId = await SeedLibraryAsync(userId);
-        UpdateTrackRequest request = _requestTrackFixture.Create();
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create();
 
         // Act
         HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}/artists/{Guid.NewGuid()}/albums/{Guid.NewGuid()}/tracks/{Guid.NewGuid()}", request);
@@ -257,7 +258,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         Guid userId = GetCurrentUserId();
         Guid libraryId = await SeedLibraryAsync(userId);
         (Guid artistId, Guid _, Guid trackId) = await SeedArtistGraphAsync(libraryId, Path.Combine(s_contentRootPath, "bohemian-rhapsody.flac"));
-        UpdateTrackRequest request = _requestTrackFixture.Create();
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create();
 
         // Act
         HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{Guid.NewGuid()}/tracks/{trackId}", request);
@@ -273,7 +274,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         Guid userId = GetCurrentUserId();
         Guid libraryId = await SeedLibraryAsync(userId);
         (Guid artistId, Guid albumId, Guid _) = await SeedArtistGraphAsync(libraryId, Path.Combine(s_contentRootPath, "bohemian-rhapsody.flac"));
-        UpdateTrackRequest request = _requestTrackFixture.Create();
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create();
 
         // Act
         HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{Guid.NewGuid()}", request);
@@ -289,7 +290,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         Guid unseededLibraryId = Guid.NewGuid();
         _seededLibraryIds.Add(unseededLibraryId);
         (Guid artistId, Guid albumId, Guid trackId) = await SeedArtistGraphAsync(unseededLibraryId, Path.Combine(s_contentRootPath, "bohemian-rhapsody.flac"));
-        UpdateTrackRequest request = _requestTrackFixture.Create();
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create();
         (HttpClient adminClient, _) = await CreateAdminClientAsync();
 
         // Act
@@ -306,7 +307,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         Guid userId = GetCurrentUserId();
         Guid libraryId = await SeedLibraryAsync(userId);
         (Guid artistId, Guid albumId, Guid trackId) = await SeedArtistGraphAsync(libraryId, Path.Combine(s_contentRootPath, "bohemian-rhapsody.flac"));
-        UpdateTrackRequest request = _requestTrackFixture.Create(path: Path.Combine(s_outsideContentRootPath, "under-pressure.flac"));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(path: Path.Combine(s_outsideContentRootPath, "under-pressure.flac"));
 
         // Act
         HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}", request);
@@ -322,7 +323,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         Guid userId = GetCurrentUserId();
         Guid libraryId = await SeedLibraryAsync(userId);
         (Guid artistId, Guid albumId, Guid trackId) = await SeedArtistGraphAsync(libraryId, Path.Combine(s_contentRootPath, "bohemian-rhapsody.flac"));
-        UpdateTrackRequest request = _requestTrackFixture.Create(
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(
             path: Path.Combine(s_contentRootPath, "somebody-to-love.flac"),
             contributors: [_mediaContributorReferenceDtoFixture.Create(contributorId: Guid.NewGuid(), role: MediaContributorRole.Vocals)]);
 
@@ -347,7 +348,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
             _mediaContributorReferenceDtoFixture.Create(contributorId: contributorId, role: MediaContributorRole.Guitar)
         ];
         await SeedContributorsAsync(duplicatedContributors);
-        UpdateTrackRequest request = _requestTrackFixture.Create(
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(
             path: Path.Combine(s_contentRootPath, "another-one-bites-the-dust.flac"),
             moods: [],
             isrcs: [],
@@ -375,7 +376,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenPathIsNull_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(includePath: false);
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(includePath: false);
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -388,7 +389,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenPathExceeds2048Characters_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(path: new Faker().Random.String2(2049));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(path: new Faker().Random.String2(2049));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -401,7 +402,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenMetadataIsNull_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(includeMetadata: false);
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(includeMetadata: false);
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -414,7 +415,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenTitleIsNull_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(includeTitle: false));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(includeTitle: false));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -427,7 +428,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenTitleExceeds255Characters_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(title: new Faker().Random.String2(256)));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(title: new Faker().Random.String2(256)));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -440,7 +441,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenOriginalTitleExceeds255Characters_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(originalTitle: new Faker().Random.String2(256)));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(originalTitle: new Faker().Random.String2(256)));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -453,7 +454,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenDescriptionExceeds2000Characters_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(description: new Faker().Random.String2(2001)));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(description: new Faker().Random.String2(2001)));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -466,7 +467,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenReleaseInfoIsNull_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(includeReleaseInfo: false));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(includeReleaseInfo: false));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -479,7 +480,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenOriginalReleaseYearIsOutOfRange_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(includeOriginalReleaseDate: false, originalReleaseYear: 0, includeReReleaseDate: false, includeReReleaseYear: false)));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(includeOriginalReleaseDate: false, originalReleaseYear: 0, includeReReleaseDate: false, includeReReleaseYear: false)));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -492,7 +493,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenReReleaseYearIsOutOfRange_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(includeOriginalReleaseDate: false, includeOriginalReleaseYear: false, includeReReleaseDate: false, reReleaseYear: 0)));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(includeOriginalReleaseDate: false, includeOriginalReleaseYear: false, includeReReleaseDate: false, reReleaseYear: 0)));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -505,7 +506,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenReleaseVersionExceeds50Characters_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(releaseVersion: new Faker().Random.String2(51))));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(releaseVersion: new Faker().Random.String2(51))));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -518,7 +519,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenOriginalReleaseDateAndYearDoNotMatch_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2020, 1, 1), originalReleaseYear: 2021, includeReReleaseDate: false, includeReReleaseYear: false)));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2020, 1, 1), originalReleaseYear: 2021, includeReReleaseDate: false, includeReReleaseYear: false)));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -531,7 +532,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenReReleaseDateAndYearDoNotMatch_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(includeOriginalReleaseDate: false, includeOriginalReleaseYear: false, reReleaseDate: new DateOnly(2020, 1, 1), reReleaseYear: 2021)));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(includeOriginalReleaseDate: false, includeOriginalReleaseYear: false, reReleaseDate: new DateOnly(2020, 1, 1), reReleaseYear: 2021)));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -544,7 +545,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenReReleaseYearIsBeforeOriginalReleaseYear_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(includeOriginalReleaseDate: false, originalReleaseYear: 2001, includeReReleaseDate: false, reReleaseYear: 2000)));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(includeOriginalReleaseDate: false, originalReleaseYear: 2001, includeReReleaseDate: false, reReleaseYear: 2000)));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -557,7 +558,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenReReleaseDateIsBeforeOriginalReleaseDate_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2001, 1, 1), includeOriginalReleaseYear: false, reReleaseDate: new DateOnly(2000, 1, 1), includeReReleaseYear: false)));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2001, 1, 1), includeOriginalReleaseYear: false, reReleaseDate: new DateOnly(2000, 1, 1), includeReReleaseYear: false)));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -570,7 +571,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenGenresAreNull_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(includeGenres: false));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(includeGenres: false));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -583,7 +584,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenGenreNameIsEmpty_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -596,7 +597,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenGenreNameExceeds50Characters_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: new Faker().Random.String2(51))]));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: new Faker().Random.String2(51))]));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -609,7 +610,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenTagsAreNull_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(includeTags: false));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(includeTags: false));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -622,7 +623,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenTagNameIsEmpty_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: string.Empty)]));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: string.Empty)]));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -635,7 +636,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenTagNameExceeds50Characters_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: new Faker().Random.String2(51))]));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: new Faker().Random.String2(51))]));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -648,7 +649,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenLanguageCodeIsEmpty_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageCode: string.Empty)));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageCode: string.Empty)));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -661,7 +662,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenLanguageCodeIsNotTwoCharacters_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageCode: new Faker().Random.String2(3))));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageCode: new Faker().Random.String2(3))));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -674,7 +675,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenLanguageNameIsEmpty_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageName: string.Empty)));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageName: string.Empty)));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -687,7 +688,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenLanguageNameExceeds50Characters_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageName: new Faker().Random.String2(51))));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageName: new Faker().Random.String2(51))));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -700,7 +701,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenLanguageNativeNameExceeds50Characters_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(nativeName: new Faker().Random.String2(51))));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(nativeName: new Faker().Random.String2(51))));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -713,7 +714,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenOriginalLanguageCodeIsEmpty_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageCode: string.Empty)));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageCode: string.Empty)));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -726,7 +727,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenOriginalLanguageNameExceeds50Characters_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageName: new Faker().Random.String2(51))));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageName: new Faker().Random.String2(51))));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -739,7 +740,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenTrackNumberIsNull_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(includeTrackNumber: false);
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(includeTrackNumber: false);
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -752,7 +753,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenTrackNumberIsZero_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(trackNumber: 0);
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(trackNumber: 0);
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -765,7 +766,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenDiscNumberIsZero_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(discNumber: 0);
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(discNumber: 0);
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -778,7 +779,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenScriptExceeds50Characters_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(script: new Faker().Random.String2(51));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(script: new Faker().Random.String2(51));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -791,7 +792,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenKeyIsInvalidEnum_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(key: (MusicKey)9999);
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(key: (MusicKey)9999);
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -804,7 +805,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenBpmIsZero_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(bpm: 0);
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(bpm: 0);
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -817,7 +818,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenWorkExceeds255Characters_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(work: new Faker().Random.String2(256));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(work: _musicWorkDtoFixture.Create(title: new Faker().Random.String2(256)));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -830,7 +831,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenMusicBrainzRecordingIdIsEmptyGuid_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(musicBrainzRecordingId: Guid.Empty);
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(musicBrainzRecordingId: Guid.Empty);
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -843,7 +844,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenMusicBrainzTrackIdIsEmptyGuid_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(musicBrainzTrackId: Guid.Empty);
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(musicBrainzTrackId: Guid.Empty);
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -856,7 +857,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenMusicBrainzWorkIdIsEmptyGuid_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(musicBrainzWorkId: Guid.Empty);
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(work: _musicWorkDtoFixture.Create(musicBrainzWorkId: Guid.Empty));
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -869,7 +870,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenMoodNameIsEmpty_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(moods: [_moodDtoFixture.Create(name: string.Empty)]);
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(moods: [_moodDtoFixture.Create(name: string.Empty)]);
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -882,7 +883,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenIsrcValueIsEmpty_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(isrcs: [_isrcDtoFixture.Create(value: string.Empty)]);
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(isrcs: [_isrcDtoFixture.Create(value: string.Empty)]);
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -895,7 +896,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenContributorsAreNull_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(includeContributors: false);
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(includeContributors: false);
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -908,7 +909,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenContributorIdIsEmptyGuid_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(contributors: [_mediaContributorReferenceDtoFixture.Create(contributorId: Guid.Empty, role: MediaContributorRole.Vocals)]);
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(contributors: [_mediaContributorReferenceDtoFixture.Create(contributorId: Guid.Empty, role: MediaContributorRole.Vocals)]);
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -921,7 +922,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenContributorRoleIsInvalid_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(contributors: [_mediaContributorReferenceDtoFixture.Create(role: (MediaContributorRole)9999)]);
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(contributors: [_mediaContributorReferenceDtoFixture.Create(role: (MediaContributorRole)9999)]);
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -934,7 +935,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenRatingsAreNull_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(includeRatings: false);
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(includeRatings: false);
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -947,7 +948,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenRatingValueIsNotPositive_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(ratings: [_audioRatingDtoFixture.Create(value: 0, maxValue: 5)]);
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(ratings: [_audioRatingDtoFixture.Create(value: 0, maxValue: 5)]);
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -960,7 +961,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenRatingValueIsGreaterThanMaxValue_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(ratings: [_audioRatingDtoFixture.Create(value: 6, maxValue: 5)]);
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(ratings: [_audioRatingDtoFixture.Create(value: 6, maxValue: 5)]);
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -973,7 +974,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenRatingMaxValueIsNotPositive_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(ratings: [_audioRatingDtoFixture.Create(value: 1, maxValue: 0)]);
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(ratings: [_audioRatingDtoFixture.Create(value: 1, maxValue: 0)]);
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -986,7 +987,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task UpdateTrack_WhenRatingVoteCountIsNegative_ShouldReturnUnprocessableEntity()
     {
         // Arrange
-        UpdateTrackRequest request = _requestTrackFixture.Create(ratings: [_audioRatingDtoFixture.Create(value: 4, maxValue: 5, voteCount: -1)]);
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(ratings: [_audioRatingDtoFixture.Create(value: 4, maxValue: 5, voteCount: -1)]);
 
         // Act
         HttpResponseMessage response = await PutTrackAsync(request);
@@ -1002,7 +1003,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         Guid userId = GetCurrentUserId();
         Guid libraryId = await SeedLibraryAsync(userId);
         (Guid artistId, Guid albumId, Guid trackId) = await SeedArtistGraphAsync(libraryId, Path.Combine(s_contentRootPath, "bohemian-rhapsody.flac"));
-        UpdateTrackRequest request = _requestTrackFixture.Create(path: Path.Combine(s_contentRootPath, "the-show-must-go-on.flac"));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(path: Path.Combine(s_contentRootPath, "the-show-must-go-on.flac"));
         using CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
 
         // Act & Assert
@@ -1160,7 +1161,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
 
         HttpClient client = _apiFactory.CreateClient();
         client.DefaultRequestHeaders.Add("X-Forwarded-For", $"192.{Random.Shared.Next(0, 255)}.{Random.Shared.Next(0, 255)}.{Random.Shared.Next(0, 255)}");
-        HttpResponseMessage loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", new LoginRequest(Username: username, Password: "TestPass123!"));
+        HttpResponseMessage loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", _loginRequestFixture.Create(username: username, password: "TestPass123!"));
         string content = await loginResponse.Content.ReadAsStringAsync();
         LoginResponse? loginResult = JsonSerializer.Deserialize<LoginResponse>(content, _jsonOptions);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResult!.Token);

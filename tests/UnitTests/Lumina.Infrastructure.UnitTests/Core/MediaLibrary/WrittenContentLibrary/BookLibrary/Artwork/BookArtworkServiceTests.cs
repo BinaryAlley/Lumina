@@ -144,7 +144,7 @@ public class BookArtworkServiceTests
 
         string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, bookId, libraryName, authorName, bookTitle);
         MockArtworkDirectoryStubs(artworkDirectoryPath);
-        FileSystemPathId coverFileId = _fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpeg"));
+        FileSystemPathId coverFileId = _fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpg"));
         FileSystemPathId otherFileId = _fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "metadata.json"));
         _mockFileProviderService.GetFilePaths(Arg.Any<FileSystemPathId>(), true)
             .Returns(Result.From<IEnumerable<FileSystemPathId>>([coverFileId, otherFileId]));

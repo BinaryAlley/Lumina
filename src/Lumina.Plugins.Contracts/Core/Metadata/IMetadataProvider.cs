@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.DTO.Common;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,6 +23,11 @@ public interface IMetadataProvider
     /// Gets the media library types this metadata provider supports.
     /// </summary>
     IReadOnlyList<LibraryType> SupportedLibraryTypes { get; }
+
+    /// <summary>
+    /// Gets the type of the metadata lookup this provider accepts, used to select the provider that matches a given lookup.
+    /// </summary>
+    Type LookupType { get; }
 
     /// <summary>
     /// Gets a value indicating whether this metadata provider requires access to the web to retrieve metadata.

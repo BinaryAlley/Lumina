@@ -5,7 +5,7 @@ Content-Type: application/json
 {
   "pluginId": "{{$guid}}",
   "settings": {
-    "language": "en",
-    "includeSeries": "true"
+    "BaseUrl": "https://musicbrainz.org/ws/2/",
+    "SearchResultLimit": "25"
   }
 }

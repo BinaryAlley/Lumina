@@ -20,10 +20,14 @@ public static partial class Errors
         public static Error LibraryNotFound => Error.NotFound(description: nameof(LibraryNotFound));
         public static Error LibraryTypeCannotBeNull => Error.Validation(description: nameof(LibraryTypeCannotBeNull));
         public static Error CoverFileMustBeAnImage => Error.Validation(description: nameof(CoverFileMustBeAnImage));
-        public static Error UnknownLibraryType => Error.Unexpected(description: nameof(UnknownLibraryType));
+        public static Error UnknownLibraryType => Error.Forbidden(description: nameof(UnknownLibraryType));
         public static Error PathsListCannotBeNull => Error.Validation(description: nameof(PathsListCannotBeNull));
         public static Error PathsListCannotBeEmpty => Error.Validation(description: nameof(PathsListCannotBeEmpty));
         public static Error TitleCannotBeEmpty => Error.Validation(description: nameof(TitleCannotBeEmpty));
         public static Error TitleMustBeMaximum255CharactersLong => Error.Validation(description: nameof(TitleMustBeMaximum255CharactersLong));
+        public static Error PathTemplateLiteralCannotBeEmpty => Error.Validation(description: nameof(PathTemplateLiteralCannotBeEmpty));
+        public static Error PathTemplateValuePartMustContainSinglePlaceholder => Error.Validation(description: nameof(PathTemplateValuePartMustContainSinglePlaceholder));
+        public static Error PathTemplatePartKindNotSupportedForLibraryType => Error.Validation(description: nameof(PathTemplatePartKindNotSupportedForLibraryType));
+        public static Error PathTemplateIsNotSupportedForLibraryType => Error.Validation(description: nameof(PathTemplateIsNotSupportedForLibraryType));
     }
 }

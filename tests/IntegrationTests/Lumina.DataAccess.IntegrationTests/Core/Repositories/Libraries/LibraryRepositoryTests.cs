@@ -30,6 +30,7 @@ public class LibraryRepositoryTests
 {
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly LibraryContentLocationEntityFixture _libraryContentLocationEntityFixture = new();
 
     [Fact]
     public async Task UpdateAsync_WhenNothingChanged_ShouldNotChangeTheLibraryAudit()
@@ -78,7 +79,7 @@ public class LibraryRepositoryTests
         LibraryEntity incoming = await LoadDetachedLibraryAsync(context, library.Id);
         incoming.ContentLocations.Clear();
         foreach (string path in new[] { "/media/one", "/media/keep", "/media/three" })
-            incoming.ContentLocations.Add(new LibraryContentLocationEntity { Path = path });
+            incoming.ContentLocations.Add(_libraryContentLocationEntityFixture.Create(path: path));
 
         // Act
         Result<Updated> result = await sut.UpdateAsync(incoming, CancellationToken.None);

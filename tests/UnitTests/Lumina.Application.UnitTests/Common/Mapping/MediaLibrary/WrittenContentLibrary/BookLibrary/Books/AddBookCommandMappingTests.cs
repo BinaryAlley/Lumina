@@ -21,7 +21,7 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenConten
 [ExcludeFromCodeCoverage]
 public class AddBookCommandMappingTests
 {
-    private readonly AddBookCommandFixture _commandBookFixture = new();
+    private readonly AddBookCommandFixture _addBookCommandFixture = new();
     private readonly IsbnDtoFixture _isbnDtoFixture = new();
     private readonly BookRatingDtoFixture _bookRatingDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
@@ -32,7 +32,7 @@ public class AddBookCommandMappingTests
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
-        AddBookCommand command = _commandBookFixture.Create(libraryId: libraryId.ToString());
+        AddBookCommand command = _addBookCommandFixture.Create(libraryId: libraryId.ToString());
 
         // Act
         Result<Book> result = command.ToDomainEntity(libraryId);
@@ -57,7 +57,7 @@ public class AddBookCommandMappingTests
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
-        AddBookCommand command = _commandBookFixture.Create(
+        AddBookCommand command = _addBookCommandFixture.Create(
             libraryId: libraryId.ToString(),
             isbns: [],
             contributors: [],
@@ -103,7 +103,7 @@ public class AddBookCommandMappingTests
     public void ToDomainEntity_WhenRatingCreationFails_ShouldReturnError()
     {
         // Arrange
-        AddBookCommand command = _commandBookFixture.Create(ratings: [_bookRatingDtoFixture.Create(value: -1, maxValue: 5, includeSource: false, includeVoteCount: false)]);
+        AddBookCommand command = _addBookCommandFixture.Create(ratings: [_bookRatingDtoFixture.Create(value: -1, maxValue: 5, includeSource: false, includeVoteCount: false)]);
 
         // Act
         Result<Book> result = command.ToDomainEntity(Guid.NewGuid());
@@ -117,7 +117,7 @@ public class AddBookCommandMappingTests
     public void ToDomainEntity_WhenIsbnCreationFails_ShouldReturnError()
     {
         // Arrange
-        AddBookCommand command = _commandBookFixture.Create(isbns: [_isbnDtoFixture.Create(value: "invalid", format: IsbnFormat.Isbn13)]);
+        AddBookCommand command = _addBookCommandFixture.Create(isbns: [_isbnDtoFixture.Create(value: "invalid", format: IsbnFormat.Isbn13)]);
 
         // Act
         Result<Book> result = command.ToDomainEntity(Guid.NewGuid());
@@ -131,7 +131,7 @@ public class AddBookCommandMappingTests
     public void ToDomainEntity_WhenMetadataCreationFails_ShouldReturnError()
     {
         // Arrange
-        AddBookCommand command = _commandBookFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: "")]));
+        AddBookCommand command = _addBookCommandFixture.Create(metadata: _writtenContentMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: "")]));
 
         // Act
         Result<Book> result = command.ToDomainEntity(Guid.NewGuid());

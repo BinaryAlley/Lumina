@@ -11,9 +11,7 @@ namespace Lumina.DataAccess.Common.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropIndex(
-                name: "IX_BookContributors_BookId_MediaContributorId",
-                table: "BookContributors");
+            migrationBuilder.Sql("DROP INDEX IF EXISTS \"IX_BookContributors_BookId_MediaContributorId\";");
 
             migrationBuilder.DropColumn(
                 name: "RoleName",

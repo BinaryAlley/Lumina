@@ -256,11 +256,7 @@ public class ExceptionHandlingMiddlewareTests
     {
         // Arrange
         DefaultHttpContext httpContext = CreateHttpContext(isApiRequest: true);
-        ProblemDetailsDto problemDetails = new()
-        {
-            Title = "General.Failure",
-            Status = 400
-        };
+        ProblemDetailsDto problemDetails = _problemDetailsDtoFixture.Create(title: "General.Failure", status: 400, includeType: false, includeDetail: false);
         _nextDelegate = _ => throw new ApiException(problemDetails, HttpStatusCode.BadRequest);
 
         // Act

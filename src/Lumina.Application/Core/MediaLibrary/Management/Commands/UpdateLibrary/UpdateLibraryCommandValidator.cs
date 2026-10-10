@@ -53,5 +53,17 @@ public class UpdateLibraryCommandValidator : AbstractValidator<UpdateLibraryComm
             .WithError(Errors.Library.TitleCannotBeEmpty)
             .MaximumLength(255)
             .WithError(Errors.Library.TitleMustBeMaximum255CharactersLong);
+
+        RuleForEach(command => command.PathTemplateParts)
+            .ChildRules(part =>
+            {
+                part.RuleFor(pathPart => pathPart.Kind)
+                    .NotEmpty()
+                    .WithError(Errors.Library.PathTemplatePartKindNotSupportedForLibraryType);
+                part.RuleFor(pathPart => pathPart.Representation)
+                    .NotEmpty()
+                    .When(pathPart => !string.Equals(pathPart.Kind, nameof(LibraryPathPartKind.Separator), StringComparison.OrdinalIgnoreCase))
+                    .WithError(Errors.Library.PathTemplateLiteralCannotBeEmpty);
+            });
     }
 }

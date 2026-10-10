@@ -43,7 +43,7 @@ public class AddAlbumEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
     private readonly AddAlbumRequestFixture _addAlbumRequestFixture = new();
-    private readonly AlbumMetadataDtoFixture _albumMetadataDtoFixture = new();
+    private readonly MusicAlbumMetadataDtoFixture _musicAlbumMetadataDtoFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly ArtistEntityFixture _artistEntityFixture = new();
     private readonly AlbumEntityFixture _albumEntityFixture = new();
@@ -75,7 +75,7 @@ public class AddAlbumEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         Guid libraryId = await SeedLibraryAsync(userId);
         Guid artistId = await SeedArtistWithAlbumAsync(libraryId);
         AddAlbumRequest request = _addAlbumRequestFixture.Create(
-            metadata: _albumMetadataDtoFixture.Create(title: "News of the World"),
+            metadata: _musicAlbumMetadataDtoFixture.Create(title: "News of the World"),
             contributors: [],
             ratings: [],
             tracks: []);
@@ -121,7 +121,7 @@ public class AddAlbumEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         Guid libraryId = await SeedLibraryAsync(userId);
         Guid artistId = await SeedArtistWithAlbumAsync(libraryId);
         AddAlbumRequest request = _addAlbumRequestFixture.Create(
-            metadata: _albumMetadataDtoFixture.Create(includeTitle: false),
+            metadata: _musicAlbumMetadataDtoFixture.Create(includeTitle: false),
             contributors: [],
             ratings: [],
             tracks: []);

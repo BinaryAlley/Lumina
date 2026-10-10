@@ -19,8 +19,9 @@ public class RecoverPasswordCommandFixture
     /// </summary>
     /// <param name="username">Optional. The username.</param>
     /// <param name="totpCode">Optional. The TOTP code.</param>
+    /// <param name="includeTotpCode">Whether the TOTP code should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created command.</returns>
-    public RecoverPasswordCommand Create(string? username = null, string? totpCode = null)
+    public RecoverPasswordCommand Create(string? username = null, string? totpCode = null, bool includeTotpCode = true)
     {
         return new Faker<RecoverPasswordCommand>()
             .CustomInstantiator(f => new RecoverPasswordCommand(
@@ -28,7 +29,7 @@ public class RecoverPasswordCommandFixture
                 default!
             ))
             .RuleFor(x => x.Username, f => username ?? f.Person.UserName)
-            .RuleFor(x => x.TotpCode, f => totpCode ?? f.Random.Replace("######"));
+            .RuleFor(x => x.TotpCode, f => includeTotpCode ? (totpCode ?? f.Random.Replace("######")) : null);
     }
 
     /// <summary>

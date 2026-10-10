@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Contracts.Fixtures.Core.Responses.FileSystemManagement.Common;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -11,11 +12,13 @@ namespace Lumina.Contracts.UnitTests.Responses.FileSystemManagement.Common;
 [ExcludeFromCodeCoverage]
 public class FileSystemTreeNodeResponseTests
 {
+    private readonly FileSystemTreeNodeResponseFixture _fileSystemTreeNodeResponseFixture = new();
+
     [Fact]
     public void Constructor_WhenInstantiatingNode_ShouldInitializeEmptyChildren()
     {
         // Act
-        FileSystemTreeNodeResponse sut = new();
+        FileSystemTreeNodeResponse sut = _fileSystemTreeNodeResponseFixture.Create(maxDepth: 0);
 
         // Assert
         Assert.NotNull(sut.Children);

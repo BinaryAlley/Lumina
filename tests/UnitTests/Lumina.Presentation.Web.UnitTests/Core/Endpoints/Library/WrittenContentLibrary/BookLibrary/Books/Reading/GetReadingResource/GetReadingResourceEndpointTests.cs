@@ -26,7 +26,7 @@ public class GetReadingResourceEndpointTests
 {
     private readonly IApiHttpClient _mockApiHttpClient;
     private readonly GetReadingResourceEndpoint _sut;
-    private readonly GetBookReadingResourceRequestFixture _requestFixture = new();
+    private readonly GetBookReadingResourceRequestFixture _getBookReadingResourceRequestFixture = new();
     private readonly BlobDataDtoFixture _blobDataDtoFixture = new();
 
     /// <summary>
@@ -42,7 +42,7 @@ public class GetReadingResourceEndpointTests
     public async Task ExecuteAsync_WhenSuccessful_ShouldReturnBytesResultWithResourceData()
     {
         // Arrange
-        GetBookReadingResourceRequest request = _requestFixture.Create();
+        GetBookReadingResourceRequest request = _getBookReadingResourceRequestFixture.Create();
         BlobDataDto blob = _blobDataDtoFixture.Create(contentType: "image/png");
         _mockApiHttpClient.GetBlobAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(blob);
@@ -60,7 +60,7 @@ public class GetReadingResourceEndpointTests
     public async Task ExecuteAsync_WhenCalled_ShouldRequestReadingResourceFromApi()
     {
         // Arrange
-        GetBookReadingResourceRequest request = _requestFixture.Create();
+        GetBookReadingResourceRequest request = _getBookReadingResourceRequestFixture.Create();
         BlobDataDto blob = _blobDataDtoFixture.Create();
         _mockApiHttpClient.GetBlobAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(blob);

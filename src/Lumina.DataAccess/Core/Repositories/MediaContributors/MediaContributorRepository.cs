@@ -2,6 +2,7 @@
 using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
 using Lumina.Application.Common.DataAccess.Repositories.MediaContributors;
 using Lumina.DataAccess.Core.UoW;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -37,6 +38,19 @@ internal sealed class MediaContributorRepository : IMediaContributorRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Created>> InsertAsync(MediaContributorEntity contributor, CancellationToken cancellationToken)
     {
+        bool doesContributorExist = await _luminaDbContext.MediaContributors
+            .AnyAsync(repositoryContributor => repositoryContributor.Id == contributor.Id, cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+        if (doesContributorExist)
+            return Errors.MediaContributor.MediaContributorAlreadyExists;
+
+        // A contributor is unique by its display name, so the same person can never be registered twice under different spellings of the same name.
+        bool doesContributorNameExist = await _luminaDbContext.MediaContributors
+            .AnyAsync(repositoryContributor => EF.Functions.Collate(repositoryContributor.DisplayName, "NOCASE") == contributor.DisplayName, cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+        if (doesContributorNameExist)
+            return Errors.MediaContributor.MediaContributorAlreadyExists;
+
         _luminaDbContext.MediaContributors.Add(contributor);
         return Result.Created;
     }
@@ -54,8 +68,19 @@ internal sealed class MediaContributorRepository : IMediaContributorRepository
         // the comparison is case-insensitive, so that "Stephen King" and "stephen king" are never treated as distinct contributors
         string normalizedDisplayName = displayName.ToLowerInvariant();
 
+        // Contributors added earlier in the same unit of work are not returned by a database query, so the change tracker is consulted
+        // first; without this, the same contributor discovered for several items of the same save would be inserted more than once and
+        // violate the unique index on the display name.
+        MediaContributorEntity? trackedContributor = _luminaDbContext.MediaContributors.Local
+            .FirstOrDefault(contributor => contributor.DisplayName.ToLowerInvariant() == normalizedDisplayName);
+        if (trackedContributor is not null)
+            return trackedContributor;
+
+        // The lookup must use the same case-insensitive collation as the unique index on the display name, so that a name whose case is
+        // not folded by the storage medium (for example one that starts with a non-ASCII uppercase letter) is still matched, instead of
+        // being inserted again and violating the unique index.
         MediaContributorEntity? existingContributor = await _luminaDbContext.MediaContributors
-            .FirstOrDefaultAsync(contributor => contributor.DisplayName.ToLower() == normalizedDisplayName, cancellationToken)
+            .FirstOrDefaultAsync(contributor => EF.Functions.Collate(contributor.DisplayName, "NOCASE") == displayName, cancellationToken)
             .ConfigureAwait(false);
         if (existingContributor is not null)
             return existingContributor;

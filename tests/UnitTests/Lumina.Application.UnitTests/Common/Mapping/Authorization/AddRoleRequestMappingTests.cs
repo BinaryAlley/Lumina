@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Application.Core.Admin.Authorization.Roles.Commands.AddRole;
+using Lumina.Contracts.Fixtures.Core.Requests.Authorization;
 using Lumina.Contracts.Requests.Authorization;
 using System;
 using System.Collections.Generic;
@@ -15,11 +16,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Authorization;
 [ExcludeFromCodeCoverage]
 public class AddRoleRequestMappingTests
 {
+    private readonly AddRoleRequestFixture _addRoleRequestFixture = new();
+
     [Fact]
     public void ToCommand_WhenMappingValidRequest_ShouldMapCorrectly()
     {
         // Arrange
-        AddRoleRequest request = new(
+        AddRoleRequest request = _addRoleRequestFixture.Create(
             "Admin",
             [Guid.NewGuid(), Guid.NewGuid()]
         );
@@ -37,7 +40,7 @@ public class AddRoleRequestMappingTests
     public void ToCommand_WhenMappingRequestWithEmptyPermissions_ShouldMapCorrectly()
     {
         // Arrange
-        AddRoleRequest request = new(
+        AddRoleRequest request = _addRoleRequestFixture.Create(
             "Guest",
             []
         );
@@ -58,7 +61,7 @@ public class AddRoleRequestMappingTests
     public void ToCommand_WhenMappingDifferentRoleNames_ShouldMapCorrectly(string roleName)
     {
         // Arrange
-        AddRoleRequest request = new(
+        AddRoleRequest request = _addRoleRequestFixture.Create(
             roleName,
             [Guid.NewGuid()]
         );
@@ -82,7 +85,7 @@ public class AddRoleRequestMappingTests
             Guid.Parse("00000000-0000-0000-0000-000000000002"),
             Guid.Parse("00000000-0000-0000-0000-000000000003")
         ];
-        AddRoleRequest request = new("SuperAdmin", permissions);
+        AddRoleRequest request = _addRoleRequestFixture.Create("SuperAdmin", permissions);
 
         // Act
         AddRoleCommand result = request.ToCommand();

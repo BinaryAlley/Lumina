@@ -21,16 +21,22 @@ public class PermissionEntityFixture
     /// </summary>
     /// <param name="id">Optional. The permission Id.</param>
     /// <param name="permissionName">Optional. The permission name.</param>
+    /// <param name="createdBy">Optional. The Id of the user that created the permission.</param>
+    /// <param name="createdOnUtc">Optional. The time and date when the permission was created.</param>
     /// <returns>The created <see cref="PermissionEntity"/>.</returns>
-    public PermissionEntity Create(Guid? id = null, AuthorizationPermission? permissionName = null)
+    public PermissionEntity Create(
+        Guid? id = null,
+        AuthorizationPermission? permissionName = null,
+        Guid? createdBy = null,
+        DateTime? createdOnUtc = null)
     {
         return new Faker<PermissionEntity>()
             .RuleFor(x => x.Id, f => id ?? f.Random.Guid())
             .RuleFor(x => x.PermissionName, f => permissionName ?? f.PickRandom<AuthorizationPermission>())
             .RuleFor(x => x.RolePermissions, [])
             .RuleFor(x => x.UserPermissions, [])
-            .RuleFor(x => x.CreatedOnUtc, f => f.Date.Past())
-            .RuleFor(x => x.CreatedBy, f => f.Random.Guid())
+            .RuleFor(x => x.CreatedOnUtc, f => createdOnUtc ?? f.Date.Past())
+            .RuleFor(x => x.CreatedBy, f => createdBy ?? f.Random.Guid())
             .RuleFor(x => x.UpdatedOnUtc, f => f.Date.Recent())
             .RuleFor(x => x.UpdatedBy, f => f.Random.Guid())
             .Generate();

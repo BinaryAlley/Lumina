@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetUserRole;
+using Lumina.Contracts.Fixtures.Core.Requests.Authorization;
 using Lumina.Contracts.Requests.Authorization;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -14,12 +15,14 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Authorization;
 [ExcludeFromCodeCoverage]
 public class GetUserRoleRequestMappingTests
 {
+    private readonly GetUserRoleRequestFixture _getUserRoleRequestFixture = new();
+
     [Fact]
     public void ToQuery_WhenMappingValidRequest_ShouldMapCorrectly()
     {
         // Arrange
         Guid userId = Guid.NewGuid();
-        GetUserRoleRequest request = new(userId);
+        GetUserRoleRequest request = _getUserRoleRequestFixture.Create(userId);
 
         // Act
         GetUserRoleQuery result = request.ToQuery();
@@ -33,7 +36,7 @@ public class GetUserRoleRequestMappingTests
     public void ToQuery_WhenUserIdIsNull_ShouldMapCorrectly()
     {
         // Arrange
-        GetUserRoleRequest request = new(null);
+        GetUserRoleRequest request = _getUserRoleRequestFixture.Create(includeUserId: false);
 
         // Act
         GetUserRoleQuery result = request.ToQuery();
@@ -51,7 +54,7 @@ public class GetUserRoleRequestMappingTests
     {
         // Arrange
         Guid userId = Guid.Parse(userIdString);
-        GetUserRoleRequest request = new(userId);
+        GetUserRoleRequest request = _getUserRoleRequestFixture.Create(userId);
 
         // Act
         GetUserRoleQuery result = request.ToQuery();
@@ -65,7 +68,7 @@ public class GetUserRoleRequestMappingTests
     public void ToQuery_WhenMappingEmptyGuid_ShouldMapCorrectly()
     {
         // Arrange
-        GetUserRoleRequest request = new(Guid.Empty);
+        GetUserRoleRequest request = _getUserRoleRequestFixture.Create(Guid.Empty);
 
         // Act
         GetUserRoleQuery result = request.ToQuery();

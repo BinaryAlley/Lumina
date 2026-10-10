@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Commands.UpdateBook;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaContributors;
@@ -18,7 +18,7 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenConten
 [ExcludeFromCodeCoverage]
 public class UpdateBookRequestMappingTests
 {
-    private readonly UpdateBookRequestFixture _requestFixture = new();
+    private readonly UpdateBookRequestFixture _updateBookRequestFixture = new();
     private readonly MediaContributorReferenceDtoFixture _mediaContributorReferenceDtoFixture = new();
 
     [Fact]
@@ -27,7 +27,7 @@ public class UpdateBookRequestMappingTests
         // Arrange
         Guid libraryId = Guid.NewGuid();
         Guid bookId = Guid.NewGuid();
-        UpdateBookRequest request = _requestFixture.Create();
+        UpdateBookRequest request = _updateBookRequestFixture.Create();
 
         // Act
         UpdateBookCommand result = request.ToCommand(libraryId.ToString(), bookId.ToString());
@@ -61,7 +61,7 @@ public class UpdateBookRequestMappingTests
         // Arrange
         Guid libraryId = Guid.NewGuid();
         Guid bookId = Guid.NewGuid();
-        UpdateBookRequest request = _requestFixture.Create(includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false, includeIsbns: false, includeRatings: false, includeContributors: false);
+        UpdateBookRequest request = _updateBookRequestFixture.Create(includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false, includeIsbns: false, includeRatings: false, includeContributors: false);
 
         // Act
         UpdateBookCommand result = request.ToCommand(libraryId.ToString(), bookId.ToString());
@@ -95,7 +95,7 @@ public class UpdateBookRequestMappingTests
         // Arrange
         Guid libraryId = Guid.NewGuid();
         Guid bookId = Guid.NewGuid();
-        UpdateBookRequest request = _requestFixture.Create(
+        UpdateBookRequest request = _updateBookRequestFixture.Create(
             isbns: [new("978-0-123456-78-9", IsbnFormat.Isbn13)],
             contributors:
             [
@@ -130,7 +130,7 @@ public class UpdateBookRequestMappingTests
     public void ToCommand_WhenRouteValuesAreNotParseable_ShouldMapThemAsIs()
     {
         // Arrange
-        UpdateBookRequest request = _requestFixture.Create(includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false, includeIsbns: false, includeRatings: false, includeContributors: false);
+        UpdateBookRequest request = _updateBookRequestFixture.Create(includeFormat: false, includeEdition: false, includeVolumeNumber: false, includeAsin: false, includeGoodreadsId: false, includeLccn: false, includeOclcNumber: false, includeOpenLibraryId: false, includeLibraryThingId: false, includeGoogleBooksId: false, includeBarnesAndNobleId: false, includeAppleBooksId: false, includeIsbns: false, includeRatings: false, includeContributors: false);
 
         // Act
         UpdateBookCommand result = request.ToCommand("not-a-library-guid", "not-a-guid");

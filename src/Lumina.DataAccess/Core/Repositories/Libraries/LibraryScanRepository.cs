@@ -114,4 +114,20 @@ internal sealed class LibraryScanRepository : ILibraryScanRepository
         EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundLibraryScan, data);
         return Result.Updated;
     }
+
+    /// <summary>
+    /// Marks the media library scans that were interrupted by an application restart, meaning the ones that are still
+    /// <see cref="LibraryScanJobStatus.Pending"/> or <see cref="LibraryScanJobStatus.Running"/>, as failed.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Updated>> FailInterruptedScansAsync(CancellationToken cancellationToken)
+    {
+        // The scans that were pending or running when the application stopped cannot survive the restart, because their jobs,
+        // progress and cancellation tokens live only in memory, so they are marked as failed and can be triggered again.
+        await _luminaDbContext.LibraryScans
+            .Where(libraryScan => libraryScan.Status == LibraryScanJobStatus.Pending || libraryScan.Status == LibraryScanJobStatus.Running)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(libraryScan => libraryScan.Status, LibraryScanJobStatus.Failed), cancellationToken).ConfigureAwait(false);
+        return Result.Updated;
+    }
 }

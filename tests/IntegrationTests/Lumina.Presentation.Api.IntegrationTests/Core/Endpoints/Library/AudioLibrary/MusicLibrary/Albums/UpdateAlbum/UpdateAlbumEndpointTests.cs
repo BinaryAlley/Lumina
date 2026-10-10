@@ -41,7 +41,7 @@ public class UpdateAlbumEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
     private readonly UpdateAlbumRequestFixture _updateAlbumRequestFixture = new();
-    private readonly AlbumMetadataDtoFixture _albumMetadataDtoFixture = new();
+    private readonly MusicAlbumMetadataDtoFixture _musicAlbumMetadataDtoFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly ArtistEntityFixture _artistEntityFixture = new();
     private readonly AlbumEntityFixture _albumEntityFixture = new();
@@ -72,7 +72,7 @@ public class UpdateAlbumEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         Guid userId = GetCurrentUserId();
         (Guid libraryId, Guid artistId, Guid albumId) = await SeedLibraryArtistAndAlbumAsync(userId, "A Night at the Opera");
         UpdateAlbumRequest request = _updateAlbumRequestFixture.Create(
-            metadata: _albumMetadataDtoFixture.Create(title: "Updated Album"),
+            metadata: _musicAlbumMetadataDtoFixture.Create(title: "Updated Album"),
             contributors: [],
             ratings: []);
 

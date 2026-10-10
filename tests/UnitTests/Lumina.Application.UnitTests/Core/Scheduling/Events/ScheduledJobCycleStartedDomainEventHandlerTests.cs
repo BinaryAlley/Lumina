@@ -7,6 +7,7 @@ using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Infrastructure.Scheduling;
 using Lumina.Application.Core.Scheduling.Events;
 using Lumina.Application.Core.Scheduling.Notifications;
+using Lumina.Application.Fixtures.Common.DTO.Pagination;
 using Lumina.Contracts.Responses.Scheduling;
 using Lumina.Domain.Common.Exceptions;
 using Lumina.Domain.Common.Primitives;
@@ -34,6 +35,7 @@ public class ScheduledJobCycleStartedDomainEventHandlerTests
     private readonly IScheduledJobRepository _mockScheduledJobRepository;
     private readonly ScheduledJobCycleStartedDomainEventHandler _sut;
     private readonly ScheduledJobCycleStartedDomainEventFixture _scheduledJobCycleStartedDomainEventFixture = new();
+    private readonly PaginatedResultDtoFixture<ScheduledJobEntity> _paginatedResultDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ScheduledJobCycleStartedDomainEventHandlerTests"/> class.
@@ -47,7 +49,7 @@ public class ScheduledJobCycleStartedDomainEventHandlerTests
         _mockScheduledJobRepository = Substitute.For<IScheduledJobRepository>();
 
         _mockUnitOfWork.ScheduledJobRepository.Returns(_mockScheduledJobRepository);
-        _mockScheduledJobRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<ScheduledJobEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
+        _mockScheduledJobRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(_paginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 0, count: 0, numberOfPages: 1)));
 
         _sut = new ScheduledJobCycleStartedDomainEventHandler(_mockScheduledJobNotifier, _mockScheduledJobScheduler, _mockUnitOfWork);
     }

@@ -14,10 +14,18 @@ namespace Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLib
 [DebuggerDisplay("{Title}")]
 public class AlbumMetadata : BaseMetadata
 {
+    private readonly List<MusicReleaseType> _releaseTypes;
+
     /// <summary>
-    /// Gets the type of the release, if applicable.
+    /// Gets the title of the specific release (edition) the album files match, if different from the release group title.
     /// </summary>
-    public Optional<MusicReleaseType> ReleaseType { get; }
+    public Optional<string> ReleaseTitle { get; }
+
+    /// <summary>
+    /// Gets the set of types of the release, if applicable.
+    /// A MusicBrainz release group can carry more than one type at the same time, for example an album that is also a compilation.
+    /// </summary>
+    public IReadOnlyCollection<MusicReleaseType> ReleaseTypes => _releaseTypes.AsReadOnly();
 
     /// <summary>
     /// Gets the status of the release, if applicable.
@@ -39,32 +47,35 @@ public class AlbumMetadata : BaseMetadata
     /// </summary>
     /// <param name="title">The title of the album.</param>
     /// <param name="originalTitle">The optional original title of the album, if applicable.</param>
+    /// <param name="releaseTitle">The optional title of the specific release (edition) of the album.</param>
     /// <param name="description">The description of the album, if applicable.</param>
     /// <param name="releaseInfo">The release information of the album.</param>
     /// <param name="genres">The genres of the album.</param>
     /// <param name="tags">The tags associated with the album.</param>
     /// <param name="language">The language of the album, if applicable.</param>
     /// <param name="originalLanguage">The optional original language of the album, if applicable.</param>
-    /// <param name="releaseType">The optional type of the release.</param>
+    /// <param name="releaseTypes">The set of types of the release, if applicable.</param>
     /// <param name="releaseStatus">The optional status of the release.</param>
     /// <param name="totalDiscs">The optional number of discs of the release.</param>
     /// <param name="totalTracks">The number of tracks of the release.</param>
     private AlbumMetadata(
         string title,
         Optional<string> originalTitle,
+        Optional<string> releaseTitle,
         Optional<string> description,
         ReleaseInfo releaseInfo,
         List<Genre> genres,
         List<Tag> tags,
         Optional<LanguageInfo> language,
         Optional<LanguageInfo> originalLanguage,
-        Optional<MusicReleaseType> releaseType,
+        List<MusicReleaseType> releaseTypes,
         Optional<MusicReleaseStatus> releaseStatus,
         Optional<int> totalDiscs,
         int totalTracks)
         : base(title, originalTitle, description, releaseInfo, genres, tags, language, originalLanguage)
     {
-        ReleaseType = releaseType;
+        ReleaseTitle = releaseTitle;
+        _releaseTypes = releaseTypes;
         ReleaseStatus = releaseStatus;
         TotalDiscs = totalDiscs;
         TotalTracks = totalTracks;
@@ -75,13 +86,14 @@ public class AlbumMetadata : BaseMetadata
     /// </summary>
     /// <param name="title">The title of the album.</param>
     /// <param name="originalTitle">The optional original title of the album, if applicable.</param>
+    /// <param name="releaseTitle">The optional title of the specific release (edition) of the album.</param>
     /// <param name="description">The description of the album, if applicable.</param>
     /// <param name="releaseInfo">The release information of the album.</param>
     /// <param name="genres">The genres of the album.</param>
     /// <param name="tags">The tags associated with the album.</param>
     /// <param name="language">The language of the album, if applicable.</param>
     /// <param name="originalLanguage">The optional original language of the album, if applicable.</param>
-    /// <param name="releaseType">The optional type of the release.</param>
+    /// <param name="releaseTypes">The set of types of the release, if applicable.</param>
     /// <param name="releaseStatus">The optional status of the release.</param>
     /// <param name="totalDiscs">The optional number of discs of the release.</param>
     /// <param name="totalTracks">The number of tracks of the release.</param>
@@ -91,13 +103,14 @@ public class AlbumMetadata : BaseMetadata
     public static Result<AlbumMetadata> Create(
         string title,
         Optional<string> originalTitle,
+        Optional<string> releaseTitle,
         Optional<string> description,
         ReleaseInfo releaseInfo,
         List<Genre> genres,
         List<Tag> tags,
         Optional<LanguageInfo> language,
         Optional<LanguageInfo> originalLanguage,
-        Optional<MusicReleaseType> releaseType,
+        List<MusicReleaseType> releaseTypes,
         Optional<MusicReleaseStatus> releaseStatus,
         Optional<int> totalDiscs,
         int totalTracks)
@@ -105,13 +118,14 @@ public class AlbumMetadata : BaseMetadata
         return new AlbumMetadata(
             title,
             originalTitle,
+            releaseTitle,
             description,
             releaseInfo,
             genres,
             tags,
             language,
             originalLanguage,
-            releaseType,
+            releaseTypes,
             releaseStatus,
             totalDiscs,
             totalTracks);
@@ -125,7 +139,9 @@ public class AlbumMetadata : BaseMetadata
     {
         foreach (object component in base.GetEqualityComponents())
             yield return component;
-        yield return ReleaseType;
+        yield return ReleaseTitle;
+        foreach (MusicReleaseType releaseType in _releaseTypes)
+            yield return releaseType;
         yield return ReleaseStatus;
         yield return TotalDiscs;
         yield return TotalTracks;

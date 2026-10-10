@@ -27,7 +27,7 @@ public class GetReadingSectionEndpointTests
 {
     private readonly IApiHttpClient _mockApiHttpClient;
     private readonly GetReadingSectionEndpoint _sut;
-    private readonly GetBookReadingSectionRequestFixture _requestFixture = new();
+    private readonly GetBookReadingSectionRequestFixture _getBookReadingSectionRequestFixture = new();
     private readonly ReadingSectionDtoFixture _readingSectionDtoFixture = new();
 
     /// <summary>
@@ -43,7 +43,7 @@ public class GetReadingSectionEndpointTests
     public async Task ExecuteAsync_WhenSuccessful_ShouldReturnSuccessJsonWithSection()
     {
         // Arrange
-        GetBookReadingSectionRequest request = _requestFixture.Create();
+        GetBookReadingSectionRequest request = _getBookReadingSectionRequestFixture.Create();
         ReadingSectionDto section = _readingSectionDtoFixture.Create(locationRef: request.LocationRef);
         _mockApiHttpClient.GetAsync<ReadingSectionDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(section);
@@ -62,7 +62,7 @@ public class GetReadingSectionEndpointTests
     public async Task ExecuteAsync_WhenCalled_ShouldRequestReadingSectionFromApi()
     {
         // Arrange
-        GetBookReadingSectionRequest request = _requestFixture.Create();
+        GetBookReadingSectionRequest request = _getBookReadingSectionRequestFixture.Create();
         ReadingSectionDto section = _readingSectionDtoFixture.Create(locationRef: request.LocationRef);
         _mockApiHttpClient.GetAsync<ReadingSectionDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(section);

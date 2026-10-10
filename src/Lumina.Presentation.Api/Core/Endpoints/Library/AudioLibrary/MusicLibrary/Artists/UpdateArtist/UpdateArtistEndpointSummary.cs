@@ -32,7 +32,7 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
         Summary = "Updates an existing artist.";
         Description = "Updates the details of the artist identified by the route, together with its contributors and albums, returning the full details of the updated artist. The artist is updated by an Admin, who can update the artists of all libraries, or by the owner of the library of the artist.";
 
-        RequestParam(r => r.Name, "The name of the artist. Required.");
+        RequestParam(r => r.Metadata!.Name, "The name of the artist. Required.");
         RequestParam(r => r.Website, "The website of the artist. Optional.");
         RequestParam(r => r.MusicBrainzArtistId, "The MusicBrainz identifier of the artist. Optional.");
         RequestParam(r => r.Contributors, "The list of media contributors that make up the artist. Required.");
@@ -52,20 +52,20 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
         RequestParam(r => r.Albums![0].Metadata!.Language, "The language of the album. Optional.");
         RequestParam(r => r.Albums![0].Metadata!.Language!.LanguageCode, "The ISO code of the language (e.g., \"en\" for English). Required.");
         RequestParam(r => r.Albums![0].Metadata!.Language!.LanguageName, "The name of the language in English. Required.");
-        RequestParam(r => r.Albums![0].Metadata!.Language!.NativeName, "The native name of the language (e.g., \"Español\" for Spanish). Optional.");
+        RequestParam(r => r.Albums![0].Metadata!.Language!.NativeName, "The native name of the language (e.g., \"EspaÃ±ol\" for Spanish). Optional.");
         RequestParam(r => r.Albums![0].Metadata!.OriginalLanguage, "The original language of the album, if it has been translated. Optional.");
         RequestParam(r => r.Albums![0].Metadata!.OriginalLanguage!.LanguageCode, "The ISO code of the language (e.g., \"en\" for English). Required.");
         RequestParam(r => r.Albums![0].Metadata!.OriginalLanguage!.LanguageName, "The name of the language in English. Required.");
-        RequestParam(r => r.Albums![0].Metadata!.OriginalLanguage!.NativeName, "The native name of the language (e.g., \"Español\" for Spanish). Optional.");
+        RequestParam(r => r.Albums![0].Metadata!.OriginalLanguage!.NativeName, "The native name of the language (e.g., \"EspaÃ±ol\" for Spanish). Optional.");
         RequestParam(r => r.Albums![0].Metadata!.Tags, "The list of tags that further describe or categorize the album. Required.");
         RequestParam(r => r.Albums![0].Metadata!.Genres, "The list of genres associated with the album. Required.");
-        RequestParam(r => r.Albums![0].Metadata!.ReleaseType, "The type of the release. Optional.");
+        RequestParam(r => r.Albums![0].Metadata!.ReleaseTypes, "The type of the release. Optional.");
         RequestParam(r => r.Albums![0].Metadata!.ReleaseStatus, "The status of the release. Optional.");
         RequestParam(r => r.Albums![0].Metadata!.TotalDiscs, "The number of discs of the release. Optional.");
         RequestParam(r => r.Albums![0].Metadata!.TotalTracks, "The number of tracks of the release. Optional.");
         RequestParam(r => r.Albums![0].MediaFormat, "The physical or digital medium of the album. Optional.");
         RequestParam(r => r.Albums![0].Barcode, "The barcode of the album. Optional.");
-        RequestParam(r => r.Albums![0].CatalogNumber, "The catalog number of the album. Optional.");
+        RequestParam(r => r.Albums![0].CatalogNumbers, "The catalog numbers of the album. Optional.");
         RequestParam(r => r.Albums![0].MusicBrainzReleaseId, "The MusicBrainz identifier of the release. Optional.");
         RequestParam(r => r.Albums![0].MusicBrainzReleaseGroupId, "The MusicBrainz identifier of the release group. Optional.");
         RequestParam(r => r.Albums![0].MusicBrainzReleaseArtistId, "The MusicBrainz identifier of the release artist. Optional.");
@@ -88,11 +88,11 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
         RequestParam(r => r.Albums![0].Tracks![0].Metadata!.Language, "The language of the track. Optional.");
         RequestParam(r => r.Albums![0].Tracks![0].Metadata!.Language!.LanguageCode, "The ISO code of the language (e.g., \"en\" for English). Required.");
         RequestParam(r => r.Albums![0].Tracks![0].Metadata!.Language!.LanguageName, "The name of the language in English. Required.");
-        RequestParam(r => r.Albums![0].Tracks![0].Metadata!.Language!.NativeName, "The native name of the language (e.g., \"Español\" for Spanish). Optional.");
+        RequestParam(r => r.Albums![0].Tracks![0].Metadata!.Language!.NativeName, "The native name of the language (e.g., \"EspaÃ±ol\" for Spanish). Optional.");
         RequestParam(r => r.Albums![0].Tracks![0].Metadata!.OriginalLanguage, "The original language of the track, if it has been translated. Optional.");
         RequestParam(r => r.Albums![0].Tracks![0].Metadata!.OriginalLanguage!.LanguageCode, "The ISO code of the language (e.g., \"en\" for English). Required.");
         RequestParam(r => r.Albums![0].Tracks![0].Metadata!.OriginalLanguage!.LanguageName, "The name of the language in English. Required.");
-        RequestParam(r => r.Albums![0].Tracks![0].Metadata!.OriginalLanguage!.NativeName, "The native name of the language (e.g., \"Español\" for Spanish). Optional.");
+        RequestParam(r => r.Albums![0].Tracks![0].Metadata!.OriginalLanguage!.NativeName, "The native name of the language (e.g., \"EspaÃ±ol\" for Spanish). Optional.");
         RequestParam(r => r.Albums![0].Tracks![0].Metadata!.Tags, "The list of tags that further describe or categorize the track. Required.");
         RequestParam(r => r.Albums![0].Tracks![0].Metadata!.Genres, "The list of genres associated with the track. Required.");
         RequestParam(r => r.Albums![0].Tracks![0].Metadata!.DurationInSeconds, "The duration of the audio of the track in seconds. Required.");
@@ -106,19 +106,37 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
         RequestParam(r => r.Albums![0].Tracks![0].Script, "The script used by the language of the track. Optional.");
         RequestParam(r => r.Albums![0].Tracks![0].Key, "The musical key of the track. Optional.");
         RequestParam(r => r.Albums![0].Tracks![0].Bpm, "The tempo of the track in beats per minute. Optional.");
-        RequestParam(r => r.Albums![0].Tracks![0].Work, "The title of the work the track is a recording of. Optional.");
+        RequestParam(r => r.Albums![0].Tracks![0].Work!.Title, "The title of the work the track is a recording of. Optional.");
         RequestParam(r => r.Albums![0].Tracks![0].MusicBrainzRecordingId, "The MusicBrainz identifier of the recording. Optional.");
         RequestParam(r => r.Albums![0].Tracks![0].MusicBrainzTrackId, "The MusicBrainz identifier of the track. Optional.");
-        RequestParam(r => r.Albums![0].Tracks![0].MusicBrainzWorkId, "The MusicBrainz identifier of the work. Optional.");
+        RequestParam(r => r.Albums![0].Tracks![0].Work!.MusicBrainzWorkId, "The MusicBrainz identifier of the work. Optional.");
         RequestParam(r => r.Albums![0].Tracks![0].Moods, "The list of moods of the track. Optional.");
         RequestParam(r => r.Albums![0].Tracks![0].Isrcs, "The list of ISRC (International Standard Recording Code) of the track. Optional.");
         RequestParam(r => r.Albums![0].Tracks![0].Contributors, "The list of media contributors that performed on the track. Required.");
         RequestParam(r => r.Albums![0].Tracks![0].Ratings, "The list of ratings for this track. Required.");
 
         ExampleRequest = new UpdateArtistRequest(
-            Name: "Queen",
+            Metadata: new MusicArtistMetadataDto(
+                Name: "Queen",
+                SortName: "Queen",
+                Disambiguation: "British rock band",
+                Type: MusicArtistType.Group,
+                Gender: MusicArtistGender.NotApplicable,
+                Country: "GB",
+                Area: new MusicAreaDto(MusicBrainzAreaId: Guid.NewGuid(), Name: "United Kingdom", SortName: "United Kingdom", Disambiguation: "sovereign state", Type: "Country", Iso3166Code: "GB"),
+                BeginArea: new MusicAreaDto(MusicBrainzAreaId: Guid.NewGuid(), Name: "United Kingdom", SortName: "United Kingdom", Disambiguation: "sovereign state", Type: "Country", Iso3166Code: "GB"),
+                EndArea: new MusicAreaDto(MusicBrainzAreaId: Guid.NewGuid(), Name: "United Kingdom", SortName: "United Kingdom", Disambiguation: "sovereign state", Type: "Country", Iso3166Code: "GB"),
+                LifeSpanBegin: new DateOnly(1970, 6, 27),
+                LifeSpanEnd: new DateOnly(1991, 11, 24),
+                IsEnded: false,
+                Aliases: [new MusicArtistAliasDto(Name: "The Queen", SortName: "Queen", Type: "Artist name", Locale: "en", IsPrimary: false, BeginDate: new DateOnly(1970, 6, 27), EndDate: new DateOnly(1991, 11, 24), IsEnded: true)],
+                Genres: [new GenreDto(Name: "Rock")],
+                Tags: [new TagDto(Name: "classic")]
+            ),
             Website: "https://www.queenonline.com",
             MusicBrainzArtistId: Guid.NewGuid(),
+            Ipis: ["00012345678"],
+            Isnis: ["0000000123456789"],
             Contributors:
             [
                 new MediaContributorReferenceDto(
@@ -130,18 +148,20 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                     Role: MediaContributorRole.Guitar
                 )
             ],
+            Ratings: [new AudioRatingDto(Value: 4.5M, MaxValue: 5, Source: AudioRatingSource.MusicBrainz, VoteCount: 2345)],
             Albums: [
                 new UpdateArtistAlbumRequest(
                     AlbumId: Guid.NewGuid(),
-                    Metadata: new AlbumMetadataDto(
+                    Metadata: new MusicAlbumMetadataDto(
                         Title: "A Night at the Opera",
                         OriginalTitle: "A Night at the Opera",
                         Description: "The fourth studio album by the British rock band Queen, released in 1975. It was the most expensive album ever recorded at the time of its release.",
+                        Disambiguation: "original release",
                         ReleaseInfo: new ReleaseInfoDto(
                             OriginalReleaseDate: new DateOnly(1975, 11, 21),
                             OriginalReleaseYear: 1975,
-                            ReReleaseDate: default,
-                            ReReleaseYear: default,
+                            ReReleaseDate: new DateOnly(2011, 11, 21),
+                            ReReleaseYear: 2011,
                             ReleaseCountry: ReleaseCountry.GB,
                             ReleaseVersion: "Remastered"
                         ),
@@ -163,14 +183,18 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                             new GenreDto(Name: "Rock"),
                             new GenreDto(Name: "Progressive Rock")
                         ],
-                        ReleaseType: MusicReleaseType.Album,
+                        Script: "Latn",
+                        ReleaseTypes: [MusicReleaseType.Album],
                         ReleaseStatus: MusicReleaseStatus.Official,
                         TotalDiscs: 1,
                         TotalTracks: 12
                     ),
                     MediaFormat: MusicMediaFormat.CD,
+                    Packaging: MusicReleasePackaging.JewelCase,
                     Barcode: "0042282778329",
-                    CatalogNumber: "EMC 4008",
+                    CatalogNumbers: ["EMC 4008"],
+                    Label: "EMI",
+                    ASIN: "B000002UTK",
                     MusicBrainzReleaseId: Guid.NewGuid(),
                     MusicBrainzReleaseGroupId: Guid.NewGuid(),
                     MusicBrainzReleaseArtistId: Guid.NewGuid(),
@@ -203,15 +227,16 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                         new UpdateArtistTrackRequest(
                             TrackId: Guid.NewGuid(),
                             Path: "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
-                            Metadata: new AudioMetadataDto(
+                            Metadata: new MusicTrackMetadataDto(
                                 Title: "Bohemian Rhapsody",
                                 OriginalTitle: "Bohemian Rhapsody",
                                 Description: "A song by the British rock band Queen. It was written by Freddie Mercury and originally released on the album A Night at the Opera in 1975.",
+                                Disambiguation: "album version",
                                 ReleaseInfo: new ReleaseInfoDto(
                                     OriginalReleaseDate: new DateOnly(1975, 10, 31),
                                     OriginalReleaseYear: 1975,
-                                    ReReleaseDate: default,
-                                    ReReleaseYear: default,
+                                    ReReleaseDate: new DateOnly(2011, 11, 21),
+                                    ReReleaseYear: 2011,
                                     ReleaseCountry: ReleaseCountry.GB,
                                     ReleaseVersion: "Original"
                                 ),
@@ -233,6 +258,7 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                                     new GenreDto(Name: "Rock"),
                                     new GenreDto(Name: "Progressive Rock")
                                 ],
+                                IsVideo: false,
                                 DurationInSeconds: 354,
                                 SampleRate: 44100,
                                 Channels: 2,
@@ -240,22 +266,25 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                                 AudioCodec: "FLAC",
                                 Bitrate: 980
                             ),
-                            TrackNumber: 1,
-                            DiscNumber: 1,
                             Script: "Latn",
                             Key: MusicKey.CMajor,
                             Bpm: 72,
-                            Work: "Bohemian Rhapsody",
-                            MusicBrainzRecordingId: Guid.NewGuid(),
-                            MusicBrainzTrackId: Guid.NewGuid(),
-                            MusicBrainzWorkId: Guid.NewGuid(),
+                            Work: new MusicWorkDto(
+                                MusicBrainzWorkId: Guid.NewGuid(),
+                                Title: "Bohemian Rhapsody",
+                                Type: "Song",
+                                Languages: [new LanguageInfoDto(LanguageCode: "en", LanguageName: "English", NativeName: "English")],
+                                Iswcs: ["T-010489707-6"]
+                            ),
+                            Isrcs: [
+                                new IsrcDto(Value: "GBUM71029604")
+                            ],
                             Moods: [
                                 new MoodDto(Name: "dramatic"),
                                 new MoodDto(Name: "anxious")
                             ],
-                            Isrcs: [
-                                new IsrcDto(Value: "GBUM71029604")
-                            ],
+                            MusicBrainzRecordingId: Guid.NewGuid(),
+                            MusicBrainzTrackId: Guid.NewGuid(),
                             Contributors:
                             [
                                 new MediaContributorReferenceDto(
@@ -280,20 +309,23 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                                     Source: AudioRatingSource.LastFm,
                                     VoteCount: 1234
                                 )
-                            ]
+                            ],
+                            TrackNumber: 1,
+                            DiscNumber: 1
                         ),
                         new UpdateArtistTrackRequest(
                             TrackId: Guid.NewGuid(),
                             Path: "/music/queen/a-night-at-the-opera/07-youre-my-best-friend.flac",
-                            Metadata: new AudioMetadataDto(
+                            Metadata: new MusicTrackMetadataDto(
                                 Title: "You're My Best Friend",
                                 OriginalTitle: "You're My Best Friend",
                                 Description: "A song by the British rock band Queen, written by bass guitarist John Deacon. It was originally released on the album A Night at the Opera in 1975 and as a single in 1976.",
+                                Disambiguation: "album version",
                                 ReleaseInfo: new ReleaseInfoDto(
                                     OriginalReleaseDate: new DateOnly(1976, 6, 18),
                                     OriginalReleaseYear: 1976,
-                                    ReReleaseDate: default,
-                                    ReReleaseYear: default,
+                                    ReReleaseDate: new DateOnly(2011, 11, 21),
+                                    ReReleaseYear: 2011,
                                     ReleaseCountry: ReleaseCountry.GB,
                                     ReleaseVersion: "Original"
                                 ),
@@ -315,6 +347,7 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                                     new GenreDto(Name: "Rock"),
                                     new GenreDto(Name: "Pop Rock")
                                 ],
+                                IsVideo: false,
                                 DurationInSeconds: 181,
                                 SampleRate: 44100,
                                 Channels: 2,
@@ -322,22 +355,25 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                                 AudioCodec: "FLAC",
                                 Bitrate: 912
                             ),
-                            TrackNumber: 7,
-                            DiscNumber: 1,
                             Script: "Latn",
                             Key: MusicKey.BMajor,
                             Bpm: 118,
-                            Work: "You're My Best Friend",
-                            MusicBrainzRecordingId: Guid.NewGuid(),
-                            MusicBrainzTrackId: Guid.NewGuid(),
-                            MusicBrainzWorkId: Guid.NewGuid(),
+                            Work: new MusicWorkDto(
+                                MusicBrainzWorkId: Guid.NewGuid(),
+                                Title: "You're My Best Friend",
+                                Type: "Song",
+                                Languages: [new LanguageInfoDto(LanguageCode: "en", LanguageName: "English", NativeName: "English")],
+                                Iswcs: ["T-010489707-6"]
+                            ),
+                            Isrcs: [
+                                new IsrcDto(Value: "GBUM71029609")
+                            ],
                             Moods: [
                                 new MoodDto(Name: "happy"),
                                 new MoodDto(Name: "warm")
                             ],
-                            Isrcs: [
-                                new IsrcDto(Value: "GBUM71029609")
-                            ],
+                            MusicBrainzRecordingId: Guid.NewGuid(),
+                            MusicBrainzTrackId: Guid.NewGuid(),
                             Contributors:
                             [
                                 new MediaContributorReferenceDto(
@@ -362,7 +398,9 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                                     Source: AudioRatingSource.LastFm,
                                     VoteCount: 567
                                 )
-                            ]
+                            ],
+                            TrackNumber: 7,
+                            DiscNumber: 1
                         )
                     ]
                 )
@@ -371,7 +409,7 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
 
         ResponseParam<ArtistResponse>(r => r.Id, "The Id of the artist.");
         ResponseParam<ArtistResponse>(r => r.LibraryId, "The Id of the media library this artist belongs to.");
-        ResponseParam<ArtistResponse>(r => r.Name, "The name of the artist.");
+        ResponseParam<ArtistResponse>(r => r.Metadata!.Name, "The name of the artist.");
         ResponseParam<ArtistResponse>(r => r.Website, "The website of the artist, if applicable.");
         ResponseParam<ArtistResponse>(r => r.MusicBrainzArtistId, "The MusicBrainz identifier of the artist, if applicable.");
         ResponseParam<ArtistResponse>(r => r.Contributors, "The list of references to the media contributors that make up the artist, each with the role they played.");
@@ -400,13 +438,13 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
         ResponseParam<ArtistResponse>(r => r.Albums![0].Metadata!.OriginalLanguage!.NativeName, "The native name of the original language of the album.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Metadata!.Tags, "The list of tags of the album.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Metadata!.Genres, "The list of genres of the album.");
-        ResponseParam<ArtistResponse>(r => r.Albums![0].Metadata!.ReleaseType, "The type of the release of the album.");
+        ResponseParam<ArtistResponse>(r => r.Albums![0].Metadata!.ReleaseTypes, "The type of the release of the album.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Metadata!.ReleaseStatus, "The status of the release of the album.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Metadata!.TotalDiscs, "The number of discs of the release of the album.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Metadata!.TotalTracks, "The number of tracks of the release of the album.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].MediaFormat, "The physical or digital medium of the album, if applicable.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Barcode, "The barcode of the album, if applicable.");
-        ResponseParam<ArtistResponse>(r => r.Albums![0].CatalogNumber, "The catalog number of the album, if applicable.");
+        ResponseParam<ArtistResponse>(r => r.Albums![0].CatalogNumbers, "The catalog numbers of the album, if applicable.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].MusicBrainzReleaseId, "The MusicBrainz identifier of the release, if applicable.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].MusicBrainzReleaseGroupId, "The MusicBrainz identifier of the release group, if applicable.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].MusicBrainzReleaseArtistId, "The MusicBrainz identifier of the release artist, if applicable.");
@@ -451,10 +489,10 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
         ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].Script, "The script used by the language of the track, if applicable.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].Key, "The musical key of the track, if applicable.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].Bpm, "The tempo of the track in beats per minute, if applicable.");
-        ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].Work, "The title of the work the track is a recording of, if applicable.");
+        ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].Work!.Title, "The title of the work the track is a recording of, if applicable.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].MusicBrainzRecordingId, "The MusicBrainz identifier of the recording, if applicable.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].MusicBrainzTrackId, "The MusicBrainz identifier of the track, if applicable.");
-        ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].MusicBrainzWorkId, "The MusicBrainz identifier of the work, if applicable.");
+        ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].Work!.MusicBrainzWorkId, "The MusicBrainz identifier of the work, if applicable.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].CreatedOnUtc, "The date and time when the track was created.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].UpdatedOnUtc, "The date and time when the track was last updated, if applicable.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].Moods, "The list of moods of the track.");
@@ -472,29 +510,49 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
             example: new ArtistResponse(
                 Id: artistId,
                 LibraryId: libraryId,
-                Name: "Queen",
+                Metadata: new MusicArtistMetadataDto(
+                    Name: "Queen",
+                    SortName: "Queen",
+                    Disambiguation: "British rock band",
+                    Type: MusicArtistType.Group,
+                    Gender: MusicArtistGender.NotApplicable,
+                    Country: "GB",
+                    Area: new MusicAreaDto(MusicBrainzAreaId: Guid.NewGuid(), Name: "United Kingdom", SortName: "United Kingdom", Disambiguation: "sovereign state", Type: "Country", Iso3166Code: "GB"),
+                    BeginArea: new MusicAreaDto(MusicBrainzAreaId: Guid.NewGuid(), Name: "United Kingdom", SortName: "United Kingdom", Disambiguation: "sovereign state", Type: "Country", Iso3166Code: "GB"),
+                    EndArea: new MusicAreaDto(MusicBrainzAreaId: Guid.NewGuid(), Name: "United Kingdom", SortName: "United Kingdom", Disambiguation: "sovereign state", Type: "Country", Iso3166Code: "GB"),
+                    LifeSpanBegin: new DateOnly(1970, 6, 27),
+                    LifeSpanEnd: new DateOnly(1991, 11, 24),
+                    IsEnded: false,
+                    Aliases: [new MusicArtistAliasDto(Name: "The Queen", SortName: "Queen", Type: "Artist name", Locale: "en", IsPrimary: false, BeginDate: new DateOnly(1970, 6, 27), EndDate: new DateOnly(1991, 11, 24), IsEnded: true)],
+                    Genres: [new GenreDto(Name: "Rock")],
+                    Tags: [new TagDto(Name: "classic")]
+                ),
                 Website: "https://www.queenonline.com",
                 MusicBrainzArtistId: Guid.NewGuid(),
+                Ipis: ["00012345678"],
+                Isnis: ["0000000123456789"],
                 Contributors:
                 [
-                    new(ContributorId: Guid.NewGuid(), Role: MediaContributorRole.Vocals),
-                    new(ContributorId: Guid.NewGuid(), Role: MediaContributorRole.Guitar)
+                    new MediaContributorReferenceDto(ContributorId: Guid.NewGuid(), Role: MediaContributorRole.Vocals),
+                    new MediaContributorReferenceDto(ContributorId: Guid.NewGuid(), Role: MediaContributorRole.Guitar)
                 ],
+                Ratings: [new AudioRatingDto(Value: 4.5M, MaxValue: 5, Source: AudioRatingSource.MusicBrainz, VoteCount: 2345)],
                 Albums:
                 [
                     new AlbumResponse(
                         Id: albumId,
                         ArtistId: artistId,
                         LibraryId: libraryId,
-                        Metadata: new AlbumMetadataDto(
+                        Metadata: new MusicAlbumMetadataDto(
                             Title: "A Night at the Opera",
                             OriginalTitle: "A Night at the Opera",
                             Description: "The fourth studio album by the British rock band Queen, released in 1975. It was the most expensive album ever recorded at the time of its release.",
+                            Disambiguation: "original release",
                             ReleaseInfo: new ReleaseInfoDto(
                                 OriginalReleaseDate: new DateOnly(1975, 11, 21),
                                 OriginalReleaseYear: 1975,
-                                ReReleaseDate: default,
-                                ReReleaseYear: default,
+                                ReReleaseDate: new DateOnly(2011, 11, 21),
+                                ReReleaseYear: 2011,
                                 ReleaseCountry: ReleaseCountry.GB,
                                 ReleaseVersion: "Remastered"
                             ),
@@ -518,19 +576,21 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                                 new TagDto(Name: "classic"),
                                 new TagDto(Name: "vinyl")
                             ],
-                            ReleaseType: MusicReleaseType.Album,
+                            Script: "Latn",
+                            ReleaseTypes: [MusicReleaseType.Album],
                             ReleaseStatus: MusicReleaseStatus.Official,
                             TotalDiscs: 1,
                             TotalTracks: 12
                         ),
                         MediaFormat: MusicMediaFormat.CD,
+                        Packaging: MusicReleasePackaging.JewelCase,
                         Barcode: "0042282778329",
-                        CatalogNumber: "EMC 4008",
+                        CatalogNumbers: ["EMC 4008"],
+                        Label: "EMI",
+                        ASIN: "B000002UTK",
                         MusicBrainzReleaseId: Guid.NewGuid(),
                         MusicBrainzReleaseGroupId: Guid.NewGuid(),
                         MusicBrainzReleaseArtistId: Guid.NewGuid(),
-                        CreatedOnUtc: DateTime.UtcNow,
-                        UpdatedOnUtc: DateTime.UtcNow,
                         Contributors:
                         [
                             new MediaContributorReferenceDto(
@@ -557,6 +617,8 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                                 VoteCount: 1234
                             )
                         ],
+                        CreatedOnUtc: new DateTime(2025, 1, 15, 10, 30, 0, DateTimeKind.Utc),
+                        UpdatedOnUtc: new DateTime(2025, 1, 20, 14, 45, 0, DateTimeKind.Utc),
                         Tracks:
                         [
                             new TrackResponse(
@@ -564,15 +626,16 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                                 AlbumId: albumId,
                                 LibraryId: libraryId,
                                 Path: "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
-                                Metadata: new AudioMetadataDto(
+                                Metadata: new MusicTrackMetadataDto(
                                     Title: "Bohemian Rhapsody",
                                     OriginalTitle: "Bohemian Rhapsody",
                                     Description: "A song by the British rock band Queen. It was written by Freddie Mercury and originally released on the album A Night at the Opera in 1975.",
+                                    Disambiguation: "album version",
                                     ReleaseInfo: new ReleaseInfoDto(
                                         OriginalReleaseDate: new DateOnly(1975, 10, 31),
                                         OriginalReleaseYear: 1975,
-                                        ReReleaseDate: default,
-                                        ReReleaseYear: default,
+                                        ReReleaseDate: new DateOnly(2011, 11, 21),
+                                        ReReleaseYear: 2011,
                                         ReleaseCountry: ReleaseCountry.GB,
                                         ReleaseVersion: "Original"
                                     ),
@@ -596,6 +659,7 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                                         new GenreDto(Name: "Rock"),
                                         new GenreDto(Name: "Progressive Rock")
                                     ],
+                                    IsVideo: false,
                                     DurationInSeconds: 354,
                                     SampleRate: 44100,
                                     Channels: 2,
@@ -603,26 +667,27 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                                     AudioCodec: "FLAC",
                                     Bitrate: 980
                                 ),
-                                TrackNumber: 1,
-                                DiscNumber: 1,
                                 Script: "Latn",
                                 Key: MusicKey.CMajor,
                                 Bpm: 72,
-                                Work: "Bohemian Rhapsody",
-                                MusicBrainzRecordingId: Guid.NewGuid(),
-                                MusicBrainzTrackId: Guid.NewGuid(),
-                                MusicBrainzWorkId: Guid.NewGuid(),
-                                CreatedOnUtc: DateTime.UtcNow,
-                                UpdatedOnUtc: DateTime.UtcNow,
+                                Work: new MusicWorkDto(
+                                    MusicBrainzWorkId: Guid.NewGuid(),
+                                    Title: "Bohemian Rhapsody",
+                                    Type: "Song",
+                                    Languages: [new LanguageInfoDto(LanguageCode: "en", LanguageName: "English", NativeName: "English")],
+                                    Iswcs: ["T-010489707-6"]
+                                ),
+                                Isrcs:
+                                [
+                                    new IsrcDto(Value: "GBUM71029604")
+                                ],
                                 Moods:
                                 [
                                     new MoodDto(Name: "dramatic"),
                                     new MoodDto(Name: "anxious")
                                 ],
-                                Isrcs:
-                                [
-                                    new IsrcDto(Value: "GBUM71029604")
-                                ],
+                                MusicBrainzRecordingId: Guid.NewGuid(),
+                                MusicBrainzTrackId: Guid.NewGuid(),
                                 Contributors:
                                 [
                                     new MediaContributorReferenceDto(
@@ -648,22 +713,27 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                                         Source: AudioRatingSource.LastFm,
                                         VoteCount: 1234
                                     )
-                                ]
+                                ],
+                                TrackNumber: 1,
+                                DiscNumber: 1,
+                                CreatedOnUtc: new DateTime(2025, 1, 15, 10, 30, 0, DateTimeKind.Utc),
+                                UpdatedOnUtc: new DateTime(2025, 1, 20, 14, 45, 0, DateTimeKind.Utc)
                             ),
                             new TrackResponse(
                                 Id: Guid.NewGuid(),
                                 AlbumId: albumId,
                                 LibraryId: libraryId,
                                 Path: "/music/queen/a-night-at-the-opera/07-youre-my-best-friend.flac",
-                                Metadata: new AudioMetadataDto(
+                                Metadata: new MusicTrackMetadataDto(
                                     Title: "You're My Best Friend",
                                     OriginalTitle: "You're My Best Friend",
                                     Description: "A song by the British rock band Queen, written by bass guitarist John Deacon. It was originally released on the album A Night at the Opera in 1975 and as a single in 1976.",
+                                    Disambiguation: "album version",
                                     ReleaseInfo: new ReleaseInfoDto(
                                         OriginalReleaseDate: new DateOnly(1976, 6, 18),
                                         OriginalReleaseYear: 1976,
-                                        ReReleaseDate: default,
-                                        ReReleaseYear: default,
+                                        ReReleaseDate: new DateOnly(2011, 11, 21),
+                                        ReReleaseYear: 2011,
                                         ReleaseCountry: ReleaseCountry.GB,
                                         ReleaseVersion: "Original"
                                     ),
@@ -687,6 +757,7 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                                         new GenreDto(Name: "Rock"),
                                         new GenreDto(Name: "Pop Rock")
                                     ],
+                                    IsVideo: false,
                                     DurationInSeconds: 181,
                                     SampleRate: 44100,
                                     Channels: 2,
@@ -694,26 +765,27 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                                     AudioCodec: "FLAC",
                                     Bitrate: 912
                                 ),
-                                TrackNumber: 7,
-                                DiscNumber: 1,
                                 Script: "Latn",
                                 Key: MusicKey.BMajor,
                                 Bpm: 118,
-                                Work: "You're My Best Friend",
-                                MusicBrainzRecordingId: Guid.NewGuid(),
-                                MusicBrainzTrackId: Guid.NewGuid(),
-                                MusicBrainzWorkId: Guid.NewGuid(),
-                                CreatedOnUtc: DateTime.UtcNow,
-                                UpdatedOnUtc: DateTime.UtcNow,
+                                Work: new MusicWorkDto(
+                                    MusicBrainzWorkId: Guid.NewGuid(),
+                                    Title: "You're My Best Friend",
+                                    Type: "Song",
+                                    Languages: [new LanguageInfoDto(LanguageCode: "en", LanguageName: "English", NativeName: "English")],
+                                    Iswcs: ["T-010489707-6"]
+                                ),
+                                Isrcs:
+                                [
+                                    new IsrcDto(Value: "GBUM71029609")
+                                ],
                                 Moods:
                                 [
                                     new MoodDto(Name: "happy"),
                                     new MoodDto(Name: "warm")
                                 ],
-                                Isrcs:
-                                [
-                                    new IsrcDto(Value: "GBUM71029609")
-                                ],
+                                MusicBrainzRecordingId: Guid.NewGuid(),
+                                MusicBrainzTrackId: Guid.NewGuid(),
                                 Contributors:
                                 [
                                     new MediaContributorReferenceDto(
@@ -739,13 +811,17 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                                         Source: AudioRatingSource.LastFm,
                                         VoteCount: 567
                                     )
-                                ]
+                                ],
+                                TrackNumber: 7,
+                                DiscNumber: 1,
+                                CreatedOnUtc: new DateTime(2025, 1, 15, 10, 30, 0, DateTimeKind.Utc),
+                                UpdatedOnUtc: new DateTime(2025, 1, 20, 14, 45, 0, DateTimeKind.Utc)
                             )
                         ]
                     )
                 ],
-                CreatedOnUtc: DateTime.UtcNow,
-                UpdatedOnUtc: DateTime.UtcNow
+                CreatedOnUtc: new DateTime(2025, 1, 15, 10, 30, 0, DateTimeKind.Utc),
+                UpdatedOnUtc: new DateTime(2025, 1, 20, 14, 45, 0, DateTimeKind.Utc)
             )
         );
 

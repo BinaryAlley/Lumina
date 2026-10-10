@@ -11,6 +11,7 @@ using Lumina.Application.Common.Infrastructure.Plugins;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Plugins.Queries.GetLibraryMetadataProviders;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
+using Lumina.Application.Fixtures.Common.DTO.Pagination;
 using Lumina.Application.Fixtures.Core.Plugins.Queries.GetLibraryMetadataProviders;
 using Lumina.Contracts.Responses.Plugins;
 using Lumina.Domain.Common.Errors;
@@ -40,8 +41,9 @@ public class GetLibraryMetadataProvidersQueryHandlerTests
     private readonly IValidator<GetLibraryMetadataProvidersQuery> _mockValidator;
     private readonly GetLibraryMetadataProvidersQueryHandler _sut;
     private readonly GetLibraryMetadataProvidersQueryFixture _getLibraryMetadataProvidersQueryFixture = new();
-    private readonly LibraryMetadataProviderConfigurationEntityFixture _configurationEntityFixture = new();
+    private readonly LibraryMetadataProviderConfigurationEntityFixture _libraryMetadataProviderConfigurationEntityFixture = new();
     private readonly PluginEntityFixture _pluginEntityFixture = new();
+    private readonly PaginatedResultDtoFixture<PluginEntity> _paginatedResultDtoFixture = new();
     private readonly Guid _userId;
 
     /// <summary>
@@ -93,8 +95,8 @@ public class GetLibraryMetadataProvidersQueryHandlerTests
         Guid secondPluginId = Guid.NewGuid();
         List<LibraryMetadataProviderConfigurationEntity> configurations =
         [
-            _configurationEntityFixture.Create(query.LibraryId, secondPluginId, 2),
-            _configurationEntityFixture.Create(query.LibraryId, firstPluginId, 1)
+            _libraryMetadataProviderConfigurationEntityFixture.Create(query.LibraryId, secondPluginId, 2),
+            _libraryMetadataProviderConfigurationEntityFixture.Create(query.LibraryId, firstPluginId, 1)
         ];
         _mockProviderConfigurationStore.GetConfigurationsAsync(query.LibraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>(configurations));
@@ -104,7 +106,7 @@ public class GetLibraryMetadataProvidersQueryHandlerTests
             _pluginEntityFixture.Create(secondPluginId)
         ];
         _mockPluginRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<PluginEntity> { Data = plugins, CurrentPage = 1, PerPage = plugins.Count, Count = plugins.Count, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: plugins, currentPage: 1, perPage: plugins.Count, count: plugins.Count, numberOfPages: 1)));
 
         // Act
         Result<IReadOnlyList<LibraryMetadataProviderResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
@@ -127,12 +129,12 @@ public class GetLibraryMetadataProvidersQueryHandlerTests
         Guid unknownPluginId = Guid.NewGuid();
         List<LibraryMetadataProviderConfigurationEntity> configurations =
         [
-            _configurationEntityFixture.Create(query.LibraryId, unknownPluginId, 1)
+            _libraryMetadataProviderConfigurationEntityFixture.Create(query.LibraryId, unknownPluginId, 1)
         ];
         _mockProviderConfigurationStore.GetConfigurationsAsync(query.LibraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>(configurations));
         _mockPluginRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<PluginEntity> { Data = [_pluginEntityFixture.Create()], CurrentPage = 1, PerPage = 1, Count = 1, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: [_pluginEntityFixture.Create()], currentPage: 1, perPage: 1, count: 1, numberOfPages: 1)));
 
         // Act
         Result<IReadOnlyList<LibraryMetadataProviderResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
@@ -152,7 +154,7 @@ public class GetLibraryMetadataProvidersQueryHandlerTests
         _mockProviderConfigurationStore.GetConfigurationsAsync(query.LibraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([]));
         _mockPluginRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<PluginEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 0, count: 0, numberOfPages: 1)));
 
         // Act
         Result<IReadOnlyList<LibraryMetadataProviderResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);

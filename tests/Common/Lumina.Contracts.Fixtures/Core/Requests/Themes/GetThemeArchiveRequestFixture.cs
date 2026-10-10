@@ -20,10 +20,11 @@ public class GetThemeArchiveRequestFixture
     /// Creates a random valid <see cref="GetThemeArchiveRequest"/>.
     /// </summary>
     /// <param name="themeId">Optional. The manifest id of the theme.</param>
+    /// <param name="includeThemeId">Whether the theme Id should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="GetThemeArchiveRequest"/>.</returns>
-    public GetThemeArchiveRequest Create(string? themeId = null)
+    public GetThemeArchiveRequest Create(string? themeId = null, bool includeThemeId = true)
     {
-        return new GetThemeArchiveRequest(themeId ?? _faker.Lorem.Slug(2));
+        return new GetThemeArchiveRequest(includeThemeId ? (themeId ?? _faker.Lorem.Slug(2)) : null);
     }
 
     /// <summary>

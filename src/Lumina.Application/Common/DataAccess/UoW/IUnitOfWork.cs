@@ -61,6 +61,16 @@ public interface IUnitOfWork
     ITrackRepository TrackRepository { get; }
 
     /// <summary>
+    /// Gets the repository for the artwork of the music library items.
+    /// </summary>
+    IMusicArtworkRepository MusicArtworkRepository { get; }
+
+    /// <summary>
+    /// Gets the repository for the music metadata staged during a media library scan.
+    /// </summary>
+    IMusicLibraryScanItemMetadataRepository MusicLibraryScanItemMetadataRepository { get; }
+
+    /// <summary>
     /// Gets the media contributor repository.
     /// </summary>
     IMediaContributorRepository MediaContributorRepository { get; }

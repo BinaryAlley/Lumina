@@ -4,6 +4,7 @@ using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaContributors;
 using Lumina.DataAccess.Core.Repositories.MediaContributors;
 using Lumina.DataAccess.Core.UoW;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -92,6 +93,42 @@ public class MediaContributorRepositoryTests
     }
 
     [Fact]
+    public async Task FindOrCreateByDisplayNameAsync_WhenExistingNameStartsWithNonAsciiUppercase_ShouldReturnTheExistingContributor()
+    {
+        // Arrange
+        // The storage medium folds only ASCII case, so a name starting with a non-ASCII uppercase letter would previously not be found by the lookup
+        // and would be inserted again, violating the unique index on the display name.
+        MediaContributorEntity existingContributor = _mediaContributorEntityFixture.Create(displayName: "Лев Ошанин");
+        _mockContext.MediaContributors.Add(existingContributor);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<MediaContributorEntity> result = await _sut.FindOrCreateByDisplayNameAsync("Лев Ошанин", null, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(existingContributor.Id, result.Value.Id);
+        Assert.Single(_mockContext.ChangeTracker.Entries<MediaContributorEntity>());
+    }
+
+    [Fact]
+    public async Task FindOrCreateByDisplayNameAsync_WhenContributorWasAddedButNotSaved_ShouldReturnTheTrackedContributor()
+    {
+        // Arrange
+        Result<MediaContributorEntity> firstResult = await _sut.FindOrCreateByDisplayNameAsync("Bob Ludwig", null, CancellationToken.None);
+        Assert.False(firstResult.IsFailure);
+
+        // Act
+        Result<MediaContributorEntity> secondResult = await _sut.FindOrCreateByDisplayNameAsync("BOB LUDWIG", null, CancellationToken.None);
+
+        // Assert
+        Assert.False(secondResult.IsFailure);
+        // The contributor added earlier in the same unit of work is tracked, so it is returned instead of a duplicate being added.
+        Assert.Equal(firstResult.Value.Id, secondResult.Value.Id);
+        Assert.Single(_mockContext.ChangeTracker.Entries<MediaContributorEntity>(), entityEntry => entityEntry.State == EntityState.Added);
+    }
+
+    [Fact]
     public async Task GetByIdsAsync_WhenCalled_ShouldReturnOnlyTheContributorsWithTheProvidedIds()
     {
         // Arrange
@@ -127,5 +164,22 @@ public class MediaContributorRepositoryTests
         EntityEntry<MediaContributorEntity>? addedContributor = _mockContext.ChangeTracker.Entries<MediaContributorEntity>()
             .FirstOrDefault(entityEntry => entityEntry.State == EntityState.Added && entityEntry.Entity.Id == contributor.Id);
         Assert.NotNull(addedContributor);
+    }
+
+    [Fact]
+    public async Task InsertAsync_WhenContributorWithSameIdAlreadyExists_ShouldReturnError()
+    {
+        // Arrange
+        MediaContributorEntity existingContributor = _mediaContributorEntityFixture.Create();
+        _mockContext.MediaContributors.Add(existingContributor);
+        await _mockContext.SaveChangesAsync();
+        MediaContributorEntity contributor = _mediaContributorEntityFixture.Create(id: existingContributor.Id);
+
+        // Act
+        Result<Created> result = await _sut.InsertAsync(contributor, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.MediaContributor.MediaContributorAlreadyExists, result.FirstError);
     }
 }

@@ -61,7 +61,7 @@ public class IsbnEntityMappingTests
     public void ToResponse_WhenMappingInvalidIsbnEntity_ShouldPreserveValues(string? value, IsbnFormat? format)
     {
         // Arrange
-        IsbnEntity entity = _isbnEntityFixture.Create(value: value, format: format, includeValue: value is not null);
+        IsbnEntity entity = _isbnEntityFixture.Create(value: value, format: format, includeValue: value is not null, includeFormat: false);
 
         // Act
         IsbnDto result = entity.ToResponse();
@@ -72,13 +72,13 @@ public class IsbnEntityMappingTests
     }
 
     [Fact]
-    public void ToDomainEntity_WhenMappingValidIsbnEntity_ShouldMapCorrectly()
+    public void ToDomainValueObject_WhenMappingValidIsbnEntity_ShouldMapCorrectly()
     {
         // Arrange
         IsbnEntity entity = _isbnEntityFixture.Create(value: "0-7475-3269-9", format: IsbnFormat.Isbn10);
 
         // Act
-        Result<Isbn> result = entity.ToDomainEntity();
+        Result<Isbn> result = entity.ToDomainValueObject();
 
         // Assert
         Assert.False(result.IsFailure);
@@ -91,20 +91,20 @@ public class IsbnEntityMappingTests
     [InlineData("")]
     [InlineData(" ")]
     [InlineData(null)]
-    public void ToDomainEntity_WhenMappingInvalidIsbnEntity_ShouldReturnError(string? invalidValue)
+    public void ToDomainValueObject_WhenMappingInvalidIsbnEntity_ShouldReturnError(string? invalidValue)
     {
         // Arrange
         IsbnEntity entity = _isbnEntityFixture.Create(value: invalidValue, includeValue: invalidValue is not null);
 
         // Act
-        Result<Isbn> result = entity.ToDomainEntity();
+        Result<Isbn> result = entity.ToDomainValueObject();
 
         // Assert
         Assert.True(result.IsFailure);
     }
 
     [Fact]
-    public void ToDomainEntities_WhenMappingMultipleValidIsbnEntities_ShouldMapAllCorrectly()
+    public void ToDomainValueObjects_WhenMappingMultipleValidIsbnEntities_ShouldMapAllCorrectly()
     {
         // Arrange
         List<IsbnEntity> entities =
@@ -114,7 +114,7 @@ public class IsbnEntityMappingTests
         ];
 
         // Act
-        IEnumerable<Result<Isbn>> results = entities.ToDomainEntities();
+        IEnumerable<Result<Isbn>> results = entities.ToDomainValueObjects();
 
         // Assert
         Assert.NotNull(results);

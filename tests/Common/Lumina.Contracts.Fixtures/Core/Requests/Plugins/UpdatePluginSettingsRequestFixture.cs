@@ -22,17 +22,21 @@ public class UpdatePluginSettingsRequestFixture
     /// </summary>
     /// <param name="pluginId">Optional. The Id of the plugin whose settings are updated.</param>
     /// <param name="settings">Optional. The settings to apply to the plugin.</param>
+    /// <param name="includeSettings">Whether the settings should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="UpdatePluginSettingsRequest"/>.</returns>
     public UpdatePluginSettingsRequest Create(
         Guid? pluginId = null,
-        IReadOnlyDictionary<string, string>? settings = null)
+        IReadOnlyDictionary<string, string>? settings = null,
+        bool includeSettings = true)
     {
         return new UpdatePluginSettingsRequest(
             pluginId ?? _faker.Random.Guid(),
-            settings ?? new Dictionary<string, string>
-            {
-                [_faker.Lorem.Word()] = _faker.Lorem.Word()
-            }
+            includeSettings
+                ? settings ?? new Dictionary<string, string>
+                {
+                    [_faker.Lorem.Word()] = _faker.Lorem.Word()
+                }
+                : null
         );
     }
 

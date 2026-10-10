@@ -57,4 +57,16 @@
   <data name="DescriptionShouldPreserveBookStyles" xml:space="preserve">
     <value>Визначає, чи зберігається оригінальне оформлення вмісту книги під час її читання. Увімкнення зберігає вигляд книги (шрифти, кольори, вирівнювання), але стилі книг можуть завантажувати ресурси із зовнішніх серверів, і ті сервери можуть це спостерігати. Вимкніть, щоб прибрати стилі.</value>
   </data>
+  <data name="ShouldAggregateMetadataWhenMissing" xml:space="preserve">
+    <value>Об'єднувати відсутні метадані</value>
+  </data>
+  <data name="DescriptionShouldAggregateMetadataWhenMissing" xml:space="preserve">
+    <value>Коли ввімкнено, метадані елементів бібліотеки, які не надає перший постачальник метаданих, доповнюються з наступних постачальників.</value>
+  </data>
+  <data name="ShouldAggregateArtworkWhenMissing" xml:space="preserve">
+    <value>Об'єднувати ілюстрації за відсутності</value>
+  </data>
+  <data name="DescriptionShouldAggregateArtworkWhenMissing" xml:space="preserve">
+    <value>Коли ввімкнено, ілюстрації елементів бібліотеки, які не надає перший постачальник ілюстрацій, доповнюються від наступних постачальників.</value>
+  </data>
 </root>

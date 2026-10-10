@@ -47,7 +47,7 @@ public static class AudioRatingEntityMapping
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully converted <see cref="AudioRating"/>, or an error message.
     /// </returns>
-    public static Result<AudioRating> ToDomainEntity(this AudioRatingEntity repositoryEntity)
+    public static Result<AudioRating> ToDomainValueObject(this AudioRatingEntity repositoryEntity)
     {
         return AudioRating.Create(
             repositoryEntity.Value ?? default,
@@ -64,8 +64,8 @@ public static class AudioRatingEntityMapping
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a collection of converted <see cref="AudioRating"/>, or an error message.
     /// </returns>
-    public static IEnumerable<Result<AudioRating>> ToDomainEntities(this IEnumerable<AudioRatingEntity> repositoryEntities)
+    public static IEnumerable<Result<AudioRating>> ToDomainValueObjects(this IEnumerable<AudioRatingEntity> repositoryEntities)
     {
-        return repositoryEntities.Select(repositoryEntity => repositoryEntity.ToDomainEntity());
+        return repositoryEntities.Select(repositoryEntity => repositoryEntity.ToDomainValueObject());
     }
 }

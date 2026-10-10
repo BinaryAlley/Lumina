@@ -18,11 +18,12 @@ public class GetAuthorizationRequestFixture
     /// Creates a <see cref="GetAuthorizationRequest"/> with default or specified values.
     /// </summary>
     /// <param name="userId">Optional. The user Id to use.</param>
+    /// <param name="includeUserId">Whether the user Id should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="GetAuthorizationRequest"/>.</returns>
-    public GetAuthorizationRequest Create(Guid? userId = null)
+    public GetAuthorizationRequest Create(Guid? userId = null, bool includeUserId = true)
     {
         return new GetAuthorizationRequest(
-            UserId: userId ?? Guid.NewGuid()
+            UserId: includeUserId ? (userId ?? Guid.NewGuid()) : null
         );
     }
 

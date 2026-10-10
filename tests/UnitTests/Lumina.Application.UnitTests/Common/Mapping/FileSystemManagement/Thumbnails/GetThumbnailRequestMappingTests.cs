@@ -40,7 +40,7 @@ public class GetThumbnailRequestMappingTests
     public void ToQuery_WhenMappingWithDifferentPathsAndQualities_ShouldMapCorrectly(string path, int quality)
     {
         // Arrange
-        GetThumbnailRequest request = new(path, quality);
+        GetThumbnailRequest request = _getThumbnailRequestFixture.Create(path, quality);
 
         // Act
         GetThumbnailQuery result = request.ToQuery();

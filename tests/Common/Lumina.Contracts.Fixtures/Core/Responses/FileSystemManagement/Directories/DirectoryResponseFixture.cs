@@ -16,7 +16,7 @@ namespace Lumina.Contracts.Fixtures.Core.Responses.FileSystemManagement.Director
 public class DirectoryResponseFixture
 {
     private readonly Faker _faker = new();
-    private readonly FileSystemItemDtoFixture _fileSystemItemModelFixture = new();
+    private readonly FileSystemItemDtoFixture _fileSystemItemDtoFixture = new();
 
     /// <summary>
     /// Creates a random valid <see cref="DirectoryResponse"/>.
@@ -30,7 +30,7 @@ public class DirectoryResponseFixture
             _faker.System.FileName(),
             _faker.Date.Past(),
             _faker.Date.Recent(),
-            _fileSystemItemModelFixture.CreateMany(itemCount)
+            _fileSystemItemDtoFixture.CreateMany(itemCount)
         );
     }
 

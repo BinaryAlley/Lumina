@@ -14,6 +14,7 @@ using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using NSubstitute;
@@ -500,6 +501,32 @@ public class AlbumRepositoryTests
     }
 
     [Fact]
+    public async Task UpdateAsync_WhenCatalogNumbersChange_ShouldAddTheNewAndRemoveTheMissingOnes()
+    {
+        // Arrange
+        AlbumEntity storedAlbum = _albumEntityFixture.Create(includeTracks: false, includeMetadata: false, catalogNumbers: ["EMC 3006", "OC 062 o 94519"]);
+        _mockContext.Albums.Add(storedAlbum);
+        await _mockContext.SaveChangesAsync();
+
+        AlbumEntity data = _albumEntityFixture.Create(id: storedAlbum.Id, includeTracks: false, includeMetadata: false, catalogNumbers: ["EMC 3006", "EMTC 104"]);
+
+        // Act
+        Result<Updated> result = await _sut.UpdateAsync(data, CancellationToken.None);
+        await _mockContext.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        AlbumEntity? retrievedAlbum = await _mockContext.Albums
+            .Include(album => album.CatalogNumbers)
+            .FirstOrDefaultAsync(album => album.Id == storedAlbum.Id);
+        Assert.NotNull(retrievedAlbum);
+        Assert.Equal(2, retrievedAlbum!.CatalogNumbers.Count);
+        Assert.Contains(retrievedAlbum.CatalogNumbers, catalogNumber => catalogNumber.CatalogNumber == "EMC 3006");
+        Assert.Contains(retrievedAlbum.CatalogNumbers, catalogNumber => catalogNumber.CatalogNumber == "EMTC 104");
+        Assert.DoesNotContain(retrievedAlbum.CatalogNumbers, catalogNumber => catalogNumber.CatalogNumber == "OC 062 o 94519");
+    }
+
+    [Fact]
     public async Task GetByIdAsync_WhenAlbumExists_ShouldReturnTheAlbum()
     {
         // Arrange
@@ -712,6 +739,26 @@ public class AlbumRepositoryTests
         Assert.Equal(album.Id, row.Id);
         Assert.Equal("A Night at the Opera", row.Title);
         Assert.Equal(12, row.TotalTracks);
+    }
+
+    [Fact]
+    public async Task GetAlbumsNeedingMetadataCountAsync_WhenAlbumsHaveMixedMetadataStatuses_ShouldCountOnlyTheNotEnrichedOnesOfTheLibrary()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        AlbumEntity pendingAlbum = _albumEntityFixture.Create(libraryId: libraryId, includeTracks: false, includeMetadata: false, metadataStatus: MetadataStatus.Pending);
+        AlbumEntity failedAlbum = _albumEntityFixture.Create(libraryId: libraryId, includeTracks: false, includeMetadata: false, metadataStatus: MetadataStatus.Failed);
+        AlbumEntity enrichedAlbum = _albumEntityFixture.Create(libraryId: libraryId, includeTracks: false, includeMetadata: false, metadataStatus: MetadataStatus.Enriched);
+        AlbumEntity albumOfAnotherLibrary = _albumEntityFixture.Create(includeTracks: false, includeMetadata: false, metadataStatus: MetadataStatus.Pending);
+        _mockContext.Albums.AddRange(pendingAlbum, failedAlbum, enrichedAlbum, albumOfAnotherLibrary);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<int> result = await _sut.GetAlbumsNeedingMetadataCountAsync(libraryId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(2, result.Value);
     }
 
     /// <summary>

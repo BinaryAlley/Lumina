@@ -5,7 +5,6 @@
         <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <BaseOutputPath>$(SolutionDir)..\bin\api\</BaseOutputPath>
-
         <IsPackable>false</IsPackable>
         <IsTestProject>false</IsTestProject>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
@@ -20,5 +19,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\src\Lumina.Infrastructure\Lumina.Infrastructure.csproj" />
+        <ProjectReference Include="..\Lumina.Application.Fixtures\Lumina.Application.Fixtures.csproj" />
     </ItemGroup>
 </Project>

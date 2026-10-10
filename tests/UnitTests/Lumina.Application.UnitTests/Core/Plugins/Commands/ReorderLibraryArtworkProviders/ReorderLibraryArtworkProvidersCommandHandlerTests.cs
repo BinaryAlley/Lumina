@@ -34,7 +34,7 @@ public class ReorderLibraryArtworkProvidersCommandHandlerTests
     private readonly ICurrentUserService _mockCurrentUserService;
     private readonly IValidator<ReorderLibraryArtworkProvidersCommand> _mockValidator;
     private readonly ReorderLibraryArtworkProvidersCommandHandler _sut;
-    private readonly LibraryArtworkProviderConfigurationEntityFixture _configurationEntityFixture = new();
+    private readonly LibraryArtworkProviderConfigurationEntityFixture _libraryArtworkProviderConfigurationEntityFixture = new();
     private readonly ReorderLibraryArtworkProvidersCommandFixture _reorderLibraryArtworkProvidersCommandFixture = new();
     private readonly Guid _userId;
 
@@ -66,8 +66,8 @@ public class ReorderLibraryArtworkProvidersCommandHandlerTests
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
-        LibraryArtworkProviderConfigurationEntity firstProvider = _configurationEntityFixture.Create(libraryId, Guid.NewGuid(), 2);
-        LibraryArtworkProviderConfigurationEntity secondProvider = _configurationEntityFixture.Create(libraryId, Guid.NewGuid(), 1);
+        LibraryArtworkProviderConfigurationEntity firstProvider = _libraryArtworkProviderConfigurationEntityFixture.Create(libraryId, Guid.NewGuid(), 2);
+        LibraryArtworkProviderConfigurationEntity secondProvider = _libraryArtworkProviderConfigurationEntityFixture.Create(libraryId, Guid.NewGuid(), 1);
         _mockConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
             .Returns(new List<LibraryArtworkProviderConfigurationEntity> { firstProvider, secondProvider });
         _mockConfigurationRepository.UpsertAsync(Arg.Any<LibraryArtworkProviderConfigurationEntity>(), Arg.Any<CancellationToken>())
@@ -92,7 +92,7 @@ public class ReorderLibraryArtworkProvidersCommandHandlerTests
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
-        LibraryArtworkProviderConfigurationEntity configuration = _configurationEntityFixture.Create(libraryId, Guid.NewGuid(), 1);
+        LibraryArtworkProviderConfigurationEntity configuration = _libraryArtworkProviderConfigurationEntityFixture.Create(libraryId, Guid.NewGuid(), 1);
         Guid unknownPluginId = Guid.NewGuid();
         _mockConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
             .Returns(new List<LibraryArtworkProviderConfigurationEntity> { configuration });

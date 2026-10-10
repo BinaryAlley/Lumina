@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.DTO.MediaLibrary.Management;
 using Lumina.Application.Core.MediaLibrary.Management.Commands.UpdateLibrary;
 using Lumina.Contracts.Requests.MediaLibrary.Management;
+using System.Linq;
 #endregion
 
 namespace Lumina.Application.Common.Mapping.MediaLibrary.Management;
@@ -28,7 +30,8 @@ public static class UpdateLibraryRequestMapping
             request.IsLocked,
             request.CanDownloadMetadataFromWeb,
             request.ShouldSaveMetadataInMediaDirectories,
-            request.ShouldSkipUnchangedDirectoriesDuringScan
+            request.ShouldSkipUnchangedDirectoriesDuringScan,
+            request.PathTemplateParts?.Select(part => new LibraryPathTemplatePartDto(part.Kind, part.Representation, part.IsOptional)).ToArray()
         );
     }
 }

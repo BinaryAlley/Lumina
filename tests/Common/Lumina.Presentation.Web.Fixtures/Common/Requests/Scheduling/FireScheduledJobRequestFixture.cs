@@ -9,7 +9,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.Requests.Scheduling;
 
 /// <summary>
-/// Fixture class for generating <see cref="FireScheduledJobRequest"/> test data.
+/// Fixture class for the <see cref="FireScheduledJobRequest"/> record.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class FireScheduledJobRequestFixture

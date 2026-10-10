@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.Plugins;
 using Lumina.Application.Core.Plugins.Queries.GetPluginSettings;
+using Lumina.Contracts.Fixtures.Core.Requests.Plugins;
 using Lumina.Contracts.Requests.Plugins;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -14,11 +15,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Plugins;
 [ExcludeFromCodeCoverage]
 public class GetPluginSettingsRequestMappingTests
 {
+    private readonly GetPluginSettingsRequestFixture _getPluginSettingsRequestFixture = new();
+
     [Fact]
     public void ToQuery_WhenMappingValidRequest_ShouldMapCorrectly()
     {
         // Arrange
-        GetPluginSettingsRequest request = new(PluginId: Guid.NewGuid());
+        GetPluginSettingsRequest request = _getPluginSettingsRequestFixture.Create(Guid.NewGuid());
 
         // Act
         GetPluginSettingsQuery result = request.ToQuery();

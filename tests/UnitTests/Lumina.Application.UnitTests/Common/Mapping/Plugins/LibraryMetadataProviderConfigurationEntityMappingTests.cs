@@ -15,7 +15,7 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Plugins;
 [ExcludeFromCodeCoverage]
 public class LibraryMetadataProviderConfigurationEntityMappingTests
 {
-    private readonly LibraryMetadataProviderConfigurationEntityFixture _configurationEntityFixture = new();
+    private readonly LibraryMetadataProviderConfigurationEntityFixture _libraryMetadataProviderConfigurationEntityFixture = new();
 
     [Fact]
     public void ToResponse_WhenMappingValidConfiguration_ShouldMapCorrectly()
@@ -23,7 +23,7 @@ public class LibraryMetadataProviderConfigurationEntityMappingTests
         // Arrange
         Guid libraryId = Guid.NewGuid();
         Guid pluginId = Guid.NewGuid();
-        LibraryMetadataProviderConfigurationEntity configuration = _configurationEntityFixture.Create(libraryId, pluginId, 3);
+        LibraryMetadataProviderConfigurationEntity configuration = _libraryMetadataProviderConfigurationEntityFixture.Create(libraryId, pluginId, 3);
 
         // Act
         LibraryMetadataProviderResponse result = configuration.ToResponse("My Provider");

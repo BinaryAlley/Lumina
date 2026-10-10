@@ -2,6 +2,7 @@
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -41,9 +42,19 @@ public class AlbumEntity : IStorageEntity, IAuditableEntity
     public string? OriginalTitle { get; set; }
 
     /// <summary>
+    /// Gets or sets the title of the specific release (edition) the album files match, if different from the release group title.
+    /// </summary>
+    public string? ReleaseTitle { get; set; }
+
+    /// <summary>
     /// Gets or sets the description of the album, if applicable.
     /// </summary>
     public string? Description { get; set; }
+
+    /// <summary>
+    /// Gets or sets the disambiguation comment of the album, used to distinguish albums with the same title, if applicable.
+    /// </summary>
+    public string? Disambiguation { get; set; }
 
     /// <summary>
     /// Gets or sets the original release date of the album, if applicable.
@@ -106,9 +117,9 @@ public class AlbumEntity : IStorageEntity, IAuditableEntity
     public string? OriginalLanguageNativeName { get; set; }
 
     /// <summary>
-    /// Gets or sets the type of the release, if applicable.
+    /// Gets or sets the script used by the language of the release of the album, if applicable.
     /// </summary>
-    public MusicReleaseType? ReleaseType { get; set; }
+    public string? Script { get; set; }
 
     /// <summary>
     /// Gets or sets the status of the release, if applicable.
@@ -131,14 +142,29 @@ public class AlbumEntity : IStorageEntity, IAuditableEntity
     public MusicMediaFormat? MediaFormat { get; set; }
 
     /// <summary>
+    /// Gets or sets the outermost physical packaging of the album, if applicable.
+    /// </summary>
+    public MusicReleasePackaging? Packaging { get; set; }
+
+    /// <summary>
     /// Gets or sets the barcode of the album, if applicable.
     /// </summary>
     public string? Barcode { get; set; }
 
     /// <summary>
-    /// Gets or sets the catalog number of the album, if applicable.
+    /// Gets or sets the catalog numbers of the album.
     /// </summary>
-    public string? CatalogNumber { get; set; }
+    public List<AlbumCatalogNumberEntity> CatalogNumbers { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the name of the label that issued the album, if applicable.
+    /// </summary>
+    public string? Label { get; set; }
+
+    /// <summary>
+    /// Gets or sets the ASIN (Amazon Standard Identification Number) of the album, if applicable.
+    /// </summary>
+    public string? ASIN { get; set; }
 
     /// <summary>
     /// Gets or sets the MusicBrainz identifier of the release, if applicable.
@@ -176,6 +202,11 @@ public class AlbumEntity : IStorageEntity, IAuditableEntity
     public List<AlbumContributorEntity> Contributors { get; set; } = [];
 
     /// <summary>
+    /// Gets or sets the types of the release. A release can carry more than one type at the same time.
+    /// </summary>
+    public List<AlbumReleaseTypeEntity> ReleaseTypes { get; set; } = [];
+
+    /// <summary>
     /// Gets or sets the genres of the album.
     /// </summary>
     public HashSet<GenreEntity> Genres { get; set; } = [];
@@ -184,6 +215,21 @@ public class AlbumEntity : IStorageEntity, IAuditableEntity
     /// Gets or sets the tags of the album.
     /// </summary>
     public HashSet<TagEntity> Tags { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the status of the metadata enrichment of the album.
+    /// </summary>
+    public MetadataStatus MetadataStatus { get; set; }
+
+    /// <summary>
+    /// Gets or sets the date and time when the metadata of the album was last enriched.
+    /// </summary>
+    public DateTime? LastMetadataUpdateUtc { get; set; }
+
+    /// <summary>
+    /// Gets or sets the name of the plugin that enriched the metadata of the album.
+    /// </summary>
+    public string? MetadataProvider { get; set; }
 
     /// <summary>
     /// Gets or sets the time and date when the entity was added.

@@ -7,6 +7,7 @@ using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Core.Scheduling.Events;
 using Lumina.Application.Core.Scheduling.Notifications;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Scheduling;
+using Lumina.Application.Fixtures.Common.DTO.Pagination;
 using Lumina.Contracts.Responses.Scheduling;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Exceptions;
@@ -39,6 +40,7 @@ public class ScheduledJobExecutionStartedDomainEventHandlerTests
     private readonly ScheduledJobEntityFixture _scheduledJobEntityFixture = new();
     private readonly ScheduledJobExecutionEntityFixture _scheduledJobExecutionEntityFixture = new();
     private readonly ScheduledJobExecutionStartedDomainEventFixture _scheduledJobExecutionStartedDomainEventFixture = new();
+    private readonly PaginatedResultDtoFixture<ScheduledJobEntity> _paginatedResultDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ScheduledJobExecutionStartedDomainEventHandlerTests"/> class.
@@ -55,7 +57,7 @@ public class ScheduledJobExecutionStartedDomainEventHandlerTests
         _mockUnitOfWork.ScheduledJobExecutionRepository.Returns(_mockScheduledJobExecutionRepository);
         _mockScheduledJobRepository.UpdateAsync(Arg.Any<ScheduledJobEntity>(), Arg.Any<CancellationToken>()).Returns(Result.Updated);
         _mockScheduledJobExecutionRepository.InsertAsync(Arg.Any<ScheduledJobExecutionEntity>(), Arg.Any<CancellationToken>()).Returns(Result.Created);
-        _mockScheduledJobRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<ScheduledJobEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
+        _mockScheduledJobRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(_paginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 0, count: 0, numberOfPages: 1)));
 
         _sut = new ScheduledJobExecutionStartedDomainEventHandler(_mockScheduledJobNotifier, _mockUnitOfWork);
     }

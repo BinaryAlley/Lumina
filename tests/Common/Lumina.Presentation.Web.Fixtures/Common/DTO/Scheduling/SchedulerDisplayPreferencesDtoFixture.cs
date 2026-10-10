@@ -11,7 +11,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.DTO.Scheduling;
 
 /// <summary>
-/// Fixture class for generating <see cref="SchedulerDisplayPreferencesDto"/> test data.
+/// Fixture class for the <see cref="SchedulerDisplayPreferencesDto"/> record.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class SchedulerDisplayPreferencesDtoFixture

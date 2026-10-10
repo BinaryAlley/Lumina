@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Core.FileSystemManagement.Thumbnails.Queries.GetThumbnail;
+using Lumina.Application.Fixtures.Core.FileSystemManagement.Thumbnails.Queries.GetThumbnail;
 using Lumina.Application.UnitTests.Common.Setup;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
@@ -16,12 +17,13 @@ namespace Lumina.Application.UnitTests.Core.FileSystemManagement.Thumbnails.Quer
 public class GetThumbnailQueryValidatorTests
 {
     private readonly GetThumbnailQueryValidator _validator = new();
+    private readonly GetThumbnailQueryFixture _getThumbnailQueryFixture = new();
 
     [Fact]
     public void Validate_WhenPathIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        GetThumbnailQuery query = new(null!, 1);
+        GetThumbnailQuery query = _getThumbnailQueryFixture.Create(includePath: false, quality: 1);
 
         // Act
         List<Error> result = _validator.TestValidate(query);
@@ -34,7 +36,7 @@ public class GetThumbnailQueryValidatorTests
     public void Validate_WhenPathIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        GetThumbnailQuery query = new(string.Empty, 1);
+        GetThumbnailQuery query = _getThumbnailQueryFixture.Create(string.Empty, 1);
 
         // Act
         List<Error> result = _validator.TestValidate(query);
@@ -47,7 +49,7 @@ public class GetThumbnailQueryValidatorTests
     public void Validate_WhenPathIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        GetThumbnailQuery query = new("test", 1);
+        GetThumbnailQuery query = _getThumbnailQueryFixture.Create("test", 1);
 
         // Act
         List<Error> result = _validator.TestValidate(query);
@@ -60,7 +62,7 @@ public class GetThumbnailQueryValidatorTests
     public void Validate_WhenQualityIsNegative_ShouldHaveValidationError()
     {
         // Arrange
-        GetThumbnailQuery query = new("test", -1);
+        GetThumbnailQuery query = _getThumbnailQueryFixture.Create("test", -1);
 
         // Act
         List<Error> result = _validator.TestValidate(query);
@@ -73,7 +75,7 @@ public class GetThumbnailQueryValidatorTests
     public void Validate_WhenQualityIsOver100_ShouldHaveValidationError()
     {
         // Arrange
-        GetThumbnailQuery query = new("test", 101);
+        GetThumbnailQuery query = _getThumbnailQueryFixture.Create("test", 101);
 
         // Act
         List<Error> result = _validator.TestValidate(query);
@@ -86,7 +88,7 @@ public class GetThumbnailQueryValidatorTests
     public void Validate_WhenQualityIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        GetThumbnailQuery query = new("test", 1);
+        GetThumbnailQuery query = _getThumbnailQueryFixture.Create("test", 1);
 
         // Act
         List<Error> result = _validator.TestValidate(query);

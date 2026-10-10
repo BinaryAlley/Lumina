@@ -6,6 +6,8 @@ using Lumina.Application.Fixtures.Common.DataAccess.Entities.Common;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary;
+using Lumina.Contracts.Fixtures.Core.DTO.MediaContributors;
+using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
@@ -29,6 +31,9 @@ public class AlbumEntityMappingTests
     private readonly GenreEntityFixture _genreEntityFixture = new();
     private readonly TagEntityFixture _tagEntityFixture = new();
     private readonly AudioRatingEntityFixture _audioRatingEntityFixture = new();
+    private readonly TrackIsrcEntityFixture _trackIsrcEntityFixture = new();
+    private readonly MediaContributorReferenceDtoFixture _mediaContributorReferenceDtoFixture = new();
+    private readonly AudioRatingDtoFixture _audioRatingDtoFixture = new();
 
     [Fact]
     public void ToDomainEntity_WhenMappingValidAlbumEntity_ShouldMapAllPropertiesCorrectly()
@@ -64,13 +69,13 @@ public class AlbumEntityMappingTests
         Assert.Equal(entity.OriginalLanguageCode!.ToLowerInvariant(), album.Metadata.OriginalLanguage.Value.LanguageCode);
         Assert.Equal(entity.OriginalLanguageName, album.Metadata.OriginalLanguage.Value.LanguageName);
         Assert.Equal(entity.OriginalLanguageNativeName, album.Metadata.OriginalLanguage.Value.NativeName.Value);
-        Assert.Equal(entity.ReleaseType, album.Metadata.ReleaseType.Value);
+        Assert.Equal(entity.ReleaseTypes.Select(releaseType => releaseType.ReleaseType), album.Metadata.ReleaseTypes);
         Assert.Equal(entity.ReleaseStatus, album.Metadata.ReleaseStatus.Value);
         Assert.Equal(entity.TotalDiscs, album.Metadata.TotalDiscs.Value);
         Assert.Equal(entity.TotalTracks, album.Metadata.TotalTracks);
         Assert.Equal(entity.MediaFormat, album.MediaFormat.Value);
         Assert.Equal(entity.Barcode, album.Barcode.Value.Value);
-        Assert.Equal(entity.CatalogNumber, album.CatalogNumber.Value);
+        Assert.Equal(entity.CatalogNumbers.Select(catalogNumber => catalogNumber.CatalogNumber), album.CatalogNumbers);
         Assert.Equal(entity.MusicBrainzReleaseId, album.MusicBrainzReleaseId.Value.Value);
         Assert.Equal(entity.MusicBrainzReleaseGroupId, album.MusicBrainzReleaseGroupId.Value.Value);
         Assert.Equal(entity.MusicBrainzReleaseArtistId, album.MusicBrainzReleaseArtistId.Value.Value);
@@ -102,7 +107,7 @@ public class AlbumEntityMappingTests
             includeReleaseStatus: false,
             includeTotalDiscs: false,
             includeMediaFormat: false,
-            includeCatalogNumber: false,
+            includeCatalogNumbers: false,
             includeMusicBrainzReleaseId: false,
             includeMusicBrainzReleaseGroupId: false,
             includeMusicBrainzReleaseArtistId: false);
@@ -123,12 +128,12 @@ public class AlbumEntityMappingTests
         Assert.Empty(album.Metadata.Tags);
         Assert.False(album.Metadata.Language.HasValue);
         Assert.False(album.Metadata.OriginalLanguage.HasValue);
-        Assert.False(album.Metadata.ReleaseType.HasValue);
+        Assert.Empty(album.Metadata.ReleaseTypes);
         Assert.False(album.Metadata.ReleaseStatus.HasValue);
         Assert.False(album.Metadata.TotalDiscs.HasValue);
         Assert.False(album.MediaFormat.HasValue);
         Assert.False(album.Barcode.HasValue);
-        Assert.False(album.CatalogNumber.HasValue);
+        Assert.Empty(album.CatalogNumbers);
         Assert.False(album.MusicBrainzReleaseId.HasValue);
         Assert.False(album.MusicBrainzReleaseGroupId.HasValue);
         Assert.False(album.MusicBrainzReleaseArtistId.HasValue);
@@ -231,7 +236,7 @@ public class AlbumEntityMappingTests
     {
         // Arrange
         TrackEntity trackEntity = _trackEntityFixture.Create();
-        trackEntity.Isrcs = [new TrackIsrcEntity("not-an-isrc")];
+        trackEntity.Isrcs = [_trackIsrcEntityFixture.Create(value: "not-an-isrc")];
         AlbumEntity entity = _albumEntityFixture.Create(tracks: [trackEntity]);
 
         // Act
@@ -275,20 +280,20 @@ public class AlbumEntityMappingTests
         Assert.Equal(entity.OriginalLanguageNativeName, result.Metadata.OriginalLanguage.NativeName);
         Assert.Equal(entity.Tags.Select(tag => tag.Name).OrderBy(name => name), result.Metadata.Tags!.Select(tag => tag.Name).OrderBy(name => name));
         Assert.Equal(entity.Genres.Select(genre => genre.Name).OrderBy(name => name), result.Metadata.Genres!.Select(genre => genre.Name).OrderBy(name => name));
-        Assert.Equal(entity.ReleaseType, result.Metadata.ReleaseType);
+        Assert.Equal(entity.ReleaseTypes.Select(releaseType => releaseType.ReleaseType), result.Metadata.ReleaseTypes);
         Assert.Equal(entity.ReleaseStatus, result.Metadata.ReleaseStatus);
         Assert.Equal(entity.TotalDiscs, result.Metadata.TotalDiscs);
         Assert.Equal(entity.TotalTracks, result.Metadata.TotalTracks);
         Assert.Equal(entity.MediaFormat, result.MediaFormat);
         Assert.Equal(entity.Barcode, result.Barcode);
-        Assert.Equal(entity.CatalogNumber, result.CatalogNumber);
+        Assert.Equal(entity.CatalogNumbers.Select(catalogNumber => catalogNumber.CatalogNumber), result.CatalogNumbers);
         Assert.Equal(entity.MusicBrainzReleaseId, result.MusicBrainzReleaseId);
         Assert.Equal(entity.MusicBrainzReleaseGroupId, result.MusicBrainzReleaseGroupId);
         Assert.Equal(entity.MusicBrainzReleaseArtistId, result.MusicBrainzReleaseArtistId);
         Assert.Equal(entity.CreatedOnUtc, result.CreatedOnUtc);
         Assert.Equal(entity.UpdatedOnUtc, result.UpdatedOnUtc);
-        Assert.Equal(entity.Contributors.Select(contributor => new MediaContributorReferenceDto(contributor.MediaContributorId, contributor.Role)), result.Contributors);
-        Assert.Equal(entity.Ratings.Select(rating => new AudioRatingDto(rating.Value, rating.MaxValue, rating.Source, rating.VoteCount)), result.Ratings);
+        Assert.Equal(entity.Contributors.Select(contributor => _mediaContributorReferenceDtoFixture.Create(contributorId: contributor.MediaContributorId, role: contributor.Role)), result.Contributors);
+        Assert.Equal(entity.Ratings.Select(rating => _audioRatingDtoFixture.Create(value: rating.Value, maxValue: rating.MaxValue, source: rating.Source, voteCount: rating.VoteCount)), result.Ratings);
         Assert.Equal(entity.Tracks.Select(track => track.Id), result.Tracks!.Select(track => track.Id));
     }
 

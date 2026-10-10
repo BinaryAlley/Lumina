@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
 using Lumina.Contracts.Requests.Authentication;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -11,11 +12,13 @@ namespace Lumina.Contracts.UnitTests.Requests.Authentication;
 [ExcludeFromCodeCoverage]
 public class RegistrationRequestTests
 {
+    private readonly RegistrationRequestFixture _registrationRequestFixture = new();
+
     [Fact]
     public void Constructor_WhenOmittingUse2fa_ShouldDefaultToTrue()
     {
         // Act
-        RegistrationRequest sut = new(Username: "user1", Password: "pass1", PasswordConfirm: "pass1");
+        RegistrationRequest sut = _registrationRequestFixture.Create(username: "user1", password: "pass1", passwordConfirm: "pass1", use2fa: true);
 
         // Assert
         Assert.True(sut.Use2fa);

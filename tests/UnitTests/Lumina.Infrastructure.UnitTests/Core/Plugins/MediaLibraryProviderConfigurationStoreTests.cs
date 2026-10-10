@@ -35,9 +35,9 @@ public class MediaLibraryProviderConfigurationStoreTests
     private readonly ILibraryBookReaderConfigurationRepository _mockBookReaderConfigurationRepository;
     private readonly IPluginManager _mockPluginManager;
     private readonly IBookReaderEnablementCache _mockEnablementCache;
-    private readonly LibraryMetadataProviderConfigurationEntityFixture _metadataConfigurationFixture = new();
-    private readonly LibraryArtworkProviderConfigurationEntityFixture _artworkConfigurationFixture = new();
-    private readonly LibraryBookReaderConfigurationEntityFixture _bookReaderConfigurationFixture = new();
+    private readonly LibraryMetadataProviderConfigurationEntityFixture _libraryMetadataProviderConfigurationEntityFixture = new();
+    private readonly LibraryArtworkProviderConfigurationEntityFixture _libraryArtworkProviderConfigurationEntityFixture = new();
+    private readonly LibraryBookReaderConfigurationEntityFixture _libraryBookReaderConfigurationEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MediaLibraryProviderConfigurationStoreTests"/> class.
@@ -62,7 +62,7 @@ public class MediaLibraryProviderConfigurationStoreTests
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
-        LibraryMetadataProviderConfigurationEntity configuration = _metadataConfigurationFixture.Create(libraryId, Guid.NewGuid(), 1);
+        LibraryMetadataProviderConfigurationEntity configuration = _libraryMetadataProviderConfigurationEntityFixture.Create(libraryId, Guid.NewGuid(), 1);
         _mockMetadataConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([configuration]));
         MediaLibraryProviderConfigurationStore sut = CreateSut();
@@ -122,7 +122,7 @@ public class MediaLibraryProviderConfigurationStoreTests
         IPlugin plugin = CreatePlugin(pluginId, "Plugin");
         _mockPluginManager.GetPlugins().Returns([plugin]);
         MediaLibraryProviderConfigurationStore sut = CreateSut((pluginId, CreateMetadataProvider(LibraryType.Book), null, null));
-        LibraryMetadataProviderConfigurationEntity existingConfiguration = _metadataConfigurationFixture.Create(libraryId, pluginId, 4);
+        LibraryMetadataProviderConfigurationEntity existingConfiguration = _libraryMetadataProviderConfigurationEntityFixture.Create(libraryId, pluginId, 4);
         _mockMetadataConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([existingConfiguration]));
 
@@ -185,7 +185,7 @@ public class MediaLibraryProviderConfigurationStoreTests
         MediaLibraryProviderConfigurationStore sut = CreateSut(
             (alphaPluginId, CreateMetadataProvider(LibraryType.Book), null, null),
             (betaPluginId, CreateMetadataProvider(LibraryType.EBook), null, null));
-        LibraryMetadataProviderConfigurationEntity existingConfiguration = _metadataConfigurationFixture.Create(libraryId, alphaPluginId, 1);
+        LibraryMetadataProviderConfigurationEntity existingConfiguration = _libraryMetadataProviderConfigurationEntityFixture.Create(libraryId, alphaPluginId, 1);
         _mockMetadataConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([existingConfiguration]));
         _mockArtworkConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
@@ -371,7 +371,7 @@ public class MediaLibraryProviderConfigurationStoreTests
         IPlugin plugin = CreatePlugin(pluginId, "Reader Plugin");
         _mockPluginManager.GetPlugins().Returns([plugin]);
         MediaLibraryProviderConfigurationStore sut = CreateSut((pluginId, null, null, CreateBookReader(LibraryType.EBook, ".epub")));
-        LibraryBookReaderConfigurationEntity existingConfiguration = _bookReaderConfigurationFixture.Create(libraryId: libraryId, pluginId: pluginId);
+        LibraryBookReaderConfigurationEntity existingConfiguration = _libraryBookReaderConfigurationEntityFixture.Create(libraryId: libraryId, pluginId: pluginId);
         _mockBookReaderConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryBookReaderConfigurationEntity>>([existingConfiguration]));
 
@@ -473,7 +473,7 @@ public class MediaLibraryProviderConfigurationStoreTests
         MediaLibraryProviderConfigurationStore sut = CreateSut(
             (alphaPluginId, null, null, CreateBookReader(LibraryType.Book, ".pdf")),
             (betaPluginId, null, null, CreateBookReader(LibraryType.EBook, ".epub")));
-        LibraryBookReaderConfigurationEntity existingConfiguration = _bookReaderConfigurationFixture.Create(libraryId: libraryId, pluginId: alphaPluginId);
+        LibraryBookReaderConfigurationEntity existingConfiguration = _libraryBookReaderConfigurationEntityFixture.Create(libraryId: libraryId, pluginId: alphaPluginId);
         _mockBookReaderConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryBookReaderConfigurationEntity>>([existingConfiguration]));
         _mockBookReaderConfigurationRepository.DeleteByLibraryIdAndPluginIdsAsync(libraryId, Arg.Any<IEnumerable<Guid>>(), Arg.Any<CancellationToken>())
@@ -524,7 +524,7 @@ public class MediaLibraryProviderConfigurationStoreTests
         IPlugin plugin = CreatePlugin(pluginId, "Reader Plugin");
         _mockPluginManager.GetPlugins().Returns([plugin]);
         MediaLibraryProviderConfigurationStore sut = CreateSut((pluginId, null, null, CreateBookReader(LibraryType.EBook, ".epub")));
-        LibraryBookReaderConfigurationEntity staleConfiguration = _bookReaderConfigurationFixture.Create(libraryId: libraryId, pluginId: stalePluginId);
+        LibraryBookReaderConfigurationEntity staleConfiguration = _libraryBookReaderConfigurationEntityFixture.Create(libraryId: libraryId, pluginId: stalePluginId);
         _mockBookReaderConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryBookReaderConfigurationEntity>>([staleConfiguration]));
         _mockBookReaderConfigurationRepository.DeleteByLibraryIdAndPluginIdsAsync(libraryId, Arg.Any<IEnumerable<Guid>>(), Arg.Any<CancellationToken>())
@@ -641,7 +641,7 @@ public class MediaLibraryProviderConfigurationStoreTests
         MediaLibraryProviderConfigurationStore sut = CreateSut(
             (alphaPluginId, null, CreateArtworkProvider(LibraryType.Book), null),
             (betaPluginId, null, CreateArtworkProvider(LibraryType.EBook), null));
-        LibraryArtworkProviderConfigurationEntity existingArtworkConfiguration = _artworkConfigurationFixture.Create(libraryId, alphaPluginId, 1);
+        LibraryArtworkProviderConfigurationEntity existingArtworkConfiguration = _libraryArtworkProviderConfigurationEntityFixture.Create(libraryId, alphaPluginId, 1);
         _mockMetadataConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([]));
         _mockArtworkConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
@@ -674,7 +674,7 @@ public class MediaLibraryProviderConfigurationStoreTests
         IPlugin alphaPlugin = CreatePlugin(alphaPluginId, "Alpha");
         _mockPluginManager.GetPlugins().Returns([alphaPlugin]);
         MediaLibraryProviderConfigurationStore sut = CreateSut((alphaPluginId, null, CreateArtworkProvider(LibraryType.Movie), null));
-        LibraryArtworkProviderConfigurationEntity staleArtworkConfiguration = _artworkConfigurationFixture.Create(libraryId, alphaPluginId, 1);
+        LibraryArtworkProviderConfigurationEntity staleArtworkConfiguration = _libraryArtworkProviderConfigurationEntityFixture.Create(libraryId, alphaPluginId, 1);
         _mockMetadataConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([]));
         _mockArtworkConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
@@ -698,7 +698,7 @@ public class MediaLibraryProviderConfigurationStoreTests
         IPlugin plugin = CreatePlugin(pluginId, "Plugin");
         _mockPluginManager.GetPlugins().Returns([plugin]);
         MediaLibraryProviderConfigurationStore sut = CreateSut((pluginId, null, CreateArtworkProvider(LibraryType.Book), null));
-        LibraryArtworkProviderConfigurationEntity existingConfiguration = _artworkConfigurationFixture.Create(libraryId, pluginId, 3);
+        LibraryArtworkProviderConfigurationEntity existingConfiguration = _libraryArtworkProviderConfigurationEntityFixture.Create(libraryId, pluginId, 3);
         _mockMetadataConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([]));
         _mockArtworkConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
@@ -788,7 +788,7 @@ public class MediaLibraryProviderConfigurationStoreTests
         IPlugin plugin = CreatePlugin(pluginId, "Plugin");
         _mockPluginManager.GetPlugins().Returns([plugin]);
         MediaLibraryProviderConfigurationStore sut = CreateSut((pluginId, CreateMetadataProvider(LibraryType.EBook), null, null));
-        LibraryMetadataProviderConfigurationEntity existingConfiguration = _metadataConfigurationFixture.Create(libraryId, pluginId, 1);
+        LibraryMetadataProviderConfigurationEntity existingConfiguration = _libraryMetadataProviderConfigurationEntityFixture.Create(libraryId, pluginId, 1);
         _mockMetadataConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([existingConfiguration]));
         _mockArtworkConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
@@ -814,7 +814,7 @@ public class MediaLibraryProviderConfigurationStoreTests
         IPlugin plugin = CreatePlugin(pluginId, "Plugin");
         _mockPluginManager.GetPlugins().Returns([plugin]);
         MediaLibraryProviderConfigurationStore sut = CreateSut((pluginId, null, CreateArtworkProvider(LibraryType.EBook), null));
-        LibraryArtworkProviderConfigurationEntity existingConfiguration = _artworkConfigurationFixture.Create(libraryId, pluginId, 1);
+        LibraryArtworkProviderConfigurationEntity existingConfiguration = _libraryArtworkProviderConfigurationEntityFixture.Create(libraryId, pluginId, 1);
         _mockMetadataConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([]));
         _mockArtworkConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
@@ -861,7 +861,7 @@ public class MediaLibraryProviderConfigurationStoreTests
         IPlugin plugin = CreatePlugin(pluginId, "Plugin");
         _mockPluginManager.GetPlugins().Returns([plugin]);
         MediaLibraryProviderConfigurationStore sut = CreateSut((pluginId, CreateMetadataProvider(LibraryType.Book), null, null));
-        LibraryMetadataProviderConfigurationEntity staleConfiguration = _metadataConfigurationFixture.Create(libraryId, pluginId, 1);
+        LibraryMetadataProviderConfigurationEntity staleConfiguration = _libraryMetadataProviderConfigurationEntityFixture.Create(libraryId, pluginId, 1);
         _mockMetadataConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([staleConfiguration]));
         _mockMetadataConfigurationRepository.DeleteByLibraryIdAndPluginIdsAsync(libraryId, Arg.Any<IEnumerable<Guid>>(), Arg.Any<CancellationToken>())
@@ -951,7 +951,7 @@ public class MediaLibraryProviderConfigurationStoreTests
         IPlugin plugin = CreatePlugin(pluginId, "Reader Plugin");
         _mockPluginManager.GetPlugins().Returns([plugin]);
         MediaLibraryProviderConfigurationStore sut = CreateSut((pluginId, null, null, CreateBookReader(LibraryType.EBook, ".epub")));
-        LibraryBookReaderConfigurationEntity existingConfiguration = _bookReaderConfigurationFixture.Create(libraryId: libraryId, pluginId: pluginId);
+        LibraryBookReaderConfigurationEntity existingConfiguration = _libraryBookReaderConfigurationEntityFixture.Create(libraryId: libraryId, pluginId: pluginId);
         _mockMetadataConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([]));
         _mockArtworkConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())

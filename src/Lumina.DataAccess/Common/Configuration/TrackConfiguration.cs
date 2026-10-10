@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -46,77 +47,111 @@ public class TrackConfiguration : IEntityTypeConfiguration<TrackEntity>
         builder.Property(track => track.Description)
             .HasMaxLength(2000)
             .HasColumnOrder(6);
-        builder.Property(track => track.OriginalReleaseDate)
+        builder.Property(track => track.Disambiguation)
+            .HasMaxLength(255)
             .HasColumnOrder(7);
-        builder.Property(track => track.OriginalReleaseYear)
+        builder.Property(track => track.OriginalReleaseDate)
             .HasColumnOrder(8);
-        builder.Property(track => track.ReReleaseDate)
+        builder.Property(track => track.OriginalReleaseYear)
             .HasColumnOrder(9);
-        builder.Property(track => track.ReReleaseYear)
+        builder.Property(track => track.ReReleaseDate)
             .HasColumnOrder(10);
+        builder.Property(track => track.ReReleaseYear)
+            .HasColumnOrder(11);
         builder.Property(track => track.ReleaseCountry)
             .HasConversion<string>()
             .HasMaxLength(2)
-            .HasColumnOrder(11);
-        builder.Property(track => track.ReleaseVersion)
             .HasColumnOrder(12);
-        builder.Property(track => track.LanguageCode)
+        builder.Property(track => track.ReleaseVersion)
             .HasColumnOrder(13);
-        builder.Property(track => track.LanguageName)
+        builder.Property(track => track.LanguageCode)
             .HasColumnOrder(14);
-        builder.Property(track => track.LanguageNativeName)
+        builder.Property(track => track.LanguageName)
             .HasColumnOrder(15);
-        builder.Property(track => track.OriginalLanguageCode)
+        builder.Property(track => track.LanguageNativeName)
             .HasColumnOrder(16);
-        builder.Property(track => track.OriginalLanguageName)
+        builder.Property(track => track.OriginalLanguageCode)
             .HasColumnOrder(17);
-        builder.Property(track => track.OriginalLanguageNativeName)
+        builder.Property(track => track.OriginalLanguageName)
             .HasColumnOrder(18);
-        builder.Property(track => track.DurationInSeconds)
+        builder.Property(track => track.OriginalLanguageNativeName)
             .HasColumnOrder(19);
-        builder.Property(track => track.SampleRate)
+        builder.Property(track => track.DurationInSeconds)
             .HasColumnOrder(20);
-        builder.Property(track => track.Channels)
+        builder.Property(track => track.SampleRate)
             .HasColumnOrder(21);
-        builder.Property(track => track.BitDepth)
+        builder.Property(track => track.Channels)
             .HasColumnOrder(22);
+        builder.Property(track => track.BitDepth)
+            .HasColumnOrder(23);
         builder.Property(track => track.AudioCodec)
             .HasMaxLength(50)
-            .HasColumnOrder(23);
-        builder.Property(track => track.Bitrate)
             .HasColumnOrder(24);
-        builder.Property(track => track.TrackNumber)
+        builder.Property(track => track.Bitrate)
             .HasColumnOrder(25);
-        builder.Property(track => track.DiscNumber)
+        builder.Property(track => track.TrackNumber)
             .HasColumnOrder(26);
+        builder.Property(track => track.DiscNumber)
+            .HasColumnOrder(27);
         builder.Property(track => track.Script)
             .HasMaxLength(50)
-            .HasColumnOrder(27);
+            .HasColumnOrder(28);
         builder.Property(track => track.Key)
             .HasConversion<string>()
             .HasMaxLength(50)
-            .HasColumnOrder(28);
-        builder.Property(track => track.Bpm)
             .HasColumnOrder(29);
-        builder.Property(track => track.Work)
-            .HasMaxLength(255)
+        builder.Property(track => track.Bpm)
             .HasColumnOrder(30);
-        builder.Property(track => track.MusicBrainzRecordingId)
+        builder.Property(track => track.IsVideo)
             .HasColumnOrder(31);
-        builder.Property(track => track.MusicBrainzTrackId)
+        builder.Property(track => track.WorkTitle)
+            .HasMaxLength(255)
             .HasColumnOrder(32);
-        builder.Property(track => track.MusicBrainzWorkId)
+        builder.Property(track => track.WorkType)
+            .HasMaxLength(50)
             .HasColumnOrder(33);
+        builder.Property(track => track.MusicBrainzRecordingId)
+            .HasColumnOrder(34);
+        builder.Property(track => track.MusicBrainzTrackId)
+            .HasColumnOrder(35);
+        builder.Property(track => track.MusicBrainzWorkId)
+            .HasColumnOrder(36);
         builder.Property(track => track.CreatedOnUtc)
             .IsRequired()
-            .HasColumnOrder(34);
+            .HasColumnOrder(37);
         builder.Property(track => track.CreatedBy)
             .IsRequired()
-            .HasColumnOrder(35);
+            .HasColumnOrder(38);
         builder.Property(track => track.UpdatedOnUtc)
-            .HasColumnOrder(36);
+            .HasColumnOrder(39);
         builder.Property(track => track.UpdatedBy)
-            .HasColumnOrder(37);
+            .HasColumnOrder(40);
+        builder.Property(track => track.MetadataStatus)
+            .HasConversion<string>()
+            .HasMaxLength(20)
+            .IsRequired()
+            .HasDefaultValue(MetadataStatus.Pending)
+            .HasColumnOrder(41);
+        builder.Property(track => track.LastMetadataUpdateUtc)
+            .HasColumnOrder(42);
+        builder.Property(track => track.MetadataProvider)
+            .HasMaxLength(100)
+            .HasColumnOrder(43);
+        builder.Property(track => track.AcoustId)
+            .HasMaxLength(64)
+            .HasColumnOrder(44);
+        builder.Property(track => track.ReplayGainTrackGain)
+            .HasColumnType("decimal(8,2)")
+            .HasColumnOrder(45);
+        builder.Property(track => track.ReplayGainTrackPeak)
+            .HasColumnType("decimal(8,6)")
+            .HasColumnOrder(46);
+        builder.Property(track => track.ReplayGainAlbumGain)
+            .HasColumnType("decimal(8,2)")
+            .HasColumnOrder(47);
+        builder.Property(track => track.ReplayGainAlbumPeak)
+            .HasColumnType("decimal(8,6)")
+            .HasColumnOrder(48);
 
         builder.HasOne(track => track.Album)
             .WithMany(album => album.Tracks)
@@ -183,6 +218,39 @@ public class TrackConfiguration : IEntityTypeConfiguration<TrackEntity>
             isrcBuilder.Property(isrc => isrc.Value)
                 .HasColumnName("ISRC")
                 .HasMaxLength(12)
+                .IsRequired();
+        });
+
+        builder.OwnsMany(track => track.WorkLanguages, workLanguageBuilder =>
+        {
+            workLanguageBuilder.ToTable("TrackWorkLanguages");
+            workLanguageBuilder.WithOwner()
+                .HasForeignKey("TrackId");
+            workLanguageBuilder.Property<Guid>("Id")
+                .ValueGeneratedOnAdd();
+            workLanguageBuilder.HasKey("Id");
+
+            workLanguageBuilder.Property(workLanguage => workLanguage.LanguageCode)
+                .IsRequired()
+                .HasMaxLength(5);
+            workLanguageBuilder.Property(workLanguage => workLanguage.LanguageName)
+                .IsRequired()
+                .HasMaxLength(100);
+            workLanguageBuilder.Property(workLanguage => workLanguage.NativeName)
+                .HasMaxLength(100);
+        });
+
+        builder.OwnsMany(track => track.WorkIswcs, workIswcBuilder =>
+        {
+            workIswcBuilder.ToTable("TrackWorkIswcs");
+            workIswcBuilder.WithOwner()
+                .HasForeignKey("TrackId");
+            workIswcBuilder.Property<Guid>("Id")
+                .ValueGeneratedOnAdd();
+            workIswcBuilder.HasKey("Id");
+
+            workIswcBuilder.Property(workIswc => workIswc.Value)
+                .HasMaxLength(20)
                 .IsRequired();
         });
 

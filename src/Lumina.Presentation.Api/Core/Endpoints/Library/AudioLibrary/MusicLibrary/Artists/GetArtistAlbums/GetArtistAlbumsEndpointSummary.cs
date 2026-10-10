@@ -35,13 +35,13 @@ public class GetArtistAlbumsEndpointSummary : Summary<GetArtistAlbumsEndpoint, E
         ResponseParam<AlbumResponse>(r => r.Metadata!.Title, "The title of the album.");
         ResponseParam<AlbumResponse>(r => r.Metadata!.OriginalTitle, "The original title of the album, if applicable.");
         ResponseParam<AlbumResponse>(r => r.Metadata!.Description, "The description of the album, if applicable.");
-        ResponseParam<AlbumResponse>(r => r.Metadata!.ReleaseType, "The type of the release, if applicable.");
+        ResponseParam<AlbumResponse>(r => r.Metadata!.ReleaseTypes, "The type of the release, if applicable.");
         ResponseParam<AlbumResponse>(r => r.Metadata!.ReleaseStatus, "The status of the release, if applicable.");
         ResponseParam<AlbumResponse>(r => r.Metadata!.TotalDiscs, "The number of discs of the release, if applicable.");
         ResponseParam<AlbumResponse>(r => r.Metadata!.TotalTracks, "The number of tracks of the release.");
         ResponseParam<AlbumResponse>(r => r.MediaFormat, "The physical or digital medium of the album, if applicable.");
         ResponseParam<AlbumResponse>(r => r.Barcode, "The barcode of the album, if applicable.");
-        ResponseParam<AlbumResponse>(r => r.CatalogNumber, "The catalog number of the album, if applicable.");
+        ResponseParam<AlbumResponse>(r => r.CatalogNumbers, "The catalog numbers of the album, if applicable.");
         ResponseParam<AlbumResponse>(r => r.MusicBrainzReleaseId, "The MusicBrainz identifier of the release, if applicable.");
         ResponseParam<AlbumResponse>(r => r.MusicBrainzReleaseGroupId, "The MusicBrainz identifier of the release group, if applicable.");
         ResponseParam<AlbumResponse>(r => r.MusicBrainzReleaseArtistId, "The MusicBrainz identifier of the release artist, if applicable.");
@@ -72,15 +72,16 @@ public class GetArtistAlbumsEndpointSummary : Summary<GetArtistAlbumsEndpoint, E
                     Id: Guid.NewGuid(),
                     ArtistId: Guid.NewGuid(),
                     LibraryId: Guid.NewGuid(),
-                    Metadata: new AlbumMetadataDto(
+                    Metadata: new MusicAlbumMetadataDto(
                         Title: "A Night at the Opera",
                         OriginalTitle: "A Night at the Opera",
                         Description: "The fourth studio album by the British rock band Queen, released in 1975. It was the most expensive album ever recorded at the time of its release.",
+                        Disambiguation: "original release",
                         ReleaseInfo: new ReleaseInfoDto(
                             OriginalReleaseDate: new DateOnly(1975, 11, 21),
                             OriginalReleaseYear: 1975,
-                            ReReleaseDate: default,
-                            ReReleaseYear: default,
+                            ReReleaseDate: new DateOnly(2011, 11, 21),
+                            ReReleaseYear: 2011,
                             ReleaseCountry: ReleaseCountry.GB,
                             ReleaseVersion: "Remastered"
                         ),
@@ -102,19 +103,21 @@ public class GetArtistAlbumsEndpointSummary : Summary<GetArtistAlbumsEndpoint, E
                             new TagDto(Name: "classic"),
                             new TagDto(Name: "vinyl")
                         ],
-                        ReleaseType: MusicReleaseType.Album,
+                        Script: "Latn",
+                        ReleaseTypes: [MusicReleaseType.Album],
                         ReleaseStatus: MusicReleaseStatus.Official,
                         TotalDiscs: 1,
                         TotalTracks: 12
                     ),
                     MediaFormat: MusicMediaFormat.CD,
+                    Packaging: MusicReleasePackaging.JewelCase,
                     Barcode: "0042282778329",
-                    CatalogNumber: "EMC 4008",
+                    CatalogNumbers: ["EMC 4008"],
+                    Label: "EMI",
+                    ASIN: "B000002UTK",
                     MusicBrainzReleaseId: Guid.NewGuid(),
                     MusicBrainzReleaseGroupId: Guid.NewGuid(),
                     MusicBrainzReleaseArtistId: Guid.NewGuid(),
-                    CreatedOnUtc: DateTime.UtcNow,
-                    UpdatedOnUtc: DateTime.UtcNow,
                     Contributors: [
                         new MediaContributorReferenceDto(
                             ContributorId: Guid.NewGuid(),
@@ -139,21 +142,24 @@ public class GetArtistAlbumsEndpointSummary : Summary<GetArtistAlbumsEndpoint, E
                             VoteCount: 1234
                         )
                     ],
+                    CreatedOnUtc: new DateTime(2025, 1, 15, 10, 30, 0, DateTimeKind.Utc),
+                    UpdatedOnUtc: new DateTime(2025, 1, 20, 14, 45, 0, DateTimeKind.Utc),
                     Tracks: []
                 ),
                 new AlbumResponse(
                     Id: Guid.NewGuid(),
                     ArtistId: Guid.NewGuid(),
                     LibraryId: Guid.NewGuid(),
-                    Metadata: new AlbumMetadataDto(
+                    Metadata: new MusicAlbumMetadataDto(
                         Title: "The Works",
                         OriginalTitle: "The Works",
                         Description: "The eleventh studio album by the British rock band Queen, released in 1984. It was the first Queen album to be released on CD.",
+                        Disambiguation: "original release",
                         ReleaseInfo: new ReleaseInfoDto(
                             OriginalReleaseDate: new DateOnly(1984, 2, 27),
                             OriginalReleaseYear: 1984,
-                            ReReleaseDate: default,
-                            ReReleaseYear: default,
+                            ReReleaseDate: new DateOnly(2011, 11, 21),
+                            ReReleaseYear: 2011,
                             ReleaseCountry: ReleaseCountry.GB,
                             ReleaseVersion: "Original"
                         ),
@@ -175,19 +181,21 @@ public class GetArtistAlbumsEndpointSummary : Summary<GetArtistAlbumsEndpoint, E
                             new TagDto(Name: "classic"),
                             new TagDto(Name: "compact disc")
                         ],
-                        ReleaseType: MusicReleaseType.Album,
+                        Script: "Latn",
+                        ReleaseTypes: [MusicReleaseType.Album],
                         ReleaseStatus: MusicReleaseStatus.Official,
                         TotalDiscs: 1,
                         TotalTracks: 9
                     ),
                     MediaFormat: MusicMediaFormat.CD,
+                    Packaging: MusicReleasePackaging.JewelCase,
                     Barcode: "0042282771043",
-                    CatalogNumber: "EMC 2400141",
+                    CatalogNumbers: ["EMC 2400141"],
+                    Label: "EMI",
+                    ASIN: "B000002UTK",
                     MusicBrainzReleaseId: Guid.NewGuid(),
                     MusicBrainzReleaseGroupId: Guid.NewGuid(),
                     MusicBrainzReleaseArtistId: Guid.NewGuid(),
-                    CreatedOnUtc: DateTime.UtcNow,
-                    UpdatedOnUtc: DateTime.UtcNow,
                     Contributors: [
                         new MediaContributorReferenceDto(
                             ContributorId: Guid.NewGuid(),
@@ -212,6 +220,8 @@ public class GetArtistAlbumsEndpointSummary : Summary<GetArtistAlbumsEndpoint, E
                             VoteCount: 1234
                         )
                     ],
+                    CreatedOnUtc: new DateTime(2025, 1, 15, 10, 30, 0, DateTimeKind.Utc),
+                    UpdatedOnUtc: new DateTime(2025, 1, 20, 14, 45, 0, DateTimeKind.Utc),
                     Tracks: []
                 )
             }

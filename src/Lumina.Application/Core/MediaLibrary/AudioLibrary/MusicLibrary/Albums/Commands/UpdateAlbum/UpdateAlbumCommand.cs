@@ -19,8 +19,11 @@ namespace Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Albums.
 /// <param name="AlbumId">The unique identifier of the album, taken from the route.</param>
 /// <param name="Metadata">The album metadata of the album.</param>
 /// <param name="MediaFormat">The physical or digital medium of the album, if applicable.</param>
+/// <param name="Packaging">The outermost physical packaging of the album, if applicable.</param>
 /// <param name="Barcode">The barcode of the album, if applicable.</param>
-/// <param name="CatalogNumber">The catalog number of the album, if applicable.</param>
+/// <param name="CatalogNumbers">The catalog numbers of the album, if applicable.</param>
+/// <param name="Label">The name of the label that issued the album, if applicable.</param>
+/// <param name="ASIN">The ASIN (Amazon Standard Identification Number) of the album, if applicable.</param>
 /// <param name="MusicBrainzReleaseId">The MusicBrainz identifier of the release, if applicable.</param>
 /// <param name="MusicBrainzReleaseGroupId">The MusicBrainz identifier of the release group, if applicable.</param>
 /// <param name="MusicBrainzReleaseArtistId">The MusicBrainz identifier of the release artist, if applicable.</param>
@@ -31,10 +34,13 @@ public record UpdateAlbumCommand(
     string? LibraryId,
     string? ArtistId,
     string? AlbumId,
-    AlbumMetadataDto? Metadata,
+    MusicAlbumMetadataDto? Metadata,
     MusicMediaFormat? MediaFormat,
+    MusicReleasePackaging? Packaging,
     string? Barcode,
-    string? CatalogNumber,
+    List<string>? CatalogNumbers,
+    string? Label,
+    string? ASIN,
     Guid? MusicBrainzReleaseId,
     Guid? MusicBrainzReleaseGroupId,
     Guid? MusicBrainzReleaseArtistId,

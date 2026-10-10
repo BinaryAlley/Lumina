@@ -176,5 +176,10 @@ public enum MediaContributorRole
     /// <summary>
     /// The contributor orchestrated the music of the media item.
     /// </summary>
-    Orchestrator
+    Orchestrator,
+
+    /// <summary>
+    /// The contributor performed the media item, without a more specific role being known.
+    /// </summary>
+    Performer
 }

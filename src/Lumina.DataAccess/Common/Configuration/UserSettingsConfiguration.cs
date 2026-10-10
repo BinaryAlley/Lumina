@@ -50,6 +50,10 @@ public class UserSettingsConfiguration : IEntityTypeConfiguration<UserSettingsEn
             .IsRequired()
             .HasColumnOrder(10);
 
+        builder.Property(settings => settings.ShouldAggregateArtworkWhenMissing)
+            .IsRequired()
+            .HasColumnOrder(13);
+
         builder.Property(settings => settings.ShouldRenderPdfAsImages)
             .IsRequired()
             .HasColumnOrder(11);

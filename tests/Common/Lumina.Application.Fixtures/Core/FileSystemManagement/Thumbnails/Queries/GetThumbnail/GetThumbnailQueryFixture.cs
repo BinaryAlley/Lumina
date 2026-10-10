@@ -19,15 +19,16 @@ public class GetThumbnailQueryFixture
     /// </summary>
     /// <param name="path">Optional. The file system path.</param>
     /// <param name="quality">Optional. The thumbnail quality.</param>
+    /// <param name="includePath">Whether the path should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created query.</returns>
-    public GetThumbnailQuery Create(string? path = null, int? quality = null)
+    public GetThumbnailQuery Create(string? path = null, int? quality = null, bool includePath = true)
     {
         return new Faker<GetThumbnailQuery>()
             .CustomInstantiator(f => new GetThumbnailQuery(
                 default!,
                 default
             ))
-            .RuleFor(x => x.Path, f => path ?? f.System.FilePath())
+            .RuleFor(x => x.Path, f => includePath ? (path ?? f.System.FilePath()) : null)
             .RuleFor(x => x.Quality, f => quality ?? f.Random.Int());
     }
 

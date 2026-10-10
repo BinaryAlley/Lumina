@@ -39,13 +39,25 @@ end note
 interface IBooksFileSystemDiscoveryJob {
 }
 
+interface IMusicFileSystemDiscoveryJob {
+}
+
+interface IMusicMetadataExtractionJob {
+}
+
 interface IMediaLibraryScanDiffJob {
 }
 
 interface IMediaLibraryScanHashJob {
 }
 
-interface IGoodReadsMetadataScrapJob {
+interface IMediaLibraryScanProviderConfigurationInvalidationJob {
+}
+
+interface IMediaLibraryScanMetadataEnrichmentJob {
+}
+
+interface IMediaLibraryScanArtworkEnrichmentJob {
 }
 
 interface IMediaLibraryScanResultsSaveJob {
@@ -53,6 +65,16 @@ interface IMediaLibraryScanResultsSaveJob {
 
 class BooksFileSystemDiscoveryJob {
     - STAGING_BATCH_SIZE: int = 1000
+    + ExecuteAsync<TInput>(id: Guid, input: TInput, token: CancellationToken): Task
+}
+
+class MusicFileSystemDiscoveryJob {
+    - STAGING_BATCH_SIZE: int = 1000
+    + ExecuteAsync<TInput>(id: Guid, input: TInput, token: CancellationToken): Task
+}
+
+class MusicMetadataExtractionJob {
+    - EXTRACTION_BATCH_SIZE: int = 1000
     + ExecuteAsync<TInput>(id: Guid, input: TInput, token: CancellationToken): Task
 }
 
@@ -65,8 +87,15 @@ class MediaLibraryScanHashJob {
     + ExecuteAsync<TInput>(id: Guid, input: TInput, token: CancellationToken): Task
 }
 
-class GoodReadsMetadataScrapJob {
-    - ENRICHMENT_PAGE_SIZE: int = 1000
+class MediaLibraryScanProviderConfigurationInvalidationJob {
+    + ExecuteAsync<TInput>(id: Guid, input: TInput, token: CancellationToken): Task
+}
+
+class MediaLibraryScanMetadataEnrichmentJob {
+    + ExecuteAsync<TInput>(id: Guid, input: TInput, token: CancellationToken): Task
+}
+
+class MediaLibraryScanArtworkEnrichmentJob {
     + ExecuteAsync<TInput>(id: Guid, input: TInput, token: CancellationToken): Task
 }
 
@@ -94,8 +123,8 @@ end note
 
 note right of MediaLibraryScanResultsSaveJob
   Persists the results of the current scan and swaps the scan
-  snapshot in a single transaction. Always the last job in the
-  directed acyclic job graph.
+  snapshot in a single transaction, then triggers the provider
+  configuration invalidation job.
 end note
 
 class ScanFailurePublisher {
@@ -107,30 +136,6 @@ note top of ScanFailurePublisher
   LibraryScanFailedDomainEvent, so that a failed scan
   releases its processing resources (see ADR-0009).
 end note
-
-' ============================== HOOKS AND REGISTRY ==============================
-
-class ScanJobHooks {
-    + AFTER_FILE_SYSTEM_DISCOVERY: string
-    + AFTER_SCAN_DIFF: string
-    + BEFORE_METADATA_ENRICHMENT: string
-    + AFTER_METADATA_ENRICHMENT: string
-    + BEFORE_SCAN_RESULTS_SAVE: string
-}
-
-note bottom of ScanJobHooks
-  Named junction points of the scan job graph where plugin
-  jobs can be injected (see ADR-0008).
-end note
-
-interface IScanJobRegistry {
-    + GetJobsForHook(hookName: string, libraryId: LibraryId): IEnumerable<IMediaLibraryScanJob>
-}
-
-class ScanJobRegistry {
-    - _jobsByHook: IReadOnlyDictionary<string, IReadOnlyList<Type>>
-    + GetJobsForHook(hookName: string, libraryId: LibraryId): IEnumerable<IMediaLibraryScanJob>
-}
 
 ' ============================== FACTORIES AND SCANNERS ==============================
 
@@ -151,25 +156,103 @@ class MediaLibraryScannerFactory {
 }
 
 interface IMediaTypeScanner {
-    + SupportedType: LibraryType
-    + CreateScanJobsForLibrary(libraryId: LibraryId, downloadMetadataFromWeb: bool): IEnumerable<IMediaLibraryScanJob>
+    + SupportedLibraryType: LibraryType
+    + CreateScanJobsForLibrary(libraryId: LibraryId): IEnumerable<IMediaLibraryScanJob>
 }
 
 interface IBookLibraryTypeScanner {
 }
 
+interface IMusicLibraryTypeScanner {
+}
+
 class BookLibraryTypeScanner {
     - _mediaScanJobFactory: IMediaLibraryScanJobFactory
-    - _scanJobRegistry: IScanJobRegistry
-    + SupportedType: LibraryType
-    + CreateScanJobsForLibrary(libraryId: LibraryId, downloadMetadataFromWeb: bool): IEnumerable<IMediaLibraryScanJob>
+    + SupportedLibraryType: LibraryType
+    + CreateScanJobsForLibrary(libraryId: LibraryId): IEnumerable<IMediaLibraryScanJob>
+}
+
+class MusicLibraryTypeScanner {
+    - _mediaScanJobFactory: IMediaLibraryScanJobFactory
+    + SupportedLibraryType: LibraryType
+    + CreateScanJobsForLibrary(libraryId: LibraryId): IEnumerable<IMediaLibraryScanJob>
+}
+
+' ============================== MEDIA TYPE STRATEGIES ==============================
+
+interface IMediaLibraryScanItemMaterializer {
+    + SupportedLibraryType: LibraryType
+    + ResetEnrichmentStateForChangedPathsAsync(unitOfWork: IUnitOfWork, libraryId: Guid, paths: IReadOnlyCollection<string>, token: CancellationToken): Task<Result<Updated>>
+    + MaterializeItemsAsync(unitOfWork: IUnitOfWork, libraryId: Guid, scanId: Guid, paths: IReadOnlyList<string>, token: CancellationToken): Task<Result<Success>>
+    + ResetMetadataStatusForLibraryAsync(unitOfWork: IUnitOfWork, libraryId: Guid, token: CancellationToken): Task<Result<Updated>>
+    + ResetArtworkStatusForLibraryAsync(unitOfWork: IUnitOfWork, libraryId: Guid, token: CancellationToken): Task<Result<Updated>>
+}
+
+interface IMediaLibraryScanMetadataEnricher {
+    + SupportedLibraryType: LibraryType
+    + EnrichAsync(libraryId: LibraryId, scanId: ScanId, userId: UserId, token: CancellationToken): Task
+}
+
+interface IMediaLibraryScanArtworkEnricher {
+    + SupportedLibraryType: LibraryType
+    + EnrichAsync(libraryId: LibraryId, scanId: ScanId, userId: UserId, token: CancellationToken): Task
+}
+
+class BooksMediaLibraryScanItemMaterializer {
+}
+
+class MusicMediaLibraryScanItemMaterializer {
+}
+
+class BooksMediaLibraryScanMetadataEnricher {
+    - ENRICHMENT_PAGE_SIZE: int = 1000
+}
+
+class MusicMediaLibraryScanMetadataEnricher {
+    - ENRICHMENT_PAGE_SIZE: int = 200
+}
+
+class BooksMediaLibraryScanArtworkEnricher {
+    - ENRICHMENT_PAGE_SIZE: int = 1000
+}
+
+class MusicMediaLibraryScanArtworkEnricher {
+    - ENRICHMENT_PAGE_SIZE: int = 200
 }
 
 note top of BookLibraryTypeScanner
   Builds the books scan job graph: file system discovery,
-  scan diff, hashing, optional GoodReads metadata enrichment
-  and scan results save, splicing the plugin jobs registered
-  at the ScanJobHooks hook points (see ADR-0008).
+  scan diff, hashing, scan results save, provider configuration
+  invalidation, metadata enrichment and artwork enrichment.
+end note
+
+' ============================== PATH TEMPLATE ==============================
+
+interface ILibraryPathTemplateService {
+    + GetDefaultTemplate(libraryType: LibraryType): LibraryPathTemplate
+    + ResolveTemplate(libraryType: LibraryType, providedParts: IReadOnlyList<LibraryPathPart>): Result<LibraryPathTemplate>
+    + Validate(libraryType: LibraryType, template: LibraryPathTemplate): Result<Success>
+    + Parse(libraryType: LibraryType, template: LibraryPathTemplate, relativePath: string, pathSeparator: char): Result<Optional<ParsedLibraryPath>>
+}
+
+class LibraryPathTemplateService {
+}
+
+interface ILibraryPathPartCatalog {
+    + SupportedLibraryType: LibraryType
+    + GetPartDefinitions(): IReadOnlyList<LibraryPathPartDefinition>
+    + GetDefaultTemplate(): LibraryPathTemplate
+}
+
+class MusicLibraryPathPartCatalog {
+}
+
+class BookLibraryPathPartCatalog {
+}
+
+note bottom of ILibraryPathTemplateService
+  Validates media library path templates and derives item
+  metadata from paths, using the catalog of each library type.
 end note
 
 ' ============================== SCAN ORCHESTRATION ==============================
@@ -179,12 +262,12 @@ class LibraryScan {
     + LibraryId: LibraryId
     + UserId: UserId
     + Status: LibraryScanJobStatus
-    + {static} Create(libraryId: LibraryId, userId: UserId, pastScans: List<LibraryScan>): ErrorOr<LibraryScan>
-    + QueueScan(): ErrorOr<Success>
-    + StartScan(): ErrorOr<Success>
-    + FinishScan(): ErrorOr<Success>
-    + CancelScan(): ErrorOr<Success>
-    + FailScan(): ErrorOr<Success>
+    + {static} Create(libraryId: LibraryId, userId: UserId, pastScans: List<LibraryScan>): Result<LibraryScan>
+    + QueueScan(): Result<Success>
+    + StartScan(): Result<Success>
+    + FinishScan(): Result<Success>
+    + CancelScan(): Result<Success>
+    + FailScan(): Result<Success>
 }
 
 note right of LibraryScan
@@ -193,8 +276,8 @@ note right of LibraryScan
 end note
 
 interface IMediaLibraryScanningService {
-    + StartScanAsync(scan: LibraryScan, libraryType: LibraryType, downloadMetadataFromWeb: bool, token: CancellationToken): Task<ErrorOr<Success>>
-    + CancelScan(scan: LibraryScan): ErrorOr<Success>
+    + StartScanAsync(scan: LibraryScan, libraryType: LibraryType, token: CancellationToken): Task<Result<Success>>
+    + CancelScan(scan: LibraryScan): Result<Success>
 }
 
 class MediaLibraryScanningService {
@@ -202,9 +285,9 @@ class MediaLibraryScanningService {
     - _mediaLibraryScannerFactory: IMediaLibraryScannerFactory
     - _mediaLibrariesScanCancellationTracker: IMediaLibrariesScanCancellationTracker
     - _mediaLibrariesScanProgressTracker: IMediaLibrariesScanProgressTracker
-    - _publisher: IPublisher
-    + StartScanAsync(scan: LibraryScan, libraryType: LibraryType, downloadMetadataFromWeb: bool, token: CancellationToken): Task<ErrorOr<Success>>
-    + CancelScan(scan: LibraryScan): ErrorOr<Success>
+    - _domainEventPublisher: IDomainEventPublisher
+    + StartScanAsync(scan: LibraryScan, libraryType: LibraryType, token: CancellationToken): Task<Result<Success>>
+    + CancelScan(scan: LibraryScan): Result<Success>
 }
 
 note top of MediaLibraryScanningService
@@ -259,11 +342,11 @@ class MediaLibrariesScanCancellationTracker {
 }
 
 interface IMediaLibrariesScanProgressTracker {
-    + InitializeScanProgress(libraryId: LibraryId, compositeKey: MediaLibraryScanCompositeId, totalJobs: int): ErrorOr<Created>
-    + UpdateScanProgress(libraryId: LibraryId, compositeKey: MediaLibraryScanCompositeId): ErrorOr<Updated>
-    + UpdateScanJobProgress(libraryId: LibraryId, compositeKey: MediaLibraryScanCompositeId, progress: MediaLibraryScanJobProgress): ErrorOr<Updated>
-    + GetScanProgress(compositeKey: MediaLibraryScanCompositeId): ErrorOr<MediaLibraryScanProgress>
-    + RemoveScanProgress(compositeKey: MediaLibraryScanCompositeId): ErrorOr<MediaLibraryScanProgress>
+    + InitializeScanProgress(libraryId: LibraryId, compositeKey: MediaLibraryScanCompositeId, totalJobs: int): Result<Created>
+    + UpdateScanProgress(libraryId: LibraryId, compositeKey: MediaLibraryScanCompositeId): Result<Updated>
+    + UpdateScanJobProgress(libraryId: LibraryId, compositeKey: MediaLibraryScanCompositeId, progress: MediaLibraryScanJobProgress): Result<Updated>
+    + GetScanProgress(compositeKey: MediaLibraryScanCompositeId): Result<MediaLibraryScanProgress>
+    + RemoveScanProgress(compositeKey: MediaLibraryScanCompositeId): Result<MediaLibraryScanProgress>
 }
 
 class MediaLibrariesScanProgressTracker {
@@ -285,7 +368,7 @@ class DebouncedMediaLibraryScanProgressNotifier {
 }
 
 class MediaLibraryScanProgressHub {
-    + SubscribeToScan(scanId: Guid, userId: Guid): Task
+    + SubscribeToScan(scanId: Guid): Task
 }
 
 note top of MediaLibraryScanProgressHub
@@ -296,31 +379,31 @@ end note
 ' ============================== DOMAIN EVENT HANDLERS ==============================
 
 class LibraryScanQueuedDomainEventHandler {
-    + Handle(domainEvent: LibraryScanQueuedDomainEvent, token: CancellationToken): ValueTask
+    + HandleAsync(domainEvent: LibraryScanQueuedDomainEvent, token: CancellationToken): ValueTask
 }
 
 class LibraryScanStartedDomainEventHandler {
-    + Handle(domainEvent: LibraryScanStartedDomainEvent, token: CancellationToken): ValueTask
+    + HandleAsync(domainEvent: LibraryScanStartedDomainEvent, token: CancellationToken): ValueTask
 }
 
 class LibraryScanFinishedDomainEventHandler {
-    + Handle(domainEvent: LibraryScanFinishedDomainEvent, token: CancellationToken): ValueTask
+    + HandleAsync(domainEvent: LibraryScanFinishedDomainEvent, token: CancellationToken): ValueTask
 }
 
 class LibraryScanFailedDomainEventHandler {
-    + Handle(domainEvent: LibraryScanFailedDomainEvent, token: CancellationToken): ValueTask
+    + HandleAsync(domainEvent: LibraryScanFailedDomainEvent, token: CancellationToken): ValueTask
 }
 
 class LibraryScanCancelledDomainEventHandler {
-    + Handle(domainEvent: LibraryScanCancelledDomainEvent, token: CancellationToken): ValueTask
+    + HandleAsync(domainEvent: LibraryScanCancelledDomainEvent, token: CancellationToken): ValueTask
 }
 
 class LibraryScanProgressChangedDomainEventHandler {
-    + Handle(domainEvent: LibraryScanProgressChangedDomainEvent, token: CancellationToken): ValueTask
+    + HandleAsync(domainEvent: LibraryScanProgressChangedDomainEvent, token: CancellationToken): ValueTask
 }
 
 class LibraryScanJobProgressChangedDomainEventHandler {
-    + Handle(domainEvent: LibraryScanJobProgressChangedDomainEvent, token: CancellationToken): ValueTask
+    + HandleAsync(domainEvent: LibraryScanJobProgressChangedDomainEvent, token: CancellationToken): ValueTask
 }
 
 ' ============================== JOB MODEL RELATIONSHIPS ==============================
@@ -328,30 +411,46 @@ class LibraryScanJobProgressChangedDomainEventHandler {
 IMediaLibraryScanJob <|.. MediaLibraryScanJob : implements
 
 IMediaLibraryScanJob <|-- IBooksFileSystemDiscoveryJob
+IMediaLibraryScanJob <|-- IMusicFileSystemDiscoveryJob
+IMediaLibraryScanJob <|-- IMusicMetadataExtractionJob
 IMediaLibraryScanJob <|-- IMediaLibraryScanDiffJob
 IMediaLibraryScanJob <|-- IMediaLibraryScanHashJob
-IMediaLibraryScanJob <|-- IGoodReadsMetadataScrapJob
+IMediaLibraryScanJob <|-- IMediaLibraryScanProviderConfigurationInvalidationJob
+IMediaLibraryScanJob <|-- IMediaLibraryScanMetadataEnrichmentJob
+IMediaLibraryScanJob <|-- IMediaLibraryScanArtworkEnrichmentJob
 IMediaLibraryScanJob <|-- IMediaLibraryScanResultsSaveJob
 
 MediaLibraryScanJob <|-- BooksFileSystemDiscoveryJob : inherits
+MediaLibraryScanJob <|-- MusicFileSystemDiscoveryJob : inherits
+MediaLibraryScanJob <|-- MusicMetadataExtractionJob : inherits
 MediaLibraryScanJob <|-- MediaLibraryScanDiffJob : inherits
 MediaLibraryScanJob <|-- MediaLibraryScanHashJob : inherits
-MediaLibraryScanJob <|-- GoodReadsMetadataScrapJob : inherits
+MediaLibraryScanJob <|-- MediaLibraryScanProviderConfigurationInvalidationJob : inherits
+MediaLibraryScanJob <|-- MediaLibraryScanMetadataEnrichmentJob : inherits
+MediaLibraryScanJob <|-- MediaLibraryScanArtworkEnrichmentJob : inherits
 MediaLibraryScanJob <|-- MediaLibraryScanResultsSaveJob : inherits
 
 IBooksFileSystemDiscoveryJob <|.. BooksFileSystemDiscoveryJob : implements
+IMusicFileSystemDiscoveryJob <|.. MusicFileSystemDiscoveryJob : implements
+IMusicMetadataExtractionJob <|.. MusicMetadataExtractionJob : implements
 IMediaLibraryScanDiffJob <|.. MediaLibraryScanDiffJob : implements
 IMediaLibraryScanHashJob <|.. MediaLibraryScanHashJob : implements
-IGoodReadsMetadataScrapJob <|.. GoodReadsMetadataScrapJob : implements
+IMediaLibraryScanProviderConfigurationInvalidationJob <|.. MediaLibraryScanProviderConfigurationInvalidationJob : implements
+IMediaLibraryScanMetadataEnrichmentJob <|.. MediaLibraryScanMetadataEnrichmentJob : implements
+IMediaLibraryScanArtworkEnrichmentJob <|.. MediaLibraryScanArtworkEnrichmentJob : implements
 IMediaLibraryScanResultsSaveJob <|.. MediaLibraryScanResultsSaveJob : implements
 
 ' ============================== JOB TRIGGER CHAIN ==============================
 
 BooksFileSystemDiscoveryJob ..> MediaLibraryScanDiffJob : triggers
+MusicFileSystemDiscoveryJob ..> MediaLibraryScanDiffJob : triggers
 MediaLibraryScanDiffJob ..> MediaLibraryScanHashJob : triggers
-MediaLibraryScanHashJob ..> GoodReadsMetadataScrapJob : triggers when metadata enrichment is enabled
-GoodReadsMetadataScrapJob ..> MediaLibraryScanResultsSaveJob : triggers
-MediaLibraryScanHashJob ..> MediaLibraryScanResultsSaveJob : triggers when metadata enrichment is disabled
+MediaLibraryScanHashJob ..> MediaLibraryScanResultsSaveJob : triggers
+MediaLibraryScanHashJob ..> MusicMetadataExtractionJob : triggers
+MusicMetadataExtractionJob ..> MediaLibraryScanResultsSaveJob : triggers
+MediaLibraryScanResultsSaveJob ..> MediaLibraryScanProviderConfigurationInvalidationJob : triggers
+MediaLibraryScanProviderConfigurationInvalidationJob ..> MediaLibraryScanMetadataEnrichmentJob : triggers
+MediaLibraryScanMetadataEnrichmentJob ..> MediaLibraryScanArtworkEnrichmentJob : triggers
 
 MediaLibraryScanJob ..> ScanFailurePublisher : publishes failure on unhandled exception
 
@@ -359,21 +458,48 @@ MediaLibraryScanJob ..> ScanFailurePublisher : publishes failure on unhandled ex
 
 IMediaLibraryScannerFactory <|.. MediaLibraryScannerFactory : implements
 IMediaLibraryScanJobFactory <|.. MediaLibraryScanJobFactory : implements
-IScanJobRegistry <|.. ScanJobRegistry : implements
 
 IMediaTypeScanner <|-- IBookLibraryTypeScanner
 IBookLibraryTypeScanner <|.. BookLibraryTypeScanner : implements
+IMediaTypeScanner <|-- IMusicLibraryTypeScanner
+IMusicLibraryTypeScanner <|.. MusicLibraryTypeScanner : implements
 
 MediaLibraryScannerFactory ..> IMediaTypeScanner : creates
 BookLibraryTypeScanner --> IMediaLibraryScanJobFactory : uses
-BookLibraryTypeScanner --> IScanJobRegistry : splices plugin jobs
 BookLibraryTypeScanner ..> IBooksFileSystemDiscoveryJob : creates
 BookLibraryTypeScanner ..> IMediaLibraryScanDiffJob : creates
 BookLibraryTypeScanner ..> IMediaLibraryScanHashJob : creates
-BookLibraryTypeScanner ..> IGoodReadsMetadataScrapJob : creates
 BookLibraryTypeScanner ..> IMediaLibraryScanResultsSaveJob : creates
+BookLibraryTypeScanner ..> IMediaLibraryScanProviderConfigurationInvalidationJob : creates
+BookLibraryTypeScanner ..> IMediaLibraryScanMetadataEnrichmentJob : creates
+BookLibraryTypeScanner ..> IMediaLibraryScanArtworkEnrichmentJob : creates
+MusicLibraryTypeScanner --> IMediaLibraryScanJobFactory : uses
+MusicLibraryTypeScanner ..> IMusicFileSystemDiscoveryJob : creates
+MusicLibraryTypeScanner ..> IMediaLibraryScanDiffJob : creates
+MusicLibraryTypeScanner ..> IMediaLibraryScanHashJob : creates
+MusicLibraryTypeScanner ..> IMusicMetadataExtractionJob : creates
+MusicLibraryTypeScanner ..> IMediaLibraryScanResultsSaveJob : creates
+MusicLibraryTypeScanner ..> IMediaLibraryScanProviderConfigurationInvalidationJob : creates
+MusicLibraryTypeScanner ..> IMediaLibraryScanMetadataEnrichmentJob : creates
+MusicLibraryTypeScanner ..> IMediaLibraryScanArtworkEnrichmentJob : creates
 
-ScanJobRegistry ..> IMediaLibraryScanJob : resolves plugin jobs for hooks
+IMediaLibraryScanResultsSaveJob --> IMediaLibraryScanItemMaterializer : delegates to
+IMediaLibraryScanProviderConfigurationInvalidationJob --> IMediaLibraryScanItemMaterializer : delegates to
+IMediaLibraryScanMetadataEnrichmentJob --> IMediaLibraryScanMetadataEnricher : delegates to
+IMediaLibraryScanArtworkEnrichmentJob --> IMediaLibraryScanArtworkEnricher : delegates to
+IMediaLibraryScanItemMaterializer <|.. BooksMediaLibraryScanItemMaterializer : implements
+IMediaLibraryScanItemMaterializer <|.. MusicMediaLibraryScanItemMaterializer : implements
+IMediaLibraryScanMetadataEnricher <|.. BooksMediaLibraryScanMetadataEnricher : implements
+IMediaLibraryScanMetadataEnricher <|.. MusicMediaLibraryScanMetadataEnricher : implements
+IMediaLibraryScanArtworkEnricher <|.. BooksMediaLibraryScanArtworkEnricher : implements
+IMediaLibraryScanArtworkEnricher <|.. MusicMediaLibraryScanArtworkEnricher : implements
+
+ILibraryPathTemplateService <|.. LibraryPathTemplateService : implements
+ILibraryPathPartCatalog <|.. MusicLibraryPathPartCatalog : implements
+ILibraryPathPartCatalog <|.. BookLibraryPathPartCatalog : implements
+LibraryPathTemplateService --> ILibraryPathPartCatalog : uses
+MusicMetadataExtractionJob --> ILibraryPathTemplateService : derives metadata from paths
+
 MediaLibraryScanJobFactory ..> IMediaLibraryScanJob : creates
 
 ' ============================== SERVICE RELATIONSHIPS ==============================
@@ -392,7 +518,7 @@ IMediaLibrariesScanQueue <|.. MediaLibrariesScanQueue : implements
 
 MediaLibraryScanJobProcessorJob --> IMediaLibrariesScanQueue : reads from
 MediaLibraryScanJobProcessorJob --> IMediaLibrariesScanCancellationTracker : links scan token
-MediaLibraryScanJobProcessorJob ..> BooksFileSystemDiscoveryJob : triggers root job
+MediaLibraryScanJobProcessorJob ..> IMediaLibraryScanJob : triggers root job
 
 ' ============================== TRACKER RELATIONSHIPS ==============================
 

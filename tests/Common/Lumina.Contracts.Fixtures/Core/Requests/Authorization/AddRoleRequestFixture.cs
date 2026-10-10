@@ -22,12 +22,14 @@ public class AddRoleRequestFixture
     /// </summary>
     /// <param name="roleName">Optional. The name of the role.</param>
     /// <param name="permissions">Optional. The Ids of the permissions granted to the role.</param>
+    /// <param name="includePermissions">Whether the permissions should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="AddRoleRequest"/>.</returns>
     public AddRoleRequest Create(
         string? roleName = null, 
-        List<Guid>? permissions = null)
+        List<Guid>? permissions = null,
+        bool includePermissions = true)
     {
-        return new AddRoleRequest(roleName ?? _faker.Commerce.Department(), permissions ?? []);
+        return new AddRoleRequest(roleName ?? _faker.Commerce.Department(), includePermissions ? (permissions ?? []) : null);
     }
 
     /// <summary>

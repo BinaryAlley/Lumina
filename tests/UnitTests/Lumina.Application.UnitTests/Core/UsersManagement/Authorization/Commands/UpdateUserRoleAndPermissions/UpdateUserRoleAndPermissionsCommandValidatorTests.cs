@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
+using Lumina.Application.Fixtures.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
 using Lumina.Application.UnitTests.Common.Setup;
 using Lumina.Domain.Common.Primitives;
 using System;
@@ -18,12 +19,13 @@ namespace Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Comman
 public class UpdateUserRoleAndPermissionsCommandValidatorTests
 {
     private readonly UpdateUserRoleAndPermissionsCommandValidator _validator = new();
+    private readonly UpdateUserRoleAndPermissionsCommandFixture _updateUserRoleAndPermissionsCommandFixture = new();
 
     [Fact]
     public void Validate_WhenUserIdIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateUserRoleAndPermissionsCommand command = new(
+        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create(
             Guid.Empty,
             Guid.NewGuid(),
             [Guid.NewGuid()]);
@@ -39,7 +41,7 @@ public class UpdateUserRoleAndPermissionsCommandValidatorTests
     public void Validate_WhenPermissionsContainEmptyGuid_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateUserRoleAndPermissionsCommand command = new(
+        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create(
             Guid.NewGuid(),
             Guid.NewGuid(),
             [Guid.Empty, Guid.NewGuid()]);
@@ -55,10 +57,10 @@ public class UpdateUserRoleAndPermissionsCommandValidatorTests
     public void Validate_WhenPermissionsIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateUserRoleAndPermissionsCommand command = new(
+        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create(
             Guid.NewGuid(),
             Guid.NewGuid(),
-            null!);
+            includePermissions: false);
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -71,7 +73,7 @@ public class UpdateUserRoleAndPermissionsCommandValidatorTests
     public void Validate_WhenPermissionsIsEmpty_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateUserRoleAndPermissionsCommand command = new(
+        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create(
             Guid.NewGuid(),
             Guid.NewGuid(),
             []);
@@ -87,7 +89,7 @@ public class UpdateUserRoleAndPermissionsCommandValidatorTests
     public void Validate_WhenCommandIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateUserRoleAndPermissionsCommand command = new(
+        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create(
             Guid.NewGuid(),
             Guid.NewGuid(),
             [Guid.NewGuid()]);

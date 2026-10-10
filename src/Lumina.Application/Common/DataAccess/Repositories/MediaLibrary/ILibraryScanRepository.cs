@@ -33,4 +33,12 @@ public interface ILibraryScanRepository : IRepository<LibraryScanEntity>,
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="LibraryScanEntity"/>, or an error.</returns>
     Task<Result<IEnumerable<LibraryScanEntity>>> GetRunningScansAsync(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Marks the media library scans that were interrupted by an application restart, meaning the ones that are still
+    /// <see cref="LibraryScanJobStatus.Pending"/> or <see cref="LibraryScanJobStatus.Running"/>, as failed.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Updated>> FailInterruptedScansAsync(CancellationToken cancellationToken);
 }

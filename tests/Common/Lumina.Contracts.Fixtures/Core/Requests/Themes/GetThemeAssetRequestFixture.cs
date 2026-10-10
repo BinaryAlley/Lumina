@@ -21,12 +21,19 @@ public class GetThemeAssetRequestFixture
     /// </summary>
     /// <param name="themeId">Optional. The manifest id of the theme.</param>
     /// <param name="assetPath">Optional. The asset path relative to the theme pack root.</param>
+    /// <param name="includeThemeId">Whether the theme Id should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeAssetPath">Whether the asset path should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="GetThemeAssetRequest"/>.</returns>
-    public GetThemeAssetRequest Create(string? themeId = null, string? assetPath = null)
+    public GetThemeAssetRequest Create(
+        string? themeId = null,
+        string? assetPath = null,
+        bool includeThemeId = true,
+        bool includeAssetPath = true)
     {
         return new GetThemeAssetRequest(
-            themeId ?? _faker.Lorem.Slug(2),
-            assetPath ?? _faker.System.FilePath());
+            includeThemeId ? (themeId ?? _faker.Lorem.Slug(2)) : null,
+            includeAssetPath ? (assetPath ?? _faker.System.FilePath()) : null
+        );
     }
 
     /// <summary>

@@ -22,28 +22,28 @@ public static class WrittenContentMetadataDtoMapping
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully converted <see cref="WrittenContentMetadata"/>, or an error message.
     /// </returns>
-    public static Result<WrittenContentMetadata> ToDomainEntity(this WrittenContentMetadataDto dto)
+    public static Result<WrittenContentMetadata> ToDomainValueObject(this WrittenContentMetadataDto dto)
     {
 
-        Result<ReleaseInfo>? domainReleaseInfoResult = dto.ReleaseInfo!.ToDomainEntity();
+        Result<ReleaseInfo>? domainReleaseInfoResult = dto.ReleaseInfo!.ToDomainValueObject();
         if (domainReleaseInfoResult.Value.IsFailure)
             return domainReleaseInfoResult.Value.Errors;
 
-        IEnumerable<Result<Genre>> domainGenresResult = dto.Genres!.ToDomainEntities();
+        IEnumerable<Result<Genre>> domainGenresResult = dto.Genres!.ToDomainValueObjects();
         List<Error> errors = [.. domainGenresResult.Where(genreResult => genreResult.IsFailure).SelectMany(genreResult => genreResult.Errors)];
         if (errors.Count > 0)
             return errors;
 
-        IEnumerable<Result<Tag>> domainTagsResult = dto.Tags!.ToDomainEntities();
+        IEnumerable<Result<Tag>> domainTagsResult = dto.Tags!.ToDomainValueObjects();
         errors = [.. domainTagsResult.Where(tagResult => tagResult.IsFailure).SelectMany(tagResult => tagResult.Errors)];
         if (errors.Count > 0)
             return errors;
 
-        Result<LanguageInfo>? domainLanguageInfoResult = dto.Language?.ToDomainEntity();
+        Result<LanguageInfo>? domainLanguageInfoResult = dto.Language?.ToDomainValueObject();
         if (domainLanguageInfoResult.HasValue && domainLanguageInfoResult.Value.IsFailure)
             return domainLanguageInfoResult.Value.Errors;
 
-        Result<LanguageInfo>? domainOriginalLanguageInfoResult = dto.OriginalLanguage?.ToDomainEntity();
+        Result<LanguageInfo>? domainOriginalLanguageInfoResult = dto.OriginalLanguage?.ToDomainValueObject();
         if (domainOriginalLanguageInfoResult.HasValue && domainOriginalLanguageInfoResult.Value.IsFailure)
             return domainOriginalLanguageInfoResult.Value.Errors;
 

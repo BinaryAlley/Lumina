@@ -30,6 +30,7 @@ public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     private readonly PasswordHashService _hashService = new();
     private readonly UserEntityFixture _userEntityFixture = new();
     private readonly ChangePasswordRequestFixture _changePasswordRequestFixture = new();
+    private readonly LoginRequestFixture _loginRequestFixture = new();
     private readonly string _testUsername;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -165,9 +166,10 @@ public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDis
         await dbContext.SaveChangesAsync();
 
         // Authenticate user.
-        LoginRequest loginRequest = new(
-            Username: user.Username,
-            Password: "TestPass123!"
+        LoginRequest loginRequest = _loginRequestFixture.Create(
+            username: user.Username,
+            password: "TestPass123!",
+            includeTotpCode: false
         );
 
         HttpResponseMessage loginResponse = await _client.PostAsJsonAsync("/api/v1/auth/login", loginRequest);

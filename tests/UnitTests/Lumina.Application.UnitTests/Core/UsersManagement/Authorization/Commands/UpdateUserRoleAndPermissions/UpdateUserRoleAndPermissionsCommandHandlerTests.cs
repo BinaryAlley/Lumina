@@ -12,6 +12,7 @@ using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Common.DTO.Pagination;
 using Lumina.Application.Fixtures.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.Common.Primitives;
@@ -49,6 +50,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     private readonly UserPermissionEntityFixture _userPermissionEntityFixture = new();
     private readonly UpdateUserRoleAndPermissionsCommandFixture _updateUserRoleAndPermissionsCommandFixture = new();
     private readonly PermissionEntityFixture _permissionEntityFixture = new();
+    private readonly PaginatedResultDtoFixture<UserEntity> _paginatedResultDtoFixture = new();
     private readonly Guid _userId;
 
     /// <summary>
@@ -180,7 +182,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
         _mockRoleRepository.GetByIdAsync(command.RoleId!.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(newRole);
         _mockUserRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PaginatedResultDto<UserEntity> { Data = users, CurrentPage = 1, PerPage = users.Count, Count = users.Count, NumberOfPages = 1 }));
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: users, currentPage: 1, perPage: users.Count, count: users.Count, numberOfPages: 1)));
 
         // Act
         Result<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);

@@ -30,6 +30,7 @@ public class TrackTests
     private readonly AudioRatingFixture _audioRatingFixture = new();
     private readonly AudioMetadataFixture _audioMetadataFixture = new();
     private readonly MusicBrainzIdFixture _musicBrainzIdFixture = new();
+    private readonly MusicWorkFixture _musicWorkFixture = new();
 
     [Fact]
     public void Create_WhenCalledWithValidData_ShouldCreateTrackWithAllPropertiesPopulated()
@@ -54,9 +55,9 @@ public class TrackTests
         Assert.True(track.Bpm.HasValue);
         Assert.NotEmpty(track.Isrcs);
         Assert.True(track.Work.HasValue);
+        Assert.NotEqual(Guid.Empty, track.Work.Value.MusicBrainzWorkId.Value);
         Assert.True(track.MusicBrainzRecordingId.HasValue);
         Assert.True(track.MusicBrainzTrackId.HasValue);
-        Assert.True(track.MusicBrainzWorkId.HasValue);
         Assert.NotEmpty(track.Contributors);
         Assert.NotEmpty(track.Ratings);
         Assert.InRange(track.CreatedOnUtc, beforeCreate, DateTime.UtcNow);
@@ -76,17 +77,18 @@ public class TrackTests
             sourceTrack.Id,
             sourceTrack.Path,
             sourceTrack.Metadata,
+            sourceTrack.Disambiguation,
             sourceTrack.TrackNumber,
             sourceTrack.DiscNumber,
             [.. sourceTrack.Moods],
             sourceTrack.Script,
             sourceTrack.Key,
             sourceTrack.Bpm,
+            sourceTrack.IsVideo,
             [.. sourceTrack.Isrcs],
             sourceTrack.Work,
             sourceTrack.MusicBrainzRecordingId,
             sourceTrack.MusicBrainzTrackId,
-            sourceTrack.MusicBrainzWorkId,
             [.. sourceTrack.Contributors],
             [.. sourceTrack.Ratings],
             createdOnUtc,
@@ -195,10 +197,10 @@ public class TrackTests
         Optional<string> script = Optional<string>.Some("Latin");
         Optional<MusicKey> key = Optional<MusicKey>.Some(MusicKey.DMajor);
         Optional<int> bpm = Optional<int>.Some(128);
-        Optional<string> work = Optional<string>.Some("Symphony No. 5");
+        bool isVideo = true;
+        Optional<MusicWork> work = Optional<MusicWork>.Some(_musicWorkFixture.Create(title: "Symphony No. 5"));
         Optional<MusicBrainzId> recordingId = Optional<MusicBrainzId>.Some(_musicBrainzIdFixture.Create());
         Optional<MusicBrainzId> trackId = Optional<MusicBrainzId>.Some(_musicBrainzIdFixture.Create());
-        Optional<MusicBrainzId> workId = Optional<MusicBrainzId>.Some(_musicBrainzIdFixture.Create());
         DateTime beforeUpdate = DateTime.UtcNow;
 
         // Act
@@ -210,10 +212,10 @@ public class TrackTests
             script,
             key,
             bpm,
+            isVideo,
             work,
             recordingId,
-            trackId,
-            workId);
+            trackId);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -224,10 +226,10 @@ public class TrackTests
         Assert.Equal(script, track.Script);
         Assert.Equal(key, track.Key);
         Assert.Equal(bpm, track.Bpm);
+        Assert.True(track.IsVideo);
         Assert.Equal(work, track.Work);
         Assert.Equal(recordingId, track.MusicBrainzRecordingId);
         Assert.Equal(trackId, track.MusicBrainzTrackId);
-        Assert.Equal(workId, track.MusicBrainzWorkId);
         Assert.True(track.UpdatedOnUtc.HasValue);
         Assert.True(track.UpdatedOnUtc.Value >= beforeUpdate);
         // the collections are not part of the details update
@@ -245,10 +247,9 @@ public class TrackTests
             key: Optional<MusicKey>.None(),
             bpm: Optional<int>.None(),
             isrcs: [],
-            work: Optional<string>.None(),
+            work: Optional<MusicWork>.None(),
             musicBrainzRecordingId: Optional<MusicBrainzId>.None(),
             musicBrainzTrackId: Optional<MusicBrainzId>.None(),
-            musicBrainzWorkId: Optional<MusicBrainzId>.None(),
             contributors: [],
             ratings: []);
 
@@ -260,7 +261,6 @@ public class TrackTests
         Assert.False(track.Work.HasValue);
         Assert.False(track.MusicBrainzRecordingId.HasValue);
         Assert.False(track.MusicBrainzTrackId.HasValue);
-        Assert.False(track.MusicBrainzWorkId.HasValue);
         Assert.Empty(track.Moods);
         Assert.Empty(track.Isrcs);
         Assert.Empty(track.Contributors);
@@ -280,17 +280,18 @@ public class TrackTests
             sourceTrack.Id,
             sourceTrack.Path,
             sourceTrack.Metadata,
+            sourceTrack.Disambiguation,
             sourceTrack.TrackNumber,
             sourceTrack.DiscNumber,
             [.. sourceTrack.Moods],
             sourceTrack.Script,
             sourceTrack.Key,
             sourceTrack.Bpm,
+            sourceTrack.IsVideo,
             [.. sourceTrack.Isrcs],
             sourceTrack.Work,
             sourceTrack.MusicBrainzRecordingId,
             sourceTrack.MusicBrainzTrackId,
-            sourceTrack.MusicBrainzWorkId,
             [.. sourceTrack.Contributors],
             [.. sourceTrack.Ratings],
             createdOnUtc,
@@ -305,7 +306,6 @@ public class TrackTests
         Assert.Equal(sourceTrack.Work, track.Work);
         Assert.Equal(sourceTrack.MusicBrainzRecordingId, track.MusicBrainzRecordingId);
         Assert.Equal(sourceTrack.MusicBrainzTrackId, track.MusicBrainzTrackId);
-        Assert.Equal(sourceTrack.MusicBrainzWorkId, track.MusicBrainzWorkId);
         // The pre-existing identity and the provided timestamps must survive the rehydration.
         Assert.Equal(sourceTrack.Id, track.Id);
         Assert.Equal(createdOnUtc, track.CreatedOnUtc);
@@ -380,8 +380,8 @@ public class TrackTests
             Optional<string>.None(),
             Optional<MusicKey>.None(),
             Optional<int>.None(),
-            Optional<string>.None(),
-            Optional<MusicBrainzId>.None(),
+            false,
+            Optional<MusicWork>.None(),
             Optional<MusicBrainzId>.None(),
             Optional<MusicBrainzId>.None());
 
@@ -391,9 +391,9 @@ public class TrackTests
         Assert.False(track.Script.HasValue);
         Assert.False(track.Key.HasValue);
         Assert.False(track.Bpm.HasValue);
+        Assert.False(track.IsVideo);
         Assert.False(track.Work.HasValue);
         Assert.False(track.MusicBrainzRecordingId.HasValue);
         Assert.False(track.MusicBrainzTrackId.HasValue);
-        Assert.False(track.MusicBrainzWorkId.HasValue);
     }
 }

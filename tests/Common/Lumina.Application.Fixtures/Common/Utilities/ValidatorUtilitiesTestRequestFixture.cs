@@ -9,7 +9,7 @@ using System.Linq;
 namespace Lumina.Application.Fixtures.Common.Utilities;
 
 /// <summary>
-/// Fixture class for generating <see cref="ValidatorUtilitiesTestRequest"/> test data.
+/// Fixture class for the <see cref="ValidatorUtilitiesTestRequest"/> record.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ValidatorUtilitiesTestRequestFixture

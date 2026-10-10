@@ -6,6 +6,7 @@ using Lumina.Application.Common.DTO.Filtering;
 using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Infrastructure.Models.DTO.Themes;
 using Lumina.Application.Common.Infrastructure.Themes;
+using Lumina.Application.Fixtures.Common.DTO.Pagination;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
@@ -34,6 +35,7 @@ public class RepairThemesTaskExecutorTests
     private readonly IThemeRepository _mockThemeRepository;
     private readonly RepairThemesTaskExecutor _sut;
     private readonly ScheduledJobFixture _scheduledJobFixture = new();
+    private readonly PaginatedResultDtoFixture<ThemeEntity> _paginatedResultDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RepairThemesTaskExecutorTests"/> class.
@@ -55,7 +57,7 @@ public class RepairThemesTaskExecutorTests
         // Arrange
         ScheduledJob scheduledJob = _scheduledJobFixture.Create(taskType: ScheduledTaskType.RepairThemes);
         _mockThemeService.GetBundledThemeArchivePaths().Returns([]);
-        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(_paginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 0, count: 0, numberOfPages: 1)));
 
         // Act
         Result<Success> result = await _sut.ExecutePayloadAsync(scheduledJob, CancellationToken.None);
@@ -74,7 +76,7 @@ public class RepairThemesTaskExecutorTests
         _mockThemeService.GetBundledThemeArchivePaths().Returns(["missing.zip"]);
         _mockThemeService.ReadManifestFromArchiveAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(Error.Failure("Theme.Manifest", "Failed to read the theme manifest"));
-        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(new PaginatedResultDto<ThemeEntity> { Data = [], CurrentPage = 1, PerPage = 0, Count = 0, NumberOfPages = 1 }));
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(_paginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 0, count: 0, numberOfPages: 1)));
 
         // Act
         Result<Success> result = await _sut.ExecutePayloadAsync(scheduledJob, CancellationToken.None);

@@ -42,7 +42,7 @@ public class ErrorsTests
     {
         // Assert
         // The count assertion fails when an error is added or removed, reminding to update the assertions below.
-        Assert.Equal(14, typeof(DomainErrors.Library).GetProperties().Length);
+        Assert.Equal(18, typeof(DomainErrors.Library).GetProperties().Length);
         AssertError(DomainErrors.Library.CannotScanLockedLibrary, ErrorType.Forbidden);
         AssertError(DomainErrors.Library.CannotScanDisabledLibrary, ErrorType.Forbidden);
         AssertError(DomainErrors.Library.LibraryIdCannotBeEmpty, ErrorType.Validation);
@@ -52,11 +52,15 @@ public class ErrorsTests
         AssertError(DomainErrors.Library.LibraryNotFound, ErrorType.NotFound);
         AssertError(DomainErrors.Library.LibraryTypeCannotBeNull, ErrorType.Validation);
         AssertError(DomainErrors.Library.CoverFileMustBeAnImage, ErrorType.Validation);
-        AssertError(DomainErrors.Library.UnknownLibraryType, ErrorType.Unexpected);
+        AssertError(DomainErrors.Library.UnknownLibraryType, ErrorType.Forbidden);
         AssertError(DomainErrors.Library.PathsListCannotBeNull, ErrorType.Validation);
         AssertError(DomainErrors.Library.PathsListCannotBeEmpty, ErrorType.Validation);
         AssertError(DomainErrors.Library.TitleCannotBeEmpty, ErrorType.Validation);
         AssertError(DomainErrors.Library.TitleMustBeMaximum255CharactersLong, ErrorType.Validation);
+        AssertError(DomainErrors.Library.PathTemplateLiteralCannotBeEmpty, ErrorType.Validation);
+        AssertError(DomainErrors.Library.PathTemplateValuePartMustContainSinglePlaceholder, ErrorType.Validation);
+        AssertError(DomainErrors.Library.PathTemplatePartKindNotSupportedForLibraryType, ErrorType.Validation);
+        AssertError(DomainErrors.Library.PathTemplateIsNotSupportedForLibraryType, ErrorType.Validation);
     }
 
     [Fact]
@@ -164,7 +168,7 @@ public class ErrorsTests
     {
         // Assert
         // The count assertion fails when an error is added or removed, reminding to update the assertions below.
-        Assert.Equal(12, typeof(DomainErrors.MediaContributor).GetProperties().Length);
+        Assert.Equal(13, typeof(DomainErrors.MediaContributor).GetProperties().Length);
         AssertError(DomainErrors.MediaContributor.ContributorNameCannotBeEmpty, ErrorType.Validation);
         AssertError(DomainErrors.MediaContributor.ContributorDisplayNameCannotBeEmpty, ErrorType.Validation);
         AssertError(DomainErrors.MediaContributor.ContributorDisplayNameMustBeMaximum100CharactersLong, ErrorType.Validation);
@@ -176,6 +180,7 @@ public class ErrorsTests
         AssertError(DomainErrors.MediaContributor.ContributorsListCannotBeNull, ErrorType.Validation);
         AssertError(DomainErrors.MediaContributor.MediaContributorIdCannotBeEmpty, ErrorType.Validation);
         AssertError(DomainErrors.MediaContributor.MediaContributorNotFound, ErrorType.NotFound);
+        AssertError(DomainErrors.MediaContributor.MediaContributorAlreadyExists, ErrorType.Conflict);
         AssertError(DomainErrors.MediaContributor.UnknownMediaContributorRole, ErrorType.Validation);
     }
 

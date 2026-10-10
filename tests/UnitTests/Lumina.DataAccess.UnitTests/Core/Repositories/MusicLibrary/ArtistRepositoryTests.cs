@@ -16,6 +16,7 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
@@ -1116,6 +1117,104 @@ public class ArtistRepositoryTests
         Assert.Equal(expectedCurrentPage, page.CurrentPage);
         Assert.Equal(perPage, page.PerPage);
         Assert.Equal(expectedRowCount, page.Data.Count);
+    }
+
+    [Fact]
+    public async Task GetArtistsNeedingMetadataAsync_WhenAnArtistAndAllItsDescendantsAreEnriched_ShouldNotReturnIt()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity enriched = CreateArtistWithFullAggregate();
+        enriched.LibraryId = libraryId;
+        MarkEnriched(enriched);
+        ArtistEntity pending = _artistEntityFixture.Create(libraryId: libraryId, name: "Pending Artist", includeAlbums: false, includeContributors: false);
+        _mockContext.Artists.AddRange(enriched, pending);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<ArtistEntity>> result = await _sut.GetArtistsNeedingMetadataAsync(libraryId, null, 10, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        ArtistEntity onlyArtist = Assert.Single(result.Value);
+        Assert.Equal(pending.Id, onlyArtist.Id);
+    }
+
+    [Fact]
+    public async Task GetArtistsNeedingMetadataAsync_WhenATrackIsNotEnriched_ShouldReturnTheArtist()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = CreateArtistWithFullAggregate();
+        artist.LibraryId = libraryId;
+        MarkEnriched(artist);
+        artist.Albums[0].Tracks[0].MetadataStatus = MetadataStatus.Pending;
+        _mockContext.Artists.Add(artist);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<ArtistEntity>> result = await _sut.GetArtistsNeedingMetadataAsync(libraryId, null, 10, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        ArtistEntity onlyArtist = Assert.Single(result.Value);
+        Assert.Equal(artist.Id, onlyArtist.Id);
+    }
+
+    [Fact]
+    public async Task GetArtistsNeedingMetadataAsync_WhenLastNameIsProvided_ShouldReturnOnlyArtistsAfterIt()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity alpha = _artistEntityFixture.Create(libraryId: libraryId, name: "Alpha", includeAlbums: false, includeContributors: false);
+        ArtistEntity beta = _artistEntityFixture.Create(libraryId: libraryId, name: "Beta", includeAlbums: false, includeContributors: false);
+        ArtistEntity gamma = _artistEntityFixture.Create(libraryId: libraryId, name: "Gamma", includeAlbums: false, includeContributors: false);
+        _mockContext.Artists.AddRange(alpha, beta, gamma);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<ArtistEntity>> result = await _sut.GetArtistsNeedingMetadataAsync(libraryId, "Beta", 10, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        ArtistEntity onlyArtist = Assert.Single(result.Value);
+        Assert.Equal(gamma.Id, onlyArtist.Id);
+    }
+
+    [Fact]
+    public async Task GetArtistsNeedingMetadataCountAsync_ShouldCountArtistsWithPendingMetadataIncludingDescendants()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity enriched = CreateArtistWithFullAggregate();
+        enriched.LibraryId = libraryId;
+        MarkEnriched(enriched);
+        ArtistEntity pending = _artistEntityFixture.Create(libraryId: libraryId, includeAlbums: false, includeContributors: false);
+        ArtistEntity otherLibrary = _artistEntityFixture.Create(includeAlbums: false, includeContributors: false);
+        _mockContext.Artists.AddRange(enriched, pending, otherLibrary);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<int> result = await _sut.GetArtistsNeedingMetadataCountAsync(libraryId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(1, result.Value);
+    }
+
+    /// <summary>
+    /// Marks the provided artist, its albums and its tracks as enriched.
+    /// </summary>
+    /// <param name="artist">The artist whose metadata enrichment status is set.</param>
+    private static void MarkEnriched(ArtistEntity artist)
+    {
+        artist.MetadataStatus = MetadataStatus.Enriched;
+        foreach (AlbumEntity album in artist.Albums)
+        {
+            album.MetadataStatus = MetadataStatus.Enriched;
+            foreach (TrackEntity track in album.Tracks)
+                track.MetadataStatus = MetadataStatus.Enriched;
+        }
     }
 
     /// <summary>

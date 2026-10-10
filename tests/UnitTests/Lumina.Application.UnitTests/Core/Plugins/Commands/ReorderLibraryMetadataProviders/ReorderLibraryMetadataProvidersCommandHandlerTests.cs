@@ -34,7 +34,7 @@ public class ReorderLibraryMetadataProvidersCommandHandlerTests
     private readonly ICurrentUserService _mockCurrentUserService;
     private readonly IValidator<ReorderLibraryMetadataProvidersCommand> _mockValidator;
     private readonly ReorderLibraryMetadataProvidersCommandHandler _sut;
-    private readonly LibraryMetadataProviderConfigurationEntityFixture _configurationEntityFixture = new();
+    private readonly LibraryMetadataProviderConfigurationEntityFixture _libraryMetadataProviderConfigurationEntityFixture = new();
     private readonly ReorderLibraryMetadataProvidersCommandFixture _reorderLibraryMetadataProvidersCommandFixture = new();
     private readonly Guid _userId;
 
@@ -66,8 +66,8 @@ public class ReorderLibraryMetadataProvidersCommandHandlerTests
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
-        LibraryMetadataProviderConfigurationEntity firstProvider = _configurationEntityFixture.Create(libraryId, Guid.NewGuid(), 2);
-        LibraryMetadataProviderConfigurationEntity secondProvider = _configurationEntityFixture.Create(libraryId, Guid.NewGuid(), 1);
+        LibraryMetadataProviderConfigurationEntity firstProvider = _libraryMetadataProviderConfigurationEntityFixture.Create(libraryId, Guid.NewGuid(), 2);
+        LibraryMetadataProviderConfigurationEntity secondProvider = _libraryMetadataProviderConfigurationEntityFixture.Create(libraryId, Guid.NewGuid(), 1);
         _mockConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
             .Returns(new List<LibraryMetadataProviderConfigurationEntity> { firstProvider, secondProvider });
         _mockConfigurationRepository.UpsertAsync(Arg.Any<LibraryMetadataProviderConfigurationEntity>(), Arg.Any<CancellationToken>())

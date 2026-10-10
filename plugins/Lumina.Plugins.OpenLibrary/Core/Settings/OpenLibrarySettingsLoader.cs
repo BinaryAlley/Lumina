@@ -20,7 +20,10 @@ internal static class OpenLibrarySettingsLoader
     public static void Apply(OpenLibrarySettingsDto settings, IReadOnlyDictionary<string, string> storedSettings)
     {
         if (storedSettings.TryGetValue(OpenLibrarySettingsKeys.CONTACT_EMAIL, out string? contactEmail))
-            settings.ContactEmail = string.IsNullOrWhiteSpace(contactEmail) ? null : contactEmail.Trim();
+        {
+            string? trimmedContactEmail = string.IsNullOrWhiteSpace(contactEmail) ? null : contactEmail.Trim();
+            settings.ContactEmail = trimmedContactEmail is not null && IsSafeContactEmail(trimmedContactEmail) ? trimmedContactEmail : null;
+        }
 
         if (storedSettings.TryGetValue(OpenLibrarySettingsKeys.SEARCH_RESULT_LIMIT, out string? searchResultLimit) &&
             int.TryParse(searchResultLimit, NumberStyles.Integer, CultureInfo.InvariantCulture, out int searchResultLimitValue))
@@ -33,5 +36,18 @@ internal static class OpenLibrarySettingsLoader
         if (storedSettings.TryGetValue(OpenLibrarySettingsKeys.MINIMUM_REQUEST_INTERVAL_SECONDS, out string? minimumRequestInterval) &&
             double.TryParse(minimumRequestInterval, NumberStyles.Float, CultureInfo.InvariantCulture, out double minimumRequestIntervalValue))
             settings.MinimumRequestInterval = TimeSpan.FromSeconds(Math.Max(0, minimumRequestIntervalValue));
+    }
+
+    /// <summary>
+    /// Determines whether the persisted contact email only contains characters that are safe inside the request from header.
+    /// </summary>
+    /// <param name="contactEmail">The persisted contact email.</param>
+    /// <returns><see langword="true"/> when the email is safe, otherwise <see langword="false"/>.</returns>
+    private static bool IsSafeContactEmail(string contactEmail)
+    {
+        foreach (char character in contactEmail)
+            if (!char.IsAsciiLetterOrDigit(character) && character is not ('@' or '.' or '_' or '-' or '+'))
+                return false;
+        return true;
     }
 }

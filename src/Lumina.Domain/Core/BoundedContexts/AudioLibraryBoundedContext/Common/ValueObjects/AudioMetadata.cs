@@ -44,6 +44,31 @@ public class AudioMetadata : BaseMetadata
     public Optional<int> Bitrate { get; }
 
     /// <summary>
+    /// Gets the AcoustID fingerprint identifier of the audio file, if applicable.
+    /// </summary>
+    public Optional<string> AcoustId { get; }
+
+    /// <summary>
+    /// Gets the ReplayGain track gain in decibels, if applicable.
+    /// </summary>
+    public Optional<decimal> ReplayGainTrackGain { get; }
+
+    /// <summary>
+    /// Gets the ReplayGain track peak, if applicable.
+    /// </summary>
+    public Optional<decimal> ReplayGainTrackPeak { get; }
+
+    /// <summary>
+    /// Gets the ReplayGain album gain in decibels, if applicable.
+    /// </summary>
+    public Optional<decimal> ReplayGainAlbumGain { get; }
+
+    /// <summary>
+    /// Gets the ReplayGain album peak, if applicable.
+    /// </summary>
+    public Optional<decimal> ReplayGainAlbumPeak { get; }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="AudioMetadata"/> class.
     /// </summary>
     /// <param name="title">The title of the audio.</param>
@@ -60,6 +85,11 @@ public class AudioMetadata : BaseMetadata
     /// <param name="genres">The genres of the audio.</param>
     /// <param name="tags">The tags associated with the audio.</param>
     /// <param name="bitrate">The bitrate of the audio in kbps.</param>
+    /// <param name="acoustId">The AcoustID fingerprint identifier of the audio file.</param>
+    /// <param name="replayGainTrackGain">The ReplayGain track gain in decibels.</param>
+    /// <param name="replayGainTrackPeak">The ReplayGain track peak.</param>
+    /// <param name="replayGainAlbumGain">The ReplayGain album gain in decibels.</param>
+    /// <param name="replayGainAlbumPeak">The ReplayGain album peak.</param>
     private AudioMetadata(
         string title,
         Optional<string> originalTitle,
@@ -74,7 +104,12 @@ public class AudioMetadata : BaseMetadata
         Optional<LanguageInfo> originalLanguage,
         Optional<int> bitDepth,
         Optional<string> audioCodec,
-        Optional<int> bitrate)
+        Optional<int> bitrate,
+        Optional<string> acoustId,
+        Optional<decimal> replayGainTrackGain,
+        Optional<decimal> replayGainTrackPeak,
+        Optional<decimal> replayGainAlbumGain,
+        Optional<decimal> replayGainAlbumPeak)
         : base(title, originalTitle, description, releaseInfo, genres, tags, language, originalLanguage)
     {
         DurationInSeconds = durationInSeconds;
@@ -83,6 +118,11 @@ public class AudioMetadata : BaseMetadata
         BitDepth = bitDepth;
         AudioCodec = audioCodec;
         Bitrate = bitrate;
+        AcoustId = acoustId;
+        ReplayGainTrackGain = replayGainTrackGain;
+        ReplayGainTrackPeak = replayGainTrackPeak;
+        ReplayGainAlbumGain = replayGainAlbumGain;
+        ReplayGainAlbumPeak = replayGainAlbumPeak;
     }
 
     /// <summary>
@@ -102,6 +142,11 @@ public class AudioMetadata : BaseMetadata
     /// <param name="genres">The genres of the audio.</param>
     /// <param name="tags">The tags associated with the audio.</param>
     /// <param name="bitrate">The bitrate of the audio in kbps.</param>
+    /// <param name="acoustId">The AcoustID fingerprint identifier of the audio file.</param>
+    /// <param name="replayGainTrackGain">The ReplayGain track gain in decibels.</param>
+    /// <param name="replayGainTrackPeak">The ReplayGain track peak.</param>
+    /// <param name="replayGainAlbumGain">The ReplayGain album gain in decibels.</param>
+    /// <param name="replayGainAlbumPeak">The ReplayGain album peak.</param>
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="AudioMetadata"/>, or an error message.
     /// </returns>
@@ -119,7 +164,12 @@ public class AudioMetadata : BaseMetadata
         Optional<LanguageInfo> originalLanguage,
         Optional<int> bitDepth,
         Optional<string> audioCodec,
-        Optional<int> bitrate)
+        Optional<int> bitrate,
+        Optional<string> acoustId,
+        Optional<decimal> replayGainTrackGain,
+        Optional<decimal> replayGainTrackPeak,
+        Optional<decimal> replayGainAlbumGain,
+        Optional<decimal> replayGainAlbumPeak)
     {
         return new AudioMetadata(
             title,
@@ -135,7 +185,12 @@ public class AudioMetadata : BaseMetadata
             originalLanguage,
             bitDepth,
             audioCodec,
-            bitrate);
+            bitrate,
+            acoustId,
+            replayGainTrackGain,
+            replayGainTrackPeak,
+            replayGainAlbumGain,
+            replayGainAlbumPeak);
     }
 
     /// <summary>
@@ -152,5 +207,10 @@ public class AudioMetadata : BaseMetadata
         yield return BitDepth;
         yield return AudioCodec;
         yield return Bitrate;
+        yield return AcoustId;
+        yield return ReplayGainTrackGain;
+        yield return ReplayGainTrackPeak;
+        yield return ReplayGainAlbumGain;
+        yield return ReplayGainAlbumPeak;
     }
 }

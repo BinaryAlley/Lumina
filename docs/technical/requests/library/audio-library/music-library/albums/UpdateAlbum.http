@@ -7,6 +7,7 @@ Content-Type: application/json
     "title": "A Night at the Opera",
     "originalTitle": "A Night at the Opera",
     "description": "The fourth studio album by the British rock band Queen, released in 1975. It was the most expensive album ever recorded at the time of its release.",
+    "disambiguation": null,
     "releaseInfo": {
       "originalReleaseDate": "1975-11-21",
       "originalReleaseYear": 1975,
@@ -15,10 +16,6 @@ Content-Type: application/json
       "releaseCountry": "GB",
       "releaseVersion": "Remastered"
     },
-    "releaseType": "Album",
-    "releaseStatus": "Official",
-    "totalDiscs": 1,
-    "totalTracks": 12,
     "language": {
       "languageCode": "en",
       "languageName": "English",
@@ -29,18 +26,27 @@ Content-Type: application/json
       "languageName": "English",
       "nativeName": "English"
     },
+    "tags": [
+      { "name": "classic" },
+      { "name": "vinyl" }
+    ],
     "genres": [
       { "name": "Rock" },
       { "name": "Progressive Rock" }
     ],
-    "tags": [
-      { "name": "classic" },
-      { "name": "vinyl" }
-    ]
+    "script": "Latn",
+    "releaseTypes": [ "Album" ],
+    "releaseStatus": "Official",
+    "totalDiscs": 1,
+    "totalTracks": 12,
+    "releaseTitle": "A Night at the Opera"
   },
   "mediaFormat": "CD",
+  "packaging": "JewelCase",
   "barcode": "0042282778329",
-  "catalogNumber": "EMC 4008",
+  "catalogNumbers": ["EMC 4008"],
+  "label": "EMI",
+  "asin": "B000000000",
   "musicBrainzReleaseId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
   "musicBrainzReleaseGroupId": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
   "musicBrainzReleaseArtistId": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f",
