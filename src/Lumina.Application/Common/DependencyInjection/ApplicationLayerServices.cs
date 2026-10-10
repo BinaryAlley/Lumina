@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Telemetry;
+using Lumina.Application.Core.MediaLibrary.Management.Deletion;
 using Lumina.Domain.Common.Events;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -40,6 +41,9 @@ public static class ApplicationLayerServices
             .SelectMany(implementation => implementation.GetInterfaces(),
                 (implementation, contract) => new { Contract = contract, Implementation = implementation })
             .Where(registration => registration.Contract.IsGenericType && handlerContractTypes.Contains(registration.Contract.GetGenericTypeDefinition()));
+
+        services.AddScoped<IMediaLibraryItemDeletionStrategy, BooksMediaLibraryItemDeletionStrategy>();
+        services.AddScoped<IMediaLibraryItemDeletionStrategy, MusicMediaLibraryItemDeletionStrategy>();
 
         foreach (var registration in handlerRegistrations)
         {

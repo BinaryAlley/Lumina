@@ -8,6 +8,7 @@ using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Library
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Progress;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.PathTemplate;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Services.PathTemplate;
+using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Services.Scanners;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Scanners;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Services.PathTemplate;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Services.Scanners;
@@ -52,6 +53,7 @@ public static class DomainLayerServices
         services.AddScoped<IMediaLibraryScanJobFactory, MediaLibraryScanJobFactory>();
         services.AddScoped<IMediaLibraryScanningService, MediaLibraryScanningService>();
         services.AddScoped<IBookLibraryTypeScanner, BookLibraryTypeScanner>();
+        services.AddScoped<IMusicLibraryTypeScanner, MusicLibraryTypeScanner>();
         services.AddScoped<IMediaLibraryScannerFactory, MediaLibraryScannerFactory>();
         services.AddScoped<ILibraryPathPartCatalog, MusicLibraryPathPartCatalog>();
         services.AddScoped<ILibraryPathPartCatalog, BookLibraryPathPartCatalog>();
