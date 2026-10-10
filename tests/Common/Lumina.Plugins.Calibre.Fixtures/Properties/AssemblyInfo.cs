@@ -13,9 +13,10 @@ using System.Runtime.InteropServices;
 // COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
 
-// The following GUID is for the ID of the typelib if this project is exposed to COM
+// The following GUID is for the ID of the typelib if this project is exposed to COM.
 [assembly: Guid("B6F9E5D2-3C4D-5E6F-9A7B-8C9D0E1F2A31")]
 
 [assembly: InternalsVisibleTo("Lumina.Plugins.Calibre.UnitTests")]
+[assembly: InternalsVisibleTo("Lumina.Plugins.Calibre.SecurityTests")]
 [assembly: InternalsVisibleTo("Lumina.Plugins.Calibre.IntegrationTests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

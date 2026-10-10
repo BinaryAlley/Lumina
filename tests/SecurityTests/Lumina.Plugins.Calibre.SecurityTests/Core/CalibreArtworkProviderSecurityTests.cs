@@ -4,10 +4,15 @@ using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.Book
 using Lumina.Plugins.Calibre.Core;
 using Lumina.Plugins.Contracts.Core.Metadata;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Plugins.Calibre;
+namespace Lumina.Plugins.Calibre.SecurityTests.Core;
 
 /// <summary>
 /// Contains security tests for the <see cref="CalibreArtworkProvider"/> class, exercised through the public artwork provider surface.
@@ -29,11 +34,11 @@ public class CalibreArtworkProviderSecurityTests
             IArtworkProvider provider = CreateArtworkProvider();
 
             // Act
-            ArtworkDto? result = await provider.GetArtworkAsync(_bookMetadataLookupDtoFixture.Create(path: bookPath), CancellationToken.None);
+            IReadOnlyList<ArtworkDto> result = await provider.GetArtworkAsync(_bookMetadataLookupDtoFixture.Create(path: bookPath), CancellationToken.None);
 
             // Assert
-            Assert.NotNull(result);
-            Assert.Equal(Path.Combine(bookDirectory, "cover.jpg"), result!.LocalPath);
+            ArtworkDto artwork = Assert.Single(result);
+            Assert.Equal(Path.Combine(bookDirectory, "cover.jpg"), artwork.LocalPath);
         }
         finally
         {
@@ -60,10 +65,10 @@ public class CalibreArtworkProviderSecurityTests
             IArtworkProvider provider = CreateArtworkProvider();
 
             // Act
-            ArtworkDto? result = await provider.GetArtworkAsync(_bookMetadataLookupDtoFixture.Create(path: bookPath), CancellationToken.None);
+            IReadOnlyList<ArtworkDto> result = await provider.GetArtworkAsync(_bookMetadataLookupDtoFixture.Create(path: bookPath), CancellationToken.None);
 
             // Assert
-            Assert.Null(result);
+            Assert.Empty(result);
         }
         finally
         {

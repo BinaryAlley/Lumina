@@ -13,10 +13,10 @@ using System.Runtime.InteropServices;
 // COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
 
-// The following GUID is for the ID of the typelib if this project is exposed to COM
+// The following GUID is for the ID of the typelib if this project is exposed to COM.
 [assembly: Guid("C4D7E1A9-2F83-4B56-9E0D-6A8C1F3B5D72")]
 
 [assembly: InternalsVisibleTo("Lumina.Plugins.MusicBrainz.UnitTests")]
+[assembly: InternalsVisibleTo("Lumina.Plugins.MusicBrainz.SecurityTests")]
 [assembly: InternalsVisibleTo("Lumina.Plugins.MusicBrainz.IntegrationTests")]
-[assembly: InternalsVisibleTo("Lumina.Presentation.Api.SecurityTests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

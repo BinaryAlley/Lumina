@@ -6,10 +6,14 @@ using Lumina.Plugins.Calibre.Core;
 using Lumina.Plugins.Calibre.Core.Opf;
 using Lumina.Plugins.Contracts.Core.Metadata;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Plugins.Calibre.Opf;
+namespace Lumina.Plugins.Calibre.SecurityTests.Core.Opf;
 
 /// <summary>
 /// Contains security tests for the <see cref="OpfReader"/> class, exercised through the public metadata provider surface.
@@ -27,7 +31,7 @@ public class OpfReaderSecurityTests
         string bookDirectory = CreateTempDirectory();
         try
         {
-            // the OPF is untrusted XML, so a DTD with an external entity must be rejected instead of being read and expanded
+            // The OPF is untrusted XML, so a DTD with an external entity must be rejected instead of being read and expanded.
             string opfContent = """<?xml version="1.0" encoding="utf-8"?><!DOCTYPE package [<!ENTITY xxe SYSTEM "file:///etc/passwd">]><package xmlns="http://www.idpf.org/2007/opf"><metadata xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:title>&xxe;</dc:title></metadata></package>""";
             string bookPath = WriteBookWithOpf(bookDirectory, opfContent);
             IMetadataProvider provider = CreateMetadataProvider();

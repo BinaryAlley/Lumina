@@ -14,7 +14,7 @@
             <_Parameter1_IsLiteral>true</_Parameter1_IsLiteral>
         </AssemblyAttribute>
     </ItemGroup>
-    
+
     <ItemGroup>
         <PackageReference Include="AutoFixture.AutoNSubstitute" />
         <PackageReference Include="AutoFixture.Xunit2" />
@@ -23,7 +23,6 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.AspNetCore.Http.Features" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" />
         <PackageReference Include="NSubstitute" />
@@ -39,12 +38,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\src\Lumina.Infrastructure\Lumina.Infrastructure.csproj" />
-        <ProjectReference Include="..\..\Common\Lumina.Domain.Fixtures\Lumina.Domain.Fixtures.csproj" />
-        <ProjectReference Include="..\..\Common\Lumina.Application.Fixtures\Lumina.Application.Fixtures.csproj" />
+        <ProjectReference Include="..\..\..\plugins\Lumina.Plugins.MusicBrainz\Lumina.Plugins.MusicBrainz.csproj" />
+        <ProjectReference Include="..\..\..\src\Lumina.Plugins.Contracts\Lumina.Plugins.Contracts.csproj" />
+        <ProjectReference Include="..\..\Common\Lumina.Plugins.MusicBrainz.Fixtures\Lumina.Plugins.MusicBrainz.Fixtures.csproj" />
         <ProjectReference Include="..\..\Common\Lumina.Contracts.Fixtures\Lumina.Contracts.Fixtures.csproj" />
-        <ProjectReference Include="..\..\Common\Lumina.Infrastructure.Fixtures\Lumina.Infrastructure.Fixtures.csproj" />
-        <ProjectReference Include="..\..\Common\Lumina.TestPlugin\Lumina.TestPlugin.csproj" />
     </ItemGroup>
 
 </Project>
