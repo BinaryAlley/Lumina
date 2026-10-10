@@ -57,4 +57,16 @@
   <data name="DescriptionShouldPreserveBookStyles" xml:space="preserve">
     <value>阅读书籍时是否保留书籍内容的原始样式。启用后保留书籍的外观（字体、颜色、对齐方式），但书籍样式可以从外部服务器加载资源，这些服务器可能观察到该行为。禁用可去除样式。</value>
   </data>
+  <data name="ShouldAggregateMetadataWhenMissing" xml:space="preserve">
+    <value>缺失时聚合元数据</value>
+  </data>
+  <data name="DescriptionShouldAggregateMetadataWhenMissing" xml:space="preserve">
+    <value>启用后，第一个元数据提供程序未提供的媒体库项目元数据将由后续提供程序补充。</value>
+  </data>
+  <data name="ShouldAggregateArtworkWhenMissing" xml:space="preserve">
+    <value>缺失时聚合图片</value>
+  </data>
+  <data name="DescriptionShouldAggregateArtworkWhenMissing" xml:space="preserve">
+    <value>启用后，首个图片提供程序未提供的媒体库项目图片将由后续提供程序补齐。</value>
+  </data>
 </root>

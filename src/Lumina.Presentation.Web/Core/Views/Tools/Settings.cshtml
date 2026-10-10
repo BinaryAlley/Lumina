@@ -104,6 +104,32 @@
                     </div>
                     <small class="form-label text-disabled form-description">@_localizer["DescriptionShouldPreserveBookStyles"]</small>
                 </div>
+                <!-- Metadata aggregation. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label asp-for="ShouldAggregateMetadataWhenMissing">@_localizer["ShouldAggregateMetadataWhenMissing"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <label class="enlightenment-checkbox-label">
+                            <input type="checkbox" asp-for="ShouldAggregateMetadataWhenMissing" class="enlightenment-checkbox-hidden" />
+                            <span class="enlightenment-checkbox"></span>
+                        </label>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionShouldAggregateMetadataWhenMissing"]</small>
+                </div>
+                <!-- Artwork aggregation. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label asp-for="ShouldAggregateArtworkWhenMissing">@_localizer["ShouldAggregateArtworkWhenMissing"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <label class="enlightenment-checkbox-label">
+                            <input type="checkbox" asp-for="ShouldAggregateArtworkWhenMissing" class="enlightenment-checkbox-hidden" />
+                            <span class="enlightenment-checkbox"></span>
+                        </label>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionShouldAggregateArtworkWhenMissing"]</small>
+                </div>
                 <div class="form-row" style="justify-content: center;">
                     <button type="submit" class="confirm-button h-22px">@_localizer["Save"]</button>
                 </div>
@@ -126,7 +152,8 @@
         const checkboxIsThemeCachingEnabled = document.getElementById('IsThemeCachingEnabled');
         const checkboxShouldRenderPdfAsImages = document.getElementById('ShouldRenderPdfAsImages');
         const checkboxShouldPreserveBookStyles = document.getElementById('ShouldPreserveBookStyles');
-        let shouldAggregateMetadataWhenMissing = false;
+        const checkboxShouldAggregateMetadataWhenMissing = document.getElementById('ShouldAggregateMetadataWhenMissing');
+        const checkboxShouldAggregateArtworkWhenMissing = document.getElementById('ShouldAggregateArtworkWhenMissing');
 
         // Toggle the enabled state of the items per page input based on the pagination checkbox.
         function updateItemsPerPageEnabledState() {
@@ -143,7 +170,8 @@
                 checkboxIsThemeCachingEnabled.checked = data.isThemeCachingEnabled === true;
                 checkboxShouldRenderPdfAsImages.checked = data.shouldRenderPdfAsImages === true;
                 checkboxShouldPreserveBookStyles.checked = data.shouldPreserveBookStyles === true;
-                shouldAggregateMetadataWhenMissing = data.shouldAggregateMetadataWhenMissing === true;
+                checkboxShouldAggregateMetadataWhenMissing.checked = data.shouldAggregateMetadataWhenMissing === true;
+                checkboxShouldAggregateArtworkWhenMissing.checked = data.shouldAggregateArtworkWhenMissing === true;
                 updateItemsPerPageEnabledState();
             }
         }
@@ -155,7 +183,8 @@
                 ItemsPerPage: Number(inputItemsPerPage.value),
                 ShouldIgnoreThePrefixForAlphaPicker: checkboxShouldIgnoreThePrefixForAlphaPicker.checked,
                 IsThemeCachingEnabled: checkboxIsThemeCachingEnabled.checked,
-                ShouldAggregateMetadataWhenMissing: shouldAggregateMetadataWhenMissing,
+                ShouldAggregateMetadataWhenMissing: checkboxShouldAggregateMetadataWhenMissing.checked,
+                ShouldAggregateArtworkWhenMissing: checkboxShouldAggregateArtworkWhenMissing.checked,
                 ShouldRenderPdfAsImages: checkboxShouldRenderPdfAsImages.checked,
                 ShouldPreserveBookStyles: checkboxShouldPreserveBookStyles.checked
             };

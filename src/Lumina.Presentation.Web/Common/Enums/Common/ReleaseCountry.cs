@@ -2,7 +2,7 @@
 namespace Lumina.Presentation.Web.Common.Enums.Common;
 
 /// <summary>
-/// Enumeration for the country of a media release, using the ISO 3166-1 alpha-2 country codes.
+/// Enumeration for the country of a media release, using the ISO 3166-1 alpha-2 country codes, together with the MusicBrainz special codes for releases issued across Europe or worldwide.
 /// </summary>
 public enum ReleaseCountry
 {
@@ -984,5 +984,20 @@ public enum ReleaseCountry
     /// <summary>
     /// The ISO 3166-1 alpha-2 code of Zimbabwe.
     /// </summary>
-    ZW
+    ZW,
+
+    /// <summary>
+    /// The ISO 3166-1 alpha-2 code of the Netherlands Antilles, withdrawn in 2010.
+    /// </summary>
+    AN,
+
+    /// <summary>
+    /// The MusicBrainz code for a release issued across Europe.
+    /// </summary>
+    XE,
+
+    /// <summary>
+    /// The MusicBrainz code for a release issued worldwide.
+    /// </summary>
+    XW
 }

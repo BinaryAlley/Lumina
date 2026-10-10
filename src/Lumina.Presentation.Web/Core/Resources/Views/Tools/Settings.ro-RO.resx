@@ -57,4 +57,16 @@
   <data name="DescriptionShouldPreserveBookStyles" xml:space="preserve">
     <value>Dacă stilul original al conținutului cărții este păstrat atunci când citiți o carte. Activarea păstrează aspectul cărții (fonturi, culori, aliniere), dar stilurile cărților pot încărca resurse de pe servere externe, pe care acele servere le-ar putea observa. Dezactivați-l pentru a elimina stilurile.</value>
   </data>
+  <data name="ShouldAggregateMetadataWhenMissing" xml:space="preserve">
+    <value>Agregați metadatele lipsă</value>
+  </data>
+  <data name="DescriptionShouldAggregateMetadataWhenMissing" xml:space="preserve">
+    <value>Când este activat, metadatele elementelor din bibliotecă pe care primul furnizor de metadate nu le oferă sunt completate din furnizorii următori.</value>
+  </data>
+  <data name="ShouldAggregateArtworkWhenMissing" xml:space="preserve">
+    <value>Agregă ilustrațiile când lipsesc</value>
+  </data>
+  <data name="DescriptionShouldAggregateArtworkWhenMissing" xml:space="preserve">
+    <value>Când este activat, ilustrațiile elementelor din bibliotecă pe care primul furnizor de ilustrații nu le oferă sunt completate de la furnizorii următori.</value>
+  </data>
 </root>

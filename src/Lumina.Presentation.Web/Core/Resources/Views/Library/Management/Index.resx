@@ -189,6 +189,9 @@
   <data name="EnrichingMetadata" xml:space="preserve">
     <value>Enriching metadata...</value>
   </data>
+  <data name="ExtractingMetadata" xml:space="preserve">
+    <value>Extracting metadata...</value>
+  </data>
   <data name="HashingFileContents" xml:space="preserve">
     <value>Hashing file contents...</value>
   </data>

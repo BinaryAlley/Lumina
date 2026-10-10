@@ -57,4 +57,16 @@
   <data name="DescriptionShouldPreserveBookStyles" xml:space="preserve">
     <value>Indica si se conserva el estilo original del contenido de los libros al leer un libro. Activarlo mantiene el aspecto del libro (fuentes, colores, alineación), pero los estilos de los libros pueden cargar recursos de servidores externos, que esos servidores podrían observar. Desactívelo para eliminar los estilos.</value>
   </data>
+  <data name="ShouldAggregateMetadataWhenMissing" xml:space="preserve">
+    <value>Agregar metadatos cuando faltan</value>
+  </data>
+  <data name="DescriptionShouldAggregateMetadataWhenMissing" xml:space="preserve">
+    <value>Cuando está habilitado, los metadatos de los elementos de la biblioteca que el primer proveedor de metadatos no proporciona se completan con los proveedores siguientes.</value>
+  </data>
+  <data name="ShouldAggregateArtworkWhenMissing" xml:space="preserve">
+    <value>Combinar ilustraciones cuando falten</value>
+  </data>
+  <data name="DescriptionShouldAggregateArtworkWhenMissing" xml:space="preserve">
+    <value>Cuando está habilitado, las ilustraciones de los elementos de la biblioteca que el primer proveedor de ilustraciones no proporciona se completan desde los proveedores siguientes.</value>
+  </data>
 </root>

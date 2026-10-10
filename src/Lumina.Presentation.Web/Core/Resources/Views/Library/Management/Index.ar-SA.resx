@@ -189,6 +189,9 @@
   <data name="EnrichingMetadata" xml:space="preserve">
     <value>إثراء البيانات الوصفية...</value>
   </data>
+  <data name="ExtractingMetadata" xml:space="preserve">
+    <value>استخراج البيانات الوصفية...</value>
+  </data>
   <data name="HashingFileContents" xml:space="preserve">
     <value>تجزئة محتويات الملفات...</value>
   </data>

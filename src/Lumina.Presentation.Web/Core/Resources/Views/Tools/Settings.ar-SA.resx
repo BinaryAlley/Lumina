@@ -57,4 +57,16 @@
   <data name="DescriptionShouldPreserveBookStyles" xml:space="preserve">
     <value>ما إذا كان يتم الحفاظ على التنسيق الأصلي لمحتوى الكتاب عند قراءته. يؤدي تفعيله إلى الاحتفاظ بمظهر الكتاب (الخطوط والألوان والمحاذاة)، لكن أنماط الكتب يمكنها تحميل موارد من خوادم خارجية، وقد تتمكن تلك الخوادم من مراقبة ذلك. عطّله لإزالة الأنماط.</value>
   </data>
+  <data name="ShouldAggregateMetadataWhenMissing" xml:space="preserve">
+    <value>تجميع البيانات الوصفية عند فقدانها</value>
+  </data>
+  <data name="DescriptionShouldAggregateMetadataWhenMissing" xml:space="preserve">
+    <value>عند التمكين، تُكمَّل البيانات الوصفية لعناصر المكتبة التي لا يوفّرها مزوّد البيانات الوصفية الأول من المزوّدين التاليين.</value>
+  </data>
+  <data name="ShouldAggregateArtworkWhenMissing" xml:space="preserve">
+    <value>تجميع الأعمال الفنية عند فقدانها</value>
+  </data>
+  <data name="DescriptionShouldAggregateArtworkWhenMissing" xml:space="preserve">
+    <value>عند التفعيل، تُستكمل الأعمال الفنية لعناصر المكتبة التي لا يوفرها مزود الأعمال الفنية الأول من المزودين التاليين.</value>
+  </data>
 </root>
