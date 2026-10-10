@@ -42,7 +42,8 @@ public class UpdateArtistEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     };
     private readonly UpdateArtistRequestFixture _updateArtistRequestFixture = new();
     private readonly UpdateArtistAlbumRequestFixture _updateArtistAlbumRequestFixture = new();
-    private readonly AlbumMetadataDtoFixture _albumMetadataDtoFixture = new();
+    private readonly MusicAlbumMetadataDtoFixture _musicAlbumMetadataDtoFixture = new();
+    private readonly MusicArtistMetadataDtoFixture _musicArtistMetadataDtoFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly ArtistEntityFixture _artistEntityFixture = new();
     private readonly AlbumEntityFixture _albumEntityFixture = new();
@@ -75,11 +76,11 @@ public class UpdateArtistEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         (Guid artistId, Guid albumId) = await SeedArtistWithAlbumAsync(libraryId);
         UpdateArtistAlbumRequest album = _updateArtistAlbumRequestFixture.Create(
             albumId: albumId,
-            metadata: _albumMetadataDtoFixture.Create(title: "Updated Album"),
+            metadata: _musicAlbumMetadataDtoFixture.Create(title: "Updated Album"),
             contributors: [],
             ratings: [],
             tracks: []);
-        UpdateArtistRequest request = _updateArtistRequestFixture.Create(name: "Queen Updated", contributors: [], albums: [album]);
+        UpdateArtistRequest request = _updateArtistRequestFixture.Create(metadata: _musicArtistMetadataDtoFixture.Create(name: "Queen Updated"), contributors: [], albums: [album]);
 
         // Act
         HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}/artists/{artistId}", request);
@@ -90,7 +91,7 @@ public class UpdateArtistEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         ArtistResponse? artistResponse = JsonSerializer.Deserialize<ArtistResponse>(content, _jsonOptions);
         Assert.NotNull(artistResponse);
         Assert.Equal(artistId, artistResponse!.Id);
-        Assert.Equal("Queen Updated", artistResponse.Name);
+        Assert.Equal("Queen Updated", artistResponse.Metadata.Name);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
@@ -170,7 +171,7 @@ public class UpdateArtistEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         Guid userId = GetCurrentUserId();
         Guid libraryId = await SeedLibraryAsync(userId);
         (Guid artistId, _) = await SeedArtistWithAlbumAsync(libraryId);
-        UpdateArtistRequest request = _updateArtistRequestFixture.Create(name: string.Empty, contributors: [], albums: []);
+        UpdateArtistRequest request = _updateArtistRequestFixture.Create(metadata: _musicArtistMetadataDtoFixture.Create(name: string.Empty), contributors: [], albums: []);
         string url = $"/api/v1/libraries/{libraryId}/artists/{artistId}";
 
         // Act

@@ -2,6 +2,7 @@
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.Admin.Authorization.Permissions.Queries.GetPermissions;
+using Lumina.Contracts.Fixtures.Core.Responses.Authorization;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
@@ -27,6 +28,7 @@ public class GetPermissionsEndpointTests
 {
     private readonly IQueryHandler<GetPermissionsQuery, Result<IEnumerable<PermissionResponse>>> _mockHandler;
     private readonly GetPermissionsEndpoint _sut;
+    private readonly PermissionResponseFixture _permissionResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPermissionsEndpointTests"/> class.
@@ -44,9 +46,9 @@ public class GetPermissionsEndpointTests
         CancellationToken cancellationToken = CancellationToken.None;
         IEnumerable<PermissionResponse> expectedResponse =
         [
-            new(Guid.NewGuid(), AuthorizationPermission.CanViewUsers),
-            new(Guid.NewGuid(), AuthorizationPermission.CanDeleteUsers),
-            new(Guid.NewGuid(), AuthorizationPermission.CanRegisterUsers)
+            _permissionResponseFixture.Create(id: Guid.NewGuid(), permissionName: AuthorizationPermission.CanViewUsers),
+            _permissionResponseFixture.Create(id: Guid.NewGuid(), permissionName: AuthorizationPermission.CanDeleteUsers),
+            _permissionResponseFixture.Create(id: Guid.NewGuid(), permissionName: AuthorizationPermission.CanRegisterUsers)
         ];
         _mockHandler.HandleAsync(Arg.Any<GetPermissionsQuery>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(expectedResponse));

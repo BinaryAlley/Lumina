@@ -29,6 +29,7 @@ public class GetUserSettingsEndpointSummary : Summary<GetUserSettingsEndpoint, E
                 ShouldIgnoreThePrefixForAlphaPicker: false,
                 IsThemeCachingEnabled: true,
                 ShouldAggregateMetadataWhenMissing: false,
+                ShouldAggregateArtworkWhenMissing: false,
                 ShouldRenderPdfAsImages: false,
                 ShouldPreserveBookStyles: true
             ));

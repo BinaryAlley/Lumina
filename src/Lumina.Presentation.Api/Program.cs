@@ -109,6 +109,7 @@ public class Program
             {
                 ILogger<Program> logger = services.GetRequiredService<ILogger<Program>>();
                 logger.LogCritical(ex, "Failed to run database migrations");
+                throw;
             }
         }
 

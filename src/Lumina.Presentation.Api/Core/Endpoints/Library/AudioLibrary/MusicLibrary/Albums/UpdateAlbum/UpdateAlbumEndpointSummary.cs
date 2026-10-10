@@ -41,7 +41,7 @@ public class UpdateAlbumEndpointSummary : Summary<UpdateAlbumEndpoint, UpdateAlb
         RequestParam(r => r.Metadata!.ReleaseInfo!.ReReleaseYear, "The re-release or reissue year of the album. Optional.");
         RequestParam(r => r.Metadata!.ReleaseInfo!.ReleaseCountry, "The country or region of the release of the album. Optional.");
         RequestParam(r => r.Metadata!.ReleaseInfo!.ReleaseVersion, "The version or edition of the release of the album. Optional.");
-        RequestParam(r => r.Metadata!.ReleaseType, "The type of the release. Optional.");
+        RequestParam(r => r.Metadata!.ReleaseTypes, "The type of the release. Optional.");
         RequestParam(r => r.Metadata!.ReleaseStatus, "The status of the release. Optional.");
         RequestParam(r => r.Metadata!.TotalDiscs, "The number of discs of the release. Optional.");
         RequestParam(r => r.Metadata!.TotalTracks, "The number of tracks of the release. Optional.");
@@ -57,7 +57,7 @@ public class UpdateAlbumEndpointSummary : Summary<UpdateAlbumEndpoint, UpdateAlb
         RequestParam(r => r.Metadata!.Tags, "The list of tags that further describe or categorize the album. Required.");
         RequestParam(r => r.MediaFormat, "The physical or digital medium of the album. Optional.");
         RequestParam(r => r.Barcode, "The barcode of the album. Optional.");
-        RequestParam(r => r.CatalogNumber, "The catalog number of the album. Optional.");
+        RequestParam(r => r.CatalogNumbers, "The catalog numbers of the album. Optional.");
         RequestParam(r => r.MusicBrainzReleaseId, "The MusicBrainz identifier of the release. Optional.");
         RequestParam(r => r.MusicBrainzReleaseGroupId, "The MusicBrainz identifier of the release group. Optional.");
         RequestParam(r => r.MusicBrainzReleaseArtistId, "The MusicBrainz identifier of the release artist. Optional.");
@@ -65,22 +65,19 @@ public class UpdateAlbumEndpointSummary : Summary<UpdateAlbumEndpoint, UpdateAlb
         RequestParam(r => r.Ratings, "The list of ratings for this album. Required.");
 
         ExampleRequest = new UpdateAlbumRequest(
-            Metadata: new AlbumMetadataDto(
+            Metadata: new MusicAlbumMetadataDto(
                 Title: "A Night at the Opera",
                 OriginalTitle: "A Night at the Opera",
                 Description: "The fourth studio album by the British rock band Queen, released in 1975. It was the most expensive album ever recorded at the time of its release.",
+                Disambiguation: "original release",
                 ReleaseInfo: new ReleaseInfoDto(
                     OriginalReleaseDate: new DateOnly(1975, 11, 21),
                     OriginalReleaseYear: 1975,
-                    ReReleaseDate: default,
-                    ReReleaseYear: default,
+                    ReReleaseDate: new DateOnly(2011, 11, 21),
+                    ReReleaseYear: 2011,
                     ReleaseCountry: ReleaseCountry.GB,
                     ReleaseVersion: "Remastered"
                 ),
-                ReleaseType: MusicReleaseType.Album,
-                ReleaseStatus: MusicReleaseStatus.Official,
-                TotalDiscs: 1,
-                TotalTracks: 12,
                 Language: new LanguageInfoDto(
                     LanguageCode: "en",
                     LanguageName: "English",
@@ -100,11 +97,19 @@ public class UpdateAlbumEndpointSummary : Summary<UpdateAlbumEndpoint, UpdateAlb
                 [
                     new TagDto(Name: "classic"),
                     new TagDto(Name: "vinyl")
-                ]
+                ],
+                Script: "Latn",
+                ReleaseTypes: [MusicReleaseType.Album],
+                ReleaseStatus: MusicReleaseStatus.Official,
+                TotalDiscs: 1,
+                TotalTracks: 12
             ),
             MediaFormat: MusicMediaFormat.CD,
+            Packaging: MusicReleasePackaging.JewelCase,
             Barcode: "0042282778329",
-            CatalogNumber: "EMC 4008",
+            CatalogNumbers: ["EMC 4008"],
+            Label: "EMI",
+            ASIN: "B000002UTK",
             MusicBrainzReleaseId: Guid.NewGuid(),
             MusicBrainzReleaseGroupId: Guid.NewGuid(),
             MusicBrainzReleaseArtistId: Guid.NewGuid(),
@@ -142,13 +147,13 @@ public class UpdateAlbumEndpointSummary : Summary<UpdateAlbumEndpoint, UpdateAlb
         ResponseParam<AlbumResponse>(r => r.Metadata!.Title, "The title of the album.");
         ResponseParam<AlbumResponse>(r => r.Metadata!.OriginalTitle, "The original title of the album, if applicable.");
         ResponseParam<AlbumResponse>(r => r.Metadata!.Description, "The description of the album, if applicable.");
-        ResponseParam<AlbumResponse>(r => r.Metadata!.ReleaseType, "The type of the release, if applicable.");
+        ResponseParam<AlbumResponse>(r => r.Metadata!.ReleaseTypes, "The type of the release, if applicable.");
         ResponseParam<AlbumResponse>(r => r.Metadata!.ReleaseStatus, "The status of the release, if applicable.");
         ResponseParam<AlbumResponse>(r => r.Metadata!.TotalDiscs, "The number of discs of the release, if applicable.");
         ResponseParam<AlbumResponse>(r => r.Metadata!.TotalTracks, "The number of tracks of the release.");
         ResponseParam<AlbumResponse>(r => r.MediaFormat, "The physical or digital medium of the album, if applicable.");
         ResponseParam<AlbumResponse>(r => r.Barcode, "The barcode of the album, if applicable.");
-        ResponseParam<AlbumResponse>(r => r.CatalogNumber, "The catalog number of the album, if applicable.");
+        ResponseParam<AlbumResponse>(r => r.CatalogNumbers, "The catalog numbers of the album, if applicable.");
         ResponseParam<AlbumResponse>(r => r.MusicBrainzReleaseId, "The MusicBrainz identifier of the release, if applicable.");
         ResponseParam<AlbumResponse>(r => r.MusicBrainzReleaseGroupId, "The MusicBrainz identifier of the release group, if applicable.");
         ResponseParam<AlbumResponse>(r => r.MusicBrainzReleaseArtistId, "The MusicBrainz identifier of the release artist, if applicable.");
@@ -177,15 +182,16 @@ public class UpdateAlbumEndpointSummary : Summary<UpdateAlbumEndpoint, UpdateAlb
                 Id: Guid.NewGuid(),
                 ArtistId: Guid.NewGuid(),
                 LibraryId: Guid.NewGuid(),
-                Metadata: new AlbumMetadataDto(
+                Metadata: new MusicAlbumMetadataDto(
                     Title: "A Night at the Opera",
                     OriginalTitle: "A Night at the Opera",
                     Description: "The fourth studio album by the British rock band Queen, released in 1975. It was the most expensive album ever recorded at the time of its release.",
+                    Disambiguation: "original release",
                     ReleaseInfo: new ReleaseInfoDto(
                         OriginalReleaseDate: new DateOnly(1975, 11, 21),
                         OriginalReleaseYear: 1975,
-                        ReReleaseDate: default,
-                        ReReleaseYear: default,
+                        ReReleaseDate: new DateOnly(2011, 11, 21),
+                        ReReleaseYear: 2011,
                         ReleaseCountry: ReleaseCountry.GB,
                         ReleaseVersion: "Remastered"
                     ),
@@ -207,19 +213,21 @@ public class UpdateAlbumEndpointSummary : Summary<UpdateAlbumEndpoint, UpdateAlb
                         new TagDto(Name: "classic"),
                         new TagDto(Name: "vinyl")
                     ],
-                    ReleaseType: MusicReleaseType.Album,
+                    Script: "Latn",
+                    ReleaseTypes: [MusicReleaseType.Album],
                     ReleaseStatus: MusicReleaseStatus.Official,
                     TotalDiscs: 1,
                     TotalTracks: 12
                 ),
                 MediaFormat: MusicMediaFormat.CD,
+                Packaging: MusicReleasePackaging.JewelCase,
                 Barcode: "0042282778329",
-                CatalogNumber: "EMC 4008",
+                CatalogNumbers: ["EMC 4008"],
+                Label: "EMI",
+                ASIN: "B000002UTK",
                 MusicBrainzReleaseId: Guid.NewGuid(),
                 MusicBrainzReleaseGroupId: Guid.NewGuid(),
                 MusicBrainzReleaseArtistId: Guid.NewGuid(),
-                CreatedOnUtc: DateTime.UtcNow,
-                UpdatedOnUtc: DateTime.UtcNow,
                 Contributors: [
                     new MediaContributorReferenceDto(
                         ContributorId: Guid.NewGuid(),
@@ -244,6 +252,8 @@ public class UpdateAlbumEndpointSummary : Summary<UpdateAlbumEndpoint, UpdateAlb
                         VoteCount: 1234
                     )
                 ],
+                CreatedOnUtc: new DateTime(2025, 1, 15, 10, 30, 0, DateTimeKind.Utc),
+                UpdatedOnUtc: new DateTime(2025, 1, 20, 14, 45, 0, DateTimeKind.Utc),
                 Tracks: []
             )
         );

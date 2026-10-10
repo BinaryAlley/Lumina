@@ -57,8 +57,9 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         PropertyNameCaseInsensitive = true,
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
-    private readonly AddTrackRequestFixture _requestTrackFixture = new();
-    private readonly AudioMetadataDtoFixture _audioMetadataDtoFixture = new();
+    private readonly AddTrackRequestFixture _addTrackRequestFixture = new();
+    private readonly MusicTrackMetadataDtoFixture _musicTrackMetadataDtoFixture = new();
+    private readonly MusicWorkDtoFixture _musicWorkDtoFixture = new();
     private readonly ReleaseInfoDtoFixture _releaseInfoDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
     private readonly TagDtoFixture _tagDtoFixture = new();
@@ -112,7 +113,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
             reReleaseYear: 2000,
             releaseCountry: ReleaseCountry.GB,
             releaseVersion: "Original");
-        AudioMetadataDto metadata = _audioMetadataDtoFixture.Create(
+        MusicTrackMetadataDto metadata = _musicTrackMetadataDtoFixture.Create(
             title: "Bohemian Rhapsody",
             originalTitle: "Bohemian Rhapsody",
             description: "A song by the British rock band Queen.",
@@ -127,7 +128,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
             bitDepth: 16,
             audioCodec: "FLAC",
             bitrate: 980);
-        AddTrackRequest trackRequest = _requestTrackFixture.Create(
+        AddTrackRequest trackRequest = _addTrackRequestFixture.Create(
             path: Path.Combine(_libraryContentLocation, $"{Guid.NewGuid():N}.flac"),
             metadata: metadata,
             trackNumber: 1,
@@ -135,10 +136,9 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
             script: "Latn",
             key: MusicKey.CMajor,
             bpm: 72,
-            work: "Bohemian Rhapsody",
+            work: _musicWorkDtoFixture.Create(title: "Bohemian Rhapsody", musicBrainzWorkId: Guid.NewGuid()),
             musicBrainzRecordingId: Guid.NewGuid(),
             musicBrainzTrackId: Guid.NewGuid(),
-            musicBrainzWorkId: Guid.NewGuid(),
             moods: [_moodDtoFixture.Create(name: "dramatic"), _moodDtoFixture.Create(name: "anxious")],
             isrcs: [_isrcDtoFixture.Create(value: "GBUM71029604")],
             contributors:
@@ -168,12 +168,22 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         Assert.Equal(trackRequest.Script, trackResponse.Script);
         Assert.Equal(trackRequest.Key, trackResponse.Key);
         Assert.Equal(trackRequest.Bpm, trackResponse.Bpm);
-        Assert.Equal(trackRequest.Work, trackResponse.Work);
+        // MusicWorkDto is a record whose Languages and Iswcs members are lists, which the generated record equality
+        // compares by reference, so the work is verified member by member, comparing the nested collections by value.
+        Assert.NotNull(trackResponse.Work);
+        Assert.Equal(trackRequest.Work!.MusicBrainzWorkId, trackResponse.Work.MusicBrainzWorkId);
+        Assert.Equal(trackRequest.Work.Title, trackResponse.Work.Title);
+        Assert.Equal(trackRequest.Work.Type, trackResponse.Work.Type);
+        Assert.Equal(
+            trackRequest.Work.Languages!.Select(language => (language.LanguageCode, language.LanguageName, language.NativeName)).OrderBy(language => language.LanguageCode),
+            trackResponse.Work.Languages!.Select(language => (language.LanguageCode, language.LanguageName, language.NativeName)).OrderBy(language => language.LanguageCode));
+        Assert.Equal(
+            trackRequest.Work.Iswcs!.OrderBy(iswc => iswc),
+            trackResponse.Work.Iswcs!.OrderBy(iswc => iswc));
         Assert.Equal(trackRequest.MusicBrainzRecordingId, trackResponse.MusicBrainzRecordingId);
         Assert.Equal(trackRequest.MusicBrainzTrackId, trackResponse.MusicBrainzTrackId);
-        Assert.Equal(trackRequest.MusicBrainzWorkId, trackResponse.MusicBrainzWorkId);
 
-        // metadata checks
+        // Metadata checks.
         Assert.Equal(metadata.Title, trackResponse.Metadata.Title);
         Assert.Equal(metadata.OriginalTitle, trackResponse.Metadata.OriginalTitle);
         Assert.Equal(metadata.Description, trackResponse.Metadata.Description);
@@ -184,7 +194,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         Assert.Equal(metadata.AudioCodec, trackResponse.Metadata.AudioCodec);
         Assert.Equal(metadata.Bitrate, trackResponse.Metadata.Bitrate);
 
-        // release info checks
+        // Release info checks.
         Assert.Equal(releaseInfo.OriginalReleaseDate, trackResponse.Metadata.ReleaseInfo!.OriginalReleaseDate);
         Assert.Equal(releaseInfo.OriginalReleaseYear, trackResponse.Metadata.ReleaseInfo.OriginalReleaseYear);
         Assert.Equal(releaseInfo.ReReleaseDate, trackResponse.Metadata.ReleaseInfo.ReReleaseDate);
@@ -192,7 +202,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         Assert.Equal(releaseInfo.ReleaseCountry, trackResponse.Metadata.ReleaseInfo.ReleaseCountry);
         Assert.Equal(releaseInfo.ReleaseVersion, trackResponse.Metadata.ReleaseInfo.ReleaseVersion);
 
-        // language checks
+        // Language checks.
         Assert.Equal(metadata.Language!.LanguageCode, trackResponse.Metadata.Language!.LanguageCode);
         Assert.Equal(metadata.Language.LanguageName, trackResponse.Metadata.Language.LanguageName);
         Assert.Equal(metadata.Language.NativeName, trackResponse.Metadata.Language.NativeName);
@@ -200,7 +210,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         Assert.Equal(metadata.OriginalLanguage.LanguageName, trackResponse.Metadata.OriginalLanguage.LanguageName);
         Assert.Equal(metadata.OriginalLanguage.NativeName, trackResponse.Metadata.OriginalLanguage.NativeName);
 
-        // genres and tags checks
+        // Genres and tags checks.
         Assert.Equal(
             metadata.Genres!.Select(genre => genre.Name).OrderBy(name => name),
             trackResponse.Metadata.Genres!.Select(genre => genre.Name).OrderBy(name => name));
@@ -208,7 +218,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
             metadata.Tags!.Select(tag => tag.Name).OrderBy(name => name),
             trackResponse.Metadata.Tags!.Select(tag => tag.Name).OrderBy(name => name));
 
-        // moods, ISRCs, contributors and ratings checks
+        // Moods, ISRCs, contributors and ratings checks.
         Assert.Equal(
             trackRequest.Moods!.Select(mood => mood.Name).OrderBy(name => name),
             trackResponse.Moods!.Select(mood => mood.Name).OrderBy(name => name));
@@ -222,7 +232,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         Assert.Contains(trackResponse.Ratings, rating => rating.Source == AudioRatingSource.MusicBrainz && rating.Value == 4.5m && rating.MaxValue == 5 && rating.VoteCount == 2345);
         Assert.Contains(trackResponse.Ratings, rating => rating.Source == AudioRatingSource.LastFm && rating.Value == 4.8m && rating.MaxValue == 5 && rating.VoteCount == 1234);
 
-        // check Location header
+        // Check Location header.
         Assert.NotNull(response.Headers.Location);
         string locationUri = response.Headers.Location!.ToString();
         Assert.EndsWith($"/api/v1/libraries/{_libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackResponse.Id}", locationUri);
@@ -233,7 +243,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(includePath: false);
+        AddTrackRequest request = _addTrackRequestFixture.Create(includePath: false);
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -247,7 +257,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(path: "/" + new Faker().Random.String2(2048) + ".flac");
+        AddTrackRequest request = _addTrackRequestFixture.Create(path: "/" + new Faker().Random.String2(2048) + ".flac");
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -261,7 +271,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(includeMetadata: false);
+        AddTrackRequest request = _addTrackRequestFixture.Create(includeMetadata: false);
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -275,7 +285,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(includeTitle: false));
+        AddTrackRequest request = _addTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(includeTitle: false));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -289,7 +299,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(title: new Faker().Random.String2(300)));
+        AddTrackRequest request = _addTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(title: new Faker().Random.String2(300)));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -303,7 +313,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(originalTitle: new Faker().Random.String2(300)));
+        AddTrackRequest request = _addTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(originalTitle: new Faker().Random.String2(300)));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -317,7 +327,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(description: new Faker().Random.String2(2001)));
+        AddTrackRequest request = _addTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(description: new Faker().Random.String2(2001)));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -331,7 +341,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(includeReleaseInfo: false));
+        AddTrackRequest request = _addTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(includeReleaseInfo: false));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -345,7 +355,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: 10000)));
+        AddTrackRequest request = _addTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: 10000)));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -359,7 +369,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(reReleaseYear: 10000)));
+        AddTrackRequest request = _addTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(reReleaseYear: 10000)));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -373,7 +383,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(releaseVersion: new Faker().Random.String2(100))));
+        AddTrackRequest request = _addTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(releaseVersion: new Faker().Random.String2(100))));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -387,7 +397,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2020, 1, 1), originalReleaseYear: 2019)));
+        AddTrackRequest request = _addTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2020, 1, 1), originalReleaseYear: 2019)));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -401,7 +411,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(reReleaseDate: new DateOnly(2021, 1, 1), reReleaseYear: 2020)));
+        AddTrackRequest request = _addTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(reReleaseDate: new DateOnly(2021, 1, 1), reReleaseYear: 2020)));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -415,7 +425,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: 2001, reReleaseYear: 2000, includeReReleaseDate: false)));
+        AddTrackRequest request = _addTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseYear: 2001, reReleaseYear: 2000, includeReReleaseDate: false)));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -429,7 +439,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2001, 1, 1), reReleaseDate: new DateOnly(2000, 1, 1))));
+        AddTrackRequest request = _addTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(releaseInfo: _releaseInfoDtoFixture.Create(originalReleaseDate: new DateOnly(2001, 1, 1), reReleaseDate: new DateOnly(2000, 1, 1))));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -443,7 +453,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(includeGenres: false));
+        AddTrackRequest request = _addTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(includeGenres: false));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -457,7 +467,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]));
+        AddTrackRequest request = _addTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -471,7 +481,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: new Faker().Random.String2(51))]));
+        AddTrackRequest request = _addTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: new Faker().Random.String2(51))]));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -485,7 +495,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(includeTags: false));
+        AddTrackRequest request = _addTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(includeTags: false));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -499,7 +509,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: string.Empty)]));
+        AddTrackRequest request = _addTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: string.Empty)]));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -513,7 +523,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: new Faker().Random.String2(51))]));
+        AddTrackRequest request = _addTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: new Faker().Random.String2(51))]));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -527,7 +537,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageCode: string.Empty)));
+        AddTrackRequest request = _addTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageCode: string.Empty)));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -541,7 +551,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageCode: new Faker().Random.String2(10))));
+        AddTrackRequest request = _addTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageCode: new Faker().Random.String2(10))));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -555,7 +565,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageName: string.Empty)));
+        AddTrackRequest request = _addTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageName: string.Empty)));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -569,7 +579,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageName: new Faker().Random.String2(100))));
+        AddTrackRequest request = _addTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(languageName: new Faker().Random.String2(100))));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -583,7 +593,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(nativeName: new Faker().Random.String2(100))));
+        AddTrackRequest request = _addTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(language: _languageInfoDtoFixture.Create(nativeName: new Faker().Random.String2(100))));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -597,7 +607,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageCode: string.Empty)));
+        AddTrackRequest request = _addTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageCode: string.Empty)));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -611,7 +621,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageCode: new Faker().Random.String2(10))));
+        AddTrackRequest request = _addTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageCode: new Faker().Random.String2(10))));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -625,7 +635,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageName: string.Empty)));
+        AddTrackRequest request = _addTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageName: string.Empty)));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -639,7 +649,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageName: new Faker().Random.String2(100))));
+        AddTrackRequest request = _addTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(languageName: new Faker().Random.String2(100))));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -653,7 +663,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(metadata: _audioMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(nativeName: new Faker().Random.String2(100))));
+        AddTrackRequest request = _addTrackRequestFixture.Create(metadata: _musicTrackMetadataDtoFixture.Create(originalLanguage: _languageInfoDtoFixture.Create(nativeName: new Faker().Random.String2(100))));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -667,7 +677,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(musicBrainzRecordingId: Guid.Empty);
+        AddTrackRequest request = _addTrackRequestFixture.Create(musicBrainzRecordingId: Guid.Empty);
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -681,7 +691,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(musicBrainzTrackId: Guid.Empty);
+        AddTrackRequest request = _addTrackRequestFixture.Create(musicBrainzTrackId: Guid.Empty);
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -695,7 +705,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(musicBrainzWorkId: Guid.Empty);
+        AddTrackRequest request = _addTrackRequestFixture.Create(work: _musicWorkDtoFixture.Create(musicBrainzWorkId: Guid.Empty));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -709,7 +719,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(includeTrackNumber: false);
+        AddTrackRequest request = _addTrackRequestFixture.Create(includeTrackNumber: false);
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -723,7 +733,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(trackNumber: 0);
+        AddTrackRequest request = _addTrackRequestFixture.Create(trackNumber: 0);
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -737,7 +747,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(discNumber: 0);
+        AddTrackRequest request = _addTrackRequestFixture.Create(discNumber: 0);
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -751,7 +761,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(script: new Faker().Random.String2(100));
+        AddTrackRequest request = _addTrackRequestFixture.Create(script: new Faker().Random.String2(100));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -765,7 +775,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(key: (MusicKey)999);
+        AddTrackRequest request = _addTrackRequestFixture.Create(key: (MusicKey)999);
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -779,7 +789,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(bpm: 0);
+        AddTrackRequest request = _addTrackRequestFixture.Create(bpm: 0);
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -793,7 +803,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(work: new Faker().Random.String2(300));
+        AddTrackRequest request = _addTrackRequestFixture.Create(work: _musicWorkDtoFixture.Create(title: new Faker().Random.String2(300)));
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -807,7 +817,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(moods: [_moodDtoFixture.Create(includeName: false)]);
+        AddTrackRequest request = _addTrackRequestFixture.Create(moods: [_moodDtoFixture.Create(includeName: false)]);
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -821,7 +831,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(isrcs: [_isrcDtoFixture.Create(includeValue: false)]);
+        AddTrackRequest request = _addTrackRequestFixture.Create(isrcs: [_isrcDtoFixture.Create(includeValue: false)]);
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -835,7 +845,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(includeContributors: false);
+        AddTrackRequest request = _addTrackRequestFixture.Create(includeContributors: false);
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -849,7 +859,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(contributors: [_mediaContributorReferenceDtoFixture.Create(contributorId: Guid.Empty, role: MediaContributorRole.Vocals)]);
+        AddTrackRequest request = _addTrackRequestFixture.Create(contributors: [_mediaContributorReferenceDtoFixture.Create(contributorId: Guid.Empty, role: MediaContributorRole.Vocals)]);
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -863,7 +873,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(contributors: [_mediaContributorReferenceDtoFixture.Create(contributorId: Guid.NewGuid(), role: (MediaContributorRole)999)]);
+        AddTrackRequest request = _addTrackRequestFixture.Create(contributors: [_mediaContributorReferenceDtoFixture.Create(contributorId: Guid.NewGuid(), role: (MediaContributorRole)999)]);
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -877,7 +887,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(includeRatings: false);
+        AddTrackRequest request = _addTrackRequestFixture.Create(includeRatings: false);
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -891,7 +901,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(ratings: [_audioRatingDtoFixture.Create(value: -3, maxValue: 5)]);
+        AddTrackRequest request = _addTrackRequestFixture.Create(ratings: [_audioRatingDtoFixture.Create(value: -3, maxValue: 5)]);
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -905,7 +915,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(ratings: [_audioRatingDtoFixture.Create(value: 6, maxValue: 5)]);
+        AddTrackRequest request = _addTrackRequestFixture.Create(ratings: [_audioRatingDtoFixture.Create(value: 6, maxValue: 5)]);
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -919,7 +929,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(ratings: [_audioRatingDtoFixture.Create(value: 1, maxValue: -3)]);
+        AddTrackRequest request = _addTrackRequestFixture.Create(ratings: [_audioRatingDtoFixture.Create(value: 1, maxValue: -3)]);
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -933,7 +943,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(ratings: [_audioRatingDtoFixture.Create(value: 4, maxValue: 5, voteCount: -3)]);
+        AddTrackRequest request = _addTrackRequestFixture.Create(ratings: [_audioRatingDtoFixture.Create(value: 4, maxValue: 5, voteCount: -3)]);
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -948,7 +958,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
         string pathOutsideTheLibrary = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "..", "lumina-tracks-outside", $"{Guid.NewGuid():N}.flac"));
-        AddTrackRequest request = _requestTrackFixture.Create(path: pathOutsideTheLibrary);
+        AddTrackRequest request = _addTrackRequestFixture.Create(path: pathOutsideTheLibrary);
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -963,7 +973,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         // Arrange
         Guid artistId = Guid.NewGuid();
         Guid albumId = Guid.NewGuid();
-        AddTrackRequest request = _requestTrackFixture.Create();
+        AddTrackRequest request = _addTrackRequestFixture.Create();
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, albumId, request);
@@ -978,7 +988,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
         Guid otherLibraryId = Guid.NewGuid();
-        AddTrackRequest request = _requestTrackFixture.Create(contributors: []);
+        AddTrackRequest request = _addTrackRequestFixture.Create(contributors: []);
 
         // Act
         HttpResponseMessage response = await _client.PostAsJsonAsync($"/api/v1/libraries/{otherLibraryId}/artists/{artistId}/albums/{albumId}/tracks", request);
@@ -993,7 +1003,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         // Arrange
         (Guid artistId, _) = await SeedArtistAndAlbumAsync();
         Guid missingAlbumId = Guid.NewGuid();
-        AddTrackRequest request = _requestTrackFixture.Create(contributors: []);
+        AddTrackRequest request = _addTrackRequestFixture.Create(contributors: []);
 
         // Act
         HttpResponseMessage response = await PostTrackAsync(artistId, missingAlbumId, request);
@@ -1018,7 +1028,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
             seedDbContext.Albums.Add(_albumEntityFixture.Create(id: albumId, artistId: artistId, libraryId: missingLibraryId, title: "A Night at the Opera", includeTracks: false, includeMetadata: false));
             await seedDbContext.SaveChangesAsync();
         }
-        AddTrackRequest request = _requestTrackFixture.Create(contributors: []);
+        AddTrackRequest request = _addTrackRequestFixture.Create(contributors: []);
 
         // Act
         HttpResponseMessage response = await adminClient.PostAsJsonAsync($"/api/v1/libraries/{missingLibraryId}/artists/{artistId}/albums/{albumId}/tracks", request);
@@ -1033,7 +1043,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(contributors: [_mediaContributorReferenceDtoFixture.Create()]);
+        AddTrackRequest request = _addTrackRequestFixture.Create(contributors: [_mediaContributorReferenceDtoFixture.Create()]);
 
         // Act
         HttpResponseMessage response = await _client.PostAsJsonAsync($"/api/v1/libraries/{_libraryId}/artists/{artistId}/albums/{albumId}/tracks", request);
@@ -1058,7 +1068,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
             seedDbContext.Albums.Add(_albumEntityFixture.Create(id: albumId, artistId: artistId, libraryId: otherLibraryId, title: "News of the World", includeTracks: false, includeMetadata: false));
             await seedDbContext.SaveChangesAsync();
         }
-        AddTrackRequest request = _requestTrackFixture.Create(contributors: []);
+        AddTrackRequest request = _addTrackRequestFixture.Create(contributors: []);
 
         // Act
         HttpResponseMessage response = await _client.PostAsJsonAsync($"/api/v1/libraries/{otherLibraryId}/artists/{artistId}/albums/{albumId}/tracks", request);
@@ -1073,7 +1083,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         // Arrange
         Guid artistId = Guid.NewGuid();
         Guid albumId = Guid.NewGuid();
-        AddTrackRequest request = _requestTrackFixture.Create(contributors: []);
+        AddTrackRequest request = _addTrackRequestFixture.Create(contributors: []);
 
         // Act
         HttpResponseMessage response = await _client.PostAsJsonAsync($"/api/v1/libraries/not-a-guid/artists/{artistId}/albums/{albumId}/tracks", request);
@@ -1087,7 +1097,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         Guid albumId = Guid.NewGuid();
-        AddTrackRequest request = _requestTrackFixture.Create(contributors: []);
+        AddTrackRequest request = _addTrackRequestFixture.Create(contributors: []);
 
         // Act
         HttpResponseMessage response = await _client.PostAsJsonAsync($"/api/v1/libraries/{_libraryId}/artists/not-a-guid/albums/{albumId}/tracks", request);
@@ -1101,7 +1111,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         Guid artistId = Guid.NewGuid();
-        AddTrackRequest request = _requestTrackFixture.Create(contributors: []);
+        AddTrackRequest request = _addTrackRequestFixture.Create(contributors: []);
 
         // Act
         HttpResponseMessage response = await _client.PostAsJsonAsync($"/api/v1/libraries/{_libraryId}/artists/{artistId}/albums/not-a-guid/tracks", request);
@@ -1116,7 +1126,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         // Arrange
         HttpClient unauthenticatedClient = _apiFactory.CreateClient();
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(contributors: []);
+        AddTrackRequest request = _addTrackRequestFixture.Create(contributors: []);
 
         // Act
         HttpResponseMessage response = await unauthenticatedClient.PostAsJsonAsync($"/api/v1/libraries/{_libraryId}/artists/{artistId}/albums/{albumId}/tracks", request);
@@ -1130,7 +1140,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(contributors: []);
+        AddTrackRequest request = _addTrackRequestFixture.Create(contributors: []);
         using CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
 
         // Act & Assert
@@ -1144,7 +1154,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        AddTrackRequest request = _requestTrackFixture.Create(contributors: []);
+        AddTrackRequest request = _addTrackRequestFixture.Create(contributors: []);
         using CancellationTokenSource cts = new();
 
         // Act & Assert

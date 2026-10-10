@@ -172,7 +172,7 @@ public class UpdateArtistEndpointTests
             Arg.Is<UpdateArtistCommand>(command =>
                 command.LibraryId == libraryId.ToString() &&
                 command.ArtistId == artistId.ToString() &&
-                command.Name == request.Name &&
+                command.Metadata == request.Metadata &&
                 command.Website == request.Website &&
                 command.MusicBrainzArtistId == request.MusicBrainzArtistId &&
                 command.Contributors == request.Contributors &&

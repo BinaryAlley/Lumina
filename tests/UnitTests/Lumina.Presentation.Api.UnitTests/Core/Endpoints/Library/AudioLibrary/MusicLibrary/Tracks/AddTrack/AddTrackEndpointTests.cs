@@ -151,7 +151,6 @@ public class AddTrackEndpointTests
                 command.Work == request.Work &&
                 command.MusicBrainzRecordingId == request.MusicBrainzRecordingId &&
                 command.MusicBrainzTrackId == request.MusicBrainzTrackId &&
-                command.MusicBrainzWorkId == request.MusicBrainzWorkId &&
                 command.Moods == request.Moods &&
                 command.Isrcs == request.Isrcs &&
                 command.Contributors == request.Contributors &&

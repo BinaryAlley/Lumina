@@ -159,7 +159,7 @@ public class AddArtistEndpointTests
         await _mockHandler.Received(1).HandleAsync(
             Arg.Is<AddArtistCommand>(command =>
                 command.LibraryId == libraryId.ToString() &&
-                command.Name == request.Name &&
+                command.Metadata == request.Metadata &&
                 command.Website == request.Website &&
                 command.MusicBrainzArtistId == request.MusicBrainzArtistId &&
                 command.Contributors == request.Contributors &&

@@ -33,7 +33,7 @@ public class UpdateAlbumEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
 {
     private readonly LuminaApiFactory _apiFactory;
     private readonly UpdateAlbumRequestFixture _updateAlbumRequestFixture = new();
-    private readonly AlbumMetadataDtoFixture _albumMetadataDtoFixture = new();
+    private readonly MusicAlbumMetadataDtoFixture _musicAlbumMetadataDtoFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly ArtistEntityFixture _artistEntityFixture = new();
     private readonly AlbumEntityFixture _albumEntityFixture = new();
@@ -104,7 +104,7 @@ public class UpdateAlbumEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         (Guid userId, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(client);
         _seededUsernames.Add(username);
         (Guid libraryId, Guid artistId, Guid albumId) = await SeedLibraryArtistAndAlbumAsync(userId);
-        UpdateAlbumRequest request = _updateAlbumRequestFixture.Create(metadata: _albumMetadataDtoFixture.Create(title: maliciousTitle), contributors: [], ratings: []);
+        UpdateAlbumRequest request = _updateAlbumRequestFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(title: maliciousTitle), contributors: [], ratings: []);
 
         // Act
         HttpResponseMessage response = await client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}", request);
@@ -223,7 +223,7 @@ public class UpdateAlbumEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         (Guid victimUserId, string victimUsername) = await _apiFactory.CreateAndAuthenticateUserAsync(victimClient);
         _seededUsernames.Add(victimUsername);
         (_, Guid victimArtistId, Guid victimAlbumId) = await SeedLibraryArtistAndAlbumAsync(victimUserId);
-        UpdateAlbumRequest request = _updateAlbumRequestFixture.Create(metadata: _albumMetadataDtoFixture.Create(title: "Hijacked"), contributors: [], ratings: []);
+        UpdateAlbumRequest request = _updateAlbumRequestFixture.Create(metadata: _musicAlbumMetadataDtoFixture.Create(title: "Hijacked"), contributors: [], ratings: []);
 
         // Act
         HttpResponseMessage response = await client.PutAsJsonAsync($"/api/v1/libraries/{ownLibraryId}/artists/{victimArtistId}/albums/{victimAlbumId}", request);

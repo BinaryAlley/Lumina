@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaContributors;
@@ -32,10 +32,11 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
 
         ExampleRequest = new AddTrackRequest(
             Path: "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
-            Metadata: new AudioMetadataDto(
+            Metadata: new MusicTrackMetadataDto(
                 Title: "Bohemian Rhapsody",
                 OriginalTitle: "Bohemian Rhapsody",
                 Description: "A song by the British rock band Queen. It was written by Freddie Mercury and originally released on the album A Night at the Opera in 1975.",
+                Disambiguation: "album version",
                 DurationInSeconds: 354,
                 SampleRate: 44100,
                 Channels: 2,
@@ -45,8 +46,8 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
                 ReleaseInfo: new ReleaseInfoDto(
                     OriginalReleaseDate: new DateOnly(1975, 10, 31),
                     OriginalReleaseYear: 1975,
-                    ReReleaseDate: default,
-                    ReReleaseYear: default,
+                    ReReleaseDate: new DateOnly(2011, 11, 21),
+                    ReReleaseYear: 2011,
                     ReleaseCountry: ReleaseCountry.GB,
                     ReleaseVersion: "Original"
                 ),
@@ -69,26 +70,30 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
                 [
                     new TagDto(Name: "classic"),
                     new TagDto(Name: "epic")
-                ]
+                ],
+                IsVideo: false
             ),
-            TrackNumber: 1,
-            DiscNumber: 1,
             Script: "Latn",
             Key: MusicKey.CMajor,
             Bpm: 72,
-            Work: "Bohemian Rhapsody",
-            MusicBrainzRecordingId: Guid.NewGuid(),
-            MusicBrainzTrackId: Guid.NewGuid(),
-            MusicBrainzWorkId: Guid.NewGuid(),
+            Work: new MusicWorkDto(
+                MusicBrainzWorkId: Guid.NewGuid(),
+                Title: "Bohemian Rhapsody",
+                Type: "Song",
+                Languages: [new LanguageInfoDto(LanguageCode: "en", LanguageName: "English", NativeName: "English")],
+                Iswcs: ["T-010489707-6"]
+            ),
+            Isrcs:
+            [
+                new IsrcDto(Value: "GBUM71029604")
+            ],
             Moods:
             [
                 new MoodDto(Name: "dramatic"),
                 new MoodDto(Name: "anxious")
             ],
-            Isrcs:
-            [
-                new IsrcDto(Value: "GBUM71029604")
-            ],
+            MusicBrainzRecordingId: Guid.NewGuid(),
+            MusicBrainzTrackId: Guid.NewGuid(),
             Contributors:
             [
                 new MediaContributorReferenceDto(
@@ -114,7 +119,9 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
                     Source: AudioRatingSource.LastFm,
                     VoteCount: 1234
                 )
-            ]
+            ],
+            TrackNumber: 1,
+            DiscNumber: 1
         );
 
         RequestParam(r => r.Path, "The file system path of the track. Required.");
@@ -150,10 +157,10 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
         RequestParam(r => r.Script, "The script used by the language of the track. Optional.");
         RequestParam(r => r.Key, "The musical key of the track. Optional.");
         RequestParam(r => r.Bpm, "The tempo of the track in beats per minute. Optional.");
-        RequestParam(r => r.Work, "The title of the work the track is a recording of. Optional.");
+        RequestParam(r => r.Work!.Title, "The title of the work the track is a recording of. Optional.");
         RequestParam(r => r.MusicBrainzRecordingId, "The MusicBrainz identifier of the recording. Optional.");
         RequestParam(r => r.MusicBrainzTrackId, "The MusicBrainz identifier of the track. Optional.");
-        RequestParam(r => r.MusicBrainzWorkId, "The MusicBrainz identifier of the work. Optional.");
+        RequestParam(r => r.Work!.MusicBrainzWorkId, "The MusicBrainz identifier of the work. Optional.");
         RequestParam(r => r.Moods, "The list of moods of the track. Optional.");
         RequestParam(r => r.Isrcs, "The list of ISRC (International Standard Recording Code) of the track. Optional.");
         RequestParam(r => r.Contributors, "The list of media contributors that performed on the track. Required.");
@@ -171,10 +178,10 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
         ResponseParam<TrackResponse>(r => r.Script, "The script used by the language of the track, if applicable.");
         ResponseParam<TrackResponse>(r => r.Key, "The musical key of the track, if applicable.");
         ResponseParam<TrackResponse>(r => r.Bpm, "The tempo of the track in beats per minute, if applicable.");
-        ResponseParam<TrackResponse>(r => r.Work, "The title of the work the track is a recording of, if applicable.");
+        ResponseParam<TrackResponse>(r => r.Work!.Title, "The title of the work the track is a recording of, if applicable.");
         ResponseParam<TrackResponse>(r => r.MusicBrainzRecordingId, "The MusicBrainz identifier of the recording, if applicable.");
         ResponseParam<TrackResponse>(r => r.MusicBrainzTrackId, "The MusicBrainz identifier of the track, if applicable.");
-        ResponseParam<TrackResponse>(r => r.MusicBrainzWorkId, "The MusicBrainz identifier of the work, if applicable.");
+        ResponseParam<TrackResponse>(r => r.Work!.MusicBrainzWorkId, "The MusicBrainz identifier of the work, if applicable.");
         ResponseParam<TrackResponse>(r => r.CreatedOnUtc, "The date and time when the track was created.");
         ResponseParam<TrackResponse>(r => r.UpdatedOnUtc, "The date and time when the track was last updated, if applicable.");
         ResponseParam<TrackResponse>(r => r.Moods, "The list of moods of the track.");
@@ -208,15 +215,16 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
                 AlbumId: Guid.NewGuid(),
                 LibraryId: Guid.NewGuid(),
                 Path: "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
-                Metadata: new AudioMetadataDto(
+                Metadata: new MusicTrackMetadataDto(
                     Title: "Bohemian Rhapsody",
                     OriginalTitle: "Bohemian Rhapsody",
                     Description: "A song by the British rock band Queen. It was written by Freddie Mercury and originally released on the album A Night at the Opera in 1975.",
+                    Disambiguation: "album version",
                     ReleaseInfo: new ReleaseInfoDto(
                         OriginalReleaseDate: new DateOnly(1975, 10, 31),
                         OriginalReleaseYear: 1975,
-                        ReReleaseDate: default,
-                        ReReleaseYear: default,
+                        ReReleaseDate: new DateOnly(2011, 11, 21),
+                        ReReleaseYear: 2011,
                         ReleaseCountry: ReleaseCountry.GB,
                         ReleaseVersion: "Original"
                     ),
@@ -243,26 +251,28 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
                     Channels: 2,
                     BitDepth: 16,
                     AudioCodec: "FLAC",
-                    Bitrate: 980
+                    Bitrate: 980,
+                    IsVideo: false
                 ),
-                TrackNumber: 1,
-                DiscNumber: 1,
                 Script: "Latn",
                 Key: MusicKey.CMajor,
                 Bpm: 72,
-                Work: "Bohemian Rhapsody",
-                MusicBrainzRecordingId: Guid.NewGuid(),
-                MusicBrainzTrackId: Guid.NewGuid(),
-                MusicBrainzWorkId: Guid.NewGuid(),
-                CreatedOnUtc: DateTime.UtcNow,
-                UpdatedOnUtc: default,
+                Work: new MusicWorkDto(
+                    MusicBrainzWorkId: Guid.NewGuid(),
+                    Title: "Bohemian Rhapsody",
+                    Type: "Song",
+                    Languages: [new LanguageInfoDto(LanguageCode: "en", LanguageName: "English", NativeName: "English")],
+                    Iswcs: ["T-010489707-6"]
+                ),
+                Isrcs: [
+                    new IsrcDto(Value: "GBUM71029604")
+                ],
                 Moods: [
                     new MoodDto(Name: "dramatic"),
                     new MoodDto(Name: "anxious")
                 ],
-                Isrcs: [
-                    new IsrcDto(Value: "GBUM71029604")
-                ],
+                MusicBrainzRecordingId: Guid.NewGuid(),
+                MusicBrainzTrackId: Guid.NewGuid(),
                 Contributors: [
                     new MediaContributorReferenceDto(
                         ContributorId: Guid.NewGuid(),
@@ -286,7 +296,11 @@ public class AddTrackEndpointSummary : Summary<AddTrackEndpoint, AddTrackRequest
                         Source: AudioRatingSource.LastFm,
                         VoteCount: 1234
                     )
-                ]
+                ],
+                TrackNumber: 1,
+                DiscNumber: 1,
+                CreatedOnUtc: new DateTime(2025, 1, 15, 10, 30, 0, DateTimeKind.Utc),
+                UpdatedOnUtc: new DateTime(2025, 1, 20, 14, 45, 0, DateTimeKind.Utc)
             )
         );
 

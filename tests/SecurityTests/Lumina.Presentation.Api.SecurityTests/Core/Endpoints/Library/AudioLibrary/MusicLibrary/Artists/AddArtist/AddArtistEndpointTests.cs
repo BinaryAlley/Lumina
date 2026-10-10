@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
 using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 using Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
@@ -34,6 +35,7 @@ public class AddArtistEndpointTests : IClassFixture<LuminaApiFactory>, IDisposab
     private readonly LuminaApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly AddArtistRequestFixture _addArtistRequestFixture = new();
+    private readonly MusicArtistMetadataDtoFixture _musicArtistMetadataDtoFixture = new();
     private readonly AddAlbumRequestFixture _addAlbumRequestFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
@@ -58,7 +60,7 @@ public class AddArtistEndpointTests : IClassFixture<LuminaApiFactory>, IDisposab
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
-        AddArtistRequest request = _addArtistRequestFixture.Create(name: "Queen", contributors: [], albums: []);
+        AddArtistRequest request = _addArtistRequestFixture.Create(metadata: _musicArtistMetadataDtoFixture.Create(name: "Queen"), contributors: [], albums: []);
 
         // Act
         HttpResponseMessage response = await _client.PostAsJsonAsync($"/api/v1/libraries/{libraryId}/artists", request);
@@ -80,7 +82,7 @@ public class AddArtistEndpointTests : IClassFixture<LuminaApiFactory>, IDisposab
     public async Task AddArtist_WhenUnauthorized_ShouldNotLeakSensitiveData()
     {
         // Arrange
-        AddArtistRequest request = _addArtistRequestFixture.Create(name: "Queen", contributors: [], albums: []);
+        AddArtistRequest request = _addArtistRequestFixture.Create(metadata: _musicArtistMetadataDtoFixture.Create(name: "Queen"), contributors: [], albums: []);
 
         // Act
         HttpResponseMessage response = await _client.PostAsJsonAsync($"/api/v1/libraries/{Guid.NewGuid()}/artists", request);
@@ -103,7 +105,7 @@ public class AddArtistEndpointTests : IClassFixture<LuminaApiFactory>, IDisposab
         // Arrange
         (Guid _, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(_client);
         _seededUsernames.Add(username);
-        AddArtistRequest request = _addArtistRequestFixture.Create(name: "Queen", contributors: [], albums: []);
+        AddArtistRequest request = _addArtistRequestFixture.Create(metadata: _musicArtistMetadataDtoFixture.Create(name: "Queen"), contributors: [], albums: []);
 
         // Act
         HttpResponseMessage response = await _client.PostAsJsonAsync($"/api/v1/libraries/{Uri.EscapeDataString(maliciousLibraryId)}/artists", request);
@@ -130,7 +132,7 @@ public class AddArtistEndpointTests : IClassFixture<LuminaApiFactory>, IDisposab
         _seededUsernames.Add(username);
         Guid libraryId = await SeedLibraryAsync(userId);
         AddAlbumRequest album = _addAlbumRequestFixture.Create(contributors: [], ratings: [], tracks: []);
-        AddArtistRequest request = _addArtistRequestFixture.Create(name: maliciousName, contributors: [], albums: [album]);
+        AddArtistRequest request = _addArtistRequestFixture.Create(metadata: _musicArtistMetadataDtoFixture.Create(name: maliciousName), contributors: [], albums: [album]);
 
         // Act
         HttpResponseMessage response = await _client.PostAsJsonAsync($"/api/v1/libraries/{libraryId}/artists", request);
@@ -159,7 +161,7 @@ public class AddArtistEndpointTests : IClassFixture<LuminaApiFactory>, IDisposab
         (Guid _, string requesterUsername) = await _apiFactory.CreateAndAuthenticateUserAsync(_client);
         _seededUsernames.Add(requesterUsername);
         AddAlbumRequest album = _addAlbumRequestFixture.Create(contributors: [], ratings: [], tracks: []);
-        AddArtistRequest request = _addArtistRequestFixture.Create(name: "Queen", contributors: [], albums: [album]);
+        AddArtistRequest request = _addArtistRequestFixture.Create(metadata: _musicArtistMetadataDtoFixture.Create(name: "Queen"), contributors: [], albums: [album]);
 
         // Act
         HttpResponseMessage response = await _client.PostAsJsonAsync($"/api/v1/libraries/{libraryId}/artists", request);
