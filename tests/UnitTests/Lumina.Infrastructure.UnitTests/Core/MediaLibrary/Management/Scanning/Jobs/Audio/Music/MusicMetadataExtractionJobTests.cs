@@ -273,5 +273,7 @@ public class MusicMetadataExtractionJobTests
     {
         _mockStagingResultsRepository.GetPathsNeedingRehashAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<string>>(paths));
+        _mockPathService.GetFileNameWithoutExtension(Arg.Any<string>()).Returns("Bohemian Rhapsody");
+        _mockPathService.GetFileName(Arg.Any<string>()).Returns("Bohemian Rhapsody.mp3");
     }
 }

@@ -106,6 +106,32 @@ public class PathService : IPathService
     }
 
     /// <summary>
+    /// Gets the name of the file or directory stored at <paramref name="path"/>, using the path separator of the current platform.
+    /// </summary>
+    /// <param name="path">The path whose name is retrieved.</param>
+    /// <returns>The name of the file or directory stored at <paramref name="path"/>.</returns>
+    public string GetFileName(string path)
+    {
+        if (string.IsNullOrEmpty(path))
+            return path;
+        string trimmedPath = path.TrimEnd(PathSeparator);
+        int lastSeparatorIndex = trimmedPath.LastIndexOf(PathSeparator);
+        return lastSeparatorIndex < 0 ? trimmedPath : trimmedPath[(lastSeparatorIndex + 1)..];
+    }
+
+    /// <summary>
+    /// Gets the name of the file stored at <paramref name="path"/> without its extension, using the path separator of the current platform.
+    /// </summary>
+    /// <param name="path">The path whose file name is retrieved.</param>
+    /// <returns>The name of the file stored at <paramref name="path"/> without its extension.</returns>
+    public string GetFileNameWithoutExtension(string path)
+    {
+        string fileName = GetFileName(path);
+        int lastDotIndex = fileName.LastIndexOf('.');
+        return lastDotIndex <= 0 ? fileName : fileName[..lastDotIndex];
+    }
+
+    /// <summary>
     /// Returns a collection of characters that are invalid for paths.
     /// </summary>
     /// <returns>A collection of characters that are invalid in the context of paths.</returns>

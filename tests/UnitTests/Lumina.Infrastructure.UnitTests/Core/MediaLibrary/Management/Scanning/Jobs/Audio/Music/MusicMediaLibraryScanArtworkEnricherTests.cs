@@ -22,6 +22,7 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
@@ -60,6 +61,7 @@ public class MusicMediaLibraryScanArtworkEnricherTests
     private readonly IMusicArtworkService _mockMusicArtworkService;
     private readonly IFileHashService _mockFileHashService;
     private readonly IDomainEventPublisher _mockDomainEventPublisher;
+    private readonly IPathService _mockPathService;
     private readonly TestArtworkProvider<ArtistMetadataLookupDto> _artistProvider;
     private readonly TestArtworkProvider<AlbumMetadataLookupDto> _albumProvider;
     private readonly MusicMediaLibraryScanArtworkEnricher _sut;
@@ -108,7 +110,10 @@ public class MusicMediaLibraryScanArtworkEnricherTests
         _mockDomainEventPublisher.PublishAsync(Arg.Any<IDomainEvent>(), Arg.Any<CancellationToken>())
             .Returns(ValueTask.CompletedTask);
 
-        // the enricher resolves the keyed artwork providers from the scope of the service provider, and specializes them by the lookup they accept,
+        _mockPathService = Substitute.For<IPathService>();
+        _mockPathService.PathSeparator.Returns('/');
+
+        // The enricher resolves the keyed artwork providers from the scope of the service provider, and specializes them by the lookup they accept,
         // so a real container is used to honor the keyed registration of the typed providers.
         ServiceCollection services = new();
         services.AddScoped<IUnitOfWork>(_ => _mockUnitOfWork);
@@ -119,7 +124,7 @@ public class MusicMediaLibraryScanArtworkEnricherTests
         services.AddKeyedSingleton<IArtworkProvider>(_albumPluginId, _albumProvider);
         _serviceProvider = services.BuildServiceProvider();
 
-        _sut = new MusicMediaLibraryScanArtworkEnricher(_serviceProvider.GetRequiredService<IServiceScopeFactory>(), NullLogger<MusicMediaLibraryScanArtworkEnricher>.Instance);
+        _sut = new MusicMediaLibraryScanArtworkEnricher(_serviceProvider.GetRequiredService<IServiceScopeFactory>(), NullLogger<MusicMediaLibraryScanArtworkEnricher>.Instance, new MusicLibraryPathStructure(_mockPathService));
 
         _libraryId = _libraryIdFixture.Create();
         _scanId = _scanIdFixture.Create();

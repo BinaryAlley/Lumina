@@ -310,7 +310,7 @@ internal sealed class MusicMetadataExtractionJob : MediaLibraryScanJob, IMusicMe
         }
 
         if (string.IsNullOrWhiteSpace(trackTitle))
-            trackTitle = Path.GetFileNameWithoutExtension(path);
+            trackTitle = pathService.GetFileNameWithoutExtension(path);
 
         return new MusicLibraryScanItemMetadataEntity
         {
@@ -527,7 +527,7 @@ internal sealed class MusicMetadataExtractionJob : MediaLibraryScanJob, IMusicMe
                     return relativePath;
             }
         }
-        return Path.GetFileName(path);
+        return pathService.GetFileName(path);
     }
 
     /// <summary>

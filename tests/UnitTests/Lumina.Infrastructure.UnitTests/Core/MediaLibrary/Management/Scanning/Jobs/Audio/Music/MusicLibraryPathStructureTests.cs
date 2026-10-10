@@ -1,5 +1,7 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Audio.Music;
+using NSubstitute;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -11,121 +13,146 @@ namespace Lumina.Infrastructure.UnitTests.Core.MediaLibrary.Management.Scanning.
 [ExcludeFromCodeCoverage]
 public class MusicLibraryPathStructureTests
 {
-    private const string ALBUM_DIRECTORY = @"C:\Music\Queen\A Night at the Opera";
-    private const string TRACK_PATH = @"C:\Music\Queen\A Night at the Opera\Bohemian Rhapsody.flac";
+    private readonly IPathService _mockPathService;
+    private readonly MusicLibraryPathStructure _sut;
 
-    [Fact]
-    public void GetAlbumDirectory_WhenTheTrackIsInTheAlbumDirectory_ShouldReturnTheTrackDirectory()
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MusicLibraryPathStructureTests"/> class.
+    /// </summary>
+    public MusicLibraryPathStructureTests()
     {
-        // Act
-        string result = MusicLibraryPathStructure.GetAlbumDirectory(TRACK_PATH);
-
-        // Assert
-        Assert.Equal(ALBUM_DIRECTORY, result);
+        _mockPathService = Substitute.For<IPathService>();
+        _sut = new MusicLibraryPathStructure(_mockPathService);
     }
 
     [Theory]
-    [InlineData("Disc 1")] // canonical disc directory name
-    [InlineData("disc 2")] // lowercase disc directory name
-    [InlineData("CD3")] // compact disc directory name
-    [InlineData("disk4")] // disk directory name
-    public void GetAlbumDirectory_WhenTheTrackIsInADiscDirectory_ShouldReturnTheParentAlbumDirectory(string discDirectoryName)
+    [InlineData('\\', @"C:\Music\Queen\A Night at the Opera", @"C:\Music\Queen\A Night at the Opera\Bohemian Rhapsody.flac")] // Windows separated path
+    [InlineData('/', "/music/queen/a-night-at-the-opera", "/music/queen/a-night-at-the-opera/bohemian-rhapsody.flac")] // Unix separated path
+    public void GetAlbumDirectory_WhenTheTrackIsInTheAlbumDirectory_ShouldReturnTheTrackDirectory(char separator, string albumDirectory, string trackPath)
     {
         // Arrange
-        string trackPath = $@"{ALBUM_DIRECTORY}\{discDirectoryName}\Bohemian Rhapsody.flac";
+        _mockPathService.PathSeparator.Returns(separator);
 
         // Act
-        string result = MusicLibraryPathStructure.GetAlbumDirectory(trackPath);
+        string result = _sut.GetAlbumDirectory(trackPath);
 
         // Assert
-        Assert.Equal(ALBUM_DIRECTORY, result);
+        Assert.Equal(albumDirectory, result);
     }
 
-    [Fact]
-    public void GetAlbumDirectory_WhenTheDirectoryIsNotADiscDirectory_ShouldReturnTheTrackDirectory()
+    [Theory]
+    [InlineData('\\', "Disc 1")] // canonical disc directory name, Windows separated path
+    [InlineData('\\', "disc 2")] // lowercase disc directory name, Windows separated path
+    [InlineData('\\', "CD3")] // compact disc directory name, Windows separated path
+    [InlineData('\\', "disk4")] // disk directory name, Windows separated path
+    [InlineData('/', "Disc 1")] // canonical disc directory name, Unix separated path
+    [InlineData('/', "disc 2")] // lowercase disc directory name, Unix separated path
+    [InlineData('/', "CD3")] // compact disc directory name, Unix separated path
+    [InlineData('/', "disk4")] // disk directory name, Unix separated path
+    public void GetAlbumDirectory_WhenTheTrackIsInADiscDirectory_ShouldReturnTheParentAlbumDirectory(char separator, string discDirectoryName)
     {
         // Arrange
-        const string NON_DISC_TRACK_PATH = @"C:\Music\Queen\Live\Bohemian Rhapsody.flac";
+        _mockPathService.PathSeparator.Returns(separator);
+        string albumDirectory = string.Join(separator, "music", "queen", "a-night-at-the-opera");
+        string trackPath = string.Join(separator, albumDirectory, discDirectoryName, "bohemian-rhapsody.flac");
 
         // Act
-        string result = MusicLibraryPathStructure.GetAlbumDirectory(NON_DISC_TRACK_PATH);
+        string result = _sut.GetAlbumDirectory(trackPath);
 
         // Assert
-        Assert.Equal(@"C:\Music\Queen\Live", result);
+        Assert.Equal(albumDirectory, result);
+    }
+
+    [Theory]
+    [InlineData('\\')] // Windows separated path
+    [InlineData('/')] // Unix separated path
+    public void GetAlbumDirectory_WhenTheDirectoryIsNotADiscDirectory_ShouldReturnTheTrackDirectory(char separator)
+    {
+        // Arrange
+        _mockPathService.PathSeparator.Returns(separator);
+        string albumDirectory = string.Join(separator, "music", "queen", "live");
+        string trackPath = string.Join(separator, albumDirectory, "bohemian-rhapsody.flac");
+
+        // Act
+        string result = _sut.GetAlbumDirectory(trackPath);
+
+        // Assert
+        Assert.Equal(albumDirectory, result);
     }
 
     [Fact]
     public void GetAlbumDirectory_WhenThePathIsNullOrEmpty_ShouldReturnTheProvidedPath()
     {
         // Act
-        string nullResult = MusicLibraryPathStructure.GetAlbumDirectory(null!);
-        string emptyResult = MusicLibraryPathStructure.GetAlbumDirectory(string.Empty);
+        string nullResult = _sut.GetAlbumDirectory(null!);
+        string emptyResult = _sut.GetAlbumDirectory(string.Empty);
 
         // Assert
         Assert.Null(nullResult);
         Assert.Equal(string.Empty, emptyResult);
     }
 
-    [Fact]
-    public void GetAlbumDirectory_WhenThePathHasNoDirectory_ShouldReturnTheProvidedPath()
+    [Theory]
+    [InlineData('\\')] // Windows separated path
+    [InlineData('/')] // Unix separated path
+    public void GetAlbumDirectory_WhenThePathHasNoDirectory_ShouldReturnTheProvidedPath(char separator)
     {
         // Arrange
+        _mockPathService.PathSeparator.Returns(separator);
         const string FILE_NAME_ONLY = "Bohemian Rhapsody.flac";
 
         // Act
-        string result = MusicLibraryPathStructure.GetAlbumDirectory(FILE_NAME_ONLY);
+        string result = _sut.GetAlbumDirectory(FILE_NAME_ONLY);
 
         // Assert
         Assert.Equal(FILE_NAME_ONLY, result);
     }
 
-    [Fact]
-    public void GetReleaseTypeDirectoryName_WhenTheParentOfTheAlbumDirectoryIsAReleaseType_ShouldReturnIt()
+    [Theory]
+    [InlineData('\\', "Album")] // canonical release type directory, Windows separated path
+    [InlineData('\\', "album")] // lowercase release type directory, Windows separated path
+    [InlineData('/', "Album")] // canonical release type directory, Unix separated path
+    [InlineData('/', "album")] // lowercase release type directory, Unix separated path
+    public void GetReleaseTypeDirectoryName_WhenTheParentOfTheAlbumDirectoryIsAReleaseType_ShouldReturnIt(char separator, string releaseTypeDirectoryName)
     {
         // Arrange
-        const string RELEASE_TYPE_TRACK_PATH = @"C:\Music\Queen\Album\A Night at the Opera\Bohemian Rhapsody.flac";
+        _mockPathService.PathSeparator.Returns(separator);
+        string trackPath = string.Join(separator, "music", "queen", releaseTypeDirectoryName, "a-night-at-the-opera", "bohemian-rhapsody.flac");
 
         // Act
-        string? result = MusicLibraryPathStructure.GetReleaseTypeDirectoryName(RELEASE_TYPE_TRACK_PATH);
+        string? result = _sut.GetReleaseTypeDirectoryName(trackPath);
+
+        // Assert
+        Assert.Equal(releaseTypeDirectoryName, result);
+    }
+
+    [Theory]
+    [InlineData('\\')] // Windows separated path
+    [InlineData('/')] // Unix separated path
+    public void GetReleaseTypeDirectoryName_WhenTheAlbumIsMultiDisc_ShouldReturnTheReleaseTypeDirectory(char separator)
+    {
+        // Arrange
+        _mockPathService.PathSeparator.Returns(separator);
+        string trackPath = string.Join(separator, "music", "queen", "Album", "a-night-at-the-opera", "Disc 1", "bohemian-rhapsody.flac");
+
+        // Act
+        string? result = _sut.GetReleaseTypeDirectoryName(trackPath);
 
         // Assert
         Assert.Equal("Album", result);
     }
 
-    [Fact]
-    public void GetReleaseTypeDirectoryName_WhenTheReleaseTypeDirectoryIsLowercase_ShouldReturnIt()
+    [Theory]
+    [InlineData('\\')] // Windows separated path
+    [InlineData('/')] // Unix separated path
+    public void GetReleaseTypeDirectoryName_WhenTheParentOfTheAlbumDirectoryIsNotAReleaseType_ShouldReturnNull(char separator)
     {
         // Arrange
-        const string LOWERCASE_RELEASE_TYPE_TRACK_PATH = @"C:\Music\Queen\album\A Night at the Opera\Bohemian Rhapsody.flac";
+        _mockPathService.PathSeparator.Returns(separator);
+        string trackPath = string.Join(separator, "music", "queen", "a-night-at-the-opera", "bohemian-rhapsody.flac");
 
         // Act
-        string? result = MusicLibraryPathStructure.GetReleaseTypeDirectoryName(LOWERCASE_RELEASE_TYPE_TRACK_PATH);
-
-        // Assert
-        Assert.Equal("album", result);
-    }
-
-    [Fact]
-    public void GetReleaseTypeDirectoryName_WhenTheAlbumIsMultiDisc_ShouldReturnTheReleaseTypeDirectory()
-    {
-        // Arrange
-        const string MULTI_DISC_TRACK_PATH = @"C:\Music\Queen\Album\A Night at the Opera\Disc 1\Bohemian Rhapsody.flac";
-
-        // Act
-        string? result = MusicLibraryPathStructure.GetReleaseTypeDirectoryName(MULTI_DISC_TRACK_PATH);
-
-        // Assert
-        Assert.Equal("Album", result);
-    }
-
-    [Fact]
-    public void GetReleaseTypeDirectoryName_WhenTheParentOfTheAlbumDirectoryIsNotAReleaseType_ShouldReturnNull()
-    {
-        // Arrange
-        const string NON_RELEASE_TYPE_TRACK_PATH = @"C:\Music\Queen\A Night at the Opera\Bohemian Rhapsody.flac";
-
-        // Act
-        string? result = MusicLibraryPathStructure.GetReleaseTypeDirectoryName(NON_RELEASE_TYPE_TRACK_PATH);
+        string? result = _sut.GetReleaseTypeDirectoryName(trackPath);
 
         // Assert
         Assert.Null(result);

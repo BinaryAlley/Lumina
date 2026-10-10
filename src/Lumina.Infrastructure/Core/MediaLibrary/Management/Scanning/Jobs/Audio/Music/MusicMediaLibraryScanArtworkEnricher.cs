@@ -41,6 +41,7 @@ internal sealed class MusicMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
     private const int ENRICHMENT_PAGE_SIZE = 200; // The number of artists or albums that are enriched in a single batch, keeping the peak memory bounded regardless of the library size.
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly ILogger<MusicMediaLibraryScanArtworkEnricher> _logger;
+    private readonly MusicLibraryPathStructure _musicLibraryPathStructure;
 
     /// <summary>
     /// The media library type that this artwork enricher supports.
@@ -52,10 +53,12 @@ internal sealed class MusicMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
     /// </summary>
     /// <param name="serviceScopeFactory">Injected factory for creating scopes in which services are requested.</param>
     /// <param name="logger">Injected logger used to report the issues encountered while resolving the artwork.</param>
-    public MusicMediaLibraryScanArtworkEnricher(IServiceScopeFactory serviceScopeFactory, ILogger<MusicMediaLibraryScanArtworkEnricher> logger)
+    /// <param name="musicLibraryPathStructure">Injected service used to derive the release type directory of the tracks from their file system paths.</param>
+    public MusicMediaLibraryScanArtworkEnricher(IServiceScopeFactory serviceScopeFactory, ILogger<MusicMediaLibraryScanArtworkEnricher> logger, MusicLibraryPathStructure musicLibraryPathStructure)
     {
         _serviceScopeFactory = serviceScopeFactory;
         _logger = logger;
+        _musicLibraryPathStructure = musicLibraryPathStructure;
     }
 
     /// <summary>
@@ -367,7 +370,7 @@ internal sealed class MusicMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
 
         // The release type directory groups the artwork of the releases of the artist that share a title, so the album, the single and the live release of the same songs do not collide.
         // It is read from the file system, because the structure on disk is the source of truth of the release type of an album.
-        string? releaseTypeName = MusicLibraryPathStructure.GetReleaseTypeDirectoryName(firstTrackPath);
+        string? releaseTypeName = _musicLibraryPathStructure.GetReleaseTypeDirectoryName(firstTrackPath);
 
         return await EnrichArtworkAsync(
             artworkLookup,

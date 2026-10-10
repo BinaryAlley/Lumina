@@ -817,4 +817,76 @@ public class PathServiceTests
         Assert.False(result);
         _mockPathStrategy.DidNotReceive().IsPathWithin(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>());
     }
+
+    [Theory]
+    [InlineData('\\', @"C:\Music\Queen\Bohemian Rhapsody.mp3", "Bohemian Rhapsody.mp3")] // Windows separated path
+    [InlineData('/', "/music/queen/bohemian-rhapsody.mp3", "bohemian-rhapsody.mp3")] // Unix separated path
+    public void GetFileName_WhenPathHasDirectories_ShouldReturnTheLastSegment(char separator, string path, string expectedFileName)
+    {
+        // Arrange
+        _mockPathStrategy.PathSeparator.Returns(separator);
+
+        // Act
+        string result = _sut.GetFileName(path);
+
+        // Assert
+        Assert.Equal(expectedFileName, result);
+    }
+
+    [Theory]
+    [InlineData('\\')] // Windows separated path
+    [InlineData('/')] // Unix separated path
+    public void GetFileName_WhenPathHasNoDirectory_ShouldReturnThePath(char separator)
+    {
+        // Arrange
+        _mockPathStrategy.PathSeparator.Returns(separator);
+
+        // Act
+        string result = _sut.GetFileName("Bohemian Rhapsody.mp3");
+
+        // Assert
+        Assert.Equal("Bohemian Rhapsody.mp3", result);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public void GetFileName_WhenPathIsNullOrEmpty_ShouldReturnThePath(string? path)
+    {
+        // Act
+        string result = _sut.GetFileName(path!);
+
+        // Assert
+        Assert.Equal(path, result);
+    }
+
+    [Theory]
+    [InlineData('\\', @"C:\Music\Queen\Bohemian Rhapsody.mp3", "Bohemian Rhapsody")] // Windows separated path
+    [InlineData('/', "/music/queen/bohemian-rhapsody.mp3", "bohemian-rhapsody")] // Unix separated path
+    public void GetFileNameWithoutExtension_WhenPathHasDirectories_ShouldReturnTheFileNameWithoutItsExtension(char separator, string path, string expectedFileName)
+    {
+        // Arrange
+        _mockPathStrategy.PathSeparator.Returns(separator);
+
+        // Act
+        string result = _sut.GetFileNameWithoutExtension(path);
+
+        // Assert
+        Assert.Equal(expectedFileName, result);
+    }
+
+    [Theory]
+    [InlineData('\\')] // Windows separated path
+    [InlineData('/')] // Unix separated path
+    public void GetFileNameWithoutExtension_WhenFileNameHasNoExtension_ShouldReturnTheFileName(char separator)
+    {
+        // Arrange
+        _mockPathStrategy.PathSeparator.Returns(separator);
+
+        // Act
+        string result = _sut.GetFileNameWithoutExtension("Bohemian Rhapsody");
+
+        // Assert
+        Assert.Equal("Bohemian Rhapsody", result);
+    }
 }

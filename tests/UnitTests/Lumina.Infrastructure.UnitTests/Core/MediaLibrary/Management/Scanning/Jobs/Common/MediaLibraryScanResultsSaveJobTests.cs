@@ -86,8 +86,16 @@ public class MediaLibraryScanResultsSaveJobTests
         // The job resolves the materializer of the loaded library type from the service scope, so the books materializer must be available.
         ILibraryPathTemplateService mockPathTemplateService = Substitute.For<ILibraryPathTemplateService>();
         mockPathTemplateService.ResolveTemplate(Arg.Any<LibraryType>(), Arg.Any<IReadOnlyList<LibraryPathPart>>()).Returns(Result.From(LibraryPathTemplate.Empty()));
+        IPathService mockPathService = Substitute.For<IPathService>();
+        mockPathService.GetFileName(Arg.Any<string>()).Returns(callInfo => callInfo.Arg<string>());
+        mockPathService.GetFileNameWithoutExtension(Arg.Any<string>()).Returns(callInfo =>
+        {
+            string fileName = callInfo.Arg<string>();
+            int lastDotIndex = fileName.LastIndexOf('.');
+            return lastDotIndex <= 0 ? fileName : fileName[..lastDotIndex];
+        });
         _mockServiceProvider.GetService(typeof(IEnumerable<IMediaLibraryScanItemMaterializer>))
-            .Returns(new IMediaLibraryScanItemMaterializer[] { new BooksMediaLibraryScanItemMaterializer(mockPathTemplateService, Substitute.For<IPathService>()) });
+            .Returns(new IMediaLibraryScanItemMaterializer[] { new BooksMediaLibraryScanItemMaterializer(mockPathTemplateService, mockPathService) });
 
         _mockDomainEventPublisher = Substitute.For<IDomainEventPublisher>();
         _mockDomainEventPublisher.PublishAsync(Arg.Any<IDomainEvent>(), Arg.Any<CancellationToken>())

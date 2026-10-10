@@ -57,6 +57,7 @@ public class BooksMediaLibraryScanItemMaterializerTests
         _mockPathTemplateService.ResolveTemplate(Arg.Any<LibraryType>(), Arg.Any<IReadOnlyList<LibraryPathPart>>())
             .Returns(Result.From(LibraryPathTemplate.Empty()));
         _mockPathService.PathSeparator.Returns('\\');
+        _mockPathService.GetFileNameWithoutExtension(Arg.Any<string>()).Returns("track");
         _mockBookRepository.GetExistingPathsAsync(Arg.Any<Guid>(), Arg.Any<IReadOnlyCollection<string>>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyCollection<string>>([]));
         _mockBookRepository.InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>())
@@ -75,6 +76,7 @@ public class BooksMediaLibraryScanItemMaterializerTests
         _mockLibraryRepository.GetByIdAsync(_libraryId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
         _mockPathService.IsPathWithin("C:\\MusicBackup\\track.epub", "C:\\Music").Returns(false);
+        _mockPathService.GetFileName("C:\\MusicBackup\\track.epub").Returns("track.epub");
 
         // Act
         Result<Success> result = await _sut.MaterializeItemsAsync(_mockUnitOfWork, _libraryId, _scanId, ["C:\\MusicBackup\\track.epub"], CancellationToken.None);

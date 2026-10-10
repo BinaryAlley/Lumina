@@ -130,6 +130,7 @@ public static class InfrastructureLayerServices
         services.AddTransient<IMediaLibraryScanArtworkEnricher, BooksMediaLibraryScanArtworkEnricher>();
         services.AddTransient<IMediaLibraryScanArtworkEnricher, MusicMediaLibraryScanArtworkEnricher>();
 
+        services.AddSingleton<MusicLibraryPathStructure>();
 
         services.AddSingleton<IMediaLibraryScanProgressNotifier, DebouncedMediaLibraryScanProgressNotifier>();
 

@@ -2,11 +2,11 @@
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,10 +22,24 @@ internal sealed class MusicMediaLibraryScanItemMaterializer : IMediaLibraryScanI
     private const string UNKNOWN_ARTIST_NAME = "Unknown Artist";
     private const string UNKNOWN_ALBUM_TITLE = "Unknown Album";
 
+    private readonly MusicLibraryPathStructure _musicLibraryPathStructure;
+    private readonly IPathService _pathService;
+
     /// <summary>
     /// The media library type that this materializer supports.
     /// </summary>
     public LibraryType SupportedLibraryType => LibraryType.Music;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MusicMediaLibraryScanItemMaterializer"/> class.
+    /// </summary>
+    /// <param name="musicLibraryPathStructure">Injected service used to derive the album directory of the tracks from their file system paths.</param>
+    /// <param name="pathService">Injected service used to derive the file name of a track from its file system path.</param>
+    public MusicMediaLibraryScanItemMaterializer(MusicLibraryPathStructure musicLibraryPathStructure, IPathService pathService)
+    {
+        _musicLibraryPathStructure = musicLibraryPathStructure;
+        _pathService = pathService;
+    }
 
     /// <summary>
     /// Resets the enrichment state of the tracks stored at the provided <paramref name="paths"/>, together with their albums and artists.
@@ -86,11 +100,11 @@ internal sealed class MusicMediaLibraryScanItemMaterializer : IMediaLibraryScanI
             // A brand new artist is accumulated together with all its new albums, so that the whole aggregate is inserted in a single call.
             ArtistEntity? newArtist = null;
 
-            foreach (IGrouping<string, MusicLibraryScanItemMetadataEntity> albumGroup in artistGroup.GroupBy(stagedItem => MusicLibraryPathStructure.GetAlbumDirectory(stagedItem.Path), StringComparer.OrdinalIgnoreCase))
+            foreach (IGrouping<string, MusicLibraryScanItemMetadataEntity> albumGroup in artistGroup.GroupBy(stagedItem => _musicLibraryPathStructure.GetAlbumDirectory(stagedItem.Path), StringComparer.OrdinalIgnoreCase))
             {
                 List<MusicLibraryScanItemMetadataEntity> albumStagedItems = [.. albumGroup];
                 string albumTitle = GetAlbumTitle(albumStagedItems[0]);
-                string albumDirectory = MusicLibraryPathStructure.GetAlbumDirectory(albumStagedItems[0].Path);
+                string albumDirectory = _musicLibraryPathStructure.GetAlbumDirectory(albumStagedItems[0].Path);
                 Guid? musicBrainzReleaseId = albumStagedItems.Select(stagedItem => stagedItem.MusicBrainzReleaseId).FirstOrDefault(musicBrainzId => musicBrainzId is not null);
                 Guid? musicBrainzReleaseGroupId = albumStagedItems.Select(stagedItem => stagedItem.MusicBrainzReleaseGroupId).FirstOrDefault(musicBrainzId => musicBrainzId is not null);
                 Guid? musicBrainzReleaseArtistId = albumStagedItems.Select(stagedItem => stagedItem.MusicBrainzReleaseArtistId).FirstOrDefault(musicBrainzId => musicBrainzId is not null);
@@ -276,7 +290,7 @@ internal sealed class MusicMediaLibraryScanItemMaterializer : IMediaLibraryScanI
     /// <param name="albumId">The Id of the album the track belongs to.</param>
     /// <param name="stagedItem">The staged music metadata item of the track.</param>
     /// <returns>The created track entity.</returns>
-    private static TrackEntity CreateTrackEntity(Guid libraryId, Guid albumId, MusicLibraryScanItemMetadataEntity stagedItem)
+    private TrackEntity CreateTrackEntity(Guid libraryId, Guid albumId, MusicLibraryScanItemMetadataEntity stagedItem)
     {
         return new TrackEntity
         {
@@ -284,7 +298,7 @@ internal sealed class MusicMediaLibraryScanItemMaterializer : IMediaLibraryScanI
             AlbumId = albumId,
             LibraryId = libraryId,
             Path = stagedItem.Path,
-            Title = string.IsNullOrWhiteSpace(stagedItem.TrackTitle) ? Path.GetFileNameWithoutExtension(stagedItem.Path) : stagedItem.TrackTitle,
+            Title = string.IsNullOrWhiteSpace(stagedItem.TrackTitle) ? _pathService.GetFileNameWithoutExtension(stagedItem.Path) : stagedItem.TrackTitle,
             TrackNumber = stagedItem.TrackNumber ?? 0,
             DiscNumber = stagedItem.DiscNumber,
             DurationInSeconds = stagedItem.DurationInSeconds,

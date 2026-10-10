@@ -54,6 +54,20 @@ public interface IPathService
     Result<IEnumerable<PathSegment>> GoUpOneLevel(string path);
 
     /// <summary>
+    /// Gets the name of the file or directory stored at <paramref name="path"/>, using the path separator of the current platform.
+    /// </summary>
+    /// <param name="path">The path whose name is retrieved.</param>
+    /// <returns>The name of the file or directory stored at <paramref name="path"/>.</returns>
+    string GetFileName(string path);
+
+    /// <summary>
+    /// Gets the name of the file stored at <paramref name="path"/> without its extension, using the path separator of the current platform.
+    /// </summary>
+    /// <param name="path">The path whose file name is retrieved.</param>
+    /// <returns>The name of the file stored at <paramref name="path"/> without its extension.</returns>
+    string GetFileNameWithoutExtension(string path);
+
+    /// <summary>
     /// Returns a collection of characters that are invalid for paths.
     /// </summary>
     /// <returns>A collection of characters that are invalid in the context of paths.</returns>

@@ -4,6 +4,7 @@ using Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Audio.Music;
 using NSubstitute;
 using System;
@@ -27,6 +28,7 @@ public class MusicMediaLibraryScanItemMaterializerTests
     private readonly IAlbumRepository _mockAlbumRepository;
     private readonly ITrackRepository _mockTrackRepository;
     private readonly IMusicLibraryScanItemMetadataRepository _mockStagedMetadataRepository;
+    private readonly IPathService _mockPathService;
     private readonly MusicMediaLibraryScanItemMaterializer _sut;
     private readonly MusicLibraryScanItemMetadataEntityFixture _musicLibraryScanItemMetadataEntityFixture = new();
     private readonly List<ArtistEntity> _insertedArtists = [];
@@ -63,7 +65,11 @@ public class MusicMediaLibraryScanItemMaterializerTests
         _mockStagedMetadataRepository.DeleteByScanIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(new Deleted()));
 
-        _sut = new MusicMediaLibraryScanItemMaterializer();
+        _mockPathService = Substitute.For<IPathService>();
+        _mockPathService.PathSeparator.Returns('/');
+        _mockPathService.GetFileNameWithoutExtension(Arg.Any<string>()).Returns("track");
+
+        _sut = new MusicMediaLibraryScanItemMaterializer(new MusicLibraryPathStructure(_mockPathService), _mockPathService);
     }
 
     [Fact]

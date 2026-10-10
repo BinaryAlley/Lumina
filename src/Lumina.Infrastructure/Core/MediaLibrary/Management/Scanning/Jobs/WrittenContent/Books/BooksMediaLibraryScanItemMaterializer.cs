@@ -14,7 +14,6 @@ using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -176,9 +175,9 @@ internal sealed class BooksMediaLibraryScanItemMaterializer : IMediaLibraryScanI
     /// </summary>
     /// <param name="path">The file system path of the book.</param>
     /// <returns>The derived title.</returns>
-    private static string GetTitleFromPath(string path)
+    private string GetTitleFromPath(string path)
     {
-        string fileName = Path.GetFileNameWithoutExtension(path);
+        string fileName = _pathService.GetFileNameWithoutExtension(path);
         string title = Regex.Replace(fileName, @"[_\-\.]+", " ").Trim();
         return title.Length > 0 ? title : fileName;
     }
@@ -201,6 +200,6 @@ internal sealed class BooksMediaLibraryScanItemMaterializer : IMediaLibraryScanI
                     return relativePath;
             }
         }
-        return Path.GetFileName(path);
+        return pathService.GetFileName(path);
     }
 }
