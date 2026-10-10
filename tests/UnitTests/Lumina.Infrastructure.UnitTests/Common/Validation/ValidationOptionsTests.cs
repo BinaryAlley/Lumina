@@ -21,6 +21,7 @@ namespace Lumina.Infrastructure.UnitTests.Common.Validation;
 public class ValidationOptionsTests
 {
     private readonly IFixture _fixture;
+    private readonly ValidationOptionsFixture _validationOptionsFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ValidationOptionsTests"/> class.
@@ -35,7 +36,7 @@ public class ValidationOptionsTests
     {
         // Arrange
         string name = _fixture.Create<string>();
-        ValidationOptionsFixture options = _fixture.Create<ValidationOptionsFixture>();
+        ValidationOptionsFixture options = _validationOptionsFixture.Create();
         IValidator<ValidationOptionsFixture> validator = Substitute.For<IValidator<ValidationOptionsFixture>>();
         validator.Validate(options).Returns([]);
         ValidationOptions<ValidationOptionsFixture> sut = new(name, validator);
@@ -55,7 +56,7 @@ public class ValidationOptionsTests
         // Arrange
         string name = _fixture.Create<string>();
         string differentName = _fixture.Create<string>();
-        ValidationOptionsFixture options = _fixture.Create<ValidationOptionsFixture>();
+        ValidationOptionsFixture options = _validationOptionsFixture.Create();
         IValidator<ValidationOptionsFixture> validator = Substitute.For<IValidator<ValidationOptionsFixture>>();
         ValidationOptions<ValidationOptionsFixture> sut = new(name, validator);
 
@@ -71,7 +72,7 @@ public class ValidationOptionsTests
     public void Validate_WhenNullName_ShouldValidateOptions()
     {
         // Arrange
-        ValidationOptionsFixture options = _fixture.Create<ValidationOptionsFixture>();
+        ValidationOptionsFixture options = _validationOptionsFixture.Create();
         IValidator<ValidationOptionsFixture> validator = Substitute.For<IValidator<ValidationOptionsFixture>>();
         validator.Validate(options).Returns([]);
         ValidationOptions<ValidationOptionsFixture> sut = new(null, validator);
@@ -105,7 +106,7 @@ public class ValidationOptionsTests
     {
         // Arrange
         string name = _fixture.Create<string>();
-        ValidationOptionsFixture options = _fixture.Create<ValidationOptionsFixture>();
+        ValidationOptionsFixture options = _validationOptionsFixture.Create();
         IValidator<ValidationOptionsFixture> validator = Substitute.For<IValidator<ValidationOptionsFixture>>();
         List<Error> validationFailures =
         [

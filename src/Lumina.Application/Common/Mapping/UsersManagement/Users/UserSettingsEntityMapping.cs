@@ -31,6 +31,7 @@ public static class UserSettingsEntityMapping
             repositoryEntity.ShouldIgnoreThePrefixForAlphaPicker,
             repositoryEntity.IsThemeCachingEnabled,
             repositoryEntity.ShouldAggregateMetadataWhenMissing,
+            repositoryEntity.ShouldAggregateArtworkWhenMissing,
             repositoryEntity.ShouldRenderPdfAsImages,
             repositoryEntity.ShouldPreserveBookStyles
         );
@@ -50,6 +51,7 @@ public static class UserSettingsEntityMapping
             repositoryEntity.ShouldIgnoreThePrefixForAlphaPicker,
             repositoryEntity.IsThemeCachingEnabled,
             repositoryEntity.ShouldAggregateMetadataWhenMissing,
+            repositoryEntity.ShouldAggregateArtworkWhenMissing,
             repositoryEntity.ShouldRenderPdfAsImages,
             repositoryEntity.ShouldPreserveBookStyles
         );

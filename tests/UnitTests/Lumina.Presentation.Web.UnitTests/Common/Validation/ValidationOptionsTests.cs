@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.Primitives;
 using Lumina.Presentation.Web.Common.Validation;
+using Lumina.Presentation.Web.Fixtures.Common.Validation;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using System;
@@ -17,15 +18,17 @@ namespace Lumina.Presentation.Web.UnitTests.Common.Validation;
 [ExcludeFromCodeCoverage]
 public class ValidationOptionsTests
 {
+    private readonly ValidationOptionsFixture _validationOptionsFixture = new();
+
     [Fact]
     public void Validate_WhenMatchingName_ShouldValidateOptions()
     {
         // Arrange
         string optionsName = "OptionsName";
-        TestOptions options = new();
-        IValidator<TestOptions> validator = Substitute.For<IValidator<TestOptions>>();
+        ValidationOptionsFixture options = _validationOptionsFixture.Create();
+        IValidator<ValidationOptionsFixture> validator = Substitute.For<IValidator<ValidationOptionsFixture>>();
         validator.Validate(options).Returns([]);
-        ValidationOptions<TestOptions> sut = new(optionsName, validator);
+        ValidationOptions<ValidationOptionsFixture> sut = new(optionsName, validator);
 
         // Act
         ValidateOptionsResult result = sut.Validate(optionsName, options);
@@ -42,9 +45,9 @@ public class ValidationOptionsTests
         // Arrange
         string optionsName = "OptionsName";
         string differentOptionsName = "DifferentOptionsName";
-        TestOptions options = new();
-        IValidator<TestOptions> validator = Substitute.For<IValidator<TestOptions>>();
-        ValidationOptions<TestOptions> sut = new(optionsName, validator);
+        ValidationOptionsFixture options = _validationOptionsFixture.Create();
+        IValidator<ValidationOptionsFixture> validator = Substitute.For<IValidator<ValidationOptionsFixture>>();
+        ValidationOptions<ValidationOptionsFixture> sut = new(optionsName, validator);
 
         // Act
         ValidateOptionsResult result = sut.Validate(differentOptionsName, options);
@@ -58,10 +61,10 @@ public class ValidationOptionsTests
     public void Validate_WhenNullName_ShouldValidateOptions()
     {
         // Arrange
-        TestOptions options = new();
-        IValidator<TestOptions> validator = Substitute.For<IValidator<TestOptions>>();
+        ValidationOptionsFixture options = _validationOptionsFixture.Create();
+        IValidator<ValidationOptionsFixture> validator = Substitute.For<IValidator<ValidationOptionsFixture>>();
         validator.Validate(options).Returns([]);
-        ValidationOptions<TestOptions> sut = new(null, validator);
+        ValidationOptions<ValidationOptionsFixture> sut = new(null, validator);
 
         // Act
         ValidateOptionsResult result = sut.Validate("AnyOptionsName", options);
@@ -77,15 +80,15 @@ public class ValidationOptionsTests
     {
         // Arrange
         string optionsName = "OptionsName";
-        IValidator<TestOptions> validator = Substitute.For<IValidator<TestOptions>>();
-        ValidationOptions<TestOptions> sut = new(optionsName, validator);
+        IValidator<ValidationOptionsFixture> validator = Substitute.For<IValidator<ValidationOptionsFixture>>();
+        ValidationOptions<ValidationOptionsFixture> sut = new(optionsName, validator);
 
         // Act
         Action act = () => sut.Validate(optionsName, null!);
 
         // Assert
         Assert.Throws<ArgumentNullException>(act);
-        validator.DidNotReceive().Validate(Arg.Any<TestOptions>());
+        validator.DidNotReceive().Validate(Arg.Any<ValidationOptionsFixture>());
     }
 
     [Fact]
@@ -93,14 +96,14 @@ public class ValidationOptionsTests
     {
         // Arrange
         string optionsName = "OptionsName";
-        TestOptions options = new();
-        IValidator<TestOptions> validator = Substitute.For<IValidator<TestOptions>>();
+        ValidationOptionsFixture options = _validationOptionsFixture.Create();
+        IValidator<ValidationOptionsFixture> validator = Substitute.For<IValidator<ValidationOptionsFixture>>();
         List<Error> validationFailures =
         [
             Error.Validation("PropertyName", "Error Message")
         ];
         validator.Validate(options).Returns(validationFailures);
-        ValidationOptions<TestOptions> sut = new(optionsName, validator);
+        ValidationOptions<ValidationOptionsFixture> sut = new(optionsName, validator);
 
         // Act
         ValidateOptionsResult result = sut.Validate(optionsName, options);
@@ -117,15 +120,15 @@ public class ValidationOptionsTests
     {
         // Arrange
         string optionsName = "OptionsName";
-        TestOptions options = new();
-        IValidator<TestOptions> validator = Substitute.For<IValidator<TestOptions>>();
+        ValidationOptionsFixture options = _validationOptionsFixture.Create();
+        IValidator<ValidationOptionsFixture> validator = Substitute.For<IValidator<ValidationOptionsFixture>>();
         List<Error> validationFailures =
         [
             Error.Validation("PropertyOne", "First Error Message"),
             Error.Validation("PropertyTwo", "Second Error Message")
         ];
         validator.Validate(options).Returns(validationFailures);
-        ValidationOptions<TestOptions> sut = new(optionsName, validator);
+        ValidationOptions<ValidationOptionsFixture> sut = new(optionsName, validator);
 
         // Act
         ValidateOptionsResult result = sut.Validate(optionsName, options);
@@ -136,13 +139,5 @@ public class ValidationOptionsTests
         Assert.Equal(2, result.Failures.Count());
         Assert.Contains("Options validation failed for 'PropertyOne' with error: 'First Error Message'", result.Failures);
         Assert.Contains("Options validation failed for 'PropertyTwo' with error: 'Second Error Message'", result.Failures);
-    }
-
-    /// <summary>
-    /// Placeholder options type used to exercise the generic <see cref="ValidationOptions{TOptions}"/> class.
-    /// </summary>
-    [ExcludeFromCodeCoverage]
-    public sealed class TestOptions
-    {
     }
 }

@@ -14,13 +14,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.UsersManagement.Users;
 [ExcludeFromCodeCoverage]
 public class UpdateUserSettingsRequestMappingTests
 {
-    private readonly UpdateUserSettingsRequestFixture _requestFixture = new();
+    private readonly UpdateUserSettingsRequestFixture _updateUserSettingsRequestFixture = new();
 
     [Fact]
     public void ToCommand_WhenMappingValidRequest_ShouldMapCorrectly()
     {
         // Arrange
-        UpdateUserSettingsRequest request = _requestFixture.Create(
+        UpdateUserSettingsRequest request = _updateUserSettingsRequestFixture.Create(
             isPaginationEnabled: true,
             itemsPerPage: 48,
             shouldIgnoreThePrefixForAlphaPicker: false,

@@ -22,17 +22,20 @@ public class MediaSettingsDtoFixture
     /// <param name="rootDirectory">Optional. The root directory where media files are stored.</param>
     /// <param name="librariesDirectory">Optional. The directory where media library files are stored.</param>
     /// <param name="booksDirectory">Optional. The directory where the media item files are stored.</param>
+    /// <param name="musicDirectory">Optional. The directory where the music library item files are stored.</param>
     /// <returns>The created <see cref="MediaSettingsDto"/>.</returns>
     public MediaSettingsDto Create(
         string? rootDirectory = null, 
         string? librariesDirectory = null, 
-        string? booksDirectory = null)
+        string? booksDirectory = null, 
+        string? musicDirectory = null)
     {
         return new MediaSettingsDto
         {
             RootDirectory = rootDirectory ?? _faker.System.DirectoryPath(),
             LibrariesDirectory = librariesDirectory ?? _faker.System.DirectoryPath(),
-            BooksDirectory = booksDirectory ?? _faker.System.DirectoryPath()
+            BooksDirectory = booksDirectory ?? _faker.System.DirectoryPath(),
+            MusicDirectory = musicDirectory ?? _faker.System.DirectoryPath()
         };
     }
 

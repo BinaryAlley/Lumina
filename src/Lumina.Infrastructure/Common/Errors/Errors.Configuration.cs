@@ -15,6 +15,7 @@ public static partial class Errors
         public static Error MediaRootDirectoryCannotBeEmpty => Error.Validation(description: nameof(MediaRootDirectoryCannotBeEmpty));
         public static Error MediaLibrariesDirectoryCannotBeEmpty => Error.Validation(description: nameof(MediaLibrariesDirectoryCannotBeEmpty));
         public static Error MediaBooksDirectoryCannotBeEmpty => Error.Validation(description: nameof(MediaBooksDirectoryCannotBeEmpty));
+        public static Error MediaMusicDirectoryCannotBeEmpty => Error.Validation(description: nameof(MediaMusicDirectoryCannotBeEmpty));
         public static Error EncryptionSecretKeyCannotBeEmpty => Error.Validation(description: nameof(EncryptionSecretKeyCannotBeEmpty));
         public static Error EncryptionSecretKeyMustBeABase64String => Error.Validation(description: nameof(EncryptionSecretKeyMustBeABase64String));
         public static Error JwtSecretKeyCannotBeEmpty => Error.Validation(description: nameof(JwtSecretKeyCannotBeEmpty));

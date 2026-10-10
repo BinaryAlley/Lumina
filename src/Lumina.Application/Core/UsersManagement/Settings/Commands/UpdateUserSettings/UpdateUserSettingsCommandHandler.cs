@@ -74,6 +74,7 @@ public class UpdateUserSettingsCommandHandler : ICommandHandler<UpdateUserSettin
                 command.ShouldIgnoreThePrefixForAlphaPicker,
                 command.IsThemeCachingEnabled,
                 command.ShouldAggregateMetadataWhenMissing,
+                command.ShouldAggregateArtworkWhenMissing,
                 command.ShouldRenderPdfAsImages,
                 command.ShouldPreserveBookStyles);
             if (createSettingsResult.IsFailure)
@@ -96,6 +97,7 @@ public class UpdateUserSettingsCommandHandler : ICommandHandler<UpdateUserSettin
                 command.ShouldIgnoreThePrefixForAlphaPicker,
                 command.IsThemeCachingEnabled,
                 command.ShouldAggregateMetadataWhenMissing,
+                command.ShouldAggregateArtworkWhenMissing,
                 command.ShouldRenderPdfAsImages,
                 command.ShouldPreserveBookStyles);
             if (updateSettingsResult.IsFailure)
