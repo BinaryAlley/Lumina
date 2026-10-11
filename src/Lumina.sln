@@ -31,11 +31,39 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{19C1EE2F-0F4C-4BF6-B677-E0EC37AB3C72}"
 	ProjectSection(SolutionItems) = preProject
 		..\docs\CONTRIBUTING.md = ..\docs\CONTRIBUTING.md
-		..\docs\INSTALL.md = ..\docs\INSTALL.md
 		..\LICENSE.md = ..\LICENSE.md
 		..\README.md = ..\README.md
 		..\docs\SOURCES.md = ..\docs\SOURCES.md
-		..\docs\USAGE.md = ..\docs\USAGE.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "manual", "manual", "{7E9ED516-A6A6-452F-855A-FE1B0BA42703}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\manual\index.md = ..\docs\manual\index.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "installation", "installation", "{A0C7314A-3D91-46A4-8E14-303E179F96E8}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\manual\installation\index.md = ..\docs\manual\installation\index.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "using-lumina", "using-lumina", "{E5599FF5-B16B-4BA5-A0C4-BEBCA087F972}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\manual\using-lumina\index.md = ..\docs\manual\using-lumina\index.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "managing-libraries", "managing-libraries", "{9515979E-F28E-4062-8C3D-7CB3E38102D6}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\manual\managing-libraries\index.md = ..\docs\manual\managing-libraries\index.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "plugins", "plugins", "{60E7E49C-BAC5-415C-A998-9182B9A17131}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\manual\plugins\index.md = ..\docs\manual\plugins\index.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "themes", "themes", "{55FEC474-E130-4808-A0BB-1BF6C97ECA2D}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\manual\themes\index.md = ..\docs\manual\themes\index.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "technical", "technical", "{64570222-A5AC-49EE-BEBC-25D61B989A20}"
@@ -1332,6 +1360,12 @@ Global
 		{3BB42EB9-A0A3-4E3F-9053-785F429714AE} = {53B1231B-37F5-44BA-80D5-DBA979775F5C}
 		{4D5E4789-8437-4F3B-883E-28BBF8A4848F} = {53B1231B-37F5-44BA-80D5-DBA979775F5C}
 		{53B1231B-37F5-44BA-80D5-DBA979775F5C} = {16E590D3-DD9F-4B45-BF19-C6E317A57D11}
+		{7E9ED516-A6A6-452F-855A-FE1B0BA42703} = {19C1EE2F-0F4C-4BF6-B677-E0EC37AB3C72}
+		{A0C7314A-3D91-46A4-8E14-303E179F96E8} = {7E9ED516-A6A6-452F-855A-FE1B0BA42703}
+		{E5599FF5-B16B-4BA5-A0C4-BEBCA087F972} = {7E9ED516-A6A6-452F-855A-FE1B0BA42703}
+		{9515979E-F28E-4062-8C3D-7CB3E38102D6} = {7E9ED516-A6A6-452F-855A-FE1B0BA42703}
+		{60E7E49C-BAC5-415C-A998-9182B9A17131} = {7E9ED516-A6A6-452F-855A-FE1B0BA42703}
+		{55FEC474-E130-4808-A0BB-1BF6C97ECA2D} = {7E9ED516-A6A6-452F-855A-FE1B0BA42703}
 		{64570222-A5AC-49EE-BEBC-25D61B989A20} = {19C1EE2F-0F4C-4BF6-B677-E0EC37AB3C72}
 		{D78A725D-C3AE-420B-ABA8-255A000D7324} = {64570222-A5AC-49EE-BEBC-25D61B989A20}
 		{459EF701-AB73-40ED-81E6-144D3587C667} = {D78A725D-C3AE-420B-ABA8-255A000D7324}

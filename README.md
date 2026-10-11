@@ -16,7 +16,11 @@ Stay tuned as we build something amazing together. Lumina is about to light up y
 
 P.S. This README is just a spark. Watch it grow into a supernova! ✨
 
+> **Warning: pre-alpha, not production ready.** Lumina is under heavy development, and breaking changes happen all the time. Configuration, APIs, data formats and behavior can change between versions without a migration path or a guaranteed way back. Do not use Lumina in production. Back up before you update.
+
 ## Documentation
+
+The user facing manual, covering installing, using and administering Lumina, can be found at [docs/manual](./docs/manual/index.md). Start there if you want to run Lumina rather than read how it is built.
 
 For those with technical curiosities, here are some goodies to browse through:
 - This application was written following Clean Architecture and Domain Driven Design. Although you've probably seen it countless times before, here is the diagram of how the structure looks like.
