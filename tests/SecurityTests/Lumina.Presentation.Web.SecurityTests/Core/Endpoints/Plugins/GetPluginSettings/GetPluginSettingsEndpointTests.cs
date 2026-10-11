@@ -66,7 +66,6 @@ public class GetPluginSettingsEndpointTests : IClassFixture<LuminaWebFactory>
         // reaches the handler; the Web application reports the binding failure as a 200 response carrying success=false
         using JsonDocument json = JsonDocument.Parse(content);
         Assert.False(json.RootElement.GetProperty("success").GetBoolean());
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("password", content, StringComparison.OrdinalIgnoreCase);

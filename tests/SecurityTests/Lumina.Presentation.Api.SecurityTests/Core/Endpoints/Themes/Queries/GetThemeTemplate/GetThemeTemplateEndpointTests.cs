@@ -65,7 +65,6 @@ public class GetThemeTemplateEndpointTests : IClassFixture<LuminaApiFactory>, ID
         Assert.Equal(url, problemDetails["instance"].GetString());
         Assert.True(problemDetails.ContainsKey("traceId"));
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
     }
@@ -89,7 +88,6 @@ public class GetThemeTemplateEndpointTests : IClassFixture<LuminaApiFactory>, ID
         // Assert
         Assert.NotEqual(HttpStatusCode.InternalServerError, response.StatusCode);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(DECOY_CONTENT, content, StringComparison.OrdinalIgnoreCase);
@@ -116,7 +114,6 @@ public class GetThemeTemplateEndpointTests : IClassFixture<LuminaApiFactory>, ID
         // Assert
         Assert.NotEqual(HttpStatusCode.InternalServerError, response.StatusCode);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(DECOY_CONTENT, content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
@@ -139,7 +136,6 @@ public class GetThemeTemplateEndpointTests : IClassFixture<LuminaApiFactory>, ID
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
 

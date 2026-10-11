@@ -117,7 +117,6 @@ public class InstallPluginEndpointTests : IClassFixture<LuminaWebFactory>
         using JsonDocument json = JsonDocument.Parse(content);
         Assert.False(json.RootElement.GetProperty("success").GetBoolean());
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
     }

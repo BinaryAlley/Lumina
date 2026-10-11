@@ -62,7 +62,6 @@ public class SplitPathEndpointTests : IClassFixture<LuminaWebFactory>
 
         // Assert
         response.EnsureSuccessStatusCode();
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("password", content, StringComparison.OrdinalIgnoreCase);

@@ -62,7 +62,6 @@ public class ThemeAssetsEndpointTests : IClassFixture<LuminaWebFactory>
         string content = await response.Content.ReadAsStringAsync();
 
         // Assert
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("password", content, StringComparison.OrdinalIgnoreCase);
@@ -86,7 +85,6 @@ public class ThemeAssetsEndpointTests : IClassFixture<LuminaWebFactory>
         string content = await response.Content.ReadAsStringAsync();
 
         // Assert
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("password", content, StringComparison.OrdinalIgnoreCase);

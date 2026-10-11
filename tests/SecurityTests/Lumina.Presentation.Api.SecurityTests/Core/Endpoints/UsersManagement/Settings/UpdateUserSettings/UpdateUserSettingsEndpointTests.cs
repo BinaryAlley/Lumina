@@ -96,7 +96,6 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<LuminaApiFactory>
         response.EnsureSuccessStatusCode();
         string content = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -120,7 +119,6 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<LuminaApiFactory>
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
     }
 

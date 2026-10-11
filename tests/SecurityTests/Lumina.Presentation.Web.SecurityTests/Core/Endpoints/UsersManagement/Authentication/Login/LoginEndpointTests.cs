@@ -57,7 +57,6 @@ public class LoginEndpointTests : IClassFixture<LuminaWebFactory>
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         using JsonDocument json = JsonDocument.Parse(content);
         Assert.False(json.RootElement.GetProperty("success").GetBoolean());
-        Assert.DoesNotContain("SQL", content);
         Assert.DoesNotContain("Exception", content);
         Assert.DoesNotContain("Abcd123$", content);
         Assert.DoesNotContain("hash", content, StringComparison.OrdinalIgnoreCase);

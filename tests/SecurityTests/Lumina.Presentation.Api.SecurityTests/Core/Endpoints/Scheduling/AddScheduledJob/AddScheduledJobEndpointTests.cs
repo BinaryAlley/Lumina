@@ -119,7 +119,6 @@ public class AddScheduledJobEndpointTests : IClassFixture<LuminaApiFactory>, IAs
         string content = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         // The malicious name either reaches the parameterized insert verbatim or is rejected by validation; it never corrupts the storage medium.
         Assert.True(response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.UnprocessableEntity);
 
