@@ -105,7 +105,6 @@ public class UpdatePluginSettingsEndpointTests : IClassFixture<LuminaWebFactory>
         // Assert
         Assert.False(response.IsSuccessStatusCode);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
     }

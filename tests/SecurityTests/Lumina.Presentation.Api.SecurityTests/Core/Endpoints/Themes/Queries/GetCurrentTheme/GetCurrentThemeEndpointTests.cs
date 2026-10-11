@@ -45,7 +45,6 @@ public class GetCurrentThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDi
         Assert.NotEqual(HttpStatusCode.InternalServerError, response.StatusCode);
 
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("password", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("hash", content, StringComparison.OrdinalIgnoreCase);

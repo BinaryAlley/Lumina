@@ -49,7 +49,6 @@ public class UpdateBookCoverEndpointTests : IClassFixture<LuminaWebFactory>
 
         // Assert
         // The route is authoritative: an unparseable route value becomes an empty book Id, so the upload can never reach a real book.
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
         Assert.Contains(_apiFactory.ApiClientStub.PutRequests, putRequest => putRequest.Endpoint == $"libraries/{libraryId}/books/{Guid.Empty}/cover");

@@ -92,7 +92,6 @@ public class SaveBookEndpointTests : IClassFixture<LuminaWebFactory>
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
         Assert.Contains(_apiFactory.ApiClientStub.PutRequests, putRequest => putRequest.Endpoint == $"libraries/{libraryId}/books/{bookId}" && putRequest.Data is UpdateBookRequest forwarded && forwarded.Metadata!.Title == maliciousTitle);

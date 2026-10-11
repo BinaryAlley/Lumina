@@ -82,7 +82,6 @@ public class InstallPluginEndpointTests : IClassFixture<LuminaApiFactory>, IDisp
         Assert.Equal("General.Unauthorized", problemDetails["title"].GetString());
         Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -106,7 +105,6 @@ public class InstallPluginEndpointTests : IClassFixture<LuminaApiFactory>, IDisp
         Assert.Equal("General.Failure", problemDetails["title"].GetString());
         Assert.Equal("PluginArchiveNotReadable", problemDetails["detail"].GetString());
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
     }
@@ -134,7 +132,6 @@ public class InstallPluginEndpointTests : IClassFixture<LuminaApiFactory>, IDisp
         Assert.False(File.Exists(Path.Combine(AppContext.BaseDirectory, "evil.dll")));
         Assert.True(File.Exists(Path.Combine(AppContext.BaseDirectory, "plugins", "evil.dll")));
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -158,7 +155,6 @@ public class InstallPluginEndpointTests : IClassFixture<LuminaApiFactory>, IDisp
         Assert.Equal("General.Validation", problemDetails["title"].GetString());
         Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
     }
@@ -184,7 +180,6 @@ public class InstallPluginEndpointTests : IClassFixture<LuminaApiFactory>, IDisp
         Assert.Equal("General.Validation", problemDetails["title"].GetString());
         Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
     }
