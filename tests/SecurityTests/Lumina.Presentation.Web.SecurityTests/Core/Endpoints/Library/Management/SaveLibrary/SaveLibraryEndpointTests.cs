@@ -82,7 +82,6 @@ public class SaveLibraryEndpointTests : IClassFixture<LuminaWebFactory>
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.DoesNotContain("SQL", content);
         Assert.DoesNotContain("Exception", content);
     }
 

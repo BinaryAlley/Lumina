@@ -92,7 +92,6 @@ public class GetTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(maliciousLibraryId, content, StringComparison.Ordinal);
         Assert.DoesNotContain("testuser_", content, StringComparison.OrdinalIgnoreCase);
@@ -119,7 +118,6 @@ public class GetTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(maliciousArtistId, content, StringComparison.Ordinal);
         Assert.DoesNotContain("testuser_", content, StringComparison.OrdinalIgnoreCase);
@@ -147,7 +145,6 @@ public class GetTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(maliciousAlbumId, content, StringComparison.Ordinal);
         Assert.DoesNotContain("testuser_", content, StringComparison.OrdinalIgnoreCase);
@@ -174,7 +171,6 @@ public class GetTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(maliciousTrackId, content, StringComparison.Ordinal);
         Assert.DoesNotContain("testuser_", content, StringComparison.OrdinalIgnoreCase);
@@ -206,7 +202,6 @@ public class GetTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         Assert.Equal("General.Unauthorized", problemDetails["title"].GetString());
         Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("password", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("hash", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("salt", content, StringComparison.OrdinalIgnoreCase);

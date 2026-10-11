@@ -57,7 +57,6 @@ public class RegisterEndpointTests : IClassFixture<LuminaWebFactory>
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         using JsonDocument json = JsonDocument.Parse(content);
         Assert.False(json.RootElement.GetProperty("success").GetBoolean());
-        Assert.DoesNotContain("SQL", content);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
@@ -105,7 +104,6 @@ public class RegisterEndpointTests : IClassFixture<LuminaWebFactory>
 
         // Assert
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
     }

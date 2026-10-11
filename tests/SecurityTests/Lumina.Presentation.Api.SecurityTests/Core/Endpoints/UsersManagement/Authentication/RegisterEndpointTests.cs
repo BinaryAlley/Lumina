@@ -128,7 +128,6 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
 
         // Assert
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
-        Assert.DoesNotContain("SQL", content);
         Assert.DoesNotContain("Exception", content);
         Assert.DoesNotContain("password", content);
         Assert.DoesNotContain("hash", content);

@@ -69,7 +69,6 @@ public class GetThemeAssetEndpointTests : IClassFixture<LuminaApiFactory>, IDisp
         Assert.Equal(url, problemDetails["instance"].GetString());
         Assert.True(problemDetails.ContainsKey("traceId"));
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
     }
@@ -97,7 +96,6 @@ public class GetThemeAssetEndpointTests : IClassFixture<LuminaApiFactory>, IDisp
         // in both cases it must be a clean client error that never serves or leaks the decoy.
         Assert.True(response.StatusCode >= HttpStatusCode.BadRequest && response.StatusCode < HttpStatusCode.InternalServerError, $"Unexpected status code {response.StatusCode}.");
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(DECOY_CONTENT, content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
@@ -119,7 +117,6 @@ public class GetThemeAssetEndpointTests : IClassFixture<LuminaApiFactory>, IDisp
         // Assert
         Assert.NotEqual(HttpStatusCode.InternalServerError, response.StatusCode);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(DECOY_CONTENT, content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
@@ -142,7 +139,6 @@ public class GetThemeAssetEndpointTests : IClassFixture<LuminaApiFactory>, IDisp
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
 

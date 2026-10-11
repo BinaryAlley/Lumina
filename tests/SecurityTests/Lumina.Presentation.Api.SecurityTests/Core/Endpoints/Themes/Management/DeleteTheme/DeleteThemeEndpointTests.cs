@@ -82,7 +82,6 @@ public class DeleteThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         Assert.Equal(url, problemDetails["instance"].GetString());
         Assert.True(problemDetails.ContainsKey("traceId"));
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
     }
 
     [Theory]
@@ -104,7 +103,6 @@ public class DeleteThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);

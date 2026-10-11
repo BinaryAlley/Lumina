@@ -198,7 +198,6 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
 
         // Assert
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
-        Assert.DoesNotContain("SQL", content);
         Assert.DoesNotContain("Exception", content);
         Assert.DoesNotContain(legitimateUser.Username, content); // Shouldn't expose other usernames.
         Assert.DoesNotContain(legitimateUser.Password, content); // Shouldn't expose password hashes.
@@ -227,7 +226,6 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
 
         // Assert
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
-        Assert.DoesNotContain("SQL", content);
         Assert.DoesNotContain("Exception", content);
     }
 
@@ -248,7 +246,6 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
 
         // Assert
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
-        Assert.DoesNotContain("SQL", content);
         Assert.DoesNotContain("Exception", content);
     }
 

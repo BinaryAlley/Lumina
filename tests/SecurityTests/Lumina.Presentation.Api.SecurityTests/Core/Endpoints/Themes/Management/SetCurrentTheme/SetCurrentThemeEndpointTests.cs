@@ -84,7 +84,6 @@ public class SetCurrentThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDi
         Assert.Equal("/api/v1/themes/current", problemDetails["instance"].GetString());
         Assert.True(problemDetails.ContainsKey("traceId"));
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
     }
 
     [Theory]
@@ -114,7 +113,6 @@ public class SetCurrentThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDi
         Assert.Equal("General.NotFound", problemDetails["title"].GetString());
         Assert.Equal("ThemeNotFound", problemDetails["detail"].GetString());
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);

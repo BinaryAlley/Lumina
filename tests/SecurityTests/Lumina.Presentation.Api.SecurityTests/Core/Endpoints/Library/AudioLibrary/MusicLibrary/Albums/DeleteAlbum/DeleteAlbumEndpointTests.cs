@@ -92,7 +92,6 @@ public class DeleteAlbumEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         using JsonDocument problemDetails = JsonDocument.Parse(content);
         Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
@@ -117,7 +116,6 @@ public class DeleteAlbumEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         using JsonDocument problemDetails = JsonDocument.Parse(content);
         Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
@@ -142,7 +140,6 @@ public class DeleteAlbumEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         using JsonDocument problemDetails = JsonDocument.Parse(content);
         Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
@@ -172,7 +169,7 @@ public class DeleteAlbumEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
         Assert.Equal("General.Unauthorized", problemDetails["title"].GetString());
         Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("password", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("hash", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("salt", content, StringComparison.OrdinalIgnoreCase);

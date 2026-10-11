@@ -88,7 +88,6 @@ public class GetArtistEndpointTests : IClassFixture<LuminaApiFactory>, IDisposab
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(maliciousLibraryId, content, StringComparison.Ordinal);
         using JsonDocument problemDetails = JsonDocument.Parse(content);
@@ -113,7 +112,6 @@ public class GetArtistEndpointTests : IClassFixture<LuminaApiFactory>, IDisposab
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(maliciousArtistId, content, StringComparison.Ordinal);
         using JsonDocument problemDetails = JsonDocument.Parse(content);

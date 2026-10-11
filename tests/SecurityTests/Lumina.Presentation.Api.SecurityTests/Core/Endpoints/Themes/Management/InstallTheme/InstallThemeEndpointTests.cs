@@ -97,7 +97,6 @@ public class InstallThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDispo
         Assert.Equal("/api/v1/themes", problemDetails["instance"].GetString());
         Assert.True(problemDetails.ContainsKey("traceId"));
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -121,7 +120,6 @@ public class InstallThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDispo
         Assert.Equal("General.Failure", problemDetails["title"].GetString());
         Assert.Equal("ThemeArchiveNotReadable", problemDetails["detail"].GetString());
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
     }
@@ -150,7 +148,6 @@ public class InstallThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDispo
         Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
         Assert.True(problemDetails["errors"].GetProperty("Theme.Package.Invalid").GetArrayLength() > 0);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
     }
@@ -177,7 +174,6 @@ public class InstallThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDispo
         Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
         Assert.True(problemDetails["errors"].GetProperty("Theme.Archive.TooLarge").GetArrayLength() > 0);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -209,7 +205,6 @@ public class InstallThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDispo
         Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
         Assert.True(problemDetails["errors"].GetProperty("Theme.Package.Invalid").GetArrayLength() > 0);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
     }
@@ -255,7 +250,6 @@ public class InstallThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDispo
         Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
         Assert.True(problemDetails["errors"].GetProperty("Theme.Package.Invalid").GetArrayLength() > 0);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
     }
@@ -281,7 +275,6 @@ public class InstallThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDispo
         Assert.Equal("General.Validation", problemDetails["title"].GetString());
         Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
     }

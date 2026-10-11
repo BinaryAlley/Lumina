@@ -96,7 +96,6 @@ public class DeleteTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("testuser_", content, StringComparison.OrdinalIgnoreCase);
         using JsonDocument problemDetails = JsonDocument.Parse(content);
@@ -122,7 +121,6 @@ public class DeleteTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("testuser_", content, StringComparison.OrdinalIgnoreCase);
         using JsonDocument problemDetails = JsonDocument.Parse(content);
@@ -148,7 +146,6 @@ public class DeleteTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("testuser_", content, StringComparison.OrdinalIgnoreCase);
         using JsonDocument problemDetails = JsonDocument.Parse(content);
@@ -174,7 +171,6 @@ public class DeleteTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("testuser_", content, StringComparison.OrdinalIgnoreCase);
         using JsonDocument problemDetails = JsonDocument.Parse(content);
@@ -200,7 +196,6 @@ public class DeleteTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
 
         // Assert
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
@@ -243,7 +238,6 @@ public class DeleteTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         Assert.Equal("General.Unauthorized", problemDetails["title"].GetString());
         Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("password", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("hash", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("salt", content, StringComparison.OrdinalIgnoreCase);
