@@ -381,7 +381,7 @@ internal sealed class MusicMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
             musicArtworkService,
             fileHashService,
             () => musicArtworkService!.DeleteAlbumArtwork(albumEntity.LibraryId, albumEntity.Id, libraryName, artistName, albumEntity.Title, releaseTypeName),
-            (artwork, token) => musicArtworkService!.SaveAlbumArtworkAsync(albumEntity.LibraryId, albumEntity.Id, libraryName, artistName, albumEntity.Title, artwork, token, releaseTypeName),
+            (artwork, token) => musicArtworkService!.SaveAlbumArtworkAsync(albumEntity.LibraryId, albumEntity.Id, libraryName, artistName, albumEntity.Title, artwork, releaseTypeName, token),
             shouldAggregateArtworkWhenMissing,
             unitOfWork,
             cancellationToken).ConfigureAwait(false);
