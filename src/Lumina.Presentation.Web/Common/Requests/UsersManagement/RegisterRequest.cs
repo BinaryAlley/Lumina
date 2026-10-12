@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace Lumina.Presentation.Web.Common.Requests.UsersManagement;
 
 /// <summary>
-/// Represents the request model for user registration.
+/// Represents a request for user registration.
 /// </summary>
 /// <param name="Username">The desired username for the new account. Required.</param>
 /// <param name="Password">The password for the new account. Required.</param>

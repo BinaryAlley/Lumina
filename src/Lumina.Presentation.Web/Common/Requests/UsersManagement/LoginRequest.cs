@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace Lumina.Presentation.Web.Common.Requests.UsersManagement;
 
 /// <summary>
-/// Represents the request model for user authentication.
+/// Represents a request for user authentication.
 /// </summary>
 /// <param name="Username">The username of the account to authenticate. Required.</param>
 /// <param name="Password">The password of the account to authenticate. Required.</param>

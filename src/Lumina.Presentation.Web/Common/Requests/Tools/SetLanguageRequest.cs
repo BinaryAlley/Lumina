@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace Lumina.Presentation.Web.Common.Requests.Tools;
 
 /// <summary>
-/// Represents the request for setting the culture used by the application.
+/// Represents a request for setting the culture used by the application.
 /// </summary>
 /// <param name="NewCulture">The new culture to set. Required.</param>
 /// <param name="ReturnUrl">The URL to return to, after setting the new culture. Optional.</param>

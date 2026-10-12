@@ -6,7 +6,7 @@ using System.Diagnostics;
 namespace Lumina.Presentation.Web.Common.Requests.Library.WrittenContentLibrary.BookLibrary.Books;
 
 /// <summary>
-/// Represents the request for displaying the books browsing view.
+/// Represents a request for displaying the books browsing view.
 /// </summary>
 /// <param name="LibraryId">The unique identifier of the media library whose books are browsed. Optional.</param>
 [DebuggerDisplay("LibraryId: {LibraryId}")]
