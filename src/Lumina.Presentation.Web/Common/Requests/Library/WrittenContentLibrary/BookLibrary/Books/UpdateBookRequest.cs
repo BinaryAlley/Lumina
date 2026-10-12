@@ -13,101 +13,44 @@ namespace Lumina.Presentation.Web.Common.Requests.Library.WrittenContentLibrary.
 /// <summary>
 /// Represents a request to update an existing book.
 /// </summary>
+/// <param name="BookId">The Id of the book to update, taken from the route. Required.</param>
+/// <param name="LibraryId">The Id of the media library the book belongs to. Required.</param>
+/// <param name="Metadata">The written content metadata of the book. Required.</param>
+/// <param name="Format">The format of the book (e.g., Hardcover, Paperback). Optional.</param>
+/// <param name="Edition">The edition of the book. Optional.</param>
+/// <param name="VolumeNumber">The volume or book number in the series. Optional.</param>
+/// <param name="Series">The series the book is part of. Optional.</param>
+/// <param name="ASIN">The ASIN (Amazon Standard Identification Number) of the book. Optional.</param>
+/// <param name="GoodreadsId">The Goodreads Id of the book. Optional.</param>
+/// <param name="LCCN">The Library of Congress Control Number (LCCN) of the book. Optional.</param>
+/// <param name="OCLCNumber">The OCLC Number (WorldCat identifier) of the book. Optional.</param>
+/// <param name="OpenLibraryId">The Open Library Id of the book. Optional.</param>
+/// <param name="LibraryThingId">The LibraryThing Id of the book. Optional.</param>
+/// <param name="GoogleBooksId">The Google Books Id of the book. Optional.</param>
+/// <param name="BarnesAndNobleId">The Barnes &amp; Noble Id of the book. Optional.</param>
+/// <param name="AppleBooksId">The Apple Books Id of the book. Optional.</param>
+/// <param name="ISBNs">The list of ISBN (International Standard Book Number) of the book. Required.</param>
+/// <param name="Contributors">The list of media contributors of the book. Required.</param>
+/// <param name="Ratings">The list of ratings of the book. Required.</param>
 [DebuggerDisplay("Title: {Metadata?.Title}")]
-public class UpdateBookRequest
-{
-    /// <summary>
-    /// Gets or sets the Id of the book to update, taken from the route.
-    /// </summary>
-    public string? BookId { get; set; }
-
-    /// <summary>
-    /// Gets or sets the Id of the media library the book belongs to.
-    /// </summary>
-    public Guid LibraryId { get; set; }
-
-    /// <summary>
-    /// Gets or sets the written content metadata of the book.
-    /// </summary>
-    public WrittenContentMetadataDto? Metadata { get; set; }
-
-    /// <summary>
-    /// Gets or sets the format of the book (e.g., Hardcover, Paperback), if applicable.
-    /// </summary>
-    public BookFormat? Format { get; set; }
-
-    /// <summary>
-    /// Gets or sets the edition of the book, if applicable.
-    /// </summary>
-    public string? Edition { get; set; }
-
-    /// <summary>
-    /// Gets or sets the volume or book number in the series, if applicable.
-    /// </summary>
-    public float? VolumeNumber { get; set; }
-
-    /// <summary>
-    /// Gets or sets the series name, if the book is part of a series.
-    /// </summary>
-    public BookSeriesDto? Series { get; set; }
-
-    /// <summary>
-    /// Gets or sets the ASIN (Amazon Standard Identification Number) of the book, if applicable.
-    /// </summary>
-    public string? ASIN { get; set; }
-
-    /// <summary>
-    /// Gets or sets the Goodreads Id of the book, if applicable.
-    /// </summary>
-    public string? GoodreadsId { get; set; }
-
-    /// <summary>
-    /// Gets or sets the Library of Congress Control Number (LCCN) of the book, if applicable.
-    /// </summary>
-    public string? LCCN { get; set; }
-
-    /// <summary>
-    /// Gets or sets the OCLC Number (WorldCat identifier) of the book, if applicable.
-    /// </summary>
-    public string? OCLCNumber { get; set; }
-
-    /// <summary>
-    /// Gets or sets the Open Library Id of the book, if applicable.
-    /// </summary>
-    public string? OpenLibraryId { get; set; }
-
-    /// <summary>
-    /// Gets or sets the LibraryThing Id of the book, if applicable.
-    /// </summary>
-    public string? LibraryThingId { get; set; }
-
-    /// <summary>
-    /// Gets or sets the Google Books Id of the book, if applicable.
-    /// </summary>
-    public string? GoogleBooksId { get; set; }
-
-    /// <summary>
-    /// Gets or sets the Barnes &amp; Noble Id of the book, if applicable.
-    /// </summary>
-    public string? BarnesAndNobleId { get; set; }
-
-    /// <summary>
-    /// Gets or sets the Apple Books Id of the book, if applicable.
-    /// </summary>
-    public string? AppleBooksId { get; set; }
-
-    /// <summary>
-    /// Gets or sets the list of ISBN (International Standard Book Number) of the book.
-    /// </summary>
-    public List<IsbnDto>? ISBNs { get; set; }
-
-    /// <summary>
-    /// Gets or sets the list of media contributors of the book. Required.
-    /// </summary>
-    public List<MediaContributorDto>? Contributors { get; set; }
-
-    /// <summary>
-    /// Gets or sets the list of ratings of the book.
-    /// </summary>
-    public List<BookRatingDto>? Ratings { get; set; }
-}
+public record UpdateBookRequest(
+    string? BookId,
+    Guid LibraryId,
+    WrittenContentMetadataDto? Metadata,
+    BookFormat? Format,
+    string? Edition,
+    float? VolumeNumber,
+    BookSeriesDto? Series,
+    string? ASIN,
+    string? GoodreadsId,
+    string? LCCN,
+    string? OCLCNumber,
+    string? OpenLibraryId,
+    string? LibraryThingId,
+    string? GoogleBooksId,
+    string? BarnesAndNobleId,
+    string? AppleBooksId,
+    List<IsbnDto>? ISBNs,
+    List<MediaContributorDto>? Contributors,
+    List<BookRatingDto>? Ratings
+);

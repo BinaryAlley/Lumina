@@ -25,15 +25,14 @@ public class UpdatePluginSettingsEndpointSummary : Summary<UpdatePluginSettingsE
         RequestParam(r => r.PluginId, "The unique identifier of the plugin. Required.");
         RequestParam(r => r.Settings, "The settings of the plugin. Optional.");
 
-        ExampleRequest = new UpdatePluginSettingsRequest
-        {
-            PluginId = Guid.NewGuid(),
-            Settings = new Dictionary<string, string>
+        ExampleRequest = new UpdatePluginSettingsRequest(
+            PluginId: Guid.NewGuid(),
+            Settings: new Dictionary<string, string>
             {
                 { "preferredLanguage", "fr" },
                 { "selectionStrategy", "first" }
             }
-        };
+        );
 
         Response(200, "The settings of the plugin are updated.", example: new SuccessResponse(true));
     }

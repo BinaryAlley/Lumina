@@ -10,7 +10,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.Requests.Plugins;
 
 /// <summary>
-/// Fixture class for the <see cref="ReorderLibraryArtworkProvidersRequest"/> class.
+/// Fixture class for the <see cref="ReorderLibraryArtworkProvidersRequest"/> record.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ReorderLibraryArtworkProvidersRequestFixture
@@ -27,11 +27,10 @@ public class ReorderLibraryArtworkProvidersRequestFixture
         Guid? libraryId = null,
         List<Guid>? pluginIds = null)
     {
-        return new ReorderLibraryArtworkProvidersRequest
-        {
-            LibraryId = libraryId ?? Guid.NewGuid(),
-            PluginIds = pluginIds ?? [_faker.Random.Guid(), _faker.Random.Guid()]
-        };
+        return new ReorderLibraryArtworkProvidersRequest(
+            LibraryId: libraryId ?? Guid.NewGuid(),
+            PluginIds: pluginIds ?? [_faker.Random.Guid(), _faker.Random.Guid()]
+        );
     }
 
     /// <summary>

@@ -10,7 +10,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.Requests.Libraries;
 
 /// <summary>
-/// Fixture class for the <see cref="GetBooksLiteRequest"/> class.
+/// Fixture class for the <see cref="GetBooksLiteRequest"/> record.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetBooksLiteRequestFixture
@@ -37,17 +37,16 @@ public class GetBooksLiteRequestFixture
         string? sortBy = null,
         SortOrder? sortOrder = null)
     {
-        return new GetBooksLiteRequest
-        {
-            LibraryId = libraryId ?? Guid.NewGuid(),
-            CurrentPage = currentPage,
-            PerPage = perPage,
-            SearchTerm = searchTerm,
-            FilterAlphaKey = filterAlphaKey,
-            ShouldIgnoreThePrefixForAlphaPicker = shouldIgnoreThePrefixForAlphaPicker,
-            SortBy = sortBy,
-            SortOrder = sortOrder
-        };
+        return new GetBooksLiteRequest(
+            LibraryId: libraryId ?? Guid.NewGuid(),
+            CurrentPage: currentPage,
+            PerPage: perPage,
+            SearchTerm: searchTerm,
+            FilterAlphaKey: filterAlphaKey,
+            ShouldIgnoreThePrefixForAlphaPicker: shouldIgnoreThePrefixForAlphaPicker,
+            SortBy: sortBy,
+            SortOrder: sortOrder
+        );
     }
 
     /// <summary>

@@ -10,7 +10,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.Requests.Plugins;
 
 /// <summary>
-/// Fixture class for the <see cref="UpdatePluginSettingsRequest"/> class.
+/// Fixture class for the <see cref="UpdatePluginSettingsRequest"/> record.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class UpdatePluginSettingsRequestFixture
@@ -27,11 +27,10 @@ public class UpdatePluginSettingsRequestFixture
         Guid? pluginId = null, 
         Dictionary<string, string>? settings = null)
     {
-        return new UpdatePluginSettingsRequest
-        {
-            PluginId = pluginId ?? Guid.NewGuid(),
-            Settings = settings ?? new Dictionary<string, string> { [_faker.Lorem.Word()] = _faker.Lorem.Word() }
-        };
+        return new UpdatePluginSettingsRequest(
+            PluginId: pluginId ?? Guid.NewGuid(),
+            Settings: settings ?? new Dictionary<string, string> { [_faker.Lorem.Word()] = _faker.Lorem.Word() }
+        );
     }
 
     /// <summary>

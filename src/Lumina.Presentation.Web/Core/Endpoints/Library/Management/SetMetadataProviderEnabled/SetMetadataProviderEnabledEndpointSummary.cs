@@ -25,12 +25,11 @@ public class SetMetadataProviderEnabledEndpointSummary : Summary<SetMetadataProv
         RequestParam(r => r.PluginId, "The unique identifier of the plugin providing the metadata. Required.");
         RequestParam(r => r.IsEnabled, "Whether the metadata provider should be enabled for the media library, or not. Required.");
 
-        ExampleRequest = new SetLibraryMetadataProviderEnabledRequest
-        {
-            LibraryId = Guid.NewGuid(),
-            PluginId = Guid.NewGuid(),
-            IsEnabled = true
-        };
+        ExampleRequest = new SetLibraryMetadataProviderEnabledRequest(
+            LibraryId: Guid.NewGuid(),
+            PluginId: Guid.NewGuid(),
+            IsEnabled: true
+        );
 
         Response(200, "The metadata provider of the media library is enabled or disabled.", example: new SuccessResponse(true));
     }

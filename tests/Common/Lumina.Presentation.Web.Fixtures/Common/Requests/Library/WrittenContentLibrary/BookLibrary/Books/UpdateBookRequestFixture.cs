@@ -15,7 +15,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.Requests.Library.WrittenContentLibrary.BookLibrary.Books;
 
 /// <summary>
-/// Fixture class for the <see cref="UpdateBookRequest"/> class.
+/// Fixture class for the <see cref="UpdateBookRequest"/> record.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class UpdateBookRequestFixture
@@ -73,28 +73,27 @@ public class UpdateBookRequestFixture
         bool includeContributors = true,
         bool includeRatings = true)
     {
-        return new UpdateBookRequest
-        {
-            BookId = id?.ToString() ?? Guid.NewGuid().ToString(),
-            LibraryId = libraryId ?? Guid.NewGuid(),
-            Metadata = includeMetadata ? (metadata ?? _writtenContentMetadataDtoFixture.Create()) : null,
-            Format = includeFormat ? _faker.PickRandom<BookFormat>() : null,
-            Edition = includeEdition ? _faker.Random.String2(_faker.Random.Number(1, 50)) : null,
-            VolumeNumber = includeVolumeNumber ? _faker.Random.Number(1, 3) : null,
-            Series = includeSeries ? _bookSeriesDtoFixture.Create() : null,
-            ASIN = includeAsin ? _faker.Random.String2(10) : null,
-            GoodreadsId = includeGoodreadsId ? _faker.Random.Number(100000, 500000).ToString() : null,
-            LCCN = includeLccn ? "n78890351" : null,
-            OCLCNumber = includeOclcNumber ? "ocm12345678" : null,
-            OpenLibraryId = includeOpenLibraryId ? "OL123456M" : null,
-            LibraryThingId = includeLibraryThingId ? _faker.Random.String2(_faker.Random.Number(1, 50)) : null,
-            GoogleBooksId = includeGoogleBooksId ? CreateGoogleBooksId() : null,
-            BarnesAndNobleId = includeBarnesAndNobleId ? _faker.Random.String2(10, "0123456789") : null,
-            AppleBooksId = includeAppleBooksId ? $"id{_faker.Random.Number(1, 999999)}" : null,
-            ISBNs = includeIsbns ? [.. _isbnDtoFixture.CreateMany(_faker.Random.Number(1, 3))] : null,
-            Contributors = includeContributors ? [.. _mediaContributorDtoFixture.CreateMany(_faker.Random.Number(1, 3))] : null,
-            Ratings = includeRatings ? [.. _bookRatingDtoFixture.CreateMany(_faker.Random.Number(1, 3))] : null
-        };
+        return new UpdateBookRequest(
+            BookId: id?.ToString() ?? Guid.NewGuid().ToString(),
+            LibraryId: libraryId ?? Guid.NewGuid(),
+            Metadata: includeMetadata ? (metadata ?? _writtenContentMetadataDtoFixture.Create()) : null,
+            Format: includeFormat ? _faker.PickRandom<BookFormat>() : null,
+            Edition: includeEdition ? _faker.Random.String2(_faker.Random.Number(1, 50)) : null,
+            VolumeNumber: includeVolumeNumber ? _faker.Random.Number(1, 3) : null,
+            Series: includeSeries ? _bookSeriesDtoFixture.Create() : null,
+            ASIN: includeAsin ? _faker.Random.String2(10) : null,
+            GoodreadsId: includeGoodreadsId ? _faker.Random.Number(100000, 500000).ToString() : null,
+            LCCN: includeLccn ? "n78890351" : null,
+            OCLCNumber: includeOclcNumber ? "ocm12345678" : null,
+            OpenLibraryId: includeOpenLibraryId ? "OL123456M" : null,
+            LibraryThingId: includeLibraryThingId ? _faker.Random.String2(_faker.Random.Number(1, 50)) : null,
+            GoogleBooksId: includeGoogleBooksId ? CreateGoogleBooksId() : null,
+            BarnesAndNobleId: includeBarnesAndNobleId ? _faker.Random.String2(10, "0123456789") : null,
+            AppleBooksId: includeAppleBooksId ? $"id{_faker.Random.Number(1, 999999)}" : null,
+            ISBNs: includeIsbns ? [.. _isbnDtoFixture.CreateMany(_faker.Random.Number(1, 3))] : null,
+            Contributors: includeContributors ? [.. _mediaContributorDtoFixture.CreateMany(_faker.Random.Number(1, 3))] : null,
+            Ratings: includeRatings ? [.. _bookRatingDtoFixture.CreateMany(_faker.Random.Number(1, 3))] : null
+        );
     }
 
     /// <summary>

@@ -25,14 +25,14 @@ public class ReorderMetadataProvidersEndpointSummary : Summary<ReorderMetadataPr
         RequestParam(r => r.LibraryId, "The Id of the media library whose metadata providers are reordered. Required.");
         RequestParam(r => r.PluginIds, "The plugin Ids in the new order, from highest to lowest rank. Required.");
 
-        ExampleRequest = new ReorderLibraryMetadataProvidersRequest
-        {
-            LibraryId = Guid.NewGuid(),
-            PluginIds = [
+        ExampleRequest = new ReorderLibraryMetadataProvidersRequest(
+            LibraryId: Guid.NewGuid(),
+            PluginIds:
+            [
                 Guid.NewGuid(),
                 Guid.NewGuid(),
             ]
-        };
+        );
 
         Response(200, "The metadata providers of the media library are reordered.", example: new SuccessResponse(true));
     }

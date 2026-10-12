@@ -10,7 +10,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.Requests.Plugins;
 
 /// <summary>
-/// Fixture class for the <see cref="SetLibraryArtworkProviderEnabledRequest"/> class.
+/// Fixture class for the <see cref="SetLibraryArtworkProviderEnabledRequest"/> record.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class SetLibraryArtworkProviderEnabledRequestFixture
@@ -29,12 +29,11 @@ public class SetLibraryArtworkProviderEnabledRequestFixture
         Guid? pluginId = null,
         bool? isEnabled = null)
     {
-        return new SetLibraryArtworkProviderEnabledRequest
-        {
-            LibraryId = libraryId ?? Guid.NewGuid(),
-            PluginId = pluginId ?? Guid.NewGuid(),
-            IsEnabled = isEnabled ?? _faker.Random.Bool()
-        };
+        return new SetLibraryArtworkProviderEnabledRequest(
+            LibraryId: libraryId ?? Guid.NewGuid(),
+            PluginId: pluginId ?? Guid.NewGuid(),
+            IsEnabled: isEnabled ?? _faker.Random.Bool()
+        );
     }
 
     /// <summary>
