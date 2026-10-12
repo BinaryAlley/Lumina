@@ -3,6 +3,7 @@ using FastEndpoints;
 using Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 using Lumina.Contracts.Responses.Common;
 using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -27,12 +28,20 @@ public class GetArtistsLiteEndpointSummary : Summary<GetArtistsLiteEndpoint, Get
         ExampleRequest = new GetArtistsLiteRequest(
             CurrentPage: 1,
             PerPage: 48,
-            SearchTerm: "queen"
+            SearchTerm: "queen",
+            FilterAlphaKey: "q",
+            ShouldIgnoreThePrefixForAlphaPicker: true,
+            SortBy: "name",
+            SortOrder: SortOrder.Ascending
         );
 
         RequestParam(r => r.CurrentPage, "The page of results to retrieve. Optional.");
         RequestParam(r => r.PerPage, "The maximum number of artists to retrieve per page. Optional.");
         RequestParam(r => r.SearchTerm, "The search term used to filter the artists by name. Optional.");
+        RequestParam(r => r.FilterAlphaKey, "The alpha key used to filter the artists by the first character of their name, for the alpha picker. Optional.");
+        RequestParam(r => r.ShouldIgnoreThePrefixForAlphaPicker, "Whether the leading \"The \" prefix of a name is ignored when computing the alpha key, or not.");
+        RequestParam(r => r.SortBy, "The name of the field by which to sort the results. Optional.");
+        RequestParam(r => r.SortOrder, "The direction in which to sort the results. Optional.");
 
         ResponseParam<ArtistLiteResponse>(r => r.Id, "The Id of the artist.");
         ResponseParam<ArtistLiteResponse>(r => r.Name, "The name of the artist.");
@@ -44,11 +53,13 @@ public class GetArtistsLiteEndpointSummary : Summary<GetArtistsLiteEndpoint, Get
                 [
                     new ArtistLiteResponse(
                         Id: Guid.NewGuid(),
-                        Name: "Queen"
+                        Name: "Queen",
+                        CoverPath: "/media/music/Queen-3b3a19f3/cover.jpg"
                     ),
                     new ArtistLiteResponse(
                         Id: Guid.NewGuid(),
-                        Name: "David Bowie"
+                        Name: "David Bowie",
+                        CoverPath: "/media/music/David Bowie-2b0e5f5a/cover.jpg"
                     )
                 ],
                 CurrentPage = 1,
@@ -113,7 +124,8 @@ public class GetArtistsLiteEndpointSummary : Summary<GetArtistsLiteEndpoint, Get
                     {
                         "General.Validation", new[]
                         {
-                            "LibraryIdCannotBeEmpty"
+                            "LibraryIdCannotBeEmpty",
+                            "InvalidFilterAlphaKey"
                         }
                     }
                 },

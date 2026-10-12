@@ -3,6 +3,7 @@ using FastEndpoints;
 using Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 using Lumina.Contracts.Responses.Common;
 using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
+using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -44,12 +45,18 @@ public class GetArtistAlbumsLiteEndpointSummary : Summary<GetArtistAlbumsLiteEnd
                     new AlbumLiteResponse(
                         Id: Guid.NewGuid(),
                         Title: "A Night at the Opera",
-                        TotalTracks: 12
+                        TotalTracks: 12,
+                        CoverPath: "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg",
+                        ReleaseYear: 1975,
+                        ReleaseTypes: [MusicReleaseType.Album]
                     ),
                     new AlbumLiteResponse(
                         Id: Guid.NewGuid(),
                         Title: "The Works",
-                        TotalTracks: 9
+                        TotalTracks: 9,
+                        CoverPath: "/media/music/Queen-3b3a19f3/The Works-6d7e8f9a/cover.jpg",
+                        ReleaseYear: 1984,
+                        ReleaseTypes: [MusicReleaseType.Album]
                     )
                 ],
                 CurrentPage = 1,

@@ -8,6 +8,7 @@ using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -144,7 +145,103 @@ public class GetArtistAlbumsEndpointSummary : Summary<GetArtistAlbumsEndpoint, E
                     ],
                     CreatedOnUtc: new DateTime(2025, 1, 15, 10, 30, 0, DateTimeKind.Utc),
                     UpdatedOnUtc: new DateTime(2025, 1, 20, 14, 45, 0, DateTimeKind.Utc),
-                    Tracks: []
+                    Tracks:
+                    [
+                        new(
+                            Id: Guid.NewGuid(),
+                            AlbumId: Guid.NewGuid(),
+                            LibraryId: Guid.NewGuid(),
+                            Path: "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
+                            Metadata: new(
+                                Title: "Bohemian Rhapsody",
+                                OriginalTitle: "Bohemian Rhapsody",
+                                Description: "A song by the British rock band Queen. It was written by Freddie Mercury and originally released on the album A Night at the Opera in 1975.",
+                                Disambiguation: "album version",
+                                ReleaseInfo: new(
+                                    OriginalReleaseDate: new DateOnly(1975, 10, 31),
+                                    OriginalReleaseYear: 1975,
+                                    ReReleaseDate: new DateOnly(2011, 11, 21),
+                                    ReReleaseYear: 2011,
+                                    ReleaseCountry: ReleaseCountry.GB,
+                                    ReleaseVersion: "Original"
+                                ),
+                                Language: new(
+                                    LanguageCode: "en",
+                                    LanguageName: "English",
+                                    NativeName: "English"
+                                ),
+                                OriginalLanguage: new(
+                                    LanguageCode: "en",
+                                    LanguageName: "English",
+                                    NativeName: "English"
+                                ),
+                                Tags: [
+                                    new(Name: "classic"),
+                                    new(Name: "epic")
+                                ],
+                                Genres: [
+                                    new(Name: "Rock"),
+                                    new(Name: "Progressive Rock")
+                                ],
+                                DurationInSeconds: 354,
+                                SampleRate: 44100,
+                                Channels: 2,
+                                BitDepth: 16,
+                                AudioCodec: "FLAC",
+                                Bitrate: 980,
+                                IsVideo: false
+                            ),
+                            Script: "Latn",
+                            Key: MusicKey.CMajor,
+                            Bpm: 72,
+                            Work: new MusicWorkDto(
+                                MusicBrainzWorkId: Guid.NewGuid(),
+                                Title: "Bohemian Rhapsody",
+                                Type: "Song",
+                                Languages: [new LanguageInfoDto(LanguageCode: "en", LanguageName: "English", NativeName: "English")],
+                                Iswcs: ["T-010489707-6"]
+                            ),
+                            Isrcs: [
+                                new(Value: "GBUM71029604")
+                            ],
+                            Moods: [
+                                new(Name: "dramatic"),
+                                new(Name: "anxious")
+                            ],
+                            MusicBrainzRecordingId: Guid.NewGuid(),
+                            MusicBrainzTrackId: Guid.NewGuid(),
+                            Contributors: [
+                                new MediaContributorReferenceDto(
+                                    ContributorId: Guid.NewGuid(),
+                                    Role: MediaContributorRole.Vocals
+                                ),
+                                new MediaContributorReferenceDto(
+                                    ContributorId: Guid.NewGuid(),
+                                    Role: MediaContributorRole.Guitar
+                                )
+                            ],
+                            Ratings: [
+                                new(
+                                    Value: 4.5M,
+                                    MaxValue: 5,
+                                    Source: AudioRatingSource.MusicBrainz,
+                                    VoteCount: 2345
+                                ),
+                                new(
+                                    Value: 4.8M,
+                                    MaxValue: 5,
+                                    Source: AudioRatingSource.LastFm,
+                                    VoteCount: 1234
+                                )
+                            ],
+                            TrackNumber: 1,
+                            DiscNumber: 1,
+                            CreatedOnUtc: new DateTime(2025, 1, 15, 10, 30, 0, DateTimeKind.Utc),
+                            UpdatedOnUtc: new DateTime(2025, 1, 20, 14, 45, 0, DateTimeKind.Utc)
+                        )
+                    ],
+                    CoverPath: "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg",
+                    Artwork: [new MediaArtworkDto(ArtworkType.Cover, 0, "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg")]
                 ),
                 new AlbumResponse(
                     Id: Guid.NewGuid(),
@@ -222,7 +319,97 @@ public class GetArtistAlbumsEndpointSummary : Summary<GetArtistAlbumsEndpoint, E
                     ],
                     CreatedOnUtc: new DateTime(2025, 1, 15, 10, 30, 0, DateTimeKind.Utc),
                     UpdatedOnUtc: new DateTime(2025, 1, 20, 14, 45, 0, DateTimeKind.Utc),
-                    Tracks: []
+                    Tracks:
+                    [
+                        new(
+                            Id: Guid.NewGuid(),
+                            AlbumId: Guid.NewGuid(),
+                            LibraryId: Guid.NewGuid(),
+                            Path: "/music/queen/the-works/01-radio-ga-ga.flac",
+                            Metadata: new(
+                                Title: "Radio Ga Ga",
+                                OriginalTitle: "Radio Ga Ga",
+                                Description: "A song by the British rock band Queen, written by Roger Taylor and released on the album The Works in 1984.",
+                                Disambiguation: "album version",
+                                ReleaseInfo: new(
+                                    OriginalReleaseDate: new DateOnly(1984, 1, 23),
+                                    OriginalReleaseYear: 1984,
+                                    ReReleaseDate: new DateOnly(2011, 11, 21),
+                                    ReReleaseYear: 2011,
+                                    ReleaseCountry: ReleaseCountry.GB,
+                                    ReleaseVersion: "Remastered"
+                                ),
+                                Language: new(
+                                    LanguageCode: "en",
+                                    LanguageName: "English",
+                                    NativeName: "English"
+                                ),
+                                OriginalLanguage: new(
+                                    LanguageCode: "en",
+                                    LanguageName: "English",
+                                    NativeName: "English"
+                                ),
+                                Tags: [
+                                    new(Name: "classic"),
+                                    new(Name: "synth-pop")
+                                ],
+                                Genres: [
+                                    new(Name: "Rock"),
+                                    new(Name: "Synth-pop")
+                                ],
+                                DurationInSeconds: 349,
+                                SampleRate: 44100,
+                                Channels: 2,
+                                BitDepth: 16,
+                                AudioCodec: "FLAC",
+                                Bitrate: 920,
+                                IsVideo: false
+                            ),
+                            Script: "Latn",
+                            Key: MusicKey.FMajor,
+                            Bpm: 112,
+                            Work: new MusicWorkDto(
+                                MusicBrainzWorkId: Guid.NewGuid(),
+                                Title: "Radio Ga Ga",
+                                Type: "Song",
+                                Languages: [new LanguageInfoDto(LanguageCode: "en", LanguageName: "English", NativeName: "English")],
+                                Iswcs: ["T-010489707-6"]
+                            ),
+                            Isrcs: [
+                                new(Value: "GBUM71029610")
+                            ],
+                            Moods: [
+                                new(Name: "dramatic"),
+                                new(Name: "uplifting")
+                            ],
+                            MusicBrainzRecordingId: Guid.NewGuid(),
+                            MusicBrainzTrackId: Guid.NewGuid(),
+                            Contributors: [
+                                new MediaContributorReferenceDto(
+                                    ContributorId: Guid.NewGuid(),
+                                    Role: MediaContributorRole.Vocals
+                                ),
+                                new MediaContributorReferenceDto(
+                                    ContributorId: Guid.NewGuid(),
+                                    Role: MediaContributorRole.Guitar
+                                )
+                            ],
+                            Ratings: [
+                                new(
+                                    Value: 4.6M,
+                                    MaxValue: 5,
+                                    Source: AudioRatingSource.MusicBrainz,
+                                    VoteCount: 2100
+                                )
+                            ],
+                            TrackNumber: 1,
+                            DiscNumber: 1,
+                            CreatedOnUtc: new DateTime(2025, 1, 15, 10, 30, 0, DateTimeKind.Utc),
+                            UpdatedOnUtc: new DateTime(2025, 1, 20, 14, 45, 0, DateTimeKind.Utc)
+                        )
+                    ],
+                    CoverPath: "/media/music/Queen-3b3a19f3/The Works-6d7e8f9a/cover.jpg",
+                    Artwork: [new MediaArtworkDto(ArtworkType.Cover, 0, "/media/music/Queen-3b3a19f3/The Works-6d7e8f9a/cover.jpg")]
                 )
             }
         );

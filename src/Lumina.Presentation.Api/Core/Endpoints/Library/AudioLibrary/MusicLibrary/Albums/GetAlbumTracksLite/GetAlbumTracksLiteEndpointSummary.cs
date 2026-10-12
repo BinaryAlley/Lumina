@@ -36,6 +36,7 @@ public class GetAlbumTracksLiteEndpointSummary : Summary<GetAlbumTracksLiteEndpo
         ResponseParam<TrackLiteResponse>(r => r.Title, "The title of the track.");
         ResponseParam<TrackLiteResponse>(r => r.TrackNumber, "The number of the track on its disc.");
         ResponseParam<TrackLiteResponse>(r => r.DiscNumber, "The number of the disc the track belongs to, if applicable.");
+        ResponseParam<TrackLiteResponse>(r => r.DurationInSeconds, "The duration of the track in seconds.");
 
         Response(200, "The paginated list of the lightweight read models of the tracks of the album is returned.",
             example: new PaginatedResponse<TrackLiteResponse>
@@ -46,13 +47,15 @@ public class GetAlbumTracksLiteEndpointSummary : Summary<GetAlbumTracksLiteEndpo
                         Id: Guid.NewGuid(),
                         Title: "Bohemian Rhapsody",
                         TrackNumber: 1,
-                        DiscNumber: 1
+                        DiscNumber: 1,
+                        DurationInSeconds: 354
                     ),
                     new TrackLiteResponse(
                         Id: Guid.NewGuid(),
                         Title: "You're My Best Friend",
                         TrackNumber: 2,
-                        DiscNumber: 1
+                        DiscNumber: 1,
+                        DurationInSeconds: 174
                     )
                 ],
                 CurrentPage = 1,

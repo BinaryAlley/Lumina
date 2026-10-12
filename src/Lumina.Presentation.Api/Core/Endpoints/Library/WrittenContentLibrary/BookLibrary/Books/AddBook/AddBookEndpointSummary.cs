@@ -308,7 +308,7 @@ public class AddBookEndpointSummary : Summary<AddBookEndpoint, AddBookRequest>
                 MetadataProvider: default,
                 CreatedOnUtc: DateTime.UtcNow,
                 UpdatedOnUtc: default,
-                CoverPath: null
+                CoverPath: "/media/books/tolkien/the-fellowship-of-the-ring/cover.jpg"
             )
         );
 

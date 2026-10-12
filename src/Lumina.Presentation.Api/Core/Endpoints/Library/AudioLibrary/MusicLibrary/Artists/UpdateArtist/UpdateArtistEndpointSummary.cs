@@ -11,6 +11,7 @@ using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -817,9 +818,12 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                                 CreatedOnUtc: new DateTime(2025, 1, 15, 10, 30, 0, DateTimeKind.Utc),
                                 UpdatedOnUtc: new DateTime(2025, 1, 20, 14, 45, 0, DateTimeKind.Utc)
                             )
-                        ]
+                        ],
+                        CoverPath: "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg",
+                        Artwork: [new MediaArtworkDto(ArtworkType.Cover, 0, "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg")]
                     )
                 ],
+                CoverPath: "/media/music/Queen-3b3a19f3/cover.jpg",
                 CreatedOnUtc: new DateTime(2025, 1, 15, 10, 30, 0, DateTimeKind.Utc),
                 UpdatedOnUtc: new DateTime(2025, 1, 20, 14, 45, 0, DateTimeKind.Utc)
             )
