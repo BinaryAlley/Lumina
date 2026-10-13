@@ -181,8 +181,9 @@ public class UpdateBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         // command validator reports a clean validation error instead of failing the request binding.
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        using JsonDocument problemDetails = JsonDocument.Parse(content);
-        Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Validation", problemDetails!["title"].GetString());
         Assert.Contains("BookIdCannotBeEmpty", content, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -199,9 +200,10 @@ public class UpdateBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        using JsonDocument problemDetails = JsonDocument.Parse(content);
-        Assert.Equal("General.NotFound", problemDetails.RootElement.GetProperty("title").GetString());
-        Assert.Equal("BookNotFound", problemDetails.RootElement.GetProperty("detail").GetString());
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.NotFound", problemDetails!["title"].GetString());
+        Assert.Equal("BookNotFound", problemDetails["detail"].GetString());
     }
 
     [Fact]
@@ -218,9 +220,10 @@ public class UpdateBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         // Assert
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        using JsonDocument problemDetails = JsonDocument.Parse(content);
-        Assert.Equal("General.Unauthorized", problemDetails.RootElement.GetProperty("title").GetString());
-        Assert.Equal("NotAuthorized", problemDetails.RootElement.GetProperty("detail").GetString());
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Unauthorized", problemDetails!["title"].GetString());
+        Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
     }
 
     [Fact]
@@ -237,8 +240,9 @@ public class UpdateBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         // Assert
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        using JsonDocument problemDetails = JsonDocument.Parse(content);
-        Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Validation", problemDetails!["title"].GetString());
         Assert.Contains("TitleCannotBeEmpty", content, StringComparison.OrdinalIgnoreCase);
     }
 

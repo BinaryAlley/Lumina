@@ -197,9 +197,10 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         // Assert
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        using JsonDocument problemDetails = JsonDocument.Parse(content);
-        Assert.Equal("General.Unauthorized", problemDetails.RootElement.GetProperty("title").GetString());
-        Assert.Equal("NotAuthorized", problemDetails.RootElement.GetProperty("detail").GetString());
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Unauthorized", problemDetails!["title"].GetString());
+        Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
     }
 
     [Fact]
@@ -1032,13 +1033,14 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     /// </summary>
     /// <param name="response">The HTTP response to assert.</param>
     /// <param name="expectedDetail">The expected detail of the problem details.</param>
-    private static async Task AssertNotFoundAsync(HttpResponseMessage response, string expectedDetail)
+    private async Task AssertNotFoundAsync(HttpResponseMessage response, string expectedDetail)
     {
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        using JsonDocument problemDetails = JsonDocument.Parse(content);
-        Assert.Equal("General.NotFound", problemDetails.RootElement.GetProperty("title").GetString());
-        Assert.Equal(expectedDetail, problemDetails.RootElement.GetProperty("detail").GetString());
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.NotFound", problemDetails!["title"].GetString());
+        Assert.Equal(expectedDetail, problemDetails["detail"].GetString());
     }
 
     /// <summary>

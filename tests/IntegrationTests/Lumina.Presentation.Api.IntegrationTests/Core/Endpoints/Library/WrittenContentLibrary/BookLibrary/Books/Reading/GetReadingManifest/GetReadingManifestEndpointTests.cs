@@ -9,11 +9,13 @@ using Lumina.DataAccess.Core.UoW;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 #endregion
 
@@ -27,6 +29,11 @@ public class GetReadingManifestEndpointTests : IClassFixture<AuthenticatedLumina
 {
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+    };
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly BookEntityFixture _bookEntityFixture = new();
     private readonly UserEntityFixture _userEntityFixture = new();
@@ -74,10 +81,12 @@ public class GetReadingManifestEndpointTests : IClassFixture<AuthenticatedLumina
 
         // Assert
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
-        using JsonDocument problemDetails = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-        Assert.Equal("General.Unauthorized", problemDetails.RootElement.GetProperty("title").GetString());
-        Assert.Equal("NotAuthorized", problemDetails.RootElement.GetProperty("detail").GetString());
-        Assert.DoesNotContain("Exception", problemDetails.RootElement.GetRawText(), StringComparison.Ordinal);
+        string content = await response.Content.ReadAsStringAsync();
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Unauthorized", problemDetails!["title"].GetString());
+        Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
+        Assert.DoesNotContain("Exception", content, StringComparison.Ordinal);
     }
 
     [Fact]

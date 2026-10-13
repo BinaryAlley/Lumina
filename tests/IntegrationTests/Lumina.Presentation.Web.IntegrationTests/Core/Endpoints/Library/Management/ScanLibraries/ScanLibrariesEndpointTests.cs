@@ -73,7 +73,7 @@ public class ScanLibrariesEndpointTests : IClassFixture<LuminaWebFactory>
         {
             Content = new StringContent("{}", Encoding.UTF8, "application/json")
         };
-        // the antiforgery middleware matches the content type exactly, so the charset suffix must be omitted
+        // The antiforgery middleware matches the content type exactly, so the charset suffix must be omitted.
         scanRequest.Content!.Headers.ContentType = new MediaTypeHeaderValue("application/json");
         scanRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         return scanRequest;

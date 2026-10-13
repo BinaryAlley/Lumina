@@ -63,10 +63,10 @@ public class DeleteLibraryEndpointTests : IClassFixture<LuminaWebFactory>
     {
         HttpRequestMessage deleteRequest = new(HttpMethod.Delete, $"/en-us/libraries/manage/api-item/{libraryId}")
         {
-            // the front-end sends the JSON content type even for DELETE requests, which triggers the antiforgery validation
+            // The front-end sends the JSON content type even for DELETE requests, which triggers the antiforgery validation.
             Content = new StringContent("{}", Encoding.UTF8, "application/json")
         };
-        // the antiforgery middleware matches the content type exactly, so the charset suffix must be omitted
+        // The antiforgery middleware matches the content type exactly, so the charset suffix must be omitted.
         deleteRequest.Content!.Headers.ContentType = new MediaTypeHeaderValue("application/json");
         deleteRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         return deleteRequest;

@@ -14,6 +14,7 @@ using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
@@ -262,11 +263,11 @@ public class GetBooksEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         Assert.NotNull(paginatedBooks);
         BookResponse book = Assert.Single(paginatedBooks!.Data);
         Assert.Equal(seededBook.Title, book.Metadata.Title);
-        Assert.Equal(seededBook.Tags.Select(tag => tag.Name), book.Metadata.Tags.Select(tag => tag.Name));
-        Assert.Equal(seededBook.Genres.Select(genre => genre.Name), book.Metadata.Genres.Select(genre => genre.Name));
-        Assert.Equal(seededBook.ISBNs.Select(isbn => isbn.Value), book.ISBNs.Select(isbn => isbn.Value));
-        Assert.Equal(seededBook.Ratings.Select(rating => rating.Value), book.Ratings.Select(rating => rating.Value));
-        Assert.Equal(seededBook.Ratings.Single().Source, book.Ratings.Single().Source);
+        Assert.Equal(seededBook.Tags.Select(tag => tag.Name), book?.Metadata?.Tags?.Select(tag => tag.Name));
+        Assert.Equal(seededBook.Genres.Select(genre => genre.Name), book?.Metadata?.Genres?.Select(genre => genre.Name));
+        Assert.Equal(seededBook.ISBNs.Select(isbn => isbn.Value), book?.ISBNs?.Select(isbn => isbn.Value));
+        Assert.Equal(seededBook.Ratings.Select(rating => rating.Value), book?.Ratings?.Select(rating => rating.Value));
+        Assert.Equal(seededBook.Ratings.Single().Source, book?.Ratings?.Single().Source);
     }
 
     [Fact]
@@ -280,8 +281,9 @@ public class GetBooksEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         // validation error instead of failing the request binding.
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        using JsonDocument problemDetails = JsonDocument.Parse(content);
-        Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Validation", problemDetails!["title"].GetString());
         Assert.Contains("LibraryIdCannotBeEmpty", content, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -303,7 +305,7 @@ public class GetBooksEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         response.EnsureSuccessStatusCode();
         PaginatedResponse<BookResponse>? paginatedBooks = await response.Content.ReadFromJsonAsync<PaginatedResponse<BookResponse>>(_jsonOptions);
         Assert.NotNull(paginatedBooks);
-        Assert.Equal(new[] { "Book A", "Book B", "Book C" }, paginatedBooks!.Data.Select(book => book.Metadata.Title));
+        Assert.Equal(["Book A", "Book B", "Book C"], paginatedBooks!.Data.Select(book => book.Metadata.Title));
     }
 
     [Fact]
@@ -324,7 +326,7 @@ public class GetBooksEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         response.EnsureSuccessStatusCode();
         PaginatedResponse<BookResponse>? paginatedBooks = await response.Content.ReadFromJsonAsync<PaginatedResponse<BookResponse>>(_jsonOptions);
         Assert.NotNull(paginatedBooks);
-        Assert.Equal(new[] { "Book C", "Book B", "Book A" }, paginatedBooks!.Data.Select(book => book.Metadata.Title));
+        Assert.Equal(["Book C", "Book B", "Book A"], paginatedBooks!.Data.Select(book => book.Metadata.Title));
     }
 
     [Fact]
@@ -410,7 +412,7 @@ public class GetBooksEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         response.EnsureSuccessStatusCode();
         PaginatedResponse<BookResponse>? paginatedBooks = await response.Content.ReadFromJsonAsync<PaginatedResponse<BookResponse>>(_jsonOptions);
         Assert.NotNull(paginatedBooks);
-        Assert.Equal(new[] { "Book A", "Book B", "Book C" }, paginatedBooks!.Data.Select(book => book.Metadata.Title));
+        Assert.Equal(["Book A", "Book B", "Book C"], paginatedBooks!.Data.Select(book => book.Metadata.Title));
     }
 
     [Fact]
