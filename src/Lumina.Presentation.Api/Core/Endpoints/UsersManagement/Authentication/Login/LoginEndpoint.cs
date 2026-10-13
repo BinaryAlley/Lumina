@@ -6,6 +6,7 @@ using Lumina.Application.Core.UsersManagement.Authentication.Queries.LoginUser;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Presentation.Api.Common.DependencyInjection;
 using Lumina.Presentation.Api.Common.Routes.UsersManagement;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Builder;
@@ -42,7 +43,7 @@ public class LoginEndpoint : BaseEndpoint<LoginRequest, IResult>
         Version(1);
         AllowAnonymous();
         DontCatchExceptions();
-        Options(x => x.RequireRateLimiting("authenticationPolicy"));
+        Options(x => x.RequireRateLimiting(PresentationApiLayerServices.AUTHENTICATION_RATE_LIMIT_POLICY));
     }
 
     /// <summary>
