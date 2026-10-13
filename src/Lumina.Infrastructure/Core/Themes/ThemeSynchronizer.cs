@@ -53,9 +53,17 @@ internal static class ThemeSynchronizer
 
             ThemeEntity? existingTheme = themes.Where(theme => theme.ThemeId == manifestResult.Value.Id).FirstOrDefault();
 
-            // A theme that was soft deleted by the user must not be reinstalled automatically; an installed bundled theme
-            // whose files are present is already in sync, so only a bundled theme whose files went missing gets its files reinstalled.
-            if (existingTheme is not null && (existingTheme.IsDeleted || existingTheme.InstallSource != ThemeInstallSource.Bundled || themeService.HasThemePack(existingTheme.ThemeId)))
+            // A theme that was soft deleted by the user must not be reinstalled automatically, and a theme installed from
+            // another source (like an uploaded pack) is never replaced by a bundled archive.
+            if (existingTheme is not null && (existingTheme.IsDeleted || existingTheme.InstallSource != ThemeInstallSource.Bundled))
+                continue;
+
+            // A bundled theme that is already installed is reinstalled when its files went missing, or when the shipped
+            // archive carries a new version, so that content updates of the bundled themes reach the installed packs.
+            bool isBundledThemeOutOfDate = existingTheme is not null
+                && (!themeService.HasThemePack(existingTheme.ThemeId)
+                    || !string.Equals(existingTheme.Version, manifestResult.Value.Version, StringComparison.Ordinal));
+            if (existingTheme is not null && !isBundledThemeOutOfDate)
                 continue;
 
             // Installing a bundled theme at startup is best effort: a file system failure here must never crash the host, because the default
@@ -70,9 +78,20 @@ internal static class ThemeSynchronizer
                     continue;
                 }
 
-                // A known theme only gets its missing files reinstalled, so no new row is inserted.
+                // A known theme is refreshed in place, so its row is updated with the shipped version instead of a new row being inserted.
                 if (existingTheme is not null)
+                {
+                    if (!string.Equals(existingTheme.Version, manifestResult.Value.Version, StringComparison.Ordinal))
+                    {
+                        existingTheme.Version = manifestResult.Value.Version;
+                        existingTheme.UpdatedOnUtc = DateTime.UtcNow;
+                        existingTheme.UpdatedBy = default;
+                        Result<Updated> updateResult = await unitOfWork.ThemeRepository.UpdateAsync(existingTheme, cancellationToken).ConfigureAwait(false);
+                        if (updateResult.IsFailure)
+                            logger.LogWarning("Failed to update the version of theme '{ThemeId}': {Error}", existingTheme.ThemeId, updateResult.FirstError.Description);
+                    }
                     continue;
+                }
 
                 ThemeEntity themeEntity = new()
                 {
@@ -107,7 +126,7 @@ internal static class ThemeSynchronizer
         }
 
         await CleanUpMissingThemePacksAsync(themeService, unitOfWork, themes, logger, cancellationToken).ConfigureAwait(false);
-        await EnsureCurrentThemeExistsAsync(themeService, unitOfWork, themes, cancellationToken).ConfigureAwait(false);
+        await EnsureCurrentThemeExistsAsync(themeService, unitOfWork, themes, logger, cancellationToken).ConfigureAwait(false);
 
         Result<Success> saveChangesResult = await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         if (saveChangesResult.IsFailure)
@@ -189,8 +208,9 @@ internal static class ThemeSynchronizer
     /// <param name="themeService">Injected service for the server-side storage and serving of theme packs.</param>
     /// <param name="unitOfWork">The unit of work for interacting with the theme repository.</param>
     /// <param name="themes">The installed themes read from the storage medium.</param>
+    /// <param name="logger">Injected logger used for logging.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    private static async Task EnsureCurrentThemeExistsAsync(IThemeService themeService, IUnitOfWork unitOfWork, IReadOnlyList<ThemeEntity> themes, CancellationToken cancellationToken)
+    private static async Task EnsureCurrentThemeExistsAsync(IThemeService themeService, IUnitOfWork unitOfWork, IReadOnlyList<ThemeEntity> themes, ILogger logger, CancellationToken cancellationToken)
     {
         if (themes.Any(theme => !theme.IsDeleted && theme.IsCurrent == true))
             return;
@@ -209,6 +229,8 @@ internal static class ThemeSynchronizer
         defaultTheme.IsCurrent = true;
         defaultTheme.UpdatedOnUtc = DateTime.UtcNow;
         defaultTheme.UpdatedBy = default;
-        await unitOfWork.ThemeRepository.UpdateAsync(defaultTheme, cancellationToken).ConfigureAwait(false);
+        Result<Updated> updateResult = await unitOfWork.ThemeRepository.UpdateAsync(defaultTheme, cancellationToken).ConfigureAwait(false);
+        if (updateResult.IsFailure)
+            logger.LogWarning("Failed to activate theme '{ThemeId}': {Error}", defaultTheme.ThemeId, updateResult.FirstError.Description);
     }
 }
