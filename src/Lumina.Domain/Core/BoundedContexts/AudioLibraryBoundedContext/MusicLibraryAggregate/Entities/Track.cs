@@ -347,6 +347,7 @@ public sealed class Track : Entity<TrackId>
     /// </summary>
     /// <param name="path">The file system path of the track.</param>
     /// <param name="metadata">The audio metadata of the track.</param>
+    /// <param name="disambiguation">The optional disambiguation comment of the track.</param>
     /// <param name="trackNumber">The number of the track on its disc.</param>
     /// <param name="discNumber">The optional number of the disc the track belongs to.</param>
     /// <param name="script">The optional script used by the language of the track.</param>
@@ -360,6 +361,7 @@ public sealed class Track : Entity<TrackId>
     internal Result<Updated> UpdateDetails(
         string path,
         AudioMetadata metadata,
+        Optional<string> disambiguation,
         int trackNumber,
         Optional<int> discNumber,
         Optional<string> script,
@@ -372,6 +374,7 @@ public sealed class Track : Entity<TrackId>
     {
         Path = path;
         Metadata = metadata;
+        Disambiguation = disambiguation;
         TrackNumber = trackNumber;
         DiscNumber = discNumber;
         Script = script;

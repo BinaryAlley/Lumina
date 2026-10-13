@@ -87,6 +87,7 @@ public static class UpdateTrackCommandMapping
             track,
             command.Path!,
             metadataResult.Value,
+            Optional<string>.FromNullable(metadata.Disambiguation),
             command.TrackNumber!.Value,
             Optional<int>.FromNullable(command.DiscNumber),
             Optional<string>.FromNullable(command.Script),

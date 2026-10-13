@@ -663,6 +663,7 @@ public class ArtistTests
         Artist artist = _artistFixture.Create(albums: [album]);
         string path = "C:\\Music\\queen\\bohemian-rhapsody.flac";
         AudioMetadata metadata = _audioMetadataFixture.Create();
+        Optional<string> disambiguation = Optional<string>.Some("remastered");
         Optional<int> discNumber = Optional<int>.Some(1);
         Optional<string> script = Optional<string>.Some("Latin");
         Optional<MusicKey> key = Optional<MusicKey>.Some(MusicKey.BMajor);
@@ -682,6 +683,7 @@ public class ArtistTests
             track,
             path,
             metadata,
+            disambiguation,
             11,
             discNumber,
             script,
@@ -700,6 +702,7 @@ public class ArtistTests
         Assert.False(result.IsFailure);
         Assert.Equal(path, track.Path);
         Assert.Equal(metadata, track.Metadata);
+        Assert.Equal(disambiguation, track.Disambiguation);
         Assert.Equal(11, track.TrackNumber);
         Assert.Equal(discNumber, track.DiscNumber);
         Assert.Equal(script, track.Script);
@@ -734,6 +737,7 @@ public class ArtistTests
             track,
             "C:\\Music\\queen\\bohemian-rhapsody.flac",
             _audioMetadataFixture.Create(),
+            Optional<string>.None(),
             11,
             Optional<int>.None(),
             Optional<string>.None(),
@@ -771,6 +775,7 @@ public class ArtistTests
             track,
             "C:\\Music\\queen\\bohemian-rhapsody.flac",
             _audioMetadataFixture.Create(),
+            Optional<string>.None(),
             11,
             Optional<int>.None(),
             Optional<string>.None(),

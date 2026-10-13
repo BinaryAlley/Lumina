@@ -119,18 +119,55 @@ public class AudioMetadataDtoMappingTests
         Assert.Equal(Errors.Music.TrackNotFound, result.FirstError);
     }
 
+    [Fact]
+    public void ApplyTo_WhenDtoHasDisambiguation_ShouldUseTheDtoDisambiguation()
+    {
+        // Arrange
+        (Artist artist, Album album, Track track) = CreateDomainArtist();
+        string disambiguation = "album version";
+        AudioMetadataDto dto = _audioMetadataDtoFixture.Create(disambiguation: disambiguation);
+
+        // Act
+        Result<Updated> result = dto.ApplyTo(artist, album, track, []);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.True(track.Disambiguation.HasValue);
+        Assert.Equal(disambiguation, track.Disambiguation.Value);
+    }
+
+    [Fact]
+    public void ApplyTo_WhenDtoHasNoDisambiguation_ShouldKeepTheTrackDisambiguation()
+    {
+        // Arrange
+        string trackDisambiguation = "single version";
+        (Artist artist, Album album, Track track) = CreateDomainArtist(trackDisambiguation);
+        AudioMetadataDto dto = _audioMetadataDtoFixture.Create(includeDisambiguation: false);
+
+        // Act
+        Result<Updated> result = dto.ApplyTo(artist, album, track, []);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.True(track.Disambiguation.HasValue);
+        Assert.Equal(trackDisambiguation, track.Disambiguation.Value);
+    }
+
     /// <summary>
     /// Creates a domain artist that owns a single album, which in turn owns a single track.
     /// </summary>
+    /// <param name="trackDisambiguation">Optional. The disambiguation of the created track.</param>
     /// <returns>The created domain artist, together with its album and track.</returns>
-    private (Artist artist, Album album, Track track) CreateDomainArtist()
+    private (Artist artist, Album album, Track track) CreateDomainArtist(string? trackDisambiguation = null)
     {
         Guid libraryId = Guid.NewGuid();
         Guid albumId = Guid.NewGuid();
+        TrackEntity trackEntity = _trackEntityFixture.Create(albumId: albumId, libraryId: libraryId);
+        trackEntity.Disambiguation = trackDisambiguation;
         AlbumEntity albumEntity = _albumEntityFixture.Create(
             id: albumId,
             libraryId: libraryId,
-            tracks: [_trackEntityFixture.Create(albumId: albumId, libraryId: libraryId)]);
+            tracks: [trackEntity]);
         ArtistEntity artistEntity = _artistEntityFixture.Create(libraryId: libraryId, albums: [albumEntity]);
         Artist artist = artistEntity.ToDomainEntity().Value;
         Album album = artist.Albums.First();

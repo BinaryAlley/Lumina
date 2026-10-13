@@ -35,6 +35,7 @@ public class UpdateArtistCommandMappingTests
     private readonly TrackEntityFixture _trackEntityFixture = new();
     private readonly MusicAlbumMetadataDtoFixture _musicAlbumMetadataDtoFixture = new();
     private readonly MusicArtistMetadataDtoFixture _musicArtistMetadataDtoFixture = new();
+    private readonly MusicTrackMetadataDtoFixture _musicTrackMetadataDtoFixture = new();
     private readonly GenreDtoFixture _genreDtoFixture = new();
 
     [Fact]
@@ -252,6 +253,32 @@ public class UpdateArtistCommandMappingTests
         Assert.False(result.IsFailure);
         Album updatedAlbum = result.Value.Albums.First(album => album.Id.Value == albumId);
         Assert.Empty(updatedAlbum.Tracks);
+    }
+
+    [Fact]
+    public void ToDomainEntity_WhenTrackHasDisambiguation_ShouldMapTheDisambiguationThrough()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        (Artist artist, Guid albumId, Guid trackId) = CreateDomainArtist(libraryId);
+        string disambiguation = "live at Wembley";
+        AddTrackCommand trackCommand = _addTrackCommandFixture.Create(
+            trackId: trackId,
+            metadata: _musicTrackMetadataDtoFixture.Create(disambiguation: disambiguation));
+        AddAlbumCommand albumCommand = _addAlbumCommandFixture.Create(albumId: albumId, tracks: [trackCommand]);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(
+            libraryId: libraryId.ToString(),
+            artistId: artist.Id.Value.ToString(),
+            albums: [albumCommand]);
+
+        // Act
+        Result<Artist> result = command.ToDomainEntity(artist);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Track updatedTrack = result.Value.Albums.First(album => album.Id.Value == albumId).Tracks.First(track => track.Id.Value == trackId);
+        Assert.True(updatedTrack.Disambiguation.HasValue);
+        Assert.Equal(disambiguation, updatedTrack.Disambiguation.Value);
     }
 
     /// <summary>

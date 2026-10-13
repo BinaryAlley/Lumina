@@ -238,6 +238,52 @@ public class UpdateTrackCommandMappingTests
         Assert.Equal(Errors.Music.TrackNotFound, result.FirstError);
     }
 
+    [Fact]
+    public void ToDomainEntity_WhenMetadataHasDisambiguation_ShouldMapTheDisambiguationThrough()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        (Artist artist, Guid albumId, Guid trackId) = CreateDomainArtist(libraryId);
+        string disambiguation = "2011 remaster";
+        UpdateTrackCommand command = _updateTrackCommandFixture.Create(
+            libraryId: libraryId.ToString(),
+            artistId: artist.Id.Value.ToString(),
+            albumId: albumId.ToString(),
+            trackId: trackId.ToString(),
+            metadata: _musicTrackMetadataDtoFixture.Create(disambiguation: disambiguation));
+
+        // Act
+        Result<Artist> result = command.ToDomainEntity(artist);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Track updatedTrack = result.Value.Albums.First(album => album.Id.Value == albumId).Tracks.First(track => track.Id.Value == trackId);
+        Assert.True(updatedTrack.Disambiguation.HasValue);
+        Assert.Equal(disambiguation, updatedTrack.Disambiguation.Value);
+    }
+
+    [Fact]
+    public void ToDomainEntity_WhenMetadataHasNoDisambiguation_ShouldClearTheDisambiguation()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        (Artist artist, Guid albumId, Guid trackId) = CreateDomainArtist(libraryId);
+        UpdateTrackCommand command = _updateTrackCommandFixture.Create(
+            libraryId: libraryId.ToString(),
+            artistId: artist.Id.Value.ToString(),
+            albumId: albumId.ToString(),
+            trackId: trackId.ToString(),
+            metadata: _musicTrackMetadataDtoFixture.Create(includeDisambiguation: false));
+
+        // Act
+        Result<Artist> result = command.ToDomainEntity(artist);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Track updatedTrack = result.Value.Albums.First(album => album.Id.Value == albumId).Tracks.First(track => track.Id.Value == trackId);
+        Assert.False(updatedTrack.Disambiguation.HasValue);
+    }
+
     /// <summary>
     /// Creates a domain artist that owns a single album, which in turn owns a single track, all belonging to <paramref name="libraryId"/>.
     /// </summary>

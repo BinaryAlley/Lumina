@@ -193,6 +193,7 @@ public class TrackTests
         List<Mood> originalMoods = [.. track.Moods];
         string path = "C:\\Music\\queen\\bohemian-rhapsody.flac";
         AudioMetadata metadata = _audioMetadataFixture.Create();
+        Optional<string> disambiguation = Optional<string>.Some("remastered");
         Optional<int> discNumber = Optional<int>.Some(2);
         Optional<string> script = Optional<string>.Some("Latin");
         Optional<MusicKey> key = Optional<MusicKey>.Some(MusicKey.DMajor);
@@ -207,6 +208,7 @@ public class TrackTests
         Result<Updated> result = track.UpdateDetails(
             path,
             metadata,
+            disambiguation,
             7,
             discNumber,
             script,
@@ -221,6 +223,7 @@ public class TrackTests
         Assert.False(result.IsFailure);
         Assert.Equal(path, track.Path);
         Assert.Equal(metadata, track.Metadata);
+        Assert.Equal(disambiguation, track.Disambiguation);
         Assert.Equal(7, track.TrackNumber);
         Assert.Equal(discNumber, track.DiscNumber);
         Assert.Equal(script, track.Script);
@@ -375,6 +378,7 @@ public class TrackTests
         Result<Updated> result = track.UpdateDetails(
             "C:\\Music\\queen\\bohemian-rhapsody.flac",
             _audioMetadataFixture.Create(),
+            Optional<string>.None(),
             11,
             Optional<int>.None(),
             Optional<string>.None(),
@@ -388,6 +392,7 @@ public class TrackTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.False(track.DiscNumber.HasValue);
+        Assert.False(track.Disambiguation.HasValue);
         Assert.False(track.Script.HasValue);
         Assert.False(track.Key.HasValue);
         Assert.False(track.Bpm.HasValue);

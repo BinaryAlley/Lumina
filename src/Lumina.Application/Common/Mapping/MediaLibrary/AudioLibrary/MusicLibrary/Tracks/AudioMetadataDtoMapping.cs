@@ -94,6 +94,9 @@ public static class AudioMetadataDtoMapping
         Optional<int> bpm = Optional<int>.FromNullable(dto.Bpm);
         if (!bpm.HasValue)
             bpm = track.Bpm;
+        Optional<string> disambiguation = Optional<string>.FromNullable(dto.Disambiguation);
+        if (!disambiguation.HasValue)
+            disambiguation = track.Disambiguation;
         Optional<MusicBrainzId> musicBrainzRecordingId = Optional<MusicBrainzId>.None();
         if (dto.MusicBrainzRecordingId is not null)
             musicBrainzRecordingId = MusicBrainzId.Create(dto.MusicBrainzRecordingId.Value);
@@ -110,6 +113,7 @@ public static class AudioMetadataDtoMapping
             track,
             track.Path,
             metadataResult.Value,
+            disambiguation,
             track.TrackNumber,
             track.DiscNumber,
             script,
@@ -187,21 +191,37 @@ public static class AudioMetadataDtoMapping
         if (dto.OriginalLanguage is not null && dto.OriginalLanguage.LanguageCode is not null && dto.OriginalLanguage.LanguageName is not null)
             originalLanguage = LanguageInfo.Create(dto.OriginalLanguage.LanguageCode, dto.OriginalLanguage.LanguageName, Optional<string>.FromNullable(dto.OriginalLanguage.NativeName));
 
+        Optional<string> originalTitle = Optional<string>.FromNullable(dto.OriginalTitle);
+        if (!originalTitle.HasValue)
+            originalTitle = track.Metadata.OriginalTitle;
+        Optional<string> description = Optional<string>.FromNullable(dto.Description);
+        if (!description.HasValue)
+            description = track.Metadata.Description;
+        Optional<int> bitDepth = Optional<int>.FromNullable(dto.BitDepth);
+        if (!bitDepth.HasValue)
+            bitDepth = track.Metadata.BitDepth;
+        Optional<string> audioCodec = Optional<string>.FromNullable(dto.AudioCodec);
+        if (!audioCodec.HasValue)
+            audioCodec = track.Metadata.AudioCodec;
+        Optional<int> bitrate = Optional<int>.FromNullable(dto.Bitrate);
+        if (!bitrate.HasValue)
+            bitrate = track.Metadata.Bitrate;
+
         return AudioMetadata.Create(
             string.IsNullOrWhiteSpace(dto.Title) ? track.Metadata.Title : dto.Title,
-            Optional<string>.FromNullable(dto.OriginalTitle).HasValue ? Optional<string>.FromNullable(dto.OriginalTitle) : track.Metadata.OriginalTitle,
+            originalTitle,
             dto.DurationInSeconds is > 0 ? dto.DurationInSeconds.Value : track.Metadata.DurationInSeconds,
             dto.SampleRate is > 0 ? dto.SampleRate.Value : track.Metadata.SampleRate,
             dto.Channels is > 0 ? dto.Channels.Value : track.Metadata.Channels,
             releaseInfoResult.Value,
-            Optional<string>.FromNullable(dto.Description).HasValue ? Optional<string>.FromNullable(dto.Description) : track.Metadata.Description,
+            description,
             genres,
             tags,
             language,
             originalLanguage,
-            Optional<int>.FromNullable(dto.BitDepth).HasValue ? Optional<int>.FromNullable(dto.BitDepth) : track.Metadata.BitDepth,
-            Optional<string>.FromNullable(dto.AudioCodec).HasValue ? Optional<string>.FromNullable(dto.AudioCodec) : track.Metadata.AudioCodec,
-            Optional<int>.FromNullable(dto.Bitrate).HasValue ? Optional<int>.FromNullable(dto.Bitrate) : track.Metadata.Bitrate,
+            bitDepth,
+            audioCodec,
+            bitrate,
             track.Metadata.AcoustId,
             track.Metadata.ReplayGainTrackGain,
             track.Metadata.ReplayGainTrackPeak,
