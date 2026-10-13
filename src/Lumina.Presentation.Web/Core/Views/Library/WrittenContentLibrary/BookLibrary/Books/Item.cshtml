@@ -305,19 +305,47 @@
 
                 <h3 class="text-light-two">@_localizer["Genres"]</h3>
                 <div class="form-row">
-                    <div class="form-label"><label for="genres-input">@_localizer["Genres"]</label>:</div>
-                    <div class="form-field">
-                        <input id="genres-input" type="text" class="enlightenment-input" value="@(string.Join(", ", genres.Select(genre => genre.Name)))" />
-                    </div>
+                    <table class="w-100 form-table book-list-table">
+                        <thead>
+                            <tr>
+                                <th>@_localizer["Genre"]</th>
+                                <th class="w-40px"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="genres-body">
+                            @foreach (var genre in genres)
+                            {
+                                <tr class="genre-row">
+                                    <td><input type="text" class="enlightenment-input genre-name w-100" value="@(genre.Name)" /></td>
+                                    <td><img src="~/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" /></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <button id="btn-add-genre" type="button" class="confirm-button">@_localizer["AddGenre"]</button>
                     <small class="form-label text-disabled form-description">@_localizer["GenresDescription"]</small>
                 </div>
 
                 <h3 class="text-light-two">@_localizer["Tags"]</h3>
                 <div class="form-row">
-                    <div class="form-label"><label for="tags-input">@_localizer["Tags"]</label>:</div>
-                    <div class="form-field">
-                        <input id="tags-input" type="text" class="enlightenment-input" value="@(string.Join(", ", tags.Select(tag => tag.Name)))" />
-                    </div>
+                    <table class="w-100 form-table book-list-table">
+                        <thead>
+                            <tr>
+                                <th>@_localizer["Tag"]</th>
+                                <th class="w-40px"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tags-body">
+                            @foreach (var tag in tags)
+                            {
+                                <tr class="tag-row">
+                                    <td><input type="text" class="enlightenment-input tag-name w-100" value="@(tag.Name)" /></td>
+                                    <td><img src="~/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" /></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <button id="btn-add-tag" type="button" class="confirm-button">@_localizer["AddTag"]</button>
                     <small class="form-label text-disabled form-description">@_localizer["TagsDescription"]</small>
                 </div>
 
@@ -373,9 +401,9 @@
                     <table class="w-100 form-table book-list-table">
                         <thead>
                             <tr>
-                                <th class="w-50">@_localizer["IsbnValue"]</th>
-                                <th class="w-40">@_localizer["IsbnFormat"]</th>
-                                <th class="w-10"></th>
+                                <th>@_localizer["IsbnValue"]</th>
+                                <th>@_localizer["IsbnFormat"]</th>
+                                <th class="w-40px"></th>
                             </tr>
                         </thead>
                         <tbody id="isbns-body">
@@ -413,9 +441,9 @@
                     <table class="w-100 form-table book-list-table">
                         <thead>
                             <tr>
-                                <th class="w-55">@_localizer["ContributorName"]</th>
-                                <th class="w-35">@_localizer["Role"]</th>
-                                <th class="w-10"></th>
+                                <th>@_localizer["ContributorName"]</th>
+                                <th>@_localizer["Role"]</th>
+                                <th class="w-40px"></th>
                             </tr>
                         </thead>
                         <tbody id="contributors-body">
@@ -454,11 +482,11 @@
                     <table class="w-100 form-table book-list-table">
                         <thead>
                             <tr>
-                                <th class="w-15">@_localizer["RatingValue"]</th>
-                                <th class="w-15">@_localizer["RatingMaxValue"]</th>
-                                <th class="w-25">@_localizer["RatingSource"]</th>
-                                <th class="w-25">@_localizer["RatingVoteCount"]</th>
-                                <th class="w-10"></th>
+                                <th>@_localizer["RatingValue"]</th>
+                                <th>@_localizer["RatingMaxValue"]</th>
+                                <th>@_localizer["RatingSource"]</th>
+                                <th>@_localizer["RatingVoteCount"]</th>
+                                <th class="w-40px"></th>
                             </tr>
                         </thead>
                         <tbody id="ratings-body">
@@ -529,9 +557,13 @@
         const isbnsBody = document.getElementById('isbns-body');
         const contributorsBody = document.getElementById('contributors-body');
         const ratingsBody = document.getElementById('ratings-body');
+        const genresBody = document.getElementById('genres-body');
+        const tagsBody = document.getElementById('tags-body');
         const btnAddIsbn = document.getElementById('btn-add-isbn');
         const btnAddContributor = document.getElementById('btn-add-contributor');
         const btnAddRating = document.getElementById('btn-add-rating');
+        const btnAddGenre = document.getElementById('btn-add-genre');
+        const btnAddTag = document.getElementById('btn-add-tag');
 
         const jsLocalizedStrings = {
             bookSaved: @Json.Serialize(_localizer["BookSaved"].Value),
@@ -569,9 +601,12 @@
             return Number.isNaN(parsed) ? null : parsed;
         }
 
-        // Splits a comma separated list into trimmed values.
-        function splitList(value) {
-            return value.split(',').map(item => item.trim()).filter(item => item !== '');
+        // Builds a list of name valued entries from the rows of a table, skipping the rows whose name is empty.
+        function buildNameList(body, rowSelector, inputSelector) {
+            return Array.from(body.querySelectorAll(rowSelector))
+                .map(row => row.querySelector(inputSelector).value.trim())
+                .filter(name => name !== '')
+                .map(name => ({ Name: name }));
         }
 
         // Builds the payload of the edited book, matching the update request of the API.
@@ -619,8 +654,8 @@
                         ReleaseCountry: readComboboxValue('release-country-combobox') || null,
                         ReleaseVersion: readValue('release-version-input') || null
                     },
-                    Genres: splitList(readValue('genres-input')).map(name => ({ Name: name })),
-                    Tags: splitList(readValue('tags-input')).map(name => ({ Name: name })),
+                    Genres: buildNameList(genresBody, '.genre-row', '.genre-name'),
+                    Tags: buildNameList(tagsBody, '.tag-row', '.tag-name'),
                     Language: buildLanguage('language-code-input', 'language-name-input', 'language-native-name-input'),
                     OriginalLanguage: buildLanguage('original-language-code-input', 'original-language-name-input', 'original-language-native-name-input')
                 }
@@ -819,6 +854,24 @@
                 </tr>`);
         }
 
+        // Adds a blank genre row.
+        function addGenreRow() {
+            genresBody.insertAdjacentHTML('beforeend', `
+                <tr class="genre-row">
+                    <td><input type="text" class="enlightenment-input genre-name w-100" /></td>
+                    <td><img src="/images/ui/delete.svg" alt="${jsLocalizedStrings.remove}" title="${jsLocalizedStrings.remove}" class="remove-form-table-row-icon" /></td>
+                </tr>`);
+        }
+
+        // Adds a blank tag row.
+        function addTagRow() {
+            tagsBody.insertAdjacentHTML('beforeend', `
+                <tr class="tag-row">
+                    <td><input type="text" class="enlightenment-input tag-name w-100" /></td>
+                    <td><img src="/images/ui/delete.svg" alt="${jsLocalizedStrings.remove}" title="${jsLocalizedStrings.remove}" class="remove-form-table-row-icon" /></td>
+                </tr>`);
+        }
+
         // Removes the row of the clicked remove icon.
         function handleRowRemoval(event) {
             if (event.target.matches('.remove-form-table-row-icon'))
@@ -833,9 +886,13 @@
         btnAddIsbn.addEventListener('click', addIsbnRow);
         btnAddContributor.addEventListener('click', addContributorRow);
         btnAddRating.addEventListener('click', addRatingRow);
+        btnAddGenre.addEventListener('click', addGenreRow);
+        btnAddTag.addEventListener('click', addTagRow);
         isbnsBody.addEventListener('click', handleRowRemoval);
         contributorsBody.addEventListener('click', handleRowRemoval);
         ratingsBody.addEventListener('click', handleRowRemoval);
+        genresBody.addEventListener('click', handleRowRemoval);
+        tagsBody.addEventListener('click', handleRowRemoval);
         document.addEventListener('DOMContentLoaded', InitializeAsync);
 
         // Register cleanup for these listeners.
@@ -847,9 +904,13 @@
             btnAddIsbn.removeEventListener('click', addIsbnRow);
             btnAddContributor.removeEventListener('click', addContributorRow);
             btnAddRating.removeEventListener('click', addRatingRow);
+            btnAddGenre.removeEventListener('click', addGenreRow);
+            btnAddTag.removeEventListener('click', addTagRow);
             isbnsBody.removeEventListener('click', handleRowRemoval);
             contributorsBody.removeEventListener('click', handleRowRemoval);
             ratingsBody.removeEventListener('click', handleRowRemoval);
+            genresBody.removeEventListener('click', handleRowRemoval);
+            tagsBody.removeEventListener('click', handleRowRemoval);
             document.removeEventListener('DOMContentLoaded', InitializeAsync);
         });
 

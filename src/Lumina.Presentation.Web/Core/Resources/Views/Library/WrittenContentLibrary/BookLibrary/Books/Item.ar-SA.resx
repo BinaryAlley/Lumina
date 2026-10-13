@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -94,7 +94,7 @@
     <value>الأنواع</value>
   </data>
   <data name="GenresDescription" xml:space="preserve">
-    <value>أنواع الكتاب، مفصولة بفواصل.</value>
+    <value>الأنواع الموسيقية الخاصة بالكتاب.</value>
   </data>
   <data name="GoodreadsIdDescription" xml:space="preserve">
     <value>المعرّف الرقمي للكتاب على Goodreads.</value>
@@ -304,7 +304,7 @@
     <value>الوسوم</value>
   </data>
   <data name="TagsDescription" xml:space="preserve">
-    <value>وسوم الكتاب، مفصولة بفواصل.</value>
+    <value>الوسوم الخاصة بالكتاب.</value>
   </data>
   <data name="Title" xml:space="preserve">
     <value>العنوان</value>
@@ -1050,5 +1050,38 @@
   </data>
   <data name="Orchestrator" xml:space="preserve">
     <value>منسق الأوركسترا</value>
+  </data>
+  <data name="Performer" xml:space="preserve">
+    <value>مؤدٍ</value>
+  </data>
+<data name="ContributorId" xml:space="preserve">
+    <value>معرّف المساهم</value>
+  </data>
+<data name="ContributorRole" xml:space="preserve">
+    <value>الدور</value>
+  </data>
+<data name="Other" xml:space="preserve">
+    <value>آخر</value>
+  </data>
+<data name="MusicBrainz" xml:space="preserve">
+    <value>MusicBrainz</value>
+  </data>
+<data name="Discogs" xml:space="preserve">
+    <value>Discogs</value>
+  </data>
+<data name="LastFm" xml:space="preserve">
+    <value>Last.fm</value>
+  </data>
+  <data name="Genre" xml:space="preserve">
+    <value>النوع</value>
+  </data>
+  <data name="AddGenre" xml:space="preserve">
+    <value>إضافة نوع</value>
+  </data>
+  <data name="Tag" xml:space="preserve">
+    <value>وسم</value>
+  </data>
+  <data name="AddTag" xml:space="preserve">
+    <value>إضافة وسم</value>
   </data>
 </root>

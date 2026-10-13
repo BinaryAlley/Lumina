@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -253,10 +253,10 @@
     <value>The native name of the original language of the book.</value>
   </data>
   <data name="GenresDescription" xml:space="preserve">
-    <value>The genres of the book, separated by commas.</value>
+    <value>The genres of the book.</value>
   </data>
   <data name="TagsDescription" xml:space="preserve">
-    <value>The tags of the book, separated by commas.</value>
+    <value>The tags of the book.</value>
   </data>
   <data name="ASINDescription" xml:space="preserve">
     <value>The Amazon Standard Identification Number of the book.</value>
@@ -1049,5 +1049,38 @@
   </data>
   <data name="Orchestrator" xml:space="preserve">
     <value>Orchestrator</value>
+  </data>
+  <data name="Performer" xml:space="preserve">
+    <value>Performer</value>
+  </data>
+<data name="ContributorId" xml:space="preserve">
+    <value>Contributor Id</value>
+  </data>
+<data name="ContributorRole" xml:space="preserve">
+    <value>Role</value>
+  </data>
+<data name="Other" xml:space="preserve">
+    <value>Other</value>
+  </data>
+<data name="MusicBrainz" xml:space="preserve">
+    <value>MusicBrainz</value>
+  </data>
+<data name="Discogs" xml:space="preserve">
+    <value>Discogs</value>
+  </data>
+<data name="LastFm" xml:space="preserve">
+    <value>Last.fm</value>
+  </data>
+  <data name="Genre" xml:space="preserve">
+    <value>Genre</value>
+  </data>
+  <data name="AddGenre" xml:space="preserve">
+    <value>Add genre</value>
+  </data>
+  <data name="Tag" xml:space="preserve">
+    <value>Tag</value>
+  </data>
+  <data name="AddTag" xml:space="preserve">
+    <value>Add tag</value>
   </data>
 </root>
