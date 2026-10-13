@@ -49,7 +49,7 @@ public class GetThumbnailEndpoint : BaseEndpoint<GetThumbnailRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(GetThumbnailRequest request, CancellationToken cancellationToken)
     {
-        // the thumbnail is proxied through the Web application, so that the request carries the authentication of the current user
+        // The thumbnail is proxied through the Web application, so that the request carries the authentication of the current user.
         BlobDataDto blob = await _apiHttpClient.GetBlobAsync($"{ApiRoutes.Thumbnails.GET_THUMBNAIL}?path={Uri.EscapeDataString(request.Path!)}&quality={request.Quality}", cancellationToken).ConfigureAwait(false);
         return Results.File(blob.Data, blob.ContentType);
     }

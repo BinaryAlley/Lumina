@@ -48,7 +48,7 @@ public class LogoutEndpoint : BaseEndpoint<EmptyRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(EmptyRequest request, CancellationToken cancellationToken)
     {
-        // if the user is not logged in, redirect them to the home page
+        // If the user is not logged in, redirect them to the home page.
         if (User?.Identity?.IsAuthenticated == false)
             return Results.Redirect(_urlService.GetAbsoluteUrl(WebRoutes.Home.INDEX_CULTURED)!);
         HttpContext.Response.Cookies.Delete("Token");

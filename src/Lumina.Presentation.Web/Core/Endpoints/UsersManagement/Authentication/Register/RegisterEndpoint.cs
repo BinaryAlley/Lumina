@@ -50,9 +50,9 @@ public class RegisterEndpoint : BaseEndpoint<RegisterRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(RegisterRequest request, CancellationToken cancellationToken)
     {
-        // call different endpoints based on the view hidden field - registration for normal users, or initial application admin account setup
+        // Call different endpoints based on the view hidden field - registration for normal users, or initial application admin account setup.
         string endpoint = request.RegistrationType == "Admin" ? ApiRoutes.Initialization.SETUP_APPLICATION : ApiRoutes.Authentication.REGISTER_ACCOUNT;
-        // attempt API registration
+        // Attempt API registration.
         RegisterResponse response = await _apiHttpClient.PostAsync<RegisterResponse, RegisterRequest>(endpoint, request, cancellationToken).ConfigureAwait(false);
         return JsonSuccess(response);
     }

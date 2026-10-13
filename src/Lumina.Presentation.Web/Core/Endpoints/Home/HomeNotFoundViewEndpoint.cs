@@ -20,10 +20,10 @@ namespace Lumina.Presentation.Web.Core.Endpoints.Home;
 /// </summary>
 public class HomeNotFoundViewEndpoint : BaseEndpoint<EmptyRequest, IResult>
 {
-    // the resource base name deliberately excludes the "Core.Resources" segment: the localization factory re-roots it with the configured ResourcesPath
+    // The resource base name deliberately excludes the "Core.Resources" segment: the localization factory re-roots it with the configured ResourcesPath.
     private const string VIEW_RESOURCE_BASE_NAME = "Lumina.Presentation.Web.Views.Shared.NotFound";
     private const string VIEW_RESOURCE_LOCATION = "Lumina.Presentation.Web";
-    // the page key mirrors the path of the Razor view under Core/Views, so that theme templates can override it at the page, section or default scope
+    // The page key mirrors the path of the Razor view under Core/Views, so that theme templates can override it at the page, section or default scope.
     private const string VIEW_PAGE_KEY = "shared/not-found";
 
     private readonly ThemePageRenderer _themePageRenderer;

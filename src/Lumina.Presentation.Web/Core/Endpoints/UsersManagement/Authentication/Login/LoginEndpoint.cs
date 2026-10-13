@@ -67,9 +67,9 @@ public class LoginEndpoint : BaseEndpoint<LoginRequest, IResult>
     {
         try
         {
-            // attempt API login
+            // Attempt API login.
             LoginResponse response = await _apiHttpClient.PostAsync<LoginResponse, LoginRequest>(ApiRoutes.Authentication.LOGIN_ACCOUNT, request, cancellationToken).ConfigureAwait(false);
-            // store the received token in a secure cookie
+            // Store the received token in a secure cookie.
             HttpContext.Response.Cookies.Delete("Token");
             HttpContext.Response.Cookies.Append("Token", _cryptographyService.Encrypt(response.Token!), new CookieOptions
             {
@@ -80,7 +80,7 @@ public class LoginEndpoint : BaseEndpoint<LoginRequest, IResult>
                 IsEssential = true,
                 SameSite = SameSiteMode.Strict
             });
-            // tell asp.net we are logged in
+            // Tell ASP.NET we are logged in.
             List<Claim> claims =
             [
                 new Claim(ClaimTypes.Name, response.Username!),
@@ -89,34 +89,34 @@ public class LoginEndpoint : BaseEndpoint<LoginRequest, IResult>
             ];
             ClaimsIdentity claimsIdentity = new(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity)).ConfigureAwait(false);
-            // get current culture from route data or use default if not set
+            // Get current culture from route data or use default if not set.
             string currentCulture = Culture;
-            // handle ReturnUrl and ensure it includes the correct culture
+            // Handle ReturnUrl and ensure it includes the correct culture.
             string redirectUrl;
             if (!string.IsNullOrEmpty(request.ReturnUrl) && IsLocalUrl(request.ReturnUrl)) // ensure that return URL contains the correct culture
                 redirectUrl = request.ReturnUrl.StartsWith($"/{currentCulture}/") ? request.ReturnUrl : $"/{currentCulture}{request.ReturnUrl}";
             else
             {
-                // if no ReturnUrl is provided or it's invalid, use a default URL with respect to base paths
+                // If no ReturnUrl is provided or it's invalid, use a default URL with respect to base paths.
                 redirectUrl = "/";
 
-                // handle reverse proxy scenarios by respecting any base path or forwarded headers
+                // Handle reverse proxy scenarios by respecting any base path or forwarded headers.
                 if (HttpContext.Request.Headers.TryGetValue("X-Forwarded-Prefix", out Microsoft.Extensions.Primitives.StringValues pathBase))
                     redirectUrl = pathBase + redirectUrl;
 
-                // ensure that default redirect contains the correct culture
+                // Ensure that default redirect contains the correct culture.
                 if (!redirectUrl.StartsWith($"/{currentCulture}/"))
                     redirectUrl = $"/{currentCulture}{redirectUrl}";
             }
 
-            // return success status and redirect URL
+            // Return success status and redirect URL.
             return JsonSuccess(redirectUrl);
         }
         catch (ApiException apiException)
         {
-            // in this particular case, we DO NOT want to let the exception handling middleware take care of this exception, because when the user has 2FA enabled, the first auth step involves sending
+            // In this particular case, we DO NOT want to let the exception handling middleware take care of this exception, because when the user has 2FA enabled, the first auth step involves sending
             // only the username and password, in which case the server API will respond with a validation error, that TOTP code is not valid (empty); it is then that we catch this error here
-            // and display the form that asks the user for the TOTP code
+            // and display the form that asks the user for the TOTP code.
             if (apiException.ProblemDetails is not null && apiException.ProblemDetails.Extensions?.Count > 0 && apiException.ProblemDetails.Extensions.TryGetValue("errors", out JsonElement errorsObj))
                 if (errorsObj is JsonElement jsonElement && jsonElement.ValueKind == JsonValueKind.Object)
                     foreach (JsonProperty error in jsonElement.EnumerateObject())

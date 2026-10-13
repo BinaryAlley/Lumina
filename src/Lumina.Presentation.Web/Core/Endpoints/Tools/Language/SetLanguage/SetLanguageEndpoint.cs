@@ -38,7 +38,7 @@ public class SetLanguageEndpoint : BaseEndpoint<SetLanguageRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(SetLanguageRequest request, CancellationToken cancellationToken)
     {
-        // store the culture preference in a cookie
+        // Store the culture preference in a cookie.
         HttpContext.Response.Cookies.Append(
             CookieRequestCultureProvider.DefaultCookieName,
             CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(request.NewCulture!)),
@@ -50,25 +50,25 @@ public class SetLanguageEndpoint : BaseEndpoint<SetLanguageRequest, IResult>
                 Path = "/" // ensure the cookie works across all paths
             }
         );
-        // determine the URL to return to, defaulting to the localized home page when no return URL is supplied
+        // Determine the URL to return to, defaulting to the localized home page when no return URL is supplied.
         string newCulture = request.NewCulture!;
         string returnUrl = string.IsNullOrEmpty(request.ReturnUrl) ? $"/{newCulture.ToLower()}" : request.ReturnUrl;
         string currentCulture = Culture;
 
-        // handle the base path, so that the culture replacement matches the URL
+        // Handle the base path, so that the culture replacement matches the URL.
         if (!string.IsNullOrEmpty(HttpContext.Request.PathBase))
             returnUrl = returnUrl.Replace(HttpContext.Request.PathBase.Value!, string.Empty, StringComparison.OrdinalIgnoreCase);
-        // replace the current culture segment of the URL with the new one, whether or not a trailing slash is present
+        // Replace the current culture segment of the URL with the new one, whether or not a trailing slash is present.
         string currentCultureSegment = $"/{currentCulture.ToLower()}";
         string newCultureSegment = $"/{newCulture.ToLower()}";
         if (returnUrl.StartsWith(currentCultureSegment, StringComparison.OrdinalIgnoreCase))
             returnUrl = newCultureSegment + returnUrl[currentCultureSegment.Length..];
 
-        // re-apply the base path if present
+        // Re-apply the base path if present.
         if (!string.IsNullOrEmpty(HttpContext.Request.PathBase))
             returnUrl = HttpContext.Request.PathBase.Value + returnUrl;
 
-        // redirect to the target page
+        // Redirect to the target page.
         return Results.LocalRedirect(returnUrl);
     }
 }

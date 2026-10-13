@@ -49,7 +49,7 @@ public class ChangePasswordEndpoint : BaseEndpoint<ChangePasswordRequest, IResul
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(ChangePasswordRequest request, CancellationToken cancellationToken)
     {
-        // assign the currently logged in user as the user for which to change the password
+        // Assign the currently logged in user as the user for which to change the password.
         ChangePasswordRequest changePasswordRequest = request with { Username = User?.Identity?.Name };
         ChangePasswordResponse response = await _apiHttpClient.PostAsync<ChangePasswordResponse, ChangePasswordRequest>(ApiRoutes.Authentication.CHANGE_PASSWORD, changePasswordRequest, cancellationToken).ConfigureAwait(false);
         return JsonSuccess(response);
