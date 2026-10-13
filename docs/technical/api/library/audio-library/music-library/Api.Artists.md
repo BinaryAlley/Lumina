@@ -17,6 +17,9 @@
     - [Update Artist](#update-artist)
       - [Update Artist Request](#update-artist-request)
       - [Update Artist Response](#update-artist-response)
+    - [Update Artist Cover](#update-artist-cover)
+      - [Update Artist Cover Request](#update-artist-cover-request)
+      - [Update Artist Cover Response](#update-artist-cover-response)
     - [Delete Artist](#delete-artist)
 
 ## Artist
@@ -34,22 +37,36 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists
   "metadata": {
     "name": "Queen",
     "sortName": "Queen",
-    "disambiguation": null,
+    "disambiguation": "British rock band",
     "type": "Group",
-    "gender": null,
+    "gender": "NotApplicable",
     "country": "GB",
     "area": {
       "musicBrainzAreaId": "7f2a1b3c-4d5e-4f6a-8b9c-0d1e2f3a4b5c",
       "name": "United Kingdom",
       "sortName": "United Kingdom",
-      "disambiguation": null,
+      "disambiguation": "sovereign state",
       "type": "Country",
       "iso3166Code": "GB"
     },
-    "beginArea": null,
-    "endArea": null,
+    "beginArea": {
+      "musicBrainzAreaId": "7f2a1b3c-4d5e-4f6a-8b9c-0d1e2f3a4b5c",
+      "name": "United Kingdom",
+      "sortName": "United Kingdom",
+      "disambiguation": "sovereign state",
+      "type": "Country",
+      "iso3166Code": "GB"
+    },
+    "endArea": {
+      "musicBrainzAreaId": "7f2a1b3c-4d5e-4f6a-8b9c-0d1e2f3a4b5c",
+      "name": "United Kingdom",
+      "sortName": "United Kingdom",
+      "disambiguation": "sovereign state",
+      "type": "Country",
+      "iso3166Code": "GB"
+    },
     "lifeSpanBegin": "1970-06-27",
-    "lifeSpanEnd": null,
+    "lifeSpanEnd": "1991-11-24",
     "isEnded": false,
     "genres": [
       { "name": "Rock" }
@@ -65,15 +82,15 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists
         "locale": "en",
         "isPrimary": true,
         "beginDate": "1970-06-27",
-        "endDate": null,
+        "endDate": "1991-11-24",
         "isEnded": false
       }
     ]
   },
   "website": "https://www.queenonline.com",
   "musicBrainzArtistId": "6f9c0b2a-1d3e-4a5b-8c7d-9e0f1a2b3c4d",
-  "ipis": [],
-  "isnis": [],
+  "ipis": ["00012345678"],
+  "isnis": ["0000000123456789"],
   "contributors": [
     { "contributorId": "6a3f0c2d-1b4e-4f5a-8c6d-9e0f1a2b3c4d", "role": "Vocals" },
     { "contributorId": "7b4e1d3f-2c5a-4e6b-9d7e-0f1a2b3c4d5e", "role": "Guitar" }
@@ -92,12 +109,12 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists
         "title": "A Night at the Opera",
         "originalTitle": "A Night at the Opera",
         "description": "The fourth studio album by the British rock band Queen, released in 1975. It was the most expensive album ever recorded at the time of its release.",
-        "disambiguation": null,
+        "disambiguation": "original release",
         "releaseInfo": {
           "originalReleaseDate": "1975-11-21",
           "originalReleaseYear": 1975,
-          "reReleaseDate": null,
-          "reReleaseYear": null,
+          "reReleaseDate": "2011-11-21",
+          "reReleaseYear": 2011,
           "releaseCountry": "GB",
           "releaseVersion": "Remastered"
         },
@@ -160,12 +177,12 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists
             "title": "Bohemian Rhapsody",
             "originalTitle": "Bohemian Rhapsody",
             "description": "A song by the British rock band Queen. It was written by Freddie Mercury and originally released on the album A Night at the Opera in 1975.",
-            "disambiguation": null,
+            "disambiguation": "album version",
             "releaseInfo": {
               "originalReleaseDate": "1975-10-31",
               "originalReleaseYear": 1975,
-              "reReleaseDate": null,
-              "reReleaseYear": null,
+              "reReleaseDate": "2011-11-21",
+              "reReleaseYear": 2011,
               "releaseCountry": "GB",
               "releaseVersion": "Original"
             },
@@ -212,7 +229,7 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists
             "languages": [
               { "languageCode": "en", "languageName": "English", "nativeName": "English" }
             ],
-            "iswcs": []
+            "iswcs": ["T-010489707-6"]
           },
           "musicBrainzRecordingId": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
           "musicBrainzTrackId": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
@@ -248,12 +265,12 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists
             "title": "You're My Best Friend",
             "originalTitle": "You're My Best Friend",
             "description": "A song by the British rock band Queen, written by bass guitarist John Deacon. It was originally released on the album A Night at the Opera in 1975 and as a single in 1976.",
-            "disambiguation": null,
+            "disambiguation": "album version",
             "releaseInfo": {
               "originalReleaseDate": "1976-06-18",
               "originalReleaseYear": 1976,
-              "reReleaseDate": null,
-              "reReleaseYear": null,
+              "reReleaseDate": "2011-11-21",
+              "reReleaseYear": 2011,
               "releaseCountry": "GB",
               "releaseVersion": "Original"
             },
@@ -282,11 +299,11 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists
             "bitDepth": 16,
             "audioCodec": "FLAC",
             "bitrate": 912,
-            "acoustId": null,
-            "replayGainTrackGain": null,
-            "replayGainTrackPeak": null,
-            "replayGainAlbumGain": null,
-            "replayGainAlbumPeak": null
+            "acoustId": "0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d",
+            "replayGainTrackGain": -7.2,
+            "replayGainTrackPeak": 0.9812,
+            "replayGainAlbumGain": -6.5,
+            "replayGainAlbumPeak": 0.9987
           },
           "trackNumber": 7,
           "discNumber": 1,
@@ -300,7 +317,7 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists
             "languages": [
               { "languageCode": "en", "languageName": "English", "nativeName": "English" }
             ],
-            "iswcs": []
+            "iswcs": ["T-010489707-6"]
           },
           "musicBrainzRecordingId": "0f3e4d5c-6b7a-4f8e-9d0c-1b2a3c4d5e6f",
           "musicBrainzTrackId": "1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
@@ -349,22 +366,36 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists
   "metadata": {
     "name": "Queen",
     "sortName": "Queen",
-    "disambiguation": null,
+    "disambiguation": "British rock band",
     "type": "Group",
-    "gender": null,
+    "gender": "NotApplicable",
     "country": "GB",
     "area": {
       "musicBrainzAreaId": "7f2a1b3c-4d5e-4f6a-8b9c-0d1e2f3a4b5c",
       "name": "United Kingdom",
       "sortName": "United Kingdom",
-      "disambiguation": null,
+      "disambiguation": "sovereign state",
       "type": "Country",
       "iso3166Code": "GB"
     },
-    "beginArea": null,
-    "endArea": null,
+    "beginArea": {
+      "musicBrainzAreaId": "7f2a1b3c-4d5e-4f6a-8b9c-0d1e2f3a4b5c",
+      "name": "United Kingdom",
+      "sortName": "United Kingdom",
+      "disambiguation": "sovereign state",
+      "type": "Country",
+      "iso3166Code": "GB"
+    },
+    "endArea": {
+      "musicBrainzAreaId": "7f2a1b3c-4d5e-4f6a-8b9c-0d1e2f3a4b5c",
+      "name": "United Kingdom",
+      "sortName": "United Kingdom",
+      "disambiguation": "sovereign state",
+      "type": "Country",
+      "iso3166Code": "GB"
+    },
     "lifeSpanBegin": "1970-06-27",
-    "lifeSpanEnd": null,
+    "lifeSpanEnd": "1991-11-24",
     "isEnded": false,
     "genres": [
       { "name": "Rock" }
@@ -380,17 +411,17 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists
         "locale": "en",
         "isPrimary": true,
         "beginDate": "1970-06-27",
-        "endDate": null,
+        "endDate": "1991-11-24",
         "isEnded": false
       }
     ]
   },
   "website": "https://www.queenonline.com",
   "musicBrainzArtistId": "6f9c0b2a-1d3e-4a5b-8c7d-9e0f1a2b3c4d",
-  "ipis": [],
-  "isnis": [],
+  "ipis": ["00012345678"],
+  "isnis": ["0000000123456789"],
   "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
-  "updatedOnUtc": null,
+  "updatedOnUtc": "2025-01-20T14:45:00.0000000Z",
   "contributors": [
     { "contributorId": "6a3f0c2d-1b4e-4f5a-8c6d-9e0f1a2b3c4d", "role": "Vocals" },
     { "contributorId": "7b4e1d3f-2c5a-4e6b-9d7e-0f1a2b3c4d5e", "role": "Guitar" }
@@ -412,12 +443,12 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists
         "title": "A Night at the Opera",
         "originalTitle": "A Night at the Opera",
         "description": "The fourth studio album by the British rock band Queen, released in 1975. It was the most expensive album ever recorded at the time of its release.",
-        "disambiguation": null,
+        "disambiguation": "original release",
         "releaseInfo": {
           "originalReleaseDate": "1975-11-21",
           "originalReleaseYear": 1975,
-          "reReleaseDate": null,
-          "reReleaseYear": null,
+          "reReleaseDate": "2011-11-21",
+          "reReleaseYear": 2011,
           "releaseCountry": "GB",
           "releaseVersion": "Remastered"
         },
@@ -456,7 +487,7 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists
       "musicBrainzReleaseGroupId": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
       "musicBrainzReleaseArtistId": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f",
       "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
-      "updatedOnUtc": null,
+      "updatedOnUtc": "2025-01-20T14:45:00.0000000Z",
       "contributors": [
         {
           "contributorId": "0e7b4a6c-5f8d-6b9e-ca0b-3c4d5e6f7a8b",
@@ -491,8 +522,8 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists
             "title": "Bohemian Rhapsody",
             "originalTitle": "Bohemian Rhapsody",
             "description": "A song by the British rock band Queen. It was written by Freddie Mercury and originally released on the album A Night at the Opera in 1975.",
-            "disambiguation": null,
-            "releaseInfo": { "originalReleaseDate": "1975-10-31", "originalReleaseYear": 1975, "reReleaseDate": null, "reReleaseYear": null, "releaseCountry": "GB", "releaseVersion": "Original" },
+            "disambiguation": "album version",
+            "releaseInfo": { "originalReleaseDate": "1975-10-31", "originalReleaseYear": 1975, "reReleaseDate": "2011-11-21", "reReleaseYear": 2011, "releaseCountry": "GB", "releaseVersion": "Original" },
             "language": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
             "originalLanguage": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
             "tags": [ { "name": "classic" }, { "name": "epic" } ],
@@ -522,12 +553,12 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists
             "languages": [
               { "languageCode": "en", "languageName": "English", "nativeName": "English" }
             ],
-            "iswcs": []
+            "iswcs": ["T-010489707-6"]
           },
           "musicBrainzRecordingId": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
           "musicBrainzTrackId": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
           "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
-          "updatedOnUtc": null,
+          "updatedOnUtc": "2025-01-20T14:45:00.0000000Z",
           "moods": [
             { "name": "dramatic" },
             { "name": "anxious" }
@@ -569,8 +600,8 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists
             "title": "You're My Best Friend",
             "originalTitle": "You're My Best Friend",
             "description": "A song by the British rock band Queen, written by bass guitarist John Deacon. It was originally released on the album A Night at the Opera in 1975 and as a single in 1976.",
-            "disambiguation": null,
-            "releaseInfo": { "originalReleaseDate": "1976-06-18", "originalReleaseYear": 1976, "reReleaseDate": null, "reReleaseYear": null, "releaseCountry": "GB", "releaseVersion": "Original" },
+            "disambiguation": "album version",
+            "releaseInfo": { "originalReleaseDate": "1976-06-18", "originalReleaseYear": 1976, "reReleaseDate": "2011-11-21", "reReleaseYear": 2011, "releaseCountry": "GB", "releaseVersion": "Original" },
             "language": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
             "originalLanguage": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
             "tags": [ { "name": "classic" }, { "name": "love" } ],
@@ -582,11 +613,11 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists
             "bitDepth": 16,
             "audioCodec": "FLAC",
             "bitrate": 912,
-            "acoustId": null,
-            "replayGainTrackGain": null,
-            "replayGainTrackPeak": null,
-            "replayGainAlbumGain": null,
-            "replayGainAlbumPeak": null
+            "acoustId": "0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d",
+            "replayGainTrackGain": -7.2,
+            "replayGainTrackPeak": 0.9812,
+            "replayGainAlbumGain": -6.5,
+            "replayGainAlbumPeak": 0.9987
           },
           "trackNumber": 7,
           "discNumber": 1,
@@ -600,12 +631,12 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists
             "languages": [
               { "languageCode": "en", "languageName": "English", "nativeName": "English" }
             ],
-            "iswcs": []
+            "iswcs": ["T-010489707-6"]
           },
           "musicBrainzRecordingId": "0f3e4d5c-6b7a-4f8e-9d0c-1b2a3c4d5e6f",
           "musicBrainzTrackId": "1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
           "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
-          "updatedOnUtc": null,
+          "updatedOnUtc": "2025-01-20T14:45:00.0000000Z",
           "moods": [
             { "name": "happy" },
             { "name": "warm" }
@@ -638,9 +669,18 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists
             }
           ]
         }
+      ],
+      "coverPath": "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg",
+      "artwork": [
+        {
+          "type": "Cover",
+          "ordinal": 0,
+          "path": "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg"
+        }
       ]
     }
-  ]
+  ],
+  "coverPath": "/media/music/Queen-3b3a19f3/cover.jpg"
 }
 ```
 
@@ -674,29 +714,320 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists?currentPage=1&
       "metadata": {
         "name": "Queen",
         "sortName": "Queen",
-        "disambiguation": null,
+        "disambiguation": "British rock band",
         "type": "Group",
-        "gender": null,
+        "gender": "NotApplicable",
         "country": "GB",
-        "area": null,
-        "beginArea": null,
-        "endArea": null,
+        "area": {
+          "musicBrainzAreaId": "7f2a1b3c-4d5e-4f6a-8b9c-0d1e2f3a4b5c",
+          "name": "United Kingdom",
+          "sortName": "United Kingdom",
+          "disambiguation": "sovereign state",
+          "type": "Country",
+          "iso3166Code": "GB"
+        },
+        "beginArea": {
+          "musicBrainzAreaId": "7f2a1b3c-4d5e-4f6a-8b9c-0d1e2f3a4b5c",
+          "name": "United Kingdom",
+          "sortName": "United Kingdom",
+          "disambiguation": "sovereign state",
+          "type": "Country",
+          "iso3166Code": "GB"
+        },
+        "endArea": {
+          "musicBrainzAreaId": "7f2a1b3c-4d5e-4f6a-8b9c-0d1e2f3a4b5c",
+          "name": "United Kingdom",
+          "sortName": "United Kingdom",
+          "disambiguation": "sovereign state",
+          "type": "Country",
+          "iso3166Code": "GB"
+        },
         "lifeSpanBegin": "1970-06-27",
-        "lifeSpanEnd": null,
+        "lifeSpanEnd": "1991-11-24",
         "isEnded": false,
-        "genres": [],
-        "tags": [],
-        "aliases": []
+        "genres": [
+          { "name": "Rock" }
+        ],
+        "tags": [
+          { "name": "classic" }
+        ],
+        "aliases": [
+          {
+            "name": "The Queen",
+            "sortName": "Queen",
+            "type": "Artist name",
+            "locale": "en",
+            "isPrimary": false,
+            "beginDate": "1970-06-27",
+            "endDate": "1991-11-24",
+            "isEnded": true
+          }
+        ]
       },
       "website": "https://www.queenonline.com",
       "musicBrainzArtistId": "6f9c0b2a-1d3e-4a5b-8c7d-9e0f1a2b3c4d",
-      "ipis": [],
-      "isnis": [],
+      "ipis": ["00012345678"],
+      "isnis": ["0000000123456789"],
       "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
-      "updatedOnUtc": null,
-      "contributors": [],
-      "ratings": [],
-      "albums": []
+      "updatedOnUtc": "2025-01-20T14:45:00.0000000Z",
+      "contributors": [
+        { "contributorId": "6a3f0c2d-1b4e-4f5a-8c6d-9e0f1a2b3c4d", "role": "Vocals" }
+      ],
+      "ratings": [
+        {
+          "value": 4.5,
+          "maxValue": 5,
+          "source": "MusicBrainz",
+          "voteCount": 2345
+        }
+      ],
+      "albums": [
+        {
+          "id": "e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f",
+          "artistId": "d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a",
+          "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
+          "metadata": {
+            "title": "A Night at the Opera",
+            "originalTitle": "A Night at the Opera",
+            "description": "The fourth studio album by the British rock band Queen, released in 1975. It was the most expensive album ever recorded at the time of its release.",
+            "disambiguation": "original release",
+            "releaseInfo": {
+              "originalReleaseDate": "1975-11-21",
+              "originalReleaseYear": 1975,
+              "reReleaseDate": "2011-11-21",
+              "reReleaseYear": 2011,
+              "releaseCountry": "GB",
+              "releaseVersion": "Remastered"
+            },
+            "language": {
+              "languageCode": "en",
+              "languageName": "English",
+              "nativeName": "English"
+            },
+            "originalLanguage": {
+              "languageCode": "en",
+              "languageName": "English",
+              "nativeName": "English"
+            },
+            "tags": [
+              { "name": "classic" },
+              { "name": "vinyl" }
+            ],
+            "genres": [
+              { "name": "Rock" },
+              { "name": "Progressive Rock" }
+            ],
+            "script": "Latn",
+            "releaseTypes": [ "Album" ],
+            "releaseStatus": "Official",
+            "totalDiscs": 1,
+            "totalTracks": 12,
+            "releaseTitle": "A Night at the Opera"
+          },
+          "mediaFormat": "CD",
+          "packaging": "JewelCase",
+          "barcode": "0042282778329",
+          "catalogNumbers": ["EMC 4008"],
+          "label": "EMI",
+          "asin": "B000000000",
+          "musicBrainzReleaseId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+          "musicBrainzReleaseGroupId": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
+          "musicBrainzReleaseArtistId": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f",
+          "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
+          "updatedOnUtc": "2025-01-20T14:45:00.0000000Z",
+          "contributors": [
+            {
+              "contributorId": "0e7b4a6c-5f8d-6b9e-ca0b-3c4d5e6f7a8b",
+              "role": "Producer"
+            },
+            {
+              "contributorId": "1a8c5b7d-6a9e-7c0f-db1c-4d5e6f7a8b9c",
+              "role": "Engineer"
+            }
+          ],
+          "ratings": [
+            {
+              "value": 4.5,
+              "maxValue": 5,
+              "source": "MusicBrainz",
+              "voteCount": 2345
+            },
+            {
+              "value": 4.8,
+              "maxValue": 5,
+              "source": "LastFm",
+              "voteCount": 1234
+            }
+          ],
+          "tracks": [
+            {
+              "id": "9f0e1d2c-3b4a-4c6d-8e7f-9a0b1c2d3e4f",
+              "albumId": "e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f",
+              "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
+              "path": "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
+              "metadata": {
+                "title": "Bohemian Rhapsody",
+                "originalTitle": "Bohemian Rhapsody",
+                "description": "A song by the British rock band Queen. It was written by Freddie Mercury and originally released on the album A Night at the Opera in 1975.",
+                "disambiguation": "album version",
+                "releaseInfo": { "originalReleaseDate": "1975-10-31", "originalReleaseYear": 1975, "reReleaseDate": "2011-11-21", "reReleaseYear": 2011, "releaseCountry": "GB", "releaseVersion": "Original" },
+                "language": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
+                "originalLanguage": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
+                "tags": [ { "name": "classic" }, { "name": "epic" } ],
+                "genres": [ { "name": "Rock" }, { "name": "Progressive Rock" } ],
+                "isVideo": false,
+                "durationInSeconds": 354,
+                "sampleRate": 44100,
+                "channels": 2,
+                "bitDepth": 16,
+                "audioCodec": "FLAC",
+                "bitrate": 980,
+                "acoustId": "f0e1d2c3-b4a5-4c6d-8e7f-9a0b1c2d3e4f",
+                "replayGainTrackGain": -7.5,
+                "replayGainTrackPeak": 0.9877,
+                "replayGainAlbumGain": -6.8,
+                "replayGainAlbumPeak": 0.9999
+              },
+              "trackNumber": 1,
+              "discNumber": 1,
+              "script": "Latn",
+              "key": "CMajor",
+              "bpm": 72,
+              "work": {
+                "musicBrainzWorkId": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+                "title": "Bohemian Rhapsody",
+                "type": "Song",
+                "languages": [
+                  { "languageCode": "en", "languageName": "English", "nativeName": "English" }
+                ],
+                "iswcs": ["T-010489707-6"]
+              },
+              "musicBrainzRecordingId": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
+              "musicBrainzTrackId": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
+              "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
+              "updatedOnUtc": "2025-01-20T14:45:00.0000000Z",
+              "moods": [
+                { "name": "dramatic" },
+                { "name": "anxious" }
+              ],
+              "isrcs": [
+                { "value": "GBUM71029604" }
+              ],
+              "contributors": [
+                {
+                  "contributorId": "6a3f0c2d-1b4e-4f5a-8c6d-9e0f1a2b3c4d",
+                  "role": "Vocals"
+                },
+                {
+                  "contributorId": "7b4e1d3f-2c5a-4e6b-9d7e-0f1a2b3c4d5e",
+                  "role": "Guitar"
+                }
+              ],
+              "ratings": [
+                {
+                  "value": 4.5,
+                  "maxValue": 5,
+                  "source": "MusicBrainz",
+                  "voteCount": 2345
+                },
+                {
+                  "value": 4.8,
+                  "maxValue": 5,
+                  "source": "LastFm",
+                  "voteCount": 1234
+                }
+              ]
+            },
+            {
+              "id": "8e1f2a3b-4c5d-4e6f-8a9b-0c1d2e3f4a5b",
+              "albumId": "e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f",
+              "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
+              "path": "/music/queen/a-night-at-the-opera/07-youre-my-best-friend.flac",
+              "metadata": {
+                "title": "You're My Best Friend",
+                "originalTitle": "You're My Best Friend",
+                "description": "A song by the British rock band Queen, written by bass guitarist John Deacon. It was originally released on the album A Night at the Opera in 1975 and as a single in 1976.",
+                "disambiguation": "album version",
+                "releaseInfo": { "originalReleaseDate": "1976-06-18", "originalReleaseYear": 1976, "reReleaseDate": "2011-11-21", "reReleaseYear": 2011, "releaseCountry": "GB", "releaseVersion": "Original" },
+                "language": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
+                "originalLanguage": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
+                "tags": [ { "name": "classic" }, { "name": "love" } ],
+                "genres": [ { "name": "Rock" }, { "name": "Pop Rock" } ],
+                "isVideo": false,
+                "durationInSeconds": 181,
+                "sampleRate": 44100,
+                "channels": 2,
+                "bitDepth": 16,
+                "audioCodec": "FLAC",
+                "bitrate": 912,
+                "acoustId": "0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d",
+                "replayGainTrackGain": -7.2,
+                "replayGainTrackPeak": 0.9812,
+                "replayGainAlbumGain": -6.5,
+                "replayGainAlbumPeak": 0.9987
+              },
+              "trackNumber": 7,
+              "discNumber": 1,
+              "script": "Latn",
+              "key": "BMajor",
+              "bpm": 118,
+              "work": {
+                "musicBrainzWorkId": "2b3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d6e",
+                "title": "You're My Best Friend",
+                "type": "Song",
+                "languages": [
+                  { "languageCode": "en", "languageName": "English", "nativeName": "English" }
+                ],
+                "iswcs": ["T-010489707-6"]
+              },
+              "musicBrainzRecordingId": "0f3e4d5c-6b7a-4f8e-9d0c-1b2a3c4d5e6f",
+              "musicBrainzTrackId": "1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
+              "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
+              "updatedOnUtc": "2025-01-20T14:45:00.0000000Z",
+              "moods": [
+                { "name": "happy" },
+                { "name": "warm" }
+              ],
+              "isrcs": [
+                { "value": "GBUM71029609" }
+              ],
+              "contributors": [
+                {
+                  "contributorId": "6a3f0c2d-1b4e-4f5a-8c6d-9e0f1a2b3c4d",
+                  "role": "Vocals"
+                },
+                {
+                  "contributorId": "7b4e1d3f-2c5a-4e6b-9d7e-0f1a2b3c4d5e",
+                  "role": "Guitar"
+                }
+              ],
+              "ratings": [
+                {
+                  "value": 4.2,
+                  "maxValue": 5,
+                  "source": "MusicBrainz",
+                  "voteCount": 1234
+                },
+                {
+                  "value": 4.4,
+                  "maxValue": 5,
+                  "source": "LastFm",
+                  "voteCount": 567
+                }
+              ]
+            }
+          ],
+          "coverPath": "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg",
+          "artwork": [
+            {
+              "type": "Cover",
+              "ordinal": 0,
+              "path": "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg"
+            }
+          ]
+        }
+      ],
+      "coverPath": "/media/music/Queen-3b3a19f3/cover.jpg"
     }
   ],
   "currentPage": 1,
@@ -712,7 +1043,7 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists?currentPage=1&
 #### Get Artists Lite Request
 
 ```js
-GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/lite?currentPage=1&perPage=10&searchTerm=queen
+GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/lite?currentPage=1&perPage=10&searchTerm=queen&filterAlphaKey=q&shouldIgnoreThePrefixForAlphaPicker=true&sortBy=name&sortOrder=Ascending
 ```
 
 | Query Parameter | Type | Description |
@@ -720,6 +1051,10 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/lite?currentPa
 | `currentPage` | `int` | Optional. The page of results to retrieve. |
 | `perPage` | `int` | Optional. The maximum number of artists to retrieve per page. |
 | `searchTerm` | `string` | Optional. The search term used to filter the artists by name. |
+| `filterAlphaKey` | `string` | Optional. Filters results by the first character of their name. A single ASCII letter (case-insensitive), `#` for names starting with a digit, or `*` for names starting with any other character. |
+| `shouldIgnoreThePrefixForAlphaPicker` | `bool` | Whether the leading "The " prefix of a name should be ignored when computing the alpha key. |
+| `sortBy` | `string` | Optional. The name of the field by which to sort the results. |
+| `sortOrder` | `string` | Optional. The direction in which to sort the results (`Ascending` or `Descending`). |
 
 #### Get Artists Lite Response
 
@@ -732,7 +1067,8 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/lite?currentPa
   "data": [
     {
       "id": "d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a",
-      "name": "Queen"
+      "name": "Queen",
+      "coverPath": "/media/music/Queen-3b3a19f3/cover.jpg"
     }
   ],
   "currentPage": 1,
@@ -764,22 +1100,36 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
   "metadata": {
     "name": "Queen",
     "sortName": "Queen",
-    "disambiguation": null,
+    "disambiguation": "British rock band",
     "type": "Group",
-    "gender": null,
+    "gender": "NotApplicable",
     "country": "GB",
     "area": {
       "musicBrainzAreaId": "7f2a1b3c-4d5e-4f6a-8b9c-0d1e2f3a4b5c",
       "name": "United Kingdom",
       "sortName": "United Kingdom",
-      "disambiguation": null,
+      "disambiguation": "sovereign state",
       "type": "Country",
       "iso3166Code": "GB"
     },
-    "beginArea": null,
-    "endArea": null,
+    "beginArea": {
+      "musicBrainzAreaId": "7f2a1b3c-4d5e-4f6a-8b9c-0d1e2f3a4b5c",
+      "name": "United Kingdom",
+      "sortName": "United Kingdom",
+      "disambiguation": "sovereign state",
+      "type": "Country",
+      "iso3166Code": "GB"
+    },
+    "endArea": {
+      "musicBrainzAreaId": "7f2a1b3c-4d5e-4f6a-8b9c-0d1e2f3a4b5c",
+      "name": "United Kingdom",
+      "sortName": "United Kingdom",
+      "disambiguation": "sovereign state",
+      "type": "Country",
+      "iso3166Code": "GB"
+    },
     "lifeSpanBegin": "1970-06-27",
-    "lifeSpanEnd": null,
+    "lifeSpanEnd": "1991-11-24",
     "isEnded": false,
     "genres": [
       { "name": "Rock" }
@@ -795,17 +1145,17 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
         "locale": "en",
         "isPrimary": true,
         "beginDate": "1970-06-27",
-        "endDate": null,
+        "endDate": "1991-11-24",
         "isEnded": false
       }
     ]
   },
   "website": "https://www.queenonline.com",
   "musicBrainzArtistId": "6f9c0b2a-1d3e-4a5b-8c7d-9e0f1a2b3c4d",
-  "ipis": [],
-  "isnis": [],
+  "ipis": ["00012345678"],
+  "isnis": ["0000000123456789"],
   "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
-  "updatedOnUtc": null,
+  "updatedOnUtc": "2025-01-20T14:45:00.0000000Z",
   "contributors": [
     { "contributorId": "6a3f0c2d-1b4e-4f5a-8c6d-9e0f1a2b3c4d", "role": "Vocals" },
     { "contributorId": "7b4e1d3f-2c5a-4e6b-9d7e-0f1a2b3c4d5e", "role": "Guitar" }
@@ -818,7 +1168,253 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
       "voteCount": 2345
     }
   ],
-  "albums": []
+  "albums": [
+    {
+      "id": "e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f",
+      "artistId": "d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a",
+      "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
+      "metadata": {
+        "title": "A Night at the Opera",
+        "originalTitle": "A Night at the Opera",
+        "description": "The fourth studio album by the British rock band Queen, released in 1975. It was the most expensive album ever recorded at the time of its release.",
+        "disambiguation": "original release",
+        "releaseInfo": {
+          "originalReleaseDate": "1975-11-21",
+          "originalReleaseYear": 1975,
+          "reReleaseDate": "2011-11-21",
+          "reReleaseYear": 2011,
+          "releaseCountry": "GB",
+          "releaseVersion": "Remastered"
+        },
+        "language": {
+          "languageCode": "en",
+          "languageName": "English",
+          "nativeName": "English"
+        },
+        "originalLanguage": {
+          "languageCode": "en",
+          "languageName": "English",
+          "nativeName": "English"
+        },
+        "tags": [
+          { "name": "classic" },
+          { "name": "vinyl" }
+        ],
+        "genres": [
+          { "name": "Rock" },
+          { "name": "Progressive Rock" }
+        ],
+        "script": "Latn",
+        "releaseTypes": [ "Album" ],
+        "releaseStatus": "Official",
+        "totalDiscs": 1,
+        "totalTracks": 12,
+        "releaseTitle": "A Night at the Opera"
+      },
+      "mediaFormat": "CD",
+      "packaging": "JewelCase",
+      "barcode": "0042282778329",
+      "catalogNumbers": ["EMC 4008"],
+      "label": "EMI",
+      "asin": "B000000000",
+      "musicBrainzReleaseId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+      "musicBrainzReleaseGroupId": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
+      "musicBrainzReleaseArtistId": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f",
+      "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
+      "updatedOnUtc": "2025-01-20T14:45:00.0000000Z",
+      "contributors": [
+        {
+          "contributorId": "0e7b4a6c-5f8d-6b9e-ca0b-3c4d5e6f7a8b",
+          "role": "Producer"
+        },
+        {
+          "contributorId": "1a8c5b7d-6a9e-7c0f-db1c-4d5e6f7a8b9c",
+          "role": "Engineer"
+        }
+      ],
+      "ratings": [
+        {
+          "value": 4.5,
+          "maxValue": 5,
+          "source": "MusicBrainz",
+          "voteCount": 2345
+        },
+        {
+          "value": 4.8,
+          "maxValue": 5,
+          "source": "LastFm",
+          "voteCount": 1234
+        }
+      ],
+      "tracks": [
+        {
+          "id": "9f0e1d2c-3b4a-4c6d-8e7f-9a0b1c2d3e4f",
+          "albumId": "e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f",
+          "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
+          "path": "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
+          "metadata": {
+            "title": "Bohemian Rhapsody",
+            "originalTitle": "Bohemian Rhapsody",
+            "description": "A song by the British rock band Queen. It was written by Freddie Mercury and originally released on the album A Night at the Opera in 1975.",
+            "disambiguation": "album version",
+            "releaseInfo": { "originalReleaseDate": "1975-10-31", "originalReleaseYear": 1975, "reReleaseDate": "2011-11-21", "reReleaseYear": 2011, "releaseCountry": "GB", "releaseVersion": "Original" },
+            "language": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
+            "originalLanguage": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
+            "tags": [ { "name": "classic" }, { "name": "epic" } ],
+            "genres": [ { "name": "Rock" }, { "name": "Progressive Rock" } ],
+            "isVideo": false,
+            "durationInSeconds": 354,
+            "sampleRate": 44100,
+            "channels": 2,
+            "bitDepth": 16,
+            "audioCodec": "FLAC",
+            "bitrate": 980,
+            "acoustId": "f0e1d2c3-b4a5-4c6d-8e7f-9a0b1c2d3e4f",
+            "replayGainTrackGain": -7.5,
+            "replayGainTrackPeak": 0.9877,
+            "replayGainAlbumGain": -6.8,
+            "replayGainAlbumPeak": 0.9999
+          },
+          "trackNumber": 1,
+          "discNumber": 1,
+          "script": "Latn",
+          "key": "CMajor",
+          "bpm": 72,
+          "work": {
+            "musicBrainzWorkId": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+            "title": "Bohemian Rhapsody",
+            "type": "Song",
+            "languages": [
+              { "languageCode": "en", "languageName": "English", "nativeName": "English" }
+            ],
+            "iswcs": ["T-010489707-6"]
+          },
+          "musicBrainzRecordingId": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
+          "musicBrainzTrackId": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
+          "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
+          "updatedOnUtc": "2025-01-20T14:45:00.0000000Z",
+          "moods": [
+            { "name": "dramatic" },
+            { "name": "anxious" }
+          ],
+          "isrcs": [
+            { "value": "GBUM71029604" }
+          ],
+          "contributors": [
+            {
+              "contributorId": "6a3f0c2d-1b4e-4f5a-8c6d-9e0f1a2b3c4d",
+              "role": "Vocals"
+            },
+            {
+              "contributorId": "7b4e1d3f-2c5a-4e6b-9d7e-0f1a2b3c4d5e",
+              "role": "Guitar"
+            }
+          ],
+          "ratings": [
+            {
+              "value": 4.5,
+              "maxValue": 5,
+              "source": "MusicBrainz",
+              "voteCount": 2345
+            },
+            {
+              "value": 4.8,
+              "maxValue": 5,
+              "source": "LastFm",
+              "voteCount": 1234
+            }
+          ]
+        },
+        {
+          "id": "8e1f2a3b-4c5d-4e6f-8a9b-0c1d2e3f4a5b",
+          "albumId": "e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f",
+          "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
+          "path": "/music/queen/a-night-at-the-opera/07-youre-my-best-friend.flac",
+          "metadata": {
+            "title": "You're My Best Friend",
+            "originalTitle": "You're My Best Friend",
+            "description": "A song by the British rock band Queen, written by bass guitarist John Deacon. It was originally released on the album A Night at the Opera in 1975 and as a single in 1976.",
+            "disambiguation": "album version",
+            "releaseInfo": { "originalReleaseDate": "1976-06-18", "originalReleaseYear": 1976, "reReleaseDate": "2011-11-21", "reReleaseYear": 2011, "releaseCountry": "GB", "releaseVersion": "Original" },
+            "language": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
+            "originalLanguage": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
+            "tags": [ { "name": "classic" }, { "name": "love" } ],
+            "genres": [ { "name": "Rock" }, { "name": "Pop Rock" } ],
+            "isVideo": false,
+            "durationInSeconds": 181,
+            "sampleRate": 44100,
+            "channels": 2,
+            "bitDepth": 16,
+            "audioCodec": "FLAC",
+            "bitrate": 912,
+            "acoustId": "0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d",
+            "replayGainTrackGain": -7.2,
+            "replayGainTrackPeak": 0.9812,
+            "replayGainAlbumGain": -6.5,
+            "replayGainAlbumPeak": 0.9987
+          },
+          "trackNumber": 7,
+          "discNumber": 1,
+          "script": "Latn",
+          "key": "BMajor",
+          "bpm": 118,
+          "work": {
+            "musicBrainzWorkId": "2b3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d6e",
+            "title": "You're My Best Friend",
+            "type": "Song",
+            "languages": [
+              { "languageCode": "en", "languageName": "English", "nativeName": "English" }
+            ],
+            "iswcs": ["T-010489707-6"]
+          },
+          "musicBrainzRecordingId": "0f3e4d5c-6b7a-4f8e-9d0c-1b2a3c4d5e6f",
+          "musicBrainzTrackId": "1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
+          "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
+          "updatedOnUtc": "2025-01-20T14:45:00.0000000Z",
+          "moods": [
+            { "name": "happy" },
+            { "name": "warm" }
+          ],
+          "isrcs": [
+            { "value": "GBUM71029609" }
+          ],
+          "contributors": [
+            {
+              "contributorId": "6a3f0c2d-1b4e-4f5a-8c6d-9e0f1a2b3c4d",
+              "role": "Vocals"
+            },
+            {
+              "contributorId": "7b4e1d3f-2c5a-4e6b-9d7e-0f1a2b3c4d5e",
+              "role": "Guitar"
+            }
+          ],
+          "ratings": [
+            {
+              "value": 4.2,
+              "maxValue": 5,
+              "source": "MusicBrainz",
+              "voteCount": 1234
+            },
+            {
+              "value": 4.4,
+              "maxValue": 5,
+              "source": "LastFm",
+              "voteCount": 567
+            }
+          ]
+        }
+      ],
+      "coverPath": "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg",
+      "artwork": [
+        {
+          "type": "Cover",
+          "ordinal": 0,
+          "path": "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg"
+        }
+      ]
+    }
+  ],
+  "coverPath": "/media/music/Queen-3b3a19f3/cover.jpg"
 }
 ```
 
@@ -836,22 +1432,36 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
   "metadata": {
     "name": "Queen",
     "sortName": "Queen",
-    "disambiguation": null,
+    "disambiguation": "British rock band",
     "type": "Group",
-    "gender": null,
+    "gender": "NotApplicable",
     "country": "GB",
     "area": {
       "musicBrainzAreaId": "7f2a1b3c-4d5e-4f6a-8b9c-0d1e2f3a4b5c",
       "name": "United Kingdom",
       "sortName": "United Kingdom",
-      "disambiguation": null,
+      "disambiguation": "sovereign state",
       "type": "Country",
       "iso3166Code": "GB"
     },
-    "beginArea": null,
-    "endArea": null,
+    "beginArea": {
+      "musicBrainzAreaId": "7f2a1b3c-4d5e-4f6a-8b9c-0d1e2f3a4b5c",
+      "name": "United Kingdom",
+      "sortName": "United Kingdom",
+      "disambiguation": "sovereign state",
+      "type": "Country",
+      "iso3166Code": "GB"
+    },
+    "endArea": {
+      "musicBrainzAreaId": "7f2a1b3c-4d5e-4f6a-8b9c-0d1e2f3a4b5c",
+      "name": "United Kingdom",
+      "sortName": "United Kingdom",
+      "disambiguation": "sovereign state",
+      "type": "Country",
+      "iso3166Code": "GB"
+    },
     "lifeSpanBegin": "1970-06-27",
-    "lifeSpanEnd": null,
+    "lifeSpanEnd": "1991-11-24",
     "isEnded": false,
     "genres": [
       { "name": "Rock" }
@@ -867,15 +1477,15 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
         "locale": "en",
         "isPrimary": true,
         "beginDate": "1970-06-27",
-        "endDate": null,
+        "endDate": "1991-11-24",
         "isEnded": false
       }
     ]
   },
   "website": "https://www.queenonline.com",
   "musicBrainzArtistId": "6f9c0b2a-1d3e-4a5b-8c7d-9e0f1a2b3c4d",
-  "ipis": [],
-  "isnis": [],
+  "ipis": ["00012345678"],
+  "isnis": ["0000000123456789"],
   "contributors": [
     { "contributorId": "6a3f0c2d-1b4e-4f5a-8c6d-9e0f1a2b3c4d", "role": "Vocals" },
     { "contributorId": "7b4e1d3f-2c5a-4e6b-9d7e-0f1a2b3c4d5e", "role": "Guitar" }
@@ -895,12 +1505,12 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
         "title": "A Night at the Opera",
         "originalTitle": "A Night at the Opera",
         "description": "The fourth studio album by the British rock band Queen, released in 1975. It was the most expensive album ever recorded at the time of its release.",
-        "disambiguation": null,
+        "disambiguation": "original release",
         "releaseInfo": {
           "originalReleaseDate": "1975-11-21",
           "originalReleaseYear": 1975,
-          "reReleaseDate": null,
-          "reReleaseYear": null,
+          "reReleaseDate": "2011-11-21",
+          "reReleaseYear": 2011,
           "releaseCountry": "GB",
           "releaseVersion": "Remastered"
         },
@@ -964,12 +1574,12 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
             "title": "Bohemian Rhapsody",
             "originalTitle": "Bohemian Rhapsody",
             "description": "A song by the British rock band Queen. It was written by Freddie Mercury and originally released on the album A Night at the Opera in 1975.",
-            "disambiguation": null,
+            "disambiguation": "album version",
             "releaseInfo": {
               "originalReleaseDate": "1975-10-31",
               "originalReleaseYear": 1975,
-              "reReleaseDate": null,
-              "reReleaseYear": null,
+              "reReleaseDate": "2011-11-21",
+              "reReleaseYear": 2011,
               "releaseCountry": "GB",
               "releaseVersion": "Original"
             },
@@ -1016,7 +1626,7 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
             "languages": [
               { "languageCode": "en", "languageName": "English", "nativeName": "English" }
             ],
-            "iswcs": []
+            "iswcs": ["T-010489707-6"]
           },
           "musicBrainzRecordingId": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
           "musicBrainzTrackId": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
@@ -1053,12 +1663,12 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
             "title": "You're My Best Friend",
             "originalTitle": "You're My Best Friend",
             "description": "A song by the British rock band Queen, written by bass guitarist John Deacon. It was originally released on the album A Night at the Opera in 1975 and as a single in 1976.",
-            "disambiguation": null,
+            "disambiguation": "album version",
             "releaseInfo": {
               "originalReleaseDate": "1976-06-18",
               "originalReleaseYear": 1976,
-              "reReleaseDate": null,
-              "reReleaseYear": null,
+              "reReleaseDate": "2011-11-21",
+              "reReleaseYear": 2011,
               "releaseCountry": "GB",
               "releaseVersion": "Original"
             },
@@ -1087,11 +1697,11 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
             "bitDepth": 16,
             "audioCodec": "FLAC",
             "bitrate": 912,
-            "acoustId": null,
-            "replayGainTrackGain": null,
-            "replayGainTrackPeak": null,
-            "replayGainAlbumGain": null,
-            "replayGainAlbumPeak": null
+            "acoustId": "0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d",
+            "replayGainTrackGain": -7.2,
+            "replayGainTrackPeak": 0.9812,
+            "replayGainAlbumGain": -6.5,
+            "replayGainAlbumPeak": 0.9987
           },
           "trackNumber": 7,
           "discNumber": 1,
@@ -1105,7 +1715,7 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
             "languages": [
               { "languageCode": "en", "languageName": "English", "nativeName": "English" }
             ],
-            "iswcs": []
+            "iswcs": ["T-010489707-6"]
           },
           "musicBrainzRecordingId": "0f3e4d5c-6b7a-4f8e-9d0c-1b2a3c4d5e6f",
           "musicBrainzTrackId": "1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
@@ -1154,22 +1764,36 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
   "metadata": {
     "name": "Queen",
     "sortName": "Queen",
-    "disambiguation": null,
+    "disambiguation": "British rock band",
     "type": "Group",
-    "gender": null,
+    "gender": "NotApplicable",
     "country": "GB",
     "area": {
       "musicBrainzAreaId": "7f2a1b3c-4d5e-4f6a-8b9c-0d1e2f3a4b5c",
       "name": "United Kingdom",
       "sortName": "United Kingdom",
-      "disambiguation": null,
+      "disambiguation": "sovereign state",
       "type": "Country",
       "iso3166Code": "GB"
     },
-    "beginArea": null,
-    "endArea": null,
+    "beginArea": {
+      "musicBrainzAreaId": "7f2a1b3c-4d5e-4f6a-8b9c-0d1e2f3a4b5c",
+      "name": "United Kingdom",
+      "sortName": "United Kingdom",
+      "disambiguation": "sovereign state",
+      "type": "Country",
+      "iso3166Code": "GB"
+    },
+    "endArea": {
+      "musicBrainzAreaId": "7f2a1b3c-4d5e-4f6a-8b9c-0d1e2f3a4b5c",
+      "name": "United Kingdom",
+      "sortName": "United Kingdom",
+      "disambiguation": "sovereign state",
+      "type": "Country",
+      "iso3166Code": "GB"
+    },
     "lifeSpanBegin": "1970-06-27",
-    "lifeSpanEnd": null,
+    "lifeSpanEnd": "1991-11-24",
     "isEnded": false,
     "genres": [
       { "name": "Rock" }
@@ -1185,15 +1809,15 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
         "locale": "en",
         "isPrimary": true,
         "beginDate": "1970-06-27",
-        "endDate": null,
+        "endDate": "1991-11-24",
         "isEnded": false
       }
     ]
   },
   "website": "https://www.queenonline.com",
   "musicBrainzArtistId": "6f9c0b2a-1d3e-4a5b-8c7d-9e0f1a2b3c4d",
-  "ipis": [],
-  "isnis": [],
+  "ipis": ["00012345678"],
+  "isnis": ["0000000123456789"],
   "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
   "updatedOnUtc": "2025-02-01T12:00:00.0000000Z",
   "contributors": [
@@ -1217,12 +1841,12 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
         "title": "A Night at the Opera",
         "originalTitle": "A Night at the Opera",
         "description": "The fourth studio album by the British rock band Queen, released in 1975. It was the most expensive album ever recorded at the time of its release.",
-        "disambiguation": null,
+        "disambiguation": "original release",
         "releaseInfo": {
           "originalReleaseDate": "1975-11-21",
           "originalReleaseYear": 1975,
-          "reReleaseDate": null,
-          "reReleaseYear": null,
+          "reReleaseDate": "2011-11-21",
+          "reReleaseYear": 2011,
           "releaseCountry": "GB",
           "releaseVersion": "Remastered"
         },
@@ -1261,7 +1885,7 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
       "musicBrainzReleaseGroupId": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
       "musicBrainzReleaseArtistId": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f",
       "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
-      "updatedOnUtc": null,
+      "updatedOnUtc": "2025-01-20T14:45:00.0000000Z",
       "contributors": [
         {
           "contributorId": "0e7b4a6c-5f8d-6b9e-ca0b-3c4d5e6f7a8b",
@@ -1296,8 +1920,8 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
             "title": "Bohemian Rhapsody",
             "originalTitle": "Bohemian Rhapsody",
             "description": "A song by the British rock band Queen. It was written by Freddie Mercury and originally released on the album A Night at the Opera in 1975.",
-            "disambiguation": null,
-            "releaseInfo": { "originalReleaseDate": "1975-10-31", "originalReleaseYear": 1975, "reReleaseDate": null, "reReleaseYear": null, "releaseCountry": "GB", "releaseVersion": "Original" },
+            "disambiguation": "album version",
+            "releaseInfo": { "originalReleaseDate": "1975-10-31", "originalReleaseYear": 1975, "reReleaseDate": "2011-11-21", "reReleaseYear": 2011, "releaseCountry": "GB", "releaseVersion": "Original" },
             "language": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
             "originalLanguage": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
             "tags": [ { "name": "classic" }, { "name": "epic" } ],
@@ -1327,12 +1951,12 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
             "languages": [
               { "languageCode": "en", "languageName": "English", "nativeName": "English" }
             ],
-            "iswcs": []
+            "iswcs": ["T-010489707-6"]
           },
           "musicBrainzRecordingId": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
           "musicBrainzTrackId": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
           "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
-          "updatedOnUtc": null,
+          "updatedOnUtc": "2025-01-20T14:45:00.0000000Z",
           "moods": [
             { "name": "dramatic" },
             { "name": "anxious" }
@@ -1374,8 +1998,8 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
             "title": "You're My Best Friend",
             "originalTitle": "You're My Best Friend",
             "description": "A song by the British rock band Queen, written by bass guitarist John Deacon. It was originally released on the album A Night at the Opera in 1975 and as a single in 1976.",
-            "disambiguation": null,
-            "releaseInfo": { "originalReleaseDate": "1976-06-18", "originalReleaseYear": 1976, "reReleaseDate": null, "reReleaseYear": null, "releaseCountry": "GB", "releaseVersion": "Original" },
+            "disambiguation": "album version",
+            "releaseInfo": { "originalReleaseDate": "1976-06-18", "originalReleaseYear": 1976, "reReleaseDate": "2011-11-21", "reReleaseYear": 2011, "releaseCountry": "GB", "releaseVersion": "Original" },
             "language": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
             "originalLanguage": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
             "tags": [ { "name": "classic" }, { "name": "love" } ],
@@ -1387,11 +2011,11 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
             "bitDepth": 16,
             "audioCodec": "FLAC",
             "bitrate": 912,
-            "acoustId": null,
-            "replayGainTrackGain": null,
-            "replayGainTrackPeak": null,
-            "replayGainAlbumGain": null,
-            "replayGainAlbumPeak": null
+            "acoustId": "0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d",
+            "replayGainTrackGain": -7.2,
+            "replayGainTrackPeak": 0.9812,
+            "replayGainAlbumGain": -6.5,
+            "replayGainAlbumPeak": 0.9987
           },
           "trackNumber": 7,
           "discNumber": 1,
@@ -1405,12 +2029,12 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
             "languages": [
               { "languageCode": "en", "languageName": "English", "nativeName": "English" }
             ],
-            "iswcs": []
+            "iswcs": ["T-010489707-6"]
           },
           "musicBrainzRecordingId": "0f3e4d5c-6b7a-4f8e-9d0c-1b2a3c4d5e6f",
           "musicBrainzTrackId": "1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
           "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
-          "updatedOnUtc": null,
+          "updatedOnUtc": "2025-01-20T14:45:00.0000000Z",
           "moods": [
             { "name": "happy" },
             { "name": "warm" }
@@ -1443,9 +2067,48 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
             }
           ]
         }
+      ],
+      "coverPath": "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg",
+      "artwork": [
+        {
+          "type": "Cover",
+          "ordinal": 0,
+          "path": "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg"
+        }
       ]
     }
-  ]
+  ],
+  "coverPath": "/media/music/Queen-3b3a19f3/cover.jpg"
+}
+```
+
+### Update Artist Cover
+
+Updates the cover image of the artist identified by `artistId` with the image uploaded in the multipart form of the request. The artist must belong to the media library identified by `libraryId`, and the uploaded file must be an image.
+
+#### Update Artist Cover Request
+
+```js
+PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}/cover
+Content-Type: multipart/form-data; boundary=LuminaBoundary
+
+--LuminaBoundary
+Content-Disposition: form-data; name="cover"; filename="cover.jpg"
+Content-Type: image/jpeg
+
+< ./cover.jpg
+--LuminaBoundary--
+```
+
+#### Update Artist Cover Response
+
+```js
+200 Ok
+```
+
+```json
+{
+  "coverPath": "/media/music/music-3f2504e0-4f89-41d3-9a0c-0305e82c3301/Queen-2b0e5f5a-0b3f-4b7e-8f4a-8c9e3d2f5a6b/cover.jpg"
 }
 ```
 

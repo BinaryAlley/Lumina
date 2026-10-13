@@ -25,7 +25,8 @@ public static class TrackLiteRowMapping
             readModel.Id,
             readModel.Title,
             readModel.TrackNumber,
-            readModel.DiscNumber);
+            readModel.DiscNumber,
+            readModel.DurationInSeconds);
     }
 
     /// <summary>

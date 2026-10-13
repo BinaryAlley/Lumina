@@ -36,6 +36,9 @@ public class GetArtistAlbumsLiteEndpointSummary : Summary<GetArtistAlbumsLiteEnd
         ResponseParam<AlbumLiteResponse>(r => r.Id, "The Id of the album.");
         ResponseParam<AlbumLiteResponse>(r => r.Title, "The title of the album.");
         ResponseParam<AlbumLiteResponse>(r => r.TotalTracks, "The number of tracks of the release.");
+        ResponseParam<AlbumLiteResponse>(r => r.CoverPath, "The path of the image representing the album, if available.");
+        ResponseParam<AlbumLiteResponse>(r => r.ReleaseYear, "The release year of the album (the re-release year, if available, or the original release year), if known.");
+        ResponseParam<AlbumLiteResponse>(r => r.ReleaseTypes, "The set of types of the release.");
 
         Response(200, "The paginated list of the lightweight read models of the albums of the artist is returned.",
             example: new PaginatedResponse<AlbumLiteResponse>

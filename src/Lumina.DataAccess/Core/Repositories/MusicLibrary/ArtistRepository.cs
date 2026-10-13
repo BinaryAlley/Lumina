@@ -18,6 +18,8 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -29,6 +31,10 @@ namespace Lumina.DataAccess.Core.Repositories.MusicLibrary;
 /// </summary>
 internal sealed class ArtistRepository : IArtistRepository
 {
+    private static readonly MethodInfo s_toLowerMethod = typeof(string).GetMethod(nameof(string.ToLower), Type.EmptyTypes)!;
+    private static readonly MethodInfo s_startsWithMethod = typeof(string).GetMethod(nameof(string.StartsWith), [typeof(string)])!;
+    private static readonly MethodInfo s_substringMethod = typeof(string).GetMethod(nameof(string.Substring), [typeof(int)])!;
+
     private readonly LuminaDbContext _luminaDbContext;
     private readonly IAlbumRepository _albumRepository;
     private readonly ITrackRepository _trackRepository;
@@ -488,7 +494,7 @@ internal sealed class ArtistRepository : IArtistRepository
         if (filterSpecification is not null)
             artistsQuery = artistsQuery.Where(filterSpecification.ToExpression());
 
-        IQueryable<ArtistEntity> orderedArtistsQuery = ApplySorting(artistsQuery, sortBy, sortOrder ?? SortOrder.Ascending);
+        IQueryable<ArtistEntity> orderedArtistsQuery = ApplySorting(artistsQuery, sortBy, sortOrder ?? SortOrder.Ascending, libraryFilter.ShouldIgnoreThePrefixForAlphaPicker);
 
         // If no pagination was requested, return all the artists of the library.
         if (paginationData is null)
@@ -559,11 +565,16 @@ internal sealed class ArtistRepository : IArtistRepository
         if (filterSpecification is not null)
             artistsQuery = artistsQuery.Where(filterSpecification.ToExpression());
 
-        IQueryable<ArtistLiteRow> liteRowsQuery = ApplySorting(artistsQuery, sortBy, sortOrder ?? SortOrder.Ascending)
+        IQueryable<ArtistLiteRow> liteRowsQuery = ApplySorting(artistsQuery, sortBy, sortOrder ?? SortOrder.Ascending, libraryFilter.ShouldIgnoreThePrefixForAlphaPicker)
             .Select(artist => new ArtistLiteRow
             {
                 Id = artist.Id,
-                Name = artist.Name
+                Name = artist.Name,
+                // The cover of the artist is the cover artwork stored for it, if any, and it is exposed so that the clients can display it without loading the whole artist.
+                CoverPath = _luminaDbContext.MusicArtwork
+                    .Where(artwork => artwork.OwnerType == MusicArtworkOwnerType.Artist && artwork.OwnerId == artist.Id && artwork.ArtworkType == ArtworkType.Cover)
+                    .Select(artwork => artwork.FileName)
+                    .FirstOrDefault()
             });
 
         // If no pagination was requested, return all the artists of the library.
@@ -607,11 +618,22 @@ internal sealed class ArtistRepository : IArtistRepository
     /// <returns>A filter specification that can be used to query artists matching the provided criteria.</returns>
     private static FilterSpecification<ArtistEntity>? BuildFilterSpecification(LibraryFilterDto libraryFilter)
     {
+        FilterSpecification<ArtistEntity>? filterSpecification = null;
+
         // Include the search term filter, if provided.
         if (!string.IsNullOrWhiteSpace(libraryFilter.SearchTerm))
-            return new ArtistSearchSpecification(libraryFilter.SearchTerm);
+            filterSpecification = new ArtistSearchSpecification(libraryFilter.SearchTerm);
 
-        return null;
+        // Include the alpha key filter, if provided.
+        if (libraryFilter.FilterAlphaKey is not null)
+        {
+            ArtistAlphaFilterSpecification alphaFilterSpecification = new(libraryFilter.FilterAlphaKey, libraryFilter.ShouldIgnoreThePrefixForAlphaPicker);
+            filterSpecification = filterSpecification is null
+                ? alphaFilterSpecification
+                : filterSpecification.And(alphaFilterSpecification);
+        }
+
+        return filterSpecification;
     }
 
     /// <summary>
@@ -620,8 +642,8 @@ internal sealed class ArtistRepository : IArtistRepository
     /// <param name="artistsQuery">The query to sort.</param>
     /// <param name="sortBy">The field to sort by (case-insensitive).</param>
     /// <param name="sortOrder">The direction of the sorting.</param>
-    /// <returns>An ordered artists query.</returns>
-    private static IOrderedQueryable<ArtistEntity> ApplySorting(IQueryable<ArtistEntity> artistsQuery, string? sortBy, SortOrder sortOrder)
+    /// <param name="shouldIgnoreThePrefixForAlphaPicker">Whether a leading "the " prefix of a name is ignored when deriving the name sort key, or not.</param>
+    private static IOrderedQueryable<ArtistEntity> ApplySorting(IQueryable<ArtistEntity> artistsQuery, string? sortBy, SortOrder sortOrder, bool shouldIgnoreThePrefixForAlphaPicker)
     {
         return sortBy?.ToLowerInvariant() switch
         {
@@ -638,9 +660,39 @@ internal sealed class ArtistRepository : IArtistRepository
                 ? artistsQuery.OrderByDescending(artist => artist.UpdatedOnUtc).ThenBy(artist => artist.Id)
                 : artistsQuery.OrderBy(artist => artist.UpdatedOnUtc).ThenBy(artist => artist.Id),
             _ => sortOrder == SortOrder.Descending
-                ? artistsQuery.OrderByDescending(artist => artist.Name).ThenBy(artist => artist.Id)
-                : artistsQuery.OrderBy(artist => artist.Name).ThenBy(artist => artist.Id),
+                ? artistsQuery.OrderByDescending(BuildNameSortKey(shouldIgnoreThePrefixForAlphaPicker)).ThenBy(artist => artist.Id)
+                : artistsQuery.OrderBy(BuildNameSortKey(shouldIgnoreThePrefixForAlphaPicker)).ThenBy(artist => artist.Id),
         };
+    }
+
+    /// <summary>
+    /// Builds the expression that derives the name sort key of an artist, matching the effective name used by the alpha filter:
+    /// the name lowercased, falling back to an empty string when the name is <see langword="null"/>, and optionally
+    /// stripped of a leading "the " prefix.
+    /// </summary>
+    /// <param name="shouldIgnoreThePrefixForAlphaPicker">Whether a leading "the " prefix of a name is ignored when deriving the name sort key, or not.</param>
+    /// <returns>An expression that evaluates to the name sort key of an artist.</returns>
+    private static Expression<Func<ArtistEntity, string>> BuildNameSortKey(bool shouldIgnoreThePrefixForAlphaPicker)
+    {
+        ParameterExpression artist = Expression.Parameter(typeof(ArtistEntity), "artist");
+
+        Expression nameProperty = Expression.Property(artist, nameof(ArtistEntity.Name));
+
+        // The raw name: the name, unless it is null, in which case an empty string is used.
+        Expression rawName = Expression.Coalesce(nameProperty, Expression.Constant(string.Empty));
+
+        MethodCallExpression lowerName = Expression.Call(rawName, s_toLowerMethod);
+
+        // When ignoring the "The " prefix, strip a leading "the " from the lowercased name.
+        Expression effectiveName = lowerName;
+        if (shouldIgnoreThePrefixForAlphaPicker)
+        {
+            MethodCallExpression startsWithThe = Expression.Call(lowerName, s_startsWithMethod, Expression.Constant("the "));
+            MethodCallExpression strippedName = Expression.Call(lowerName, s_substringMethod, Expression.Constant(4));
+            effectiveName = Expression.Condition(startsWithThe, strippedName, lowerName);
+        }
+
+        return Expression.Lambda<Func<ArtistEntity, string>>(effectiveName, artist);
     }
 
     /// <summary>
@@ -792,5 +844,20 @@ internal sealed class ArtistRepository : IArtistRepository
             .Where(artist => artist.LibraryId == libraryId)
             .ExecuteUpdateAsync(setters => setters.SetProperty(artist => artist.MetadataStatus, MetadataStatus.Pending), cancellationToken).ConfigureAwait(false);
         return Result.Updated;
+    }
+
+    /// <summary>
+    /// Deletes all the artists of the media library identified by <paramref name="libraryId"/>, together with their albums and tracks and their related data.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose artists are deleted.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Deleted>> DeleteByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken)
+    {
+        // The albums, tracks and the related data of the artists are removed by the database, through the cascading foreign keys.
+        await _luminaDbContext.Artists
+            .Where(artist => artist.LibraryId == libraryId)
+            .ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
+        return Result.Deleted;
     }
 }

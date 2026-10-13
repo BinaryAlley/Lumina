@@ -284,7 +284,15 @@ internal sealed class AlbumRepository : IAlbumRepository
             {
                 Id = album.Id,
                 Title = album.Title,
-                TotalTracks = album.TotalTracks
+                TotalTracks = album.TotalTracks,
+                // The release year and the release types are exposed so that the clients can group and order the releases of an artist.
+                ReleaseYear = album.ReReleaseYear ?? album.OriginalReleaseYear,
+                ReleaseTypes = album.ReleaseTypes.Select(releaseType => releaseType.ReleaseType).ToList(),
+                // The cover of the album is the cover artwork stored for it, if any, and it is exposed so that the clients can display it without loading the whole album.
+                CoverPath = _luminaDbContext.MusicArtwork
+                    .Where(artwork => artwork.OwnerType == MusicArtworkOwnerType.Album && artwork.OwnerId == album.Id && artwork.ArtworkType == ArtworkType.Cover)
+                    .Select(artwork => artwork.FileName)
+                    .FirstOrDefault()
             });
 
         if (paginationData is null)

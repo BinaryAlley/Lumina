@@ -454,6 +454,8 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
         ResponseParam<ArtistResponse>(r => r.Albums![0].Contributors, "The list of references to the media contributors that performed on the album, each with the role they played.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Ratings, "The list of ratings for the album.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks, "The list of tracks of the album.");
+        ResponseParam<ArtistResponse>(r => r.Albums![0].CoverPath, "The path of the image representing the album, if available.");
+        ResponseParam<ArtistResponse>(r => r.Albums![0].Artwork, "The stored artwork of the album, in display order, if applicable.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].Id, "The Id of the track.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].AlbumId, "The Id of the album the track belongs to.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].LibraryId, "The Id of the media library this track belongs to.");
@@ -502,6 +504,7 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
         ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].Ratings, "The list of ratings for the track.");
         ResponseParam<ArtistResponse>(r => r.CreatedOnUtc, "The date and time when the artist was created.");
         ResponseParam<ArtistResponse>(r => r.UpdatedOnUtc, "The date and time when the artist was last updated, if applicable.");
+        ResponseParam<ArtistResponse>(r => r.CoverPath, "The path of the image representing the artist, if available.");
 
         Guid artistId = Guid.NewGuid();
         Guid libraryId = Guid.NewGuid();

@@ -147,8 +147,9 @@ public static class ArtistEntityMapping
     /// Converts <paramref name="repositoryEntity"/> to <see cref="ArtistResponse"/>.
     /// </summary>
     /// <param name="repositoryEntity">The repository entity to be converted.</param>
+    /// <param name="coverPath">The optional path of the image representing the artist.</param>
     /// <returns>The converted response entity.</returns>
-    public static ArtistResponse ToResponse(this ArtistEntity repositoryEntity)
+    public static ArtistResponse ToResponse(this ArtistEntity repositoryEntity, string? coverPath = null)
     {
         MusicArtistMetadataDto metadata = new(
             repositoryEntity.Name,
@@ -178,7 +179,8 @@ public static class ArtistEntityMapping
             repositoryEntity.UpdatedOnUtc,
             [.. repositoryEntity.Contributors.Select(contributor => new MediaContributorReferenceDto(contributor.MediaContributorId, contributor.Role))],
             [.. repositoryEntity.Ratings.ToResponses()],
-            [.. repositoryEntity.Albums.Select(album => album.ToResponse())]);
+            [.. repositoryEntity.Albums.Select(album => album.ToResponse())],
+            coverPath);
     }
 
     /// <summary>

@@ -25,20 +25,23 @@ public class TrackLiteRowFixture
     /// <param name="trackNumber">Optional. The number of the track on its disc.</param>
     /// <param name="discNumber">Optional. The number of the disc the track belongs to.</param>
     /// <param name="includeDiscNumber">Whether the disc number should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="durationInSeconds">Optional. The duration of the track in seconds.</param>
     /// <returns>The created <see cref="TrackLiteRow"/>.</returns>
     public TrackLiteRow Create(
         Guid? id = null,
         string? title = null,
         int? trackNumber = null,
         int? discNumber = null,
-        bool includeDiscNumber = true)
+        bool includeDiscNumber = true,
+        int? durationInSeconds = null)
     {
         return new TrackLiteRow
         {
             Id = id ?? _faker.Random.Guid(),
             Title = title ?? _faker.Lorem.Sentence(),
             TrackNumber = trackNumber ?? _faker.Random.Int(1, 30),
-            DiscNumber = includeDiscNumber ? (discNumber ?? _faker.Random.Int(1, 3)) : null
+            DiscNumber = includeDiscNumber ? (discNumber ?? _faker.Random.Int(1, 3)) : null,
+            DurationInSeconds = durationInSeconds ?? _faker.Random.Int(1, 600)
         };
     }
 

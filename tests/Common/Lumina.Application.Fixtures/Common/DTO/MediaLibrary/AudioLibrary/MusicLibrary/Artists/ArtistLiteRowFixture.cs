@@ -22,15 +22,20 @@ public class ArtistLiteRowFixture
     /// </summary>
     /// <param name="id">Optional. The Id of the artist.</param>
     /// <param name="name">Optional. The name of the artist.</param>
+    /// <param name="coverPath">Optional. The path of the image representing the artist.</param>
+    /// <param name="includeCoverPath">Whether the cover path should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="ArtistLiteRow"/>.</returns>
     public ArtistLiteRow Create(
         Guid? id = null,
-        string? name = null)
+        string? name = null,
+        string? coverPath = null,
+        bool includeCoverPath = true)
     {
         return new ArtistLiteRow
         {
             Id = id ?? _faker.Random.Guid(),
-            Name = name ?? _faker.Name.FullName()
+            Name = name ?? _faker.Name.FullName(),
+            CoverPath = includeCoverPath ? (coverPath ?? _faker.System.FilePath()) : null
         };
     }
 

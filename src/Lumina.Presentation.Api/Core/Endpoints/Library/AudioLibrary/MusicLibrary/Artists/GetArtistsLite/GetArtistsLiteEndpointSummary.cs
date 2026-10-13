@@ -39,12 +39,13 @@ public class GetArtistsLiteEndpointSummary : Summary<GetArtistsLiteEndpoint, Get
         RequestParam(r => r.PerPage, "The maximum number of artists to retrieve per page. Optional.");
         RequestParam(r => r.SearchTerm, "The search term used to filter the artists by name. Optional.");
         RequestParam(r => r.FilterAlphaKey, "The alpha key used to filter the artists by the first character of their name, for the alpha picker. Optional.");
-        RequestParam(r => r.ShouldIgnoreThePrefixForAlphaPicker, "Whether the leading \"The \" prefix of a name is ignored when computing the alpha key, or not.");
+        RequestParam(r => r.ShouldIgnoreThePrefixForAlphaPicker, "Whether the leading \"The \" prefix of a name is ignored when computing the alpha key, or not. Optional.");
         RequestParam(r => r.SortBy, "The name of the field by which to sort the results. Optional.");
         RequestParam(r => r.SortOrder, "The direction in which to sort the results. Optional.");
 
         ResponseParam<ArtistLiteResponse>(r => r.Id, "The Id of the artist.");
         ResponseParam<ArtistLiteResponse>(r => r.Name, "The name of the artist.");
+        ResponseParam<ArtistLiteResponse>(r => r.CoverPath, "The path of the image representing the artist, if available.");
 
         Response(200, "The paginated list of the lightweight read models of the artists is returned.",
             example: new PaginatedResponse<ArtistLiteResponse>

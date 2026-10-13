@@ -37,6 +37,7 @@ public class TrackLiteRowMappingTests
         Assert.Equal(readModel.Title, result.Title);
         Assert.Equal(readModel.TrackNumber, result.TrackNumber);
         Assert.Equal(readModel.DiscNumber, result.DiscNumber);
+        Assert.Equal(readModel.DurationInSeconds, result.DurationInSeconds);
     }
 
     [Fact]

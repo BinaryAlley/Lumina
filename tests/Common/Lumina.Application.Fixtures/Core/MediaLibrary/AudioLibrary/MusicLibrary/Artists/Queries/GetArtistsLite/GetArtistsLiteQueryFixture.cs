@@ -3,6 +3,7 @@ using Bogus;
 using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artists.Queries.GetArtistsLite;
 using Lumina.Application.Fixtures.Common.DTO.Pagination;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -26,6 +27,10 @@ public class GetArtistsLiteQueryFixture
     /// <param name="libraryId">Optional. The Id of the media library whose artists are retrieved, taken from the route.</param>
     /// <param name="paginationData">Optional. The pagination data of the query.</param>
     /// <param name="searchTerm">Optional. The search term used to filter the artists by name.</param>
+    /// <param name="filterAlphaKey">Optional. The alpha key used to filter the results by the first character of their name, for the alpha picker.</param>
+    /// <param name="shouldIgnoreThePrefixForAlphaPicker">Optional. Whether the leading "The " prefix of a name should be ignored when computing the alpha key, or not.</param>
+    /// <param name="sortBy">Optional. The name of the field by which to sort the results.</param>
+    /// <param name="sortOrder">Optional. The direction in which to sort the results.</param>
     /// <param name="includeLibraryId">Whether the library Id should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includePaginationData">Whether the pagination data should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeSearchTerm">Whether the search term should be included, or forced to <see langword="null"/>.</param>
@@ -34,6 +39,10 @@ public class GetArtistsLiteQueryFixture
         string? libraryId = null,
         PaginationDataDto? paginationData = null,
         string? searchTerm = null,
+        string? filterAlphaKey = null,
+        bool shouldIgnoreThePrefixForAlphaPicker = false,
+        string? sortBy = null,
+        SortOrder? sortOrder = null,
         bool includeLibraryId = true,
         bool includePaginationData = true,
         bool includeSearchTerm = true)
@@ -41,7 +50,11 @@ public class GetArtistsLiteQueryFixture
         return new GetArtistsLiteQuery(
             includeLibraryId ? (libraryId ?? Guid.NewGuid().ToString()) : null,
             includePaginationData ? (paginationData ?? _paginationDataDtoFixture.Create()) : null,
-            includeSearchTerm ? (searchTerm ?? _faker.Name.FullName()) : null);
+            includeSearchTerm ? (searchTerm ?? _faker.Name.FullName()) : null,
+            filterAlphaKey,
+            shouldIgnoreThePrefixForAlphaPicker,
+            sortBy ?? _faker.Lorem.Word(),
+            sortOrder ?? _faker.PickRandom<SortOrder>());
     }
 
     /// <summary>

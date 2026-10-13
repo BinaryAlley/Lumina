@@ -17,6 +17,7 @@ using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -51,6 +52,7 @@ public class ArtistRepositoryTests
     private readonly GenreEntityFixture _genreEntityFixture = new();
     private readonly PaginationDataDtoFixture _paginationDataDtoFixture = new();
     private readonly LibraryFilterDtoFixture _libraryFilterDtoFixture = new();
+    private readonly MusicArtworkEntityFixture _musicArtworkEntityFixture = new();
 
     [Fact]
     public async Task InsertAsync_WhenCalledWithAValidArtist_ShouldPersistTheArtistAndItsAggregate()
@@ -1077,6 +1079,257 @@ public class ArtistRepositoryTests
         Assert.Equal("Calm", Assert.Single(storedTrack.Moods).Name);
         Assert.Equal("USRC12345678", Assert.Single(storedTrack.Isrcs).Value);
         Assert.Equal(keptTrackContributor.Id, Assert.Single(storedTrack.Contributors).Id);
+    }
+
+    [Fact]
+    public async Task DeleteByLibraryIdAsync_WhenCalled_ShouldDeleteOnlyTheLibraryArtistsAndTheirChildren()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-artistrepo-deletebylibrary-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        ArtistRepository sut = CreateArtistRepository(context);
+
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity targetArtist = await SeedArtistAsync(context, libraryId, "Queen");
+        AlbumEntity targetAlbum = await SeedAlbumAsync(context, libraryId, targetArtist.Id);
+        context.Tracks.Add(_trackEntityFixture.Create(albumId: targetAlbum.Id, libraryId: libraryId, includeMetadata: false));
+        ArtistEntity artistOfAnotherLibrary = await SeedArtistAsync(context, Guid.NewGuid(), "Pink Floyd");
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<Deleted> result = await sut.DeleteByLibraryIdAsync(libraryId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Deleted, result.Value);
+        context.ChangeTracker.Clear();
+        // Only the artists of the target library are deleted, and the database cascade removes their albums and tracks.
+        ArtistEntity survivor = Assert.Single(await context.Artists.AsNoTracking().ToListAsync());
+        Assert.Equal(artistOfAnotherLibrary.Id, survivor.Id);
+        Assert.Empty(await context.Albums.AsNoTracking().Where(candidate => candidate.LibraryId == libraryId).ToListAsync());
+        Assert.Empty(await context.Tracks.AsNoTracking().Where(candidate => candidate.LibraryId == libraryId).ToListAsync());
+    }
+
+    [Fact]
+    public async Task GetAllLiteAsync_WhenAlphaKeyIsTheNumberKey_ShouldMatchOnlyNamesStartingWithADigit()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-artistrepo-lite-alpha-number-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        ArtistRepository sut = CreateArtistRepository(context);
+
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity numericArtist = _artistEntityFixture.Create(libraryId: libraryId, name: "1984", includeAlbums: false, includeContributors: false);
+        ArtistEntity letterArtist = _artistEntityFixture.Create(libraryId: libraryId, name: "Alpha", includeAlbums: false, includeContributors: false);
+        ArtistEntity symbolArtist = _artistEntityFixture.Create(libraryId: libraryId, name: "!Voyager", includeAlbums: false, includeContributors: false);
+        context.Artists.AddRange(numericArtist, letterArtist, symbolArtist);
+        await context.SaveChangesAsync();
+
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId, filterAlphaKey: LibraryItemAlphaKeys.NUMBER);
+
+        // Act
+        Result<PaginatedResultDto<ArtistLiteRow>> result = await sut.GetAllLiteAsync(null, null, null, filter, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        ArtistLiteRow row = Assert.Single(result.Value.Data);
+        Assert.Equal("1984", row.Name);
+    }
+
+    [Fact]
+    public async Task GetAllLiteAsync_WhenAlphaKeyIsTheSymbolKey_ShouldMatchOnlyNamesStartingWithASymbol()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-artistrepo-lite-alpha-symbol-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        ArtistRepository sut = CreateArtistRepository(context);
+
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity symbolArtist = _artistEntityFixture.Create(libraryId: libraryId, name: "!Voyager", includeAlbums: false, includeContributors: false);
+        ArtistEntity numericArtist = _artistEntityFixture.Create(libraryId: libraryId, name: "1984", includeAlbums: false, includeContributors: false);
+        ArtistEntity letterArtist = _artistEntityFixture.Create(libraryId: libraryId, name: "Alpha", includeAlbums: false, includeContributors: false);
+        context.Artists.AddRange(symbolArtist, numericArtist, letterArtist);
+        await context.SaveChangesAsync();
+
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId, filterAlphaKey: LibraryItemAlphaKeys.SYMBOL);
+
+        // Act
+        Result<PaginatedResultDto<ArtistLiteRow>> result = await sut.GetAllLiteAsync(null, null, null, filter, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        ArtistLiteRow row = Assert.Single(result.Value.Data);
+        Assert.Equal("!Voyager", row.Name);
+    }
+
+    [Fact]
+    public async Task GetAllLiteAsync_WhenAlphaKeyIsALetter_ShouldMatchOnlyNamesStartingWithIt()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-artistrepo-lite-alpha-letter-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        ArtistRepository sut = CreateArtistRepository(context);
+
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity alphaArtist = _artistEntityFixture.Create(libraryId: libraryId, name: "Alpha", includeAlbums: false, includeContributors: false);
+        ArtistEntity bravoArtist = _artistEntityFixture.Create(libraryId: libraryId, name: "Bravo", includeAlbums: false, includeContributors: false);
+        ArtistEntity charlieArtist = _artistEntityFixture.Create(libraryId: libraryId, name: "Charlie", includeAlbums: false, includeContributors: false);
+        context.Artists.AddRange(alphaArtist, bravoArtist, charlieArtist);
+        await context.SaveChangesAsync();
+
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId, filterAlphaKey: "b");
+
+        // Act
+        Result<PaginatedResultDto<ArtistLiteRow>> result = await sut.GetAllLiteAsync(null, null, null, filter, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        ArtistLiteRow row = Assert.Single(result.Value.Data);
+        Assert.Equal("Bravo", row.Name);
+    }
+
+    [Fact]
+    public async Task GetAllLiteAsync_WhenSearchTermAndAlphaKeyAreProvided_ShouldCombineThemWithAnd()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-artistrepo-lite-search-alpha-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        ArtistRepository sut = CreateArtistRepository(context);
+
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity matchingArtist = _artistEntityFixture.Create(libraryId: libraryId, name: "Alpha Band", includeAlbums: false, includeContributors: false);
+        ArtistEntity artistMatchingOnlyTheAlphaKey = _artistEntityFixture.Create(libraryId: libraryId, name: "Adele", includeAlbums: false, includeContributors: false);
+        ArtistEntity artistMatchingOnlyTheSearchTerm = _artistEntityFixture.Create(libraryId: libraryId, name: "Beta Band", includeAlbums: false, includeContributors: false);
+        context.Artists.AddRange(matchingArtist, artistMatchingOnlyTheAlphaKey, artistMatchingOnlyTheSearchTerm);
+        await context.SaveChangesAsync();
+
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId, searchTerm: "Band", filterAlphaKey: "a");
+
+        // Act
+        Result<PaginatedResultDto<ArtistLiteRow>> result = await sut.GetAllLiteAsync(null, null, null, filter, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        ArtistLiteRow row = Assert.Single(result.Value.Data);
+        Assert.Equal(matchingArtist.Id, row.Id);
+    }
+
+    [Fact]
+    public async Task GetAllLiteAsync_WhenIgnoringThePrefix_ShouldFilterOnTheStrippedName()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-artistrepo-lite-alpha-the-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        ArtistRepository sut = CreateArtistRepository(context);
+
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity beatlesArtist = _artistEntityFixture.Create(libraryId: libraryId, name: "The Beatles", includeAlbums: false, includeContributors: false);
+        ArtistEntity adeleArtist = _artistEntityFixture.Create(libraryId: libraryId, name: "Adele", includeAlbums: false, includeContributors: false);
+        context.Artists.AddRange(beatlesArtist, adeleArtist);
+        await context.SaveChangesAsync();
+
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId, filterAlphaKey: "b", shouldIgnoreThePrefixForAlphaPicker: true);
+
+        // Act
+        Result<PaginatedResultDto<ArtistLiteRow>> result = await sut.GetAllLiteAsync(null, null, null, filter, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        ArtistLiteRow row = Assert.Single(result.Value.Data);
+        Assert.Equal("The Beatles", row.Name);
+    }
+
+    [Fact]
+    public async Task GetAllLiteAsync_WhenNotIgnoringThePrefix_ShouldFilterOnTheFullName()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-artistrepo-lite-alpha-the-off-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        ArtistRepository sut = CreateArtistRepository(context);
+
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity beatlesArtist = _artistEntityFixture.Create(libraryId: libraryId, name: "The Beatles", includeAlbums: false, includeContributors: false);
+        ArtistEntity adeleArtist = _artistEntityFixture.Create(libraryId: libraryId, name: "Adele", includeAlbums: false, includeContributors: false);
+        context.Artists.AddRange(beatlesArtist, adeleArtist);
+        await context.SaveChangesAsync();
+
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId, filterAlphaKey: "b", shouldIgnoreThePrefixForAlphaPicker: false);
+
+        // Act
+        Result<PaginatedResultDto<ArtistLiteRow>> result = await sut.GetAllLiteAsync(null, null, null, filter, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Empty(result.Value.Data);
+    }
+
+    [Fact]
+    public async Task GetAllLiteAsync_WhenIgnoringThePrefixForSorting_ShouldSortByTheStrippedName()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-artistrepo-lite-sort-the-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        ArtistRepository sut = CreateArtistRepository(context);
+
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity beneathArtist = _artistEntityFixture.Create(libraryId: libraryId, name: "Beneath the Surface", includeAlbums: false, includeContributors: false);
+        ArtistEntity beatlesArtist = _artistEntityFixture.Create(libraryId: libraryId, name: "The Beatles", includeAlbums: false, includeContributors: false);
+        context.Artists.AddRange(beneathArtist, beatlesArtist);
+        await context.SaveChangesAsync();
+
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId, shouldIgnoreThePrefixForAlphaPicker: true);
+
+        // Act
+        Result<PaginatedResultDto<ArtistLiteRow>> result = await sut.GetAllLiteAsync(null, null, null, filter, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        // With the prefix stripped, the sort key of "The Beatles" is "beatles", which sorts before "beneath".
+        Assert.Equal(["The Beatles", "Beneath the Surface"], result.Value.Data.Select(row => row.Name));
+    }
+
+    [Fact]
+    public async Task GetAllLiteAsync_WhenCoverArtworkExists_ShouldReturnItsPath()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-artistrepo-lite-cover-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        ArtistRepository sut = CreateArtistRepository(context);
+
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = _artistEntityFixture.Create(libraryId: libraryId, name: "Queen", includeAlbums: false, includeContributors: false);
+        context.Artists.Add(artist);
+        context.MusicArtwork.Add(
+            _musicArtworkEntityFixture.Create(ownerType: MusicArtworkOwnerType.Artist, ownerId: artist.Id, artworkType: ArtworkType.Cover, fileName: "covers/queen.jpg"));
+        await context.SaveChangesAsync();
+
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
+
+        // Act
+        Result<PaginatedResultDto<ArtistLiteRow>> result = await sut.GetAllLiteAsync(null, null, null, filter, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        ArtistLiteRow row = Assert.Single(result.Value.Data);
+        Assert.Equal("covers/queen.jpg", row.CoverPath);
     }
 
     /// <summary>

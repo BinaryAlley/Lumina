@@ -65,6 +65,8 @@ public class GetArtistAlbumsEndpointSummary : Summary<GetArtistAlbumsEndpoint, E
         ResponseParam<AlbumResponse>(r => r.Metadata!.Genres, "The list of genres associated with the album.");
         ResponseParam<AlbumResponse>(r => r.Metadata!.Tags, "The list of tags that further describe or categorize the album.");
         ResponseParam<AlbumResponse>(r => r.Tracks, "The list of tracks of the album.");
+        ResponseParam<AlbumResponse>(r => r.CoverPath, "The path of the image representing the album, if available.");
+        ResponseParam<AlbumResponse>(r => r.Artwork, "The stored artwork of the album, in display order, if applicable.");
 
         Response(200, "The list of albums of the artist is returned.",
             example: new AlbumResponse[]

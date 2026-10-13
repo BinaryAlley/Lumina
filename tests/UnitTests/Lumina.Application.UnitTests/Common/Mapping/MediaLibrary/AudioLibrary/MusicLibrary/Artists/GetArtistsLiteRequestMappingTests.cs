@@ -3,6 +3,7 @@ using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.A
 using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artists.Queries.GetArtistsLite;
 using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 using Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -98,5 +99,25 @@ public class GetArtistsLiteRequestMappingTests
         Assert.NotNull(result.PaginationData);
         Assert.Equal(2, result.PaginationData.CurrentPage);
         Assert.Equal(25, result.PaginationData.PerPage);
+    }
+
+    [Fact]
+    public void ToQuery_WhenAlphaAndSortingAreProvided_ShouldMapThem()
+    {
+        // Arrange
+        GetArtistsLiteRequest request = _getArtistsLiteRequestFixture.Create(
+            filterAlphaKey: "q",
+            shouldIgnoreThePrefixForAlphaPicker: true,
+            sortBy: "name",
+            sortOrder: SortOrder.Descending);
+
+        // Act
+        GetArtistsLiteQuery result = request.ToQuery("library-route");
+
+        // Assert
+        Assert.Equal("q", result.FilterAlphaKey);
+        Assert.True(result.ShouldIgnoreThePrefixForAlphaPicker);
+        Assert.Equal("name", result.SortBy);
+        Assert.Equal(SortOrder.Descending, result.SortOrder);
     }
 }

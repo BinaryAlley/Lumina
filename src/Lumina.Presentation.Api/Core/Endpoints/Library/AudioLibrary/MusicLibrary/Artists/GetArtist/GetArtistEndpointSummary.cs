@@ -39,6 +39,7 @@ public class GetArtistEndpointSummary : Summary<GetArtistEndpoint, EmptyRequest>
         ResponseParam<ArtistResponse>(r => r.Albums, "The list of albums of the artist, each with its own list of tracks.");
         ResponseParam<ArtistResponse>(r => r.CreatedOnUtc, "The date and time when the artist was created.");
         ResponseParam<ArtistResponse>(r => r.UpdatedOnUtc, "The date and time when the artist was last updated, if applicable.");
+        ResponseParam<ArtistResponse>(r => r.CoverPath, "The path of the image representing the artist, if available.");
 
         Response(200, "The requested artist is returned.",
             example: new ArtistResponse(

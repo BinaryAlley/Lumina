@@ -261,6 +261,8 @@ public class AlbumEntityMappingTests
         Assert.Equal(entity.Id, result.Id);
         Assert.Equal(entity.ArtistId, result.ArtistId);
         Assert.Equal(entity.LibraryId, result.LibraryId);
+        // No cover path is supplied by default, so the response exposes none.
+        Assert.Null(result.CoverPath);
         Assert.Equal(entity.Title, result.Metadata.Title);
         Assert.Equal(entity.OriginalTitle, result.Metadata.OriginalTitle);
         Assert.Equal(entity.Description, result.Metadata.Description);
@@ -345,5 +347,20 @@ public class AlbumEntityMappingTests
             Assert.Equal(entities[i].Id, results[i].Id);
             Assert.Equal(entities[i].Title, results[i].Metadata.Title);
         }
+    }
+
+    [Fact]
+    public void ToResponse_WhenCoverPathIsProvided_ShouldMapIt()
+    {
+        // Arrange
+        AlbumEntity entity = _albumEntityFixture.Create();
+        string coverPath = "/media/albums/cover.jpg";
+
+        // Act
+        AlbumResponse result = entity.ToResponse(coverPath);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(coverPath, result.CoverPath);
     }
 }

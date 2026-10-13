@@ -11,8 +11,11 @@ using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.A
 using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
@@ -87,6 +90,15 @@ public class GetArtistQueryHandler : IQueryHandler<GetArtistQuery, Result<Artist
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
-        return existingArtist.ToResponse();
+        // The artwork of the artist is stored separately from the artist, so it is loaded to expose the cover of the artist in the response.
+        Result<IReadOnlyList<MusicArtworkEntity>> getArtworkResult = await _unitOfWork.MusicArtworkRepository.GetByOwnerAsync(MusicArtworkOwnerType.Artist, artistId, cancellationToken).ConfigureAwait(false);
+        if (getArtworkResult.IsFailure)
+            return getArtworkResult.Errors;
+        string? coverPath = getArtworkResult.Value
+            .Where(artwork => artwork.ArtworkType == ArtworkType.Cover)
+            .Select(artwork => artwork.FileName)
+            .FirstOrDefault();
+
+        return existingArtist.ToResponse(coverPath);
     }
 }

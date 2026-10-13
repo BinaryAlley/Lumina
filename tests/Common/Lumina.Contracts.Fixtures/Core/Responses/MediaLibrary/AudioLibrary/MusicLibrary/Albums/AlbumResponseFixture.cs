@@ -1,8 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
+using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Lumina.Contracts.Fixtures.Core.DTO.Common;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaContributors;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
@@ -29,6 +31,7 @@ public class AlbumResponseFixture
     private readonly MediaContributorReferenceDtoFixture _mediaContributorReferenceDtoFixture = new();
     private readonly AudioRatingDtoFixture _audioRatingDtoFixture = new();
     private readonly TrackResponseFixture _trackResponseFixture = new();
+    private readonly MediaArtworkDtoFixture _mediaArtworkDtoFixture = new();
 
     /// <summary>
     /// Creates a random valid <see cref="AlbumResponse"/>.
@@ -51,6 +54,8 @@ public class AlbumResponseFixture
     /// <param name="contributors">Optional. The list of contributor references of the album.</param>
     /// <param name="ratings">Optional. The list of ratings of the album.</param>
     /// <param name="tracks">Optional. The list of tracks of the album.</param>
+    /// <param name="coverPath">Optional. The path of the image representing the album.</param>
+    /// <param name="artwork">Optional. The stored artwork of the album, in display order.</param>
     /// <param name="includeMediaFormat">Whether the media format should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includePackaging">Whether the packaging should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeBarcode">Whether the barcode should be included, or forced to <see langword="null"/>.</param>
@@ -64,6 +69,8 @@ public class AlbumResponseFixture
     /// <param name="includeContributors">Whether the contributors should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeRatings">Whether the ratings should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeTracks">Whether the tracks should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeCoverPath">Whether the cover path should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeArtwork">Whether the artwork should be included, or forced to an empty collection.</param>
     /// <returns>The created <see cref="AlbumResponse"/>.</returns>
     public AlbumResponse Create(
         Guid? id = null,
@@ -84,6 +91,8 @@ public class AlbumResponseFixture
         List<MediaContributorReferenceDto>? contributors = null,
         List<AudioRatingDto>? ratings = null,
         List<TrackResponse>? tracks = null,
+        string? coverPath = null,
+        List<MediaArtworkDto>? artwork = null,
         bool includeMediaFormat = true,
         bool includePackaging = true,
         bool includeBarcode = true,
@@ -96,8 +105,14 @@ public class AlbumResponseFixture
         bool includeUpdatedOnUtc = true,
         bool includeContributors = true,
         bool includeRatings = true,
-        bool includeTracks = true)
+        bool includeTracks = true,
+        bool includeCoverPath = true,
+        bool includeArtwork = true)
     {
+        IReadOnlyList<MediaArtworkDto> resolvedArtwork = includeArtwork
+            ? (artwork ?? _mediaArtworkDtoFixture.CreateMany(1))
+            : [];
+
         return new AlbumResponse(
             id ?? Guid.NewGuid(),
             artistId ?? Guid.NewGuid(),
@@ -116,7 +131,9 @@ public class AlbumResponseFixture
             includeUpdatedOnUtc ? (updatedOnUtc ?? _faker.Date.Recent().ToUniversalTime()) : null,
             includeContributors ? (contributors ?? _mediaContributorReferenceDtoFixture.CreateMany(1)) : null,
             includeRatings ? (ratings ?? _audioRatingDtoFixture.CreateMany(1)) : null,
-            includeTracks ? (tracks ?? _trackResponseFixture.CreateMany(1)) : null);
+            includeTracks ? (tracks ?? _trackResponseFixture.CreateMany(1)) : null,
+            includeCoverPath ? (coverPath ?? _faker.System.FilePath()) : null,
+            resolvedArtwork);
     }
 
     /// <summary>

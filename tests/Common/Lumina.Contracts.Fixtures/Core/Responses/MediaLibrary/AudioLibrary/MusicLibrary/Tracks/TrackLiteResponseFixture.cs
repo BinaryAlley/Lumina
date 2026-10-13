@@ -25,19 +25,22 @@ public class TrackLiteResponseFixture
     /// <param name="trackNumber">Optional. The number of the track on its disc.</param>
     /// <param name="discNumber">Optional. The number of the disc the track belongs to.</param>
     /// <param name="includeDiscNumber">Whether the disc number should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="durationInSeconds">Optional. The duration of the track in seconds.</param>
     /// <returns>The created <see cref="TrackLiteResponse"/>.</returns>
     public TrackLiteResponse Create(
         Guid? id = null,
         string? title = null,
         int? trackNumber = null,
         int? discNumber = null,
-        bool includeDiscNumber = true)
+        bool includeDiscNumber = true,
+        int? durationInSeconds = null)
     {
         return new TrackLiteResponse(
             id ?? _faker.Random.Guid(),
             title ?? _faker.Lorem.Sentence(),
             trackNumber ?? _faker.Random.Int(1, 30),
-            includeDiscNumber ? (discNumber ?? _faker.Random.Int(1, 3)) : null);
+            includeDiscNumber ? (discNumber ?? _faker.Random.Int(1, 3)) : null,
+            durationInSeconds ?? _faker.Random.Int(1, 600));
     }
 
     /// <summary>

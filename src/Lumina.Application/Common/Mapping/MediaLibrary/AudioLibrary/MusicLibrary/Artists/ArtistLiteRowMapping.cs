@@ -23,7 +23,8 @@ public static class ArtistLiteRowMapping
     {
         return new ArtistLiteResponse(
             readModel.Id,
-            readModel.Name);
+            readModel.Name,
+            readModel.CoverPath);
     }
 
     /// <summary>
