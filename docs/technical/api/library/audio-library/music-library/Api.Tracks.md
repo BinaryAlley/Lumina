@@ -8,6 +8,9 @@
     - [Get Track](#get-track)
       - [Get Track Request](#get-track-request)
       - [Get Track Response](#get-track-response)
+    - [Stream Track](#stream-track)
+      - [Stream Track Request](#stream-track-request)
+      - [Stream Track Response](#stream-track-response)
     - [Update Track](#update-track)
       - [Update Track Request](#update-track-request)
       - [Update Track Response](#update-track-response)
@@ -308,6 +311,35 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
   ]
 }
 ```
+
+
+### Stream Track
+
+#### Stream Track Request
+
+```js
+GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/albums/e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f/tracks/9f0e1d2c-3b4a-4c6d-8e7f-9a0b1c2d3e4f/stream
+Authorization: Bearer <token>
+Range: bytes=0-1048575
+```
+
+Streams the audio file of the track identified by the route, with HTTP range support. The `Range` header is optional: without it the whole file is streamed, and with it only the requested range is streamed, so that a player can start playback before the whole file is downloaded and can seek within the file. The audio file is streamed to an Admin, who can stream the tracks of all libraries, or to the owner of the library of the track.
+
+#### Stream Track Response
+
+```js
+200 Ok
+```
+
+or, when a range is requested:
+
+```js
+206 Partial Content
+Content-Range: bytes 0-1048575/3542771
+Accept-Ranges: bytes
+```
+
+The response is the raw bytes of the audio file, served with the media type of the file when it is an audio type, or `application/octet-stream` otherwise. Every response carries `X-Content-Type-Options: nosniff`, `Cache-Control: private` and `Vary: Authorization`, together with a `Last-Modified` and an `ETag` derived from the size and the modification time of the file.
 
 
 ### Update Track

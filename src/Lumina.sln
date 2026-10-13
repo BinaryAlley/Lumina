@@ -286,6 +286,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tracks", "tracks", "{B1B657
 		..\docs\technical\requests\library\audio-library\music-library\tracks\AddTrack.http = ..\docs\technical\requests\library\audio-library\music-library\tracks\AddTrack.http
 		..\docs\technical\requests\library\audio-library\music-library\tracks\DeleteTrack.http = ..\docs\technical\requests\library\audio-library\music-library\tracks\DeleteTrack.http
 		..\docs\technical\requests\library\audio-library\music-library\tracks\GetTrack.http = ..\docs\technical\requests\library\audio-library\music-library\tracks\GetTrack.http
+		..\docs\technical\requests\library\audio-library\music-library\tracks\StreamTrack.http = ..\docs\technical\requests\library\audio-library\music-library\tracks\StreamTrack.http
 		..\docs\technical\requests\library\audio-library\music-library\tracks\UpdateTrack.http = ..\docs\technical\requests\library\audio-library\music-library\tracks\UpdateTrack.http
 	EndProjectSection
 EndProject

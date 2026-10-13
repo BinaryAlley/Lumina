@@ -3,6 +3,7 @@ using Lumina.Application.Common.DomainEvents;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Exceptions;
+using Lumina.Presentation.Api.Common.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
@@ -39,6 +40,14 @@ public class EventualConsistencyMiddleware
     /// <param name="domainEventQueue">In memory queue containing the queued domain events.</param>
     public async Task InvokeAsync(HttpContext context, IDomainEventPublisher domainEventPublisher, LuminaDbContext dbContext, IDomainEventsQueue domainEventQueue)
     {
+        // Endpoints that serve long lived responses (for example a track stream) opt out through endpoint metadata, so that their response never
+        // holds the request's database transaction open; the opt out is metadata based, so it follows the endpoint even when its route changes.
+        if (context.GetEndpoint()?.Metadata.GetMetadata<SkipEventualConsistencyMetadata>() is not null)
+        {
+            await _next(context).ConfigureAwait(false);
+            return;
+        }
+
         // begin a new database transaction - this will wrap any database operations performed during this HTTP request in an atomic operation
         IDbContextTransaction transaction = await dbContext.Database.BeginTransactionAsync(context.RequestAborted).ConfigureAwait(false);
         // register an action to be executed once the response is completed (the user already received a response for the request)

@@ -321,6 +321,43 @@ internal sealed class TrackRepository : ITrackRepository
     }
 
     /// <summary>
+    /// Gets the data needed to stream the audio file of the track identified by <paramref name="trackId"/>, when it belongs to the album identified by
+    /// <paramref name="albumId"/> and to the media library identified by <paramref name="libraryId"/>, and that album belongs to the artist identified by
+    /// <paramref name="artistId"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library the track must belong to.</param>
+    /// <param name="albumId">The Id of the album the track must belong to.</param>
+    /// <param name="artistId">The Id of the artist that must own the album the track belongs to.</param>
+    /// <param name="trackId">The Id of the track whose streaming data is retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>
+    /// An <see cref="Result{TValue}"/> containing either the <see cref="TrackStreamDto"/> of the track, <see langword="null"/> when no track matches the
+    /// provided identifiers, or an error.
+    /// </returns>
+    public async Task<Result<TrackStreamDto?>> GetTrackStreamInfoAsync(Guid libraryId, Guid albumId, Guid artistId, Guid trackId, CancellationToken cancellationToken)
+    {
+        // The projection is flat and untracked, and the album is joined both to scope the track by its artist and to project the artist Id, so a track
+        // that is not in the named library, album and artist simply yields no row.
+        return await _luminaDbContext.Tracks
+            .AsNoTracking()
+            .Where(track => track.Id == trackId && track.LibraryId == libraryId && track.AlbumId == albumId && track.Album!.ArtistId == artistId)
+            .Select(track => new TrackStreamDto
+            {
+                Path = track.Path,
+                LibraryId = track.LibraryId,
+                AlbumId = track.AlbumId,
+                ArtistId = track.Album!.ArtistId,
+                AudioCodec = track.AudioCodec,
+                DurationInSeconds = track.DurationInSeconds,
+                SampleRate = track.SampleRate,
+                Channels = track.Channels,
+                BitDepth = track.BitDepth,
+                Bitrate = track.Bitrate
+            })
+            .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
     /// Deletes the track identified by <paramref name="id"/>, together with its owned collections and contributions, by the database cascade.
     /// </summary>
     /// <param name="id">The Id of the track to delete.</param>

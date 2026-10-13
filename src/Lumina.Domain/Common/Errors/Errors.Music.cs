@@ -38,6 +38,7 @@ public static partial class Errors
         public static Error UnknownMusicKey => Error.Validation(description: nameof(UnknownMusicKey));
         public static Error CatalogNumberMustBeMaximum50CharactersLong => Error.Validation(description: nameof(CatalogNumberMustBeMaximum50CharactersLong));
         public static Error TrackNotFound => Error.NotFound(description: nameof(TrackNotFound));
+        public static Error TrackFileNotFound => Error.NotFound(description: nameof(TrackFileNotFound));
         public static Error TrackAlreadyExists => Error.Conflict(description: nameof(TrackAlreadyExists));
         public static Error TrackIdCannotBeEmpty => Error.Validation(description: nameof(TrackIdCannotBeEmpty));
         public static Error TracksListCannotBeNull => Error.Validation(description: nameof(TracksListCannotBeNull));
