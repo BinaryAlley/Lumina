@@ -19,7 +19,6 @@ namespace Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.
 /// <param name="ArtistId">The unique identifier of the artist this track belongs to, taken from the route.</param>
 /// <param name="AlbumId">The unique identifier of the album this track belongs to, taken from the route.</param>
 /// <param name="TrackId">The unique identifier of the track, taken from the route.</param>
-/// <param name="Path">The file system path of the track.</param>
 /// <param name="Metadata">The audio metadata of the track.</param>
 /// <param name="TrackNumber">The number of the track on its disc.</param>
 /// <param name="DiscNumber">The number of the disc the track belongs to, if applicable.</param>
@@ -39,7 +38,6 @@ public record UpdateTrackCommand(
     string? ArtistId,
     string? AlbumId,
     string? TrackId,
-    string? Path,
     MusicTrackMetadataDto? Metadata,
     int? TrackNumber,
     int? DiscNumber,

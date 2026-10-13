@@ -35,7 +35,6 @@ public class UpdateMusicTrackRequestFixture
     /// <summary>
     /// Creates a new <see cref="UpdateMusicTrackRequest"/> instance with randomized test data.
     /// </summary>
-    /// <param name="path">Optional. The file system path of the track.</param>
     /// <param name="metadata">Optional. The audio metadata of the track.</param>
     /// <param name="trackNumber">Optional. The number of the track on its disc.</param>
     /// <param name="discNumber">Optional. The number of the disc the track belongs to.</param>
@@ -49,7 +48,6 @@ public class UpdateMusicTrackRequestFixture
     /// <param name="isrcs">Optional. The ISRC codes of the track.</param>
     /// <param name="contributors">Optional. The references to the media contributors that performed on the track.</param>
     /// <param name="ratings">Optional. The ratings of the track.</param>
-    /// <param name="includePath">Whether the path should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeMetadata">Whether the metadata should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeTrackNumber">Whether the track number should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeDiscNumber">Whether the disc number should be included, or forced to <see langword="null"/>.</param>
@@ -65,7 +63,6 @@ public class UpdateMusicTrackRequestFixture
     /// <param name="includeRatings">Whether the ratings should be included, or forced to <see langword="null"/>.</param>
     /// <returns>A configured <see cref="UpdateMusicTrackRequest"/> instance.</returns>
     public UpdateMusicTrackRequest Create(
-        string? path = null,
         MusicTrackMetadataDto? metadata = null,
         int? trackNumber = null,
         int? discNumber = null,
@@ -79,7 +76,6 @@ public class UpdateMusicTrackRequestFixture
         List<IsrcDto>? isrcs = null,
         List<MediaContributorReferenceDto>? contributors = null,
         List<AudioRatingDto>? ratings = null,
-        bool includePath = true,
         bool includeMetadata = true,
         bool includeTrackNumber = true,
         bool includeDiscNumber = true,
@@ -95,7 +91,6 @@ public class UpdateMusicTrackRequestFixture
         bool includeRatings = true)
     {
         return new UpdateMusicTrackRequest(
-            Path: includePath ? (path ?? _faker.System.FilePath()) : null,
             Metadata: includeMetadata ? (metadata ?? _musicTrackMetadataDtoFixture.Create()) : null,
             TrackNumber: includeTrackNumber ? (trackNumber ?? _faker.Random.Number(1, 30)) : null,
             DiscNumber: includeDiscNumber ? (discNumber ?? _faker.Random.Number(1, 4)) : null,

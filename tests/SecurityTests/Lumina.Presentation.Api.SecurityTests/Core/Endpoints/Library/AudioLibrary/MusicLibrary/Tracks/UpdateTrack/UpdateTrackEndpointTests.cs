@@ -94,7 +94,6 @@ public class UpdateTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         SeedLibrary(libraryId, userId);
         (Guid artistId, Guid albumId, Guid trackId) = SeedArtistGraph(libraryId);
         UpdateTrackRequest request = _updateTrackRequestFixture.Create(
-            path: Path.Combine(s_contentRootPath, $"injected-{Guid.NewGuid():N}.flac"),
             metadata: _musicTrackMetadataDtoFixture.Create(title: maliciousTitle),
             moods: [],
             isrcs: [],

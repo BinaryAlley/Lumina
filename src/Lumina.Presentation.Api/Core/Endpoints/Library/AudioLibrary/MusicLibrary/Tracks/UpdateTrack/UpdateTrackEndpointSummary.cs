@@ -31,7 +31,6 @@ public class UpdateTrackEndpointSummary : Summary<UpdateTrackEndpoint, UpdateTra
         Description = "Updates the details of the track identified by the route, returning the full details of the updated track. The track is updated by an Admin, who can update the tracks of all libraries, or by the owner of the library of the track.";
 
         ExampleRequest = new UpdateTrackRequest(
-            Path: "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
             Metadata: new MusicTrackMetadataDto(
                 Title: "Bohemian Rhapsody",
                 OriginalTitle: "Bohemian Rhapsody",
@@ -124,7 +123,6 @@ public class UpdateTrackEndpointSummary : Summary<UpdateTrackEndpoint, UpdateTra
             DiscNumber: 1
         );
 
-        RequestParam(r => r.Path, "The file system path of the track. Required.");
         RequestParam(r => r.Metadata, "The audio metadata of the track. Required.");
         RequestParam(r => r.Metadata!.Title, "The title of the track. Required.");
         RequestParam(r => r.Metadata!.OriginalTitle, "The original title of the track. Optional.");
@@ -397,7 +395,7 @@ public class UpdateTrackEndpointSummary : Summary<UpdateTrackEndpoint, UpdateTra
             }
         );
 
-        Response(409, "The request failed because the new file system path already belongs to another track in the library, or because a unique constraint was violated.", "application/problem+json",
+        Response(409, "The request failed because a unique constraint was violated.", "application/problem+json",
             example: new
             {
                 type = "https://tools.ietf.org/html/rfc9110#section-15.5.10",
@@ -426,8 +424,6 @@ public class UpdateTrackEndpointSummary : Summary<UpdateTrackEndpoint, UpdateTra
                             "ArtistIdCannotBeEmpty",
                             "AlbumIdCannotBeEmpty",
                             "TrackIdCannotBeEmpty",
-                            "TrackPathCannotBeEmpty",
-                            "TrackPathMustBeMaximum2048CharactersLong",
                             "MetadataCannotBeNull",
                             "TitleCannotBeEmpty",
                             "TitleMustBeMaximum255CharactersLong",
@@ -468,8 +464,7 @@ public class UpdateTrackEndpointSummary : Summary<UpdateTrackEndpoint, UpdateTra
                             "RatingValueMustBePositive",
                             "RatingValueCannotBeGreaterThanMaxValue",
                             "RatingMaxValueMustBePositive",
-                            "RatingVoteCountMustBePositive",
-                            "TrackPathMustBeWithinLibraryContentLocations"
+                            "RatingVoteCountMustBePositive"
                         }
                     }
                 },

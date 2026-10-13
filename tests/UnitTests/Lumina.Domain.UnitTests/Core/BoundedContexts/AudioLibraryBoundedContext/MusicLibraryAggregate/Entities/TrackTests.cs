@@ -190,8 +190,8 @@ public class TrackTests
     {
         // Arrange
         Track track = _trackFixture.Create();
+        string originalPath = track.Path;
         List<Mood> originalMoods = [.. track.Moods];
-        string path = "C:\\Music\\queen\\bohemian-rhapsody.flac";
         AudioMetadata metadata = _audioMetadataFixture.Create();
         Optional<string> disambiguation = Optional<string>.Some("remastered");
         Optional<int> discNumber = Optional<int>.Some(2);
@@ -206,7 +206,6 @@ public class TrackTests
 
         // Act
         Result<Updated> result = track.UpdateDetails(
-            path,
             metadata,
             disambiguation,
             7,
@@ -221,7 +220,6 @@ public class TrackTests
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Equal(path, track.Path);
         Assert.Equal(metadata, track.Metadata);
         Assert.Equal(disambiguation, track.Disambiguation);
         Assert.Equal(7, track.TrackNumber);
@@ -235,7 +233,9 @@ public class TrackTests
         Assert.Equal(trackId, track.MusicBrainzTrackId);
         Assert.True(track.UpdatedOnUtc.HasValue);
         Assert.True(track.UpdatedOnUtc.Value >= beforeUpdate);
-        // the collections are not part of the details update
+        // The file system path is not part of the details update, it is set only when the track is created.
+        Assert.Equal(originalPath, track.Path);
+        // The collections are not part of the details update.
         Assert.Equal(originalMoods, track.Moods);
     }
 
@@ -376,7 +376,6 @@ public class TrackTests
 
         // Act
         Result<Updated> result = track.UpdateDetails(
-            "C:\\Music\\queen\\bohemian-rhapsody.flac",
             _audioMetadataFixture.Create(),
             Optional<string>.None(),
             11,

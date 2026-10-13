@@ -45,8 +45,8 @@ public class UpdateTrackCommandMappingTests
         // Arrange
         Guid libraryId = Guid.NewGuid();
         (Artist artist, Guid albumId, Guid trackId) = CreateDomainArtist(libraryId);
-        string updatedPath = "/music/queen/a-night-at-the-opera/02-love-of-my-life.flac";
-        UpdateTrackCommand command = _updateTrackCommandFixture.Create(libraryId: libraryId.ToString(), artistId: artist.Id.Value.ToString(), albumId: albumId.ToString(), trackId: trackId.ToString(), path: updatedPath);
+        string originalPath = artist.Albums.SelectMany(album => album.Tracks).First(track => track.Id.Value == trackId).Path;
+        UpdateTrackCommand command = _updateTrackCommandFixture.Create(libraryId: libraryId.ToString(), artistId: artist.Id.Value.ToString(), albumId: albumId.ToString(), trackId: trackId.ToString());
 
         // Act
         Result<Artist> result = command.ToDomainEntity(artist);
@@ -55,7 +55,8 @@ public class UpdateTrackCommandMappingTests
         Assert.False(result.IsFailure);
         Assert.Same(artist, result.Value);
         Track updatedTrack = result.Value.Albums.First(album => album.Id.Value == albumId).Tracks.First(track => track.Id.Value == trackId);
-        Assert.Equal(updatedPath, updatedTrack.Path);
+        // The file system path is never changed by the update, it is set only when the track is created.
+        Assert.Equal(originalPath, updatedTrack.Path);
         Assert.Equal(command.Metadata!.Title, updatedTrack.Metadata.Title);
         Assert.Equal(command.TrackNumber, updatedTrack.TrackNumber);
         Assert.True(updatedTrack.DiscNumber.HasValue);
@@ -83,8 +84,8 @@ public class UpdateTrackCommandMappingTests
         // Arrange
         Guid libraryId = Guid.NewGuid();
         (Artist artist, Guid albumId, Guid trackId) = CreateDomainArtist(libraryId);
-        string updatedPath = "/music/queen/a-night-at-the-opera/03-you-re-my-best-friend.flac";
-        UpdateTrackCommand command = _updateTrackCommandFixture.Create(libraryId: libraryId.ToString(), artistId: artist.Id.Value.ToString(), albumId: albumId.ToString(), trackId: trackId.ToString(), path: updatedPath, includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMoods: false, includeIsrcs: false, contributors: [], ratings: []);
+        string originalPath = artist.Albums.SelectMany(album => album.Tracks).First(track => track.Id.Value == trackId).Path;
+        UpdateTrackCommand command = _updateTrackCommandFixture.Create(libraryId: libraryId.ToString(), artistId: artist.Id.Value.ToString(), albumId: albumId.ToString(), trackId: trackId.ToString(), includeDiscNumber: false, includeScript: false, includeKey: false, includeBpm: false, includeWork: false, includeMusicBrainzRecordingId: false, includeMusicBrainzTrackId: false, includeMoods: false, includeIsrcs: false, contributors: [], ratings: []);
 
         // Act
         Result<Artist> result = command.ToDomainEntity(artist);
@@ -92,7 +93,8 @@ public class UpdateTrackCommandMappingTests
         // Assert
         Assert.False(result.IsFailure);
         Track updatedTrack = result.Value.Albums.First(album => album.Id.Value == albumId).Tracks.First(track => track.Id.Value == trackId);
-        Assert.Equal(updatedPath, updatedTrack.Path);
+        // the file system path is never changed by the update, it is set only when the track is created
+        Assert.Equal(originalPath, updatedTrack.Path);
         Assert.Equal(command.TrackNumber, updatedTrack.TrackNumber);
         Assert.False(updatedTrack.DiscNumber.HasValue);
         Assert.False(updatedTrack.Script.HasValue);

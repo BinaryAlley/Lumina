@@ -35,7 +35,6 @@ public class UpdateTrackRequestFixture
     /// <summary>
     /// Creates a random valid request to update a track.
     /// </summary>
-    /// <param name="path">Optional. The file system path of the track.</param>
     /// <param name="metadata">Optional. The audio metadata of the track.</param>
     /// <param name="trackNumber">Optional. The number of the track on its disc.</param>
     /// <param name="discNumber">Optional. The number of the disc the track belongs to.</param>
@@ -60,12 +59,10 @@ public class UpdateTrackRequestFixture
     /// <param name="includeIsrcs">Whether the ISRC codes should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeContributors">Whether the contributors list should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeRatings">Whether the ratings list should be included, or forced to <see langword="null"/>.</param>
-    /// <param name="includePath">Whether the path should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeMetadata">Whether the metadata should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeTrackNumber">Whether the track number should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created request to update a track.</returns>
     public UpdateTrackRequest Create(
-        string? path = null,
         MusicTrackMetadataDto? metadata = null,
         int? trackNumber = null,
         int? discNumber = null,
@@ -90,12 +87,10 @@ public class UpdateTrackRequestFixture
         bool includeIsrcs = true,
         bool includeContributors = true,
         bool includeRatings = true,
-        bool includePath = true,
         bool includeMetadata = true,
         bool includeTrackNumber = true)
     {
         return new UpdateTrackRequest(
-            includePath ? (path ?? _faker.System.FilePath()) : null,
             includeMetadata ? (metadata ?? _musicTrackMetadataDtoFixture.Create()) : null,
             includeTrackNumber ? (trackNumber ?? _faker.Random.Int(1, 20)) : null,
             includeDiscNumber ? (discNumber ?? _faker.Random.Int(1, 3)) : null,

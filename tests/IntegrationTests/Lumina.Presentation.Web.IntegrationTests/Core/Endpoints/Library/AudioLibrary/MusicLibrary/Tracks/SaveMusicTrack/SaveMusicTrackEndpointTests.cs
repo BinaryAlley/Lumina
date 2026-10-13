@@ -63,7 +63,7 @@ public class SaveMusicTrackEndpointTests : IClassFixture<LuminaWebFactory>
         using JsonDocument json = JsonDocument.Parse(content);
         Assert.True(json.RootElement.GetProperty("success").GetBoolean());
         Assert.Equal(trackId, json.RootElement.GetProperty("data").GetProperty("id").GetGuid());
-        Assert.Contains(_apiFactory.ApiClientStub.PutRequests, putRequest => putRequest.Endpoint == $"libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}" && putRequest.Data is UpdateMusicTrackRequest forwarded && forwarded.Metadata!.Title == request.Metadata!.Title && forwarded.Path == request.Path);
+        Assert.Contains(_apiFactory.ApiClientStub.PutRequests, putRequest => putRequest.Endpoint == $"libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}" && putRequest.Data is UpdateMusicTrackRequest forwarded && forwarded.Metadata!.Title == request.Metadata!.Title);
     }
 
     [Fact]

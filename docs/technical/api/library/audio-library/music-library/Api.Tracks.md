@@ -320,7 +320,6 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
 
 ```json
 {
-  "path": "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
   "metadata": {
     "title": "Bohemian Rhapsody",
     "originalTitle": "Bohemian Rhapsody",

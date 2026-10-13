@@ -111,7 +111,6 @@ public static class AudioMetadataDtoMapping
         return artist.UpdateTrackInAlbum(
             album,
             track,
-            track.Path,
             metadataResult.Value,
             disambiguation,
             track.TrackNumber,

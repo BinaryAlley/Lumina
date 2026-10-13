@@ -57,12 +57,6 @@ public class UpdateTrackCommandValidator : AbstractValidator<UpdateTrackCommand>
             .When(command => command.TrackId is not null && command.TrackId.Length > 0)
             .WithError(Errors.Music.TrackIdCannotBeEmpty);
 
-        RuleFor(command => command.Path)
-            .NotEmpty()
-            .WithError(Errors.Music.TrackPathCannotBeEmpty)
-            .MaximumLength(2048)
-            .WithError(Errors.Music.TrackPathMustBeMaximum2048CharactersLong);
-
         // Validates the audio metadata of the track: title, lengths, release information, languages, genres and tags.
         RuleFor(command => command.Metadata)
             .NotNull()

@@ -3,7 +3,6 @@ Authorization: Bearer {{ACCESS_TOKEN}}
 Content-Type: application/json
 
 {
-  "path": "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
   "metadata": {
     "title": "Bohemian Rhapsody",
     "originalTitle": "Bohemian Rhapsody",

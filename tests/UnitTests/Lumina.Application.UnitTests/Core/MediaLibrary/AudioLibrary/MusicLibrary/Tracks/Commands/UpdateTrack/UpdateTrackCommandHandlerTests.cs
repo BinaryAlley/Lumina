@@ -26,7 +26,6 @@ using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using NSubstitute;
 using System;
@@ -54,7 +53,6 @@ public class UpdateTrackCommandHandlerTests
     private readonly IAuthorizationService _mockAuthorizationService;
     private readonly ICurrentUserService _mockCurrentUserService;
     private readonly IValidator<UpdateTrackCommand> _mockValidator;
-    private readonly IPathService _mockPathService;
     private readonly UpdateTrackCommandHandler _sut;
     private readonly Guid _userId;
     private readonly UpdateTrackCommandFixture _updateTrackCommandFixture = new();
@@ -86,16 +84,14 @@ public class UpdateTrackCommandHandlerTests
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockValidator = Substitute.For<IValidator<UpdateTrackCommand>>();
-        _mockPathService = Substitute.For<IPathService>();
         _userId = Guid.NewGuid();
 
         // Default stubs: the current user is authenticated, the library ownership policy allows access, the validator passes,
-        // the track path is within the library content locations, the artist is updated and the library and contributors exist.
+        // the artist is updated and the library and contributors exist.
         _mockCurrentUserService.UserId.Returns(_userId);
         _mockAuthorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(_userId, Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>())
             .Returns(true);
         _mockValidator.Validate(Arg.Any<UpdateTrackCommand>()).Returns([]);
-        _mockPathService.IsPathWithin(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
         _mockArtistRepository.UpdateAsync(Arg.Any<ArtistEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Updated);
         _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
@@ -109,7 +105,7 @@ public class UpdateTrackCommandHandlerTests
                 return Result.From<IReadOnlyList<MediaContributorEntity>>([.. contributorIds.Select(contributorId => _mediaContributorEntityFixture.Create(id: contributorId, displayName: contributorId.ToString()))]);
             });
 
-        _sut = new UpdateTrackCommandHandler(_mockUnitOfWork, _mockAuthorizationService, _mockCurrentUserService, _mockValidator, _mockPathService);
+        _sut = new UpdateTrackCommandHandler(_mockUnitOfWork, _mockAuthorizationService, _mockCurrentUserService, _mockValidator);
     }
 
     [Fact]
@@ -118,6 +114,7 @@ public class UpdateTrackCommandHandlerTests
         // Arrange
         Guid libraryId = Guid.NewGuid();
         (ArtistEntity existingArtist, Guid albumId, Guid trackId) = CreateArtistWithTrack(libraryId);
+        string originalPath = existingArtist.Albums.SelectMany(album => album.Tracks).First(track => track.Id == trackId).Path;
         UpdateTrackCommand command = _updateTrackCommandFixture.Create(libraryId: libraryId.ToString(), artistId: existingArtist.Id.ToString(), albumId: albumId.ToString(), trackId: trackId.ToString());
         ArtistEntity? updatedArtist = null;
         TrackEntity? updatedTrack = null;
@@ -139,7 +136,8 @@ public class UpdateTrackCommandHandlerTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.Equal(trackId, result.Value.Id);
-        Assert.Equal(command.Path, result.Value.Path);
+        // The file system path is preserved by the update, it is set only when the track is created.
+        Assert.Equal(originalPath, result.Value.Path);
         Assert.Equal(command.Metadata!.Title, result.Value.Metadata!.Title);
         Assert.Equal(command.Contributors!.Count, result.Value.Contributors!.Count);
         await _mockArtistRepository.Received(1).UpdateAsync(Arg.Any<ArtistEntity>(), Arg.Any<CancellationToken>());
@@ -335,29 +333,6 @@ public class UpdateTrackCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Library.LibraryNotFound, result.FirstError);
-        await _mockArtistRepository.DidNotReceive().UpdateAsync(Arg.Any<ArtistEntity>(), Arg.Any<CancellationToken>());
-    }
-
-    [Fact]
-    public async Task HandleAsync_WhenPathIsNotWithinLibraryContentLocations_ShouldReturnPathError()
-    {
-        // Arrange
-        Guid libraryId = Guid.NewGuid();
-        (ArtistEntity existingArtist, Guid albumId, Guid trackId) = CreateArtistWithTrack(libraryId);
-        UpdateTrackCommand command = _updateTrackCommandFixture.Create(libraryId: libraryId.ToString(), artistId: existingArtist.Id.ToString(), albumId: albumId.ToString(), trackId: trackId.ToString());
-        _mockArtistRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From<ArtistEntity?>(existingArtist));
-        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
-            .Returns(_ => Result.From<LibraryEntity?>(_libraryEntityFixture.Create(contentLocations: ["/music/queen"])));
-        _mockPathService.IsPathWithin(Arg.Any<string>(), Arg.Any<string>()).Returns(false);
-
-        // Act
-        Result<TrackResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
-
-        // Assert
-        Assert.True(result.IsFailure);
-        Assert.Equal(Errors.Music.TrackPathMustBeWithinLibraryContentLocations, result.FirstError);
-        _mockPathService.Received(1).IsPathWithin(command.Path!, Arg.Any<string>());
         await _mockArtistRepository.DidNotReceive().UpdateAsync(Arg.Any<ArtistEntity>(), Arg.Any<CancellationToken>());
     }
 

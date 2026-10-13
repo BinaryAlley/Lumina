@@ -95,10 +95,10 @@
             <div class="book-details-form">
                 <!-- General information. -->
                 <h3 class="text-light-two">@_localizer["GeneralInformation"]</h3>
-        <!-- Path. -->
+        <!-- Path (read-only: a track path is set only by the scanner, it can never be edited). -->
         <div class="form-row">
-            <div class="form-label"><label for="track-path">@_localizer["TrackPath"]</label>:</div>
-            <div class="form-field"><input id="track-path" type="text" class="enlightenment-input" value="@(Model.Path ?? string.Empty)" /></div>
+            <div class="form-label">@_localizer["TrackPath"]:</div>
+            <div class="form-field"><span id="track-path" style="word-break: break-all;">@(Model.Path ?? string.Empty)</span></div>
             <small class="form-label text-disabled form-description">@_localizer["TrackPathDescription"]</small>
         </div>
         <!-- Title. -->
@@ -793,9 +793,9 @@
         }
 
         // Builds the payload of the edited track, matching the update request of the API.
+        // The file system path is not included: a track path is set only by the scanner and can never be edited.
         function buildPayload() {
             return {
-                Path: readValue('track-path') || null,
                 Metadata: {
                     Title: readValue('track-title'),
                     OriginalTitle: readValue('track-original-title') || null,
