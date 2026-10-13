@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
-using Lumina.Presentation.Api.Common.Utilities;
+using Lumina.Presentation.Api.Common.MimeTypes;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Common.Utilities;
+namespace Lumina.Presentation.Api.UnitTests.Common.MimeTypes;
 
 /// <summary>
-/// Contains unit tests for the <see cref="MimeTypes"/> class.
+/// Contains unit tests for the <see cref="ImageMimeTypes"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class MimeTypesTests
+public class ImageMimeTypesTests
 {
     [Theory]
     [InlineData(ImageType.BMP, "image/bmp")] // bmp image type
@@ -21,7 +21,7 @@ public class MimeTypesTests
     public void GetMimeType_WhenTypeIsKnown_ShouldReturnTheMappedMimeType(ImageType type, string expectedMimeType)
     {
         // Act
-        string result = MimeTypes.GetMimeType(type);
+        string result = ImageMimeTypes.GetMimeType(type);
 
         // Assert
         Assert.Equal(expectedMimeType, result);
@@ -33,7 +33,7 @@ public class MimeTypesTests
     public void GetMimeType_WhenTypeIsUnknown_ShouldReturnOpaqueBinaryMimeType(ImageType type)
     {
         // Act
-        string result = MimeTypes.GetMimeType(type);
+        string result = ImageMimeTypes.GetMimeType(type);
 
         // Assert
         Assert.Equal("application/octet-stream", result);

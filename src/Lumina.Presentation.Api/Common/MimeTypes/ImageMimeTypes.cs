@@ -4,12 +4,12 @@ using System.Collections.Frozen;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Presentation.Api.Common.Utilities;
+namespace Lumina.Presentation.Api.Common.MimeTypes;
 
 /// <summary>
-/// Utility class for converting from domain image types to known image mime types.
+/// Resolves the MIME content type of image types.
 /// </summary>
-public static class MimeTypes
+public static class ImageMimeTypes
 {
     private static readonly FrozenDictionary<ImageType, string> s_imageTypeToMimeType = new Dictionary<ImageType, string>
     {

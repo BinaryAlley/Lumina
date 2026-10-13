@@ -7,7 +7,7 @@ using Lumina.Contracts.Fixtures.Core.Responses.FileSystemManagement.Thumbnails;
 using Lumina.Contracts.Requests.FileSystemManagement.Thumbnails;
 using Lumina.Contracts.Responses.FileSystemManagement.Thumbnails;
 using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Common.Utilities;
+using Lumina.Presentation.Api.Common.MimeTypes;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Thumbnails.GetThumbnail;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -56,7 +56,7 @@ public class GetThumbnailEndpointTests
         // Assert
         FileContentHttpResult fileResult = Assert.IsType<FileContentHttpResult>(result);
         Assert.Equal(expectedResponse.Bytes, fileResult.FileContents.ToArray());
-        Assert.Equal(MimeTypes.GetMimeType(expectedResponse.Type), fileResult.ContentType);
+        Assert.Equal(ImageMimeTypes.GetMimeType(expectedResponse.Type), fileResult.ContentType);
     }
 
     [Fact]

@@ -7,8 +7,8 @@ using Lumina.Application.Core.FileSystemManagement.Thumbnails.Queries.GetThumbna
 using Lumina.Contracts.Requests.FileSystemManagement.Thumbnails;
 using Lumina.Contracts.Responses.FileSystemManagement.Thumbnails;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Presentation.Api.Common.MimeTypes;
 using Lumina.Presentation.Api.Common.Routes.FileSystemManagement;
-using Lumina.Presentation.Api.Common.Utilities;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
@@ -52,6 +52,6 @@ public class GetThumbnailEndpoint : BaseEndpoint<GetThumbnailRequest, IResult>
     public override async Task<IResult> ExecuteAsync(GetThumbnailRequest request, CancellationToken cancellationToken)
     {
         Result<ThumbnailResponse> result = await _getThumbnailQueryHandler.HandleAsync(request.ToQuery(), cancellationToken).ConfigureAwait(false);
-        return result.Match(success => TypedResults.File(success.Bytes, MimeTypes.GetMimeType(success.Type)), Problem);
+        return result.Match(success => TypedResults.File(success.Bytes, ImageMimeTypes.GetMimeType(success.Type)), Problem);
     }
 }
