@@ -12,10 +12,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.DataAccess.UnitTests.Core.Repositories.BookLibrary.Specifications;
+namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.BookLibrary.Specifications;
 
 /// <summary>
-/// Contains unit tests for the <see cref="BookAlphaFilterSpecification"/> class.
+/// Contains integration tests for the <see cref="BookAlphaFilterSpecification"/> class, exercising it against a real SQLite database.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class BookAlphaFilterSpecificationTests : IDisposable
@@ -29,7 +29,7 @@ public class BookAlphaFilterSpecificationTests : IDisposable
     /// </summary>
     public BookAlphaFilterSpecificationTests()
     {
-        // the specification translates to the SQLite glob() function, so it can only be exercised against a real SQLite database
+        // The specification translates to the SQLite glob() function, so it can only be exercised against a real SQLite database.
         _connection = new SqliteConnection("Data Source=:memory:");
         _connection.Open();
         _context = new LuminaDbContext(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(_connection).Options);

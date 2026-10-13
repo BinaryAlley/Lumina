@@ -14,10 +14,10 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.UnitTests.Core.Repositories.MusicLibrary;
+namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.MusicLibrary;
 
 /// <summary>
-/// Contains unit tests for the <see cref="MusicLibraryScanItemMetadataRepository"/> class.
+/// Contains integration tests for the <see cref="MusicLibraryScanItemMetadataRepository"/> class, exercising it against a real SQLite database.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class MusicLibraryScanItemMetadataRepositoryTests : IDisposable
@@ -32,7 +32,7 @@ public class MusicLibraryScanItemMetadataRepositoryTests : IDisposable
     /// </summary>
     public MusicLibraryScanItemMetadataRepositoryTests()
     {
-        // the repository deletes in bulk, which translates to SQL, so it can only be exercised against a real SQLite database
+        // The repository deletes in bulk, which translates to SQL, so the tests exercise it against a real SQLite database.
         _connection = new SqliteConnection("Data Source=:memory:");
         _connection.Open();
         _context = new LuminaDbContext(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(_connection).Options);
@@ -117,6 +117,26 @@ public class MusicLibraryScanItemMetadataRepositoryTests : IDisposable
         Assert.Equal(Result.Deleted, result.Value);
         MusicLibraryScanItemMetadataEntity remainingItem = Assert.Single(await _context.MusicLibraryScanItemMetadata.ToListAsync());
         Assert.Equal(itemOfAnotherScan.Id, remainingItem.Id);
+    }
+
+    [Fact]
+    public async Task DeleteByLibraryIdAsync_WhenCalled_ShouldDeleteOnlyThatLibrariesStagedMetadata()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        MusicLibraryScanItemMetadataEntity itemOfLibrary = _musicLibraryScanItemMetadataEntityFixture.Create(libraryId: libraryId, path: "/music/queen/bohemian-rhapsody.flac");
+        MusicLibraryScanItemMetadataEntity itemOfAnotherLibrary = _musicLibraryScanItemMetadataEntityFixture.Create(path: "/music/queen/love-of-my-life.flac");
+        _context.MusicLibraryScanItemMetadata.AddRange(itemOfLibrary, itemOfAnotherLibrary);
+        await _context.SaveChangesAsync();
+
+        // Act
+        Result<Deleted> result = await _sut.DeleteByLibraryIdAsync(libraryId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Deleted, result.Value);
+        MusicLibraryScanItemMetadataEntity remainingItem = Assert.Single(await _context.MusicLibraryScanItemMetadata.ToListAsync());
+        Assert.Equal(itemOfAnotherLibrary.Id, remainingItem.Id);
     }
 
     /// <summary>

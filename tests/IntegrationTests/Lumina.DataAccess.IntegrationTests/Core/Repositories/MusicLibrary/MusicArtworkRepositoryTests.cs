@@ -16,10 +16,10 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.UnitTests.Core.Repositories.MusicLibrary;
+namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.MusicLibrary;
 
 /// <summary>
-/// Contains unit tests for the <see cref="MusicArtworkRepository"/> class.
+/// Contains integration tests for the <see cref="MusicArtworkRepository"/> class, exercising it against a real SQLite database.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class MusicArtworkRepositoryTests : IDisposable
@@ -37,7 +37,7 @@ public class MusicArtworkRepositoryTests : IDisposable
     /// </summary>
     public MusicArtworkRepositoryTests()
     {
-        // the repository deletes and updates in bulk, which translates to SQL, so it can only be exercised against a real SQLite database
+        // The repository deletes and updates in bulk, which translates to SQL, so the tests exercise it against a real SQLite database.
         _connection = new SqliteConnection("Data Source=:memory:");
         _connection.Open();
         _context = new LuminaDbContext(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(_connection).Options);
@@ -168,12 +168,144 @@ public class MusicArtworkRepositoryTests : IDisposable
         // Assert
         Assert.False(result.IsFailure);
         Assert.Equal(Result.Updated, result.Value);
-        // the bulk update bypasses the change tracker, so the tracked entities are detached before the stored values are read back
+        // The bulk update bypasses the change tracker, so the tracked entities are detached before the stored values are read back.
         _context.ChangeTracker.Clear();
         Assert.Equal(ArtworkStatus.Pending, (await _context.MusicArtwork.FindAsync(artistArtwork.Id))!.Status);
         Assert.Equal(ArtworkStatus.Pending, (await _context.MusicArtwork.FindAsync(albumArtwork.Id))!.Status);
         Assert.Equal(ArtworkStatus.Pending, (await _context.MusicArtwork.FindAsync(trackArtwork.Id))!.Status);
         Assert.Equal(ArtworkStatus.Enriched, (await _context.MusicArtwork.FindAsync(artworkOfAnotherLibrary.Id))!.Status);
+    }
+
+    [Fact]
+    public async Task DeleteByLibraryIdAsync_WhenCalled_ShouldDeleteOnlyTheArtworkOfTheLibraryItems()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = _artistEntityFixture.Create(libraryId: libraryId, includeAlbums: false, includeContributors: false);
+        AlbumEntity album = _albumEntityFixture.Create(artistId: artist.Id, libraryId: libraryId, includeTracks: false, includeMetadata: false);
+        TrackEntity track = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, includeMetadata: false);
+        ArtistEntity artistOfAnotherLibrary = _artistEntityFixture.Create(includeAlbums: false, includeContributors: false);
+        AlbumEntity albumOfAnotherLibrary = _albumEntityFixture.Create(
+            artistId: artistOfAnotherLibrary.Id, libraryId: artistOfAnotherLibrary.LibraryId, includeTracks: false, includeMetadata: false);
+        TrackEntity trackOfAnotherLibrary = _trackEntityFixture.Create(
+            albumId: albumOfAnotherLibrary.Id, libraryId: artistOfAnotherLibrary.LibraryId, includeMetadata: false);
+        _context.Artists.AddRange(artist, artistOfAnotherLibrary);
+        _context.Albums.AddRange(album, albumOfAnotherLibrary);
+        _context.Tracks.AddRange(track, trackOfAnotherLibrary);
+        MusicArtworkEntity artistArtwork = _musicArtworkEntityFixture.Create(ownerType: MusicArtworkOwnerType.Artist, ownerId: artist.Id);
+        MusicArtworkEntity albumArtwork = _musicArtworkEntityFixture.Create(ownerType: MusicArtworkOwnerType.Album, ownerId: album.Id);
+        MusicArtworkEntity trackArtwork = _musicArtworkEntityFixture.Create(ownerType: MusicArtworkOwnerType.Track, ownerId: track.Id);
+        MusicArtworkEntity artworkOfAnotherLibrary = _musicArtworkEntityFixture.Create(ownerType: MusicArtworkOwnerType.Artist, ownerId: artistOfAnotherLibrary.Id);
+        _context.MusicArtwork.AddRange(artistArtwork, albumArtwork, trackArtwork, artworkOfAnotherLibrary);
+        await _context.SaveChangesAsync();
+
+        // Act
+        Result<Deleted> result = await _sut.DeleteByLibraryIdAsync(libraryId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Deleted, result.Value);
+        _context.ChangeTracker.Clear();
+        // Every artwork owned by an artist, album or track of the library is deleted, while the artwork of another library survives.
+        MusicArtworkEntity remainingArtwork = Assert.Single(await _context.MusicArtwork.ToListAsync());
+        Assert.Equal(artworkOfAnotherLibrary.Id, remainingArtwork.Id);
+    }
+
+    [Fact]
+    public async Task DeleteByLibraryIdAsync_WhenTheLibraryHasNoArtwork_ShouldReturnDeleted()
+    {
+        // Act
+        Result<Deleted> result = await _sut.DeleteByLibraryIdAsync(Guid.NewGuid(), CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Deleted, result.Value);
+    }
+
+    [Fact]
+    public async Task UpsertCoverAsync_WhenNoCoverExists_ShouldInsertANewCoverArtwork()
+    {
+        // Arrange
+        Guid ownerId = Guid.NewGuid();
+        DateTime before = DateTime.UtcNow;
+
+        // Act
+        Result<Updated> result = await _sut.UpsertCoverAsync(MusicArtworkOwnerType.Album, ownerId, "covers/new.jpg", CancellationToken.None);
+        await _context.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Updated, result.Value);
+        MusicArtworkEntity cover = Assert.Single(await _context.MusicArtwork.ToListAsync());
+        Assert.Equal(MusicArtworkOwnerType.Album, cover.OwnerType);
+        Assert.Equal(ownerId, cover.OwnerId);
+        Assert.Equal(ArtworkType.Cover, cover.ArtworkType);
+        Assert.Equal(0, cover.Ordinal);
+        Assert.Equal("covers/new.jpg", cover.FileName);
+        Assert.Equal(ArtworkStatus.Enriched, cover.Status);
+        Assert.Equal(Guid.Empty, cover.CreatedBy);
+        Assert.True(cover.CreatedOnUtc >= before);
+        Assert.Null(cover.UpdatedBy);
+    }
+
+    [Fact]
+    public async Task UpsertCoverAsync_WhenCoverExists_ShouldUpdateItInPlace()
+    {
+        // Arrange
+        Guid ownerId = Guid.NewGuid();
+        MusicArtworkEntity existingCover = _musicArtworkEntityFixture.Create(
+            ownerType: MusicArtworkOwnerType.Album, ownerId: ownerId, artworkType: ArtworkType.Cover, ordinal: 0, fileName: "covers/old.jpg",
+            status: ArtworkStatus.Pending, includeLastUpdateUtc: false);
+        _context.MusicArtwork.Add(existingCover);
+        await _context.SaveChangesAsync();
+        Guid existingCoverId = existingCover.Id;
+        Guid existingCreatedBy = existingCover.CreatedBy;
+        DateTime existingCreatedOnUtc = existingCover.CreatedOnUtc;
+        _context.ChangeTracker.Clear();
+
+        // Act
+        Result<Updated> result = await _sut.UpsertCoverAsync(MusicArtworkOwnerType.Album, ownerId, "covers/new.jpg", CancellationToken.None);
+        await _context.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Updated, result.Value);
+        // The existing cover is updated in place, so no new row is inserted and the creation audit columns are preserved.
+        MusicArtworkEntity cover = Assert.Single(await _context.MusicArtwork.ToListAsync());
+        Assert.Equal(existingCoverId, cover.Id);
+        Assert.Equal("covers/new.jpg", cover.FileName);
+        Assert.Equal(ArtworkStatus.Enriched, cover.Status);
+        Assert.NotNull(cover.LastUpdateUtc);
+        Assert.Equal(existingCreatedBy, cover.CreatedBy);
+        Assert.Equal(existingCreatedOnUtc, cover.CreatedOnUtc);
+    }
+
+    [Fact]
+    public async Task UpsertCoverAsync_WhenTheCoverHasANonZeroOrdinal_ShouldUpdateItInPlaceInsteadOfInsertingASecondCover()
+    {
+        // Arrange
+        Guid ownerId = Guid.NewGuid();
+        // The callers resolve the existing cover by artwork type only, so a cover stored with an ordinal other than zero must still be the one replaced.
+        MusicArtworkEntity existingCover = _musicArtworkEntityFixture.Create(
+            ownerType: MusicArtworkOwnerType.Album, ownerId: ownerId, artworkType: ArtworkType.Cover, ordinal: 3, fileName: "covers/old.jpg",
+            status: ArtworkStatus.Pending, includeLastUpdateUtc: false);
+        _context.MusicArtwork.Add(existingCover);
+        await _context.SaveChangesAsync();
+        Guid existingCoverId = existingCover.Id;
+        _context.ChangeTracker.Clear();
+
+        // Act
+        Result<Updated> result = await _sut.UpsertCoverAsync(MusicArtworkOwnerType.Album, ownerId, "covers/new.jpg", CancellationToken.None);
+        await _context.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Updated, result.Value);
+        MusicArtworkEntity cover = Assert.Single(await _context.MusicArtwork.ToListAsync());
+        Assert.Equal(existingCoverId, cover.Id);
+        Assert.Equal(3, cover.Ordinal);
+        Assert.Equal("covers/new.jpg", cover.FileName);
+        Assert.Equal(ArtworkStatus.Enriched, cover.Status);
     }
 
     /// <summary>
