@@ -42,7 +42,7 @@ internal sealed class BookAlphaFilterSpecification : FilterSpecification<BookEnt
     /// <returns>An expression tree that can be used to evaluate whether a <see cref="BookEntity"/> satisfies the specification criteria.</returns>
     public override Expression<Func<BookEntity, bool>> ToExpression()
     {
-        // when no alpha key was requested, every book matches
+        // When no alpha key was requested, every book matches.
         if (_filterAlphaKey is null)
             return book => true;
 
@@ -55,7 +55,7 @@ internal sealed class BookAlphaFilterSpecification : FilterSpecification<BookEnt
         if (_filterAlphaKey == LibraryItemAlphaKeys.SYMBOL)
             return BuildSymbolPredicate(book, effectiveTitle);
 
-        // the alpha key is a single ASCII letter
+        // The alpha key is a single ASCII letter.
         string globPattern = char.ToLowerInvariant(_filterAlphaKey[0]) + "*";
         return BuildGlobPredicate(book, effectiveTitle, globPattern);
     }
@@ -70,7 +70,7 @@ internal sealed class BookAlphaFilterSpecification : FilterSpecification<BookEnt
     {
         Expression titleProperty = Expression.Property(book, nameof(BookEntity.Title));
 
-        // the raw title: the title, unless it is null or empty, in which case the original title (or an empty string) is used
+        // The raw title is the title, unless it is null or empty, in which case the original title (or an empty string) is used.
         BinaryExpression isTitleMissing = Expression.OrElse(
             Expression.Equal(titleProperty, Expression.Constant(null, typeof(string))),
             Expression.Equal(titleProperty, Expression.Constant(string.Empty)));
@@ -80,7 +80,7 @@ internal sealed class BookAlphaFilterSpecification : FilterSpecification<BookEnt
 
         MethodCallExpression lowerTitle = Expression.Call(rawTitle, s_toLowerMethod);
 
-        // when ignoring the "The " prefix, strip a leading "the " from the lowercased title
+        // When ignoring the "The " prefix, a leading "the " is stripped from the lowercased title.
         Expression effectiveTitle = lowerTitle;
         if (_shouldIgnoreThePrefixForAlphaPicker)
         {
