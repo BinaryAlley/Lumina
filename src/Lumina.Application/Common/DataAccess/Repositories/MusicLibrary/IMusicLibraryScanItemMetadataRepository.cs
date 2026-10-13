@@ -32,4 +32,12 @@ public interface IMusicLibraryScanItemMetadataRepository : IRepository<MusicLibr
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     Task<Result<Deleted>> DeleteByScanIdAsync(Guid scanId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Deletes all the staged music metadata items of the media library identified by <paramref name="libraryId"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose staged music metadata is deleted.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Deleted>> DeleteByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken);
 }

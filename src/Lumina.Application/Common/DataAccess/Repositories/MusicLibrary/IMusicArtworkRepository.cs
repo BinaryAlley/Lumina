@@ -46,4 +46,23 @@ public interface IMusicArtworkRepository : IRepository<MusicArtworkEntity>,
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     Task<Result<Updated>> ResetStatusForLibraryAsync(Guid libraryId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Deletes all the pieces of artwork owned by the artists, albums and tracks of the media library identified by <paramref name="libraryId"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose artwork is deleted.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Deleted>> DeleteByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Stores the cover image of the music library item of the provided <paramref name="ownerType"/> identified by <paramref name="ownerId"/>,
+    /// replacing the file of its existing cover, or adding a new cover artwork when it has none.
+    /// </summary>
+    /// <param name="ownerType">The type of the music library item that owns the artwork.</param>
+    /// <param name="ownerId">The Id of the music library item that owns the artwork.</param>
+    /// <param name="fileName">The relative file name of the stored cover image.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Updated>> UpsertCoverAsync(MusicArtworkOwnerType ownerType, Guid ownerId, string fileName, CancellationToken cancellationToken);
 }

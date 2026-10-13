@@ -78,4 +78,12 @@ public interface IArtistRepository : IRepository<ArtistEntity>,
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     Task<Result<Updated>> ResetMetadataStatusForLibraryAsync(Guid libraryId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Deletes all the artists of the media library identified by <paramref name="libraryId"/>, together with their albums and tracks and their related data.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose artists are deleted.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Deleted>> DeleteByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken);
 }

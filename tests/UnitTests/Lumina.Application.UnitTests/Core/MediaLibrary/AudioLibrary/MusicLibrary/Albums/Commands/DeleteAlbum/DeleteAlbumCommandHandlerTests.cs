@@ -9,6 +9,7 @@ using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Albums.Commands.DeleteAlbum;
+using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artwork;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Fixtures.Core.MediaLibrary.AudioLibrary.MusicLibrary.Albums.Commands.DeleteAlbum;
@@ -35,6 +36,7 @@ public class DeleteAlbumCommandHandlerTests
     private readonly IUnitOfWork _mockUnitOfWork;
     private readonly IArtistRepository _mockArtistRepository;
     private readonly ILibraryRepository _mockLibraryRepository;
+    private readonly IMusicArtworkCleanupService _mockMusicArtworkCleanupService;
     private readonly IAuthorizationService _mockAuthorizationService;
     private readonly ICurrentUserService _mockCurrentUserService;
     private readonly IValidator<DeleteAlbumCommand> _mockValidator;
@@ -55,24 +57,27 @@ public class DeleteAlbumCommandHandlerTests
         _mockLibraryRepository = Substitute.For<ILibraryRepository>();
         _mockUnitOfWork.ArtistRepository.Returns(_mockArtistRepository);
         _mockUnitOfWork.LibraryRepository.Returns(_mockLibraryRepository);
+        _mockMusicArtworkCleanupService = Substitute.For<IMusicArtworkCleanupService>();
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockValidator = Substitute.For<IValidator<DeleteAlbumCommand>>();
         _userId = Guid.NewGuid();
 
-        // Default stubs: the command is valid, the current user is authenticated, the ownership policy allows the deletion, the library exists, the artist update succeeds and saving changes succeeds.
+        // Default stubs: the command is valid, the current user is authenticated, the ownership policy allows the deletion, the library exists, the artist update succeeds, the artwork cleanup succeeds and saving changes succeeds.
         _mockValidator.Validate(Arg.Any<DeleteAlbumCommand>()).Returns([]);
         _mockCurrentUserService.UserId.Returns(_userId);
         _mockAuthorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(_userId, Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>())
             .Returns(true);
         _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
             .Returns(_ => Result.From<LibraryEntity?>(_libraryEntityFixture.Create()));
+        _mockMusicArtworkCleanupService.DeleteAlbumArtworkAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Deleted);
         _mockArtistRepository.UpdateAsync(Arg.Any<ArtistEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Updated);
         _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>())
             .Returns(Result.Success);
 
-        _sut = new DeleteAlbumCommandHandler(_mockUnitOfWork, _mockAuthorizationService, _mockCurrentUserService, _mockValidator);
+        _sut = new DeleteAlbumCommandHandler(_mockUnitOfWork, _mockMusicArtworkCleanupService, _mockAuthorizationService, _mockCurrentUserService, _mockValidator);
     }
 
     [Fact]
@@ -92,6 +97,13 @@ public class DeleteAlbumCommandHandlerTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.Equal(Result.Deleted, result.Value);
+        // The artwork of the album and of its tracks is removed before the album is removed from the artist aggregate, so that no artwork is orphaned.
+        await _mockMusicArtworkCleanupService.Received(1).DeleteAlbumArtworkAsync(albumId, Arg.Any<CancellationToken>());
+        Received.InOrder(() =>
+        {
+            _mockMusicArtworkCleanupService.DeleteAlbumArtworkAsync(albumId, Arg.Any<CancellationToken>());
+            _mockArtistRepository.UpdateAsync(Arg.Any<ArtistEntity>(), Arg.Any<CancellationToken>());
+        });
         await _mockArtistRepository.Received(1).UpdateAsync(
             Arg.Is<ArtistEntity>(updatedArtist =>
                 updatedArtist.Id == artistId &&
@@ -117,6 +129,7 @@ public class DeleteAlbumCommandHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(DomainErrors.Music.AlbumIdCannotBeEmpty, result.FirstError);
         await _mockArtistRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
+        await _mockMusicArtworkCleanupService.DidNotReceive().DeleteAlbumArtworkAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockArtistRepository.DidNotReceive().UpdateAsync(Arg.Any<ArtistEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
@@ -323,6 +336,30 @@ public class DeleteAlbumCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(DomainErrors.Music.ArtistMustHaveAtLeastOneAlbum, result.FirstError);
+        await _mockMusicArtworkCleanupService.DidNotReceive().DeleteAlbumArtworkAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockArtistRepository.DidNotReceive().UpdateAsync(Arg.Any<ArtistEntity>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenArtworkCleanupFails_ShouldReturnErrorWithoutUpdatingTheArtist()
+    {
+        // Arrange
+        DeleteAlbumCommand command = _deleteAlbumCommandFixture.Create();
+        Guid libraryId = Guid.Parse(command.LibraryId!);
+        Guid artistId = Guid.Parse(command.ArtistId!);
+        Guid albumId = Guid.Parse(command.AlbumId!);
+        StubExistingArtist(CreateArtistWithAlbums(libraryId, artistId, albumId, Guid.NewGuid()));
+        Error error = Error.Failure(description: "Failed to delete the artwork");
+        _mockMusicArtworkCleanupService.DeleteAlbumArtworkAsync(albumId, Arg.Any<CancellationToken>())
+            .Returns(error);
+
+        // Act
+        Result<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(error, result.FirstError);
         await _mockArtistRepository.DidNotReceive().UpdateAsync(Arg.Any<ArtistEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }

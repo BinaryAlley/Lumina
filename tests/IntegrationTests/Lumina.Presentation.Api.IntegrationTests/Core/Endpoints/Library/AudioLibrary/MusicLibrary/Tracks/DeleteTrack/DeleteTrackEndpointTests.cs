@@ -6,12 +6,14 @@ using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioL
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.DataAccess.Core.UoW;
+using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.DeleteTrack;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
@@ -40,6 +42,7 @@ public class DeleteTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     private readonly ArtistEntityFixture _artistEntityFixture = new();
     private readonly AlbumEntityFixture _albumEntityFixture = new();
     private readonly TrackEntityFixture _trackEntityFixture = new();
+    private readonly MusicArtworkEntityFixture _musicArtworkEntityFixture = new();
     private readonly UserEntityFixture _userEntityFixture = new();
 
     /// <summary>
@@ -79,6 +82,26 @@ public class DeleteTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         // The album and the artist that contained the track are preserved.
         Assert.NotNull(await dbContext.Albums.FirstOrDefaultAsync(album => album.Id == albumId));
         Assert.NotNull(await dbContext.Artists.FirstOrDefaultAsync(artist => artist.Id == artistId));
+    }
+
+    [Fact]
+    public async Task DeleteTrack_WhenTrackHasStoredArtwork_ShouldRemoveItsArtworkRecords()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        (Guid libraryId, Guid artistId, Guid albumId, Guid trackId) = await SeedLibraryArtistAlbumAndTrackAsync(userId, "Bohemian Rhapsody", "/music/queen/bohemian-rhapsody.flac");
+        await SeedArtworkAsync(MusicArtworkOwnerType.Track, trackId, "media/music/queen/bohemian-rhapsody.jpg");
+
+        // Act
+        HttpResponseMessage response = await _client.DeleteAsync($"/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        // The artwork of the track does not cascade from the track row, so it is removed together with the track.
+        Assert.Null(await dbContext.MusicArtwork.FirstOrDefaultAsync(artwork => artwork.OwnerType == MusicArtworkOwnerType.Track && artwork.OwnerId == trackId));
     }
 
     [Fact]
@@ -229,10 +252,12 @@ public class DeleteTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
 
         // Assert
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
-        using JsonDocument problemDetails = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-        Assert.Equal("General.Unauthorized", problemDetails.RootElement.GetProperty("title").GetString());
-        Assert.Equal("NotAuthorized", problemDetails.RootElement.GetProperty("detail").GetString());
-        Assert.DoesNotContain("Exception", problemDetails.RootElement.GetRawText(), StringComparison.Ordinal);
+        string content = await response.Content.ReadAsStringAsync();
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Unauthorized", problemDetails!["title"].GetString());
+        Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
+        Assert.DoesNotContain("Exception", content, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -258,8 +283,9 @@ public class DeleteTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         // The route value is kept as a raw string, so the unparseable Id reaches the command validator, which reports a clean validation error instead of failing the request binding.
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        using JsonDocument problemDetails = JsonDocument.Parse(content);
-        Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Validation", problemDetails!["title"].GetString());
         Assert.Contains("LibraryIdCannotBeEmpty", content, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -272,8 +298,9 @@ public class DeleteTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         // Assert
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        using JsonDocument problemDetails = JsonDocument.Parse(content);
-        Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Validation", problemDetails!["title"].GetString());
         Assert.Contains("ArtistIdCannotBeEmpty", content, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -286,8 +313,9 @@ public class DeleteTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         // Assert
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        using JsonDocument problemDetails = JsonDocument.Parse(content);
-        Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Validation", problemDetails!["title"].GetString());
         Assert.Contains("AlbumIdCannotBeEmpty", content, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -300,9 +328,25 @@ public class DeleteTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         // Assert
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        using JsonDocument problemDetails = JsonDocument.Parse(content);
-        Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Validation", problemDetails!["title"].GetString());
         Assert.Contains("TrackIdCannotBeEmpty", content, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Seeds a piece of stored artwork owned by the music library item identified by <paramref name="ownerId"/>.
+    /// </summary>
+    /// <param name="ownerType">The type of the music library item that owns the artwork.</param>
+    /// <param name="ownerId">The Id of the music library item that owns the artwork.</param>
+    /// <param name="fileName">The relative file name of the stored artwork.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    private async Task SeedArtworkAsync(MusicArtworkOwnerType ownerType, Guid ownerId, string fileName)
+    {
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        dbContext.MusicArtwork.Add(_musicArtworkEntityFixture.Create(ownerType: ownerType, ownerId: ownerId, fileName: fileName));
+        await dbContext.SaveChangesAsync();
     }
 
     /// <summary>

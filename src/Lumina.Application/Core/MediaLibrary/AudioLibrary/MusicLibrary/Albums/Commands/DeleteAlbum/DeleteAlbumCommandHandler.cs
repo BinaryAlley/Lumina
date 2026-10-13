@@ -8,6 +8,7 @@ using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
+using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artwork;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Entities;
@@ -28,6 +29,7 @@ namespace Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Albums.
 public class DeleteAlbumCommandHandler : ICommandHandler<DeleteAlbumCommand, Result<Deleted>>
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IMusicArtworkCleanupService _musicArtworkCleanupService;
     private readonly IAuthorizationService _authorizationService;
     private readonly ICurrentUserService _currentUserService;
     private readonly IValidator<DeleteAlbumCommand> _validator;
@@ -36,12 +38,14 @@ public class DeleteAlbumCommandHandler : ICommandHandler<DeleteAlbumCommand, Res
     /// Initializes a new instance of the <see cref="DeleteAlbumCommandHandler"/> class.
     /// </summary>
     /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
+    /// <param name="musicArtworkCleanupService">Injected service for removing the artwork of a music library item and of its children.</param>
     /// <param name="authorizationService">Injected service for authorization related functionality.</param>
     /// <param name="currentUserService">Injected service to retrieve the current user information.</param>
     /// <param name="validator">Injected validator for application validation rules.</param>
-    public DeleteAlbumCommandHandler(IUnitOfWork unitOfWork, IAuthorizationService authorizationService, ICurrentUserService currentUserService, IValidator<DeleteAlbumCommand> validator)
+    public DeleteAlbumCommandHandler(IUnitOfWork unitOfWork, IMusicArtworkCleanupService musicArtworkCleanupService, IAuthorizationService authorizationService, ICurrentUserService currentUserService, IValidator<DeleteAlbumCommand> validator)
     {
         _unitOfWork = unitOfWork;
+        _musicArtworkCleanupService = musicArtworkCleanupService;
         _authorizationService = authorizationService;
         _currentUserService = currentUserService;
         _validator = validator;
@@ -114,6 +118,12 @@ public class DeleteAlbumCommandHandler : ICommandHandler<DeleteAlbumCommand, Res
         Result<Deleted> removeAlbumResult = artistResult.Value.RemoveAlbum(domainAlbum);
         if (removeAlbumResult.IsFailure)
             return removeAlbumResult.Errors;
+
+        // The artwork of the album and of its tracks does not cascade from the album row, because the artwork table is shared by all the music
+        // library item types, so it is removed first, while the album and its tracks are still present.
+        Result<Deleted> deleteArtworkResult = await _musicArtworkCleanupService.DeleteAlbumArtworkAsync(albumId, cancellationToken).ConfigureAwait(false);
+        if (deleteArtworkResult.IsFailure)
+            return deleteArtworkResult.Errors;
 
         Result<Updated> updateResult = await _unitOfWork.ArtistRepository
             .UpdateAsync(artistResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);

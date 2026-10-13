@@ -123,4 +123,12 @@ public interface IBookRepository : IRepository<BookEntity>,
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either the display names of the authors of the books, keyed by book Id, or an error.</returns>
     Task<Result<IReadOnlyDictionary<Guid, string?>>> GetAuthorsDisplayNamesByBookIdsAsync(IReadOnlyCollection<Guid> bookIds, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Deletes all the books of the media library identified by <paramref name="libraryId"/>, together with their artwork and their related data.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose books are deleted.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Deleted>> DeleteByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken);
 }
