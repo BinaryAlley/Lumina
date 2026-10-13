@@ -15,6 +15,7 @@ using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
@@ -44,6 +45,7 @@ public class AlbumRepositoryTests
     private readonly TagEntityFixture _tagEntityFixture = new();
     private readonly GenreEntityFixture _genreEntityFixture = new();
     private readonly ArtistEntityFixture _artistEntityFixture = new();
+    private readonly MusicArtworkEntityFixture _musicArtworkEntityFixture = new();
     private readonly PaginationDataDtoFixture _paginationDataDtoFixture = new();
 
     [Fact]
@@ -599,6 +601,112 @@ public class AlbumRepositoryTests
         Assert.Equal(expectedCurrentPage, result.Value.CurrentPage);
         Assert.Equal(perPage, result.Value.PerPage);
         Assert.Equal(expectedRowCount, result.Value.Data.Count);
+    }
+
+    [Fact]
+    public async Task GetAlbumsLiteByArtistIdAsync_WhenReReleaseYearIsSet_ShouldProjectItAsReleaseYear()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-lite-releaseyear-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        AlbumRepository sut = CreateAlbumRepository(context);
+
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId);
+        AlbumEntity album = _albumEntityFixture.Create(
+            artistId: artist.Id, libraryId: libraryId, originalReleaseYear: 1975, reReleaseYear: 2011, includeTracks: false, includeMetadata: false);
+        context.Albums.Add(album);
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<PaginatedResultDto<AlbumLiteRow>> result = await sut.GetAlbumsLiteByArtistIdAsync(artist.Id, null, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        AlbumLiteRow row = Assert.Single(result.Value.Data);
+        Assert.Equal(2011, row.ReleaseYear);
+    }
+
+    [Fact]
+    public async Task GetAlbumsLiteByArtistIdAsync_WhenReReleaseYearIsNull_ShouldFallBackToOriginalReleaseYear()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-lite-originalyear-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        AlbumRepository sut = CreateAlbumRepository(context);
+
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId);
+        AlbumEntity album = _albumEntityFixture.Create(
+            artistId: artist.Id, libraryId: libraryId, originalReleaseYear: 1975, includeReReleaseYear: false, includeTracks: false, includeMetadata: false);
+        context.Albums.Add(album);
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<PaginatedResultDto<AlbumLiteRow>> result = await sut.GetAlbumsLiteByArtistIdAsync(artist.Id, null, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        AlbumLiteRow row = Assert.Single(result.Value.Data);
+        Assert.Equal(1975, row.ReleaseYear);
+    }
+
+    [Fact]
+    public async Task GetAlbumsLiteByArtistIdAsync_WhenTheReleaseHasTypes_ShouldProjectThem()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-lite-releasetypes-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        AlbumRepository sut = CreateAlbumRepository(context);
+
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId);
+        AlbumEntity album = _albumEntityFixture.Create(
+            artistId: artist.Id, libraryId: libraryId, releaseType: MusicReleaseType.Single, includeTracks: false, includeMetadata: false);
+        context.Albums.Add(album);
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<PaginatedResultDto<AlbumLiteRow>> result = await sut.GetAlbumsLiteByArtistIdAsync(artist.Id, null, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        AlbumLiteRow row = Assert.Single(result.Value.Data);
+        Assert.NotNull(row.ReleaseTypes);
+        Assert.Equal(MusicReleaseType.Single, Assert.Single(row.ReleaseTypes));
+    }
+
+    [Fact]
+    public async Task GetAlbumsLiteByArtistIdAsync_WhenCoverArtworkExists_ShouldProjectTheCoverPath()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-lite-cover-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        AlbumRepository sut = CreateAlbumRepository(context);
+
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId);
+        AlbumEntity album = _albumEntityFixture.Create(artistId: artist.Id, libraryId: libraryId, includeTracks: false, includeMetadata: false);
+        context.Albums.Add(album);
+        context.MusicArtwork.Add(
+            _musicArtworkEntityFixture.Create(ownerType: MusicArtworkOwnerType.Album, ownerId: album.Id, artworkType: ArtworkType.Cover, fileName: "covers/opera.jpg"));
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<PaginatedResultDto<AlbumLiteRow>> result = await sut.GetAlbumsLiteByArtistIdAsync(artist.Id, null, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        AlbumLiteRow row = Assert.Single(result.Value.Data);
+        Assert.Equal("covers/opera.jpg", row.CoverPath);
     }
 
     /// <summary>

@@ -1,9 +1,11 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.DataAccess.Core.UoW;
+using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.DeleteArtist;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
@@ -35,6 +37,9 @@ public class DeleteArtistEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     };
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly ArtistEntityFixture _artistEntityFixture = new();
+    private readonly AlbumEntityFixture _albumEntityFixture = new();
+    private readonly TrackEntityFixture _trackEntityFixture = new();
+    private readonly MusicArtworkEntityFixture _musicArtworkEntityFixture = new();
     private readonly UserEntityFixture _userEntityFixture = new();
 
     /// <summary>
@@ -71,6 +76,33 @@ public class DeleteArtistEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         Assert.Null(await dbContext.Artists.FirstOrDefaultAsync(artist => artist.Id == artistId));
+    }
+
+    [Fact]
+    public async Task DeleteArtist_WhenArtistHasStoredArtwork_ShouldRemoveTheArtworkOfTheArtistAndOfItsChildren()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        (Guid libraryId, Guid artistId, Guid albumId, Guid trackId) = await SeedLibraryArtistAlbumAndTrackAsync(userId);
+        await SeedArtworkAsync(MusicArtworkOwnerType.Artist, artistId, "media/music/queen/artist.jpg");
+        await SeedArtworkAsync(MusicArtworkOwnerType.Album, albumId, "media/music/queen/album.jpg");
+        await SeedArtworkAsync(MusicArtworkOwnerType.Track, trackId, "media/music/queen/track.jpg");
+
+        // Act
+        HttpResponseMessage response = await _client.DeleteAsync($"/api/v1/libraries/{libraryId}/artists/{artistId}");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        // The artist takes its albums and their tracks with it, and the artwork of all of them does not cascade, so it is removed together with the artist.
+        Assert.Null(await dbContext.Artists.FirstOrDefaultAsync(artist => artist.Id == artistId));
+        Assert.Null(await dbContext.Albums.FirstOrDefaultAsync(album => album.Id == albumId));
+        Assert.Null(await dbContext.Tracks.FirstOrDefaultAsync(track => track.Id == trackId));
+        Assert.Null(await dbContext.MusicArtwork.FirstOrDefaultAsync(artwork => artwork.OwnerType == MusicArtworkOwnerType.Artist && artwork.OwnerId == artistId));
+        Assert.Null(await dbContext.MusicArtwork.FirstOrDefaultAsync(artwork => artwork.OwnerType == MusicArtworkOwnerType.Album && artwork.OwnerId == albumId));
+        Assert.Null(await dbContext.MusicArtwork.FirstOrDefaultAsync(artwork => artwork.OwnerType == MusicArtworkOwnerType.Track && artwork.OwnerId == trackId));
     }
 
     [Fact]
@@ -163,6 +195,61 @@ public class DeleteArtistEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     /// </summary>
     /// <param name="userId">The Id of the user that owns the library.</param>
     /// <returns>The Id of the seeded library.</returns>
+    /// <summary>
+    /// Seeds a library owned by <paramref name="userId"/>, an artist of that library, an album of that artist and a track of that album.
+    /// </summary>
+    /// <param name="userId">The Id of the user that owns the library.</param>
+    /// <returns>The Ids of the seeded library, artist, album and track.</returns>
+    private async Task<(Guid libraryId, Guid artistId, Guid albumId, Guid trackId)> SeedLibraryArtistAlbumAndTrackAsync(Guid userId)
+    {
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        Guid libraryId = Guid.NewGuid();
+        Guid artistId = Guid.NewGuid();
+        Guid albumId = Guid.NewGuid();
+        Guid trackId = Guid.NewGuid();
+        TrackEntity track = _trackEntityFixture.Create(
+            id: trackId,
+            albumId: albumId,
+            libraryId: libraryId,
+            includeMetadata: false,
+            includeOriginalReleaseDate: false,
+            includeOriginalReleaseYear: false,
+            includeReReleaseDate: false,
+            includeReReleaseYear: false);
+        AlbumEntity album = _albumEntityFixture.Create(
+            id: albumId,
+            artistId: artistId,
+            libraryId: libraryId,
+            title: "A Night at the Opera",
+            tracks: [track],
+            includeMetadata: false,
+            includeBarcode: false,
+            includeOriginalReleaseDate: false,
+            includeOriginalReleaseYear: false,
+            includeReReleaseDate: false,
+            includeReReleaseYear: false);
+        dbContext.Libraries.Add(_libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Queen Library", libraryType: LibraryType.Music, contentLocations: []));
+        dbContext.Artists.Add(_artistEntityFixture.Create(id: artistId, libraryId: libraryId, name: "Queen", albums: [album], includeContributors: false));
+        await dbContext.SaveChangesAsync();
+        return (libraryId, artistId, albumId, trackId);
+    }
+
+    /// <summary>
+    /// Seeds a piece of stored artwork owned by the music library item identified by <paramref name="ownerId"/>.
+    /// </summary>
+    /// <param name="ownerType">The type of the music library item that owns the artwork.</param>
+    /// <param name="ownerId">The Id of the music library item that owns the artwork.</param>
+    /// <param name="fileName">The relative file name of the stored artwork.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    private async Task SeedArtworkAsync(MusicArtworkOwnerType ownerType, Guid ownerId, string fileName)
+    {
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        dbContext.MusicArtwork.Add(_musicArtworkEntityFixture.Create(ownerType: ownerType, ownerId: ownerId, fileName: fileName));
+        await dbContext.SaveChangesAsync();
+    }
+
     private async Task<Guid> SeedLibraryAsync(Guid userId)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();

@@ -567,7 +567,7 @@ public class TrackRepositoryTests
 
         List<TrackEntity> albumTracks = [firstDiscFirstTrack, firstDiscSecondTrack, secondDiscTrack];
         Guid[] expectedOrder = [.. albumTracks
-            .OrderBy(track => track.DiscNumber)
+            .OrderBy(track => track.DiscNumber ?? 1)
             .ThenBy(track => track.TrackNumber)
             .ThenBy(track => track.Id)
             .Select(track => track.Id)];
@@ -634,6 +634,34 @@ public class TrackRepositoryTests
         Assert.Equal(3, page.PerPage);
         Assert.Equal(1, page.NumberOfPages);
         Assert.DoesNotContain(page.Data, row => row.Id == trackOfAnotherAlbum.Id);
+        Assert.Equal(tracks.Select(track => track.DurationInSeconds), page.Data.Select(row => row.DurationInSeconds));
+    }
+
+    [Fact]
+    public async Task GetTracksLiteByAlbumIdAsync_WhenATrackHasNoDiscNumber_ShouldTreatItAsTheFirstDisc()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-lite-nodisc-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        TrackRepository sut = new(context);
+
+        Guid libraryId = Guid.NewGuid();
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId);
+        TrackEntity secondTrackWithoutDiscNumber = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, path: "/music/queen/second.flac", trackNumber: 2, includeMetadata: false);
+        secondTrackWithoutDiscNumber.DiscNumber = null;
+        TrackEntity thirdTrack = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, path: "/music/queen/third.flac", trackNumber: 3, includeMetadata: false);
+        thirdTrack.DiscNumber = 1;
+        context.Tracks.AddRange(secondTrackWithoutDiscNumber, thirdTrack);
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<PaginatedResultDto<TrackLiteRow>> result = await sut.GetTracksLiteByAlbumIdAsync(album.Id, null, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal([secondTrackWithoutDiscNumber.Id, thirdTrack.Id], result.Value.Data.Select(row => row.Id));
     }
 
     [Theory]
@@ -684,6 +712,60 @@ public class TrackRepositoryTests
         Assert.Equal(expectedCurrentPage, page.CurrentPage);
         Assert.Equal(perPage, page.PerPage);
         Assert.Equal(expectedRowCount, page.Data.Count);
+    }
+
+    [Fact]
+    public async Task GetByAlbumIdAsync_WhenATrackHasNoDiscNumber_ShouldTreatItAsTheFirstDisc()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-nodisc-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        TrackRepository sut = new(context);
+
+        Guid libraryId = Guid.NewGuid();
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId);
+        TrackEntity secondDiscTrack = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, path: "/music/queen/second-disc.flac", trackNumber: 1, includeMetadata: false);
+        secondDiscTrack.DiscNumber = 2;
+        TrackEntity trackWithoutDiscNumber = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, path: "/music/queen/first-disc.flac", trackNumber: 2, includeMetadata: false);
+        trackWithoutDiscNumber.DiscNumber = null;
+        context.Tracks.AddRange(secondDiscTrack, trackWithoutDiscNumber);
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<TrackEntity>> result = await sut.GetByAlbumIdAsync(album.Id, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        // A track without a disc number belongs to the first disc, so it is ordered before the tracks of disc 2.
+        Assert.Equal([trackWithoutDiscNumber.Id, secondDiscTrack.Id], result.Value.Select(track => track.Id));
+    }
+
+    [Fact]
+    public async Task GetTracksLiteByAlbumIdAsync_WhenCalled_ShouldProjectTheDurationInSeconds()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-lite-duration-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        TrackRepository sut = new(context);
+
+        Guid libraryId = Guid.NewGuid();
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId);
+        TrackEntity track = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, path: "/music/queen/the-prophet-song.flac", includeMetadata: false);
+        track.DurationInSeconds = 367;
+        context.Tracks.Add(track);
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<PaginatedResultDto<TrackLiteRow>> result = await sut.GetTracksLiteByAlbumIdAsync(album.Id, null, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        TrackLiteRow row = Assert.Single(result.Value.Data);
+        Assert.Equal(367, row.DurationInSeconds);
     }
 
     /// <summary>

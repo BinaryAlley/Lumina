@@ -40,7 +40,7 @@ public class RegisterViewEndpoint : BaseEndpoint<EmptyRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override Task<IResult> ExecuteAsync(EmptyRequest request, CancellationToken cancellationToken)
     {
-        // check if this is the initial super admin setup
+        // Check if this is the initial super admin setup.
         string? isPendingSuperAdminSetup = HttpContext.Session.GetString(HttpContextItemKeys.PENDING_SUPER_ADMIN_SETUP);
         string registrationType = isPendingSuperAdminSetup == "true" ? "Admin" : "User";
         Dictionary<string, object?> viewData = new() { ["RegistrationType"] = registrationType };

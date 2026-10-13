@@ -22,14 +22,19 @@ public class ArtistLiteResponseFixture
     /// </summary>
     /// <param name="id">Optional. The Id of the artist.</param>
     /// <param name="name">Optional. The name of the artist.</param>
+    /// <param name="coverPath">Optional. The path of the image representing the artist.</param>
+    /// <param name="includeCoverPath">Whether the cover path should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="ArtistLiteResponse"/>.</returns>
     public ArtistLiteResponse Create(
         Guid? id = null,
-        string? name = null)
+        string? name = null,
+        string? coverPath = null,
+        bool includeCoverPath = true)
     {
         return new ArtistLiteResponse(
             id ?? Guid.NewGuid(),
-            name ?? _faker.Name.FullName());
+            name ?? _faker.Name.FullName(),
+            includeCoverPath ? (coverPath ?? _faker.System.FilePath()) : null);
     }
 
     /// <summary>

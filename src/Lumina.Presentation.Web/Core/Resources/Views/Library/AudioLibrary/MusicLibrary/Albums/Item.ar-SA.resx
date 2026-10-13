@@ -1,0 +1,1509 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="BackToArtist" xml:space="preserve">
+    <value>العودة إلى الفنان</value>
+  </data>
+  <data name="EditAlbum" xml:space="preserve">
+    <value>تعديل الألبوم</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>حفظ</value>
+  </data>
+  <data name="AlbumSaved" xml:space="preserve">
+    <value>تم حفظ الألبوم.</value>
+  </data>
+  <data name="SaveFailed" xml:space="preserve">
+    <value>تعذر حفظ العنصر.</value>
+  </data>
+  <data name="DeleteAlbum" xml:space="preserve">
+    <value>حذف الألبوم</value>
+  </data>
+  <data name="AlbumDeleted" xml:space="preserve">
+    <value>تم حذف الألبوم.</value>
+  </data>
+  <data name="DeleteConfirm" xml:space="preserve">
+    <value>هل أنت متأكد من أنك تريد حذف هذا العنصر؟</value>
+  </data>
+  <data name="DeleteFailed" xml:space="preserve">
+    <value>تعذر حذف العنصر.</value>
+  </data>
+  <data name="GeneralInformation" xml:space="preserve">
+    <value>معلومات عامة</value>
+  </data>
+  <data name="AlbumTitle" xml:space="preserve">
+    <value>العنوان</value>
+  </data>
+  <data name="AlbumOriginalTitle" xml:space="preserve">
+    <value>العنوان الأصلي</value>
+  </data>
+  <data name="AlbumDescription" xml:space="preserve">
+    <value>الوصف</value>
+  </data>
+  <data name="AlbumDisambiguation" xml:space="preserve">
+    <value>إزالة الالتباس</value>
+  </data>
+  <data name="AlbumScript" xml:space="preserve">
+    <value>الكتابة</value>
+  </data>
+  <data name="AlbumReleaseStatus" xml:space="preserve">
+    <value>حالة الإصدار</value>
+  </data>
+  <data name="AlbumTotalDiscs" xml:space="preserve">
+    <value>إجمالي الأقراص</value>
+  </data>
+  <data name="AlbumTotalTracks" xml:space="preserve">
+    <value>إجمالي المقاطع</value>
+  </data>
+  <data name="AlbumReleaseTitle" xml:space="preserve">
+    <value>عنوان الإصدار</value>
+  </data>
+  <data name="AlbumMediaFormat" xml:space="preserve">
+    <value>صيغة الوسائط</value>
+  </data>
+  <data name="AlbumPackaging" xml:space="preserve">
+    <value>التغليف</value>
+  </data>
+  <data name="AlbumBarcode" xml:space="preserve">
+    <value>الباركود</value>
+  </data>
+  <data name="AlbumCatalogNumbers" xml:space="preserve">
+    <value>أرقام الكتالوج</value>
+  </data>
+  <data name="AlbumLabel" xml:space="preserve">
+    <value>الشركة</value>
+  </data>
+  <data name="AlbumAsin" xml:space="preserve">
+    <value>ASIN</value>
+  </data>
+  <data name="AlbumMusicBrainzReleaseId" xml:space="preserve">
+    <value>معرّف إصدار MusicBrainz</value>
+  </data>
+  <data name="AlbumMusicBrainzReleaseGroupId" xml:space="preserve">
+    <value>معرّف مجموعة إصدار MusicBrainz</value>
+  </data>
+  <data name="AlbumMusicBrainzReleaseArtistId" xml:space="preserve">
+    <value>معرّف فنان الإصدار MusicBrainz</value>
+  </data>
+  <data name="AlbumReleaseInformation" xml:space="preserve">
+    <value>معلومات الإصدار</value>
+  </data>
+  <data name="AlbumOriginalReleaseDate" xml:space="preserve">
+    <value>تاريخ الإصدار الأصلي</value>
+  </data>
+  <data name="AlbumOriginalReleaseYear" xml:space="preserve">
+    <value>سنة الإصدار الأصلي</value>
+  </data>
+  <data name="AlbumReReleaseDate" xml:space="preserve">
+    <value>تاريخ إعادة الإصدار</value>
+  </data>
+  <data name="AlbumReReleaseYear" xml:space="preserve">
+    <value>سنة إعادة الإصدار</value>
+  </data>
+  <data name="AlbumReleaseCountry" xml:space="preserve">
+    <value>بلد الإصدار</value>
+  </data>
+  <data name="AlbumReleaseVersion" xml:space="preserve">
+    <value>نسخة الإصدار</value>
+  </data>
+  <data name="AlbumLanguage" xml:space="preserve">
+    <value>اللغة</value>
+  </data>
+  <data name="LanguageCode" xml:space="preserve">
+    <value>رمز اللغة</value>
+  </data>
+  <data name="LanguageName" xml:space="preserve">
+    <value>اسم اللغة</value>
+  </data>
+  <data name="NativeName" xml:space="preserve">
+    <value>الاسم الأصلي للغة</value>
+  </data>
+  <data name="AlbumOriginalLanguage" xml:space="preserve">
+    <value>اللغة الأصلية</value>
+  </data>
+  <data name="AlbumGenres" xml:space="preserve">
+    <value>الأنواع</value>
+  </data>
+  <data name="AlbumTags" xml:space="preserve">
+    <value>الوسوم</value>
+  </data>
+  <data name="AlbumReleaseTypes" xml:space="preserve">
+    <value>أنواع الإصدار</value>
+  </data>
+  <data name="Tracks" xml:space="preserve">
+    <value>المقاطع</value>
+  </data>
+  <data name="NoTracks" xml:space="preserve">
+    <value>لا يحتوي هذا الألبوم على مقاطع</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>إزالة</value>
+  </data>
+  <data name="Bootleg" xml:space="preserve">
+    <value>نسخة مقرصنة</value>
+  </data>
+  <data name="Cancelled" xml:space="preserve">
+    <value>ملغى</value>
+  </data>
+  <data name="Expunged" xml:space="preserve">
+    <value>محذوف</value>
+  </data>
+  <data name="Official" xml:space="preserve">
+    <value>رسمي</value>
+  </data>
+  <data name="Promotion" xml:space="preserve">
+    <value>ترويجي</value>
+  </data>
+  <data name="PseudoRelease" xml:space="preserve">
+    <value>إصدار زائف</value>
+  </data>
+  <data name="Withdrawn" xml:space="preserve">
+    <value>مسحوب</value>
+  </data>
+  <data name="Inch10Acetate" xml:space="preserve">
+    <value>أسيتات 10 بوصة</value>
+  </data>
+  <data name="Inch10Shellac" xml:space="preserve">
+    <value>شيلاك 10 بوصة</value>
+  </data>
+  <data name="Inch10Vinyl" xml:space="preserve">
+    <value>فينيل 10 بوصة</value>
+  </data>
+  <data name="Inch12Acetate" xml:space="preserve">
+    <value>أسيتات 12 بوصة</value>
+  </data>
+  <data name="Inch12LaserDisc" xml:space="preserve">
+    <value>قرص ليزر 12 بوصة</value>
+  </data>
+  <data name="Inch12Shellac" xml:space="preserve">
+    <value>شيلاك 12 بوصة</value>
+  </data>
+  <data name="Inch12Vinyl" xml:space="preserve">
+    <value>فينيل 12 بوصة</value>
+  </data>
+  <data name="Inch3Vinyl" xml:space="preserve">
+    <value>فينيل 3 بوصة</value>
+  </data>
+  <data name="Inch3_5FloppyDisk" xml:space="preserve">
+    <value>قرص مرن 3.5 بوصة</value>
+  </data>
+  <data name="Inch5_25FloppyDisk" xml:space="preserve">
+    <value>قرص مرن 5.25 بوصة</value>
+  </data>
+  <data name="Inch7Acetate" xml:space="preserve">
+    <value>أسيتات 7 بوصة</value>
+  </data>
+  <data name="Inch7FlexiDisc" xml:space="preserve">
+    <value>قرص فليكسي 7 بوصة</value>
+  </data>
+  <data name="Inch7Shellac" xml:space="preserve">
+    <value>شيلاك 7 بوصة</value>
+  </data>
+  <data name="Inch7Vinyl" xml:space="preserve">
+    <value>فينيل 7 بوصة</value>
+  </data>
+  <data name="Inch8LaserDisc" xml:space="preserve">
+    <value>قرص ليزر 8 بوصة</value>
+  </data>
+  <data name="EightTrackCartridge" xml:space="preserve">
+    <value>خرطوشة ثمانية مسارات</value>
+  </data>
+  <data name="Cm8CD" xml:space="preserve">
+    <value>CD 8 سم</value>
+  </data>
+  <data name="Cm8CDPlusG" xml:space="preserve">
+    <value>CD 8 سم زائد G</value>
+  </data>
+  <data name="Cm8CDMinusR" xml:space="preserve">
+    <value>CD 8 سم ناقص R</value>
+  </data>
+  <data name="Acetate" xml:space="preserve">
+    <value>أسيتات</value>
+  </data>
+  <data name="BetacamSP" xml:space="preserve">
+    <value>Betacam SP</value>
+  </data>
+  <data name="Betamax" xml:space="preserve">
+    <value>Betamax</value>
+  </data>
+  <data name="BluRay" xml:space="preserve">
+    <value>Blu-ray</value>
+  </data>
+  <data name="BluRayMinusR" xml:space="preserve">
+    <value>Blu-ray ناقص R</value>
+  </data>
+  <data name="BluSpecCD" xml:space="preserve">
+    <value>Blu Spec CD</value>
+  </data>
+  <data name="Cartridge" xml:space="preserve">
+    <value>خرطوشة</value>
+  </data>
+  <data name="Cassette" xml:space="preserve">
+    <value>كاسيت</value>
+  </data>
+  <data name="CD" xml:space="preserve">
+    <value>CD</value>
+  </data>
+  <data name="CDPlusG" xml:space="preserve">
+    <value>CD زائد G</value>
+  </data>
+  <data name="CDMinusi" xml:space="preserve">
+    <value>CD Minusi</value>
+  </data>
+  <data name="CDMinusR" xml:space="preserve">
+    <value>CD ناقص R</value>
+  </data>
+  <data name="CDV" xml:space="preserve">
+    <value>CDV</value>
+  </data>
+  <data name="CED" xml:space="preserve">
+    <value>CED</value>
+  </data>
+  <data name="CopyControlCD" xml:space="preserve">
+    <value>CD حماية النسخ</value>
+  </data>
+  <data name="DAT" xml:space="preserve">
+    <value>DAT</value>
+  </data>
+  <data name="DataCD" xml:space="preserve">
+    <value>CD بيانات</value>
+  </data>
+  <data name="DataDVD" xml:space="preserve">
+    <value>DVD بيانات</value>
+  </data>
+  <data name="DataDVDMinusR" xml:space="preserve">
+    <value>DVD بيانات ناقص R</value>
+  </data>
+  <data name="DataPlay" xml:space="preserve">
+    <value>Data Play</value>
+  </data>
+  <data name="DCC" xml:space="preserve">
+    <value>DCC</value>
+  </data>
+  <data name="DigitalMedia" xml:space="preserve">
+    <value>وسائط رقمية</value>
+  </data>
+  <data name="DownloadCard" xml:space="preserve">
+    <value>بطاقة تنزيل</value>
+  </data>
+  <data name="DTSCD" xml:space="preserve">
+    <value>DTSCD</value>
+  </data>
+  <data name="DualDisc" xml:space="preserve">
+    <value>قرص مزدوج</value>
+  </data>
+  <data name="DualDiscCDSide" xml:space="preserve">
+    <value>قرص مزدوج - جانب CD</value>
+  </data>
+  <data name="DualDiscDVDSide" xml:space="preserve">
+    <value>قرص مزدوج - جانب DVD</value>
+  </data>
+  <data name="DualDiscDVDAudioSide" xml:space="preserve">
+    <value>قرص مزدوج - جانب صوت DVD</value>
+  </data>
+  <data name="DualDiscDVDVideoSide" xml:space="preserve">
+    <value>قرص مزدوج - جانب فيديو DVD</value>
+  </data>
+  <data name="DVD" xml:space="preserve">
+    <value>DVD</value>
+  </data>
+  <data name="DVDAudio" xml:space="preserve">
+    <value>DVD صوت</value>
+  </data>
+  <data name="DVDMinusRVideo" xml:space="preserve">
+    <value>DVD ناقص R فيديو</value>
+  </data>
+  <data name="DVDVideo" xml:space="preserve">
+    <value>DVD فيديو</value>
+  </data>
+  <data name="DVDPlus" xml:space="preserve">
+    <value>DVD زائد</value>
+  </data>
+  <data name="DVDPlusCDSide" xml:space="preserve">
+    <value>DVD زائد - جانب CD</value>
+  </data>
+  <data name="DVDPlusDVDAudioSide" xml:space="preserve">
+    <value>DVD زائد - جانب صوت DVD</value>
+  </data>
+  <data name="DVDPlusDVDVideoSide" xml:space="preserve">
+    <value>DVD زائد - جانب فيديو DVD</value>
+  </data>
+  <data name="EdisonDiamondDisc" xml:space="preserve">
+    <value>أسطوانة إديسون الماسية</value>
+  </data>
+  <data name="EnhancedCD" xml:space="preserve">
+    <value>CD محسن</value>
+  </data>
+  <data name="FlexiDisc" xml:space="preserve">
+    <value>قرص فليكسي</value>
+  </data>
+  <data name="FloppyDisk" xml:space="preserve">
+    <value>قرص مرن</value>
+  </data>
+  <data name="HDDVD" xml:space="preserve">
+    <value>HDDVD</value>
+  </data>
+  <data name="HDCD" xml:space="preserve">
+    <value>HDCD</value>
+  </data>
+  <data name="HiPac" xml:space="preserve">
+    <value>Hi Pac</value>
+  </data>
+  <data name="HQCD" xml:space="preserve">
+    <value>HQCD</value>
+  </data>
+  <data name="HybridSACD" xml:space="preserve">
+    <value>SACD هجين</value>
+  </data>
+  <data name="HybridSACDCDLayer" xml:space="preserve">
+    <value>SACD هجين طبقة CD</value>
+  </data>
+  <data name="HybridSACDSACDLayer" xml:space="preserve">
+    <value>SACD هجين طبقة SACD</value>
+  </data>
+  <data name="HybridSACDSACDLayer2Channels" xml:space="preserve">
+    <value>SACD هجين طبقة SACD قناتان</value>
+  </data>
+  <data name="HybridSACDSACDLayerMultichannel" xml:space="preserve">
+    <value>SACD هجين طبقة SACD متعدد القنوات</value>
+  </data>
+  <data name="KiTAlbum" xml:space="preserve">
+    <value>Ki T Album</value>
+  </data>
+  <data name="LaserDisc" xml:space="preserve">
+    <value>قرص ليزر</value>
+  </data>
+  <data name="Microcassette" xml:space="preserve">
+    <value>ميكروكاسيت</value>
+  </data>
+  <data name="MicroSD" xml:space="preserve">
+    <value>Micro SD</value>
+  </data>
+  <data name="MiniDisc" xml:space="preserve">
+    <value>Mini Disc</value>
+  </data>
+  <data name="MiniDVD" xml:space="preserve">
+    <value>Mini DVD</value>
+  </data>
+  <data name="MiniDVDAudio" xml:space="preserve">
+    <value>Mini DVD صوت</value>
+  </data>
+  <data name="MiniDVDVideo" xml:space="preserve">
+    <value>Mini DVD فيديو</value>
+  </data>
+  <data name="MinimaxCD" xml:space="preserve">
+    <value>Minimax CD</value>
+  </data>
+  <data name="MinimaxDVD" xml:space="preserve">
+    <value>Minimax DVD</value>
+  </data>
+  <data name="MinimaxDVDAudio" xml:space="preserve">
+    <value>Minimax DVD صوت</value>
+  </data>
+  <data name="MinimaxDVDVideo" xml:space="preserve">
+    <value>Minimax DVD فيديو</value>
+  </data>
+  <data name="MixedModeCD" xml:space="preserve">
+    <value>CD الوضع المختلط</value>
+  </data>
+  <data name="Other" xml:space="preserve">
+    <value>آخر</value>
+  </data>
+  <data name="PatheDisc" xml:space="preserve">
+    <value>أسطوانة Pathe</value>
+  </data>
+  <data name="PhonographRecord" xml:space="preserve">
+    <value>أسطوانة فونوغراف</value>
+  </data>
+  <data name="PianoRoll" xml:space="preserve">
+    <value>لفافة بيانو</value>
+  </data>
+  <data name="Playbutton" xml:space="preserve">
+    <value>زر تشغيل</value>
+  </data>
+  <data name="PlayTape" xml:space="preserve">
+    <value>Play Tape</value>
+  </data>
+  <data name="ReelToReel" xml:space="preserve">
+    <value>بكرة إلى بكرة</value>
+  </data>
+  <data name="ROMCartridge" xml:space="preserve">
+    <value>خرطوشة ROM</value>
+  </data>
+  <data name="SACD" xml:space="preserve">
+    <value>SACD</value>
+  </data>
+  <data name="SACD2Channels" xml:space="preserve">
+    <value>SACD قناتان</value>
+  </data>
+  <data name="SACDMultichannel" xml:space="preserve">
+    <value>SACD متعدد القنوات</value>
+  </data>
+  <data name="SDCard" xml:space="preserve">
+    <value>SD Card</value>
+  </data>
+  <data name="Shellac" xml:space="preserve">
+    <value>شيلاك</value>
+  </data>
+  <data name="SHMCD" xml:space="preserve">
+    <value>SHMCD</value>
+  </data>
+  <data name="SHMSACD" xml:space="preserve">
+    <value>SHMSACD</value>
+  </data>
+  <data name="SHMSACDMultichannel" xml:space="preserve">
+    <value>SHMSACD متعدد القنوات</value>
+  </data>
+  <data name="SlotMusic" xml:space="preserve">
+    <value>Slot Music</value>
+  </data>
+  <data name="SVCD" xml:space="preserve">
+    <value>SVCD</value>
+  </data>
+  <data name="Tefifon" xml:space="preserve">
+    <value>Tefifon</value>
+  </data>
+  <data name="UMD" xml:space="preserve">
+    <value>UMD</value>
+  </data>
+  <data name="USBFlashDrive" xml:space="preserve">
+    <value>قرص فلاش USB</value>
+  </data>
+  <data name="VCD" xml:space="preserve">
+    <value>VCD</value>
+  </data>
+  <data name="VHD" xml:space="preserve">
+    <value>VHD</value>
+  </data>
+  <data name="VHS" xml:space="preserve">
+    <value>VHS</value>
+  </data>
+  <data name="Vinyl" xml:space="preserve">
+    <value>فينيل</value>
+  </data>
+  <data name="VinylDisc" xml:space="preserve">
+    <value>قرص فينيل</value>
+  </data>
+  <data name="VinylDiscCDSide" xml:space="preserve">
+    <value>قرص فينيل - جانب CD</value>
+  </data>
+  <data name="VinylDiscDVDSide" xml:space="preserve">
+    <value>قرص فينيل - جانب DVD</value>
+  </data>
+  <data name="VinylDiscVinylSide" xml:space="preserve">
+    <value>قرص فينيل - جانب فينيل</value>
+  </data>
+  <data name="WaxCylinder" xml:space="preserve">
+    <value>أسطوانة شمعية</value>
+  </data>
+  <data name="ZipDisk" xml:space="preserve">
+    <value>قرص Zip</value>
+  </data>
+  <data name="Book" xml:space="preserve">
+    <value>كتاب</value>
+  </data>
+  <data name="Box" xml:space="preserve">
+    <value>صندوق</value>
+  </data>
+  <data name="CardboardPaperSleeve" xml:space="preserve">
+    <value>غلاف ورقي من الكرتون</value>
+  </data>
+  <data name="CassetteCase" xml:space="preserve">
+    <value>علبة كاسيت</value>
+  </data>
+  <data name="ClamshellCase" xml:space="preserve">
+    <value>علبة صدفية</value>
+  </data>
+  <data name="Digibook" xml:space="preserve">
+    <value>Digibook</value>
+  </data>
+  <data name="Digifile" xml:space="preserve">
+    <value>Digifile</value>
+  </data>
+  <data name="Digipak" xml:space="preserve">
+    <value>Digipak</value>
+  </data>
+  <data name="DiscboxSlider" xml:space="preserve">
+    <value>منزلق علبة الأقراص</value>
+  </data>
+  <data name="Fatbox" xml:space="preserve">
+    <value>علبة سميكة</value>
+  </data>
+  <data name="GatefoldCover" xml:space="preserve">
+    <value>غلاف مطوي</value>
+  </data>
+  <data name="JewelCase" xml:space="preserve">
+    <value>علبة جواهر</value>
+  </data>
+  <data name="KeepCase" xml:space="preserve">
+    <value>علبة حفظ</value>
+  </data>
+  <data name="Longbox" xml:space="preserve">
+    <value>صندوق طويل</value>
+  </data>
+  <data name="MetalTin" xml:space="preserve">
+    <value>علبة معدنية</value>
+  </data>
+  <data name="PlasticSleeve" xml:space="preserve">
+    <value>غلاف بلاستيكي</value>
+  </data>
+  <data name="Slidepack" xml:space="preserve">
+    <value>حزمة منزلقة</value>
+  </data>
+  <data name="SlimJewelCase" xml:space="preserve">
+    <value>علبة جواهر رفيعة</value>
+  </data>
+  <data name="Slipcase" xml:space="preserve">
+    <value>غلاف منزلق</value>
+  </data>
+  <data name="SnapCase" xml:space="preserve">
+    <value>علبة بمشبك</value>
+  </data>
+  <data name="SnapPack" xml:space="preserve">
+    <value>حزمة بمشبك</value>
+  </data>
+  <data name="SuperJewelBox" xml:space="preserve">
+    <value>علبة جواهر فائقة</value>
+  </data>
+  <data name="None" xml:space="preserve">
+    <value>لا شيء</value>
+  </data>
+  <data name="Country.AF" xml:space="preserve">
+    <value>أفغانستان</value>
+  </data>
+  <data name="Country.AL" xml:space="preserve">
+    <value>ألبانيا</value>
+  </data>
+  <data name="Country.DZ" xml:space="preserve">
+    <value>الجزائر</value>
+  </data>
+  <data name="Country.AD" xml:space="preserve">
+    <value>أندورا</value>
+  </data>
+  <data name="Country.AO" xml:space="preserve">
+    <value>أنغولا</value>
+  </data>
+  <data name="Country.AG" xml:space="preserve">
+    <value>أنتيغوا وبربودا</value>
+  </data>
+  <data name="Country.AR" xml:space="preserve">
+    <value>الأرجنتين</value>
+  </data>
+  <data name="Country.AM" xml:space="preserve">
+    <value>أرمينيا</value>
+  </data>
+  <data name="Country.AU" xml:space="preserve">
+    <value>أستراليا</value>
+  </data>
+  <data name="Country.AT" xml:space="preserve">
+    <value>النمسا</value>
+  </data>
+  <data name="Country.AZ" xml:space="preserve">
+    <value>أذربيجان</value>
+  </data>
+  <data name="Country.BS" xml:space="preserve">
+    <value>الباهاما</value>
+  </data>
+  <data name="Country.BH" xml:space="preserve">
+    <value>البحرين</value>
+  </data>
+  <data name="Country.BD" xml:space="preserve">
+    <value>بنغلاديش</value>
+  </data>
+  <data name="Country.BB" xml:space="preserve">
+    <value>بربادوس</value>
+  </data>
+  <data name="Country.BY" xml:space="preserve">
+    <value>بيلاروسيا</value>
+  </data>
+  <data name="Country.BE" xml:space="preserve">
+    <value>بلجيكا</value>
+  </data>
+  <data name="Country.BZ" xml:space="preserve">
+    <value>بليز</value>
+  </data>
+  <data name="Country.BJ" xml:space="preserve">
+    <value>بنين</value>
+  </data>
+  <data name="Country.BT" xml:space="preserve">
+    <value>بوتان</value>
+  </data>
+  <data name="Country.BO" xml:space="preserve">
+    <value>بوليفيا</value>
+  </data>
+  <data name="Country.BA" xml:space="preserve">
+    <value>البوسنة والهرسك</value>
+  </data>
+  <data name="Country.BW" xml:space="preserve">
+    <value>بوتسوانا</value>
+  </data>
+  <data name="Country.BR" xml:space="preserve">
+    <value>البرازيل</value>
+  </data>
+  <data name="Country.BN" xml:space="preserve">
+    <value>بروناي</value>
+  </data>
+  <data name="Country.BG" xml:space="preserve">
+    <value>بلغاريا</value>
+  </data>
+  <data name="Country.BF" xml:space="preserve">
+    <value>بوركينا فاسو</value>
+  </data>
+  <data name="Country.BI" xml:space="preserve">
+    <value>بوروندي</value>
+  </data>
+  <data name="Country.CV" xml:space="preserve">
+    <value>الرأس الأخضر</value>
+  </data>
+  <data name="Country.KH" xml:space="preserve">
+    <value>كمبوديا</value>
+  </data>
+  <data name="Country.CM" xml:space="preserve">
+    <value>الكاميرون</value>
+  </data>
+  <data name="Country.CA" xml:space="preserve">
+    <value>كندا</value>
+  </data>
+  <data name="Country.CF" xml:space="preserve">
+    <value>جمهورية أفريقيا الوسطى</value>
+  </data>
+  <data name="Country.TD" xml:space="preserve">
+    <value>تشاد</value>
+  </data>
+  <data name="Country.CL" xml:space="preserve">
+    <value>تشيلي</value>
+  </data>
+  <data name="Country.CN" xml:space="preserve">
+    <value>الصين</value>
+  </data>
+  <data name="Country.CO" xml:space="preserve">
+    <value>كولومبيا</value>
+  </data>
+  <data name="Country.KM" xml:space="preserve">
+    <value>جزر القمر</value>
+  </data>
+  <data name="Country.CG" xml:space="preserve">
+    <value>الكونغو - برازافيل</value>
+  </data>
+  <data name="Country.CD" xml:space="preserve">
+    <value>الكونغو - كينشاسا</value>
+  </data>
+  <data name="Country.CR" xml:space="preserve">
+    <value>كوستاريكا</value>
+  </data>
+  <data name="Country.CI" xml:space="preserve">
+    <value>ساحل العاج</value>
+  </data>
+  <data name="Country.HR" xml:space="preserve">
+    <value>كرواتيا</value>
+  </data>
+  <data name="Country.CU" xml:space="preserve">
+    <value>كوبا</value>
+  </data>
+  <data name="Country.CY" xml:space="preserve">
+    <value>قبرص</value>
+  </data>
+  <data name="Country.CZ" xml:space="preserve">
+    <value>التشيك</value>
+  </data>
+  <data name="Country.DK" xml:space="preserve">
+    <value>الدنمارك</value>
+  </data>
+  <data name="Country.DJ" xml:space="preserve">
+    <value>جيبوتي</value>
+  </data>
+  <data name="Country.DM" xml:space="preserve">
+    <value>دومينيكا</value>
+  </data>
+  <data name="Country.DO" xml:space="preserve">
+    <value>جمهورية الدومينيكان</value>
+  </data>
+  <data name="Country.EC" xml:space="preserve">
+    <value>الإكوادور</value>
+  </data>
+  <data name="Country.EG" xml:space="preserve">
+    <value>مصر</value>
+  </data>
+  <data name="Country.SV" xml:space="preserve">
+    <value>السلفادور</value>
+  </data>
+  <data name="Country.GQ" xml:space="preserve">
+    <value>غينيا الاستوائية</value>
+  </data>
+  <data name="Country.ER" xml:space="preserve">
+    <value>إريتريا</value>
+  </data>
+  <data name="Country.EE" xml:space="preserve">
+    <value>إستونيا</value>
+  </data>
+  <data name="Country.SZ" xml:space="preserve">
+    <value>إسواتيني</value>
+  </data>
+  <data name="Country.ET" xml:space="preserve">
+    <value>إثيوبيا</value>
+  </data>
+  <data name="Country.FJ" xml:space="preserve">
+    <value>فيجي</value>
+  </data>
+  <data name="Country.FI" xml:space="preserve">
+    <value>فنلندا</value>
+  </data>
+  <data name="Country.FR" xml:space="preserve">
+    <value>فرنسا</value>
+  </data>
+  <data name="Country.GA" xml:space="preserve">
+    <value>الغابون</value>
+  </data>
+  <data name="Country.GM" xml:space="preserve">
+    <value>غامبيا</value>
+  </data>
+  <data name="Country.GE" xml:space="preserve">
+    <value>جورجيا</value>
+  </data>
+  <data name="Country.DE" xml:space="preserve">
+    <value>ألمانيا</value>
+  </data>
+  <data name="Country.GH" xml:space="preserve">
+    <value>غانا</value>
+  </data>
+  <data name="Country.GR" xml:space="preserve">
+    <value>اليونان</value>
+  </data>
+  <data name="Country.GD" xml:space="preserve">
+    <value>غرينادا</value>
+  </data>
+  <data name="Country.GT" xml:space="preserve">
+    <value>غواتيمالا</value>
+  </data>
+  <data name="Country.GN" xml:space="preserve">
+    <value>غينيا</value>
+  </data>
+  <data name="Country.GW" xml:space="preserve">
+    <value>غينيا بيساو</value>
+  </data>
+  <data name="Country.GY" xml:space="preserve">
+    <value>غيانا</value>
+  </data>
+  <data name="Country.HT" xml:space="preserve">
+    <value>هايتي</value>
+  </data>
+  <data name="Country.HN" xml:space="preserve">
+    <value>هندوراس</value>
+  </data>
+  <data name="Country.HU" xml:space="preserve">
+    <value>هنغاريا</value>
+  </data>
+  <data name="Country.IS" xml:space="preserve">
+    <value>آيسلندا</value>
+  </data>
+  <data name="Country.IN" xml:space="preserve">
+    <value>الهند</value>
+  </data>
+  <data name="Country.ID" xml:space="preserve">
+    <value>إندونيسيا</value>
+  </data>
+  <data name="Country.IR" xml:space="preserve">
+    <value>إيران</value>
+  </data>
+  <data name="Country.IQ" xml:space="preserve">
+    <value>العراق</value>
+  </data>
+  <data name="Country.IE" xml:space="preserve">
+    <value>أيرلندا</value>
+  </data>
+  <data name="Country.IL" xml:space="preserve">
+    <value>إسرائيل</value>
+  </data>
+  <data name="Country.IT" xml:space="preserve">
+    <value>إيطاليا</value>
+  </data>
+  <data name="Country.JM" xml:space="preserve">
+    <value>جامايكا</value>
+  </data>
+  <data name="Country.JP" xml:space="preserve">
+    <value>اليابان</value>
+  </data>
+  <data name="Country.JO" xml:space="preserve">
+    <value>الأردن</value>
+  </data>
+  <data name="Country.KZ" xml:space="preserve">
+    <value>كازاخستان</value>
+  </data>
+  <data name="Country.KE" xml:space="preserve">
+    <value>كينيا</value>
+  </data>
+  <data name="Country.KI" xml:space="preserve">
+    <value>كيريباتي</value>
+  </data>
+  <data name="Country.KP" xml:space="preserve">
+    <value>كوريا الشمالية</value>
+  </data>
+  <data name="Country.KR" xml:space="preserve">
+    <value>كوريا الجنوبية</value>
+  </data>
+  <data name="Country.KW" xml:space="preserve">
+    <value>الكويت</value>
+  </data>
+  <data name="Country.KG" xml:space="preserve">
+    <value>قيرغيزستان</value>
+  </data>
+  <data name="Country.LA" xml:space="preserve">
+    <value>لاوس</value>
+  </data>
+  <data name="Country.LV" xml:space="preserve">
+    <value>لاتفيا</value>
+  </data>
+  <data name="Country.LB" xml:space="preserve">
+    <value>لبنان</value>
+  </data>
+  <data name="Country.LS" xml:space="preserve">
+    <value>ليسوتو</value>
+  </data>
+  <data name="Country.LR" xml:space="preserve">
+    <value>ليبيريا</value>
+  </data>
+  <data name="Country.LY" xml:space="preserve">
+    <value>ليبيا</value>
+  </data>
+  <data name="Country.LI" xml:space="preserve">
+    <value>ليختنشتاين</value>
+  </data>
+  <data name="Country.LT" xml:space="preserve">
+    <value>ليتوانيا</value>
+  </data>
+  <data name="Country.LU" xml:space="preserve">
+    <value>لوكسمبورغ</value>
+  </data>
+  <data name="Country.MG" xml:space="preserve">
+    <value>مدغشقر</value>
+  </data>
+  <data name="Country.MW" xml:space="preserve">
+    <value>مالاوي</value>
+  </data>
+  <data name="Country.MY" xml:space="preserve">
+    <value>ماليزيا</value>
+  </data>
+  <data name="Country.MV" xml:space="preserve">
+    <value>المالديف</value>
+  </data>
+  <data name="Country.ML" xml:space="preserve">
+    <value>مالي</value>
+  </data>
+  <data name="Country.MT" xml:space="preserve">
+    <value>مالطا</value>
+  </data>
+  <data name="Country.MH" xml:space="preserve">
+    <value>جزر مارشال</value>
+  </data>
+  <data name="Country.MR" xml:space="preserve">
+    <value>موريتانيا</value>
+  </data>
+  <data name="Country.MU" xml:space="preserve">
+    <value>موريشيوس</value>
+  </data>
+  <data name="Country.MX" xml:space="preserve">
+    <value>المكسيك</value>
+  </data>
+  <data name="Country.FM" xml:space="preserve">
+    <value>ميكرونيزيا</value>
+  </data>
+  <data name="Country.MD" xml:space="preserve">
+    <value>مولدوفا</value>
+  </data>
+  <data name="Country.MC" xml:space="preserve">
+    <value>موناكو</value>
+  </data>
+  <data name="Country.MN" xml:space="preserve">
+    <value>منغوليا</value>
+  </data>
+  <data name="Country.ME" xml:space="preserve">
+    <value>الجبل الأسود</value>
+  </data>
+  <data name="Country.MA" xml:space="preserve">
+    <value>المغرب</value>
+  </data>
+  <data name="Country.MZ" xml:space="preserve">
+    <value>موزمبيق</value>
+  </data>
+  <data name="Country.MM" xml:space="preserve">
+    <value>ميانمار (بورما)</value>
+  </data>
+  <data name="Country.NA" xml:space="preserve">
+    <value>ناميبيا</value>
+  </data>
+  <data name="Country.NR" xml:space="preserve">
+    <value>ناورو</value>
+  </data>
+  <data name="Country.NP" xml:space="preserve">
+    <value>نيبال</value>
+  </data>
+  <data name="Country.NL" xml:space="preserve">
+    <value>هولندا</value>
+  </data>
+  <data name="Country.NZ" xml:space="preserve">
+    <value>نيوزيلندا</value>
+  </data>
+  <data name="Country.NI" xml:space="preserve">
+    <value>نيكاراغوا</value>
+  </data>
+  <data name="Country.NE" xml:space="preserve">
+    <value>النيجر</value>
+  </data>
+  <data name="Country.NG" xml:space="preserve">
+    <value>نيجيريا</value>
+  </data>
+  <data name="Country.MK" xml:space="preserve">
+    <value>مقدونيا الشمالية</value>
+  </data>
+  <data name="Country.NO" xml:space="preserve">
+    <value>النرويج</value>
+  </data>
+  <data name="Country.OM" xml:space="preserve">
+    <value>عُمان</value>
+  </data>
+  <data name="Country.PK" xml:space="preserve">
+    <value>باكستان</value>
+  </data>
+  <data name="Country.PW" xml:space="preserve">
+    <value>بالاو</value>
+  </data>
+  <data name="Country.PS" xml:space="preserve">
+    <value>الأراضي الفلسطينية</value>
+  </data>
+  <data name="Country.PA" xml:space="preserve">
+    <value>بنما</value>
+  </data>
+  <data name="Country.PG" xml:space="preserve">
+    <value>بابوا غينيا الجديدة</value>
+  </data>
+  <data name="Country.PY" xml:space="preserve">
+    <value>باراغواي</value>
+  </data>
+  <data name="Country.PE" xml:space="preserve">
+    <value>بيرو</value>
+  </data>
+  <data name="Country.PH" xml:space="preserve">
+    <value>الفلبين</value>
+  </data>
+  <data name="Country.PL" xml:space="preserve">
+    <value>بولندا</value>
+  </data>
+  <data name="Country.PT" xml:space="preserve">
+    <value>البرتغال</value>
+  </data>
+  <data name="Country.QA" xml:space="preserve">
+    <value>قطر</value>
+  </data>
+  <data name="Country.RO" xml:space="preserve">
+    <value>رومانيا</value>
+  </data>
+  <data name="Country.RU" xml:space="preserve">
+    <value>روسيا</value>
+  </data>
+  <data name="Country.RW" xml:space="preserve">
+    <value>رواندا</value>
+  </data>
+  <data name="Country.KN" xml:space="preserve">
+    <value>سانت كيتس ونيفيس</value>
+  </data>
+  <data name="Country.LC" xml:space="preserve">
+    <value>سانت لوسيا</value>
+  </data>
+  <data name="Country.VC" xml:space="preserve">
+    <value>سانت فينسنت والغرينادين</value>
+  </data>
+  <data name="Country.WS" xml:space="preserve">
+    <value>ساموا</value>
+  </data>
+  <data name="Country.SM" xml:space="preserve">
+    <value>سان مارينو</value>
+  </data>
+  <data name="Country.ST" xml:space="preserve">
+    <value>ساو تومي وبرينسيبي</value>
+  </data>
+  <data name="Country.SA" xml:space="preserve">
+    <value>المملكة العربية السعودية</value>
+  </data>
+  <data name="Country.SN" xml:space="preserve">
+    <value>السنغال</value>
+  </data>
+  <data name="Country.RS" xml:space="preserve">
+    <value>صربيا</value>
+  </data>
+  <data name="Country.SC" xml:space="preserve">
+    <value>سيشل</value>
+  </data>
+  <data name="Country.SL" xml:space="preserve">
+    <value>سيراليون</value>
+  </data>
+  <data name="Country.SG" xml:space="preserve">
+    <value>سنغافورة</value>
+  </data>
+  <data name="Country.SK" xml:space="preserve">
+    <value>سلوفاكيا</value>
+  </data>
+  <data name="Country.SI" xml:space="preserve">
+    <value>سلوفينيا</value>
+  </data>
+  <data name="Country.SB" xml:space="preserve">
+    <value>جزر سليمان</value>
+  </data>
+  <data name="Country.SO" xml:space="preserve">
+    <value>الصومال</value>
+  </data>
+  <data name="Country.ZA" xml:space="preserve">
+    <value>جنوب أفريقيا</value>
+  </data>
+  <data name="Country.SS" xml:space="preserve">
+    <value>جنوب السودان</value>
+  </data>
+  <data name="Country.ES" xml:space="preserve">
+    <value>إسبانيا</value>
+  </data>
+  <data name="Country.LK" xml:space="preserve">
+    <value>سريلانكا</value>
+  </data>
+  <data name="Country.SD" xml:space="preserve">
+    <value>السودان</value>
+  </data>
+  <data name="Country.SR" xml:space="preserve">
+    <value>سورينام</value>
+  </data>
+  <data name="Country.SE" xml:space="preserve">
+    <value>السويد</value>
+  </data>
+  <data name="Country.CH" xml:space="preserve">
+    <value>سويسرا</value>
+  </data>
+  <data name="Country.SY" xml:space="preserve">
+    <value>سوريا</value>
+  </data>
+  <data name="Country.TW" xml:space="preserve">
+    <value>تايوان</value>
+  </data>
+  <data name="Country.TJ" xml:space="preserve">
+    <value>طاجيكستان</value>
+  </data>
+  <data name="Country.TZ" xml:space="preserve">
+    <value>تنزانيا</value>
+  </data>
+  <data name="Country.TH" xml:space="preserve">
+    <value>تايلاند</value>
+  </data>
+  <data name="Country.TL" xml:space="preserve">
+    <value>تيمور الشرقية</value>
+  </data>
+  <data name="Country.TG" xml:space="preserve">
+    <value>توغو</value>
+  </data>
+  <data name="Country.TO" xml:space="preserve">
+    <value>تونغا</value>
+  </data>
+  <data name="Country.TT" xml:space="preserve">
+    <value>ترينيداد وتوباغو</value>
+  </data>
+  <data name="Country.TN" xml:space="preserve">
+    <value>تونس</value>
+  </data>
+  <data name="Country.TR" xml:space="preserve">
+    <value>تركيا</value>
+  </data>
+  <data name="Country.TM" xml:space="preserve">
+    <value>تركمانستان</value>
+  </data>
+  <data name="Country.TV" xml:space="preserve">
+    <value>توفالو</value>
+  </data>
+  <data name="Country.UG" xml:space="preserve">
+    <value>أوغندا</value>
+  </data>
+  <data name="Country.UA" xml:space="preserve">
+    <value>أوكرانيا</value>
+  </data>
+  <data name="Country.AE" xml:space="preserve">
+    <value>الإمارات العربية المتحدة</value>
+  </data>
+  <data name="Country.GB" xml:space="preserve">
+    <value>المملكة المتحدة</value>
+  </data>
+  <data name="Country.US" xml:space="preserve">
+    <value>الولايات المتحدة</value>
+  </data>
+  <data name="Country.UY" xml:space="preserve">
+    <value>أوروغواي</value>
+  </data>
+  <data name="Country.UZ" xml:space="preserve">
+    <value>أوزبكستان</value>
+  </data>
+  <data name="Country.VU" xml:space="preserve">
+    <value>فانواتو</value>
+  </data>
+  <data name="Country.VA" xml:space="preserve">
+    <value>مدينة الفاتيكان</value>
+  </data>
+  <data name="Country.VE" xml:space="preserve">
+    <value>فنزويلا</value>
+  </data>
+  <data name="Country.VN" xml:space="preserve">
+    <value>فيتنام</value>
+  </data>
+  <data name="Country.YE" xml:space="preserve">
+    <value>اليمن</value>
+  </data>
+  <data name="Country.ZM" xml:space="preserve">
+    <value>زامبيا</value>
+  </data>
+  <data name="Country.ZW" xml:space="preserve">
+    <value>زيمبابوي</value>
+  </data>
+  <data name="Country.AN" xml:space="preserve">
+    <value>جزر الأنتيل الهولندية</value>
+  </data>
+  <data name="Country.XE" xml:space="preserve">
+    <value>أوروبا</value>
+  </data>
+  <data name="Country.XW" xml:space="preserve">
+    <value>العالم</value>
+  </data>
+  <data name="AlbumTitleDescription" xml:space="preserve">
+    <value>عنوان الألبوم.</value>
+  </data>
+  <data name="AlbumOriginalTitleDescription" xml:space="preserve">
+    <value>العنوان الأصلي للألبوم عندما يختلف عن الحالي.</value>
+  </data>
+  <data name="AlbumDescriptionDescription" xml:space="preserve">
+    <value>ملخص أو وصف قصير للألبوم.</value>
+  </data>
+  <data name="AlbumDisambiguationDescription" xml:space="preserve">
+    <value>تعليق يميز الألبوم عن غيره ممن يحمل العنوان نفسه.</value>
+  </data>
+  <data name="AlbumScriptDescription" xml:space="preserve">
+    <value>الكتابة المستخدمة في عنوان الإصدار.</value>
+  </data>
+  <data name="AlbumReleaseStatusDescription" xml:space="preserve">
+    <value>حالة إصدار الألبوم.</value>
+  </data>
+  <data name="AlbumTotalDiscsDescription" xml:space="preserve">
+    <value>عدد الأقراص في الألبوم.</value>
+  </data>
+  <data name="AlbumTotalTracksDescription" xml:space="preserve">
+    <value>عدد المقطوعات في الألبوم.</value>
+  </data>
+  <data name="AlbumReleaseTitleDescription" xml:space="preserve">
+    <value>عنوان الإصدار.</value>
+  </data>
+  <data name="AlbumMediaFormatDescription" xml:space="preserve">
+    <value>صيغة الوسائط للألبوم.</value>
+  </data>
+  <data name="AlbumPackagingDescription" xml:space="preserve">
+    <value>تغليف الألبوم.</value>
+  </data>
+  <data name="AlbumBarcodeDescription" xml:space="preserve">
+    <value>الباركود الخاص بالألبوم.</value>
+  </data>
+  <data name="AlbumCatalogNumbersDescription" xml:space="preserve">
+    <value>أرقام فهارس الألبوم.</value>
+  </data>
+  <data name="AlbumLabelDescription" xml:space="preserve">
+    <value>الشركة التي أصدرت الألبوم.</value>
+  </data>
+  <data name="AlbumAsinDescription" xml:space="preserve">
+    <value>رقم تعريف أمازون القياسي للألبوم.</value>
+  </data>
+  <data name="AlbumMusicBrainzReleaseIdDescription" xml:space="preserve">
+    <value>معرّف MusicBrainz للإصدار.</value>
+  </data>
+  <data name="AlbumMusicBrainzReleaseGroupIdDescription" xml:space="preserve">
+    <value>معرّف MusicBrainz لمجموعة الإصدارات.</value>
+  </data>
+  <data name="AlbumMusicBrainzReleaseArtistIdDescription" xml:space="preserve">
+    <value>معرّف MusicBrainz لفنان الإصدار.</value>
+  </data>
+  <data name="AlbumOriginalReleaseDateDescription" xml:space="preserve">
+    <value>تاريخ الإصدار الأصلي للألبوم.</value>
+  </data>
+  <data name="AlbumOriginalReleaseYearDescription" xml:space="preserve">
+    <value>سنة الإصدار الأصلي للألبوم.</value>
+  </data>
+  <data name="AlbumReReleaseDateDescription" xml:space="preserve">
+    <value>تاريخ إعادة إصدار الألبوم.</value>
+  </data>
+  <data name="AlbumReReleaseYearDescription" xml:space="preserve">
+    <value>سنة إعادة إصدار الألبوم.</value>
+  </data>
+  <data name="AlbumReleaseCountryDescription" xml:space="preserve">
+    <value>بلد إصدار الألبوم.</value>
+  </data>
+  <data name="AlbumReleaseVersionDescription" xml:space="preserve">
+    <value>النسخة الصادرة، مثل النسخة الأصلية.</value>
+  </data>
+  <data name="LanguageCodeDescription" xml:space="preserve">
+    <value>رمز اللغة المكون من حرفين للألبوم.</value>
+  </data>
+  <data name="LanguageNameDescription" xml:space="preserve">
+    <value>اسم لغة الألبوم.</value>
+  </data>
+  <data name="NativeNameDescription" xml:space="preserve">
+    <value>الاسم الأصلي للغة الألبوم.</value>
+  </data>
+  <data name="AlbumGenresDescription" xml:space="preserve">
+    <value>الأنواع الموسيقية الخاصة بالألبوم.</value>
+  </data>
+  <data name="AlbumTagsDescription" xml:space="preserve">
+    <value>الوسوم الخاصة بالألبوم.</value>
+  </data>
+  <data name="AlbumReleaseTypesDescription" xml:space="preserve">
+    <value>أنواع إصدار الألبوم.</value>
+  </data>
+  <data name="TracksDescription" xml:space="preserve">
+    <value>مقطوعات الألبوم.</value>
+  </data>
+  <data name="ChangeCover" xml:space="preserve">
+    <value>تغيير الغلاف</value>
+  </data>
+  <data name="CoverImage" xml:space="preserve">
+    <value>صورة الغلاف</value>
+  </data>
+  <data name="NoCover" xml:space="preserve">
+    <value>لا يوجد غلاف</value>
+  </data>
+  <data name="CoverSaved" xml:space="preserve">
+    <value>تم تحديث صورة الغلاف.</value>
+  </data>
+  <data name="CoverUploadFailed" xml:space="preserve">
+    <value>تعذّر تحميل صورة الغلاف.</value>
+  </data>
+<data name="Contributors" xml:space="preserve">
+    <value>المساهمون</value>
+  </data>
+<data name="ContributorId" xml:space="preserve">
+    <value>معرّف المساهم</value>
+  </data>
+<data name="ContributorRole" xml:space="preserve">
+    <value>الدور</value>
+  </data>
+<data name="AddContributor" xml:space="preserve">
+    <value>إضافة مساهم</value>
+  </data>
+<data name="ContributorsDescription" xml:space="preserve">
+    <value>الأشخاص الذين ساهموا في الفنان.</value>
+  </data>
+<data name="Ratings" xml:space="preserve">
+    <value>التقييمات</value>
+  </data>
+<data name="RatingValue" xml:space="preserve">
+    <value>التقييم</value>
+  </data>
+<data name="RatingMaxValue" xml:space="preserve">
+    <value>أقصى تقييم</value>
+  </data>
+<data name="RatingSource" xml:space="preserve">
+    <value>المصدر</value>
+  </data>
+<data name="RatingVoteCount" xml:space="preserve">
+    <value>عدد الأصوات</value>
+  </data>
+<data name="AddRating" xml:space="preserve">
+    <value>إضافة تقييم</value>
+  </data>
+<data name="RatingsDescription" xml:space="preserve">
+    <value>تقييمات الفنان من مصادر مختلفة.</value>
+  </data>
+<data name="Author" xml:space="preserve">
+    <value>مؤلف</value>
+  </data>
+<data name="Translator" xml:space="preserve">
+    <value>مترجم</value>
+  </data>
+<data name="Illustrator" xml:space="preserve">
+    <value>رسام</value>
+  </data>
+<data name="Publisher" xml:space="preserve">
+    <value>ناشر</value>
+  </data>
+<data name="Narrator" xml:space="preserve">
+    <value>راوٍ</value>
+  </data>
+<data name="Actor" xml:space="preserve">
+    <value>ممثل</value>
+  </data>
+<data name="Director" xml:space="preserve">
+    <value>مخرج</value>
+  </data>
+<data name="Screenwriter" xml:space="preserve">
+    <value>كاتب سيناريو</value>
+  </data>
+<data name="Composer" xml:space="preserve">
+    <value>ملحن</value>
+  </data>
+<data name="Lyricist" xml:space="preserve">
+    <value>كاتب كلمات</value>
+  </data>
+<data name="Arranger" xml:space="preserve">
+    <value>موزع</value>
+  </data>
+<data name="Conductor" xml:space="preserve">
+    <value>قائد أوركسترا</value>
+  </data>
+<data name="Producer" xml:space="preserve">
+    <value>منتج</value>
+  </data>
+<data name="ExecutiveProducer" xml:space="preserve">
+    <value>منتج تنفيذي</value>
+  </data>
+<data name="Engineer" xml:space="preserve">
+    <value>مهندس صوت</value>
+  </data>
+<data name="Mixer" xml:space="preserve">
+    <value>خالط صوت</value>
+  </data>
+<data name="Remixer" xml:space="preserve">
+    <value>معيد المزج</value>
+  </data>
+<data name="RecordLabel" xml:space="preserve">
+    <value>شركة تسجيلات</value>
+  </data>
+<data name="Vocals" xml:space="preserve">
+    <value>غناء</value>
+  </data>
+<data name="BackingVocals" xml:space="preserve">
+    <value>غناء مساند</value>
+  </data>
+<data name="Guitar" xml:space="preserve">
+    <value>غيتار</value>
+  </data>
+<data name="BassGuitar" xml:space="preserve">
+    <value>غيتار باس</value>
+  </data>
+<data name="Drums" xml:space="preserve">
+    <value>طبول</value>
+  </data>
+<data name="Percussion" xml:space="preserve">
+    <value>إيقاع</value>
+  </data>
+<data name="Keyboards" xml:space="preserve">
+    <value>لوحات المفاتيح</value>
+  </data>
+<data name="Piano" xml:space="preserve">
+    <value>بيانو</value>
+  </data>
+<data name="Synthesizer" xml:space="preserve">
+    <value>مركب صوتي</value>
+  </data>
+<data name="Strings" xml:space="preserve">
+    <value>آلات وترية</value>
+  </data>
+<data name="Woodwinds" xml:space="preserve">
+    <value>آلات نفخ خشبية</value>
+  </data>
+<data name="Brass" xml:space="preserve">
+    <value>آلات نفخ نحاسية</value>
+  </data>
+<data name="Choir" xml:space="preserve">
+    <value>جوقة</value>
+  </data>
+<data name="Orchestrator" xml:space="preserve">
+    <value>منسق أوركسترالي</value>
+  </data>
+<data name="Performer" xml:space="preserve">
+    <value>مؤدٍ</value>
+  </data>
+<data name="User" xml:space="preserve">
+    <value>المستخدم</value>
+  </data>
+<data name="MusicBrainz" xml:space="preserve">
+    <value>MusicBrainz</value>
+  </data>
+<data name="Discogs" xml:space="preserve">
+    <value>Discogs</value>
+  </data>
+<data name="LastFm" xml:space="preserve">
+    <value>Last.fm</value>
+  </data>
+  <data name="Genre" xml:space="preserve">
+    <value>النوع</value>
+  </data>
+  <data name="AddGenre" xml:space="preserve">
+    <value>إضافة نوع</value>
+  </data>
+  <data name="Tag" xml:space="preserve">
+    <value>وسم</value>
+  </data>
+  <data name="AddTag" xml:space="preserve">
+    <value>إضافة وسم</value>
+  </data>
+  <data name="ReleaseType" xml:space="preserve">
+    <value>نوع الإصدار</value>
+  </data>
+  <data name="AddReleaseType" xml:space="preserve">
+    <value>إضافة نوع إصدار</value>
+  </data>
+  <data name="CatalogNumber" xml:space="preserve">
+    <value>رقم الكتالوج</value>
+  </data>
+  <data name="AddCatalogNumber" xml:space="preserve">
+    <value>إضافة رقم كتالوج</value>
+  </data>
+  <data name="Cover" xml:space="preserve">
+    <value>الغلاف</value>
+  </data>
+  <data name="Front" xml:space="preserve">
+    <value>الواجهة</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>الظهر</value>
+  </data>
+  <data name="Booklet" xml:space="preserve">
+    <value>الكتيب</value>
+  </data>
+  <data name="Medium" xml:space="preserve">
+    <value>الوسيط</value>
+  </data>
+  <data name="Tray" xml:space="preserve">
+    <value>الدرج</value>
+  </data>
+  <data name="Spine" xml:space="preserve">
+    <value>الكعب</value>
+  </data>
+  <data name="Obi" xml:space="preserve">
+    <value>أوبي</value>
+  </data>
+  <data name="Sticker" xml:space="preserve">
+    <value>ملصق</value>
+  </data>
+  <data name="Poster" xml:space="preserve">
+    <value>ملصق جداري</value>
+  </data>
+  <data name="Liner" xml:space="preserve">
+    <value>ملاحظات</value>
+  </data>
+  <data name="Watermark" xml:space="preserve">
+    <value>علامة مائية</value>
+  </data>
+  <data name="Backdrop" xml:space="preserve">
+    <value>خلفية</value>
+  </data>
+  <data name="Banner" xml:space="preserve">
+    <value>لافتة</value>
+  </data>
+  <data name="Logo" xml:space="preserve">
+    <value>شعار</value>
+  </data>
+  <data name="Thumb" xml:space="preserve">
+    <value>صورة مصغرة</value>
+  </data>
+  <data name="Identifiers" xml:space="preserve">
+    <value>المعرّفات</value>
+  </data>
+</root>

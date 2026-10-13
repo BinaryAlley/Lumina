@@ -53,6 +53,7 @@ public class ArtistRepositoryTests
     private readonly PaginationDataDtoFixture _paginationDataDtoFixture = new();
     private readonly LibraryFilterDtoFixture _libraryFilterDtoFixture = new();
     private readonly BaseFilterDtoFixture _baseFilterDtoFixture = new();
+    private readonly MusicArtworkEntityFixture _musicArtworkEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ArtistRepositoryTests"/> class.
@@ -1042,6 +1043,28 @@ public class ArtistRepositoryTests
     }
 
     [Fact]
+    public async Task GetAllLiteAsync_WhenIgnoringTheNamePrefixForSorting_ShouldSortByNameStrippedOfItsPrefix()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity beneathArtist = _artistEntityFixture.Create(libraryId: libraryId, name: "Beneath the Surface", includeAlbums: false, includeContributors: false);
+        ArtistEntity beatlesArtist = _artistEntityFixture.Create(libraryId: libraryId, name: "The Beatles", includeAlbums: false, includeContributors: false);
+        _mockContext.Artists.AddRange(beneathArtist, beatlesArtist);
+        await _mockContext.SaveChangesAsync();
+
+        PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId, shouldIgnoreThePrefixForAlphaPicker: true);
+
+        // Act
+        Result<PaginatedResultDto<ArtistLiteRow>> result = await _sut.GetAllLiteAsync(paginationData, null, null, filter, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        // Without stripping the prefix, "The Beatles" would be sorted after "Beneath the Surface", since its sort key would start with "the" instead of "beatles".
+        Assert.Equal(["The Beatles", "Beneath the Surface"], result.Value.Data.Select(row => row.Name));
+    }
+
+    [Fact]
     public async Task GetAllLiteAsync_WhenCalled_ShouldProjectOnlyTheIdAndTheName()
     {
         // Arrange
@@ -1200,6 +1223,92 @@ public class ArtistRepositoryTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.Equal(1, result.Value);
+    }
+
+    [Fact]
+    public async Task GetAllLiteAsync_WhenCoverArtworkExists_ShouldReturnItsPath()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = _artistEntityFixture.Create(libraryId: libraryId, name: "Queen", includeAlbums: false, includeContributors: false);
+        _mockContext.Artists.Add(artist);
+        _mockContext.MusicArtwork.Add(
+            _musicArtworkEntityFixture.Create(ownerType: MusicArtworkOwnerType.Artist, ownerId: artist.Id, artworkType: ArtworkType.Cover, fileName: "covers/queen.jpg"));
+        await _mockContext.SaveChangesAsync();
+
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
+
+        // Act
+        Result<PaginatedResultDto<ArtistLiteRow>> result = await _sut.GetAllLiteAsync(null, null, null, filter, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        ArtistLiteRow row = Assert.Single(result.Value.Data);
+        Assert.Equal("covers/queen.jpg", row.CoverPath);
+    }
+
+    [Fact]
+    public async Task GetAllLiteAsync_WhenOnlyNonCoverArtworkExists_ShouldReturnNullCoverPath()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = _artistEntityFixture.Create(libraryId: libraryId, name: "Queen", includeAlbums: false, includeContributors: false);
+        _mockContext.Artists.Add(artist);
+        _mockContext.MusicArtwork.Add(
+            _musicArtworkEntityFixture.Create(ownerType: MusicArtworkOwnerType.Artist, ownerId: artist.Id, artworkType: ArtworkType.Front, fileName: "front/queen.jpg"));
+        await _mockContext.SaveChangesAsync();
+
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
+
+        // Act
+        Result<PaginatedResultDto<ArtistLiteRow>> result = await _sut.GetAllLiteAsync(null, null, null, filter, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        ArtistLiteRow row = Assert.Single(result.Value.Data);
+        Assert.Null(row.CoverPath);
+    }
+
+    [Fact]
+    public async Task GetAllLiteAsync_WhenNoCoverArtworkExists_ShouldReturnNullCoverPath()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = _artistEntityFixture.Create(libraryId: libraryId, name: "Queen", includeAlbums: false, includeContributors: false);
+        _mockContext.Artists.Add(artist);
+        await _mockContext.SaveChangesAsync();
+
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
+
+        // Act
+        Result<PaginatedResultDto<ArtistLiteRow>> result = await _sut.GetAllLiteAsync(null, null, null, filter, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        ArtistLiteRow row = Assert.Single(result.Value.Data);
+        Assert.Null(row.CoverPath);
+    }
+
+    [Fact]
+    public async Task GetAllLiteAsync_WhenNotIgnoringTheNamePrefixForSorting_ShouldKeepThePrefix()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity beneathArtist = _artistEntityFixture.Create(libraryId: libraryId, name: "Beneath the Surface", includeAlbums: false, includeContributors: false);
+        ArtistEntity beatlesArtist = _artistEntityFixture.Create(libraryId: libraryId, name: "The Beatles", includeAlbums: false, includeContributors: false);
+        _mockContext.Artists.AddRange(beneathArtist, beatlesArtist);
+        await _mockContext.SaveChangesAsync();
+
+        PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId, shouldIgnoreThePrefixForAlphaPicker: false);
+
+        // Act
+        Result<PaginatedResultDto<ArtistLiteRow>> result = await _sut.GetAllLiteAsync(paginationData, null, null, filter, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        // The prefix is not stripped, so the sort key of "The Beatles" starts with "the" and it sorts after "Beneath the Surface".
+        Assert.Equal(["Beneath the Surface", "The Beatles"], result.Value.Data.Select(row => row.Name));
     }
 
     /// <summary>

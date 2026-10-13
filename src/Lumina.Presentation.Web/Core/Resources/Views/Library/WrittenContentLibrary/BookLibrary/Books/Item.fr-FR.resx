@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -94,7 +94,7 @@
     <value>Genres</value>
   </data>
   <data name="GenresDescription" xml:space="preserve">
-    <value>Les genres du livre, séparés par des virgules.</value>
+    <value>Les genres du livre.</value>
   </data>
   <data name="GoodreadsIdDescription" xml:space="preserve">
     <value>L'identifiant numérique du livre sur Goodreads.</value>
@@ -304,7 +304,7 @@
     <value>Étiquettes</value>
   </data>
   <data name="TagsDescription" xml:space="preserve">
-    <value>Les étiquettes du livre, séparées par des virgules.</value>
+    <value>Les étiquettes du livre.</value>
   </data>
   <data name="Title" xml:space="preserve">
     <value>Titre</value>
@@ -1050,5 +1050,38 @@
   </data>
   <data name="Orchestrator" xml:space="preserve">
     <value>Orchestrateur</value>
+  </data>
+  <data name="Performer" xml:space="preserve">
+    <value>Interprète</value>
+  </data>
+<data name="ContributorId" xml:space="preserve">
+    <value>Id du contributeur</value>
+  </data>
+<data name="ContributorRole" xml:space="preserve">
+    <value>Rôle</value>
+  </data>
+<data name="Other" xml:space="preserve">
+    <value>Autre</value>
+  </data>
+<data name="MusicBrainz" xml:space="preserve">
+    <value>MusicBrainz</value>
+  </data>
+<data name="Discogs" xml:space="preserve">
+    <value>Discogs</value>
+  </data>
+<data name="LastFm" xml:space="preserve">
+    <value>Last.fm</value>
+  </data>
+  <data name="Genre" xml:space="preserve">
+    <value>Genre</value>
+  </data>
+  <data name="AddGenre" xml:space="preserve">
+    <value>Ajouter un genre</value>
+  </data>
+  <data name="Tag" xml:space="preserve">
+    <value>Étiquette</value>
+  </data>
+  <data name="AddTag" xml:space="preserve">
+    <value>Ajouter une étiquette</value>
   </data>
 </root>

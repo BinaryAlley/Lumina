@@ -44,6 +44,7 @@ public class ArtistResponseFixture
     /// <param name="albums">Optional. The list of albums of the artist.</param>
     /// <param name="createdOnUtc">Optional. The date and time when the artist was created.</param>
     /// <param name="updatedOnUtc">Optional. The date and time when the artist was updated.</param>
+    /// <param name="coverPath">Optional. The path of the image representing the artist.</param>
     /// <param name="includeWebsite">Whether the website should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeMusicBrainzArtistId">Whether the MusicBrainz artist Id should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeIpis">Whether the IPI codes should be included, or forced to <see langword="null"/>.</param>
@@ -52,6 +53,7 @@ public class ArtistResponseFixture
     /// <param name="includeContributors">Whether the contributors should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeRatings">Whether the ratings should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeAlbums">Whether the albums should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeCoverPath">Whether the cover path should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="ArtistResponse"/>.</returns>
     public ArtistResponse Create(
         Guid? id = null,
@@ -66,6 +68,7 @@ public class ArtistResponseFixture
         List<AlbumResponse>? albums = null,
         DateTime? createdOnUtc = null,
         DateTime? updatedOnUtc = null,
+        string? coverPath = null,
         bool includeWebsite = true,
         bool includeMusicBrainzArtistId = true,
         bool includeIpis = true,
@@ -73,7 +76,8 @@ public class ArtistResponseFixture
         bool includeUpdatedOnUtc = true,
         bool includeContributors = true,
         bool includeRatings = true,
-        bool includeAlbums = true)
+        bool includeAlbums = true,
+        bool includeCoverPath = true)
     {
         return new ArtistResponse(
             id ?? Guid.NewGuid(),
@@ -87,7 +91,8 @@ public class ArtistResponseFixture
             includeUpdatedOnUtc ? (updatedOnUtc ?? _faker.Date.Recent().ToUniversalTime()) : null,
             includeContributors ? (contributors ?? _mediaContributorReferenceDtoFixture.CreateMany(1)) : null,
             includeRatings ? (ratings ?? _audioRatingDtoFixture.CreateMany(1)) : null,
-            includeAlbums ? (albums ?? _albumResponseFixture.CreateMany(1)) : null);
+            includeAlbums ? (albums ?? _albumResponseFixture.CreateMany(1)) : null,
+            includeCoverPath ? (coverPath ?? _faker.System.FilePath()) : null);
     }
 
     /// <summary>

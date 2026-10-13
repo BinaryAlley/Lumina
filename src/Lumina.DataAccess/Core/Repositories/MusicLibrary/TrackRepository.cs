@@ -242,7 +242,7 @@ internal sealed class TrackRepository : ITrackRepository
             .Include(track => track.Contributors)
             .AsSplitQuery()
             .Where(track => track.AlbumId == albumId)
-            .OrderBy(track => track.DiscNumber)
+            .OrderBy(track => track.DiscNumber ?? 1) // some releases don't have a disc number, assume 1
             .ThenBy(track => track.TrackNumber)
             .ThenBy(track => track.Id)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
@@ -262,7 +262,7 @@ internal sealed class TrackRepository : ITrackRepository
         IQueryable<TrackLiteRow> liteRowsQuery = _luminaDbContext.Tracks
             .AsNoTracking()
             .Where(track => track.AlbumId == albumId)
-            .OrderBy(track => track.DiscNumber)
+            .OrderBy(track => track.DiscNumber ?? 1) // some releases don't have a disc number, assume 1
             .ThenBy(track => track.TrackNumber)
             .ThenBy(track => track.Id)
             .Select(track => new TrackLiteRow
@@ -270,7 +270,8 @@ internal sealed class TrackRepository : ITrackRepository
                 Id = track.Id,
                 Title = track.Title,
                 TrackNumber = track.TrackNumber,
-                DiscNumber = track.DiscNumber
+                DiscNumber = track.DiscNumber,
+                DurationInSeconds = track.DurationInSeconds
             });
 
         if (paginationData is null)

@@ -14,12 +14,14 @@ using Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookL
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 #endregion
 
@@ -33,6 +35,11 @@ public class UpdateBookCoverEndpointTests : IClassFixture<AuthenticatedLuminaApi
 {
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+    };
     private readonly BookEntityFixture _bookEntityFixture = new();
     private readonly BookArtworkEntityFixture _bookArtworkEntityFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
@@ -69,7 +76,7 @@ public class UpdateBookCoverEndpointTests : IClassFixture<AuthenticatedLuminaApi
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        string storedPath = JsonSerializer.Deserialize<UpdateBookCoverResponse>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!.CoverPath;
+        string storedPath = JsonSerializer.Deserialize<UpdateBookCoverResponse>(content, _jsonOptions)!.CoverPath;
         Assert.False(string.IsNullOrWhiteSpace(storedPath));
         Assert.Contains("cover.png", storedPath, StringComparison.OrdinalIgnoreCase);
 
@@ -95,7 +102,7 @@ public class UpdateBookCoverEndpointTests : IClassFixture<AuthenticatedLuminaApi
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        string storedPath = JsonSerializer.Deserialize<UpdateBookCoverResponse>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!.CoverPath;
+        string storedPath = JsonSerializer.Deserialize<UpdateBookCoverResponse>(content, _jsonOptions)!.CoverPath;
         Assert.False(string.IsNullOrWhiteSpace(storedPath));
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
@@ -115,9 +122,10 @@ public class UpdateBookCoverEndpointTests : IClassFixture<AuthenticatedLuminaApi
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        using JsonDocument problemDetails = JsonDocument.Parse(content);
-        Assert.Equal("General.NotFound", problemDetails.RootElement.GetProperty("title").GetString());
-        Assert.Equal("BookNotFound", problemDetails.RootElement.GetProperty("detail").GetString());
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.NotFound", problemDetails!["title"].GetString());
+        Assert.Equal("BookNotFound", problemDetails["detail"].GetString());
     }
 
     [Fact]
@@ -129,8 +137,9 @@ public class UpdateBookCoverEndpointTests : IClassFixture<AuthenticatedLuminaApi
         // Assert
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        using JsonDocument problemDetails = JsonDocument.Parse(content);
-        Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Validation", problemDetails!["title"].GetString());
         Assert.Contains("BookIdCannotBeEmpty", content, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -147,9 +156,10 @@ public class UpdateBookCoverEndpointTests : IClassFixture<AuthenticatedLuminaApi
         // Assert
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        using JsonDocument problemDetails = JsonDocument.Parse(content);
-        Assert.Equal("General.Unauthorized", problemDetails.RootElement.GetProperty("title").GetString());
-        Assert.Equal("NotAuthorized", problemDetails.RootElement.GetProperty("detail").GetString());
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Unauthorized", problemDetails!["title"].GetString());
+        Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
     }
 
     [Fact]
@@ -166,9 +176,10 @@ public class UpdateBookCoverEndpointTests : IClassFixture<AuthenticatedLuminaApi
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        using JsonDocument problemDetails = JsonDocument.Parse(content);
-        Assert.Equal("General.NotFound", problemDetails.RootElement.GetProperty("title").GetString());
-        Assert.Equal("BookNotFound", problemDetails.RootElement.GetProperty("detail").GetString());
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.NotFound", problemDetails!["title"].GetString());
+        Assert.Equal("BookNotFound", problemDetails["detail"].GetString());
     }
 
     [Fact]
@@ -197,8 +208,9 @@ public class UpdateBookCoverEndpointTests : IClassFixture<AuthenticatedLuminaApi
         // Assert
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        using JsonDocument problemDetails = JsonDocument.Parse(content);
-        Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Validation", problemDetails!["title"].GetString());
         Assert.Contains("BookCoverCannotBeNull", content, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -216,8 +228,9 @@ public class UpdateBookCoverEndpointTests : IClassFixture<AuthenticatedLuminaApi
         // Assert
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        using JsonDocument problemDetails = JsonDocument.Parse(content);
-        Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Validation", problemDetails!["title"].GetString());
         Assert.Contains("CoverFileMustBeAnImage", content, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -245,8 +258,9 @@ public class UpdateBookCoverEndpointTests : IClassFixture<AuthenticatedLuminaApi
         // Assert
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        using JsonDocument problemDetails = JsonDocument.Parse(content);
-        Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Validation", problemDetails!["title"].GetString());
         Assert.Contains("FileTooLarge", content, StringComparison.OrdinalIgnoreCase);
     }
 

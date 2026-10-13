@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
@@ -32,6 +33,8 @@ namespace Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Albu
 /// <param name="Contributors">The list of references to the media contributors that performed on the album, each with the role they played.</param>
 /// <param name="Ratings">The list of ratings for this album.</param>
 /// <param name="Tracks">The list of tracks of the album.</param>
+/// <param name="CoverPath">The path of the image representing the album, if available.</param>
+/// <param name="Artwork">The stored artwork of the album, in display order, so that all of its pieces can be presented, not just the cover.</param>
 [DebuggerDisplay("Title: {Metadata.Title}")]
 public record AlbumResponse(
     Guid Id,
@@ -51,5 +54,7 @@ public record AlbumResponse(
     DateTime? UpdatedOnUtc,
     List<MediaContributorReferenceDto>? Contributors,
     List<AudioRatingDto>? Ratings,
-    List<TrackResponse>? Tracks
+    List<TrackResponse>? Tracks,
+    string? CoverPath,
+    IReadOnlyList<MediaArtworkDto> Artwork
 );

@@ -237,7 +237,7 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books
   "metadataProvider": null,
   "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
   "updatedOnUtc": null,
-  "coverPath": null
+  "coverPath": "/media/books/tolkien/the-fellowship-of-the-ring/cover.jpg"
 }
 ```
 
@@ -353,7 +353,7 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books/{bookId}
   "metadataProvider": null,
   "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
   "updatedOnUtc": null,
-  "coverPath": null
+  "coverPath": "/media/books/tolkien/the-fellowship-of-the-ring/cover.jpg"
 }
 ```
 
@@ -467,7 +467,7 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books?currentPage=1&pe
       "metadataProvider": null,
       "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
       "updatedOnUtc": null,
-      "coverPath": null
+      "coverPath": "/media/books/tolkien/the-fellowship-of-the-ring/cover.jpg"
     }
   ],
   "currentPage": 1,

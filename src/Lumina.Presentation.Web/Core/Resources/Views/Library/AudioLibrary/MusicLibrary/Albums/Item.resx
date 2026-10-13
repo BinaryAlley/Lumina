@@ -1,0 +1,1509 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="BackToArtist" xml:space="preserve">
+    <value>Back to artist</value>
+  </data>
+  <data name="EditAlbum" xml:space="preserve">
+    <value>Edit album</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="AlbumSaved" xml:space="preserve">
+    <value>The album was saved.</value>
+  </data>
+  <data name="SaveFailed" xml:space="preserve">
+    <value>The item could not be saved.</value>
+  </data>
+  <data name="DeleteAlbum" xml:space="preserve">
+    <value>Delete album</value>
+  </data>
+  <data name="AlbumDeleted" xml:space="preserve">
+    <value>The album was deleted.</value>
+  </data>
+  <data name="DeleteConfirm" xml:space="preserve">
+    <value>Are you sure you want to delete this item?</value>
+  </data>
+  <data name="DeleteFailed" xml:space="preserve">
+    <value>The item could not be deleted.</value>
+  </data>
+  <data name="GeneralInformation" xml:space="preserve">
+    <value>General information</value>
+  </data>
+  <data name="AlbumTitle" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="AlbumOriginalTitle" xml:space="preserve">
+    <value>Original title</value>
+  </data>
+  <data name="AlbumDescription" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="AlbumDisambiguation" xml:space="preserve">
+    <value>Disambiguation</value>
+  </data>
+  <data name="AlbumScript" xml:space="preserve">
+    <value>Script</value>
+  </data>
+  <data name="AlbumReleaseStatus" xml:space="preserve">
+    <value>Release status</value>
+  </data>
+  <data name="AlbumTotalDiscs" xml:space="preserve">
+    <value>Total discs</value>
+  </data>
+  <data name="AlbumTotalTracks" xml:space="preserve">
+    <value>Total tracks</value>
+  </data>
+  <data name="AlbumReleaseTitle" xml:space="preserve">
+    <value>Release title</value>
+  </data>
+  <data name="AlbumMediaFormat" xml:space="preserve">
+    <value>Media format</value>
+  </data>
+  <data name="AlbumPackaging" xml:space="preserve">
+    <value>Packaging</value>
+  </data>
+  <data name="AlbumBarcode" xml:space="preserve">
+    <value>Barcode</value>
+  </data>
+  <data name="AlbumCatalogNumbers" xml:space="preserve">
+    <value>Catalog numbers</value>
+  </data>
+  <data name="AlbumLabel" xml:space="preserve">
+    <value>Label</value>
+  </data>
+  <data name="AlbumAsin" xml:space="preserve">
+    <value>ASIN</value>
+  </data>
+  <data name="AlbumMusicBrainzReleaseId" xml:space="preserve">
+    <value>MusicBrainz release Id</value>
+  </data>
+  <data name="AlbumMusicBrainzReleaseGroupId" xml:space="preserve">
+    <value>MusicBrainz release group Id</value>
+  </data>
+  <data name="AlbumMusicBrainzReleaseArtistId" xml:space="preserve">
+    <value>MusicBrainz release artist Id</value>
+  </data>
+  <data name="AlbumReleaseInformation" xml:space="preserve">
+    <value>Release information</value>
+  </data>
+  <data name="AlbumOriginalReleaseDate" xml:space="preserve">
+    <value>Original release date</value>
+  </data>
+  <data name="AlbumOriginalReleaseYear" xml:space="preserve">
+    <value>Original release year</value>
+  </data>
+  <data name="AlbumReReleaseDate" xml:space="preserve">
+    <value>Re-release date</value>
+  </data>
+  <data name="AlbumReReleaseYear" xml:space="preserve">
+    <value>Re-release year</value>
+  </data>
+  <data name="AlbumReleaseCountry" xml:space="preserve">
+    <value>Release country</value>
+  </data>
+  <data name="AlbumReleaseVersion" xml:space="preserve">
+    <value>Release version</value>
+  </data>
+  <data name="AlbumLanguage" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="LanguageCode" xml:space="preserve">
+    <value>Language code</value>
+  </data>
+  <data name="LanguageName" xml:space="preserve">
+    <value>Language name</value>
+  </data>
+  <data name="NativeName" xml:space="preserve">
+    <value>Native name</value>
+  </data>
+  <data name="AlbumOriginalLanguage" xml:space="preserve">
+    <value>Original language</value>
+  </data>
+  <data name="AlbumGenres" xml:space="preserve">
+    <value>Genres</value>
+  </data>
+  <data name="AlbumTags" xml:space="preserve">
+    <value>Tags</value>
+  </data>
+  <data name="AlbumReleaseTypes" xml:space="preserve">
+    <value>Release types</value>
+  </data>
+  <data name="Tracks" xml:space="preserve">
+    <value>Tracks</value>
+  </data>
+  <data name="NoTracks" xml:space="preserve">
+    <value>This album has no tracks</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="Bootleg" xml:space="preserve">
+    <value>Bootleg</value>
+  </data>
+  <data name="Cancelled" xml:space="preserve">
+    <value>Cancelled</value>
+  </data>
+  <data name="Expunged" xml:space="preserve">
+    <value>Expunged</value>
+  </data>
+  <data name="Official" xml:space="preserve">
+    <value>Official</value>
+  </data>
+  <data name="Promotion" xml:space="preserve">
+    <value>Promotion</value>
+  </data>
+  <data name="PseudoRelease" xml:space="preserve">
+    <value>Pseudo Release</value>
+  </data>
+  <data name="Withdrawn" xml:space="preserve">
+    <value>Withdrawn</value>
+  </data>
+  <data name="Inch10Acetate" xml:space="preserve">
+    <value>10 inch Acetate</value>
+  </data>
+  <data name="Inch10Shellac" xml:space="preserve">
+    <value>10 inch Shellac</value>
+  </data>
+  <data name="Inch10Vinyl" xml:space="preserve">
+    <value>10 inch Vinyl</value>
+  </data>
+  <data name="Inch12Acetate" xml:space="preserve">
+    <value>12 inch Acetate</value>
+  </data>
+  <data name="Inch12LaserDisc" xml:space="preserve">
+    <value>12 inch Laser Disc</value>
+  </data>
+  <data name="Inch12Shellac" xml:space="preserve">
+    <value>12 inch Shellac</value>
+  </data>
+  <data name="Inch12Vinyl" xml:space="preserve">
+    <value>12 inch Vinyl</value>
+  </data>
+  <data name="Inch3Vinyl" xml:space="preserve">
+    <value>3 inch Vinyl</value>
+  </data>
+  <data name="Inch3_5FloppyDisk" xml:space="preserve">
+    <value>3.5 inch Floppy Disk</value>
+  </data>
+  <data name="Inch5_25FloppyDisk" xml:space="preserve">
+    <value>5.25 inch Floppy Disk</value>
+  </data>
+  <data name="Inch7Acetate" xml:space="preserve">
+    <value>7 inch Acetate</value>
+  </data>
+  <data name="Inch7FlexiDisc" xml:space="preserve">
+    <value>7 inch Flexi Disc</value>
+  </data>
+  <data name="Inch7Shellac" xml:space="preserve">
+    <value>7 inch Shellac</value>
+  </data>
+  <data name="Inch7Vinyl" xml:space="preserve">
+    <value>7 inch Vinyl</value>
+  </data>
+  <data name="Inch8LaserDisc" xml:space="preserve">
+    <value>8 inch Laser Disc</value>
+  </data>
+  <data name="EightTrackCartridge" xml:space="preserve">
+    <value>Eight Track Cartridge</value>
+  </data>
+  <data name="Cm8CD" xml:space="preserve">
+    <value>8 cm CD</value>
+  </data>
+  <data name="Cm8CDPlusG" xml:space="preserve">
+    <value>8 cm CD Plus G</value>
+  </data>
+  <data name="Cm8CDMinusR" xml:space="preserve">
+    <value>8 cm CD Minus R</value>
+  </data>
+  <data name="Acetate" xml:space="preserve">
+    <value>Acetate</value>
+  </data>
+  <data name="BetacamSP" xml:space="preserve">
+    <value>Betacam SP</value>
+  </data>
+  <data name="Betamax" xml:space="preserve">
+    <value>Betamax</value>
+  </data>
+  <data name="BluRay" xml:space="preserve">
+    <value>Blu Ray</value>
+  </data>
+  <data name="BluRayMinusR" xml:space="preserve">
+    <value>Blu Ray Minus R</value>
+  </data>
+  <data name="BluSpecCD" xml:space="preserve">
+    <value>Blu Spec CD</value>
+  </data>
+  <data name="Cartridge" xml:space="preserve">
+    <value>Cartridge</value>
+  </data>
+  <data name="Cassette" xml:space="preserve">
+    <value>Cassette</value>
+  </data>
+  <data name="CD" xml:space="preserve">
+    <value>CD</value>
+  </data>
+  <data name="CDPlusG" xml:space="preserve">
+    <value>CD Plus G</value>
+  </data>
+  <data name="CDMinusi" xml:space="preserve">
+    <value>CD Minusi</value>
+  </data>
+  <data name="CDMinusR" xml:space="preserve">
+    <value>CD Minus R</value>
+  </data>
+  <data name="CDV" xml:space="preserve">
+    <value>CDV</value>
+  </data>
+  <data name="CED" xml:space="preserve">
+    <value>CED</value>
+  </data>
+  <data name="CopyControlCD" xml:space="preserve">
+    <value>Copy Control CD</value>
+  </data>
+  <data name="DAT" xml:space="preserve">
+    <value>DAT</value>
+  </data>
+  <data name="DataCD" xml:space="preserve">
+    <value>Data CD</value>
+  </data>
+  <data name="DataDVD" xml:space="preserve">
+    <value>Data DVD</value>
+  </data>
+  <data name="DataDVDMinusR" xml:space="preserve">
+    <value>Data DVD Minus R</value>
+  </data>
+  <data name="DataPlay" xml:space="preserve">
+    <value>Data Play</value>
+  </data>
+  <data name="DCC" xml:space="preserve">
+    <value>DCC</value>
+  </data>
+  <data name="DigitalMedia" xml:space="preserve">
+    <value>Digital Media</value>
+  </data>
+  <data name="DownloadCard" xml:space="preserve">
+    <value>Download Card</value>
+  </data>
+  <data name="DTSCD" xml:space="preserve">
+    <value>DTSCD</value>
+  </data>
+  <data name="DualDisc" xml:space="preserve">
+    <value>Dual Disc</value>
+  </data>
+  <data name="DualDiscCDSide" xml:space="preserve">
+    <value>Dual Disc CD Side</value>
+  </data>
+  <data name="DualDiscDVDSide" xml:space="preserve">
+    <value>Dual Disc DVD Side</value>
+  </data>
+  <data name="DualDiscDVDAudioSide" xml:space="preserve">
+    <value>Dual Disc DVD Audio Side</value>
+  </data>
+  <data name="DualDiscDVDVideoSide" xml:space="preserve">
+    <value>Dual Disc DVD Video Side</value>
+  </data>
+  <data name="DVD" xml:space="preserve">
+    <value>DVD</value>
+  </data>
+  <data name="DVDAudio" xml:space="preserve">
+    <value>DVD Audio</value>
+  </data>
+  <data name="DVDMinusRVideo" xml:space="preserve">
+    <value>DVD Minus R Video</value>
+  </data>
+  <data name="DVDVideo" xml:space="preserve">
+    <value>DVD Video</value>
+  </data>
+  <data name="DVDPlus" xml:space="preserve">
+    <value>DVD Plus</value>
+  </data>
+  <data name="DVDPlusCDSide" xml:space="preserve">
+    <value>DVD Plus CD Side</value>
+  </data>
+  <data name="DVDPlusDVDAudioSide" xml:space="preserve">
+    <value>DVD Plus DVD Audio Side</value>
+  </data>
+  <data name="DVDPlusDVDVideoSide" xml:space="preserve">
+    <value>DVD Plus DVD Video Side</value>
+  </data>
+  <data name="EdisonDiamondDisc" xml:space="preserve">
+    <value>Edison Diamond Disc</value>
+  </data>
+  <data name="EnhancedCD" xml:space="preserve">
+    <value>Enhanced CD</value>
+  </data>
+  <data name="FlexiDisc" xml:space="preserve">
+    <value>Flexi Disc</value>
+  </data>
+  <data name="FloppyDisk" xml:space="preserve">
+    <value>Floppy Disk</value>
+  </data>
+  <data name="HDDVD" xml:space="preserve">
+    <value>HDDVD</value>
+  </data>
+  <data name="HDCD" xml:space="preserve">
+    <value>HDCD</value>
+  </data>
+  <data name="HiPac" xml:space="preserve">
+    <value>Hi Pac</value>
+  </data>
+  <data name="HQCD" xml:space="preserve">
+    <value>HQCD</value>
+  </data>
+  <data name="HybridSACD" xml:space="preserve">
+    <value>Hybrid SACD</value>
+  </data>
+  <data name="HybridSACDCDLayer" xml:space="preserve">
+    <value>Hybrid SACDCD Layer</value>
+  </data>
+  <data name="HybridSACDSACDLayer" xml:space="preserve">
+    <value>Hybrid SACDSACD Layer</value>
+  </data>
+  <data name="HybridSACDSACDLayer2Channels" xml:space="preserve">
+    <value>Hybrid SACDSACD Layer 2 Channels</value>
+  </data>
+  <data name="HybridSACDSACDLayerMultichannel" xml:space="preserve">
+    <value>Hybrid SACDSACD Layer Multichannel</value>
+  </data>
+  <data name="KiTAlbum" xml:space="preserve">
+    <value>Ki T Album</value>
+  </data>
+  <data name="LaserDisc" xml:space="preserve">
+    <value>Laser Disc</value>
+  </data>
+  <data name="Microcassette" xml:space="preserve">
+    <value>Microcassette</value>
+  </data>
+  <data name="MicroSD" xml:space="preserve">
+    <value>Micro SD</value>
+  </data>
+  <data name="MiniDisc" xml:space="preserve">
+    <value>Mini Disc</value>
+  </data>
+  <data name="MiniDVD" xml:space="preserve">
+    <value>Mini DVD</value>
+  </data>
+  <data name="MiniDVDAudio" xml:space="preserve">
+    <value>Mini DVD Audio</value>
+  </data>
+  <data name="MiniDVDVideo" xml:space="preserve">
+    <value>Mini DVD Video</value>
+  </data>
+  <data name="MinimaxCD" xml:space="preserve">
+    <value>Minimax CD</value>
+  </data>
+  <data name="MinimaxDVD" xml:space="preserve">
+    <value>Minimax DVD</value>
+  </data>
+  <data name="MinimaxDVDAudio" xml:space="preserve">
+    <value>Minimax DVD Audio</value>
+  </data>
+  <data name="MinimaxDVDVideo" xml:space="preserve">
+    <value>Minimax DVD Video</value>
+  </data>
+  <data name="MixedModeCD" xml:space="preserve">
+    <value>Mixed Mode CD</value>
+  </data>
+  <data name="Other" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="PatheDisc" xml:space="preserve">
+    <value>Pathe Disc</value>
+  </data>
+  <data name="PhonographRecord" xml:space="preserve">
+    <value>Phonograph Record</value>
+  </data>
+  <data name="PianoRoll" xml:space="preserve">
+    <value>Piano Roll</value>
+  </data>
+  <data name="Playbutton" xml:space="preserve">
+    <value>Playbutton</value>
+  </data>
+  <data name="PlayTape" xml:space="preserve">
+    <value>Play Tape</value>
+  </data>
+  <data name="ReelToReel" xml:space="preserve">
+    <value>Reel To Reel</value>
+  </data>
+  <data name="ROMCartridge" xml:space="preserve">
+    <value>ROM Cartridge</value>
+  </data>
+  <data name="SACD" xml:space="preserve">
+    <value>SACD</value>
+  </data>
+  <data name="SACD2Channels" xml:space="preserve">
+    <value>SACD 2 Channels</value>
+  </data>
+  <data name="SACDMultichannel" xml:space="preserve">
+    <value>SACD Multichannel</value>
+  </data>
+  <data name="SDCard" xml:space="preserve">
+    <value>SD Card</value>
+  </data>
+  <data name="Shellac" xml:space="preserve">
+    <value>Shellac</value>
+  </data>
+  <data name="SHMCD" xml:space="preserve">
+    <value>SHMCD</value>
+  </data>
+  <data name="SHMSACD" xml:space="preserve">
+    <value>SHMSACD</value>
+  </data>
+  <data name="SHMSACDMultichannel" xml:space="preserve">
+    <value>SHMSACD Multichannel</value>
+  </data>
+  <data name="SlotMusic" xml:space="preserve">
+    <value>Slot Music</value>
+  </data>
+  <data name="SVCD" xml:space="preserve">
+    <value>SVCD</value>
+  </data>
+  <data name="Tefifon" xml:space="preserve">
+    <value>Tefifon</value>
+  </data>
+  <data name="UMD" xml:space="preserve">
+    <value>UMD</value>
+  </data>
+  <data name="USBFlashDrive" xml:space="preserve">
+    <value>USB Flash Drive</value>
+  </data>
+  <data name="VCD" xml:space="preserve">
+    <value>VCD</value>
+  </data>
+  <data name="VHD" xml:space="preserve">
+    <value>VHD</value>
+  </data>
+  <data name="VHS" xml:space="preserve">
+    <value>VHS</value>
+  </data>
+  <data name="Vinyl" xml:space="preserve">
+    <value>Vinyl</value>
+  </data>
+  <data name="VinylDisc" xml:space="preserve">
+    <value>Vinyl Disc</value>
+  </data>
+  <data name="VinylDiscCDSide" xml:space="preserve">
+    <value>Vinyl Disc CD Side</value>
+  </data>
+  <data name="VinylDiscDVDSide" xml:space="preserve">
+    <value>Vinyl Disc DVD Side</value>
+  </data>
+  <data name="VinylDiscVinylSide" xml:space="preserve">
+    <value>Vinyl Disc Vinyl Side</value>
+  </data>
+  <data name="WaxCylinder" xml:space="preserve">
+    <value>Wax Cylinder</value>
+  </data>
+  <data name="ZipDisk" xml:space="preserve">
+    <value>Zip Disk</value>
+  </data>
+  <data name="Book" xml:space="preserve">
+    <value>Book</value>
+  </data>
+  <data name="Box" xml:space="preserve">
+    <value>Box</value>
+  </data>
+  <data name="CardboardPaperSleeve" xml:space="preserve">
+    <value>Cardboard Paper Sleeve</value>
+  </data>
+  <data name="CassetteCase" xml:space="preserve">
+    <value>Cassette Case</value>
+  </data>
+  <data name="ClamshellCase" xml:space="preserve">
+    <value>Clamshell Case</value>
+  </data>
+  <data name="Digibook" xml:space="preserve">
+    <value>Digibook</value>
+  </data>
+  <data name="Digifile" xml:space="preserve">
+    <value>Digifile</value>
+  </data>
+  <data name="Digipak" xml:space="preserve">
+    <value>Digipak</value>
+  </data>
+  <data name="DiscboxSlider" xml:space="preserve">
+    <value>Discbox Slider</value>
+  </data>
+  <data name="Fatbox" xml:space="preserve">
+    <value>Fatbox</value>
+  </data>
+  <data name="GatefoldCover" xml:space="preserve">
+    <value>Gatefold Cover</value>
+  </data>
+  <data name="JewelCase" xml:space="preserve">
+    <value>Jewel Case</value>
+  </data>
+  <data name="KeepCase" xml:space="preserve">
+    <value>Keep Case</value>
+  </data>
+  <data name="Longbox" xml:space="preserve">
+    <value>Longbox</value>
+  </data>
+  <data name="MetalTin" xml:space="preserve">
+    <value>Metal Tin</value>
+  </data>
+  <data name="PlasticSleeve" xml:space="preserve">
+    <value>Plastic Sleeve</value>
+  </data>
+  <data name="Slidepack" xml:space="preserve">
+    <value>Slidepack</value>
+  </data>
+  <data name="SlimJewelCase" xml:space="preserve">
+    <value>Slim Jewel Case</value>
+  </data>
+  <data name="Slipcase" xml:space="preserve">
+    <value>Slipcase</value>
+  </data>
+  <data name="SnapCase" xml:space="preserve">
+    <value>Snap Case</value>
+  </data>
+  <data name="SnapPack" xml:space="preserve">
+    <value>Snap Pack</value>
+  </data>
+  <data name="SuperJewelBox" xml:space="preserve">
+    <value>Super Jewel Box</value>
+  </data>
+  <data name="None" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="Country.AF" xml:space="preserve">
+    <value>Afghanistan</value>
+  </data>
+  <data name="Country.AL" xml:space="preserve">
+    <value>Albania</value>
+  </data>
+  <data name="Country.DZ" xml:space="preserve">
+    <value>Algeria</value>
+  </data>
+  <data name="Country.AD" xml:space="preserve">
+    <value>Andorra</value>
+  </data>
+  <data name="Country.AO" xml:space="preserve">
+    <value>Angola</value>
+  </data>
+  <data name="Country.AG" xml:space="preserve">
+    <value>Antigua &amp; Barbuda</value>
+  </data>
+  <data name="Country.AR" xml:space="preserve">
+    <value>Argentina</value>
+  </data>
+  <data name="Country.AM" xml:space="preserve">
+    <value>Armenia</value>
+  </data>
+  <data name="Country.AU" xml:space="preserve">
+    <value>Australia</value>
+  </data>
+  <data name="Country.AT" xml:space="preserve">
+    <value>Austria</value>
+  </data>
+  <data name="Country.AZ" xml:space="preserve">
+    <value>Azerbaijan</value>
+  </data>
+  <data name="Country.BS" xml:space="preserve">
+    <value>Bahamas</value>
+  </data>
+  <data name="Country.BH" xml:space="preserve">
+    <value>Bahrain</value>
+  </data>
+  <data name="Country.BD" xml:space="preserve">
+    <value>Bangladesh</value>
+  </data>
+  <data name="Country.BB" xml:space="preserve">
+    <value>Barbados</value>
+  </data>
+  <data name="Country.BY" xml:space="preserve">
+    <value>Belarus</value>
+  </data>
+  <data name="Country.BE" xml:space="preserve">
+    <value>Belgium</value>
+  </data>
+  <data name="Country.BZ" xml:space="preserve">
+    <value>Belize</value>
+  </data>
+  <data name="Country.BJ" xml:space="preserve">
+    <value>Benin</value>
+  </data>
+  <data name="Country.BT" xml:space="preserve">
+    <value>Bhutan</value>
+  </data>
+  <data name="Country.BO" xml:space="preserve">
+    <value>Bolivia</value>
+  </data>
+  <data name="Country.BA" xml:space="preserve">
+    <value>Bosnia &amp; Herzegovina</value>
+  </data>
+  <data name="Country.BW" xml:space="preserve">
+    <value>Botswana</value>
+  </data>
+  <data name="Country.BR" xml:space="preserve">
+    <value>Brazil</value>
+  </data>
+  <data name="Country.BN" xml:space="preserve">
+    <value>Brunei</value>
+  </data>
+  <data name="Country.BG" xml:space="preserve">
+    <value>Bulgaria</value>
+  </data>
+  <data name="Country.BF" xml:space="preserve">
+    <value>Burkina Faso</value>
+  </data>
+  <data name="Country.BI" xml:space="preserve">
+    <value>Burundi</value>
+  </data>
+  <data name="Country.CV" xml:space="preserve">
+    <value>Cape Verde</value>
+  </data>
+  <data name="Country.KH" xml:space="preserve">
+    <value>Cambodia</value>
+  </data>
+  <data name="Country.CM" xml:space="preserve">
+    <value>Cameroon</value>
+  </data>
+  <data name="Country.CA" xml:space="preserve">
+    <value>Canada</value>
+  </data>
+  <data name="Country.CF" xml:space="preserve">
+    <value>Central African Republic</value>
+  </data>
+  <data name="Country.TD" xml:space="preserve">
+    <value>Chad</value>
+  </data>
+  <data name="Country.CL" xml:space="preserve">
+    <value>Chile</value>
+  </data>
+  <data name="Country.CN" xml:space="preserve">
+    <value>China</value>
+  </data>
+  <data name="Country.CO" xml:space="preserve">
+    <value>Colombia</value>
+  </data>
+  <data name="Country.KM" xml:space="preserve">
+    <value>Comoros</value>
+  </data>
+  <data name="Country.CG" xml:space="preserve">
+    <value>Congo - Brazzaville</value>
+  </data>
+  <data name="Country.CD" xml:space="preserve">
+    <value>Congo - Kinshasa</value>
+  </data>
+  <data name="Country.CR" xml:space="preserve">
+    <value>Costa Rica</value>
+  </data>
+  <data name="Country.CI" xml:space="preserve">
+    <value>CÃ´te dâ€™Ivoire</value>
+  </data>
+  <data name="Country.HR" xml:space="preserve">
+    <value>Croatia</value>
+  </data>
+  <data name="Country.CU" xml:space="preserve">
+    <value>Cuba</value>
+  </data>
+  <data name="Country.CY" xml:space="preserve">
+    <value>Cyprus</value>
+  </data>
+  <data name="Country.CZ" xml:space="preserve">
+    <value>Czechia</value>
+  </data>
+  <data name="Country.DK" xml:space="preserve">
+    <value>Denmark</value>
+  </data>
+  <data name="Country.DJ" xml:space="preserve">
+    <value>Djibouti</value>
+  </data>
+  <data name="Country.DM" xml:space="preserve">
+    <value>Dominica</value>
+  </data>
+  <data name="Country.DO" xml:space="preserve">
+    <value>Dominican Republic</value>
+  </data>
+  <data name="Country.EC" xml:space="preserve">
+    <value>Ecuador</value>
+  </data>
+  <data name="Country.EG" xml:space="preserve">
+    <value>Egypt</value>
+  </data>
+  <data name="Country.SV" xml:space="preserve">
+    <value>El Salvador</value>
+  </data>
+  <data name="Country.GQ" xml:space="preserve">
+    <value>Equatorial Guinea</value>
+  </data>
+  <data name="Country.ER" xml:space="preserve">
+    <value>Eritrea</value>
+  </data>
+  <data name="Country.EE" xml:space="preserve">
+    <value>Estonia</value>
+  </data>
+  <data name="Country.SZ" xml:space="preserve">
+    <value>Eswatini</value>
+  </data>
+  <data name="Country.ET" xml:space="preserve">
+    <value>Ethiopia</value>
+  </data>
+  <data name="Country.FJ" xml:space="preserve">
+    <value>Fiji</value>
+  </data>
+  <data name="Country.FI" xml:space="preserve">
+    <value>Finland</value>
+  </data>
+  <data name="Country.FR" xml:space="preserve">
+    <value>France</value>
+  </data>
+  <data name="Country.GA" xml:space="preserve">
+    <value>Gabon</value>
+  </data>
+  <data name="Country.GM" xml:space="preserve">
+    <value>Gambia</value>
+  </data>
+  <data name="Country.GE" xml:space="preserve">
+    <value>Georgia</value>
+  </data>
+  <data name="Country.DE" xml:space="preserve">
+    <value>Germany</value>
+  </data>
+  <data name="Country.GH" xml:space="preserve">
+    <value>Ghana</value>
+  </data>
+  <data name="Country.GR" xml:space="preserve">
+    <value>Greece</value>
+  </data>
+  <data name="Country.GD" xml:space="preserve">
+    <value>Grenada</value>
+  </data>
+  <data name="Country.GT" xml:space="preserve">
+    <value>Guatemala</value>
+  </data>
+  <data name="Country.GN" xml:space="preserve">
+    <value>Guinea</value>
+  </data>
+  <data name="Country.GW" xml:space="preserve">
+    <value>Guinea-Bissau</value>
+  </data>
+  <data name="Country.GY" xml:space="preserve">
+    <value>Guyana</value>
+  </data>
+  <data name="Country.HT" xml:space="preserve">
+    <value>Haiti</value>
+  </data>
+  <data name="Country.HN" xml:space="preserve">
+    <value>Honduras</value>
+  </data>
+  <data name="Country.HU" xml:space="preserve">
+    <value>Hungary</value>
+  </data>
+  <data name="Country.IS" xml:space="preserve">
+    <value>Iceland</value>
+  </data>
+  <data name="Country.IN" xml:space="preserve">
+    <value>India</value>
+  </data>
+  <data name="Country.ID" xml:space="preserve">
+    <value>Indonesia</value>
+  </data>
+  <data name="Country.IR" xml:space="preserve">
+    <value>Iran</value>
+  </data>
+  <data name="Country.IQ" xml:space="preserve">
+    <value>Iraq</value>
+  </data>
+  <data name="Country.IE" xml:space="preserve">
+    <value>Ireland</value>
+  </data>
+  <data name="Country.IL" xml:space="preserve">
+    <value>Israel</value>
+  </data>
+  <data name="Country.IT" xml:space="preserve">
+    <value>Italy</value>
+  </data>
+  <data name="Country.JM" xml:space="preserve">
+    <value>Jamaica</value>
+  </data>
+  <data name="Country.JP" xml:space="preserve">
+    <value>Japan</value>
+  </data>
+  <data name="Country.JO" xml:space="preserve">
+    <value>Jordan</value>
+  </data>
+  <data name="Country.KZ" xml:space="preserve">
+    <value>Kazakhstan</value>
+  </data>
+  <data name="Country.KE" xml:space="preserve">
+    <value>Kenya</value>
+  </data>
+  <data name="Country.KI" xml:space="preserve">
+    <value>Kiribati</value>
+  </data>
+  <data name="Country.KP" xml:space="preserve">
+    <value>North Korea</value>
+  </data>
+  <data name="Country.KR" xml:space="preserve">
+    <value>South Korea</value>
+  </data>
+  <data name="Country.KW" xml:space="preserve">
+    <value>Kuwait</value>
+  </data>
+  <data name="Country.KG" xml:space="preserve">
+    <value>Kyrgyzstan</value>
+  </data>
+  <data name="Country.LA" xml:space="preserve">
+    <value>Laos</value>
+  </data>
+  <data name="Country.LV" xml:space="preserve">
+    <value>Latvia</value>
+  </data>
+  <data name="Country.LB" xml:space="preserve">
+    <value>Lebanon</value>
+  </data>
+  <data name="Country.LS" xml:space="preserve">
+    <value>Lesotho</value>
+  </data>
+  <data name="Country.LR" xml:space="preserve">
+    <value>Liberia</value>
+  </data>
+  <data name="Country.LY" xml:space="preserve">
+    <value>Libya</value>
+  </data>
+  <data name="Country.LI" xml:space="preserve">
+    <value>Liechtenstein</value>
+  </data>
+  <data name="Country.LT" xml:space="preserve">
+    <value>Lithuania</value>
+  </data>
+  <data name="Country.LU" xml:space="preserve">
+    <value>Luxembourg</value>
+  </data>
+  <data name="Country.MG" xml:space="preserve">
+    <value>Madagascar</value>
+  </data>
+  <data name="Country.MW" xml:space="preserve">
+    <value>Malawi</value>
+  </data>
+  <data name="Country.MY" xml:space="preserve">
+    <value>Malaysia</value>
+  </data>
+  <data name="Country.MV" xml:space="preserve">
+    <value>Maldives</value>
+  </data>
+  <data name="Country.ML" xml:space="preserve">
+    <value>Mali</value>
+  </data>
+  <data name="Country.MT" xml:space="preserve">
+    <value>Malta</value>
+  </data>
+  <data name="Country.MH" xml:space="preserve">
+    <value>Marshall Islands</value>
+  </data>
+  <data name="Country.MR" xml:space="preserve">
+    <value>Mauritania</value>
+  </data>
+  <data name="Country.MU" xml:space="preserve">
+    <value>Mauritius</value>
+  </data>
+  <data name="Country.MX" xml:space="preserve">
+    <value>Mexico</value>
+  </data>
+  <data name="Country.FM" xml:space="preserve">
+    <value>Micronesia</value>
+  </data>
+  <data name="Country.MD" xml:space="preserve">
+    <value>Moldova</value>
+  </data>
+  <data name="Country.MC" xml:space="preserve">
+    <value>Monaco</value>
+  </data>
+  <data name="Country.MN" xml:space="preserve">
+    <value>Mongolia</value>
+  </data>
+  <data name="Country.ME" xml:space="preserve">
+    <value>Montenegro</value>
+  </data>
+  <data name="Country.MA" xml:space="preserve">
+    <value>Morocco</value>
+  </data>
+  <data name="Country.MZ" xml:space="preserve">
+    <value>Mozambique</value>
+  </data>
+  <data name="Country.MM" xml:space="preserve">
+    <value>Myanmar (Burma)</value>
+  </data>
+  <data name="Country.NA" xml:space="preserve">
+    <value>Namibia</value>
+  </data>
+  <data name="Country.NR" xml:space="preserve">
+    <value>Nauru</value>
+  </data>
+  <data name="Country.NP" xml:space="preserve">
+    <value>Nepal</value>
+  </data>
+  <data name="Country.NL" xml:space="preserve">
+    <value>Netherlands</value>
+  </data>
+  <data name="Country.NZ" xml:space="preserve">
+    <value>New Zealand</value>
+  </data>
+  <data name="Country.NI" xml:space="preserve">
+    <value>Nicaragua</value>
+  </data>
+  <data name="Country.NE" xml:space="preserve">
+    <value>Niger</value>
+  </data>
+  <data name="Country.NG" xml:space="preserve">
+    <value>Nigeria</value>
+  </data>
+  <data name="Country.MK" xml:space="preserve">
+    <value>North Macedonia</value>
+  </data>
+  <data name="Country.NO" xml:space="preserve">
+    <value>Norway</value>
+  </data>
+  <data name="Country.OM" xml:space="preserve">
+    <value>Oman</value>
+  </data>
+  <data name="Country.PK" xml:space="preserve">
+    <value>Pakistan</value>
+  </data>
+  <data name="Country.PW" xml:space="preserve">
+    <value>Palau</value>
+  </data>
+  <data name="Country.PS" xml:space="preserve">
+    <value>Palestinian Territories</value>
+  </data>
+  <data name="Country.PA" xml:space="preserve">
+    <value>Panama</value>
+  </data>
+  <data name="Country.PG" xml:space="preserve">
+    <value>Papua New Guinea</value>
+  </data>
+  <data name="Country.PY" xml:space="preserve">
+    <value>Paraguay</value>
+  </data>
+  <data name="Country.PE" xml:space="preserve">
+    <value>Peru</value>
+  </data>
+  <data name="Country.PH" xml:space="preserve">
+    <value>Philippines</value>
+  </data>
+  <data name="Country.PL" xml:space="preserve">
+    <value>Poland</value>
+  </data>
+  <data name="Country.PT" xml:space="preserve">
+    <value>Portugal</value>
+  </data>
+  <data name="Country.QA" xml:space="preserve">
+    <value>Qatar</value>
+  </data>
+  <data name="Country.RO" xml:space="preserve">
+    <value>Romania</value>
+  </data>
+  <data name="Country.RU" xml:space="preserve">
+    <value>Russia</value>
+  </data>
+  <data name="Country.RW" xml:space="preserve">
+    <value>Rwanda</value>
+  </data>
+  <data name="Country.KN" xml:space="preserve">
+    <value>St. Kitts &amp; Nevis</value>
+  </data>
+  <data name="Country.LC" xml:space="preserve">
+    <value>St. Lucia</value>
+  </data>
+  <data name="Country.VC" xml:space="preserve">
+    <value>St. Vincent &amp; Grenadines</value>
+  </data>
+  <data name="Country.WS" xml:space="preserve">
+    <value>Samoa</value>
+  </data>
+  <data name="Country.SM" xml:space="preserve">
+    <value>San Marino</value>
+  </data>
+  <data name="Country.ST" xml:space="preserve">
+    <value>SÃ£o TomÃ© &amp; PrÃ­ncipe</value>
+  </data>
+  <data name="Country.SA" xml:space="preserve">
+    <value>Saudi Arabia</value>
+  </data>
+  <data name="Country.SN" xml:space="preserve">
+    <value>Senegal</value>
+  </data>
+  <data name="Country.RS" xml:space="preserve">
+    <value>Serbia</value>
+  </data>
+  <data name="Country.SC" xml:space="preserve">
+    <value>Seychelles</value>
+  </data>
+  <data name="Country.SL" xml:space="preserve">
+    <value>Sierra Leone</value>
+  </data>
+  <data name="Country.SG" xml:space="preserve">
+    <value>Singapore</value>
+  </data>
+  <data name="Country.SK" xml:space="preserve">
+    <value>Slovakia</value>
+  </data>
+  <data name="Country.SI" xml:space="preserve">
+    <value>Slovenia</value>
+  </data>
+  <data name="Country.SB" xml:space="preserve">
+    <value>Solomon Islands</value>
+  </data>
+  <data name="Country.SO" xml:space="preserve">
+    <value>Somalia</value>
+  </data>
+  <data name="Country.ZA" xml:space="preserve">
+    <value>South Africa</value>
+  </data>
+  <data name="Country.SS" xml:space="preserve">
+    <value>South Sudan</value>
+  </data>
+  <data name="Country.ES" xml:space="preserve">
+    <value>Spain</value>
+  </data>
+  <data name="Country.LK" xml:space="preserve">
+    <value>Sri Lanka</value>
+  </data>
+  <data name="Country.SD" xml:space="preserve">
+    <value>Sudan</value>
+  </data>
+  <data name="Country.SR" xml:space="preserve">
+    <value>Suriname</value>
+  </data>
+  <data name="Country.SE" xml:space="preserve">
+    <value>Sweden</value>
+  </data>
+  <data name="Country.CH" xml:space="preserve">
+    <value>Switzerland</value>
+  </data>
+  <data name="Country.SY" xml:space="preserve">
+    <value>Syria</value>
+  </data>
+  <data name="Country.TW" xml:space="preserve">
+    <value>Taiwan</value>
+  </data>
+  <data name="Country.TJ" xml:space="preserve">
+    <value>Tajikistan</value>
+  </data>
+  <data name="Country.TZ" xml:space="preserve">
+    <value>Tanzania</value>
+  </data>
+  <data name="Country.TH" xml:space="preserve">
+    <value>Thailand</value>
+  </data>
+  <data name="Country.TL" xml:space="preserve">
+    <value>Timor-Leste</value>
+  </data>
+  <data name="Country.TG" xml:space="preserve">
+    <value>Togo</value>
+  </data>
+  <data name="Country.TO" xml:space="preserve">
+    <value>Tonga</value>
+  </data>
+  <data name="Country.TT" xml:space="preserve">
+    <value>Trinidad &amp; Tobago</value>
+  </data>
+  <data name="Country.TN" xml:space="preserve">
+    <value>Tunisia</value>
+  </data>
+  <data name="Country.TR" xml:space="preserve">
+    <value>TÃ¼rkiye</value>
+  </data>
+  <data name="Country.TM" xml:space="preserve">
+    <value>Turkmenistan</value>
+  </data>
+  <data name="Country.TV" xml:space="preserve">
+    <value>Tuvalu</value>
+  </data>
+  <data name="Country.UG" xml:space="preserve">
+    <value>Uganda</value>
+  </data>
+  <data name="Country.UA" xml:space="preserve">
+    <value>Ukraine</value>
+  </data>
+  <data name="Country.AE" xml:space="preserve">
+    <value>United Arab Emirates</value>
+  </data>
+  <data name="Country.GB" xml:space="preserve">
+    <value>United Kingdom</value>
+  </data>
+  <data name="Country.US" xml:space="preserve">
+    <value>United States</value>
+  </data>
+  <data name="Country.UY" xml:space="preserve">
+    <value>Uruguay</value>
+  </data>
+  <data name="Country.UZ" xml:space="preserve">
+    <value>Uzbekistan</value>
+  </data>
+  <data name="Country.VU" xml:space="preserve">
+    <value>Vanuatu</value>
+  </data>
+  <data name="Country.VA" xml:space="preserve">
+    <value>Vatican City</value>
+  </data>
+  <data name="Country.VE" xml:space="preserve">
+    <value>Venezuela</value>
+  </data>
+  <data name="Country.VN" xml:space="preserve">
+    <value>Vietnam</value>
+  </data>
+  <data name="Country.YE" xml:space="preserve">
+    <value>Yemen</value>
+  </data>
+  <data name="Country.ZM" xml:space="preserve">
+    <value>Zambia</value>
+  </data>
+  <data name="Country.ZW" xml:space="preserve">
+    <value>Zimbabwe</value>
+  </data>
+  <data name="Country.AN" xml:space="preserve">
+    <value>Netherlands Antilles</value>
+  </data>
+  <data name="Country.XE" xml:space="preserve">
+    <value>Europe</value>
+  </data>
+  <data name="Country.XW" xml:space="preserve">
+    <value>Worldwide</value>
+  </data>
+  <data name="AlbumTitleDescription" xml:space="preserve">
+    <value>The title of the album.</value>
+  </data>
+  <data name="AlbumOriginalTitleDescription" xml:space="preserve">
+    <value>The original title of the album, when it differs from the current one.</value>
+  </data>
+  <data name="AlbumDescriptionDescription" xml:space="preserve">
+    <value>A short summary or description of the album.</value>
+  </data>
+  <data name="AlbumDisambiguationDescription" xml:space="preserve">
+    <value>A comment that distinguishes the album from others with the same title.</value>
+  </data>
+  <data name="AlbumScriptDescription" xml:space="preserve">
+    <value>The script used in the release title.</value>
+  </data>
+  <data name="AlbumReleaseStatusDescription" xml:space="preserve">
+    <value>The release status of the album.</value>
+  </data>
+  <data name="AlbumTotalDiscsDescription" xml:space="preserve">
+    <value>The number of discs of the album.</value>
+  </data>
+  <data name="AlbumTotalTracksDescription" xml:space="preserve">
+    <value>The number of tracks of the album.</value>
+  </data>
+  <data name="AlbumReleaseTitleDescription" xml:space="preserve">
+    <value>The title of the release.</value>
+  </data>
+  <data name="AlbumMediaFormatDescription" xml:space="preserve">
+    <value>The media format of the album.</value>
+  </data>
+  <data name="AlbumPackagingDescription" xml:space="preserve">
+    <value>The packaging of the album.</value>
+  </data>
+  <data name="AlbumBarcodeDescription" xml:space="preserve">
+    <value>The barcode of the album.</value>
+  </data>
+  <data name="AlbumCatalogNumbersDescription" xml:space="preserve">
+    <value>The catalog numbers of the album.</value>
+  </data>
+  <data name="AlbumLabelDescription" xml:space="preserve">
+    <value>The label that released the album.</value>
+  </data>
+  <data name="AlbumAsinDescription" xml:space="preserve">
+    <value>The Amazon Standard Identification Number of the album.</value>
+  </data>
+  <data name="AlbumMusicBrainzReleaseIdDescription" xml:space="preserve">
+    <value>The MusicBrainz identifier of the release.</value>
+  </data>
+  <data name="AlbumMusicBrainzReleaseGroupIdDescription" xml:space="preserve">
+    <value>The MusicBrainz identifier of the release group.</value>
+  </data>
+  <data name="AlbumMusicBrainzReleaseArtistIdDescription" xml:space="preserve">
+    <value>The MusicBrainz identifier of the release artist.</value>
+  </data>
+  <data name="AlbumOriginalReleaseDateDescription" xml:space="preserve">
+    <value>The date when the album was originally released.</value>
+  </data>
+  <data name="AlbumOriginalReleaseYearDescription" xml:space="preserve">
+    <value>The year when the album was originally released.</value>
+  </data>
+  <data name="AlbumReReleaseDateDescription" xml:space="preserve">
+    <value>The date when the album was released again.</value>
+  </data>
+  <data name="AlbumReReleaseYearDescription" xml:space="preserve">
+    <value>The year when the album was released again.</value>
+  </data>
+  <data name="AlbumReleaseCountryDescription" xml:space="preserve">
+    <value>The country of release of the album.</value>
+  </data>
+  <data name="AlbumReleaseVersionDescription" xml:space="preserve">
+    <value>The version of the release, like the original one.</value>
+  </data>
+  <data name="LanguageCodeDescription" xml:space="preserve">
+    <value>The two letter code of the language of the album.</value>
+  </data>
+  <data name="LanguageNameDescription" xml:space="preserve">
+    <value>The name of the language of the album.</value>
+  </data>
+  <data name="NativeNameDescription" xml:space="preserve">
+    <value>The native name of the language of the album.</value>
+  </data>
+  <data name="AlbumGenresDescription" xml:space="preserve">
+    <value>The genres of the album.</value>
+  </data>
+  <data name="AlbumTagsDescription" xml:space="preserve">
+    <value>The tags of the album.</value>
+  </data>
+  <data name="AlbumReleaseTypesDescription" xml:space="preserve">
+    <value>The release types of the album.</value>
+  </data>
+  <data name="TracksDescription" xml:space="preserve">
+    <value>The tracks of the album.</value>
+  </data>
+  <data name="ChangeCover" xml:space="preserve">
+    <value>Change cover</value>
+  </data>
+  <data name="CoverImage" xml:space="preserve">
+    <value>Cover image</value>
+  </data>
+  <data name="NoCover" xml:space="preserve">
+    <value>No cover</value>
+  </data>
+  <data name="CoverSaved" xml:space="preserve">
+    <value>The cover image was updated.</value>
+  </data>
+  <data name="CoverUploadFailed" xml:space="preserve">
+    <value>The cover image could not be uploaded.</value>
+  </data>
+<data name="Contributors" xml:space="preserve">
+    <value>Contributors</value>
+  </data>
+<data name="ContributorId" xml:space="preserve">
+    <value>Contributor Id</value>
+  </data>
+<data name="ContributorRole" xml:space="preserve">
+    <value>Role</value>
+  </data>
+<data name="AddContributor" xml:space="preserve">
+    <value>Add contributor</value>
+  </data>
+<data name="ContributorsDescription" xml:space="preserve">
+    <value>The people that contributed to the artist.</value>
+  </data>
+<data name="Ratings" xml:space="preserve">
+    <value>Ratings</value>
+  </data>
+<data name="RatingValue" xml:space="preserve">
+    <value>Rating</value>
+  </data>
+<data name="RatingMaxValue" xml:space="preserve">
+    <value>Maximum rating</value>
+  </data>
+<data name="RatingSource" xml:space="preserve">
+    <value>Source</value>
+  </data>
+<data name="RatingVoteCount" xml:space="preserve">
+    <value>Vote count</value>
+  </data>
+<data name="AddRating" xml:space="preserve">
+    <value>Add rating</value>
+  </data>
+<data name="RatingsDescription" xml:space="preserve">
+    <value>The ratings of the artist from different sources.</value>
+  </data>
+<data name="Author" xml:space="preserve">
+    <value>Author</value>
+  </data>
+<data name="Translator" xml:space="preserve">
+    <value>Translator</value>
+  </data>
+<data name="Illustrator" xml:space="preserve">
+    <value>Illustrator</value>
+  </data>
+<data name="Publisher" xml:space="preserve">
+    <value>Publisher</value>
+  </data>
+<data name="Narrator" xml:space="preserve">
+    <value>Narrator</value>
+  </data>
+<data name="Actor" xml:space="preserve">
+    <value>Actor</value>
+  </data>
+<data name="Director" xml:space="preserve">
+    <value>Director</value>
+  </data>
+<data name="Screenwriter" xml:space="preserve">
+    <value>Screenwriter</value>
+  </data>
+<data name="Composer" xml:space="preserve">
+    <value>Composer</value>
+  </data>
+<data name="Lyricist" xml:space="preserve">
+    <value>Lyricist</value>
+  </data>
+<data name="Arranger" xml:space="preserve">
+    <value>Arranger</value>
+  </data>
+<data name="Conductor" xml:space="preserve">
+    <value>Conductor</value>
+  </data>
+<data name="Producer" xml:space="preserve">
+    <value>Producer</value>
+  </data>
+<data name="ExecutiveProducer" xml:space="preserve">
+    <value>Executive Producer</value>
+  </data>
+<data name="Engineer" xml:space="preserve">
+    <value>Engineer</value>
+  </data>
+<data name="Mixer" xml:space="preserve">
+    <value>Mixer</value>
+  </data>
+<data name="Remixer" xml:space="preserve">
+    <value>Remixer</value>
+  </data>
+<data name="RecordLabel" xml:space="preserve">
+    <value>Record Label</value>
+  </data>
+<data name="Vocals" xml:space="preserve">
+    <value>Vocals</value>
+  </data>
+<data name="BackingVocals" xml:space="preserve">
+    <value>Backing Vocals</value>
+  </data>
+<data name="Guitar" xml:space="preserve">
+    <value>Guitar</value>
+  </data>
+<data name="BassGuitar" xml:space="preserve">
+    <value>Bass Guitar</value>
+  </data>
+<data name="Drums" xml:space="preserve">
+    <value>Drums</value>
+  </data>
+<data name="Percussion" xml:space="preserve">
+    <value>Percussion</value>
+  </data>
+<data name="Keyboards" xml:space="preserve">
+    <value>Keyboards</value>
+  </data>
+<data name="Piano" xml:space="preserve">
+    <value>Piano</value>
+  </data>
+<data name="Synthesizer" xml:space="preserve">
+    <value>Synthesizer</value>
+  </data>
+<data name="Strings" xml:space="preserve">
+    <value>Strings</value>
+  </data>
+<data name="Woodwinds" xml:space="preserve">
+    <value>Woodwinds</value>
+  </data>
+<data name="Brass" xml:space="preserve">
+    <value>Brass</value>
+  </data>
+<data name="Choir" xml:space="preserve">
+    <value>Choir</value>
+  </data>
+<data name="Orchestrator" xml:space="preserve">
+    <value>Orchestrator</value>
+  </data>
+<data name="Performer" xml:space="preserve">
+    <value>Performer</value>
+  </data>
+<data name="User" xml:space="preserve">
+    <value>User</value>
+  </data>
+<data name="MusicBrainz" xml:space="preserve">
+    <value>MusicBrainz</value>
+  </data>
+<data name="Discogs" xml:space="preserve">
+    <value>Discogs</value>
+  </data>
+<data name="LastFm" xml:space="preserve">
+    <value>Last.fm</value>
+  </data>
+  <data name="Genre" xml:space="preserve">
+    <value>Genre</value>
+  </data>
+  <data name="AddGenre" xml:space="preserve">
+    <value>Add genre</value>
+  </data>
+  <data name="Tag" xml:space="preserve">
+    <value>Tag</value>
+  </data>
+  <data name="AddTag" xml:space="preserve">
+    <value>Add tag</value>
+  </data>
+  <data name="ReleaseType" xml:space="preserve">
+    <value>Release type</value>
+  </data>
+  <data name="AddReleaseType" xml:space="preserve">
+    <value>Add release type</value>
+  </data>
+  <data name="CatalogNumber" xml:space="preserve">
+    <value>Catalog number</value>
+  </data>
+  <data name="AddCatalogNumber" xml:space="preserve">
+    <value>Add catalog number</value>
+  </data>
+  <data name="Cover" xml:space="preserve">
+    <value>Cover</value>
+  </data>
+  <data name="Front" xml:space="preserve">
+    <value>Front</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="Booklet" xml:space="preserve">
+    <value>Booklet</value>
+  </data>
+  <data name="Medium" xml:space="preserve">
+    <value>Medium</value>
+  </data>
+  <data name="Tray" xml:space="preserve">
+    <value>Tray</value>
+  </data>
+  <data name="Spine" xml:space="preserve">
+    <value>Spine</value>
+  </data>
+  <data name="Obi" xml:space="preserve">
+    <value>Obi</value>
+  </data>
+  <data name="Sticker" xml:space="preserve">
+    <value>Sticker</value>
+  </data>
+  <data name="Poster" xml:space="preserve">
+    <value>Poster</value>
+  </data>
+  <data name="Liner" xml:space="preserve">
+    <value>Liner notes</value>
+  </data>
+  <data name="Watermark" xml:space="preserve">
+    <value>Watermark</value>
+  </data>
+  <data name="Backdrop" xml:space="preserve">
+    <value>Backdrop</value>
+  </data>
+  <data name="Banner" xml:space="preserve">
+    <value>Banner</value>
+  </data>
+  <data name="Logo" xml:space="preserve">
+    <value>Logo</value>
+  </data>
+  <data name="Thumb" xml:space="preserve">
+    <value>Thumbnail</value>
+  </data>
+  <data name="Identifiers" xml:space="preserve">
+    <value>Identifiers</value>
+  </data>
+</root>

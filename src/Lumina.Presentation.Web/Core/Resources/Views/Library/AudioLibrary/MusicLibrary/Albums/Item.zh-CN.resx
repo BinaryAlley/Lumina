@@ -1,0 +1,1509 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="BackToArtist" xml:space="preserve">
+    <value>返回艺术家</value>
+  </data>
+  <data name="EditAlbum" xml:space="preserve">
+    <value>编辑专辑</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="AlbumSaved" xml:space="preserve">
+    <value>专辑已保存。</value>
+  </data>
+  <data name="SaveFailed" xml:space="preserve">
+    <value>无法保存该项目。</value>
+  </data>
+  <data name="DeleteAlbum" xml:space="preserve">
+    <value>删除专辑</value>
+  </data>
+  <data name="AlbumDeleted" xml:space="preserve">
+    <value>专辑已删除。</value>
+  </data>
+  <data name="DeleteConfirm" xml:space="preserve">
+    <value>确定要删除此项目吗？</value>
+  </data>
+  <data name="DeleteFailed" xml:space="preserve">
+    <value>无法删除该项目。</value>
+  </data>
+  <data name="GeneralInformation" xml:space="preserve">
+    <value>常规信息</value>
+  </data>
+  <data name="AlbumTitle" xml:space="preserve">
+    <value>标题</value>
+  </data>
+  <data name="AlbumOriginalTitle" xml:space="preserve">
+    <value>原标题</value>
+  </data>
+  <data name="AlbumDescription" xml:space="preserve">
+    <value>简介</value>
+  </data>
+  <data name="AlbumDisambiguation" xml:space="preserve">
+    <value>消歧义</value>
+  </data>
+  <data name="AlbumScript" xml:space="preserve">
+    <value>文字</value>
+  </data>
+  <data name="AlbumReleaseStatus" xml:space="preserve">
+    <value>发行状态</value>
+  </data>
+  <data name="AlbumTotalDiscs" xml:space="preserve">
+    <value>光盘总数</value>
+  </data>
+  <data name="AlbumTotalTracks" xml:space="preserve">
+    <value>曲目总数</value>
+  </data>
+  <data name="AlbumReleaseTitle" xml:space="preserve">
+    <value>发行标题</value>
+  </data>
+  <data name="AlbumMediaFormat" xml:space="preserve">
+    <value>媒介格式</value>
+  </data>
+  <data name="AlbumPackaging" xml:space="preserve">
+    <value>包装</value>
+  </data>
+  <data name="AlbumBarcode" xml:space="preserve">
+    <value>条码</value>
+  </data>
+  <data name="AlbumCatalogNumbers" xml:space="preserve">
+    <value>目录编号</value>
+  </data>
+  <data name="AlbumLabel" xml:space="preserve">
+    <value>唱片公司</value>
+  </data>
+  <data name="AlbumAsin" xml:space="preserve">
+    <value>ASIN</value>
+  </data>
+  <data name="AlbumMusicBrainzReleaseId" xml:space="preserve">
+    <value>MusicBrainz 发行 Id</value>
+  </data>
+  <data name="AlbumMusicBrainzReleaseGroupId" xml:space="preserve">
+    <value>MusicBrainz 发行组 Id</value>
+  </data>
+  <data name="AlbumMusicBrainzReleaseArtistId" xml:space="preserve">
+    <value>MusicBrainz 发行艺术家 Id</value>
+  </data>
+  <data name="AlbumReleaseInformation" xml:space="preserve">
+    <value>发行信息</value>
+  </data>
+  <data name="AlbumOriginalReleaseDate" xml:space="preserve">
+    <value>首次发行日期</value>
+  </data>
+  <data name="AlbumOriginalReleaseYear" xml:space="preserve">
+    <value>首次发行年份</value>
+  </data>
+  <data name="AlbumReReleaseDate" xml:space="preserve">
+    <value>再发行日期</value>
+  </data>
+  <data name="AlbumReReleaseYear" xml:space="preserve">
+    <value>再发行年份</value>
+  </data>
+  <data name="AlbumReleaseCountry" xml:space="preserve">
+    <value>发行国家</value>
+  </data>
+  <data name="AlbumReleaseVersion" xml:space="preserve">
+    <value>发行版本</value>
+  </data>
+  <data name="AlbumLanguage" xml:space="preserve">
+    <value>语言</value>
+  </data>
+  <data name="LanguageCode" xml:space="preserve">
+    <value>语言代码</value>
+  </data>
+  <data name="LanguageName" xml:space="preserve">
+    <value>语言名称</value>
+  </data>
+  <data name="NativeName" xml:space="preserve">
+    <value>本地语名称</value>
+  </data>
+  <data name="AlbumOriginalLanguage" xml:space="preserve">
+    <value>原语言</value>
+  </data>
+  <data name="AlbumGenres" xml:space="preserve">
+    <value>体裁</value>
+  </data>
+  <data name="AlbumTags" xml:space="preserve">
+    <value>标签</value>
+  </data>
+  <data name="AlbumReleaseTypes" xml:space="preserve">
+    <value>发行类型</value>
+  </data>
+  <data name="Tracks" xml:space="preserve">
+    <value>曲目</value>
+  </data>
+  <data name="NoTracks" xml:space="preserve">
+    <value>此专辑没有曲目</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>移除</value>
+  </data>
+  <data name="Bootleg" xml:space="preserve">
+    <value>盗版</value>
+  </data>
+  <data name="Cancelled" xml:space="preserve">
+    <value>已取消</value>
+  </data>
+  <data name="Expunged" xml:space="preserve">
+    <value>已删除</value>
+  </data>
+  <data name="Official" xml:space="preserve">
+    <value>官方</value>
+  </data>
+  <data name="Promotion" xml:space="preserve">
+    <value>宣传</value>
+  </data>
+  <data name="PseudoRelease" xml:space="preserve">
+    <value>伪发行</value>
+  </data>
+  <data name="Withdrawn" xml:space="preserve">
+    <value>已撤回</value>
+  </data>
+  <data name="Inch10Acetate" xml:space="preserve">
+    <value>10 英寸醋酸盐唱片</value>
+  </data>
+  <data name="Inch10Shellac" xml:space="preserve">
+    <value>10 英寸虫胶唱片</value>
+  </data>
+  <data name="Inch10Vinyl" xml:space="preserve">
+    <value>10 英寸黑胶</value>
+  </data>
+  <data name="Inch12Acetate" xml:space="preserve">
+    <value>12 英寸醋酸盐唱片</value>
+  </data>
+  <data name="Inch12LaserDisc" xml:space="preserve">
+    <value>12 英寸 Laser Disc</value>
+  </data>
+  <data name="Inch12Shellac" xml:space="preserve">
+    <value>12 英寸虫胶唱片</value>
+  </data>
+  <data name="Inch12Vinyl" xml:space="preserve">
+    <value>12 英寸黑胶</value>
+  </data>
+  <data name="Inch3Vinyl" xml:space="preserve">
+    <value>3 英寸黑胶</value>
+  </data>
+  <data name="Inch3_5FloppyDisk" xml:space="preserve">
+    <value>3.5 英寸软盘</value>
+  </data>
+  <data name="Inch5_25FloppyDisk" xml:space="preserve">
+    <value>5.25 英寸软盘</value>
+  </data>
+  <data name="Inch7Acetate" xml:space="preserve">
+    <value>7 英寸醋酸盐唱片</value>
+  </data>
+  <data name="Inch7FlexiDisc" xml:space="preserve">
+    <value>7 英寸 Flexi Disc</value>
+  </data>
+  <data name="Inch7Shellac" xml:space="preserve">
+    <value>7 英寸虫胶唱片</value>
+  </data>
+  <data name="Inch7Vinyl" xml:space="preserve">
+    <value>7 英寸黑胶</value>
+  </data>
+  <data name="Inch8LaserDisc" xml:space="preserve">
+    <value>8 英寸 Laser Disc</value>
+  </data>
+  <data name="EightTrackCartridge" xml:space="preserve">
+    <value>八轨磁带盒</value>
+  </data>
+  <data name="Cm8CD" xml:space="preserve">
+    <value>8 厘米 CD</value>
+  </data>
+  <data name="Cm8CDPlusG" xml:space="preserve">
+    <value>8 厘米 CD Plus G</value>
+  </data>
+  <data name="Cm8CDMinusR" xml:space="preserve">
+    <value>8 厘米 CD-R</value>
+  </data>
+  <data name="Acetate" xml:space="preserve">
+    <value>醋酸盐唱片</value>
+  </data>
+  <data name="BetacamSP" xml:space="preserve">
+    <value>Betacam SP</value>
+  </data>
+  <data name="Betamax" xml:space="preserve">
+    <value>Betamax</value>
+  </data>
+  <data name="BluRay" xml:space="preserve">
+    <value>Blu-ray</value>
+  </data>
+  <data name="BluRayMinusR" xml:space="preserve">
+    <value>Blu-ray-R</value>
+  </data>
+  <data name="BluSpecCD" xml:space="preserve">
+    <value>Blu Spec CD</value>
+  </data>
+  <data name="Cartridge" xml:space="preserve">
+    <value>卡带</value>
+  </data>
+  <data name="Cassette" xml:space="preserve">
+    <value>盒式磁带</value>
+  </data>
+  <data name="CD" xml:space="preserve">
+    <value>CD</value>
+  </data>
+  <data name="CDPlusG" xml:space="preserve">
+    <value>CD Plus G</value>
+  </data>
+  <data name="CDMinusi" xml:space="preserve">
+    <value>CD Minusi</value>
+  </data>
+  <data name="CDMinusR" xml:space="preserve">
+    <value>CD-R</value>
+  </data>
+  <data name="CDV" xml:space="preserve">
+    <value>CDV</value>
+  </data>
+  <data name="CED" xml:space="preserve">
+    <value>CED</value>
+  </data>
+  <data name="CopyControlCD" xml:space="preserve">
+    <value>复制控制 CD</value>
+  </data>
+  <data name="DAT" xml:space="preserve">
+    <value>DAT</value>
+  </data>
+  <data name="DataCD" xml:space="preserve">
+    <value>数据 CD</value>
+  </data>
+  <data name="DataDVD" xml:space="preserve">
+    <value>数据 DVD</value>
+  </data>
+  <data name="DataDVDMinusR" xml:space="preserve">
+    <value>数据 DVD-R</value>
+  </data>
+  <data name="DataPlay" xml:space="preserve">
+    <value>Data Play</value>
+  </data>
+  <data name="DCC" xml:space="preserve">
+    <value>DCC</value>
+  </data>
+  <data name="DigitalMedia" xml:space="preserve">
+    <value>数字媒体</value>
+  </data>
+  <data name="DownloadCard" xml:space="preserve">
+    <value>下载卡</value>
+  </data>
+  <data name="DTSCD" xml:space="preserve">
+    <value>DTSCD</value>
+  </data>
+  <data name="DualDisc" xml:space="preserve">
+    <value>Dual Disc</value>
+  </data>
+  <data name="DualDiscCDSide" xml:space="preserve">
+    <value>Dual Disc CD 面</value>
+  </data>
+  <data name="DualDiscDVDSide" xml:space="preserve">
+    <value>Dual Disc DVD 面</value>
+  </data>
+  <data name="DualDiscDVDAudioSide" xml:space="preserve">
+    <value>Dual Disc DVD 音频面</value>
+  </data>
+  <data name="DualDiscDVDVideoSide" xml:space="preserve">
+    <value>Dual Disc DVD 视频面</value>
+  </data>
+  <data name="DVD" xml:space="preserve">
+    <value>DVD</value>
+  </data>
+  <data name="DVDAudio" xml:space="preserve">
+    <value>DVD 音频</value>
+  </data>
+  <data name="DVDMinusRVideo" xml:space="preserve">
+    <value>DVD-R 视频</value>
+  </data>
+  <data name="DVDVideo" xml:space="preserve">
+    <value>DVD 视频</value>
+  </data>
+  <data name="DVDPlus" xml:space="preserve">
+    <value>DVD Plus</value>
+  </data>
+  <data name="DVDPlusCDSide" xml:space="preserve">
+    <value>DVD Plus CD 面</value>
+  </data>
+  <data name="DVDPlusDVDAudioSide" xml:space="preserve">
+    <value>DVD Plus DVD 音频面</value>
+  </data>
+  <data name="DVDPlusDVDVideoSide" xml:space="preserve">
+    <value>DVD Plus DVD 视频面</value>
+  </data>
+  <data name="EdisonDiamondDisc" xml:space="preserve">
+    <value>Edison Diamond Disc</value>
+  </data>
+  <data name="EnhancedCD" xml:space="preserve">
+    <value>增强型 CD</value>
+  </data>
+  <data name="FlexiDisc" xml:space="preserve">
+    <value>Flexi Disc</value>
+  </data>
+  <data name="FloppyDisk" xml:space="preserve">
+    <value>软盘</value>
+  </data>
+  <data name="HDDVD" xml:space="preserve">
+    <value>HDDVD</value>
+  </data>
+  <data name="HDCD" xml:space="preserve">
+    <value>HDCD</value>
+  </data>
+  <data name="HiPac" xml:space="preserve">
+    <value>Hi Pac</value>
+  </data>
+  <data name="HQCD" xml:space="preserve">
+    <value>HQCD</value>
+  </data>
+  <data name="HybridSACD" xml:space="preserve">
+    <value>混合 SACD</value>
+  </data>
+  <data name="HybridSACDCDLayer" xml:space="preserve">
+    <value>混合 SACDCD 层</value>
+  </data>
+  <data name="HybridSACDSACDLayer" xml:space="preserve">
+    <value>混合 SACDSACD 层</value>
+  </data>
+  <data name="HybridSACDSACDLayer2Channels" xml:space="preserve">
+    <value>混合 SACDSACD 层 2 声道</value>
+  </data>
+  <data name="HybridSACDSACDLayerMultichannel" xml:space="preserve">
+    <value>混合 SACDSACD 层多声道</value>
+  </data>
+  <data name="KiTAlbum" xml:space="preserve">
+    <value>Ki T Album</value>
+  </data>
+  <data name="LaserDisc" xml:space="preserve">
+    <value>Laser Disc</value>
+  </data>
+  <data name="Microcassette" xml:space="preserve">
+    <value>微型盒式磁带</value>
+  </data>
+  <data name="MicroSD" xml:space="preserve">
+    <value>Micro SD</value>
+  </data>
+  <data name="MiniDisc" xml:space="preserve">
+    <value>Mini Disc</value>
+  </data>
+  <data name="MiniDVD" xml:space="preserve">
+    <value>Mini DVD</value>
+  </data>
+  <data name="MiniDVDAudio" xml:space="preserve">
+    <value>Mini DVD 音频</value>
+  </data>
+  <data name="MiniDVDVideo" xml:space="preserve">
+    <value>Mini DVD 视频</value>
+  </data>
+  <data name="MinimaxCD" xml:space="preserve">
+    <value>Minimax CD</value>
+  </data>
+  <data name="MinimaxDVD" xml:space="preserve">
+    <value>Minimax DVD</value>
+  </data>
+  <data name="MinimaxDVDAudio" xml:space="preserve">
+    <value>Minimax DVD 音频</value>
+  </data>
+  <data name="MinimaxDVDVideo" xml:space="preserve">
+    <value>Minimax DVD 视频</value>
+  </data>
+  <data name="MixedModeCD" xml:space="preserve">
+    <value>混合模式 CD</value>
+  </data>
+  <data name="Other" xml:space="preserve">
+    <value>其他</value>
+  </data>
+  <data name="PatheDisc" xml:space="preserve">
+    <value>Pathe Disc</value>
+  </data>
+  <data name="PhonographRecord" xml:space="preserve">
+    <value>留声机唱片</value>
+  </data>
+  <data name="PianoRoll" xml:space="preserve">
+    <value>钢琴卷</value>
+  </data>
+  <data name="Playbutton" xml:space="preserve">
+    <value>Playbutton</value>
+  </data>
+  <data name="PlayTape" xml:space="preserve">
+    <value>Play Tape</value>
+  </data>
+  <data name="ReelToReel" xml:space="preserve">
+    <value>开盘式磁带</value>
+  </data>
+  <data name="ROMCartridge" xml:space="preserve">
+    <value>ROM 卡带</value>
+  </data>
+  <data name="SACD" xml:space="preserve">
+    <value>SACD</value>
+  </data>
+  <data name="SACD2Channels" xml:space="preserve">
+    <value>SACD 2 声道</value>
+  </data>
+  <data name="SACDMultichannel" xml:space="preserve">
+    <value>SACD 多声道</value>
+  </data>
+  <data name="SDCard" xml:space="preserve">
+    <value>SD Card</value>
+  </data>
+  <data name="Shellac" xml:space="preserve">
+    <value>虫胶唱片</value>
+  </data>
+  <data name="SHMCD" xml:space="preserve">
+    <value>SHMCD</value>
+  </data>
+  <data name="SHMSACD" xml:space="preserve">
+    <value>SHMSACD</value>
+  </data>
+  <data name="SHMSACDMultichannel" xml:space="preserve">
+    <value>SHMSACD 多声道</value>
+  </data>
+  <data name="SlotMusic" xml:space="preserve">
+    <value>Slot Music</value>
+  </data>
+  <data name="SVCD" xml:space="preserve">
+    <value>SVCD</value>
+  </data>
+  <data name="Tefifon" xml:space="preserve">
+    <value>Tefifon</value>
+  </data>
+  <data name="UMD" xml:space="preserve">
+    <value>UMD</value>
+  </data>
+  <data name="USBFlashDrive" xml:space="preserve">
+    <value>USB 闪存盘</value>
+  </data>
+  <data name="VCD" xml:space="preserve">
+    <value>VCD</value>
+  </data>
+  <data name="VHD" xml:space="preserve">
+    <value>VHD</value>
+  </data>
+  <data name="VHS" xml:space="preserve">
+    <value>VHS</value>
+  </data>
+  <data name="Vinyl" xml:space="preserve">
+    <value>黑胶</value>
+  </data>
+  <data name="VinylDisc" xml:space="preserve">
+    <value>黑胶唱片</value>
+  </data>
+  <data name="VinylDiscCDSide" xml:space="preserve">
+    <value>黑胶唱片 CD 面</value>
+  </data>
+  <data name="VinylDiscDVDSide" xml:space="preserve">
+    <value>黑胶唱片 DVD 面</value>
+  </data>
+  <data name="VinylDiscVinylSide" xml:space="preserve">
+    <value>黑胶唱片 黑胶面</value>
+  </data>
+  <data name="WaxCylinder" xml:space="preserve">
+    <value>蜡筒</value>
+  </data>
+  <data name="ZipDisk" xml:space="preserve">
+    <value>Zip Disk</value>
+  </data>
+  <data name="Book" xml:space="preserve">
+    <value>书</value>
+  </data>
+  <data name="Box" xml:space="preserve">
+    <value>盒装</value>
+  </data>
+  <data name="CardboardPaperSleeve" xml:space="preserve">
+    <value>纸板纸质套</value>
+  </data>
+  <data name="CassetteCase" xml:space="preserve">
+    <value>盒式磁带盒</value>
+  </data>
+  <data name="ClamshellCase" xml:space="preserve">
+    <value>翻盖盒</value>
+  </data>
+  <data name="Digibook" xml:space="preserve">
+    <value>Digibook</value>
+  </data>
+  <data name="Digifile" xml:space="preserve">
+    <value>Digifile</value>
+  </data>
+  <data name="Digipak" xml:space="preserve">
+    <value>Digipak</value>
+  </data>
+  <data name="DiscboxSlider" xml:space="preserve">
+    <value>Discbox Slider</value>
+  </data>
+  <data name="Fatbox" xml:space="preserve">
+    <value>Fatbox</value>
+  </data>
+  <data name="GatefoldCover" xml:space="preserve">
+    <value>对开封面</value>
+  </data>
+  <data name="JewelCase" xml:space="preserve">
+    <value>珠宝盒</value>
+  </data>
+  <data name="KeepCase" xml:space="preserve">
+    <value>Keep Case</value>
+  </data>
+  <data name="Longbox" xml:space="preserve">
+    <value>长盒</value>
+  </data>
+  <data name="MetalTin" xml:space="preserve">
+    <value>金属盒</value>
+  </data>
+  <data name="PlasticSleeve" xml:space="preserve">
+    <value>塑料套</value>
+  </data>
+  <data name="Slidepack" xml:space="preserve">
+    <value>Slidepack</value>
+  </data>
+  <data name="SlimJewelCase" xml:space="preserve">
+    <value>超薄珠宝盒</value>
+  </data>
+  <data name="Slipcase" xml:space="preserve">
+    <value>封套</value>
+  </data>
+  <data name="SnapCase" xml:space="preserve">
+    <value>卡扣盒</value>
+  </data>
+  <data name="SnapPack" xml:space="preserve">
+    <value>Snap Pack</value>
+  </data>
+  <data name="SuperJewelBox" xml:space="preserve">
+    <value>Super Jewel Box</value>
+  </data>
+  <data name="None" xml:space="preserve">
+    <value>无</value>
+  </data>
+  <data name="Country.AF" xml:space="preserve">
+    <value>阿富汗</value>
+  </data>
+  <data name="Country.AL" xml:space="preserve">
+    <value>阿尔巴尼亚</value>
+  </data>
+  <data name="Country.DZ" xml:space="preserve">
+    <value>阿尔及利亚</value>
+  </data>
+  <data name="Country.AD" xml:space="preserve">
+    <value>安道尔</value>
+  </data>
+  <data name="Country.AO" xml:space="preserve">
+    <value>安哥拉</value>
+  </data>
+  <data name="Country.AG" xml:space="preserve">
+    <value>安提瓜和巴布达</value>
+  </data>
+  <data name="Country.AR" xml:space="preserve">
+    <value>阿根廷</value>
+  </data>
+  <data name="Country.AM" xml:space="preserve">
+    <value>亚美尼亚</value>
+  </data>
+  <data name="Country.AU" xml:space="preserve">
+    <value>澳大利亚</value>
+  </data>
+  <data name="Country.AT" xml:space="preserve">
+    <value>奥地利</value>
+  </data>
+  <data name="Country.AZ" xml:space="preserve">
+    <value>阿塞拜疆</value>
+  </data>
+  <data name="Country.BS" xml:space="preserve">
+    <value>巴哈马</value>
+  </data>
+  <data name="Country.BH" xml:space="preserve">
+    <value>巴林</value>
+  </data>
+  <data name="Country.BD" xml:space="preserve">
+    <value>孟加拉国</value>
+  </data>
+  <data name="Country.BB" xml:space="preserve">
+    <value>巴巴多斯</value>
+  </data>
+  <data name="Country.BY" xml:space="preserve">
+    <value>白俄罗斯</value>
+  </data>
+  <data name="Country.BE" xml:space="preserve">
+    <value>比利时</value>
+  </data>
+  <data name="Country.BZ" xml:space="preserve">
+    <value>伯利兹</value>
+  </data>
+  <data name="Country.BJ" xml:space="preserve">
+    <value>贝宁</value>
+  </data>
+  <data name="Country.BT" xml:space="preserve">
+    <value>不丹</value>
+  </data>
+  <data name="Country.BO" xml:space="preserve">
+    <value>玻利维亚</value>
+  </data>
+  <data name="Country.BA" xml:space="preserve">
+    <value>波斯尼亚和黑塞哥维那</value>
+  </data>
+  <data name="Country.BW" xml:space="preserve">
+    <value>博茨瓦纳</value>
+  </data>
+  <data name="Country.BR" xml:space="preserve">
+    <value>巴西</value>
+  </data>
+  <data name="Country.BN" xml:space="preserve">
+    <value>文莱</value>
+  </data>
+  <data name="Country.BG" xml:space="preserve">
+    <value>保加利亚</value>
+  </data>
+  <data name="Country.BF" xml:space="preserve">
+    <value>布基纳法索</value>
+  </data>
+  <data name="Country.BI" xml:space="preserve">
+    <value>布隆迪</value>
+  </data>
+  <data name="Country.CV" xml:space="preserve">
+    <value>佛得角</value>
+  </data>
+  <data name="Country.KH" xml:space="preserve">
+    <value>柬埔寨</value>
+  </data>
+  <data name="Country.CM" xml:space="preserve">
+    <value>喀麦隆</value>
+  </data>
+  <data name="Country.CA" xml:space="preserve">
+    <value>加拿大</value>
+  </data>
+  <data name="Country.CF" xml:space="preserve">
+    <value>中非共和国</value>
+  </data>
+  <data name="Country.TD" xml:space="preserve">
+    <value>乍得</value>
+  </data>
+  <data name="Country.CL" xml:space="preserve">
+    <value>智利</value>
+  </data>
+  <data name="Country.CN" xml:space="preserve">
+    <value>中国</value>
+  </data>
+  <data name="Country.CO" xml:space="preserve">
+    <value>哥伦比亚</value>
+  </data>
+  <data name="Country.KM" xml:space="preserve">
+    <value>科摩罗</value>
+  </data>
+  <data name="Country.CG" xml:space="preserve">
+    <value>刚果（布拉柴维尔）</value>
+  </data>
+  <data name="Country.CD" xml:space="preserve">
+    <value>刚果（金沙萨）</value>
+  </data>
+  <data name="Country.CR" xml:space="preserve">
+    <value>哥斯达黎加</value>
+  </data>
+  <data name="Country.CI" xml:space="preserve">
+    <value>科特迪瓦</value>
+  </data>
+  <data name="Country.HR" xml:space="preserve">
+    <value>克罗地亚</value>
+  </data>
+  <data name="Country.CU" xml:space="preserve">
+    <value>古巴</value>
+  </data>
+  <data name="Country.CY" xml:space="preserve">
+    <value>塞浦路斯</value>
+  </data>
+  <data name="Country.CZ" xml:space="preserve">
+    <value>捷克</value>
+  </data>
+  <data name="Country.DK" xml:space="preserve">
+    <value>丹麦</value>
+  </data>
+  <data name="Country.DJ" xml:space="preserve">
+    <value>吉布提</value>
+  </data>
+  <data name="Country.DM" xml:space="preserve">
+    <value>多米尼克</value>
+  </data>
+  <data name="Country.DO" xml:space="preserve">
+    <value>多米尼加共和国</value>
+  </data>
+  <data name="Country.EC" xml:space="preserve">
+    <value>厄瓜多尔</value>
+  </data>
+  <data name="Country.EG" xml:space="preserve">
+    <value>埃及</value>
+  </data>
+  <data name="Country.SV" xml:space="preserve">
+    <value>萨尔瓦多</value>
+  </data>
+  <data name="Country.GQ" xml:space="preserve">
+    <value>赤道几内亚</value>
+  </data>
+  <data name="Country.ER" xml:space="preserve">
+    <value>厄立特里亚</value>
+  </data>
+  <data name="Country.EE" xml:space="preserve">
+    <value>爱沙尼亚</value>
+  </data>
+  <data name="Country.SZ" xml:space="preserve">
+    <value>斯威士兰</value>
+  </data>
+  <data name="Country.ET" xml:space="preserve">
+    <value>埃塞俄比亚</value>
+  </data>
+  <data name="Country.FJ" xml:space="preserve">
+    <value>斐济</value>
+  </data>
+  <data name="Country.FI" xml:space="preserve">
+    <value>芬兰</value>
+  </data>
+  <data name="Country.FR" xml:space="preserve">
+    <value>法国</value>
+  </data>
+  <data name="Country.GA" xml:space="preserve">
+    <value>加蓬</value>
+  </data>
+  <data name="Country.GM" xml:space="preserve">
+    <value>冈比亚</value>
+  </data>
+  <data name="Country.GE" xml:space="preserve">
+    <value>格鲁吉亚</value>
+  </data>
+  <data name="Country.DE" xml:space="preserve">
+    <value>德国</value>
+  </data>
+  <data name="Country.GH" xml:space="preserve">
+    <value>加纳</value>
+  </data>
+  <data name="Country.GR" xml:space="preserve">
+    <value>希腊</value>
+  </data>
+  <data name="Country.GD" xml:space="preserve">
+    <value>格林纳达</value>
+  </data>
+  <data name="Country.GT" xml:space="preserve">
+    <value>危地马拉</value>
+  </data>
+  <data name="Country.GN" xml:space="preserve">
+    <value>几内亚</value>
+  </data>
+  <data name="Country.GW" xml:space="preserve">
+    <value>几内亚比绍</value>
+  </data>
+  <data name="Country.GY" xml:space="preserve">
+    <value>圭亚那</value>
+  </data>
+  <data name="Country.HT" xml:space="preserve">
+    <value>海地</value>
+  </data>
+  <data name="Country.HN" xml:space="preserve">
+    <value>洪都拉斯</value>
+  </data>
+  <data name="Country.HU" xml:space="preserve">
+    <value>匈牙利</value>
+  </data>
+  <data name="Country.IS" xml:space="preserve">
+    <value>冰岛</value>
+  </data>
+  <data name="Country.IN" xml:space="preserve">
+    <value>印度</value>
+  </data>
+  <data name="Country.ID" xml:space="preserve">
+    <value>印度尼西亚</value>
+  </data>
+  <data name="Country.IR" xml:space="preserve">
+    <value>伊朗</value>
+  </data>
+  <data name="Country.IQ" xml:space="preserve">
+    <value>伊拉克</value>
+  </data>
+  <data name="Country.IE" xml:space="preserve">
+    <value>爱尔兰</value>
+  </data>
+  <data name="Country.IL" xml:space="preserve">
+    <value>以色列</value>
+  </data>
+  <data name="Country.IT" xml:space="preserve">
+    <value>意大利</value>
+  </data>
+  <data name="Country.JM" xml:space="preserve">
+    <value>牙买加</value>
+  </data>
+  <data name="Country.JP" xml:space="preserve">
+    <value>日本</value>
+  </data>
+  <data name="Country.JO" xml:space="preserve">
+    <value>约旦</value>
+  </data>
+  <data name="Country.KZ" xml:space="preserve">
+    <value>哈萨克斯坦</value>
+  </data>
+  <data name="Country.KE" xml:space="preserve">
+    <value>肯尼亚</value>
+  </data>
+  <data name="Country.KI" xml:space="preserve">
+    <value>基里巴斯</value>
+  </data>
+  <data name="Country.KP" xml:space="preserve">
+    <value>朝鲜</value>
+  </data>
+  <data name="Country.KR" xml:space="preserve">
+    <value>韩国</value>
+  </data>
+  <data name="Country.KW" xml:space="preserve">
+    <value>科威特</value>
+  </data>
+  <data name="Country.KG" xml:space="preserve">
+    <value>吉尔吉斯斯坦</value>
+  </data>
+  <data name="Country.LA" xml:space="preserve">
+    <value>老挝</value>
+  </data>
+  <data name="Country.LV" xml:space="preserve">
+    <value>拉脱维亚</value>
+  </data>
+  <data name="Country.LB" xml:space="preserve">
+    <value>黎巴嫩</value>
+  </data>
+  <data name="Country.LS" xml:space="preserve">
+    <value>莱索托</value>
+  </data>
+  <data name="Country.LR" xml:space="preserve">
+    <value>利比里亚</value>
+  </data>
+  <data name="Country.LY" xml:space="preserve">
+    <value>利比亚</value>
+  </data>
+  <data name="Country.LI" xml:space="preserve">
+    <value>列支敦士登</value>
+  </data>
+  <data name="Country.LT" xml:space="preserve">
+    <value>立陶宛</value>
+  </data>
+  <data name="Country.LU" xml:space="preserve">
+    <value>卢森堡</value>
+  </data>
+  <data name="Country.MG" xml:space="preserve">
+    <value>马达加斯加</value>
+  </data>
+  <data name="Country.MW" xml:space="preserve">
+    <value>马拉维</value>
+  </data>
+  <data name="Country.MY" xml:space="preserve">
+    <value>马来西亚</value>
+  </data>
+  <data name="Country.MV" xml:space="preserve">
+    <value>马尔代夫</value>
+  </data>
+  <data name="Country.ML" xml:space="preserve">
+    <value>马里</value>
+  </data>
+  <data name="Country.MT" xml:space="preserve">
+    <value>马耳他</value>
+  </data>
+  <data name="Country.MH" xml:space="preserve">
+    <value>马绍尔群岛</value>
+  </data>
+  <data name="Country.MR" xml:space="preserve">
+    <value>毛里塔尼亚</value>
+  </data>
+  <data name="Country.MU" xml:space="preserve">
+    <value>毛里求斯</value>
+  </data>
+  <data name="Country.MX" xml:space="preserve">
+    <value>墨西哥</value>
+  </data>
+  <data name="Country.FM" xml:space="preserve">
+    <value>密克罗尼西亚</value>
+  </data>
+  <data name="Country.MD" xml:space="preserve">
+    <value>摩尔多瓦</value>
+  </data>
+  <data name="Country.MC" xml:space="preserve">
+    <value>摩纳哥</value>
+  </data>
+  <data name="Country.MN" xml:space="preserve">
+    <value>蒙古</value>
+  </data>
+  <data name="Country.ME" xml:space="preserve">
+    <value>黑山</value>
+  </data>
+  <data name="Country.MA" xml:space="preserve">
+    <value>摩洛哥</value>
+  </data>
+  <data name="Country.MZ" xml:space="preserve">
+    <value>莫桑比克</value>
+  </data>
+  <data name="Country.MM" xml:space="preserve">
+    <value>缅甸</value>
+  </data>
+  <data name="Country.NA" xml:space="preserve">
+    <value>纳米比亚</value>
+  </data>
+  <data name="Country.NR" xml:space="preserve">
+    <value>瑙鲁</value>
+  </data>
+  <data name="Country.NP" xml:space="preserve">
+    <value>尼泊尔</value>
+  </data>
+  <data name="Country.NL" xml:space="preserve">
+    <value>荷兰</value>
+  </data>
+  <data name="Country.NZ" xml:space="preserve">
+    <value>新西兰</value>
+  </data>
+  <data name="Country.NI" xml:space="preserve">
+    <value>尼加拉瓜</value>
+  </data>
+  <data name="Country.NE" xml:space="preserve">
+    <value>尼日尔</value>
+  </data>
+  <data name="Country.NG" xml:space="preserve">
+    <value>尼日利亚</value>
+  </data>
+  <data name="Country.MK" xml:space="preserve">
+    <value>北马其顿</value>
+  </data>
+  <data name="Country.NO" xml:space="preserve">
+    <value>挪威</value>
+  </data>
+  <data name="Country.OM" xml:space="preserve">
+    <value>阿曼</value>
+  </data>
+  <data name="Country.PK" xml:space="preserve">
+    <value>巴基斯坦</value>
+  </data>
+  <data name="Country.PW" xml:space="preserve">
+    <value>帕劳</value>
+  </data>
+  <data name="Country.PS" xml:space="preserve">
+    <value>巴勒斯坦领土</value>
+  </data>
+  <data name="Country.PA" xml:space="preserve">
+    <value>巴拿马</value>
+  </data>
+  <data name="Country.PG" xml:space="preserve">
+    <value>巴布亚新几内亚</value>
+  </data>
+  <data name="Country.PY" xml:space="preserve">
+    <value>巴拉圭</value>
+  </data>
+  <data name="Country.PE" xml:space="preserve">
+    <value>秘鲁</value>
+  </data>
+  <data name="Country.PH" xml:space="preserve">
+    <value>菲律宾</value>
+  </data>
+  <data name="Country.PL" xml:space="preserve">
+    <value>波兰</value>
+  </data>
+  <data name="Country.PT" xml:space="preserve">
+    <value>葡萄牙</value>
+  </data>
+  <data name="Country.QA" xml:space="preserve">
+    <value>卡塔尔</value>
+  </data>
+  <data name="Country.RO" xml:space="preserve">
+    <value>罗马尼亚</value>
+  </data>
+  <data name="Country.RU" xml:space="preserve">
+    <value>俄罗斯</value>
+  </data>
+  <data name="Country.RW" xml:space="preserve">
+    <value>卢旺达</value>
+  </data>
+  <data name="Country.KN" xml:space="preserve">
+    <value>圣基茨和尼维斯</value>
+  </data>
+  <data name="Country.LC" xml:space="preserve">
+    <value>圣卢西亚</value>
+  </data>
+  <data name="Country.VC" xml:space="preserve">
+    <value>圣文森特和格林纳丁斯</value>
+  </data>
+  <data name="Country.WS" xml:space="preserve">
+    <value>萨摩亚</value>
+  </data>
+  <data name="Country.SM" xml:space="preserve">
+    <value>圣马力诺</value>
+  </data>
+  <data name="Country.ST" xml:space="preserve">
+    <value>圣多美和普林西比</value>
+  </data>
+  <data name="Country.SA" xml:space="preserve">
+    <value>沙特阿拉伯</value>
+  </data>
+  <data name="Country.SN" xml:space="preserve">
+    <value>塞内加尔</value>
+  </data>
+  <data name="Country.RS" xml:space="preserve">
+    <value>塞尔维亚</value>
+  </data>
+  <data name="Country.SC" xml:space="preserve">
+    <value>塞舌尔</value>
+  </data>
+  <data name="Country.SL" xml:space="preserve">
+    <value>塞拉利昂</value>
+  </data>
+  <data name="Country.SG" xml:space="preserve">
+    <value>新加坡</value>
+  </data>
+  <data name="Country.SK" xml:space="preserve">
+    <value>斯洛伐克</value>
+  </data>
+  <data name="Country.SI" xml:space="preserve">
+    <value>斯洛文尼亚</value>
+  </data>
+  <data name="Country.SB" xml:space="preserve">
+    <value>所罗门群岛</value>
+  </data>
+  <data name="Country.SO" xml:space="preserve">
+    <value>索马里</value>
+  </data>
+  <data name="Country.ZA" xml:space="preserve">
+    <value>南非</value>
+  </data>
+  <data name="Country.SS" xml:space="preserve">
+    <value>南苏丹</value>
+  </data>
+  <data name="Country.ES" xml:space="preserve">
+    <value>西班牙</value>
+  </data>
+  <data name="Country.LK" xml:space="preserve">
+    <value>斯里兰卡</value>
+  </data>
+  <data name="Country.SD" xml:space="preserve">
+    <value>苏丹</value>
+  </data>
+  <data name="Country.SR" xml:space="preserve">
+    <value>苏里南</value>
+  </data>
+  <data name="Country.SE" xml:space="preserve">
+    <value>瑞典</value>
+  </data>
+  <data name="Country.CH" xml:space="preserve">
+    <value>瑞士</value>
+  </data>
+  <data name="Country.SY" xml:space="preserve">
+    <value>叙利亚</value>
+  </data>
+  <data name="Country.TW" xml:space="preserve">
+    <value>台湾</value>
+  </data>
+  <data name="Country.TJ" xml:space="preserve">
+    <value>塔吉克斯坦</value>
+  </data>
+  <data name="Country.TZ" xml:space="preserve">
+    <value>坦桑尼亚</value>
+  </data>
+  <data name="Country.TH" xml:space="preserve">
+    <value>泰国</value>
+  </data>
+  <data name="Country.TL" xml:space="preserve">
+    <value>东帝汶</value>
+  </data>
+  <data name="Country.TG" xml:space="preserve">
+    <value>多哥</value>
+  </data>
+  <data name="Country.TO" xml:space="preserve">
+    <value>汤加</value>
+  </data>
+  <data name="Country.TT" xml:space="preserve">
+    <value>特立尼达和多巴哥</value>
+  </data>
+  <data name="Country.TN" xml:space="preserve">
+    <value>突尼斯</value>
+  </data>
+  <data name="Country.TR" xml:space="preserve">
+    <value>土耳其</value>
+  </data>
+  <data name="Country.TM" xml:space="preserve">
+    <value>土库曼斯坦</value>
+  </data>
+  <data name="Country.TV" xml:space="preserve">
+    <value>图瓦卢</value>
+  </data>
+  <data name="Country.UG" xml:space="preserve">
+    <value>乌干达</value>
+  </data>
+  <data name="Country.UA" xml:space="preserve">
+    <value>乌克兰</value>
+  </data>
+  <data name="Country.AE" xml:space="preserve">
+    <value>阿拉伯联合酋长国</value>
+  </data>
+  <data name="Country.GB" xml:space="preserve">
+    <value>英国</value>
+  </data>
+  <data name="Country.US" xml:space="preserve">
+    <value>美国</value>
+  </data>
+  <data name="Country.UY" xml:space="preserve">
+    <value>乌拉圭</value>
+  </data>
+  <data name="Country.UZ" xml:space="preserve">
+    <value>乌兹别克斯坦</value>
+  </data>
+  <data name="Country.VU" xml:space="preserve">
+    <value>瓦努阿图</value>
+  </data>
+  <data name="Country.VA" xml:space="preserve">
+    <value>梵蒂冈</value>
+  </data>
+  <data name="Country.VE" xml:space="preserve">
+    <value>委内瑞拉</value>
+  </data>
+  <data name="Country.VN" xml:space="preserve">
+    <value>越南</value>
+  </data>
+  <data name="Country.YE" xml:space="preserve">
+    <value>也门</value>
+  </data>
+  <data name="Country.ZM" xml:space="preserve">
+    <value>赞比亚</value>
+  </data>
+  <data name="Country.ZW" xml:space="preserve">
+    <value>津巴布韦</value>
+  </data>
+  <data name="Country.AN" xml:space="preserve">
+    <value>荷属安的列斯</value>
+  </data>
+  <data name="Country.XE" xml:space="preserve">
+    <value>欧洲</value>
+  </data>
+  <data name="Country.XW" xml:space="preserve">
+    <value>全球</value>
+  </data>
+  <data name="AlbumTitleDescription" xml:space="preserve">
+    <value>专辑的标题。</value>
+  </data>
+  <data name="AlbumOriginalTitleDescription" xml:space="preserve">
+    <value>与当前标题不同时的专辑原始标题。</value>
+  </data>
+  <data name="AlbumDescriptionDescription" xml:space="preserve">
+    <value>专辑的简短摘要或描述。</value>
+  </data>
+  <data name="AlbumDisambiguationDescription" xml:space="preserve">
+    <value>用于将专辑与同名专辑区分开的说明。</value>
+  </data>
+  <data name="AlbumScriptDescription" xml:space="preserve">
+    <value>发行标题中使用的文字。</value>
+  </data>
+  <data name="AlbumReleaseStatusDescription" xml:space="preserve">
+    <value>专辑的发行状态。</value>
+  </data>
+  <data name="AlbumTotalDiscsDescription" xml:space="preserve">
+    <value>专辑的唱片数量。</value>
+  </data>
+  <data name="AlbumTotalTracksDescription" xml:space="preserve">
+    <value>专辑的音轨数量。</value>
+  </data>
+  <data name="AlbumReleaseTitleDescription" xml:space="preserve">
+    <value>发行的标题。</value>
+  </data>
+  <data name="AlbumMediaFormatDescription" xml:space="preserve">
+    <value>专辑的媒体格式。</value>
+  </data>
+  <data name="AlbumPackagingDescription" xml:space="preserve">
+    <value>专辑的包装。</value>
+  </data>
+  <data name="AlbumBarcodeDescription" xml:space="preserve">
+    <value>专辑的条形码。</value>
+  </data>
+  <data name="AlbumCatalogNumbersDescription" xml:space="preserve">
+    <value>专辑的目录编号。</value>
+  </data>
+  <data name="AlbumLabelDescription" xml:space="preserve">
+    <value>发行该专辑的唱片公司。</value>
+  </data>
+  <data name="AlbumAsinDescription" xml:space="preserve">
+    <value>专辑的亚马逊标准识别号。</value>
+  </data>
+  <data name="AlbumMusicBrainzReleaseIdDescription" xml:space="preserve">
+    <value>发行的MusicBrainz标识符。</value>
+  </data>
+  <data name="AlbumMusicBrainzReleaseGroupIdDescription" xml:space="preserve">
+    <value>发行组的MusicBrainz标识符。</value>
+  </data>
+  <data name="AlbumMusicBrainzReleaseArtistIdDescription" xml:space="preserve">
+    <value>发行艺术家的MusicBrainz标识符。</value>
+  </data>
+  <data name="AlbumOriginalReleaseDateDescription" xml:space="preserve">
+    <value>专辑最初发行的日期。</value>
+  </data>
+  <data name="AlbumOriginalReleaseYearDescription" xml:space="preserve">
+    <value>专辑最初发行的年份。</value>
+  </data>
+  <data name="AlbumReReleaseDateDescription" xml:space="preserve">
+    <value>专辑再次发行的日期。</value>
+  </data>
+  <data name="AlbumReReleaseYearDescription" xml:space="preserve">
+    <value>专辑再次发行的年份。</value>
+  </data>
+  <data name="AlbumReleaseCountryDescription" xml:space="preserve">
+    <value>专辑的发行国家/地区。</value>
+  </data>
+  <data name="AlbumReleaseVersionDescription" xml:space="preserve">
+    <value>发行的版本，例如原始版本。</value>
+  </data>
+  <data name="LanguageCodeDescription" xml:space="preserve">
+    <value>专辑语言的两字母代码。</value>
+  </data>
+  <data name="LanguageNameDescription" xml:space="preserve">
+    <value>专辑语言的名称。</value>
+  </data>
+  <data name="NativeNameDescription" xml:space="preserve">
+    <value>专辑语言的本地名称。</value>
+  </data>
+  <data name="AlbumGenresDescription" xml:space="preserve">
+    <value>专辑的流派。</value>
+  </data>
+  <data name="AlbumTagsDescription" xml:space="preserve">
+    <value>专辑的标签。</value>
+  </data>
+  <data name="AlbumReleaseTypesDescription" xml:space="preserve">
+    <value>专辑的发行类型。</value>
+  </data>
+  <data name="TracksDescription" xml:space="preserve">
+    <value>专辑的音轨。</value>
+  </data>
+  <data name="ChangeCover" xml:space="preserve">
+    <value>更改封面</value>
+  </data>
+  <data name="CoverImage" xml:space="preserve">
+    <value>封面图片</value>
+  </data>
+  <data name="NoCover" xml:space="preserve">
+    <value>无封面</value>
+  </data>
+  <data name="CoverSaved" xml:space="preserve">
+    <value>封面图片已更新。</value>
+  </data>
+  <data name="CoverUploadFailed" xml:space="preserve">
+    <value>无法上传封面图片。</value>
+  </data>
+<data name="Contributors" xml:space="preserve">
+    <value>贡献者</value>
+  </data>
+<data name="ContributorId" xml:space="preserve">
+    <value>贡献者 Id</value>
+  </data>
+<data name="ContributorRole" xml:space="preserve">
+    <value>角色</value>
+  </data>
+<data name="AddContributor" xml:space="preserve">
+    <value>添加贡献者</value>
+  </data>
+<data name="ContributorsDescription" xml:space="preserve">
+    <value>为艺术家做出贡献的人员。</value>
+  </data>
+<data name="Ratings" xml:space="preserve">
+    <value>评分</value>
+  </data>
+<data name="RatingValue" xml:space="preserve">
+    <value>评分</value>
+  </data>
+<data name="RatingMaxValue" xml:space="preserve">
+    <value>最高评分</value>
+  </data>
+<data name="RatingSource" xml:space="preserve">
+    <value>来源</value>
+  </data>
+<data name="RatingVoteCount" xml:space="preserve">
+    <value>票数</value>
+  </data>
+<data name="AddRating" xml:space="preserve">
+    <value>添加评分</value>
+  </data>
+<data name="RatingsDescription" xml:space="preserve">
+    <value>来自不同来源的艺术家评分。</value>
+  </data>
+<data name="Author" xml:space="preserve">
+    <value>作者</value>
+  </data>
+<data name="Translator" xml:space="preserve">
+    <value>译者</value>
+  </data>
+<data name="Illustrator" xml:space="preserve">
+    <value>插画师</value>
+  </data>
+<data name="Publisher" xml:space="preserve">
+    <value>出版商</value>
+  </data>
+<data name="Narrator" xml:space="preserve">
+    <value>旁白</value>
+  </data>
+<data name="Actor" xml:space="preserve">
+    <value>演员</value>
+  </data>
+<data name="Director" xml:space="preserve">
+    <value>导演</value>
+  </data>
+<data name="Screenwriter" xml:space="preserve">
+    <value>编剧</value>
+  </data>
+<data name="Composer" xml:space="preserve">
+    <value>作曲</value>
+  </data>
+<data name="Lyricist" xml:space="preserve">
+    <value>作词</value>
+  </data>
+<data name="Arranger" xml:space="preserve">
+    <value>编曲</value>
+  </data>
+<data name="Conductor" xml:space="preserve">
+    <value>指挥</value>
+  </data>
+<data name="Producer" xml:space="preserve">
+    <value>制作人</value>
+  </data>
+<data name="ExecutiveProducer" xml:space="preserve">
+    <value>执行制作人</value>
+  </data>
+<data name="Engineer" xml:space="preserve">
+    <value>工程师</value>
+  </data>
+<data name="Mixer" xml:space="preserve">
+    <value>混音师</value>
+  </data>
+<data name="Remixer" xml:space="preserve">
+    <value>重混师</value>
+  </data>
+<data name="RecordLabel" xml:space="preserve">
+    <value>唱片公司</value>
+  </data>
+<data name="Vocals" xml:space="preserve">
+    <value>人声</value>
+  </data>
+<data name="BackingVocals" xml:space="preserve">
+    <value>和声</value>
+  </data>
+<data name="Guitar" xml:space="preserve">
+    <value>吉他</value>
+  </data>
+<data name="BassGuitar" xml:space="preserve">
+    <value>贝斯</value>
+  </data>
+<data name="Drums" xml:space="preserve">
+    <value>鼓</value>
+  </data>
+<data name="Percussion" xml:space="preserve">
+    <value>打击乐</value>
+  </data>
+<data name="Keyboards" xml:space="preserve">
+    <value>键盘</value>
+  </data>
+<data name="Piano" xml:space="preserve">
+    <value>钢琴</value>
+  </data>
+<data name="Synthesizer" xml:space="preserve">
+    <value>合成器</value>
+  </data>
+<data name="Strings" xml:space="preserve">
+    <value>弦乐</value>
+  </data>
+<data name="Woodwinds" xml:space="preserve">
+    <value>木管乐</value>
+  </data>
+<data name="Brass" xml:space="preserve">
+    <value>铜管乐</value>
+  </data>
+<data name="Choir" xml:space="preserve">
+    <value>合唱</value>
+  </data>
+<data name="Orchestrator" xml:space="preserve">
+    <value>配器</value>
+  </data>
+<data name="Performer" xml:space="preserve">
+    <value>表演者</value>
+  </data>
+<data name="User" xml:space="preserve">
+    <value>用户</value>
+  </data>
+<data name="MusicBrainz" xml:space="preserve">
+    <value>MusicBrainz</value>
+  </data>
+<data name="Discogs" xml:space="preserve">
+    <value>Discogs</value>
+  </data>
+<data name="LastFm" xml:space="preserve">
+    <value>Last.fm</value>
+  </data>
+  <data name="Genre" xml:space="preserve">
+    <value>流派</value>
+  </data>
+  <data name="AddGenre" xml:space="preserve">
+    <value>添加流派</value>
+  </data>
+  <data name="Tag" xml:space="preserve">
+    <value>标签</value>
+  </data>
+  <data name="AddTag" xml:space="preserve">
+    <value>添加标签</value>
+  </data>
+  <data name="ReleaseType" xml:space="preserve">
+    <value>发行类型</value>
+  </data>
+  <data name="AddReleaseType" xml:space="preserve">
+    <value>添加发行类型</value>
+  </data>
+  <data name="CatalogNumber" xml:space="preserve">
+    <value>目录编号</value>
+  </data>
+  <data name="AddCatalogNumber" xml:space="preserve">
+    <value>添加目录编号</value>
+  </data>
+  <data name="Cover" xml:space="preserve">
+    <value>封面</value>
+  </data>
+  <data name="Front" xml:space="preserve">
+    <value>正面</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>背面</value>
+  </data>
+  <data name="Booklet" xml:space="preserve">
+    <value>小册子</value>
+  </data>
+  <data name="Medium" xml:space="preserve">
+    <value>介质</value>
+  </data>
+  <data name="Tray" xml:space="preserve">
+    <value>托盘</value>
+  </data>
+  <data name="Spine" xml:space="preserve">
+    <value>书脊</value>
+  </data>
+  <data name="Obi" xml:space="preserve">
+    <value>腰带</value>
+  </data>
+  <data name="Sticker" xml:space="preserve">
+    <value>贴纸</value>
+  </data>
+  <data name="Poster" xml:space="preserve">
+    <value>海报</value>
+  </data>
+  <data name="Liner" xml:space="preserve">
+    <value>内页</value>
+  </data>
+  <data name="Watermark" xml:space="preserve">
+    <value>水印</value>
+  </data>
+  <data name="Backdrop" xml:space="preserve">
+    <value>背景</value>
+  </data>
+  <data name="Banner" xml:space="preserve">
+    <value>横幅</value>
+  </data>
+  <data name="Logo" xml:space="preserve">
+    <value>标志</value>
+  </data>
+  <data name="Thumb" xml:space="preserve">
+    <value>缩略图</value>
+  </data>
+  <data name="Identifiers" xml:space="preserve">
+    <value>标识符</value>
+  </data>
+</root>

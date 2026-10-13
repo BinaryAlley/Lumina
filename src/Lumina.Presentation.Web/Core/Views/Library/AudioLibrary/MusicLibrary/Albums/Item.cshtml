@@ -1,0 +1,1120 @@
+@*
+    FALLBACK MUSIC ALBUM DETAILS / EDITING VIEW - READ BEFORE EDITING
+
+    This view is the application fallback of the music album details and editing page, rendered only when the
+    active theme does not provide its own template for the page. On a healthy site the page is presented by
+    the theme files, which hook into the class names and element ids that this view uses as a contract.
+
+    The tracks of the album are NOT edited inline: they are listed as cards that navigate to their own pages,
+    and the update request never changes the tracks.
+
+    To change the behavior of the page, edit this script (and the theme template, when present). To restyle
+    the page, edit the theme files. This fallback keeps every feature working without styling, so that a
+    broken theme is obvious to the user while the page still functions.
+
+    /library/audio-library/music-library/artists/{artistId}/albums/{albumId}?libraryId=...
+*@
+
+@using Lumina.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary
+@using Lumina.Presentation.Web.Common.Enums.AudioLibrary
+@using Lumina.Presentation.Web.Common.Enums.Common
+@using Lumina.Presentation.Web.Common.Enums.MediaContributors
+@using Lumina.Presentation.Web.Common.Services
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System
+@using System.Globalization
+@using System.Linq
+
+@{
+    // Generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler.
+    var scriptId = ScriptIdentifierHelper.GenerateScriptId();
+    var artistId = Model.ArtistId.ToString();
+    var albumId = Model.Id.ToString();
+    var libraryId = Model.LibraryId.ToString();
+    var metadata = Model.Metadata;
+    var releaseInfo = metadata?.ReleaseInfo;
+    var language = metadata?.Language;
+    var originalLanguage = metadata?.OriginalLanguage;
+    var genres = metadata?.Genres ?? [];
+    var tags = metadata?.Tags ?? [];
+    var releaseTypes = metadata?.ReleaseTypes ?? [];
+    var contributors = Model.Contributors ?? [];
+    var ratings = Model.Ratings ?? [];
+    // Resolves the localized label of a release country, shown as "DE (Germany)", keyed by its ISO code.
+    Func<string?, string> releaseCountryLabel = countryCode =>
+    {
+        if (string.IsNullOrEmpty(countryCode))
+            return "-";
+        string localizedName = _localizer[$"Country.{countryCode}"].Value;
+        if (localizedName == $"Country.{countryCode}")
+            return countryCode;
+        return $"{countryCode} ({localizedName})";
+    };
+    var currentReleaseCountry = releaseInfo?.ReleaseCountry?.ToString() ?? string.Empty;
+    // The localized options of the release types, contributor roles and rating sources, serialized for the dynamic rows of the client script.
+    var releaseTypeOptionsJson = System.Text.Json.JsonSerializer.Serialize(
+        Enum.GetNames<MusicReleaseType>().Select(type => new { value = type, label = _localizer[type].Value }),
+        new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase });
+    var contributorRoleOptionsJson = System.Text.Json.JsonSerializer.Serialize(
+        Enum.GetNames<MediaContributorRole>().Select(role => new { value = role, label = _localizer[role].Value }),
+        new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase });
+    var ratingSourceOptionsJson = System.Text.Json.JsonSerializer.Serialize(
+        Enum.GetNames<AudioRatingSource>().Select(source => new { value = source, label = _localizer[source].Value }),
+        new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase });
+    // The stored artwork of the album, each with the localized label of its type, serialized for the client carousel script.
+    var artworkItems = (Model.Artwork ?? [])
+        .Where(artwork => !string.IsNullOrWhiteSpace(artwork.Path))
+        .Select(artwork => new
+        {
+            path = artwork.Path,
+            label = artwork.Ordinal > 0
+                ? $"{_localizer[artwork.Type.ToString()].Value} {artwork.Ordinal}"
+                : _localizer[artwork.Type.ToString()].Value
+        })
+        .ToList();
+    var artworkItemsJson = System.Text.Json.JsonSerializer.Serialize(artworkItems);
+}
+
+@inject IViewLocalizer _localizer
+@inject IUrlService _urlService
+
+@model MusicAlbumDto
+
+@Html.AntiForgeryToken()
+
+<div style="display: grid; grid-template-rows: auto 1fr;"><!-- Container with two rows, one fixed, one filling remaining space. -->
+    <div style="min-height: 1rem;"></div><!-- The first row is a dummy row for "margin", because setting a margin on the next row would offset the parent's position. -->
+    <div class="enlightenment-panel shadow-effect mx-auto panel w-60 mb-10" style="min-width: 320px;">
+        <div class="shine-effect"></div>
+        <div class="form-row">
+            <button id="btn-back-to-artist" type="button" class="abort-button">@_localizer["BackToArtist"]</button>
+        </div>
+        <div class="form-row">
+            <h1 class="text-light-two w-100 text-center pt-0 pb-0 engraved-title">@_localizer["EditAlbum"]</h1>
+        </div>
+        <div class="book-details-body">
+            <!-- Cover, on the left. -->
+            <div class="book-details-cover">
+                <img id="album-cover-image" style="width: 300px; height: 300px; object-fit: cover; object-position: center;" data-cover-path="@(Model.CoverPath ?? string.Empty)" alt="@_localizer["CoverImage"]" />
+                <div id="album-artwork-carousel" class="artwork-carousel hidden"></div>
+                <div class="form-row">
+                    <button id="btn-change-cover" type="button" class="confirm-button">@_localizer["ChangeCover"]</button>
+                    <input id="album-cover-input" type="file" accept="image/*" class="hidden" />
+                </div>
+                <div class="form-row">
+                    <small id="album-cover-path" class="book-cover-path text-disabled" title="@(Model.CoverPath ?? string.Empty)">@(Model.CoverPath ?? _localizer["NoCover"].Value)</small>
+                </div>
+            </div>
+            <!-- Editable fields, on the right. -->
+            <div class="book-details-form">
+                <!-- Tracks. -->
+                <h3 class="text-light-two">@_localizer["Tracks"]</h3>
+                <div class="form-row">
+                    <table class="w-100 form-table tracks-table">
+                        <colgroup>
+                            <col class="track-number-column" />
+                            <col />
+                            <col class="track-duration-column" />
+                        </colgroup>
+                        <tbody id="tracks-body"></tbody>
+                    </table>
+                    <p id="no-tracks" class="hidden text-light-two">@_localizer["NoTracks"]</p>
+                    <small class="form-label text-disabled form-description">@_localizer["TracksDescription"]</small>
+                </div>
+                <!-- General information. -->
+                <h3 class="text-light-two">@_localizer["GeneralInformation"]</h3>
+        <!-- Album title. -->
+        <div class="form-row">
+            <div class="form-label"><label for="album-title-input">@_localizer["AlbumTitle"]</label><span class="mandatory-field">*</span>:</div>
+            <div class="form-field"><input id="album-title-input" type="text" class="enlightenment-input" value="@(metadata?.Title ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AlbumTitleDescription"]</small>
+        </div>
+        <!-- Original title. -->
+        <div class="form-row">
+            <div class="form-label"><label for="album-original-title-input">@_localizer["AlbumOriginalTitle"]</label>:</div>
+            <div class="form-field"><input id="album-original-title-input" type="text" class="enlightenment-input" value="@(metadata?.OriginalTitle ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AlbumOriginalTitleDescription"]</small>
+        </div>
+        <!-- Description. -->
+        <div class="form-row">
+            <div class="form-label"><label for="album-description-input">@_localizer["AlbumDescription"]</label>:</div>
+            <div class="form-field"><textarea id="album-description-input" class="enlightenment-input">@(metadata?.Description ?? string.Empty)</textarea></div>
+            <small class="form-label text-disabled form-description">@_localizer["AlbumDescriptionDescription"]</small>
+        </div>
+        <!-- Disambiguation. -->
+        <div class="form-row">
+            <div class="form-label"><label for="album-disambiguation-input">@_localizer["AlbumDisambiguation"]</label>:</div>
+            <div class="form-field"><input id="album-disambiguation-input" type="text" class="enlightenment-input" value="@(metadata?.Disambiguation ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AlbumDisambiguationDescription"]</small>
+        </div>
+        <!-- Script. -->
+        <div class="form-row">
+            <div class="form-label"><label for="album-script-input">@_localizer["AlbumScript"]</label>:</div>
+            <div class="form-field"><input id="album-script-input" type="text" class="enlightenment-input" value="@(metadata?.Script ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AlbumScriptDescription"]</small>
+        </div>
+        <!-- Release status. -->
+        <div class="form-row">
+            <div class="form-label"><label for="album-release-status-combobox-toggle">@_localizer["AlbumReleaseStatus"]</label>:</div>
+            <div class="form-field">
+                <div class="enlightenment-combobox inline-block w-100" id="album-release-status-combobox">
+                    <div class="shine-effect" style="top: 1px;"></div>
+                    <input type="checkbox" class="enlightenment-toggle-checkbox" id="album-release-status-combobox-toggle" />
+                    <label class="enlightenment-toggle" for="album-release-status-combobox-toggle">
+                        <span class="enlightenment-selected-text" data-value="@(metadata?.ReleaseStatus?.ToString() ?? string.Empty)">@(metadata is not null && metadata.ReleaseStatus.HasValue ? _localizer[metadata.ReleaseStatus.Value.ToString()].Value : "-")</span>
+                    </label>
+                    <div class="enlightenment-dropdown">
+                        <div class="enlightenment-option" data-value="">-</div>
+                        @foreach (string status in Enum.GetNames<MusicReleaseStatus>())
+                        {
+                            <div class="enlightenment-option" data-value="@status">@_localizer[status].Value</div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <small class="form-label text-disabled form-description">@_localizer["AlbumReleaseStatusDescription"]</small>
+        </div>
+        <!-- Total discs. -->
+        <div class="form-row">
+            <div class="form-label"><label for="album-total-discs-input">@_localizer["AlbumTotalDiscs"]</label>:</div>
+            <div class="form-field"><input id="album-total-discs-input" type="number" min="1" class="enlightenment-input" value="@(metadata?.TotalDiscs?.ToString(CultureInfo.InvariantCulture) ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AlbumTotalDiscsDescription"]</small>
+        </div>
+        <!-- Total tracks. -->
+        <div class="form-row">
+            <div class="form-label"><label for="album-total-tracks-input">@_localizer["AlbumTotalTracks"]</label>:</div>
+            <div class="form-field"><input id="album-total-tracks-input" type="number" min="1" class="enlightenment-input" value="@(metadata?.TotalTracks?.ToString(CultureInfo.InvariantCulture) ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AlbumTotalTracksDescription"]</small>
+        </div>
+        <!-- Release title. -->
+        <div class="form-row">
+            <div class="form-label"><label for="album-release-title-input">@_localizer["AlbumReleaseTitle"]</label>:</div>
+            <div class="form-field"><input id="album-release-title-input" type="text" class="enlightenment-input" value="@(metadata?.ReleaseTitle ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AlbumReleaseTitleDescription"]</small>
+        </div>
+        <!-- Media format. -->
+        <div class="form-row">
+            <div class="form-label"><label for="album-media-format-combobox-toggle">@_localizer["AlbumMediaFormat"]</label>:</div>
+            <div class="form-field">
+                <div class="enlightenment-combobox inline-block w-100" id="album-media-format-combobox">
+                    <div class="shine-effect" style="top: 1px;"></div>
+                    <input type="checkbox" class="enlightenment-toggle-checkbox" id="album-media-format-combobox-toggle" />
+                    <label class="enlightenment-toggle" for="album-media-format-combobox-toggle">
+                        <span class="enlightenment-selected-text" data-value="@(Model.MediaFormat?.ToString() ?? string.Empty)">@(Model.MediaFormat.HasValue ? _localizer[Model.MediaFormat.Value.ToString()].Value : "-")</span>
+                    </label>
+                    <div class="enlightenment-dropdown">
+                        <div class="enlightenment-option" data-value="">-</div>
+                        @foreach (string format in Enum.GetNames<MusicMediaFormat>())
+                        {
+                            <div class="enlightenment-option" data-value="@format">@_localizer[format].Value</div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <small class="form-label text-disabled form-description">@_localizer["AlbumMediaFormatDescription"]</small>
+        </div>
+        <!-- Packaging. -->
+        <div class="form-row">
+            <div class="form-label"><label for="album-packaging-combobox-toggle">@_localizer["AlbumPackaging"]</label>:</div>
+            <div class="form-field">
+                <div class="enlightenment-combobox inline-block w-100" id="album-packaging-combobox">
+                    <div class="shine-effect" style="top: 1px;"></div>
+                    <input type="checkbox" class="enlightenment-toggle-checkbox" id="album-packaging-combobox-toggle" />
+                    <label class="enlightenment-toggle" for="album-packaging-combobox-toggle">
+                        <span class="enlightenment-selected-text" data-value="@(Model.Packaging?.ToString() ?? string.Empty)">@(Model.Packaging.HasValue ? _localizer[Model.Packaging.Value.ToString()].Value : "-")</span>
+                    </label>
+                    <div class="enlightenment-dropdown">
+                        <div class="enlightenment-option" data-value="">-</div>
+                        @foreach (string packaging in Enum.GetNames<MusicReleasePackaging>())
+                        {
+                            <div class="enlightenment-option" data-value="@packaging">@_localizer[packaging].Value</div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <small class="form-label text-disabled form-description">@_localizer["AlbumPackagingDescription"]</small>
+        </div>
+
+        <!-- Contributors. -->
+        <h3 class="text-light-two">@_localizer["Contributors"]</h3>
+        <div class="form-row">
+            <table class="w-100 form-table">
+                <thead>
+                    <tr>
+                        <th>@_localizer["ContributorId"]</th>
+                        <th>@_localizer["ContributorRole"]</th>
+                        <th class="w-40px"></th>
+                    </tr>
+                </thead>
+                <tbody id="contributors-body">
+                    @{ int contributorIndex = 0; }
+                    @foreach (var contributor in contributors)
+                    {
+                        <tr class="contributor-row">
+                            <td><input type="text" class="enlightenment-input contributor-id w-100" value="@(contributor.ContributorId.ToString())" /></td>
+                            <td>
+                                <div class="enlightenment-combobox inline-block w-100 contributor-role-combobox">
+                                    <div class="shine-effect" style="top: 1px;"></div>
+                                    <input type="checkbox" class="enlightenment-toggle-checkbox" id="contributor-role-toggle-@contributorIndex" />
+                                    <label class="enlightenment-toggle" for="contributor-role-toggle-@contributorIndex">
+                                        <span class="enlightenment-selected-text" data-value="@(contributor.Role?.ToString() ?? string.Empty)">@(contributor.Role.HasValue ? _localizer[contributor.Role.Value.ToString()].Value : "-")</span>
+                                    </label>
+                                    <div class="enlightenment-dropdown">
+                                        <div class="enlightenment-option" data-value="">-</div>
+                                        @foreach (string role in Enum.GetNames<MediaContributorRole>())
+                                        {
+                                            <div class="enlightenment-option" data-value="@role">@_localizer[role].Value</div>
+                                        }
+                                    </div>
+                                </div>
+                            </td>
+                            <td><img src="~/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" /></td>
+                        </tr>
+                        contributorIndex++;
+                    }
+                </tbody>
+            </table>
+            <button id="btn-add-contributor" type="button" class="confirm-button">@_localizer["AddContributor"]</button>
+            <small class="form-label text-disabled form-description">@_localizer["ContributorsDescription"]</small>
+        </div>
+
+        <!-- Ratings. -->
+        <h3 class="text-light-two">@_localizer["Ratings"]</h3>
+        <div class="form-row">
+            <table class="w-100 form-table">
+                <thead>
+                    <tr>
+                        <th>@_localizer["RatingValue"]</th>
+                        <th>@_localizer["RatingMaxValue"]</th>
+                        <th>@_localizer["RatingSource"]</th>
+                        <th>@_localizer["RatingVoteCount"]</th>
+                        <th class="w-40px"></th>
+                    </tr>
+                </thead>
+                <tbody id="ratings-body">
+                    @{ int ratingIndex = 0; }
+                    @foreach (var rating in ratings)
+                    {
+                        <tr class="rating-row">
+                            <td><input type="number" step="any" min="0" class="enlightenment-input rating-value w-100" value="@(rating.Value?.ToString(CultureInfo.InvariantCulture) ?? string.Empty)" /></td>
+                            <td><input type="number" step="any" min="0" class="enlightenment-input rating-max-value w-100" value="@(rating.MaxValue?.ToString(CultureInfo.InvariantCulture) ?? string.Empty)" /></td>
+                            <td>
+                                <div class="enlightenment-combobox inline-block w-100 rating-source-combobox">
+                                    <div class="shine-effect" style="top: 1px;"></div>
+                                    <input type="checkbox" class="enlightenment-toggle-checkbox" id="rating-source-toggle-@ratingIndex" />
+                                    <label class="enlightenment-toggle" for="rating-source-toggle-@ratingIndex">
+                                        <span class="enlightenment-selected-text" data-value="@(rating.Source?.ToString() ?? string.Empty)">@(rating.Source.HasValue ? _localizer[rating.Source.Value.ToString()].Value : "-")</span>
+                                    </label>
+                                    <div class="enlightenment-dropdown">
+                                        <div class="enlightenment-option" data-value="">-</div>
+                                        @foreach (string source in Enum.GetNames<AudioRatingSource>())
+                                        {
+                                            <div class="enlightenment-option" data-value="@source">@_localizer[source].Value</div>
+                                        }
+                                    </div>
+                                </div>
+                            </td>
+                            <td><input type="number" min="0" class="enlightenment-input rating-vote-count w-100" value="@(rating.VoteCount?.ToString(CultureInfo.InvariantCulture) ?? string.Empty)" /></td>
+                            <td><img src="~/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" /></td>
+                        </tr>
+                        ratingIndex++;
+                    }
+                </tbody>
+            </table>
+            <button id="btn-add-rating" type="button" class="confirm-button">@_localizer["AddRating"]</button>
+            <small class="form-label text-disabled form-description">@_localizer["RatingsDescription"]</small>
+        </div>
+
+        <!-- Genres. -->
+        <h3 class="text-light-two">@_localizer["AlbumGenres"]</h3>
+        <div class="form-row">
+            <table class="w-100 form-table">
+                <thead>
+                    <tr>
+                        <th>@_localizer["Genre"]</th>
+                        <th class="w-40px"></th>
+                    </tr>
+                </thead>
+                <tbody id="genres-body">
+                    @foreach (var genre in genres)
+                    {
+                        <tr class="genre-row">
+                            <td><input type="text" class="enlightenment-input genre-name w-100" value="@(genre.Name)" /></td>
+                            <td><img src="~/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" /></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <button id="btn-add-genre" type="button" class="confirm-button">@_localizer["AddGenre"]</button>
+            <small class="form-label text-disabled form-description">@_localizer["AlbumGenresDescription"]</small>
+        </div>
+        <!-- Tags. -->
+        <h3 class="text-light-two">@_localizer["AlbumTags"]</h3>
+        <div class="form-row">
+            <table class="w-100 form-table">
+                <thead>
+                    <tr>
+                        <th>@_localizer["Tag"]</th>
+                        <th class="w-40px"></th>
+                    </tr>
+                </thead>
+                <tbody id="tags-body">
+                    @foreach (var tag in tags)
+                    {
+                        <tr class="tag-row">
+                            <td><input type="text" class="enlightenment-input tag-name w-100" value="@(tag.Name)" /></td>
+                            <td><img src="~/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" /></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <button id="btn-add-tag" type="button" class="confirm-button">@_localizer["AddTag"]</button>
+            <small class="form-label text-disabled form-description">@_localizer["AlbumTagsDescription"]</small>
+        </div>
+        <!-- Release types. -->
+        <h3 class="text-light-two">@_localizer["AlbumReleaseTypes"]</h3>
+        <div class="form-row">
+            <table class="w-100 form-table">
+                <thead>
+                    <tr>
+                        <th>@_localizer["ReleaseType"]</th>
+                        <th class="w-40px"></th>
+                    </tr>
+                </thead>
+                <tbody id="release-types-body">
+                    @{ int releaseTypeIndex = 0; }
+                    @foreach (var releaseType in releaseTypes)
+                    {
+                        <tr class="release-type-row">
+                            <td>
+                                <div class="enlightenment-combobox inline-block w-100 release-type-combobox">
+                                    <div class="shine-effect" style="top: 1px;"></div>
+                                    <input type="checkbox" class="enlightenment-toggle-checkbox" id="release-type-toggle-@releaseTypeIndex" />
+                                    <label class="enlightenment-toggle" for="release-type-toggle-@releaseTypeIndex">
+                                        <span class="enlightenment-selected-text" data-value="@releaseType.ToString()">@_localizer[releaseType.ToString()].Value</span>
+                                    </label>
+                                    <div class="enlightenment-dropdown">
+                                        <div class="enlightenment-option" data-value="">-</div>
+                                        @foreach (string releaseTypeOption in Enum.GetNames<MusicReleaseType>())
+                                        {
+                                            <div class="enlightenment-option" data-value="@releaseTypeOption">@_localizer[releaseTypeOption].Value</div>
+                                        }
+                                    </div>
+                                </div>
+                            </td>
+                            <td><img src="~/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" /></td>
+                        </tr>
+                        releaseTypeIndex++;
+                    }
+                </tbody>
+            </table>
+            <button id="btn-add-release-type" type="button" class="confirm-button">@_localizer["AddReleaseType"]</button>
+            <small class="form-label text-disabled form-description">@_localizer["AlbumReleaseTypesDescription"]</small>
+        </div>
+
+        <!-- Release information. -->
+        <h3 class="text-light-two">@_localizer["AlbumReleaseInformation"]</h3>
+        <!-- Original release date. -->
+        <div class="form-row">
+            <div class="form-label"><label for="album-original-release-date-input">@_localizer["AlbumOriginalReleaseDate"]</label>:</div>
+            <div class="form-field"><input id="album-original-release-date-input" type="date" class="enlightenment-input" value="@(releaseInfo?.OriginalReleaseDate?.ToString("yyyy-MM-dd") ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AlbumOriginalReleaseDateDescription"]</small>
+        </div>
+        <!-- Original release year. -->
+        <div class="form-row">
+            <div class="form-label"><label for="album-original-release-year-input">@_localizer["AlbumOriginalReleaseYear"]</label>:</div>
+            <div class="form-field"><input id="album-original-release-year-input" type="number" min="1" max="9999" class="enlightenment-input" value="@(releaseInfo?.OriginalReleaseYear?.ToString(CultureInfo.InvariantCulture) ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AlbumOriginalReleaseYearDescription"]</small>
+        </div>
+        <!-- Re-release date. -->
+        <div class="form-row">
+            <div class="form-label"><label for="album-re-release-date-input">@_localizer["AlbumReReleaseDate"]</label>:</div>
+            <div class="form-field"><input id="album-re-release-date-input" type="date" class="enlightenment-input" value="@(releaseInfo?.ReReleaseDate?.ToString("yyyy-MM-dd") ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AlbumReReleaseDateDescription"]</small>
+        </div>
+        <!-- Re-release year. -->
+        <div class="form-row">
+            <div class="form-label"><label for="album-re-release-year-input">@_localizer["AlbumReReleaseYear"]</label>:</div>
+            <div class="form-field"><input id="album-re-release-year-input" type="number" min="1" max="9999" class="enlightenment-input" value="@(releaseInfo?.ReReleaseYear?.ToString(CultureInfo.InvariantCulture) ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AlbumReReleaseYearDescription"]</small>
+        </div>
+        <!-- Release country. -->
+        <div class="form-row">
+            <div class="form-label"><label for="album-release-country-combobox-toggle">@_localizer["AlbumReleaseCountry"]</label>:</div>
+            <div class="form-field">
+                <div class="enlightenment-combobox inline-block w-100" id="album-release-country-combobox">
+                    <div class="shine-effect" style="top: 1px;"></div>
+                    <input type="checkbox" class="enlightenment-toggle-checkbox" id="album-release-country-combobox-toggle" />
+                    <label class="enlightenment-toggle" for="album-release-country-combobox-toggle">
+                        <span class="enlightenment-selected-text" data-value="@currentReleaseCountry">@releaseCountryLabel(currentReleaseCountry)</span>
+                    </label>
+                    <div class="enlightenment-dropdown">
+                        <div class="enlightenment-option" data-value="">-</div>
+                        @foreach (string country in Enum.GetNames<ReleaseCountry>())
+                        {
+                            <div class="enlightenment-option" data-value="@country">@releaseCountryLabel(country)</div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <small class="form-label text-disabled form-description">@_localizer["AlbumReleaseCountryDescription"]</small>
+        </div>
+        <!-- Release version. -->
+        <div class="form-row">
+            <div class="form-label"><label for="album-release-version-input">@_localizer["AlbumReleaseVersion"]</label>:</div>
+            <div class="form-field"><input id="album-release-version-input" type="text" class="enlightenment-input" value="@(releaseInfo?.ReleaseVersion ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AlbumReleaseVersionDescription"]</small>
+        </div>
+
+        <!-- Language. -->
+        <h3 class="text-light-two">@_localizer["AlbumLanguage"]</h3>
+        <!-- Language code. -->
+        <div class="form-row">
+            <div class="form-label"><label for="album-language-code-input">@_localizer["LanguageCode"]</label>:</div>
+            <div class="form-field"><input id="album-language-code-input" type="text" maxlength="2" class="enlightenment-input" value="@(language?.LanguageCode ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["LanguageCodeDescription"]</small>
+        </div>
+        <!-- Language name. -->
+        <div class="form-row">
+            <div class="form-label"><label for="album-language-name-input">@_localizer["LanguageName"]</label>:</div>
+            <div class="form-field"><input id="album-language-name-input" type="text" class="enlightenment-input" value="@(language?.LanguageName ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["LanguageNameDescription"]</small>
+        </div>
+        <!-- Native name. -->
+        <div class="form-row">
+            <div class="form-label"><label for="album-language-native-name-input">@_localizer["NativeName"]</label>:</div>
+            <div class="form-field"><input id="album-language-native-name-input" type="text" class="enlightenment-input" value="@(language?.NativeName ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["NativeNameDescription"]</small>
+        </div>
+        <!-- Original language. -->
+        <h3 class="text-light-two">@_localizer["AlbumOriginalLanguage"]</h3>
+        <!-- Language code. -->
+        <div class="form-row">
+            <div class="form-label"><label for="album-original-language-code-input">@_localizer["LanguageCode"]</label>:</div>
+            <div class="form-field"><input id="album-original-language-code-input" type="text" maxlength="2" class="enlightenment-input" value="@(originalLanguage?.LanguageCode ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["LanguageCodeDescription"]</small>
+        </div>
+        <!-- Language name. -->
+        <div class="form-row">
+            <div class="form-label"><label for="album-original-language-name-input">@_localizer["LanguageName"]</label>:</div>
+            <div class="form-field"><input id="album-original-language-name-input" type="text" class="enlightenment-input" value="@(originalLanguage?.LanguageName ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["LanguageNameDescription"]</small>
+        </div>
+        <!-- Native name. -->
+        <div class="form-row">
+            <div class="form-label"><label for="album-original-language-native-name-input">@_localizer["NativeName"]</label>:</div>
+            <div class="form-field"><input id="album-original-language-native-name-input" type="text" class="enlightenment-input" value="@(originalLanguage?.NativeName ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["NativeNameDescription"]</small>
+        </div>
+
+        <!-- Catalog numbers. -->
+        <h3 class="text-light-two">@_localizer["AlbumCatalogNumbers"]</h3>
+        <div class="form-row">
+            <table class="w-100 form-table">
+                <thead>
+                    <tr>
+                        <th>@_localizer["CatalogNumber"]</th>
+                        <th class="w-40px"></th>
+                    </tr>
+                </thead>
+                <tbody id="catalog-numbers-body">
+                    @foreach (string catalogNumber in Model.CatalogNumbers ?? [])
+                    {
+                        <tr class="catalog-number-row">
+                            <td><input type="text" class="enlightenment-input catalog-number-value w-100" value="@catalogNumber" /></td>
+                            <td><img src="~/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" /></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <button id="btn-add-catalog-number" type="button" class="confirm-button">@_localizer["AddCatalogNumber"]</button>
+            <small class="form-label text-disabled form-description">@_localizer["AlbumCatalogNumbersDescription"]</small>
+        </div>
+
+        <!-- Identifiers. -->
+        <h3 class="text-light-two">@_localizer["Identifiers"]</h3>
+        <!-- Barcode. -->
+        <div class="form-row">
+            <div class="form-label"><label for="album-barcode-input">@_localizer["AlbumBarcode"]</label>:</div>
+            <div class="form-field"><input id="album-barcode-input" type="text" class="enlightenment-input" value="@(Model.Barcode ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AlbumBarcodeDescription"]</small>
+        </div>
+        <!-- Label. -->
+        <div class="form-row">
+            <div class="form-label"><label for="album-label-input">@_localizer["AlbumLabel"]</label>:</div>
+            <div class="form-field"><input id="album-label-input" type="text" class="enlightenment-input" value="@(Model.Label ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AlbumLabelDescription"]</small>
+        </div>
+        <!-- ASIN. -->
+        <div class="form-row">
+            <div class="form-label"><label for="album-asin-input">@_localizer["AlbumAsin"]</label>:</div>
+            <div class="form-field"><input id="album-asin-input" type="text" class="enlightenment-input" value="@(Model.ASIN ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AlbumAsinDescription"]</small>
+        </div>
+        <!-- MusicBrainz release Id. -->
+        <div class="form-row">
+            <div class="form-label"><label for="album-musicbrainz-release-id-input">@_localizer["AlbumMusicBrainzReleaseId"]</label>:</div>
+            <div class="form-field"><input id="album-musicbrainz-release-id-input" type="text" class="enlightenment-input" value="@(Model.MusicBrainzReleaseId?.ToString() ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AlbumMusicBrainzReleaseIdDescription"]</small>
+        </div>
+        <!-- MusicBrainz release group Id. -->
+        <div class="form-row">
+            <div class="form-label"><label for="album-musicbrainz-release-group-id-input">@_localizer["AlbumMusicBrainzReleaseGroupId"]</label>:</div>
+            <div class="form-field"><input id="album-musicbrainz-release-group-id-input" type="text" class="enlightenment-input" value="@(Model.MusicBrainzReleaseGroupId?.ToString() ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AlbumMusicBrainzReleaseGroupIdDescription"]</small>
+        </div>
+        <!-- MusicBrainz release artist Id. -->
+        <div class="form-row">
+            <div class="form-label"><label for="album-musicbrainz-release-artist-id-input">@_localizer["AlbumMusicBrainzReleaseArtistId"]</label>:</div>
+            <div class="form-field"><input id="album-musicbrainz-release-artist-id-input" type="text" class="enlightenment-input" value="@(Model.MusicBrainzReleaseArtistId?.ToString() ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AlbumMusicBrainzReleaseArtistIdDescription"]</small>
+        </div>
+
+                <div class="form-row mt-10">
+                    <button id="btn-save-album" type="button" class="confirm-button w-100px">@_localizer["Save"]</button>
+                    <button id="btn-delete-album" type="button" class="abort-button w-150px">@_localizer["DeleteAlbum"]</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- The "text/plain" type is a design choice, not a mistake: it keeps the browser from executing this view script during HTML parsing, before site.js defines the API helpers it calls. site.js (which loads deferred) executes these scripts once it is loaded, both on the initial page load and during AJAX navigation. -->
+    <script type="text/plain" data-form="@scriptId">
+        // Create cleanup registry for this view.
+        const cleanupFunctions = [];
+        let isInitialized = false;
+        let generatedId = 1000;
+
+        const artistId = '@artistId';
+        const albumId = '@albumId';
+        const libraryId = '@libraryId';
+        const saveUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Music.SAVE_ALBUM, new { artistId = default(Guid), albumId = default(Guid) })'.replace('/@(default(Guid))', `/${artistId}`).replace('/@(default(Guid))', `/${albumId}`);
+        const deleteUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Music.DELETE_ALBUM, new { artistId = default(Guid), albumId = default(Guid) })'.replace('/@(default(Guid))', `/${artistId}`).replace('/@(default(Guid))', `/${albumId}`);
+        const artistUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Music.ARTIST, new { artistId = default(Guid) })'.replace('/@(default(Guid))', `/${artistId}`);
+        const tracksUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Music.GET_ALBUM_TRACKS, new { artistId = default(Guid), albumId = default(Guid) })';
+        const trackUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Music.TRACK, new { artistId = default(Guid), albumId = default(Guid), trackId = default(Guid) })';
+        const coverUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Music.UPDATE_ALBUM_COVER, new { artistId = default(Guid), albumId = default(Guid) })'.replace('/@(default(Guid))', `/${artistId}`).replace('/@(default(Guid))', `/${albumId}`) + `?libraryId=${libraryId}`;
+
+        // The element references are captured once, so that the cleanup can unbind their listeners even after the AJAX navigator has swapped the content out of the document.
+        const btnBackToArtist = document.getElementById('btn-back-to-artist');
+        const btnSaveAlbum = document.getElementById('btn-save-album');
+        const btnDeleteAlbum = document.getElementById('btn-delete-album');
+        const btnAddCatalogNumber = document.getElementById('btn-add-catalog-number');
+        const btnAddReleaseType = document.getElementById('btn-add-release-type');
+        const btnAddGenre = document.getElementById('btn-add-genre');
+        const btnAddTag = document.getElementById('btn-add-tag');
+        const btnAddContributor = document.getElementById('btn-add-contributor');
+        const btnAddRating = document.getElementById('btn-add-rating');
+        const tracksBody = document.getElementById('tracks-body');
+        const noTracksMessage = document.getElementById('no-tracks');
+        const catalogNumbersBody = document.getElementById('catalog-numbers-body');
+        const releaseTypesBody = document.getElementById('release-types-body');
+        const genresBody = document.getElementById('genres-body');
+        const tagsBody = document.getElementById('tags-body');
+        const contributorsBody = document.getElementById('contributors-body');
+        const ratingsBody = document.getElementById('ratings-body');
+        const coverImage = document.getElementById('album-cover-image');
+        const coverPathLabel = document.getElementById('album-cover-path');
+        const coverInput = document.getElementById('album-cover-input');
+        const btnChangeCover = document.getElementById('btn-change-cover');
+        const artworkCarousel = document.getElementById('album-artwork-carousel');
+        // The stored artwork of the album, each with the localized label of its type, used by the carousel of the cover.
+        const artworkItems = @Html.Raw(artworkItemsJson);
+
+        const jsLocalizedStrings = {
+            albumSaved: @Json.Serialize(_localizer["AlbumSaved"].Value),
+            saveFailed: @Json.Serialize(_localizer["SaveFailed"].Value),
+            albumDeleted: @Json.Serialize(_localizer["AlbumDeleted"].Value),
+            deleteConfirm: @Json.Serialize(_localizer["DeleteConfirm"].Value),
+            deleteFailed: @Json.Serialize(_localizer["DeleteFailed"].Value),
+            noTracks: @Json.Serialize(_localizer["NoTracks"].Value),
+            noCover: @Json.Serialize(_localizer["NoCover"].Value),
+            coverSaved: @Json.Serialize(_localizer["CoverSaved"].Value),
+            coverUploadFailed: @Json.Serialize(_localizer["CoverUploadFailed"].Value),
+            remove: @Json.Serialize(_localizer["Remove"].Value)
+        };
+
+        // Reads the trimmed value of the element with the provided id.
+        function readValue(id) {
+            const element = document.getElementById(id);
+            return element ? element.value.trim() : '';
+        }
+
+        // Reads the value of the enlightenment combobox with the provided id.
+        function readComboboxValue(id) {
+            const element = document.querySelector(`#${id} .enlightenment-selected-text`);
+            return element ? (element.getAttribute('data-value') || '') : '';
+        }
+
+        // Reads the value of the enlightenment combobox inside the provided row, selected by its class.
+        function readRowComboboxValue(row, className) {
+            const element = row.querySelector(className + ' .enlightenment-selected-text');
+            return element ? (element.getAttribute('data-value') || '') : '';
+        }
+
+        // Reads an optional number from a field, returning null when the field is empty or not a number.
+        function readNumber(id) {
+            const value = readValue(id);
+            if (value === '')
+                return null;
+            const parsed = Number(value);
+            return Number.isNaN(parsed) ? null : parsed;
+        }
+
+        // Parses a decimal value, returning null when the value is empty or not a number.
+        function parseOptionalDecimal(value) {
+            if (value.trim() === '')
+                return null;
+            const parsed = Number(value);
+            return Number.isNaN(parsed) ? null : parsed;
+        }
+
+        // Parses an integer value, returning null when the value is empty or not a number.
+        function parseIntOrNull(value) {
+            if (value.trim() === '')
+                return null;
+            const parsed = parseInt(value, 10);
+            return Number.isNaN(parsed) ? null : parsed;
+        }
+
+        // Reads an optional Guid from a field, returning null when the field is empty or not a valid Guid.
+        function readGuid(id) {
+            const value = readValue(id);
+            if (!/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(value))
+                return null;
+            return value;
+        }
+
+        // Builds the language object of a language group, or null when no field of the group carries a value.
+        function buildLanguage(codeId, nameId, nativeNameId) {
+            const code = readValue(codeId);
+            const name = readValue(nameId);
+            const nativeName = readValue(nativeNameId);
+            if (code === '' && name === '' && nativeName === '')
+                return null;
+            return { LanguageCode: code || null, LanguageName: name || null, NativeName: nativeName || null };
+        }
+
+        // Builds the list of media contributor references from the contributor rows.
+        function buildContributors() {
+            return Array.from(contributorsBody.querySelectorAll('.contributor-row')).map(row => ({
+                ContributorId: row.querySelector('.contributor-id').value.trim() || '00000000-0000-0000-0000-000000000000',
+                Role: readRowComboboxValue(row, '.contributor-role-combobox') || null
+            }));
+        }
+
+        // Builds the list of ratings from the rating rows.
+        function buildRatings() {
+            return Array.from(ratingsBody.querySelectorAll('.rating-row')).map(row => ({
+                Value: parseOptionalDecimal(row.querySelector('.rating-value').value),
+                MaxValue: parseOptionalDecimal(row.querySelector('.rating-max-value').value),
+                Source: readRowComboboxValue(row, '.rating-source-combobox') || null,
+                VoteCount: parseIntOrNull(row.querySelector('.rating-vote-count').value)
+            }));
+        }
+
+        // Builds the list of release types from the release type rows, skipping the rows whose value is empty.
+        function buildReleaseTypes() {
+            return Array.from(releaseTypesBody.querySelectorAll('.release-type-row'))
+                .map(row => readRowComboboxValue(row, '.release-type-combobox'))
+                .filter(value => value !== '');
+        }
+
+        // Builds a list of name valued entries from the rows of a table, skipping the rows whose name is empty.
+        function buildNameList(body, rowSelector, inputSelector) {
+            return Array.from(body.querySelectorAll(rowSelector))
+                .map(row => row.querySelector(inputSelector).value.trim())
+                .filter(name => name !== '')
+                .map(name => ({ Name: name }));
+        }
+
+        // Builds a list of plain string entries from the rows of a table, skipping the rows whose value is empty.
+        function buildStringList(body, rowSelector, inputSelector) {
+            return Array.from(body.querySelectorAll(rowSelector))
+                .map(row => row.querySelector(inputSelector).value.trim())
+                .filter(value => value !== '');
+        }
+
+        // Builds the payload of the edited album, matching the update request of the API.
+        function buildPayload() {
+            return {
+                Metadata: {
+                    Title: readValue('album-title-input'),
+                    OriginalTitle: readValue('album-original-title-input') || null,
+                    Description: readValue('album-description-input') || null,
+                    Disambiguation: readValue('album-disambiguation-input') || null,
+                    Script: readValue('album-script-input') || null,
+                    ReleaseStatus: readComboboxValue('album-release-status-combobox') || null,
+                    TotalDiscs: readNumber('album-total-discs-input'),
+                    TotalTracks: readNumber('album-total-tracks-input'),
+                    ReleaseTitle: readValue('album-release-title-input') || null,
+                    ReleaseInfo: {
+                        OriginalReleaseDate: readValue('album-original-release-date-input') || null,
+                        OriginalReleaseYear: readNumber('album-original-release-year-input'),
+                        ReReleaseDate: readValue('album-re-release-date-input') || null,
+                        ReReleaseYear: readNumber('album-re-release-year-input'),
+                        ReleaseCountry: readComboboxValue('album-release-country-combobox') || null,
+                        ReleaseVersion: readValue('album-release-version-input') || null
+                    },
+                    Language: buildLanguage('album-language-code-input', 'album-language-name-input', 'album-language-native-name-input'),
+                    OriginalLanguage: buildLanguage('album-original-language-code-input', 'album-original-language-name-input', 'album-original-language-native-name-input'),
+                    Genres: buildNameList(genresBody, '.genre-row', '.genre-name'),
+                    Tags: buildNameList(tagsBody, '.tag-row', '.tag-name'),
+                    ReleaseTypes: buildReleaseTypes()
+                },
+                MediaFormat: readComboboxValue('album-media-format-combobox') || null,
+                Packaging: readComboboxValue('album-packaging-combobox') || null,
+                Barcode: readValue('album-barcode-input') || null,
+                CatalogNumbers: buildStringList(catalogNumbersBody, '.catalog-number-row', '.catalog-number-value'),
+                Label: readValue('album-label-input') || null,
+                ASIN: readValue('album-asin-input') || null,
+                MusicBrainzReleaseId: readGuid('album-musicbrainz-release-id-input'),
+                MusicBrainzReleaseGroupId: readGuid('album-musicbrainz-release-group-id-input'),
+                MusicBrainzReleaseArtistId: readGuid('album-musicbrainz-release-artist-id-input'),
+                Contributors: buildContributors(),
+                Ratings: buildRatings()
+            };
+        }
+
+        // Builds the HTML of an enlightenment combobox of a row, with the provided options and an optional wrapper class.
+        function buildRowCombobox(options, selectedValue, wrapperClass) {
+            const id = `row-combobox-${generatedId++}`;
+            const optionHtml = options.map(option =>
+                `<div class="enlightenment-option" data-value="${option.value}">${option.label}</div>`).join('');
+            return `
+                <div class="enlightenment-combobox inline-block w-100 ${wrapperClass || ''}">
+                    <div class="shine-effect" style="top: 1px;"></div>
+                    <input type="checkbox" class="enlightenment-toggle-checkbox" id="${id}" />
+                    <label class="enlightenment-toggle" for="${id}">
+                        <span class="enlightenment-selected-text" data-value="${selectedValue || ''}">${selectedLabel(options, selectedValue)}</span>
+                    </label>
+                    <div class="enlightenment-dropdown">
+                        <div class="enlightenment-option" data-value="">-</div>
+                        ${optionHtml}
+                    </div>
+                </div>`;
+        }
+
+        // Returns the display text of a selected combobox value, using the default dash when nothing is selected.
+        function selectedLabel(options, value) {
+            if (!value)
+                return '-';
+            const option = options.find(item => item.value === value);
+            return option ? option.label : value;
+        }
+
+        const releaseTypeOptions = @Html.Raw(releaseTypeOptionsJson);
+        const contributorRoleOptions = @Html.Raw(contributorRoleOptionsJson);
+        const ratingSourceOptions = @Html.Raw(ratingSourceOptionsJson);
+
+        // Adds a blank catalog number row.
+        function addCatalogNumberRow() {
+            catalogNumbersBody.insertAdjacentHTML('beforeend', `
+                <tr class="catalog-number-row">
+                    <td><input type="text" class="enlightenment-input catalog-number-value w-100" /></td>
+                    <td><img src="/images/ui/delete.svg" alt="${jsLocalizedStrings.remove}" title="${jsLocalizedStrings.remove}" class="remove-form-table-row-icon" /></td>
+                </tr>`);
+        }
+
+        // Adds a blank release type row.
+        function addReleaseTypeRow() {
+            releaseTypesBody.insertAdjacentHTML('beforeend', `
+                <tr class="release-type-row">
+                    <td>${buildRowCombobox(releaseTypeOptions, '', 'release-type-combobox')}</td>
+                    <td><img src="/images/ui/delete.svg" alt="${jsLocalizedStrings.remove}" title="${jsLocalizedStrings.remove}" class="remove-form-table-row-icon" /></td>
+                </tr>`);
+        }
+
+        // Adds a blank genre row.
+        function addGenreRow() {
+            genresBody.insertAdjacentHTML('beforeend', `
+                <tr class="genre-row">
+                    <td><input type="text" class="enlightenment-input genre-name w-100" /></td>
+                    <td><img src="/images/ui/delete.svg" alt="${jsLocalizedStrings.remove}" title="${jsLocalizedStrings.remove}" class="remove-form-table-row-icon" /></td>
+                </tr>`);
+        }
+
+        // Adds a blank tag row.
+        function addTagRow() {
+            tagsBody.insertAdjacentHTML('beforeend', `
+                <tr class="tag-row">
+                    <td><input type="text" class="enlightenment-input tag-name w-100" /></td>
+                    <td><img src="/images/ui/delete.svg" alt="${jsLocalizedStrings.remove}" title="${jsLocalizedStrings.remove}" class="remove-form-table-row-icon" /></td>
+                </tr>`);
+        }
+
+        // Adds a blank contributor row.
+        function addContributorRow() {
+            contributorsBody.insertAdjacentHTML('beforeend', `
+                <tr class="contributor-row">
+                    <td><input type="text" class="enlightenment-input contributor-id w-100" /></td>
+                    <td>${buildRowCombobox(contributorRoleOptions, '', 'contributor-role-combobox')}</td>
+                    <td><img src="/images/ui/delete.svg" alt="${jsLocalizedStrings.remove}" title="${jsLocalizedStrings.remove}" class="remove-form-table-row-icon" /></td>
+                </tr>`);
+        }
+
+        // Adds a blank rating row.
+        function addRatingRow() {
+            ratingsBody.insertAdjacentHTML('beforeend', `
+                <tr class="rating-row">
+                    <td><input type="number" step="any" min="0" class="enlightenment-input rating-value w-100" /></td>
+                    <td><input type="number" step="any" min="0" class="enlightenment-input rating-max-value w-100" /></td>
+                    <td>${buildRowCombobox(ratingSourceOptions, '', 'rating-source-combobox')}</td>
+                    <td><input type="number" min="0" class="enlightenment-input rating-vote-count w-100" /></td>
+                    <td><img src="/images/ui/delete.svg" alt="${jsLocalizedStrings.remove}" title="${jsLocalizedStrings.remove}" class="remove-form-table-row-icon" /></td>
+                </tr>`);
+        }
+
+        // Removes the row of the clicked remove icon.
+        function handleRowRemoval(event) {
+            if (event.target.matches('.remove-form-table-row-icon'))
+                event.target.closest('tr').remove();
+        }
+
+        // Builds the URL of the track details page of the provided track.
+        function buildTrackUrl(trackId) {
+            return trackUrlTemplate.replace('/@(default(Guid))', `/${artistId}`).replace('/@(default(Guid))', `/${albumId}`).replace('/@(default(Guid))', `/${trackId}`) + `?libraryId=${libraryId}`;
+        }
+
+        // Loads and renders the tracks of the album in the tracks table.
+        async function loadTracksAsync() {
+            const url = tracksUrlTemplate.replace('/@(default(Guid))', `/${artistId}`).replace('/@(default(Guid))', `/${albumId}`) + `?libraryId=${libraryId}`;
+            const response = await callApiGetAsync(url);
+            renderTracks(response);
+        }
+
+        // Formats a duration in seconds as m:ss, or h:mm:ss when the track is an hour or longer.
+        function formatDuration(totalSeconds) {
+            if (!totalSeconds || totalSeconds <= 0)
+                return '';
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            const paddedSeconds = String(seconds).padStart(2, '0');
+            if (hours > 0)
+                return `${hours}:${String(minutes).padStart(2, '0')}:${paddedSeconds}`;
+            return `${minutes}:${paddedSeconds}`;
+        }
+
+        // Renders a row of the tracks table per track, or shows the empty message when the album has no tracks.
+        function renderTracks(response) {
+            tracksBody.innerHTML = '';
+            const tracks = response && response.data ? response.data : [];
+            noTracksMessage.classList.toggle('hidden', tracks.length !== 0);
+            tracks.forEach(track => tracksBody.appendChild(createTrackRow(track)));
+            bindNavigationLinks();
+        }
+
+        // Creates a row of the tracks table, with the name of the track linking to its own page.
+        function createTrackRow(track) {
+            const row = document.createElement('tr');
+            row.className = 'track-row';
+
+            const numberCell = document.createElement('td');
+            numberCell.textContent = track.trackNumber;
+
+            const nameCell = document.createElement('td');
+            const link = document.createElement('a');
+            link.className = 'nav-link track-name-link';
+            link.href = buildTrackUrl(track.id);
+            link.textContent = track.title;
+            nameCell.appendChild(link);
+
+            const durationCell = document.createElement('td');
+            durationCell.textContent = formatDuration(track.durationInSeconds);
+
+            row.appendChild(numberCell);
+            row.appendChild(nameCell);
+            row.appendChild(durationCell);
+            return row;
+        }
+
+        // Sends the edited album data to the server.
+        async function handleSaveAsync() {
+            const result = await callApiPutAsync(`${saveUrl}?libraryId=${encodeURIComponent(libraryId)}`, buildPayload());
+            if (result && result.success === true) {
+                notificationService.show(jsLocalizedStrings.albumSaved, NotificationType.SUCCESS);
+            } else {
+                notificationService.show(jsLocalizedStrings.saveFailed, NotificationType.ERROR);
+            }
+        }
+
+        // Deletes the album after confirmation, then returns to the artist page.
+        async function handleDeleteAsync() {
+            if (await dialogService.show(jsLocalizedStrings.deleteConfirm, jsLocalizedDialogs.confirmation, DialogButtons.YES_NO, DialogIcon.QUESTION) !== DialogButton.YES)
+                return;
+            const success = await callApiDeleteAsync(`${deleteUrl}?libraryId=${encodeURIComponent(libraryId)}`);
+            if (success) {
+                notificationService.show(jsLocalizedStrings.albumDeleted, NotificationType.SUCCESS);
+                await updateContentAsync(`${artistUrl}?libraryId=${encodeURIComponent(libraryId)}`, true);
+            } else 
+                notificationService.show(jsLocalizedStrings.deleteFailed, NotificationType.ERROR);
+        }
+
+        // Navigates back to the artist page.
+        async function handleBackToArtistAsync() {
+            await updateContentAsync(`${artistUrl}?libraryId=${encodeURIComponent(libraryId)}`, true);
+        }
+
+        // Opens the file picker that chooses the new cover image.
+        function handleChangeCoverClick() {
+            if (coverInput)
+                coverInput.click();
+        }
+
+        // Uploads the selected cover image to the server.
+        async function handleCoverChangeAsync() {
+            const file = coverInput.files && coverInput.files[0];
+            if (!file)
+                return;
+            const formData = new FormData();
+            formData.append('cover', file);
+
+            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+            const headers = { 'X-Requested-With': 'XMLHttpRequest' };
+            if (token)
+                headers['RequestVerificationToken'] = token;
+
+            let response;
+            try {
+                response = await fetch(coverUrl, {
+                    method: 'PUT',
+                    headers: headers,
+                    body: formData
+                });
+            } catch (error) {
+                console.error('Error:', error);
+                notificationService.show(jsLocalizedStrings.coverUploadFailed, NotificationType.ERROR);
+                return;
+            }
+            if (response.redirected) {
+                window.location.href = response.url;
+                return;
+            }
+            if (!response.ok) {
+                notificationService.show(jsLocalizedStrings.coverUploadFailed, NotificationType.ERROR);
+                return;
+            }
+            const jsonResponse = await response.json();
+            if (jsonResponse.success === true) {
+                // Show the uploaded cover immediately, so that the user sees the change without reloading.
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    coverImage.src = event.target.result;
+                    const storedPath = jsonResponse.data || '';
+                    coverImage.dataset.coverPath = storedPath;
+                    coverPathLabel.textContent = storedPath ? storedPath : jsLocalizedStrings.noCover;
+                    coverPathLabel.title = storedPath;
+                };
+                reader.readAsDataURL(file);
+                notificationService.show(jsLocalizedStrings.coverSaved, NotificationType.SUCCESS);
+            } else 
+                notificationService.show(jsLocalizedStrings.coverUploadFailed, NotificationType.ERROR);
+        }
+
+        // Renders the horizontally scrollable carousel of the stored artwork of the album.
+        function renderArtworkCarousel(items) {
+            artworkCarousel.innerHTML = '';
+            items.forEach(item => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'artwork-carousel-item';
+                button.title = item.label;
+                button.dataset.artworkPath = item.path;
+                const image = document.createElement('img');
+                image.src = `${globalConfiguration.serverBasePath}${item.path}`;
+                image.alt = item.label;
+                button.appendChild(image);
+                button.addEventListener('click', () => selectArtwork(item.path));
+                artworkCarousel.appendChild(button);
+            });
+            artworkCarousel.classList.toggle('hidden', items.length === 0);
+        }
+
+        // Displays the stored artwork at the provided path in place of the cover, and marks its carousel item as selected.
+        function selectArtwork(artworkPath) {
+            coverImage.dataset.coverPath = artworkPath;
+            coverImage.src = `${globalConfiguration.serverBasePath}${artworkPath}`;
+            coverPathLabel.textContent = artworkPath;
+            coverPathLabel.title = artworkPath;
+            artworkCarousel.querySelectorAll('.artwork-carousel-item').forEach(item => {
+                item.classList.toggle('selected', item.dataset.artworkPath === artworkPath);
+            });
+        }
+
+        // Shows the cover image of the album, or the first stored artwork when there is no cover, or a placeholder when the album has neither.
+        function showCover() {
+            const coverPath = coverImage.dataset.coverPath || '';
+            const artworkPath = coverPath || (artworkItems.length > 0 ? artworkItems[0].path : '');
+            if (artworkPath) {
+                selectArtwork(artworkPath);
+            } else {
+                coverImage.src = `/images/ui/music-placeholder.svg`;
+                coverPathLabel.textContent = jsLocalizedStrings.noCover;
+                coverPathLabel.title = '';
+            }
+        }
+
+        // Add listeners.
+        btnSaveAlbum.addEventListener('click', handleSaveAsync);
+        btnDeleteAlbum.addEventListener('click', handleDeleteAsync);
+        btnBackToArtist.addEventListener('click', handleBackToArtistAsync);
+        btnAddCatalogNumber.addEventListener('click', addCatalogNumberRow);
+        btnAddReleaseType.addEventListener('click', addReleaseTypeRow);
+        btnAddGenre.addEventListener('click', addGenreRow);
+        btnAddTag.addEventListener('click', addTagRow);
+        btnAddContributor.addEventListener('click', addContributorRow);
+        btnAddRating.addEventListener('click', addRatingRow);
+        catalogNumbersBody.addEventListener('click', handleRowRemoval);
+        releaseTypesBody.addEventListener('click', handleRowRemoval);
+        genresBody.addEventListener('click', handleRowRemoval);
+        tagsBody.addEventListener('click', handleRowRemoval);
+        contributorsBody.addEventListener('click', handleRowRemoval);
+        ratingsBody.addEventListener('click', handleRowRemoval);
+        btnChangeCover.addEventListener('click', handleChangeCoverClick);
+        coverInput.addEventListener('change', handleCoverChangeAsync);
+        document.addEventListener('DOMContentLoaded', InitializeAsync);
+
+        // Register cleanup for these listeners.
+        cleanupFunctions.push(() => {
+            btnSaveAlbum.removeEventListener('click', handleSaveAsync);
+            btnDeleteAlbum.removeEventListener('click', handleDeleteAsync);
+            btnBackToArtist.removeEventListener('click', handleBackToArtistAsync);
+            btnAddCatalogNumber.removeEventListener('click', addCatalogNumberRow);
+            btnAddReleaseType.removeEventListener('click', addReleaseTypeRow);
+            btnAddGenre.removeEventListener('click', addGenreRow);
+            btnAddTag.removeEventListener('click', addTagRow);
+            btnAddContributor.removeEventListener('click', addContributorRow);
+            btnAddRating.removeEventListener('click', addRatingRow);
+            catalogNumbersBody.removeEventListener('click', handleRowRemoval);
+            releaseTypesBody.removeEventListener('click', handleRowRemoval);
+            genresBody.removeEventListener('click', handleRowRemoval);
+            tagsBody.removeEventListener('click', handleRowRemoval);
+            contributorsBody.removeEventListener('click', handleRowRemoval);
+            ratingsBody.removeEventListener('click', handleRowRemoval);
+            btnChangeCover.removeEventListener('click', handleChangeCoverClick);
+            coverInput.removeEventListener('change', handleCoverChangeAsync);
+            document.removeEventListener('DOMContentLoaded', InitializeAsync);
+        });
+
+        // Initializes the page, showing the artwork of the album and loading its tracks.
+        async function InitializeAsync() {
+            if (isInitialized)
+                return;
+            isInitialized = true;
+            renderArtworkCarousel(artworkItems);
+            showCover();
+            await loadTracksAsync();
+        }
+
+        // Store all cleanups for this view on window object using the scriptId.
+        window.viewCleanups = window.viewCleanups || {};
+        window.viewCleanups['@scriptId'] = () => {
+            cleanupFunctions.forEach(cleanup => cleanup());
+            console.log(`Unloaded @scriptId`);
+        };
+        console.log(`Loaded @scriptId`);
+    </script>
+}

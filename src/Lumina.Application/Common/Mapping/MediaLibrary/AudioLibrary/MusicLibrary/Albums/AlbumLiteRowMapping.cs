@@ -24,7 +24,10 @@ public static class AlbumLiteRowMapping
         return new AlbumLiteResponse(
             readModel.Id,
             readModel.Title,
-            readModel.TotalTracks);
+            readModel.TotalTracks,
+            readModel.CoverPath,
+            readModel.ReleaseYear,
+            readModel.ReleaseTypes);
     }
 
     /// <summary>

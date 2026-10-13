@@ -157,8 +157,10 @@ public static class AlbumEntityMapping
     /// Converts <paramref name="repositoryEntity"/> to <see cref="AlbumResponse"/>.
     /// </summary>
     /// <param name="repositoryEntity">The repository entity to be converted.</param>
+    /// <param name="coverPath">The optional path of the image representing the album.</param>
+    /// <param name="artwork">The optional stored artwork of the album, in display order.</param>
     /// <returns>The converted response entity.</returns>
-    public static AlbumResponse ToResponse(this AlbumEntity repositoryEntity)
+    public static AlbumResponse ToResponse(this AlbumEntity repositoryEntity, string? coverPath = null, IReadOnlyList<MediaArtworkDto>? artwork = null)
     {
         ReleaseInfoDto releaseInfo = new(
             repositoryEntity.OriginalReleaseDate,
@@ -220,7 +222,9 @@ public static class AlbumEntityMapping
             repositoryEntity.UpdatedOnUtc,
             [.. repositoryEntity.Contributors.Select(contributor => new MediaContributorReferenceDto(contributor.MediaContributorId, contributor.Role))],
             [.. repositoryEntity.Ratings.ToResponses()],
-            [.. repositoryEntity.Tracks.Select(track => track.ToResponse())]);
+            [.. repositoryEntity.Tracks.Select(track => track.ToResponse())],
+            coverPath,
+            artwork ?? []);
     }
 
     /// <summary>

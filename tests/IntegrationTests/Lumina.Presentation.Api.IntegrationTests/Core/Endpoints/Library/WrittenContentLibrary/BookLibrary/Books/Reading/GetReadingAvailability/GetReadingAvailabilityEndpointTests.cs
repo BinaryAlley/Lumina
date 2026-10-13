@@ -10,6 +10,7 @@ using Lumina.DataAccess.Core.UoW;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
@@ -105,10 +106,12 @@ public class GetReadingAvailabilityEndpointTests : IClassFixture<AuthenticatedLu
 
         // Assert
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
-        using JsonDocument problemDetails = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-        Assert.Equal("General.Unauthorized", problemDetails.RootElement.GetProperty("title").GetString());
-        Assert.Equal("NotAuthorized", problemDetails.RootElement.GetProperty("detail").GetString());
-        Assert.DoesNotContain("Exception", problemDetails.RootElement.GetRawText(), StringComparison.Ordinal);
+        string content = await response.Content.ReadAsStringAsync();
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Unauthorized", problemDetails!["title"].GetString());
+        Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
+        Assert.DoesNotContain("Exception", content, StringComparison.Ordinal);
     }
 
     [Fact]

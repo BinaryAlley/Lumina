@@ -40,8 +40,8 @@ public abstract class BaseEndpoint<TRequest, TResponse> : Endpoint<TRequest, TRe
     /// <returns>An <see cref="IResult"/> that renders the view.</returns>
     protected IResult View(string viewName, object? model = null, IReadOnlyDictionary<string, object?>? viewData = null)
     {
-        // store the path of the displayed view in the session, so that the login redirect after the JWT token expires points to it; ignore the login endpoint,
-        // because it is incorrect to be redirected to the login URL, with the login URL as the return URL
+        // Store the path of the displayed view in the session, so that the login redirect after the JWT token expires points to it; ignore the login endpoint,
+        // because it is incorrect to be redirected to the login URL, with the login URL as the return URL.
         if (HttpContext.Request.Path != "/en-us/auth/login")
             HttpContext.Session.SetString(HttpContextItemKeys.LAST_DISPLAYED_VIEW, $"{HttpContext.Request.PathBase}{HttpContext.Request.Path}{HttpContext.Request.QueryString}");
         return new RazorViewResult(viewName, model, viewData);

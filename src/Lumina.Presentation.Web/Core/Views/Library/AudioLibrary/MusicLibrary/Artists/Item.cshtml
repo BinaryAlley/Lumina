@@ -1,0 +1,1325 @@
+@*
+    FALLBACK MUSIC ARTIST DETAILS / EDITING VIEW - READ BEFORE EDITING
+
+    This view is the application fallback of the music artist details and editing page, rendered only when the
+    active theme does not provide its own template for the page. On a healthy site the page is presented
+    by the theme files, which hook into the class names and element ids that this view uses as a contract,
+    exactly like the media library editing page.
+
+    The albums of the artist are NOT edited inline: they are listed as cards that navigate to their own pages,
+    and the update request only round-trips the albums unchanged, so that updating the artist never drops them.
+
+    To change the behavior of the page, edit this script (and the theme template, when present). To restyle
+    the page, edit the theme files. This fallback keeps every feature working without styling, so that a
+    broken theme is obvious to the user while the page still functions.
+
+    /library/audio-library/music-library/artists/{artistId}?libraryId=...
+*@
+
+@using Lumina.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary
+@using Lumina.Presentation.Web.Common.Enums.AudioLibrary
+@using Lumina.Presentation.Web.Common.Enums.Common
+@using Lumina.Presentation.Web.Common.Enums.MediaContributors
+@using Lumina.Presentation.Web.Common.Services
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System
+@using System.Globalization
+@using System.Linq
+
+@{
+    // Generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler.
+    var scriptId = ScriptIdentifierHelper.GenerateScriptId();
+
+    var artistId = Model.Id.ToString();
+    var libraryId = Model.LibraryId.ToString();
+    var metadata = Model.Metadata;
+    var aliases = metadata?.Aliases ?? [];
+    var contributors = Model.Contributors ?? [];
+    var ratings = Model.Ratings ?? [];
+    var genres = metadata?.Genres ?? [];
+    var tags = metadata?.Tags ?? [];
+    var area = metadata?.Area;
+    var beginArea = metadata?.BeginArea;
+    var endArea = metadata?.EndArea;
+    // Resolves the localized label of a release country, shown as "DE (Germany)", keyed by its ISO code.
+    Func<string?, string> releaseCountryLabel = countryCode =>
+    {
+        if (string.IsNullOrEmpty(countryCode))
+            return "-";
+        string localizedName = _localizer[$"Country.{countryCode}"].Value;
+        if (localizedName == $"Country.{countryCode}")
+            return countryCode;
+        return $"{countryCode} ({localizedName})";
+    };
+    // The baseline of the albums of the artist, mapped to the update request shape, so that the update round-trips them unchanged.
+    var albumsBaseline = (Model.Albums ?? []).Select(album => new
+    {
+        AlbumId = album.Id,
+        Metadata = album.Metadata,
+        MediaFormat = album.MediaFormat,
+        Packaging = album.Packaging,
+        Barcode = album.Barcode,
+        CatalogNumbers = album.CatalogNumbers,
+        Label = album.Label,
+        ASIN = album.ASIN,
+        MusicBrainzReleaseId = album.MusicBrainzReleaseId,
+        MusicBrainzReleaseGroupId = album.MusicBrainzReleaseGroupId,
+        MusicBrainzReleaseArtistId = album.MusicBrainzReleaseArtistId,
+        Contributors = album.Contributors,
+        Ratings = album.Ratings,
+        Tracks = (album.Tracks ?? []).Select(track => new
+        {
+            TrackId = track.Id,
+            Path = track.Path,
+            Metadata = track.Metadata,
+            TrackNumber = track.TrackNumber,
+            DiscNumber = track.DiscNumber,
+            Script = track.Script,
+            Key = track.Key,
+            Bpm = track.Bpm,
+            Work = track.Work,
+            MusicBrainzRecordingId = track.MusicBrainzRecordingId,
+            MusicBrainzTrackId = track.MusicBrainzTrackId,
+            Moods = track.Moods,
+            Isrcs = track.Isrcs,
+            Contributors = track.Contributors,
+            Ratings = track.Ratings
+        })
+    });
+    var albumsBaselineJson = System.Text.Json.JsonSerializer.Serialize(albumsBaseline, new System.Text.Json.JsonSerializerOptions { Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() } });
+    // The localized options of the contributor roles and rating sources, serialized for the dynamic rows of the client script.
+    var contributorRoleOptionsJson = System.Text.Json.JsonSerializer.Serialize(
+        Enum.GetNames<MediaContributorRole>().Select(role => new { value = role, label = _localizer[role].Value }),
+        new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase });
+    var ratingSourceOptionsJson = System.Text.Json.JsonSerializer.Serialize(
+        Enum.GetNames<AudioRatingSource>().Select(source => new { value = source, label = _localizer[source].Value }),
+        new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase });
+}
+
+@inject IViewLocalizer _localizer
+@inject IUrlService _urlService
+
+@model MusicArtistDto
+
+@Html.AntiForgeryToken()
+
+<div style="display: grid; grid-template-rows: auto 1fr;"><!-- Container with two rows, one fixed, one filling remaining space. -->
+    <!-- The first row is a dummy row for "margin", because setting a margin on the next row would offset the parent's position. -->
+    <div style="min-height: 1rem;"></div>
+    <div class="enlightenment-panel shadow-effect mx-auto panel w-60 mb-10" style="min-width: 320px;">
+        <div class="shine-effect"></div>
+        <div class="form-row">
+            <button id="btn-back-to-artists" type="button" class="abort-button">@_localizer["BackToArtists"]</button>
+        </div>
+        <div class="form-row">
+            <h1 class="text-light-two w-100 text-center pt-0 pb-0 engraved-title">@_localizer["EditArtist"]</h1>
+        </div>
+        <div class="book-details-body">
+            <!-- Cover, on the left. -->
+            <div class="book-details-cover">
+                <img id="artist-cover-image" style="width: 300px; height: 300px; object-fit: cover; object-position: center;" data-cover-path="@(Model.CoverPath ?? string.Empty)" alt="@_localizer["CoverImage"]" />
+                <div class="form-row">
+                    <button id="btn-change-cover" type="button" class="confirm-button">@_localizer["ChangeCover"]</button>
+                    <input id="artist-cover-input" type="file" accept="image/*" class="hidden" />
+                </div>
+                <div class="form-row">
+                    <small id="artist-cover-path" class="book-cover-path text-disabled" title="@(Model.CoverPath ?? string.Empty)">@(Model.CoverPath ?? _localizer["NoCover"].Value)</small>
+                </div>
+            </div>
+            <!-- Editable fields, on the right. -->
+            <div class="book-details-form">
+        <!-- Releases. -->
+        <h3 class="text-light-two">@_localizer["Releases"]</h3>
+        <!-- Albums. -->
+        <div class="form-row">
+            <div id="albums-container" style="width: 100%;">
+                <p id="no-albums" class="hidden text-light-two">@_localizer["NoAlbums"]</p>
+            </div>
+        </div>
+
+        <!-- General information. -->
+        <h3 class="text-light-two">@_localizer["GeneralInformation"]</h3>
+        <!-- Name. -->
+        <div class="form-row">
+            <div class="form-label"><label for="artist-name-input">@_localizer["Name"]</label><span class="mandatory-field">*</span>:</div>
+            <div class="form-field"><input id="artist-name-input" type="text" class="enlightenment-input" value="@(metadata?.Name ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["NameDescription"]</small>
+        </div>
+        <!-- Sort name. -->
+        <div class="form-row">
+            <div class="form-label"><label for="artist-sort-name-input">@_localizer["SortName"]</label>:</div>
+            <div class="form-field"><input id="artist-sort-name-input" type="text" class="enlightenment-input" value="@(metadata?.SortName ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["SortNameDescription"]</small>
+        </div>
+        <!-- Disambiguation. -->
+        <div class="form-row">
+            <div class="form-label"><label for="artist-disambiguation-input">@_localizer["Disambiguation"]</label>:</div>
+            <div class="form-field"><input id="artist-disambiguation-input" type="text" class="enlightenment-input" value="@(metadata?.Disambiguation ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["DisambiguationDescription"]</small>
+        </div>
+        <!-- Type. -->
+        <div class="form-row">
+            <div class="form-label"><label for="artist-type-combobox-toggle">@_localizer["Type"]</label>:</div>
+            <div class="form-field">
+                <div class="enlightenment-combobox inline-block w-100" id="artist-type-combobox">
+                    <div class="shine-effect" style="top: 1px;"></div>
+                    <input type="checkbox" class="enlightenment-toggle-checkbox" id="artist-type-combobox-toggle" />
+                    <label class="enlightenment-toggle" for="artist-type-combobox-toggle">
+                        <span class="enlightenment-selected-text" data-value="@(metadata?.Type?.ToString() ?? string.Empty)">@(metadata is not null && metadata.Type.HasValue ? _localizer[metadata.Type.Value.ToString()].Value : "-")</span>
+                    </label>
+                    <div class="enlightenment-dropdown">
+                        <div class="enlightenment-option" data-value="">-</div>
+                        @foreach (string type in Enum.GetNames<MusicArtistType>())
+                        {
+                            <div class="enlightenment-option" data-value="@type">@_localizer[type].Value</div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <small class="form-label text-disabled form-description">@_localizer["TypeDescription"]</small>
+        </div>
+        <!-- Gender. -->
+        <div class="form-row">
+            <div class="form-label"><label for="artist-gender-combobox-toggle">@_localizer["Gender"]</label>:</div>
+            <div class="form-field">
+                <div class="enlightenment-combobox inline-block w-100" id="artist-gender-combobox">
+                    <div class="shine-effect" style="top: 1px;"></div>
+                    <input type="checkbox" class="enlightenment-toggle-checkbox" id="artist-gender-combobox-toggle" />
+                    <label class="enlightenment-toggle" for="artist-gender-combobox-toggle">
+                        <span class="enlightenment-selected-text" data-value="@(metadata?.Gender?.ToString() ?? string.Empty)">@(metadata is not null && metadata.Gender.HasValue ? _localizer[metadata.Gender.Value.ToString()].Value : "-")</span>
+                    </label>
+                    <div class="enlightenment-dropdown">
+                        <div class="enlightenment-option" data-value="">-</div>
+                        @foreach (string gender in Enum.GetNames<MusicArtistGender>())
+                        {
+                            <div class="enlightenment-option" data-value="@gender">@_localizer[gender].Value</div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <small class="form-label text-disabled form-description">@_localizer["GenderDescription"]</small>
+        </div>
+        <!-- Country. -->
+        <div class="form-row">
+            <div class="form-label"><label for="artist-country-input">@_localizer["Country"]</label>:</div>
+            <div class="form-field"><input id="artist-country-input" type="text" maxlength="2" class="enlightenment-input" value="@(metadata?.Country ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["CountryDescription"]</small>
+        </div>
+        <!-- Website. -->
+        <div class="form-row">
+            <div class="form-label"><label for="artist-website-input">@_localizer["Website"]</label>:</div>
+            <div class="form-field"><input id="artist-website-input" type="text" class="enlightenment-input" value="@(Model.Website ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["WebsiteDescription"]</small>
+        </div>
+        <!-- MusicBrainz artist Id. -->
+        <div class="form-row">
+            <div class="form-label"><label for="artist-musicbrainz-id-input">@_localizer["MusicBrainzArtistId"]</label>:</div>
+            <div class="form-field"><input id="artist-musicbrainz-id-input" type="text" class="enlightenment-input" value="@(Model.MusicBrainzArtistId?.ToString() ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["MusicBrainzArtistIdDescription"]</small>
+        </div>
+        <!-- Begin date. -->
+        <div class="form-row">
+            <div class="form-label"><label for="artist-lifespan-begin-input">@_localizer["LifeSpanBegin"]</label>:</div>
+            <div class="form-field"><input id="artist-lifespan-begin-input" type="date" class="enlightenment-input" value="@(metadata?.LifeSpanBegin?.ToString("yyyy-MM-dd") ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["LifeSpanBeginDescription"]</small>
+        </div>
+        <!-- End date. -->
+        <div class="form-row">
+            <div class="form-label"><label for="artist-lifespan-end-input">@_localizer["LifeSpanEnd"]</label>:</div>
+            <div class="form-field"><input id="artist-lifespan-end-input" type="date" class="enlightenment-input" value="@(metadata?.LifeSpanEnd?.ToString("yyyy-MM-dd") ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["LifeSpanEndDescription"]</small>
+        </div>
+        <!-- Ended. -->
+        <div class="form-row">
+            <div class="form-label"><label for="artist-is-ended-input">@_localizer["IsEnded"]</label>:</div>
+            <div class="form-field">
+                <label class="enlightenment-checkbox-label">
+                    <input id="artist-is-ended-input" type="checkbox" class="enlightenment-checkbox-hidden" @(metadata?.IsEnded == true ? "checked" : "") />
+                    <span class="enlightenment-checkbox"></span>
+                </label>
+            </div>
+            <small class="form-label text-disabled form-description">@_localizer["IsEndedDescription"]</small>
+        </div>
+
+        <!-- Contributors. -->
+        <h3 class="text-light-two">@_localizer["Contributors"]</h3>
+        <!-- Contributors table. -->
+        <div class="form-row">
+            <table class="w-100 form-table">
+                <thead>
+                    <tr>
+                        <th>@_localizer["ContributorId"]</th>
+                        <th>@_localizer["ContributorRole"]</th>
+                        <th class="w-40px"></th>
+                    </tr>
+                </thead>
+                <tbody id="contributors-body">
+                    @{ int contributorIndex = 0; }
+                    @foreach (var contributor in contributors)
+                    {
+                        <tr class="contributor-row">
+                            <td><input type="text" class="enlightenment-input contributor-id w-100" value="@(contributor.ContributorId.ToString())" /></td>
+                            <td>
+                                <div class="enlightenment-combobox inline-block w-100 contributor-role-combobox">
+                                    <div class="shine-effect" style="top: 1px;"></div>
+                                    <input type="checkbox" class="enlightenment-toggle-checkbox" id="contributor-role-toggle-@contributorIndex" />
+                                    <label class="enlightenment-toggle" for="contributor-role-toggle-@contributorIndex">
+                                        <span class="enlightenment-selected-text" data-value="@(contributor.Role?.ToString() ?? string.Empty)">@(contributor.Role.HasValue ? _localizer[contributor.Role.Value.ToString()].Value : "-")</span>
+                                    </label>
+                                    <div class="enlightenment-dropdown">
+                                        <div class="enlightenment-option" data-value="">-</div>
+                                        @foreach (string role in Enum.GetNames<MediaContributorRole>())
+                                        {
+                                            <div class="enlightenment-option" data-value="@role">@_localizer[role].Value</div>
+                                        }
+                                    </div>
+                                </div>
+                            </td>
+                            <td><img src="~/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" /></td>
+                        </tr>
+                        contributorIndex++;
+                    }
+                </tbody>
+            </table>
+            <button id="btn-add-contributor" type="button" class="confirm-button">@_localizer["AddContributor"]</button>
+            <small class="form-label text-disabled form-description">@_localizer["ContributorsDescription"]</small>
+        </div>
+
+        <!-- Ratings. -->
+        <h3 class="text-light-two">@_localizer["Ratings"]</h3>
+        <!-- Ratings table. -->
+        <div class="form-row">
+            <table class="w-100 form-table">
+                <thead>
+                    <tr>
+                        <th>@_localizer["RatingValue"]</th>
+                        <th>@_localizer["RatingMaxValue"]</th>
+                        <th>@_localizer["RatingSource"]</th>
+                        <th>@_localizer["RatingVoteCount"]</th>
+                        <th class="w-40px"></th>
+                    </tr>
+                </thead>
+                <tbody id="ratings-body">
+                    @{ int ratingIndex = 0; }
+                    @foreach (var rating in ratings)
+                    {
+                        <tr class="rating-row">
+                            <td><input type="number" step="any" min="0" class="enlightenment-input rating-value" value="@(rating.Value?.ToString(CultureInfo.InvariantCulture) ?? string.Empty)" /></td>
+                            <td><input type="number" step="any" min="0" class="enlightenment-input rating-max-value" value="@(rating.MaxValue?.ToString(CultureInfo.InvariantCulture) ?? string.Empty)" /></td>
+                            <td>
+                                <div class="enlightenment-combobox inline-block w-100 rating-source-combobox">
+                                    <div class="shine-effect" style="top: 1px;"></div>
+                                    <input type="checkbox" class="enlightenment-toggle-checkbox" id="rating-source-toggle-@ratingIndex" />
+                                    <label class="enlightenment-toggle" for="rating-source-toggle-@ratingIndex">
+                                        <span class="enlightenment-selected-text" data-value="@(rating.Source?.ToString() ?? string.Empty)">@(rating.Source.HasValue ? _localizer[rating.Source.Value.ToString()].Value : "-")</span>
+                                    </label>
+                                    <div class="enlightenment-dropdown">
+                                        <div class="enlightenment-option" data-value="">-</div>
+                                        @foreach (string source in Enum.GetNames<AudioRatingSource>())
+                                        {
+                                            <div class="enlightenment-option" data-value="@source">@_localizer[source].Value</div>
+                                        }
+                                    </div>
+                                </div>
+                            </td>
+                            <td><input type="number" min="0" class="enlightenment-input rating-vote-count" value="@(rating.VoteCount?.ToString(CultureInfo.InvariantCulture) ?? string.Empty)" /></td>
+                            <td><img src="~/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" /></td>
+                        </tr>
+                        ratingIndex++;
+                    }
+                </tbody>
+            </table>
+            <button id="btn-add-rating" type="button" class="confirm-button">@_localizer["AddRating"]</button>
+            <small class="form-label text-disabled form-description">@_localizer["RatingsDescription"]</small>
+        </div>
+
+        <!-- Genres. -->
+        <h3 class="text-light-two">@_localizer["Genres"]</h3>
+        <!-- Genres table. -->
+        <div class="form-row">
+            <table class="w-100 form-table">
+                <thead>
+                    <tr>
+                        <th>@_localizer["Genre"]</th>
+                        <th class="w-40px"></th>
+                    </tr>
+                </thead>
+                <tbody id="genres-body">
+                    @foreach (var genre in genres)
+                    {
+                        <tr class="genre-row">
+                            <td><input type="text" class="enlightenment-input genre-name w-100" value="@(genre.Name)" /></td>
+                            <td><img src="~/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" /></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <button id="btn-add-genre" type="button" class="confirm-button">@_localizer["AddGenre"]</button>
+            <small class="form-label text-disabled form-description">@_localizer["GenresDescription"]</small>
+        </div>
+
+        <!-- Tags. -->
+        <h3 class="text-light-two">@_localizer["Tags"]</h3>
+        <!-- Tags table. -->
+        <div class="form-row">
+            <table class="w-100 form-table">
+                <thead>
+                    <tr>
+                        <th>@_localizer["Tag"]</th>
+                        <th class="w-40px"></th>
+                    </tr>
+                </thead>
+                <tbody id="tags-body">
+                    @foreach (var tag in tags)
+                    {
+                        <tr class="tag-row">
+                            <td><input type="text" class="enlightenment-input tag-name w-100" value="@(tag.Name)" /></td>
+                            <td><img src="~/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" /></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <button id="btn-add-tag" type="button" class="confirm-button">@_localizer["AddTag"]</button>
+            <small class="form-label text-disabled form-description">@_localizer["TagsDescription"]</small>
+        </div>
+
+        <!-- Aliases. -->
+        <h3 class="text-light-two">@_localizer["Aliases"]</h3>
+        <!-- Aliases table. -->
+        <div class="form-row">
+            <table class="w-100 form-table">
+                <thead>
+                    <tr>
+                        <th>@_localizer["AliasName"]</th>
+                        <th>@_localizer["AliasSortName"]</th>
+                        <th>@_localizer["AliasType"]</th>
+                        <th>@_localizer["AliasLocale"]</th>
+                        <th>@_localizer["AliasIsPrimary"]</th>
+                        <th>@_localizer["AliasBeginDate"]</th>
+                        <th>@_localizer["AliasEndDate"]</th>
+                        <th>@_localizer["AliasIsEnded"]</th>
+                        <th class="w-40px"></th>
+                    </tr>
+                </thead>
+                <tbody id="aliases-body">
+                    @foreach (var alias in aliases)
+                    {
+                        <tr class="alias-row">
+                            <td><input type="text" class="enlightenment-input alias-name" value="@(alias.Name ?? string.Empty)" /></td>
+                            <td><input type="text" class="enlightenment-input alias-sort-name" value="@(alias.SortName ?? string.Empty)" /></td>
+                            <td><input type="text" class="enlightenment-input alias-type" value="@(alias.Type ?? string.Empty)" /></td>
+                            <td><input type="text" class="enlightenment-input alias-locale" value="@(alias.Locale ?? string.Empty)" /></td>
+                            <td><label class="enlightenment-checkbox-label"><input type="checkbox" class="enlightenment-checkbox-hidden alias-is-primary" @(alias.IsPrimary ? "checked" : "") /><span class="enlightenment-checkbox"></span></label></td>
+                            <td><input type="date" class="enlightenment-input alias-begin-date" value="@(alias.BeginDate?.ToString("yyyy-MM-dd") ?? string.Empty)" /></td>
+                            <td><input type="date" class="enlightenment-input alias-end-date" value="@(alias.EndDate?.ToString("yyyy-MM-dd") ?? string.Empty)" /></td>
+                            <td><label class="enlightenment-checkbox-label"><input type="checkbox" class="enlightenment-checkbox-hidden alias-is-ended" @(alias.IsEnded ? "checked" : "") /><span class="enlightenment-checkbox"></span></label></td>
+                            <td><img src="~/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" /></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <button id="btn-add-alias" type="button" class="confirm-button">@_localizer["AddAlias"]</button>
+            <small class="form-label text-disabled form-description">@_localizer["AliasesDescription"]</small>
+        </div>
+
+        <!-- Areas. -->
+        <h3 class="text-light-two">@_localizer["Areas"]</h3>
+        <!-- Area. -->
+        <h4 class="text-light-two">@_localizer["Area"]</h4>
+        <!-- Name. -->
+        <div class="form-row">
+            <div class="form-label"><label for="artist-area-name-input">@_localizer["AreaName"]</label>:</div>
+            <div class="form-field"><input id="artist-area-name-input" type="text" class="enlightenment-input" value="@(area?.Name ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AreaNameDescription"]</small>
+        </div>
+        <!-- Sort name. -->
+        <div class="form-row">
+            <div class="form-label"><label for="artist-area-sort-name-input">@_localizer["AreaSortName"]</label>:</div>
+            <div class="form-field"><input id="artist-area-sort-name-input" type="text" class="enlightenment-input" value="@(area?.SortName ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AreaSortNameDescription"]</small>
+        </div>
+        <!-- Disambiguation. -->
+        <div class="form-row">
+            <div class="form-label"><label for="artist-area-disambiguation-input">@_localizer["AreaDisambiguation"]</label>:</div>
+            <div class="form-field"><input id="artist-area-disambiguation-input" type="text" class="enlightenment-input" value="@(area?.Disambiguation ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AreaDisambiguationDescription"]</small>
+        </div>
+        <!-- Type. -->
+        <div class="form-row">
+            <div class="form-label"><label for="artist-area-type-input">@_localizer["AreaType"]</label>:</div>
+            <div class="form-field"><input id="artist-area-type-input" type="text" class="enlightenment-input" value="@(area?.Type ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AreaTypeDescription"]</small>
+        </div>
+        <!-- ISO 3166 code. -->
+        <div class="form-row">
+            <div class="form-label"><label for="artist-area-iso3166-code-input">@_localizer["Iso3166Code"]</label>:</div>
+            <div class="form-field"><input id="artist-area-iso3166-code-input" type="text" class="enlightenment-input" value="@(area?.Iso3166Code ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["Iso3166CodeDescription"]</small>
+        </div>
+        <!-- MusicBrainz area Id. -->
+        <div class="form-row">
+            <div class="form-label"><label for="artist-area-musicbrainz-id-input">@_localizer["MusicBrainzAreaId"]</label>:</div>
+            <div class="form-field"><input id="artist-area-musicbrainz-id-input" type="text" class="enlightenment-input" value="@(area?.MusicBrainzAreaId?.ToString() ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["MusicBrainzAreaIdDescription"]</small>
+        </div>
+
+        <!-- Begin area. -->
+        <h4 class="text-light-two">@_localizer["BeginArea"]</h4>
+        <!-- Name. -->
+        <div class="form-row">
+            <div class="form-label"><label for="artist-begin-area-name-input">@_localizer["AreaName"]</label>:</div>
+            <div class="form-field"><input id="artist-begin-area-name-input" type="text" class="enlightenment-input" value="@(beginArea?.Name ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AreaNameDescription"]</small>
+        </div>
+        <!-- Sort name. -->
+        <div class="form-row">
+            <div class="form-label"><label for="artist-begin-area-sort-name-input">@_localizer["AreaSortName"]</label>:</div>
+            <div class="form-field"><input id="artist-begin-area-sort-name-input" type="text" class="enlightenment-input" value="@(beginArea?.SortName ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AreaSortNameDescription"]</small>
+        </div>
+        <!-- Disambiguation. -->
+        <div class="form-row">
+            <div class="form-label"><label for="artist-begin-area-disambiguation-input">@_localizer["AreaDisambiguation"]</label>:</div>
+            <div class="form-field"><input id="artist-begin-area-disambiguation-input" type="text" class="enlightenment-input" value="@(beginArea?.Disambiguation ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AreaDisambiguationDescription"]</small>
+        </div>
+        <!-- Type. -->
+        <div class="form-row">
+            <div class="form-label"><label for="artist-begin-area-type-input">@_localizer["AreaType"]</label>:</div>
+            <div class="form-field"><input id="artist-begin-area-type-input" type="text" class="enlightenment-input" value="@(beginArea?.Type ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AreaTypeDescription"]</small>
+        </div>
+        <!-- ISO 3166 code. -->
+        <div class="form-row">
+            <div class="form-label"><label for="artist-begin-area-iso3166-code-input">@_localizer["Iso3166Code"]</label>:</div>
+            <div class="form-field"><input id="artist-begin-area-iso3166-code-input" type="text" class="enlightenment-input" value="@(beginArea?.Iso3166Code ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["Iso3166CodeDescription"]</small>
+        </div>
+        <!-- MusicBrainz area Id. -->
+        <div class="form-row">
+            <div class="form-label"><label for="artist-begin-area-musicbrainz-id-input">@_localizer["MusicBrainzAreaId"]</label>:</div>
+            <div class="form-field"><input id="artist-begin-area-musicbrainz-id-input" type="text" class="enlightenment-input" value="@(beginArea?.MusicBrainzAreaId?.ToString() ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["MusicBrainzAreaIdDescription"]</small>
+        </div>
+
+        <!-- End area. -->
+        <h4 class="text-light-two">@_localizer["EndArea"]</h4>
+        <!-- Name. -->
+        <div class="form-row">
+            <div class="form-label"><label for="artist-end-area-name-input">@_localizer["AreaName"]</label>:</div>
+            <div class="form-field"><input id="artist-end-area-name-input" type="text" class="enlightenment-input" value="@(endArea?.Name ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AreaNameDescription"]</small>
+        </div>
+        <!-- Sort name. -->
+        <div class="form-row">
+            <div class="form-label"><label for="artist-end-area-sort-name-input">@_localizer["AreaSortName"]</label>:</div>
+            <div class="form-field"><input id="artist-end-area-sort-name-input" type="text" class="enlightenment-input" value="@(endArea?.SortName ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AreaSortNameDescription"]</small>
+        </div>
+        <!-- Disambiguation. -->
+        <div class="form-row">
+            <div class="form-label"><label for="artist-end-area-disambiguation-input">@_localizer["AreaDisambiguation"]</label>:</div>
+            <div class="form-field"><input id="artist-end-area-disambiguation-input" type="text" class="enlightenment-input" value="@(endArea?.Disambiguation ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AreaDisambiguationDescription"]</small>
+        </div>
+        <!-- Type. -->
+        <div class="form-row">
+            <div class="form-label"><label for="artist-end-area-type-input">@_localizer["AreaType"]</label>:</div>
+            <div class="form-field"><input id="artist-end-area-type-input" type="text" class="enlightenment-input" value="@(endArea?.Type ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["AreaTypeDescription"]</small>
+        </div>
+        <!-- ISO 3166 code. -->
+        <div class="form-row">
+            <div class="form-label"><label for="artist-end-area-iso3166-code-input">@_localizer["Iso3166Code"]</label>:</div>
+            <div class="form-field"><input id="artist-end-area-iso3166-code-input" type="text" class="enlightenment-input" value="@(endArea?.Iso3166Code ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["Iso3166CodeDescription"]</small>
+        </div>
+        <!-- MusicBrainz area Id. -->
+        <div class="form-row">
+            <div class="form-label"><label for="artist-end-area-musicbrainz-id-input">@_localizer["MusicBrainzAreaId"]</label>:</div>
+            <div class="form-field"><input id="artist-end-area-musicbrainz-id-input" type="text" class="enlightenment-input" value="@(endArea?.MusicBrainzAreaId?.ToString() ?? string.Empty)" /></div>
+            <small class="form-label text-disabled form-description">@_localizer["MusicBrainzAreaIdDescription"]</small>
+        </div>
+
+        <!-- IPIs. -->
+        <h3 class="text-light-two">@_localizer["Ipis"]</h3>
+        <!-- IPIs table. -->
+        <div class="form-row">
+            <table class="w-100 form-table">
+                <thead>
+                    <tr>
+                        <th>@_localizer["Ipi"]</th>
+                        <th class="w-40px"></th>
+                    </tr>
+                </thead>
+                <tbody id="ipis-body">
+                    @foreach (string ipi in Model.Ipis ?? [])
+                    {
+                        <tr class="ipi-row">
+                            <td><input type="text" class="enlightenment-input ipi-value w-100" value="@ipi" /></td>
+                            <td><img src="~/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" /></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <button id="btn-add-ipi" type="button" class="confirm-button">@_localizer["AddIpi"]</button>
+            <small class="form-label text-disabled form-description">@_localizer["IpisDescription"]</small>
+        </div>
+
+        <!-- ISNIs. -->
+        <h3 class="text-light-two">@_localizer["Isnis"]</h3>
+        <!-- ISNIs table. -->
+        <div class="form-row">
+            <table class="w-100 form-table">
+                <thead>
+                    <tr>
+                        <th>@_localizer["Isni"]</th>
+                        <th class="w-40px"></th>
+                    </tr>
+                </thead>
+                <tbody id="isnis-body">
+                    @foreach (string isni in Model.Isnis ?? [])
+                    {
+                        <tr class="isni-row">
+                            <td><input type="text" class="enlightenment-input isni-value w-100" value="@isni" /></td>
+                            <td><img src="~/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" /></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <button id="btn-add-isni" type="button" class="confirm-button">@_localizer["AddIsni"]</button>
+            <small class="form-label text-disabled form-description">@_localizer["IsnisDescription"]</small>
+        </div>
+
+                <div class="form-row mt-10">
+                    <button id="btn-save-artist" type="button" class="confirm-button w-100px">@_localizer["Save"]</button>
+                    <button id="btn-delete-artist" type="button" class="abort-button w-100px">@_localizer["DeleteArtist"]</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- The "text/plain" type is a design choice, not a mistake: it keeps the browser from executing this view script during HTML parsing, before site.js defines the API helpers it calls (callApiGetAsync, callApiPostAsync, ...). site.js (which loads deferred) executes these scripts once it is loaded, both on the initial page load and during AJAX navigation. -->
+    <script type="text/plain" data-form="@scriptId">
+        // Create cleanup registry for this view.
+        const cleanupFunctions = [];
+        let isInitialized = false;
+        let generatedId = 1000;
+
+        const artistId = '@artistId';
+        const libraryId = '@libraryId';
+        const artistsIndexUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Music.ARTISTS_INDEX)';
+        const saveUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Music.SAVE_ARTIST, new { artistId = default(Guid) })'.replace('/@(default(Guid))', `/${artistId}`);
+        const deleteUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Music.DELETE_ARTIST, new { artistId = default(Guid) })'.replace('/@(default(Guid))', `/${artistId}`);
+        const albumsUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Music.GET_ARTIST_ALBUMS, new { artistId = default(Guid) })';
+        const albumUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Music.ALBUM, new { artistId = default(Guid), albumId = default(Guid) })';
+        const deleteAlbumUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Music.DELETE_ALBUM, new { artistId = default(Guid), albumId = default(Guid) })';
+        const coverUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Music.UPDATE_ARTIST_COVER, new { artistId = default(Guid) })'.replace('/@(default(Guid))', `/${artistId}`) + `?libraryId=${libraryId}`;
+        // The albums of the artist, mapped to the update request shape, so that saving the artist never drops them.
+        const currentAlbums = @Html.Raw(albumsBaselineJson);
+
+        // The element references are captured once, so that the cleanup can unbind their listeners even after the AJAX navigator has swapped the content out of the document.
+        const btnBackToArtists = document.getElementById('btn-back-to-artists');
+        const btnSaveArtist = document.getElementById('btn-save-artist');
+        const btnDeleteArtist = document.getElementById('btn-delete-artist');
+        const btnAddAlias = document.getElementById('btn-add-alias');
+        const btnAddIpi = document.getElementById('btn-add-ipi');
+        const btnAddIsni = document.getElementById('btn-add-isni');
+        const btnAddGenre = document.getElementById('btn-add-genre');
+        const btnAddTag = document.getElementById('btn-add-tag');
+        const btnAddContributor = document.getElementById('btn-add-contributor');
+        const btnAddRating = document.getElementById('btn-add-rating');
+        const albumsContainer = document.getElementById('albums-container');
+        const noAlbumsMessage = document.getElementById('no-albums');
+        const aliasesBody = document.getElementById('aliases-body');
+        const ipisBody = document.getElementById('ipis-body');
+        const isnisBody = document.getElementById('isnis-body');
+        const genresBody = document.getElementById('genres-body');
+        const tagsBody = document.getElementById('tags-body');
+        const contributorsBody = document.getElementById('contributors-body');
+        const ratingsBody = document.getElementById('ratings-body');
+        const coverImage = document.getElementById('artist-cover-image');
+        const coverPathLabel = document.getElementById('artist-cover-path');
+        const coverInput = document.getElementById('artist-cover-input');
+        const btnChangeCover = document.getElementById('btn-change-cover');
+
+        const jsLocalizedStrings = {
+            artistSaved: @Json.Serialize(_localizer["ArtistSaved"].Value),
+            saveFailed: @Json.Serialize(_localizer["SaveFailed"].Value),
+            artistDeleted: @Json.Serialize(_localizer["ArtistDeleted"].Value),
+            albumDeleted: @Json.Serialize(_localizer["AlbumDeleted"].Value),
+            deleteConfirm: @Json.Serialize(_localizer["DeleteConfirm"].Value),
+            deleteFailed: @Json.Serialize(_localizer["DeleteFailed"].Value),
+            noAlbums: @Json.Serialize(_localizer["NoAlbums"].Value),
+            noCover: @Json.Serialize(_localizer["NoCover"].Value),
+            coverSaved: @Json.Serialize(_localizer["CoverSaved"].Value),
+            coverUploadFailed: @Json.Serialize(_localizer["CoverUploadFailed"].Value),
+            remove: @Json.Serialize(_localizer["Remove"].Value)
+        };
+
+        // Reads the trimmed value of the element with the provided id.
+        function readValue(id) {
+            const element = document.getElementById(id);
+            return element ? element.value.trim() : '';
+        }
+
+        // Reads the value of the enlightenment combobox with the provided id.
+        function readComboboxValue(id) {
+            const element = document.querySelector(`#${id} .enlightenment-selected-text`);
+            return element ? (element.getAttribute('data-value') || '') : '';
+        }
+
+        // Reads the value of the enlightenment combobox inside the provided row, selected by its class.
+        function readRowComboboxValue(row, className) {
+            const element = row.querySelector(className + ' .enlightenment-selected-text');
+            return element ? (element.getAttribute('data-value') || '') : '';
+        }
+
+        // Reads an optional number from a field, returning null when the field is empty or not a number.
+        function readNumber(id) {
+            const value = readValue(id);
+            if (value === '')
+                return null;
+            const parsed = Number(value);
+            return Number.isNaN(parsed) ? null : parsed;
+        }
+
+        // Reads an optional Guid from a field, returning null when the field is empty or not a valid Guid.
+        function readGuid(id) {
+            const value = readValue(id);
+            if (!/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(value))
+                return null;
+            return value;
+        }
+
+        // Reads the checked state of a checkbox element with the provided id.
+        function readCheckbox(id) {
+            const element = document.getElementById(id);
+            return element ? element.checked === true : false;
+        }
+
+        // Parses a decimal value, returning null when the value is empty or not a number.
+        function parseOptionalDecimal(value) {
+            if (value.trim() === '')
+                return null;
+            const parsed = Number(value);
+            return Number.isNaN(parsed) ? null : parsed;
+        }
+
+        // Parses an integer value, returning null when the value is empty or not a number.
+        function parseIntOrNull(value) {
+            if (value.trim() === '')
+                return null;
+            const parsed = parseInt(value, 10);
+            return Number.isNaN(parsed) ? null : parsed;
+        }
+
+        // Builds the metadata object of the artist, matching the artist metadata of the API.
+        function buildArtistMetadata() {
+            return {
+                Name: readValue('artist-name-input'),
+                SortName: readValue('artist-sort-name-input') || null,
+                Disambiguation: readValue('artist-disambiguation-input') || null,
+                Type: readComboboxValue('artist-type-combobox') || null,
+                Gender: readComboboxValue('artist-gender-combobox') || null,
+                Country: readValue('artist-country-input') || null,
+                Area: buildArea('artist-area'),
+                BeginArea: buildArea('artist-begin-area'),
+                EndArea: buildArea('artist-end-area'),
+                LifeSpanBegin: readValue('artist-lifespan-begin-input') || null,
+                LifeSpanEnd: readValue('artist-lifespan-end-input') || null,
+                IsEnded: readCheckbox('artist-is-ended-input'),
+                Genres: buildNameList(genresBody, '.genre-row', '.genre-name'),
+                Tags: buildNameList(tagsBody, '.tag-row', '.tag-name'),
+                Aliases: Array.from(aliasesBody.querySelectorAll('.alias-row')).map(row => ({
+                    Name: row.querySelector('.alias-name').value.trim() || null,
+                    SortName: row.querySelector('.alias-sort-name').value.trim() || null,
+                    Type: row.querySelector('.alias-type').value.trim() || null,
+                    Locale: row.querySelector('.alias-locale').value.trim() || null,
+                    IsPrimary: row.querySelector('.alias-is-primary').checked,
+                    BeginDate: row.querySelector('.alias-begin-date').value || null,
+                    EndDate: row.querySelector('.alias-end-date').value || null,
+                    IsEnded: row.querySelector('.alias-is-ended').checked
+                }))
+            };
+        }
+
+        // Builds the area object of an area group, or null when no field of the group carries a value.
+        function buildArea(prefix) {
+            const name = readValue(`${prefix}-name-input`);
+            const sortName = readValue(`${prefix}-sort-name-input`);
+            const disambiguation = readValue(`${prefix}-disambiguation-input`);
+            const type = readValue(`${prefix}-type-input`);
+            const isoCode = readValue(`${prefix}-iso3166-code-input`);
+            const musicBrainzId = readGuid(`${prefix}-musicbrainz-id-input`);
+            if (name === '' && sortName === '' && disambiguation === '' && type === '' && isoCode === '' && musicBrainzId === null)
+                return null;
+            return {
+                MusicBrainzAreaId: musicBrainzId,
+                Name: name || null,
+                SortName: sortName || null,
+                Disambiguation: disambiguation || null,
+                Type: type || null,
+                Iso3166Code: isoCode || null
+            };
+        }
+
+        // Builds the list of media contributor references from the contributor rows.
+        function buildContributors() {
+            return Array.from(contributorsBody.querySelectorAll('.contributor-row')).map(row => ({
+                ContributorId: row.querySelector('.contributor-id').value.trim() || '00000000-0000-0000-0000-000000000000',
+                Role: readRowComboboxValue(row, '.contributor-role-combobox') || null
+            }));
+        }
+
+        // Builds the list of ratings from the rating rows.
+        function buildRatings() {
+            return Array.from(ratingsBody.querySelectorAll('.rating-row')).map(row => ({
+                Value: parseOptionalDecimal(row.querySelector('.rating-value').value),
+                MaxValue: parseOptionalDecimal(row.querySelector('.rating-max-value').value),
+                Source: readRowComboboxValue(row, '.rating-source-combobox') || null,
+                VoteCount: parseIntOrNull(row.querySelector('.rating-vote-count').value)
+            }));
+        }
+
+        // Builds a list of name valued entries from the rows of a table, skipping the rows whose name is empty.
+        function buildNameList(body, rowSelector, inputSelector) {
+            return Array.from(body.querySelectorAll(rowSelector))
+                .map(row => row.querySelector(inputSelector).value.trim())
+                .filter(name => name !== '')
+                .map(name => ({ Name: name }));
+        }
+
+        // Builds a list of plain string entries from the rows of a table, skipping the rows whose value is empty.
+        function buildStringList(body, rowSelector, inputSelector) {
+            return Array.from(body.querySelectorAll(rowSelector))
+                .map(row => row.querySelector(inputSelector).value.trim())
+                .filter(value => value !== '');
+        }
+
+        // Builds the payload of the edited artist, matching the update request of the API, round-tripping the albums unchanged.
+        function buildPayload() {
+            return {
+                Metadata: buildArtistMetadata(),
+                Website: readValue('artist-website-input') || null,
+                MusicBrainzArtistId: readGuid('artist-musicbrainz-id-input'),
+                Ipis: buildStringList(ipisBody, '.ipi-row', '.ipi-value'),
+                Isnis: buildStringList(isnisBody, '.isni-row', '.isni-value'),
+                Contributors: buildContributors(),
+                Ratings: buildRatings(),
+                Albums: currentAlbums
+            };
+        }
+
+        // Builds the HTML of an enlightenment combobox of a row, with the provided options and an optional wrapper class.
+        function buildRowCombobox(options, selectedValue, wrapperClass) {
+            const id = `row-combobox-${generatedId++}`;
+            const optionHtml = options.map(option =>
+                `<div class="enlightenment-option" data-value="${option.value}">${option.label}</div>`).join('');
+            return `
+                <div class="enlightenment-combobox inline-block w-100 ${wrapperClass || ''}">
+                    <div class="shine-effect" style="top: 1px;"></div>
+                    <input type="checkbox" class="enlightenment-toggle-checkbox" id="${id}" />
+                    <label class="enlightenment-toggle" for="${id}">
+                        <span class="enlightenment-selected-text" data-value="${selectedValue || ''}">${selectedLabel(options, selectedValue)}</span>
+                    </label>
+                    <div class="enlightenment-dropdown">
+                        <div class="enlightenment-option" data-value="">-</div>
+                        ${optionHtml}
+                    </div>
+                </div>`;
+        }
+
+        // Returns the display text of a selected combobox value, using the default dash when nothing is selected.
+        function selectedLabel(options, value) {
+            if (!value)
+                return '-';
+            const option = options.find(item => item.value === value);
+            return option ? option.label : value;
+        }
+
+        const contributorRoleOptions = @Html.Raw(contributorRoleOptionsJson);
+        const ratingSourceOptions = @Html.Raw(ratingSourceOptionsJson);
+
+        // Adds a blank alias row.
+        function addAliasRow() {
+            aliasesBody.insertAdjacentHTML('beforeend', `
+                <tr class="alias-row">
+                    <td><input type="text" class="enlightenment-input alias-name" /></td>
+                    <td><input type="text" class="enlightenment-input alias-sort-name" /></td>
+                    <td><input type="text" class="enlightenment-input alias-type" /></td>
+                    <td><input type="text" class="enlightenment-input alias-locale" /></td>
+                    <td><label class="enlightenment-checkbox-label"><input type="checkbox" class="enlightenment-checkbox-hidden alias-is-primary" /><span class="enlightenment-checkbox"></span></label></td>
+                    <td><input type="date" class="enlightenment-input alias-begin-date" /></td>
+                    <td><input type="date" class="enlightenment-input alias-end-date" /></td>
+                    <td><label class="enlightenment-checkbox-label"><input type="checkbox" class="enlightenment-checkbox-hidden alias-is-ended" /><span class="enlightenment-checkbox"></span></label></td>
+                    <td><img src="/images/ui/delete.svg" alt="${jsLocalizedStrings.remove}" title="${jsLocalizedStrings.remove}" class="remove-form-table-row-icon" /></td>
+                </tr>`);
+        }
+
+        // Adds a blank IPI row.
+        function addIpiRow() {
+            ipisBody.insertAdjacentHTML('beforeend', `
+                <tr class="ipi-row">
+                    <td><input type="text" class="enlightenment-input ipi-value w-100" /></td>
+                    <td><img src="/images/ui/delete.svg" alt="${jsLocalizedStrings.remove}" title="${jsLocalizedStrings.remove}" class="remove-form-table-row-icon" /></td>
+                </tr>`);
+        }
+
+        // Adds a blank ISNI row.
+        function addIsniRow() {
+            isnisBody.insertAdjacentHTML('beforeend', `
+                <tr class="isni-row">
+                    <td><input type="text" class="enlightenment-input isni-value w-100" /></td>
+                    <td><img src="/images/ui/delete.svg" alt="${jsLocalizedStrings.remove}" title="${jsLocalizedStrings.remove}" class="remove-form-table-row-icon" /></td>
+                </tr>`);
+        }
+
+        // Adds a blank genre row.
+        function addGenreRow() {
+            genresBody.insertAdjacentHTML('beforeend', `
+                <tr class="genre-row">
+                    <td><input type="text" class="enlightenment-input genre-name w-100" /></td>
+                    <td><img src="/images/ui/delete.svg" alt="${jsLocalizedStrings.remove}" title="${jsLocalizedStrings.remove}" class="remove-form-table-row-icon" /></td>
+                </tr>`);
+        }
+
+        // Adds a blank tag row.
+        function addTagRow() {
+            tagsBody.insertAdjacentHTML('beforeend', `
+                <tr class="tag-row">
+                    <td><input type="text" class="enlightenment-input tag-name w-100" /></td>
+                    <td><img src="/images/ui/delete.svg" alt="${jsLocalizedStrings.remove}" title="${jsLocalizedStrings.remove}" class="remove-form-table-row-icon" /></td>
+                </tr>`);
+        }
+
+        // Adds a blank contributor row.
+        function addContributorRow() {
+            contributorsBody.insertAdjacentHTML('beforeend', `
+                <tr class="contributor-row">
+                    <td><input type="text" class="enlightenment-input contributor-id w-100" /></td>
+                    <td>${buildRowCombobox(contributorRoleOptions, '', 'contributor-role-combobox')}</td>
+                    <td><img src="/images/ui/delete.svg" alt="${jsLocalizedStrings.remove}" title="${jsLocalizedStrings.remove}" class="remove-form-table-row-icon" /></td>
+                </tr>`);
+        }
+        // Adds a blank rating row.
+        function addRatingRow() {
+            ratingsBody.insertAdjacentHTML('beforeend', `
+                <tr class="rating-row">
+                    <td><input type="number" step="any" min="0" class="enlightenment-input rating-value" /></td>
+                    <td><input type="number" step="any" min="0" class="enlightenment-input rating-max-value" /></td>
+                    <td>${buildRowCombobox(ratingSourceOptions, '', 'rating-source-combobox')}</td>
+                    <td><input type="number" min="0" class="enlightenment-input rating-vote-count" /></td>
+                    <td><img src="/images/ui/delete.svg" alt="${jsLocalizedStrings.remove}" title="${jsLocalizedStrings.remove}" class="remove-form-table-row-icon" /></td>
+                </tr>`);
+        }
+
+        // Removes the row of the clicked remove icon.
+        function handleRowRemoval(event) {
+            if (event.target.matches('.remove-form-table-row-icon'))
+                event.target.closest('tr').remove();
+        }
+
+        // Builds the URL of the album details page of the provided album.
+        function buildAlbumUrl(albumId) {
+            return albumUrlTemplate.replace('/@(default(Guid))', `/${artistId}`).replace('/@(default(Guid))', `/${albumId}`) + `?libraryId=${libraryId}`;
+        }
+
+        // Builds the URL of the album deletion endpoint of the provided album.
+        function buildDeleteAlbumUrl(albumId) {
+            return deleteAlbumUrlTemplate.replace('/@(default(Guid))', `/${artistId}`).replace('/@(default(Guid))', `/${albumId}`) + `?libraryId=${libraryId}`;
+        }
+
+        // The localized labels of the release types, keyed by their canonical enum name.
+        const releaseTypeLabels = {
+            'Album': '@_localizer["Album"].Value',
+            'Broadcast': '@_localizer["Broadcast"].Value',
+            'Ep': '@_localizer["Ep"].Value',
+            'Other': '@_localizer["Other"].Value',
+            'Single': '@_localizer["Single"].Value',
+            'AudioDrama': '@_localizer["AudioDrama"].Value',
+            'AudioBook': '@_localizer["AudioBook"].Value',
+            'Compilation': '@_localizer["Compilation"].Value',
+            'DjMix': '@_localizer["DjMix"].Value',
+            'Demo': '@_localizer["Demo"].Value',
+            'FieldRecording': '@_localizer["FieldRecording"].Value',
+            'Interview': '@_localizer["Interview"].Value',
+            'Live': '@_localizer["Live"].Value',
+            'Mixtape': '@_localizer["Mixtape"].Value',
+            'Remix': '@_localizer["Remix"].Value',
+            'Soundtrack': '@_localizer["Soundtrack"].Value',
+            'SpokenWord': '@_localizer["SpokenWord"].Value'
+        };
+        // The order in which the release type groups are displayed, from the most common to the least common.
+        const releaseTypeOrder = ['Album', 'Compilation', 'Ep', 'Live', 'Remix', 'Single', 'Soundtrack', 'Broadcast', 'AudioDrama', 'AudioBook', 'Demo', 'DjMix', 'FieldRecording', 'Interview', 'Mixtape', 'SpokenWord', 'Other'];
+
+        // Loads and renders the releases of the artist, grouped by their release type.
+        async function loadAlbumsAsync() {
+            const url = albumsUrlTemplate.replace('/@(default(Guid))', `/${artistId}`) + `?libraryId=${libraryId}`;
+            const response = await callApiGetAsync(url);
+            renderReleases(response);
+        }
+
+        // Renders the releases of the artist, grouped by their primary release type, each group ordered by release year.
+        function renderReleases(response) {
+            albumsContainer.querySelectorAll('.release-group').forEach(group => group.remove());
+            const releases = response && response.data ? response.data : [];
+            noAlbumsMessage.classList.toggle('hidden', releases.length !== 0);
+
+            // The releases are grouped by their first release type, falling back to "Other" when the type is not known.
+            const groups = new Map();
+            releases.forEach(release => {
+                const type = release.releaseTypes && release.releaseTypes.length > 0 ? release.releaseTypes[0] : 'Other';
+                if (!groups.has(type))
+                    groups.set(type, []);
+                groups.get(type).push(release);
+            });
+
+            releaseTypeOrder.forEach(type => {
+                const items = groups.get(type);
+                if (!items || items.length === 0)
+                    return;
+                items.sort((left, right) => (left.releaseYear ?? 0) - (right.releaseYear ?? 0));
+                albumsContainer.appendChild(createReleaseGroup(type, items));
+            });
+
+            bindNavigationLinks();
+        }
+
+        // Creates a titled group of release cards, ordered by release year.
+        function createReleaseGroup(type, releases) {
+            const group = document.createElement('div');
+            group.className = 'release-group';
+            group.style.width = '100%';
+            const heading = document.createElement('h3');
+            heading.className = 'text-light-three';
+            heading.style.fontSize = '1.5rem';
+            heading.textContent = releaseTypeLabels[type] || type;
+            group.appendChild(heading);
+            const container = document.createElement('div');
+            container.className = 'cards-container justify-start';
+            releases.forEach(release => container.appendChild(createAlbumCard(release)));
+            group.appendChild(container);
+            return group;
+        }
+
+        // Creates a card for an album, that navigates to the album page when clicked, with a delete action.
+        function createAlbumCard(album) {
+            const card = document.createElement('div');
+            card.className = 'media-card';
+            card.dataset.albumId = album.id;
+
+            const cardLink = document.createElement('a');
+            cardLink.className = 'media-panel nav-link no-underline';
+            cardLink.style.width = '200px';
+            cardLink.style.height = 'auto';
+            cardLink.href = buildAlbumUrl(album.id);
+
+            // The cover is shown as a square, cropped from its center (never stretched), and the title and year are shown underneath it.
+            const image = document.createElement('img');
+            image.src = album.coverPath
+                ? `${globalConfiguration.serverBasePath}${album.coverPath}`
+                : `/images/ui/music-placeholder.svg`;
+            image.alt = album.title;
+            image.style.width = '200px';
+            image.style.height = '200px';
+            image.style.flexGrow = '0';
+            image.style.objectFit = 'cover';
+            image.style.objectPosition = 'center';
+            cardLink.appendChild(image);
+
+            // The title is kept on a single line, truncated with an ellipsis when it does not fit, so that all the cards share the same height.
+            const titleSpan = document.createElement('span');
+            titleSpan.className = 'text-light-two';
+            titleSpan.style.display = 'block';
+            titleSpan.style.width = '200px';
+            titleSpan.style.boxSizing = 'border-box';
+            titleSpan.style.height = 'auto';
+            titleSpan.style.padding = '4px';
+            titleSpan.style.textAlign = 'center';
+            titleSpan.style.whiteSpace = 'nowrap';
+            titleSpan.style.overflow = 'hidden';
+            titleSpan.style.textOverflow = 'ellipsis';
+            const title = document.createElement('strong');
+            title.textContent = album.title;
+            titleSpan.appendChild(title);
+            cardLink.appendChild(titleSpan);
+
+            // The release year is shown underneath the title, in a smaller, centered font.
+            if (album.releaseYear) {
+                const yearSpan = document.createElement('small');
+                yearSpan.className = 'text-light-two';
+                yearSpan.style.display = 'block';
+                yearSpan.style.textAlign = 'center';
+                yearSpan.style.fontSize = '0.75rem';
+                yearSpan.style.paddingBottom = '4px';
+                yearSpan.textContent = album.releaseYear;
+                cardLink.appendChild(yearSpan);
+            }
+
+            const trigger = document.createElement('button');
+            trigger.type = 'button';
+            trigger.className = 'card-actions-trigger';
+            trigger.setAttribute('aria-haspopup', 'menu');
+            trigger.addEventListener('click', event => {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                toggleCardMenu(card, resolveMenuAnchor(event));
+            });
+
+            const menu = document.createElement('nav');
+            menu.className = 'card-actions-menu';
+            menu.setAttribute('role', 'menu');
+            menu.innerHTML = `<a role="menuitem" href="#" class="card-action-delete">${jsLocalizedStrings.remove}</a>`;
+            menu.addEventListener('click', async event => {
+                const deleteItem = event.target.closest('.card-action-delete');
+                if (!deleteItem)
+                    return;
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                closeCardMenus();
+                await deleteAlbumAsync(card.dataset.albumId);
+            });
+
+            card.appendChild(cardLink);
+            card.appendChild(trigger);
+            card.appendChild(menu);
+
+            card.addEventListener('contextmenu', event => {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                toggleCardMenu(card, resolveMenuAnchor(event));
+            });
+
+            return card;
+        }
+
+        // Toggles the actions menu of the album card, opening it with its top left corner at the given viewport position.
+        function toggleCardMenu(card, anchor) {
+            const wasOpen = card.classList.contains('open');
+            closeCardMenus();
+            if (wasOpen)
+                return;
+            card.classList.add('open');
+            const menu = card.querySelector('.card-actions-menu');
+            if (menu) {
+                menu.classList.add('open');
+                positionActionsMenu(menu, anchor);
+            }
+        }
+
+        // Resolves the viewport point where the card actions menu opens.
+        function resolveMenuAnchor(event) {
+            if (event.clientX !== 0 || event.clientY !== 0)
+                return { x: event.clientX, y: event.clientY };
+            const triggerRect = event.currentTarget.getBoundingClientRect();
+            return { x: triggerRect.left, y: triggerRect.bottom };
+        }
+
+        // Places the card actions menu with its top left corner at the requested viewport point.
+        function positionActionsMenu(menu, anchor) {
+            const margin = 4;
+            const maxLeft = Math.max(margin, window.innerWidth - menu.offsetWidth - margin);
+            const maxTop = Math.max(margin, window.innerHeight - menu.offsetHeight - margin);
+            menu.style.position = 'fixed';
+            menu.style.left = `${Math.min(Math.max(margin, anchor.x), maxLeft)}px`;
+            menu.style.top = `${Math.min(Math.max(margin, anchor.y), maxTop)}px`;
+        }
+
+        // Closes the actions menus of all the album cards.
+        function closeCardMenus() {
+            albumsContainer.querySelectorAll('.media-card.open').forEach(card => {
+                card.classList.remove('open');
+                const menu = card.querySelector('.card-actions-menu');
+                if (menu)
+                    menu.classList.remove('open');
+            });
+        }
+
+        // Closes the actions menus when clicking or pressing a key outside them.
+        function handleCardMenuDismiss(event) {
+            if (event.type === 'keydown' && event.key !== 'Escape')
+                return;
+            if (event.type === 'click' && event.target.closest('.card-actions-menu, .card-actions-trigger'))
+                return;
+            closeCardMenus();
+        }
+
+        // Deletes an album after confirmation, then reloads the albums.
+        async function deleteAlbumAsync(albumId) {
+            if (await dialogService.show(jsLocalizedStrings.deleteConfirm, jsLocalizedDialogs.confirmation, DialogButtons.YES_NO, DialogIcon.QUESTION) !== DialogButton.YES)
+                return;
+            const success = await callApiDeleteAsync(buildDeleteAlbumUrl(albumId));
+            if (success) {
+                notificationService.show(jsLocalizedStrings.albumDeleted, NotificationType.SUCCESS);
+                await loadAlbumsAsync();
+            } else {
+                notificationService.show(jsLocalizedStrings.deleteFailed, NotificationType.ERROR);
+            }
+        }
+
+        // Sends the edited artist data to the server.
+        async function handleSaveAsync() {
+            const result = await callApiPutAsync(`${saveUrl}?libraryId=${encodeURIComponent(libraryId)}`, buildPayload());
+            if (result && result.success === true) {
+                notificationService.show(jsLocalizedStrings.artistSaved, NotificationType.SUCCESS);
+            } else {
+                notificationService.show(jsLocalizedStrings.saveFailed, NotificationType.ERROR);
+            }
+        }
+
+        // Deletes the artist after confirmation, then returns to the artists browsing page.
+        async function handleDeleteAsync() {
+            if (await dialogService.show(jsLocalizedStrings.deleteConfirm, jsLocalizedDialogs.confirmation, DialogButtons.YES_NO, DialogIcon.QUESTION) !== DialogButton.YES)
+                return;
+            const success = await callApiDeleteAsync(`${deleteUrl}?libraryId=${encodeURIComponent(libraryId)}`);
+            if (success) {
+                notificationService.show(jsLocalizedStrings.artistDeleted, NotificationType.SUCCESS);
+                await updateContentAsync(`${artistsIndexUrl}?libraryId=${encodeURIComponent(libraryId)}`, true);
+            } else {
+                notificationService.show(jsLocalizedStrings.deleteFailed, NotificationType.ERROR);
+            }
+        }
+
+        // Navigates back to the artists browsing page.
+        async function handleBackToArtistsAsync() {
+            await updateContentAsync(`${artistsIndexUrl}?libraryId=${encodeURIComponent(libraryId)}`, true);
+        }
+
+        // Opens the file picker that chooses the new cover image.
+        function handleChangeCoverClick() {
+            if (coverInput)
+                coverInput.click();
+        }
+
+        // Uploads the selected cover image to the server.
+        async function handleCoverChangeAsync() {
+            const file = coverInput.files && coverInput.files[0];
+            if (!file)
+                return;
+            const formData = new FormData();
+            formData.append('cover', file);
+
+            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+            const headers = { 'X-Requested-With': 'XMLHttpRequest' };
+            if (token)
+                headers['RequestVerificationToken'] = token;
+
+            let response;
+            try {
+                response = await fetch(coverUrl, {
+                    method: 'PUT',
+                    headers: headers,
+                    body: formData
+                });
+            } catch (error) {
+                console.error('Error:', error);
+                notificationService.show(jsLocalizedStrings.coverUploadFailed, NotificationType.ERROR);
+                return;
+            }
+            if (response.redirected) {
+                window.location.href = response.url;
+                return;
+            }
+            if (!response.ok) {
+                notificationService.show(jsLocalizedStrings.coverUploadFailed, NotificationType.ERROR);
+                return;
+            }
+            const jsonResponse = await response.json();
+            if (jsonResponse.success === true) {
+                // Show the uploaded cover immediately, so that the user sees the change without reloading.
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    coverImage.src = event.target.result;
+                    const storedPath = jsonResponse.data || '';
+                    coverImage.dataset.coverPath = storedPath;
+                    coverPathLabel.textContent = storedPath ? storedPath : jsLocalizedStrings.noCover;
+                    coverPathLabel.title = storedPath;
+                };
+                reader.readAsDataURL(file);
+                notificationService.show(jsLocalizedStrings.coverSaved, NotificationType.SUCCESS);
+            } else {
+                notificationService.show(jsLocalizedStrings.coverUploadFailed, NotificationType.ERROR);
+            }
+        }
+
+        // Shows the cover image of the artist, or a placeholder when the artist has no cover.
+        function showCover() {
+            const coverPath = coverImage.dataset.coverPath || '';
+            coverImage.src = coverPath
+                ? `${globalConfiguration.serverBasePath}${coverPath}`
+                : `/images/ui/music-placeholder.svg`;
+            coverPathLabel.textContent = coverPath ? coverPath : jsLocalizedStrings.noCover;
+            coverPathLabel.title = coverPath || '';
+        }
+
+        // Add listeners.
+        btnSaveArtist.addEventListener('click', handleSaveAsync);
+        btnDeleteArtist.addEventListener('click', handleDeleteAsync);
+        btnBackToArtists.addEventListener('click', handleBackToArtistsAsync);
+        btnAddAlias.addEventListener('click', addAliasRow);
+        btnAddIpi.addEventListener('click', addIpiRow);
+        btnAddIsni.addEventListener('click', addIsniRow);
+        btnAddGenre.addEventListener('click', addGenreRow);
+        btnAddTag.addEventListener('click', addTagRow);
+        btnAddContributor.addEventListener('click', addContributorRow);
+        btnAddRating.addEventListener('click', addRatingRow);
+        aliasesBody.addEventListener('click', handleRowRemoval);
+        ipisBody.addEventListener('click', handleRowRemoval);
+        isnisBody.addEventListener('click', handleRowRemoval);
+        genresBody.addEventListener('click', handleRowRemoval);
+        tagsBody.addEventListener('click', handleRowRemoval);
+        contributorsBody.addEventListener('click', handleRowRemoval);
+        ratingsBody.addEventListener('click', handleRowRemoval);
+        document.addEventListener('click', handleCardMenuDismiss);
+        document.addEventListener('keydown', handleCardMenuDismiss);
+        btnChangeCover.addEventListener('click', handleChangeCoverClick);
+        coverInput.addEventListener('change', handleCoverChangeAsync);
+        document.addEventListener('DOMContentLoaded', InitializeAsync);
+
+        // Register cleanup for these listeners.
+        cleanupFunctions.push(() => {
+            btnSaveArtist.removeEventListener('click', handleSaveAsync);
+            btnDeleteArtist.removeEventListener('click', handleDeleteAsync);
+            btnBackToArtists.removeEventListener('click', handleBackToArtistsAsync);
+            btnAddAlias.removeEventListener('click', addAliasRow);
+            btnAddIpi.removeEventListener('click', addIpiRow);
+            btnAddIsni.removeEventListener('click', addIsniRow);
+            btnAddGenre.removeEventListener('click', addGenreRow);
+            btnAddTag.removeEventListener('click', addTagRow);
+            btnAddContributor.removeEventListener('click', addContributorRow);
+            btnAddRating.removeEventListener('click', addRatingRow);
+            aliasesBody.removeEventListener('click', handleRowRemoval);
+            ipisBody.removeEventListener('click', handleRowRemoval);
+            isnisBody.removeEventListener('click', handleRowRemoval);
+            genresBody.removeEventListener('click', handleRowRemoval);
+            tagsBody.removeEventListener('click', handleRowRemoval);
+            contributorsBody.removeEventListener('click', handleRowRemoval);
+            ratingsBody.removeEventListener('click', handleRowRemoval);
+            document.removeEventListener('click', handleCardMenuDismiss);
+            document.removeEventListener('keydown', handleCardMenuDismiss);
+            btnChangeCover.removeEventListener('click', handleChangeCoverClick);
+            coverInput.removeEventListener('change', handleCoverChangeAsync);
+            document.removeEventListener('DOMContentLoaded', InitializeAsync);
+        });
+
+        // Initializes the page, showing the cover of the artist and loading the albums of the artist.
+        async function InitializeAsync() {
+            if (isInitialized)
+                return;
+            isInitialized = true;
+            showCover();
+            await loadAlbumsAsync();
+        }
+
+        // Store all cleanups for this view on window object using the scriptId.
+        window.viewCleanups = window.viewCleanups || {};
+        window.viewCleanups['@scriptId'] = () => {
+            cleanupFunctions.forEach(cleanup => cleanup());
+            console.log(`Unloaded @scriptId`);
+        };
+        console.log(`Loaded @scriptId`);
+    </script>
+}

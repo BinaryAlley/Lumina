@@ -98,6 +98,155 @@ public class GetArtistsLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     }
 
     [Fact]
+    public async Task GetArtistsLite_WhenCalledWithFilterAlphaKeyLetter_ShouldReturnOnlyArtistsStartingWithThatLetter()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = await SeedLibraryAsync(userId);
+        await SeedArtistAsync(libraryId, "Queen");
+        await SeedArtistAsync(libraryId, "The Queen");
+        await SeedArtistAsync(libraryId, "Radiohead");
+
+        // Act
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/artists/lite?filterAlphaKey=q");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        PaginatedResponse<ArtistLiteResponse>? paginatedArtists = await response.Content.ReadFromJsonAsync<PaginatedResponse<ArtistLiteResponse>>(_jsonOptions);
+        Assert.NotNull(paginatedArtists);
+        ArtistLiteResponse artist = Assert.Single(paginatedArtists!.Data);
+        Assert.Equal("Queen", artist.Name);
+        Assert.Equal(1, paginatedArtists.Count);
+    }
+
+    [Fact]
+    public async Task GetArtistsLite_WhenCalledWithFilterAlphaKeyLetterAndIgnoreThePrefix_ShouldIncludeThePrefixedNames()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = await SeedLibraryAsync(userId);
+        await SeedArtistAsync(libraryId, "Queen");
+        await SeedArtistAsync(libraryId, "The Queen");
+        await SeedArtistAsync(libraryId, "Radiohead");
+
+        // Act
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/artists/lite?filterAlphaKey=q&shouldIgnoreThePrefixForAlphaPicker=true");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        PaginatedResponse<ArtistLiteResponse>? paginatedArtists = await response.Content.ReadFromJsonAsync<PaginatedResponse<ArtistLiteResponse>>(_jsonOptions);
+        Assert.NotNull(paginatedArtists);
+        Assert.Equal(2, paginatedArtists!.Count);
+        Assert.Contains(paginatedArtists.Data, artist => artist.Name == "Queen");
+        Assert.Contains(paginatedArtists.Data, artist => artist.Name == "The Queen");
+    }
+
+    [Fact]
+    public async Task GetArtistsLite_WhenCalledWithFilterAlphaKeyNumber_ShouldReturnOnlyArtistsStartingWithADigit()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = await SeedLibraryAsync(userId);
+        await SeedArtistAsync(libraryId, "1984");
+        await SeedArtistAsync(libraryId, "7th Sense");
+        await SeedArtistAsync(libraryId, "Adele");
+
+        // Act
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/artists/lite?filterAlphaKey=%23");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        PaginatedResponse<ArtistLiteResponse>? paginatedArtists = await response.Content.ReadFromJsonAsync<PaginatedResponse<ArtistLiteResponse>>(_jsonOptions);
+        Assert.NotNull(paginatedArtists);
+        Assert.Equal(2, paginatedArtists!.Count);
+        Assert.Contains(paginatedArtists.Data, artist => artist.Name == "1984");
+        Assert.Contains(paginatedArtists.Data, artist => artist.Name == "7th Sense");
+    }
+
+    [Fact]
+    public async Task GetArtistsLite_WhenCalledWithFilterAlphaKeySymbol_ShouldReturnOnlyArtistsStartingWithASymbol()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = await SeedLibraryAsync(userId);
+        await SeedArtistAsync(libraryId, "!Important");
+        await SeedArtistAsync(libraryId, "1984");
+        await SeedArtistAsync(libraryId, "Adele");
+
+        // Act
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/artists/lite?filterAlphaKey=%2A");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        PaginatedResponse<ArtistLiteResponse>? paginatedArtists = await response.Content.ReadFromJsonAsync<PaginatedResponse<ArtistLiteResponse>>(_jsonOptions);
+        Assert.NotNull(paginatedArtists);
+        ArtistLiteResponse artist = Assert.Single(paginatedArtists!.Data);
+        Assert.Equal("!Important", artist.Name);
+        Assert.Equal(1, paginatedArtists.Count);
+    }
+
+    [Fact]
+    public async Task GetArtistsLite_WhenCalledWithSearchTermAndFilterAlphaKey_ShouldReturnOnlyArtistsSatisfyingBothFilters()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = await SeedLibraryAsync(userId);
+        // The search term matches only one artist, while the alpha key matches only the other, so no artist satisfies both filters at once.
+        await SeedArtistAsync(libraryId, "The Fellowship Band");
+        await SeedArtistAsync(libraryId, "Zoo");
+
+        // Act
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/artists/lite?searchTerm={Uri.EscapeDataString("Fellowship")}&filterAlphaKey=z");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        PaginatedResponse<ArtistLiteResponse>? paginatedArtists = await response.Content.ReadFromJsonAsync<PaginatedResponse<ArtistLiteResponse>>(_jsonOptions);
+        Assert.NotNull(paginatedArtists);
+        Assert.Empty(paginatedArtists!.Data);
+        Assert.Equal(0, paginatedArtists.Count);
+    }
+
+    [Fact]
+    public async Task GetArtistsLite_WhenSortedByNameAscending_ShouldReturnArtistsInAscendingOrder()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = await SeedLibraryAsync(userId);
+        await SeedArtistAsync(libraryId, "Zulu");
+        await SeedArtistAsync(libraryId, "Mike");
+        await SeedArtistAsync(libraryId, "Alpha");
+
+        // Act
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/artists/lite?sortBy=name&sortOrder=Ascending");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        PaginatedResponse<ArtistLiteResponse>? paginatedArtists = await response.Content.ReadFromJsonAsync<PaginatedResponse<ArtistLiteResponse>>(_jsonOptions);
+        Assert.NotNull(paginatedArtists);
+        Assert.Equal(new[] { "Alpha", "Mike", "Zulu" }, paginatedArtists!.Data.Select(artist => artist.Name));
+    }
+
+    [Fact]
+    public async Task GetArtistsLite_WhenSortedByNameDescending_ShouldReturnArtistsInDescendingOrder()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = await SeedLibraryAsync(userId);
+        await SeedArtistAsync(libraryId, "Zulu");
+        await SeedArtistAsync(libraryId, "Mike");
+        await SeedArtistAsync(libraryId, "Alpha");
+
+        // Act
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/artists/lite?sortBy=name&sortOrder=Descending");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        PaginatedResponse<ArtistLiteResponse>? paginatedArtists = await response.Content.ReadFromJsonAsync<PaginatedResponse<ArtistLiteResponse>>(_jsonOptions);
+        Assert.NotNull(paginatedArtists);
+        Assert.Equal(new[] { "Zulu", "Mike", "Alpha" }, paginatedArtists!.Data.Select(artist => artist.Name));
+    }
+
+    [Fact]
     public async Task GetArtistsLite_WhenLibraryBelongsToAnotherUser_ShouldReturnForbidden()
     {
         // Arrange

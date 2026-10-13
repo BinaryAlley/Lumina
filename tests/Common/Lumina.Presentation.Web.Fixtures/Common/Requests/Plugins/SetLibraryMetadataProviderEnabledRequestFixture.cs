@@ -10,7 +10,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.Requests.Plugins;
 
 /// <summary>
-/// Fixture class for the <see cref="SetLibraryMetadataProviderEnabledRequest"/> class.
+/// Fixture class for the <see cref="SetLibraryMetadataProviderEnabledRequest"/> record.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class SetLibraryMetadataProviderEnabledRequestFixture
@@ -29,12 +29,11 @@ public class SetLibraryMetadataProviderEnabledRequestFixture
         Guid? pluginId = null,
         bool? isEnabled = null)
     {
-        return new SetLibraryMetadataProviderEnabledRequest
-        {
-            LibraryId = libraryId ?? Guid.NewGuid(),
-            PluginId = pluginId ?? Guid.NewGuid(),
-            IsEnabled = isEnabled ?? _faker.Random.Bool()
-        };
+        return new SetLibraryMetadataProviderEnabledRequest(
+            LibraryId: libraryId ?? Guid.NewGuid(),
+            PluginId: pluginId ?? Guid.NewGuid(),
+            IsEnabled: isEnabled ?? _faker.Random.Bool()
+        );
     }
 
     /// <summary>

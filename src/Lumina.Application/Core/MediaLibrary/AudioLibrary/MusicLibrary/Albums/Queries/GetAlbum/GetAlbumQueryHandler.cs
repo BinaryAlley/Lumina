@@ -8,11 +8,15 @@ using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwn
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
+using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
@@ -88,6 +92,21 @@ public class GetAlbumQueryHandler : IQueryHandler<GetAlbumQuery, Result<AlbumRes
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
-        return existingAlbum.ToResponse();
+        // The artwork of an album is stored in the MusicArtwork table, not on the album row, so it is loaded to expose the cover
+        // and every other stored piece of artwork.
+        Result<IReadOnlyList<MusicArtworkEntity>> getArtworkResult = await _unitOfWork.MusicArtworkRepository.GetByOwnerAsync(MusicArtworkOwnerType.Album, albumId, cancellationToken).ConfigureAwait(false);
+        if (getArtworkResult.IsFailure)
+            return getArtworkResult.Errors;
+        string? coverPath = getArtworkResult.Value
+            .Where(artwork => artwork.ArtworkType == ArtworkType.Cover)
+            .Select(artwork => artwork.FileName)
+            .FirstOrDefault();
+
+        // Only the artwork whose file has already been stored can be presented, so the ones that are still pending resolution are left out.
+        List<MediaArtworkDto> artwork = [.. getArtworkResult.Value
+            .Where(storedArtwork => !string.IsNullOrWhiteSpace(storedArtwork.FileName))
+            .Select(storedArtwork => new MediaArtworkDto(storedArtwork.ArtworkType, storedArtwork.Ordinal, storedArtwork.FileName!))];
+
+        return existingAlbum.ToResponse(coverPath, artwork);
     }
 }

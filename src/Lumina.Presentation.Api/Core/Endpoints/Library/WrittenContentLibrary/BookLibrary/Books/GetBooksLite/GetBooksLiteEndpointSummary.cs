@@ -57,13 +57,13 @@ public class GetBooksLiteEndpointSummary : Summary<GetBooksLiteEndpoint, GetBook
                         Id: Guid.NewGuid(),
                         Title: "The Fellowship of the Ring",
                         ReleaseYear: 1954,
-                        CoverPath: null
+                        CoverPath: "/media/books/tolkien/the-fellowship-of-the-ring/cover.jpg"
                     ),
                     new(
                         Id: Guid.NewGuid(),
                         Title: "The Two Towers",
                         ReleaseYear: 1954,
-                        CoverPath: null
+                        CoverPath: "/media/books/tolkien/the-two-towers/cover.jpg"
                     )
                 ],
                 CurrentPage = 1,

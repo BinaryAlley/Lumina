@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
 using Lumina.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
+using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -15,6 +16,9 @@ namespace Lumina.Application.Fixtures.Common.DTO.MediaLibrary.AudioLibrary.Music
 [ExcludeFromCodeCoverage]
 public class AlbumLiteRowFixture
 {
+    private const int MINIMUM_RELEASE_YEAR = 1900;
+    private const int MAXIMUM_RELEASE_YEAR = 2026;
+
     private readonly Faker _faker = new();
 
     /// <summary>
@@ -23,17 +27,32 @@ public class AlbumLiteRowFixture
     /// <param name="id">Optional. The Id of the album.</param>
     /// <param name="title">Optional. The title of the album.</param>
     /// <param name="totalTracks">Optional. The number of tracks of the release.</param>
+    /// <param name="coverPath">Optional. The path of the image representing the album.</param>
+    /// <param name="releaseYear">Optional. The release year of the album.</param>
+    /// <param name="releaseTypes">Optional. The set of types of the release.</param>
+    /// <param name="includeCoverPath">Whether the cover path should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeReleaseYear">Whether the release year should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeReleaseTypes">Whether the release types should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="AlbumLiteRow"/>.</returns>
     public AlbumLiteRow Create(
         Guid? id = null,
         string? title = null,
-        int? totalTracks = null)
+        int? totalTracks = null,
+        string? coverPath = null,
+        int? releaseYear = null,
+        List<MusicReleaseType>? releaseTypes = null,
+        bool includeCoverPath = true,
+        bool includeReleaseYear = true,
+        bool includeReleaseTypes = true)
     {
         return new AlbumLiteRow
         {
             Id = id ?? _faker.Random.Guid(),
             Title = title ?? _faker.Music.Genre(),
-            TotalTracks = totalTracks ?? _faker.Random.Int(1, 30)
+            TotalTracks = totalTracks ?? _faker.Random.Int(1, 30),
+            CoverPath = includeCoverPath ? (coverPath ?? _faker.System.FilePath()) : null,
+            ReleaseYear = includeReleaseYear ? (releaseYear ?? _faker.Random.Int(MINIMUM_RELEASE_YEAR, MAXIMUM_RELEASE_YEAR)) : null,
+            ReleaseTypes = includeReleaseTypes ? (releaseTypes ?? [.. Enumerable.Range(0, _faker.Random.Int(1, 3)).Select(index => _faker.PickRandom<MusicReleaseType>())]) : null
         };
     }
 

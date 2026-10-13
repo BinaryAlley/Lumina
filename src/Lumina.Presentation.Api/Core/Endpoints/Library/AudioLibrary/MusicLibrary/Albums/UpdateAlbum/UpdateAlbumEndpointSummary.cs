@@ -9,6 +9,7 @@ using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -176,6 +177,8 @@ public class UpdateAlbumEndpointSummary : Summary<UpdateAlbumEndpoint, UpdateAlb
         ResponseParam<AlbumResponse>(r => r.Metadata!.Genres, "The list of genres associated with the album.");
         ResponseParam<AlbumResponse>(r => r.Metadata!.Tags, "The list of tags that further describe or categorize the album.");
         ResponseParam<AlbumResponse>(r => r.Tracks, "The list of tracks of the album.");
+        ResponseParam<AlbumResponse>(r => r.CoverPath, "The path of the image representing the album, if available.");
+        ResponseParam<AlbumResponse>(r => r.Artwork, "The stored artwork of the album, in display order, if applicable.");
 
         Response(200, "The updated album is returned.",
             example: new AlbumResponse(
@@ -254,8 +257,195 @@ public class UpdateAlbumEndpointSummary : Summary<UpdateAlbumEndpoint, UpdateAlb
                 ],
                 CreatedOnUtc: new DateTime(2025, 1, 15, 10, 30, 0, DateTimeKind.Utc),
                 UpdatedOnUtc: new DateTime(2025, 1, 20, 14, 45, 0, DateTimeKind.Utc),
-                Tracks: []
-            )
+                Tracks:
+                [
+                    new(
+                        Id: Guid.NewGuid(),
+                        AlbumId: Guid.NewGuid(),
+                        LibraryId: Guid.NewGuid(),
+                        Path: "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
+                        Metadata: new(
+                            Title: "Bohemian Rhapsody",
+                            OriginalTitle: "Bohemian Rhapsody",
+                            Description: "A song by the British rock band Queen. It was written by Freddie Mercury and originally released on the album A Night at the Opera in 1975.",
+                            Disambiguation: "album version",
+                            ReleaseInfo: new(
+                                OriginalReleaseDate: new DateOnly(1975, 10, 31),
+                                OriginalReleaseYear: 1975,
+                                ReReleaseDate: new DateOnly(2011, 11, 21),
+                                ReReleaseYear: 2011,
+                                ReleaseCountry: ReleaseCountry.GB,
+                                ReleaseVersion: "Original"
+                            ),
+                            Language: new(
+                                LanguageCode: "en",
+                                LanguageName: "English",
+                                NativeName: "English"
+                            ),
+                            OriginalLanguage: new(
+                                LanguageCode: "en",
+                                LanguageName: "English",
+                                NativeName: "English"
+                            ),
+                            Tags: [
+                                new(Name: "classic"),
+                                new(Name: "epic")
+                            ],
+                            Genres: [
+                                new(Name: "Rock"),
+                                new(Name: "Progressive Rock")
+                            ],
+                            DurationInSeconds: 354,
+                            SampleRate: 44100,
+                            Channels: 2,
+                            BitDepth: 16,
+                            AudioCodec: "FLAC",
+                            Bitrate: 980,
+                            IsVideo: false
+                        ),
+                        Script: "Latn",
+                        Key: MusicKey.CMajor,
+                        Bpm: 72,
+                        Work: new MusicWorkDto(
+                            MusicBrainzWorkId: Guid.NewGuid(),
+                            Title: "Bohemian Rhapsody",
+                            Type: "Song",
+                            Languages: [new LanguageInfoDto(LanguageCode: "en", LanguageName: "English", NativeName: "English")],
+                            Iswcs: ["T-010489707-6"]
+                        ),
+                        Isrcs: [
+                            new(Value: "GBUM71029604")
+                        ],
+                        Moods: [
+                            new(Name: "dramatic"),
+                            new(Name: "anxious")
+                        ],
+                        MusicBrainzRecordingId: Guid.NewGuid(),
+                        MusicBrainzTrackId: Guid.NewGuid(),
+                        Contributors: [
+                            new MediaContributorReferenceDto(
+                                ContributorId: Guid.NewGuid(),
+                                Role: MediaContributorRole.Vocals
+                            ),
+                            new MediaContributorReferenceDto(
+                                ContributorId: Guid.NewGuid(),
+                                Role: MediaContributorRole.Guitar
+                            )
+                        ],
+                        Ratings: [
+                            new(
+                                Value: 4.5M,
+                                MaxValue: 5,
+                                Source: AudioRatingSource.MusicBrainz,
+                                VoteCount: 2345
+                            ),
+                            new(
+                                Value: 4.8M,
+                                MaxValue: 5,
+                                Source: AudioRatingSource.LastFm,
+                                VoteCount: 1234
+                            )
+                        ],
+                        TrackNumber: 1,
+                        DiscNumber: 1,
+                        CreatedOnUtc: new DateTime(2025, 1, 15, 10, 30, 0, DateTimeKind.Utc),
+                        UpdatedOnUtc: new DateTime(2025, 1, 20, 14, 45, 0, DateTimeKind.Utc)
+                    ),
+                    new(
+                        Id: Guid.NewGuid(),
+                        AlbumId: Guid.NewGuid(),
+                        LibraryId: Guid.NewGuid(),
+                        Path: "/music/queen/a-night-at-the-opera/07-youre-my-best-friend.flac",
+                        Metadata: new(
+                            Title: "You're My Best Friend",
+                            OriginalTitle: "You're My Best Friend",
+                            Description: "A song by the British rock band Queen, written by bass guitarist John Deacon. It was originally released on the album A Night at the Opera in 1975 and as a single in 1976.",
+                            Disambiguation: "album version",
+                            ReleaseInfo: new(
+                                OriginalReleaseDate: new DateOnly(1976, 6, 18),
+                                OriginalReleaseYear: 1976,
+                                ReReleaseDate: new DateOnly(2011, 11, 21),
+                                ReReleaseYear: 2011,
+                                ReleaseCountry: ReleaseCountry.GB,
+                                ReleaseVersion: "Original"
+                            ),
+                            Language: new(
+                                LanguageCode: "en",
+                                LanguageName: "English",
+                                NativeName: "English"
+                            ),
+                            OriginalLanguage: new(
+                                LanguageCode: "en",
+                                LanguageName: "English",
+                                NativeName: "English"
+                            ),
+                            Tags: [
+                                new(Name: "classic"),
+                                new(Name: "love")
+                            ],
+                            Genres: [
+                                new(Name: "Rock"),
+                                new(Name: "Pop Rock")
+                            ],
+                            DurationInSeconds: 181,
+                            SampleRate: 44100,
+                            Channels: 2,
+                            BitDepth: 16,
+                            AudioCodec: "FLAC",
+                            Bitrate: 912,
+                            IsVideo: false
+                        ),
+                        Script: "Latn",
+                        Key: MusicKey.BMajor,
+                        Bpm: 118,
+                        Work: new MusicWorkDto(
+                            MusicBrainzWorkId: Guid.NewGuid(),
+                            Title: "You're My Best Friend",
+                            Type: "Song",
+                            Languages: [new LanguageInfoDto(LanguageCode: "en", LanguageName: "English", NativeName: "English")],
+                            Iswcs: ["T-010489707-6"]
+                        ),
+                        Isrcs: [
+                            new(Value: "GBUM71029609")
+                        ],
+                        Moods: [
+                            new(Name: "happy"),
+                            new(Name: "warm")
+                        ],
+                        MusicBrainzRecordingId: Guid.NewGuid(),
+                        MusicBrainzTrackId: Guid.NewGuid(),
+                        Contributors: [
+                            new MediaContributorReferenceDto(
+                                ContributorId: Guid.NewGuid(),
+                                Role: MediaContributorRole.Vocals
+                            ),
+                            new MediaContributorReferenceDto(
+                                ContributorId: Guid.NewGuid(),
+                                Role: MediaContributorRole.Guitar
+                            )
+                        ],
+                        Ratings: [
+                            new(
+                                Value: 4.2M,
+                                MaxValue: 5,
+                                Source: AudioRatingSource.MusicBrainz,
+                                VoteCount: 1234
+                            ),
+                            new(
+                                Value: 4.4M,
+                                MaxValue: 5,
+                                Source: AudioRatingSource.LastFm,
+                                VoteCount: 567
+                            )
+                        ],
+                        TrackNumber: 7,
+                        DiscNumber: 1,
+                        CreatedOnUtc: new DateTime(2025, 1, 15, 10, 30, 0, DateTimeKind.Utc),
+                        UpdatedOnUtc: new DateTime(2025, 1, 20, 14, 45, 0, DateTimeKind.Utc)
+                    )
+                ],
+                CoverPath: "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg",
+                Artwork: [new MediaArtworkDto(ArtworkType.Cover, 0, "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg")])
         );
 
         Response(401, "Authentication required.", "application/problem+json",

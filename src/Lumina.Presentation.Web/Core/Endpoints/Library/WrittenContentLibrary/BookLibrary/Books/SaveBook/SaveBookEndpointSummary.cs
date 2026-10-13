@@ -72,11 +72,10 @@ public class SaveBookEndpointSummary : Summary<SaveBookEndpoint, UpdateBookReque
         RequestParam(r => r.Contributors, "The list of media contributors of the book. Required.");
         RequestParam(r => r.Ratings, "The list of ratings of the book. Required.");
 
-        ExampleRequest = new UpdateBookRequest
-        {
-            BookId = Guid.NewGuid().ToString(),
-            LibraryId = Guid.NewGuid(),
-            Metadata = new WrittenContentMetadataDto
+        ExampleRequest = new UpdateBookRequest(
+            BookId: Guid.NewGuid().ToString(),
+            LibraryId: Guid.NewGuid(),
+            Metadata: new WrittenContentMetadataDto
             {
                 Title = "The Fellowship of the Ring",
                 OriginalTitle = "The Fellowship of the Ring",
@@ -117,28 +116,28 @@ public class SaveBookEndpointSummary : Summary<SaveBookEndpoint, UpdateBookReque
                 Publisher = "Houghton Mifflin",
                 PageCount = 398
             },
-            Format = BookFormat.Paperback,
-            Edition = "50th Anniversary Edition",
-            VolumeNumber = 1,
-            Series = new BookSeriesDto
+            Format: BookFormat.Paperback,
+            Edition: "50th Anniversary Edition",
+            VolumeNumber: 1,
+            Series: new BookSeriesDto
             {
                 Title = "The Lord of the Rings"
             },
-            ASIN = "B007978NPG",
-            GoodreadsId = "3",
-            LCCN = "54009621",
-            OCLCNumber = "ocm00012345",
-            OpenLibraryId = "OL7603910M",
-            LibraryThingId = "3203347",
-            GoogleBooksId = "aWZzLPhY4o0C",
-            BarnesAndNobleId = "1100307790",
-            AppleBooksId = "id395211",
-            ISBNs =
+            ASIN: "B007978NPG",
+            GoodreadsId: "3",
+            LCCN: "54009621",
+            OCLCNumber: "ocm00012345",
+            OpenLibraryId: "OL7603910M",
+            LibraryThingId: "3203347",
+            GoogleBooksId: "aWZzLPhY4o0C",
+            BarnesAndNobleId: "1100307790",
+            AppleBooksId: "id395211",
+            ISBNs:
             [
                 new IsbnDto { Value = "0395272238", Format = IsbnFormat.Isbn10 },
                 new IsbnDto { Value = "9780395272237", Format = IsbnFormat.Isbn13 }
             ],
-            Contributors =
+            Contributors:
             [
                 new MediaContributorDto
                 {
@@ -151,12 +150,12 @@ public class SaveBookEndpointSummary : Summary<SaveBookEndpoint, UpdateBookReque
                     Role = MediaContributorRole.Illustrator
                 }
             ],
-            Ratings =
+            Ratings:
             [
                 new BookRatingDto { Source = BookRatingSource.GoogleBooks, Value = 4.36M, MaxValue = 5, VoteCount = 2345678 },
                 new BookRatingDto { Source = BookRatingSource.Amazon, Value = 4.7M, MaxValue = 5, VoteCount = 87654 }
             ]
-        };
+        );
 
         Response(200, "The updated book is returned.", example: new SuccessResponse<BookDetailsDto>(true, default));
     }

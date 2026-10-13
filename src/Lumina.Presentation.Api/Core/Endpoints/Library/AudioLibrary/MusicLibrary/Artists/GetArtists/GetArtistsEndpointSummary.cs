@@ -10,6 +10,7 @@ using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -50,6 +51,7 @@ public class GetArtistsEndpointSummary : Summary<GetArtistsEndpoint, GetArtistsR
         ResponseParam<ArtistResponse>(r => r.Albums, "The list of albums of the artist, each with its own list of tracks.");
         ResponseParam<ArtistResponse>(r => r.CreatedOnUtc, "The date and time when the artist was created.");
         ResponseParam<ArtistResponse>(r => r.UpdatedOnUtc, "The date and time when the artist was last updated, if applicable.");
+        ResponseParam<ArtistResponse>(r => r.CoverPath, "The path of the image representing the artist, if available.");
 
         Response(200, "The paginated list of the artists of the media library is returned.",
             example: new PaginatedResponse<ArtistResponse>
@@ -173,9 +175,12 @@ public class GetArtistsEndpointSummary : Summary<GetArtistsEndpoint, GetArtistsR
                                         CreatedOnUtc: new DateTime(2025, 1, 15, 10, 30, 0, DateTimeKind.Utc),
                                         UpdatedOnUtc: new DateTime(2025, 1, 20, 14, 45, 0, DateTimeKind.Utc)
                                     )
-                                ]
+                                ],
+                                CoverPath: "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg",
+                                Artwork: [new MediaArtworkDto(ArtworkType.Cover, 0, "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg")]
                             )
-                        ]
+                        ],
+                        CoverPath: "/media/music/Queen-3b3a19f3/cover.jpg"
                     ),
                     new ArtistResponse(
                         Id: Guid.NewGuid(),
@@ -294,9 +299,12 @@ public class GetArtistsEndpointSummary : Summary<GetArtistsEndpoint, GetArtistsR
                                         CreatedOnUtc: new DateTime(2025, 1, 15, 10, 30, 0, DateTimeKind.Utc),
                                         UpdatedOnUtc: new DateTime(2025, 1, 20, 14, 45, 0, DateTimeKind.Utc)
                                     )
-                                ]
+                                ],
+                                CoverPath: "/media/music/David Bowie-2b0e5f5a/Heroes-4a5b6c7d/cover.jpg",
+                                Artwork: [new MediaArtworkDto(ArtworkType.Cover, 0, "/media/music/David Bowie-2b0e5f5a/Heroes-4a5b6c7d/cover.jpg")]
                             )
-                        ]
+                        ],
+                        CoverPath: "/media/music/David Bowie-2b0e5f5a/cover.jpg"
                     )
                 ],
                 CurrentPage = 1,

@@ -18,6 +18,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 #endregion
 
@@ -33,7 +34,8 @@ public class GetArtistAlbumsLiteEndpointTests : IClassFixture<AuthenticatedLumin
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
-        PropertyNameCaseInsensitive = true
+        PropertyNameCaseInsensitive = true,
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly ArtistEntityFixture _artistEntityFixture = new();
@@ -79,6 +81,8 @@ public class GetArtistAlbumsLiteEndpointTests : IClassFixture<AuthenticatedLumin
         Assert.Equal(2, albums.Data.Count);
         Assert.Contains(albums.Data, album => album.Title == "A Night at the Opera");
         Assert.Contains(albums.Data, album => album.Title == "News of the World");
+        // The release types and the release year are exposed by the read model, so the lite listing can group and order the releases of an artist.
+        Assert.All(albums.Data, album => Assert.NotEmpty(album.ReleaseTypes!));
     }
 
     [Fact]

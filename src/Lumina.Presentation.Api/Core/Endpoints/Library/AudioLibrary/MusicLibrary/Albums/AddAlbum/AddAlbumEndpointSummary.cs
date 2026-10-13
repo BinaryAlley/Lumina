@@ -11,6 +11,7 @@ using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -372,6 +373,8 @@ public class AddAlbumEndpointSummary : Summary<AddAlbumEndpoint, AddAlbumRequest
         ResponseParam<AlbumResponse>(r => r.Metadata!.Genres, "The list of genres associated with the album.");
         ResponseParam<AlbumResponse>(r => r.Metadata!.Tags, "The list of tags that further describe or categorize the album.");
         ResponseParam<AlbumResponse>(r => r.Tracks, "The list of tracks of the album.");
+        ResponseParam<AlbumResponse>(r => r.CoverPath, "The path of the image representing the album, if available.");
+        ResponseParam<AlbumResponse>(r => r.Artwork, "The stored artwork of the album, in display order, if applicable.");
 
         Response(201, "The newly created album is returned.",
             example: new AlbumResponse(
@@ -636,8 +639,9 @@ public class AddAlbumEndpointSummary : Summary<AddAlbumEndpoint, AddAlbumRequest
                         CreatedOnUtc: new DateTime(2025, 1, 15, 10, 30, 0, DateTimeKind.Utc),
                         UpdatedOnUtc: new DateTime(2025, 1, 20, 14, 45, 0, DateTimeKind.Utc)
                     )
-                ]
-            )
+                ],
+                CoverPath: "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg",
+                Artwork: [new MediaArtworkDto(ArtworkType.Cover, 0, "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg")])
         );
 
         Response(401, "Authentication required.", "application/problem+json",

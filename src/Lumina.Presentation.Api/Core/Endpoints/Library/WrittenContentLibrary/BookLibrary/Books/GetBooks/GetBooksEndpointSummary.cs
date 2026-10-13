@@ -147,7 +147,7 @@ public class GetBooksEndpointSummary : Summary<GetBooksEndpoint, GetBooksRequest
                         MetadataProvider: default,
                         CreatedOnUtc: DateTime.UtcNow,
                         UpdatedOnUtc: default,
-                        CoverPath: null
+                        CoverPath: "/media/books/tolkien/the-fellowship-of-the-ring/cover.jpg"
                     ),
                     new(
                         Id: Guid.NewGuid(),
@@ -240,7 +240,7 @@ public class GetBooksEndpointSummary : Summary<GetBooksEndpoint, GetBooksRequest
                         MetadataProvider: default,
                         CreatedOnUtc: DateTime.UtcNow,
                         UpdatedOnUtc: default,
-                        CoverPath: null
+                        CoverPath: "/media/books/tolkien/the-two-towers/cover.jpg"
                     )
                 ],
                 CurrentPage = 1,

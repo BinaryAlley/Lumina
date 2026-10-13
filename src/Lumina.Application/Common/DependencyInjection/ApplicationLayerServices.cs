@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Telemetry;
+using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artwork;
 using Lumina.Application.Core.MediaLibrary.Management.Deletion;
 using Lumina.Domain.Common.Events;
 using Microsoft.Extensions.DependencyInjection;
@@ -44,6 +45,7 @@ public static class ApplicationLayerServices
 
         services.AddScoped<IMediaLibraryItemDeletionStrategy, BooksMediaLibraryItemDeletionStrategy>();
         services.AddScoped<IMediaLibraryItemDeletionStrategy, MusicMediaLibraryItemDeletionStrategy>();
+        services.AddScoped<IMusicArtworkCleanupService, MusicArtworkCleanupService>();
 
         foreach (var registration in handlerRegistrations)
         {

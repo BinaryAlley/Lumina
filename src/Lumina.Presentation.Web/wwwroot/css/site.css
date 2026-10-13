@@ -1188,3 +1188,65 @@ body {
 .reader-content p {
     margin: 0 0 1em;
 }
+
+/* Music album track list. */
+.tracks-table {
+    table-layout: fixed;
+}
+
+    .tracks-table .track-number-column {
+        width: 44px;
+    }
+
+    .tracks-table .track-duration-column {
+        width: 64px;
+    }
+
+.track-name-link {
+    text-decoration: none;
+    color: #E6E6E6;
+}
+
+.track-name-link:visited {
+    color: #9AA7B0;
+}
+
+.track-name-link:hover {
+    color: #FFFFFF;
+}
+
+/* Music album artwork carousel. */
+.artwork-carousel {
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    width: 100%;
+    max-width: 300px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.artwork-carousel-item {
+    flex: 0 0 auto;
+    width: 56px;
+    height: 56px;
+    padding: 0;
+    border: 1px solid #555555;
+    background-color: #00000033;
+    cursor: pointer;
+}
+
+.artwork-carousel-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.artwork-carousel-item.selected {
+    border-color: #6DCBFE;
+}
+
+.artwork-carousel-item:hover {
+    border-color: #FFFFFF;
+}

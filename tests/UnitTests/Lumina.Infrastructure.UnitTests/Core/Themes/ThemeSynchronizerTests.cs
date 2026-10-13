@@ -96,11 +96,11 @@ public class ThemeSynchronizerTests : IDisposable
     }
 
     [Fact]
-    public async Task SynchronizeAsync_WhenTheBundledThemeIsAlreadyInstalled_ShouldNotReinstallIt()
+    public async Task SynchronizeAsync_WhenTheBundledThemeIsAlreadyInstalledAtTheSameVersion_ShouldNotReinstallIt()
     {
         // Arrange
-        ThemeManifestDto manifest = _themeManifestDtoFixture.Create();
-        ThemeEntity installedTheme = _themeEntityFixture.Create(themeId: manifest.Id, installSource: ThemeInstallSource.Bundled, isDeleted: false, includeIsCurrent: true, isCurrent: true);
+        ThemeManifestDto manifest = _themeManifestDtoFixture.Create(version: "1.2.3");
+        ThemeEntity installedTheme = _themeEntityFixture.Create(themeId: manifest.Id, version: "1.2.3", installSource: ThemeInstallSource.Bundled, isDeleted: false, includeIsCurrent: true, isCurrent: true);
         _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(_paginatedResultDtoFixture.Create(data: [installedTheme], currentPage: 1, perPage: 1, count: 1, numberOfPages: 1)));
         _mockThemeService.GetBundledThemeArchivePaths().Returns(["bundled.zip"]);
         _mockThemeService.ReadManifestFromArchiveAsync("bundled.zip", Arg.Any<CancellationToken>()).Returns(Result.From(manifest));
@@ -111,6 +111,28 @@ public class ThemeSynchronizerTests : IDisposable
         // Assert
         await _mockThemeService.DidNotReceive().InstallAsync(Arg.Any<Stream>(), Arg.Any<CancellationToken>());
         await _mockThemeRepository.DidNotReceive().InsertAsync(Arg.Any<ThemeEntity>(), Arg.Any<CancellationToken>());
+        await _mockThemeRepository.DidNotReceive().UpdateAsync(Arg.Any<ThemeEntity>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task SynchronizeAsync_WhenTheBundledThemeCarriesANewerVersion_ShouldReinstallItAndUpdateTheVersion()
+    {
+        // Arrange
+        ThemeManifestDto manifest = _themeManifestDtoFixture.Create(version: "2.0.0");
+        ThemeEntity installedTheme = _themeEntityFixture.Create(themeId: manifest.Id, version: "1.0.0", installSource: ThemeInstallSource.Bundled, isDeleted: false, includeIsCurrent: true, isCurrent: true);
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(_paginatedResultDtoFixture.Create(data: [installedTheme], currentPage: 1, perPage: 1, count: 1, numberOfPages: 1)));
+        string archivePath = CreateArchiveFile();
+        _mockThemeService.GetBundledThemeArchivePaths().Returns([archivePath]);
+        _mockThemeService.ReadManifestFromArchiveAsync(archivePath, Arg.Any<CancellationToken>()).Returns(Result.From(manifest));
+        _mockThemeService.InstallAsync(Arg.Any<Stream>(), Arg.Any<CancellationToken>()).Returns(Result.From(manifest));
+
+        // Act
+        await ThemeSynchronizer.SynchronizeAsync(_mockThemeService, _mockUnitOfWork, _mockLogger, CancellationToken.None);
+
+        // Assert
+        await _mockThemeService.Received(1).InstallAsync(Arg.Any<Stream>(), Arg.Any<CancellationToken>());
+        await _mockThemeRepository.DidNotReceive().InsertAsync(Arg.Any<ThemeEntity>(), Arg.Any<CancellationToken>());
+        await _mockThemeRepository.Received(1).UpdateAsync(Arg.Is<ThemeEntity>(theme => theme.ThemeId == manifest.Id && theme.Version == "2.0.0"), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -421,6 +443,112 @@ public class ThemeSynchronizerTests : IDisposable
     }
 
     [Fact]
+    public async Task SynchronizeAsync_WhenTheBundledThemeVersionDiffers_ShouldRefreshTheVersionTimestampAndUpdater()
+    {
+        // Arrange
+        ThemeManifestDto manifest = _themeManifestDtoFixture.Create(version: "3.0.0");
+        ThemeEntity installedTheme = _themeEntityFixture.Create(
+            themeId: manifest.Id,
+            version: "1.0.0",
+            installSource: ThemeInstallSource.Bundled,
+            isDeleted: false,
+            includeIsCurrent: true,
+            isCurrent: true,
+            includeUpdatedOnUtc: true,
+            updatedOnUtc: DateTime.UtcNow.AddDays(-1),
+            includeUpdatedBy: true,
+            updatedBy: Guid.NewGuid());
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(_paginatedResultDtoFixture.Create(data: [installedTheme], currentPage: 1, perPage: 1, count: 1, numberOfPages: 1)));
+        string archivePath = CreateArchiveFile();
+        _mockThemeService.GetBundledThemeArchivePaths().Returns([archivePath]);
+        _mockThemeService.HasThemePack(installedTheme.ThemeId).Returns(true);
+        _mockThemeService.ReadManifestFromArchiveAsync(archivePath, Arg.Any<CancellationToken>()).Returns(Result.From(manifest));
+        _mockThemeService.InstallAsync(Arg.Any<Stream>(), Arg.Any<CancellationToken>()).Returns(Result.From(manifest));
+
+        // Act
+        await ThemeSynchronizer.SynchronizeAsync(_mockThemeService, _mockUnitOfWork, _mockLogger, CancellationToken.None);
+
+        // Assert
+        Assert.Equal("3.0.0", installedTheme.Version);
+        Assert.NotNull(installedTheme.UpdatedOnUtc);
+        Assert.Null(installedTheme.UpdatedBy);
+        await _mockThemeRepository.Received(1).UpdateAsync(
+            Arg.Is<ThemeEntity>(theme => theme.Id == installedTheme.Id && theme.Version == "3.0.0"),
+            Arg.Any<CancellationToken>());
+        await _mockThemeRepository.DidNotReceive().InsertAsync(Arg.Any<ThemeEntity>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task SynchronizeAsync_WhenRefreshingTheInstalledThemeVersionFails_ShouldLogAndContinueWithoutThrowing()
+    {
+        // Arrange
+        ThemeManifestDto manifest = _themeManifestDtoFixture.Create(version: "3.0.0");
+        ThemeEntity installedTheme = _themeEntityFixture.Create(themeId: manifest.Id, version: "1.0.0", installSource: ThemeInstallSource.Bundled, isDeleted: false, includeIsCurrent: true, isCurrent: true);
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(_paginatedResultDtoFixture.Create(data: [installedTheme], currentPage: 1, perPage: 1, count: 1, numberOfPages: 1)));
+        string archivePath = CreateArchiveFile();
+        _mockThemeService.GetBundledThemeArchivePaths().Returns([archivePath]);
+        _mockThemeService.HasThemePack(installedTheme.ThemeId).Returns(true);
+        _mockThemeService.ReadManifestFromArchiveAsync(archivePath, Arg.Any<CancellationToken>()).Returns(Result.From(manifest));
+        _mockThemeService.InstallAsync(Arg.Any<Stream>(), Arg.Any<CancellationToken>()).Returns(Result.From(manifest));
+        _mockThemeRepository.UpdateAsync(Arg.Any<ThemeEntity>(), Arg.Any<CancellationToken>())
+            .Returns(Error.Failure("Themes.UpdateFailed", "Failed to update the theme"));
+
+        // Act
+        await ThemeSynchronizer.SynchronizeAsync(_mockThemeService, _mockUnitOfWork, _mockLogger, CancellationToken.None);
+
+        // Assert
+        _mockLogger.Received(1).Log(
+            LogLevel.Warning,
+            Arg.Any<EventId>(),
+            Arg.Any<object>(),
+            Arg.Any<Exception?>(),
+            Arg.Any<Func<object, Exception?, string>>());
+        await _mockThemeRepository.Received(1).UpdateAsync(Arg.Any<ThemeEntity>(), Arg.Any<CancellationToken>());
+        await _mockThemeRepository.DidNotReceive().InsertAsync(Arg.Any<ThemeEntity>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task SynchronizeAsync_WhenAThemeWithTheSameIdWasInstalledFromAnotherSource_ShouldSkipTheBundledArchive()
+    {
+        // Arrange
+        ThemeManifestDto manifest = _themeManifestDtoFixture.Create(version: "2.0.0");
+        ThemeEntity uploadedTheme = _themeEntityFixture.Create(themeId: manifest.Id, version: "1.0.0", installSource: ThemeInstallSource.Uploaded, isDeleted: false, includeIsCurrent: true, isCurrent: true);
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(_paginatedResultDtoFixture.Create(data: [uploadedTheme], currentPage: 1, perPage: 1, count: 1, numberOfPages: 1)));
+        _mockThemeService.GetBundledThemeArchivePaths().Returns(["bundled.zip"]);
+        _mockThemeService.HasThemePack(uploadedTheme.ThemeId).Returns(true);
+        _mockThemeService.ReadManifestFromArchiveAsync("bundled.zip", Arg.Any<CancellationToken>()).Returns(Result.From(manifest));
+
+        // Act
+        await ThemeSynchronizer.SynchronizeAsync(_mockThemeService, _mockUnitOfWork, _mockLogger, CancellationToken.None);
+
+        // Assert
+        await _mockThemeService.DidNotReceive().InstallAsync(Arg.Any<Stream>(), Arg.Any<CancellationToken>());
+        await _mockThemeRepository.DidNotReceive().InsertAsync(Arg.Any<ThemeEntity>(), Arg.Any<CancellationToken>());
+        await _mockThemeRepository.DidNotReceive().UpdateAsync(Arg.Any<ThemeEntity>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task SynchronizeAsync_WhenABundledThemeIsAlreadyInstalledAndUpToDate_ShouldSkipIt()
+    {
+        // Arrange
+        ThemeManifestDto manifest = _themeManifestDtoFixture.Create(version: "1.5.0");
+        ThemeEntity installedTheme = _themeEntityFixture.Create(themeId: manifest.Id, version: "1.5.0", installSource: ThemeInstallSource.Bundled, isDeleted: false, includeIsCurrent: true, isCurrent: true);
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(_paginatedResultDtoFixture.Create(data: [installedTheme], currentPage: 1, perPage: 1, count: 1, numberOfPages: 1)));
+        string archivePath = CreateArchiveFile();
+        _mockThemeService.GetBundledThemeArchivePaths().Returns([archivePath]);
+        _mockThemeService.HasThemePack(installedTheme.ThemeId).Returns(true);
+        _mockThemeService.ReadManifestFromArchiveAsync(archivePath, Arg.Any<CancellationToken>()).Returns(Result.From(manifest));
+
+        // Act
+        await ThemeSynchronizer.SynchronizeAsync(_mockThemeService, _mockUnitOfWork, _mockLogger, CancellationToken.None);
+
+        // Assert
+        await _mockThemeService.DidNotReceive().InstallAsync(Arg.Any<Stream>(), Arg.Any<CancellationToken>());
+        await _mockThemeRepository.DidNotReceive().InsertAsync(Arg.Any<ThemeEntity>(), Arg.Any<CancellationToken>());
+        await _mockThemeRepository.DidNotReceive().UpdateAsync(Arg.Any<ThemeEntity>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task EnsureCurrentThemeExistsAsync_WhenANonDeletedThemeIsCurrent_ShouldNotSelectAnotherTheme()
     {
         // Arrange
@@ -467,6 +595,30 @@ public class ThemeSynchronizerTests : IDisposable
         await _mockThemeRepository.Received(1).UpdateAsync(Arg.Is<ThemeEntity>(theme => theme.Id == defaultTheme.Id), Arg.Any<CancellationToken>());
     }
 
+    [Fact]
+    public async Task EnsureCurrentThemeExistsAsync_WhenActivatingTheDefaultThemeFails_ShouldLogAndNotThrow()
+    {
+        // Arrange
+        ThemeEntity defaultTheme = _themeEntityFixture.Create(themeId: "lumina-default", installSource: ThemeInstallSource.Bundled, isDeleted: false);
+        _mockThemeService.HasThemePack(defaultTheme.ThemeId).Returns(true);
+        _mockThemeRepository.UpdateAsync(Arg.Any<ThemeEntity>(), Arg.Any<CancellationToken>())
+            .Returns(Error.Failure("Themes.UpdateFailed", "Failed to activate the theme"));
+
+        // Act
+        await InvokeEnsureCurrentThemeExistsAsync([defaultTheme]);
+
+        // Assert
+        Assert.True(defaultTheme.IsCurrent);
+        await _mockThemeRepository.Received(1).UpdateAsync(Arg.Is<ThemeEntity>(theme => theme.Id == defaultTheme.Id), Arg.Any<CancellationToken>());
+        // A failed activation must not be silent, so it is logged instead of being discarded.
+        _mockLogger.Received(1).Log(
+            LogLevel.Warning,
+            Arg.Any<EventId>(),
+            Arg.Any<object>(),
+            Arg.Any<Exception?>(),
+            Arg.Any<Func<object, Exception?, string>>());
+    }
+
     /// <summary>
     /// Creates a real archive file on disk so that <see cref="ThemeSynchronizer"/> can open it.
     /// </summary>
@@ -487,7 +639,7 @@ public class ThemeSynchronizerTests : IDisposable
     {
         MethodInfo method = typeof(ThemeSynchronizer).GetMethod("EnsureCurrentThemeExistsAsync", BindingFlags.Static | BindingFlags.NonPublic)
             ?? throw new InvalidOperationException("The method 'EnsureCurrentThemeExistsAsync' was not found on the theme synchronizer.");
-        Task task = (Task)method.Invoke(null, [_mockThemeService, _mockUnitOfWork, themes, CancellationToken.None])!;
+        Task task = (Task)method.Invoke(null, [_mockThemeService, _mockUnitOfWork, themes, _mockLogger, CancellationToken.None])!;
         await task.ConfigureAwait(false);
     }
 

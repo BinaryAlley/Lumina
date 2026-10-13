@@ -54,10 +54,10 @@ public class LoginViewEndpoint : BaseEndpoint<LoginViewRequest, IResult>
     public override Task<IResult> ExecuteAsync(LoginViewRequest request, CancellationToken cancellationToken)
     {
         Dictionary<string, object?> viewData = new() { ["ReturnUrl"] = request.ReturnUrl };
-        // if the user is already logged in, redirect them to the home page
+        // If the user is already logged in, redirect them to the home page.
         if (User?.Identity?.IsAuthenticated == true)
             return Task.FromResult(Results.Redirect(_urlService.GetAbsoluteUrl(WebRoutes.Home.INDEX_CULTURED)!));
-        // check if the application is initialized (does contain at least the super user account); if it's not, redirect to registration view
+        // Check if the application is initialized (does contain at least the super user account); if it's not, redirect to registration view.
         string? isPendingSuperAdminSetup = HttpContext.Session.GetString(HttpContextItemKeys.PENDING_SUPER_ADMIN_SETUP);
         if (isPendingSuperAdminSetup == "true")
             return Task.FromResult(Results.Redirect(_urlService.GetAbsoluteUrl(WebRoutes.Authentication.REGISTER_VIEW)!));

@@ -85,25 +85,84 @@ internal sealed class MusicArtworkRepository : IMusicArtworkRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Updated>> ResetStatusForLibraryAsync(Guid libraryId, CancellationToken cancellationToken)
     {
-        // The artwork table is shared by all the music library item types, so the owners of the artwork of this library are collected per type.
-        List<Guid> artistIds = await _luminaDbContext.Artists
-            .Where(artist => artist.LibraryId == libraryId)
-            .Select(artist => artist.Id)
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
-        List<Guid> albumIds = await _luminaDbContext.Albums
-            .Where(album => album.LibraryId == libraryId)
-            .Select(album => album.Id)
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
-        List<Guid> trackIds = await _luminaDbContext.Tracks
-            .Where(track => track.LibraryId == libraryId)
-            .Select(track => track.Id)
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
-
+        // The artwork table is shared by all the music library item types, so the owner of a piece of artwork is matched by its type against the
+        // corresponding table, and the database resolves the membership of the owner in the library by a correlated subquery. Collecting the ids
+        // of every artist, album and track of the library in memory first would make the cost of the operation grow with the size of the library.
         await _luminaDbContext.MusicArtwork
-            .Where(musicArtwork => (musicArtwork.OwnerType == MusicArtworkOwnerType.Artist && artistIds.Contains(musicArtwork.OwnerId))
-                || (musicArtwork.OwnerType == MusicArtworkOwnerType.Album && albumIds.Contains(musicArtwork.OwnerId))
-                || (musicArtwork.OwnerType == MusicArtworkOwnerType.Track && trackIds.Contains(musicArtwork.OwnerId)))
+            .Where(musicArtwork => (musicArtwork.OwnerType == MusicArtworkOwnerType.Artist
+                    && _luminaDbContext.Artists.Any(artist => artist.Id == musicArtwork.OwnerId && artist.LibraryId == libraryId))
+                || (musicArtwork.OwnerType == MusicArtworkOwnerType.Album
+                    && _luminaDbContext.Albums.Any(album => album.Id == musicArtwork.OwnerId && album.LibraryId == libraryId))
+                || (musicArtwork.OwnerType == MusicArtworkOwnerType.Track
+                    && _luminaDbContext.Tracks.Any(track => track.Id == musicArtwork.OwnerId && track.LibraryId == libraryId)))
             .ExecuteUpdateAsync(setters => setters.SetProperty(musicArtwork => musicArtwork.Status, ArtworkStatus.Pending), cancellationToken).ConfigureAwait(false);
+        return Result.Updated;
+    }
+
+    /// <summary>
+    /// Deletes all the pieces of artwork owned by the artists, albums and tracks of the media library identified by <paramref name="libraryId"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose artwork is deleted.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Deleted>> DeleteByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken)
+    {
+        // The artwork table is shared by all the music library item types, so the owner of a piece of artwork is matched by its type against the
+        // corresponding table, and the database resolves the membership of the owner in the library by a correlated subquery. Collecting the ids
+        // of every artist, album and track of the library in memory first would make the cost of the operation grow with the size of the library.
+        await _luminaDbContext.MusicArtwork
+            .Where(musicArtwork => (musicArtwork.OwnerType == MusicArtworkOwnerType.Artist
+                    && _luminaDbContext.Artists.Any(artist => artist.Id == musicArtwork.OwnerId && artist.LibraryId == libraryId))
+                || (musicArtwork.OwnerType == MusicArtworkOwnerType.Album
+                    && _luminaDbContext.Albums.Any(album => album.Id == musicArtwork.OwnerId && album.LibraryId == libraryId))
+                || (musicArtwork.OwnerType == MusicArtworkOwnerType.Track
+                    && _luminaDbContext.Tracks.Any(track => track.Id == musicArtwork.OwnerId && track.LibraryId == libraryId)))
+            .ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
+        return Result.Deleted;
+    }
+
+    /// <summary>
+    /// Stores the cover image of the music library item of the provided <paramref name="ownerType"/> identified by <paramref name="ownerId"/>.
+    /// </summary>
+    /// <param name="ownerType">The type of the music library item that owns the artwork.</param>
+    /// <param name="ownerId">The Id of the music library item that owns the artwork.</param>
+    /// <param name="fileName">The relative file name of the stored cover image.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Updated>> UpsertCoverAsync(MusicArtworkOwnerType ownerType, Guid ownerId, string fileName, CancellationToken cancellationToken)
+    {
+        // The existing cover is matched the same way the callers that resolve it do, by owner and artwork type only, so that a cover stored
+        // with an ordinal other than zero is replaced in place instead of a second cover row being inserted next to it.
+        MusicArtworkEntity? existingCover = await _luminaDbContext.MusicArtwork
+            .FirstOrDefaultAsync(musicArtwork => musicArtwork.OwnerType == ownerType
+                && musicArtwork.OwnerId == ownerId
+                && musicArtwork.ArtworkType == ArtworkType.Cover, cancellationToken).ConfigureAwait(false);
+
+        DateTime now = DateTime.UtcNow;
+        if (existingCover is null)
+        {
+            _luminaDbContext.MusicArtwork.Add(new MusicArtworkEntity
+            {
+                Id = Guid.NewGuid(),
+                OwnerType = ownerType,
+                OwnerId = ownerId,
+                ArtworkType = ArtworkType.Cover,
+                Ordinal = 0,
+                FileName = fileName,
+                Status = ArtworkStatus.Enriched,
+                CreatedOnUtc = now,
+                CreatedBy = Guid.Empty,
+                // The audit columns are owned by the auditing interceptor, which stamps only the rows that actually changed, so they are never mapped here.
+                UpdatedOnUtc = null,
+                UpdatedBy = null
+            });
+        }
+        else
+        {
+            existingCover.FileName = fileName;
+            existingCover.Status = ArtworkStatus.Enriched;
+            existingCover.LastUpdateUtc = now;
+        }
         return Result.Updated;
     }
 }

@@ -58,10 +58,10 @@ internal sealed class MusicArtworkService : IMusicArtworkService
     /// <param name="artistName">The name of the artist of the album.</param>
     /// <param name="albumTitle">The title of the album.</param>
     /// <param name="artwork">The artwork to store.</param>
+    /// <param name="releaseTypeName">The name of the release type directory the album is stored under on disk, used to group the artwork of the different releases of an artist. When <see langword="null"/>, no release type segment is added.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <param name="releaseTypeName">The name of the release type directory the album is stored under on disk, used to group the artwork of the different releases of an artist. When omitted, no release type segment is added.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either the relative path of the stored artwork, or an error.</returns>
-    public async Task<Result<string>> SaveAlbumArtworkAsync(Guid libraryId, Guid albumId, string libraryName, string artistName, string albumTitle, ArtworkDto artwork, CancellationToken cancellationToken, string? releaseTypeName = null)
+    public async Task<Result<string>> SaveAlbumArtworkAsync(Guid libraryId, Guid albumId, string libraryName, string artistName, string albumTitle, ArtworkDto artwork, string? releaseTypeName, CancellationToken cancellationToken)
     {
         Result<string> artworkDirectoryPathResult = BuildAlbumArtworkDirectoryPath(libraryId, albumId, libraryName, artistName, albumTitle, releaseTypeName);
         if (artworkDirectoryPathResult.IsFailure)
@@ -84,6 +84,106 @@ internal sealed class MusicArtworkService : IMusicArtworkService
         if (artworkDirectoryPathResult.IsFailure)
             return artworkDirectoryPathResult.Errors;
         return await SaveArtworkAsync(artworkDirectoryPathResult.Value, artwork, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Stores the uploaded <paramref name="artwork"/> of the album into the internal media directory, and returns the relative path of the stored artwork.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library the album belongs to.</param>
+    /// <param name="albumId">The Id of the album.</param>
+    /// <param name="libraryName">The name of the media library the album belongs to.</param>
+    /// <param name="artistName">The name of the artist of the album.</param>
+    /// <param name="albumTitle">The title of the album.</param>
+    /// <param name="artwork">The stream of the uploaded artwork to store.</param>
+    /// <param name="fileName">The name of the uploaded artwork file.</param>
+    /// <param name="releaseTypeName">The name of the release type directory the album is stored under on disk, used to group the artwork of the different releases of an artist. When <see langword="null"/>, no release type segment is added.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the relative path of the stored artwork, or an error.</returns>
+    public async Task<Result<string>> SaveAlbumArtworkAsync(Guid libraryId, Guid albumId, string libraryName, string artistName, string albumTitle, Stream artwork, string fileName, string? releaseTypeName, CancellationToken cancellationToken)
+    {
+        // The uploaded bytes are persisted to a temporary file first, so that the storage pipeline can treat the upload like any other local artwork source and clean it up afterwards.
+        string temporaryPath = BuildTemporaryUploadPath(fileName);
+        try
+        {
+            await WriteUploadedArtworkAsync(artwork, temporaryPath, cancellationToken).ConfigureAwait(false);
+            return await SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistName, albumTitle, new ArtworkDto(ArtworkType.Cover, 0, temporaryPath, null, IsTemporary: true), releaseTypeName, cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            DeleteTemporaryFile(temporaryPath);
+        }
+    }
+
+    /// <summary>
+    /// Stores the uploaded <paramref name="artwork"/> of the artist into the internal media directory, and returns the relative path of the stored artwork.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library the artist belongs to.</param>
+    /// <param name="libraryName">The name of the media library the artist belongs to.</param>
+    /// <param name="artistName">The name of the artist.</param>
+    /// <param name="artwork">The stream of the uploaded artwork to store.</param>
+    /// <param name="fileName">The name of the uploaded artwork file.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the relative path of the stored artwork, or an error.</returns>
+    public async Task<Result<string>> SaveArtistArtworkAsync(Guid libraryId, string libraryName, string artistName, Stream artwork, string fileName, CancellationToken cancellationToken)
+    {
+        // The uploaded bytes are persisted to a temporary file first, so that the storage pipeline can treat the upload like any other local artwork source and clean it up afterwards.
+        string temporaryPath = BuildTemporaryUploadPath(fileName);
+        try
+        {
+            await WriteUploadedArtworkAsync(artwork, temporaryPath, cancellationToken).ConfigureAwait(false);
+            return await SaveArtistArtworkAsync(libraryId, libraryName, artistName, new ArtworkDto(ArtworkType.Cover, 0, temporaryPath, null, IsTemporary: true), cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            DeleteTemporaryFile(temporaryPath);
+        }
+    }
+
+    /// <summary>
+    /// Builds the path of the temporary file an uploaded artwork is buffered into, keeping the extension of the uploaded file so that its content can be probed by name.
+    /// </summary>
+    /// <param name="fileName">The name of the uploaded artwork file.</param>
+    /// <returns>The file system path of the temporary file.</returns>
+    private static string BuildTemporaryUploadPath(string fileName)
+    {
+        string extension = Path.GetExtension(fileName);
+        if (string.IsNullOrWhiteSpace(extension))
+            extension = ".img";
+        return Path.Combine(Path.GetTempPath(), $"lumina-upload-{Guid.NewGuid():N}{extension}");
+    }
+
+    /// <summary>
+    /// Copies the uploaded <paramref name="artwork"/> stream into the temporary file at <paramref name="temporaryPath"/>.
+    /// </summary>
+    /// <param name="artwork">The stream of the uploaded artwork.</param>
+    /// <param name="temporaryPath">The file system path of the temporary file.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    private static async Task WriteUploadedArtworkAsync(Stream artwork, string temporaryPath, CancellationToken cancellationToken)
+    {
+        await using FileStream fileStream = new(temporaryPath, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 81920, useAsync: true);
+        await artwork.CopyToAsync(fileStream, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Deletes the temporary file at <paramref name="temporaryPath"/>, ignoring the failures that must not mask the result of the operation.
+    /// </summary>
+    /// <param name="temporaryPath">The file system path of the temporary file.</param>
+    private static void DeleteTemporaryFile(string temporaryPath)
+    {
+        if (!File.Exists(temporaryPath))
+            return;
+        try
+        {
+            File.Delete(temporaryPath);
+        }
+        catch (IOException)
+        {
+            // A failed cleanup of the temporary file must not mask the result of the operation.
+        }
+        catch (UnauthorizedAccessException)
+        {
+            // A failed cleanup of the temporary file must not mask the result of the operation.
+        }
     }
 
     /// <summary>
@@ -157,6 +257,32 @@ internal sealed class MusicArtworkService : IMusicArtworkService
         if (artworkDirectoryPathResult.IsFailure)
             return artworkDirectoryPathResult.Errors;
         return DeleteArtworkInDirectory(artworkDirectoryPathResult.Value);
+    }
+
+    /// <summary>
+    /// Deletes the stored artwork file at <paramref name="artworkRelativePath"/> from the internal media directory, when it still exists.
+    /// </summary>
+    /// <param name="artworkRelativePath">The relative path of the stored artwork file.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public Result<Deleted> DeleteStoredArtwork(string artworkRelativePath)
+    {
+        if (string.IsNullOrWhiteSpace(artworkRelativePath))
+            return Result.Deleted;
+
+        // The stored path is relative to the application's base directory, so it is rooted back to the absolute path of the file to delete.
+        string absolutePath = Path.Combine(AppContext.BaseDirectory, artworkRelativePath.TrimStart(_pathService.PathSeparator));
+        Result<FileSystemPathId> filePathIdResult = FileSystemPathId.Create(absolutePath);
+        if (filePathIdResult.IsFailure)
+            return filePathIdResult.Errors;
+
+        Result<bool> fileExistsResult = _environmentContext.FileProviderService.FileExists(filePathIdResult.Value);
+        if (fileExistsResult.IsFailure)
+            return fileExistsResult.Errors;
+        if (!fileExistsResult.Value)
+            return Result.Deleted;
+
+        _environmentContext.FileProviderService.DeleteFile(filePathIdResult.Value);
+        return Result.Deleted;
     }
 
     /// <summary>

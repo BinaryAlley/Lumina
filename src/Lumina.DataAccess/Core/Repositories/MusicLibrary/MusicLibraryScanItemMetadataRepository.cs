@@ -71,4 +71,18 @@ internal sealed class MusicLibraryScanItemMetadataRepository : IMusicLibraryScan
             .ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
         return Result.Deleted;
     }
+
+    /// <summary>
+    /// Deletes all the staged music metadata items of the media library identified by <paramref name="libraryId"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose staged music metadata is deleted.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Deleted>> DeleteByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken)
+    {
+        await _luminaDbContext.MusicLibraryScanItemMetadata
+            .Where(musicMetadata => musicMetadata.LibraryId == libraryId)
+            .ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
+        return Result.Deleted;
+    }
 }

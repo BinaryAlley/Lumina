@@ -25,12 +25,11 @@ public class SetBookReaderEnabledEndpointSummary : Summary<SetBookReaderEnabledE
         RequestParam(r => r.PluginId, "The unique identifier of the plugin providing the book reader. Required.");
         RequestParam(r => r.IsEnabled, "Whether the book reader should be enabled for the media library, or not. Required.");
 
-        ExampleRequest = new SetBookReaderEnabledRequest
-        {
-            LibraryId = Guid.NewGuid(),
-            PluginId = Guid.NewGuid(),
-            IsEnabled = true
-        };
+        ExampleRequest = new SetBookReaderEnabledRequest(
+            LibraryId: Guid.NewGuid(),
+            PluginId: Guid.NewGuid(),
+            IsEnabled: true
+        );
 
         Response(200, "The book reader of the media library is enabled or disabled.", example: new SuccessResponse(true));
     }

@@ -1,5 +1,6 @@
 @*
-/
+    /
+    ?category=...  (optional quick-navigation filter: lists only the libraries of the category)
 *@
 
 @using Lumina.Presentation.Web.Common.DTO.Libraries
@@ -9,6 +10,11 @@
 @{
     // Generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler.
     var scriptId = ScriptIdentifierHelper.GenerateScriptId();
+    // The optional quick-navigation category the page is filtered to; empty when the page lists every enabled library.
+    // The value is restricted to the known categories, so that an arbitrary query value is never reflected back into the page.
+    var category = Context.Request.Query["category"].ToString().ToLowerInvariant();
+    if (category != "books" && category != "music")
+        category = string.Empty;
 }
 
 @inject IViewLocalizer _localizer
@@ -30,6 +36,25 @@
         const cleanupFunctions = [];
         let isInitialized = false;
 
+        // The category the page is filtered to, empty when it lists every enabled library.
+        const libraryCategory = '@category';
+        // Library types that have a browsing page in this application, mapped to it, so that the library cards link to their contents.
+        const libraryBrowseUrls = {
+            'Book': '@_urlService.GetAbsoluteUrl(WebRoutes.Books.INDEX)',
+            'EBook': '@_urlService.GetAbsoluteUrl(WebRoutes.Books.INDEX)',
+            'ComicBook': '@_urlService.GetAbsoluteUrl(WebRoutes.Books.INDEX)',
+            'Manga': '@_urlService.GetAbsoluteUrl(WebRoutes.Books.INDEX)',
+            'GraphicNovel': '@_urlService.GetAbsoluteUrl(WebRoutes.Books.INDEX)',
+            'AcademicPaper': '@_urlService.GetAbsoluteUrl(WebRoutes.Books.INDEX)',
+            'SheetMusic': '@_urlService.GetAbsoluteUrl(WebRoutes.Books.INDEX)',
+            'Music': '@_urlService.GetAbsoluteUrl(WebRoutes.Music.ARTISTS_INDEX)'
+        };
+        // The quick-navigation categories of the navigation menu, mapped to the library types they list.
+        const libraryCategoryTypes = {
+            'books': ['Book', 'EBook', 'ComicBook', 'Manga', 'GraphicNovel', 'AcademicPaper', 'SheetMusic'],
+            'music': ['Music']
+        };
+
         // The element references are captured once, so that the cleanup can unbind their listeners even after the AJAX navigator has swapped the content out of the document.
         const librariesContainer = document.getElementById('libraries-container');
         const noLibrariesMessage = document.getElementById('no-libraries');
@@ -41,16 +66,19 @@
             // Get the media libraries.
             // TODO: add setting check whether the user desires this feature or not.
             const data = await callApiGetAsync('@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.GET_ENABLED_LIBRARIES)');
-            if (data && data.length > 0) {
-                noLibrariesMessage.classList.replace('block', 'hidden');
-                librariesContainer.classList.replace('justify-center', 'justify-start');
+            // When the page is filtered to a category, only the libraries of the types of that category are listed; otherwise, every enabled library is listed.
+            const categoryTypes = libraryCategory ? (libraryCategoryTypes[libraryCategory] || null) : null;
+            const libraries = data && categoryTypes ? data.filter((library) => categoryTypes.includes(library.libraryType)) : data;
+            if (libraries && libraries.length > 0) {
+                noLibrariesMessage.classList.add('hidden');
+                librariesContainer.classList.remove('justify-center');
+                librariesContainer.classList.add('justify-start');
                 // Populate media library items.
-                data.forEach((library) => {
-                    // Book libraries are browsable, so their panel is rendered as a link to their browse page.
-                    const isBrowsable = library.libraryType === 'Book';
-                    const browseUrl = isBrowsable
-                        ? '@_urlService.GetAbsoluteUrl(WebRoutes.Books.INDEX)' + '?libraryId=' + library.id
-                        : null;
+                libraries.forEach((library) => {
+                    // Libraries that have a browsing page are rendered as a link to it; the others are rendered as a plain panel.
+                    const browseBase = libraryBrowseUrls[library.libraryType] || null;
+                    const browseUrl = browseBase ? browseBase + '?libraryId=' + library.id : null;
+                    const isBrowsable = browseUrl !== null;
 
                     const libraryElement = isBrowsable ? document.createElement('a') : document.createElement('div');
                     libraryElement.className = isBrowsable ? 'media-panel nav-link no-underline' : 'media-panel';
@@ -72,8 +100,9 @@
                 // Bind the AJAX navigation behavior to the library links, which were created after the initial navigation binding.
                 bindNavigationLinks();
             } else {
-                 noLibrariesMessage.classList.replace('hidden', 'block');
-                 librariesContainer.classList.replace('justify-start', 'justify-center');
+                noLibrariesMessage.classList.remove('hidden');
+                librariesContainer.classList.remove('justify-start');
+                librariesContainer.classList.add('justify-center');
             }
         }
 

@@ -35,6 +35,7 @@ public class ArtistLiteRowMappingTests
         Assert.NotNull(result);
         Assert.Equal(readModel.Id, result.Id);
         Assert.Equal(readModel.Name, result.Name);
+        Assert.Equal(readModel.CoverPath, result.CoverPath);
     }
 
     [Fact]
@@ -51,6 +52,7 @@ public class ArtistLiteRowMappingTests
         Assert.Equal(readModels.Count, results.Count);
         Assert.Equal(readModels.Select(readModel => readModel.Id), results.Select(response => response.Id));
         Assert.Equal(readModels.Select(readModel => readModel.Name), results.Select(response => response.Name));
+        Assert.Equal(readModels.Select(readModel => readModel.CoverPath), results.Select(response => response.CoverPath));
     }
 
     [Fact]

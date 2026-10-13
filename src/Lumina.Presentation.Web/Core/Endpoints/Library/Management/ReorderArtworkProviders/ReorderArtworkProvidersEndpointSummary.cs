@@ -22,12 +22,12 @@ public class ReorderArtworkProvidersEndpointSummary : Summary<ReorderArtworkProv
         Summary = "Reorders the artwork providers of a media library.";
         Description = "Reorders the artwork providers of the media library identified by the route, in the provided order.";
         RequestParam(r => r.LibraryId, "The Id of the media library whose artwork providers are reordered. Required.");
+        RequestParam(r => r.PluginIds, "The plugin Ids in the new order, from highest to lowest rank. Required.");
 
-        ExampleRequest = new ReorderLibraryArtworkProvidersRequest
-        {
-            LibraryId = Guid.NewGuid(),
-            PluginIds = [Guid.NewGuid(), Guid.NewGuid()]
-        };
+        ExampleRequest = new ReorderLibraryArtworkProvidersRequest(
+            LibraryId: Guid.NewGuid(),
+            PluginIds: [Guid.NewGuid(), Guid.NewGuid()]
+        );
 
         Response(200, "The artwork providers of the media library are reordered.", example: new SuccessResponse(true));
     }

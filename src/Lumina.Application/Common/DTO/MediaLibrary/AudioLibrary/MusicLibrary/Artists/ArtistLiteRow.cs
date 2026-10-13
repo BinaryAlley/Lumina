@@ -18,4 +18,9 @@ public sealed record ArtistLiteRow
     /// Gets the name of the artist.
     /// </summary>
     public required string Name { get; init; }
+
+    /// <summary>
+    /// Gets the path of the image representing the artist, if available.
+    /// </summary>
+    public string? CoverPath { get; init; }
 }

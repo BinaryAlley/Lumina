@@ -78,12 +78,16 @@ public class GetArtistsLiteQueryHandler : IQueryHandler<GetArtistsLiteQuery, Res
         LibraryFilterDto filter = new()
         {
             LibraryId = libraryId,
-            SearchTerm = query.SearchTerm
+            SearchTerm = query.SearchTerm,
+            FilterAlphaKey = query.FilterAlphaKey,
+            ShouldIgnoreThePrefixForAlphaPicker = query.ShouldIgnoreThePrefixForAlphaPicker
         };
 
         Result<PaginatedResultDto<ArtistLiteRow>> getArtistsResult = await _unitOfWork.ArtistRepository.GetAllLiteAsync(
             query.PaginationData,
-            filterModel: filter,
+            query.SortBy,
+            query.SortOrder,
+            filter,
             cancellationToken: cancellationToken).ConfigureAwait(false);
         return getArtistsResult.Match(value => Result.From(value.ToResponses()), errors => errors);
     }

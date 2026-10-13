@@ -113,6 +113,8 @@ public class ArtistEntityMappingTests
         Assert.NotNull(result);
         Assert.Equal(entity.Id, result.Id);
         Assert.Equal(entity.LibraryId, result.LibraryId);
+        // No cover path is supplied by default, so the response exposes none.
+        Assert.Null(result.CoverPath);
         Assert.Equal(entity.Name, result.Metadata.Name);
         Assert.Equal(entity.Website, result.Website);
         Assert.Equal(entity.MusicBrainzArtistId, result.MusicBrainzArtistId);
@@ -185,5 +187,20 @@ public class ArtistEntityMappingTests
         Assert.Equal(paginatedEntities.PerPage, result.PerPage);
         Assert.Equal(paginatedEntities.Count, result.Count);
         Assert.Equal(paginatedEntities.NumberOfPages, result.NumberOfPages);
+    }
+
+    [Fact]
+    public void ToResponse_WhenCoverPathIsProvided_ShouldMapIt()
+    {
+        // Arrange
+        ArtistEntity entity = _artistEntityFixture.Create();
+        string coverPath = "/media/artists/cover.jpg";
+
+        // Act
+        ArtistResponse result = entity.ToResponse(coverPath);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(coverPath, result.CoverPath);
     }
 }

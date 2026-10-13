@@ -13,6 +13,7 @@ using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -454,6 +455,8 @@ public class AddArtistEndpointSummary : Summary<AddArtistEndpoint, AddArtistRequ
         ResponseParam<ArtistResponse>(r => r.Albums![0].Contributors, "The list of references to the media contributors that performed on the album, each with the role they played.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Ratings, "The list of ratings for the album.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks, "The list of tracks of the album.");
+        ResponseParam<ArtistResponse>(r => r.Albums![0].CoverPath, "The path of the image representing the album, if available.");
+        ResponseParam<ArtistResponse>(r => r.Albums![0].Artwork, "The stored artwork of the album, in display order, if applicable.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].Id, "The Id of the track.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].AlbumId, "The Id of the album the track belongs to.");
         ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].LibraryId, "The Id of the media library this track belongs to.");
@@ -502,6 +505,7 @@ public class AddArtistEndpointSummary : Summary<AddArtistEndpoint, AddArtistRequ
         ResponseParam<ArtistResponse>(r => r.Albums![0].Tracks![0].Ratings, "The list of ratings for the track.");
         ResponseParam<ArtistResponse>(r => r.CreatedOnUtc, "The date and time when the artist was created.");
         ResponseParam<ArtistResponse>(r => r.UpdatedOnUtc, "The date and time when the artist was last updated, if applicable.");
+        ResponseParam<ArtistResponse>(r => r.CoverPath, "The path of the image representing the artist, if available.");
 
         Response(201, "The new artist is returned.",
             example: new ArtistResponse(
@@ -820,9 +824,12 @@ public class AddArtistEndpointSummary : Summary<AddArtistEndpoint, AddArtistRequ
                                 CreatedOnUtc: new DateTime(2025, 1, 15, 10, 30, 0, DateTimeKind.Utc),
                                 UpdatedOnUtc: new DateTime(2025, 1, 20, 14, 45, 0, DateTimeKind.Utc)
                             )
-                        ]
+                        ],
+                        CoverPath: "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg",
+                        Artwork: [new MediaArtworkDto(ArtworkType.Cover, 0, "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg")]
                     )
                 ],
+                CoverPath: "/media/music/Queen-3b3a19f3/cover.jpg",
                 CreatedOnUtc: new DateTime(2025, 1, 15, 10, 30, 0, DateTimeKind.Utc),
                 UpdatedOnUtc: new DateTime(2025, 1, 20, 14, 45, 0, DateTimeKind.Utc)
             )

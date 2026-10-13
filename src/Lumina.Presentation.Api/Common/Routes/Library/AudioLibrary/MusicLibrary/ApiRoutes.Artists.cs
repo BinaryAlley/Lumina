@@ -15,6 +15,7 @@ public static partial class ApiRoutes
         public const string GET_ARTISTS_LITE = "/libraries/{libraryId}/artists/lite";
         public const string ADD_ARTIST = "/libraries/{libraryId}/artists";
         public const string UPDATE_ARTIST = "/libraries/{libraryId}/artists/{artistId}";
+        public const string UPDATE_ARTIST_COVER = "/libraries/{libraryId}/artists/{artistId}/cover";
         public const string DELETE_ARTIST = "/libraries/{libraryId}/artists/{artistId}";
     }
 }

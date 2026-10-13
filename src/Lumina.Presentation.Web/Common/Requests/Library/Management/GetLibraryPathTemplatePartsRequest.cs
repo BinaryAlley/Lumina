@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace Lumina.Presentation.Web.Common.Requests.Library.Management;
 
 /// <summary>
-/// Represents the request for retrieving the path parts available for a media library type.
+/// Represents a request for retrieving the path parts available for a media library type.
 /// </summary>
 /// <param name="LibraryType">The media library type whose available path parts are retrieved. Required.</param>
 [DebuggerDisplay("LibraryType: {LibraryType}")]

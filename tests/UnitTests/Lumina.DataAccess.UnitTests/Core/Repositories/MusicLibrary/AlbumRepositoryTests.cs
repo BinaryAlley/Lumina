@@ -47,6 +47,7 @@ public class AlbumRepositoryTests
     private readonly TagEntityFixture _tagEntityFixture = new();
     private readonly GenreEntityFixture _genreEntityFixture = new();
     private readonly ArtistEntityFixture _artistEntityFixture = new();
+    private readonly MusicArtworkEntityFixture _musicArtworkEntityFixture = new();
     private readonly PaginationDataDtoFixture _paginationDataDtoFixture = new();
 
     /// <summary>
@@ -739,6 +740,112 @@ public class AlbumRepositoryTests
         Assert.Equal(album.Id, row.Id);
         Assert.Equal("A Night at the Opera", row.Title);
         Assert.Equal(12, row.TotalTracks);
+    }
+
+    [Fact]
+    public async Task GetAlbumsLiteByArtistIdAsync_WhenReReleaseYearIsSet_ShouldProjectItAsReleaseYear()
+    {
+        // Arrange
+        Guid artistId = Guid.NewGuid();
+        AlbumEntity album = _albumEntityFixture.Create(
+            artistId: artistId, originalReleaseYear: 1975, reReleaseYear: 2011, includeTracks: false, includeMetadata: false);
+        _mockContext.Albums.Add(album);
+        await _mockContext.SaveChangesAsync();
+
+        PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
+
+        // Act
+        Result<PaginatedResultDto<AlbumLiteRow>> result = await _sut.GetAlbumsLiteByArtistIdAsync(artistId, paginationData, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        AlbumLiteRow row = Assert.Single(result.Value.Data);
+        Assert.Equal(2011, row.ReleaseYear);
+    }
+
+    [Fact]
+    public async Task GetAlbumsLiteByArtistIdAsync_WhenReReleaseYearIsNull_ShouldFallBackToOriginalReleaseYear()
+    {
+        // Arrange
+        Guid artistId = Guid.NewGuid();
+        AlbumEntity album = _albumEntityFixture.Create(
+            artistId: artistId, originalReleaseYear: 1975, includeReReleaseYear: false, includeTracks: false, includeMetadata: false);
+        _mockContext.Albums.Add(album);
+        await _mockContext.SaveChangesAsync();
+
+        PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
+
+        // Act
+        Result<PaginatedResultDto<AlbumLiteRow>> result = await _sut.GetAlbumsLiteByArtistIdAsync(artistId, paginationData, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        AlbumLiteRow row = Assert.Single(result.Value.Data);
+        Assert.Equal(1975, row.ReleaseYear);
+    }
+
+    [Fact]
+    public async Task GetAlbumsLiteByArtistIdAsync_WhenTheReleaseHasTypes_ShouldProjectThem()
+    {
+        // Arrange
+        Guid artistId = Guid.NewGuid();
+        AlbumEntity album = _albumEntityFixture.Create(
+            artistId: artistId, releaseType: MusicReleaseType.Single, includeTracks: false, includeMetadata: false);
+        _mockContext.Albums.Add(album);
+        await _mockContext.SaveChangesAsync();
+
+        PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
+
+        // Act
+        Result<PaginatedResultDto<AlbumLiteRow>> result = await _sut.GetAlbumsLiteByArtistIdAsync(artistId, paginationData, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        AlbumLiteRow row = Assert.Single(result.Value.Data);
+        Assert.NotNull(row.ReleaseTypes);
+        Assert.Equal(MusicReleaseType.Single, Assert.Single(row.ReleaseTypes));
+    }
+
+    [Fact]
+    public async Task GetAlbumsLiteByArtistIdAsync_WhenCoverArtworkExists_ShouldProjectTheCoverPath()
+    {
+        // Arrange
+        Guid artistId = Guid.NewGuid();
+        AlbumEntity album = _albumEntityFixture.Create(artistId: artistId, includeTracks: false, includeMetadata: false);
+        _mockContext.Albums.Add(album);
+        _mockContext.MusicArtwork.Add(
+            _musicArtworkEntityFixture.Create(ownerType: MusicArtworkOwnerType.Album, ownerId: album.Id, artworkType: ArtworkType.Cover, fileName: "covers/opera.jpg"));
+        await _mockContext.SaveChangesAsync();
+
+        PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
+
+        // Act
+        Result<PaginatedResultDto<AlbumLiteRow>> result = await _sut.GetAlbumsLiteByArtistIdAsync(artistId, paginationData, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        AlbumLiteRow row = Assert.Single(result.Value.Data);
+        Assert.Equal("covers/opera.jpg", row.CoverPath);
+    }
+
+    [Fact]
+    public async Task GetAlbumsLiteByArtistIdAsync_WhenNoCoverArtworkExists_ShouldProjectNullCoverPath()
+    {
+        // Arrange
+        Guid artistId = Guid.NewGuid();
+        AlbumEntity album = _albumEntityFixture.Create(artistId: artistId, includeTracks: false, includeMetadata: false);
+        _mockContext.Albums.Add(album);
+        await _mockContext.SaveChangesAsync();
+
+        PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
+
+        // Act
+        Result<PaginatedResultDto<AlbumLiteRow>> result = await _sut.GetAlbumsLiteByArtistIdAsync(artistId, paginationData, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        AlbumLiteRow row = Assert.Single(result.Value.Data);
+        Assert.Null(row.CoverPath);
     }
 
     [Fact]

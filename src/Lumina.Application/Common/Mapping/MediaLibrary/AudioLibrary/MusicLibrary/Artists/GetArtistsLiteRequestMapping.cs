@@ -30,6 +30,10 @@ public static class GetArtistsLiteRequestMapping
         return new GetArtistsLiteQuery(
             libraryId,
             paginationData,
-            request.SearchTerm);
+            request.SearchTerm,
+            request.FilterAlphaKey,
+            request.ShouldIgnoreThePrefixForAlphaPicker,
+            request.SortBy,
+            request.SortOrder);
     }
 }

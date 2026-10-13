@@ -160,6 +160,7 @@ public static class UpdateArtistCommandMapping
                     existingTrack,
                     domainTrack.Path,
                     domainTrack.Metadata,
+                    domainTrack.Disambiguation,
                     domainTrack.TrackNumber,
                     domainTrack.DiscNumber,
                     domainTrack.Script,

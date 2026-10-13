@@ -9,48 +9,26 @@ namespace Lumina.Presentation.Web.Common.Requests.Libraries;
 /// <summary>
 /// Represents a request to get the lightweight details of the books of a media library.
 /// </summary>
+/// <param name="LibraryId">The Id of the media library whose books are retrieved. Required.</param>
+/// <param name="CurrentPage">The page of results to retrieve. Optional.</param>
+/// <param name="PerPage">The maximum number of books to retrieve per page. Optional.</param>
+/// <param name="SearchTerm">The search term used to filter results. Optional.</param>
+/// <param name="FilterAlphaKey">
+/// The alpha key used to filter the results by the first character of their title, for the alpha picker. Optional.
+/// Can be <see langword="null"/> to disable alpha filtering, a single ASCII letter (case-insensitive) to filter by that letter,
+/// "#" to filter by titles whose first character is a digit, or "*" to filter by titles whose first character is neither a letter nor a digit.
+/// </param>
+/// <param name="ShouldIgnoreThePrefixForAlphaPicker">Whether the leading "The " prefix of a title is ignored when computing the alpha key, or not. Optional.</param>
+/// <param name="SortBy">The name of the field by which to sort the results. Optional.</param>
+/// <param name="SortOrder">The direction in which to sort the results. Optional.</param>
 [DebuggerDisplay("LibraryId: {LibraryId}")]
-public class GetBooksLiteRequest
-{
-    /// <summary>
-    /// Gets or sets the Id of the media library whose books are retrieved.
-    /// </summary>
-    public Guid LibraryId { get; set; }
-
-    /// <summary>
-    /// Gets or sets the page of results to retrieve.
-    /// </summary>
-    public int? CurrentPage { get; set; }
-
-    /// <summary>
-    /// Gets or sets the maximum number of books to retrieve per page.
-    /// </summary>
-    public int? PerPage { get; set; }
-
-    /// <summary>
-    /// Gets or sets the search term used to filter results.
-    /// </summary>
-    public string? SearchTerm { get; set; }
-
-    /// <summary>
-    /// Gets or sets the alpha key used to filter the results by the first character of their title, for the alpha picker.
-    /// Can be <see langword="null"/> to disable alpha filtering, a single ASCII letter (case-insensitive) to filter by that letter,
-    /// "#" to filter by titles whose first character is a digit, or "*" to filter by titles whose first character is neither a letter nor a digit.
-    /// </summary>
-    public string? FilterAlphaKey { get; set; }
-
-    /// <summary>
-    /// Gets or sets whether the leading "The " prefix of a title is ignored when computing the alpha key, or not.
-    /// </summary>
-    public bool ShouldIgnoreThePrefixForAlphaPicker { get; set; }
-
-    /// <summary>
-    /// Gets or sets the name of the field by which to sort the results.
-    /// </summary>
-    public string? SortBy { get; set; }
-
-    /// <summary>
-    /// Gets or sets the direction in which to sort the results.
-    /// </summary>
-    public SortOrder? SortOrder { get; set; }
-}
+public record GetBooksLiteRequest(
+    Guid LibraryId,
+    int? CurrentPage,
+    int? PerPage,
+    string? SearchTerm,
+    string? FilterAlphaKey,
+    bool ShouldIgnoreThePrefixForAlphaPicker,
+    string? SortBy,
+    SortOrder? SortOrder
+);

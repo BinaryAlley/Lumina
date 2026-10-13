@@ -442,6 +442,38 @@ public class BookRepositoryTests
         Assert.Equal(keptContributor.Id, Assert.Single(storedBook.Contributors).Id);
     }
 
+    [Fact]
+    public async Task DeleteByLibraryIdAsync_WhenCalled_ShouldDeleteOnlyThatLibrariesBooks()
+    {
+        // Arrange
+        // The delete uses ExecuteDeleteAsync, which is not supported by the in-memory provider, so a real SQLite database is used.
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-deletebylibrary-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        BookRepository sut = new(context);
+
+        Guid libraryId = Guid.NewGuid();
+        BookEntity bookOfLibrary = _bookEntityFixture.Create();
+        bookOfLibrary.LibraryId = libraryId;
+        bookOfLibrary.Path = "/books/library.epub";
+        BookEntity bookOfAnotherLibrary = _bookEntityFixture.Create();
+        bookOfAnotherLibrary.LibraryId = Guid.NewGuid();
+        bookOfAnotherLibrary.Path = "/books/other.epub";
+        context.Books.AddRange(bookOfLibrary, bookOfAnotherLibrary);
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<Deleted> result = await sut.DeleteByLibraryIdAsync(libraryId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Deleted, result.Value);
+        context.ChangeTracker.Clear();
+        BookEntity survivor = Assert.Single(await context.Books.AsNoTracking().ToListAsync());
+        Assert.Equal(bookOfAnotherLibrary.Id, survivor.Id);
+    }
+
     /// <summary>
     /// Creates a real SQLite backed context with the auditing interceptor attached, so that audit columns behave exactly like in production.
     /// </summary>

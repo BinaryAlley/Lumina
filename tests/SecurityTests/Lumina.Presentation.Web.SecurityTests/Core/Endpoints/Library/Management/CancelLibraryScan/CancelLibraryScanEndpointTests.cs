@@ -77,7 +77,7 @@ public class CancelLibraryScanEndpointTests : IClassFixture<LuminaWebFactory>
         {
             Content = new StringContent("{}", Encoding.UTF8, "application/json")
         };
-        // the antiforgery middleware matches the content type exactly, so the charset suffix must be omitted
+        // The antiforgery middleware matches the content type exactly, so the charset suffix must be omitted.
         cancelRequest.Content!.Headers.ContentType = new MediaTypeHeaderValue("application/json");
         cancelRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         return cancelRequest;

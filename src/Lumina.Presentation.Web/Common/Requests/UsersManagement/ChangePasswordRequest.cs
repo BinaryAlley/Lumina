@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace Lumina.Presentation.Web.Common.Requests.UsersManagement;
 
 /// <summary>
-/// Represents the request model for account password change.
+/// Represents a request for account password change.
 /// </summary>
 /// <param name="Username">The username of the account. Required.</param>
 /// <param name="CurrentPassword">The current password of the account. Required.</param>

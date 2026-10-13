@@ -10,8 +10,10 @@ namespace Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Arti
 /// </summary>
 /// <param name="Id">The Id of the artist.</param>
 /// <param name="Name">The name of the artist.</param>
+/// <param name="CoverPath">The path of the image representing the artist, if available.</param>
 [DebuggerDisplay("Name: {Name}")]
 public record ArtistLiteResponse(
     Guid Id,
-    string Name
+    string Name,
+    string? CoverPath
 );

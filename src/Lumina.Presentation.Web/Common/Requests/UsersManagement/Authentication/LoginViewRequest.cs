@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace Lumina.Presentation.Web.Common.Requests.UsersManagement.Authentication;
 
 /// <summary>
-/// Represents the request for displaying the account login view.
+/// Represents a request for displaying the account login view.
 /// </summary>
 /// <param name="ReturnUrl">The URL to return to, after login. Optional.</param>
 [DebuggerDisplay("ReturnUrl: {ReturnUrl}")]

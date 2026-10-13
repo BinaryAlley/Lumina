@@ -28,4 +28,9 @@ public sealed record TrackLiteRow
     /// Gets the number of the disc the track belongs to, if applicable.
     /// </summary>
     public int? DiscNumber { get; init; }
+
+    /// <summary>
+    /// Gets the duration of the track in seconds.
+    /// </summary>
+    public int DurationInSeconds { get; init; }
 }

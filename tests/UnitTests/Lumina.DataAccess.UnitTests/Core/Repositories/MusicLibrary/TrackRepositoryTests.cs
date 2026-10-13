@@ -637,7 +637,7 @@ public class TrackRepositoryTests
 
         List<TrackEntity> albumTracks = [firstDiscFirstTrack, firstDiscFirstTieTrack, firstDiscSecondTrack, secondDiscTrack];
         Guid[] expectedOrder = [.. albumTracks
-            .OrderBy(track => track.DiscNumber)
+            .OrderBy(track => track.DiscNumber ?? 1)
             .ThenBy(track => track.TrackNumber)
             .ThenBy(track => track.Id)
             .Select(track => track.Id)];
@@ -649,6 +649,27 @@ public class TrackRepositoryTests
         Assert.False(result.IsFailure);
         Assert.Equal(expectedOrder, result.Value.Select(track => track.Id));
         Assert.DoesNotContain(result.Value, track => track.Id == trackOfAnotherAlbum.Id);
+    }
+
+    [Fact]
+    public async Task GetByAlbumIdAsync_WhenATrackHasNoDiscNumber_ShouldTreatItAsTheFirstDisc()
+    {
+        // Arrange
+        Guid albumId = Guid.NewGuid();
+        TrackEntity secondDiscTrack = _trackEntityFixture.Create(albumId: albumId, path: "/music/queen/second-disc.flac", trackNumber: 1, includeMetadata: false);
+        secondDiscTrack.DiscNumber = 2;
+        TrackEntity firstDiscTrackWithoutDiscNumber = _trackEntityFixture.Create(albumId: albumId, path: "/music/queen/first-disc.flac", trackNumber: 2, includeMetadata: false);
+        firstDiscTrackWithoutDiscNumber.DiscNumber = null;
+        _mockContext.Tracks.AddRange(secondDiscTrack, firstDiscTrackWithoutDiscNumber);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<TrackEntity>> result = await _sut.GetByAlbumIdAsync(albumId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        // A track without a disc number belongs to the first disc, so it is ordered before the tracks of disc 2.
+        Assert.Equal([firstDiscTrackWithoutDiscNumber.Id, secondDiscTrack.Id], result.Value.Select(track => track.Id));
     }
 
     [Fact]
@@ -705,6 +726,26 @@ public class TrackRepositoryTests
         Assert.Equal(2, page.PerPage);
         Assert.Equal(1, page.NumberOfPages);
         Assert.Equal([firstTrack.Id, secondTrack.Id], page.Data.Select(row => row.Id));
+    }
+
+    [Fact]
+    public async Task GetTracksLiteByAlbumIdAsync_WhenATrackHasNoDiscNumber_ShouldTreatItAsTheFirstDisc()
+    {
+        // Arrange
+        Guid albumId = Guid.NewGuid();
+        TrackEntity thirdTrack = _trackEntityFixture.Create(albumId: albumId, path: "/music/queen/third.flac", trackNumber: 3, includeMetadata: false);
+        thirdTrack.DiscNumber = 1;
+        TrackEntity secondTrackWithoutDiscNumber = _trackEntityFixture.Create(albumId: albumId, path: "/music/queen/second.flac", trackNumber: 2, includeMetadata: false);
+        secondTrackWithoutDiscNumber.DiscNumber = null;
+        _mockContext.Tracks.AddRange(thirdTrack, secondTrackWithoutDiscNumber);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<PaginatedResultDto<TrackLiteRow>> result = await _sut.GetTracksLiteByAlbumIdAsync(albumId, null, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal([secondTrackWithoutDiscNumber.Id, thirdTrack.Id], result.Value.Data.Select(row => row.Id));
     }
 
     [Theory]
@@ -792,6 +833,28 @@ public class TrackRepositoryTests
         Assert.Equal("Killer Queen", row.Title);
         Assert.Equal(9, row.TrackNumber);
         Assert.Equal(3, row.DiscNumber);
+        Assert.Equal(track.DurationInSeconds, row.DurationInSeconds);
+    }
+
+    [Fact]
+    public async Task GetTracksLiteByAlbumIdAsync_WhenCalled_ShouldProjectTheDurationInSeconds()
+    {
+        // Arrange
+        Guid albumId = Guid.NewGuid();
+        TrackEntity track = _trackEntityFixture.Create(albumId: albumId, path: "/music/queen/the-prophet-song.flac", includeMetadata: false);
+        track.DurationInSeconds = 367;
+        _mockContext.Tracks.Add(track);
+        await _mockContext.SaveChangesAsync();
+
+        PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
+
+        // Act
+        Result<PaginatedResultDto<TrackLiteRow>> result = await _sut.GetTracksLiteByAlbumIdAsync(albumId, paginationData, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        TrackLiteRow row = Assert.Single(result.Value.Data);
+        Assert.Equal(367, row.DurationInSeconds);
     }
 
     [Fact]

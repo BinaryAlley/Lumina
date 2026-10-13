@@ -77,6 +77,7 @@ public class GetAlbumTracksLiteEndpointTests : IClassFixture<AuthenticatedLumina
         Assert.Equal(1, tracks!.Count);
         TrackLiteResponse track = Assert.Single(tracks.Data);
         Assert.Equal("Bohemian Rhapsody", track.Title);
+        Assert.True(track.DurationInSeconds > 0);
     }
 
     [Fact]

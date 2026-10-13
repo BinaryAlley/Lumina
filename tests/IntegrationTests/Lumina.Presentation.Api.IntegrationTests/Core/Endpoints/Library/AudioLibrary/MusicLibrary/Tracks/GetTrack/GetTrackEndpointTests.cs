@@ -12,6 +12,7 @@ using Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.T
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
@@ -203,10 +204,12 @@ public class GetTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
 
         // Assert
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
-        using JsonDocument problemDetails = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-        Assert.Equal("General.Unauthorized", problemDetails.RootElement.GetProperty("title").GetString());
-        Assert.Equal("NotAuthorized", problemDetails.RootElement.GetProperty("detail").GetString());
-        Assert.DoesNotContain("Exception", problemDetails.RootElement.GetRawText(), StringComparison.Ordinal);
+        string content = await response.Content.ReadAsStringAsync();
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Unauthorized", problemDetails!["title"].GetString());
+        Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
+        Assert.DoesNotContain("Exception", content, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -232,8 +235,9 @@ public class GetTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         // The route value is kept as a raw string, so the unparseable Id reaches the query validator, which reports a clean validation error instead of failing the request binding.
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        using JsonDocument problemDetails = JsonDocument.Parse(content);
-        Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Validation", problemDetails!["title"].GetString());
         Assert.Contains("LibraryIdCannotBeEmpty", content, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -246,8 +250,9 @@ public class GetTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         // Assert
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        using JsonDocument problemDetails = JsonDocument.Parse(content);
-        Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Validation", problemDetails!["title"].GetString());
         Assert.Contains("ArtistIdCannotBeEmpty", content, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -260,8 +265,9 @@ public class GetTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         // Assert
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        using JsonDocument problemDetails = JsonDocument.Parse(content);
-        Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Validation", problemDetails!["title"].GetString());
         Assert.Contains("AlbumIdCannotBeEmpty", content, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -274,8 +280,9 @@ public class GetTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         // Assert
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        using JsonDocument problemDetails = JsonDocument.Parse(content);
-        Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Validation", problemDetails!["title"].GetString());
         Assert.Contains("TrackIdCannotBeEmpty", content, StringComparison.OrdinalIgnoreCase);
     }
 

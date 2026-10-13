@@ -56,7 +56,7 @@ public class UpdateUserSettingsEndpoint : BaseEndpoint<UserSettingsDto, IResult>
     {
         await _apiHttpClient.PutAsync<Web.Common.Requests.Common.EmptyRequest, UserSettingsDto>(ApiRoutes.Users.UPDATE_USER_SETTINGS, request, cancellationToken).ConfigureAwait(false);
 
-        // keep the per-user theme cache preference in sync with the stored settings, so the handler applies it immediately
+        // Keep the per-user theme cache preference in sync with the stored settings, so the handler applies it immediately.
         Guid? userId = GetCurrentUserId();
         if (userId is not null)
             await _themeCachePreferenceService.SetAsync(userId.Value, request.IsThemeCachingEnabled, cancellationToken).ConfigureAwait(false);

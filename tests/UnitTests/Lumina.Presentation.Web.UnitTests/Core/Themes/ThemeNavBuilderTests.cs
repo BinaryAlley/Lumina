@@ -108,6 +108,27 @@ public class ThemeNavBuilderTests
     }
 
     [Fact]
+    public async Task BuildAsync_WhenUserIsAuthenticated_ShouldLinkWrittenContentAndAudioEntriesToTheFilteredLibraryCatalog()
+    {
+        // Arrange
+        _mockHttpContextAccessor.HttpContext.Returns(TestHttpContextFactory.Create(user: TestHttpContextFactory.CreateAuthenticatedUser()));
+
+        // Act
+        ThemeNavMenuDto result = await _sut.BuildAsync(CancellationToken.None);
+
+        // Assert
+        // The written content and audio entries open the home page filtered to the libraries of their category, so that browsing starts
+        // from the libraries of that category, instead of from a single library picked upfront.
+        ThemeNavSectionDto librarySection = FindSection(result, "Localized-Library")!;
+        ThemeNavEntryDto writtenContentEntry = librarySection.Items.First(entry => entry.Label == "Localized-WrittenContent");
+        ThemeNavEntryDto audioEntry = librarySection.Items.First(entry => entry.Label == "Localized-Audio");
+        Assert.Contains(writtenContentEntry.Children, entry => entry.Label == "Localized-Books" && entry.Url == "http://localhost/en-us?category=books");
+        Assert.Contains(writtenContentEntry.Children, entry => entry.Label == "Localized-Magazines" && entry.Url == "library/written-content/magazines");
+        Assert.Contains(audioEntry.Children, entry => entry.Label == "Localized-Music" && entry.Url == "http://localhost/en-us?category=music");
+        Assert.Contains(audioEntry.Children, entry => entry.Label == "Localized-Interviews" && entry.Url == "library/audio/interviews");
+    }
+
+    [Fact]
     public async Task BuildAsync_WhenUserIsAdmin_ShouldIncludeAdministratorSection()
     {
         // Arrange

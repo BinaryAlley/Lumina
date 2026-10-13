@@ -8,21 +8,12 @@ namespace Lumina.Presentation.Web.Common.Requests.Plugins;
 /// <summary>
 /// Represents a request to enable or disable a book reader for a media library.
 /// </summary>
+/// <param name="LibraryId">The Id of the media library whose book reader is enabled or disabled. Required.</param>
+/// <param name="PluginId">The unique identifier of the plugin providing the book reader. Required.</param>
+/// <param name="IsEnabled">Whether the book reader should be enabled for the media library. Required.</param>
 [DebuggerDisplay("LibraryId: {LibraryId}, PluginId: {PluginId}")]
-public class SetBookReaderEnabledRequest
-{
-    /// <summary>
-    /// Gets or sets the Id of the media library whose book reader is enabled or disabled. Required.
-    /// </summary>
-    public Guid LibraryId { get; set; }
-
-    /// <summary>
-    /// Gets or sets the unique identifier of the plugin providing the book reader. Required.
-    /// </summary>
-    public Guid PluginId { get; set; }
-
-    /// <summary>
-    /// Gets or sets whether the book reader should be enabled for the media library. Required.
-    /// </summary>
-    public bool IsEnabled { get; set; }
-}
+public record SetBookReaderEnabledRequest(
+    Guid LibraryId,
+    Guid PluginId,
+    bool IsEnabled
+);

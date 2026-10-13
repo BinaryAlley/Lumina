@@ -36,6 +36,9 @@ public class AlbumLiteRowMappingTests
         Assert.Equal(readModel.Id, result.Id);
         Assert.Equal(readModel.Title, result.Title);
         Assert.Equal(readModel.TotalTracks, result.TotalTracks);
+        Assert.Equal(readModel.CoverPath, result.CoverPath);
+        Assert.Equal(readModel.ReleaseYear, result.ReleaseYear);
+        Assert.Equal(readModel.ReleaseTypes, result.ReleaseTypes);
     }
 
     [Fact]
@@ -53,6 +56,9 @@ public class AlbumLiteRowMappingTests
         Assert.Equal(readModels.Select(readModel => readModel.Id), results.Select(response => response.Id));
         Assert.Equal(readModels.Select(readModel => readModel.Title), results.Select(response => response.Title));
         Assert.Equal(readModels.Select(readModel => readModel.TotalTracks), results.Select(response => response.TotalTracks));
+        Assert.Equal(readModels.Select(readModel => readModel.CoverPath), results.Select(response => response.CoverPath));
+        Assert.Equal(readModels.Select(readModel => readModel.ReleaseYear), results.Select(response => response.ReleaseYear));
+        Assert.Equal(readModels.Select(readModel => readModel.ReleaseTypes), results.Select(response => response.ReleaseTypes));
     }
 
     [Fact]

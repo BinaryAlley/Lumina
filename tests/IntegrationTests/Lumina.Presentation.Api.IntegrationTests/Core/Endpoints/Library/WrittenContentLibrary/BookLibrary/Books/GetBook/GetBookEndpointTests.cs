@@ -13,6 +13,7 @@ using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
@@ -130,10 +131,12 @@ public class GetBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
 
         // Assert
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
-        using JsonDocument problemDetails = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-        Assert.Equal("General.Unauthorized", problemDetails.RootElement.GetProperty("title").GetString());
-        Assert.Equal("NotAuthorized", problemDetails.RootElement.GetProperty("detail").GetString());
-        Assert.DoesNotContain("Exception", problemDetails.RootElement.GetRawText(), StringComparison.Ordinal);
+        string content = await response.Content.ReadAsStringAsync();
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Unauthorized", problemDetails!["title"].GetString());
+        Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
+        Assert.DoesNotContain("Exception", content, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -160,8 +163,9 @@ public class GetBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
         // validation error instead of failing the request binding.
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        using JsonDocument problemDetails = JsonDocument.Parse(content);
-        Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Validation", problemDetails!["title"].GetString());
         Assert.Contains("LibraryIdCannotBeEmpty", content, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -176,8 +180,9 @@ public class GetBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
         // validation error instead of failing the request binding.
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        using JsonDocument problemDetails = JsonDocument.Parse(content);
-        Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Validation", problemDetails!["title"].GetString());
         Assert.Contains("BookIdCannotBeEmpty", content, StringComparison.OrdinalIgnoreCase);
     }
 

@@ -50,14 +50,15 @@ public class SaveBookEndpoint : BaseEndpoint<UpdateBookRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(UpdateBookRequest request, CancellationToken cancellationToken)
     {
-        // The book is identified by the {bookId} route value, not by the id posted in the form, so that a mismatched id can never redirect
-        // the update to another book; the value is normalized to a Guid before it is substituted into the upstream URL, so that a crafted
-        // route value can never escape its URL segment, and an unparseable id is reported by the API as a missing book id.
+        // The book is identified by the {bookId} route value, not by the id posted in the body, so that a mismatched id can never redirect
+        // the update to another book; both ids are normalized to Guids before they are substituted into the upstream URL, so that a crafted
+        // value can never escape its URL segment, and an unparseable id is reported by the API as a missing book id.
         string routeId = HttpContext.Request.RouteValues["bookId"]?.ToString() ?? string.Empty;
-        request.BookId = Guid.TryParse(routeId, out Guid bookId) ? bookId.ToString() : Guid.Empty.ToString();
+        string bookId = Guid.TryParse(routeId, out Guid parsedBookId) ? parsedBookId.ToString() : Guid.Empty.ToString();
+        UpdateBookRequest requestWithRouteId = request with { BookId = bookId };
 
         BookDetailsDto book = await _apiHttpClient.PutAsync<BookDetailsDto, UpdateBookRequest>(
-            ApiRoutes.Books.UPDATE_BOOK.Replace("{libraryId}", request.LibraryId.ToString()).Replace("{bookId}", request.BookId), request, cancellationToken).ConfigureAwait(false);
+            ApiRoutes.Books.UPDATE_BOOK.Replace("{libraryId}", requestWithRouteId.LibraryId.ToString()).Replace("{bookId}", bookId), requestWithRouteId, cancellationToken).ConfigureAwait(false);
         return JsonSuccess(book);
     }
 }

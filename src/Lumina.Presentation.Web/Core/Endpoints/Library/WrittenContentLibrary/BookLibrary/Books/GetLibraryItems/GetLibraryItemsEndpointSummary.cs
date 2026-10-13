@@ -33,17 +33,16 @@ public class GetLibraryItemsEndpointSummary : Summary<GetLibraryItemsEndpoint, G
         RequestParam(r => r.SortBy, "The name of the field by which to sort the results. Optional.");
         RequestParam(r => r.SortOrder, "The direction in which to sort the results. Optional.");
 
-        ExampleRequest = new GetBooksLiteRequest
-        {
-            LibraryId = Guid.NewGuid(),
-            CurrentPage = 1,
-            PerPage = 48,
-            SearchTerm = "fellowship",
-            FilterAlphaKey = "f",
-            ShouldIgnoreThePrefixForAlphaPicker = true,
-            SortBy = "title",
-            SortOrder = SortOrder.Ascending
-        };
+        ExampleRequest = new GetBooksLiteRequest(
+            LibraryId: Guid.NewGuid(),
+            CurrentPage: 1,
+            PerPage: 48,
+            SearchTerm: "fellowship",
+            FilterAlphaKey: "f",
+            ShouldIgnoreThePrefixForAlphaPicker: true,
+            SortBy: "title",
+            SortOrder: SortOrder.Ascending
+        );
 
         Response(200, "The lightweight details of the books of the media library are returned.", example: new SuccessResponse<PaginatedBookLiteDto>(true, default));
     }

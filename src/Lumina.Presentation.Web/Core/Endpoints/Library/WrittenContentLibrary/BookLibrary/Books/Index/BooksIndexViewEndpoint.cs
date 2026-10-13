@@ -25,12 +25,12 @@ namespace Lumina.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.B
 /// </summary>
 public class BooksIndexViewEndpoint : BaseEndpoint<GetBooksViewRequest, IResult>
 {
-    // the resource base name deliberately excludes the "Core.Resources" segment: the localization factory re-roots it
+    // The resource base name deliberately excludes the "Core.Resources" segment: the localization factory re-roots it
     // with the configured ResourcesPath, so "Lumina.Presentation.Web.Views.X" resolves to the embedded
-    // "Lumina.Presentation.Web.Core.Resources.Views.X" resource; including "Core" here would insert it twice
+    // "Lumina.Presentation.Web.Core.Resources.Views.X" resource; including "Core" here would insert it twice.
     private const string VIEW_RESOURCE_BASE_NAME = "Lumina.Presentation.Web.Views.Library.WrittenContentLibrary.BookLibrary.Books.Index";
     private const string VIEW_RESOURCE_LOCATION = "Lumina.Presentation.Web";
-    // the page key mirrors the path of the Razor view under Core/Views, so that theme templates can override it at the page, section or default scope
+    // The page key mirrors the path of the Razor view under Core/Views, so that theme templates can override it at the page, section or default scope.
     private const string VIEW_PAGE_KEY = "library/written-content-library/book-library/books/index";
 
     private readonly IApiHttpClient _apiHttpClient;

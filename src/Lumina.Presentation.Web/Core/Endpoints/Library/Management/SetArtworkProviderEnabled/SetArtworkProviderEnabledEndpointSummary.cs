@@ -25,12 +25,11 @@ public class SetArtworkProviderEnabledEndpointSummary : Summary<SetArtworkProvid
         RequestParam(r => r.PluginId, "The unique identifier of the plugin providing the artwork. Required.");
         RequestParam(r => r.IsEnabled, "Whether the artwork provider should be enabled for the media library, or not. Required.");
 
-        ExampleRequest = new SetLibraryArtworkProviderEnabledRequest
-        {
-            LibraryId = Guid.NewGuid(),
-            PluginId = Guid.NewGuid(),
-            IsEnabled = true
-        };
+        ExampleRequest = new SetLibraryArtworkProviderEnabledRequest(
+            LibraryId: Guid.NewGuid(),
+            PluginId: Guid.NewGuid(),
+            IsEnabled: true
+        );
 
         Response(200, "The artwork provider of the media library is enabled or disabled.", example: new SuccessResponse(true));
     }

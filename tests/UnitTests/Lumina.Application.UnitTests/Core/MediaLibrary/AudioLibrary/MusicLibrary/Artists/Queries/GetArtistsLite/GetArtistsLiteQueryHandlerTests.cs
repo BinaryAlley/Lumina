@@ -247,4 +247,41 @@ public class GetArtistsLiteQueryHandlerTests
         await _mockAuthorizationService.DidNotReceive().EvaluatePolicyAsync<ILibraryOwnershipPolicy>(Arg.Any<Guid>(), Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>());
         await _mockArtistRepository.DidNotReceive().GetAllLiteAsync(Arg.Any<PaginationDataDto?>(), Arg.Any<string?>(), Arg.Any<SortOrder?>(), Arg.Any<LibraryFilterDto>(), cancellationToken: Arg.Any<CancellationToken>());
     }
+
+    [Fact]
+    public async Task HandleAsync_WhenQueryHasAlphaFilterAndSorting_ShouldPassThemToTheRepository()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        GetArtistsLiteQuery query = _getArtistsLiteQueryFixture.Create(
+            libraryId: libraryId.ToString(),
+            searchTerm: "Queen",
+            filterAlphaKey: "Q",
+            shouldIgnoreThePrefixForAlphaPicker: true,
+            sortBy: "name",
+            sortOrder: SortOrder.Descending);
+        PaginatedResultDto<ArtistLiteRow> paginatedArtists = _paginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 10, count: 0, numberOfPages: 0);
+        _mockArtistRepository.GetAllLiteAsync(
+                Arg.Any<PaginationDataDto?>(),
+                Arg.Any<string?>(),
+                Arg.Any<SortOrder?>(),
+                Arg.Any<LibraryFilterDto>(),
+                cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(paginatedArtists));
+
+        // Act
+        await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        await _mockArtistRepository.Received(1).GetAllLiteAsync(
+            Arg.Any<PaginationDataDto?>(),
+            Arg.Is<string?>(sortBy => sortBy == "name"),
+            Arg.Is<SortOrder?>(sortOrder => sortOrder == SortOrder.Descending),
+            Arg.Is<LibraryFilterDto>(filter =>
+                filter.LibraryId == libraryId &&
+                filter.SearchTerm == "Queen" &&
+                filter.FilterAlphaKey == "Q" &&
+                filter.ShouldIgnoreThePrefixForAlphaPicker),
+            cancellationToken: Arg.Any<CancellationToken>());
+    }
 }

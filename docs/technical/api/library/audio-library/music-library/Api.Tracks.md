@@ -30,12 +30,12 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b
     "title": "Bohemian Rhapsody",
     "originalTitle": "Bohemian Rhapsody",
     "description": "A song by the British rock band Queen. It was written by Freddie Mercury and originally released on the album A Night at the Opera in 1975.",
-    "disambiguation": null,
+    "disambiguation": "album version",
     "releaseInfo": {
       "originalReleaseDate": "1975-10-31",
       "originalReleaseYear": 1975,
-      "reReleaseDate": null,
-      "reReleaseYear": null,
+      "reReleaseDate": "2011-11-21",
+      "reReleaseYear": 2011,
       "releaseCountry": "GB",
       "releaseVersion": "Original"
     },
@@ -82,7 +82,7 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b
     "languages": [
       { "languageCode": "en", "languageName": "English", "nativeName": "English" }
     ],
-    "iswcs": []
+    "iswcs": ["T-010489707-6"]
   },
   "musicBrainzRecordingId": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
   "musicBrainzTrackId": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
@@ -130,8 +130,8 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b
     "title": "Bohemian Rhapsody",
     "originalTitle": "Bohemian Rhapsody",
     "description": "A song by the British rock band Queen. It was written by Freddie Mercury and originally released on the album A Night at the Opera in 1975.",
-    "disambiguation": null,
-    "releaseInfo": { "originalReleaseDate": "1975-10-31", "originalReleaseYear": 1975, "reReleaseDate": null, "reReleaseYear": null, "releaseCountry": "GB", "releaseVersion": "Original" },
+    "disambiguation": "album version",
+    "releaseInfo": { "originalReleaseDate": "1975-10-31", "originalReleaseYear": 1975, "reReleaseDate": "2011-11-21", "reReleaseYear": 2011, "releaseCountry": "GB", "releaseVersion": "Original" },
     "language": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
     "originalLanguage": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
     "tags": [ { "name": "classic" }, { "name": "epic" } ],
@@ -161,12 +161,12 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b
     "languages": [
       { "languageCode": "en", "languageName": "English", "nativeName": "English" }
     ],
-    "iswcs": []
+    "iswcs": ["T-010489707-6"]
   },
   "musicBrainzRecordingId": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
   "musicBrainzTrackId": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
   "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
-  "updatedOnUtc": null,
+  "updatedOnUtc": "2025-01-20T14:45:00.0000000Z",
   "moods": [
     {
       "name": "dramatic"
@@ -232,8 +232,8 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
     "title": "Bohemian Rhapsody",
     "originalTitle": "Bohemian Rhapsody",
     "description": "A song by the British rock band Queen. It was written by Freddie Mercury and originally released on the album A Night at the Opera in 1975.",
-    "disambiguation": null,
-    "releaseInfo": { "originalReleaseDate": "1975-10-31", "originalReleaseYear": 1975, "reReleaseDate": null, "reReleaseYear": null, "releaseCountry": "GB", "releaseVersion": "Original" },
+    "disambiguation": "album version",
+    "releaseInfo": { "originalReleaseDate": "1975-10-31", "originalReleaseYear": 1975, "reReleaseDate": "2011-11-21", "reReleaseYear": 2011, "releaseCountry": "GB", "releaseVersion": "Original" },
     "language": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
     "originalLanguage": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
     "tags": [ { "name": "classic" }, { "name": "epic" } ],
@@ -263,12 +263,12 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
     "languages": [
       { "languageCode": "en", "languageName": "English", "nativeName": "English" }
     ],
-    "iswcs": []
+    "iswcs": ["T-010489707-6"]
   },
   "musicBrainzRecordingId": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
   "musicBrainzTrackId": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
   "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
-  "updatedOnUtc": null,
+  "updatedOnUtc": "2025-01-20T14:45:00.0000000Z",
   "moods": [
     {
       "name": "dramatic"
@@ -325,12 +325,12 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
     "title": "Bohemian Rhapsody",
     "originalTitle": "Bohemian Rhapsody",
     "description": "A song by the British rock band Queen. It was written by Freddie Mercury and originally released on the album A Night at the Opera in 1975.",
-    "disambiguation": null,
+    "disambiguation": "album version",
     "releaseInfo": {
       "originalReleaseDate": "1975-10-31",
       "originalReleaseYear": 1975,
-      "reReleaseDate": null,
-      "reReleaseYear": null,
+      "reReleaseDate": "2011-11-21",
+      "reReleaseYear": 2011,
       "releaseCountry": "GB",
       "releaseVersion": "Original"
     },
@@ -377,7 +377,7 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
     "languages": [
       { "languageCode": "en", "languageName": "English", "nativeName": "English" }
     ],
-    "iswcs": []
+    "iswcs": ["T-010489707-6"]
   },
   "musicBrainzRecordingId": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
   "musicBrainzTrackId": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
@@ -425,8 +425,8 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
     "title": "Bohemian Rhapsody",
     "originalTitle": "Bohemian Rhapsody",
     "description": "A song by the British rock band Queen. It was written by Freddie Mercury and originally released on the album A Night at the Opera in 1975.",
-    "disambiguation": null,
-    "releaseInfo": { "originalReleaseDate": "1975-10-31", "originalReleaseYear": 1975, "reReleaseDate": null, "reReleaseYear": null, "releaseCountry": "GB", "releaseVersion": "Original" },
+    "disambiguation": "album version",
+    "releaseInfo": { "originalReleaseDate": "1975-10-31", "originalReleaseYear": 1975, "reReleaseDate": "2011-11-21", "reReleaseYear": 2011, "releaseCountry": "GB", "releaseVersion": "Original" },
     "language": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
     "originalLanguage": { "languageCode": "en", "languageName": "English", "nativeName": "English" },
     "tags": [ { "name": "classic" }, { "name": "epic" } ],
@@ -456,12 +456,12 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
     "languages": [
       { "languageCode": "en", "languageName": "English", "nativeName": "English" }
     ],
-    "iswcs": []
+    "iswcs": ["T-010489707-6"]
   },
   "musicBrainzRecordingId": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
   "musicBrainzTrackId": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
   "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
-  "updatedOnUtc": null,
+  "updatedOnUtc": "2025-01-20T14:45:00.0000000Z",
   "moods": [
     {
       "name": "dramatic"

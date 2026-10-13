@@ -45,6 +45,7 @@ public class SaveBookEndpointTests
         // Arrange
         string routeId = Guid.NewGuid().ToString();
         UpdateBookRequest request = _updateBookRequestFixture.Create();
+        string originalBookId = request.BookId!;
         BookDetailsDto expectedBook = _bookDetailsDtoFixture.Create();
         _mockApiHttpClient.PutAsync<BookDetailsDto, UpdateBookRequest>(Arg.Any<string>(), Arg.Any<UpdateBookRequest>(), Arg.Any<CancellationToken>())
             .Returns(expectedBook);
@@ -56,8 +57,9 @@ public class SaveBookEndpointTests
         // Assert
         await _mockApiHttpClient.Received(1).PutAsync<BookDetailsDto, UpdateBookRequest>(
             Arg.Is<string>(endpoint => endpoint == ApiRoutes.Books.UPDATE_BOOK.Replace("{libraryId}", request.LibraryId.ToString()).Replace("{bookId}", routeId)),
-            Arg.Is<UpdateBookRequest>(forwardedRequest => forwardedRequest == request && forwardedRequest.BookId == routeId),
+            Arg.Is<UpdateBookRequest>(forwardedRequest => forwardedRequest.BookId == routeId),
             Arg.Any<CancellationToken>());
+        Assert.Equal(originalBookId, request.BookId);
     }
 
     [Fact]
@@ -66,8 +68,7 @@ public class SaveBookEndpointTests
         // Arrange
         string routeId = Guid.NewGuid().ToString();
         string bodyId = Guid.NewGuid().ToString();
-        UpdateBookRequest request = _updateBookRequestFixture.Create();
-        request.BookId = bodyId;
+        UpdateBookRequest request = _updateBookRequestFixture.Create() with { BookId = bodyId };
         BookDetailsDto expectedBook = _bookDetailsDtoFixture.Create();
         _mockApiHttpClient.PutAsync<BookDetailsDto, UpdateBookRequest>(Arg.Any<string>(), Arg.Any<UpdateBookRequest>(), Arg.Any<CancellationToken>())
             .Returns(expectedBook);
@@ -79,8 +80,9 @@ public class SaveBookEndpointTests
         // Assert
         await _mockApiHttpClient.Received(1).PutAsync<BookDetailsDto, UpdateBookRequest>(
             Arg.Is<string>(endpoint => endpoint == ApiRoutes.Books.UPDATE_BOOK.Replace("{libraryId}", request.LibraryId.ToString()).Replace("{bookId}", routeId)),
-            Arg.Is<UpdateBookRequest>(forwardedRequest => forwardedRequest == request && forwardedRequest.BookId == routeId && forwardedRequest.BookId != bodyId),
+            Arg.Is<UpdateBookRequest>(forwardedRequest => forwardedRequest.BookId == routeId && forwardedRequest.BookId != bodyId),
             Arg.Any<CancellationToken>());
+        Assert.Equal(bodyId, request.BookId);
     }
 
     [Fact]
@@ -101,7 +103,7 @@ public class SaveBookEndpointTests
         // Assert
         await _mockApiHttpClient.Received(1).PutAsync<BookDetailsDto, UpdateBookRequest>(
             Arg.Is<string>(endpoint => endpoint == ApiRoutes.Books.UPDATE_BOOK.Replace("{libraryId}", request.LibraryId.ToString()).Replace("{bookId}", expectedId)),
-            Arg.Is<UpdateBookRequest>(forwardedRequest => forwardedRequest == request && forwardedRequest.BookId == expectedId),
+            Arg.Is<UpdateBookRequest>(forwardedRequest => forwardedRequest.BookId == expectedId),
             Arg.Any<CancellationToken>());
     }
 
@@ -122,7 +124,7 @@ public class SaveBookEndpointTests
         // Assert
         await _mockApiHttpClient.Received(1).PutAsync<BookDetailsDto, UpdateBookRequest>(
             Arg.Is<string>(endpoint => endpoint == ApiRoutes.Books.UPDATE_BOOK.Replace("{libraryId}", request.LibraryId.ToString()).Replace("{bookId}", expectedId)),
-            Arg.Is<UpdateBookRequest>(forwardedRequest => forwardedRequest == request && forwardedRequest.BookId == expectedId),
+            Arg.Is<UpdateBookRequest>(forwardedRequest => forwardedRequest.BookId == expectedId),
             Arg.Any<CancellationToken>());
     }
 
@@ -148,7 +150,7 @@ public class SaveBookEndpointTests
     }
 
     /// <summary>
-    /// Sets the <c>id</c> route value the endpoint reads the book Id from.
+    /// Sets the <c>bookId</c> route value the endpoint reads the book Id from.
     /// </summary>
     /// <param name="routeId">The raw route value of the book Id.</param>
     private void ConfigureRequest(string routeId)
@@ -157,10 +159,10 @@ public class SaveBookEndpointTests
     }
 
     /// <summary>
-    /// Leaves the <c>id</c> route value unset.
+    /// Leaves the <c>bookId</c> route value unset.
     /// </summary>
     private void ConfigureRequestWithoutId()
     {
-        _sut.HttpContext.Request.RouteValues.Remove("id");
+        _sut.HttpContext.Request.RouteValues.Remove("bookId");
     }
 }

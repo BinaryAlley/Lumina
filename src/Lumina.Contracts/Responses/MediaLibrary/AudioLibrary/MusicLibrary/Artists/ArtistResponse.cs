@@ -25,6 +25,7 @@ namespace Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Arti
 /// <param name="Contributors">The list of references to the media contributors that make up the artist, each with the role they played.</param>
 /// <param name="Ratings">The list of ratings for this artist.</param>
 /// <param name="Albums">The list of albums of the artist, each with its own list of tracks.</param>
+/// <param name="CoverPath">The path of the image representing the artist, if available.</param>
 [DebuggerDisplay("Name: {Metadata.Name}")]
 public record ArtistResponse(
     Guid Id,
@@ -38,5 +39,6 @@ public record ArtistResponse(
     DateTime? UpdatedOnUtc,
     List<MediaContributorReferenceDto>? Contributors,
     List<AudioRatingDto>? Ratings,
-    List<AlbumResponse>? Albums
+    List<AlbumResponse>? Albums,
+    string? CoverPath
 );

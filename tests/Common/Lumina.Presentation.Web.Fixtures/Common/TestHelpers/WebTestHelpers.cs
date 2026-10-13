@@ -85,7 +85,7 @@ public static partial class WebTestHelpers
         {
             Content = JsonContent.Create(s_loginRequestFixture.Create(username: username, password: password))
         };
-        // the antiforgery middleware matches the content type exactly, so the charset suffix must be omitted
+        // The antiforgery middleware matches the content type exactly, so the charset suffix must be omitted.
         loginRequest.Content!.Headers.ContentType = new MediaTypeHeaderValue("application/json");
         loginRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         loginRequest.Headers.Add("RequestVerificationToken", antiforgeryToken);

@@ -9,7 +9,7 @@ using System.Linq;
 namespace Lumina.Presentation.Web.Fixtures.Common.Requests.Plugins;
 
 /// <summary>
-/// Fixture class for the <see cref="SetBookReaderEnabledRequest"/> class.
+/// Fixture class for the <see cref="SetBookReaderEnabledRequest"/> record.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class SetBookReaderEnabledRequestFixture
@@ -26,12 +26,11 @@ public class SetBookReaderEnabledRequestFixture
         Guid? pluginId = null,
         bool? isEnabled = null)
     {
-        return new SetBookReaderEnabledRequest
-        {
-            LibraryId = libraryId ?? Guid.NewGuid(),
-            PluginId = pluginId ?? Guid.NewGuid(),
-            IsEnabled = isEnabled ?? true
-        };
+        return new SetBookReaderEnabledRequest(
+            LibraryId: libraryId ?? Guid.NewGuid(),
+            PluginId: pluginId ?? Guid.NewGuid(),
+            IsEnabled: isEnabled ?? true
+        );
     }
 
     /// <summary>
