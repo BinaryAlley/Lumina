@@ -108,6 +108,7 @@ Several icons used in this project were adapted from icons sourced from [svgrepo
 - [`error.svg`](https://www.svgrepo.com/svg/486408/error-filled) (MIT License)
 - [`trigger.svg`](https://www.svgrepo.com/svg/489497/lightning-1) (Public Domain License)
 - [`stop.svg`](https://www.svgrepo.com/svg/521862/stop) (CC Attribution License)
+- [`music-placeholder.svg`](https://www.svgrepo.com/svg/446269/music) (CC Attribution License)
 
 **I greatly appreciate the creators and contributors for providing these assets.**
 

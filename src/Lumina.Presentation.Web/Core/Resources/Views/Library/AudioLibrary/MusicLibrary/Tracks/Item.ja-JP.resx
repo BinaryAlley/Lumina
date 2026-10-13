@@ -1,0 +1,1182 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="BackToAlbum" xml:space="preserve">
+    <value>アルバムに戻る</value>
+  </data>
+  <data name="EditTrack" xml:space="preserve">
+    <value>トラックを編集</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="TrackSaved" xml:space="preserve">
+    <value>トラックを保存しました。</value>
+  </data>
+  <data name="SaveFailed" xml:space="preserve">
+    <value>項目を保存できませんでした。</value>
+  </data>
+  <data name="DeleteTrack" xml:space="preserve">
+    <value>トラックを削除</value>
+  </data>
+  <data name="TrackDeleted" xml:space="preserve">
+    <value>トラックを削除しました。</value>
+  </data>
+  <data name="DeleteConfirm" xml:space="preserve">
+    <value>この項目を削除してもよろしいですか？</value>
+  </data>
+  <data name="DeleteFailed" xml:space="preserve">
+    <value>項目を削除できませんでした。</value>
+  </data>
+  <data name="GeneralInformation" xml:space="preserve">
+    <value>一般情報</value>
+  </data>
+  <data name="TrackPath" xml:space="preserve">
+    <value>パス</value>
+  </data>
+  <data name="TrackTitle" xml:space="preserve">
+    <value>タイトル</value>
+  </data>
+  <data name="TrackOriginalTitle" xml:space="preserve">
+    <value>原題</value>
+  </data>
+  <data name="TrackNumber" xml:space="preserve">
+    <value>トラック番号</value>
+  </data>
+  <data name="DiscNumber" xml:space="preserve">
+    <value>ディスク番号</value>
+  </data>
+  <data name="Script" xml:space="preserve">
+    <value>文字体系</value>
+  </data>
+  <data name="Key" xml:space="preserve">
+    <value>キー</value>
+  </data>
+  <data name="Bpm" xml:space="preserve">
+    <value>BPM</value>
+  </data>
+  <data name="Genres" xml:space="preserve">
+    <value>ジャンル</value>
+  </data>
+  <data name="Tags" xml:space="preserve">
+    <value>タグ</value>
+  </data>
+  <data name="Duration" xml:space="preserve">
+    <value>長さ（秒）</value>
+  </data>
+  <data name="Identifiers" xml:space="preserve">
+    <value>識別子</value>
+  </data>
+  <data name="MusicBrainzRecordingId" xml:space="preserve">
+    <value>MusicBrainz レコーディング Id</value>
+  </data>
+  <data name="MusicBrainzTrackId" xml:space="preserve">
+    <value>MusicBrainz トラック Id</value>
+  </data>
+  <data name="Work" xml:space="preserve">
+    <value>作品</value>
+  </data>
+  <data name="WorkTitle" xml:space="preserve">
+    <value>作品タイトル</value>
+  </data>
+  <data name="WorkMusicBrainzId" xml:space="preserve">
+    <value>作品 MusicBrainz Id</value>
+  </data>
+  <data name="Moods" xml:space="preserve">
+    <value>ムード</value>
+  </data>
+  <data name="Isrcs" xml:space="preserve">
+    <value>ISRCs</value>
+  </data>
+  <data name="CMajor" xml:space="preserve">
+    <value>ハ長調</value>
+  </data>
+  <data name="CSharpMajor" xml:space="preserve">
+    <value>嬰ハ長調</value>
+  </data>
+  <data name="DMajor" xml:space="preserve">
+    <value>ニ長調</value>
+  </data>
+  <data name="DSharpMajor" xml:space="preserve">
+    <value>嬰ニ長調</value>
+  </data>
+  <data name="EMajor" xml:space="preserve">
+    <value>ホ長調</value>
+  </data>
+  <data name="FMajor" xml:space="preserve">
+    <value>ヘ長調</value>
+  </data>
+  <data name="FSharpMajor" xml:space="preserve">
+    <value>嬰ヘ長調</value>
+  </data>
+  <data name="GMajor" xml:space="preserve">
+    <value>ト長調</value>
+  </data>
+  <data name="GSharpMajor" xml:space="preserve">
+    <value>嬰ト長調</value>
+  </data>
+  <data name="AMajor" xml:space="preserve">
+    <value>イ長調</value>
+  </data>
+  <data name="ASharpMajor" xml:space="preserve">
+    <value>嬰イ長調</value>
+  </data>
+  <data name="BMajor" xml:space="preserve">
+    <value>ロ長調</value>
+  </data>
+  <data name="CMinor" xml:space="preserve">
+    <value>ハ短調</value>
+  </data>
+  <data name="CSharpMinor" xml:space="preserve">
+    <value>嬰ハ短調</value>
+  </data>
+  <data name="DMinor" xml:space="preserve">
+    <value>ニ短調</value>
+  </data>
+  <data name="DSharpMinor" xml:space="preserve">
+    <value>嬰ニ短調</value>
+  </data>
+  <data name="EMinor" xml:space="preserve">
+    <value>ホ短調</value>
+  </data>
+  <data name="FMinor" xml:space="preserve">
+    <value>ヘ短調</value>
+  </data>
+  <data name="FSharpMinor" xml:space="preserve">
+    <value>嬰ヘ短調</value>
+  </data>
+  <data name="GMinor" xml:space="preserve">
+    <value>ト短調</value>
+  </data>
+  <data name="GSharpMinor" xml:space="preserve">
+    <value>嬰ト短調</value>
+  </data>
+  <data name="AMinor" xml:space="preserve">
+    <value>イ短調</value>
+  </data>
+  <data name="ASharpMinor" xml:space="preserve">
+    <value>嬰イ短調</value>
+  </data>
+  <data name="BMinor" xml:space="preserve">
+    <value>ロ短調</value>
+  </data>
+  <data name="TrackPathDescription" xml:space="preserve">
+    <value>トラックのファイルパス。</value>
+  </data>
+  <data name="TrackTitleDescription" xml:space="preserve">
+    <value>トラックのタイトル。</value>
+  </data>
+  <data name="TrackOriginalTitleDescription" xml:space="preserve">
+    <value>現在のタイトルと異なる場合のトラックの原題。</value>
+  </data>
+  <data name="TrackNumberDescription" xml:space="preserve">
+    <value>ディスク上のトラックの位置。</value>
+  </data>
+  <data name="DiscNumberDescription" xml:space="preserve">
+    <value>トラックが属するディスク番号。</value>
+  </data>
+  <data name="ScriptDescription" xml:space="preserve">
+    <value>トラックの言語で使用される文字体系。</value>
+  </data>
+  <data name="KeyDescription" xml:space="preserve">
+    <value>トラックの調。</value>
+  </data>
+  <data name="BpmDescription" xml:space="preserve">
+    <value>1分あたりの拍数で表したトラックのテンポ。</value>
+  </data>
+  <data name="GenresDescription" xml:space="preserve">
+    <value>トラックのジャンル。</value>
+  </data>
+  <data name="TagsDescription" xml:space="preserve">
+    <value>トラックのタグ。</value>
+  </data>
+  <data name="DurationDescription" xml:space="preserve">
+    <value>秒単位のトラックの長さ。</value>
+  </data>
+  <data name="MusicBrainzRecordingIdDescription" xml:space="preserve">
+    <value>録音のMusicBrainz識別子。</value>
+  </data>
+  <data name="MusicBrainzTrackIdDescription" xml:space="preserve">
+    <value>トラックのMusicBrainz識別子。</value>
+  </data>
+  <data name="WorkTitleDescription" xml:space="preserve">
+    <value>トラックが録音である作品のタイトル。</value>
+  </data>
+  <data name="WorkMusicBrainzIdDescription" xml:space="preserve">
+    <value>作品のMusicBrainz識別子。</value>
+  </data>
+  <data name="MoodsDescription" xml:space="preserve">
+    <value>トラックのムード。</value>
+  </data>
+  <data name="IsrcsDescription" xml:space="preserve">
+    <value>トラックのISRC。</value>
+  </data>
+  <data name="TrackDescription" xml:space="preserve">
+    <value>説明</value>
+  </data>
+  <data name="TrackDescriptionDescription" xml:space="preserve">
+    <value>トラックの簡単な概要または説明。</value>
+  </data>
+  <data name="TrackDisambiguation" xml:space="preserve">
+    <value>曖昧さ回避</value>
+  </data>
+  <data name="TrackDisambiguationDescription" xml:space="preserve">
+    <value>同じタイトルの他のトラックと区別するためのコメント。</value>
+  </data>
+  <data name="TrackIsVideo" xml:space="preserve">
+    <value>映像録音</value>
+  </data>
+  <data name="TrackIsVideoDescription" xml:space="preserve">
+    <value>トラックの録音が映像録音かどうか。</value>
+  </data>
+  <data name="TrackReleaseInformation" xml:space="preserve">
+    <value>リリース情報</value>
+  </data>
+  <data name="TrackOriginalReleaseDate" xml:space="preserve">
+    <value>初回リリース日</value>
+  </data>
+  <data name="TrackOriginalReleaseDateDescription" xml:space="preserve">
+    <value>トラックが最初にリリースされた日付。</value>
+  </data>
+  <data name="TrackOriginalReleaseYear" xml:space="preserve">
+    <value>初回リリース年</value>
+  </data>
+  <data name="TrackOriginalReleaseYearDescription" xml:space="preserve">
+    <value>トラックが最初にリリースされた年。</value>
+  </data>
+  <data name="TrackReReleaseDate" xml:space="preserve">
+    <value>再リリース日</value>
+  </data>
+  <data name="TrackReReleaseDateDescription" xml:space="preserve">
+    <value>トラックが再リリースされた日付。</value>
+  </data>
+  <data name="TrackReReleaseYear" xml:space="preserve">
+    <value>再リリース年</value>
+  </data>
+  <data name="TrackReReleaseYearDescription" xml:space="preserve">
+    <value>トラックが再リリースされた年。</value>
+  </data>
+  <data name="TrackReleaseCountry" xml:space="preserve">
+    <value>リリース国</value>
+  </data>
+  <data name="TrackReleaseCountryDescription" xml:space="preserve">
+    <value>トラックのリリース国。</value>
+  </data>
+  <data name="TrackReleaseVersion" xml:space="preserve">
+    <value>リリースバージョン</value>
+  </data>
+  <data name="TrackReleaseVersionDescription" xml:space="preserve">
+    <value>リリースのバージョン (元のものなど)。</value>
+  </data>
+  <data name="TrackLanguage" xml:space="preserve">
+    <value>言語</value>
+  </data>
+  <data name="TrackOriginalLanguage" xml:space="preserve">
+    <value>原語</value>
+  </data>
+  <data name="TrackAudioProperties" xml:space="preserve">
+    <value>オーディオプロパティ</value>
+  </data>
+  <data name="TrackSampleRate" xml:space="preserve">
+    <value>サンプルレート (Hz)</value>
+  </data>
+  <data name="TrackSampleRateDescription" xml:space="preserve">
+    <value>トラックの音声のサンプルレート (Hz)。</value>
+  </data>
+  <data name="TrackChannels" xml:space="preserve">
+    <value>チャンネル</value>
+  </data>
+  <data name="TrackChannelsDescription" xml:space="preserve">
+    <value>トラックのオーディオチャンネル数。</value>
+  </data>
+  <data name="TrackBitDepth" xml:space="preserve">
+    <value>ビット深度</value>
+  </data>
+  <data name="TrackBitDepthDescription" xml:space="preserve">
+    <value>トラックの音声のビット深度。</value>
+  </data>
+  <data name="TrackAudioCodec" xml:space="preserve">
+    <value>オーディオコーデック</value>
+  </data>
+  <data name="TrackAudioCodecDescription" xml:space="preserve">
+    <value>トラックで使用されているオーディオコーデック。</value>
+  </data>
+  <data name="TrackBitrate" xml:space="preserve">
+    <value>ビットレート (kbps)</value>
+  </data>
+  <data name="TrackBitrateDescription" xml:space="preserve">
+    <value>トラックの音声のビットレート (kbps)。</value>
+  </data>
+  <data name="TrackAcoustId" xml:space="preserve">
+    <value>AcoustID</value>
+  </data>
+  <data name="TrackAcoustIdDescription" xml:space="preserve">
+    <value>トラックの音声ファイルの AcoustID フィンガープリント識別子。</value>
+  </data>
+  <data name="TrackReplayGain" xml:space="preserve">
+    <value>ReplayGain</value>
+  </data>
+  <data name="TrackReplayGainTrackGain" xml:space="preserve">
+    <value>トラックゲイン (dB)</value>
+  </data>
+  <data name="TrackReplayGainTrackGainDescription" xml:space="preserve">
+    <value>トラックの ReplayGain トラックゲイン (デシベル)。</value>
+  </data>
+  <data name="TrackReplayGainTrackPeak" xml:space="preserve">
+    <value>トラックピーク</value>
+  </data>
+  <data name="TrackReplayGainTrackPeakDescription" xml:space="preserve">
+    <value>トラックの ReplayGain トラックピーク。</value>
+  </data>
+  <data name="TrackReplayGainAlbumGain" xml:space="preserve">
+    <value>アルバムゲイン (dB)</value>
+  </data>
+  <data name="TrackReplayGainAlbumGainDescription" xml:space="preserve">
+    <value>トラックの ReplayGain アルバムゲイン (デシベル)。</value>
+  </data>
+  <data name="TrackReplayGainAlbumPeak" xml:space="preserve">
+    <value>アルバムピーク</value>
+  </data>
+  <data name="TrackReplayGainAlbumPeakDescription" xml:space="preserve">
+    <value>トラックの ReplayGain アルバムピーク。</value>
+  </data>
+  <data name="TrackWorkType" xml:space="preserve">
+    <value>作品タイプ</value>
+  </data>
+  <data name="TrackWorkTypeDescription" xml:space="preserve">
+    <value>作品の MusicBrainz タイプ (楽曲など)。</value>
+  </data>
+  <data name="TrackWorkIswcs" xml:space="preserve">
+    <value>作品の ISWC</value>
+  </data>
+  <data name="TrackWorkIswcsDescription" xml:space="preserve">
+    <value>作品のISWC。</value>
+  </data>
+  <data name="TrackWorkLanguages" xml:space="preserve">
+    <value>作品の言語</value>
+  </data>
+  <data name="TrackWorkLanguagesDescription" xml:space="preserve">
+    <value>作品の言語。</value>
+  </data>
+  <data name="WorkLanguageCode" xml:space="preserve">
+    <value>コード</value>
+  </data>
+  <data name="WorkLanguageName" xml:space="preserve">
+    <value>名前</value>
+  </data>
+  <data name="WorkLanguageNativeName" xml:space="preserve">
+    <value>ネイティブ名</value>
+  </data>
+  <data name="AddWorkLanguage" xml:space="preserve">
+    <value>言語を追加</value>
+  </data>
+  <data name="LanguageCodeDescription" xml:space="preserve">
+    <value>トラックの言語の 2 文字コード。</value>
+  </data>
+  <data name="LanguageNameDescription" xml:space="preserve">
+    <value>トラックの言語の名前。</value>
+  </data>
+  <data name="NativeNameDescription" xml:space="preserve">
+    <value>トラックの言語のネイティブ名。</value>
+  </data>
+<data name="LanguageCode" xml:space="preserve">
+    <value>言語コード</value>
+  </data>
+<data name="LanguageName" xml:space="preserve">
+    <value>言語名</value>
+  </data>
+<data name="NativeName" xml:space="preserve">
+    <value>現地語名</value>
+  </data>
+<data name="Contributors" xml:space="preserve">
+    <value>貢献者</value>
+  </data>
+<data name="ContributorId" xml:space="preserve">
+    <value>貢献者 Id</value>
+  </data>
+<data name="ContributorRole" xml:space="preserve">
+    <value>役割</value>
+  </data>
+<data name="AddContributor" xml:space="preserve">
+    <value>貢献者を追加</value>
+  </data>
+<data name="ContributorsDescription" xml:space="preserve">
+    <value>アーティストに貢献した人々。</value>
+  </data>
+<data name="Ratings" xml:space="preserve">
+    <value>評価</value>
+  </data>
+<data name="RatingValue" xml:space="preserve">
+    <value>評価</value>
+  </data>
+<data name="RatingMaxValue" xml:space="preserve">
+    <value>最大評価</value>
+  </data>
+<data name="RatingSource" xml:space="preserve">
+    <value>出典</value>
+  </data>
+<data name="RatingVoteCount" xml:space="preserve">
+    <value>投票数</value>
+  </data>
+<data name="AddRating" xml:space="preserve">
+    <value>評価を追加</value>
+  </data>
+<data name="RatingsDescription" xml:space="preserve">
+    <value>さまざまな情報源によるアーティストの評価。</value>
+  </data>
+<data name="Remove" xml:space="preserve">
+    <value>削除</value>
+  </data>
+<data name="Other" xml:space="preserve">
+    <value>その他</value>
+  </data>
+<data name="Author" xml:space="preserve">
+    <value>著者</value>
+  </data>
+<data name="Translator" xml:space="preserve">
+    <value>翻訳者</value>
+  </data>
+<data name="Illustrator" xml:space="preserve">
+    <value>イラストレーター</value>
+  </data>
+<data name="Publisher" xml:space="preserve">
+    <value>出版社</value>
+  </data>
+<data name="Narrator" xml:space="preserve">
+    <value>ナレーター</value>
+  </data>
+<data name="Actor" xml:space="preserve">
+    <value>俳優</value>
+  </data>
+<data name="Director" xml:space="preserve">
+    <value>監督</value>
+  </data>
+<data name="Screenwriter" xml:space="preserve">
+    <value>脚本家</value>
+  </data>
+<data name="Composer" xml:space="preserve">
+    <value>作曲者</value>
+  </data>
+<data name="Lyricist" xml:space="preserve">
+    <value>作詞者</value>
+  </data>
+<data name="Arranger" xml:space="preserve">
+    <value>編曲者</value>
+  </data>
+<data name="Conductor" xml:space="preserve">
+    <value>指揮者</value>
+  </data>
+<data name="Producer" xml:space="preserve">
+    <value>プロデューサー</value>
+  </data>
+<data name="ExecutiveProducer" xml:space="preserve">
+    <value>エグゼクティブプロデューサー</value>
+  </data>
+<data name="Engineer" xml:space="preserve">
+    <value>エンジニア</value>
+  </data>
+<data name="Mixer" xml:space="preserve">
+    <value>ミキサー</value>
+  </data>
+<data name="Remixer" xml:space="preserve">
+    <value>リミキサー</value>
+  </data>
+<data name="RecordLabel" xml:space="preserve">
+    <value>レコードレーベル</value>
+  </data>
+<data name="Vocals" xml:space="preserve">
+    <value>ボーカル</value>
+  </data>
+<data name="BackingVocals" xml:space="preserve">
+    <value>バッキングボーカル</value>
+  </data>
+<data name="Guitar" xml:space="preserve">
+    <value>ギター</value>
+  </data>
+<data name="BassGuitar" xml:space="preserve">
+    <value>ベースギター</value>
+  </data>
+<data name="Drums" xml:space="preserve">
+    <value>ドラム</value>
+  </data>
+<data name="Percussion" xml:space="preserve">
+    <value>パーカッション</value>
+  </data>
+<data name="Keyboards" xml:space="preserve">
+    <value>キーボード</value>
+  </data>
+<data name="Piano" xml:space="preserve">
+    <value>ピアノ</value>
+  </data>
+<data name="Synthesizer" xml:space="preserve">
+    <value>シンセサイザー</value>
+  </data>
+<data name="Strings" xml:space="preserve">
+    <value>弦楽器</value>
+  </data>
+<data name="Woodwinds" xml:space="preserve">
+    <value>木管楽器</value>
+  </data>
+<data name="Brass" xml:space="preserve">
+    <value>金管楽器</value>
+  </data>
+<data name="Choir" xml:space="preserve">
+    <value>合唱</value>
+  </data>
+<data name="Orchestrator" xml:space="preserve">
+    <value>管弦楽編曲者</value>
+  </data>
+<data name="Performer" xml:space="preserve">
+    <value>演奏者</value>
+  </data>
+<data name="User" xml:space="preserve">
+    <value>ユーザー</value>
+  </data>
+<data name="MusicBrainz" xml:space="preserve">
+    <value>MusicBrainz</value>
+  </data>
+<data name="Discogs" xml:space="preserve">
+    <value>Discogs</value>
+  </data>
+<data name="LastFm" xml:space="preserve">
+    <value>Last.fm</value>
+  </data>
+<data name="Country.AD" xml:space="preserve">
+    <value>アンドラ</value>
+  </data>
+<data name="Country.AE" xml:space="preserve">
+    <value>アラブ首長国連邦</value>
+  </data>
+<data name="Country.AF" xml:space="preserve">
+    <value>アフガニスタン</value>
+  </data>
+<data name="Country.AG" xml:space="preserve">
+    <value>アンティグア・バーブーダ</value>
+  </data>
+<data name="Country.AL" xml:space="preserve">
+    <value>アルバニア</value>
+  </data>
+<data name="Country.AM" xml:space="preserve">
+    <value>アルメニア</value>
+  </data>
+<data name="Country.AN" xml:space="preserve">
+    <value>オランダ領アンティル</value>
+  </data>
+<data name="Country.AO" xml:space="preserve">
+    <value>アンゴラ</value>
+  </data>
+<data name="Country.AR" xml:space="preserve">
+    <value>アルゼンチン</value>
+  </data>
+<data name="Country.AT" xml:space="preserve">
+    <value>オーストリア</value>
+  </data>
+<data name="Country.AU" xml:space="preserve">
+    <value>オーストラリア</value>
+  </data>
+<data name="Country.AZ" xml:space="preserve">
+    <value>アゼルバイジャン</value>
+  </data>
+<data name="Country.BA" xml:space="preserve">
+    <value>ボスニア・ヘルツェゴビナ</value>
+  </data>
+<data name="Country.BB" xml:space="preserve">
+    <value>バルバドス</value>
+  </data>
+<data name="Country.BD" xml:space="preserve">
+    <value>バングラデシュ</value>
+  </data>
+<data name="Country.BE" xml:space="preserve">
+    <value>ベルギー</value>
+  </data>
+<data name="Country.BF" xml:space="preserve">
+    <value>ブルキナファソ</value>
+  </data>
+<data name="Country.BG" xml:space="preserve">
+    <value>ブルガリア</value>
+  </data>
+<data name="Country.BH" xml:space="preserve">
+    <value>バーレーン</value>
+  </data>
+<data name="Country.BI" xml:space="preserve">
+    <value>ブルンジ</value>
+  </data>
+<data name="Country.BJ" xml:space="preserve">
+    <value>ベナン</value>
+  </data>
+<data name="Country.BN" xml:space="preserve">
+    <value>ブルネイ</value>
+  </data>
+<data name="Country.BO" xml:space="preserve">
+    <value>ボリビア</value>
+  </data>
+<data name="Country.BR" xml:space="preserve">
+    <value>ブラジル</value>
+  </data>
+<data name="Country.BS" xml:space="preserve">
+    <value>バハマ</value>
+  </data>
+<data name="Country.BT" xml:space="preserve">
+    <value>ブータン</value>
+  </data>
+<data name="Country.BW" xml:space="preserve">
+    <value>ボツワナ</value>
+  </data>
+<data name="Country.BY" xml:space="preserve">
+    <value>ベラルーシ</value>
+  </data>
+<data name="Country.BZ" xml:space="preserve">
+    <value>ベリーズ</value>
+  </data>
+<data name="Country.CA" xml:space="preserve">
+    <value>カナダ</value>
+  </data>
+<data name="Country.CD" xml:space="preserve">
+    <value>コンゴ民主共和国</value>
+  </data>
+<data name="Country.CF" xml:space="preserve">
+    <value>中央アフリカ共和国</value>
+  </data>
+<data name="Country.CG" xml:space="preserve">
+    <value>コンゴ共和国</value>
+  </data>
+<data name="Country.CH" xml:space="preserve">
+    <value>スイス</value>
+  </data>
+<data name="Country.CI" xml:space="preserve">
+    <value>コートジボワール</value>
+  </data>
+<data name="Country.CL" xml:space="preserve">
+    <value>チリ</value>
+  </data>
+<data name="Country.CM" xml:space="preserve">
+    <value>カメルーン</value>
+  </data>
+<data name="Country.CN" xml:space="preserve">
+    <value>中国</value>
+  </data>
+<data name="Country.CO" xml:space="preserve">
+    <value>コロンビア</value>
+  </data>
+<data name="Country.CR" xml:space="preserve">
+    <value>コスタリカ</value>
+  </data>
+<data name="Country.CU" xml:space="preserve">
+    <value>キューバ</value>
+  </data>
+<data name="Country.CV" xml:space="preserve">
+    <value>カーボベルデ</value>
+  </data>
+<data name="Country.CY" xml:space="preserve">
+    <value>キプロス</value>
+  </data>
+<data name="Country.CZ" xml:space="preserve">
+    <value>チェコ</value>
+  </data>
+<data name="Country.DE" xml:space="preserve">
+    <value>ドイツ</value>
+  </data>
+<data name="Country.DJ" xml:space="preserve">
+    <value>ジブチ</value>
+  </data>
+<data name="Country.DK" xml:space="preserve">
+    <value>デンマーク</value>
+  </data>
+<data name="Country.DM" xml:space="preserve">
+    <value>ドミニカ国</value>
+  </data>
+<data name="Country.DO" xml:space="preserve">
+    <value>ドミニカ共和国</value>
+  </data>
+<data name="Country.DZ" xml:space="preserve">
+    <value>アルジェリア</value>
+  </data>
+<data name="Country.EC" xml:space="preserve">
+    <value>エクアドル</value>
+  </data>
+<data name="Country.EE" xml:space="preserve">
+    <value>エストニア</value>
+  </data>
+<data name="Country.EG" xml:space="preserve">
+    <value>エジプト</value>
+  </data>
+<data name="Country.ER" xml:space="preserve">
+    <value>エリトリア</value>
+  </data>
+<data name="Country.ES" xml:space="preserve">
+    <value>スペイン</value>
+  </data>
+<data name="Country.ET" xml:space="preserve">
+    <value>エチオピア</value>
+  </data>
+<data name="Country.FI" xml:space="preserve">
+    <value>フィンランド</value>
+  </data>
+<data name="Country.FJ" xml:space="preserve">
+    <value>フィジー</value>
+  </data>
+<data name="Country.FM" xml:space="preserve">
+    <value>ミクロネシア</value>
+  </data>
+<data name="Country.FR" xml:space="preserve">
+    <value>フランス</value>
+  </data>
+<data name="Country.GA" xml:space="preserve">
+    <value>ガボン</value>
+  </data>
+<data name="Country.GB" xml:space="preserve">
+    <value>イギリス</value>
+  </data>
+<data name="Country.GD" xml:space="preserve">
+    <value>グレナダ</value>
+  </data>
+<data name="Country.GE" xml:space="preserve">
+    <value>ジョージア</value>
+  </data>
+<data name="Country.GH" xml:space="preserve">
+    <value>ガーナ</value>
+  </data>
+<data name="Country.GM" xml:space="preserve">
+    <value>ガンビア</value>
+  </data>
+<data name="Country.GN" xml:space="preserve">
+    <value>ギニア</value>
+  </data>
+<data name="Country.GQ" xml:space="preserve">
+    <value>赤道ギニア</value>
+  </data>
+<data name="Country.GR" xml:space="preserve">
+    <value>ギリシャ</value>
+  </data>
+<data name="Country.GT" xml:space="preserve">
+    <value>グアテマラ</value>
+  </data>
+<data name="Country.GW" xml:space="preserve">
+    <value>ギニアビサウ</value>
+  </data>
+<data name="Country.GY" xml:space="preserve">
+    <value>ガイアナ</value>
+  </data>
+<data name="Country.HN" xml:space="preserve">
+    <value>ホンジュラス</value>
+  </data>
+<data name="Country.HR" xml:space="preserve">
+    <value>クロアチア</value>
+  </data>
+<data name="Country.HT" xml:space="preserve">
+    <value>ハイチ</value>
+  </data>
+<data name="Country.HU" xml:space="preserve">
+    <value>ハンガリー</value>
+  </data>
+<data name="Country.ID" xml:space="preserve">
+    <value>インドネシア</value>
+  </data>
+<data name="Country.IE" xml:space="preserve">
+    <value>アイルランド</value>
+  </data>
+<data name="Country.IL" xml:space="preserve">
+    <value>イスラエル</value>
+  </data>
+<data name="Country.IN" xml:space="preserve">
+    <value>インド</value>
+  </data>
+<data name="Country.IQ" xml:space="preserve">
+    <value>イラク</value>
+  </data>
+<data name="Country.IR" xml:space="preserve">
+    <value>イラン</value>
+  </data>
+<data name="Country.IS" xml:space="preserve">
+    <value>アイスランド</value>
+  </data>
+<data name="Country.IT" xml:space="preserve">
+    <value>イタリア</value>
+  </data>
+<data name="Country.JM" xml:space="preserve">
+    <value>ジャマイカ</value>
+  </data>
+<data name="Country.JO" xml:space="preserve">
+    <value>ヨルダン</value>
+  </data>
+<data name="Country.JP" xml:space="preserve">
+    <value>日本</value>
+  </data>
+<data name="Country.KE" xml:space="preserve">
+    <value>ケニア</value>
+  </data>
+<data name="Country.KG" xml:space="preserve">
+    <value>キルギス</value>
+  </data>
+<data name="Country.KH" xml:space="preserve">
+    <value>カンボジア</value>
+  </data>
+<data name="Country.KI" xml:space="preserve">
+    <value>キリバス</value>
+  </data>
+<data name="Country.KM" xml:space="preserve">
+    <value>コモロ</value>
+  </data>
+<data name="Country.KN" xml:space="preserve">
+    <value>セントクリストファー・ネービス</value>
+  </data>
+<data name="Country.KP" xml:space="preserve">
+    <value>北朝鮮</value>
+  </data>
+<data name="Country.KR" xml:space="preserve">
+    <value>韓国</value>
+  </data>
+<data name="Country.KW" xml:space="preserve">
+    <value>クウェート</value>
+  </data>
+<data name="Country.KZ" xml:space="preserve">
+    <value>カザフスタン</value>
+  </data>
+<data name="Country.LA" xml:space="preserve">
+    <value>ラオス</value>
+  </data>
+<data name="Country.LB" xml:space="preserve">
+    <value>レバノン</value>
+  </data>
+<data name="Country.LC" xml:space="preserve">
+    <value>セントルシア</value>
+  </data>
+<data name="Country.LI" xml:space="preserve">
+    <value>リヒテンシュタイン</value>
+  </data>
+<data name="Country.LK" xml:space="preserve">
+    <value>スリランカ</value>
+  </data>
+<data name="Country.LR" xml:space="preserve">
+    <value>リベリア</value>
+  </data>
+<data name="Country.LS" xml:space="preserve">
+    <value>レソト</value>
+  </data>
+<data name="Country.LT" xml:space="preserve">
+    <value>リトアニア</value>
+  </data>
+<data name="Country.LU" xml:space="preserve">
+    <value>ルクセンブルク</value>
+  </data>
+<data name="Country.LV" xml:space="preserve">
+    <value>ラトビア</value>
+  </data>
+<data name="Country.LY" xml:space="preserve">
+    <value>リビア</value>
+  </data>
+<data name="Country.MA" xml:space="preserve">
+    <value>モロッコ</value>
+  </data>
+<data name="Country.MC" xml:space="preserve">
+    <value>モナコ</value>
+  </data>
+<data name="Country.MD" xml:space="preserve">
+    <value>モルドバ</value>
+  </data>
+<data name="Country.ME" xml:space="preserve">
+    <value>モンテネグロ</value>
+  </data>
+<data name="Country.MG" xml:space="preserve">
+    <value>マダガスカル</value>
+  </data>
+<data name="Country.MH" xml:space="preserve">
+    <value>マーシャル諸島</value>
+  </data>
+<data name="Country.MK" xml:space="preserve">
+    <value>北マケドニア</value>
+  </data>
+<data name="Country.ML" xml:space="preserve">
+    <value>マリ</value>
+  </data>
+<data name="Country.MM" xml:space="preserve">
+    <value>ミャンマー</value>
+  </data>
+<data name="Country.MN" xml:space="preserve">
+    <value>モンゴル</value>
+  </data>
+<data name="Country.MR" xml:space="preserve">
+    <value>モーリタニア</value>
+  </data>
+<data name="Country.MT" xml:space="preserve">
+    <value>マルタ</value>
+  </data>
+<data name="Country.MU" xml:space="preserve">
+    <value>モーリシャス</value>
+  </data>
+<data name="Country.MV" xml:space="preserve">
+    <value>モルディブ</value>
+  </data>
+<data name="Country.MW" xml:space="preserve">
+    <value>マラウイ</value>
+  </data>
+<data name="Country.MX" xml:space="preserve">
+    <value>メキシコ</value>
+  </data>
+<data name="Country.MY" xml:space="preserve">
+    <value>マレーシア</value>
+  </data>
+<data name="Country.MZ" xml:space="preserve">
+    <value>モザンビーク</value>
+  </data>
+<data name="Country.NA" xml:space="preserve">
+    <value>ナミビア</value>
+  </data>
+<data name="Country.NE" xml:space="preserve">
+    <value>ニジェール</value>
+  </data>
+<data name="Country.NG" xml:space="preserve">
+    <value>ナイジェリア</value>
+  </data>
+<data name="Country.NI" xml:space="preserve">
+    <value>ニカラグア</value>
+  </data>
+<data name="Country.NL" xml:space="preserve">
+    <value>オランダ</value>
+  </data>
+<data name="Country.NO" xml:space="preserve">
+    <value>ノルウェー</value>
+  </data>
+<data name="Country.NP" xml:space="preserve">
+    <value>ネパール</value>
+  </data>
+<data name="Country.NR" xml:space="preserve">
+    <value>ナウル</value>
+  </data>
+<data name="Country.NZ" xml:space="preserve">
+    <value>ニュージーランド</value>
+  </data>
+<data name="Country.OM" xml:space="preserve">
+    <value>オマーン</value>
+  </data>
+<data name="Country.PA" xml:space="preserve">
+    <value>パナマ</value>
+  </data>
+<data name="Country.PE" xml:space="preserve">
+    <value>ペルー</value>
+  </data>
+<data name="Country.PG" xml:space="preserve">
+    <value>パプアニューギニア</value>
+  </data>
+<data name="Country.PH" xml:space="preserve">
+    <value>フィリピン</value>
+  </data>
+<data name="Country.PK" xml:space="preserve">
+    <value>パキスタン</value>
+  </data>
+<data name="Country.PL" xml:space="preserve">
+    <value>ポーランド</value>
+  </data>
+<data name="Country.PS" xml:space="preserve">
+    <value>パレスチナ</value>
+  </data>
+<data name="Country.PT" xml:space="preserve">
+    <value>ポルトガル</value>
+  </data>
+<data name="Country.PW" xml:space="preserve">
+    <value>パラオ</value>
+  </data>
+<data name="Country.PY" xml:space="preserve">
+    <value>パラグアイ</value>
+  </data>
+<data name="Country.QA" xml:space="preserve">
+    <value>カタール</value>
+  </data>
+<data name="Country.RO" xml:space="preserve">
+    <value>ルーマニア</value>
+  </data>
+<data name="Country.RS" xml:space="preserve">
+    <value>セルビア</value>
+  </data>
+<data name="Country.RU" xml:space="preserve">
+    <value>ロシア</value>
+  </data>
+<data name="Country.RW" xml:space="preserve">
+    <value>ルワンダ</value>
+  </data>
+<data name="Country.SA" xml:space="preserve">
+    <value>サウジアラビア</value>
+  </data>
+<data name="Country.SB" xml:space="preserve">
+    <value>ソロモン諸島</value>
+  </data>
+<data name="Country.SC" xml:space="preserve">
+    <value>セーシェル</value>
+  </data>
+<data name="Country.SD" xml:space="preserve">
+    <value>スーダン</value>
+  </data>
+<data name="Country.SE" xml:space="preserve">
+    <value>スウェーデン</value>
+  </data>
+<data name="Country.SG" xml:space="preserve">
+    <value>シンガポール</value>
+  </data>
+<data name="Country.SI" xml:space="preserve">
+    <value>スロベニア</value>
+  </data>
+<data name="Country.SK" xml:space="preserve">
+    <value>スロバキア</value>
+  </data>
+<data name="Country.SL" xml:space="preserve">
+    <value>シエラレオネ</value>
+  </data>
+<data name="Country.SM" xml:space="preserve">
+    <value>サンマリノ</value>
+  </data>
+<data name="Country.SN" xml:space="preserve">
+    <value>セネガル</value>
+  </data>
+<data name="Country.SO" xml:space="preserve">
+    <value>ソマリア</value>
+  </data>
+<data name="Country.SR" xml:space="preserve">
+    <value>スリナム</value>
+  </data>
+<data name="Country.SS" xml:space="preserve">
+    <value>南スーダン</value>
+  </data>
+<data name="Country.ST" xml:space="preserve">
+    <value>サントメ・プリンシペ</value>
+  </data>
+<data name="Country.SV" xml:space="preserve">
+    <value>エルサルバドル</value>
+  </data>
+<data name="Country.SY" xml:space="preserve">
+    <value>シリア</value>
+  </data>
+<data name="Country.SZ" xml:space="preserve">
+    <value>エスワティニ</value>
+  </data>
+<data name="Country.TD" xml:space="preserve">
+    <value>チャド</value>
+  </data>
+<data name="Country.TG" xml:space="preserve">
+    <value>トーゴ</value>
+  </data>
+<data name="Country.TH" xml:space="preserve">
+    <value>タイ</value>
+  </data>
+<data name="Country.TJ" xml:space="preserve">
+    <value>タジキスタン</value>
+  </data>
+<data name="Country.TL" xml:space="preserve">
+    <value>東ティモール</value>
+  </data>
+<data name="Country.TM" xml:space="preserve">
+    <value>トルクメニスタン</value>
+  </data>
+<data name="Country.TN" xml:space="preserve">
+    <value>チュニジア</value>
+  </data>
+<data name="Country.TO" xml:space="preserve">
+    <value>トンガ</value>
+  </data>
+<data name="Country.TR" xml:space="preserve">
+    <value>トルコ</value>
+  </data>
+<data name="Country.TT" xml:space="preserve">
+    <value>トリニダード・トバゴ</value>
+  </data>
+<data name="Country.TV" xml:space="preserve">
+    <value>ツバル</value>
+  </data>
+<data name="Country.TW" xml:space="preserve">
+    <value>台湾</value>
+  </data>
+<data name="Country.TZ" xml:space="preserve">
+    <value>タンザニア</value>
+  </data>
+<data name="Country.UA" xml:space="preserve">
+    <value>ウクライナ</value>
+  </data>
+<data name="Country.UG" xml:space="preserve">
+    <value>ウガンダ</value>
+  </data>
+<data name="Country.US" xml:space="preserve">
+    <value>アメリカ合衆国</value>
+  </data>
+<data name="Country.UY" xml:space="preserve">
+    <value>ウルグアイ</value>
+  </data>
+<data name="Country.UZ" xml:space="preserve">
+    <value>ウズベキスタン</value>
+  </data>
+<data name="Country.VA" xml:space="preserve">
+    <value>バチカン市国</value>
+  </data>
+<data name="Country.VC" xml:space="preserve">
+    <value>セントビンセント・グレナディーン</value>
+  </data>
+<data name="Country.VE" xml:space="preserve">
+    <value>ベネズエラ</value>
+  </data>
+<data name="Country.VN" xml:space="preserve">
+    <value>ベトナム</value>
+  </data>
+<data name="Country.VU" xml:space="preserve">
+    <value>バヌアツ</value>
+  </data>
+<data name="Country.WS" xml:space="preserve">
+    <value>サモア</value>
+  </data>
+<data name="Country.XE" xml:space="preserve">
+    <value>ヨーロッパ</value>
+  </data>
+<data name="Country.XW" xml:space="preserve">
+    <value>全世界</value>
+  </data>
+<data name="Country.YE" xml:space="preserve">
+    <value>イエメン</value>
+  </data>
+<data name="Country.ZA" xml:space="preserve">
+    <value>南アフリカ</value>
+  </data>
+<data name="Country.ZM" xml:space="preserve">
+    <value>ザンビア</value>
+  </data>
+<data name="Country.ZW" xml:space="preserve">
+    <value>ジンバブエ</value>
+  </data>
+  <data name="Genre" xml:space="preserve">
+    <value>ジャンル</value>
+  </data>
+  <data name="AddGenre" xml:space="preserve">
+    <value>ジャンルを追加</value>
+  </data>
+  <data name="Tag" xml:space="preserve">
+    <value>タグ</value>
+  </data>
+  <data name="AddTag" xml:space="preserve">
+    <value>タグを追加</value>
+  </data>
+  <data name="Mood" xml:space="preserve">
+    <value>気分</value>
+  </data>
+  <data name="AddMood" xml:space="preserve">
+    <value>気分を追加</value>
+  </data>
+  <data name="Isrc" xml:space="preserve">
+    <value>ISRC</value>
+  </data>
+  <data name="AddIsrc" xml:space="preserve">
+    <value>ISRC を追加</value>
+  </data>
+  <data name="WorkIswc" xml:space="preserve">
+    <value>ISWC</value>
+  </data>
+  <data name="AddWorkIswc" xml:space="preserve">
+    <value>ISWC を追加</value>
+  </data>
+</root>

@@ -1,0 +1,1509 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="BackToArtist" xml:space="preserve">
+    <value>Назад до виконавця</value>
+  </data>
+  <data name="EditAlbum" xml:space="preserve">
+    <value>Редагувати альбом</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Зберегти</value>
+  </data>
+  <data name="AlbumSaved" xml:space="preserve">
+    <value>Альбом збережено.</value>
+  </data>
+  <data name="SaveFailed" xml:space="preserve">
+    <value>Не вдалося зберегти елемент.</value>
+  </data>
+  <data name="DeleteAlbum" xml:space="preserve">
+    <value>Видалити альбом</value>
+  </data>
+  <data name="AlbumDeleted" xml:space="preserve">
+    <value>Альбом видалено.</value>
+  </data>
+  <data name="DeleteConfirm" xml:space="preserve">
+    <value>Ви впевнені, що хочете видалити цей елемент?</value>
+  </data>
+  <data name="DeleteFailed" xml:space="preserve">
+    <value>Не вдалося видалити елемент.</value>
+  </data>
+  <data name="GeneralInformation" xml:space="preserve">
+    <value>Загальна інформація</value>
+  </data>
+  <data name="AlbumTitle" xml:space="preserve">
+    <value>Назва</value>
+  </data>
+  <data name="AlbumOriginalTitle" xml:space="preserve">
+    <value>Оригінальна назва</value>
+  </data>
+  <data name="AlbumDescription" xml:space="preserve">
+    <value>Опис</value>
+  </data>
+  <data name="AlbumDisambiguation" xml:space="preserve">
+    <value>Уточнення</value>
+  </data>
+  <data name="AlbumScript" xml:space="preserve">
+    <value>Письмо</value>
+  </data>
+  <data name="AlbumReleaseStatus" xml:space="preserve">
+    <value>Статус випуску</value>
+  </data>
+  <data name="AlbumTotalDiscs" xml:space="preserve">
+    <value>Усього дисків</value>
+  </data>
+  <data name="AlbumTotalTracks" xml:space="preserve">
+    <value>Усього треків</value>
+  </data>
+  <data name="AlbumReleaseTitle" xml:space="preserve">
+    <value>Назва випуску</value>
+  </data>
+  <data name="AlbumMediaFormat" xml:space="preserve">
+    <value>Формат носія</value>
+  </data>
+  <data name="AlbumPackaging" xml:space="preserve">
+    <value>Пакування</value>
+  </data>
+  <data name="AlbumBarcode" xml:space="preserve">
+    <value>Штрихкод</value>
+  </data>
+  <data name="AlbumCatalogNumbers" xml:space="preserve">
+    <value>Номери каталогу</value>
+  </data>
+  <data name="AlbumLabel" xml:space="preserve">
+    <value>Лейбл</value>
+  </data>
+  <data name="AlbumAsin" xml:space="preserve">
+    <value>ASIN</value>
+  </data>
+  <data name="AlbumMusicBrainzReleaseId" xml:space="preserve">
+    <value>Ідентифікатор випуску MusicBrainz</value>
+  </data>
+  <data name="AlbumMusicBrainzReleaseGroupId" xml:space="preserve">
+    <value>Ідентифікатор групи випуску MusicBrainz</value>
+  </data>
+  <data name="AlbumMusicBrainzReleaseArtistId" xml:space="preserve">
+    <value>Ідентифікатор виконавця випуску MusicBrainz</value>
+  </data>
+  <data name="AlbumReleaseInformation" xml:space="preserve">
+    <value>Інформація про випуск</value>
+  </data>
+  <data name="AlbumOriginalReleaseDate" xml:space="preserve">
+    <value>Дата першого випуску</value>
+  </data>
+  <data name="AlbumOriginalReleaseYear" xml:space="preserve">
+    <value>Рік першого випуску</value>
+  </data>
+  <data name="AlbumReReleaseDate" xml:space="preserve">
+    <value>Дата перевипуску</value>
+  </data>
+  <data name="AlbumReReleaseYear" xml:space="preserve">
+    <value>Рік перевипуску</value>
+  </data>
+  <data name="AlbumReleaseCountry" xml:space="preserve">
+    <value>Країна випуску</value>
+  </data>
+  <data name="AlbumReleaseVersion" xml:space="preserve">
+    <value>Версія випуску</value>
+  </data>
+  <data name="AlbumLanguage" xml:space="preserve">
+    <value>Мова</value>
+  </data>
+  <data name="LanguageCode" xml:space="preserve">
+    <value>Код мови</value>
+  </data>
+  <data name="LanguageName" xml:space="preserve">
+    <value>Назва мови</value>
+  </data>
+  <data name="NativeName" xml:space="preserve">
+    <value>Власна назва</value>
+  </data>
+  <data name="AlbumOriginalLanguage" xml:space="preserve">
+    <value>Оригінальна мова</value>
+  </data>
+  <data name="AlbumGenres" xml:space="preserve">
+    <value>Жанри</value>
+  </data>
+  <data name="AlbumTags" xml:space="preserve">
+    <value>Теги</value>
+  </data>
+  <data name="AlbumReleaseTypes" xml:space="preserve">
+    <value>Типи випуску</value>
+  </data>
+  <data name="Tracks" xml:space="preserve">
+    <value>Треки</value>
+  </data>
+  <data name="NoTracks" xml:space="preserve">
+    <value>Цей альбом не має треків</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Видалити</value>
+  </data>
+  <data name="Bootleg" xml:space="preserve">
+    <value>Бутлег</value>
+  </data>
+  <data name="Cancelled" xml:space="preserve">
+    <value>Скасовано</value>
+  </data>
+  <data name="Expunged" xml:space="preserve">
+    <value>Вилучено</value>
+  </data>
+  <data name="Official" xml:space="preserve">
+    <value>Офіційний</value>
+  </data>
+  <data name="Promotion" xml:space="preserve">
+    <value>Промо</value>
+  </data>
+  <data name="PseudoRelease" xml:space="preserve">
+    <value>Псевдовидання</value>
+  </data>
+  <data name="Withdrawn" xml:space="preserve">
+    <value>Відкликано</value>
+  </data>
+  <data name="Inch10Acetate" xml:space="preserve">
+    <value>Ацетат 10 дюймів</value>
+  </data>
+  <data name="Inch10Shellac" xml:space="preserve">
+    <value>Шелак 10 дюймів</value>
+  </data>
+  <data name="Inch10Vinyl" xml:space="preserve">
+    <value>Вініл 10 дюймів</value>
+  </data>
+  <data name="Inch12Acetate" xml:space="preserve">
+    <value>Ацетат 12 дюймів</value>
+  </data>
+  <data name="Inch12LaserDisc" xml:space="preserve">
+    <value>Лазерний диск 12 дюймів</value>
+  </data>
+  <data name="Inch12Shellac" xml:space="preserve">
+    <value>Шелак 12 дюймів</value>
+  </data>
+  <data name="Inch12Vinyl" xml:space="preserve">
+    <value>Вініл 12 дюймів</value>
+  </data>
+  <data name="Inch3Vinyl" xml:space="preserve">
+    <value>Вініл 3 дюйми</value>
+  </data>
+  <data name="Inch3_5FloppyDisk" xml:space="preserve">
+    <value>Флопі-диск 3,5 дюйма</value>
+  </data>
+  <data name="Inch5_25FloppyDisk" xml:space="preserve">
+    <value>Флопі-диск 5,25 дюйма</value>
+  </data>
+  <data name="Inch7Acetate" xml:space="preserve">
+    <value>Ацетат 7 дюймів</value>
+  </data>
+  <data name="Inch7FlexiDisc" xml:space="preserve">
+    <value>Флексі-диск 7 дюймів</value>
+  </data>
+  <data name="Inch7Shellac" xml:space="preserve">
+    <value>Шелак 7 дюймів</value>
+  </data>
+  <data name="Inch7Vinyl" xml:space="preserve">
+    <value>Вініл 7 дюймів</value>
+  </data>
+  <data name="Inch8LaserDisc" xml:space="preserve">
+    <value>Лазерний диск 8 дюймів</value>
+  </data>
+  <data name="EightTrackCartridge" xml:space="preserve">
+    <value>Восьмидоріжкова касета</value>
+  </data>
+  <data name="Cm8CD" xml:space="preserve">
+    <value>CD 8 см</value>
+  </data>
+  <data name="Cm8CDPlusG" xml:space="preserve">
+    <value>CD 8 см Plus G</value>
+  </data>
+  <data name="Cm8CDMinusR" xml:space="preserve">
+    <value>CD-R 8 см</value>
+  </data>
+  <data name="Acetate" xml:space="preserve">
+    <value>Ацетат</value>
+  </data>
+  <data name="BetacamSP" xml:space="preserve">
+    <value>Betacam SP</value>
+  </data>
+  <data name="Betamax" xml:space="preserve">
+    <value>Betamax</value>
+  </data>
+  <data name="BluRay" xml:space="preserve">
+    <value>Blu-ray</value>
+  </data>
+  <data name="BluRayMinusR" xml:space="preserve">
+    <value>Blu-ray-R</value>
+  </data>
+  <data name="BluSpecCD" xml:space="preserve">
+    <value>Blu-spec CD</value>
+  </data>
+  <data name="Cartridge" xml:space="preserve">
+    <value>Картридж</value>
+  </data>
+  <data name="Cassette" xml:space="preserve">
+    <value>Касета</value>
+  </data>
+  <data name="CD" xml:space="preserve">
+    <value>CD</value>
+  </data>
+  <data name="CDPlusG" xml:space="preserve">
+    <value>CD Plus G</value>
+  </data>
+  <data name="CDMinusi" xml:space="preserve">
+    <value>CD-i</value>
+  </data>
+  <data name="CDMinusR" xml:space="preserve">
+    <value>CD-R</value>
+  </data>
+  <data name="CDV" xml:space="preserve">
+    <value>CDV</value>
+  </data>
+  <data name="CED" xml:space="preserve">
+    <value>CED</value>
+  </data>
+  <data name="CopyControlCD" xml:space="preserve">
+    <value>Copy Control CD</value>
+  </data>
+  <data name="DAT" xml:space="preserve">
+    <value>DAT</value>
+  </data>
+  <data name="DataCD" xml:space="preserve">
+    <value>CD з даними</value>
+  </data>
+  <data name="DataDVD" xml:space="preserve">
+    <value>DVD з даними</value>
+  </data>
+  <data name="DataDVDMinusR" xml:space="preserve">
+    <value>DVD-R з даними</value>
+  </data>
+  <data name="DataPlay" xml:space="preserve">
+    <value>Data Play</value>
+  </data>
+  <data name="DCC" xml:space="preserve">
+    <value>DCC</value>
+  </data>
+  <data name="DigitalMedia" xml:space="preserve">
+    <value>Цифровий носій</value>
+  </data>
+  <data name="DownloadCard" xml:space="preserve">
+    <value>Картка завантаження</value>
+  </data>
+  <data name="DTSCD" xml:space="preserve">
+    <value>DTSCD</value>
+  </data>
+  <data name="DualDisc" xml:space="preserve">
+    <value>Dual Disc</value>
+  </data>
+  <data name="DualDiscCDSide" xml:space="preserve">
+    <value>Dual Disc, сторона CD</value>
+  </data>
+  <data name="DualDiscDVDSide" xml:space="preserve">
+    <value>Dual Disc, сторона DVD</value>
+  </data>
+  <data name="DualDiscDVDAudioSide" xml:space="preserve">
+    <value>Dual Disc, сторона DVD-аудіо</value>
+  </data>
+  <data name="DualDiscDVDVideoSide" xml:space="preserve">
+    <value>Dual Disc, сторона DVD-відео</value>
+  </data>
+  <data name="DVD" xml:space="preserve">
+    <value>DVD</value>
+  </data>
+  <data name="DVDAudio" xml:space="preserve">
+    <value>DVD-аудіо</value>
+  </data>
+  <data name="DVDMinusRVideo" xml:space="preserve">
+    <value>DVD-R відео</value>
+  </data>
+  <data name="DVDVideo" xml:space="preserve">
+    <value>DVD-відео</value>
+  </data>
+  <data name="DVDPlus" xml:space="preserve">
+    <value>DVD Plus</value>
+  </data>
+  <data name="DVDPlusCDSide" xml:space="preserve">
+    <value>DVD Plus, сторона CD</value>
+  </data>
+  <data name="DVDPlusDVDAudioSide" xml:space="preserve">
+    <value>DVD Plus, сторона DVD-аудіо</value>
+  </data>
+  <data name="DVDPlusDVDVideoSide" xml:space="preserve">
+    <value>DVD Plus, сторона DVD-відео</value>
+  </data>
+  <data name="EdisonDiamondDisc" xml:space="preserve">
+    <value>Edison Diamond Disc</value>
+  </data>
+  <data name="EnhancedCD" xml:space="preserve">
+    <value>Розширений CD</value>
+  </data>
+  <data name="FlexiDisc" xml:space="preserve">
+    <value>Флексі-диск</value>
+  </data>
+  <data name="FloppyDisk" xml:space="preserve">
+    <value>Флопі-диск</value>
+  </data>
+  <data name="HDDVD" xml:space="preserve">
+    <value>HDDVD</value>
+  </data>
+  <data name="HDCD" xml:space="preserve">
+    <value>HDCD</value>
+  </data>
+  <data name="HiPac" xml:space="preserve">
+    <value>Hi Pac</value>
+  </data>
+  <data name="HQCD" xml:space="preserve">
+    <value>HQCD</value>
+  </data>
+  <data name="HybridSACD" xml:space="preserve">
+    <value>Гібридний SACD</value>
+  </data>
+  <data name="HybridSACDCDLayer" xml:space="preserve">
+    <value>Гібридний SACD, шар CD</value>
+  </data>
+  <data name="HybridSACDSACDLayer" xml:space="preserve">
+    <value>Гібридний SACD, шар SACD</value>
+  </data>
+  <data name="HybridSACDSACDLayer2Channels" xml:space="preserve">
+    <value>Гібридний SACD, шар SACD, 2 канали</value>
+  </data>
+  <data name="HybridSACDSACDLayerMultichannel" xml:space="preserve">
+    <value>Гібридний SACD, шар SACD, багатоканальний</value>
+  </data>
+  <data name="KiTAlbum" xml:space="preserve">
+    <value>Ki T Album</value>
+  </data>
+  <data name="LaserDisc" xml:space="preserve">
+    <value>Лазерний диск</value>
+  </data>
+  <data name="Microcassette" xml:space="preserve">
+    <value>Мікрокасета</value>
+  </data>
+  <data name="MicroSD" xml:space="preserve">
+    <value>MicroSD</value>
+  </data>
+  <data name="MiniDisc" xml:space="preserve">
+    <value>Мінідиск</value>
+  </data>
+  <data name="MiniDVD" xml:space="preserve">
+    <value>Міні DVD</value>
+  </data>
+  <data name="MiniDVDAudio" xml:space="preserve">
+    <value>Міні DVD-аудіо</value>
+  </data>
+  <data name="MiniDVDVideo" xml:space="preserve">
+    <value>Міні DVD-відео</value>
+  </data>
+  <data name="MinimaxCD" xml:space="preserve">
+    <value>Minimax CD</value>
+  </data>
+  <data name="MinimaxDVD" xml:space="preserve">
+    <value>Minimax DVD</value>
+  </data>
+  <data name="MinimaxDVDAudio" xml:space="preserve">
+    <value>Minimax DVD-аудіо</value>
+  </data>
+  <data name="MinimaxDVDVideo" xml:space="preserve">
+    <value>Minimax DVD-відео</value>
+  </data>
+  <data name="MixedModeCD" xml:space="preserve">
+    <value>CD змішаного режиму</value>
+  </data>
+  <data name="Other" xml:space="preserve">
+    <value>Інше</value>
+  </data>
+  <data name="PatheDisc" xml:space="preserve">
+    <value>Pathe Disc</value>
+  </data>
+  <data name="PhonographRecord" xml:space="preserve">
+    <value>Грамофонна платівка</value>
+  </data>
+  <data name="PianoRoll" xml:space="preserve">
+    <value>Ролик піаноли</value>
+  </data>
+  <data name="Playbutton" xml:space="preserve">
+    <value>Playbutton</value>
+  </data>
+  <data name="PlayTape" xml:space="preserve">
+    <value>PlayTape</value>
+  </data>
+  <data name="ReelToReel" xml:space="preserve">
+    <value>Котушкова стрічка</value>
+  </data>
+  <data name="ROMCartridge" xml:space="preserve">
+    <value>ROM-картридж</value>
+  </data>
+  <data name="SACD" xml:space="preserve">
+    <value>SACD</value>
+  </data>
+  <data name="SACD2Channels" xml:space="preserve">
+    <value>SACD, 2 канали</value>
+  </data>
+  <data name="SACDMultichannel" xml:space="preserve">
+    <value>SACD багатоканальний</value>
+  </data>
+  <data name="SDCard" xml:space="preserve">
+    <value>SD-карта</value>
+  </data>
+  <data name="Shellac" xml:space="preserve">
+    <value>Шелак</value>
+  </data>
+  <data name="SHMCD" xml:space="preserve">
+    <value>SHMCD</value>
+  </data>
+  <data name="SHMSACD" xml:space="preserve">
+    <value>SHMSACD</value>
+  </data>
+  <data name="SHMSACDMultichannel" xml:space="preserve">
+    <value>SHMSACD багатоканальний</value>
+  </data>
+  <data name="SlotMusic" xml:space="preserve">
+    <value>SlotMusic</value>
+  </data>
+  <data name="SVCD" xml:space="preserve">
+    <value>SVCD</value>
+  </data>
+  <data name="Tefifon" xml:space="preserve">
+    <value>Tefifon</value>
+  </data>
+  <data name="UMD" xml:space="preserve">
+    <value>UMD</value>
+  </data>
+  <data name="USBFlashDrive" xml:space="preserve">
+    <value>USB-флешка</value>
+  </data>
+  <data name="VCD" xml:space="preserve">
+    <value>VCD</value>
+  </data>
+  <data name="VHD" xml:space="preserve">
+    <value>VHD</value>
+  </data>
+  <data name="VHS" xml:space="preserve">
+    <value>VHS</value>
+  </data>
+  <data name="Vinyl" xml:space="preserve">
+    <value>Вініл</value>
+  </data>
+  <data name="VinylDisc" xml:space="preserve">
+    <value>Вініловий диск</value>
+  </data>
+  <data name="VinylDiscCDSide" xml:space="preserve">
+    <value>Вініловий диск, сторона CD</value>
+  </data>
+  <data name="VinylDiscDVDSide" xml:space="preserve">
+    <value>Вініловий диск, сторона DVD</value>
+  </data>
+  <data name="VinylDiscVinylSide" xml:space="preserve">
+    <value>Вініловий диск, вінілова сторона</value>
+  </data>
+  <data name="WaxCylinder" xml:space="preserve">
+    <value>Восковий циліндр</value>
+  </data>
+  <data name="ZipDisk" xml:space="preserve">
+    <value>Zip-диск</value>
+  </data>
+  <data name="Book" xml:space="preserve">
+    <value>Книга</value>
+  </data>
+  <data name="Box" xml:space="preserve">
+    <value>Бокс</value>
+  </data>
+  <data name="CardboardPaperSleeve" xml:space="preserve">
+    <value>Картонний паперовий конверт</value>
+  </data>
+  <data name="CassetteCase" xml:space="preserve">
+    <value>Корпус касети</value>
+  </data>
+  <data name="ClamshellCase" xml:space="preserve">
+    <value>Кейс-черепашка</value>
+  </data>
+  <data name="Digibook" xml:space="preserve">
+    <value>Диджибук</value>
+  </data>
+  <data name="Digifile" xml:space="preserve">
+    <value>Диджифайл</value>
+  </data>
+  <data name="Digipak" xml:space="preserve">
+    <value>Диджипак</value>
+  </data>
+  <data name="DiscboxSlider" xml:space="preserve">
+    <value>Слайдер дискового боксу</value>
+  </data>
+  <data name="Fatbox" xml:space="preserve">
+    <value>Фатбокс</value>
+  </data>
+  <data name="GatefoldCover" xml:space="preserve">
+    <value>Обкладинка-розгортка</value>
+  </data>
+  <data name="JewelCase" xml:space="preserve">
+    <value>Джевел-кейс</value>
+  </data>
+  <data name="KeepCase" xml:space="preserve">
+    <value>Кіп-кейс</value>
+  </data>
+  <data name="Longbox" xml:space="preserve">
+    <value>Лонгбокс</value>
+  </data>
+  <data name="MetalTin" xml:space="preserve">
+    <value>Металева бляшанка</value>
+  </data>
+  <data name="PlasticSleeve" xml:space="preserve">
+    <value>Пластиковий конверт</value>
+  </data>
+  <data name="Slidepack" xml:space="preserve">
+    <value>Слайд-пак</value>
+  </data>
+  <data name="SlimJewelCase" xml:space="preserve">
+    <value>Тонкий джевел-кейс</value>
+  </data>
+  <data name="Slipcase" xml:space="preserve">
+    <value>Сліпкейс</value>
+  </data>
+  <data name="SnapCase" xml:space="preserve">
+    <value>Снеп-кейс</value>
+  </data>
+  <data name="SnapPack" xml:space="preserve">
+    <value>Снеп-пак</value>
+  </data>
+  <data name="SuperJewelBox" xml:space="preserve">
+    <value>Супер-джевел-бокс</value>
+  </data>
+  <data name="None" xml:space="preserve">
+    <value>Немає</value>
+  </data>
+  <data name="Country.AF" xml:space="preserve">
+    <value>Афганістан</value>
+  </data>
+  <data name="Country.AL" xml:space="preserve">
+    <value>Албанія</value>
+  </data>
+  <data name="Country.DZ" xml:space="preserve">
+    <value>Алжир</value>
+  </data>
+  <data name="Country.AD" xml:space="preserve">
+    <value>Андорра</value>
+  </data>
+  <data name="Country.AO" xml:space="preserve">
+    <value>Ангола</value>
+  </data>
+  <data name="Country.AG" xml:space="preserve">
+    <value>Антигуа і Барбуда</value>
+  </data>
+  <data name="Country.AR" xml:space="preserve">
+    <value>Аргентина</value>
+  </data>
+  <data name="Country.AM" xml:space="preserve">
+    <value>Вірменія</value>
+  </data>
+  <data name="Country.AU" xml:space="preserve">
+    <value>Австралія</value>
+  </data>
+  <data name="Country.AT" xml:space="preserve">
+    <value>Австрія</value>
+  </data>
+  <data name="Country.AZ" xml:space="preserve">
+    <value>Азербайджан</value>
+  </data>
+  <data name="Country.BS" xml:space="preserve">
+    <value>Багамські острови</value>
+  </data>
+  <data name="Country.BH" xml:space="preserve">
+    <value>Бахрейн</value>
+  </data>
+  <data name="Country.BD" xml:space="preserve">
+    <value>Бангладеш</value>
+  </data>
+  <data name="Country.BB" xml:space="preserve">
+    <value>Барбадос</value>
+  </data>
+  <data name="Country.BY" xml:space="preserve">
+    <value>Білорусь</value>
+  </data>
+  <data name="Country.BE" xml:space="preserve">
+    <value>Бельгія</value>
+  </data>
+  <data name="Country.BZ" xml:space="preserve">
+    <value>Беліз</value>
+  </data>
+  <data name="Country.BJ" xml:space="preserve">
+    <value>Бенін</value>
+  </data>
+  <data name="Country.BT" xml:space="preserve">
+    <value>Бутан</value>
+  </data>
+  <data name="Country.BO" xml:space="preserve">
+    <value>Болівія</value>
+  </data>
+  <data name="Country.BA" xml:space="preserve">
+    <value>Боснія і Герцеговина</value>
+  </data>
+  <data name="Country.BW" xml:space="preserve">
+    <value>Ботсвана</value>
+  </data>
+  <data name="Country.BR" xml:space="preserve">
+    <value>Бразилія</value>
+  </data>
+  <data name="Country.BN" xml:space="preserve">
+    <value>Бруней</value>
+  </data>
+  <data name="Country.BG" xml:space="preserve">
+    <value>Болгарія</value>
+  </data>
+  <data name="Country.BF" xml:space="preserve">
+    <value>Буркіна-Фасо</value>
+  </data>
+  <data name="Country.BI" xml:space="preserve">
+    <value>Бурунді</value>
+  </data>
+  <data name="Country.CV" xml:space="preserve">
+    <value>Кабо-Верде</value>
+  </data>
+  <data name="Country.KH" xml:space="preserve">
+    <value>Камбоджа</value>
+  </data>
+  <data name="Country.CM" xml:space="preserve">
+    <value>Камерун</value>
+  </data>
+  <data name="Country.CA" xml:space="preserve">
+    <value>Канада</value>
+  </data>
+  <data name="Country.CF" xml:space="preserve">
+    <value>Центральноафриканська Республіка</value>
+  </data>
+  <data name="Country.TD" xml:space="preserve">
+    <value>Чад</value>
+  </data>
+  <data name="Country.CL" xml:space="preserve">
+    <value>Чилі</value>
+  </data>
+  <data name="Country.CN" xml:space="preserve">
+    <value>Китай</value>
+  </data>
+  <data name="Country.CO" xml:space="preserve">
+    <value>Колумбія</value>
+  </data>
+  <data name="Country.KM" xml:space="preserve">
+    <value>Коморські острови</value>
+  </data>
+  <data name="Country.CG" xml:space="preserve">
+    <value>Конго - Браззавіль</value>
+  </data>
+  <data name="Country.CD" xml:space="preserve">
+    <value>Конго - Кіншаса</value>
+  </data>
+  <data name="Country.CR" xml:space="preserve">
+    <value>Коста-Рика</value>
+  </data>
+  <data name="Country.CI" xml:space="preserve">
+    <value>Кот-д'Івуар</value>
+  </data>
+  <data name="Country.HR" xml:space="preserve">
+    <value>Хорватія</value>
+  </data>
+  <data name="Country.CU" xml:space="preserve">
+    <value>Куба</value>
+  </data>
+  <data name="Country.CY" xml:space="preserve">
+    <value>Кіпр</value>
+  </data>
+  <data name="Country.CZ" xml:space="preserve">
+    <value>Чехія</value>
+  </data>
+  <data name="Country.DK" xml:space="preserve">
+    <value>Данія</value>
+  </data>
+  <data name="Country.DJ" xml:space="preserve">
+    <value>Джибуті</value>
+  </data>
+  <data name="Country.DM" xml:space="preserve">
+    <value>Домініка</value>
+  </data>
+  <data name="Country.DO" xml:space="preserve">
+    <value>Домініканська Республіка</value>
+  </data>
+  <data name="Country.EC" xml:space="preserve">
+    <value>Еквадор</value>
+  </data>
+  <data name="Country.EG" xml:space="preserve">
+    <value>Єгипет</value>
+  </data>
+  <data name="Country.SV" xml:space="preserve">
+    <value>Сальвадор</value>
+  </data>
+  <data name="Country.GQ" xml:space="preserve">
+    <value>Екваторіальна Гвінея</value>
+  </data>
+  <data name="Country.ER" xml:space="preserve">
+    <value>Еритрея</value>
+  </data>
+  <data name="Country.EE" xml:space="preserve">
+    <value>Естонія</value>
+  </data>
+  <data name="Country.SZ" xml:space="preserve">
+    <value>Есватіні</value>
+  </data>
+  <data name="Country.ET" xml:space="preserve">
+    <value>Ефіопія</value>
+  </data>
+  <data name="Country.FJ" xml:space="preserve">
+    <value>Фіджі</value>
+  </data>
+  <data name="Country.FI" xml:space="preserve">
+    <value>Фінляндія</value>
+  </data>
+  <data name="Country.FR" xml:space="preserve">
+    <value>Франція</value>
+  </data>
+  <data name="Country.GA" xml:space="preserve">
+    <value>Габон</value>
+  </data>
+  <data name="Country.GM" xml:space="preserve">
+    <value>Гамбія</value>
+  </data>
+  <data name="Country.GE" xml:space="preserve">
+    <value>Грузія</value>
+  </data>
+  <data name="Country.DE" xml:space="preserve">
+    <value>Німеччина</value>
+  </data>
+  <data name="Country.GH" xml:space="preserve">
+    <value>Гана</value>
+  </data>
+  <data name="Country.GR" xml:space="preserve">
+    <value>Греція</value>
+  </data>
+  <data name="Country.GD" xml:space="preserve">
+    <value>Гренада</value>
+  </data>
+  <data name="Country.GT" xml:space="preserve">
+    <value>Гватемала</value>
+  </data>
+  <data name="Country.GN" xml:space="preserve">
+    <value>Гвінея</value>
+  </data>
+  <data name="Country.GW" xml:space="preserve">
+    <value>Гвінея-Бісау</value>
+  </data>
+  <data name="Country.GY" xml:space="preserve">
+    <value>Гаяна</value>
+  </data>
+  <data name="Country.HT" xml:space="preserve">
+    <value>Гаїті</value>
+  </data>
+  <data name="Country.HN" xml:space="preserve">
+    <value>Гондурас</value>
+  </data>
+  <data name="Country.HU" xml:space="preserve">
+    <value>Угорщина</value>
+  </data>
+  <data name="Country.IS" xml:space="preserve">
+    <value>Ісландія</value>
+  </data>
+  <data name="Country.IN" xml:space="preserve">
+    <value>Індія</value>
+  </data>
+  <data name="Country.ID" xml:space="preserve">
+    <value>Індонезія</value>
+  </data>
+  <data name="Country.IR" xml:space="preserve">
+    <value>Іран</value>
+  </data>
+  <data name="Country.IQ" xml:space="preserve">
+    <value>Ірак</value>
+  </data>
+  <data name="Country.IE" xml:space="preserve">
+    <value>Ірландія</value>
+  </data>
+  <data name="Country.IL" xml:space="preserve">
+    <value>Ізраїль</value>
+  </data>
+  <data name="Country.IT" xml:space="preserve">
+    <value>Італія</value>
+  </data>
+  <data name="Country.JM" xml:space="preserve">
+    <value>Ямайка</value>
+  </data>
+  <data name="Country.JP" xml:space="preserve">
+    <value>Японія</value>
+  </data>
+  <data name="Country.JO" xml:space="preserve">
+    <value>Йорданія</value>
+  </data>
+  <data name="Country.KZ" xml:space="preserve">
+    <value>Казахстан</value>
+  </data>
+  <data name="Country.KE" xml:space="preserve">
+    <value>Кенія</value>
+  </data>
+  <data name="Country.KI" xml:space="preserve">
+    <value>Кірибаті</value>
+  </data>
+  <data name="Country.KP" xml:space="preserve">
+    <value>Північна Корея</value>
+  </data>
+  <data name="Country.KR" xml:space="preserve">
+    <value>Південна Корея</value>
+  </data>
+  <data name="Country.KW" xml:space="preserve">
+    <value>Кувейт</value>
+  </data>
+  <data name="Country.KG" xml:space="preserve">
+    <value>Киргизстан</value>
+  </data>
+  <data name="Country.LA" xml:space="preserve">
+    <value>Лаос</value>
+  </data>
+  <data name="Country.LV" xml:space="preserve">
+    <value>Латвія</value>
+  </data>
+  <data name="Country.LB" xml:space="preserve">
+    <value>Ліван</value>
+  </data>
+  <data name="Country.LS" xml:space="preserve">
+    <value>Лесото</value>
+  </data>
+  <data name="Country.LR" xml:space="preserve">
+    <value>Ліберія</value>
+  </data>
+  <data name="Country.LY" xml:space="preserve">
+    <value>Лівія</value>
+  </data>
+  <data name="Country.LI" xml:space="preserve">
+    <value>Ліхтенштейн</value>
+  </data>
+  <data name="Country.LT" xml:space="preserve">
+    <value>Литва</value>
+  </data>
+  <data name="Country.LU" xml:space="preserve">
+    <value>Люксембург</value>
+  </data>
+  <data name="Country.MG" xml:space="preserve">
+    <value>Мадагаскар</value>
+  </data>
+  <data name="Country.MW" xml:space="preserve">
+    <value>Малаві</value>
+  </data>
+  <data name="Country.MY" xml:space="preserve">
+    <value>Малайзія</value>
+  </data>
+  <data name="Country.MV" xml:space="preserve">
+    <value>Мальдіви</value>
+  </data>
+  <data name="Country.ML" xml:space="preserve">
+    <value>Малі</value>
+  </data>
+  <data name="Country.MT" xml:space="preserve">
+    <value>Мальта</value>
+  </data>
+  <data name="Country.MH" xml:space="preserve">
+    <value>Маршаллові Острови</value>
+  </data>
+  <data name="Country.MR" xml:space="preserve">
+    <value>Мавританія</value>
+  </data>
+  <data name="Country.MU" xml:space="preserve">
+    <value>Маврикій</value>
+  </data>
+  <data name="Country.MX" xml:space="preserve">
+    <value>Мексика</value>
+  </data>
+  <data name="Country.FM" xml:space="preserve">
+    <value>Мікронезія</value>
+  </data>
+  <data name="Country.MD" xml:space="preserve">
+    <value>Молдова</value>
+  </data>
+  <data name="Country.MC" xml:space="preserve">
+    <value>Монако</value>
+  </data>
+  <data name="Country.MN" xml:space="preserve">
+    <value>Монголія</value>
+  </data>
+  <data name="Country.ME" xml:space="preserve">
+    <value>Чорногорія</value>
+  </data>
+  <data name="Country.MA" xml:space="preserve">
+    <value>Марокко</value>
+  </data>
+  <data name="Country.MZ" xml:space="preserve">
+    <value>Мозамбік</value>
+  </data>
+  <data name="Country.MM" xml:space="preserve">
+    <value>М'янма (Бірма)</value>
+  </data>
+  <data name="Country.NA" xml:space="preserve">
+    <value>Намібія</value>
+  </data>
+  <data name="Country.NR" xml:space="preserve">
+    <value>Науру</value>
+  </data>
+  <data name="Country.NP" xml:space="preserve">
+    <value>Непал</value>
+  </data>
+  <data name="Country.NL" xml:space="preserve">
+    <value>Нідерланди</value>
+  </data>
+  <data name="Country.NZ" xml:space="preserve">
+    <value>Нова Зеландія</value>
+  </data>
+  <data name="Country.NI" xml:space="preserve">
+    <value>Нікарагуа</value>
+  </data>
+  <data name="Country.NE" xml:space="preserve">
+    <value>Нігер</value>
+  </data>
+  <data name="Country.NG" xml:space="preserve">
+    <value>Нігерія</value>
+  </data>
+  <data name="Country.MK" xml:space="preserve">
+    <value>Північна Македонія</value>
+  </data>
+  <data name="Country.NO" xml:space="preserve">
+    <value>Норвегія</value>
+  </data>
+  <data name="Country.OM" xml:space="preserve">
+    <value>Оман</value>
+  </data>
+  <data name="Country.PK" xml:space="preserve">
+    <value>Пакистан</value>
+  </data>
+  <data name="Country.PW" xml:space="preserve">
+    <value>Палау</value>
+  </data>
+  <data name="Country.PS" xml:space="preserve">
+    <value>Палестинські території</value>
+  </data>
+  <data name="Country.PA" xml:space="preserve">
+    <value>Панама</value>
+  </data>
+  <data name="Country.PG" xml:space="preserve">
+    <value>Папуа-Нова Гвінея</value>
+  </data>
+  <data name="Country.PY" xml:space="preserve">
+    <value>Парагвай</value>
+  </data>
+  <data name="Country.PE" xml:space="preserve">
+    <value>Перу</value>
+  </data>
+  <data name="Country.PH" xml:space="preserve">
+    <value>Філіппіни</value>
+  </data>
+  <data name="Country.PL" xml:space="preserve">
+    <value>Польща</value>
+  </data>
+  <data name="Country.PT" xml:space="preserve">
+    <value>Португалія</value>
+  </data>
+  <data name="Country.QA" xml:space="preserve">
+    <value>Катар</value>
+  </data>
+  <data name="Country.RO" xml:space="preserve">
+    <value>Румунія</value>
+  </data>
+  <data name="Country.RU" xml:space="preserve">
+    <value>Росія</value>
+  </data>
+  <data name="Country.RW" xml:space="preserve">
+    <value>Руанда</value>
+  </data>
+  <data name="Country.KN" xml:space="preserve">
+    <value>Сент-Кітс і Невіс</value>
+  </data>
+  <data name="Country.LC" xml:space="preserve">
+    <value>Сент-Люсія</value>
+  </data>
+  <data name="Country.VC" xml:space="preserve">
+    <value>Сент-Вінсент і Гренадини</value>
+  </data>
+  <data name="Country.WS" xml:space="preserve">
+    <value>Самоа</value>
+  </data>
+  <data name="Country.SM" xml:space="preserve">
+    <value>Сан-Марино</value>
+  </data>
+  <data name="Country.ST" xml:space="preserve">
+    <value>Сан-Томе і Принсіпі</value>
+  </data>
+  <data name="Country.SA" xml:space="preserve">
+    <value>Саудівська Аравія</value>
+  </data>
+  <data name="Country.SN" xml:space="preserve">
+    <value>Сенегал</value>
+  </data>
+  <data name="Country.RS" xml:space="preserve">
+    <value>Сербія</value>
+  </data>
+  <data name="Country.SC" xml:space="preserve">
+    <value>Сейшельські Острови</value>
+  </data>
+  <data name="Country.SL" xml:space="preserve">
+    <value>Сьєрра-Леоне</value>
+  </data>
+  <data name="Country.SG" xml:space="preserve">
+    <value>Сінгапур</value>
+  </data>
+  <data name="Country.SK" xml:space="preserve">
+    <value>Словаччина</value>
+  </data>
+  <data name="Country.SI" xml:space="preserve">
+    <value>Словенія</value>
+  </data>
+  <data name="Country.SB" xml:space="preserve">
+    <value>Соломонові Острови</value>
+  </data>
+  <data name="Country.SO" xml:space="preserve">
+    <value>Сомалі</value>
+  </data>
+  <data name="Country.ZA" xml:space="preserve">
+    <value>Південно-Африканська Республіка</value>
+  </data>
+  <data name="Country.SS" xml:space="preserve">
+    <value>Південний Судан</value>
+  </data>
+  <data name="Country.ES" xml:space="preserve">
+    <value>Іспанія</value>
+  </data>
+  <data name="Country.LK" xml:space="preserve">
+    <value>Шрі-Ланка</value>
+  </data>
+  <data name="Country.SD" xml:space="preserve">
+    <value>Судан</value>
+  </data>
+  <data name="Country.SR" xml:space="preserve">
+    <value>Суринам</value>
+  </data>
+  <data name="Country.SE" xml:space="preserve">
+    <value>Швеція</value>
+  </data>
+  <data name="Country.CH" xml:space="preserve">
+    <value>Швейцарія</value>
+  </data>
+  <data name="Country.SY" xml:space="preserve">
+    <value>Сирія</value>
+  </data>
+  <data name="Country.TW" xml:space="preserve">
+    <value>Тайвань</value>
+  </data>
+  <data name="Country.TJ" xml:space="preserve">
+    <value>Таджикистан</value>
+  </data>
+  <data name="Country.TZ" xml:space="preserve">
+    <value>Танзанія</value>
+  </data>
+  <data name="Country.TH" xml:space="preserve">
+    <value>Таїланд</value>
+  </data>
+  <data name="Country.TL" xml:space="preserve">
+    <value>Тимор-Лешті</value>
+  </data>
+  <data name="Country.TG" xml:space="preserve">
+    <value>Того</value>
+  </data>
+  <data name="Country.TO" xml:space="preserve">
+    <value>Тонга</value>
+  </data>
+  <data name="Country.TT" xml:space="preserve">
+    <value>Тринідад і Тобаго</value>
+  </data>
+  <data name="Country.TN" xml:space="preserve">
+    <value>Туніс</value>
+  </data>
+  <data name="Country.TR" xml:space="preserve">
+    <value>Туреччина</value>
+  </data>
+  <data name="Country.TM" xml:space="preserve">
+    <value>Туркменістан</value>
+  </data>
+  <data name="Country.TV" xml:space="preserve">
+    <value>Тувалу</value>
+  </data>
+  <data name="Country.UG" xml:space="preserve">
+    <value>Уганда</value>
+  </data>
+  <data name="Country.UA" xml:space="preserve">
+    <value>Україна</value>
+  </data>
+  <data name="Country.AE" xml:space="preserve">
+    <value>Об'єднані Арабські Емірати</value>
+  </data>
+  <data name="Country.GB" xml:space="preserve">
+    <value>Велика Британія</value>
+  </data>
+  <data name="Country.US" xml:space="preserve">
+    <value>Сполучені Штати Америки</value>
+  </data>
+  <data name="Country.UY" xml:space="preserve">
+    <value>Уругвай</value>
+  </data>
+  <data name="Country.UZ" xml:space="preserve">
+    <value>Узбекистан</value>
+  </data>
+  <data name="Country.VU" xml:space="preserve">
+    <value>Вануату</value>
+  </data>
+  <data name="Country.VA" xml:space="preserve">
+    <value>Ватикан</value>
+  </data>
+  <data name="Country.VE" xml:space="preserve">
+    <value>Венесуела</value>
+  </data>
+  <data name="Country.VN" xml:space="preserve">
+    <value>В'єтнам</value>
+  </data>
+  <data name="Country.YE" xml:space="preserve">
+    <value>Ємен</value>
+  </data>
+  <data name="Country.ZM" xml:space="preserve">
+    <value>Замбія</value>
+  </data>
+  <data name="Country.ZW" xml:space="preserve">
+    <value>Зімбабве</value>
+  </data>
+  <data name="Country.AN" xml:space="preserve">
+    <value>Нідерландські Антильські острови</value>
+  </data>
+  <data name="Country.XE" xml:space="preserve">
+    <value>Європа</value>
+  </data>
+  <data name="Country.XW" xml:space="preserve">
+    <value>Увесь світ</value>
+  </data>
+  <data name="AlbumTitleDescription" xml:space="preserve">
+    <value>Назва альбому.</value>
+  </data>
+  <data name="AlbumOriginalTitleDescription" xml:space="preserve">
+    <value>Оригінальна назва альбому, якщо вона відрізняється від поточної.</value>
+  </data>
+  <data name="AlbumDescriptionDescription" xml:space="preserve">
+    <value>Короткий опис або резюме альбому.</value>
+  </data>
+  <data name="AlbumDisambiguationDescription" xml:space="preserve">
+    <value>Коментар, який відрізняє альбом від інших з тією самою назвою.</value>
+  </data>
+  <data name="AlbumScriptDescription" xml:space="preserve">
+    <value>Система письма, використана в назві релізу.</value>
+  </data>
+  <data name="AlbumReleaseStatusDescription" xml:space="preserve">
+    <value>Статус випуску альбому.</value>
+  </data>
+  <data name="AlbumTotalDiscsDescription" xml:space="preserve">
+    <value>Кількість дисків альбому.</value>
+  </data>
+  <data name="AlbumTotalTracksDescription" xml:space="preserve">
+    <value>Кількість треків альбому.</value>
+  </data>
+  <data name="AlbumReleaseTitleDescription" xml:space="preserve">
+    <value>Назва релізу.</value>
+  </data>
+  <data name="AlbumMediaFormatDescription" xml:space="preserve">
+    <value>Медіаформат альбому.</value>
+  </data>
+  <data name="AlbumPackagingDescription" xml:space="preserve">
+    <value>Пакування альбому.</value>
+  </data>
+  <data name="AlbumBarcodeDescription" xml:space="preserve">
+    <value>Штрих-код альбому.</value>
+  </data>
+  <data name="AlbumCatalogNumbersDescription" xml:space="preserve">
+    <value>Каталожні номери альбому.</value>
+  </data>
+  <data name="AlbumLabelDescription" xml:space="preserve">
+    <value>Лейбл, який випустив альбом.</value>
+  </data>
+  <data name="AlbumAsinDescription" xml:space="preserve">
+    <value>Стандартний ідентифікаційний номер Amazon альбому.</value>
+  </data>
+  <data name="AlbumMusicBrainzReleaseIdDescription" xml:space="preserve">
+    <value>Ідентифікатор релізу у MusicBrainz.</value>
+  </data>
+  <data name="AlbumMusicBrainzReleaseGroupIdDescription" xml:space="preserve">
+    <value>Ідентифікатор групи релізів у MusicBrainz.</value>
+  </data>
+  <data name="AlbumMusicBrainzReleaseArtistIdDescription" xml:space="preserve">
+    <value>Ідентифікатор виконавця релізу у MusicBrainz.</value>
+  </data>
+  <data name="AlbumOriginalReleaseDateDescription" xml:space="preserve">
+    <value>Дата первинного випуску альбому.</value>
+  </data>
+  <data name="AlbumOriginalReleaseYearDescription" xml:space="preserve">
+    <value>Рік первинного випуску альбому.</value>
+  </data>
+  <data name="AlbumReReleaseDateDescription" xml:space="preserve">
+    <value>Дата повторного випуску альбому.</value>
+  </data>
+  <data name="AlbumReReleaseYearDescription" xml:space="preserve">
+    <value>Рік повторного випуску альбому.</value>
+  </data>
+  <data name="AlbumReleaseCountryDescription" xml:space="preserve">
+    <value>Країна випуску альбому.</value>
+  </data>
+  <data name="AlbumReleaseVersionDescription" xml:space="preserve">
+    <value>Версія релізу, наприклад оригінальна.</value>
+  </data>
+  <data name="LanguageCodeDescription" xml:space="preserve">
+    <value>Дволітерний код мови альбому.</value>
+  </data>
+  <data name="LanguageNameDescription" xml:space="preserve">
+    <value>Назва мови альбому.</value>
+  </data>
+  <data name="NativeNameDescription" xml:space="preserve">
+    <value>Рідна назва мови альбому.</value>
+  </data>
+  <data name="AlbumGenresDescription" xml:space="preserve">
+    <value>Жанри альбому.</value>
+  </data>
+  <data name="AlbumTagsDescription" xml:space="preserve">
+    <value>Теги альбому.</value>
+  </data>
+  <data name="AlbumReleaseTypesDescription" xml:space="preserve">
+    <value>Типи випуску альбому.</value>
+  </data>
+  <data name="TracksDescription" xml:space="preserve">
+    <value>Треки альбому.</value>
+  </data>
+  <data name="ChangeCover" xml:space="preserve">
+    <value>Змінити обкладинку</value>
+  </data>
+  <data name="CoverImage" xml:space="preserve">
+    <value>Зображення обкладинки</value>
+  </data>
+  <data name="NoCover" xml:space="preserve">
+    <value>Немає обкладинки</value>
+  </data>
+  <data name="CoverSaved" xml:space="preserve">
+    <value>Зображення обкладинки оновлено.</value>
+  </data>
+  <data name="CoverUploadFailed" xml:space="preserve">
+    <value>Не вдалося завантажити зображення обкладинки.</value>
+  </data>
+<data name="Contributors" xml:space="preserve">
+    <value>Учасники</value>
+  </data>
+<data name="ContributorId" xml:space="preserve">
+    <value>Ідентифікатор учасника</value>
+  </data>
+<data name="ContributorRole" xml:space="preserve">
+    <value>Роль</value>
+  </data>
+<data name="AddContributor" xml:space="preserve">
+    <value>Додати учасника</value>
+  </data>
+<data name="ContributorsDescription" xml:space="preserve">
+    <value>Люди, які зробили внесок у виконавця.</value>
+  </data>
+<data name="Ratings" xml:space="preserve">
+    <value>Оцінки</value>
+  </data>
+<data name="RatingValue" xml:space="preserve">
+    <value>Оцінка</value>
+  </data>
+<data name="RatingMaxValue" xml:space="preserve">
+    <value>Максимальна оцінка</value>
+  </data>
+<data name="RatingSource" xml:space="preserve">
+    <value>Джерело</value>
+  </data>
+<data name="RatingVoteCount" xml:space="preserve">
+    <value>Кількість голосів</value>
+  </data>
+<data name="AddRating" xml:space="preserve">
+    <value>Додати оцінку</value>
+  </data>
+<data name="RatingsDescription" xml:space="preserve">
+    <value>Оцінки виконавця з різних джерел.</value>
+  </data>
+<data name="Author" xml:space="preserve">
+    <value>Автор</value>
+  </data>
+<data name="Translator" xml:space="preserve">
+    <value>Перекладач</value>
+  </data>
+<data name="Illustrator" xml:space="preserve">
+    <value>Ілюстратор</value>
+  </data>
+<data name="Publisher" xml:space="preserve">
+    <value>Видавець</value>
+  </data>
+<data name="Narrator" xml:space="preserve">
+    <value>Оповідач</value>
+  </data>
+<data name="Actor" xml:space="preserve">
+    <value>Актор</value>
+  </data>
+<data name="Director" xml:space="preserve">
+    <value>Режисер</value>
+  </data>
+<data name="Screenwriter" xml:space="preserve">
+    <value>Сценарист</value>
+  </data>
+<data name="Composer" xml:space="preserve">
+    <value>Композитор</value>
+  </data>
+<data name="Lyricist" xml:space="preserve">
+    <value>Автор текстів</value>
+  </data>
+<data name="Arranger" xml:space="preserve">
+    <value>Аранжувальник</value>
+  </data>
+<data name="Conductor" xml:space="preserve">
+    <value>Диригент</value>
+  </data>
+<data name="Producer" xml:space="preserve">
+    <value>Продюсер</value>
+  </data>
+<data name="ExecutiveProducer" xml:space="preserve">
+    <value>Виконавчий продюсер</value>
+  </data>
+<data name="Engineer" xml:space="preserve">
+    <value>Інженер</value>
+  </data>
+<data name="Mixer" xml:space="preserve">
+    <value>Мікшер</value>
+  </data>
+<data name="Remixer" xml:space="preserve">
+    <value>Реміксер</value>
+  </data>
+<data name="RecordLabel" xml:space="preserve">
+    <value>Лейбл звукозапису</value>
+  </data>
+<data name="Vocals" xml:space="preserve">
+    <value>Вокал</value>
+  </data>
+<data name="BackingVocals" xml:space="preserve">
+    <value>Бек-вокал</value>
+  </data>
+<data name="Guitar" xml:space="preserve">
+    <value>Гітара</value>
+  </data>
+<data name="BassGuitar" xml:space="preserve">
+    <value>Бас-гітара</value>
+  </data>
+<data name="Drums" xml:space="preserve">
+    <value>Барабани</value>
+  </data>
+<data name="Percussion" xml:space="preserve">
+    <value>Перкусія</value>
+  </data>
+<data name="Keyboards" xml:space="preserve">
+    <value>Клавішні</value>
+  </data>
+<data name="Piano" xml:space="preserve">
+    <value>Піаніно</value>
+  </data>
+<data name="Synthesizer" xml:space="preserve">
+    <value>Синтезатор</value>
+  </data>
+<data name="Strings" xml:space="preserve">
+    <value>Струнні</value>
+  </data>
+<data name="Woodwinds" xml:space="preserve">
+    <value>Дерев'яні духові</value>
+  </data>
+<data name="Brass" xml:space="preserve">
+    <value>Мідні духові</value>
+  </data>
+<data name="Choir" xml:space="preserve">
+    <value>Хор</value>
+  </data>
+<data name="Orchestrator" xml:space="preserve">
+    <value>Оркестратор</value>
+  </data>
+<data name="Performer" xml:space="preserve">
+    <value>Виконавець</value>
+  </data>
+<data name="User" xml:space="preserve">
+    <value>Користувач</value>
+  </data>
+<data name="MusicBrainz" xml:space="preserve">
+    <value>MusicBrainz</value>
+  </data>
+<data name="Discogs" xml:space="preserve">
+    <value>Discogs</value>
+  </data>
+<data name="LastFm" xml:space="preserve">
+    <value>Last.fm</value>
+  </data>
+  <data name="Genre" xml:space="preserve">
+    <value>Жанр</value>
+  </data>
+  <data name="AddGenre" xml:space="preserve">
+    <value>Додати жанр</value>
+  </data>
+  <data name="Tag" xml:space="preserve">
+    <value>Тег</value>
+  </data>
+  <data name="AddTag" xml:space="preserve">
+    <value>Додати тег</value>
+  </data>
+  <data name="ReleaseType" xml:space="preserve">
+    <value>Тип випуску</value>
+  </data>
+  <data name="AddReleaseType" xml:space="preserve">
+    <value>Додати тип випуску</value>
+  </data>
+  <data name="CatalogNumber" xml:space="preserve">
+    <value>Номер каталогу</value>
+  </data>
+  <data name="AddCatalogNumber" xml:space="preserve">
+    <value>Додати номер каталогу</value>
+  </data>
+  <data name="Cover" xml:space="preserve">
+    <value>Обкладинка</value>
+  </data>
+  <data name="Front" xml:space="preserve">
+    <value>Передня частина</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Задня частина</value>
+  </data>
+  <data name="Booklet" xml:space="preserve">
+    <value>Буклет</value>
+  </data>
+  <data name="Medium" xml:space="preserve">
+    <value>Носій</value>
+  </data>
+  <data name="Tray" xml:space="preserve">
+    <value>Лоток</value>
+  </data>
+  <data name="Spine" xml:space="preserve">
+    <value>Корінець</value>
+  </data>
+  <data name="Obi" xml:space="preserve">
+    <value>Обі</value>
+  </data>
+  <data name="Sticker" xml:space="preserve">
+    <value>Наліпка</value>
+  </data>
+  <data name="Poster" xml:space="preserve">
+    <value>Плакат</value>
+  </data>
+  <data name="Liner" xml:space="preserve">
+    <value>Вкладка</value>
+  </data>
+  <data name="Watermark" xml:space="preserve">
+    <value>Водяний знак</value>
+  </data>
+  <data name="Backdrop" xml:space="preserve">
+    <value>Фон</value>
+  </data>
+  <data name="Banner" xml:space="preserve">
+    <value>Банер</value>
+  </data>
+  <data name="Logo" xml:space="preserve">
+    <value>Логотип</value>
+  </data>
+  <data name="Thumb" xml:space="preserve">
+    <value>Мініатюра</value>
+  </data>
+  <data name="Identifiers" xml:space="preserve">
+    <value>Ідентифікатори</value>
+  </data>
+</root>

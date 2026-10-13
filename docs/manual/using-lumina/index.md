@@ -62,13 +62,20 @@ A book opens only through an enabled reader for its format. The EPUB and PDF rea
 
 ## Browsing your music
 
-Opening a music library shows a page with the library title, a search box, an item count, a grid of artist cards, and pagination. Search filters the artists by name. Each artist is a card; selecting it opens the artist's page, and the card's actions menu offers **View details** and **Delete**.
+Opening a music library shows a page with the library title, a search box, a sort toggle, a count of items, a grid of artist cards, an alphabetical picker down the side, and pagination at the bottom.
 
-The artist page is also where you edit the artist. It holds the artist's general information, areas, aliases, contributors and ratings, and it lists the artist's albums as cards, each leading to its own album page. The album page holds the album's information and its tracks, and the track page holds the track's details. Deleting an artist, album or track removes it from Lumina's catalogue; your files are not touched.
+- **Search** filters the artists by name; press Enter or use the search button.
+- **Sort** toggles between ascending and descending order.
+- **The alpha picker** jumps to names starting with a chosen character. It offers All, then the number and symbol keys, then A to Z. You can also press a letter key to filter, and press Escape to clear the filter.
+- **Pagination** splits the list into pages when you have it enabled, with previous and next buttons and a page indicator. When it is off, the whole list is shown and the count is the total.
+
+Each artist is a card; selecting it opens the artist's page, and the card's actions menu offers **View details** and **Delete**.
+
+The artist page is also where you edit the artist. It lists the artist's albums as cards, each leading to its own album page, followed by the artist's general information, contributors, ratings, genres, tags, aliases, areas and identifiers. The album page holds the album's information and its tracks, and the track page holds the track's details. The album page also shows the artwork Lumina stored for the album as a strip of thumbnails beside the main image, and selecting a thumbnail displays that image in place of the cover. Deleting an artist, album or track removes it from Lumina's catalogue; your files are not touched.
 
 ## Editing what is catalogued
 
-Both book and music pages double as editors for the items that were scanned in. A book's details page groups its fields into general and release information, language and original language, genres, tags, identifiers, ISBNs, contributors and ratings, and lets you replace its cover. An artist's page groups its fields into general information, areas, aliases, contributors and ratings. Album and track pages follow the same shape for their own fields. Saving sends the changes back to the server, and a confirmation or an error is shown in the corner of the screen.
+Both book and music pages double as editors for the items that were scanned in. A book's details page groups its fields into general and release information, language and original language, genres, tags, identifiers, ISBNs, contributors and ratings, and lets you replace its cover. An artist's page lists the artist's albums first, then groups its fields into general information, contributors, ratings, genres, tags, aliases, areas and identifiers, and lets you replace the artist's cover. An album page groups its fields into general information, contributors, ratings, genres, tags, release types, release information, language and original language, and identifiers, and lets you replace the album's cover. A track page groups its fields into general information, contributors, ratings, genres, tags, moods, release information, language and original language, work, ISRCs, identifiers and audio properties. Saving sends the changes back to the server, and a confirmation or an error is shown in the corner of the screen.
 
 Changes you make here live in Lumina's catalogue.
 
