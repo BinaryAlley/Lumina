@@ -370,7 +370,7 @@ internal sealed class MusicMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
 
         // The release type directory groups the artwork of the releases of the artist that share a title, so the album, the single and the live release of the same songs do not collide.
         // It is read from the file system, because the structure on disk is the source of truth of the release type of an album.
-        string? releaseTypeName = _musicLibraryPathStructure.GetReleaseTypeDirectoryName(firstTrackPath);
+        string? releaseTypeName = _musicLibraryPathStructure.GetReleaseTypeDirectoryName(firstTrackPath, albumEntity.Artist?.Name);
 
         return await EnrichArtworkAsync(
             artworkLookup,

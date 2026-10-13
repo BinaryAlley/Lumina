@@ -157,4 +157,39 @@ public class MusicLibraryPathStructureTests
         // Assert
         Assert.Null(result);
     }
+
+    [Theory]
+    [InlineData('\\', "Live")] // release type name used as the artist directory name, Windows separated path
+    [InlineData('/', "Live")] // release type name used as the artist directory name, Unix separated path
+    [InlineData('\\', "42")] // numeric artist directory name, Windows separated path
+    [InlineData('/', "42")] // numeric artist directory name, Unix separated path
+    public void GetReleaseTypeDirectoryName_WhenTheArtistDirectoryIsNamedLikeAReleaseType_ShouldReturnNull(char separator, string artistName)
+    {
+        // Arrange
+        _mockPathService.PathSeparator.Returns(separator);
+        // The library uses no release type directory, so the parent of the album directory is the artist directory.
+        string trackPath = string.Join(separator, "music", artistName, "a-night-at-the-opera", "bohemian-rhapsody.flac");
+
+        // Act
+        string? result = _sut.GetReleaseTypeDirectoryName(trackPath, artistName);
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    [Theory]
+    [InlineData('\\')] // Windows separated path
+    [InlineData('/')] // Unix separated path
+    public void GetReleaseTypeDirectoryName_WhenAReleaseTypeDirectoryDiffersFromTheArtistDirectory_ShouldReturnIt(char separator)
+    {
+        // Arrange
+        _mockPathService.PathSeparator.Returns(separator);
+        string trackPath = string.Join(separator, "music", "Queen", "Live", "a-night-at-the-opera", "bohemian-rhapsody.flac");
+
+        // Act
+        string? result = _sut.GetReleaseTypeDirectoryName(trackPath, "Queen");
+
+        // Assert
+        Assert.Equal("Live", result);
+    }
 }

@@ -52,12 +52,14 @@ internal sealed class MusicLibraryPathStructure
 
     /// <summary>
     /// Gets the name of the on-disk release type directory of the track stored at <paramref name="trackPath"/>, when the structure of the library
-    /// uses one. The directory is the parent of the album directory, and it is only used when its name is a known release type, so that the artist
-    /// directory of a flat library is not mistaken for a release type.
+    /// uses one. The directory is the parent of the album directory, and it is only used when its name is a known release type and it is not the
+    /// directory of <paramref name="artistName"/>, because the parent of the album directory of a library that has no release type directory is
+    /// the artist directory, which must not be mistaken for a release type.
     /// </summary>
     /// <param name="trackPath">The file system path of the track whose release type directory is retrieved.</param>
+    /// <param name="artistName">The name of the artist of the track, or <see langword="null"/> when it is not known.</param>
     /// <returns>The name of the on-disk release type directory, or <see langword="null"/> when the library does not use one.</returns>
-    public string? GetReleaseTypeDirectoryName(string trackPath)
+    public string? GetReleaseTypeDirectoryName(string trackPath, string? artistName = null)
     {
         string albumDirectory = GetAlbumDirectory(trackPath);
         string? releaseTypeDirectory = GetParentDirectoryPath(albumDirectory);
@@ -65,7 +67,16 @@ internal sealed class MusicLibraryPathStructure
             return null;
 
         string releaseTypeName = GetLastSegment(releaseTypeDirectory);
-        return Enum.TryParse(releaseTypeName, ignoreCase: true, out MusicReleaseType _) ? releaseTypeName : null;
+        // A numeric directory name parses to an enumeration member that is not defined, so it is rejected explicitly, together with any other
+        // name that is not a known release type.
+        if (!Enum.TryParse(releaseTypeName, ignoreCase: true, out MusicReleaseType releaseType) || !Enum.IsDefined(releaseType))
+            return null;
+
+        // The artist directory of a library that has no release type directory is the parent of the album directory, so it is not a release type.
+        if (!string.IsNullOrWhiteSpace(artistName) && string.Equals(releaseTypeName, artistName, StringComparison.OrdinalIgnoreCase))
+            return null;
+
+        return releaseTypeName;
     }
 
     /// <summary>
