@@ -65,5 +65,6 @@ public static partial class Errors
         public static Error IsniValueCannotBeEmpty => Error.Validation(description: nameof(IsniValueCannotBeEmpty));
         public static Error IsniValueMustBeMaximum20CharactersLong => Error.Validation(description: nameof(IsniValueMustBeMaximum20CharactersLong));
         public static Error WorkTitleCannotBeEmpty => Error.Validation(description: nameof(WorkTitleCannotBeEmpty));
+        public static Error CoverCannotBeNull => Error.Validation(description: nameof(CoverCannotBeNull));
     }
 }

@@ -265,6 +265,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "albums", "albums", "{B4DF8E
 		..\docs\technical\requests\library\audio-library\music-library\albums\GetAlbumTracks.http = ..\docs\technical\requests\library\audio-library\music-library\albums\GetAlbumTracks.http
 		..\docs\technical\requests\library\audio-library\music-library\albums\GetAlbumTracksLite.http = ..\docs\technical\requests\library\audio-library\music-library\albums\GetAlbumTracksLite.http
 		..\docs\technical\requests\library\audio-library\music-library\albums\UpdateAlbum.http = ..\docs\technical\requests\library\audio-library\music-library\albums\UpdateAlbum.http
+		..\docs\technical\requests\library\audio-library\music-library\albums\UpdateAlbumCover.http = ..\docs\technical\requests\library\audio-library\music-library\albums\UpdateAlbumCover.http
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "artists", "artists", "{F3818697-E304-491D-8BF3-4DAA1733B5F5}"
@@ -277,6 +278,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "artists", "artists", "{F381
 		..\docs\technical\requests\library\audio-library\music-library\artists\GetArtists.http = ..\docs\technical\requests\library\audio-library\music-library\artists\GetArtists.http
 		..\docs\technical\requests\library\audio-library\music-library\artists\GetArtistsLite.http = ..\docs\technical\requests\library\audio-library\music-library\artists\GetArtistsLite.http
 		..\docs\technical\requests\library\audio-library\music-library\artists\UpdateArtist.http = ..\docs\technical\requests\library\audio-library\music-library\artists\UpdateArtist.http
+		..\docs\technical\requests\library\audio-library\music-library\artists\UpdateArtistCover.http = ..\docs\technical\requests\library\audio-library\music-library\artists\UpdateArtistCover.http
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tracks", "tracks", "{B1B657B1-60DC-4E22-89D2-6212154D6BA8}"
