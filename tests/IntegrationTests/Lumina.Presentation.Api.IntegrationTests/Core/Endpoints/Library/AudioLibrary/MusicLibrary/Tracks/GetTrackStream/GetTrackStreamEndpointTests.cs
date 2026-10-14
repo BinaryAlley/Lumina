@@ -80,7 +80,7 @@ public class GetTrackStreamEndpointTests : IClassFixture<AuthenticatedLuminaApiF
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal("audio/mpeg", response.Content.Headers.ContentType?.MediaType);
-        Assert.Equal((long)audioBytes.Length, response.Content.Headers.ContentLength!.Value);
+        Assert.Equal(audioBytes.Length, response.Content.Headers.ContentLength!.Value);
         Assert.Contains("bytes", response.Headers.AcceptRanges);
         Assert.NotNull(response.Headers.ETag);
         Assert.NotNull(response.Content.Headers.LastModified);
