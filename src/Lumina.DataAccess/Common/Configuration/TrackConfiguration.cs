@@ -152,6 +152,9 @@ public class TrackConfiguration : IEntityTypeConfiguration<TrackEntity>
         builder.Property(track => track.ReplayGainAlbumPeak)
             .HasColumnType("decimal(8,6)")
             .HasColumnOrder(48);
+        builder.Property(track => track.Container)
+            .HasMaxLength(50)
+            .HasColumnOrder(49);
 
         builder.HasOne(track => track.Album)
             .WithMany(album => album.Tracks)

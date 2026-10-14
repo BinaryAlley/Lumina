@@ -217,6 +217,11 @@ internal sealed class Id3TagDto
     public string? AudioCodec { get; init; }
 
     /// <summary>
+    /// Gets or initializes the container of the audio file of the track, for example MP3, FLAC, OGG, AAC, MP4 or WAV.
+    /// </summary>
+    public string? Container { get; init; }
+
+    /// <summary>
     /// Gets or initializes the official website associated with the artist.
     /// </summary>
     public string? Website { get; init; }

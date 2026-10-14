@@ -183,6 +183,7 @@ internal static partial class MusicBrainzMapper
             Channels: null,
             BitDepth: null,
             AudioCodec: null,
+            Container: null,
             Bitrate: null,
             MusicBrainzRecordingId: ParseGuid(recording.Id),
             MusicBrainzTrackId: null,

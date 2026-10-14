@@ -95,6 +95,11 @@ public class MusicLibraryScanItemMetadataEntity : IStorageEntity
     public string? AudioCodec { get; set; }
 
     /// <summary>
+    /// Gets or sets the container of the audio file, for example MP3, FLAC, OGG, AAC, MP4 or WAV, if applicable.
+    /// </summary>
+    public string? Container { get; set; }
+
+    /// <summary>
     /// Gets or sets the bitrate of the audio in kbps, if applicable.
     /// </summary>
     public int? Bitrate { get; set; }

@@ -347,7 +347,8 @@ public sealed class Track : Entity<TrackId>
     /// </summary>
     /// <remarks>
     /// The file system path is intentionally not editable here: it is set only when the track is created by the scanner, so that a client
-    /// can never point an existing track at an arbitrary file of the host.
+    /// can never point an existing track at an arbitrary file of the host. The container is captured from the file itself and is not part of
+    /// an edit either, so an update that does not carry one keeps the container already stored for the track.
     /// </remarks>
     /// <param name="metadata">The audio metadata of the track.</param>
     /// <param name="disambiguation">The optional disambiguation comment of the track.</param>
@@ -374,7 +375,16 @@ public sealed class Track : Entity<TrackId>
         Optional<MusicBrainzId> musicBrainzRecordingId,
         Optional<MusicBrainzId> musicBrainzTrackId)
     {
-        Metadata = metadata;
+        // The container is captured from the file itself and is never part of an edit, so an update that does not carry one keeps the stored container.
+        if (metadata.Container.HasValue)
+            Metadata = metadata;
+        else
+        {
+            Result<AudioMetadata> metadataWithStoredContainerResult = metadata.WithContainer(Metadata.Container);
+            if (metadataWithStoredContainerResult.IsFailure)
+                return metadataWithStoredContainerResult.Errors;
+            Metadata = metadataWithStoredContainerResult.Value;
+        }
         Disambiguation = disambiguation;
         TrackNumber = trackNumber;
         DiscNumber = discNumber;

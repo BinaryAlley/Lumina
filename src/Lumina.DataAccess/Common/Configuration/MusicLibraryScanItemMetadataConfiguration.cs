@@ -98,6 +98,9 @@ public class MusicLibraryScanItemMetadataConfiguration : IEntityTypeConfiguratio
             .HasColumnOrder(29);
         builder.PrimitiveCollection(musicMetadata => musicMetadata.Moods)
             .HasColumnOrder(30);
+        builder.Property(musicMetadata => musicMetadata.Container)
+            .HasMaxLength(50)
+            .HasColumnOrder(31);
 
         builder.HasIndex(musicMetadata => new { musicMetadata.LibraryScanId, musicMetadata.Path })
             .IsUnique(); // the metadata of the same physical file cannot be staged twice during the same scan

@@ -154,6 +154,7 @@ public class GetArtistAlbumsEndpointSummary : Summary<GetArtistAlbumsEndpoint, E
                             AlbumId: Guid.NewGuid(),
                             LibraryId: Guid.NewGuid(),
                             Path: "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
+                            Container: "FLAC",
                             Metadata: new(
                                 Title: "Bohemian Rhapsody",
                                 OriginalTitle: "Bohemian Rhapsody",
@@ -328,6 +329,7 @@ public class GetArtistAlbumsEndpointSummary : Summary<GetArtistAlbumsEndpoint, E
                             AlbumId: Guid.NewGuid(),
                             LibraryId: Guid.NewGuid(),
                             Path: "/music/queen/the-works/01-radio-ga-ga.flac",
+                            Container: "FLAC",
                             Metadata: new(
                                 Title: "Radio Ga Ga",
                                 OriginalTitle: "Radio Ga Ga",

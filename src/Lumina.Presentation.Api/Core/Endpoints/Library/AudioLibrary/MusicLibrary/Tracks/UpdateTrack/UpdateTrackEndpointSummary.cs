@@ -168,6 +168,7 @@ public class UpdateTrackEndpointSummary : Summary<UpdateTrackEndpoint, UpdateTra
         ResponseParam<TrackResponse>(r => r.AlbumId, "The Id of the album the track belongs to.");
         ResponseParam<TrackResponse>(r => r.LibraryId, "The Id of the media library the track belongs to.");
         ResponseParam<TrackResponse>(r => r.Path, "The file system path of the track.");
+        ResponseParam<TrackResponse>(r => r.Container, "The container of the audio file of the track, if applicable.");
         ResponseParam<TrackResponse>(r => r.Metadata!.Title, "The title of the track.");
         ResponseParam<TrackResponse>(r => r.Metadata!.OriginalTitle, "The original title of the track, if applicable.");
         ResponseParam<TrackResponse>(r => r.Metadata!.Description, "The description of the track, if applicable.");
@@ -213,6 +214,7 @@ public class UpdateTrackEndpointSummary : Summary<UpdateTrackEndpoint, UpdateTra
                 AlbumId: Guid.NewGuid(),
                 LibraryId: Guid.NewGuid(),
                 Path: "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
+                Container: "FLAC",
                 Metadata: new MusicTrackMetadataDto(
                     Title: "Bohemian Rhapsody",
                     OriginalTitle: "Bohemian Rhapsody",

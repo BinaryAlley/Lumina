@@ -240,6 +240,62 @@ public class TrackTests
     }
 
     [Fact]
+    public void UpdateDetails_WhenTheMetadataCarriesNoContainer_ShouldKeepTheStoredContainer()
+    {
+        // Arrange
+        Track track = _trackFixture.Create();
+        Optional<string> storedContainer = track.Metadata.Container;
+        AudioMetadata metadata = _audioMetadataFixture.Create(container: Optional<string>.None());
+
+        // Act
+        Result<Updated> result = track.UpdateDetails(
+            metadata,
+            track.Disambiguation,
+            track.TrackNumber,
+            track.DiscNumber,
+            track.Script,
+            track.Key,
+            track.Bpm,
+            track.IsVideo,
+            track.Work,
+            track.MusicBrainzRecordingId,
+            track.MusicBrainzTrackId);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        // The container is captured from the file itself and is never part of an edit, so an update that does not carry one keeps the stored container.
+        Assert.Equal(storedContainer, track.Metadata.Container);
+        // The rest of the metadata still comes from the update.
+        Assert.Equal(metadata.Title, track.Metadata.Title);
+    }
+
+    [Fact]
+    public void UpdateDetails_WhenTheMetadataCarriesAContainer_ShouldReplaceTheStoredContainer()
+    {
+        // Arrange
+        Track track = _trackFixture.Create();
+        AudioMetadata metadata = _audioMetadataFixture.Create(container: Optional<string>.Some("OGG"));
+
+        // Act
+        Result<Updated> result = track.UpdateDetails(
+            metadata,
+            track.Disambiguation,
+            track.TrackNumber,
+            track.DiscNumber,
+            track.Script,
+            track.Key,
+            track.Bpm,
+            track.IsVideo,
+            track.Work,
+            track.MusicBrainzRecordingId,
+            track.MusicBrainzTrackId);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal("OGG", track.Metadata.Container.Value);
+    }
+
+    [Fact]
     public void Create_WhenOptionalValuesAndCollectionsAreEmpty_ShouldCreateTrackWithoutThem()
     {
         // Act

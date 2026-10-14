@@ -39,6 +39,7 @@ public class AudioMetadataFixture
     /// <param name="originalLanguage">Optional. The original language of the audio.</param>
     /// <param name="bitDepth">Optional. The bit depth of the audio.</param>
     /// <param name="audioCodec">Optional. The audio codec used.</param>
+    /// <param name="container">Optional. The container of the audio.</param>
     /// <param name="bitrate">Optional. The bitrate of the audio, in kbps.</param>
     /// <param name="acoustId">Optional. The AcoustID fingerprint identifier of the audio file.</param>
     /// <param name="replayGainTrackGain">Optional. The ReplayGain track gain, in decibels.</param>
@@ -60,6 +61,7 @@ public class AudioMetadataFixture
         Optional<LanguageInfo>? originalLanguage = null,
         Optional<int>? bitDepth = null,
         Optional<string>? audioCodec = null,
+        Optional<string>? container = null,
         Optional<int>? bitrate = null,
         Optional<string>? acoustId = null,
         Optional<decimal>? replayGainTrackGain = null,
@@ -81,6 +83,7 @@ public class AudioMetadataFixture
             originalLanguage ?? Optional<LanguageInfo>.None(),
             bitDepth ?? Optional<int>.Some(_faker.Random.Int(8, 32)),
             audioCodec ?? Optional<string>.Some("PCM"),
+            container ?? Optional<string>.Some(_faker.PickRandom("MP3", "FLAC", "OGG", "MP4", "AAC", "WAV")),
             bitrate ?? Optional<int>.Some(_faker.Random.Int(128, 320)),
             acoustId ?? Optional<string>.None(),
             replayGainTrackGain ?? Optional<decimal>.None(),

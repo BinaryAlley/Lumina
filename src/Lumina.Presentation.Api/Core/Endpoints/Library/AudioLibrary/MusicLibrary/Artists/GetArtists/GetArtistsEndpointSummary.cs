@@ -135,6 +135,7 @@ public class GetArtistsEndpointSummary : Summary<GetArtistsEndpoint, GetArtistsR
                                         AlbumId: Guid.NewGuid(),
                                         LibraryId: Guid.NewGuid(),
                                         Path: "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
+                                        Container: "FLAC",
                                         Metadata: new(
                                             Title: "Bohemian Rhapsody",
                                             OriginalTitle: "Bohemian Rhapsody",
@@ -259,6 +260,7 @@ public class GetArtistsEndpointSummary : Summary<GetArtistsEndpoint, GetArtistsR
                                         AlbumId: Guid.NewGuid(),
                                         LibraryId: Guid.NewGuid(),
                                         Path: "/music/david-bowie/heroes/01-heroes.flac",
+                                        Container: "FLAC",
                                         Metadata: new(
                                             Title: "Heroes",
                                             OriginalTitle: "Heroes",

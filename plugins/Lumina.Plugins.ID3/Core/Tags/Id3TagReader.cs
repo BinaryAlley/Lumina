@@ -166,6 +166,7 @@ internal sealed class Id3TagReader
                     BitDepth = audioProperties.BitsPerSample > 0 ? audioProperties.BitsPerSample : null,
                     Bitrate = audioProperties.AudioBitrate > 0 ? audioProperties.AudioBitrate : null,
                     AudioCodec = NullIfWhiteSpace(audioProperties.Description),
+                    Container = AudioContainerResolver.Resolve(tagFile),
                     Website = NullIfWhiteSpace(GetExtendedField(extendedFields, "WOAR", "website")),
                     MusicBrainzArtistId = NullIfWhiteSpace(tag.MusicBrainzArtistId),
                     MusicBrainzReleaseArtistId = NullIfWhiteSpace(tag.MusicBrainzReleaseArtistId),

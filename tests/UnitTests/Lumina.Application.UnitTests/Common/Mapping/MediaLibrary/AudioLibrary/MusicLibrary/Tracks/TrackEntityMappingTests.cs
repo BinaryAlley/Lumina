@@ -74,6 +74,7 @@ public class TrackEntityMappingTests
         Assert.Equal(entity.Channels, track.Metadata.Channels);
         Assert.Equal(entity.BitDepth, track.Metadata.BitDepth.Value);
         Assert.Equal(entity.AudioCodec, track.Metadata.AudioCodec.Value);
+        Assert.Equal(entity.Container, track.Metadata.Container.Value);
         Assert.Equal(entity.Bitrate, track.Metadata.Bitrate.Value);
         Assert.Equal(entity.Genres.Select(genre => genre.Name).OrderBy(name => name), track.Metadata.Genres.Select(genre => genre.Name).OrderBy(name => name));
         Assert.Equal(entity.Tags.Select(tag => tag.Name).OrderBy(name => name), track.Metadata.Tags.Select(tag => tag.Name).OrderBy(name => name));
@@ -93,6 +94,20 @@ public class TrackEntityMappingTests
         Assert.Equal(entity.Contributors.Select(contributor => contributor.Role), track.Contributors.Select(contributor => contributor.Role));
         Assert.Equal(entity.CreatedOnUtc, track.CreatedOnUtc);
         Assert.Equal(entity.UpdatedOnUtc, track.UpdatedOnUtc.Value);
+    }
+
+    [Fact]
+    public void ToDomainEntity_WhenTheEntityHasNoContainer_ShouldMapMetadataWithoutAContainer()
+    {
+        // Arrange
+        TrackEntity entity = _trackEntityFixture.Create(includeContainer: false);
+
+        // Act
+        Result<Track> result = entity.ToDomainEntity();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.False(result.Value.Metadata.Container.HasValue);
     }
 
     [Fact]
@@ -226,6 +241,7 @@ public class TrackEntityMappingTests
         Assert.Equal(entity.Bitrate, result.Metadata.Bitrate);
         Assert.Equal(entity.Tags.Select(tag => tag.Name).OrderBy(name => name), result.Metadata.Tags!.Select(tag => tag.Name).OrderBy(name => name));
         Assert.Equal(entity.Genres.Select(genre => genre.Name).OrderBy(name => name), result.Metadata.Genres!.Select(genre => genre.Name).OrderBy(name => name));
+        Assert.Equal(entity.Container, result.Container);
         Assert.Equal(entity.TrackNumber, result.TrackNumber);
         Assert.Equal(entity.DiscNumber, result.DiscNumber);
         Assert.Equal(entity.Script, result.Script);

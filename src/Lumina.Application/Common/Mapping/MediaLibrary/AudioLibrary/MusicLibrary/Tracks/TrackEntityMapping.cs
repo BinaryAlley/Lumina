@@ -84,6 +84,7 @@ public static class TrackEntityMapping
             originalLanguage,
             Optional<int>.FromNullable(repositoryEntity.BitDepth),
             Optional<string>.FromNullable(repositoryEntity.AudioCodec),
+            Optional<string>.FromNullable(repositoryEntity.Container),
             Optional<int>.FromNullable(repositoryEntity.Bitrate),
             Optional<string>.FromNullable(repositoryEntity.AcoustId),
             Optional<decimal>.FromNullable(repositoryEntity.ReplayGainTrackGain),
@@ -259,7 +260,8 @@ public static class TrackEntityMapping
             [.. repositoryEntity.Moods.ToResponses()],
             [.. repositoryEntity.Isrcs.ToResponses()],
             [.. repositoryEntity.Contributors.Select(contributor => new MediaContributorReferenceDto(contributor.MediaContributorId, contributor.Role))],
-            [.. repositoryEntity.Ratings.ToResponses()]);
+            [.. repositoryEntity.Ratings.ToResponses()],
+            repositoryEntity.Container);
     }
 
     /// <summary>

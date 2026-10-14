@@ -34,6 +34,7 @@ namespace Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
 /// <param name="Channels">The number of audio channels of the track. Required.</param>
 /// <param name="BitDepth">The bit depth of the audio of the track. Optional.</param>
 /// <param name="AudioCodec">The audio codec used by the track. Optional.</param>
+/// <param name="Container">The container of the audio file of the track, for example MP3, FLAC, OGG, AAC, MP4 or WAV. Optional.</param>
 /// <param name="Bitrate">The bitrate of the audio of the track in kbps. Optional.</param>
 /// <param name="MusicBrainzRecordingId">The MusicBrainz identifier of the recording. Optional.</param>
 /// <param name="MusicBrainzTrackId">The MusicBrainz identifier of the track. Optional.</param>
@@ -62,6 +63,7 @@ public sealed record AudioMetadataDto(
     int? Channels,
     int? BitDepth,
     string? AudioCodec,
+    string? Container,
     int? Bitrate,
     Guid? MusicBrainzRecordingId,
     Guid? MusicBrainzTrackId,

@@ -15,6 +15,11 @@ namespace Lumina.Plugins.ID3.IntegrationTests.Core.Tags;
 [ExcludeFromCodeCoverage]
 public class Id3TagReaderTests : IDisposable
 {
+    /// <summary>
+    /// A minimal, valid, one by one pixel PNG image, used to exercise a container that has no dedicated parser.
+    /// </summary>
+    private const string PNG_BYTES = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAANSURBVBhXY2BgYGAAAAAFAAGKM+MAAAAAAElFTkSuQmCC";
+
     private readonly Id3TagReader _sut = new();
     private readonly string _temporaryDirectory;
 
@@ -131,6 +136,7 @@ public class Id3TagReaderTests : IDisposable
         Assert.Equal(16, result.BitDepth);
         Assert.True(result.Bitrate > 0);
         Assert.Equal("PCM Audio", result.AudioCodec);
+        Assert.Equal("WAV", result.Container);
         Assert.Equal("https://artist.example", result.Website);
         Assert.Equal(artistId.ToString(), result.MusicBrainzArtistId);
         Assert.Equal(releaseArtistId.ToString(), result.MusicBrainzReleaseArtistId);
@@ -192,6 +198,7 @@ public class Id3TagReaderTests : IDisposable
         Assert.Equal(1, result.Channels);
         Assert.Equal(16, result.BitDepth);
         Assert.Equal("PCM Audio", result.AudioCodec);
+        Assert.Equal("WAV", result.Container);
         Assert.Null(result.Website);
         Assert.Null(result.MusicBrainzArtistId);
         Assert.Null(result.MusicBrainzReleaseArtistId);
@@ -214,6 +221,21 @@ public class Id3TagReaderTests : IDisposable
 
         // Assert
         Assert.Null(result);
+    }
+
+    [Fact]
+    public void Read_WhenTheContainerHasNoDedicatedParser_ShouldFallBackToTheMimeTypeName()
+    {
+        // Arrange
+        string path = Path.Combine(_temporaryDirectory, "cover.png");
+        File.WriteAllBytes(path, Convert.FromBase64String(PNG_BYTES));
+
+        // Act
+        Id3TagDto? result = _sut.Read(path);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("PNG", result.Container);
     }
 
     [Fact]

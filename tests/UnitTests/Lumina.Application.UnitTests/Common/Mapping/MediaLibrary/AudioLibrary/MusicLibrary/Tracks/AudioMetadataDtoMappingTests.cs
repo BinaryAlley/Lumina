@@ -50,6 +50,7 @@ public class AudioMetadataDtoMappingTests
         Assert.Equal(dto.Channels, track.Metadata.Channels);
         Assert.Equal(dto.BitDepth, track.Metadata.BitDepth.Value);
         Assert.Equal(dto.AudioCodec, track.Metadata.AudioCodec.Value);
+        Assert.Equal(dto.Container, track.Metadata.Container.Value);
         Assert.Equal(dto.Bitrate, track.Metadata.Bitrate.Value);
         Assert.True(track.Script.HasValue);
         Assert.Equal(dto.Script, track.Script.Value);
@@ -80,12 +81,14 @@ public class AudioMetadataDtoMappingTests
         int storedChannels = track.Metadata.Channels;
         bool hadStoredWork = track.Work.HasValue;
         int storedIsrcCount = track.Isrcs.Count;
+        string? storedContainer = track.Metadata.Container.HasValue ? track.Metadata.Container.Value : null;
         AudioMetadataDto dto = _audioMetadataDtoFixture.Create(
             includeDurationInSeconds: false,
             includeSampleRate: false,
             includeChannels: false,
             includeBitDepth: false,
             includeAudioCodec: false,
+            includeContainer: false,
             includeBitrate: false,
             includeWork: false,
             includeIsrcs: false,
@@ -99,6 +102,7 @@ public class AudioMetadataDtoMappingTests
         Assert.Equal(storedDuration, track.Metadata.DurationInSeconds);
         Assert.Equal(storedSampleRate, track.Metadata.SampleRate);
         Assert.Equal(storedChannels, track.Metadata.Channels);
+        Assert.Equal(storedContainer, track.Metadata.Container.HasValue ? track.Metadata.Container.Value : null);
         Assert.Equal(hadStoredWork, track.Work.HasValue);
         Assert.Equal(storedIsrcCount, track.Isrcs.Count);
     }

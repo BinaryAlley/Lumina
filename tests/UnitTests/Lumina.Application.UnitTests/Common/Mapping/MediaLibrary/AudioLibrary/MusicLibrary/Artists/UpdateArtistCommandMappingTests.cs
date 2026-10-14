@@ -284,6 +284,30 @@ public class UpdateArtistCommandMappingTests
         Assert.Equal(disambiguation, updatedTrack.Disambiguation.Value);
     }
 
+    [Fact]
+    public void ToDomainEntity_WhenTheTrackMetadataCarriesNoContainer_ShouldKeepTheTrackContainer()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        (Artist artist, Guid albumId, Guid trackId) = CreateDomainArtist(libraryId);
+        AddTrackCommand trackCommand = _addTrackCommandFixture.Create(trackId: trackId);
+        AddAlbumCommand albumCommand = _addAlbumCommandFixture.Create(albumId: albumId, tracks: [trackCommand]);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(
+            libraryId: libraryId.ToString(),
+            artistId: artist.Id.Value.ToString(),
+            albums: [albumCommand]);
+
+        // Act
+        Result<Artist> result = command.ToDomainEntity(artist);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Track updatedTrack = result.Value.Albums.First(album => album.Id.Value == albumId).Tracks.First(track => track.Id.Value == trackId);
+        // The stored container is pinned to a known value, so the assertion cannot pass by coincidence.
+        // The container is captured from the file itself, so reconciling a track during an artist edit keeps the stored container.
+        Assert.Equal("FLAC", updatedTrack.Metadata.Container.Value);
+    }
+
     /// <summary>
     /// Creates a domain artist that owns a single album, which in turn owns a single track, all belonging to <paramref name="libraryId"/>.
     /// </summary>
@@ -296,7 +320,7 @@ public class UpdateArtistCommandMappingTests
         AlbumEntity albumEntity = _albumEntityFixture.Create(
             id: albumId,
             libraryId: libraryId,
-            tracks: [_trackEntityFixture.Create(id: trackId, albumId: albumId, libraryId: libraryId)]);
+            tracks: [_trackEntityFixture.Create(id: trackId, albumId: albumId, libraryId: libraryId, container: "FLAC")]);
         ArtistEntity artistEntity = _artistEntityFixture.Create(libraryId: libraryId, albums: [albumEntity]);
         Result<Artist> artistResult = artistEntity.ToDomainEntity();
         return (artistResult.Value, albumId, trackId);

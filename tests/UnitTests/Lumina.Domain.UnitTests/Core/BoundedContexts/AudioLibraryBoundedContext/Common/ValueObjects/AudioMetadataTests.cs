@@ -41,6 +41,7 @@ public class AudioMetadataTests
             Optional<LanguageInfo>.None(),
             Optional<int>.Some(16),
             Optional<string>.Some("PCM"),
+            Optional<string>.Some("WAV"),
             Optional<int>.Some(1411),
             Optional<string>.Some("f0e9c1a2-0000-0000-0000-000000000000"),
             Optional<decimal>.Some(-6.53m),
@@ -57,6 +58,7 @@ public class AudioMetadataTests
         Assert.Equal("A song by the British rock band Queen.", result.Value.Description.Value);
         Assert.Equal(16, result.Value.BitDepth.Value);
         Assert.Equal("PCM", result.Value.AudioCodec.Value);
+        Assert.Equal("WAV", result.Value.Container.Value);
         Assert.Equal(1411, result.Value.Bitrate.Value);
         Assert.Single(result.Value.Genres);
         Assert.Single(result.Value.Tags);
@@ -80,6 +82,7 @@ public class AudioMetadataTests
             Optional<LanguageInfo>.None(),
             Optional<int>.None(),
             Optional<string>.None(),
+            Optional<string>.None(),
             Optional<int>.None(),
             Optional<string>.None(),
             Optional<decimal>.None(),
@@ -91,6 +94,7 @@ public class AudioMetadataTests
         Assert.False(result.IsFailure);
         Assert.False(result.Value.BitDepth.HasValue);
         Assert.False(result.Value.AudioCodec.HasValue);
+        Assert.False(result.Value.Container.HasValue);
         Assert.False(result.Value.Bitrate.HasValue);
     }
 
@@ -115,6 +119,7 @@ public class AudioMetadataTests
             originalLanguage: Optional<LanguageInfo>.None(),
             bitDepth: Optional<int>.None(),
             audioCodec: Optional<string>.None(),
+            container: Optional<string>.None(),
             bitrate: Optional<int>.None());
         AudioMetadata secondResult = _audioMetadataFixture.Create(
             title: "Bohemian Rhapsody",
@@ -130,6 +135,7 @@ public class AudioMetadataTests
             originalLanguage: Optional<LanguageInfo>.None(),
             bitDepth: Optional<int>.None(),
             audioCodec: Optional<string>.None(),
+            container: Optional<string>.None(),
             bitrate: Optional<int>.None());
 
         // Assert
@@ -157,6 +163,7 @@ public class AudioMetadataTests
             originalLanguage: Optional<LanguageInfo>.None(),
             bitDepth: Optional<int>.None(),
             audioCodec: Optional<string>.None(),
+            container: Optional<string>.None(),
             bitrate: Optional<int>.None());
         AudioMetadata secondResult = _audioMetadataFixture.Create(
             title: "Bohemian Rhapsody",
@@ -172,6 +179,7 @@ public class AudioMetadataTests
             originalLanguage: Optional<LanguageInfo>.None(),
             bitDepth: Optional<int>.None(),
             audioCodec: Optional<string>.None(),
+            container: Optional<string>.None(),
             bitrate: Optional<int>.None());
 
         // Assert
@@ -200,6 +208,7 @@ public class AudioMetadataTests
             Optional<LanguageInfo>.Some(originalLanguage),
             Optional<int>.Some(16),
             Optional<string>.Some("PCM"),
+            Optional<string>.Some("WAV"),
             Optional<int>.Some(1411),
             Optional<string>.Some("f0e9c1a2-0000-0000-0000-000000000000"),
             Optional<decimal>.Some(-6.53m),
@@ -237,6 +246,7 @@ public class AudioMetadataTests
             Optional<LanguageInfo>.None(),
             Optional<int>.None(),
             Optional<string>.None(),
+            Optional<string>.None(),
             Optional<int>.None(),
             Optional<string>.None(),
             Optional<decimal>.None(),
@@ -271,6 +281,7 @@ public class AudioMetadataTests
             originalLanguage: Optional<LanguageInfo>.None(),
             bitDepth: Optional<int>.None(),
             audioCodec: Optional<string>.None(),
+            container: Optional<string>.None(),
             bitrate: Optional<int>.None());
         AudioMetadata secondResult = _audioMetadataFixture.Create(
             title: "Love of My Life",
@@ -286,6 +297,7 @@ public class AudioMetadataTests
             originalLanguage: Optional<LanguageInfo>.None(),
             bitDepth: Optional<int>.None(),
             audioCodec: Optional<string>.None(),
+            container: Optional<string>.None(),
             bitrate: Optional<int>.None());
 
         // Assert
@@ -335,6 +347,50 @@ public class AudioMetadataTests
     }
 
     [Fact]
+    public void Equals_WithDifferentContainer_ShouldReturnFalse()
+    {
+        // Arrange
+        ReleaseInfo releaseInfo = _releaseInfoFixture.Create();
+
+        // Act
+        AudioMetadata firstResult = _audioMetadataFixture.Create(
+            title: "Bohemian Rhapsody",
+            originalTitle: Optional<string>.None(),
+            durationInSeconds: 355,
+            sampleRate: 44100,
+            channels: 2,
+            releaseInfo: releaseInfo,
+            description: Optional<string>.None(),
+            genres: [],
+            tags: [],
+            language: Optional<LanguageInfo>.None(),
+            originalLanguage: Optional<LanguageInfo>.None(),
+            bitDepth: Optional<int>.None(),
+            audioCodec: Optional<string>.None(),
+            container: Optional<string>.Some("MP3"),
+            bitrate: Optional<int>.None());
+        AudioMetadata secondResult = _audioMetadataFixture.Create(
+            title: "Bohemian Rhapsody",
+            originalTitle: Optional<string>.None(),
+            durationInSeconds: 355,
+            sampleRate: 44100,
+            channels: 2,
+            releaseInfo: releaseInfo,
+            description: Optional<string>.None(),
+            genres: [],
+            tags: [],
+            language: Optional<LanguageInfo>.None(),
+            originalLanguage: Optional<LanguageInfo>.None(),
+            bitDepth: Optional<int>.None(),
+            audioCodec: Optional<string>.None(),
+            container: Optional<string>.Some("FLAC"),
+            bitrate: Optional<int>.None());
+
+        // Assert
+        Assert.NotEqual(firstResult, secondResult);
+    }
+
+    [Fact]
     public void Equals_WithDifferentGenres_ShouldReturnFalse()
     {
         // Arrange
@@ -355,6 +411,7 @@ public class AudioMetadataTests
             originalLanguage: Optional<LanguageInfo>.None(),
             bitDepth: Optional<int>.None(),
             audioCodec: Optional<string>.None(),
+            container: Optional<string>.None(),
             bitrate: Optional<int>.None());
         AudioMetadata secondResult = _audioMetadataFixture.Create(
             title: "Bohemian Rhapsody",
@@ -370,6 +427,7 @@ public class AudioMetadataTests
             originalLanguage: Optional<LanguageInfo>.None(),
             bitDepth: Optional<int>.None(),
             audioCodec: Optional<string>.None(),
+            container: Optional<string>.None(),
             bitrate: Optional<int>.None());
 
         // Assert

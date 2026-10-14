@@ -37,6 +37,7 @@ public class TrackEntityFixture
     /// <param name="libraryId">Optional. The Id of the media library that owns the track.</param>
     /// <param name="path">Optional. The file system path of the track.</param>
     /// <param name="title">Optional. The title of the track.</param>
+    /// <param name="container">Optional. The container of the audio file of the track.</param>
     /// <param name="trackNumber">Optional. The number of the track on its disc.</param>
     /// <param name="originalReleaseDate">Optional. The original release date of the track.</param>
     /// <param name="originalReleaseYear">Optional. The original release year of the track.</param>
@@ -47,6 +48,7 @@ public class TrackEntityFixture
     /// <param name="includeOriginalReleaseYear">Whether the original release year should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeReReleaseDate">Whether the re-release date should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeReReleaseYear">Whether the re-release year should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeContainer">Whether the container should be included, or forced to <see langword="null"/>.</param>
     /// <param name="metadataStatus">Optional. The metadata enrichment status of the track.</param>
     /// <returns>The created <see cref="TrackEntity"/>.</returns>
     public TrackEntity Create(
@@ -55,6 +57,7 @@ public class TrackEntityFixture
         Guid? libraryId = null,
         string? path = null,
         string? title = null,
+        string? container = null,
         int? trackNumber = null,
         DateOnly? originalReleaseDate = null,
         int? originalReleaseYear = null,
@@ -65,6 +68,7 @@ public class TrackEntityFixture
         bool includeOriginalReleaseYear = true,
         bool includeReReleaseDate = true,
         bool includeReReleaseYear = true,
+        bool includeContainer = true,
         MetadataStatus? metadataStatus = null)
     {
         Guid resolvedId = id ?? Guid.NewGuid();
@@ -111,6 +115,7 @@ public class TrackEntityFixture
             .RuleFor(x => x.Channels, f => f.PickRandom(1, 2, 6))
             .RuleFor(x => x.BitDepth, Random.Shared.Next(8, 32))
             .RuleFor(x => x.AudioCodec, f => f.PickRandom("FLAC", "MP3", "AAC", "ALAC"))
+            .RuleFor(x => x.Container, f => includeContainer ? (container ?? f.PickRandom("FLAC", "MP3", "OGG", "MP4", "AAC", "WAV")) : null)
             .RuleFor(x => x.Bitrate, Random.Shared.Next(96, 1411))
             .RuleFor(x => x.TrackNumber, f => trackNumber ?? f.Random.Int(1, 20))
             .RuleFor(x => x.DiscNumber, Random.Shared.Next(1, 3))

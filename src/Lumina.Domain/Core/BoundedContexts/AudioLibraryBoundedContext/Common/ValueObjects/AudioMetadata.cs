@@ -39,6 +39,11 @@ public class AudioMetadata : BaseMetadata
     public Optional<string> AudioCodec { get; }
 
     /// <summary>
+    /// Gets the container of the audio, as read from the file itself, for example MP3, FLAC, OGG, AAC, MP4 or WAV.
+    /// </summary>
+    public Optional<string> Container { get; }
+
+    /// <summary>
     /// Gets the bitrate of the audio in kbps.
     /// </summary>
     public Optional<int> Bitrate { get; }
@@ -82,6 +87,7 @@ public class AudioMetadata : BaseMetadata
     /// <param name="originalLanguage">The optional original language of the audio.</param>
     /// <param name="bitDepth">The bit depth of the audio.</param>
     /// <param name="audioCodec">The audio codec used.</param>
+    /// <param name="container">The container of the audio.</param>
     /// <param name="genres">The genres of the audio.</param>
     /// <param name="tags">The tags associated with the audio.</param>
     /// <param name="bitrate">The bitrate of the audio in kbps.</param>
@@ -104,6 +110,7 @@ public class AudioMetadata : BaseMetadata
         Optional<LanguageInfo> originalLanguage,
         Optional<int> bitDepth,
         Optional<string> audioCodec,
+        Optional<string> container,
         Optional<int> bitrate,
         Optional<string> acoustId,
         Optional<decimal> replayGainTrackGain,
@@ -117,6 +124,7 @@ public class AudioMetadata : BaseMetadata
         Channels = channels;
         BitDepth = bitDepth;
         AudioCodec = audioCodec;
+        Container = container;
         Bitrate = bitrate;
         AcoustId = acoustId;
         ReplayGainTrackGain = replayGainTrackGain;
@@ -139,6 +147,7 @@ public class AudioMetadata : BaseMetadata
     /// <param name="originalLanguage">The optional original language of the audio.</param>
     /// <param name="bitDepth">The bit depth of the audio.</param>
     /// <param name="audioCodec">The audio codec used.</param>
+    /// <param name="container">The container of the audio.</param>
     /// <param name="genres">The genres of the audio.</param>
     /// <param name="tags">The tags associated with the audio.</param>
     /// <param name="bitrate">The bitrate of the audio in kbps.</param>
@@ -164,6 +173,7 @@ public class AudioMetadata : BaseMetadata
         Optional<LanguageInfo> originalLanguage,
         Optional<int> bitDepth,
         Optional<string> audioCodec,
+        Optional<string> container,
         Optional<int> bitrate,
         Optional<string> acoustId,
         Optional<decimal> replayGainTrackGain,
@@ -185,12 +195,45 @@ public class AudioMetadata : BaseMetadata
             originalLanguage,
             bitDepth,
             audioCodec,
+            container,
             bitrate,
             acoustId,
             replayGainTrackGain,
             replayGainTrackPeak,
             replayGainAlbumGain,
             replayGainAlbumPeak);
+    }
+
+    /// <summary>
+    /// Creates a copy of this audio metadata with the provided <paramref name="container"/>, keeping every other property unchanged.
+    /// </summary>
+    /// <param name="container">The container of the audio.</param>
+    /// <returns>
+    /// An <see cref="Result{TValue}"/> containing either a copy of this audio metadata with the provided container, or an error message.
+    /// </returns>
+    internal Result<AudioMetadata> WithContainer(Optional<string> container)
+    {
+        return Create(
+            Title,
+            OriginalTitle,
+            DurationInSeconds,
+            SampleRate,
+            Channels,
+            ReleaseInfo,
+            Description,
+            [.. Genres],
+            [.. Tags],
+            Language,
+            OriginalLanguage,
+            BitDepth,
+            AudioCodec,
+            container,
+            Bitrate,
+            AcoustId,
+            ReplayGainTrackGain,
+            ReplayGainTrackPeak,
+            ReplayGainAlbumGain,
+            ReplayGainAlbumPeak);
     }
 
     /// <summary>
@@ -206,6 +249,7 @@ public class AudioMetadata : BaseMetadata
         yield return Channels;
         yield return BitDepth;
         yield return AudioCodec;
+        yield return Container;
         yield return Bitrate;
         yield return AcoustId;
         yield return ReplayGainTrackGain;

@@ -460,6 +460,7 @@ public class AddAlbumEndpointSummary : Summary<AddAlbumEndpoint, AddAlbumRequest
                         AlbumId: albumId,
                         LibraryId: libraryId,
                         Path: "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
+                        Container: "FLAC",
                         Metadata: new(
                             Title: "Bohemian Rhapsody",
                             OriginalTitle: "Bohemian Rhapsody",
@@ -552,6 +553,7 @@ public class AddAlbumEndpointSummary : Summary<AddAlbumEndpoint, AddAlbumRequest
                         AlbumId: albumId,
                         LibraryId: libraryId,
                         Path: "/music/queen/a-night-at-the-opera/07-youre-my-best-friend.flac",
+                        Container: "FLAC",
                         Metadata: new(
                             Title: "You're My Best Friend",
                             OriginalTitle: "You're My Best Friend",

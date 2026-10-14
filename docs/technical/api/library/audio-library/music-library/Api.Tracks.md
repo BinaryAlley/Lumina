@@ -129,6 +129,7 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b
   "albumId": "e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f",
   "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
   "path": "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
+  "container": "FLAC",
   "metadata": {
     "title": "Bohemian Rhapsody",
     "originalTitle": "Bohemian Rhapsody",
@@ -231,6 +232,7 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
   "albumId": "e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f",
   "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
   "path": "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
+  "container": "FLAC",
   "metadata": {
     "title": "Bohemian Rhapsody",
     "originalTitle": "Bohemian Rhapsody",
@@ -452,6 +454,7 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
   "albumId": "e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f",
   "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
   "path": "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
+  "container": "FLAC",
   "metadata": {
     "title": "Bohemian Rhapsody",
     "originalTitle": "Bohemian Rhapsody",

@@ -111,6 +111,7 @@ internal static class MusicMetadataAggregator
             First(first.Channels, second.Channels),
             First(first.BitDepth, second.BitDepth),
             First(first.AudioCodec, second.AudioCodec),
+            First(first.Container, second.Container),
             First(first.Bitrate, second.Bitrate),
             First(first.MusicBrainzRecordingId, second.MusicBrainzRecordingId),
             First(first.MusicBrainzTrackId, second.MusicBrainzTrackId),

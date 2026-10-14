@@ -17,6 +17,7 @@ using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Library
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Lumina.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Metadata;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -232,6 +233,7 @@ internal sealed class MusicMetadataExtractionJob : MediaLibraryScanJob, IMusicMe
         int channels = 0;
         int? bitDepth = null;
         string? audioCodec = null;
+        string? container = null;
         int? bitrate = null;
         string? acoustId = null;
         decimal? replayGainTrackGain = null;
@@ -242,64 +244,71 @@ internal sealed class MusicMetadataExtractionJob : MediaLibraryScanJob, IMusicMe
 
         try
         {
-            using (TagLib.File tagFile = TagLib.File.Create(path))
+            // A file that is itself a link is not read, so its target outside the content locations is never opened. A linked directory is a separate
+            // discovery level concern, so this is a defense in depth for the leaf file rather than a complete containment guarantee.
+            if (!IsReparsePoint(path))
             {
-                TagLib.Tag tag = tagFile.Tag;
-                if (!string.IsNullOrWhiteSpace(tag.Title))
-                    trackTitle = tag.Title;
-                if (!string.IsNullOrWhiteSpace(tag.Album))
-                    releaseName = tag.Album;
-                // The album artist is preferred over the track artist, because it is the artist the release belongs to.
-                string? tagArtist = !string.IsNullOrWhiteSpace(tag.FirstAlbumArtist) ? tag.FirstAlbumArtist : tag.FirstPerformer;
-                if (!string.IsNullOrWhiteSpace(tagArtist))
-                    artistName = tagArtist;
-                if (tag.Track > 0)
-                    trackNumber = (int)tag.Track;
-                if (tag.Disc > 0)
-                    discNumber = (int)tag.Disc;
-                if (tag.Year > 0)
-                    releaseYear = (int)tag.Year;
+                using (TagLib.File tagFile = TagLib.File.Create(path))
+                {
+                    TagLib.Tag tag = tagFile.Tag;
+                    if (!string.IsNullOrWhiteSpace(tag.Title))
+                        trackTitle = tag.Title;
+                    if (!string.IsNullOrWhiteSpace(tag.Album))
+                        releaseName = tag.Album;
+                    // The album artist is preferred over the track artist, because it is the artist the release belongs to.
+                    string? tagArtist = !string.IsNullOrWhiteSpace(tag.FirstAlbumArtist) ? tag.FirstAlbumArtist : tag.FirstPerformer;
+                    if (!string.IsNullOrWhiteSpace(tagArtist))
+                        artistName = tagArtist;
+                    if (tag.Track > 0)
+                        trackNumber = (int)tag.Track;
+                    if (tag.Disc > 0)
+                        discNumber = (int)tag.Disc;
+                    if (tag.Year > 0)
+                        releaseYear = (int)tag.Year;
 
-                TagLib.Properties audioProperties = tagFile.Properties;
-                durationInSeconds = (int)audioProperties.Duration.TotalSeconds;
-                sampleRate = audioProperties.AudioSampleRate;
-                channels = audioProperties.AudioChannels;
-                if (audioProperties.BitsPerSample > 0)
-                    bitDepth = audioProperties.BitsPerSample;
-                if (audioProperties.AudioBitrate > 0)
-                    bitrate = audioProperties.AudioBitrate;
-                if (!string.IsNullOrWhiteSpace(audioProperties.Description))
-                    audioCodec = audioProperties.Description;
+                    TagLib.Properties audioProperties = tagFile.Properties;
+                    durationInSeconds = (int)audioProperties.Duration.TotalSeconds;
+                    sampleRate = audioProperties.AudioSampleRate;
+                    channels = audioProperties.AudioChannels;
+                    // The container is the format of the file itself, so it is resolved from the concrete type of the parsed file and not from its tags.
+                    container = AudioContainerResolver.Resolve(tagFile);
+                    if (audioProperties.BitsPerSample > 0)
+                        bitDepth = audioProperties.BitsPerSample;
+                    if (audioProperties.AudioBitrate > 0)
+                        bitrate = audioProperties.AudioBitrate;
+                    if (!string.IsNullOrWhiteSpace(audioProperties.Description))
+                        audioCodec = audioProperties.Description;
 
-                // The text frames of the ID3v2 tag are read once for the whole file, so that the extended tag lookups below do not walk all the frames
-                // of the tag again for every key.
-                IReadOnlyDictionary<string, string[]> id3v2ExtendedFields = GetId3v2ExtendedFields(tagFile);
+                    // The text frames of the ID3v2 tag are read once for the whole file, so that the extended tag lookups below do not walk all the frames
+                    // of the tag again for every key.
+                    IReadOnlyDictionary<string, string[]> id3v2ExtendedFields = GetId3v2ExtendedFields(tagFile);
 
-                // The MusicBrainz identifiers written by taggers like Picard are read here, so that the enrichment can look the items up directly,
-                // instead of guessing them through searches. The work identifier and title are not exposed as properties by the tagging library, so
-                // they are read from the extended tags of the container, and they only serve as a fallback for recordings that MusicBrainz leaves unlinked to a work.
-                musicBrainzArtistId = ParseGuid(tag.MusicBrainzArtistId);
-                musicBrainzReleaseArtistId = ParseGuid(tag.MusicBrainzReleaseArtistId);
-                musicBrainzReleaseGroupId = ParseGuid(tag.MusicBrainzReleaseGroupId);
-                musicBrainzReleaseId = ParseGuid(tag.MusicBrainzReleaseId);
-                musicBrainzRecordingId = ParseGuid(tag.MusicBrainzTrackId);
-                musicBrainzTrackId = ParseGuid(GetExtendedField(tagFile, id3v2ExtendedFields, "MusicBrainz Release Track Id", "MUSICBRAINZ_RELEASETRACKID"));
-                musicBrainzWorkId = ParseGuid(GetExtendedField(tagFile, id3v2ExtendedFields, "MusicBrainz Work Id", "MUSICBRAINZ_WORKID"));
-                string? extendedWorkTitle = GetExtendedField(tagFile, id3v2ExtendedFields, "WORK", "MUSICBRAINZ_WORK");
-                if (!string.IsNullOrWhiteSpace(extendedWorkTitle))
-                    workTitle = extendedWorkTitle;
+                    // The MusicBrainz identifiers written by taggers like Picard are read here, so that the enrichment can look the items up directly,
+                    // instead of guessing them through searches. The work identifier and title are not exposed as properties by the tagging library, so
+                    // they are read from the extended tags of the container, and they only serve as a fallback for recordings that MusicBrainz leaves unlinked to a work.
+                    musicBrainzArtistId = ParseGuid(tag.MusicBrainzArtistId);
+                    musicBrainzReleaseArtistId = ParseGuid(tag.MusicBrainzReleaseArtistId);
+                    musicBrainzReleaseGroupId = ParseGuid(tag.MusicBrainzReleaseGroupId);
+                    musicBrainzReleaseId = ParseGuid(tag.MusicBrainzReleaseId);
+                    musicBrainzRecordingId = ParseGuid(tag.MusicBrainzTrackId);
+                    musicBrainzTrackId = ParseGuid(GetExtendedField(tagFile, id3v2ExtendedFields, "MusicBrainz Release Track Id", "MUSICBRAINZ_RELEASETRACKID"));
+                    musicBrainzWorkId = ParseGuid(GetExtendedField(tagFile, id3v2ExtendedFields, "MusicBrainz Work Id", "MUSICBRAINZ_WORKID"));
+                    string? extendedWorkTitle = GetExtendedField(tagFile, id3v2ExtendedFields, "WORK", "MUSICBRAINZ_WORK");
+                    if (!string.IsNullOrWhiteSpace(extendedWorkTitle))
+                        workTitle = extendedWorkTitle;
 
-                // The AcoustID, the moods and the ReplayGain values written by taggers like Picard are read here as well. The moods can be a single
-                // slash separated value or several distinct values, depending on the container, so all of them are read and split before being de-duplicated.
-                acoustId = GetExtendedField(tagFile, id3v2ExtendedFields, "Acoustid Id", "ACOUSTID_ID");
-                moods = [.. GetExtendedFields(tagFile, id3v2ExtendedFields, "mood", "MOOD", "MOODS")
-                    .SelectMany(mood => mood.Split('/', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
-                    .Where(mood => !string.IsNullOrWhiteSpace(mood))
-                    .Distinct(StringComparer.OrdinalIgnoreCase)];
-                replayGainTrackGain = ParseDecimal(GetExtendedField(tagFile, id3v2ExtendedFields, "REPLAYGAIN_TRACK_GAIN", "replaygain_track_gain"));
-                replayGainTrackPeak = ParseDecimal(GetExtendedField(tagFile, id3v2ExtendedFields, "REPLAYGAIN_TRACK_PEAK", "replaygain_track_peak"));
-                replayGainAlbumGain = ParseDecimal(GetExtendedField(tagFile, id3v2ExtendedFields, "REPLAYGAIN_ALBUM_GAIN", "replaygain_album_gain"));
-                replayGainAlbumPeak = ParseDecimal(GetExtendedField(tagFile, id3v2ExtendedFields, "REPLAYGAIN_ALBUM_PEAK", "replaygain_album_peak"));
+                    // The AcoustID, the moods and the ReplayGain values written by taggers like Picard are read here as well. The moods can be a single
+                    // slash separated value or several distinct values, depending on the container, so all of them are read and split before being de-duplicated.
+                    acoustId = GetExtendedField(tagFile, id3v2ExtendedFields, "Acoustid Id", "ACOUSTID_ID");
+                    moods = [.. GetExtendedFields(tagFile, id3v2ExtendedFields, "mood", "MOOD", "MOODS")
+                        .SelectMany(mood => mood.Split('/', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                        .Where(mood => !string.IsNullOrWhiteSpace(mood))
+                        .Distinct(StringComparer.OrdinalIgnoreCase)];
+                    replayGainTrackGain = ParseDecimal(GetExtendedField(tagFile, id3v2ExtendedFields, "REPLAYGAIN_TRACK_GAIN", "replaygain_track_gain"));
+                    replayGainTrackPeak = ParseDecimal(GetExtendedField(tagFile, id3v2ExtendedFields, "REPLAYGAIN_TRACK_PEAK", "replaygain_track_peak"));
+                    replayGainAlbumGain = ParseDecimal(GetExtendedField(tagFile, id3v2ExtendedFields, "REPLAYGAIN_ALBUM_GAIN", "replaygain_album_gain"));
+                    replayGainAlbumPeak = ParseDecimal(GetExtendedField(tagFile, id3v2ExtendedFields, "REPLAYGAIN_ALBUM_PEAK", "replaygain_album_peak"));
+                }
             }
         }
         catch (Exception exception) when (exception is TagLib.CorruptFileException or TagLib.UnsupportedFormatException or IOException or UnauthorizedAccessException)
@@ -330,6 +339,7 @@ internal sealed class MusicMetadataExtractionJob : MediaLibraryScanJob, IMusicMe
             Channels = channels,
             BitDepth = bitDepth,
             AudioCodec = audioCodec,
+            Container = container,
             Bitrate = bitrate,
             AcoustId = acoustId,
             ReplayGainTrackGain = replayGainTrackGain,
@@ -346,6 +356,17 @@ internal sealed class MusicMetadataExtractionJob : MediaLibraryScanJob, IMusicMe
             MusicBrainzWorkId = musicBrainzWorkId,
             WorkTitle = workTitle
         };
+    }
+
+    /// <summary>
+    /// Determines whether the file stored at <paramref name="path"/> is a reparse point, such as a symbolic link.
+    /// </summary>
+    /// <param name="path">The file system path of the file to check.</param>
+    /// <returns><see langword="true"/> when the file is a reparse point, otherwise <see langword="false"/>.</returns>
+    private static bool IsReparsePoint(string path)
+    {
+        // This only detects a leaf file that is itself a link; a linked directory encountered during discovery is not caught here.
+        return (File.GetAttributes(path) & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint;
     }
 
     /// <summary>

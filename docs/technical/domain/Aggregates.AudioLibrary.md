@@ -286,6 +286,7 @@ class Track
     "channels": 2,
     "bitDepth": 16,
     "audioCodec": "FLAC",
+    "container": "FLAC",
     "bitrate": 980,
     "acoustId": "f0e1d2c3-b4a5-4c6d-8e7f-9a0b1c2d3e4f",
     "replayGainTrackGain": -7.5,

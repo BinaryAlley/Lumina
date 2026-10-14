@@ -202,6 +202,9 @@ public static class AudioMetadataDtoMapping
         Optional<string> audioCodec = Optional<string>.FromNullable(dto.AudioCodec);
         if (!audioCodec.HasValue)
             audioCodec = track.Metadata.AudioCodec;
+        // The container is captured from the file itself: a provider that re-reads the file supplies it, and when it is absent the track keeps the stored
+        // container, which the domain enforces when the metadata is applied. The preserve rule therefore lives in one place, the domain update.
+        Optional<string> container = Optional<string>.FromNullable(dto.Container);
         Optional<int> bitrate = Optional<int>.FromNullable(dto.Bitrate);
         if (!bitrate.HasValue)
             bitrate = track.Metadata.Bitrate;
@@ -220,6 +223,7 @@ public static class AudioMetadataDtoMapping
             originalLanguage,
             bitDepth,
             audioCodec,
+            container,
             bitrate,
             track.Metadata.AcoustId,
             track.Metadata.ReplayGainTrackGain,
