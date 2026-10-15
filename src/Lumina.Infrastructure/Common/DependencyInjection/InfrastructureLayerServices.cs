@@ -13,6 +13,7 @@ using Lumina.Application.Common.Infrastructure.Themes;
 using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artwork;
+using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
 using Lumina.Application.Core.MediaLibrary.Management.Progress;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Artwork;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
@@ -38,6 +39,7 @@ using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.WrittenCo
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Progress;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Queue;
 using Lumina.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artwork;
+using Lumina.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
 using Lumina.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Artwork;
 using Lumina.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
 using Lumina.Infrastructure.Core.Plugins;
@@ -145,6 +147,10 @@ public static class InfrastructureLayerServices
 
         // Music artwork: stores the artwork of the albums into the internal media directory.
         services.AddScoped<IMusicArtworkService, MusicArtworkService>();
+
+        // Music playback: decides, for a track and the capabilities a player advertises, whether the track is played as stored,
+        // repackaged into another container, or re-encoded into another codec.
+        services.AddSingleton<IPlaybackFormatService, PlaybackFormatService>();
 
         // Book reading: resolves the book reader plugins, extracts the books into a temporary directory, and serves their contents.
         // The enablement cache lets the reading service skip the per-request database read of the reader configurations.

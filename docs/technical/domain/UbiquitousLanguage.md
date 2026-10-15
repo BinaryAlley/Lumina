@@ -11,6 +11,11 @@
 - _**Stream**_: A media item accessed via streaming rather than local storage
 - _**Language Track**_: An audio or text track in a specific language
 - _**Media Contributor**_: A person, group, or organization that contributed to a media item, together with the role they played
+- _**Direct Play**_: Delivery of a track's audio as stored, because the player can demux its container and decode its codec
+- _**Remux**_: Delivery of a track's audio with its codec repackaged into a container the player can demux, without re-encoding it
+- _**Transcode**_: Delivery of a track's audio re-encoded into a codec the player can decode
+- _**Playback Capabilities**_: The container and codec combinations a player advertises it can demux and decode directly
+- _**Delivery Shape**_: The way delivered audio is addressed and seeked, by byte range or as fixed duration, time addressed segments
 
 ## Video Content
 - _**TV Show**_: A series of episodes typically organized into seasons
