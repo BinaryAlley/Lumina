@@ -69,4 +69,58 @@
   <data name="DescriptionShouldAggregateArtworkWhenMissing" xml:space="preserve">
     <value>有効にすると、最初のアートワークプロバイダーが提供しないライブラリ項目のアートワークが、後続のプロバイダーから補完されます。</value>
   </data>
+  <data name="Playback" xml:space="preserve">
+    <value>再生</value>
+  </data>
+  <data name="ShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>一時停止中もダウンロードを続ける</value>
+  </data>
+  <data name="DescriptionShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>再生を一時停止している間もプレーヤーがトラックのダウンロードをファイル全体まで続けるかどうか。再開時にデータを待たずに済みます。</value>
+  </data>
+  <data name="ShouldAutoplay" xml:space="preserve">
+    <value>自動再生</value>
+  </data>
+  <data name="DescriptionShouldAutoplay" xml:space="preserve">
+    <value>アルバムまたはアーティストの再生が終わったときに、続くトラックを自動的に再生するかどうか。</value>
+  </data>
+  <data name="IsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>ギャップレス再生</value>
+  </data>
+  <data name="DescriptionIsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>連続するトラックを間に無音を挟まずに再生するかどうか。</value>
+  </data>
+  <data name="ReplayGainMode" xml:space="preserve">
+    <value>ReplayGain</value>
+  </data>
+  <data name="DescriptionReplayGainMode" xml:space="preserve">
+    <value>再生するトラックに ReplayGain の正規化をどのように適用するか。</value>
+  </data>
+  <data name="ReplayGainModeOff" xml:space="preserve">
+    <value>オフ</value>
+  </data>
+  <data name="ReplayGainModeTrack" xml:space="preserve">
+    <value>トラックごと</value>
+  </data>
+  <data name="ReplayGainModeAlbum" xml:space="preserve">
+    <value>アルバムごと</value>
+  </data>
+  <data name="StreamingQuality" xml:space="preserve">
+    <value>ストリーミング品質</value>
+  </data>
+  <data name="DescriptionStreamingQuality" xml:space="preserve">
+    <value>サーバーが再生のためにトラックを正規化する必要がある場合に適用される品質の上限。直接再生は決して変更されません。</value>
+  </data>
+  <data name="StreamingQualityAuto" xml:space="preserve">
+    <value>自動</value>
+  </data>
+  <data name="StreamingQualityLow" xml:space="preserve">
+    <value>低 (96 kbps)</value>
+  </data>
+  <data name="StreamingQualityMedium" xml:space="preserve">
+    <value>中 (160 kbps)</value>
+  </data>
+  <data name="StreamingQualityHigh" xml:space="preserve">
+    <value>高 (320 kbps)</value>
+  </data>
 </root>

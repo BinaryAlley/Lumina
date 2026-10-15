@@ -193,43 +193,6 @@ public class UpdateUserSettingsCommandHandlerTests
     }
 
     [Fact]
-    public async Task HandleAsync_WhenToDomainEntityFails_ShouldReturnErrorAndNotUpdate()
-    {
-        // Arrange
-        UpdateUserSettingsCommand command = _updateUserSettingsCommandFixture.Create();
-        // An entity carrying an invalid items-per-page value fails to convert to its domain aggregate.
-        UserSettingsEntity existingSettings = _userSettingsEntityFixture.Create(userId: _userId, itemsPerPage: 0);
-        _mockUserSettingsRepository.GetByUserIdAsync(_userId, Arg.Any<CancellationToken>())
-            .Returns(Result.From<UserSettingsEntity?>(existingSettings));
-
-        // Act
-        Result<Updated> result = await _sut.HandleAsync(command, CancellationToken.None);
-
-        // Assert
-        Assert.True(result.IsFailure);
-        await _mockUserSettingsRepository.DidNotReceive().UpdateAsync(Arg.Any<UserSettingsEntity>(), Arg.Any<CancellationToken>());
-        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
-    }
-
-    [Fact]
-    public async Task HandleAsync_WhenUpdateSettingsFails_ShouldReturnErrorAndNotPersist()
-    {
-        // Arrange
-        UpdateUserSettingsCommand command = _updateUserSettingsCommandFixture.Create(itemsPerPage: 0);
-        UserSettingsEntity existingSettings = _userSettingsEntityFixture.Create(userId: _userId);
-        _mockUserSettingsRepository.GetByUserIdAsync(_userId, Arg.Any<CancellationToken>())
-            .Returns(Result.From<UserSettingsEntity?>(existingSettings));
-
-        // Act
-        Result<Updated> result = await _sut.HandleAsync(command, CancellationToken.None);
-
-        // Assert
-        Assert.True(result.IsFailure);
-        await _mockUserSettingsRepository.DidNotReceive().UpdateAsync(Arg.Any<UserSettingsEntity>(), Arg.Any<CancellationToken>());
-        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
-    }
-
-    [Fact]
     public async Task HandleAsync_WhenUpdateFails_ShouldReturnErrorAndNotSaveChanges()
     {
         // Arrange

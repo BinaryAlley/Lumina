@@ -69,4 +69,58 @@
   <data name="DescriptionShouldAggregateArtworkWhenMissing" xml:space="preserve">
     <value>Cuando está habilitado, las ilustraciones de los elementos de la biblioteca que el primer proveedor de ilustraciones no proporciona se completan desde los proveedores siguientes.</value>
   </data>
+  <data name="Playback" xml:space="preserve">
+    <value>Reproducción</value>
+  </data>
+  <data name="ShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>Seguir descargando en pausa</value>
+  </data>
+  <data name="DescriptionShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>Indica si el reproductor sigue descargando la pista mientras la reproducción está en pausa, hasta el archivo completo, para que reanudar nunca espere datos.</value>
+  </data>
+  <data name="ShouldAutoplay" xml:space="preserve">
+    <value>Reproducción automática</value>
+  </data>
+  <data name="DescriptionShouldAutoplay" xml:space="preserve">
+    <value>Indica si la reproducción continúa automáticamente con las pistas siguientes al terminar un álbum o un artista.</value>
+  </data>
+  <data name="IsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>Reproducción sin pausas</value>
+  </data>
+  <data name="DescriptionIsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>Indica si las pistas consecutivas se reproducen sin un silencio entre ellas.</value>
+  </data>
+  <data name="ReplayGainMode" xml:space="preserve">
+    <value>ReplayGain</value>
+  </data>
+  <data name="DescriptionReplayGainMode" xml:space="preserve">
+    <value>Cómo se aplica la normalización ReplayGain a las pistas que reproduces.</value>
+  </data>
+  <data name="ReplayGainModeOff" xml:space="preserve">
+    <value>Desactivado</value>
+  </data>
+  <data name="ReplayGainModeTrack" xml:space="preserve">
+    <value>Por pista</value>
+  </data>
+  <data name="ReplayGainModeAlbum" xml:space="preserve">
+    <value>Por álbum</value>
+  </data>
+  <data name="StreamingQuality" xml:space="preserve">
+    <value>Calidad de transmisión</value>
+  </data>
+  <data name="DescriptionStreamingQuality" xml:space="preserve">
+    <value>El límite de calidad que se aplica cuando el servidor tiene que normalizar una pista para reproducirla. La reproducción directa nunca se modifica.</value>
+  </data>
+  <data name="StreamingQualityAuto" xml:space="preserve">
+    <value>Automática</value>
+  </data>
+  <data name="StreamingQualityLow" xml:space="preserve">
+    <value>Baja (96 kbps)</value>
+  </data>
+  <data name="StreamingQualityMedium" xml:space="preserve">
+    <value>Media (160 kbps)</value>
+  </data>
+  <data name="StreamingQualityHigh" xml:space="preserve">
+    <value>Alta (320 kbps)</value>
+  </data>
 </root>

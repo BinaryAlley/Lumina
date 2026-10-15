@@ -130,6 +130,78 @@
                     </div>
                     <small class="form-label text-disabled form-description">@_localizer["DescriptionShouldAggregateArtworkWhenMissing"]</small>
                 </div>
+                <!-- Playback. -->
+                <div class="form-row">
+                    <h4 class="text-light-two w-100">@_localizer["Playback"]</h4>
+                </div>
+                <!-- Keep downloading while paused. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="ShouldKeepDownloadingWhilePaused">@_localizer["ShouldKeepDownloadingWhilePaused"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <label class="enlightenment-checkbox-label">
+                            <input type="checkbox" id="ShouldKeepDownloadingWhilePaused" class="enlightenment-checkbox-hidden" />
+                            <span class="enlightenment-checkbox"></span>
+                        </label>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionShouldKeepDownloadingWhilePaused"]</small>
+                </div>
+                <!-- Autoplay. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="ShouldAutoplay">@_localizer["ShouldAutoplay"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <label class="enlightenment-checkbox-label">
+                            <input type="checkbox" id="ShouldAutoplay" class="enlightenment-checkbox-hidden" />
+                            <span class="enlightenment-checkbox"></span>
+                        </label>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionShouldAutoplay"]</small>
+                </div>
+                <!-- Gapless playback. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="IsGaplessPlaybackEnabled">@_localizer["IsGaplessPlaybackEnabled"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <label class="enlightenment-checkbox-label">
+                            <input type="checkbox" id="IsGaplessPlaybackEnabled" class="enlightenment-checkbox-hidden" />
+                            <span class="enlightenment-checkbox"></span>
+                        </label>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionIsGaplessPlaybackEnabled"]</small>
+                </div>
+                <!-- ReplayGain mode. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label asp-for="ReplayGainMode">@_localizer["ReplayGainMode"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <select asp-for="ReplayGainMode" class="enlightenment-input">
+                            <option value="Off">@_localizer["ReplayGainModeOff"]</option>
+                            <option value="Track">@_localizer["ReplayGainModeTrack"]</option>
+                            <option value="Album">@_localizer["ReplayGainModeAlbum"]</option>
+                        </select>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionReplayGainMode"]</small>
+                </div>
+                <!-- Streaming quality. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label asp-for="StreamingQuality">@_localizer["StreamingQuality"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <select asp-for="StreamingQuality" class="enlightenment-input">
+                            <option value="Auto">@_localizer["StreamingQualityAuto"]</option>
+                            <option value="Low">@_localizer["StreamingQualityLow"]</option>
+                            <option value="Medium">@_localizer["StreamingQualityMedium"]</option>
+                            <option value="High">@_localizer["StreamingQualityHigh"]</option>
+                        </select>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionStreamingQuality"]</small>
+                </div>
                 <div class="form-row" style="justify-content: center;">
                     <button type="submit" class="confirm-button h-22px">@_localizer["Save"]</button>
                 </div>
@@ -154,6 +226,11 @@
         const checkboxShouldPreserveBookStyles = document.getElementById('ShouldPreserveBookStyles');
         const checkboxShouldAggregateMetadataWhenMissing = document.getElementById('ShouldAggregateMetadataWhenMissing');
         const checkboxShouldAggregateArtworkWhenMissing = document.getElementById('ShouldAggregateArtworkWhenMissing');
+        const checkboxShouldKeepDownloadingWhilePaused = document.getElementById('ShouldKeepDownloadingWhilePaused');
+        const checkboxShouldAutoplay = document.getElementById('ShouldAutoplay');
+        const checkboxIsGaplessPlaybackEnabled = document.getElementById('IsGaplessPlaybackEnabled');
+        const selectReplayGainMode = document.getElementById('ReplayGainMode');
+        const selectStreamingQuality = document.getElementById('StreamingQuality');
 
         // Toggle the enabled state of the items per page input based on the pagination checkbox.
         function updateItemsPerPageEnabledState() {
@@ -172,6 +249,11 @@
                 checkboxShouldPreserveBookStyles.checked = data.shouldPreserveBookStyles === true;
                 checkboxShouldAggregateMetadataWhenMissing.checked = data.shouldAggregateMetadataWhenMissing === true;
                 checkboxShouldAggregateArtworkWhenMissing.checked = data.shouldAggregateArtworkWhenMissing === true;
+                checkboxShouldKeepDownloadingWhilePaused.checked = data.shouldKeepDownloadingWhilePaused === true;
+                checkboxShouldAutoplay.checked = data.shouldAutoplay === true;
+                checkboxIsGaplessPlaybackEnabled.checked = data.isGaplessPlaybackEnabled === true;
+                selectReplayGainMode.value = data.replayGainMode ?? 'Off';
+                selectStreamingQuality.value = data.streamingQuality ?? 'Auto';
                 updateItemsPerPageEnabledState();
             }
         }
@@ -186,7 +268,12 @@
                 ShouldAggregateMetadataWhenMissing: checkboxShouldAggregateMetadataWhenMissing.checked,
                 ShouldAggregateArtworkWhenMissing: checkboxShouldAggregateArtworkWhenMissing.checked,
                 ShouldRenderPdfAsImages: checkboxShouldRenderPdfAsImages.checked,
-                ShouldPreserveBookStyles: checkboxShouldPreserveBookStyles.checked
+                ShouldPreserveBookStyles: checkboxShouldPreserveBookStyles.checked,
+                ShouldKeepDownloadingWhilePaused: checkboxShouldKeepDownloadingWhilePaused.checked,
+                ShouldAutoplay: checkboxShouldAutoplay.checked,
+                IsGaplessPlaybackEnabled: checkboxIsGaplessPlaybackEnabled.checked,
+                ReplayGainMode: selectReplayGainMode.value,
+                StreamingQuality: selectStreamingQuality.value
             };
             const data = await callApiPostAsync('@_urlService.GetAbsoluteUrl(WebRoutes.Settings.UPDATE_USER_SETTINGS)', formData);
             if (data && data.isUpdated === true)

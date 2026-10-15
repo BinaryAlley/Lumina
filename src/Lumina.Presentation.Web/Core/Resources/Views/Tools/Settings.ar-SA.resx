@@ -69,4 +69,58 @@
   <data name="DescriptionShouldAggregateArtworkWhenMissing" xml:space="preserve">
     <value>عند التفعيل، تُستكمل الأعمال الفنية لعناصر المكتبة التي لا يوفرها مزود الأعمال الفنية الأول من المزودين التاليين.</value>
   </data>
+  <data name="Playback" xml:space="preserve">
+    <value>التشغيل</value>
+  </data>
+  <data name="ShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>متابعة التنزيل أثناء الإيقاف المؤقت</value>
+  </data>
+  <data name="DescriptionShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>ما إذا كان المشغل يواصل تنزيل المقطع أثناء إيقاف التشغيل مؤقتًا، حتى الملف كاملاً، بحيث لا ينتظر الاستئناف البيانات أبدًا.</value>
+  </data>
+  <data name="ShouldAutoplay" xml:space="preserve">
+    <value>التشغيل التلقائي</value>
+  </data>
+  <data name="DescriptionShouldAutoplay" xml:space="preserve">
+    <value>ما إذا كان التشغيل يستمر تلقائيًا بالمقاطع التالية عند انتهاء الألبوم أو الفنان.</value>
+  </data>
+  <data name="IsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>تشغيل دون فواصل</value>
+  </data>
+  <data name="DescriptionIsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>ما إذا كانت المقاطع المتتالية تُشغَّل دون صمت بينها.</value>
+  </data>
+  <data name="ReplayGainMode" xml:space="preserve">
+    <value>ReplayGain</value>
+  </data>
+  <data name="DescriptionReplayGainMode" xml:space="preserve">
+    <value>كيفية تطبيق تسوية ReplayGain على المقاطع التي تشغّلها.</value>
+  </data>
+  <data name="ReplayGainModeOff" xml:space="preserve">
+    <value>إيقاف</value>
+  </data>
+  <data name="ReplayGainModeTrack" xml:space="preserve">
+    <value>لكل مقطع</value>
+  </data>
+  <data name="ReplayGainModeAlbum" xml:space="preserve">
+    <value>لكل ألبوم</value>
+  </data>
+  <data name="StreamingQuality" xml:space="preserve">
+    <value>جودة البث</value>
+  </data>
+  <data name="DescriptionStreamingQuality" xml:space="preserve">
+    <value>حد الجودة الذي يُطبَّق عندما يضطر الخادم إلى تسوية مقطع للتشغيل. لا يتغير التشغيل المباشر أبدًا.</value>
+  </data>
+  <data name="StreamingQualityAuto" xml:space="preserve">
+    <value>تلقائي</value>
+  </data>
+  <data name="StreamingQualityLow" xml:space="preserve">
+    <value>منخفضة (96 kbps)</value>
+  </data>
+  <data name="StreamingQualityMedium" xml:space="preserve">
+    <value>متوسطة (160 kbps)</value>
+  </data>
+  <data name="StreamingQualityHigh" xml:space="preserve">
+    <value>عالية (320 kbps)</value>
+  </data>
 </root>

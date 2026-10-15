@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
 using Lumina.Presentation.Web.Common.DTO.UsersManagement;
+using Lumina.Presentation.Web.Common.Enums.AudioLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -28,6 +29,11 @@ public class UserSettingsDtoFixture
     /// <param name="shouldAggregateMetadataWhenMissing">Whether the metadata of the media library items is aggregated from multiple providers, when fields are missing.</param>
     /// <param name="shouldRenderPdfAsImages">Whether PDF books are rendered as page images for the user.</param>
     /// <param name="shouldPreserveBookStyles">Whether the styles of the book content are preserved when it is rendered for the user.</param>
+    /// <param name="shouldKeepDownloadingWhilePaused">Whether the player keeps downloading a track while playback is paused.</param>
+    /// <param name="shouldAutoplay">Whether the player continues playback at the end of an album or artist.</param>
+    /// <param name="isGaplessPlaybackEnabled">Whether the player transitions between consecutive tracks without a gap.</param>
+    /// <param name="replayGainMode">The way ReplayGain normalization is applied to the tracks the user plays.</param>
+    /// <param name="streamingQuality">The quality cap applied to the audio the server normalizes for the user.</param>
     /// <returns>A configured <see cref="UserSettingsDto"/> instance.</returns>
     public UserSettingsDto Create(
         Guid? userId = null, 
@@ -37,7 +43,12 @@ public class UserSettingsDtoFixture
         bool? isThemeCachingEnabled = null, 
         bool? shouldAggregateMetadataWhenMissing = null,
         bool? shouldRenderPdfAsImages = null,
-        bool? shouldPreserveBookStyles = null)
+        bool? shouldPreserveBookStyles = null,
+        bool? shouldKeepDownloadingWhilePaused = null,
+        bool? shouldAutoplay = null,
+        bool? isGaplessPlaybackEnabled = null,
+        ReplayGainMode? replayGainMode = null,
+        PlaybackStreamingQuality? streamingQuality = null)
     {
         return new UserSettingsDto
         {
@@ -48,7 +59,12 @@ public class UserSettingsDtoFixture
             IsThemeCachingEnabled = isThemeCachingEnabled ?? _faker.Random.Bool(),
             ShouldAggregateMetadataWhenMissing = shouldAggregateMetadataWhenMissing ?? _faker.Random.Bool(),
             ShouldRenderPdfAsImages = shouldRenderPdfAsImages ?? _faker.Random.Bool(),
-            ShouldPreserveBookStyles = shouldPreserveBookStyles ?? _faker.Random.Bool()
+            ShouldPreserveBookStyles = shouldPreserveBookStyles ?? _faker.Random.Bool(),
+            ShouldKeepDownloadingWhilePaused = shouldKeepDownloadingWhilePaused ?? _faker.Random.Bool(),
+            ShouldAutoplay = shouldAutoplay ?? _faker.Random.Bool(),
+            IsGaplessPlaybackEnabled = isGaplessPlaybackEnabled ?? _faker.Random.Bool(),
+            ReplayGainMode = replayGainMode ?? _faker.PickRandom<ReplayGainMode>(),
+            StreamingQuality = streamingQuality ?? _faker.PickRandom<PlaybackStreamingQuality>()
         };
     }
 

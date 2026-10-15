@@ -813,4 +813,34 @@
   <data name="InvalidScheduleType" xml:space="preserve">
     <value>Tipul de programare este invalid!</value>
   </data>
+  <data name="InvalidReplayGainMode" xml:space="preserve">
+    <value>Mod ReplayGain invalid!</value>
+  </data>
+  <data name="InvalidStreamingQuality" xml:space="preserve">
+    <value>Calitate de streaming invalidă!</value>
+  </data>
+  <data name="IsMutedCannotBeNull" xml:space="preserve">
+    <value>Starea de mut nu poate fi nulă!</value>
+  </data>
+  <data name="VolumeCannotBeNull" xml:space="preserve">
+    <value>Volumul nu poate fi nul!</value>
+  </data>
+  <data name="VolumeMustBeBetweenZeroAndOne" xml:space="preserve">
+    <value>Volumul trebuie să fie între 0 și 1!</value>
+  </data>
+  <data name="ShouldKeepDownloadingWhilePausedCannotBeNull" xml:space="preserve">
+    <value>Preferința de a continua descărcarea în pauză nu poate fi nulă!</value>
+  </data>
+  <data name="ShouldAutoplayCannotBeNull" xml:space="preserve">
+    <value>Preferința de redare automată nu poate fi nulă!</value>
+  </data>
+  <data name="IsGaplessPlaybackEnabledCannotBeNull" xml:space="preserve">
+    <value>Preferința de redare fără întreruperi nu poate fi nulă!</value>
+  </data>
+  <data name="ReplayGainModeCannotBeNull" xml:space="preserve">
+    <value>Modul ReplayGain nu poate fi nul!</value>
+  </data>
+  <data name="StreamingQualityCannotBeNull" xml:space="preserve">
+    <value>Calitatea fluxului nu poate fi nulă!</value>
+  </data>
 </root>

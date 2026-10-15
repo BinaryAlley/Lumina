@@ -69,4 +69,58 @@
   <data name="DescriptionShouldAggregateArtworkWhenMissing" xml:space="preserve">
     <value>When enabled, the artwork of library items that the first artwork provider does not supply is filled in from the following providers.</value>
   </data>
+  <data name="Playback" xml:space="preserve">
+    <value>Playback</value>
+  </data>
+  <data name="ShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>Keep downloading while paused</value>
+  </data>
+  <data name="DescriptionShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>Whether the player keeps downloading the track while playback is paused, up to the entire file, so resuming never waits for data.</value>
+  </data>
+  <data name="ShouldAutoplay" xml:space="preserve">
+    <value>Autoplay</value>
+  </data>
+  <data name="DescriptionShouldAutoplay" xml:space="preserve">
+    <value>Whether playback continues automatically with the following tracks when an album or artist finishes.</value>
+  </data>
+  <data name="IsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>Gapless playback</value>
+  </data>
+  <data name="DescriptionIsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>Whether consecutive tracks play without a silent gap between them.</value>
+  </data>
+  <data name="ReplayGainMode" xml:space="preserve">
+    <value>ReplayGain</value>
+  </data>
+  <data name="DescriptionReplayGainMode" xml:space="preserve">
+    <value>How ReplayGain normalization is applied to the tracks you play.</value>
+  </data>
+  <data name="ReplayGainModeOff" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="ReplayGainModeTrack" xml:space="preserve">
+    <value>Per track</value>
+  </data>
+  <data name="ReplayGainModeAlbum" xml:space="preserve">
+    <value>Per album</value>
+  </data>
+  <data name="StreamingQuality" xml:space="preserve">
+    <value>Streaming quality</value>
+  </data>
+  <data name="DescriptionStreamingQuality" xml:space="preserve">
+    <value>The quality cap applied when the server has to normalize a track for playback. Direct playback is never changed.</value>
+  </data>
+  <data name="StreamingQualityAuto" xml:space="preserve">
+    <value>Automatic</value>
+  </data>
+  <data name="StreamingQualityLow" xml:space="preserve">
+    <value>Low (96 kbps)</value>
+  </data>
+  <data name="StreamingQualityMedium" xml:space="preserve">
+    <value>Medium (160 kbps)</value>
+  </data>
+  <data name="StreamingQualityHigh" xml:space="preserve">
+    <value>High (320 kbps)</value>
+  </data>
 </root>

@@ -69,4 +69,58 @@
   <data name="DescriptionShouldAggregateArtworkWhenMissing" xml:space="preserve">
     <value>Se abilitato, le illustrazioni degli elementi della libreria che il primo provider di illustrazioni non fornisce vengono integrate dai provider successivi.</value>
   </data>
+  <data name="Playback" xml:space="preserve">
+    <value>Riproduzione</value>
+  </data>
+  <data name="ShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>Continua il download in pausa</value>
+  </data>
+  <data name="DescriptionShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>Indica se il lettore continua a scaricare il brano mentre la riproduzione è in pausa, fino all'intero file, così che la ripresa non debba mai attendere i dati.</value>
+  </data>
+  <data name="ShouldAutoplay" xml:space="preserve">
+    <value>Riproduzione automatica</value>
+  </data>
+  <data name="DescriptionShouldAutoplay" xml:space="preserve">
+    <value>Indica se la riproduzione continua automaticamente con i brani successivi al termine di un album o di un artista.</value>
+  </data>
+  <data name="IsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>Riproduzione senza interruzioni</value>
+  </data>
+  <data name="DescriptionIsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>Indica se i brani consecutivi vengono riprodotti senza un silenzio tra loro.</value>
+  </data>
+  <data name="ReplayGainMode" xml:space="preserve">
+    <value>ReplayGain</value>
+  </data>
+  <data name="DescriptionReplayGainMode" xml:space="preserve">
+    <value>Come la normalizzazione ReplayGain viene applicata ai brani che riproduci.</value>
+  </data>
+  <data name="ReplayGainModeOff" xml:space="preserve">
+    <value>Disattivato</value>
+  </data>
+  <data name="ReplayGainModeTrack" xml:space="preserve">
+    <value>Per brano</value>
+  </data>
+  <data name="ReplayGainModeAlbum" xml:space="preserve">
+    <value>Per album</value>
+  </data>
+  <data name="StreamingQuality" xml:space="preserve">
+    <value>Qualità dello streaming</value>
+  </data>
+  <data name="DescriptionStreamingQuality" xml:space="preserve">
+    <value>Il limite di qualità applicato quando il server deve normalizzare un brano per la riproduzione. La riproduzione diretta non viene mai modificata.</value>
+  </data>
+  <data name="StreamingQualityAuto" xml:space="preserve">
+    <value>Automatica</value>
+  </data>
+  <data name="StreamingQualityLow" xml:space="preserve">
+    <value>Bassa (96 kbps)</value>
+  </data>
+  <data name="StreamingQualityMedium" xml:space="preserve">
+    <value>Media (160 kbps)</value>
+  </data>
+  <data name="StreamingQualityHigh" xml:space="preserve">
+    <value>Alta (320 kbps)</value>
+  </data>
 </root>

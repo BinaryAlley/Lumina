@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
 using Lumina.Contracts.Responses.UsersManagement.Settings;
+using Lumina.Domain.SharedKernel.Common.Enums.Playback;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -29,6 +30,11 @@ public class UserSettingsResponseFixture
     /// <param name="shouldAggregateArtworkWhenMissing">Optional. Whether the artwork of the media library items is aggregated from multiple providers, when it is missing.</param>
     /// <param name="shouldRenderPdfAsImages">Optional. Whether PDF books are rendered as page images for the user.</param>
     /// <param name="shouldPreserveBookStyles">Optional. Whether the styles of the book content are preserved when it is rendered for the user.</param>
+    /// <param name="shouldKeepDownloadingWhilePaused">Optional. Whether the player keeps downloading a track while playback is paused.</param>
+    /// <param name="shouldAutoplay">Optional. Whether the player continues playback at the end of an album or artist.</param>
+    /// <param name="isGaplessPlaybackEnabled">Optional. Whether the player transitions between consecutive tracks without a gap.</param>
+    /// <param name="replayGainMode">Optional. The way ReplayGain normalization is applied to the tracks the user plays.</param>
+    /// <param name="streamingQuality">Optional. The quality cap applied to the audio the server normalizes for the user.</param>
     /// <returns>The created <see cref="UserSettingsResponse"/>.</returns>
     public UserSettingsResponse Create(
         Guid? userId = null,
@@ -39,7 +45,12 @@ public class UserSettingsResponseFixture
         bool? shouldAggregateMetadataWhenMissing = null,
         bool? shouldAggregateArtworkWhenMissing = null,
         bool? shouldRenderPdfAsImages = null,
-        bool? shouldPreserveBookStyles = null)
+        bool? shouldPreserveBookStyles = null,
+        bool? shouldKeepDownloadingWhilePaused = null,
+        bool? shouldAutoplay = null,
+        bool? isGaplessPlaybackEnabled = null,
+        ReplayGainMode? replayGainMode = null,
+        PlaybackStreamingQuality? streamingQuality = null)
     {
         return new UserSettingsResponse(
             userId ?? Guid.NewGuid(),
@@ -50,7 +61,12 @@ public class UserSettingsResponseFixture
             shouldAggregateMetadataWhenMissing ?? _faker.Random.Bool(),
             shouldAggregateArtworkWhenMissing ?? _faker.Random.Bool(),
             shouldRenderPdfAsImages ?? _faker.Random.Bool(),
-            shouldPreserveBookStyles ?? _faker.Random.Bool());
+            shouldPreserveBookStyles ?? _faker.Random.Bool(),
+            shouldKeepDownloadingWhilePaused ?? _faker.Random.Bool(),
+            shouldAutoplay ?? _faker.Random.Bool(),
+            isGaplessPlaybackEnabled ?? _faker.Random.Bool(),
+            replayGainMode ?? _faker.PickRandom<ReplayGainMode>(),
+            streamingQuality ?? _faker.PickRandom<PlaybackStreamingQuality>());
     }
 
     /// <summary>

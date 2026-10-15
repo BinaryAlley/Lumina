@@ -12,5 +12,7 @@ public static partial class ApiRoutes
     {
         public const string GET_USER_SETTINGS = "users/me/settings";
         public const string UPDATE_USER_SETTINGS = "users/me/settings";
+        public const string GET_PLAYBACK_STATE = "users/me/settings/playback-state";
+        public const string UPDATE_PLAYBACK_STATE = "users/me/settings/playback-state";
     }
 }

@@ -813,4 +813,34 @@
   <data name="InvalidScheduleType" xml:space="preserve">
     <value>调度类型无效！</value>
   </data>
+  <data name="InvalidReplayGainMode" xml:space="preserve">
+    <value>无效的 ReplayGain 模式！</value>
+  </data>
+  <data name="InvalidStreamingQuality" xml:space="preserve">
+    <value>无效的流媒体质量！</value>
+  </data>
+  <data name="IsMutedCannotBeNull" xml:space="preserve">
+    <value>静音状态不能为空！</value>
+  </data>
+  <data name="VolumeCannotBeNull" xml:space="preserve">
+    <value>音量不能为空！</value>
+  </data>
+  <data name="VolumeMustBeBetweenZeroAndOne" xml:space="preserve">
+    <value>音量必须介于 0 和 1 之间！</value>
+  </data>
+  <data name="ShouldKeepDownloadingWhilePausedCannotBeNull" xml:space="preserve">
+    <value>暂停时继续下载的偏好设置不能为空！</value>
+  </data>
+  <data name="ShouldAutoplayCannotBeNull" xml:space="preserve">
+    <value>自动播放的偏好设置不能为空！</value>
+  </data>
+  <data name="IsGaplessPlaybackEnabledCannotBeNull" xml:space="preserve">
+    <value>无缝播放的偏好设置不能为空！</value>
+  </data>
+  <data name="ReplayGainModeCannotBeNull" xml:space="preserve">
+    <value>ReplayGain 模式不能为空！</value>
+  </data>
+  <data name="StreamingQualityCannotBeNull" xml:space="preserve">
+    <value>流媒体质量不能为空！</value>
+  </data>
 </root>

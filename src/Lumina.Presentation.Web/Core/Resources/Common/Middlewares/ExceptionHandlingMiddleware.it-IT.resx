@@ -813,4 +813,34 @@
   <data name="InvalidScheduleType" xml:space="preserve">
     <value>Il tipo di pianificazione non è valido!</value>
   </data>
+  <data name="InvalidReplayGainMode" xml:space="preserve">
+    <value>Modalità ReplayGain non valida!</value>
+  </data>
+  <data name="InvalidStreamingQuality" xml:space="preserve">
+    <value>Qualità dello streaming non valida!</value>
+  </data>
+  <data name="IsMutedCannotBeNull" xml:space="preserve">
+    <value>Lo stato di silenziamento non può essere nullo!</value>
+  </data>
+  <data name="VolumeCannotBeNull" xml:space="preserve">
+    <value>Il volume non può essere nullo!</value>
+  </data>
+  <data name="VolumeMustBeBetweenZeroAndOne" xml:space="preserve">
+    <value>Il volume deve essere compreso tra 0 e 1!</value>
+  </data>
+  <data name="ShouldKeepDownloadingWhilePausedCannotBeNull" xml:space="preserve">
+    <value>La preferenza di continuare il download in pausa non può essere nulla!</value>
+  </data>
+  <data name="ShouldAutoplayCannotBeNull" xml:space="preserve">
+    <value>La preferenza di riproduzione automatica non può essere nulla!</value>
+  </data>
+  <data name="IsGaplessPlaybackEnabledCannotBeNull" xml:space="preserve">
+    <value>La preferenza di riproduzione senza interruzioni non può essere nulla!</value>
+  </data>
+  <data name="ReplayGainModeCannotBeNull" xml:space="preserve">
+    <value>La modalità ReplayGain non può essere nulla!</value>
+  </data>
+  <data name="StreamingQualityCannotBeNull" xml:space="preserve">
+    <value>La qualità dello streaming non può essere nulla!</value>
+  </data>
 </root>

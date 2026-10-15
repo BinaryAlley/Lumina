@@ -69,4 +69,58 @@
   <data name="DescriptionShouldAggregateArtworkWhenMissing" xml:space="preserve">
     <value>Când este activat, ilustrațiile elementelor din bibliotecă pe care primul furnizor de ilustrații nu le oferă sunt completate de la furnizorii următori.</value>
   </data>
+  <data name="Playback" xml:space="preserve">
+    <value>Redare</value>
+  </data>
+  <data name="ShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>Continuă descărcarea în pauză</value>
+  </data>
+  <data name="DescriptionShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>Dacă playerul continuă să descarce piesa în timp ce redarea este în pauză, până la întregul fișier, astfel încât reluarea să nu aștepte niciodată datele.</value>
+  </data>
+  <data name="ShouldAutoplay" xml:space="preserve">
+    <value>Redare automată</value>
+  </data>
+  <data name="DescriptionShouldAutoplay" xml:space="preserve">
+    <value>Dacă redarea continuă automat cu piesele următoare la sfârșitul unui album sau al unui artist.</value>
+  </data>
+  <data name="IsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>Redare fără întreruperi</value>
+  </data>
+  <data name="DescriptionIsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>Dacă piesele consecutive sunt redate fără o pauză de sunet între ele.</value>
+  </data>
+  <data name="ReplayGainMode" xml:space="preserve">
+    <value>ReplayGain</value>
+  </data>
+  <data name="DescriptionReplayGainMode" xml:space="preserve">
+    <value>Modul în care normalizarea ReplayGain este aplicată pieselor pe care le redai.</value>
+  </data>
+  <data name="ReplayGainModeOff" xml:space="preserve">
+    <value>Dezactivat</value>
+  </data>
+  <data name="ReplayGainModeTrack" xml:space="preserve">
+    <value>Per piesă</value>
+  </data>
+  <data name="ReplayGainModeAlbum" xml:space="preserve">
+    <value>Per album</value>
+  </data>
+  <data name="StreamingQuality" xml:space="preserve">
+    <value>Calitatea fluxului</value>
+  </data>
+  <data name="DescriptionStreamingQuality" xml:space="preserve">
+    <value>Limita de calitate aplicată atunci când serverul trebuie să normalizeze o piesă pentru redare. Redarea directă nu este niciodată modificată.</value>
+  </data>
+  <data name="StreamingQualityAuto" xml:space="preserve">
+    <value>Automată</value>
+  </data>
+  <data name="StreamingQualityLow" xml:space="preserve">
+    <value>Redusă (96 kbps)</value>
+  </data>
+  <data name="StreamingQualityMedium" xml:space="preserve">
+    <value>Medie (160 kbps)</value>
+  </data>
+  <data name="StreamingQualityHigh" xml:space="preserve">
+    <value>Ridicată (320 kbps)</value>
+  </data>
 </root>

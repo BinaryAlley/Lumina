@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
+using Lumina.Domain.SharedKernel.Common.Enums.Playback;
 #endregion
 
 namespace Lumina.Application.Core.UsersManagement.Settings.Commands.UpdateUserSettings;
@@ -15,6 +16,11 @@ namespace Lumina.Application.Core.UsersManagement.Settings.Commands.UpdateUserSe
 /// <param name="ShouldAggregateArtworkWhenMissing">Whether the artwork of the media library items is aggregated from multiple providers, when it is missing, or not.</param>
 /// <param name="ShouldRenderPdfAsImages">Whether PDF books are rendered as page images for the user, or not.</param>
 /// <param name="ShouldPreserveBookStyles">Whether the styles of the book content are preserved when it is rendered for the user, or not.</param>
+/// <param name="ShouldKeepDownloadingWhilePaused">Whether the player keeps downloading a track while playback is paused, or not.</param>
+/// <param name="ShouldAutoplay">Whether the player continues playback at the end of an album or artist, or not.</param>
+/// <param name="IsGaplessPlaybackEnabled">Whether the player transitions between consecutive tracks without a gap, or not.</param>
+/// <param name="ReplayGainMode">The way ReplayGain normalization is applied to the tracks the user plays.</param>
+/// <param name="StreamingQuality">The quality cap applied to the audio the server normalizes for the user.</param>
 public record UpdateUserSettingsCommand(
     bool IsPaginationEnabled,
     int ItemsPerPage,
@@ -23,5 +29,10 @@ public record UpdateUserSettingsCommand(
     bool ShouldAggregateMetadataWhenMissing,
     bool ShouldAggregateArtworkWhenMissing,
     bool ShouldRenderPdfAsImages,
-    bool ShouldPreserveBookStyles
+    bool ShouldPreserveBookStyles,
+    bool? ShouldKeepDownloadingWhilePaused,
+    bool? ShouldAutoplay,
+    bool? IsGaplessPlaybackEnabled,
+    ReplayGainMode? ReplayGainMode,
+    PlaybackStreamingQuality? StreamingQuality
 ) : ICommand;

@@ -25,7 +25,12 @@ public static class UpdateUserSettingsRequestMapping
             request.ShouldAggregateMetadataWhenMissing,
             request.ShouldAggregateArtworkWhenMissing,
             request.ShouldRenderPdfAsImages,
-            request.ShouldPreserveBookStyles
+            request.ShouldPreserveBookStyles,
+            request.ShouldKeepDownloadingWhilePaused,
+            request.ShouldAutoplay,
+            request.IsGaplessPlaybackEnabled,
+            request.ReplayGainMode,
+            request.StreamingQuality
         );
     }
 }

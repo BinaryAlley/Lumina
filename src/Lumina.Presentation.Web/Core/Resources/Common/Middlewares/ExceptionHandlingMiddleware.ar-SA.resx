@@ -813,4 +813,34 @@
   <data name="InvalidScheduleType" xml:space="preserve">
     <value>نوع الجدول غير صالح!</value>
   </data>
+  <data name="InvalidReplayGainMode" xml:space="preserve">
+    <value>وضع ReplayGain غير صالح!</value>
+  </data>
+  <data name="InvalidStreamingQuality" xml:space="preserve">
+    <value>جودة البث غير صالحة!</value>
+  </data>
+  <data name="IsMutedCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن تكون حالة الكتم فارغة!</value>
+  </data>
+  <data name="VolumeCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن يكون مستوى الصوت فارغًا!</value>
+  </data>
+  <data name="VolumeMustBeBetweenZeroAndOne" xml:space="preserve">
+    <value>يجب أن يكون مستوى الصوت بين 0 و 1!</value>
+  </data>
+  <data name="ShouldKeepDownloadingWhilePausedCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن يكون إعداد متابعة التنزيل أثناء الإيقاف المؤقت فارغًا!</value>
+  </data>
+  <data name="ShouldAutoplayCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن يكون إعداد التشغيل التلقائي فارغًا!</value>
+  </data>
+  <data name="IsGaplessPlaybackEnabledCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن يكون إعداد التشغيل دون فواصل فارغًا!</value>
+  </data>
+  <data name="ReplayGainModeCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن يكون وضع ReplayGain فارغًا!</value>
+  </data>
+  <data name="StreamingQualityCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن تكون جودة البث فارغة!</value>
+  </data>
 </root>

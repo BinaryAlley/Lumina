@@ -69,4 +69,58 @@
   <data name="DescriptionShouldAggregateArtworkWhenMissing" xml:space="preserve">
     <value>启用后，首个图片提供程序未提供的媒体库项目图片将由后续提供程序补齐。</value>
   </data>
+  <data name="Playback" xml:space="preserve">
+    <value>播放</value>
+  </data>
+  <data name="ShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>暂停时继续下载</value>
+  </data>
+  <data name="DescriptionShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>播放暂停时播放器是否继续下载曲目直到整个文件，这样恢复播放时无需等待数据。</value>
+  </data>
+  <data name="ShouldAutoplay" xml:space="preserve">
+    <value>自动播放</value>
+  </data>
+  <data name="DescriptionShouldAutoplay" xml:space="preserve">
+    <value>专辑或艺术家播放结束后是否自动继续播放后续曲目。</value>
+  </data>
+  <data name="IsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>无缝播放</value>
+  </data>
+  <data name="DescriptionIsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>连续曲目之间是否无静默间隔地播放。</value>
+  </data>
+  <data name="ReplayGainMode" xml:space="preserve">
+    <value>ReplayGain</value>
+  </data>
+  <data name="DescriptionReplayGainMode" xml:space="preserve">
+    <value>如何对您播放的曲目应用 ReplayGain 音量标准化。</value>
+  </data>
+  <data name="ReplayGainModeOff" xml:space="preserve">
+    <value>关闭</value>
+  </data>
+  <data name="ReplayGainModeTrack" xml:space="preserve">
+    <value>按曲目</value>
+  </data>
+  <data name="ReplayGainModeAlbum" xml:space="preserve">
+    <value>按专辑</value>
+  </data>
+  <data name="StreamingQuality" xml:space="preserve">
+    <value>流媒体质量</value>
+  </data>
+  <data name="DescriptionStreamingQuality" xml:space="preserve">
+    <value>当服务器需要为播放对曲目进行标准化时应用的质量上限。直接播放永远不会被更改。</value>
+  </data>
+  <data name="StreamingQualityAuto" xml:space="preserve">
+    <value>自动</value>
+  </data>
+  <data name="StreamingQualityLow" xml:space="preserve">
+    <value>低 (96 kbps)</value>
+  </data>
+  <data name="StreamingQualityMedium" xml:space="preserve">
+    <value>中 (160 kbps)</value>
+  </data>
+  <data name="StreamingQualityHigh" xml:space="preserve">
+    <value>高 (320 kbps)</value>
+  </data>
 </root>

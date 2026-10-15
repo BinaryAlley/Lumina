@@ -79,10 +79,20 @@ public class ErrorsTests
     {
         // Assert
         // The count assertion fails when an error is added or removed, reminding to update the assertions below.
-        Assert.Equal(3, typeof(DomainErrors.UserSettings).GetProperties().Length);
+        Assert.Equal(13, typeof(DomainErrors.UserSettings).GetProperties().Length);
         AssertError(DomainErrors.UserSettings.UserSettingsAlreadyExists, ErrorType.Conflict);
         AssertError(DomainErrors.UserSettings.UserSettingsNotFound, ErrorType.NotFound);
         AssertError(DomainErrors.UserSettings.ItemsPerPageMustBeGreaterThanZero, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VolumeCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VolumeMustBeBetweenZeroAndOne, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.IsMutedCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.ShouldKeepDownloadingWhilePausedCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.ShouldAutoplayCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.IsGaplessPlaybackEnabledCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.ReplayGainModeCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.StreamingQualityCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.InvalidReplayGainMode, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.InvalidStreamingQuality, ErrorType.Validation);
     }
 
     [Fact]

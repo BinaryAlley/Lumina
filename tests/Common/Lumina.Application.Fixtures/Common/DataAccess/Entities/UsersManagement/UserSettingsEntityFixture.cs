@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Domain.SharedKernel.Common.Enums.Playback;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -27,6 +28,13 @@ public class UserSettingsEntityFixture
     /// <param name="shouldAggregateMetadataWhenMissing">Optional. Whether the metadata of the media library items is aggregated from multiple providers, when fields are missing, or not.</param>
     /// <param name="shouldRenderPdfAsImages">Optional. Whether PDF books are rendered as page images for the user, or not.</param>
     /// <param name="shouldPreserveBookStyles">Optional. Whether the styles of the book content are preserved when it is rendered for the user, or not.</param>
+    /// <param name="shouldKeepDownloadingWhilePaused">Optional. Whether the player keeps downloading a track while playback is paused, or not.</param>
+    /// <param name="shouldAutoplay">Optional. Whether the player continues playback at the end of an album or artist, or not.</param>
+    /// <param name="isGaplessPlaybackEnabled">Optional. Whether the player transitions between consecutive tracks without a gap, or not.</param>
+    /// <param name="replayGainMode">Optional. The way ReplayGain normalization is applied to the tracks the user plays.</param>
+    /// <param name="streamingQuality">Optional. The quality cap applied to the audio the server normalizes for the user.</param>
+    /// <param name="volume">Optional. The last volume the player reported for the user.</param>
+    /// <param name="isMuted">Optional. The last mute state the player reported for the user.</param>
     /// <returns>The created user settings entity.</returns>
     public UserSettingsEntity Create(
         Guid? id = null,
@@ -37,7 +45,14 @@ public class UserSettingsEntityFixture
         bool? isThemeCachingEnabled = null,
         bool? shouldAggregateMetadataWhenMissing = null,
         bool? shouldRenderPdfAsImages = null,
-        bool? shouldPreserveBookStyles = null)
+        bool? shouldPreserveBookStyles = null,
+        bool? shouldKeepDownloadingWhilePaused = null,
+        bool? shouldAutoplay = null,
+        bool? isGaplessPlaybackEnabled = null,
+        ReplayGainMode? replayGainMode = null,
+        PlaybackStreamingQuality? streamingQuality = null,
+        double? volume = null,
+        bool? isMuted = null)
     {
         return new Faker<UserSettingsEntity>()
             .CustomInstantiator(f => new UserSettingsEntity
@@ -50,7 +65,14 @@ public class UserSettingsEntityFixture
                 IsThemeCachingEnabled = isThemeCachingEnabled ?? f.Random.Bool(),
                 ShouldAggregateMetadataWhenMissing = shouldAggregateMetadataWhenMissing ?? f.Random.Bool(),
                 ShouldRenderPdfAsImages = shouldRenderPdfAsImages ?? f.Random.Bool(),
-                ShouldPreserveBookStyles = shouldPreserveBookStyles ?? f.Random.Bool()
+                ShouldPreserveBookStyles = shouldPreserveBookStyles ?? f.Random.Bool(),
+                ShouldKeepDownloadingWhilePaused = shouldKeepDownloadingWhilePaused ?? f.Random.Bool(),
+                ShouldAutoplay = shouldAutoplay ?? f.Random.Bool(),
+                IsGaplessPlaybackEnabled = isGaplessPlaybackEnabled ?? f.Random.Bool(),
+                ReplayGainMode = replayGainMode ?? f.PickRandom<ReplayGainMode>(),
+                StreamingQuality = streamingQuality ?? f.PickRandom<PlaybackStreamingQuality>(),
+                Volume = volume ?? f.Random.Double(0.0, 1.0),
+                IsMuted = isMuted ?? f.Random.Bool()
             })
             .Generate();
     }

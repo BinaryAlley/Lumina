@@ -69,4 +69,58 @@
   <data name="DescriptionShouldAggregateArtworkWhenMissing" xml:space="preserve">
     <value>Lorsque cette option est activée, les illustrations des éléments de la bibliothèque que le premier fournisseur d'illustrations ne fournit pas sont complétées par les fournisseurs suivants.</value>
   </data>
+  <data name="Playback" xml:space="preserve">
+    <value>Lecture</value>
+  </data>
+  <data name="ShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>Continuer le téléchargement en pause</value>
+  </data>
+  <data name="DescriptionShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>Indique si le lecteur continue de télécharger le morceau lorsque la lecture est en pause, jusqu'au fichier entier, afin que la reprise n'attende jamais les données.</value>
+  </data>
+  <data name="ShouldAutoplay" xml:space="preserve">
+    <value>Lecture automatique</value>
+  </data>
+  <data name="DescriptionShouldAutoplay" xml:space="preserve">
+    <value>Indique si la lecture se poursuit automatiquement avec les morceaux suivants à la fin d'un album ou d'un artiste.</value>
+  </data>
+  <data name="IsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>Lecture sans interruption</value>
+  </data>
+  <data name="DescriptionIsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>Indique si les morceaux consécutifs sont lus sans silence entre eux.</value>
+  </data>
+  <data name="ReplayGainMode" xml:space="preserve">
+    <value>ReplayGain</value>
+  </data>
+  <data name="DescriptionReplayGainMode" xml:space="preserve">
+    <value>La manière dont la normalisation ReplayGain est appliquée aux morceaux que vous écoutez.</value>
+  </data>
+  <data name="ReplayGainModeOff" xml:space="preserve">
+    <value>Désactivé</value>
+  </data>
+  <data name="ReplayGainModeTrack" xml:space="preserve">
+    <value>Par morceau</value>
+  </data>
+  <data name="ReplayGainModeAlbum" xml:space="preserve">
+    <value>Par album</value>
+  </data>
+  <data name="StreamingQuality" xml:space="preserve">
+    <value>Qualité de diffusion</value>
+  </data>
+  <data name="DescriptionStreamingQuality" xml:space="preserve">
+    <value>Le plafond de qualité appliqué lorsque le serveur doit normaliser un morceau pour la lecture. La lecture directe n'est jamais modifiée.</value>
+  </data>
+  <data name="StreamingQualityAuto" xml:space="preserve">
+    <value>Automatique</value>
+  </data>
+  <data name="StreamingQualityLow" xml:space="preserve">
+    <value>Basse (96 kbit/s)</value>
+  </data>
+  <data name="StreamingQualityMedium" xml:space="preserve">
+    <value>Moyenne (160 kbit/s)</value>
+  </data>
+  <data name="StreamingQualityHigh" xml:space="preserve">
+    <value>Élevée (320 kbit/s)</value>
+  </data>
 </root>

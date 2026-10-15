@@ -1,0 +1,8 @@
+PUT {{host}}/api/v1/users/me/settings/playback-state
+Authorization: Bearer {{ACCESS_TOKEN}}
+Content-Type: application/json
+
+{
+  "volume": 0.75,
+  "isMuted": false
+}

@@ -66,6 +66,34 @@ public class UserSettingsConfiguration : IEntityTypeConfiguration<UserSettingsEn
             .IsRequired()
             .HasColumnOrder(9);
 
+        builder.Property(settings => settings.ShouldKeepDownloadingWhilePaused)
+            .IsRequired()
+            .HasColumnOrder(14);
+
+        builder.Property(settings => settings.ShouldAutoplay)
+            .IsRequired()
+            .HasColumnOrder(15);
+
+        builder.Property(settings => settings.IsGaplessPlaybackEnabled)
+            .IsRequired()
+            .HasColumnOrder(16);
+
+        builder.Property(settings => settings.ReplayGainMode)
+            .IsRequired()
+            .HasColumnOrder(17);
+
+        builder.Property(settings => settings.StreamingQuality)
+            .IsRequired()
+            .HasColumnOrder(18);
+
+        builder.Property(settings => settings.Volume)
+            .IsRequired()
+            .HasColumnOrder(19);
+
+        builder.Property(settings => settings.IsMuted)
+            .IsRequired()
+            .HasColumnOrder(20);
+
         // audit
         builder.Property(settings => settings.CreatedOnUtc)
             .IsRequired()

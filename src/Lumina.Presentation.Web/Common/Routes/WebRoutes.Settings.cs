@@ -13,5 +13,7 @@ public static partial class WebRoutes
         public const string INDEX = "{culture}/tools/settings";
         public const string GET_USER_SETTINGS = "{culture}/tools/settings/api-get-user-settings";
         public const string UPDATE_USER_SETTINGS = "{culture}/tools/settings/api-update-user-settings";
+        public const string GET_PLAYBACK_STATE = "{culture}/tools/settings/api-get-playback-state";
+        public const string UPDATE_PLAYBACK_STATE = "{culture}/tools/settings/api-update-playback-state";
     }
 }

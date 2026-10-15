@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Common;
+using Lumina.Domain.SharedKernel.Common.Enums.Playback;
 using System;
 using System.Diagnostics;
 #endregion
@@ -64,6 +65,41 @@ public class UserSettingsEntity : IStorageEntity, IAuditableEntity
     /// external servers, which those servers could observe; stripping them removes that possibility, at the cost of the look of the book.
     /// </summary>
     public bool ShouldPreserveBookStyles { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the player keeps downloading a track while playback is paused, or not, up to the entire file.
+    /// </summary>
+    public bool ShouldKeepDownloadingWhilePaused { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets whether the player continues playback at the end of an album or artist, or not.
+    /// </summary>
+    public bool ShouldAutoplay { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets whether the player transitions between consecutive tracks without a gap, or not.
+    /// </summary>
+    public bool IsGaplessPlaybackEnabled { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets the way ReplayGain normalization is applied to the tracks the user plays.
+    /// </summary>
+    public ReplayGainMode ReplayGainMode { get; set; }
+
+    /// <summary>
+    /// Gets or sets the quality cap applied to the audio the server normalizes for the user.
+    /// </summary>
+    public PlaybackStreamingQuality StreamingQuality { get; set; }
+
+    /// <summary>
+    /// Gets or sets the last volume the player reported for the user. Written automatically by the player, and not part of the settings the user edits.
+    /// </summary>
+    public double Volume { get; set; } = 1.0;
+
+    /// <summary>
+    /// Gets or sets the last mute state the player reported for the user. Written automatically by the player, and not part of the settings the user edits.
+    /// </summary>
+    public bool IsMuted { get; set; }
 
     /// <summary>
     /// Gets or sets the time and date when the entity was added.

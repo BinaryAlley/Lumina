@@ -69,4 +69,58 @@
   <data name="DescriptionShouldAggregateArtworkWhenMissing" xml:space="preserve">
     <value>Коли ввімкнено, ілюстрації елементів бібліотеки, які не надає перший постачальник ілюстрацій, доповнюються від наступних постачальників.</value>
   </data>
+  <data name="Playback" xml:space="preserve">
+    <value>Відтворення</value>
+  </data>
+  <data name="ShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>Продовжувати завантаження на паузі</value>
+  </data>
+  <data name="DescriptionShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>Чи продовжує програвач завантажувати трек, поки відтворення призупинено, аж до всього файлу, щоб відновлення ніколи не чекало на дані.</value>
+  </data>
+  <data name="ShouldAutoplay" xml:space="preserve">
+    <value>Автовідтворення</value>
+  </data>
+  <data name="DescriptionShouldAutoplay" xml:space="preserve">
+    <value>Чи продовжується відтворення автоматично наступними треками після завершення альбому або виконавця.</value>
+  </data>
+  <data name="IsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>Відтворення без пауз</value>
+  </data>
+  <data name="DescriptionIsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>Чи відтворюються послідовні треки без тихої паузи між ними.</value>
+  </data>
+  <data name="ReplayGainMode" xml:space="preserve">
+    <value>ReplayGain</value>
+  </data>
+  <data name="DescriptionReplayGainMode" xml:space="preserve">
+    <value>Як нормалізація ReplayGain застосовується до треків, які ви відтворюєте.</value>
+  </data>
+  <data name="ReplayGainModeOff" xml:space="preserve">
+    <value>Вимкнено</value>
+  </data>
+  <data name="ReplayGainModeTrack" xml:space="preserve">
+    <value>Для кожного треку</value>
+  </data>
+  <data name="ReplayGainModeAlbum" xml:space="preserve">
+    <value>Для кожного альбому</value>
+  </data>
+  <data name="StreamingQuality" xml:space="preserve">
+    <value>Якість потокового передавання</value>
+  </data>
+  <data name="DescriptionStreamingQuality" xml:space="preserve">
+    <value>Обмеження якості, що застосовується, коли сервер має нормалізувати трек для відтворення. Пряме відтворення ніколи не змінюється.</value>
+  </data>
+  <data name="StreamingQualityAuto" xml:space="preserve">
+    <value>Автоматично</value>
+  </data>
+  <data name="StreamingQualityLow" xml:space="preserve">
+    <value>Низька (96 kbps)</value>
+  </data>
+  <data name="StreamingQualityMedium" xml:space="preserve">
+    <value>Середня (160 kbps)</value>
+  </data>
+  <data name="StreamingQualityHigh" xml:space="preserve">
+    <value>Висока (320 kbps)</value>
+  </data>
 </root>

@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
 using Lumina.Application.Core.UsersManagement.Settings.Commands.UpdateUserSettings;
+using Lumina.Domain.SharedKernel.Common.Enums.Playback;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -25,6 +26,11 @@ public class UpdateUserSettingsCommandFixture
     /// <param name="shouldAggregateArtworkWhenMissing">Optional. Whether the artwork of the media library items is aggregated from multiple providers, when it is missing.</param>
     /// <param name="shouldRenderPdfAsImages">Optional. Whether PDF books are rendered as page images for the user.</param>
     /// <param name="shouldPreserveBookStyles">Optional. Whether the styles of the book content are preserved when it is rendered for the user.</param>
+    /// <param name="shouldKeepDownloadingWhilePaused">Optional. Whether the player keeps downloading a track while playback is paused, or not.</param>
+    /// <param name="shouldAutoplay">Optional. Whether the player continues playback at the end of an album or artist, or not.</param>
+    /// <param name="isGaplessPlaybackEnabled">Optional. Whether the player transitions between consecutive tracks without a gap, or not.</param>
+    /// <param name="replayGainMode">Optional. The way ReplayGain normalization is applied to the tracks the user plays.</param>
+    /// <param name="streamingQuality">Optional. The quality cap applied to the audio the server normalizes for the user.</param>
     /// <returns>The created command.</returns>
     public UpdateUserSettingsCommand Create(
         bool? isPaginationEnabled = null,
@@ -34,10 +40,15 @@ public class UpdateUserSettingsCommandFixture
         bool? shouldAggregateMetadataWhenMissing = null,
         bool? shouldAggregateArtworkWhenMissing = null,
         bool? shouldRenderPdfAsImages = null,
-        bool? shouldPreserveBookStyles = null)
+        bool? shouldPreserveBookStyles = null,
+        bool? shouldKeepDownloadingWhilePaused = null,
+        bool? shouldAutoplay = null,
+        bool? isGaplessPlaybackEnabled = null,
+        ReplayGainMode? replayGainMode = null,
+        PlaybackStreamingQuality? streamingQuality = null)
     {
         return new Faker<UpdateUserSettingsCommand>()
-            .CustomInstantiator(f => new UpdateUserSettingsCommand(default, default, default, default, default, default, default, default))
+            .CustomInstantiator(f => new UpdateUserSettingsCommand(default, default, default, default, default, default, default, default, default, default, default, default, default))
             .RuleFor(x => x.IsPaginationEnabled, f => isPaginationEnabled ?? f.Random.Bool())
             .RuleFor(x => x.ItemsPerPage, f => itemsPerPage ?? f.Random.Int(1, 100))
             .RuleFor(x => x.ShouldIgnoreThePrefixForAlphaPicker, f => shouldIgnoreThePrefixForAlphaPicker ?? f.Random.Bool())
@@ -46,6 +57,11 @@ public class UpdateUserSettingsCommandFixture
             .RuleFor(x => x.ShouldAggregateArtworkWhenMissing, f => shouldAggregateArtworkWhenMissing ?? f.Random.Bool())
             .RuleFor(x => x.ShouldRenderPdfAsImages, f => shouldRenderPdfAsImages ?? f.Random.Bool())
             .RuleFor(x => x.ShouldPreserveBookStyles, f => shouldPreserveBookStyles ?? f.Random.Bool())
+            .RuleFor(x => x.ShouldKeepDownloadingWhilePaused, f => shouldKeepDownloadingWhilePaused ?? f.Random.Bool())
+            .RuleFor(x => x.ShouldAutoplay, f => shouldAutoplay ?? f.Random.Bool())
+            .RuleFor(x => x.IsGaplessPlaybackEnabled, f => isGaplessPlaybackEnabled ?? f.Random.Bool())
+            .RuleFor(x => x.ReplayGainMode, f => replayGainMode ?? f.PickRandom<ReplayGainMode>())
+            .RuleFor(x => x.StreamingQuality, f => streamingQuality ?? f.PickRandom<PlaybackStreamingQuality>())
             .Generate();
     }
 

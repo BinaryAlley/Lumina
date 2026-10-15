@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Contracts.Responses.UsersManagement.Settings;
+using Lumina.Domain.SharedKernel.Common.Enums.Playback;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -31,7 +32,12 @@ public class GetUserSettingsEndpointSummary : Summary<GetUserSettingsEndpoint, E
                 ShouldAggregateMetadataWhenMissing: false,
                 ShouldAggregateArtworkWhenMissing: false,
                 ShouldRenderPdfAsImages: false,
-                ShouldPreserveBookStyles: true
+                ShouldPreserveBookStyles: true,
+                ShouldKeepDownloadingWhilePaused: true,
+                ShouldAutoplay: true,
+                IsGaplessPlaybackEnabled: true,
+                ReplayGainMode: ReplayGainMode.Off,
+                StreamingQuality: PlaybackStreamingQuality.Auto
             ));
 
         Response(401, "Authentication required.", "application/problem+json",

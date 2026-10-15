@@ -5,9 +5,14 @@ Content-Type: application/json
 {
   "isPaginationEnabled": true,
   "itemsPerPage": 50,
-  "ignoreThePrefixForAlphaPicker": true,
+  "shouldIgnoreThePrefixForAlphaPicker": true,
   "isThemeCachingEnabled": true,
   "shouldAggregateMetadataWhenMissing": true,
   "shouldRenderPdfAsImages": false,
-  "shouldPreserveBookStyles": true
+  "shouldPreserveBookStyles": true,
+  "shouldKeepDownloadingWhilePaused": true,
+  "shouldAutoplay": true,
+  "isGaplessPlaybackEnabled": true,
+  "replayGainMode": "Off",
+  "streamingQuality": "Auto"
 }

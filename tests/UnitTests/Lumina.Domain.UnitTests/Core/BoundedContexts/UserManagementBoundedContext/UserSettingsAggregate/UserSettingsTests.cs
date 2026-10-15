@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate;
@@ -7,6 +6,7 @@ using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserSettin
 using Lumina.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate.ValueObjects;
+using Lumina.Domain.SharedKernel.Common.Enums.Playback;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -80,7 +80,7 @@ public class UserSettingsTests
         UserId userId = _userIdFixture.Create();
 
         // Act
-        Result<UserSettings> result = UserSettings.Create(userId, isPaginationEnabled: false, itemsPerPage: 24, shouldIgnoreThePrefixForAlphaPicker: true, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: true, shouldAggregateArtworkWhenMissing: true, shouldRenderPdfAsImages: true, shouldPreserveBookStyles: true);
+        Result<UserSettings> result = UserSettings.Create(userId, isPaginationEnabled: false, itemsPerPage: 24, shouldIgnoreThePrefixForAlphaPicker: true, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: true, shouldAggregateArtworkWhenMissing: true, shouldRenderPdfAsImages: true, shouldPreserveBookStyles: true, shouldKeepDownloadingWhilePaused: true, shouldAutoplay: true, isGaplessPlaybackEnabled: true, replayGainMode: ReplayGainMode.Off, streamingQuality: PlaybackStreamingQuality.Auto, volume: 1.0, isMuted: false);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -108,22 +108,6 @@ public class UserSettingsTests
         Assert.NotEqual(result.Value.Id.Value, result.Value.UserId.Value);
     }
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    public void Create_WhenItemsPerPageIsNotPositive_ShouldReturnError(int itemsPerPage)
-    {
-        // Arrange
-        UserId userId = _userIdFixture.Create();
-
-        // Act
-        Result<UserSettings> result = UserSettings.Create(userId, isPaginationEnabled: true, itemsPerPage: itemsPerPage, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false, shouldAggregateArtworkWhenMissing: false, shouldRenderPdfAsImages: false, shouldPreserveBookStyles: false);
-
-        // Assert
-        Assert.True(result.IsFailure);
-        Assert.Equal(Errors.UserSettings.ItemsPerPageMustBeGreaterThanZero, result.FirstError);
-    }
-
     [Fact]
     public void Create_WhenCalledWithPreExistingIdAndValidValues_ShouldCreateSettingsWithThatId()
     {
@@ -132,7 +116,7 @@ public class UserSettingsTests
         UserSettingsId id = _userSettingsIdFixture.Create();
 
         // Act
-        Result<UserSettings> result = UserSettings.Create(id, userId, isPaginationEnabled: true, itemsPerPage: 24, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false, shouldAggregateArtworkWhenMissing: false, shouldRenderPdfAsImages: false, shouldPreserveBookStyles: true);
+        Result<UserSettings> result = UserSettings.Create(id, userId, isPaginationEnabled: true, itemsPerPage: 24, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false, shouldAggregateArtworkWhenMissing: false, shouldRenderPdfAsImages: false, shouldPreserveBookStyles: true, shouldKeepDownloadingWhilePaused: true, shouldAutoplay: true, isGaplessPlaybackEnabled: true, replayGainMode: ReplayGainMode.Off, streamingQuality: PlaybackStreamingQuality.Auto, volume: 1.0, isMuted: false);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -142,28 +126,13 @@ public class UserSettingsTests
     }
 
     [Fact]
-    public void Create_WhenCalledWithPreExistingIdAndNonPositiveItemsPerPage_ShouldReturnError()
-    {
-        // Arrange
-        UserId userId = _userIdFixture.Create();
-        UserSettingsId id = _userSettingsIdFixture.Create();
-
-        // Act
-        Result<UserSettings> result = UserSettings.Create(id, userId, isPaginationEnabled: true, itemsPerPage: 0, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false, shouldAggregateArtworkWhenMissing: false, shouldRenderPdfAsImages: false, shouldPreserveBookStyles: false);
-
-        // Assert
-        Assert.True(result.IsFailure);
-        Assert.Equal(Errors.UserSettings.ItemsPerPageMustBeGreaterThanZero, result.FirstError);
-    }
-
-    [Fact]
     public void UpdateSettings_WhenCalledWithValidValues_ShouldUpdateSettings()
     {
         // Arrange
         UserSettings userSettings = _userSettingsFixture.Create();
 
         // Act
-        Result<Updated> result = userSettings.UpdateSettings(isPaginationEnabled: false, itemsPerPage: 12, shouldIgnoreThePrefixForAlphaPicker: true, isThemeCachingEnabled: false, shouldAggregateMetadataWhenMissing: true, shouldAggregateArtworkWhenMissing: true, shouldRenderPdfAsImages: true, shouldPreserveBookStyles: true);
+        Result<Updated> result = userSettings.UpdateSettings(isPaginationEnabled: false, itemsPerPage: 12, shouldIgnoreThePrefixForAlphaPicker: true, isThemeCachingEnabled: false, shouldAggregateMetadataWhenMissing: true, shouldAggregateArtworkWhenMissing: true, shouldRenderPdfAsImages: true, shouldPreserveBookStyles: true, shouldKeepDownloadingWhilePaused: true, shouldAutoplay: true, isGaplessPlaybackEnabled: true, replayGainMode: ReplayGainMode.Off, streamingQuality: PlaybackStreamingQuality.Auto);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -174,21 +143,5 @@ public class UserSettingsTests
         Assert.True(userSettings.ShouldAggregateMetadataWhenMissing);
         Assert.True(userSettings.ShouldRenderPdfAsImages);
         Assert.True(userSettings.ShouldPreserveBookStyles);
-    }
-
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-5)]
-    public void UpdateSettings_WhenItemsPerPageIsNotPositive_ShouldReturnError(int itemsPerPage)
-    {
-        // Arrange
-        UserSettings userSettings = _userSettingsFixture.Create();
-
-        // Act
-        Result<Updated> result = userSettings.UpdateSettings(isPaginationEnabled: true, itemsPerPage: itemsPerPage, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false, shouldAggregateArtworkWhenMissing: false, shouldRenderPdfAsImages: false, shouldPreserveBookStyles: false);
-
-        // Assert
-        Assert.True(result.IsFailure);
-        Assert.Equal(Errors.UserSettings.ItemsPerPageMustBeGreaterThanZero, result.FirstError);
     }
 }

@@ -69,4 +69,58 @@
   <data name="DescriptionShouldAggregateArtworkWhenMissing" xml:space="preserve">
     <value>Wenn aktiviert, wird das Artwork von Bibliothekselementen, das der erste Artwork-Anbieter nicht liefert, aus den nachfolgenden Anbietern ergänzt.</value>
   </data>
+  <data name="Playback" xml:space="preserve">
+    <value>Wiedergabe</value>
+  </data>
+  <data name="ShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>Beim Pausieren weiter herunterladen</value>
+  </data>
+  <data name="DescriptionShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>Ob der Player den Titel auch bei pausierter Wiedergabe weiter herunterlädt, bis zur gesamten Datei, damit die Fortsetzung nie auf Daten warten muss.</value>
+  </data>
+  <data name="ShouldAutoplay" xml:space="preserve">
+    <value>Automatische Wiedergabe</value>
+  </data>
+  <data name="DescriptionShouldAutoplay" xml:space="preserve">
+    <value>Ob die Wiedergabe am Ende eines Albums oder Interpreten automatisch mit den folgenden Titeln fortgesetzt wird.</value>
+  </data>
+  <data name="IsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>Lückenlose Wiedergabe</value>
+  </data>
+  <data name="DescriptionIsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>Ob aufeinanderfolgende Titel ohne stille Lücke zwischen ihnen abgespielt werden.</value>
+  </data>
+  <data name="ReplayGainMode" xml:space="preserve">
+    <value>ReplayGain</value>
+  </data>
+  <data name="DescriptionReplayGainMode" xml:space="preserve">
+    <value>Wie die ReplayGain-Normalisierung auf die abgespielten Titel angewendet wird.</value>
+  </data>
+  <data name="ReplayGainModeOff" xml:space="preserve">
+    <value>Aus</value>
+  </data>
+  <data name="ReplayGainModeTrack" xml:space="preserve">
+    <value>Pro Titel</value>
+  </data>
+  <data name="ReplayGainModeAlbum" xml:space="preserve">
+    <value>Pro Album</value>
+  </data>
+  <data name="StreamingQuality" xml:space="preserve">
+    <value>Streaming-Qualität</value>
+  </data>
+  <data name="DescriptionStreamingQuality" xml:space="preserve">
+    <value>Die Qualitätsobergrenze, die angewendet wird, wenn der Server einen Titel für die Wiedergabe normalisieren muss. Die direkte Wiedergabe wird nie verändert.</value>
+  </data>
+  <data name="StreamingQualityAuto" xml:space="preserve">
+    <value>Automatisch</value>
+  </data>
+  <data name="StreamingQualityLow" xml:space="preserve">
+    <value>Niedrig (96 kbit/s)</value>
+  </data>
+  <data name="StreamingQualityMedium" xml:space="preserve">
+    <value>Mittel (160 kbit/s)</value>
+  </data>
+  <data name="StreamingQualityHigh" xml:space="preserve">
+    <value>Hoch (320 kbit/s)</value>
+  </data>
 </root>

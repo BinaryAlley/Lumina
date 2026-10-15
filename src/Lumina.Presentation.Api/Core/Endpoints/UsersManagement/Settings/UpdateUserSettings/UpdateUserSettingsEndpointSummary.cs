@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Contracts.Requests.UsersManagement.Settings;
+using Lumina.Domain.SharedKernel.Common.Enums.Playback;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -29,7 +30,12 @@ public class UpdateUserSettingsEndpointSummary : Summary<UpdateUserSettingsEndpo
             ShouldAggregateMetadataWhenMissing: false,
             ShouldAggregateArtworkWhenMissing: false,
             ShouldRenderPdfAsImages: false,
-            ShouldPreserveBookStyles: true
+            ShouldPreserveBookStyles: true,
+            ShouldKeepDownloadingWhilePaused: true,
+            ShouldAutoplay: true,
+            IsGaplessPlaybackEnabled: true,
+            ReplayGainMode: ReplayGainMode.Off,
+            StreamingQuality: PlaybackStreamingQuality.Auto
         );
 
         RequestParam(r => r.IsPaginationEnabled, "Whether pagination is enabled for the user, or not. Required.");
@@ -40,6 +46,11 @@ public class UpdateUserSettingsEndpointSummary : Summary<UpdateUserSettingsEndpo
         RequestParam(r => r.ShouldAggregateArtworkWhenMissing, "Whether the artwork of the media library items is aggregated from multiple providers, when it is missing, or not. Required.");
         RequestParam(r => r.ShouldRenderPdfAsImages, "Whether PDF books are rendered as page images for the user, or not. Required.");
         RequestParam(r => r.ShouldPreserveBookStyles, "Whether the styles of the book content are preserved when it is rendered for the user, or not. Required.");
+        RequestParam(r => r.ShouldKeepDownloadingWhilePaused, "Whether the player keeps downloading a track while playback is paused, or not. Required.");
+        RequestParam(r => r.ShouldAutoplay, "Whether the player continues playback at the end of an album or artist, or not. Required.");
+        RequestParam(r => r.IsGaplessPlaybackEnabled, "Whether the player transitions between consecutive tracks without a gap, or not. Required.");
+        RequestParam(r => r.ReplayGainMode, "The way ReplayGain normalization is applied to the tracks the user plays. Required.");
+        RequestParam(r => r.StreamingQuality, "The quality cap applied to the audio the server normalizes for the user. Required.");
 
         Response(200, "The settings of the current user were successfully updated.");
 
@@ -86,7 +97,14 @@ public class UpdateUserSettingsEndpointSummary : Summary<UpdateUserSettingsEndpo
                     {
                         "General.Validation", new[]
                         {
-                            "ItemsPerPageMustBeGreaterThanZero"
+                            "ItemsPerPageMustBeGreaterThanZero",
+                            "ShouldKeepDownloadingWhilePausedCannotBeNull",
+                            "ShouldAutoplayCannotBeNull",
+                            "IsGaplessPlaybackEnabledCannotBeNull",
+                            "ReplayGainModeCannotBeNull",
+                            "StreamingQualityCannotBeNull",
+                            "InvalidReplayGainMode",
+                            "InvalidStreamingQuality"
                         }
                     }
                 },

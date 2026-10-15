@@ -29,7 +29,14 @@ public static class UserSettingsMapping
             ShouldAggregateMetadataWhenMissing = domainEntity.ShouldAggregateMetadataWhenMissing,
             ShouldAggregateArtworkWhenMissing = domainEntity.ShouldAggregateArtworkWhenMissing,
             ShouldRenderPdfAsImages = domainEntity.ShouldRenderPdfAsImages,
-            ShouldPreserveBookStyles = domainEntity.ShouldPreserveBookStyles
+            ShouldPreserveBookStyles = domainEntity.ShouldPreserveBookStyles,
+            ShouldKeepDownloadingWhilePaused = domainEntity.ShouldKeepDownloadingWhilePaused,
+            ShouldAutoplay = domainEntity.ShouldAutoplay,
+            IsGaplessPlaybackEnabled = domainEntity.IsGaplessPlaybackEnabled,
+            ReplayGainMode = domainEntity.ReplayGainMode,
+            StreamingQuality = domainEntity.StreamingQuality,
+            Volume = domainEntity.Volume,
+            IsMuted = domainEntity.IsMuted
         };
     }
 
@@ -49,7 +56,12 @@ public static class UserSettingsMapping
             domainEntity.ShouldAggregateMetadataWhenMissing,
             domainEntity.ShouldAggregateArtworkWhenMissing,
             domainEntity.ShouldRenderPdfAsImages,
-            domainEntity.ShouldPreserveBookStyles
+            domainEntity.ShouldPreserveBookStyles,
+            domainEntity.ShouldKeepDownloadingWhilePaused,
+            domainEntity.ShouldAutoplay,
+            domainEntity.IsGaplessPlaybackEnabled,
+            domainEntity.ReplayGainMode,
+            domainEntity.StreamingQuality
         );
     }
 }

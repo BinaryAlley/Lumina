@@ -412,7 +412,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "authorization", "authorizat
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "settings", "settings", "{240E1B2A-08A3-439D-B8B2-4D9C18B4AF8A}"
 	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\users-management\settings\GetPlaybackState.http = ..\docs\technical\requests\users-management\settings\GetPlaybackState.http
 		..\docs\technical\requests\users-management\settings\GetUserSettings.http = ..\docs\technical\requests\users-management\settings\GetUserSettings.http
+		..\docs\technical\requests\users-management\settings\UpdatePlaybackState.http = ..\docs\technical\requests\users-management\settings\UpdatePlaybackState.http
 		..\docs\technical\requests\users-management\settings\UpdateUserSettings.http = ..\docs\technical\requests\users-management\settings\UpdateUserSettings.http
 	EndProjectSection
 EndProject

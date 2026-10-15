@@ -2359,6 +2359,14 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(5);
 
+                    b.Property<bool>("IsGaplessPlaybackEnabled")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(16);
+
+                    b.Property<bool>("IsMuted")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(20);
+
                     b.Property<bool>("IsPaginationEnabled")
                         .HasColumnType("INTEGER")
                         .HasColumnOrder(2);
@@ -2371,6 +2379,10 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("INTEGER")
                         .HasColumnOrder(3);
 
+                    b.Property<int>("ReplayGainMode")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(17);
+
                     b.Property<bool>("ShouldAggregateArtworkWhenMissing")
                         .HasColumnType("INTEGER")
                         .HasColumnOrder(13);
@@ -2379,9 +2391,17 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("INTEGER")
                         .HasColumnOrder(10);
 
+                    b.Property<bool>("ShouldAutoplay")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(15);
+
                     b.Property<bool>("ShouldIgnoreThePrefixForAlphaPicker")
                         .HasColumnType("INTEGER")
                         .HasColumnOrder(4);
+
+                    b.Property<bool>("ShouldKeepDownloadingWhilePaused")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(14);
 
                     b.Property<bool>("ShouldPreserveBookStyles")
                         .HasColumnType("INTEGER")
@@ -2390,6 +2410,10 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.Property<bool>("ShouldRenderPdfAsImages")
                         .HasColumnType("INTEGER")
                         .HasColumnOrder(11);
+
+                    b.Property<int>("StreamingQuality")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(18);
 
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("TEXT")
@@ -2402,6 +2426,10 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("TEXT")
                         .HasColumnOrder(1);
+
+                    b.Property<double>("Volume")
+                        .HasColumnType("REAL")
+                        .HasColumnOrder(19);
 
                     b.HasKey("Id");
 
