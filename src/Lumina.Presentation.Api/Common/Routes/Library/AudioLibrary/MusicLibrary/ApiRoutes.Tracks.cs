@@ -15,5 +15,6 @@ public static partial class ApiRoutes
         public const string UPDATE_TRACK = "/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}";
         public const string DELETE_TRACK = "/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}";
         public const string STREAM_TRACK = "/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}/stream";
+        public const string GET_PLAYBACK_MANIFEST = "/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}/playback-manifest";
     }
 }

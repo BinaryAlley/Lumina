@@ -75,6 +75,22 @@ public interface ITrackRepository : IRepository<TrackEntity>,
     Task<Result<TrackStreamDto?>> GetTrackStreamInfoAsync(Guid libraryId, Guid albumId, Guid artistId, Guid trackId, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Gets the stored probe result needed to build the playback manifest of the track identified by <paramref name="trackId"/>, when it belongs to
+    /// the album identified by <paramref name="albumId"/> and to the media library identified by <paramref name="libraryId"/>, and that album belongs
+    /// to the artist identified by <paramref name="artistId"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library the track must belong to.</param>
+    /// <param name="albumId">The Id of the album the track must belong to.</param>
+    /// <param name="artistId">The Id of the artist that must own the album the track belongs to.</param>
+    /// <param name="trackId">The Id of the track whose playback manifest data is retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>
+    /// An <see cref="Result{TValue}"/> containing either the <see cref="TrackPlaybackManifestDto"/> of the track, <see langword="null"/> when no track
+    /// matches the provided identifiers, or an error.
+    /// </returns>
+    Task<Result<TrackPlaybackManifestDto?>> GetPlaybackManifestInfoAsync(Guid libraryId, Guid albumId, Guid artistId, Guid trackId, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Resets the enrichment state of the tracks stored at the provided <paramref name="paths"/> in the media library identified by
     /// <paramref name="libraryId"/>, together with their albums and artists, so that they are re-enriched, because their content changed since the last scan.
     /// </summary>
