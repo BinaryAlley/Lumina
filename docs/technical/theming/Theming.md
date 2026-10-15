@@ -13,6 +13,7 @@ The web client of Lumina is a themed shell: every page is rendered inside the te
     - [Safety Limits](#safety-limits)
     - [Template Resolution](#template-resolution)
     - [The Layout Template (shared/layout)](#the-layout-template-sharedlayout)
+    - [The Audio Player Bar](#the-audio-player-bar)
     - [The Navigation Template (shared/nav-menu)](#the-navigation-template-sharednav-menu)
     - [Page Templates](#page-templates)
     - [The Scripts Section](#the-scripts-section)
@@ -221,6 +222,42 @@ The layout template of the bundled theme shows the intended shape:
 ```
 
 The rendered page content, navigation and scripts are inserted unescaped with `{{&...}}`, because they are trusted application HTML. The layout is best effort: when the theme cannot be loaded or rendered, the application falls back to its built-in layout, so a broken theme never takes the whole site down.
+
+### The Audio Player Bar
+
+Every authenticated page renders the audio player bar through the `audioPlayer` field of the layout model. The bar is hidden until the user starts playback of a track, album or artist, and the global audio player script shows it, expands it and hides it again. The theming work that turns the bar into a theme template (a `shared/audio-player` page key with sub templates) is not part of this contract yet; until it lands, the bar is the application fallback markup, passed in as the `audioPlayer` field.
+
+The bar is fixed to the bottom of the viewport, so the theme owns the room reserved for it on the main content element. A layout must keep these element hooks, which the audio player drives (the two id controls are bound by the global site script, which routes them to the audio player):
+
+| Element | Hook | Meaning |
+| --- | --- | --- |
+| The bar container, with the `audio-player-container` class | `not-shown` class | The bar is hidden, and its height collapses. |
+| The bar container | `full-height` class | The bar is expanded to its full height form. |
+| The main content element | `audio-player-not-shown` class | The bar is hidden, so the content area uses the full height. |
+| The main content element | `audio-player-full-height` class | The bar is expanded, so the content area gives it the full height. |
+| The full height control | `id="audio-player-full-height-toggle"` | Expands or collapses the bar. |
+| The close control | `id="audio-player-close"` | Stops playback, and hides the bar while it is condensed. |
+
+A theme must reserve the space for the bar itself, as the bundled themes do:
+
+```css
+main {
+    bottom: 50px;
+    transition: bottom 1s ease, height 1s ease;
+}
+
+main.audio-player-not-shown {
+    bottom: 0;
+}
+
+main.audio-player-full-height {
+    bottom: calc(100% - 22px); /* full height minus the menu height */
+}
+```
+
+The application fallback layout, which renders when the active theme cannot be loaded, reserves the room itself, because the application stylesheet does not position the content area of a theme. A theme that omits the rules above leaves the fixed bar overlapping the bottom of the page.
+
+The markup inside the bar exposes the hook attributes the audio player script binds, such as `data-audio-player-play-pause`, `data-audio-player-progress`, `data-audio-player-current-time` and `data-audio-player-track-name`. A theme that replaces the bar markup must keep those attributes, and the play affordances of the pages use the `data-audio-player-play` trigger attribute.
 
 ### The Navigation Template (shared/nav-menu)
 

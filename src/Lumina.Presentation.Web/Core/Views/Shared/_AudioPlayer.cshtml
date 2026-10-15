@@ -1,4 +1,4 @@
-@using Microsoft.Extensions.Localization
+﻿@using Microsoft.Extensions.Localization
 
 @inject IStringLocalizerFactory _stringLocalizerFactory
 
@@ -6,12 +6,55 @@
     IStringLocalizer localizer = _stringLocalizerFactory.Create("Lumina.Presentation.Web.Views.Shared._Layout", "Lumina.Presentation.Web");
 }
 
-<div class="audio-player-container">
-    <video controls
-           preload="auto"
-           height="50" width="600">
-        <source src="https://samplelib.com/lib/preview/mp4/sample-5s.mp4" type="video/mp4">
-    </video>
-    <a id="audio-player-full-height-toggle">@localizer["ToggleFullHeight"]</a>
-    <a id="audio-player-close">@localizer["ToggleVisibility"]</a>
+@*
+    APPLICATION FALLBACK AUDIO PLAYER BAR - READ BEFORE EDITING
+
+    This partial renders the audio player bar into the layout of the application and of every theme, for an
+    authenticated visitor. It is only the markup: the behavior lives in the global audio player script
+    (wwwroot/js/audio-player/), which binds to the hooks documented below.
+
+    The bar is hidden by default. The 'hidden' attribute keeps it unrendered until the audio player script takes over,
+    so a page load never shows the bar, not even for a frame while the stylesheets settle. The script then hands the bar
+    to the 'not-shown' class, which keeps it hidden until playback starts.
+
+    The DOM contract a theme must preserve is:
+      - The container element with the 'audio-player-container' class, carrying 'not-shown' while the bar is hidden,
+        and 'full-height' while it is expanded. The audio player toggles both classes.
+      - The main content element, carrying 'audio-player-not-shown' while the bar is hidden, and 'audio-player-full-height'
+        while it is expanded. The audio player toggles both classes on it as well.
+      - The elements with the ids 'audio-player-full-height-toggle' and 'audio-player-close', which the global site script
+        binds and routes to the audio player.
+      - The hook attributes the audio player binds: 'data-audio-player-play-pause', '-progress', '-progress-played',
+        '-progress-downloaded', '-current-time', '-total-time', '-track-name', '-cover-thumbnail', '-cover-image' and '-queue'.
+
+    The play affordances the pages hand to the player use the 'data-audio-player-play' trigger attribute. The
+    'The Audio Player Bar' section of docs/technical/theming/Theming.md documents this contract for theme authors.
+*@
+
+<div class="audio-player-container not-shown" hidden>
+    <!-- Expanded area: cover art, and the queue when the play context holds more than one track. -->
+    <div class="audio-player-expanded">
+        <img class="audio-player-cover-image" data-audio-player-cover-image alt="" />
+        <ul class="audio-player-queue" data-audio-player-queue></ul>
+    </div>
+    <!-- Condensed bar: transport control, progress bar and track name. -->
+    <div class="audio-player-bar">
+        <img class="audio-player-cover-thumbnail" data-audio-player-cover-thumbnail alt="" />
+        <span class="audio-player-track-name" data-audio-player-track-name></span>
+        <span class="audio-player-time audio-player-current-time" data-audio-player-current-time>0:00</span>
+        <div class="audio-player-progress" data-audio-player-progress>
+            <div class="audio-player-progress-downloaded" data-audio-player-progress-downloaded></div>
+            <div class="audio-player-progress-played" data-audio-player-progress-played></div>
+        </div>
+        <span class="audio-player-time audio-player-total-time" data-audio-player-total-time>--:--</span>
+        <div class="audio-player-transport">
+            <button type="button" class="audio-player-button audio-player-play-pause" data-audio-player-play-pause>
+                <span class="audio-player-play-pause-icon"></span>
+            </button>
+        </div>
+        <div class="audio-player-controls">
+            <a id="audio-player-full-height-toggle">@localizer["ToggleFullHeight"]</a>
+            <a id="audio-player-close">@localizer["ToggleVisibility"]</a>
+        </div>
+    </div>
 </div>

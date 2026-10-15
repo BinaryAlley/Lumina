@@ -1,9 +1,12 @@
 @using Lumina.Presentation.Web.Common.DTO.Configuration
+@using Lumina.Presentation.Web.Common.Routes
+@using Lumina.Presentation.Web.Common.Services
 @using Microsoft.Extensions.Localization
 @using Microsoft.Extensions.Options
 
 @inject IStringLocalizerFactory _stringLocalizerFactory
 @inject IOptions<ServerConfigurationDto> _serverConfigurationModel
+@inject IUrlService _urlService
 
 @{
     IStringLocalizer localizer = _stringLocalizerFactory.Create("Lumina.Presentation.Web.Views.Shared._Layout", "Lumina.Presentation.Web");
@@ -30,9 +33,20 @@
         error: '@localizer["Error"]',
         information: '@localizer["Information"]'
     };
+    // The endpoints the audio player reads the stored playback preferences of the user from. The routes are the culture
+    // aware web routes, so the player never hardcodes a path, and it never reaches the API server directly.
+    var audioPlayerConfiguration = {
+        getUserSettingsUrl: '@_urlService.GetAbsoluteUrl(WebRoutes.Settings.GET_USER_SETTINGS)',
+        getPlaybackStateUrl: '@_urlService.GetAbsoluteUrl(WebRoutes.Settings.GET_PLAYBACK_STATE)'
+    };
 </script>
 <script src="~/libs/microsoft-signalr/signalr.min.js" asp-append-version="true"></script>
 <script defer src="~/js/notifications.js" asp-append-version="true"></script>
 <script defer src="~/js/dialogs.js" asp-append-version="true"></script>
 <script defer src="~/js/image-viewer.js" asp-append-version="true"></script>
 <script defer src="~/js/site.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-errors.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-events.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-capabilities.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-engine.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player.js" asp-append-version="true"></script>

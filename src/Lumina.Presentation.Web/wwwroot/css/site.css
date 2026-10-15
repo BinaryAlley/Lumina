@@ -1,4 +1,4 @@
-html,
+﻿html,
 body {
     margin: 0px;
     padding: 0px;
@@ -1249,4 +1249,203 @@ body {
 
 .artwork-carousel-item:hover {
     border-color: #FFFFFF;
+}
+
+/* Audio player bar. This is the application fallback styling: the themes own the final look, and the
+   audio player script owns the state. The 'not-shown' and 'full-height' classes on the container, and
+   the matching 'audio-player-not-shown' and 'audio-player-full-height' classes on main, are the contract. */
+.audio-player-container {
+    position: fixed;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    z-index: 997;
+    display: flex;
+    flex-direction: column;
+    height: 50px;
+    overflow: hidden;
+    background-color: #1C1C1C;
+    border-top: 1px solid #444444;
+    transition: height 0.4s ease;
+}
+
+.audio-player-container.not-shown {
+    height: 0px;
+    border-top-width: 0px;
+}
+
+/* The 'hidden' attribute keeps the bar unrendered until the audio player script takes over, so that a page load
+   never shows it, not even for a frame while the stylesheets settle. The script removes it once the bar is already
+   in its hidden state, so the removal is never visible. */
+.audio-player-container[hidden] {
+    display: none !important;
+}
+
+/* While the audio player applies its initial hidden state, its transitions, and the offset transition of the content
+   area, are suppressed, so that a page load never slides the bar or the content into place. The player removes the
+   marker once it is initialized, and later show, hide and expand transitions work normally. */
+html.audio-player-initializing main,
+html.audio-player-initializing .audio-player-container {
+    transition: none !important;
+}
+
+/* The fallback layout has no theme to position the content area, so it reserves room for the bar itself, consuming the
+   same classes a theme consumes on main. A themed layout positions main itself and does not carry this class. */
+.application-fallback-layout main {
+    padding-bottom: 50px;
+    transition: padding-bottom 0.4s ease;
+}
+
+.application-fallback-layout main.audio-player-not-shown {
+    padding-bottom: 0px;
+}
+
+.audio-player-container.full-height {
+    height: calc(100% - 22px); /* full height minus the height of the menu bar */
+}
+
+.audio-player-bar {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 8px;
+    height: 50px;
+    padding: 0px 10px;
+    color: #E6E6E6;
+}
+
+.audio-player-cover-thumbnail {
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+}
+
+.audio-player-track-name {
+    flex: 1 1 20%;
+    min-width: 0px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.audio-player-time {
+    flex: 0 0 auto;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+}
+
+.audio-player-progress {
+    position: relative;
+    flex: 2 1 40%;
+    min-width: 40px;
+    height: 6px;
+    background-color: #333333;
+    cursor: pointer;
+}
+
+/* The bar exposes three distinct states a theme can style: the not yet downloaded track, the downloaded
+   part ('audio-player-progress-downloaded'), and the played part ('audio-player-progress-played'). */
+.audio-player-progress-played,
+.audio-player-progress-downloaded {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 0%;
+    height: 100%;
+}
+
+.audio-player-progress-downloaded {
+    background-color: #5A6B78;
+}
+
+.audio-player-progress-played {
+    background-color: #6DCBFE;
+}
+
+.audio-player-transport {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+}
+
+.audio-player-play-pause {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0px;
+    background-color: transparent;
+    border: 0px;
+    cursor: pointer;
+}
+
+/* The play affordance is a right pointing triangle, and the pause affordance two bars, both drawn with CSS
+   so that a theme can restyle them without an image. */
+.audio-player-play-pause-icon {
+    display: block;
+    width: 0px;
+    height: 0px;
+    border-style: solid;
+    border-width: 6px 0px 6px 10px;
+    border-color: transparent transparent transparent #E6E6E6;
+}
+
+.audio-player-play-pause.is-playing .audio-player-play-pause-icon {
+    width: 10px;
+    height: 12px;
+    border-width: 0px;
+    border-right: 3px solid #E6E6E6;
+    border-left: 3px solid #E6E6E6;
+}
+
+.audio-player-controls {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.audio-player-expanded {
+    display: none;
+    flex: 1 1 auto;
+    min-height: 0px;
+    gap: 16px;
+    padding: 16px;
+    overflow-y: auto;
+}
+
+.audio-player-container.full-height .audio-player-expanded {
+    display: flex;
+    flex-direction: row;
+}
+
+.audio-player-cover-image {
+    flex: 0 0 auto;
+    width: 240px;
+    height: 240px;
+    object-fit: cover;
+}
+
+.audio-player-queue {
+    flex: 1 1 auto;
+    margin: 0px;
+    padding: 0px;
+    overflow-y: auto;
+    list-style: none;
+}
+
+.audio-player-queue-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 8px;
+    border-bottom: 1px solid #333333;
+}
+
+.audio-player-queue-item-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }

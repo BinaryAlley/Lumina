@@ -1,4 +1,4 @@
-const scrollbarHeight = getScrollbarHeight();
+﻿const scrollbarHeight = getScrollbarHeight();
 const scrollbarWidth = getScrollbarWidth();
 const progressIndicator = document.getElementById('progress-indicator');
 const progressIndicatorValue = document.getElementById('progress-indicator-value');
@@ -648,23 +648,26 @@ function getElementOffset(id) {
 }
 
 /**
- * Toggles the visibility of the audio player.
+ * Closes the audio player, by routing to the audio player that owns the bar.
+ *
+ * The player bar is the single owner of its own classes, its state and its visibility, so this control, and the full
+ * height control below, only route to it. The two controls exist only when the bar is rendered, which is only for an
+ * authenticated visitor, for whom the audio player is always created, so there is no separate no-player fallback to
+ * keep in sync with the player.
  */
 function toggleAudioPlayerVisibility() {
-    const playerContainer = document.querySelector('.audio-player-container');
-    const contentContainer = document.querySelector('main');
-    playerContainer.classList.toggle('not-shown');
-    contentContainer.classList.toggle('audio-player-not-shown');
+    const player = window.LuminaAudioPlayer && window.LuminaAudioPlayer.instance;
+    if (player && typeof player.stopAsync === 'function')
+        player.stopAsync();
 }
 
 /**
- * Toggles the display of the audio player as collapsed player, or full height player.
+ * Expands the audio player into its full height form, or collapses it back, by routing to the audio player that owns the bar.
  */
 function toggleAudioPlayerFullHeight() {
-    const playerContainer = document.querySelector('.audio-player-container');
-    const contentContainer = document.querySelector('main');
-    playerContainer.classList.toggle('full-height');
-    contentContainer.classList.toggle('audio-player-full-height');
+    const player = window.LuminaAudioPlayer && window.LuminaAudioPlayer.instance;
+    if (player && typeof player.toggleFullHeight === 'function')
+        player.toggleFullHeight();
 }
 
 if (audioPlayerFullHeightToggle)
