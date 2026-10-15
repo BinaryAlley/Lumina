@@ -37,7 +37,7 @@
         CAPABILITIES_CHANGED: 'capabilitieschange',
         // The stored playback preferences of the user were loaded. Payload: the preferences object.
         PREFERENCES_CHANGED: 'preferenceschange',
-        // The player bar became visible or hidden. Payload: { visible }. The value is deliberately not 'visibilitychange',
+        // The player bar became visible or hidden. Payload: { isVisible }. The value is deliberately not 'visibilitychange',
         // which is the name of the DOM page visibility event, so that the two can never be confused.
         VISIBILITY_CHANGED: 'barvisibilitychange'
     });

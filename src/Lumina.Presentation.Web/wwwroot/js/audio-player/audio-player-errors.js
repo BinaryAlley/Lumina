@@ -25,6 +25,10 @@
         ENGINE_LOAD_FAILED: 'engine-load-failed',
         // The engine reported a failure while decoding, buffering or rendering audio.
         ENGINE_ERROR: 'engine-error',
+        // The download of a track failed, or was rejected by the stream.
+        DOWNLOAD_FAILED: 'download-failed',
+        // The download of a track was intentionally stopped, by an abort or a destroy, so a reader can tell a teardown apart from a stream failure.
+        DOWNLOAD_ABORTED: 'download-aborted',
         // The stored playback preferences of the user could not be read.
         PREFERENCES_LOAD_FAILED: 'preferences-load-failed'
     });

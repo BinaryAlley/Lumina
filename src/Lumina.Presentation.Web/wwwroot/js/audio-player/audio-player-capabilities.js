@@ -111,8 +111,8 @@
          * Detects every capability the player needs, in parallel, and caches the report.
          *
          * The returned report has the shape:
-         * <code>{ webCodecs, audioDecoder, audioContext, codecs, missing, supported }</code>, where <code>codecs</code> maps each probed codec name to a boolean, <code>missing</code> lists the
-         * {@link LuminaAudioPlayer.PlayerCapability} values that are absent, and <code>supported</code> is true only when every required capability is present.
+         * <code>{ hasWebCodecs, hasAudioDecoder, hasAudioContext, codecs, missing, isSupported }</code>, where <code>codecs</code> maps each probed codec name to a boolean, <code>missing</code> lists the
+         * {@link LuminaAudioPlayer.PlayerCapability} values that are absent, and <code>isSupported</code> is true only when every required capability is present.
          * @returns {Promise<Object>} The capability report.
          */
         async detectAsync() {
@@ -136,19 +136,19 @@
          * @returns {Promise<Object>} The capability report.
          */
         async runDetectionAsync() {
-            const webCodecs = this.hasWebCodecs();
-            const audioDecoder = this.hasAudioDecoder();
-            const audioContext = this.hasAudioContext();
+            const hasWebCodecs = this.hasWebCodecs();
+            const hasAudioDecoder = this.hasAudioDecoder();
+            const hasAudioContext = this.hasAudioContext();
 
             const codecs = {};
-            if (audioDecoder) {
+            if (hasAudioDecoder) {
                 // Each isConfigSupported is an independent round trip to the browser, so they are probed in parallel; the
                 // results are folded in afterwards, in probe order, so the report never depends on which probe finishes first.
                 const probeResults = await Promise.all(LuminaAudioPlayer.PROBED_AUDIO_CODECS.map(async (probe) => {
-                    return { name: probe.name, supported: await this.supportsAudioConfigAsync(probe.config) };
+                    return { name: probe.name, isSupported: await this.supportsAudioConfigAsync(probe.config) };
                 }));
                 for (const probeResult of probeResults)
-                    codecs[probeResult.name] = probeResult.supported;
+                    codecs[probeResult.name] = probeResult.isSupported;
             } else {
                 // Without a decoder nothing can be probed, but every codec key is still reported as false, so that a
                 // consumer reads the same shape whether the decoder exists or not, instead of testing for a missing key.
@@ -159,21 +159,21 @@
             // Only the three hard capabilities decide whether the player can run at all; a codec the browser cannot decode is
             // not fatal here, because the server can normalize such a track, which the delivery decision handles at play time.
             const missing = [];
-            if (!webCodecs)
+            if (!hasWebCodecs)
                 missing.push(LuminaAudioPlayer.PlayerCapability.WEB_CODECS);
-            if (!audioDecoder)
+            if (!hasAudioDecoder)
                 missing.push(LuminaAudioPlayer.PlayerCapability.AUDIO_DECODER);
-            if (!audioContext)
+            if (!hasAudioContext)
                 missing.push(LuminaAudioPlayer.PlayerCapability.AUDIO_CONTEXT);
 
             // The report is shared and cached, so it is frozen to stop one consumer from mutating what every other consumer reads.
             return Object.freeze({
-                webCodecs,
-                audioDecoder,
-                audioContext,
+                hasWebCodecs,
+                hasAudioDecoder,
+                hasAudioContext,
                 codecs: Object.freeze(codecs),
                 missing: Object.freeze(missing),
-                supported: missing.length === 0
+                isSupported: missing.length === 0
             });
         }
 

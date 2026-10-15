@@ -22,11 +22,15 @@
  * The factory also receives a host object that the engine uses to talk back to the controller, so
  * that the controller stays the single source of truth:
  *   - host.events: the player event bus, for {@link LuminaAudioPlayer.PlayerEvent} values the engine emits itself.
+ *   - host.getPreferences(): the playback preferences of the user the player currently holds, for example the
+ *     'keep downloading while paused' setting an engine's downloader honors.
  *   - host.reportTime(currentTime, duration): reports the playhead and the known duration.
  *   - host.reportDuration(duration): reports a duration discovered after loading.
  *   - host.reportProgress(downloadedFraction): reports how much of the track has been downloaded, between 0 and 1.
  *   - host.reportEnded(): reports that the current track reached its end.
- *   - host.reportError(error): reports an engine failure, wrapped into a {@link LuminaAudioPlayer.PlayerError}.
+ *   - host.reportError(error): reports an engine failure, wrapped into a {@link LuminaAudioPlayer.PlayerError}. A download
+ *     engine must forward its downloader's onError here, because the downloader only reports to its own callback and
+ *     never emits on the event bus, so a failure that is not forwarded stays unobserved.
  *
  * Registering and selecting an engine
  * -----------------------------------

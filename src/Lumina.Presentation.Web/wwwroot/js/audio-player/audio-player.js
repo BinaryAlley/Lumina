@@ -156,16 +156,15 @@
     }
 
     /**
-     * Clamps a number into an inclusive range.
+     * Clamps a number into an inclusive range, through the shared helper on the namespace. The reference is resolved on
+     * every call rather than captured at load time, so this module does not depend on the load order of the util.
      * @param {number} value - The value to clamp.
      * @param {number} minimum - The inclusive lower bound.
      * @param {number} maximum - The inclusive upper bound.
      * @returns {number} The clamped value.
      */
     function clamp(value, minimum, maximum) {
-        if (!Number.isFinite(value))
-            return minimum;
-        return Math.min(maximum, Math.max(minimum, value));
+        return LuminaAudioPlayer.clamp(value, minimum, maximum);
     }
 
     /**
@@ -317,6 +316,8 @@
             this.duration = 0;
             this.downloadedFraction = 0;
             this.volume = 1;
+            // Boolean state keeps its conventional is/has prefix, except where a public is*() accessor already owns that name:
+            // isMuted() is that accessor here, so the backing field keeps the participle instead of shadowing the method.
             this.muted = false;
             this.lastError = null;
             this.preferences = {
@@ -329,14 +330,14 @@
             this.capabilityReport = null;
             this.capabilitiesReady = null;
             this.engine = null;
-            this.available = false;
-            this.initialized = false;
+            this.isAvailable = false;
+            this.isInitialized = false;
             this.container = null;
             this.main = null;
             this.dom = {};
             this.descriptorClickHandler = null;
             this.controlHandlers = [];
-            this.progressRenderScheduled = false;
+            this.isProgressRenderScheduled = false;
         }
 
         /**
@@ -349,17 +350,17 @@
          * @returns {LuminaAudioPlayer.AudioPlayer} This player, for chaining.
          */
         initialize() {
-            if (this.initialized)
+            if (this.isInitialized)
                 return this;
-            this.initialized = true;
+            this.isInitialized = true;
 
             this.container = this.options.container || document.querySelector('.audio-player-container');
             this.main = this.options.main || document.querySelector('main');
             if (!this.container) {
-                this.available = false;
+                this.isAvailable = false;
                 return this;
             }
-            this.available = true;
+            this.isAvailable = true;
 
             this.collectDomReferences();
             this.bindPlaybackControls();
@@ -421,6 +422,9 @@
          * into a play request, so that pages never need a direct reference to the player.
          */
         bindDescriptorDelegation() {
+            // One listener on the document rather than one per affordance, because the pages and their theme templates are
+            // swapped in place by the navigation manager and never re-bound, and because a trigger can be rendered at any
+            // time without the player being told about it.
             this.descriptorClickHandler = (event) => {
                 if (!(event.target instanceof Element))
                     return;
@@ -441,7 +445,7 @@
          */
         async playAsync(descriptorInput) {
             // The player is only available when the layout rendered the bar, so a caller on a page without one is ignored instead of failing.
-            if (!this.available)
+            if (!this.isAvailable)
                 return false;
             const descriptor = createPlayDescriptor(descriptorInput);
             if (!descriptor) {
@@ -451,7 +455,7 @@
             // Capability detection runs in the background while the page loads, so the first play waits for its answer instead
             // of starting a track the browser may not be able to decode.
             const report = await this.capabilitiesReady;
-            if (report && !report.supported) {
+            if (report && !report.isSupported) {
                 this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING, 'The browser is missing a capability the player requires.',
                     { missing: report.missing }));
                 return false;
@@ -628,10 +632,10 @@
         toggleFullHeight() {
             if (!this.container)
                 return false;
-            const expanded = this.container.classList.toggle('full-height');
+            const isExpanded = this.container.classList.toggle('full-height');
             if (this.main)
-                this.main.classList.toggle('audio-player-full-height', expanded);
-            return expanded;
+                this.main.classList.toggle('audio-player-full-height', isExpanded);
+            return isExpanded;
         }
 
         /**
@@ -661,7 +665,7 @@
             if (this.main)
                 this.main.classList.remove('audio-player-not-shown');
             if (wasHidden)
-                this.events.emit(LuminaAudioPlayer.PlayerEvent.VISIBILITY_CHANGED, { visible: true });
+                this.events.emit(LuminaAudioPlayer.PlayerEvent.VISIBILITY_CHANGED, { isVisible: true });
         }
 
         /**
@@ -676,7 +680,7 @@
             this.container.classList.add('not-shown');
             if (this.main)
                 this.main.classList.add('audio-player-not-shown');
-            this.events.emit(LuminaAudioPlayer.PlayerEvent.VISIBILITY_CHANGED, { visible: false });
+            this.events.emit(LuminaAudioPlayer.PlayerEvent.VISIBILITY_CHANGED, { isVisible: false });
         }
 
         /**
@@ -748,7 +752,8 @@
          * @returns {Object} The preferences.
          */
         getPreferences() {
-            return this.preferences;
+            // A shallow frozen copy, so a consumer cannot mutate the preferences the player uses.
+            return Object.freeze({ ...this.preferences });
         }
 
         /**
@@ -944,8 +949,12 @@
          * @returns {Object} The engine host.
          */
         createEngineHost() {
+            // The host is the only channel an engine uses to talk back, so the player stays the single source of truth and
+            // an engine never reaches into the controller state; a report is routed to the matching handler here.
             return {
                 events: this.events,
+                // A shallow frozen copy, so an engine or a test cannot mutate the controller state through the host.
+                getPreferences: () => Object.freeze({ ...this.preferences }),
                 reportTime: (currentTime, duration) => this.handleEngineTime(currentTime, duration),
                 reportDuration: (duration) => this.handleEngineDuration(duration),
                 reportProgress: (fraction) => this.handleEngineProgress(fraction),
@@ -974,6 +983,8 @@
          * @param {number} duration - The known duration, in seconds.
          */
         handleEngineDuration(duration) {
+            // An invalid, non positive or unchanged value is ignored: an engine may report its duration repeatedly, and
+            // re-rendering or re-emitting for a value that did not move would churn the bar and its subscribers for nothing.
             const value = Number(duration);
             if (!Number.isFinite(value) || value <= 0 || value === this.duration)
                 return;
@@ -999,11 +1010,11 @@
          * high frequency stream of engine reports does not turn into a high frequency stream of DOM writes.
          */
         scheduleProgressRender() {
-            if (this.progressRenderScheduled)
+            if (this.isProgressRenderScheduled)
                 return;
-            this.progressRenderScheduled = true;
+            this.isProgressRenderScheduled = true;
             const render = () => {
-                this.progressRenderScheduled = false;
+                this.isProgressRenderScheduled = false;
                 this.renderProgress();
                 this.events.emit(LuminaAudioPlayer.PlayerEvent.TIME_UPDATE, { currentTime: this.currentTime, duration: this.duration });
             };
@@ -1030,7 +1041,7 @@
             const report = await this.capabilities.detectAsync();
             this.capabilityReport = report;
             this.events.emit(LuminaAudioPlayer.PlayerEvent.CAPABILITIES_CHANGED, report);
-            if (!report.supported) {
+            if (!report.isSupported) {
                 this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING, 'The browser is missing a capability the player requires.',
                     { missing: report.missing }));
             }
@@ -1062,7 +1073,8 @@
                     replayGainMode: settings.replayGainMode || 'Off',
                     streamingQuality: settings.streamingQuality || 'Auto'
                 };
-                this.events.emit(LuminaAudioPlayer.PlayerEvent.PREFERENCES_CHANGED, this.preferences);
+                // The payload is a frozen copy, so a subscriber that mutates it cannot change the preferences the player uses.
+                this.events.emit(LuminaAudioPlayer.PlayerEvent.PREFERENCES_CHANGED, Object.freeze({ ...this.preferences }));
             }
             if (playbackState) {
                 if (Number.isFinite(Number(playbackState.volume)))
@@ -1077,6 +1089,9 @@
          * @returns {Object} The endpoints configuration.
          */
         getConfiguration() {
+            // Options win, so a composition or a test can inject endpoints; otherwise the global object the layout emits is
+            // used, and an empty object is returned when neither exists, so a read of a missing endpoint is a no-op rather
+            // than a crash.
             return this.options.configuration || window.audioPlayerConfiguration || {};
         }
 
@@ -1135,6 +1150,8 @@
          * @returns {number} The effective volume, between 0 and 1.
          */
         getEffectiveVolume() {
+            // Mute is a flag of its own, so the volume is kept untouched and only the value sent to the output is zeroed;
+            // that is what lets unmuting restore the volume the user had set rather than a default.
             return this.muted ? 0 : this.volume;
         }
 
@@ -1151,6 +1168,8 @@
          * @param {MouseEvent} event - The click event on the progress bar.
          */
         handleProgressClick(event) {
+            // Without a track, without a known duration, without the bar, or with a zero width bar there is no position to
+            // map the click to, and dividing by the width would produce a NaN seek, so the click is ignored instead.
             if (!this.descriptor || this.duration <= 0 || !this.dom.progress)
                 return;
             const bounds = this.dom.progress.getBoundingClientRect();
@@ -1227,6 +1246,8 @@
          * Renders the three state progress bar: the played part, the downloaded part, and the remainder.
          */
         renderProgress() {
+            // Only widths are written here, as percentages; the colors, shape and layering of the three states belong to the
+            // theme's CSS, which selects them through the classes on the bar elements, so the player never hardcodes a look.
             if (this.dom.currentTime)
                 this.dom.currentTime.textContent = formatTime(this.currentTime);
             if (this.dom.totalTime)
@@ -1243,9 +1264,9 @@
          * Renders the play or pause affordance of the transport control.
          */
         renderTransportState() {
-            const playing = this.state === LuminaAudioPlayer.PlayerState.PLAYING;
+            const isPlaying = this.state === LuminaAudioPlayer.PlayerState.PLAYING;
             if (this.dom.playPause)
-                this.dom.playPause.classList.toggle('is-playing', playing);
+                this.dom.playPause.classList.toggle('is-playing', isPlaying);
         }
 
         /**
