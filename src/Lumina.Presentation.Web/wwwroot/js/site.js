@@ -366,7 +366,14 @@ async function updateContentAsync(url, addToHistory) {
             window.viewCleanups = {};
         }
 
-        const response = await fetch(url);
+        // The in-place navigation is a page load performed through fetch, so it declares that it expects HTML. Without this header, the
+        // server cannot tell it apart from a media request, since both send Accept: */*, and a failed navigation (an expired session, for
+        // example) would be answered with a bare status code instead of the redirect to the login page this code follows.
+        const response = await fetch(url, {
+            headers: {
+                'Accept': 'text/html'
+            }
+        });
         if (response.redirected) // if a redirect is requested, perform it
             window.location.href = response.url;
         else {

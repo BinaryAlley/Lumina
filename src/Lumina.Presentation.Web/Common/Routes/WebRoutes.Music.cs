@@ -28,5 +28,7 @@ public static partial class WebRoutes
         public const string GET_TRACK = "{culture}/library/audio-library/music-library/artists/{artistId}/albums/{albumId}/tracks/{trackId}/api-get-track";
         public const string SAVE_TRACK = "{culture}/library/audio-library/music-library/artists/{artistId}/albums/{albumId}/tracks/{trackId}/api-save-track";
         public const string DELETE_TRACK = "{culture}/library/audio-library/music-library/artists/{artistId}/albums/{albumId}/tracks/{trackId}/api-delete-track";
+        public const string STREAM_TRACK = "{culture}/library/audio-library/music-library/artists/{artistId}/albums/{albumId}/tracks/{trackId}/api-stream-track";
+        public const string GET_PLAYBACK_MANIFEST = "{culture}/library/audio-library/music-library/artists/{artistId}/albums/{albumId}/tracks/{trackId}/api-get-playback-manifest";
     }
 }

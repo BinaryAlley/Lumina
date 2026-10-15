@@ -100,6 +100,8 @@ public class Program
         app.UseSession();
         app.UseAuthentication();
         app.UseAuthorization();
+        // The rate limiting policies are evaluated after authentication, because the track stream limit is partitioned per authenticated user.
+        app.UseRateLimiter();
         // validate the antiforgery token after authentication, because the token is bound to the authenticated user and
         // validating it before the user is known would reject every request made by a logged-in user
         app.UseAntiforgeryFE(additionalContentTypes: ["application/json"]);
