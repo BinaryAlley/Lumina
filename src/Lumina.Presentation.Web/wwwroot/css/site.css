@@ -1407,6 +1407,15 @@ html.audio-player-initializing .audio-player-container {
     gap: 10px;
 }
 
+.audio-player-controls button {
+    background: none;
+    border: none;
+    padding: 0px;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
 .audio-player-expanded {
     display: none;
     flex: 1 1 auto;

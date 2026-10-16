@@ -85,7 +85,9 @@ public class ThemeLayoutRendererTests
         RazorViewToStringRenderer viewRenderer = new(_mockViewEngine, _mockTempDataProvider, _mockServiceProvider, _mockHttpContextAccessor);
         ThemeNavBuilder navBuilder = new(_mockUrlService, _mockStringLocalizerFactory, _mockAuthorizationService, _mockHttpContextAccessor);
         ThemeService themeService = new(_mockApiHttpClient);
-        _sut = new ThemeLayoutRenderer(themeService, new ThemeTemplateEngine(), viewRenderer, navBuilder, _mockHttpContextAccessor);
+        ThemeAudioPlayerBuilder audioPlayerBuilder = new(_mockStringLocalizerFactory, _mockHttpContextAccessor);
+        ThemeAudioPlayerRenderer audioPlayerRenderer = new(themeService, new ThemeTemplateEngine(), audioPlayerBuilder);
+        _sut = new ThemeLayoutRenderer(themeService, new ThemeTemplateEngine(), viewRenderer, navBuilder, audioPlayerRenderer, _mockHttpContextAccessor);
     }
 
     [Fact]

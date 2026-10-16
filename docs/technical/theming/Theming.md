@@ -14,6 +14,7 @@ The web client of Lumina is a themed shell: every page is rendered inside the te
     - [Template Resolution](#template-resolution)
     - [The Layout Template (shared/layout)](#the-layout-template-sharedlayout)
     - [The Audio Player Bar](#the-audio-player-bar)
+      - [The audio player sub templates](#the-audio-player-sub-templates)
     - [The Navigation Template (shared/nav-menu)](#the-navigation-template-sharednav-menu)
     - [Page Templates](#page-templates)
     - [The Scripts Section](#the-scripts-section)
@@ -162,6 +163,9 @@ Known page keys:
 | `shared/layout` | The layout that wraps the shell of every page. |
 | `shared/nav-menu` | The navigation menu of the theme. |
 | `shared/not-found` | The 404 page. |
+| `shared/audio-player` | The audio player bar shell. |
+| `shared/audio-player/queue-item` | The queue item of the audio player bar. |
+| `shared/audio-player/playlist-item` | The playlist item of the audio player bar. |
 | `library/written-content-library/book-library/books/index` | The books browsing page. |
 | `shared/file-system-browser` | The file system browser component shell. |
 | `shared/file-system-browser/tree-node` | The tree view node of the file system browser. |
@@ -225,7 +229,7 @@ The rendered page content, navigation and scripts are inserted unescaped with `{
 
 ### The Audio Player Bar
 
-Every authenticated page renders the audio player bar through the `audioPlayer` field of the layout model. The bar is hidden until the user starts playback of a track, album or artist, and the global audio player script shows it, expands it and hides it again. The theming work that turns the bar into a theme template (a `shared/audio-player` page key with sub templates) is not part of this contract yet; until it lands, the bar is the application fallback markup, passed in as the `audioPlayer` field.
+Every authenticated page renders the audio player bar through the `audioPlayer` field of the layout model. The bar is hidden until the user starts playback of a track, album or artist, and the global audio player script shows it, expands it and hides it again. The markup comes from the `shared/audio-player` template of the active theme; when the theme does not provide that template, the application renders its own fallback markup, so the player always has a bar to bind to.
 
 The bar is fixed to the bottom of the viewport, so the theme owns the room reserved for it on the main content element. A layout must keep these element hooks, which the audio player drives (the two id controls are bound by the global site script, which routes them to the audio player):
 
@@ -235,8 +239,18 @@ The bar is fixed to the bottom of the viewport, so the theme owns the room reser
 | The bar container | `full-height` class | The bar is expanded to its full height form. |
 | The main content element | `audio-player-not-shown` class | The bar is hidden, so the content area uses the full height. |
 | The main content element | `audio-player-full-height` class | The bar is expanded, so the content area gives it the full height. |
-| The full height control | `id="audio-player-full-height-toggle"` | Expands or collapses the bar. |
-| The close control | `id="audio-player-close"` | Stops playback, and hides the bar while it is condensed. |
+| The full height control | `id="audio-player-full-height-toggle"` | A focusable control, such as a `button`, that expands or collapses the bar. |
+| The close control | `id="audio-player-close"` | A focusable control, such as a `button`, that stops playback and hides the bar while it is condensed. |
+
+The `shared/audio-player` template receives the following model:
+
+| Field | Content |
+| --- | --- |
+| `appBase` | The absolute base URL of the Web application, used to reference the application scripts. |
+| `assetBase` | The base URL of the theme assets, used by the theme template to reference its own assets. |
+| `queueItemTemplate` | The raw source of the `shared/audio-player/queue-item` sub template, inlined by the application into a plain text script element. |
+| `playlistItemTemplate` | The raw source of the `shared/audio-player/playlist-item` sub template, inlined by the application into a plain text script element. |
+| `strings` | The localized strings of the bar, keyed by their resource names. |
 
 A theme must reserve the space for the bar itself, as the bundled themes do:
 
@@ -257,7 +271,25 @@ main.audio-player-full-height {
 
 The application fallback layout, which renders when the active theme cannot be loaded, reserves the room itself, because the application stylesheet does not position the content area of a theme. A theme that omits the rules above leaves the fixed bar overlapping the bottom of the page.
 
-The markup inside the bar exposes the hook attributes the audio player script binds, such as `data-audio-player-play-pause`, `data-audio-player-progress`, `data-audio-player-current-time` and `data-audio-player-track-name`. A theme that replaces the bar markup must keep those attributes, and the play affordances of the pages use the `data-audio-player-play` trigger attribute.
+The markup inside the bar exposes the ten hook attributes the audio player script binds: `data-audio-player-play-pause`, `data-audio-player-progress`, `data-audio-player-progress-played`, `data-audio-player-progress-downloaded`, `data-audio-player-current-time`, `data-audio-player-total-time`, `data-audio-player-track-name`, `data-audio-player-cover-thumbnail`, `data-audio-player-cover-image` and `data-audio-player-queue`. A theme that replaces the bar markup must keep all of them; the part of the bar whose hook is missing stays inert. The play affordances of the pages use the `data-audio-player-play` trigger attribute.
+
+#### The audio player sub templates
+
+Like the file system browser, the audio player is split into a shell template and the sub templates of its dynamic content, all provided as mirrored files under `templates/shared/audio-player/`. The shell template inlines the raw source of each sub template into a plain text script element, so that the browser never parses the theme markup into live elements and requests their resources before the player renders them:
+
+```html
+<script type="text/plain" id="audio-player-template-queue-item">{{{queueItemTemplate}}}</script>
+<script type="text/plain" id="audio-player-template-playlist-item">{{{playlistItemTemplate}}}</script>
+```
+
+The sub templates are rendered client side by the audio player script with the same Mustache syntax as the server side engine. They receive the following fields:
+
+| Template | Fields |
+| --- | --- |
+| `queue-item` | `index` (the one based position in the queue), `trackId`, `albumId`, `artistId`, `libraryId`, `title`, `duration` (the formatted `m:ss` duration), `durationSeconds`, `coverArtUrl`, `isCurrent`, `isPlayed` and `isLast`. The item root must keep the `audio-player-queue-item` class, the stylesheet hook of a queue item: the player appends the rendered element as-is, so the class is what lets the theme style it. |
+| `playlist-item` | `index`, `trackId`, `albumId`, `artistId`, `libraryId`, `title`, `duration`, `durationSeconds`, `coverArtUrl` and `isCurrent`. The item root must keep the `audio-player-playlist-item` class, the stylesheet hook of a playlist item. Saved playlists do not exist yet, so the shell inlines this sub template for theme authors, but nothing renders it yet; the playlist feature renders the entries of a playlist from it. |
+
+A theme can omit either sub template: the player then renders that part with its own built-in markup. When a theme replaces the shell, it must keep the two plain text script element ids above, the element hooks of the bar, and the `audio-player-container`, `not-shown` and `full-height` classes the player toggles.
 
 ### The Navigation Template (shared/nav-menu)
 

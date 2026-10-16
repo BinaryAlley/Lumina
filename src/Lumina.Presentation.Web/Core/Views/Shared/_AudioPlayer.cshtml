@@ -9,9 +9,10 @@
 @*
     APPLICATION FALLBACK AUDIO PLAYER BAR - READ BEFORE EDITING
 
-    This partial renders the audio player bar into the layout of the application and of every theme, for an
-    authenticated visitor. It is only the markup: the behavior lives in the global audio player script
-    (wwwroot/js/audio-player/), which binds to the hooks documented below.
+    This partial renders the audio player bar into the fallback layout of the application, for an authenticated visitor.
+    The themed layout renders the same bar from the 'shared/audio-player' template of the active theme instead, and only
+    calls this partial when the theme does not provide one. Either way, the markup is only the structure: the behavior
+    lives in the global audio player script (wwwroot/js/audio-player/), which binds to the hooks documented below.
 
     The bar is hidden by default. The 'hidden' attribute keeps it unrendered until the audio player script takes over,
     so a page load never shows the bar, not even for a frame while the stylesheets settle. The script then hands the bar
@@ -26,6 +27,9 @@
         binds and routes to the audio player.
       - The hook attributes the audio player binds: 'data-audio-player-play-pause', '-progress', '-progress-played',
         '-progress-downloaded', '-current-time', '-total-time', '-track-name', '-cover-thumbnail', '-cover-image' and '-queue'.
+      - The plain text script elements that carry the raw source of the 'shared/audio-player/queue-item' and
+        'shared/audio-player/playlist-item' sub templates, with the ids 'audio-player-template-queue-item' and
+        'audio-player-template-playlist-item'.
 
     The play affordances the pages hand to the player use the 'data-audio-player-play' trigger attribute. The
     'The Audio Player Bar' section of docs/technical/theming/Theming.md documents this contract for theme authors.
@@ -53,8 +57,8 @@
             </button>
         </div>
         <div class="audio-player-controls">
-            <a id="audio-player-full-height-toggle">@localizer["ToggleFullHeight"]</a>
-            <a id="audio-player-close">@localizer["ToggleVisibility"]</a>
+            <button type="button" id="audio-player-full-height-toggle">@localizer["ToggleFullHeight"]</button>
+            <button type="button" id="audio-player-close">@localizer["ToggleVisibility"]</button>
         </div>
     </div>
 </div>

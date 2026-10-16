@@ -1,6 +1,6 @@
 // A small, non-executable Mustache-style renderer, mirroring the subset of the server side ThemeTemplateEngine that the
-// file system browser uses. The theme sub templates rendered by this script can place values and test truthiness, but cannot execute JavaScript.
-// It is loaded lazily together with the file system browser dialog script, and exposed globally so that components can share it.
+// file system browser and the audio player use. The theme sub templates rendered by this script can place values and test truthiness, but cannot execute JavaScript.
+// It is loaded globally by the layout scripts, and exposed globally so that every component shares a single instance.
 (function () {
     'use strict';
 

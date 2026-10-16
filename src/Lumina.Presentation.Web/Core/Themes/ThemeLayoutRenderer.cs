@@ -22,6 +22,7 @@ public class ThemeLayoutRenderer
     private readonly ThemeTemplateEngine _templateEngine;
     private readonly RazorViewToStringRenderer _viewRenderer;
     private readonly ThemeNavBuilder _navBuilder;
+    private readonly ThemeAudioPlayerRenderer _audioPlayerRenderer;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     /// <summary>
@@ -31,13 +32,15 @@ public class ThemeLayoutRenderer
     /// <param name="templateEngine">The template engine used to render the documents.</param>
     /// <param name="viewRenderer">The renderer used to produce the application chrome fragments.</param>
     /// <param name="navBuilder">The builder used to produce the navigation menu model.</param>
+    /// <param name="audioPlayerRenderer">The renderer used to produce the themed audio player bar.</param>
     /// <param name="httpContextAccessor">Injected accessor for the current HTTP context.</param>
-    public ThemeLayoutRenderer(ThemeService themeService, ThemeTemplateEngine templateEngine, RazorViewToStringRenderer viewRenderer, ThemeNavBuilder navBuilder, IHttpContextAccessor httpContextAccessor)
+    public ThemeLayoutRenderer(ThemeService themeService, ThemeTemplateEngine templateEngine, RazorViewToStringRenderer viewRenderer, ThemeNavBuilder navBuilder, ThemeAudioPlayerRenderer audioPlayerRenderer, IHttpContextAccessor httpContextAccessor)
     {
         _themeService = themeService;
         _templateEngine = templateEngine;
         _viewRenderer = viewRenderer;
         _navBuilder = navBuilder;
+        _audioPlayerRenderer = audioPlayerRenderer;
         _httpContextAccessor = httpContextAccessor;
     }
 
@@ -58,7 +61,7 @@ public class ThemeLayoutRenderer
 
             string appHead = await _viewRenderer.RenderPartialAsync("_ThemeLayoutHead", cancellationToken);
             string nav = await RenderNavAsync(themeId, cancellationToken);
-            string audioPlayer = isAuthenticated ? await _viewRenderer.RenderPartialAsync("_AudioPlayer", cancellationToken) : string.Empty;
+            string audioPlayer = isAuthenticated ? await RenderAudioPlayerAsync(themeId, cancellationToken) : string.Empty;
             string appScripts = await _viewRenderer.RenderPartialAsync("_ThemeLayoutScripts", cancellationToken);
 
             ThemeLayoutModelDto layoutModel = new(
@@ -118,5 +121,22 @@ public class ThemeLayoutRenderer
         }
 
         return await _viewRenderer.RenderPartialAsync("_NavMenu", cancellationToken);
+    }
+
+    /// <summary>
+    /// Renders the audio player bar with the theme the layout was resolved with, falling back to the application Razor markup when the theme does not provide a bar template.
+    /// </summary>
+    /// <param name="themeId">The manifest id of the theme the layout was rendered with, so that the bar always matches the shell, including a preview of another theme.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>The rendered audio player bar HTML.</returns>
+    private async Task<string> RenderAudioPlayerAsync(string themeId, CancellationToken cancellationToken)
+    {
+        // The audio player renderer already degrades to an error when the theme template is missing or cannot be
+        // rendered, so a failure here only means the application fallback markup is rendered instead.
+        Result<string> audioPlayerResult = await _audioPlayerRenderer.RenderAsync(themeId, cancellationToken);
+        if (audioPlayerResult.IsSuccess)
+            return audioPlayerResult.Value;
+
+        return await _viewRenderer.RenderPartialAsync("_AudioPlayer", cancellationToken);
     }
 }

@@ -351,6 +351,8 @@ public static class PresentationWebLayerServices
         services.AddScoped<ThemeLayoutRenderer>();
         services.AddScoped<ThemeFileSystemBrowserBuilder>();
         services.AddScoped<ThemeFileSystemBrowserRenderer>();
+        services.AddScoped<ThemeAudioPlayerBuilder>();
+        services.AddScoped<ThemeAudioPlayerRenderer>();
 
         services.AddScoped<IAuthorizationHandler, InitializationHandler>();
         services.AddScoped<IAuthorizationHandler, RoleAuthorizationHandler>();

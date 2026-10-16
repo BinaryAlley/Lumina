@@ -27,7 +27,7 @@
  *   - on(event, handler): subscribes to a player event, returns an unsubscribe function.
  *   - once(event, handler), off(event, handler): one shot subscribe, and unsubscribe.
  *   - getState(), getDescriptor(), getQueue(), getCurrentTime(), getDuration(),
- *     getVolume(), isMuted(), getPreferences(), getCapabilities(), getLastError().
+ *     getVolume(), isMuted(), getPreferences(), getCapabilities(), getLastError(), getSubTemplates().
  *   - destroyAsync(): releases every resource of the player. It is only used for an explicit teardown, never
  *                     by a navigation, because the navigation manager never recreates the player.
  *   - registerEngine(name, factory): registers an engine factory on this player, by name.
@@ -265,6 +265,26 @@
     }
 
     /**
+     * Reads the raw source of a theme sub template element of the player bar, or null when the theme does not provide one.
+     *
+     * The theme inlines the sub template sources into plain text script elements of the bar, so that the browser never
+     * parses the theme markup into live elements and requests their resources before the player renders them. The raw
+     * source is recovered by reading the element text, exactly like the file system browser does it.
+     * @param {string} elementId - The id of the plain text template element.
+     * @returns {string|null} The raw template source, or null when the element or the template engine is missing.
+     */
+    function readSubTemplate(elementId) {
+        const templateElement = document.getElementById(elementId);
+        if (!templateElement)
+            return null;
+        // The theme template engine may be absent on a partially loaded page, in which case the built-in markup is used.
+        if (typeof window.renderThemeTemplate !== 'function')
+            return null;
+        // An empty template element means the theme does not provide the template, in which case the built-in markup is used.
+        return templateElement.textContent || null;
+    }
+
+    /**
      * Reads a play descriptor from the data attributes of a play trigger element, per
      * {@link LuminaAudioPlayer.PLAY_DESCRIPTOR_DATA_KEYS}.
      * @param {Element} element - The element carrying the descriptor attributes.
@@ -335,6 +355,8 @@
             this.container = null;
             this.main = null;
             this.dom = {};
+            // The raw theme sub templates of the dynamic content, read once with the bar elements and null when the theme does not provide them.
+            this.subTemplates = { queueItem: null, playlistItem: null };
             this.descriptorClickHandler = null;
             this.controlHandlers = [];
             this.isProgressRenderScheduled = false;
@@ -392,6 +414,12 @@
             this.dom.progressDownloaded = query('[data-audio-player-progress-downloaded]');
             this.dom.playPause = query('[data-audio-player-play-pause]');
             this.dom.queue = query('[data-audio-player-queue]');
+            // The sub template sources are read once, with the bar elements, because the theme markup is part of the bar
+            // the player was bound to, and the player is never recreated by a navigation.
+            this.subTemplates = {
+                queueItem: readSubTemplate('audio-player-template-queue-item'),
+                playlistItem: readSubTemplate('audio-player-template-playlist-item')
+            };
         }
 
         /**
@@ -713,6 +741,14 @@
          */
         getQueue() {
             return [...this.queue];
+        }
+
+        /**
+         * Gets the raw theme sub templates the player renders its dynamic content from.
+         * @returns {Object} The sub templates, with a queueItem and a playlistItem source, each null when the theme provides none.
+         */
+        getSubTemplates() {
+            return { ...this.subTemplates };
         }
 
         /**
@@ -1272,26 +1308,81 @@
         /**
          * Renders the ordered queue in the expanded bar. The list is only shown when the play context
          * holds more than one track, so that a single track never renders a one item list.
+         *
+         * Each item is rendered from the 'shared/audio-player/queue-item' sub template of the active theme when it
+         * provides one, so that the theme owns the structure of a queue item, and the built-in markup is used otherwise.
          */
         renderQueue() {
             if (!this.dom.queue)
                 return;
             this.dom.queue.innerHTML = '';
             const items = this.queue.length > 1 ? this.queue : [];
-            for (const item of items) {
-                const entry = document.createElement('li');
-                entry.className = 'audio-player-queue-item';
-                entry.dataset.trackId = item.trackId;
-                const title = document.createElement('span');
-                title.className = 'audio-player-queue-item-title';
-                title.textContent = item.title || '';
-                const duration = document.createElement('span');
-                duration.className = 'audio-player-queue-item-duration';
-                duration.textContent = formatDuration(item.durationInSeconds);
-                entry.appendChild(title);
-                entry.appendChild(duration);
-                this.dom.queue.appendChild(entry);
+            for (let index = 0; index < items.length; index++) {
+                const entry = this.renderQueueItem(items[index], index, items.length);
+                if (entry)
+                    this.dom.queue.appendChild(entry);
             }
+        }
+
+        /**
+         * Renders one queue item, from the theme sub template when the theme provides one and from the built-in markup
+         * otherwise.
+         * @param {Object} item - The play descriptor of the item.
+         * @param {number} index - The zero based position of the item in the queue.
+         * @param {number} totalItems - The number of items in the queue.
+         * @returns {HTMLElement|null} The rendered queue item, or null when the markup produced no element.
+         */
+        renderQueueItem(item, index, totalItems) {
+            // The model exposes only what a queue item can show, so a theme template never reaches into the player internals.
+            const viewModel = {
+                index: index + 1,
+                trackId: item.trackId,
+                albumId: item.albumId,
+                artistId: item.artistId,
+                libraryId: item.libraryId,
+                title: item.title || '',
+                duration: formatDuration(item.durationInSeconds),
+                durationSeconds: item.durationInSeconds,
+                coverArtUrl: item.coverArtUrl || '',
+                isCurrent: index === this.currentIndex,
+                isPlayed: index < this.currentIndex,
+                isLast: index === totalItems - 1
+            };
+            if (this.subTemplates.queueItem) {
+                try {
+                    const container = document.createElement('div');
+                    container.innerHTML = window.renderThemeTemplate(this.subTemplates.queueItem, viewModel);
+                    const entry = container.firstElementChild;
+                    if (entry)
+                        return entry;
+                } catch (error) {
+                    // A broken theme sub template falls through to the built-in markup, so the queue never disappears.
+                    console.error('Audio player: the theme queue item template could not be rendered.', error);
+                }
+            }
+            return this.buildDefaultQueueItem(viewModel);
+        }
+
+        /**
+         * Builds one queue item with the built-in markup, used when the theme provides no queue item sub template.
+         * @param {Object} viewModel - The queue item model, per {@link LuminaAudioPlayer.AudioPlayer#renderQueueItem}.
+         * @returns {HTMLElement} The built-in queue item.
+         */
+        buildDefaultQueueItem(viewModel) {
+            const entry = document.createElement('li');
+            entry.className = 'audio-player-queue-item';
+            entry.dataset.trackId = viewModel.trackId;
+            if (viewModel.isCurrent)
+                entry.classList.add('is-current');
+            const title = document.createElement('span');
+            title.className = 'audio-player-queue-item-title';
+            title.textContent = viewModel.title;
+            const duration = document.createElement('span');
+            duration.className = 'audio-player-queue-item-duration';
+            duration.textContent = viewModel.duration;
+            entry.appendChild(title);
+            entry.appendChild(duration);
+            return entry;
         }
     }
 
