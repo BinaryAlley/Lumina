@@ -217,16 +217,6 @@
     }
 
     /**
-     * Checks whether a value is the AbortError a reset or a close rejects a pending flush with. An AbortError is tested
-     * by name rather than by type, because in a browser it is a DOMException, which is not an Error.
-     * @param {*} error - The value to check.
-     * @returns {boolean} True when the value is an AbortError.
-     */
-    function isAbortError(error) {
-        return !!error && error.name === 'AbortError';
-    }
-
-    /**
      * Checks whether a scheduler refused a frame because its own scheduled ahead ceiling is tighter than the decoder's.
      * That is backpressure, not corruption: the scheduler refused the frame before scheduling it, so the pipeline can keep
      * running, it must only wait for the schedule to drain. The classification rests on two properties the scheduler's
@@ -253,41 +243,6 @@
         const duration = toFiniteNumber(audioData.duration);
         // WebCodecs reports the duration of a decoded frame in microseconds.
         return duration === null ? 0 : Math.max(0, duration) / 1000000;
-    }
-
-    /**
-     * Merges two error detail objects into a new one, so that a details object a component owns is never mutated in place.
-     * @param {Object|null} base - The existing details.
-     * @param {Object|null} extra - The details to add.
-     * @returns {Object|null} The merged details, or null when both are absent.
-     */
-    function mergeErrorDetails(base, extra) {
-        const hasBase = base !== null && base !== undefined;
-        const hasExtra = extra !== null && extra !== undefined;
-        if (!hasBase && !hasExtra)
-            return null;
-        if (!hasExtra)
-            return Object.assign({}, base);
-        if (!hasBase)
-            return Object.assign({}, extra);
-        return Object.assign({}, base, extra);
-    }
-
-    /**
-     * Builds an error this decoder owns. A PlayerError raised by another component is copied rather than adopted, so its
-     * details are never mutated and the decoder failure never aliases the error the raising component keeps for itself.
-     * @param {*} error - The failure to own.
-     * @param {string} fallbackCode - The code to use when the failure is not already a player error.
-     * @param {Object|null} details - Optional details to merge in.
-     * @returns {LuminaAudioPlayer.PlayerError} The owned typed error.
-     */
-    function toOwnedError(error, fallbackCode, details) {
-        if (error instanceof LuminaAudioPlayer.PlayerError)
-            return new LuminaAudioPlayer.PlayerError(error.code, error.message, mergeErrorDetails(error.details, details));
-        const typed = LuminaAudioPlayer.PlayerError.from(error, fallbackCode);
-        if (!details)
-            return typed;
-        return new LuminaAudioPlayer.PlayerError(typed.code, typed.message, mergeErrorDetails(typed.details, details));
     }
 
     /**
@@ -608,7 +563,7 @@
             } catch (error) {
                 // A reset or a close interrupts a pending flush; that is a teardown of the decode pipeline, not a failure
                 // of the track, so it is observed as a clean stop.
-                if (this.destroyed || this.error || isAbortError(error))
+                if (this.destroyed || this.error || LuminaAudioPlayer.isAbortError(error))
                     return;
                 throw this.fail(error, LuminaAudioPlayer.PlayerErrorCode.DECODE_FAILED, { reason: 'flush-failed' });
             }
@@ -1063,7 +1018,7 @@
                 return this.error;
             // The error is owned by this decoder: a PlayerError raised elsewhere is copied rather than adopted, so its
             // details are never mutated and getError never returns an object the raising component still holds.
-            const typed = toOwnedError(error, code, details);
+            const typed = LuminaAudioPlayer.toOwnedPlayerError(error, code, details);
             this.error = typed;
             this.clearCapacityTimer();
             this.closeDecoder();

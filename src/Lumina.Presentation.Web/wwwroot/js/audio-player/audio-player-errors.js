@@ -34,6 +34,8 @@
         DOWNLOAD_FAILED: 'download-failed',
         // The download of a track was intentionally stopped, by an abort or a destroy, so a reader can tell a teardown apart from a stream failure.
         DOWNLOAD_ABORTED: 'download-aborted',
+        // The container of a track could not be parsed into encoded packets, or the bytes it holds do not describe a stream the demuxer supports.
+        DEMUX_FAILED: 'demux-failed',
         // The stored playback preferences of the user could not be read.
         PREFERENCES_LOAD_FAILED: 'preferences-load-failed'
     });
@@ -56,7 +58,22 @@
         // A scheduler's scheduled ahead ceiling is smaller than one frame plus its scheduling lead, so it can never accept a
         // frame at all. Unlike SCHEDULED_AHEAD_LIMIT, which is recoverable backpressure, this is terminal: the decode
         // pipeline stops because it can never make progress.
-        SCHEDULED_AHEAD_UNSATISFIABLE: 'scheduled-ahead-unsatisfiable'
+        SCHEDULED_AHEAD_UNSATISFIABLE: 'scheduled-ahead-unsatisfiable',
+        // The bundled demuxers have no demuxer for the container of a track, so the server must change the container or the
+        // codec of the track before the player can play it. Published by the demux capability module, which a consumer reads
+        // to ask for a normalized delivery instead of failing.
+        NO_DEMUXER: 'no-demuxer',
+        // A demuxer exists for the container of a track, but the browser cannot decode the codec of the track, so the server
+        // must re-encode it. Published by the demux capability module alongside NO_DEMUXER.
+        CODEC_UNSUPPORTED: 'codec-unsupported',
+        // A demuxer exists for the container of a track, but the bytes of the track could not be parsed, so the file is
+        // treated as one the bundled player cannot play directly rather than as a fatal player failure.
+        DEMUXER_FAILED: 'demuxer-failed',
+        // A read asked the download engine for a byte window it can never fill, because the file completed or the loop
+        // stopped with no gap left to fill. Published by the download engine and recognized by the demuxer byte source,
+        // which reads it as end of file rather than as a failure, so a rename on either side cannot silently turn a
+        // drained window into a fatal read error.
+        WINDOW_UNAVAILABLE: 'window-unavailable'
     });
 
     /**

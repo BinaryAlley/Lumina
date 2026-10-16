@@ -39,6 +39,13 @@
         CAPABILITIES_CHANGED: 'capabilitieschange',
         // The stored playback preferences of the user were loaded. Payload: the preferences object.
         PREFERENCES_CHANGED: 'preferenceschange',
+        // A track cannot be demuxed and decoded directly by the bundled player, so the server has to normalize it (remux or
+        // transcode) before it can play. Payload: { container, codec, reason }, where reason is one of the
+        // {@link LuminaAudioPlayer.PlayerErrorReason} values NO_DEMUXER, CODEC_UNSUPPORTED or DEMUXER_FAILED, and, when the
+        // caller supplied one, directPlay, the direct play flag of the manifest it asked about, so a consumer can tell a
+        // client-side capability gap from a track the server already decided to normalize. The flag is absent, not false,
+        // when the caller had no manifest.
+        NEEDS_NORMALIZATION: 'needsnormalization',
         // The player bar became visible or hidden. Payload: { isVisible }. The value is deliberately not 'visibilitychange',
         // which is the name of the DOM page visibility event, so that the two can never be confused.
         VISIBILITY_CHANGED: 'barvisibilitychange'

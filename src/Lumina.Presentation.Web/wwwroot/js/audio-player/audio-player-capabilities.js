@@ -22,19 +22,59 @@
     });
 
     /**
-     * The codec configurations probed with AudioDecoder.isConfigSupported, one per audio codec the demuxers of the player can recognize.
-     *  Each entry is a representative configuration; the returned report says whether the browser can decode that codec at all.
+     * The representative decoder configuration of every audio codec the player supports, keyed by the canonical codec name
+     * a demuxer registers itself with. It is the single source of truth for those configurations: the capability report
+     * below probes them, and each demuxer registers its own descriptor with the entry for its codec, so the report and the
+     * per demuxer check can never silently disagree.
+     * @readonly
+     * @type {Object<string, { codec: string, sampleRate: number, numberOfChannels: number }>}
+     */
+    LuminaAudioPlayer.AUDIO_CODEC_PROBES = Object.freeze({
+        MP3: Object.freeze({ codec: 'mp3', sampleRate: 44100, numberOfChannels: 2 }),
+        FLAC: Object.freeze({ codec: 'flac', sampleRate: 44100, numberOfChannels: 2 }),
+        OPUS: Object.freeze({ codec: 'opus', sampleRate: 48000, numberOfChannels: 2 }),
+        AAC: Object.freeze({ codec: 'mp4a.40.2', sampleRate: 44100, numberOfChannels: 2 }),
+        VORBIS: Object.freeze({ codec: 'vorbis', sampleRate: 44100, numberOfChannels: 2 }),
+        PCM: Object.freeze({ codec: 'pcm-s16', sampleRate: 44100, numberOfChannels: 2 })
+    });
+
+    /**
+     * The codec configurations probed with AudioDecoder.isConfigSupported, one per audio codec the demuxers of the player
+     * can recognize. It is derived from {@link LuminaAudioPlayer.AUDIO_CODEC_PROBES}, so the same configuration answers
+     * both this report and the per demuxer check.
      * @readonly
      * @type {ReadonlyArray<{ name: string, config: Object }>}
      */
-    LuminaAudioPlayer.PROBED_AUDIO_CODECS = Object.freeze([
-        Object.freeze({ name: 'mp3', config: Object.freeze({ codec: 'mp3', sampleRate: 44100, numberOfChannels: 2 }) }),
-        Object.freeze({ name: 'flac', config: Object.freeze({ codec: 'flac', sampleRate: 44100, numberOfChannels: 2 }) }),
-        Object.freeze({ name: 'opus', config: Object.freeze({ codec: 'opus', sampleRate: 48000, numberOfChannels: 2 }) }),
-        Object.freeze({ name: 'aac', config: Object.freeze({ codec: 'mp4a.40.2', sampleRate: 44100, numberOfChannels: 2 }) }),
-        Object.freeze({ name: 'vorbis', config: Object.freeze({ codec: 'vorbis', sampleRate: 44100, numberOfChannels: 2 }) }),
-        Object.freeze({ name: 'pcm', config: Object.freeze({ codec: 'pcm-s16', sampleRate: 44100, numberOfChannels: 2 }) })
-    ]);
+    LuminaAudioPlayer.PROBED_AUDIO_CODECS = Object.freeze(Object.keys(LuminaAudioPlayer.AUDIO_CODEC_PROBES)
+        .map((name) => Object.freeze({ name: name.toLowerCase(), config: LuminaAudioPlayer.AUDIO_CODEC_PROBES[name] })));
+
+    /**
+     * Builds a stable fingerprint of the codec private data of a configuration, so that two configurations that differ
+     * only in their description bytes are never answered from the same cache entry. The decoder can depend on the
+     * description, because it overrides values of the configuration itself, for example the bit depth a FLAC STREAMINFO
+     * states or the channel count an OpusHead states, so the bytes matter and not merely whether they are present.
+     * @param {*} value - The description, as an ArrayBuffer, a view over one, or nothing.
+     * @returns {string} A fingerprint that combines the length and a 32 bit FNV-1a hash of the bytes.
+     */
+    function fingerprintDescription(value) {
+        if (value === null || value === undefined)
+            return 'none';
+        let bytes;
+        if (typeof ArrayBuffer !== 'undefined' && value instanceof ArrayBuffer)
+            bytes = new Uint8Array(value);
+        else if (typeof ArrayBuffer !== 'undefined' && ArrayBuffer.isView(value))
+            bytes = new Uint8Array(value.buffer, value.byteOffset, value.byteLength);
+        else
+            return 'unknown';
+        let hash = 0x811c9dc5;
+        for (let index = 0; index < bytes.length; index++) {
+            hash ^= bytes[index];
+            // 0x811c9dc5 is the FNV offset basis and 0x01000193 the FNV prime; the multiply is done modulo 2^32 by the
+            // unsigned shift, so the hash is a plain 32 bit value whatever the platform's number type.
+            hash = (hash * 0x01000193) >>> 0;
+        }
+        return `${bytes.length}:${hash.toString(16)}`;
+    }
 
     /**
      * Detects the browser capabilities the audio player relies on, and caches the result.
@@ -50,6 +90,14 @@
             this.report = null;
             /** @type {Promise<Object>|null} */
             this.pendingReport = null;
+            /**
+             * The answers the browser already gave for a configuration, keyed by the shape of the configuration. The answer
+             * cannot change while the page lives, so it is memoized: enumerating many tracks, each with its own exact
+             * configuration, would otherwise be one browser round trip per track. The pending promise is cached rather than
+             * the settled value, so concurrent probes of the same configuration share one round trip.
+             * @type {Map<string, Promise<boolean>>}
+             */
+            this.configSupportCache = new Map();
         }
 
         /**
@@ -86,6 +134,25 @@
         async supportsAudioConfigAsync(config) {
             if (!this.hasAudioDecoder())
                 return false;
+            // The key covers the whole configuration, including a fingerprint of the description bytes: the decoder can
+            // depend on them, so two configurations that differ only in their codec private data must not share an answer.
+            const key = config
+                ? `${config.codec}|${config.sampleRate}|${config.numberOfChannels}|${fingerprintDescription(config.description)}`
+                : String(config);
+            const cached = this.configSupportCache.get(key);
+            if (cached)
+                return await cached;
+            const probe = this.runAudioConfigProbeAsync(config);
+            this.configSupportCache.set(key, probe);
+            return await probe;
+        }
+
+        /**
+         * Performs one configuration probe against the browser, without consulting the cache.
+         * @param {Object} config - An AudioDecoderConfig like value, with codec, sampleRate and numberOfChannels.
+         * @returns {Promise<boolean>} True when the configuration is decodable, false otherwise or when it cannot be probed.
+         */
+        async runAudioConfigProbeAsync(config) {
             try {
                 const result = await this.window.AudioDecoder.isConfigSupported(config);
                 // The isConfigSupported call resolves with a result object; a missing result and a false supported flag both

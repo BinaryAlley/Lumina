@@ -69,7 +69,7 @@
  * the reads that are waiting for a window, with {@link LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED}, so a seek
  * teardown is never mistaken for a stream failure. A read therefore resolves once the buffer covers its window, and is
  * rejected when the window can no longer be filled: on a destroy or an abort (DOWNLOAD_ABORTED), with the recorded failure
- * when the loop stopped after a failure, or with DOWNLOAD_FAILED and <c>details.reason === 'window-unavailable'</c> when
+ * when the loop stopped after a failure, or with DOWNLOAD_FAILED and <c>details.reason</c> {@link LuminaAudioPlayer.PlayerErrorReason.WINDOW_UNAVAILABLE} when
  * the file completed or the loop ended with no gap left to fill. A read that is waiting while the download is merely
  * paused, or before it has started, is left pending, because a resume or a start can still fill it. The loop callbacks and
  * getError only ever see DOWNLOAD_FAILED.
@@ -128,16 +128,6 @@
         if (!Number.isInteger(start) || !Number.isInteger(end) || start > end)
             return null;
         return { start, end, total };
-    }
-
-    /**
-     * Checks whether a value is the AbortError a cancelled fetch or stream read rejects with. It is tested by name rather
-     * than by type, because in a browser an AbortError is a DOMException, which is not an Error.
-     * @param {*} error - The value to check.
-     * @returns {boolean} True when the value is an AbortError.
-     */
-    function isAbortError(error) {
-        return !!error && error.name === 'AbortError';
     }
 
     /**
@@ -777,7 +767,7 @@
          * @param {number} offset - The first byte of the window.
          * @param {number} length - The length of the window, in bytes.
          * @returns {Promise<Uint8Array>} A copy of the requested bytes.
-         * @throws {LuminaAudioPlayer.PlayerError} The rejection of {@link LuminaAudioPlayer.TrackDownloader#whenRangeAvailableAsync}, which a read propagates, or <c>DOWNLOAD_FAILED</c> with <c>details.reason === 'window-unavailable'</c> if the window was released without ever arriving.
+         * @throws {LuminaAudioPlayer.PlayerError} The rejection of {@link LuminaAudioPlayer.TrackDownloader#whenRangeAvailableAsync}, which a read propagates, or <c>DOWNLOAD_FAILED</c> with <c>details.reason</c> {@link LuminaAudioPlayer.PlayerErrorReason.WINDOW_UNAVAILABLE} if the window was released without ever arriving.
          */
         async readBytesAsync(offset, length) {
             const direct = this.buffer.read(offset, length);
@@ -794,8 +784,8 @@
          * Resolves once a window of bytes has been downloaded.
          * @param {number} offset - The first byte of the window.
          * @param {number} length - The length of the window, in bytes.
-         * @returns {Promise<void>} A promise that resolves once the buffer covers the window. It is rejected when the window can no longer be filled: on a destroy or an abort, with the recorded failure when the loop stopped after a failure, or with the window-unavailable error when the file completed or the loop ended with no gap left to fill. A read issued while the download is merely paused, or before it has started, stays pending, because a resume or a start can still fill it.
-         * @throws {LuminaAudioPlayer.PlayerError} With <c>DOWNLOAD_ABORTED</c> when the downloader is destroyed or was aborted, with the recorded failure when the loop stopped after a failure, or with <c>DOWNLOAD_FAILED</c> and <c>details.reason === 'window-unavailable'</c> when the file completed or the loop ended with no gap left to fill.
+         * @returns {Promise<void>} A promise that resolves once the buffer covers the window. It is rejected when the window can no longer be filled: on a destroy or an abort, with the recorded failure when the loop stopped after a failure, or with the {@link LuminaAudioPlayer.PlayerErrorReason.WINDOW_UNAVAILABLE} error when the file completed or the loop ended with no gap left to fill. A read issued while the download is merely paused, or before it has started, stays pending, because a resume or a start can still fill it.
+         * @throws {LuminaAudioPlayer.PlayerError} With <c>DOWNLOAD_ABORTED</c> when the downloader is destroyed or was aborted, with the recorded failure when the loop stopped after a failure, or with <c>DOWNLOAD_FAILED</c> and <c>details.reason</c> {@link LuminaAudioPlayer.PlayerErrorReason.WINDOW_UNAVAILABLE} when the file completed or the loop ended with no gap left to fill.
          */
         whenRangeAvailableAsync(offset, length) {
             if (this.buffer.covers(offset, length))
@@ -1034,7 +1024,7 @@
                 this.noteTotal(resolved.total);
                 return await this.readResponseIntoBufferAsync(response, resolved, controller, spec.stopOnPause === true, spec.openEnded === true);
             } catch (error) {
-                if (isAbortError(error))
+                if (LuminaAudioPlayer.isAbortError(error))
                     return { isAborted: true, isFailed: false, isDestroyed: this.destroyed };
                 // The failure left the response body unread, so it is discarded and the request is aborted to release the
                 // connection instead of waiting for the browser to drop the stream.
@@ -1156,7 +1146,7 @@
                     try {
                         result = await reader.read();
                     } catch (error) {
-                        if (isAbortError(error)) {
+                        if (LuminaAudioPlayer.isAbortError(error)) {
                             isStopped = true;
                             break;
                         }
@@ -1359,10 +1349,10 @@
          * Builds the single error used whenever a byte window can no longer be filled: a completed file, a loop that
          * drained with nothing left to fetch, or a window that was released without ever arriving. Every path that reports
          * this outcome uses it, so a consumer sees one consistent code and reason.
-         * @returns {LuminaAudioPlayer.PlayerError} The window unavailable error, with <c>details.reason === 'window-unavailable'</c>.
+         * @returns {LuminaAudioPlayer.PlayerError} The window unavailable error, with <c>details.reason === {@link LuminaAudioPlayer.PlayerErrorReason.WINDOW_UNAVAILABLE}</c>.
          */
         createWindowUnavailableError() {
-            return new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The requested byte window can no longer be filled.', { reason: 'window-unavailable' });
+            return new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The requested byte window can no longer be filled.', { reason: LuminaAudioPlayer.PlayerErrorReason.WINDOW_UNAVAILABLE });
         }
     }
 
