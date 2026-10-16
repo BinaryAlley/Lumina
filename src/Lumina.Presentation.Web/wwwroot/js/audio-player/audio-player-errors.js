@@ -25,12 +25,38 @@
         ENGINE_LOAD_FAILED: 'engine-load-failed',
         // The engine reported a failure while decoding, buffering or rendering audio.
         ENGINE_ERROR: 'engine-error',
+        // The WebCodecs decode pipeline could not be configured, refused a chunk, or failed to decode one.
+        DECODE_FAILED: 'decode-failed',
+        // The decoder has no room for another chunk right now, so a caller that paces itself should wait. Unlike
+        // DECODE_FAILED, which is fatal, this is a transient, recoverable pacing condition.
+        DECODER_BUSY: 'decoder-busy',
         // The download of a track failed, or was rejected by the stream.
         DOWNLOAD_FAILED: 'download-failed',
         // The download of a track was intentionally stopped, by an abort or a destroy, so a reader can tell a teardown apart from a stream failure.
         DOWNLOAD_ABORTED: 'download-aborted',
         // The stored playback preferences of the user could not be read.
         PREFERENCES_LOAD_FAILED: 'preferences-load-failed'
+    });
+
+    /**
+     * Enum-like object for the stable <c>details.reason</c> values that cross a module boundary of the player.
+     *
+     * A reason is a structured detail of a {@link LuminaAudioPlayer.PlayerError} that a consumer branches on, so its value
+     * is defined once here and shared, never written as a literal by the producer and the consumer separately: two copies
+     * of a literal drift apart silently, and a consumer that keys on a stale one reclassifies a recoverable condition as
+     * a fatal failure without anything failing to compile.
+     * @readonly
+     * @enum {string}
+     */
+    LuminaAudioPlayer.PlayerErrorReason = Object.freeze({
+        // A scheduler refused a decoded frame because its own scheduled ahead ceiling is tighter than the caller's, so the
+        // frame is backpressure rather than a failure. Published by the renderer's schedule and recognized by the decode
+        // pipeline, which pauses feeding instead of stopping.
+        SCHEDULED_AHEAD_LIMIT: 'scheduled-ahead-limit',
+        // A scheduler's scheduled ahead ceiling is smaller than one frame plus its scheduling lead, so it can never accept a
+        // frame at all. Unlike SCHEDULED_AHEAD_LIMIT, which is recoverable backpressure, this is terminal: the decode
+        // pipeline stops because it can never make progress.
+        SCHEDULED_AHEAD_UNSATISFIABLE: 'scheduled-ahead-unsatisfiable'
     });
 
     /**

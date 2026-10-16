@@ -35,9 +35,10 @@
  *     bar shows the same loading state for an engine's own range fetch as it does for a seek. The state it sets
  *     stays until the engine reports it is no longer buffering, and a playhead report never clears it.
  *   - host.reportEnded(): reports that the current track reached its end.
- *   - host.reportError(error): reports an engine failure, wrapped into a {@link LuminaAudioPlayer.PlayerError}. A download
- *     engine must forward its downloader's onError here, because the downloader only reports to its own callback and
- *     never emits on the event bus, so a failure that is not forwarded stays unobserved.
+ *   - host.reportError(error): reports an engine failure, wrapped into a {@link LuminaAudioPlayer.PlayerError}. Every sub
+ *     component that reports through its own callback must be forwarded here, because such a component only reports to its
+ *     own callback and never emits on the event bus, so a failure that is not forwarded stays unobserved. The download
+ *     engine must forward its downloader's onError, and an engine that decodes must forward its decoder's onError as well.
  *
  * Registering and selecting an engine
  * -----------------------------------

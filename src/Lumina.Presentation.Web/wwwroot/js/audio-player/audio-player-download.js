@@ -131,12 +131,13 @@
     }
 
     /**
-     * Checks whether a value is the AbortError a cancelled fetch or stream read rejects with.
+     * Checks whether a value is the AbortError a cancelled fetch or stream read rejects with. It is tested by name rather
+     * than by type, because in a browser an AbortError is a DOMException, which is not an Error.
      * @param {*} error - The value to check.
      * @returns {boolean} True when the value is an AbortError.
      */
     function isAbortError(error) {
-        return error instanceof Error && error.name === 'AbortError';
+        return !!error && error.name === 'AbortError';
     }
 
     /**

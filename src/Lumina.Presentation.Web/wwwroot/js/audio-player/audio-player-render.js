@@ -674,7 +674,7 @@
          * the current track resumes the playback state, so the playhead and the callbacks continue to run.
          * @param {AudioData} audioData - The decoded audio to schedule. Ownership transfers to the renderer, which closes it.
          * @returns {number} The media position, in seconds, at the end of the scheduled audio.
-         * @throws {LuminaAudioPlayer.PlayerError} When the renderer was destroyed, or the audio could not be converted or scheduled.
+         * @throws {LuminaAudioPlayer.PlayerError} When the renderer was destroyed, or the audio could not be converted or scheduled. A refusal caused by the renderer's own <c>maxScheduledAheadSeconds</c> ceiling carries <c>details.reason === {@link LuminaAudioPlayer.PlayerErrorReason}.SCHEDULED_AHEAD_LIMIT</c> and is backpressure rather than corruption: it is thrown without being recorded as the renderer's last error, so a caller can treat it as recoverable. The frame is closed before this call returns or throws, whichever happens, so a caller must never close it and a refusal never leaks. Both properties are load-bearing for a caller, such as the decode pipeline, that classifies the refusal from the thrown value.
          */
         schedule(audioData) {
             // The decoded audio is consumed by this call whatever happens, so it is released even when the renderer refuses
@@ -701,7 +701,10 @@
                 // the clock and one lead ahead otherwise.
                 const prospectiveStart = hasScheduled && this.nextStartTime > now ? this.nextStartTime : now + MIN_SCHEDULE_LEAD_SECONDS;
                 if (this.maxScheduledAheadSeconds !== null && prospectiveStart + wallDuration - now > this.maxScheduledAheadSeconds)
-                    throw this.raise(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR, 'The schedule would run further ahead than the renderer allows.', { reason: 'scheduled-ahead-limit' }));
+                    // The refusal is backpressure, not a failure: a caller that paces itself retries once the schedule has
+                    // drained, so it is thrown without being recorded as the renderer's last error, which would mark a
+                    // renderer that is still healthy as failed, contradicting the reason the shared enum publishes.
+                    throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR, 'The schedule would run further ahead than the renderer allows.', { reason: LuminaAudioPlayer.PlayerErrorReason.SCHEDULED_AHEAD_LIMIT });
                 let when = this.nextStartTime;
                 // The chain is anchored on its first buffer, and re-anchored whenever it fell behind the context clock, which
                 // is an underrun: the buffer starts as soon as it can and the playhead follows the audio that actually plays.
@@ -968,6 +971,18 @@
             if (!this.context || this.nextStartTime <= 0)
                 return 0;
             return Math.max(0, this.nextStartTime - this.context.currentTime);
+        }
+
+        /**
+         * Gets the scheduled ahead ceiling the renderer enforces, in seconds, or null when it enforces none.
+         *
+         * It is published so that a caller that paces itself, such as the decode pipeline, can keep its own ceiling
+         * strictly below it and never feed a frame the renderer would refuse. Keeping a decode ceiling above the renderer's
+         * is what makes the renderer refuse, and a refused frame is closed and lost.
+         * @returns {number|null} The ceiling, in seconds, or null when the renderer enforces none.
+         */
+        getMaxScheduledAheadSeconds() {
+            return this.maxScheduledAheadSeconds;
         }
 
         /**
