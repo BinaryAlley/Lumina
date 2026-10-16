@@ -120,6 +120,27 @@
   <data name="Abort" xml:space="preserve">
     <value>中止</value>
   </data>
+  <data name="AudioPlayerBuffering" xml:space="preserve">
+    <value>缓冲中</value>
+  </data>
+  <data name="AudioPlayerMute" xml:space="preserve">
+    <value>静音</value>
+  </data>
+  <data name="AudioPlayerPause" xml:space="preserve">
+    <value>暂停</value>
+  </data>
+  <data name="AudioPlayerPlay" xml:space="preserve">
+    <value>播放</value>
+  </data>
+  <data name="AudioPlayerSeek" xml:space="preserve">
+    <value>播放位置</value>
+  </data>
+  <data name="AudioPlayerUnmute" xml:space="preserve">
+    <value>取消静音</value>
+  </data>
+  <data name="AudioPlayerVolume" xml:space="preserve">
+    <value>音量</value>
+  </data>
   <data name="Cancel" xml:space="preserve">
     <value>取消</value>
   </data>

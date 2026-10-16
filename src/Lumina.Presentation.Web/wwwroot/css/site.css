@@ -1340,27 +1340,76 @@ html.audio-player-initializing .audio-player-container {
     flex: 2 1 40%;
     min-width: 40px;
     height: 6px;
-    background-color: #333333;
+    background-color: transparent;
     cursor: pointer;
+    /* A touch drag is claimed by the control instead of the browser, which would otherwise cancel the gesture. */
+    touch-action: none;
 }
 
-/* The bar exposes three distinct states a theme can style: the not yet downloaded track, the downloaded
-   part ('audio-player-progress-downloaded'), and the played part ('audio-player-progress-played'). */
+/* The bar exposes three distinct states a theme can style independently: the not yet downloaded track
+   ('audio-player-progress-undownloaded'), the downloaded but not played part ('audio-player-progress-downloaded'),
+   and the played part ('audio-player-progress-played'). The player publishes the start and the width of each state as
+   the custom properties below, and this stylesheet consumes them; a theme overrides these rules, or consumes the same
+   properties itself, to give each state its own look and the bar its own shape or orientation. */
 .audio-player-progress-played,
-.audio-player-progress-downloaded {
+.audio-player-progress-downloaded,
+.audio-player-progress-undownloaded {
     position: absolute;
     top: 0px;
-    left: 0px;
-    width: 0%;
     height: 100%;
 }
 
+.audio-player-progress-played {
+    left: var(--audio-player-progress-played-start, 0%);
+    width: var(--audio-player-progress-played-width, 0%);
+    background-color: #6DCBFE;
+}
+
 .audio-player-progress-downloaded {
+    left: var(--audio-player-progress-downloaded-start, 0%);
+    width: var(--audio-player-progress-downloaded-width, 0%);
     background-color: #5A6B78;
 }
 
-.audio-player-progress-played {
-    background-color: #6DCBFE;
+.audio-player-progress-undownloaded {
+    left: var(--audio-player-progress-undownloaded-start, 0%);
+    width: var(--audio-player-progress-undownloaded-width, 100%);
+    background-color: #333333;
+}
+
+/* While a seek waits for the range of its target position the bar pulses, so the loading state is visible without a
+   separate element. A theme restyles it through the 'is-buffering' class. The pulse is a decoration, so it is dropped
+   when the visitor asked for reduced motion; the 'is-buffering' class and the state attribute still mark the state. */
+.audio-player-progress.is-buffering {
+    animation: audio-player-progress-buffering 1s ease-in-out infinite;
+}
+
+@keyframes audio-player-progress-buffering {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.45;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .audio-player-progress.is-buffering {
+        animation: none;
+    }
+}
+
+.audio-player-progress.is-scrubbing {
+    cursor: grabbing;
+}
+
+.audio-player-volume.is-scrubbing {
+    cursor: grabbing;
 }
 
 .audio-player-transport {
@@ -1398,6 +1447,64 @@ html.audio-player-initializing .audio-player-container {
     border-width: 0px;
     border-right: 3px solid #E6E6E6;
     border-left: 3px solid #E6E6E6;
+}
+
+.audio-player-volume-control {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.audio-player-mute {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0px;
+    background-color: transparent;
+    border: 0px;
+    cursor: pointer;
+}
+
+/* The speaker cone of the mute toggle is drawn with CSS, so that a theme restyles it without an image. */
+.audio-player-mute-icon {
+    display: block;
+    width: 0px;
+    height: 0px;
+    border-style: solid;
+    border-width: 5px 8px 5px 0px;
+    border-color: transparent #E6E6E6 transparent transparent;
+}
+
+.audio-player-mute.is-muted .audio-player-mute-icon {
+    border-right-color: #8A8A8A;
+}
+
+/* The volume fill is positioned from the custom properties the player publishes, exactly like the progress bar, so a
+   theme restyles or reorients it without any inline geometry. touch-action is disabled on both sliders so a touch drag
+   is claimed by the control instead of the browser, which would otherwise cancel the gesture mid-drag. */
+.audio-player-volume {
+    position: relative;
+    width: 80px;
+    height: 6px;
+    background-color: #333333;
+    cursor: pointer;
+    touch-action: none;
+}
+
+.audio-player-volume-level {
+    position: absolute;
+    top: 0px;
+    left: var(--audio-player-volume-start, 0%);
+    width: var(--audio-player-volume-width, 100%);
+    height: 100%;
+    background-color: #6DCBFE;
+}
+
+.audio-player-volume.is-muted .audio-player-volume-level {
+    background-color: #5A6B78;
 }
 
 .audio-player-controls {

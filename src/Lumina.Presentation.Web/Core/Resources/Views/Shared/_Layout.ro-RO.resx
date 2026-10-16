@@ -120,6 +120,27 @@
   <data name="Abort" xml:space="preserve">
     <value>Anulare</value>
   </data>
+  <data name="AudioPlayerBuffering" xml:space="preserve">
+    <value>Se încarcă</value>
+  </data>
+  <data name="AudioPlayerMute" xml:space="preserve">
+    <value>Fără sunet</value>
+  </data>
+  <data name="AudioPlayerPause" xml:space="preserve">
+    <value>Pauză</value>
+  </data>
+  <data name="AudioPlayerPlay" xml:space="preserve">
+    <value>Redare</value>
+  </data>
+  <data name="AudioPlayerSeek" xml:space="preserve">
+    <value>Poziția de redare</value>
+  </data>
+  <data name="AudioPlayerUnmute" xml:space="preserve">
+    <value>Activează sunetul</value>
+  </data>
+  <data name="AudioPlayerVolume" xml:space="preserve">
+    <value>Volum</value>
+  </data>
   <data name="Cancel" xml:space="preserve">
     <value>Anulare</value>
   </data>

@@ -29,6 +29,8 @@
         MUTE_CHANGED: 'mutechange',
         // The downloaded fraction of the current track changed. Payload: { downloadedFraction }.
         PROGRESS: 'progress',
+        // A seek started waiting for the range of its target position, or such a wait ended. Payload: { isBuffering, pendingSeekTime }.
+        BUFFERING_CHANGED: 'bufferingchange',
         // The current track reached its end.
         ENDED: 'ended',
         // A {@link LuminaAudioPlayer.PlayerError} was raised. Payload: the player error.

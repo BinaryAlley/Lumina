@@ -33,13 +33,31 @@
         error: '@localizer["Error"]',
         information: '@localizer["Information"]'
     };
-    // The endpoints the audio player reads the stored playback preferences of the user from. The routes are the culture
-    // aware web routes, so the player never hardcodes a path, and it never reaches the API server directly.
+    // The endpoints the audio player reads the stored playback preferences of the user from, and writes the volume and
+    // mute state it changes back to. The routes are the culture aware web routes, so the player never hardcodes a path,
+    // and it never reaches the API server directly.
     var audioPlayerConfiguration = {
         getUserSettingsUrl: '@_urlService.GetAbsoluteUrl(WebRoutes.Settings.GET_USER_SETTINGS)',
-        getPlaybackStateUrl: '@_urlService.GetAbsoluteUrl(WebRoutes.Settings.GET_PLAYBACK_STATE)'
+        getPlaybackStateUrl: '@_urlService.GetAbsoluteUrl(WebRoutes.Settings.GET_PLAYBACK_STATE)',
+        updatePlaybackStateUrl: '@_urlService.GetAbsoluteUrl(WebRoutes.Settings.UPDATE_PLAYBACK_STATE)',
+        strings: {
+            play: '@localizer["AudioPlayerPlay"]',
+            pause: '@localizer["AudioPlayerPause"]',
+            mute: '@localizer["AudioPlayerMute"]',
+            unmute: '@localizer["AudioPlayerUnmute"]',
+            volume: '@localizer["AudioPlayerVolume"]',
+            seek: '@localizer["AudioPlayerSeek"]',
+            buffering: '@localizer["AudioPlayerBuffering"]'
+        }
     };
 </script>
+@if (User?.Identity?.IsAuthenticated == true)
+{
+    <!-- The audio player writes the volume and mute state it changes to the playback state endpoint, which validates an
+         anti-forgery token. The player is rendered only for an authenticated visitor, so the token is rendered here too,
+         once, with the global configuration, whatever the active theme is. -->
+    @Html.AntiForgeryToken()
+}
 <script src="~/libs/microsoft-signalr/signalr.min.js" asp-append-version="true"></script>
 <script defer src="~/js/notifications.js" asp-append-version="true"></script>
 <script defer src="~/js/dialogs.js" asp-append-version="true"></script>

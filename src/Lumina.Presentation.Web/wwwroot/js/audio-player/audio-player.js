@@ -5,8 +5,11 @@
  * in-place navigation manager swaps. Because it is never torn down by a page swap, playback and its
  * UI survive navigation. It produces no audio itself: audio is delegated to a swappable engine that
  * fulfills the interface documented in audio-player-engine.js. This module only owns the state machine, the
- * event bus, capability detection, the play descriptor, the bar and the public API; the download,
- * decode and render pipeline is plugged in as an engine by the later stages.
+ * event bus, capability detection, the play descriptor, the bar, the transport controls it binds and renders, and the
+ * public API. The download, decode and render pipeline is plugged in as an engine by the later stages. The bar holds
+ * the three state progress bar (played, downloaded but not played, and not yet downloaded), the volume and mute
+ * controls, the keyboard shortcuts, and the loading state a seek into a not yet downloaded position shows; the volume
+ * and mute the controls change are persisted to the stored playback state of the user on their own.
  *
  * Public control API (window.LuminaAudioPlayer.instance)
  * ----------------------------------------
@@ -19,15 +22,16 @@
  *   - stopAsync(): stops playback. While the bar is condensed, it also hides the bar; while the bar is
  *                  expanded, it stays on screen.
  *   - seekAsync(seconds): moves the playhead to an absolute position, in seconds.
- *   - setVolumeAsync(volume): sets the output volume, between 0 and 1.
+ *   - setVolumeAsync(volume): sets the output volume, between 0 and 1. Volume and mute are persisted to the stored
+ *                             playback state of the user, so they survive a reload.
  *   - setMutedAsync(muted): sets the mute state. Volume and mute are independent: unmuting restores the volume.
  *   - toggleMuteAsync(): flips the mute state.
  *   - toggleFullHeight(): expands or collapses the bar.
  *   - toggleVisibility(): shows or hides the bar.
  *   - on(event, handler): subscribes to a player event, returns an unsubscribe function.
  *   - once(event, handler), off(event, handler): one shot subscribe, and unsubscribe.
- *   - getState(), getDescriptor(), getQueue(), getCurrentTime(), getDuration(),
- *     getVolume(), isMuted(), getPreferences(), getCapabilities(), getLastError(), getSubTemplates().
+ *   - getState(), getDescriptor(), getQueue(), getCurrentTime(), getDuration(), getVolume(), isMuted(),
+ *     isBuffering(), getBufferedTimeRanges(), getPreferences(), getCapabilities(), getLastError(), getSubTemplates().
  *   - destroyAsync(): releases every resource of the player. It is only used for an explicit teardown, never
  *                     by a navigation, because the navigation manager never recreates the player.
  *   - registerEngine(name, factory): registers an engine factory on this player, by name.
@@ -87,6 +91,43 @@
     const REDIRECTED = Object.freeze({ redirected: true });
 
     /**
+     * Follows a server redirect, but only when the target is an http or https URL on the same origin and protocol as
+     * the current page, and carries no credentials.
+     *
+     * An expired session is answered with a redirect to the sign in page, which is on this origin. A redirect to any
+     * other origin, which a misconfigured proxy that trusts a forwarded host header could produce, is not followed, so
+     * the player never turns a session expiry into an open redirect. The protocol is checked separately, so a target
+     * that only matches because an opaque document and a javascript:, data: or about: target all report the origin
+     * 'null' is not followed either. A target that embeds a user name or a password is dropped too, because the origin
+     * check ignores the userinfo, so such a target would otherwise put attacker-chosen credentials in the address bar.
+     * The target is resolved against the current page, so a relative target is handled, and a malformed one is dropped.
+     * @param {string} url - The redirect target the server answered with.
+     */
+    function navigateToRedirect(url) {
+        if (!url)
+            return;
+        try {
+            const target = new URL(url, window.location.href);
+            // The target must stay on the origin of the page and use its protocol. The protocol is checked separately
+            // from the origin because an opaque document, such as about:blank, reports the origin 'null', which a
+            // javascript: or data: target also reports, so the origin alone would let such a target through. The scheme
+            // is also confined to http and https, so a redirect can never introduce one. A target that embeds a user
+            // name or a password is dropped too, because the origin check ignores the userinfo, so such a target would
+            // otherwise put attacker-chosen credentials in the address bar.
+            const isHttp = target.protocol === 'http:' || target.protocol === 'https:';
+            const isSameOrigin = target.origin === window.location.origin
+                && target.protocol === window.location.protocol;
+            if (!isHttp || !isSameOrigin || target.username !== '' || target.password !== '') {
+                console.warn('Audio player: a redirect that is not to this page was not followed.');
+                return;
+            }
+            window.location.href = target.href;
+        } catch (error) {
+            console.debug('Audio player: a redirect target could not be followed.', error);
+        }
+    }
+
+    /**
      * The attribute that marks an element as a play trigger the player handles by event delegation.
      * @readonly
      * @type {string}
@@ -117,6 +158,38 @@
      * @type {string}
      */
     const UNKNOWN_TIME = '--:--';
+
+    /**
+     * The number of seconds the left and right arrow keys move the playhead by, matching the seek step of the
+     * reference web player.
+     * @readonly
+     * @type {number}
+     */
+    const SEEK_STEP_SECONDS = 5;
+
+    /**
+     * The fraction of the full volume the up and down arrow keys change the volume by, matching the volume step of
+     * the reference web player.
+     * @readonly
+     * @type {number}
+     */
+    const VOLUME_STEP = 0.05;
+
+    /**
+     * The delay, in milliseconds, that coalesces the volume and mute writes a drag of the volume control produces
+     * into a single request, so that dragging across the control never sends one request per pixel.
+     * @readonly
+     * @type {number}
+     */
+    const PLAYBACK_STATE_PERSIST_DELAY_MS = 500;
+
+    /**
+     * The tolerance, in seconds, within which a playhead report counts as having reached a pending seek target, so
+     * that the loading state of the seek is cleared once playback resumes there.
+     * @readonly
+     * @type {number}
+     */
+    const SEEK_SETTLE_TOLERANCE_SECONDS = 0.25;
 
     /**
      * Formats a known, positive time in seconds as m:ss, or h:mm:ss when it is an hour or longer.
@@ -352,6 +425,54 @@
             this.engine = null;
             this.isAvailable = false;
             this.isInitialized = false;
+            // True while the bar shows a loading state, which is either a seek waiting for the range of its target, or
+            // the engine reporting that it is itself waiting for data. Boolean state keeps its conventional is/has
+            // prefix, except where a public is*() accessor already owns that name: isBuffering() is that accessor here,
+            // so the backing field keeps the participle instead of shadowing the method.
+            this.buffering = false;
+            // The position a pending seek is waiting for, or null when no seek is pending.
+            this.pendingSeekTime = null;
+            // The pending seek time the last loading state event carried, so a second seek that only moves the target
+            // while the bar is already buffering still publishes the new target.
+            this.announcedPendingSeekTime = null;
+            // The position the pending seek started from, so a backward seek is only cleared once the playhead crosses
+            // down into the target instead of by the pre-seek position the engine reports first.
+            this.pendingSeekFromTime = null;
+            // True while the engine reports that it is waiting for data on its own, which is independent of a seek and
+            // is therefore never cleared by a playhead report.
+            this.engineBuffering = false;
+            // The ratio, between 0 and 1, the pointer currently scrubs the progress bar to, or null when no scrub is
+            // in progress. While it is set the bar shows the scrub position instead of the reported playhead.
+            this.scrubRatio = null;
+            this.isScrubbing = false;
+            // The pointer Id captured by the progress bar or the volume control, or null, so the capture is always
+            // released with the Id it was taken with, whatever ends the drag.
+            this.scrubPointerId = null;
+            this.volumePointerId = null;
+            this.isAdjustingVolume = false;
+            // The bounds of a control, measured once when a drag starts, so a pointer move never has to read the layout
+            // again, which would force a reflow per event.
+            this.progressBounds = null;
+            this.volumeBounds = null;
+            // The latest ratio of a volume drag and whether a render of it is already scheduled, so a burst of pointer
+            // moves is coalesced into one volume change per frame.
+            this.pendingVolumeRatio = null;
+            this.isVolumeApplyScheduled = false;
+            // The last values written to the bar, so a render skips the DOM writes whose value did not move; the clock
+            // and the accessible value only change once per second, while reports arrive far more often.
+            this.renderedProgress = null;
+            // True once the user changes the volume or the mute state, so a stored state that arrives after the change
+            // is not applied over the user's choice.
+            this.hasUserChangedVolume = false;
+            this.hasUserChangedMute = false;
+            // True once the stored playback state has been read successfully, i.e. once the player knows the values the
+            // server holds. A write is refused until then, so a flush on unload can never overwrite the stored volume
+            // and mute state with the local defaults of a player that has not loaded them yet.
+            this.isStoredPlaybackStateLoaded = false;
+            this.persistenceTimer = null;
+            this.lastPersistedPlaybackState = null;
+            this.keyboardHandler = null;
+            this.unloadHandler = null;
             this.container = null;
             this.main = null;
             this.dom = {};
@@ -386,11 +507,17 @@
 
             this.collectDomReferences();
             this.bindPlaybackControls();
+            this.bindKeyboardShortcuts();
+            this.bindUnloadFlush();
             this.bindDescriptorDelegation();
             // The bar is hidden until the user starts playback, so a refresh never flashes an empty player.
             this.suppressInitialTransitions();
             this.applyHiddenState();
             this.releaseInitialHiddenState();
+            // The volume and mute controls are rendered from the state the player already holds, so the bar shows the
+            // default volume even before the stored state is read.
+            this.renderVolume();
+            this.renderTransportState();
 
             this.capabilitiesReady = this.detectCapabilitiesAsync();
             // The stored preferences are read in the background; a slow or failing request never blocks the bar.
@@ -412,7 +539,10 @@
             this.dom.progress = query('[data-audio-player-progress]');
             this.dom.progressPlayed = query('[data-audio-player-progress-played]');
             this.dom.progressDownloaded = query('[data-audio-player-progress-downloaded]');
+            this.dom.progressUndownloaded = query('[data-audio-player-progress-undownloaded]');
             this.dom.playPause = query('[data-audio-player-play-pause]');
+            this.dom.volume = query('[data-audio-player-volume]');
+            this.dom.mute = query('[data-audio-player-mute]');
             this.dom.queue = query('[data-audio-player-queue]');
             // The sub template sources are read once, with the bar elements, because the theme markup is part of the bar
             // the player was bound to, and the player is never recreated by a navigation.
@@ -423,15 +553,54 @@
         }
 
         /**
-         * Binds the transport controls the player owns. The full height and close affordances are bound
-         * by the global site script, which delegates them to this player, so that a single click never
-         * toggles them twice.
+         * Binds the transport controls the player owns: the play and pause toggle, the scrub of the progress bar and
+         * of the volume control, and the mute toggle. The full height and close affordances are bound by the global
+         * site script, which delegates them to this player, so that a single click never toggles them twice.
          */
         bindPlaybackControls() {
             if (this.dom.playPause)
                 this.addControlHandler(this.dom.playPause, 'click', () => this.toggleAsync());
-            if (this.dom.progress)
-                this.addControlHandler(this.dom.progress, 'click', (event) => this.handleProgressClick(event));
+            if (this.dom.progress) {
+                // The progress bar is scrubbed with pointer events rather than clicks, so that a drag moves the
+                // playhead continuously; the pointer is captured, so a drag that leaves the bar keeps scrubbing. A
+                // released pointer commits the seek, while a cancelled one discards the preview.
+                this.addControlHandler(this.dom.progress, 'pointerdown', (event) => this.handleProgressPointerDown(event));
+                this.addControlHandler(this.dom.progress, 'pointermove', (event) => this.handleProgressPointerMove(event));
+                this.addControlHandler(this.dom.progress, 'pointerup', () => this.handleProgressPointerUp());
+                this.addControlHandler(this.dom.progress, 'pointercancel', () => this.handleProgressPointerCancel());
+            }
+            if (this.dom.volume) {
+                // A released pointer commits the last queued volume, while a cancelled one drops it.
+                this.addControlHandler(this.dom.volume, 'pointerdown', (event) => this.handleVolumePointerDown(event));
+                this.addControlHandler(this.dom.volume, 'pointermove', (event) => this.handleVolumePointerMove(event));
+                this.addControlHandler(this.dom.volume, 'pointerup', () => this.handleVolumePointerUp());
+                this.addControlHandler(this.dom.volume, 'pointercancel', () => this.handleVolumePointerCancel());
+            }
+            if (this.dom.mute)
+                this.addControlHandler(this.dom.mute, 'click', () => this.toggleMuteAsync());
+        }
+
+        /**
+         * Binds the keyboard shortcuts of the transport, matching the reference web player: the left and right arrows
+         * seek backward and forward on the track, and the up and down arrows change the volume. The listener is on the
+         * document rather than on the bar, so a shortcut works without the bar being focused, and it is bound once
+         * because the player is created once and never torn down by a navigation.
+         */
+        bindKeyboardShortcuts() {
+            this.keyboardHandler = (event) => this.handleKeyboardShortcut(event);
+            document.addEventListener('keydown', this.keyboardHandler);
+        }
+
+        /**
+         * Binds the page unload flush, so a volume or mute change that is still inside its debounce window is written
+         * before the page goes away. The write is sent with <c>keepalive</c>, so the browser finishes it after the page
+         * is gone instead of cancelling it with the page's other requests.
+         */
+        bindUnloadFlush() {
+            this.unloadHandler = () => {
+                this.flushPlaybackStateAsync({ keepalive: true });
+            };
+            window.addEventListener('pagehide', this.unloadHandler);
         }
 
         /**
@@ -494,6 +663,10 @@
             this.duration = descriptor.durationInSeconds;
             this.currentTime = 0;
             this.downloadedFraction = 0;
+            this.scrubRatio = null;
+            this.endScrub();
+            this.endVolumeAdjust();
+            this.clearBuffering();
             // An album or artist descriptor carries no track id of its own, so the queue starts at its first item in that case.
             this.queue = descriptor.queue && descriptor.queue.length > 0 ? [...descriptor.queue] : [descriptor];
             this.currentIndex = Math.max(0, this.queue.findIndex(item => item.trackId === descriptor.trackId));
@@ -586,6 +759,10 @@
             // The playhead and the progress are reset while the descriptor is kept, so the bar can still show what was stopped.
             this.currentTime = 0;
             this.downloadedFraction = 0;
+            this.scrubRatio = null;
+            this.endScrub();
+            this.endVolumeAdjust();
+            this.clearBuffering();
             this.renderProgress();
             this.setState(LuminaAudioPlayer.PlayerState.IDLE);
             this.renderTransportState();
@@ -596,6 +773,10 @@
 
         /**
          * Moves the playhead to an absolute position.
+         *
+         * When the engine reports the ranges it already downloaded and the target position is not inside one of them,
+         * the seek needs the range of that position, so the bar shows a loading state until the engine reports the
+         * range arrived. The engine's seekAsync is what triggers that range fetch.
          * @param {number} seconds - The target position, in seconds.
          * @returns {Promise<void>} A promise that completes when the seek was requested.
          */
@@ -609,11 +790,22 @@
             const position = this.duration > 0
                 ? clamp(request, 0, this.duration)
                 : Math.max(0, Number.isFinite(request) ? request : 0);
+            // The position the seek starts from is captured before the playhead moves, so a backward seek can be told
+            // apart from the pre-seek position the engine reports first.
+            const fromPosition = this.currentTime;
             this.currentTime = position;
+            // A track that is not loaded yet, or an engine that does not report its downloaded ranges, has no range to
+            // wait for, so no loading state is shown; only a known-to-be-missing range produces one.
+            const knowsBufferedRanges = this.engine !== null && typeof this.engine.getBufferedTimeRanges === 'function';
+            if (knowsBufferedRanges && !this.isPositionBuffered(position))
+                this.setSeekPending(true, position, fromPosition);
+            else
+                this.clearSeekPending();
             if (this.engine) {
                 try {
                     await this.engine.seekAsync(position);
                 } catch (error) {
+                    this.clearSeekPending();
                     this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR);
                 }
             }
@@ -622,27 +814,81 @@
         }
 
         /**
-         * Sets the output volume. Mute is independent of the volume: a muted player remembers the volume.
+         * Seeks by a relative number of seconds, bounded by the duration of the current track.
+         * @param {number} deltaSeconds - The number of seconds to seek by, negative to seek backward.
+         */
+        seekBy(deltaSeconds) {
+            if (!this.descriptor || this.duration <= 0)
+                return;
+            this.seekAsync(this.currentTime + deltaSeconds);
+        }
+
+        /**
+         * Changes the volume by a relative amount, unmuting first when the volume changes out of a muted state.
+         * @param {number} delta - The amount to change the volume by, between -1 and 1.
+         * @returns {Promise<void>} A promise that completes when the volume was applied.
+         */
+        async changeVolumeByAsync(delta) {
+            const next = clamp(this.volume + delta, 0, 1);
+            // Changing the volume out of a muted state restores audible output, exactly like the reference web player;
+            // lowering the volume to zero still leaves the output audible at the new, lower volume.
+            if (this.muted && next > 0)
+                await this.setMutedAsync(false);
+            await this.setVolumeAsync(next);
+        }
+
+        /**
+         * Sets the output volume, as a user change, and writes it to the stored playback state of the user. Mute is
+         * independent of the volume: a muted player remembers the volume.
          * @param {number} volume - The output volume, between 0 and 1.
          * @returns {Promise<number>} The applied volume.
          */
         async setVolumeAsync(volume) {
-            const value = clamp(Number(volume), 0, 1);
-            this.volume = value;
-            await this.applyVolumeAsync();
-            this.events.emit(LuminaAudioPlayer.PlayerEvent.VOLUME_CHANGED, this.buildVolumePayload());
-            return this.volume;
+            this.hasUserChangedVolume = true;
+            return this.applyVolumeValueAsync(volume, true);
         }
 
         /**
-         * Sets the mute state.
+         * Sets the mute state, as a user change, and writes it to the stored playback state of the user.
          * @param {boolean} muted - True to mute the output, false to unmute it.
          * @returns {Promise<void>} A promise that completes when the mute was applied.
          */
         async setMutedAsync(muted) {
+            this.hasUserChangedMute = true;
+            return this.applyMuteValueAsync(muted, true);
+        }
+
+        /**
+         * Applies a volume value to the output. It is the shared body of the user-facing setter and the stored-state
+         * apply, so the stored state is applied without being marked as a user change or written back.
+         * @param {number} volume - The output volume, between 0 and 1.
+         * @param {boolean} shouldPersist - True to schedule a write of the new state.
+         * @returns {Promise<number>} The applied volume.
+         */
+        async applyVolumeValueAsync(volume, shouldPersist) {
+            const value = clamp(Number(volume), 0, 1);
+            this.volume = value;
+            await this.applyVolumeAsync();
+            this.events.emit(LuminaAudioPlayer.PlayerEvent.VOLUME_CHANGED, this.buildVolumePayload());
+            // The volume is written to the stored playback state of the user, so it survives a reload and never has to
+            // be a field of the user settings page.
+            if (shouldPersist)
+                this.schedulePlaybackStatePersist();
+            return this.volume;
+        }
+
+        /**
+         * Applies a mute state to the output. It is the shared body of the user-facing setter and the stored-state apply.
+         * @param {boolean} muted - True to mute the output, false to unmute it.
+         * @param {boolean} shouldPersist - True to schedule a write of the new state.
+         * @returns {Promise<void>} A promise that completes when the mute was applied.
+         */
+        async applyMuteValueAsync(muted, shouldPersist) {
             this.muted = muted === true;
             await this.applyVolumeAsync();
             this.events.emit(LuminaAudioPlayer.PlayerEvent.MUTE_CHANGED, this.buildVolumePayload());
+            if (shouldPersist)
+                this.schedulePlaybackStatePersist();
         }
 
         /**
@@ -690,6 +936,8 @@
             const wasHidden = this.container.classList.contains('not-shown');
             this.container.removeAttribute('hidden');
             this.container.classList.remove('not-shown');
+            // A shown bar is interactive again, so its controls return to the tab order and to assistive technology.
+            this.setBarInert(false);
             if (this.main)
                 this.main.classList.remove('audio-player-not-shown');
             if (wasHidden)
@@ -706,9 +954,25 @@
             if (this.container.classList.contains('not-shown'))
                 return;
             this.container.classList.add('not-shown');
+            // A collapsed bar is only hidden by height and overflow, so its focusable controls would otherwise stay in
+            // the tab order while invisible; inert removes the whole bar from the tab order and from assistive technology.
+            this.setBarInert(true);
             if (this.main)
                 this.main.classList.add('audio-player-not-shown');
             this.events.emit(LuminaAudioPlayer.PlayerEvent.VISIBILITY_CHANGED, { isVisible: false });
+        }
+
+        /**
+         * Sets whether the bar is inert, so that a collapsed bar keeps no focusable control in the tab order.
+         * @param {boolean} isInert - True to remove the bar and its controls from the tab order and from assistive technology.
+         */
+        setBarInert(isInert) {
+            if (!this.container)
+                return;
+            if (isInert)
+                this.container.setAttribute('inert', '');
+            else
+                this.container.removeAttribute('inert');
         }
 
         /**
@@ -784,6 +1048,37 @@
         }
 
         /**
+         * Checks whether the bar is showing a loading state, which is the case both while a seek waits for the range of
+         * its target position and while the engine reports that it is waiting for data on its own.
+         * @returns {boolean} True when the player is buffering.
+         */
+        isBuffering() {
+            return this.buffering;
+        }
+
+        /**
+         * Gets the time ranges the engine has already downloaded, in seconds. An engine that does not report them
+         * yields an empty list, and the player then never shows a loading state for a seek, because it cannot know
+         * whether the target is buffered.
+         * @returns {Array<{ start: number, end: number }>} The buffered time ranges, in ascending order.
+         */
+        getBufferedTimeRanges() {
+            if (!this.engine || typeof this.engine.getBufferedTimeRanges !== 'function')
+                return [];
+            try {
+                const ranges = this.engine.getBufferedTimeRanges();
+                // A copy is returned, never the live array of the engine, so a consumer that reads or writes the list
+                // cannot reach into the download state of the engine, exactly like the other getters copy.
+                return Array.isArray(ranges)
+                    ? ranges.map((range) => ({ start: range.start, end: range.end }))
+                    : [];
+            } catch (error) {
+                console.debug('Audio player: the buffered ranges of the engine could not be read.', error);
+                return [];
+            }
+        }
+
+        /**
          * Gets the stored playback preferences loaded for the user.
          * @returns {Object} The preferences.
          */
@@ -847,6 +1142,19 @@
                 document.removeEventListener('click', this.descriptorClickHandler);
                 this.descriptorClickHandler = null;
             }
+            if (this.keyboardHandler) {
+                document.removeEventListener('keydown', this.keyboardHandler);
+                this.keyboardHandler = null;
+            }
+            if (this.unloadHandler) {
+                window.removeEventListener('pagehide', this.unloadHandler);
+                this.unloadHandler = null;
+            }
+            // A change that is still inside its debounce window is flushed before the timer is dropped, so a teardown
+            // never loses the last volume or mute the user set. The flush clears the timer itself.
+            await this.flushPlaybackStateAsync();
+            this.endScrub();
+            this.endVolumeAdjust();
             for (const control of this.controlHandlers)
                 control.element.removeEventListener(control.event, control.handler);
             this.controlHandlers = [];
@@ -906,6 +1214,7 @@
          */
         fail(error, code = LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR) {
             const typed = this.raiseError(error, code);
+            this.clearBuffering();
             this.setState(LuminaAudioPlayer.PlayerState.ERROR);
             return typed;
         }
@@ -994,6 +1303,7 @@
                 reportTime: (currentTime, duration) => this.handleEngineTime(currentTime, duration),
                 reportDuration: (duration) => this.handleEngineDuration(duration),
                 reportProgress: (fraction) => this.handleEngineProgress(fraction),
+                reportBuffering: (isBuffering) => this.handleEngineBuffering(isBuffering),
                 reportEnded: () => this.handleEngineEnded(),
                 reportError: (error) => this.fail(error, LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR)
             };
@@ -1011,7 +1321,39 @@
             this.handleEngineDuration(duration);
             const position = Number(currentTime);
             this.currentTime = Number.isFinite(position) && position > 0 ? position : 0;
+            // The playhead crossing from where the seek started into the target means its range arrived, so the loading
+            // state of the seek is cleared. The crossing is directional: a forward seek clears once the playhead
+            // reaches the target, while a backward seek clears once it falls to the target, so the pre-seek position
+            // the engine reports first never clears the state. Engine-originated buffering is not playhead driven and
+            // is left untouched here.
+            if (this.pendingSeekTime !== null && this.hasReachedPendingSeek())
+                this.clearSeekPending();
             this.scheduleProgressRender();
+        }
+
+        /**
+         * Checks whether the playhead has crossed from where a pending seek started into its target.
+         * @returns {boolean} True when the playhead reached the target, within the settle tolerance.
+         */
+        hasReachedPendingSeek() {
+            const target = this.pendingSeekTime;
+            const from = this.pendingSeekFromTime;
+            // Without a start position there is no direction to check, so any report counts as having arrived.
+            if (from === null)
+                return true;
+            return target >= from
+                ? this.currentTime >= target - SEEK_SETTLE_TOLERANCE_SECONDS
+                : this.currentTime <= target + SEEK_SETTLE_TOLERANCE_SECONDS;
+        }
+
+        /**
+         * Handles a buffering report from the engine, so an engine that fetches a range on its own can show the same
+         * loading state the player shows for its own seeks. The state is kept on its own flag, so a playhead report
+         * never clears a buffering state the engine reported.
+         * @param {boolean} isBuffering - True when the engine is waiting for data, false when it has enough to play.
+         */
+        handleEngineBuffering(isBuffering) {
+            this.setEngineBuffering(isBuffering === true);
         }
 
         /**
@@ -1037,6 +1379,10 @@
         handleEngineProgress(fraction) {
             const value = clamp(Number(fraction), 0, 1);
             this.downloadedFraction = value;
+            // The range a pending seek waits for may have just arrived, so the seek is cleared as soon as the buffered
+            // ranges cover the target, whichever direction it was in. Engine-originated buffering is left untouched.
+            if (this.pendingSeekTime !== null && this.isPositionBuffered(this.pendingSeekTime))
+                this.clearSeekPending();
             this.scheduleProgressRender();
             this.events.emit(LuminaAudioPlayer.PlayerEvent.PROGRESS, { downloadedFraction: value });
         }
@@ -1113,10 +1459,25 @@
                 this.events.emit(LuminaAudioPlayer.PlayerEvent.PREFERENCES_CHANGED, Object.freeze({ ...this.preferences }));
             }
             if (playbackState) {
-                if (Number.isFinite(Number(playbackState.volume)))
-                    await this.setVolumeAsync(clamp(Number(playbackState.volume), 0, 1));
-                if (typeof playbackState.isMuted === 'boolean')
-                    await this.setMutedAsync(playbackState.isMuted);
+                // The state the server holds is recorded before it is applied, so a change the user makes while this
+                // request was in flight is still seen as a difference and written, instead of being recorded as already
+                // persisted and dropped. The stored state is applied through the internal appliers, which neither mark
+                // it as a user change nor write it back, and it is skipped for whichever control the user already
+                // changed, so the late answer never reverts the user's own choice.
+                this.lastPersistedPlaybackState = {
+                    volume: Number.isFinite(Number(playbackState.volume)) ? clamp(Number(playbackState.volume), 0, 1) : this.volume,
+                    isMuted: typeof playbackState.isMuted === 'boolean' ? playbackState.isMuted : this.muted
+                };
+                if (Number.isFinite(Number(playbackState.volume)) && !this.hasUserChangedVolume)
+                    await this.applyVolumeValueAsync(clamp(Number(playbackState.volume), 0, 1), false);
+                if (typeof playbackState.isMuted === 'boolean' && !this.hasUserChangedMute)
+                    await this.applyMuteValueAsync(playbackState.isMuted, false);
+                // The stored state is now known, so a write is allowed from this point on. A change the user made while
+                // this request was in flight was refused a write until now, so it is scheduled here to be written with
+                // the stored state of the control the user did not change.
+                this.isStoredPlaybackStateLoaded = true;
+                if (this.hasUserChangedVolume || this.hasUserChangedMute)
+                    this.schedulePlaybackStatePersist();
             }
         }
 
@@ -1152,7 +1513,7 @@
                 });
                 if (response.redirected) {
                     // The session expired and the server answered with the login page; follow it, and report the redirect, not a failure.
-                    window.location.href = response.url;
+                    navigateToRedirect(response.url);
                     return REDIRECTED;
                 }
                 if (!response.ok)
@@ -1166,10 +1527,59 @@
         }
 
         /**
+         * Writes a JSON payload to a web endpoint, with the anti-forgery token the page rendered, without surfacing a
+         * notification on failure, because the request is a background one that must never disturb the page.
+         * @param {string} url - The endpoint URL. Nothing is requested when it is empty.
+         * @param {Object} data - The payload to send as the JSON body.
+         * @param {Object} [options] - The request options.
+         * @param {boolean} [options.keepalive=false] - True to let the browser finish the request after the page is gone, used by the unload flush.
+         * @returns {Promise<*|null|undefined|Object>} The unwrapped data, null when the endpoint answered without data, undefined when the request failed, or the REDIRECTED marker when the session expired and the page is navigating away.
+         */
+        async postJsonAsync(url, data, options = {}) {
+            if (!url)
+                return null;
+            try {
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                };
+                // The state endpoint validates an anti-forgery token, which the global scripts partial renders into the
+                // page, so the header is set whenever the token is present.
+                const token = document.querySelector('input[name="__RequestVerificationToken"]');
+                if (token && token.value)
+                    headers['RequestVerificationToken'] = token.value;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(data ?? {}),
+                    // A keepalive request is not cancelled when the page unloads, so the last volume or mute set before
+                    // leaving the page is not lost to the navigation.
+                    keepalive: options.keepalive === true
+                });
+                if (response.redirected) {
+                    // The session expired and the server answered with the login page; follow it, and report the redirect, not a failure.
+                    navigateToRedirect(response.url);
+                    return REDIRECTED;
+                }
+                if (!response.ok)
+                    return undefined;
+                const payload = await response.json();
+                return payload && payload.success === true ? payload.data : null;
+            } catch (error) {
+                console.error('Audio player: a playback state request failed.', error);
+                return undefined;
+            }
+        }
+
+        /**
          * Applies the effective volume to the engine.
          * @returns {Promise<void>} A promise that completes when the engine received the volume.
          */
         async applyVolumeAsync() {
+            // The volume control is rendered before the engine check, so the bar reflects the volume even before the first
+            // track creates an engine.
+            this.renderVolume();
             // Before the first play there is no engine to receive the volume, so it is remembered and applied when the engine is
             // created, which keeps a volume set before playback from being lost.
             if (!this.engine)
@@ -1200,19 +1610,452 @@
         }
 
         /**
-         * Handles a click on the progress bar as a seek to the clicked ratio.
-         * @param {MouseEvent} event - The click event on the progress bar.
+         * Handles a pointer press on the progress bar: it captures the pointer so a drag that leaves the bar keeps
+         * scrubbing, and moves the preview to the pressed ratio.
+         * @param {PointerEvent} event - The pointer event on the progress bar.
          */
-        handleProgressClick(event) {
-            // Without a track, without a known duration, without the bar, or with a zero width bar there is no position to
-            // map the click to, and dividing by the width would produce a NaN seek, so the click is ignored instead.
+        handleProgressPointerDown(event) {
+            // Scrubbing only makes sense with a track and a known duration, because the ratio is mapped through the
+            // duration; without the bar there is nothing to scrub either. A secondary mouse button is ignored.
             if (!this.descriptor || this.duration <= 0 || !this.dom.progress)
                 return;
-            const bounds = this.dom.progress.getBoundingClientRect();
-            if (bounds.width <= 0)
+            if (event.button !== undefined && event.button !== 0)
                 return;
-            const ratio = clamp((event.clientX - bounds.left) / bounds.width, 0, 1);
-            this.seekAsync(ratio * this.duration);
+            event.preventDefault();
+            // The pointer press is prevented so it never starts a text selection, which suppresses the default focus on
+            // a press, so the element is focused explicitly; a focusable slider is then reachable and operable by
+            // keyboard, and the shortcut handler routes to it.
+            if (typeof this.dom.progress.focus === 'function')
+                this.dom.progress.focus({ preventScroll: true });
+            // The bounds are measured once, at the start of the drag, so a pointer move never reads the layout again.
+            this.progressBounds = this.dom.progress.getBoundingClientRect();
+            this.isScrubbing = true;
+            this.scrubPointerId = event.pointerId;
+            this.dom.progress.classList.add('is-scrubbing');
+            try {
+                this.dom.progress.setPointerCapture(event.pointerId);
+            } catch (error) {
+                console.debug('Audio player: the progress bar could not capture the pointer.', error);
+            }
+            this.updateScrubFromPointer(event);
+        }
+
+        /**
+         * Handles a pointer move while scrubbing the progress bar, updating the preview position.
+         * @param {PointerEvent} event - The pointer event on the progress bar.
+         */
+        handleProgressPointerMove(event) {
+            if (!this.isScrubbing)
+                return;
+            event.preventDefault();
+            this.updateScrubFromPointer(event);
+        }
+
+        /**
+         * Handles the release of the pointer that scrubbed the progress bar: the seek is committed once, at the
+         * scrubbed position, so that dragging across the bar never issues one range fetch per pixel.
+         */
+        handleProgressPointerUp() {
+            if (!this.isScrubbing)
+                return;
+            const ratio = this.scrubRatio;
+            this.scrubRatio = null;
+            this.endScrub();
+            // A scrub that never moved still commits the pressed ratio, so a plain click keeps seeking where it clicked.
+            if (ratio !== null)
+                this.seekAsync(ratio * this.duration);
+            else
+                this.scheduleProgressRender();
+        }
+
+        /**
+         * Handles the cancellation of the pointer that scrubbed the progress bar, which happens when the browser takes
+         * the gesture over. The scrub is abandoned without seeking, and the bar returns to the reported playhead.
+         */
+        handleProgressPointerCancel() {
+            if (!this.isScrubbing)
+                return;
+            this.scrubRatio = null;
+            this.endScrub();
+            this.scheduleProgressRender();
+        }
+
+        /**
+         * Ends a scrub of the progress bar, whatever ends it: the pointer being released, or the track stopping or
+         * another one starting while the drag is still in progress. It clears the scrubbing state, drops the dragging
+         * cursor and releases a captured pointer, so a stopped player is never left with a control that still reacts
+         * to pointer moves. It is idempotent, so calling it when no scrub is in progress is harmless.
+         */
+        endScrub() {
+            const element = this.dom.progress;
+            if (element) {
+                element.classList.remove('is-scrubbing');
+                if (this.scrubPointerId !== null) {
+                    try {
+                        element.releasePointerCapture(this.scrubPointerId);
+                    } catch (error) {
+                        console.debug('Audio player: the progress bar could not release the pointer.', error);
+                    }
+                }
+            }
+            this.scrubPointerId = null;
+            this.progressBounds = null;
+            this.isScrubbing = false;
+        }
+
+        /**
+         * Updates the preview position of a scrub from the horizontal position of the pointer.
+         * @param {PointerEvent} event - The pointer event on the progress bar.
+         */
+        updateScrubFromPointer(event) {
+            const ratio = this.computeRatioFromPointer(event, this.dom.progress, this.progressBounds);
+            if (ratio === null)
+                return;
+            this.scrubRatio = ratio;
+            this.scheduleProgressRender();
+        }
+
+        /**
+         * Handles a pointer press on the volume control: it captures the pointer and starts adjusting the volume.
+         * @param {PointerEvent} event - The pointer event on the volume control.
+         */
+        handleVolumePointerDown(event) {
+            if (!this.dom.volume)
+                return;
+            if (event.button !== undefined && event.button !== 0)
+                return;
+            event.preventDefault();
+            // The pointer press is prevented so it never starts a text selection, which suppresses the default focus on
+            // a press, so the element is focused explicitly; a focusable slider is then reachable and operable by
+            // keyboard, and the shortcut handler routes to it.
+            if (typeof this.dom.volume.focus === 'function')
+                this.dom.volume.focus({ preventScroll: true });
+            // The bounds are measured once, at the start of the drag, so a pointer move never reads the layout again.
+            this.volumeBounds = this.dom.volume.getBoundingClientRect();
+            this.isAdjustingVolume = true;
+            this.volumePointerId = event.pointerId;
+            this.dom.volume.classList.add('is-scrubbing');
+            try {
+                this.dom.volume.setPointerCapture(event.pointerId);
+            } catch (error) {
+                console.debug('Audio player: the volume control could not capture the pointer.', error);
+            }
+            this.updateVolumeFromPointer(event);
+        }
+
+        /**
+         * Handles a pointer move while adjusting the volume, queuing the volume of the pointer position.
+         * @param {PointerEvent} event - The pointer event on the volume control.
+         */
+        handleVolumePointerMove(event) {
+            if (!this.isAdjustingVolume)
+                return;
+            event.preventDefault();
+            this.updateVolumeFromPointer(event);
+        }
+
+        /**
+         * Handles the release of the pointer that adjusted the volume. The last queued volume is applied, because the
+         * frame it was queued for may not have run yet, so a fast click or the final delta of a drag is never lost.
+         */
+        handleVolumePointerUp() {
+            if (!this.isAdjustingVolume)
+                return;
+            this.endVolumeAdjust(false);
+        }
+
+        /**
+         * Handles the cancellation of the pointer that adjusted the volume, which happens when the browser takes the
+         * gesture over. The queued volume is dropped, so a cancelled gesture never changes the volume.
+         */
+        handleVolumePointerCancel() {
+            if (!this.isAdjustingVolume)
+                return;
+            this.endVolumeAdjust();
+        }
+
+        /**
+         * Ends a volume adjustment, whatever ends it: the pointer being released, or the track stopping or another one
+         * starting while the drag is still in progress. It clears the adjusting state, drops the dragging cursor and
+         * releases a captured pointer, so a stopped player is never left with a volume control that still reacts to
+         * pointer moves. It is idempotent, so calling it when no adjustment is in progress is harmless.
+         * @param {boolean} [discardPending=true] - True to drop a volume change that is still queued for the next frame, which is what a stop or a track change wants; false to apply it, which is what a pointer release wants.
+         */
+        endVolumeAdjust(discardPending = true) {
+            const element = this.dom.volume;
+            if (element) {
+                element.classList.remove('is-scrubbing');
+                if (this.volumePointerId !== null) {
+                    try {
+                        element.releasePointerCapture(this.volumePointerId);
+                    } catch (error) {
+                        console.debug('Audio player: the volume control could not release the pointer.', error);
+                    }
+                }
+            }
+            this.volumePointerId = null;
+            this.volumeBounds = null;
+            const pendingRatio = this.pendingVolumeRatio;
+            // The queued change is cleared either way, so the frame that was scheduled for it finds nothing to do; a
+            // release applies it here instead, while a stop or a track change drops it, so the control never applies one
+            // more volume after it was released.
+            this.pendingVolumeRatio = null;
+            this.isAdjustingVolume = false;
+            if (!discardPending && pendingRatio !== null)
+                this.applyVolumeRatioAsync(pendingRatio);
+        }
+
+        /**
+         * Queues the volume of the horizontal position of the pointer, coalescing a burst of pointer moves into a
+         * single volume change per frame.
+         * @param {PointerEvent} event - The pointer event on the volume control.
+         */
+        updateVolumeFromPointer(event) {
+            const ratio = this.computeRatioFromPointer(event, this.dom.volume, this.volumeBounds);
+            if (ratio === null)
+                return;
+            this.pendingVolumeRatio = ratio;
+            this.scheduleVolumeApply();
+        }
+
+        /**
+         * Schedules the queued volume change on the next frame, so a burst of pointer moves does not turn into a burst
+         * of volume changes and bar renders.
+         */
+        scheduleVolumeApply() {
+            if (this.isVolumeApplyScheduled)
+                return;
+            this.isVolumeApplyScheduled = true;
+            const apply = () => {
+                this.isVolumeApplyScheduled = false;
+                const ratio = this.pendingVolumeRatio;
+                this.pendingVolumeRatio = null;
+                if (ratio !== null)
+                    this.applyVolumeRatioAsync(ratio);
+            };
+            if (typeof requestAnimationFrame === 'function')
+                requestAnimationFrame(apply);
+            else
+                apply();
+        }
+
+        /**
+         * Applies a volume ratio, unmuting a muted player first, exactly like the keyboard shortcut does.
+         * @param {number} ratio - The volume ratio to apply, between 0 and 1.
+         * @returns {Promise<void>} A promise that completes when the volume was applied.
+         */
+        async applyVolumeRatioAsync(ratio) {
+            if (this.muted && ratio > 0)
+                await this.setMutedAsync(false);
+            await this.setVolumeAsync(ratio);
+        }
+
+        /**
+         * Computes the ratio, between 0 and 1, of the horizontal position of the pointer within an element.
+         * @param {PointerEvent} event - The pointer event whose position is measured.
+         * @param {HTMLElement} element - The element the ratio is measured on.
+         * @param {Object} [bounds] - The bounds of the element, measured when a drag started, so a move never reads the layout. They are measured here when omitted.
+         * @returns {number|null} The ratio, or null when the element has no measurable width.
+         */
+        computeRatioFromPointer(event, element, bounds) {
+            if (!element)
+                return null;
+            const measured = bounds || element.getBoundingClientRect();
+            if (measured.width <= 0)
+                return null;
+            return clamp((event.clientX - measured.left) / measured.width, 0, 1);
+        }
+
+        /**
+         * Handles a keyboard shortcut of the transport. The listener is on the document, so the shortcuts work without
+         * the bar being focused, but they never run while a form control or an editable element has focus, and never
+         * while the bar is hidden, so they never steal a keystroke from the page.
+         * @param {KeyboardEvent} event - The keydown event.
+         */
+        handleKeyboardShortcut(event) {
+            if (event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey)
+                return;
+            if (!this.isAvailable || !this.container || this.container.classList.contains('not-shown'))
+                return;
+            if (this.isTextEntryTarget(event.target))
+                return;
+            switch (event.key) {
+                case 'ArrowRight':
+                    this.seekBy(SEEK_STEP_SECONDS);
+                    event.preventDefault();
+                    break;
+                case 'ArrowLeft':
+                    this.seekBy(-SEEK_STEP_SECONDS);
+                    event.preventDefault();
+                    break;
+                case 'ArrowUp':
+                    this.changeVolumeByAsync(VOLUME_STEP);
+                    event.preventDefault();
+                    break;
+                case 'ArrowDown':
+                    this.changeVolumeByAsync(-VOLUME_STEP);
+                    event.preventDefault();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        /**
+         * Checks whether a key event targets a control that consumes the keystroke itself, such as a text field.
+         * @param {EventTarget|null} target - The target of the key event.
+         * @returns {boolean} True when the target is a form control or an editable element.
+         */
+        isTextEntryTarget(target) {
+            if (!(target instanceof Element))
+                return false;
+            const tagName = target.tagName;
+            if (tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'SELECT')
+                return true;
+            return target.isContentEditable === true;
+        }
+
+        /**
+         * Marks whether a seek is waiting for the range of its target, and publishes the combined loading state.
+         * @param {boolean} isPending - True to mark a seek as pending.
+         * @param {number|null} targetTime - The position the pending seek waits for.
+         * @param {number|null} fromTime - The position the pending seek started from, or null.
+         */
+        setSeekPending(isPending, targetTime, fromTime) {
+            const nextTarget = isPending ? targetTime : null;
+            const nextFrom = isPending ? fromTime : null;
+            if (this.pendingSeekTime === nextTarget && this.pendingSeekFromTime === nextFrom)
+                return;
+            this.pendingSeekTime = nextTarget;
+            this.pendingSeekFromTime = nextFrom;
+            this.updateBufferingState();
+        }
+
+        /**
+         * Clears a pending seek, when there is one, leaving an engine-originated buffering state in place.
+         */
+        clearSeekPending() {
+            if (this.pendingSeekTime === null && this.pendingSeekFromTime === null)
+                return;
+            this.pendingSeekTime = null;
+            this.pendingSeekFromTime = null;
+            this.updateBufferingState();
+        }
+
+        /**
+         * Marks whether the engine reports that it is waiting for data on its own, and publishes the combined state.
+         * @param {boolean} isBuffering - True when the engine is waiting for data.
+         */
+        setEngineBuffering(isBuffering) {
+            if (this.engineBuffering === isBuffering)
+                return;
+            this.engineBuffering = isBuffering;
+            this.updateBufferingState();
+        }
+
+        /**
+         * Recomputes the loading state from the pending seek and the engine buffering report, renders the bar, and
+         * publishes the change when it moved. The state is shown while either input is active, so a buffering engine
+         * stays visible even when no seek is pending, and a seek stays visible even when the engine reports no
+         * buffering.
+         */
+        updateBufferingState() {
+            const isBuffering = this.pendingSeekTime !== null || this.engineBuffering;
+            // The event is published when either input changed, so a second seek that only moves the pending target
+            // while the bar is already buffering still carries the new target, exactly as the event documents.
+            const hasChanged = this.buffering !== isBuffering || this.announcedPendingSeekTime !== this.pendingSeekTime;
+            this.buffering = isBuffering;
+            this.scheduleProgressRender();
+            if (!hasChanged)
+                return;
+            this.announcedPendingSeekTime = this.pendingSeekTime;
+            this.events.emit(LuminaAudioPlayer.PlayerEvent.BUFFERING_CHANGED, {
+                isBuffering: this.buffering,
+                pendingSeekTime: this.pendingSeekTime
+            });
+        }
+
+        /**
+         * Clears the whole loading state: a pending seek and an engine-originated buffering report.
+         */
+        clearBuffering() {
+            const hadSeek = this.pendingSeekTime !== null || this.pendingSeekFromTime !== null;
+            const hadEngineBuffering = this.engineBuffering;
+            if (!hadSeek && !hadEngineBuffering)
+                return;
+            this.pendingSeekTime = null;
+            this.pendingSeekFromTime = null;
+            this.engineBuffering = false;
+            this.updateBufferingState();
+        }
+
+        /**
+         * Checks whether a position, in seconds, falls inside one of the ranges the engine downloaded.
+         * @param {number} seconds - The position to check.
+         * @returns {boolean} True when the position is covered by a buffered range.
+         */
+        isPositionBuffered(seconds) {
+            const ranges = this.getBufferedTimeRanges();
+            if (ranges.length === 0)
+                return false;
+            return ranges.some((range) => Number.isFinite(range.start) && Number.isFinite(range.end) && seconds >= range.start && seconds <= range.end);
+        }
+
+        /**
+         * Schedules a write of the volume and mute state to the stored playback state of the user.
+         *
+         * A drag of the volume control changes the volume on every pointer move, so the writes are coalesced into one
+         * request. Only a user change schedules a write: the stored state is applied through the internal appliers,
+         * which never call this.
+         */
+        schedulePlaybackStatePersist() {
+            if (this.persistenceTimer !== null)
+                clearTimeout(this.persistenceTimer);
+            this.persistenceTimer = setTimeout(() => {
+                this.persistenceTimer = null;
+                this.persistPlaybackStateAsync();
+            }, PLAYBACK_STATE_PERSIST_DELAY_MS);
+        }
+
+        /**
+         * Writes the volume and mute state right away, cancelling a scheduled debounce, so a change that is still
+         * waiting is not lost when the page goes away or the player is torn down.
+         * @param {Object} [options] - The request options, forwarded to the write.
+         * @returns {Promise<void>} A promise that completes when the write was attempted.
+         */
+        flushPlaybackStateAsync(options = {}) {
+            if (this.persistenceTimer !== null) {
+                clearTimeout(this.persistenceTimer);
+                this.persistenceTimer = null;
+            }
+            return this.persistPlaybackStateAsync(options);
+        }
+
+        /**
+         * Writes the volume and mute state to the stored playback state of the user, unless it is already the stored
+         * state. The request is best effort: a failure is logged, and the player keeps working with the local values.
+         *
+         * The write is refused until the stored state has been read once. The endpoint takes the whole state, both the
+         * volume and the mute flag, and rejects a missing one, so writing the local defaults of a player that has not
+         * loaded the stored state yet, for example from the unload flush, would overwrite what the user had stored.
+         * @param {Object} [options] - The request options, forwarded to the write.
+         * @returns {Promise<void>} A promise that completes when the write was attempted.
+         */
+        async persistPlaybackStateAsync(options = {}) {
+            if (!this.isStoredPlaybackStateLoaded)
+                return;
+            const configuration = this.getConfiguration();
+            const url = configuration.updatePlaybackStateUrl;
+            if (!url)
+                return;
+            const state = { volume: this.volume, isMuted: this.muted };
+            const last = this.lastPersistedPlaybackState;
+            if (last && last.volume === state.volume && last.isMuted === state.isMuted)
+                return;
+            // The state is remembered as persisted before the request settles, so a failed background write is not
+            // retried on every later change of an unrelated value.
+            this.lastPersistedPlaybackState = state;
+            await this.postJsonAsync(url, state, options);
         }
 
         /**
@@ -1220,6 +2063,7 @@
          */
         applyHiddenState() {
             this.container.classList.add('not-shown');
+            this.setBarInert(true);
             if (this.main)
                 this.main.classList.add('audio-player-not-shown');
         }
@@ -1279,30 +2123,141 @@
         }
 
         /**
-         * Renders the three state progress bar: the played part, the downloaded part, and the remainder.
+         * Renders the three state progress bar: the played part, the downloaded but not played part, and the not yet
+         * downloaded part.
+         *
+         * The player publishes the geometry of each state, as a start and a width, through the CSS custom properties
+         * '--audio-player-progress-<state>-start' and '--audio-player-progress-<state>-width' on the bar, where the
+         * state is 'played', 'downloaded' or 'undownloaded'. It writes no inline geometry, so a theme consumes those
+         * properties to style each state, and to give the bar any shape or orientation; the fallback stylesheet
+         * consumes them too. The player never hardcodes a color or a shape here. While the bar is scrubbed the position
+         * shown is the scrub position, and while a seek waits for its range the bar is marked with the 'is-buffering'
+         * class and the 'buffering' state.
          */
         renderProgress() {
-            // Only widths are written here, as percentages; the colors, shape and layering of the three states belong to the
-            // theme's CSS, which selects them through the classes on the bar elements, so the player never hardcodes a look.
-            if (this.dom.currentTime)
-                this.dom.currentTime.textContent = formatTime(this.currentTime);
-            if (this.dom.totalTime)
-                this.dom.totalTime.textContent = formatDuration(this.duration);
-            const playedRatio = this.duration > 0 ? clamp(this.currentTime / this.duration, 0, 1) : 0;
+            const isScrubbing = this.scrubRatio !== null;
+            const position = isScrubbing ? this.scrubRatio * this.duration : this.currentTime;
+            const playedRatio = this.duration > 0 ? clamp(position / this.duration, 0, 1) : 0;
             const downloadedRatio = clamp(this.downloadedFraction, 0, 1);
-            if (this.dom.progressPlayed)
-                this.dom.progressPlayed.style.width = `${playedRatio * 100}%`;
-            if (this.dom.progressDownloaded)
-                this.dom.progressDownloaded.style.width = `${downloadedRatio * 100}%`;
+            // The downloaded but not played state runs from the playhead to the downloaded frontier, and the not yet
+            // downloaded state runs from that frontier to the end. Scrubbing past the frontier keeps the three states
+            // contiguous by moving the frontier with the scrub position.
+            const frontier = Math.max(playedRatio, downloadedRatio);
+            const downloadedOnlyRatio = Math.max(downloadedRatio - playedRatio, 0);
+            const undownloadedRatio = clamp(1 - frontier, 0, 1);
+            const currentTimeText = formatTime(position);
+            const totalTimeText = formatDuration(this.duration);
+            // The bar is a slider: its value is the playhead in seconds, its maximum is the duration once it is known,
+            // and its readable value is the position within the track, replaced by the loading label while it buffers.
+            const maximum = this.duration > 0 ? Math.max(1, Math.round(this.duration)) : 1;
+            const value = Math.round(clamp(playedRatio, 0, 1) * maximum);
+            const strings = this.getStrings();
+            const bufferingLabel = this.buffering ? (strings.buffering || '') : '';
+            const valueText = bufferingLabel !== '' ? bufferingLabel : `${currentTimeText} / ${totalTimeText}`;
+            const state = this.descriptor ? (this.buffering ? 'buffering' : 'ready') : 'idle';
+            // The values are compared to the previous render, so a report that arrives between two seconds skips the
+            // clock and the accessible value instead of rewriting them unchanged, while the geometry, which moves every
+            // frame during playback, is still written.
+            const next = {
+                currentTimeText,
+                totalTimeText,
+                playedStart: '0%',
+                playedWidth: `${playedRatio * 100}%`,
+                downloadedStart: `${playedRatio * 100}%`,
+                downloadedWidth: `${downloadedOnlyRatio * 100}%`,
+                undownloadedStart: `${frontier * 100}%`,
+                undownloadedWidth: `${undownloadedRatio * 100}%`,
+                buffering: this.buffering,
+                state,
+                seekLabel: strings.seek || null,
+                maximum: String(maximum),
+                value: String(value),
+                valueText,
+                ariaBusy: this.buffering ? 'true' : 'false'
+            };
+            const previous = this.renderedProgress;
+            this.renderedProgress = next;
+            const changed = (key) => !previous || previous[key] !== next[key];
+            if (this.dom.currentTime && changed('currentTimeText'))
+                this.dom.currentTime.textContent = currentTimeText;
+            if (this.dom.totalTime && changed('totalTimeText'))
+                this.dom.totalTime.textContent = totalTimeText;
+            if (this.dom.progress) {
+                // Each state gets the start and the width it occupies, so the name of a property and the value it
+                // carries always agree, and no theme has to subtract one state from another.
+                const style = this.dom.progress.style;
+                if (changed('playedStart')) style.setProperty('--audio-player-progress-played-start', next.playedStart);
+                if (changed('playedWidth')) style.setProperty('--audio-player-progress-played-width', next.playedWidth);
+                if (changed('downloadedStart')) style.setProperty('--audio-player-progress-downloaded-start', next.downloadedStart);
+                if (changed('downloadedWidth')) style.setProperty('--audio-player-progress-downloaded-width', next.downloadedWidth);
+                if (changed('undownloadedStart')) style.setProperty('--audio-player-progress-undownloaded-start', next.undownloadedStart);
+                if (changed('undownloadedWidth')) style.setProperty('--audio-player-progress-undownloaded-width', next.undownloadedWidth);
+                if (changed('buffering')) this.dom.progress.classList.toggle('is-buffering', next.buffering);
+                if (changed('state')) this.dom.progress.dataset.audioPlayerProgressState = next.state;
+                if (!previous) this.dom.progress.setAttribute('aria-valuemin', '0');
+                if (changed('maximum')) this.dom.progress.setAttribute('aria-valuemax', next.maximum);
+                if (changed('value')) this.dom.progress.setAttribute('aria-valuenow', next.value);
+                if (changed('valueText')) this.dom.progress.setAttribute('aria-valuetext', next.valueText);
+                if (changed('ariaBusy')) this.dom.progress.setAttribute('aria-busy', next.ariaBusy);
+                // The seek label comes from the configuration, so a themed bar that renders no label of its own still
+                // gets one; the fallback markup already carries it, and setting an identical value is skipped.
+                if (next.seekLabel && changed('seekLabel'))
+                    this.dom.progress.setAttribute('aria-label', next.seekLabel);
+            }
         }
 
         /**
-         * Renders the play or pause affordance of the transport control.
+         * Renders the play or pause affordance of the transport control, and its accessible label.
          */
         renderTransportState() {
             const isPlaying = this.state === LuminaAudioPlayer.PlayerState.PLAYING;
-            if (this.dom.playPause)
-                this.dom.playPause.classList.toggle('is-playing', isPlaying);
+            if (!this.dom.playPause)
+                return;
+            this.dom.playPause.classList.toggle('is-playing', isPlaying);
+            const strings = this.getStrings();
+            const label = isPlaying ? strings.pause : strings.play;
+            if (label)
+                this.dom.playPause.setAttribute('aria-label', label);
+        }
+
+        /**
+         * Renders the volume control and the mute toggle: the fill of the volume bar, and the accessible value and
+         * label of both controls. The volume shown is the volume the user set, even while the output is muted, and the
+         * muted state is exposed both as the 'aria-pressed' state of the toggle and as the 'is-muted' class.
+         *
+         * The fill is published as the '--audio-player-volume-start' and '--audio-player-volume-width' custom properties
+         * on the control, which the stylesheet consumes, so a theme restyles or reorients the bar the same way it does
+         * the progress bar; no inline geometry is written.
+         */
+        renderVolume() {
+            const strings = this.getStrings();
+            const levelRatio = clamp(this.volume, 0, 1);
+            if (this.dom.volume) {
+                this.dom.volume.style.setProperty('--audio-player-volume-start', '0%');
+                this.dom.volume.style.setProperty('--audio-player-volume-width', `${levelRatio * 100}%`);
+                this.dom.volume.setAttribute('aria-valuemin', '0');
+                this.dom.volume.setAttribute('aria-valuemax', '100');
+                this.dom.volume.setAttribute('aria-valuenow', String(Math.round(levelRatio * 100)));
+                if (strings.volume)
+                    this.dom.volume.setAttribute('aria-label', strings.volume);
+                this.dom.volume.classList.toggle('is-muted', this.muted);
+            }
+            if (this.dom.mute) {
+                this.dom.mute.setAttribute('aria-pressed', this.muted ? 'true' : 'false');
+                this.dom.mute.classList.toggle('is-muted', this.muted);
+                const label = this.muted ? strings.unmute : strings.mute;
+                if (label)
+                    this.dom.mute.setAttribute('aria-label', label);
+            }
+        }
+
+        /**
+         * Gets the localized strings of the bar, emitted with the global scripts configuration.
+         * @returns {Object} The strings, keyed by name, or an empty object.
+         */
+        getStrings() {
+            const configuration = this.getConfiguration();
+            return configuration && configuration.strings ? configuration.strings : {};
         }
 
         /**

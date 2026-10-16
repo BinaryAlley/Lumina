@@ -20,13 +20,29 @@
 
     The DOM contract a theme must preserve is:
       - The container element with the 'audio-player-container' class, carrying 'not-shown' while the bar is hidden,
-        and 'full-height' while it is expanded. The audio player toggles both classes.
+        and 'full-height' while it is expanded. The audio player toggles both classes. While the bar is hidden the
+        player also sets the 'inert' attribute on it, and removes it when the bar is shown, so a collapsed bar keeps
+        none of its focusable controls in the tab order.
       - The main content element, carrying 'audio-player-not-shown' while the bar is hidden, and 'audio-player-full-height'
         while it is expanded. The audio player toggles both classes on it as well.
       - The elements with the ids 'audio-player-full-height-toggle' and 'audio-player-close', which the global site script
         binds and routes to the audio player.
       - The hook attributes the audio player binds: 'data-audio-player-play-pause', '-progress', '-progress-played',
-        '-progress-downloaded', '-current-time', '-total-time', '-track-name', '-cover-thumbnail', '-cover-image' and '-queue'.
+        '-progress-downloaded', '-progress-undownloaded', '-current-time', '-total-time', '-track-name',
+        '-cover-thumbnail', '-cover-image', '-volume', '-volume-level', '-mute' and '-queue'. The volume fill element
+        ('-volume-level') is a styling hook the stylesheet drives from the custom properties below, not one the script
+        writes to.
+      - The three state progress bar: the played part carries 'audio-player-progress-played', the downloaded but not
+        played part carries 'audio-player-progress-downloaded', and the not yet downloaded part carries
+        'audio-player-progress-undownloaded'. Each layer also carries 'data-audio-player-progress-layer' ('played',
+        'downloaded' or 'undownloaded') in the markup, so a theme can select a layer by state as well as by class. The
+        player publishes the start and the width of each state as the CSS custom properties
+        '--audio-player-progress-played-start', '-played-width', '-downloaded-start', '-downloaded-width',
+        '-undownloaded-start' and '-undownloaded-width' on the bar, and the volume fill as
+        '--audio-player-volume-start' and '--audio-player-volume-width' on the volume control, and writes no inline
+        geometry, so a theme consumes the properties to style each state and to give either bar its own shape and
+        orientation. The player marks the bar with 'is-buffering' while it is loading, and carries the state in
+        'data-audio-player-progress-state' ('idle', 'ready' or 'buffering') together with the slider ARIA attributes.
       - The plain text script elements that carry the raw source of the 'shared/audio-player/queue-item' and
         'shared/audio-player/playlist-item' sub templates, with the ids 'audio-player-template-queue-item' and
         'audio-player-template-playlist-item'.
@@ -41,20 +57,31 @@
         <img class="audio-player-cover-image" data-audio-player-cover-image alt="" />
         <ul class="audio-player-queue" data-audio-player-queue></ul>
     </div>
-    <!-- Condensed bar: transport control, progress bar and track name. -->
+    <!-- Condensed bar: transport controls, three state progress bar, volume, and track name. -->
     <div class="audio-player-bar">
         <img class="audio-player-cover-thumbnail" data-audio-player-cover-thumbnail alt="" />
         <span class="audio-player-track-name" data-audio-player-track-name></span>
         <span class="audio-player-time audio-player-current-time" data-audio-player-current-time>0:00</span>
-        <div class="audio-player-progress" data-audio-player-progress>
-            <div class="audio-player-progress-downloaded" data-audio-player-progress-downloaded></div>
-            <div class="audio-player-progress-played" data-audio-player-progress-played></div>
+        <div class="audio-player-progress" data-audio-player-progress data-audio-player-progress-state="idle" role="slider" tabindex="0"
+             aria-label="@localizer["AudioPlayerSeek"]" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0" aria-busy="false">
+            <div class="audio-player-progress-undownloaded" data-audio-player-progress-undownloaded data-audio-player-progress-layer="undownloaded"></div>
+            <div class="audio-player-progress-downloaded" data-audio-player-progress-downloaded data-audio-player-progress-layer="downloaded"></div>
+            <div class="audio-player-progress-played" data-audio-player-progress-played data-audio-player-progress-layer="played"></div>
         </div>
         <span class="audio-player-time audio-player-total-time" data-audio-player-total-time>--:--</span>
         <div class="audio-player-transport">
-            <button type="button" class="audio-player-button audio-player-play-pause" data-audio-player-play-pause>
+            <button type="button" class="audio-player-button audio-player-play-pause" data-audio-player-play-pause aria-label="@localizer["AudioPlayerPlay"]">
                 <span class="audio-player-play-pause-icon"></span>
             </button>
+        </div>
+        <div class="audio-player-volume-control">
+            <button type="button" class="audio-player-button audio-player-mute" data-audio-player-mute aria-label="@localizer["AudioPlayerMute"]" aria-pressed="false">
+                <span class="audio-player-mute-icon"></span>
+            </button>
+            <div class="audio-player-volume" data-audio-player-volume role="slider" tabindex="0"
+                 aria-label="@localizer["AudioPlayerVolume"]" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
+                <div class="audio-player-volume-level" data-audio-player-volume-level></div>
+            </div>
         </div>
         <div class="audio-player-controls">
             <button type="button" id="audio-player-full-height-toggle">@localizer["ToggleFullHeight"]</button>

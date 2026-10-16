@@ -13,8 +13,12 @@
  *   - loadAsync(descriptor): prepares the resources of a track (opens its stream, configures a decoder).
  *   - playAsync(): starts, or resumes, audible playback.
  *   - pauseAsync(): suspends audible playback, keeping the current position.
- *   - seekAsync(seconds): moves the playhead to the given position, in seconds.
+ *   - seekAsync(seconds): moves the playhead to the given position, in seconds, fetching the range of that position
+ *     when it has not been downloaded yet.
  *   - setVolumeAsync(volume): sets the output volume, as a value between 0 and 1, with 0 meaning silence.
+ *   - getBufferedTimeRanges(): the time ranges, in seconds, the engine already downloaded, as a list of objects with
+ *     a 'start' and an 'end'. It is optional: an engine that does not implement it makes the player unable to tell
+ *     whether a seek target is buffered, in which case the player never shows a loading state for a seek.
  *   - destroyAsync(): releases every resource the engine holds, including any audio context.
  *
  * The engine host
@@ -27,6 +31,9 @@
  *   - host.reportTime(currentTime, duration): reports the playhead and the known duration.
  *   - host.reportDuration(duration): reports a duration discovered after loading.
  *   - host.reportProgress(downloadedFraction): reports how much of the track has been downloaded, between 0 and 1.
+ *   - host.reportBuffering(isBuffering): reports that the engine is, or is no longer, waiting for data, so that the
+ *     bar shows the same loading state for an engine's own range fetch as it does for a seek. The state it sets
+ *     stays until the engine reports it is no longer buffering, and a playhead report never clears it.
  *   - host.reportEnded(): reports that the current track reached its end.
  *   - host.reportError(error): reports an engine failure, wrapped into a {@link LuminaAudioPlayer.PlayerError}. A download
  *     engine must forward its downloader's onError here, because the downloader only reports to its own callback and

@@ -237,6 +237,7 @@ The bar is fixed to the bottom of the viewport, so the theme owns the room reser
 | --- | --- | --- |
 | The bar container, with the `audio-player-container` class | `not-shown` class | The bar is hidden, and its height collapses. |
 | The bar container | `full-height` class | The bar is expanded to its full height form. |
+| The bar container | `inert` attribute | Set while the bar is hidden and removed when it is shown, so a collapsed bar keeps none of its focusable controls in the tab order. |
 | The main content element | `audio-player-not-shown` class | The bar is hidden, so the content area uses the full height. |
 | The main content element | `audio-player-full-height` class | The bar is expanded, so the content area gives it the full height. |
 | The full height control | `id="audio-player-full-height-toggle"` | A focusable control, such as a `button`, that expands or collapses the bar. |
@@ -250,7 +251,7 @@ The `shared/audio-player` template receives the following model:
 | `assetBase` | The base URL of the theme assets, used by the theme template to reference its own assets. |
 | `queueItemTemplate` | The raw source of the `shared/audio-player/queue-item` sub template, inlined by the application into a plain text script element. |
 | `playlistItemTemplate` | The raw source of the `shared/audio-player/playlist-item` sub template, inlined by the application into a plain text script element. |
-| `strings` | The localized strings of the bar, keyed by their resource names. |
+| `strings` | The localized strings of the bar, keyed by their resource names. A shell template uses `toggleFullHeight` and `toggleVisibility` for its two controls; the player reads the play, pause, mute, unmute, volume, seek and buffering labels from the global scripts configuration instead, so a themed shell does not need to render them. |
 
 A theme must reserve the space for the bar itself, as the bundled themes do:
 
@@ -271,7 +272,25 @@ main.audio-player-full-height {
 
 The application fallback layout, which renders when the active theme cannot be loaded, reserves the room itself, because the application stylesheet does not position the content area of a theme. A theme that omits the rules above leaves the fixed bar overlapping the bottom of the page.
 
-The markup inside the bar exposes the ten hook attributes the audio player script binds: `data-audio-player-play-pause`, `data-audio-player-progress`, `data-audio-player-progress-played`, `data-audio-player-progress-downloaded`, `data-audio-player-current-time`, `data-audio-player-total-time`, `data-audio-player-track-name`, `data-audio-player-cover-thumbnail`, `data-audio-player-cover-image` and `data-audio-player-queue`. A theme that replaces the bar markup must keep all of them; the part of the bar whose hook is missing stays inert. The play affordances of the pages use the `data-audio-player-play` trigger attribute.
+The markup inside the bar exposes the hook attributes the audio player script binds. A theme that replaces the bar markup must keep all of them; the part of the bar whose hook is missing stays inert. The play affordances of the pages use the `data-audio-player-play` trigger attribute.
+
+| Hook attribute | Meaning |
+| --- | --- |
+| `data-audio-player-play-pause` | The play and pause control. The player adds the `is-playing` class to it while a track plays. |
+| `data-audio-player-progress` | The progress bar, a `role="slider"` element with `tabindex="0"` that the player scrubs and whose ARIA value attributes it writes. It carries `data-audio-player-progress-state` (`idle`, `ready` or `buffering`) and the `is-buffering` class while it loads. |
+| `data-audio-player-progress-played` | The played layer of the bar. The player publishes its start and width as the custom properties `--audio-player-progress-played-start` and `--audio-player-progress-played-width`. |
+| `data-audio-player-progress-downloaded` | The downloaded but not played layer. `--audio-player-progress-downloaded-start` and `--audio-player-progress-downloaded-width`. |
+| `data-audio-player-progress-undownloaded` | The not yet downloaded layer. `--audio-player-progress-undownloaded-start` and `--audio-player-progress-undownloaded-width`. |
+| `data-audio-player-current-time` | The current position, written as `m:ss`. |
+| `data-audio-player-total-time` | The duration, written as `m:ss`, or `--:--` while it is unknown. |
+| `data-audio-player-track-name` | The track name. |
+| `data-audio-player-cover-thumbnail`, `data-audio-player-cover-image` | The cover art of the condensed bar and of the expanded bar. |
+| `data-audio-player-volume` | The volume slider, a `role="slider"` element with `tabindex="0"` that the player scrubs and whose ARIA value attributes it writes. The fill is published as `--audio-player-volume-start` and `--audio-player-volume-width`. |
+| `data-audio-player-volume-level` | The volume fill. It carries no geometry of its own: the stylesheet drives it from the custom properties above. |
+| `data-audio-player-mute` | The mute toggle. The player toggles the `is-muted` class and the `aria-pressed` state on it. |
+| `data-audio-player-queue` | The queue list of the expanded bar. |
+
+Each progress layer also carries `data-audio-player-progress-layer` (`played`, `downloaded` or `undownloaded`) in the markup, so a theme can select a layer by its state as well as by its class. The player writes no inline geometry on any of the bar elements: it publishes the geometry of each state as the custom properties above, which the application stylesheet consumes, so a theme restyles or reorients either bar by consuming the same properties.
 
 #### The audio player sub templates
 

@@ -120,6 +120,27 @@
   <data name="Abort" xml:space="preserve">
     <value>Abort</value>
   </data>
+  <data name="AudioPlayerBuffering" xml:space="preserve">
+    <value>Buffering</value>
+  </data>
+  <data name="AudioPlayerMute" xml:space="preserve">
+    <value>Mute</value>
+  </data>
+  <data name="AudioPlayerPause" xml:space="preserve">
+    <value>Pause</value>
+  </data>
+  <data name="AudioPlayerPlay" xml:space="preserve">
+    <value>Play</value>
+  </data>
+  <data name="AudioPlayerSeek" xml:space="preserve">
+    <value>Playback position</value>
+  </data>
+  <data name="AudioPlayerUnmute" xml:space="preserve">
+    <value>Unmute</value>
+  </data>
+  <data name="AudioPlayerVolume" xml:space="preserve">
+    <value>Volume</value>
+  </data>
   <data name="Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
