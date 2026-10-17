@@ -33,7 +33,7 @@ public class ApiReachabilityHealthCheck : IHealthCheck
     /// Checks whether the remote API is reachable by probing its readiness endpoint.
     /// </summary>
     /// <param name="context">The health check context.</param>
-    /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>A task that represents the asynchronous operation, containing the health check result.</returns>
     public virtual async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken)
     {

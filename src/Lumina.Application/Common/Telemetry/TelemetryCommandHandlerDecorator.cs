@@ -36,7 +36,7 @@ public class TelemetryCommandHandlerDecorator<TCommand, TResult> : ICommandHandl
     /// Handles the specified command, emitting telemetry around the execution of the wrapped handler.
     /// </summary>
     /// <param name="command">The command to handle.</param>
-    /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>A task that represents the asynchronous operation, containing the result of the command execution.</returns>
     public async Task<TResult> HandleAsync(TCommand command, CancellationToken cancellationToken)
     {

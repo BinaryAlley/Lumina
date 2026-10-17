@@ -36,7 +36,7 @@ internal sealed class PeriodicScheduledJobCycleTicker : IScheduledJobCycleTicker
     /// <summary>
     /// Waits until the next tick of the ticker, or until the ticker is disposed or <paramref name="cancellationToken"/> is cancelled.
     /// </summary>
-    /// <param name="cancellationToken">Cancellation token that can be used to stop the wait.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns><see langword="true"/> when a tick occurred; <see langword="false"/> when the ticker was disposed before the next tick.</returns>
     public ValueTask<bool> WaitForNextTickAsync(CancellationToken cancellationToken)
     {
