@@ -70,6 +70,11 @@ public static class SharedConfiguration
                 .ValidateFluently()
                 .ValidateOnStart();
 
+        services.AddOptions<TranscodingSettingsDto>()
+                .Bind(configuration.GetRequiredSection(TranscodingSettingsDto.SECTION_NAME))
+                .ValidateFluently()
+                .ValidateOnStart();
+
         return services;
     }
 }

@@ -1197,7 +1197,7 @@
             // playhead, the streamed fraction and the scrubbing state while the audio keeps playing.
             if (index === this.currentIndex)
                 return this.queueEntries[index].descriptor;
-            // Navigation history, repeat and shuffle belong to the queue model of step 18. This commit only moves the cursor.
+            // Navigation history, repeat and shuffle belong to the queue model, which is not part of this cursor movement.
             const previousIndex = this.currentIndex;
             this.currentIndex = index;
             return this.applyTrackDescriptor(this.queueEntries[index].descriptor, previousIndex);

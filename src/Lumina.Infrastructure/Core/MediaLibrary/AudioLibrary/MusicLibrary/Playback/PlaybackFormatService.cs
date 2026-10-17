@@ -5,7 +5,6 @@ using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Playback;
 using System;
-using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Linq;
 #endregion
@@ -24,22 +23,6 @@ internal sealed class PlaybackFormatService : IPlaybackFormatService
 {
     // The duration of each segment of a normalized (remuxed or transcoded) delivery, in seconds: short enough to seek quickly, long enough to keep the request overhead low.
     private const int SEGMENT_DURATION_SECONDS = 6;
-
-    // The order in which the codecs the server can produce are tried when a transcode is needed, most preferred first: the
-    // efficient lossy codecs come before the lossless ones, so a transcode stays small unless the player only supports lossless.
-    private static readonly IReadOnlyList<string> s_transcodeCodecPreference = ["AAC", "OPUS", "MP3", "VORBIS", "FLAC", "PCM"];
-
-    // The containers the server can produce each codec in, in order of preference. The delivered container is always chosen from
-    // this list, so a container the player named is only ever matched against it and never becomes the delivered container itself.
-    private static readonly FrozenDictionary<string, IReadOnlyList<string>> s_producibleContainersByCodec = new Dictionary<string, IReadOnlyList<string>>(StringComparer.OrdinalIgnoreCase)
-    {
-        { "AAC", ["MP4", "AAC"] },
-        { "OPUS", ["OGG"] },
-        { "VORBIS", ["OGG"] },
-        { "MP3", ["MP3"] },
-        { "FLAC", ["FLAC"] },
-        { "PCM", ["WAV"] }
-    }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// Decides how the audio of a track, described by <paramref name="sourceFormat"/>, is delivered to a player that advertises <paramref name="capabilities"/>.
@@ -101,7 +84,7 @@ internal sealed class PlaybackFormatService : IPlaybackFormatService
     /// </returns>
     private static PlaybackCapabilityDto? SelectFormatForCodec(IReadOnlyList<PlaybackCapabilityDto> capabilities, string codec)
     {
-        if (codec.Length == 0 || !s_producibleContainersByCodec.TryGetValue(codec, out IReadOnlyList<string>? producibleContainers))
+        if (codec.Length == 0 || !PlaybackFormatCatalog.ProducibleContainersByCodec.TryGetValue(codec, out IReadOnlyList<string>? producibleContainers))
             return null;
 
         IReadOnlyList<string> advertisedContainers = [.. capabilities
@@ -124,7 +107,7 @@ internal sealed class PlaybackFormatService : IPlaybackFormatService
     /// <returns>The preferred producible container and codec, or <see langword="null"/> when the player supports no producible codec.</returns>
     private static PlaybackCapabilityDto? SelectTranscodeFormat(IReadOnlyList<PlaybackCapabilityDto> capabilities)
     {
-        foreach (string preferredCodec in s_transcodeCodecPreference)
+        foreach (string preferredCodec in PlaybackFormatCatalog.TranscodeCodecPreference)
         {
             PlaybackCapabilityDto? format = SelectFormatForCodec(capabilities, preferredCodec);
             if (format is not null)

@@ -152,6 +152,18 @@ public static class InfrastructureLayerServices
         // repackaged into another container, or re-encoded into another codec.
         services.AddSingleton<IPlaybackFormatService, PlaybackFormatService>();
 
+        // Music playback: records the outcome of the ffmpeg probe, so a missing binary or encoder is reported as unavailable for the affected formats.
+        services.AddSingleton<TranscodingToolchainStatus>();
+
+        // Music playback: produces the normalized (remuxed or transcoded) audio of a track with ffmpeg, caches it as fixed duration
+        // segments and serves it from the cache, bounded in concurrency, cancellable and capped in disk usage. The playback stream surface
+        // is its intended consumer; no API request path calls it yet.
+        services.AddSingleton<ITrackNormalizationService, TrackNormalizationService>();
+
+        // Music playback: owns the normalized audio cache lifecycle and verifies the ffmpeg encoders at startup, so a missing or changed toolchain
+        // is recorded and reported as unavailable for the affected formats instead of surfacing as a per track playback failure.
+        services.AddHostedService<TranscodingStartupInitializer>();
+
         // Book reading: resolves the book reader plugins, extracts the books into a temporary directory, and serves their contents.
         // The enablement cache lets the reading service skip the per-request database read of the reader configurations.
         services.AddSingleton<IBookReaderEnablementCache, BookReaderEnablementCache>();

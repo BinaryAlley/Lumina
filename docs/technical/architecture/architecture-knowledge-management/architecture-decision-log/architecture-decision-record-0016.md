@@ -38,7 +38,7 @@ GET /api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{tr
 - A pair must name both a container and a codec, with neither empty (for example `flac`, `a/b/c` and `a//b` are ignored).
 - At most 32 pairs are read from one request, so the parsing work stays bounded regardless of the input length.
 - When the parameter is absent, empty, or lists no valid pair, the server applies the default capabilities of the bundled player, so a request that advertises nothing still gets a playable decision:
-  `mp3/mp3`, `flac/flac`, `ogg/opus`, `ogg/vorbis`, `wav/pcm`, `aac/aac`. The default set is the bundled player's demuxer set (MP3, AAC/ADTS, FLAC, OGG and WAV, from work order 14), so it deliberately contains no `mp4/aac` pair: a track stored in MP4 is remuxed to raw AAC for a request that advertises nothing, rather than being marked direct play for a container the bundled player cannot demux.
+  `mp3/mp3`, `flac/flac`, `ogg/opus`, `ogg/vorbis`, `wav/pcm`, `aac/aac`. The default set is the bundled player's demuxer set (MP3, AAC/ADTS, FLAC, OGG and WAV), so it deliberately contains no `mp4/aac` pair: a track stored in MP4 is remuxed to raw AAC for a request that advertises nothing, rather than being marked direct play for a container the bundled player cannot demux.
 - The convention is a query parameter rather than a request header, so that it is part of the request's own contract, is trivially testable, and is forwarded by the web app's manifest proxy without depending on header forwarding.
 
 ### Delivery shape
