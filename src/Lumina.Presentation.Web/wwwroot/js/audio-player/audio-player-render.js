@@ -109,7 +109,7 @@
  *   const renderer = LuminaAudioPlayer.createTrackRenderer({
  *       replayGainMode: host.getPreferences().replayGainMode,
  *       events: host.events,
- *       onTimeUpdate: (time, duration) => host.reportTime(time, duration),
+ *       onTimeUpdate: (time, trackDuration, timelineDuration) => host.reportTime(time, trackDuration),
  *       onEnded: () => host.reportEnded()
  *   });
  *   renderer.configure(manifest);
@@ -241,6 +241,14 @@
     const TRACK_GAIN_RAMP_SECONDS = 0.05;
 
     /**
+     * The ramp, in seconds, of the ReplayGain change at a gapless boundary. It is scheduled at the context time the next
+     * track starts, so it is short enough to be inaudible as a blend and long enough not to click.
+     * @readonly
+     * @type {number}
+     */
+    const TRACK_GAIN_HANDOFF_RAMP_SECONDS = 0.01;
+
+    /**
      * The interval, in milliseconds, the reporter falls back to when the page has no requestAnimationFrame.
      * @readonly
      * @type {number}
@@ -370,7 +378,9 @@
          * @param {number} [options.playbackRate] - The playback rate, within the accepted playback rate range. Defaults to 1.
          * @param {number} [options.maxScheduledAheadSeconds] - An optional ceiling, in seconds, on how far ahead of the audio clock the schedule may run. Scheduling beyond it is refused with a typed error, so a caller that never paces itself cannot grow the schedule without bound. Leave the option out to disable the ceiling; a value of zero is a real ceiling that refuses every buffer, not a way to disable it.
          * @param {Object} [options.events] - The player event bus. When provided, the renderer follows the player's ReplayGain mode changes.
-         * @param {Function} [options.onTimeUpdate] - Called with the current time and the duration, in seconds, while the audio plays.
+         * @param {Function} [options.onTimeUpdate] - Called while the audio plays with the absolute timeline position, the
+         * duration of the current track, and the duration of the whole shared timeline, in seconds. The position is always
+         * on the timeline, so the timeline duration is the value that bounds a seek; the track duration is the one the bar shows for the current item.
          * @param {Function} [options.onEnded] - Called once per configured track when its scheduled audio has been fully played. Audio scheduled after the end, without a configure or a seek, continues the same logical track and does not report the end again.
          */
         constructor(options = {}) {
@@ -400,7 +410,12 @@
             this.trackGain = null;
             this.manifest = null;
             this.duration = 0;
+            // The media duration of the whole shared timeline. It equals the duration of the current track until a gapless
+            // handoff appends another track, which is why it is kept apart from the duration of the current track.
+            this.timelineDuration = 0;
             this.trackGainValue = 1;
+            // The ReplayGain change of a gapless handoff, scheduled at the context time the next track starts, or null.
+            this.pendingGainChange = null;
             this.error = null;
 
             // The scheduled sources, in media order, each one holding the audio buffer it plays so a playback rate change
@@ -464,6 +479,7 @@
             this.duration = this.manifest && toFiniteNumber(this.manifest.durationInSeconds) !== null
                 ? Math.max(0, Number(this.manifest.durationInSeconds))
                 : 0;
+            this.timelineDuration = this.duration;
             this.mediaCursor = 0;
             this.nextStartTime = 0;
             this.pausedMediaTime = 0;
@@ -472,8 +488,114 @@
             this.streamComplete = false;
             this.anchorContextTime = this.context.currentTime;
             this.anchorMediaTime = 0;
+            // A new track replaces any scheduled handoff gain of the previous one.
+            this.pendingGainChange = null;
             this.applyTrackGain(0);
             this.applyMasterGain(0);
+            return this;
+        }
+
+        /**
+         * Adopts the manifest of a track that continues the current schedule without resetting it, which is how a gapless
+         * transition applies the ReplayGain values of the next track. The schedule, the playhead and the completion state
+         * are left untouched, because the audio of the next track is already appended after the current one.
+         * @param {Object} manifest - The playback manifest of the continuing track.
+         * @param {boolean} [isGainAlreadyScheduled=false] - True when scheduleManifestGain already scheduled the ReplayGain
+         * change at the boundary, so applying it again with a late ramp is skipped.
+         * @returns {LuminaAudioPlayer.TrackRenderer} This renderer, for chaining.
+         * @throws {LuminaAudioPlayer.PlayerError} When the renderer was destroyed.
+         */
+        adoptManifest(manifest, isGainAlreadyScheduled = false) {
+            if (this.destroyed)
+                throw this.raise(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The renderer was destroyed.'));
+            this.manifest = manifest || null;
+            this.duration = this.manifest && toFiniteNumber(this.manifest.durationInSeconds) !== null
+                ? Math.max(0, Number(this.manifest.durationInSeconds))
+                : this.duration;
+            this.pendingGainChange = null;
+            // The gapless handoff schedules the gain automation at the exact boundary context time, so the manifest is
+            // adopted without applying a second, late ramp when that automation was accepted.
+            if (isGainAlreadyScheduled) {
+                this.trackGainValue = this.computeTrackGain(this.manifest);
+            } else {
+                this.applyTrackGain(TRACK_GAIN_RAMP_SECONDS);
+            }
+            return this;
+        }
+
+        /**
+         * Schedules the ReplayGain change of the next track at the context time that track starts, instead of applying it
+         * when the boundary is detected up to a reporter tick later. The schedule is stored, so a ReplayGain mode change
+         * before the boundary can reschedule it, and it is cleared when the handoff is abandoned.
+         * @param {Object} manifest - The playback manifest of the next track.
+         * @param {number} whenContextTime - The context time, in seconds, at which the next track starts.
+         * @returns {boolean} True when the automation was scheduled, false when the parameter cannot automate.
+         * @throws {LuminaAudioPlayer.PlayerError} When the renderer was destroyed.
+         */
+        scheduleManifestGain(manifest, whenContextTime) {
+            if (this.destroyed)
+                throw this.raise(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The renderer was destroyed.'));
+            this.ensureContext();
+            // A call that cannot schedule anything must not leave a previous handoff change pending.
+            this.pendingGainChange = null;
+            const when = toFiniteNumber(whenContextTime);
+            if (when === null || !this.trackGain || !this.trackGain.gain)
+                return false;
+            const param = this.trackGain.gain;
+            if (typeof param.setValueAtTime !== 'function' || typeof param.linearRampToValueAtTime !== 'function')
+                return false;
+            const start = Math.max(this.context.currentTime, when);
+            const gain = this.computeTrackGain(manifest);
+            try {
+                if (typeof param.cancelAndHoldAtTime === 'function') {
+                    // Holding at the boundary samples the value the automation actually has at that time, including a ramp
+                    // that is still in progress because the ReplayGain mode changed after the handoff was scheduled.
+                    param.cancelAndHoldAtTime(start);
+                } else {
+                    const current = Number.isFinite(param.value) ? param.value : 1;
+                    param.setValueAtTime(current, start);
+                }
+                param.linearRampToValueAtTime(gain, start + TRACK_GAIN_HANDOFF_RAMP_SECONDS);
+                this.pendingGainChange = { manifest: manifest || null, when: start };
+                return true;
+            } catch (error) {
+                this.pendingGainChange = null;
+                console.debug('Audio player: the ReplayGain change of the next track could not be scheduled.', error);
+                return false;
+            }
+        }
+
+        /**
+         * Cancels a scheduled gapless ReplayGain change and restores the gain of the current manifest. It is used when the
+         * handoff is abandoned before the next track starts.
+         * @returns {LuminaAudioPlayer.TrackRenderer} This renderer, for chaining.
+         */
+        cancelTrackGainChange() {
+            this.pendingGainChange = null;
+            if (this.trackGain && this.trackGain.gain && this.context
+                && typeof this.trackGain.gain.cancelScheduledValues === 'function') {
+                try {
+                    this.trackGain.gain.cancelScheduledValues(this.context.currentTime);
+                } catch (error) {
+                    console.debug('Audio player: the scheduled ReplayGain change could not be cancelled.', error);
+                }
+            }
+            if (!this.destroyed)
+                this.applyTrackGain(0);
+            return this;
+        }
+
+        /**
+         * Extends the media duration of the shared timeline, so that a seek into a gapless chain is bounded by the audio
+         * that is actually scheduled rather than by the duration of the first track of the chain. The duration is only
+         * used to bound a seek and to report the timeline length; the end of the audio is detected from the schedule.
+         * @param {number} duration - The media duration of the whole timeline, in seconds.
+         * @returns {LuminaAudioPlayer.TrackRenderer} This renderer, for chaining.
+         */
+        setTimelineDuration(duration) {
+            const value = toFiniteNumber(duration);
+            if (value !== null && value >= 0)
+                this.timelineDuration = value;
             return this;
         }
 
@@ -486,6 +608,7 @@
             this.destroyed = true;
             this.playing = false;
             this.paused = false;
+            this.pendingGainChange = null;
             this.stopReporter();
             for (const unsubscribe of this.unsubscribers) {
                 try {
@@ -656,7 +779,11 @@
             if (next === this.replayGainMode)
                 return this.replayGainMode;
             this.replayGainMode = next;
+            // The current gain is applied first, which cancels the scheduled handoff change, so a scheduled change is put back with the values of the new mode.
+            const pending = this.pendingGainChange;
             this.applyTrackGain(TRACK_GAIN_RAMP_SECONDS);
+            if (pending)
+                this.scheduleManifestGain(pending.manifest, pending.when);
             return this.replayGainMode;
         }
 
@@ -803,7 +930,10 @@
                 return this.mediaCursor;
             this.ensureContext();
             const position = Math.max(0, request);
-            const bounded = this.duration > 0 ? Math.min(position, this.duration) : position;
+            // A track whose duration is not known has no timeline bound to clamp against; clamping to the end of the
+            // previous track would silently restart it at its base position.
+            const limit = this.duration > 0 ? (this.timelineDuration > 0 ? this.timelineDuration : this.duration) : 0;
+            const bounded = limit > 0 ? Math.min(position, limit) : position;
             this.stopAllSources();
             this.mediaCursor = bounded;
             this.nextStartTime = 0;
@@ -822,6 +952,17 @@
          */
         markStreamComplete() {
             this.streamComplete = true;
+        }
+
+        /**
+         * Clears the stream-complete state, so a drained schedule is treated as an underrun gap again instead of the end
+         * of the track. It is used when a gapless handoff appends the next track after the end of the current decode was
+         * already recorded: the schedule then carries more audio, and a slow download of that audio must pause and resume rather than end the second track early.
+         * @returns {LuminaAudioPlayer.TrackRenderer} This renderer, for chaining.
+         */
+        clearStreamComplete() {
+            this.streamComplete = false;
+            return this;
         }
 
         //+======================================================================================+
@@ -847,11 +988,35 @@
         }
 
         /**
+         * Converts an absolute media position of the shared timeline into the context time at which it will play. The
+         * renderer owns the anchor, the playback rate and the lead time of the schedule, so a caller that needs to schedule
+         * something at a media position must use this conversion instead of repeating the anchor math.
+         * @param {number} mediaSeconds - The absolute media position, in seconds.
+         * @returns {number} The context time, in seconds, or zero when the renderer has no context.
+         */
+        getContextTimeForMediaPosition(mediaSeconds) {
+            const target = toFiniteNumber(mediaSeconds);
+            if (target === null || !this.context)
+                return 0;
+            const rate = this.playbackRate > 0 ? this.playbackRate : 1;
+            return this.context.currentTime + Math.max(0, (target - this.getCurrentTime()) / rate);
+        }
+
+        /**
          * Gets the duration of the current track, from its playback manifest.
          * @returns {number} The duration, in seconds, or zero when it is unknown.
          */
         getDuration() {
             return this.duration;
+        }
+
+        /**
+         * Gets the duration of the whole shared timeline, which is longer than the current track when a gapless handoff
+         * has appended another track. It is the value a seek is bounded by.
+         * @returns {number} The timeline duration, in seconds, or zero when it is unknown.
+         */
+        getTimelineDuration() {
+            return this.timelineDuration;
         }
 
         /**
@@ -1067,11 +1232,20 @@
          * @param {number} rampSeconds - The duration of the ramp to the new value, in seconds. Zero applies it at once.
          */
         applyTrackGain(rampSeconds) {
-            const values = resolveReplayGain(this.manifest, this.replayGainMode);
-            this.trackGainValue = computeReplayGainLinearGain(values.gainDb, values.peak);
+            this.trackGainValue = this.computeTrackGain(this.manifest);
             if (!this.trackGain || !this.trackGain.gain)
                 return;
             this.setAudioParamValue(this.trackGain.gain, this.trackGainValue, rampSeconds);
+        }
+
+        /**
+         * Computes the linear ReplayGain value a manifest and the current mode select.
+         * @param {Object|null} manifest - The playback manifest.
+         * @returns {number} The linear gain, one when nothing is selected.
+         */
+        computeTrackGain(manifest) {
+            const values = resolveReplayGain(manifest, this.replayGainMode);
+            return computeReplayGainLinearGain(values.gainDb, values.peak);
         }
 
         /**
@@ -1210,6 +1384,8 @@
             const ratio = outputLength / channelData.length;
             const output = new Float32Array(outputLength);
             for (let index = 0; index < outputLength; index++) {
+                // Map each output sample back to its fractional position in the input. The neighbours are clamped at the
+                // end of the source, so the last sample repeats instead of reading past the array or turning into zero.
                 const position = index / ratio;
                 const lower = Math.floor(position);
                 const fraction = position - lower;
@@ -1381,6 +1557,41 @@
         }
 
         /**
+         * Removes every scheduled source whose audio begins at or after a media position, keeping the audio before it. It is
+         * used when a gapless handoff is abandoned after the next track was already appended: the appended audio is stopped
+         * and released, the media frontier is moved back to the boundary, and the current track can end normally there
+         * instead of being followed by a transition the user disabled.
+         *
+         * Call it while the boundary is still ahead of getCurrentTime(), after the gain change of the next track was
+         * cancelled and before markStreamComplete(). Truncating behind the playhead would move the media cursor backwards
+         * and replay audio that already played, so the caller checks getCurrentTime() first and leaves a handoff that has already begun alone.
+         * @param {number} mediaPosition - The absolute media position from which scheduled audio is removed.
+         * @returns {LuminaAudioPlayer.TrackRenderer} This renderer, for chaining.
+         */
+        truncateScheduleAt(mediaPosition) {
+            const target = toFiniteNumber(mediaPosition);
+            if (this.destroyed || target === null)
+                return this;
+            const kept = [];
+            for (let index = 0; index < this.scheduledSources.length; index++) {
+                const entry = this.scheduledSources[index];
+                if (index >= this.firstLiveIndex && entry.bufferMediaStart >= target)
+                    this.releaseSource(entry.source);
+                else
+                    kept.push(entry);
+            }
+            this.scheduledSources = kept;
+            if (this.firstLiveIndex > kept.length)
+                this.firstLiveIndex = kept.length;
+            this.mediaCursor = Math.max(0, target);
+            const last = kept[kept.length - 1];
+            this.nextStartTime = last ? last.when + last.mediaDuration / last.rate : 0;
+            if (this.pausedMediaTime > this.mediaCursor)
+                this.pausedMediaTime = this.mediaCursor;
+            return this;
+        }
+
+        /**
          * Releases the scheduled sources whose audio has finished playing. The entries are held in media order, so the
          * finished ones are always a prefix; the cursor of the first live entry is advanced over that prefix instead of the
          * array being shifted, so releasing a finished source never costs the size of the schedule behind it.
@@ -1496,7 +1707,7 @@
                 return;
             if (this.onTimeUpdate) {
                 try {
-                    this.onTimeUpdate(this.getCurrentTime(), this.getDuration());
+                    this.onTimeUpdate(this.getCurrentTime(), this.getDuration(), this.getTimelineDuration());
                 } catch (error) {
                     console.error('Audio player: the renderer time callback threw.', error);
                 }

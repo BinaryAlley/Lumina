@@ -30,8 +30,15 @@
  *   - toggleVisibility(): shows or hides the bar.
  *   - on(event, handler): subscribes to a player event, returns an unsubscribe function.
  *   - once(event, handler), off(event, handler): one shot subscribe, and unsubscribe.
- *   - getState(), getDescriptor(), getQueue(), getCurrentTime(), getDuration(), getVolume(), isMuted(),
- *     isBuffering(), getBufferedTimeRanges(), getPreferences(), getCapabilities(), getLastError(), getSubTemplates().
+ *   - getState(), getDescriptor(), getQueue(), getCurrentTime(), getDuration(), getVolume(),
+ *     isMuted(), isBuffering(), getBufferedTimeRanges(), getPreferences(), getCapabilities(), getLastError(),
+ *     getSubTemplates().
+ *   - getNextDescriptor(): the identity and descriptor of the next queue entry, or null.
+ *   - advanceQueueTo(entryId): moves the queue cursor to the entry with that identity without starting playback, so a
+ *                           linear advance, a wrap, a reordered queue and a gapless handoff share one commit. The advance
+ *                           is refused when the identity is no longer part of the queue.
+ *   - requestNextTrackAsync(reason): starts the next queue entry through the player's own play path, used by the engine
+ *                           when a gapless handoff could not be prepared.
  *   - destroyAsync(): releases every resource of the player. It is only used for an explicit teardown, never
  *                     by a navigation, because the navigation manager never recreates the player.
  *   - registerEngine(name, factory): registers an engine factory on this player, by name.
@@ -81,14 +88,9 @@
         error: [LuminaAudioPlayer.PlayerState.LOADING, LuminaAudioPlayer.PlayerState.IDLE, LuminaAudioPlayer.PlayerState.ERROR]
     });
 
-    /**
-     * The result of a background request whose answer was a redirect, which means the session expired and the page is
-     * being sent to the sign in page. It is distinct from a missing value, which is a failure, so that a caller does not
-     * report an error for a redirect it is already handling.
-     * @readonly
-     * @type {Object}
-     */
-    const REDIRECTED = Object.freeze({ redirected: true });
+    // The redirect sentinel belongs to the dependency free utils module, so a consumer that is loaded without this
+    // controller, such as the manifest client, can still recognize it. The local name keeps the references readable.
+    const REDIRECTED = LuminaAudioPlayer.REDIRECTED;
 
     /**
      * Follows a server redirect, but only when the target is an http or https URL on the same origin and protocol as
@@ -124,6 +126,42 @@
             window.location.href = target.href;
         } catch (error) {
             console.debug('Audio player: a redirect target could not be followed.', error);
+        }
+    }
+
+    /**
+     * Checks whether a response is a redirect that was not followed because the request asked for manual redirects.
+     * @param {Response} response - The response to check.
+     * @returns {boolean} True when the response is a redirect.
+     */
+    function isRedirectResponse(response) {
+        if (!response)
+            return false;
+        if (response.type === 'opaqueredirect')
+            return true;
+        const status = Number(response.status);
+        return status === 301 || status === 302 || status === 303 || status === 307 || status === 308;
+    }
+
+    /**
+     * Resolves a configured endpoint URL against the origin of the page, so a root relative configuration value is always
+     * requested from the page's own origin and not from whatever the server saw as its host or a base element points at.
+     * @param {string} url - The configured URL.
+     * @returns {string|null} The resolved absolute URL, or null when it is missing or not on this origin.
+     */
+    function resolveConfiguredUrl(url) {
+        if (typeof url !== 'string' || url.length === 0)
+            return null;
+        try {
+            const resolved = new URL(url, window.location.origin);
+            if ((resolved.protocol !== 'http:' && resolved.protocol !== 'https:')
+                || resolved.origin !== window.location.origin
+                || resolved.username !== ''
+                || resolved.password !== '')
+                return null;
+            return resolved.href;
+        } catch (error) {
+            return null;
         }
     }
 
@@ -403,8 +441,15 @@
 
             this.state = LuminaAudioPlayer.PlayerState.IDLE;
             this.descriptor = null;
-            this.queue = [];
+            // The queue entries are the single queue: each entry carries an identity per occurrence, so a repeated track is
+            // distinguishable from another occurrence of the same track, and the descriptor the public API exposes. Every
+            // traversal, advance and render derives from this array, so the cursor can never disagree with the queue.
+            this.queueEntries = [];
+            this.entrySequence = 0;
             this.currentIndex = 0;
+            // The order the queue list was last rendered in, so a future shuffle or reorder that changes queueEntries
+            // without rendering the list is detected instead of updating the wrong items in place.
+            this.renderedQueueOrder = [];
             this.currentTime = 0;
             this.duration = 0;
             this.downloadedFraction = 0;
@@ -666,10 +711,12 @@
             this.scrubRatio = null;
             this.endScrub();
             this.endVolumeAdjust();
+            // clearBuffering also clears any pending seek of the previous timeline.
             this.clearBuffering();
             // An album or artist descriptor carries no track id of its own, so the queue starts at its first item in that case.
-            this.queue = descriptor.queue && descriptor.queue.length > 0 ? [...descriptor.queue] : [descriptor];
-            this.currentIndex = Math.max(0, this.queue.findIndex(item => item.trackId === descriptor.trackId));
+            const descriptors = descriptor.queue && descriptor.queue.length > 0 ? [...descriptor.queue] : [descriptor];
+            this.queueEntries = descriptors.map((entry) => ({ entryId: this.createQueueEntryId(), descriptor: entry }));
+            this.currentIndex = Math.max(0, this.queueEntries.findIndex((entry) => entry.descriptor.trackId === descriptor.trackId));
 
             // The bar is shown and the state moves to loading before the engine is touched, so a slow engine still gives the user
             // immediate feedback that the request was accepted.
@@ -679,20 +726,113 @@
             this.showBar();
             this.setState(LuminaAudioPlayer.PlayerState.LOADING);
             this.events.emit(LuminaAudioPlayer.PlayerEvent.DESCRIPTOR_CHANGED, descriptor);
-            this.events.emit(LuminaAudioPlayer.PlayerEvent.QUEUE_CHANGED, this.queue);
+            this.events.emit(LuminaAudioPlayer.PlayerEvent.QUEUE_CHANGED, this.getQueue());
 
+            return this.startLoadedDescriptorAsync(descriptor);
+        }
+
+        /**
+         * Starts the engine load and playback of a descriptor the player has already made current and set to its loading
+         * state. The player state is checked again after each await, so a stop that happens while a load is running keeps
+         * its intent instead of being overwritten by the load or by the engine.
+         * @param {Object} descriptor - The descriptor that is already current on the player.
+         * @param {Object} [options] - The load options.
+         * @param {boolean} [options.keepBuffering] - True to keep a loading state that was handed to the load, used by an
+         * automatic continuation so the gap before the manifest and header probe shows a loading state.
+         * @returns {Promise<boolean>} True when playback started, false when it was stopped or failed.
+         */
+        async startLoadedDescriptorAsync(descriptor, options = {}) {
+            let engine = null;
             try {
                 // The state follows the engine step by step, so a consumer can tell preparation apart from actual playback.
-                const engine = await this.ensureEngineAsync();
-                await engine.loadAsync(descriptor);
+                engine = await this.ensureEngineAsync();
+                await engine.loadAsync(descriptor, options);
+                if (this.state !== LuminaAudioPlayer.PlayerState.LOADING) {
+                    // A stop during the load already paused the engine; a newer request owns the player state and must not be touched by this stale continuation.
+                    if (this.state === LuminaAudioPlayer.PlayerState.IDLE)
+                        await this.pauseEngineQuietlyAsync(engine);
+                    return false;
+                }
                 this.setState(LuminaAudioPlayer.PlayerState.READY);
                 await engine.playAsync();
+                if (this.state !== LuminaAudioPlayer.PlayerState.READY) {
+                    if (this.state === LuminaAudioPlayer.PlayerState.IDLE)
+                        await this.pauseEngineQuietlyAsync(engine);
+                    return false;
+                }
                 this.setState(LuminaAudioPlayer.PlayerState.PLAYING);
                 this.renderTransportState();
             } catch (error) {
+                // A load that a newer play request overtook, and a session that expired and is already navigating to the
+                // sign in page, are expected outcomes. They must not move the player to its error state, and they must not
+                // let this stale continuation set READY or PLAYING over the request that now owns the player.
+                const reason = error && error.details ? error.details.reason : null;
+                if (reason === LuminaAudioPlayer.PlayerErrorReason.LOAD_SUPERSEDED
+                    || reason === LuminaAudioPlayer.PlayerErrorReason.SESSION_EXPIRED)
+                    return false;
                 // A failure before playback starts is a load failure; later failures are reported by the engine through its host.
                 this.fail(error, LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED);
                 return false;
+            }
+            return true;
+        }
+
+        /**
+         * Pauses an engine after a load that the user stopped, without letting a pause failure disturb the player state.
+         * @param {Object} engine - The engine to pause.
+         * @returns {Promise<void>} A promise that completes when the pause was attempted.
+         */
+        async pauseEngineQuietlyAsync(engine) {
+            if (!engine || typeof engine.pauseAsync !== 'function')
+                return;
+            try {
+                await engine.pauseAsync();
+            } catch (error) {
+                console.debug('Audio player: the engine could not be paused after a stopped load.', error);
+            }
+        }
+
+        /**
+         * Requests the next queue entry as a new playback, with the player's own state machine owning the transition. It is
+         * the seam the engine uses for the end of a track when a gapless handoff could not be prepared.
+         * @param {string} [reason] - A developer facing reason for the request, for diagnostics.
+         * @returns {Promise<boolean>} True when the player took ownership of the request, false when it declined it because the player is paused, stopped, or has no next entry.
+         */
+        async requestNextTrackAsync(reason) {
+            // A paused or stopped player has made an explicit choice that the end of a track must not override.
+            if (this.state !== LuminaAudioPlayer.PlayerState.PLAYING)
+                return false;
+            const next = this.getNextDescriptor();
+            if (!next)
+                return false;
+            // The capability gate is part of the player's play path, so an auto advance never starts a track the browser
+            // cannot decode.
+            const report = await this.capabilitiesReady;
+            if (this.state !== LuminaAudioPlayer.PlayerState.PLAYING)
+                return false;
+            if (report && !report.isSupported) {
+                this.fail(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING, 'The browser is missing a capability the player requires.',
+                    { missing: report.missing }), LuminaAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING);
+                return true;
+            }
+            const advanced = this.advanceQueueTo(next.entryId);
+            if (!advanced)
+                return false;
+            this.setState(LuminaAudioPlayer.PlayerState.LOADING);
+            this.renderTransportState();
+            // The player owns the outcome from here, including a load that fails: returning true keeps the engine from
+            // reporting an end over a state the player has already set. The loading state is kept across the engine
+            // teardown, so the end gap shows that the next track is being prepared.
+            const hasStarted = await this.startLoadedDescriptorAsync(advanced, { keepBuffering: true });
+            if (!hasStarted && this.state === LuminaAudioPlayer.PlayerState.IDLE
+                && this.engine && typeof this.engine.discardCurrentAsync === 'function') {
+                // A stop during the continuation load owns the outcome. The prepared track is released, so a stopped
+                // player does not keep a track loaded that was started only to continue a queue.
+                try {
+                    await this.engine.discardCurrentAsync();
+                } catch (error) {
+                    console.debug('Audio player: the stopped continuation track could not be released.', error);
+                }
             }
             return true;
         }
@@ -781,9 +921,17 @@
          * @returns {Promise<void>} A promise that completes when the seek was requested.
          */
         async seekAsync(seconds) {
-            // Without a descriptor there is no timeline to seek in.
-            if (!this.descriptor)
+            // Without a descriptor there is no timeline to seek in. A finished, failed or still loading track is not
+            // seekable either: its pipeline is either released or not yet the one the seek would address. Seeking a
+            // finished track is deliberately a no-op rather than a replay, and no resume is reported for it; a new play starts the next timeline.
+            if (!this.descriptor
+                || this.state === LuminaAudioPlayer.PlayerState.IDLE
+                || this.state === LuminaAudioPlayer.PlayerState.ENDED
+                || this.state === LuminaAudioPlayer.PlayerState.ERROR
+                || this.state === LuminaAudioPlayer.PlayerState.LOADING) {
+                this.clearSeekPending();
                 return;
+            }
             // A known duration bounds the target, while without one the position is only kept non negative, so a seek is never
             // silently snapped to zero just because the duration has not been reported yet.
             const request = Number(seconds);
@@ -1004,7 +1152,84 @@
          * @returns {Array<Object>} The ordered play descriptors.
          */
         getQueue() {
-            return [...this.queue];
+            return this.queueEntries.map((entry) => entry.descriptor);
+        }
+
+        /**
+         * Creates the identity of a new queue entry. Every occurrence in the queue gets its own identity, so two entries
+         * that repeat the same track are never confused.
+         * @returns {string} The new entry Id.
+         */
+        createQueueEntryId() {
+            this.entrySequence += 1;
+            return `queue-entry-${this.entrySequence}`;
+        }
+
+        /**
+         * Gets the queue entry that follows the current one.
+         * @returns {{ entryId: string, descriptor: Object }|null} The identity and descriptor of the next entry, or null at the end of the queue.
+         */
+        getNextDescriptor() {
+            if (this.currentIndex + 1 >= this.queueEntries.length)
+                return null;
+            const entry = this.queueEntries[this.currentIndex + 1];
+            return { entryId: entry.entryId, descriptor: entry.descriptor };
+        }
+
+        /**
+         * Advances the queue to the entry with the given identity, without starting a new playback. It is the single commit
+         * of a queue transition: a gapless handoff passes the identity the engine already scheduled, and a non-gapless
+         * continuation passes the identity the player selected. The entry is found by identity rather than by position, so
+         * a linear advance, a wrap to the first entry and a reordered queue all share one path.
+         * @param {string} entryId - The identity of the queue entry to make current.
+         * @returns {Object|null} The descriptor the player advanced to, or null when the player is not playing or the entry is not part of the queue.
+         */
+        advanceQueueTo(entryId) {
+            // A gapless boundary or a continuation only exists while the player is playing. In another state, for example
+            // while a new play request is loading, the queue cursor belongs to that request and must not be moved by the old timeline.
+            if (!entryId || this.state !== LuminaAudioPlayer.PlayerState.PLAYING)
+                return null;
+            const index = this.queueEntries.findIndex((entry) => entry.entryId === entryId);
+            // An entry that is no longer part of the queue is not a track this player can describe.
+            if (index < 0)
+                return null;
+            // Moving to the entry that is already current is not a transition. Applying its descriptor again would reset the
+            // playhead, the streamed fraction and the scrubbing state while the audio keeps playing.
+            if (index === this.currentIndex)
+                return this.queueEntries[index].descriptor;
+            // Navigation history, repeat and shuffle belong to the queue model of step 18. This commit only moves the cursor.
+            const previousIndex = this.currentIndex;
+            this.currentIndex = index;
+            return this.applyTrackDescriptor(this.queueEntries[index].descriptor, previousIndex);
+        }
+
+        /**
+         * Applies a descriptor as the playing track without changing the queue cursor. It is the shared body of the
+         * validated queue advance and the scheduled-track adoption.
+         * @param {Object} descriptor - The descriptor to show as the playing track.
+         * @param {number|null} [previousIndex] - The queue position that was current before the cursor moved, when the
+         * commit knows it. It lets the queue update only the items whose current or played state changed.
+         * @returns {Object} The applied descriptor.
+         */
+        applyTrackDescriptor(descriptor, previousIndex = null) {
+            this.descriptor = descriptor;
+            this.currentTime = 0;
+            this.downloadedFraction = 0;
+            this.scrubRatio = null;
+            this.endScrub();
+            this.endVolumeAdjust();
+            this.clearBuffering();
+            // The duration of the next track is reported by its manifest as soon as the engine plays it, so the descriptor value is used here only until that report arrives.
+            this.duration = Number.isFinite(descriptor.durationInSeconds) && descriptor.durationInSeconds > 0 ? descriptor.durationInSeconds : 0;
+            this.renderDescriptor();
+            this.renderProgress();
+            if (Number.isInteger(previousIndex))
+                this.updateQueueSelection(previousIndex);
+            else
+                this.renderQueue();
+            this.events.emit(LuminaAudioPlayer.PlayerEvent.DESCRIPTOR_CHANGED, descriptor);
+            this.events.emit(LuminaAudioPlayer.PlayerEvent.QUEUE_CHANGED, this.getQueue());
+            return descriptor;
         }
 
         /**
@@ -1300,6 +1525,17 @@
                 events: this.events,
                 // A shallow frozen copy, so an engine or a test cannot mutate the controller state through the host.
                 getPreferences: () => Object.freeze({ ...this.preferences }),
+                // The engine shares the player's endpoint configuration, JSON transport and capability detector, so an
+                // expired session redirect is followed by the same code that follows it for every other background
+                // request, and the engine never keeps a second copy of the configuration.
+                getConfiguration: () => this.getConfiguration(),
+                fetchJsonAsync: (url, signal, label, options) => this.fetchJsonAsync(url, signal, label, options),
+                getCapabilityDetector: () => this.capabilities,
+                // The queue cursor is read from the player for the gapless handoff, so the engine never re-implements the
+                // traversal and can never pick the wrong occurrence of a repeated track.
+                getNextDescriptor: () => this.getNextDescriptor(),
+                advanceQueueTo: (entryId) => this.advanceQueueTo(entryId),
+                requestNextTrackAsync: (reason) => this.requestNextTrackAsync(reason),
                 reportTime: (currentTime, duration) => this.handleEngineTime(currentTime, duration),
                 reportDuration: (duration) => this.handleEngineDuration(duration),
                 reportProgress: (fraction) => this.handleEngineProgress(fraction),
@@ -1410,6 +1646,11 @@
          * Handles the end of the current track reported by the engine.
          */
         handleEngineEnded() {
+            // A player that the user stopped, that already failed, or that is preparing a new track is not moved to ended by a late end report of the previous timeline.
+            if (this.state === LuminaAudioPlayer.PlayerState.IDLE
+                || this.state === LuminaAudioPlayer.PlayerState.ERROR
+                || this.state === LuminaAudioPlayer.PlayerState.LOADING)
+                return;
             this.setState(LuminaAudioPlayer.PlayerState.ENDED);
             this.renderTransportState();
             this.events.emit(LuminaAudioPlayer.PlayerEvent.ENDED);
@@ -1499,18 +1740,52 @@
          * An expired session is answered by the server with a redirect to the login page, so the redirect is followed
          * here, exactly like the application API helper does it, instead of being mistaken for a failed request.
          * @param {string} url - The endpoint URL. Nothing is requested when it is empty.
+         * @param {AbortSignal} [signal] - An optional signal that cancels the request, used by an engine's prefetch.
+         * @param {string} [label] - The description used in the failure log, so a caller such as the engine reports its own request rather than a preferences request.
+         * @param {Object} [options] - The request options.
+         * @param {string} [options.redirect='follow'] - 'manual' to keep the browser from following a redirect before its target is validated.
          * @returns {Promise<*|null|undefined|Object>} The unwrapped data, null when the endpoint answered without data, undefined when the request failed, or the REDIRECTED marker when the session expired and the page is navigating away.
          */
-        async fetchJsonAsync(url) {
+        async fetchJsonAsync(url, signal, label = 'a preferences request', options = {}) {
             if (!url)
                 return null;
+            const requestUrl = resolveConfiguredUrl(url);
+            if (!requestUrl) {
+                console.error(`Audio player: ${label} has an endpoint that is not on this origin.`);
+                return undefined;
+            }
             try {
-                const response = await fetch(url, {
+                const request = {
                     headers: {
                         'Accept': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    signal: signal
+                };
+                if (options.redirect === 'manual')
+                    request.redirect = 'manual';
+                const response = await fetch(requestUrl, request);
+                if (options.redirect === 'manual' && isRedirectResponse(response)) {
+                    // The browser did not follow the redirect, so the request cannot reach a target that was not validated.
+                    // When the environment exposes the target, it goes through the same origin policy as a followed
+                    // redirect; otherwise the request is reported as a session redirect without requesting the unknown target.
+                    let location = null;
+                    try {
+                        location = response.headers && typeof response.headers.get === 'function'
+                            ? response.headers.get('location')
+                            : null;
+                    } catch (error) {
+                        console.debug('Audio player: the redirect target of the request could not be read.', error);
                     }
-                });
+                    if (location) {
+                        try {
+                            navigateToRedirect(new URL(location, requestUrl).href);
+                        } catch (error) {
+                            console.debug('Audio player: the redirect target of the request could not be resolved.', error);
+                        }
+                    }
+                    return REDIRECTED;
+                }
                 if (response.redirected) {
                     // The session expired and the server answered with the login page; follow it, and report the redirect, not a failure.
                     navigateToRedirect(response.url);
@@ -1521,7 +1796,11 @@
                 const payload = await response.json();
                 return payload && payload.success === true ? payload.data : null;
             } catch (error) {
-                console.error('Audio player: a preferences request failed.', error);
+                // A request that a cancelled prefetch, a superseded load or a timeout aborted is an expected stop, not a
+                // failed request, so it is reported with the same undefined result but without a console error.
+                if (LuminaAudioPlayer.isAbortError(error))
+                    return undefined;
+                console.error(`Audio player: ${label} failed.`, error);
                 return undefined;
             }
         }
@@ -1538,6 +1817,11 @@
         async postJsonAsync(url, data, options = {}) {
             if (!url)
                 return null;
+            const requestUrl = resolveConfiguredUrl(url);
+            if (!requestUrl) {
+                console.error('Audio player: the playback state endpoint is not on this origin.');
+                return undefined;
+            }
             try {
                 const headers = {
                     'Content-Type': 'application/json',
@@ -1549,7 +1833,7 @@
                 const token = document.querySelector('input[name="__RequestVerificationToken"]');
                 if (token && token.value)
                     headers['RequestVerificationToken'] = token.value;
-                const response = await fetch(url, {
+                const response = await fetch(requestUrl, {
                     method: 'POST',
                     headers: headers,
                     body: JSON.stringify(data ?? {}),
@@ -2271,11 +2555,47 @@
             if (!this.dom.queue)
                 return;
             this.dom.queue.innerHTML = '';
-            const items = this.queue.length > 1 ? this.queue : [];
+            const items = this.queueEntries.length > 1 ? this.queueEntries : [];
             for (let index = 0; index < items.length; index++) {
-                const entry = this.renderQueueItem(items[index], index, items.length);
+                const entry = this.renderQueueItem(items[index].descriptor, index, items.length);
                 if (entry)
                     this.dom.queue.appendChild(entry);
+            }
+            this.renderedQueueOrder = items.map((entry) => entry.entryId);
+        }
+
+        /**
+         * Updates only the queue items whose current or played state changed after the cursor moved, so a gapless handoff
+         * of a large play context does not rebuild the whole list at the transition. It falls back to a full render when
+         * the DOM does not match the queue, for example before the first render or in a host that cannot replace a child.
+         * @param {number} previousIndex - The zero based queue position that was current before the advance.
+         */
+        updateQueueSelection(previousIndex) {
+            if (!this.dom.queue)
+                return;
+            const total = this.queueEntries.length;
+            const children = this.dom.queue.children;
+            // A changed order means the rendered child at an index no longer describes the entry at that index, so the
+            // list is rebuilt instead of updating the wrong items. The same fallback covers a list that was never rendered.
+            const hasSameOrder = this.renderedQueueOrder.length === total
+                && this.renderedQueueOrder.every((entryId, index) => entryId === this.queueEntries[index].entryId);
+            if (total <= 1 || !children || children.length !== total || !hasSameOrder
+                || typeof this.dom.queue.replaceChild !== 'function') {
+                this.renderQueue();
+                return;
+            }
+            const from = Math.min(previousIndex, this.currentIndex);
+            const to = Math.max(previousIndex, this.currentIndex);
+            if (!Number.isInteger(from) || from < 0 || to >= total) {
+                this.renderQueue();
+                return;
+            }
+            // isPlayed flips for every position between the old and the new cursor, inclusive, and isCurrent flips at
+            // both ends, so that inclusive range is exactly the set of items whose state changed.
+            for (let index = from; index <= to; index++) {
+                const item = this.renderQueueItem(this.queueEntries[index].descriptor, index, total);
+                if (item)
+                    this.dom.queue.replaceChild(item, children[index]);
             }
         }
 

@@ -24,6 +24,18 @@
     };
 
     /**
+     * Coerces a value to a finite number, or null when it is absent or not finite.
+     * @param {*} value - The value to coerce.
+     * @returns {number|null} The finite number, or null.
+     */
+    LuminaAudioPlayer.toFiniteNumber = function toFiniteNumber(value) {
+        if (value === null || value === undefined || value === '')
+            return null;
+        const number = Number(value);
+        return Number.isFinite(number) ? number : null;
+    };
+
+    /**
      * Checks whether a value is the AbortError a reset, a close or an aborted fetch rejects with. An AbortError is tested
      * by name rather than by type, because in a browser it is a DOMException, which is not an Error.
      * @param {*} error - The value to check.
@@ -68,4 +80,14 @@
             return typed;
         return new LuminaAudioPlayer.PlayerError(typed.code, typed.message, LuminaAudioPlayer.mergeErrorDetails(typed.details, details));
     };
+
+    /**
+     * The result of a background request whose answer was a redirect, which means the session expired and the page is
+     * being sent to the sign in page. It is distinct from a missing value, which is a failure, so that a caller does not
+     * report an error for a redirect it is already handling. It lives in this dependency free module, which is loaded
+     * before every feature module, so a consumer can recognize it even when the controller is not loaded.
+     * @readonly
+     * @type {Object}
+     */
+    LuminaAudioPlayer.REDIRECTED = Object.freeze({ redirected: true });
 })(window.LuminaAudioPlayer = window.LuminaAudioPlayer || {});

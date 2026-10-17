@@ -73,7 +73,20 @@
         // stopped with no gap left to fill. Published by the download engine and recognized by the demuxer byte source,
         // which reads it as end of file rather than as a failure, so a rename on either side cannot silently turn a
         // drained window into a fatal read error.
-        WINDOW_UNAVAILABLE: 'window-unavailable'
+        WINDOW_UNAVAILABLE: 'window-unavailable',
+        // A range request exceeded its timeout. Unlike an intentional abort, this is a failed request and is not retried
+        // by the seek recovery.
+        REQUEST_TIMEOUT: 'request-timeout',
+        // The playback manifest says the track is not a direct play, so the server has to normalize its container or its
+        // codec before the bundled player can play it. Published by the media pipeline engine while the normalized
+        // delivery pipeline does not exist yet, instead of playing the stored bytes.
+        NORMALIZED_DELIVERY_REQUIRED: 'normalized-delivery-required',
+        // A load was overtaken by a newer play request before it finished. The player ignores it, because the newer
+        // request owns the player state and the queue.
+        LOAD_SUPERSEDED: 'load-superseded',
+        // The session expired while a manifest was requested, and the player is already navigating to the sign in page.
+        // The player ignores it, because it is an expected outcome of an expired session, not a playback failure.
+        SESSION_EXPIRED: 'session-expired'
     });
 
     /**

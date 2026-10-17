@@ -10,7 +10,9 @@
  * --------------------
  * An engine is created by a factory that receives the engine host (see below) and returns an object
  * with these methods, all of them returning a Promise:
- *   - loadAsync(descriptor): prepares the resources of a track (opens its stream, configures a decoder).
+ *   - loadAsync(descriptor, options): prepares the resources of a track (opens its stream, configures a decoder).
+ *     options.keepBuffering keeps a loading state the player handed to the load, used by an automatic continuation so the
+ *     teardown of the previous track does not clear it during the end gap.
  *   - playAsync(): starts, or resumes, audible playback.
  *   - pauseAsync(): suspends audible playback, keeping the current position.
  *   - seekAsync(seconds): moves the playhead to the given position, in seconds, fetching the range of that position
@@ -19,15 +21,38 @@
  *   - getBufferedTimeRanges(): the time ranges, in seconds, the engine already downloaded, as a list of objects with
  *     a 'start' and an 'end'. It is optional: an engine that does not implement it makes the player unable to tell
  *     whether a seek target is buffered, in which case the player never shows a loading state for a seek.
+ *   - discardCurrentAsync() (optional): releases the currently prepared track without destroying the engine, so a stop
+ *     during an automatic continuation does not leave the track it started loaded behind an idle player.
  *   - destroyAsync(): releases every resource the engine holds, including any audio context.
  *
  * The engine host
  * ---------------
  * The factory also receives a host object that the engine uses to talk back to the controller, so
  * that the controller stays the single source of truth:
- *   - host.events: the player event bus, for {@link LuminaAudioPlayer.PlayerEvent} values the engine emits itself.
+ *   - host.events: the player event bus, for {@link LuminaAudioPlayer.PlayerEvent} values the engine emits itself. It is
+ *     also the inbound channel: an engine and the renderer subscribe to PREFERENCES_CHANGED to follow a gapless or
+ *     ReplayGain preference that changes while a track is playing.
  *   - host.getPreferences(): the playback preferences of the user the player currently holds, for example the
  *     'keep downloading while paused' setting an engine's downloader honors.
+ *   - host.getConfiguration(): the endpoint configuration of the player, so an engine never keeps a second copy of it.
+ *   - host.fetchJsonAsync(url, signal, label): the player's JSON transport. The optional signal cancels the request, the
+ *     label describes it in the failure log, and an expired session redirect is followed to the sign in page and reported
+ *     through the player's REDIRECTED marker, so an engine request behaves like the player's other background requests.
+ *   - host.getCapabilityDetector(): the browser capability detector of the player, so an engine does not run a second
+ *     capability detection.
+ *   - host.getNextDescriptor(): { entryId, descriptor } of the queue entry that follows the current one, or null at the
+ *     end of the queue. It is the player's own queue cursor, so an engine never re-implements queue traversal or picks
+ *     the wrong repeated track.
+ *   - host.advanceQueueTo(entryId): moves the player queue cursor to the entry with that identity without starting
+ *     playback, which an engine uses for a gapless transition whose audio is already scheduled immediately after the current
+ *     track. The advance is refused when the identity is no longer part of the queue, so the bar never describes a track
+ *     that is not playing. A linear advance, a wrap and a reordered queue all use this same commit.
+ *   - host.requestNextTrackAsync(reason): asks the player to start the next queue entry through its own play path, which
+ *     owns the player state, the pause intent and the capability gate. An engine uses it when a gapless handoff could not
+ *     be prepared, instead of starting a playback session itself. The returned Promise<boolean> resolves true when the
+ *     player took ownership of the transition, including a load it will report as failed, and false when it declined the
+ *     request because the player is paused, stopped, or has no next entry. An engine must not report an end for a
+ *     transition the player owns, and keeps the end it just reported when the promise resolves false.
  *   - host.reportTime(currentTime, duration): reports the playhead and the known duration.
  *   - host.reportDuration(duration): reports a duration discovered after loading.
  *   - host.reportProgress(downloadedFraction): reports how much of the track has been downloaded, between 0 and 1.
@@ -42,9 +67,10 @@
  *
  * Registering and selecting an engine
  * -----------------------------------
- * Engines are registered on a registry by name, and the player runs the engine selected by name. The silent engine
- * is registered under NULL_ENGINE_NAME and is the default, so the player is usable before the real pipeline exists.
- * The singleton is created automatically when the module loads, so the way to plug a real engine into the running
+ * Engines are registered on a registry by name, and the player runs the engine selected by name. The silent engine is
+ * registered under NULL_ENGINE_NAME and is the default of a bare player, but the shipped composition installs the media
+ * pipeline engine when that module loads and selects it, so the running application plays through the pipeline. The
+ * singleton is created automatically when the core module loads, so the way to plug a different engine into the running
  * application is the instance seam:
  *   - window.LuminaAudioPlayer.instance.registerEngine(name, factory) registers a factory of the shape (host) => engine.
  *   - window.LuminaAudioPlayer.instance.useEngine(name) selects a registered engine; it takes effect on the next load,
@@ -66,10 +92,11 @@
     /**
      * An engine that fulfills the engine interface without producing any audio.
      *
-     * It is the default engine of the core module, so that the control API, the state machine, the
-     * lifecycle and the bar are fully callable before the download, decode and render pipeline is
-     * wired up. It tracks a playhead so that a seek, a pause and a resume report the position the
-     * player expects, but it never loads, decodes or plays a byte.
+     * It is the default engine of a bare player, so that the control API, the state machine, the
+     * lifecycle and the bar are fully callable before, or without, the media pipeline. The shipped
+     * composition selects the pipeline when that module loads. This engine tracks a playhead so that
+     * a seek, a pause and a resume report the position the player expects, but it never loads,
+     * decodes or plays a byte.
      */
     class NullPlayerEngine {
         /**

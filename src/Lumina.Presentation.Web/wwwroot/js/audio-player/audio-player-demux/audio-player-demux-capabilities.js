@@ -266,15 +266,18 @@
      * request a normalized delivery instead of failing, and never receives both a player failure and a normalization
      * request for the same unplayable file.
      *
-     * The one failure that resolves to null without publishing is an intentional download stop: a teardown that crossed
-     * the header probe is not a track the server has to normalize. A caller that must tell the two nulls apart therefore
-     * checks whether it received a needs normalization event, or its own teardown state, rather than the null itself.
+     * The failures that resolve to null without publishing are the ones that say nothing about the format: an intentional
+     * download stop, a teardown that crossed the header probe, and a transport failure. A transport failure is propagated
+     * instead of being turned into a normalization request, because the server cannot make a track it could not fetch
+     * playable. A caller distinguishes the nulls by its own teardown state and by whether it received a needs
+     * normalization event, rather than by the null itself.
      * @param {string} container - The container of the track.
      * @param {string} codec - The codec of the track.
      * @param {Object} [options] - The demuxer options, plus the injected capabilities and events, per {@link LuminaAudioPlayer.DemuxerCapabilities}.
-     * @returns {Promise<LuminaAudioPlayer.Demuxer|null>} The ready demuxer, or null when the pair must be normalized.
+     * @returns {Promise<LuminaAudioPlayer.Demuxer|null>} The ready demuxer, or null when the pair must be normalized or the probe was stopped intentionally.
      * @throws {TypeError} When no event bus was injected. It is a composition error, not a property of the track, so it
      *     rejects rather than resolving to a null the caller would have to classify without an event to classify it by.
+     * @throws {LuminaAudioPlayer.PlayerError} When the bytes could not be fetched because of a transport failure, which is not a format the server could normalize.
      */
     LuminaAudioPlayer.createDemuxerFor = async function (container, codec, options) {
         const settings = options || {};
@@ -298,8 +301,13 @@
                 await demuxer.destroyAsync();
             // An intentional download stop, a teardown that crossed the header probe, is not a track the server has to
             // normalize, so it is not published as one; the demuxer already reports it as a normal stop everywhere else.
-            if (!LuminaAudioPlayer.isDownloadAbort(error))
-                publishNeedsNormalization(events, container, codec, LuminaAudioPlayer.PlayerErrorReason.DEMUXER_FAILED, settings.directPlay);
+            if (LuminaAudioPlayer.isDownloadAbort(error))
+                return null;
+            // A transport failure says nothing about the format of the track either: the server must not normalize a file
+            // whose bytes could not be fetched, so the failure is propagated and reported as the download failure it is.
+            if (error instanceof LuminaAudioPlayer.PlayerError && error.code === LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED)
+                throw error;
+            publishNeedsNormalization(events, container, codec, LuminaAudioPlayer.PlayerErrorReason.DEMUXER_FAILED, settings.directPlay);
             return null;
         }
         const configuration = demuxer.getConfiguration();

@@ -38,7 +38,20 @@ public class UrlService : IUrlService
     /// <exception cref="ArgumentException">Thrown when <paramref name="routeTemplate"/> is not one of the route templates defined in the <see cref="WebRoutes"/> constants.</exception>
     public string? GetAbsoluteUrl(string routeTemplate, object? additionalRouteValues = null)
     {
-        // fail fast when the route template is not one of the ones defined in the WebRoutes constants, instead of silently generating a broken URL
+        string? path = GetRelativeUrl(routeTemplate, additionalRouteValues);
+        if (path is null)
+            return null;
+        HttpContext? httpContext = _httpContextAccessor.HttpContext;
+        if (httpContext is null)
+            return null;
+        // Build the absolute URL from the request's scheme, host and the already localized path base.
+        return $"{httpContext.Request.Scheme}://{httpContext.Request.Host}{path}";
+    }
+
+    /// <inheritdoc />
+    public string? GetRelativeUrl(string routeTemplate, object? additionalRouteValues = null)
+    {
+        // Fail fast when the route template is not one of the ones defined in the WebRoutes constants, instead of silently generating a broken URL.
         if (!s_knownRouteTemplates.Contains(routeTemplate))
             throw new ArgumentException($"The route template '{routeTemplate}' is not defined in the WebRoutes constants.", nameof(routeTemplate));
 
@@ -50,11 +63,12 @@ public class UrlService : IUrlService
         if (additionalRouteValues is not null)
             foreach (PropertyInfo property in additionalRouteValues.GetType().GetProperties())
                 path = path.Replace($"{{{property.Name}}}", property.GetValue(additionalRouteValues)?.ToString(), StringComparison.OrdinalIgnoreCase);
-        // ensure the path starts with a slash, so that it is relative to the server root when concatenated with the host and the path base
+        // Ensure the path starts with a slash, so that it is relative to the server root when concatenated with the path base.
         if (!path.StartsWith('/'))
             path = "/" + path;
-        // build the absolute URL from the request's scheme, host and path base
-        return $"{httpContext.Request.Scheme}://{httpContext.Request.Host}{httpContext.Request.PathBase}{path}";
+        // The scheme and host are deliberately omitted. A browser resolves this against its own origin, so the value stays
+        // correct behind a reverse proxy even when the request headers do not describe the origin the browser used.
+        return $"{httpContext.Request.PathBase}{path}";
     }
 
     /// <summary>

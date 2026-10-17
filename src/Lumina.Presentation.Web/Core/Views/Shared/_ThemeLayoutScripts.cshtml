@@ -33,13 +33,16 @@
         error: '@localizer["Error"]',
         information: '@localizer["Information"]'
     };
-    // The endpoints the audio player reads the stored playback preferences of the user from, and writes the volume and
-    // mute state it changes back to. The routes are the culture aware web routes, so the player never hardcodes a path,
-    // and it never reaches the API server directly.
+    // The endpoints the audio player reads the stored playback preferences of the user from, writes the volume and mute
+    // state it changes back to, and fetches the playback manifest of a track from, together with the stream route
+    // template the manifest path must match. The routes are the culture aware web routes, so the player never hardcodes
+    // a path, and it never reaches the API server directly.
     var audioPlayerConfiguration = {
-        getUserSettingsUrl: '@_urlService.GetAbsoluteUrl(WebRoutes.Settings.GET_USER_SETTINGS)',
-        getPlaybackStateUrl: '@_urlService.GetAbsoluteUrl(WebRoutes.Settings.GET_PLAYBACK_STATE)',
-        updatePlaybackStateUrl: '@_urlService.GetAbsoluteUrl(WebRoutes.Settings.UPDATE_PLAYBACK_STATE)',
+        getUserSettingsUrl: '@_urlService.GetRelativeUrl(WebRoutes.Settings.GET_USER_SETTINGS)',
+        getPlaybackStateUrl: '@_urlService.GetRelativeUrl(WebRoutes.Settings.GET_PLAYBACK_STATE)',
+        updatePlaybackStateUrl: '@_urlService.GetRelativeUrl(WebRoutes.Settings.UPDATE_PLAYBACK_STATE)',
+        getPlaybackManifestUrl: '@_urlService.GetRelativeUrl(WebRoutes.Music.GET_PLAYBACK_MANIFEST)',
+        streamTrackRouteTemplate: '@_urlService.GetRelativeUrl(WebRoutes.Music.STREAM_TRACK)',
         strings: {
             play: '@localizer["AudioPlayerPlay"]',
             pause: '@localizer["AudioPlayerPause"]',
@@ -80,3 +83,7 @@
 <script defer src="~/js/audio-player/audio-player-demux/audio-player-demux-capabilities.js" asp-append-version="true"></script>
 <script defer src="~/js/audio-player/audio-player-engine.js" asp-append-version="true"></script>
 <script defer src="~/js/audio-player/audio-player.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-manifest.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-pipeline/audio-player-pipeline-byte-source.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-pipeline/audio-player-pipeline-schedulers.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-pipeline/audio-player-pipeline-engine.js" asp-append-version="true"></script>

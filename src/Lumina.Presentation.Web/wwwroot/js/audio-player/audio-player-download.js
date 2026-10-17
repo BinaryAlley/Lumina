@@ -41,7 +41,7 @@
  *       durationInSeconds: manifest.durationInSeconds,
  *       shouldKeepDownloadingWhilePaused: preferences.shouldKeepDownloadingWhilePaused,
  *       events: host.events,
- *       onProgress: (progress) => host.reportProgress(progress.downloadedFraction),
+ *       onProgress: (downloadedFraction) => host.reportProgress(downloadedFraction),
  *       onError: (error) => host.reportError(error)
  *   });
  *   // Fire and forget: the promise settles only when the loop stops, which is when the whole file is downloaded, the region
@@ -87,6 +87,24 @@
     'use strict';
 
     /**
+     * The timeout, in milliseconds, of an explicit one shot range request. The loop request is deliberately not bounded by
+     * a total timeout, because it is an open ended transfer; a one shot read is a small, bounded window, so a server that
+     * never answers it is a failure rather than a reason to hold a seek open forever.
+     * @readonly
+     * @type {number}
+     */
+    const ONE_SHOT_REQUEST_TIMEOUT_MS = 15000;
+
+    /**
+     * The lookahead, in bytes, within which a read is considered covered by the active loop request even though the loop
+     * has not received those bytes yet. It lets the first read of the loop wait for the bytes it is about to deliver,
+     * without making a seek at a distant offset wait for the sequential download to reach it.
+     * @readonly
+     * @type {number}
+     */
+    const LOOP_IN_FLIGHT_LOOKAHEAD_BYTES = 256 * 1024;
+
+    /**
      * Clamps a number into an inclusive range, through the shared helper on the namespace. The reference is resolved on
      * every call rather than captured at load time, so this module does not depend on the load order of the util.
      * @param {number} value - The value to clamp.
@@ -96,6 +114,15 @@
      */
     function clamp(value, minimum, maximum) {
         return LuminaAudioPlayer.clamp(value, minimum, maximum);
+    }
+
+    /**
+     * Builds the failure of a one shot range request that exceeded its timeout. It is a failed request, not an intentional
+     * abort, so the seek recovery does not retry it with another full timeout.
+     * @returns {LuminaAudioPlayer.PlayerError} The timeout failure.
+     */
+    function createRangeTimeoutError() {
+        return new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The range request timed out.', { reason: LuminaAudioPlayer.PlayerErrorReason.REQUEST_TIMEOUT });
     }
 
     /**
@@ -306,6 +333,8 @@
             const size = Math.max(0, Math.floor(length));
             if (size === 0)
                 return new Uint8Array(0);
+            // Touching segments are merged on append, so a requested window is always contained by exactly one segment.
+            // Finding that segment is enough; a window that crosses a boundary means the buffer has a real gap.
             let segmentIndex = -1;
             for (let index = 0; index < this.segments.length; index++) {
                 const candidate = this.segments[index];
@@ -321,6 +350,8 @@
             if (segmentIndex === -1)
                 return null;
             const segment = this.segments[segmentIndex];
+            // local is the offset of the requested window inside the segment. position is the segment offset of the chunk
+            // the loop is looking at, and filled is how many requested bytes were already copied.
             const local = start - segment.start;
             const result = new Uint8Array(size);
             let filled = 0;
@@ -338,6 +369,8 @@
                     position += chunk.byteLength;
                     continue;
                 }
+                // Clip the chunk to the part that intersects the requested window: from is the first byte to copy out of
+                // this chunk, take is how many bytes still fit in the result.
                 const from = Math.max(0, local - position);
                 const take = Math.min(chunk.byteLength - from, size - filled);
                 result.set(chunk.subarray(from, from + take), filled);
@@ -348,6 +381,8 @@
                 }
                 position += chunk.byteLength;
             }
+            // The segment promised the window by its length, but its chunks did not cover it. Treat it as a gap instead of
+            // returning a partially filled buffer the caller could play as if it were complete.
             return null;
         }
 
@@ -389,6 +424,8 @@
                 const segmentEnd = segment.start + segment.length;
                 if (segmentEnd <= position)
                     continue;
+                // The first segment that starts after the position is the gap that ends the run. Touching segments were
+                // merged on append, so no adjacency check is needed here.
                 if (segment.start > position)
                     break;
                 position = Math.max(position, segmentEnd);
@@ -431,7 +468,7 @@
          * @param {string} [options.credentials] - The credentials mode of the request. Defaults to 'same-origin', so the session cookie is sent.
          * @param {Object} [options.events] - The player event bus. When provided, the 'keep downloading while paused' preference is kept current from it.
          * @param {boolean} [options.shouldKeepDownloadingWhilePaused] - The value of the 'keep downloading while paused' setting, seeded by the engine from host.getPreferences(). It is the initial value; later PREFERENCES_CHANGED events and setKeepDownloadingWhilePaused override it.
-         * @param {Function} [options.onProgress] - Called with the progress snapshot every time the buffer grows.
+         * @param {Function} [options.onProgress] - Called with the downloaded fraction every time the buffer grows. The full snapshot is only produced once, by the completion callback.
          * @param {Function} [options.onComplete] - Called once when every byte of the file has been downloaded.
          * @param {Function} [options.onError] - Called with a {@link LuminaAudioPlayer.PlayerError} when the download fails.
          */
@@ -471,8 +508,15 @@
             this.isUnusable = false;
             this.error = null;
             // A downloader may have one loop request and, at most, an explicit one shot range request in flight at the same
-            // time, so every controller is tracked and an abort or a destroy cancels all of them, not just the newest.
+            // time. They are tracked apart: a pause or a pivot only cancels the loop request, while an abort or a destroy
+            // cancels every request, including an explicit range read such as the one a demuxer seek performs.
             this.abortControllers = new Set();
+            this.oneShotControllers = new Set();
+            // The byte range of the loop request that is currently being read, so a seek aware source can tell whether a
+            // window it needs is already being fetched and does not need a duplicate one shot request. The cursor is the
+            // exclusive end of the bytes the loop has actually received, so a far window is not mistaken for in flight.
+            this.activeLoopRange = null;
+            this.activeLoopCursor = null;
             this.loopPromise = null;
             this.waiters = [];
             this.unsubscribePreferences = null;
@@ -605,7 +649,7 @@
          */
         abort() {
             this.isAborted = true;
-            this.cancelActiveRequest();
+            this.abortAllRequests();
             // The download is stopping and no byte will append until it is started again, so a reader that is waiting for a
             // byte window is released with the aborted code instead of waiting forever.
             this.rejectWaiters(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED, 'The track download was aborted.'));
@@ -619,7 +663,7 @@
         async destroyAsync() {
             this.destroyed = true;
             this.isAborted = true;
-            this.cancelActiveRequest();
+            this.abortAllRequests();
             if (this.unsubscribePreferences) {
                 this.unsubscribePreferences();
                 this.unsubscribePreferences = null;
@@ -649,6 +693,69 @@
         }
 
         /**
+         * Checks whether the download buffer already holds a byte window, without allocating a range list. It is the
+         * allocation-free equivalent of searching getRanges and is safe to call on every demuxer read.
+         * @param {number} offset - The first byte of the window.
+         * @param {number} length - The length of the window, in bytes.
+         * @returns {boolean} True when the window is fully buffered.
+         */
+        isRangeCovered(offset, length) {
+            const start = Math.max(0, Math.floor(offset));
+            const size = Math.max(0, Math.floor(length));
+            return this.buffer.covers(start, size);
+        }
+
+        /**
+         * Gets the byte position the download loop fetches from, or will fetch from once it is allowed to run.
+         * @returns {number} The loop target byte.
+         */
+        getTargetByte() {
+            return this.targetByte;
+        }
+
+        /**
+         * Gets the exclusive end of the contiguous run of downloaded bytes that starts at or after an offset. A seek aware
+         * source uses it to start a range request after the bytes it already has instead of re-requesting a whole block.
+         * @param {number} offset - The byte to start from.
+         * @returns {number} The exclusive end of the contiguous run.
+         */
+        getContiguousEnd(offset) {
+            return this.buffer.getContiguousEnd(offset);
+        }
+
+        /**
+         * Gets the progress of the active loop request, so a seek aware source can tell a slow loop from a stalled one.
+         * The range start and the received cursor are both reported, because a new request can start at the same cursor a previous one was abandoned at.
+         * @returns {{ start: number, cursor: number }|null} The request start and its received cursor, or null when no loop request is active.
+         */
+        getLoopProgress() {
+            if (!this.activeLoopRange || this.activeLoopCursor === null)
+                return null;
+            return { start: this.activeLoopRange.start, cursor: this.activeLoopCursor };
+        }
+
+        /**
+         * Checks whether the loop request that is currently in flight is reading a range that covers a byte window. A seek
+         * aware source uses it to wait for the bytes that are already on their way instead of issuing a duplicate request.
+         * @param {number} offset - The first byte of the window.
+         * @param {number} length - The length of the window, in bytes.
+         * @returns {boolean} True when the active loop request covers the window.
+         */
+        isRangeBeingFetched(offset, length) {
+            if (!this.activeLoopRange || this.activeLoopCursor === null || this.destroyed || this.isAborted)
+                return false;
+            const start = Math.max(0, Math.floor(offset));
+            const end = start + Math.max(0, Math.floor(length));
+            // The loop covers a window only when it starts at or before the window, the window has been reached by the
+            // received cursor or lies within the first fetch block of the loop, and the window is inside the response. A
+            // window far ahead of the cursor is fetched as a one-shot instead of waiting for the sequential download.
+            const reachable = Math.max(this.activeLoopCursor, this.activeLoopRange.start + LOOP_IN_FLIGHT_LOOKAHEAD_BYTES);
+            return this.activeLoopRange.start <= start
+                && start <= reachable
+                && end <= this.activeLoopRange.end;
+        }
+
+        /**
          * Gets the downloaded time ranges, mapped through either the known total size and the duration or, when the size
          * is not known yet, through the bytes themselves once the whole file is in the buffer.
          * @returns {Array<{ start: number, end: number }>} The downloaded time ranges, in seconds.
@@ -664,6 +771,28 @@
                 start: (range.start / total) * this.duration,
                 end: (range.end / total) * this.duration
             }));
+        }
+
+        /**
+         * Checks whether a time position is already downloaded, without allocating a time range list. It maps the position
+         * to a byte through the same total size and duration proportion the time ranges use, and it matches the inclusive
+         * end of those ranges instead of testing one isolated byte.
+         * @param {number} seconds - The position to check, in seconds.
+         * @returns {boolean} True when the position is inside a stored run or at the inclusive end of one.
+         */
+        coversTime(seconds) {
+            const value = Number(seconds);
+            const total = this.resolveTotalForMapping();
+            if (!Number.isFinite(value) || total === null || total <= 0 || this.duration <= 0)
+                return false;
+            const fraction = clamp(value / this.duration, 0, 1);
+            const byte = Math.floor(fraction * total);
+            if (this.buffer.covers(byte, 1))
+                return true;
+            // getTimeRanges maps the exclusive end of a byte range to an inclusive time end, so the player treats a
+            // position exactly at the end of a buffered run as buffered. Checking the end of the run that covers the
+            // previous byte reproduces that inclusive end without allocating the range list.
+            return byte > 0 && this.buffer.getContiguousEnd(byte - 1) >= byte;
         }
 
         /**
@@ -820,7 +949,7 @@
          * @returns {Promise<Object>} The outcome, per {@link LuminaAudioPlayer.TrackDownloader#performFetchAsync}.
          */
         downloadRangeAsync(start, end) {
-            return this.performFetchAsync({ start, end });
+            return this.performFetchAsync({ start, end, isOneShot: true });
         }
 
         /**
@@ -830,7 +959,7 @@
          * @returns {Promise<Object>} The outcome, per {@link LuminaAudioPlayer.TrackDownloader#performFetchAsync}.
          */
         downloadOpenEndedAsync(start) {
-            return this.performFetchAsync({ start, openEnded: true });
+            return this.performFetchAsync({ start, openEnded: true, isOneShot: true });
         }
 
         /**
@@ -840,7 +969,7 @@
          * @returns {Promise<Object>} The outcome, per {@link LuminaAudioPlayer.TrackDownloader#performFetchAsync}.
          */
         downloadSuffixAsync(length) {
-            return this.performFetchAsync({ suffix: length });
+            return this.performFetchAsync({ suffix: length, isOneShot: true });
         }
 
         //+======================================================================================+
@@ -888,13 +1017,33 @@
         }
 
         /**
-         * Cancels every in flight request through its AbortController. A pause, a pivot, an abort and a destroy all route
-         * here, so no request, and no connection, is left open behind one that another controller replaced.
+         * Cancels the in flight requests of the download loop through their AbortControllers. A pause, a resume and a
+         * pivot route here, and they deliberately leave explicit one shot range requests alone: a demuxer that is scanning
+         * for a seek target must not be interrupted by a pause that happens while the scan is running.
          */
         cancelActiveRequest() {
-            if (this.abortControllers.size === 0)
+            this.abortRequests(this.abortControllers);
+        }
+
+        /**
+         * Cancels every in flight request, including explicit one shot range requests. An intentional abort, a destroy and
+         * the start of a new seek route here, so no stale read and no connection is left behind.
+         */
+        abortAllRequests() {
+            this.activeLoopRange = null;
+            this.activeLoopCursor = null;
+            this.abortRequests(this.abortControllers);
+            this.abortRequests(this.oneShotControllers);
+        }
+
+        /**
+         * Aborts every controller in one of the request sets.
+         * @param {Set<AbortController>} controllers - The controllers to abort.
+         */
+        abortRequests(controllers) {
+            if (controllers.size === 0)
                 return;
-            for (const controller of [...this.abortControllers]) {
+            for (const controller of [...controllers]) {
                 try {
                     controller.abort();
                 } catch (error) {
@@ -995,17 +1144,37 @@
          * @param {number} [spec.suffix] - The number of trailing bytes to request.
          * @param {boolean} [spec.openEnded] - True to request an open ended range, from start to the end of the file.
          * @param {boolean} [spec.stopOnPause] - True when a paused player must stop this request at the next chunk. The download loop sets it; a one shot range request does not, so an explicit request always completes.
+         * @param {boolean} [spec.isOneShot] - True for an explicit range request. Such a request is tracked apart from the
+         *     loop request and is not cancelled by a pause or a pivot, only by abort() or destroyAsync().
          * @returns {Promise<Object>} The outcome, one of: <c>{ isFailed: true, error }</c> when the request failed, <c>{ isAborted: true }</c> when it was aborted, <c>{ isDestroyed: true }</c> when the downloader was destroyed, <c>{ isSatisfied: true }</c> when the range was already satisfied, or <c>{ isAborted, isFailed: false, isDestroyed, isStopped }</c> for a read that ended. It never rejects.
          */
         async performFetchAsync(spec = {}) {
             if (this.destroyed)
                 return { isDestroyed: true, isAborted: false, isFailed: false };
+            // An explicit range request must not reopen a request after an intentional abort. startAsync clears the aborted
+            // state before it starts the loop again, so a request issued for a live timeline still runs.
+            if (this.isAborted)
+                return { isAborted: true, isFailed: false, isDestroyed: false };
             if (this.fetchImpl === null || this.url === '') {
                 this.isUnusable = true;
                 return { isFailed: true, error: new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The download request could not be built.') };
             }
             const controller = new AbortController();
-            this.abortControllers.add(controller);
+            // An explicit range request is not cancelled by a pause or a pivot, because a seek scan must be able to read
+            // its windows while playback is paused. Only abort(), destroyAsync() or its own timeout cancel it.
+            const controllers = spec.isOneShot === true ? this.oneShotControllers : this.abortControllers;
+            controllers.add(controller);
+            let didTimeout = false;
+            const timeoutTimer = spec.isOneShot === true
+                ? setTimeout(() => {
+                    didTimeout = true;
+                    try {
+                        controller.abort();
+                    } catch (error) {
+                        console.debug('Audio player: the timed out range request could not be aborted.', error);
+                    }
+                }, ONE_SHOT_REQUEST_TIMEOUT_MS)
+                : null;
             let response = null;
             try {
                 response = await this.fetchImpl(this.url, {
@@ -1022,8 +1191,44 @@
                     return { isAborted: false, isFailed: false, isDestroyed: this.destroyed, isSatisfied: true };
                 }
                 this.noteTotal(resolved.total);
-                return await this.readResponseIntoBufferAsync(response, resolved, controller, spec.stopOnPause === true, spec.openEnded === true);
+                if (spec.isOneShot !== true) {
+                    // The loop request is open ended in practice, and this is the range it is actually reading. A window
+                    // inside it is already being fetched, so a seek aware source can simply wait for it.
+                    this.activeLoopRange = {
+                        start: resolved.start,
+                        end: resolved.endInclusive === null ? Number.POSITIVE_INFINITY : resolved.endInclusive
+                    };
+                    this.activeLoopCursor = resolved.start;
+                }
+                // A bounded one shot request keeps the exact window it asked for, so a server or proxy that ignores Range
+                // and answers with a 200 cannot make the read store the whole resource. The window is only used for a 200
+                // response; a 206 already carries its own range.
+                let readWindow = null;
+                if (spec.isOneShot === true && Number.isFinite(Number(spec.start)) && Number.isFinite(Number(spec.end))) {
+                    const windowStart = Math.max(0, Math.floor(Number(spec.start)));
+                    const windowEnd = Math.max(windowStart, Math.floor(Number(spec.end)));
+                    readWindow = { start: windowStart, length: windowEnd - windowStart + 1 };
+                } else if (spec.isOneShot === true && Number.isFinite(Number(spec.suffix)) && resolved.total !== null) {
+                    const windowLength = Math.min(resolved.total, Math.max(1, Math.floor(Number(spec.suffix))));
+                    readWindow = { start: resolved.total - windowLength, length: windowLength };
+                }
+                const outcome = await this.readResponseIntoBufferAsync(response, resolved, controller, spec.stopOnPause === true, spec.openEnded === true, readWindow, spec.isOneShot !== true);
+                // A timeout that fires during the body read is caught inside the read and reported as an abort. It is still
+                // a failed request, so it is mapped to the same timeout failure as a timeout before the body started, and
+                // a seek does not retry it with another full deadline.
+                if (didTimeout && outcome.isAborted) {
+                    this.discardResponseBody(response);
+                    return { isFailed: true, isAborted: false, isDestroyed: this.destroyed, error: createRangeTimeoutError() };
+                }
+                return outcome;
             } catch (error) {
+                // A timeout is not an intentional stop: it is a failed request, so a seek does not retry it with another
+                // full timeout and the bar does not stay in its loading state for double the deadline. The check comes
+                // first because an abort can surface as an AbortError or as a body read error, depending on the browser.
+                if (didTimeout) {
+                    this.discardResponseBody(response);
+                    return { isFailed: true, isAborted: false, isDestroyed: this.destroyed, error: createRangeTimeoutError() };
+                }
                 if (LuminaAudioPlayer.isAbortError(error))
                     return { isAborted: true, isFailed: false, isDestroyed: this.destroyed };
                 // The failure left the response body unread, so it is discarded and the request is aborted to release the
@@ -1037,7 +1242,13 @@
                 }
                 return { isFailed: true, error: LuminaAudioPlayer.PlayerError.from(error, LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED) };
             } finally {
-                this.abortControllers.delete(controller);
+                if (timeoutTimer !== null)
+                    clearTimeout(timeoutTimer);
+                if (spec.isOneShot !== true) {
+                    this.activeLoopRange = null;
+                    this.activeLoopCursor = null;
+                }
+                controllers.delete(controller);
             }
         }
 
@@ -1122,16 +1333,24 @@
          * @param {AbortController} controller - The controller of the request, aborted when the loop must stop.
          * @param {boolean} stopOnPause - True when a paused player must stop the read at the next chunk boundary.
          * @param {boolean} openEnded - True when the request asked for a range that runs to the end of the file. Such a read is driven to the end of the body, and that end proves the end of the file, rather than the range the response happens to declare.
+         * @param {{ start: number, length: number }|null} [readWindow] - The bounded window a one shot request asked for. When the server answered with a 200 instead of a range, the body is read up to the end of this window, only the bytes of the window are stored, and the rest of the body is discarded.
+         * @param {boolean} [isLoopRequest=false] - True when this read belongs to the download loop. The received cursor of the loop is advanced per chunk so a seek aware source only waits for windows the loop is actually reaching.
          * @returns {Promise<Object>} The outcome of the read.
          * @throws {LuminaAudioPlayer.PlayerError} When the response carries no readable body.
          */
-        async readResponseIntoBufferAsync(response, range, controller, stopOnPause, openEnded) {
+        async readResponseIntoBufferAsync(response, range, controller, stopOnPause, openEnded, readWindow = null, isLoopRequest = false) {
             if (!response.body || typeof response.body.getReader !== 'function')
                 throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The stream response carried no readable body.');
             const reader = response.body.getReader();
             let offset = range.start;
+            if (isLoopRequest)
+                this.activeLoopCursor = offset;
             let isStopped = false;
             let hasReachedEnd = false;
+            // A 200 response means the server ignored the range. A bounded one shot request then stores only its own window
+            // and can stop reading as soon as that window is complete, instead of pulling the whole resource into memory.
+            const isFullResourceWindow = readWindow !== null && range.endInclusive === null;
+            const readWindowEnd = readWindow !== null ? readWindow.start + readWindow.length : null;
             // True when a bounded request read its whole declared range and stopped before the body ended, so any remaining
             // bytes are discarded. An open ended request instead reads the body to its end, because that end, and not the
             // range the response happens to declare, is the only signal that proves the end of the file.
@@ -1159,15 +1378,35 @@
                     const value = result.value;
                     if (!value || value.byteLength === 0)
                         continue;
-                    this.buffer.append(offset, value);
-                    offset += value.byteLength;
-                    this.notifyProgress();
-                    this.resolveWaiters();
-                    // A bounded request stops once it has read the range it asked for, while an open ended request reads on
-                    // to the end of the body, so a capped response is not mistaken for the end of the file.
-                    if (!openEnded && range.endInclusive !== null && offset > range.endInclusive) {
-                        isStoppedAtRangeEnd = true;
-                        break;
+                    if (isFullResourceWindow) {
+                        // The body starts at the beginning of the resource, so the bytes before the requested window are
+                        // consumed and dropped, and only the requested window is stored, at its absolute offset.
+                        const chunkStart = offset;
+                        const from = Math.max(chunkStart, readWindow.start);
+                        const to = Math.min(chunkStart + value.byteLength, readWindowEnd);
+                        if (to > from) {
+                            this.buffer.append(from, value.subarray(from - chunkStart, to - chunkStart));
+                            this.notifyProgress();
+                            this.resolveWaiters();
+                        }
+                        offset += value.byteLength;
+                        if (offset >= readWindowEnd) {
+                            isStoppedAtRangeEnd = true;
+                            break;
+                        }
+                    } else {
+                        this.buffer.append(offset, value);
+                        offset += value.byteLength;
+                        if (isLoopRequest)
+                            this.activeLoopCursor = offset;
+                        this.notifyProgress();
+                        this.resolveWaiters();
+                        // A bounded request stops once it has read the range it asked for, while an open ended request reads
+                        // on to the end of the body, so a capped response is not mistaken for the end of the file.
+                        if (!openEnded && range.endInclusive !== null && offset > range.endInclusive) {
+                            isStoppedAtRangeEnd = true;
+                            break;
+                        }
                     }
                 }
             } finally {
@@ -1264,7 +1503,9 @@
             if (!this.onProgress)
                 return;
             try {
-                this.onProgress(this.getProgress());
+                // Only the fraction is built per chunk: the full snapshot allocates range lists and is reserved for the
+                // completion callback, where it is produced once per track.
+                this.onProgress(this.getDownloadedFraction());
             } catch (error) {
                 console.error('Audio player: the download progress callback threw.', error);
             }
