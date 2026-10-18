@@ -27,11 +27,20 @@
         while it is expanded. The audio player toggles both classes on it as well.
       - The elements with the ids 'audio-player-full-height-toggle' and 'audio-player-close', which the global site script
         binds and routes to the audio player.
-      - The hook attributes the audio player binds: 'data-audio-player-play-pause', '-progress', '-progress-played',
-        '-progress-downloaded', '-progress-undownloaded', '-current-time', '-total-time', '-track-name',
-        '-cover-thumbnail', '-cover-image', '-volume', '-volume-level', '-mute' and '-queue'. The volume fill element
-        ('-volume-level') is a styling hook the stylesheet drives from the custom properties below, not one the script
-        writes to.
+      - The hook attributes the audio player binds: 'data-audio-player-play-pause', '-previous', '-next', '-shuffle',
+        '-shuffle-control', '-shuffle-menu', '-repeat', '-progress', '-progress-played', '-progress-downloaded',
+        '-progress-undownloaded', '-current-time', '-total-time', '-track-name', '-cover-thumbnail', '-cover-image',
+        '-volume', '-volume-level', '-mute' and '-queue'. The volume fill element ('-volume-level') is a styling hook the
+        stylesheet drives from the custom properties below, not one the script writes to.
+      - The shuffle scope items carry 'data-audio-player-shuffle-scope' ('off', 'release', 'artist' or 'library'), inside
+        the menu element carrying 'data-audio-player-shuffle-menu'. The shuffle control carries 'data-audio-player-shuffle'
+        and is wrapped by 'data-audio-player-shuffle-control', so the player can open the menu near it and close it on an
+        outside click. It is a menu button: it carries 'aria-haspopup' and 'aria-expanded', gets the 'is-active' class while
+        shuffle is on, and does not carry 'aria-pressed'. The scope items get 'aria-checked' and the 'is-selected' class, and
+        the 'off' item is selected while shuffle is off. The repeat toggle carries 'data-audio-player-repeat' and the player
+        writes 'data-audio-player-repeat-mode' ('off', 'all' or 'one') and toggles the 'is-active' and 'is-one' classes on it.
+        A queue item root rendered by the player always carries 'data-audio-player-queue-entry-id', whether it comes from the
+        theme sub template or from the built-in markup, so clicking it starts that entry.
       - The three state progress bar: the played part carries 'audio-player-progress-played', the downloaded but not
         played part carries 'audio-player-progress-downloaded', and the not yet downloaded part carries
         'audio-player-progress-undownloaded'. Each layer also carries 'data-audio-player-progress-layer' ('played',
@@ -43,19 +52,22 @@
         geometry, so a theme consumes the properties to style each state and to give either bar its own shape and
         orientation. The player marks the bar with 'is-buffering' while it is loading, and carries the state in
         'data-audio-player-progress-state' ('idle', 'ready' or 'buffering') together with the slider ARIA attributes.
-      - The plain text script elements that carry the raw source of the 'shared/audio-player/queue-item' and
-        'shared/audio-player/playlist-item' sub templates, with the ids 'audio-player-template-queue-item' and
-        'audio-player-template-playlist-item'.
+      - Themed shells only: the plain text script elements that carry the raw source of the
+        'shared/audio-player/queue-item' and 'shared/audio-player/playlist-item' sub templates, with the ids
+        'audio-player-template-queue-item' and 'audio-player-template-playlist-item'. This application fallback partial
+        renders neither element; it intentionally uses the built-in queue item markup.
 
-    The play affordances the pages hand to the player use the 'data-audio-player-play' trigger attribute. The
-    'The Audio Player Bar' section of docs/technical/theming/Theming.md documents this contract for theme authors.
+    The play affordances the pages hand to the player use the 'data-audio-player-play' trigger attribute, and a play next
+    affordance uses 'data-audio-player-play-next'. A track trigger must carry libraryId, trackId, albumId and artistId,
+    because the playback manifest route needs all four Ids. The 'The Audio Player Bar' section of
+    docs/technical/theming/Theming.md documents this contract for theme authors.
 *@
 
 <div class="audio-player-container not-shown" hidden>
     <!-- Expanded area: cover art, and the queue when the play context holds more than one track. -->
     <div class="audio-player-expanded">
         <img class="audio-player-cover-image" data-audio-player-cover-image alt="" />
-        <ul class="audio-player-queue" data-audio-player-queue></ul>
+        <ul class="audio-player-queue" data-audio-player-queue aria-label="@localizer["AudioPlayerQueue"]"></ul>
     </div>
     <!-- Condensed bar: transport controls, three state progress bar, volume, and track name. -->
     <div class="audio-player-bar">
@@ -69,9 +81,32 @@
             <div class="audio-player-progress-played" data-audio-player-progress-played data-audio-player-progress-layer="played"></div>
         </div>
         <span class="audio-player-time audio-player-total-time" data-audio-player-total-time>--:--</span>
-        <div class="audio-player-transport">
+        <div class="audio-player-queue-controls">
+            <div class="audio-player-shuffle-control" data-audio-player-shuffle-control>
+                <button type="button" class="audio-player-button audio-player-shuffle" data-audio-player-shuffle
+                        aria-haspopup="menu" aria-expanded="false" aria-label="@localizer["AudioPlayerShuffle"]">
+                    <span class="audio-player-shuffle-icon" aria-hidden="true">&#8646;</span>
+                </button>
+                <div class="audio-player-shuffle-menu" data-audio-player-shuffle-menu role="menu" hidden>
+                    <button type="button" role="menuitemradio" aria-checked="true" data-audio-player-shuffle-scope="off">@localizer["AudioPlayerShuffleOff"]</button>
+                    <button type="button" role="menuitemradio" aria-checked="false" data-audio-player-shuffle-scope="release">@localizer["AudioPlayerShuffleRelease"]</button>
+                    <button type="button" role="menuitemradio" aria-checked="false" data-audio-player-shuffle-scope="artist">@localizer["AudioPlayerShuffleArtist"]</button>
+                    <button type="button" role="menuitemradio" aria-checked="false" data-audio-player-shuffle-scope="library">@localizer["AudioPlayerShuffleLibrary"]</button>
+                </div>
+            </div>
+            <button type="button" class="audio-player-button audio-player-previous" data-audio-player-previous aria-label="@localizer["AudioPlayerPrevious"]">
+                <span class="audio-player-previous-icon" aria-hidden="true"></span>
+            </button>
             <button type="button" class="audio-player-button audio-player-play-pause" data-audio-player-play-pause aria-label="@localizer["AudioPlayerPlay"]">
-                <span class="audio-player-play-pause-icon"></span>
+                <span class="audio-player-play-pause-icon" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="audio-player-button audio-player-next" data-audio-player-next aria-label="@localizer["AudioPlayerNext"]">
+                <span class="audio-player-next-icon" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="audio-player-button audio-player-repeat" data-audio-player-repeat data-audio-player-repeat-mode="off"
+                    aria-pressed="false" aria-label="@localizer["AudioPlayerRepeatOff"]">
+                <span class="audio-player-repeat-icon" aria-hidden="true">&#8635;</span>
+                <span class="audio-player-repeat-one-badge" aria-hidden="true">1</span>
             </button>
         </div>
         <div class="audio-player-volume-control">

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * The audio player of Lumina: state machine, play descriptor, lifecycle, bar and the public control API.
  *
  * The player is a singleton created once, in the application layout, outside the content area that the
@@ -6,7 +6,7 @@
  * UI survive navigation. It produces no audio itself: audio is delegated to a swappable engine that
  * fulfills the interface documented in audio-player-engine.js. This module only owns the state machine, the
  * event bus, capability detection, the play descriptor, the bar, the transport controls it binds and renders, and the
- * public API. The download, decode and render pipeline is plugged in as an engine by the later stages. The bar holds
+ * public API. The download, decode and render pipeline is plugged in as a swappable engine. The bar holds
  * the three state progress bar (played, downloaded but not played, and not yet downloaded), the volume and mute
  * controls, the keyboard shortcuts, and the loading state a seek into a not yet downloaded position shows; the volume
  * and mute the controls change are persisted to the stored playback state of the user on their own.
@@ -15,7 +15,22 @@
  * ----------------------------------------
  * Methods:
  *   - playAsync(descriptor): starts playback of a track. The descriptor is documented by createPlayDescriptor.
- *                            When the descriptor carries a queue, that queue becomes the player queue.
+ *                            When the descriptor carries a queue, that queue becomes the player queue. When it names only
+ *                            an album or an artist, the album or the discography is loaded into the queue through the
+ *                            music endpoints documented in audio-player-queue.js.
+ *   - playNextAsync(descriptor): queues a track or an album after the current entry, without starting playback. It
+ *                            discards the pending autoplay continuation, because an explicit play next is a manual queue.
+ *   - nextAsync(): starts the next entry of the queue, wrapping at the end only when repeat all is on.
+ *   - previousAsync(): returns to the previous entry from the navigation history. When the playhead is past 3 seconds
+ *                      it restarts the current track instead, and pressing it again at the start walks back.
+ *   - setRepeatMode(mode), setRepeatModeAsync(mode): set repeat off, all or one.
+ *   - cycleRepeatMode(), cycleRepeatModeAsync(): cycle off, all, one and back to off.
+ *   - getRepeatMode(): the current repeat mode.
+ *   - setShuffleAsync(enabled, scope), toggleShuffleAsync(scope): shuffle a release, an artist or the whole library,
+ *                            one batch of randomized tracks at a time, as documented in audio-player-queue.js.
+ *   - getShuffleState(): whether shuffle is on and the scope it draws from.
+ *   - getQueueState(): the full queue entries, cursor, history, repeat mode, shuffle mode and play context.
+ *   - getQueueStateSummary(): the compact queue state published to observers.
  *   - pauseAsync(): suspends playback, keeping the position.
  *   - resumeAsync(): resumes playback from the current position.
  *   - toggleAsync(): pauses when playing, resumes otherwise.
@@ -173,6 +188,14 @@
     LuminaAudioPlayer.PLAY_DESCRIPTOR_ATTRIBUTE = 'data-audio-player-play';
 
     /**
+     * The attribute that marks an element as a play next trigger the player handles by event delegation. An explicit play
+     * next queues the item after the current entry and discards the pending autoplay continuation.
+     * @readonly
+     * @type {string}
+     */
+    LuminaAudioPlayer.PLAY_NEXT_ATTRIBUTE = 'data-audio-player-play-next';
+
+    /**
      * Maps each play descriptor field to the data attribute the pages set on a play trigger, so the
      * pages and the player share a single documented set of names.
      * @readonly
@@ -220,6 +243,23 @@
      * @type {number}
      */
     const PLAYBACK_STATE_PERSIST_DELAY_MS = 500;
+
+    /**
+     * The time, in milliseconds, after which a play context, continuation or shuffle fetch is abandoned. A request that
+     * never answers must not leave the player loading forever or keep a queue extension promise pending, so the build is
+     * aborted and the affected batch is treated as exhausted.
+     * @readonly
+     * @type {number}
+     */
+    const QUEUE_BUILD_TIMEOUT_MS = 60000;
+
+    /**
+     * The position, in seconds, after which the previous action restarts the current track instead of returning to the
+     * previous entry when there is no navigation history. It matches the convention of the reference web players.
+     * @readonly
+     * @type {number}
+     */
+    const PREVIOUS_RESTART_THRESHOLD_SECONDS = 3;
 
     /**
      * The tolerance, in seconds, within which a playhead report counts as having reached a pending seek target, so
@@ -324,27 +364,47 @@
      *
      * Field rules:
      *   - libraryId (string, required): the Id of the media library the context belongs to.
-     *   - trackId (string, required for a single track): the Id of the track.
-     *   - albumId (string, optional): the Id of the album. A descriptor without a track Id describes an album play context.
-     *   - artistId (string, optional): the Id of the artist. A descriptor without a track or album Id describes an artist play context.
+     *   - trackId (string, optional): the Id of the track. A track descriptor requires trackId, albumId and artistId,
+     *     because the playback manifest route needs all four Ids.
+     *   - albumId (string, optional): the Id of the album. An album play context requires albumId and artistId.
+     *   - artistId (string, optional): the Id of the artist. An artist play context is identified by artistId alone.
      *   - title (string, optional): the display title of the track or context.
      *   - durationInSeconds (number, optional): the duration of the track, in seconds.
      *   - coverArtPath (string, optional): the relative artwork path of the album, resolved against the server base path.
      *   - coverArtUrl (string, optional): an absolute cover art URL, or a relative artwork path.
      *   - queue (Array, optional): the ordered track descriptors of the play context, used to render the expanded bar.
+     *     A descriptor without any track, album or artist Id is valid only when it carries a non empty queue.
      * @param {Object} input - The descriptor to normalize.
-     * @returns {Object|null} The normalized descriptor, or null when it identifies no library, or no track, album or artist.
+     * @returns {Object|null} The normalized descriptor, or null when the required Ids of its context are missing.
      */
     function createPlayDescriptor(input) {
         if (!input || typeof input !== 'object')
             return null;
-        const trackId = toIdString(input.trackId);
-        const albumId = toIdString(input.albumId);
-        const artistId = toIdString(input.artistId);
-        const libraryId = toIdString(input.libraryId);
-        // A track descriptor carries its track Id, while an album or artist context descriptor carries only the Id it is built from.
-        if (!libraryId || (!trackId && !albumId && !artistId))
+        const trackId = LuminaAudioPlayer.toIdString(input.trackId);
+        const albumId = LuminaAudioPlayer.toIdString(input.albumId);
+        const artistId = LuminaAudioPlayer.toIdString(input.artistId);
+        const libraryId = LuminaAudioPlayer.toIdString(input.libraryId);
+        if (!libraryId)
             return null;
+        const queue = Array.isArray(input.queue)
+            ? input.queue
+                .map(item => createPlayDescriptor(item))
+                // An explicit queue holds playable tracks only. An album or artist context entry has no track to load, so it
+                // is dropped instead of becoming a dead queue item.
+                .filter(item => item !== null && item.trackId && item.albumId && item.artistId && item.libraryId)
+            : null;
+        const hasQueue = queue !== null && queue.length > 0;
+        // A track descriptor must carry all four Ids the manifest route needs. An album context must carry its artist,
+        // and only a pure queue list may omit the context Ids.
+        if (trackId) {
+            if (!albumId || !artistId)
+                return null;
+        } else if (albumId) {
+            if (!artistId)
+                return null;
+        } else if (!artistId && !hasQueue) {
+            return null;
+        }
         const coverArtSource = input.coverArtUrl || input.coverArtPath || '';
         const descriptor = {
             trackId,
@@ -356,23 +416,9 @@
             coverArtPath: typeof input.coverArtPath === 'string' ? input.coverArtPath : '',
             coverArtUrl: resolveCoverArtUrl(coverArtSource)
         };
-        if (Array.isArray(input.queue)) {
-            const queue = input.queue.map(item => createPlayDescriptor(item)).filter(item => item !== null);
+        if (queue !== null)
             descriptor.queue = Object.freeze(queue);
-        }
         return Object.freeze(descriptor);
-    }
-
-    /**
-     * Coerces an Id into a non empty string, or an empty string when it carries no value.
-     * @param {*} value - The Id to coerce.
-     * @returns {string} The Id as a string, or an empty string.
-     */
-    function toIdString(value) {
-        if (value === null || value === undefined)
-            return '';
-        const text = String(value).trim();
-        return text === '' ? '' : text;
     }
 
     /**
@@ -441,14 +487,35 @@
 
             this.state = LuminaAudioPlayer.PlayerState.IDLE;
             this.descriptor = null;
-            // The queue entries are the single queue: each entry carries an identity per occurrence, so a repeated track is
-            // distinguishable from another occurrence of the same track, and the descriptor the public API exposes. Every
-            // traversal, advance and render derives from this array, so the cursor can never disagree with the queue.
-            this.queueEntries = [];
-            this.entrySequence = 0;
-            this.currentIndex = 0;
-            // The order the queue list was last rendered in, so a future shuffle or reorder that changes queueEntries
-            // without rendering the list is detected instead of updating the wrong items in place.
+            // The queue is the single source of truth of what the player may play next: its entries carry an identity per
+            // occurrence, so a repeated track is distinguishable from another occurrence of the same track. The model, the
+            // play context and the client storage are documented in audio-player-queue.js.
+            this.queue = options.queue || new LuminaAudioPlayer.AudioQueue();
+            // The service that builds a queue from a play context through the web endpoints of the music pages, and the
+            // source a shuffle draws its batches from. Both are created lazily when a context or a shuffle needs them.
+            this.queueService = options.queueService || new LuminaAudioPlayer.QueueContextService({
+                fetchJsonAsync: (url, signal, label) => this.fetchJsonAsync(url, signal, label),
+                getConfiguration: () => this.getConfiguration(),
+                getShouldIgnoreThePrefix: () => this.preferences.shouldIgnoreThePrefixForAlphaPicker === true
+            });
+            this.shuffleSource = null;
+            // The generation of the queue, incremented whenever the queue is replaced, so a batch that was requested from the
+            // previous queue can never be appended to the queue that replaced it.
+            this.queueGeneration = 0;
+            // The token of the play request that owns the player, incremented by every play, skip and stop, so a request that
+            // was overtaken while it awaited its context or its engine cannot overwrite the newer one.
+            this.playRequestToken = 0;
+            // The build handles of the play context fetch, the background batch fetch (continuation or shuffle) and the
+            // explicit play next fetch. They are separate so a skip or a background batch can never silently abort the item
+            // the user chose to play next, and a play next never aborts a background batch.
+            this.playContextBuildHandle = null;
+            this.queueBatchBuildHandle = null;
+            this.playNextBuildHandle = null;
+            // True while a shuffle scope is being resolved, so a concurrent continuation does not abort its source fetch.
+            this.isShufflePending = false;
+            this.shuffleToken = 0;
+            // The order the queue list was last rendered in, so a reorder that changes the queue without rendering the list
+            // is detected instead of updating the wrong items in place.
             this.renderedQueueOrder = [];
             this.currentTime = 0;
             this.duration = 0;
@@ -463,7 +530,8 @@
                 shouldAutoplay: false,
                 isGaplessPlaybackEnabled: false,
                 replayGainMode: 'Off',
-                streamingQuality: 'Auto'
+                streamingQuality: 'Auto',
+                shouldIgnoreThePrefixForAlphaPicker: false
             };
             this.capabilityReport = null;
             this.capabilitiesReady = null;
@@ -526,6 +594,24 @@
             this.descriptorClickHandler = null;
             this.controlHandlers = [];
             this.isProgressRenderScheduled = false;
+            // The in flight batch extension of the queue, shared by every caller that needs the same next batch.
+            this.queueExtensionPromise = null;
+            // Explicit play next items that arrived while a play context was still resolving. They are inserted after that
+            // context becomes current, so a slow context build cannot swallow the later user action.
+            this.pendingPlayNext = [];
+            // True while the end of a track is being resolved, so two end reports of the same timeline cannot both continue.
+            this.isHandlingEnded = false;
+            // The handler that closes the shuffle scope menu on an outside click, and the handler that closes it on Escape.
+            this.shuffleMenuClickHandler = null;
+            this.shuffleMenuKeyHandler = null;
+        }
+
+        /**
+         * Gets the zero based position of the entry that is playing.
+         * @returns {number} The queue position, or -1 when the queue has no current entry.
+         */
+        get currentIndex() {
+            return this.queue.currentIndex;
         }
 
         /**
@@ -555,7 +641,9 @@
             this.bindKeyboardShortcuts();
             this.bindUnloadFlush();
             this.bindDescriptorDelegation();
-            // The bar is hidden until the user starts playback, so a refresh never flashes an empty player.
+            this.bindQueueInteraction();
+            this.bindShuffleMenuDismissal();
+            // A page load starts with a hidden bar and an empty queue. Nothing is restored and nothing is auto played.
             this.suppressInitialTransitions();
             this.applyHiddenState();
             this.releaseInitialHiddenState();
@@ -586,6 +674,12 @@
             this.dom.progressDownloaded = query('[data-audio-player-progress-downloaded]');
             this.dom.progressUndownloaded = query('[data-audio-player-progress-undownloaded]');
             this.dom.playPause = query('[data-audio-player-play-pause]');
+            this.dom.previous = query('[data-audio-player-previous]');
+            this.dom.next = query('[data-audio-player-next]');
+            this.dom.shuffle = query('[data-audio-player-shuffle]');
+            this.dom.shuffleControl = query('[data-audio-player-shuffle-control]');
+            this.dom.shuffleMenu = query('[data-audio-player-shuffle-menu]');
+            this.dom.repeat = query('[data-audio-player-repeat]');
             this.dom.volume = query('[data-audio-player-volume]');
             this.dom.mute = query('[data-audio-player-mute]');
             this.dom.queue = query('[data-audio-player-queue]');
@@ -605,6 +699,18 @@
         bindPlaybackControls() {
             if (this.dom.playPause)
                 this.addControlHandler(this.dom.playPause, 'click', () => this.toggleAsync());
+            if (this.dom.previous)
+                this.addControlHandler(this.dom.previous, 'click', () => this.previousAsync());
+            if (this.dom.next)
+                this.addControlHandler(this.dom.next, 'click', () => this.nextAsync());
+            if (this.dom.shuffle)
+                this.addControlHandler(this.dom.shuffle, 'click', () => this.handleShuffleControlClick());
+            if (this.dom.repeat)
+                this.addControlHandler(this.dom.repeat, 'click', () => this.cycleRepeatModeAsync());
+            if (this.dom.shuffleMenu) {
+                // The scope items are delegated, so a theme can render them as its own elements as long as each carries the documented scope attribute.
+                this.addControlHandler(this.dom.shuffleMenu, 'click', (event) => this.handleShuffleScopeClick(event));
+            }
             if (this.dom.progress) {
                 // The progress bar is scrubbed with pointer events rather than clicks, so that a drag moves the
                 // playhead continuously; the pointer is captured, so a drag that leaves the bar keeps scrubbing. A
@@ -642,9 +748,7 @@
          * is gone instead of cancelling it with the page's other requests.
          */
         bindUnloadFlush() {
-            this.unloadHandler = () => {
-                this.flushPlaybackStateAsync({ keepalive: true });
-            };
+            this.unloadHandler = () => this.flushPlaybackStateAsync({ keepalive: true });
             window.addEventListener('pagehide', this.unloadHandler);
         }
 
@@ -670,6 +774,13 @@
             this.descriptorClickHandler = (event) => {
                 if (!(event.target instanceof Element))
                     return;
+                const playNextTrigger = event.target.closest(`[${LuminaAudioPlayer.PLAY_NEXT_ATTRIBUTE}]`);
+                if (playNextTrigger) {
+                    event.preventDefault();
+                    const descriptor = readPlayDescriptorFromElement(playNextTrigger);
+                    this.playNextAsync(descriptor).catch((error) => this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED));
+                    return;
+                }
                 const trigger = event.target.closest(`[${LuminaAudioPlayer.PLAY_DESCRIPTOR_ATTRIBUTE}]`);
                 if (!trigger)
                     return;
@@ -681,7 +792,12 @@
         }
 
         /**
-         * Starts playback of a track, and shows the bar.
+         * Starts playback of a track, an album or an artist, and shows the bar.
+         *
+         * A descriptor that already carries a queue is played as is. A descriptor that names only an album or an artist is
+         * resolved into the ordered tracks of that context through {@link LuminaAudioPlayer.QueueContextService}, which also
+         * documents the endpoints and the order it uses. Starting any new context discards the previous queue, its history,
+         * its autoplay continuation and its shuffle, because a play now is an explicit choice.
          * @param {Object} descriptorInput - The play descriptor to play, per {@link LuminaAudioPlayer.createPlayDescriptor}.
          * @returns {Promise<boolean>} True when playback started, false when the request was rejected.
          */
@@ -694,14 +810,39 @@
                 this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The play descriptor identifies no library, or no track, album or artist.'));
                 return false;
             }
+            // The token invalidates this request if a later play, skip or stop takes the player while the context is loading.
+            const requestToken = ++this.playRequestToken;
+            // A new explicit play supersedes any play next that was waiting for an earlier context, so the latest play request owns the queue transition.
+            this.pendingPlayNext = [];
+            // A play now supersedes every queue fetch of the previous context, so nothing of the old queue keeps downloading.
+            this.abortQueueActivity();
             // Capability detection runs in the background while the page loads, so the first play waits for its answer instead
             // of starting a track the browser may not be able to decode.
             const report = await this.capabilitiesReady;
+            if (requestToken !== this.playRequestToken)
+                return false;
             if (report && !report.isSupported) {
                 this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING, 'The browser is missing a capability the player requires.',
                     { missing: report.missing }));
                 return false;
             }
+            // A new play context starts with fresh queue metadata, so a rescan that changed releases or artists is not
+            // masked by a list cached for an earlier context of this page.
+            if (typeof this.queueService.clearCaches === 'function')
+                this.queueService.clearCaches();
+            // A failed or empty context keeps the old queue, so it must also keep describing the old timeline instead of
+            // leaving the bar on the title of the context that never loaded.
+            const previousDescriptor = this.queue.getCurrentDescriptor() || this.descriptor;
+            const previousTimeline = {
+                descriptor: previousDescriptor,
+                duration: previousDescriptor
+                    && Number.isFinite(previousDescriptor.durationInSeconds)
+                    && previousDescriptor.durationInSeconds > 0
+                    ? previousDescriptor.durationInSeconds
+                    : this.duration,
+                currentTime: this.currentTime,
+                downloadedFraction: this.downloadedFraction
+            };
 
             // A new descriptor starts a new timeline, so the playhead and the progress of the previous track are dropped.
             this.descriptor = descriptor;
@@ -713,22 +854,283 @@
             this.endVolumeAdjust();
             // clearBuffering also clears any pending seek of the previous timeline.
             this.clearBuffering();
-            // An album or artist descriptor carries no track id of its own, so the queue starts at its first item in that case.
-            const descriptors = descriptor.queue && descriptor.queue.length > 0 ? [...descriptor.queue] : [descriptor];
-            this.queueEntries = descriptors.map((entry) => ({ entryId: this.createQueueEntryId(), descriptor: entry }));
-            this.currentIndex = Math.max(0, this.queueEntries.findIndex((entry) => entry.descriptor.trackId === descriptor.trackId));
+            this.shuffleSource = null;
 
-            // The bar is shown and the state moves to loading before the engine is touched, so a slow engine still gives the user
-            // immediate feedback that the request was accepted.
+            // The bar is shown and the state moves to loading before the context is resolved, so a slow endpoint still gives
+            // the user immediate feedback that the request was accepted.
+            this.renderDescriptor();
+            this.renderProgress();
+            this.showBar();
+            this.setState(LuminaAudioPlayer.PlayerState.LOADING);
+
+            let built;
+            const buildHandle = this.openPlayContextBuild();
+            try {
+                built = await this.queueService.buildQueueAsync(descriptor, buildHandle.signal);
+            } catch (error) {
+                // An aborted context is either superseded by a stop or a newer request, which owns the player, or it hit the
+                // build timeout. Only the timeout of the request that still owns the player is reported as a failure.
+                if (buildHandle.signal && buildHandle.signal.aborted) {
+                    if (requestToken === this.playRequestToken
+                        && buildHandle.timedOut
+                        && this.state === LuminaAudioPlayer.PlayerState.LOADING) {
+                        // The old timeline may still be playing while the new context never arrived. It is silenced before
+                        // the error state makes the play control a recovery action instead of a pause control.
+                        await this.pauseEngineQuietlyAsync(this.engine);
+                        this.restoreTimelineState(previousTimeline);
+                        this.fail(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The play context could not be loaded in time.'));
+                        await this.flushPendingPlayNext(requestToken);
+                    }
+                    return false;
+                }
+                // A session that expired while the context was loaded already owns the page: it is navigating to the sign in
+                // page, so the failure is not reported as a playback failure.
+                if (error && error.details && error.details.reason === LuminaAudioPlayer.PlayerErrorReason.SESSION_EXPIRED)
+                    return false;
+                if (requestToken !== this.playRequestToken || this.state !== LuminaAudioPlayer.PlayerState.LOADING)
+                    return false;
+                await this.pauseEngineQuietlyAsync(this.engine);
+                this.restoreTimelineState(previousTimeline);
+                this.fail(error, LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED);
+                await this.flushPendingPlayNext(requestToken);
+                return false;
+            } finally {
+                this.closePlayContextBuild(buildHandle);
+            }
+            // A stop or a newer play request while the context was loading owns the player and must not be overwritten by it.
+            if (requestToken !== this.playRequestToken || this.state !== LuminaAudioPlayer.PlayerState.LOADING)
+                return false;
+
+            // An empty context is reported before the existing queue is replaced, so a failed play of an empty album or
+            // artist does not wipe the queue that was already in memory.
+            if (!built || !Array.isArray(built.descriptors) || built.descriptors.length === 0) {
+                await this.pauseEngineQuietlyAsync(this.engine);
+                this.restoreTimelineState(previousTimeline);
+                this.fail(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The play context holds no playable track.'));
+                await this.flushPendingPlayNext(requestToken);
+                return false;
+            }
+            const current = this.queue.replaceContext(built.descriptors, {
+                startTrackId: descriptor.trackId,
+                context: built.context,
+                continuationEnabled: built.continuationEnabled && this.preferences.shouldAutoplay === true
+            });
+            // A new context is explicit and ordered, so it starts unshuffled; the model owns that reset together with the
+            // continuation flags. The repeat mode is a listening preference and is kept.
+            this.queueGeneration += 1;
+            this.shuffleSource = null;
+            if (!current) {
+                await this.pauseEngineQuietlyAsync(this.engine);
+                this.restoreTimelineState(previousTimeline);
+                this.fail(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The play context holds no playable track.'));
+                await this.flushPendingPlayNext(requestToken);
+                return false;
+            }
+            this.descriptor = current.descriptor;
+            this.duration = current.descriptor.durationInSeconds;
             this.renderDescriptor();
             this.renderProgress();
             this.renderQueue();
-            this.showBar();
-            this.setState(LuminaAudioPlayer.PlayerState.LOADING);
-            this.events.emit(LuminaAudioPlayer.PlayerEvent.DESCRIPTOR_CHANGED, descriptor);
-            this.events.emit(LuminaAudioPlayer.PlayerEvent.QUEUE_CHANGED, this.getQueue());
+            this.renderQueueControls();
+            this.events.emit(LuminaAudioPlayer.PlayerEvent.DESCRIPTOR_CHANGED, current.descriptor);
+            this.emitQueueStateChanged();
+            // Play next items that arrived while this context was resolving become the successors of the new current entry.
+            await this.flushPendingPlayNext(requestToken);
 
-            return this.startLoadedDescriptorAsync(descriptor);
+            const started = await this.startLoadedDescriptorAsync(current.descriptor, { keepBuffering: true, requestToken });
+            if (started)
+                this.maybeExtendQueueAsync();
+            return started;
+        }
+
+        /**
+         * Drops a prefetched or already appended handoff of the engine when the queue was replaced under a playing track.
+         * The engine is optional in this interface, so a player without that capability simply keeps its earlier behavior.
+         * @returns {Promise<void>} A promise that completes when the handoff was released.
+         */
+        async cancelUpcomingTransitionAsync() {
+            if (!this.engine || typeof this.engine.cancelUpcomingAsync !== 'function')
+                return;
+            try {
+                await this.engine.cancelUpcomingAsync();
+            } catch (error) {
+                console.debug('Audio player: the upcoming track of the replaced queue could not be released.', error);
+            }
+        }
+
+        /**
+         * Creates a build handle for a queue fetch: an abort controller, a timeout and a disposal.
+         *
+         * A queue fetch is a whole context, a continuation or a shuffle source, which can take seconds across many pages. The
+         * handle lets a stop or a newer action abort the request, and the timeout guarantees that a response that never
+         * arrives cannot leave the player loading or the extension promise pending forever.
+         * @returns {{ signal: AbortSignal|undefined, timedOut: boolean, abort: Function, resetTimeout: Function, dispose: Function }} The build handle.
+         */
+        createQueueBuildHandle() {
+            if (typeof AbortController !== 'function') {
+                return {
+                    signal: undefined,
+                    timedOut: false,
+                    abort: () => {},
+                    resetTimeout: () => {},
+                    dispose: () => {}
+                };
+            }
+            const controller = new AbortController();
+            const handle = {
+                signal: controller.signal,
+                timedOut: false,
+                timer: null,
+                resetTimeout: () => {
+                    if (handle.timer !== null)
+                        clearTimeout(handle.timer);
+                    handle.timedOut = false;
+                    handle.timer = setTimeout(() => {
+                        handle.timedOut = true;
+                        handle.abort();
+                    }, QUEUE_BUILD_TIMEOUT_MS);
+                },
+                abort: () => {
+                    try {
+                        if (!controller.signal.aborted)
+                            controller.abort();
+                    } catch (error) {
+                        console.debug('Audio player: the queue request could not be aborted.', error);
+                    }
+                },
+                dispose: () => {
+                    if (handle.timer !== null) {
+                        clearTimeout(handle.timer);
+                        handle.timer = null;
+                    }
+                }
+            };
+            handle.resetTimeout();
+            return handle;
+        }
+
+        /**
+         * Opens the build handle of a play context fetch, aborting a previous play context fetch that is still running.
+         * @returns {{ signal: AbortSignal|undefined, timedOut: boolean, abort: Function, dispose: Function }} The build handle.
+         */
+        openPlayContextBuild() {
+            this.abortPlayContextBuild();
+            const handle = this.createQueueBuildHandle();
+            this.playContextBuildHandle = handle;
+            return handle;
+        }
+
+        /**
+         * Closes a play context build handle, when it is still the current one.
+         * @param {Object} handle - The handle to close.
+         */
+        closePlayContextBuild(handle) {
+            if (this.playContextBuildHandle === handle)
+                this.playContextBuildHandle = null;
+            if (handle)
+                handle.dispose();
+        }
+
+        /**
+         * Opens the build handle of a queue batch fetch, which is either an autoplay continuation or a shuffle source and
+         * its first batch, aborting a previous batch fetch that is still running.
+         * @returns {{ signal: AbortSignal|undefined, timedOut: boolean, abort: Function, dispose: Function }} The build handle.
+         */
+        openQueueBatchBuild() {
+            const previous = this.queueBatchBuildHandle;
+            this.queueBatchBuildHandle = null;
+            if (previous) {
+                previous.abort();
+                previous.dispose();
+            }
+            const handle = this.createQueueBuildHandle();
+            this.queueBatchBuildHandle = handle;
+            return handle;
+        }
+
+        /**
+         * Closes a queue batch build handle, when it is still the current one.
+         * @param {Object} handle - The handle to close.
+         */
+        closeQueueBatchBuild(handle) {
+            if (this.queueBatchBuildHandle === handle)
+                this.queueBatchBuildHandle = null;
+            if (handle)
+                handle.dispose();
+        }
+
+        /**
+         * Opens the build handle of an explicit play next fetch, aborting a previous play next fetch that is still running.
+         * It never touches the background batch handle, so a continuation or shuffle batch cannot cancel the user's play
+         * next item.
+         * @returns {{ signal: AbortSignal|undefined, timedOut: boolean, abort: Function, dispose: Function }} The build handle.
+         */
+        openPlayNextBuild() {
+            const previous = this.playNextBuildHandle;
+            this.playNextBuildHandle = null;
+            if (previous) {
+                previous.abort();
+                previous.dispose();
+            }
+            const handle = this.createQueueBuildHandle();
+            this.playNextBuildHandle = handle;
+            return handle;
+        }
+
+        /**
+         * Closes a play next build handle, when it is still the current one.
+         * @param {Object} handle - The handle to close.
+         */
+        closePlayNextBuild(handle) {
+            if (this.playNextBuildHandle === handle)
+                this.playNextBuildHandle = null;
+            if (handle)
+                handle.dispose();
+        }
+
+        /**
+         * Aborts the play context fetch, when one is running.
+         */
+        abortPlayContextBuild() {
+            const handle = this.playContextBuildHandle;
+            this.playContextBuildHandle = null;
+            if (!handle)
+                return;
+            handle.abort();
+            handle.dispose();
+        }
+
+        /**
+         * Aborts the continuation or shuffle batch fetch, when one is running.
+         */
+        abortQueueBatchBuild() {
+            const handle = this.queueBatchBuildHandle;
+            this.queueBatchBuildHandle = null;
+            if (!handle)
+                return;
+            handle.abort();
+            handle.dispose();
+        }
+
+        /**
+         * Aborts the explicit play next fetch, when one is running.
+         */
+        abortPlayNextBuild() {
+            const handle = this.playNextBuildHandle;
+            this.playNextBuildHandle = null;
+            if (!handle)
+                return;
+            handle.abort();
+            handle.dispose();
+        }
+
+        /**
+         * Aborts every queue fetch of the player, used by a stop, a teardown and a new play request.
+         */
+        abortQueueActivity() {
+            this.abortPlayContextBuild();
+            this.abortQueueBatchBuild();
+            this.abortPlayNextBuild();
         }
 
         /**
@@ -739,14 +1141,23 @@
          * @param {Object} [options] - The load options.
          * @param {boolean} [options.keepBuffering] - True to keep a loading state that was handed to the load, used by an
          * automatic continuation so the gap before the manifest and header probe shows a loading state.
+         * @param {number} [options.requestToken] - The play request token that owns this load. A load whose token is no longer
+         * the current one is a request that was overtaken by a later play, skip or stop, and it never moves the player to READY
+         * or PLAYING, even when the newer request is still building its own queue.
          * @returns {Promise<boolean>} True when playback started, false when it was stopped or failed.
          */
         async startLoadedDescriptorAsync(descriptor, options = {}) {
             let engine = null;
+            const requestToken = options.requestToken;
+            const isRequestCurrent = () => requestToken === undefined || requestToken === this.playRequestToken;
             try {
                 // The state follows the engine step by step, so a consumer can tell preparation apart from actual playback.
                 engine = await this.ensureEngineAsync();
+                if (!isRequestCurrent())
+                    return false;
                 await engine.loadAsync(descriptor, options);
+                if (!isRequestCurrent())
+                    return false;
                 if (this.state !== LuminaAudioPlayer.PlayerState.LOADING) {
                     // A stop during the load already paused the engine; a newer request owns the player state and must not be touched by this stale continuation.
                     if (this.state === LuminaAudioPlayer.PlayerState.IDLE)
@@ -755,6 +1166,14 @@
                 }
                 this.setState(LuminaAudioPlayer.PlayerState.READY);
                 await engine.playAsync();
+                if (!isRequestCurrent()) {
+                    // Audio has started for a request that a newer one superseded. If the newer request has not started its own
+                    // playback yet, the superseded audio must not keep playing while its context builds, or forever when that
+                    // build fails. Playback of a newer request is left untouched.
+                    if (this.state !== LuminaAudioPlayer.PlayerState.PLAYING)
+                        await this.pauseEngineQuietlyAsync(engine);
+                    return false;
+                }
                 if (this.state !== LuminaAudioPlayer.PlayerState.READY) {
                     if (this.state === LuminaAudioPlayer.PlayerState.IDLE)
                         await this.pauseEngineQuietlyAsync(engine);
@@ -766,6 +1185,8 @@
                 // A load that a newer play request overtook, and a session that expired and is already navigating to the
                 // sign in page, are expected outcomes. They must not move the player to its error state, and they must not
                 // let this stale continuation set READY or PLAYING over the request that now owns the player.
+                if (!isRequestCurrent())
+                    return false;
                 const reason = error && error.details ? error.details.reason : null;
                 if (reason === LuminaAudioPlayer.PlayerErrorReason.LOAD_SUPERSEDED
                     || reason === LuminaAudioPlayer.PlayerErrorReason.SESSION_EXPIRED)
@@ -802,9 +1223,6 @@
             // A paused or stopped player has made an explicit choice that the end of a track must not override.
             if (this.state !== LuminaAudioPlayer.PlayerState.PLAYING)
                 return false;
-            const next = this.getNextDescriptor();
-            if (!next)
-                return false;
             // The capability gate is part of the player's play path, so an auto advance never starts a track the browser
             // cannot decode.
             const report = await this.capabilitiesReady;
@@ -815,15 +1233,14 @@
                     { missing: report.missing }), LuminaAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING);
                 return true;
             }
-            const advanced = this.advanceQueueTo(next.entryId);
-            if (!advanced)
+            // The next entry is re-resolved after the capability await, so a queue that changed in the meantime is respected.
+            const next = this.getNextDescriptor();
+            if (!next)
                 return false;
-            this.setState(LuminaAudioPlayer.PlayerState.LOADING);
-            this.renderTransportState();
             // The player owns the outcome from here, including a load that fails: returning true keeps the engine from
             // reporting an end over a state the player has already set. The loading state is kept across the engine
             // teardown, so the end gap shows that the next track is being prepared.
-            const hasStarted = await this.startLoadedDescriptorAsync(advanced, { keepBuffering: true });
+            const hasStarted = await this.startQueuedEntryAsync(next.entryId, { keepBuffering: true });
             if (!hasStarted && this.state === LuminaAudioPlayer.PlayerState.IDLE
                 && this.engine && typeof this.engine.discardCurrentAsync === 'function') {
                 // A stop during the continuation load owns the outcome. The prepared track is released, so a stopped
@@ -835,6 +1252,164 @@
                 }
             }
             return true;
+        }
+
+        /**
+         * Starts a queue entry that is already part of the queue, through the player's own play path. It is the single
+         * transition used by next, previous, the end of a track and the engine's gapless fallback, so the queue cursor, the
+         * bar and the state machine move together.
+         * @param {string} entryId - The identity of the queue entry to start.
+         * @param {Object} [options] - The start options.
+         * @param {boolean} [options.keepBuffering=false] - True to keep the loading state the caller already announced.
+         * @param {boolean} [options.recordHistory=true] - True to remember the entry that was playing in the navigation history.
+         * @param {string|null} [options.consumeHistoryId=null] - A history entry to consume once the commit succeeded.
+         * @returns {Promise<boolean>} True when the entry started, false when it was rejected or stopped.
+         */
+        async startQueuedEntryAsync(entryId, options = {}) {
+            if (!this.isAvailable)
+                return false;
+            // A skip is a new play request from the moment it starts, so an earlier play that is still waiting for its
+            // capability answer can no longer take the player. The token is checked again after the wait, so a request that
+            // arrives later still wins over this one.
+            const requestToken = ++this.playRequestToken;
+            // A skip also supersedes every queue fetch that was resolved for the track the skip is leaving: the play context
+            // fetch of a play that is still resolving, and a continuation or shuffle batch. None of them may keep downloading
+            // or apply a result to the new cursor. A play next waiting for that context belongs to it and is discarded.
+            this.pendingPlayNext = [];
+            this.abortPlayContextBuild();
+            this.abortQueueBatchBuild();
+            if (this.isShufflePending) {
+                this.shuffleToken += 1;
+                this.isShufflePending = false;
+            }
+            // Every way into a new track passes the same capability gate, so next, previous and the end of a track never
+            // start a track the browser cannot decode either.
+            const report = await this.capabilitiesReady;
+            if (requestToken !== this.playRequestToken)
+                return false;
+            if (report && !report.isSupported) {
+                this.fail(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING, 'The browser is missing a capability the player requires.',
+                    { missing: report.missing }), LuminaAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING);
+                return false;
+            }
+            const target = this.queue.findEntry(entryId);
+            if (target && !createPlayDescriptor(target.entry.descriptor)) {
+                this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The queue entry does not describe a playable track.'));
+                return false;
+            }
+            const committed = this.queue.commit(entryId, {
+                recordHistory: options.recordHistory !== false,
+                consumeHistoryId: options.consumeHistoryId || null
+            });
+            if (!committed)
+                return false;
+            // Restarting the entry that is already current must still reload its timeline, but it is not a queue move, so the
+            // state and the bar are reset by the committed entry and no history entry is produced.
+            this.showBar();
+            const applied = this.applyCommittedEntry(committed.entry, committed.changed ? committed.previousIndex : null, committed.removedCount);
+            if (!applied) {
+                this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The queue entry is no longer the current playable entry.'));
+                return false;
+            }
+            this.setState(LuminaAudioPlayer.PlayerState.LOADING);
+            this.renderTransportState();
+            const hasStarted = await this.startLoadedDescriptorAsync(committed.entry.descriptor, {
+                keepBuffering: options.keepBuffering === true,
+                requestToken
+            });
+            if (hasStarted)
+                this.maybeExtendQueueAsync();
+            return hasStarted;
+        }
+
+        /**
+         * Starts the next entry of the queue. It is the next action of the transport, and wraps at the end only when repeat
+         * all is on. When the autoplay continuation of an album or an artist still has a batch, that batch is loaded before
+         * the end, so next also works at the boundary of the context.
+         * @param {Object} [options] - The next options.
+         * @param {boolean} [options.allowWrap] - Set to false to skip without wrapping, used by error recovery.
+         * @returns {Promise<boolean>} True when an entry started.
+         */
+        async nextAsync(options = {}) {
+            if (!this.isAvailable || this.queue.entries.length === 0)
+                return false;
+            const allowWrap = options.allowWrap === false ? false : this.canWrapToFirstEntry();
+            const stateAtStart = this.state;
+            const cursorEntryId = this.queue.getCurrentEntry() ? this.queue.getCurrentEntry().entryId : null;
+            const queueGeneration = this.queueGeneration;
+            const requestToken = this.playRequestToken;
+            let next = this.queue.getNextEntry({ allowWrap });
+            if (!next) {
+                await this.maybeExtendQueueAsync({ force: true });
+                // A slow continuation must not start an entry for a cursor, queue or play request that moved while it loaded.
+                // A player that was already in its error state is still allowed to skip past the failed entry, while a new
+                // error during the extension keeps the recovery from starting over the failure.
+                if (this.queueGeneration !== queueGeneration
+                    || (this.queue.getCurrentEntry() ? this.queue.getCurrentEntry().entryId : null) !== cursorEntryId
+                    || this.playRequestToken !== requestToken
+                    || (stateAtStart !== LuminaAudioPlayer.PlayerState.ERROR && this.state === LuminaAudioPlayer.PlayerState.ERROR))
+                    return false;
+                next = this.queue.getNextEntry({ allowWrap });
+            }
+            if (!next)
+                return false;
+            return this.startQueuedEntryAsync(next.entryId);
+        }
+
+        /**
+         * Returns to the previous entry of the navigation history. When there is no history and the playhead is already at
+         * the start of the current track, it moves to the previous queue entry, or wraps to the last entry with repeat all.
+         * At the start of an entry with no earlier entry it restarts the current entry.
+         * @returns {Promise<boolean>} True when an entry started.
+         */
+        async previousAsync() {
+            if (!this.isAvailable || this.queue.entries.length === 0)
+                return false;
+            // Past the restart threshold the previous action restarts the track, like the reference web players, and only a
+            // second press walks back. At the very start it walks back immediately. A finished track is already at a fresh
+            // boundary, so previous walks back instead of restarting it. A failed entry is never restarted, because that
+            // would only repeat the failure; the history or the previous entry is the recovery path.
+            if (this.state !== LuminaAudioPlayer.PlayerState.ERROR
+                && this.state !== LuminaAudioPlayer.PlayerState.ENDED
+                && this.currentTime > PREVIOUS_RESTART_THRESHOLD_SECONDS)
+                return this.restartCurrentEntryAsync();
+            const previous = this.queue.getPreviousEntry();
+            if (!previous) {
+                if (this.state === LuminaAudioPlayer.PlayerState.ERROR)
+                    return false;
+                return this.restartCurrentEntryAsync();
+            }
+            return this.startQueuedEntryAsync(previous.entry.entryId, {
+                recordHistory: false,
+                consumeHistoryId: previous.fromHistory ? previous.entry.entryId : null
+            });
+        }
+
+        /**
+         * Checks whether the next action may wrap from the last entry to the first one. A repeat all wraps, unless an
+         * autoplay continuation of an album or an artist is still available: that continuation is the true next content,
+         * and the wrap only happens once the continuation is exhausted.
+         * @returns {boolean} True when the next action may wrap.
+         */
+        canWrapToFirstEntry() {
+            if (this.queue.getRepeatMode() !== LuminaAudioPlayer.QueueRepeatMode.ALL)
+                return false;
+            const canContinue = this.queue.isContinuationEnabled()
+                && this.preferences.shouldAutoplay === true
+                && this.queue.isContinuationExhausted() !== true;
+            const canExtendShuffle = this.queue.isShuffleEnabled() && this.queue.isShuffleSourceExhausted() !== true;
+            return !canContinue && !canExtendShuffle;
+        }
+
+        /**
+         * Restarts the current entry from its beginning, without moving the queue cursor.
+         * @returns {Promise<boolean>} True when the entry restarted.
+         */
+        async restartCurrentEntryAsync() {
+            const current = this.queue.getCurrentEntry();
+            if (!current)
+                return false;
+            return this.startQueuedEntryAsync(current.entryId, { recordHistory: false });
         }
 
         /**
@@ -868,7 +1443,7 @@
         }
 
         /**
-         * Pauses when playing, resumes when paused or ready, and replays the current track when idle.
+         * Pauses when playing, resumes when paused or ready, replays the current track when idle or ended, and moves to a playable neighbour when the current entry failed.
          * @returns {Promise<void>} A promise that completes when the toggle was applied.
          */
         async toggleAsync() {
@@ -876,8 +1451,22 @@
                 await this.pauseAsync();
             else if (this.state === LuminaAudioPlayer.PlayerState.PAUSED || this.state === LuminaAudioPlayer.PlayerState.READY)
                 await this.resumeAsync();
-            else if (this.descriptor)
-                await this.playAsync(this.descriptor);
+            else if (this.state === LuminaAudioPlayer.PlayerState.ERROR) {
+                // The current entry already failed, so the play control tries the next entry and falls back to the previous
+                // one. It never wraps back to the same dead entry, even with repeat all and a single entry queue.
+                const started = await this.nextAsync({ allowWrap: false });
+                if (!started)
+                    await this.previousAsync();
+            }
+            else if (this.state === LuminaAudioPlayer.PlayerState.IDLE || this.state === LuminaAudioPlayer.PlayerState.ENDED) {
+                // A stopped or finished queue is replayed from its current entry, so it resumes without rebuilding from a
+                // context descriptor that would discard the rest of the queue.
+                const current = this.queue.getCurrentEntry();
+                if (current)
+                    await this.startQueuedEntryAsync(current.entryId, { recordHistory: false });
+                else if (this.descriptor)
+                    await this.playAsync(this.descriptor);
+            }
         }
 
         /**
@@ -886,6 +1475,13 @@
          * @returns {Promise<void>} A promise that completes when playback stopped.
          */
         async stopAsync() {
+            // A stop invalidates a play request that is still resolving its context, so the stopped request cannot start later.
+            this.playRequestToken += 1;
+            this.shuffleToken += 1;
+            this.isShufflePending = false;
+            // A later stop wins over a play next that was waiting for a context build.
+            this.pendingPlayNext = [];
+            this.abortQueueActivity();
             if (this.engine) {
                 try {
                     // The engine is paused rather than destroyed, because it is reused for the next track and rebuilding it would
@@ -1057,6 +1653,9 @@
             const isExpanded = this.container.classList.toggle('full-height');
             if (this.main)
                 this.main.classList.toggle('audio-player-full-height', isExpanded);
+            // The queue is only rendered while the bar is expanded, so a fresh expansion draws the current queue and a collapse stops paying for a list that is not visible.
+            if (isExpanded)
+                this.renderQueue();
             return isExpanded;
         }
 
@@ -1152,28 +1751,452 @@
          * @returns {Array<Object>} The ordered play descriptors.
          */
         getQueue() {
-            return this.queueEntries.map((entry) => entry.descriptor);
+            return this.queue.entries.map((entry) => entry.descriptor);
         }
 
         /**
-         * Creates the identity of a new queue entry. Every occurrence in the queue gets its own identity, so two entries
-         * that repeat the same track are never confused.
-         * @returns {string} The new entry Id.
+         * Gets the playable state of the queue: its entries, cursor, history, repeat mode, shuffle mode and play context.
+         * @returns {Object} The queue state.
          */
-        createQueueEntryId() {
-            this.entrySequence += 1;
-            return `queue-entry-${this.entrySequence}`;
+        getQueueState() {
+            return this.queue.getState();
         }
 
         /**
-         * Gets the queue entry that follows the current one.
+         * Gets the compact queue state published to observers, without every entry, history identity or dedupe set.
+         * @returns {Object} The compact queue state.
+         */
+        getQueueStateSummary() {
+            return this.queue.getStateSummary();
+        }
+
+        /**
+         * Publishes the compact queue state, but only when somebody subscribes to it. Building a state payload for no listener is pure allocation on every cursor move.
+         */
+        emitQueueStateChanged() {
+            const canCheckListeners = typeof this.events.hasListeners === 'function';
+            // The deprecated event keeps its original descriptor array payload, but only pays for the mapping when a legacy consumer is actually subscribed.
+            if (!canCheckListeners || this.events.hasListeners(LuminaAudioPlayer.PlayerEvent.QUEUE_CHANGED))
+                this.events.emit(LuminaAudioPlayer.PlayerEvent.QUEUE_CHANGED, this.getQueue());
+            if (canCheckListeners && !this.events.hasListeners(LuminaAudioPlayer.PlayerEvent.QUEUE_STATE_CHANGED))
+                return;
+            this.events.emit(LuminaAudioPlayer.PlayerEvent.QUEUE_STATE_CHANGED, this.queue.getStateSummary());
+        }
+
+        /**
+         * Gets the current repeat mode.
+         * @returns {string} One of the {@link LuminaAudioPlayer.QueueRepeatMode} values.
+         */
+        getRepeatMode() {
+            return this.queue.getRepeatMode();
+        }
+
+        /**
+         * Applies a repeat mode and publishes it. It is the shared body of the synchronous and asynchronous repeat controls.
+         * @param {string} mode - One of the {@link LuminaAudioPlayer.QueueRepeatMode} values.
+         * @returns {{ changed: boolean, shouldCancelUpcoming: boolean }} Whether the mode changed and whether the gapless
+         * handoff must be cancelled because the mode crossed the repeat-one boundary.
+         */
+        applyRepeatMode(mode) {
+            const previous = this.queue.getRepeatMode();
+            if (!this.queue.setRepeatMode(mode))
+                return { changed: false, shouldCancelUpcoming: false };
+            this.renderQueueControls();
+            this.emitQueueStateChanged();
+            // Entering or leaving repeat one changes what the engine's already prepared handoff would do at the boundary,
+            // so a handoff cached before the change must be released.
+            return {
+                changed: true,
+                shouldCancelUpcoming: previous === LuminaAudioPlayer.QueueRepeatMode.ONE
+                    || mode === LuminaAudioPlayer.QueueRepeatMode.ONE
+            };
+        }
+
+        /**
+         * Sets the repeat mode.
+         * @param {string} mode - One of the {@link LuminaAudioPlayer.QueueRepeatMode} values.
+         * @returns {boolean} True when the mode changed.
+         */
+        setRepeatMode(mode) {
+            const result = this.applyRepeatMode(mode);
+            if (result.changed && result.shouldCancelUpcoming)
+                this.cancelUpcomingTransitionAsync();
+            return result.changed;
+        }
+
+        /**
+         * Sets the repeat mode through the asynchronous face of the control API.
+         * @param {string} mode - One of the {@link LuminaAudioPlayer.QueueRepeatMode} values.
+         * @returns {Promise<boolean>} True when the mode changed.
+         */
+        async setRepeatModeAsync(mode) {
+            const result = this.applyRepeatMode(mode);
+            if (result.changed && result.shouldCancelUpcoming)
+                await this.cancelUpcomingTransitionAsync();
+            return result.changed;
+        }
+
+        /**
+         * Cycles the repeat mode off, all, one and back to off.
+         * @returns {string} The new repeat mode.
+         */
+        cycleRepeatMode() {
+            const modes = [
+                LuminaAudioPlayer.QueueRepeatMode.OFF,
+                LuminaAudioPlayer.QueueRepeatMode.ALL,
+                LuminaAudioPlayer.QueueRepeatMode.ONE
+            ];
+            const index = modes.indexOf(this.queue.getRepeatMode());
+            const mode = modes[(index + 1) % modes.length];
+            const result = this.applyRepeatMode(mode);
+            if (result.changed && result.shouldCancelUpcoming)
+                this.cancelUpcomingTransitionAsync();
+            return mode;
+        }
+
+        /**
+         * Cycles the repeat mode from a control click.
+         * @returns {Promise<void>} A promise that completes when the control is rendered.
+         */
+        async cycleRepeatModeAsync() {
+            const modes = [
+                LuminaAudioPlayer.QueueRepeatMode.OFF,
+                LuminaAudioPlayer.QueueRepeatMode.ALL,
+                LuminaAudioPlayer.QueueRepeatMode.ONE
+            ];
+            const index = modes.indexOf(this.queue.getRepeatMode());
+            const mode = modes[(index + 1) % modes.length];
+            const result = this.applyRepeatMode(mode);
+            if (result.changed && result.shouldCancelUpcoming)
+                await this.cancelUpcomingTransitionAsync();
+        }
+
+        /**
+         * Gets the shuffle state.
+         * @returns {{ isShuffled: boolean, scope: string }} The shuffle state.
+         */
+        getShuffleState() {
+            return { isShuffled: this.queue.isShuffleEnabled(), scope: this.queue.getShuffleScope() };
+        }
+
+        /**
+         * Checks whether a shuffle scope can resolve the category it needs from the current queue and playing descriptor.
+         * A scope that cannot resolve its Ids is disabled in the menu instead of failing when it is selected.
+         * @param {string} scope - One of the {@link LuminaAudioPlayer.QueueShuffleScope} values.
+         * @returns {boolean} True when the scope has the Ids it needs.
+         */
+        canUseShuffleScope(scope) {
+            const descriptor = this.queue.getCurrentDescriptor() || this.descriptor;
+            if (!descriptor)
+                return false;
+            const context = this.queue.context;
+            const libraryId = (context && context.libraryId) || descriptor.libraryId;
+            if (!LuminaAudioPlayer.isGuid(libraryId))
+                return false;
+            if (scope === LuminaAudioPlayer.QueueShuffleScope.LIBRARY)
+                return true;
+            const artistId = descriptor.artistId || (context && context.artistId);
+            if (!LuminaAudioPlayer.isGuid(artistId))
+                return false;
+            if (scope === LuminaAudioPlayer.QueueShuffleScope.ARTIST)
+                return true;
+            if (scope === LuminaAudioPlayer.QueueShuffleScope.RELEASE) {
+                const albumId = descriptor.albumId || (context && context.albumId);
+                return LuminaAudioPlayer.isGuid(albumId);
+            }
+            return false;
+        }
+
+        /**
+         * Cancels a shuffle whose scope is still resolving, without turning an already enabled shuffle off.
+         * @returns {boolean} True when a pending shuffle was cancelled.
+         */
+        cancelPendingShuffle() {
+            if (!this.isShufflePending)
+                return false;
+            this.shuffleToken += 1;
+            this.isShufflePending = false;
+            this.abortQueueBatchBuild();
+            this.renderQueueControls();
+            this.emitQueueStateChanged();
+            return true;
+        }
+
+        /**
+         * Turns shuffle on for a scope, or off again.
+         *
+         * Shuffle never materializes the whole category: it queues a batch of randomized tracks of the scope, keeps the
+         * track that is playing first, and appends another batch while the queue approaches the end of the previous one.
+         * A release draws from its own tracks, an artist from all releases of the artist, and a library from all releases of
+         * all artists, one artist and one release at a time. Turning shuffle off restores the queue the shuffle replaced.
+         * @param {boolean} enabled - True to enable shuffle, false to disable it.
+         * @param {string} [scope] - One of the {@link LuminaAudioPlayer.QueueShuffleScope} values. Kept when omitted.
+         * @returns {Promise<boolean>} True when the shuffle state was applied.
+         */
+        async setShuffleAsync(enabled, scope) {
+            if (!this.isAvailable)
+                return false;
+            const targetScope = Object.values(LuminaAudioPlayer.QueueShuffleScope).includes(scope)
+                ? scope
+                : this.queue.getShuffleScope();
+            if (!enabled) {
+                // A scope that is still resolving is not visible through isShuffleEnabled yet. Selecting off must cancel
+                // that in-flight shuffle instead of doing nothing and letting it apply when the request returns.
+                const hadPendingShuffle = this.isShufflePending;
+                if (hadPendingShuffle) {
+                    this.shuffleToken += 1;
+                    this.isShufflePending = false;
+                    this.abortQueueBatchBuild();
+                }
+                if (!this.queue.isShuffleEnabled()) {
+                    if (hadPendingShuffle) {
+                        this.renderQueueControls();
+                        this.emitQueueStateChanged();
+                    }
+                    return hadPendingShuffle;
+                }
+                // Turning shuffle off invalidates a scope that may still be resolving, and aborts its batch fetch.
+                this.shuffleToken += 1;
+                this.isShufflePending = false;
+                this.abortQueueBatchBuild();
+                this.queue.restoreUnshuffledQueue();
+                this.queueGeneration += 1;
+                this.shuffleSource = null;
+                await this.cancelUpcomingTransitionAsync();
+                this.renderQueue();
+                this.renderQueueControls();
+                this.emitQueueStateChanged();
+                if (this.queue.getCurrentEntry())
+                    this.maybeExtendQueueAsync();
+                return true;
+            }
+            // Shuffle needs something to draw from. A queue that has not started has no context and no playing descriptor yet.
+            const descriptor = this.queue.getCurrentDescriptor() || this.descriptor;
+            if (!descriptor)
+                return false;
+            const generation = this.queueGeneration;
+            const cursorEntryId = this.queue.getCurrentEntry() ? this.queue.getCurrentEntry().entryId : null;
+            const sourceContext = this.queue.context;
+            const requestToken = this.playRequestToken;
+            const shuffleCallToken = ++this.shuffleToken;
+            this.isShufflePending = true;
+            // A shuffle supersedes a continuation or shuffle batch that is still being fetched, so that fetch is aborted.
+            this.abortQueueBatchBuild();
+            const buildHandle = this.openQueueBatchBuild();
+            try {
+                const source = await this.queueService.createShuffleSourceAsync(targetScope, this.queue, descriptor, buildHandle.signal);
+                if (generation !== this.queueGeneration
+                    || (this.queue.getCurrentEntry() ? this.queue.getCurrentEntry().entryId : null) !== cursorEntryId
+                    || this.queue.context !== sourceContext
+                    || this.playRequestToken !== requestToken)
+                    return false;
+                // The first shuffle batch replaces the ordered queue of the context, so only the track that is playing must be
+                // kept out of it: the tracks of the replaced queue are exactly the category a release or artist shuffle draws
+                // from. The complete queued set is excluded only by the later batches of extendQueueAsync, which must not
+                // repeat anything the shuffled queue already holds.
+                const excluded = new Set();
+                const identity = descriptor.trackId ? descriptor.trackId.toLowerCase() : '';
+                if (identity)
+                    excluded.add(identity);
+                const batch = await source.nextBatchAsync(excluded, LuminaAudioPlayer.SHUFFLE_BATCH_SIZE, buildHandle.signal);
+                // A queue item click, next or previous does not bump the generation, so the cursor and the context are compared
+                // as well: a shuffle resolved for the track or context the user already left must not fill the new queue.
+                if (generation !== this.queueGeneration
+                    || (this.queue.getCurrentEntry() ? this.queue.getCurrentEntry().entryId : null) !== cursorEntryId
+                    || this.queue.context !== sourceContext
+                    || this.playRequestToken !== requestToken)
+                    return false;
+                this.shuffleSource = source;
+                this.queue.applyShuffle(batch, targetScope, source.isExhausted);
+                this.queueGeneration += 1;
+                await this.cancelUpcomingTransitionAsync();
+                const current = this.queue.getCurrentEntry();
+                if (current) {
+                    this.descriptor = current.descriptor;
+                    this.renderDescriptor();
+                }
+                this.renderQueue();
+                this.renderQueueControls();
+                this.emitQueueStateChanged();
+                return true;
+            } catch (error) {
+                // A build that this player aborted was superseded by a stop, a new play or a newer shuffle. A timeout of the
+                // request that still owns the player is reported, because the shuffle could not be resolved at all.
+                if (buildHandle.signal && buildHandle.signal.aborted) {
+                    if (buildHandle.timedOut
+                        && generation === this.queueGeneration
+                        && (this.queue.getCurrentEntry() ? this.queue.getCurrentEntry().entryId : null) === cursorEntryId)
+                        this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The shuffle scope could not be loaded in time.'));
+                    return false;
+                }
+                if (error && error.details && error.details.reason === LuminaAudioPlayer.PlayerErrorReason.SESSION_EXPIRED)
+                    return false;
+                this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED);
+                return false;
+            } finally {
+                this.closeQueueBatchBuild(buildHandle);
+                if (this.shuffleToken === shuffleCallToken)
+                    this.isShufflePending = false;
+            }
+        }
+
+        /**
+         * Turns shuffle on with a scope, or off again when it is already on.
+         * @param {string} [scope] - One of the {@link LuminaAudioPlayer.QueueShuffleScope} values.
+         * @returns {Promise<boolean>} True when the shuffle state was applied.
+         */
+        async toggleShuffleAsync(scope) {
+            // A pending shuffle is still off as far as the queue is concerned, so toggling it again cancels it.
+            if (this.isShufflePending && !this.queue.isShuffleEnabled())
+                return this.setShuffleAsync(false, scope);
+            return this.setShuffleAsync(!this.queue.isShuffleEnabled(), scope);
+        }
+
+        /**
+         * Queues a descriptor or the tracks of a context after the current entry, as an explicit play next action.
+         *
+         * The pending autoplay continuation is discarded, because an explicit play next is a manual queue: the user chose
+         * what comes after the current track, so autopicking more of the album or artist would override that choice.
+         * @param {Object} descriptorInput - The play descriptor to queue, per {@link LuminaAudioPlayer.createPlayDescriptor}.
+         * @returns {Promise<boolean>} True when at least one entry was queued.
+         */
+        async playNextAsync(descriptorInput) {
+            if (!this.isAvailable)
+                return false;
+            const descriptor = createPlayDescriptor(descriptorInput);
+            if (!descriptor) {
+                this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The play descriptor identifies no library, or no track, album or artist.'));
+                return false;
+            }
+            // When nothing is current there is no "next" to queue after, so the request starts a new context instead and reports whether playback actually started.
+            if (!this.queue.getCurrentEntry())
+                return this.playAsync(descriptor);
+            // An explicit play next is a later user action than a shuffle that is still resolving, so the shuffle is
+            // cancelled and cannot replace the queue under the manual item.
+            this.cancelPendingShuffle();
+            // An end of track during this operation can move the player to ENDED after the cursor was captured. When that
+            // happens, the queued item becomes the successor of the track that just ended, so it is started instead of being
+            // left behind an ended player. A player that was already ended before the request keeps its ended state.
+            const stateAtStart = this.state;
+            const generation = this.queueGeneration;
+            // A context build that still owns the player is the play request the manual item belongs to. If it is still
+            // resolving when the item is ready, the item waits for it instead of being inserted into the queue it replaces.
+            const pendingContextToken = this.state === LuminaAudioPlayer.PlayerState.LOADING && this.playContextBuildHandle !== null
+                ? this.playRequestToken
+                : null;
+            const buildHandle = this.openPlayNextBuild();
+            let descriptors;
+            try {
+                descriptors = (await this.queueService.buildQueueAsync(descriptor, buildHandle.signal)).descriptors;
+            } catch (error) {
+                if (buildHandle.signal && buildHandle.signal.aborted) {
+                    if (buildHandle.timedOut)
+                        this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The play next item could not be loaded in time.'));
+                    return false;
+                }
+                if (error && error.details && error.details.reason === LuminaAudioPlayer.PlayerErrorReason.SESSION_EXPIRED)
+                    return false;
+                this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED);
+                return false;
+            } finally {
+                this.closePlayNextBuild(buildHandle);
+            }
+            if (descriptors.length === 0)
+                return false;
+            // The context is still resolving, so the item is held for the request that owns it. It is inserted as soon as
+            // that context becomes current, either on success or on a preserved old queue after a failed context.
+            if (pendingContextToken !== null
+                && this.playRequestToken === pendingContextToken
+                && this.playContextBuildHandle !== null) {
+                this.pendingPlayNext.push({ requestToken: pendingContextToken, descriptors });
+                return true;
+            }
+            // A new play request replaced the queue while the play next item was resolved, so the item belongs to a queue the
+            // user already left and must not be inserted into the new one. A context that resolved successfully during the
+            // fetch is owned by the same play request, so its new queue is exactly where the item belongs. A cursor that
+            // moved because a track ended or the user skipped is not an abort either.
+            const isOwnedContextResolution = pendingContextToken !== null && this.playRequestToken === pendingContextToken;
+            if (generation !== this.queueGeneration && !isOwnedContextResolution)
+                return false;
+            // A handoff the engine already prepared from the continuation is dropped, so the explicit play next item becomes
+            // the true successor and the discarded continuation is never heard.
+            await this.cancelUpcomingTransitionAsync();
+            // A queue replacement during the handoff teardown still aborts the insertion, unless it is the context this play
+            // next was waiting for. A cursor that moved because the track ended is not an abort: insertNext anchors the item
+            // to the entry that is current now.
+            if (generation !== this.queueGeneration && !isOwnedContextResolution)
+                return false;
+            // The discard is mirrored only once the insertion is certain, so a superseded play next does not leave the
+            // continuation disabled in a queue it never joined.
+            this.queue.removePendingContinuation();
+            const inserted = this.queue.insertNext(descriptors);
+            if (inserted === 0)
+                return false;
+            this.renderQueue();
+            this.renderQueueControls();
+            this.emitQueueStateChanged();
+            // The track that was playing ended while the item was queued, so the item is the next content and is started now.
+            if (stateAtStart !== LuminaAudioPlayer.PlayerState.ENDED
+                && this.state === LuminaAudioPlayer.PlayerState.ENDED) {
+                const next = this.queue.getNextEntry({ allowWrap: false });
+                if (next)
+                    await this.startQueuedEntryAsync(next.entryId);
+            }
+            return true;
+        }
+
+        /**
+         * Inserts the explicit play next items that waited for a play context to resolve. The items belong to one play
+         * request, so a newer request discards them instead of applying an old user action to a different queue.
+         * @param {number} requestToken - The play request token the pending items belong to.
+         * @returns {Promise<void>} A promise that completes when the pending items were inserted.
+         */
+        async flushPendingPlayNext(requestToken) {
+            if (!this.queue.getCurrentEntry())
+                return;
+            const pending = this.pendingPlayNext.filter((item) => item.requestToken === requestToken);
+            if (pending.length === 0)
+                return;
+            await this.cancelUpcomingTransitionAsync();
+            if (this.playRequestToken !== requestToken)
+                return;
+            this.pendingPlayNext = this.pendingPlayNext.filter((item) => item.requestToken !== requestToken);
+            for (const item of pending) {
+                this.queue.removePendingContinuation();
+                this.queue.insertNext(item.descriptors);
+            }
+            this.renderQueue();
+            this.renderQueueControls();
+            this.emitQueueStateChanged();
+        }
+
+        /**
+         * Restores the timeline that was visible before a play context attempt. It is used when the context fails or is
+         * empty, so the bar keeps describing the queue that is still in memory.
+         * @param {Object} snapshot - The descriptor, duration, playhead and downloaded fraction to restore.
+         */
+        restoreTimelineState(snapshot) {
+            this.descriptor = snapshot.descriptor;
+            this.duration = snapshot.duration;
+            this.currentTime = snapshot.currentTime;
+            this.downloadedFraction = snapshot.downloadedFraction;
+            this.renderDescriptor();
+            this.renderProgress();
+        }
+
+        /**
+         * Gets the queue entry that follows the current one. The wrap of repeat all is withheld while the autoplay
+         * continuation of an album or artist is still available, so the continuation is the true next content and the wrap
+         * only happens once the continuation is exhausted.
          * @returns {{ entryId: string, descriptor: Object }|null} The identity and descriptor of the next entry, or null at the end of the queue.
          */
         getNextDescriptor() {
-            if (this.currentIndex + 1 >= this.queueEntries.length)
+            // Repeat one replays the current entry at the end, so there is no next entry for a gapless handoff to prefetch:
+            // prefetching the next queue entry would hand off to another track instead of repeating the current one.
+            if (this.queue.getRepeatMode() === LuminaAudioPlayer.QueueRepeatMode.ONE)
                 return null;
-            const entry = this.queueEntries[this.currentIndex + 1];
-            return { entryId: entry.entryId, descriptor: entry.descriptor };
+            const entry = this.queue.getNextEntry({ allowWrap: this.canWrapToFirstEntry() });
+            return entry ? { entryId: entry.entryId, descriptor: entry.descriptor } : null;
         }
 
         /**
@@ -1189,29 +2212,42 @@
             // while a new play request is loading, the queue cursor belongs to that request and must not be moved by the old timeline.
             if (!entryId || this.state !== LuminaAudioPlayer.PlayerState.PLAYING)
                 return null;
-            const index = this.queueEntries.findIndex((entry) => entry.entryId === entryId);
+            // The entry is validated before the cursor moves, so a malformed entry can never leave the queue committed to a
+            // descriptor the bar and the engine cannot play.
+            const target = this.queue.findEntry(entryId);
+            if (!target || !createPlayDescriptor(target.entry.descriptor))
+                return null;
+            const committed = this.queue.commit(entryId);
             // An entry that is no longer part of the queue is not a track this player can describe.
-            if (index < 0)
+            if (!committed)
                 return null;
             // Moving to the entry that is already current is not a transition. Applying its descriptor again would reset the
             // playhead, the streamed fraction and the scrubbing state while the audio keeps playing.
-            if (index === this.currentIndex)
-                return this.queueEntries[index].descriptor;
-            // Navigation history, repeat and shuffle belong to the queue model, which is not part of this cursor movement.
-            const previousIndex = this.currentIndex;
-            this.currentIndex = index;
-            return this.applyTrackDescriptor(this.queueEntries[index].descriptor, previousIndex);
+            if (!committed.changed)
+                return committed.entry.descriptor;
+            const applied = this.applyCommittedEntry(committed.entry, committed.previousIndex, committed.removedCount);
+            // The commit may have trimmed the played part of the queue, which changes what the next control can do.
+            this.renderQueueControls();
+            this.maybeExtendQueueAsync();
+            return applied;
         }
 
         /**
-         * Applies a descriptor as the playing track without changing the queue cursor. It is the shared body of the
-         * validated queue advance and the scheduled-track adoption.
-         * @param {Object} descriptor - The descriptor to show as the playing track.
+         * Applies a queue entry that a commit has already made current. It is an internal seam of the validated queue
+         * advance, not a public way to start a track: the entry must be the current queue entry and it must still describe a
+         * playable descriptor, so a caller cannot bypass the identity and descriptor checks of the play path.
+         * @param {Object} entry - The committed queue entry to show as the playing track.
          * @param {number|null} [previousIndex] - The queue position that was current before the cursor moved, when the
          * commit knows it. It lets the queue update only the items whose current or played state changed.
-         * @returns {Object} The applied descriptor.
+         * @param {number} [removedCount=0] - The number of played entries the commit trimmed from the head of the queue.
+         * @returns {Object|null} The applied descriptor, or null when the entry is not the current playable entry.
          */
-        applyTrackDescriptor(descriptor, previousIndex = null) {
+        applyCommittedEntry(entry, previousIndex = null, removedCount = 0) {
+            const found = entry ? this.queue.findEntry(entry.entryId) : null;
+            const current = this.queue.getCurrentEntry();
+            if (!found || found.entry !== entry || !current || current !== entry || !createPlayDescriptor(entry.descriptor))
+                return null;
+            const descriptor = entry.descriptor;
             this.descriptor = descriptor;
             this.currentTime = 0;
             this.downloadedFraction = 0;
@@ -1223,12 +2259,21 @@
             this.duration = Number.isFinite(descriptor.durationInSeconds) && descriptor.durationInSeconds > 0 ? descriptor.durationInSeconds : 0;
             this.renderDescriptor();
             this.renderProgress();
-            if (Number.isInteger(previousIndex))
-                this.updateQueueSelection(previousIndex);
-            else
-                this.renderQueue();
+            // The queue list is only visible in the expanded bar, so its DOM is only updated while it is expanded. An expansion
+            // renders it from the current queue, so a change made while it was collapsed is not lost.
+            if (this.isExpanded()) {
+                // A trim removes entries from the head of the queue, so the one based index and the last flag of every
+                // remaining item move. Re-rendering the remaining list keeps the numbering correct; the fragment build makes
+                // it one insertion instead of one per item.
+                if (removedCount > 0)
+                    this.renderQueue();
+                else if (Number.isInteger(previousIndex))
+                    this.updateQueueSelection(previousIndex);
+                else
+                    this.renderQueue();
+            }
             this.events.emit(LuminaAudioPlayer.PlayerEvent.DESCRIPTOR_CHANGED, descriptor);
-            this.events.emit(LuminaAudioPlayer.PlayerEvent.QUEUE_CHANGED, this.getQueue());
+            this.emitQueueStateChanged();
             return descriptor;
         }
 
@@ -1363,6 +2408,9 @@
          * @returns {Promise<void>} A promise that completes when the engine was destroyed.
          */
         async destroyAsync() {
+            this.shuffleToken += 1;
+            this.isShufflePending = false;
+            this.abortQueueActivity();
             if (this.descriptorClickHandler) {
                 document.removeEventListener('click', this.descriptorClickHandler);
                 this.descriptorClickHandler = null;
@@ -1375,8 +2423,16 @@
                 window.removeEventListener('pagehide', this.unloadHandler);
                 this.unloadHandler = null;
             }
+            if (this.shuffleMenuClickHandler) {
+                document.removeEventListener('click', this.shuffleMenuClickHandler);
+                this.shuffleMenuClickHandler = null;
+            }
+            if (this.shuffleMenuKeyHandler) {
+                document.removeEventListener('keydown', this.shuffleMenuKeyHandler);
+                this.shuffleMenuKeyHandler = null;
+            }
             // A change that is still inside its debounce window is flushed before the timer is dropped, so a teardown
-            // never loses the last volume or mute the user set. The flush clears the timer itself.
+            // never loses the last volume, mute or queue the user set. The flush clears the timer itself.
             await this.flushPlaybackStateAsync();
             this.endScrub();
             this.endVolumeAdjust();
@@ -1441,14 +2497,17 @@
             const typed = this.raiseError(error, code);
             this.clearBuffering();
             this.setState(LuminaAudioPlayer.PlayerState.ERROR);
+            // The error state still offers recovery: the play control retries the entry, next skips it and previous walks back
+            // when there is somewhere to go. The controls are rendered now so that recovery is available immediately.
+            this.renderTransportState();
             return typed;
         }
 
         /**
          * Registers an engine factory on this player, by name.
          *
-         * This is the documented seam through which the later stages plug the real download, decode and render
-         * engine into the player, without reaching into its internals.
+         * This is the documented seam through which the download, decode and render engine is plugged into the player,
+         * without reaching into its internals.
          * @param {string} name - The name the engine is selected by, later passed to {@link LuminaAudioPlayer.AudioPlayer#useEngine}.
          * @param {Function} factory - A factory that receives the engine host and returns an engine.
          * @returns {LuminaAudioPlayer.AudioPlayer} This player, for chaining.
@@ -1643,17 +2702,324 @@
         }
 
         /**
-         * Handles the end of the current track reported by the engine.
+         * Handles the end of the current track reported by the engine: it repeats the track, continues with the next queue
+         * entry, extends an exhausted queue from its autoplay continuation, or moves the player to its ended state.
          */
         handleEngineEnded() {
-            // A player that the user stopped, that already failed, or that is preparing a new track is not moved to ended by a late end report of the previous timeline.
-            if (this.state === LuminaAudioPlayer.PlayerState.IDLE
-                || this.state === LuminaAudioPlayer.PlayerState.ERROR
-                || this.state === LuminaAudioPlayer.PlayerState.LOADING)
+            // Only a playing player may continue its queue. A pause, a stop, a failure or a load in progress is an explicit
+            // state that an end report of the old timeline must never override by starting the next entry.
+            if (this.state !== LuminaAudioPlayer.PlayerState.PLAYING)
                 return;
-            this.setState(LuminaAudioPlayer.PlayerState.ENDED);
-            this.renderTransportState();
-            this.events.emit(LuminaAudioPlayer.PlayerEvent.ENDED);
+            this.handleEndedAsync().catch((error) => {
+                this.fail(error, LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR);
+            });
+        }
+
+        /**
+         * Resolves the end of the current track. It is asynchronous because an autoplay continuation may have to load the
+         * next batch of the album, artist or shuffle before the next entry exists.
+         * @returns {Promise<void>} A promise that completes when the end was resolved.
+         */
+        async handleEndedAsync() {
+            if (this.isHandlingEnded)
+                return;
+            this.isHandlingEnded = true;
+            try {
+                const endedEntryId = this.queue.getCurrentEntry() ? this.queue.getCurrentEntry().entryId : null;
+                const queueGeneration = this.queueGeneration;
+                const requestToken = this.playRequestToken;
+                // Repeat one replays the entry that just ended, through the player's own play path, so the queue cursor
+                // stays where it is and the bar keeps describing the same track.
+                if (this.queue.getRepeatMode() === LuminaAudioPlayer.QueueRepeatMode.ONE) {
+                    await this.restartCurrentEntryAsync();
+                    return;
+                }
+                let next = this.queue.getNextEntry({ allowWrap: this.canWrapToFirstEntry() });
+                if (!next) {
+                    await this.maybeExtendQueueAsync({ force: true });
+                    // A slow continuation must not advance a track whose cursor, queue or play request moved while it loaded.
+                    // A manual pick or skip during the fetch owns the transition now, and the end of the old track is stale.
+                    if (this.queueGeneration !== queueGeneration
+                        || (this.queue.getCurrentEntry() ? this.queue.getCurrentEntry().entryId : null) !== endedEntryId
+                        || this.playRequestToken !== requestToken
+                        || this.state !== LuminaAudioPlayer.PlayerState.PLAYING)
+                        return;
+                    next = this.queue.getNextEntry({ allowWrap: this.canWrapToFirstEntry() });
+                }
+                if (next) {
+                    await this.startQueuedEntryAsync(next.entryId);
+                    return;
+                }
+                if (this.state !== LuminaAudioPlayer.PlayerState.PLAYING)
+                    return;
+                this.setState(LuminaAudioPlayer.PlayerState.ENDED);
+                this.renderTransportState();
+                this.events.emit(LuminaAudioPlayer.PlayerEvent.ENDED);
+            } finally {
+                this.isHandlingEnded = false;
+            }
+        }
+
+        /**
+         * Loads the next batch of the queue when it approaches the end of what is already queued, so a long album, artist or shuffle scope never stalls at the end of a batch.
+         *
+         * A shuffled queue appends another batch of its scope when fewer than the shuffle lookahead of entries remain. An
+         * album or artist queue appends the autoplay continuation only when the current entry is the last one, because the
+         * continuation is a boundary of the whole context. A caller that is already at the end of the queue forces the
+         * fetch, even when the lookahead would not have asked for it yet.
+         * @param {Object} [options] - The extension options.
+         * @param {boolean} [options.force=false] - True to fetch the next batch regardless of the lookahead.
+         * @returns {Promise<void>} A promise that completes when no more data can be fetched immediately.
+         */
+        async maybeExtendQueueAsync(options = {}) {
+            if (!this.isAvailable)
+                return;
+            // A shuffle is resolving its own source and first batch, so a continuation must not start a competing batch fetch.
+            if (this.isShufflePending)
+                return;
+            const force = options.force === true;
+            if (this.queue.isShuffleEnabled()) {
+                if (this.queue.isShuffleSourceExhausted())
+                    return;
+                if (!force && this.queue.getRemainingCount() > LuminaAudioPlayer.SHUFFLE_LOOKAHEAD)
+                    return;
+            } else {
+                if (this.queue.getRepeatMode() === LuminaAudioPlayer.QueueRepeatMode.ONE)
+                    return;
+                if (!this.queue.isContinuationEnabled() || this.preferences.shouldAutoplay !== true || this.queue.isContinuationExhausted())
+                    return;
+                if (!force && this.queue.getRemainingCount() > 0)
+                    return;
+            }
+            // A shuffle batch and an autoplay batch are both a single request per queue change, so a burst of advances shares
+            // one in flight extension instead of starting the same request several times.
+            if (this.queueExtensionPromise)
+                return this.queueExtensionPromise;
+            const promise = this.extendQueueAsync();
+            this.queueExtensionPromise = promise;
+            try {
+                await promise;
+            } finally {
+                if (this.queueExtensionPromise === promise)
+                    this.queueExtensionPromise = null;
+                // A batch can change the queue length, the continuation state or the shuffle exhaustion, all of which decide
+                // whether the next control is available, so the transport is rendered after every extension attempt.
+                this.renderQueueControls();
+            }
+        }
+
+        /**
+         * Fetches and appends one batch of the queue: the next shuffle batch of the current scope, or the autoplay continuation of the current play context.
+         * @returns {Promise<void>} A promise that completes when the batch was handled.
+         */
+        async extendQueueAsync() {
+            const generation = this.queueGeneration;
+            const buildHandle = this.openQueueBatchBuild();
+            try {
+                if (this.queue.isShuffleEnabled()) {
+                    if (!this.shuffleSource) {
+                        const descriptor = this.queue.getCurrentDescriptor() || this.descriptor;
+                        if (!descriptor)
+                            return;
+                        this.shuffleSource = await this.queueService.createShuffleSourceAsync(this.queue.getShuffleScope(), this.queue, descriptor, buildHandle.signal);
+                        if (generation !== this.queueGeneration || !this.queue.isShuffleEnabled())
+                            return;
+                    }
+                    const excluded = this.queue.getQueuedTrackIdentities();
+                    const batch = await this.shuffleSource.nextBatchAsync(excluded, LuminaAudioPlayer.SHUFFLE_BATCH_SIZE, buildHandle.signal);
+                    // A queue that was replaced or turned unshuffled while the batch was requested must not receive it.
+                    if (generation !== this.queueGeneration || !this.queue.isShuffleEnabled())
+                        return;
+                    if (batch.length === 0) {
+                        this.queue.markShuffleSourceExhausted();
+                        // The exhaustion is part of the queue state, so it is published like every other batch result.
+                        this.emitQueueStateChanged();
+                        return;
+                    }
+                    const insertIndex = this.queue.entries.length;
+                    this.queue.appendShuffleBatch(batch, this.shuffleSource.isExhausted);
+                    this.appendQueueTail(insertIndex);
+                    this.emitQueueStateChanged();
+                    return;
+                }
+                if (!this.queue.isContinuationEnabled() || this.preferences.shouldAutoplay !== true)
+                    return;
+                const batch = await this.queueService.buildContinuationBatchAsync(this.queue.context, this.queue, buildHandle.signal);
+                // A new play context replaced the queue, or an explicit play next discarded the continuation, while the batch
+                // was requested: the batch belongs to a queue that no longer exists and is dropped.
+                if (generation !== this.queueGeneration || !this.queue.isContinuationEnabled())
+                    return;
+                if (batch.descriptors.length === 0) {
+                    // Only the service declaring the continuation exhausted ends it. An empty, non-exhausted result is a transient gap and is retried by the next transition.
+                    if (batch.isExhausted === true) {
+                        this.queue.markContinuationExhausted();
+                        this.emitQueueStateChanged();
+                    }
+                    return;
+                }
+                const insertIndex = this.queue.entries.length;
+                this.queue.append(batch.descriptors, 'continuation');
+                if (batch.isExhausted)
+                    this.queue.markContinuationExhausted();
+                this.appendQueueTail(insertIndex);
+                this.emitQueueStateChanged();
+            } catch (error) {
+                // A build that this player aborted was superseded by a stop, a new play, a shuffle or a newer batch. A timeout
+                // of a batch that still belongs to the current queue is treated as exhausted, so a hanging response marks the
+                // batch done instead of leaving the extension promise pending and the queue unable to extend again.
+                if (buildHandle.signal && buildHandle.signal.aborted) {
+                    if (buildHandle.timedOut) {
+                        if (this.queue.isShuffleEnabled())
+                            this.queue.markShuffleSourceExhausted();
+                        else
+                            this.queue.markContinuationExhausted();
+                        this.renderQueueControls();
+                        this.emitQueueStateChanged();
+                    }
+                    return;
+                }
+                // A failed extension must never stop the current track. The session expiry is already navigating away, and
+                // any other failure leaves the queue at its current end, so the player can still be stopped or restarted.
+                if (error && error.details && error.details.reason === LuminaAudioPlayer.PlayerErrorReason.SESSION_EXPIRED)
+                    return;
+                this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED);
+            } finally {
+                this.closeQueueBatchBuild(buildHandle);
+            }
+        }
+
+        /**
+         * Handles a click on the shuffle control. A shuffled queue turns shuffle off, while an unshuffled one opens the
+         * scope menu when the bar provides one, or turns the release scope on directly when it does not.
+         */
+        handleShuffleControlClick() {
+            if (this.dom.shuffleMenu) {
+                // The control is a menu button, so it always opens the scope menu. Turning shuffle off is the 'off' item of
+                // that menu, and the selected scope can be changed without first turning shuffle off.
+                this.toggleShuffleMenu();
+                return;
+            }
+            if (this.isShufflePending || this.queue.isShuffleEnabled()) {
+                this.setShuffleAsync(false).catch((error) => this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED));
+                return;
+            }
+            this.setShuffleAsync(true).catch((error) => this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED));
+        }
+
+        /**
+         * Opens or closes the shuffle scope menu.
+         * @returns {boolean} True when the menu is open after the toggle.
+         */
+        toggleShuffleMenu() {
+            if (!this.dom.shuffleMenu)
+                return false;
+            const willOpen = this.dom.shuffleMenu.hasAttribute('hidden');
+            if (willOpen)
+                this.dom.shuffleMenu.removeAttribute('hidden');
+            else
+                this.dom.shuffleMenu.setAttribute('hidden', '');
+            if (this.container)
+                this.container.classList.toggle('is-menu-open', willOpen);
+            if (this.dom.shuffle)
+                this.dom.shuffle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+            return willOpen;
+        }
+
+        /**
+         * Closes the shuffle scope menu, when it is open.
+         */
+        closeShuffleMenu() {
+            if (!this.dom.shuffleMenu || this.dom.shuffleMenu.hasAttribute('hidden'))
+                return;
+            this.dom.shuffleMenu.setAttribute('hidden', '');
+            if (this.container)
+                this.container.classList.remove('is-menu-open');
+            if (this.dom.shuffle)
+                this.dom.shuffle.setAttribute('aria-expanded', 'false');
+        }
+
+        /**
+         * Handles a click on a shuffle scope item, including the 'off' item that turns shuffle back off.
+         * @param {MouseEvent} event - The click event.
+         */
+        handleShuffleScopeClick(event) {
+            if (!(event.target instanceof Element))
+                return;
+            const item = event.target.closest('[data-audio-player-shuffle-scope]');
+            if (!item || item.disabled || item.getAttribute('aria-disabled') === 'true')
+                return;
+            const scope = item.getAttribute('data-audio-player-shuffle-scope');
+            const isOff = scope === 'off';
+            if (!isOff && (!Object.values(LuminaAudioPlayer.QueueShuffleScope).includes(scope) || !this.canUseShuffleScope(scope)))
+                return;
+            event.preventDefault();
+            this.closeShuffleMenu();
+            const request = isOff ? this.setShuffleAsync(false) : this.setShuffleAsync(true, scope);
+            request.catch((error) => this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED));
+        }
+
+        /**
+         * Closes the shuffle scope menu when the user clicks outside it or presses Escape, so a menu that a theme renders never stays open over the page.
+         */
+        bindShuffleMenuDismissal() {
+            this.shuffleMenuClickHandler = (event) => {
+                if (!this.dom.shuffleControl || !(event.target instanceof Node)
+                    || this.dom.shuffleControl.contains(event.target))
+                    return;
+                this.closeShuffleMenu();
+            };
+            this.shuffleMenuKeyHandler = (event) => {
+                if (event.key === 'Escape')
+                    this.closeShuffleMenu();
+            };
+            document.addEventListener('click', this.shuffleMenuClickHandler);
+            document.addEventListener('keydown', this.shuffleMenuKeyHandler);
+        }
+
+        /**
+         * Binds the queue list, so a queue item starts the entry it describes. The entry identity is written on the rendered
+         * item root whatever the theme markup is, so a theme item is clickable without knowing the identity contract.
+         */
+        bindQueueInteraction() {
+            if (!this.dom.queue)
+                return;
+            // One activation rule for the pointer and the keyboard: any non-control part of an item starts it, while a button,
+            // link, field or editable element a theme renders inside the item keeps its own activation. The item root itself
+            // is allowed even when the theme renders it as a button or a link.
+            const interactiveSelector = 'button, a, input, select, textarea, [role="button"], [role="link"], [contenteditable="true"]';
+            const findActivationItem = (target) => {
+                const item = target.closest('[data-audio-player-queue-entry-id]');
+                if (!item)
+                    return null;
+                const control = target.closest(interactiveSelector);
+                return control && control !== item ? null : item;
+            };
+            const startFromItem = (item) => {
+                const entryId = item.getAttribute('data-audio-player-queue-entry-id');
+                if (!entryId || !this.queue.findEntry(entryId))
+                    return;
+                this.startQueuedEntryAsync(entryId).catch((error) => this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR));
+            };
+            this.addControlHandler(this.dom.queue, 'click', (event) => {
+                if (!(event.target instanceof Element))
+                    return;
+                const item = findActivationItem(event.target);
+                if (!item)
+                    return;
+                event.preventDefault();
+                startFromItem(item);
+            });
+            // The same activation rule applies to a queue item that has keyboard focus. A focused control inside an item still
+            // consumes its own Enter and Space, because the shared rule excludes it.
+            this.addControlHandler(this.dom.queue, 'keydown', (event) => {
+                if (!(event.target instanceof Element) || (event.key !== 'Enter' && event.key !== ' '))
+                    return;
+                const item = findActivationItem(event.target);
+                if (!item)
+                    return;
+                event.preventDefault();
+                startFromItem(item);
+            });
         }
 
         /**
@@ -1686,7 +3052,7 @@
             // reported and nothing is applied, instead of treating an expected outcome as a failure.
             if (settings === REDIRECTED || playbackState === REDIRECTED)
                 return;
-            if (settings === undefined || playbackState === undefined) 
+            if (settings === undefined || playbackState === undefined)
                 this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.PREFERENCES_LOAD_FAILED, 'The stored playback preferences of the user could not be read.'));
             if (settings) {
                 this.preferences = {
@@ -1694,10 +3060,25 @@
                     shouldAutoplay: settings.shouldAutoplay === true,
                     isGaplessPlaybackEnabled: settings.isGaplessPlaybackEnabled === true,
                     replayGainMode: settings.replayGainMode || 'Off',
-                    streamingQuality: settings.streamingQuality || 'Auto'
+                    streamingQuality: settings.streamingQuality || 'Auto',
+                    shouldIgnoreThePrefixForAlphaPicker: settings.shouldIgnoreThePrefixForAlphaPicker === true
                 };
                 // The payload is a frozen copy, so a subscriber that mutates it cannot change the preferences the player uses.
                 this.events.emit(LuminaAudioPlayer.PlayerEvent.PREFERENCES_CHANGED, Object.freeze({ ...this.preferences }));
+                // The autoplay continuation is enabled by the preference, so a queue that was built before the preferences
+                // arrived follows the stored value instead of the default of the player. A shuffled queue extends itself with
+                // its next shuffle batch instead, so it is never given an autoplay continuation.
+                const contextKind = this.queue.context ? this.queue.context.kind : '';
+                if (this.queue.entries.length > 0) {
+                    if (this.queue.isShuffleEnabled()) {
+                        this.maybeExtendQueueAsync();
+                    } else if (contextKind === LuminaAudioPlayer.PlayContextKind.ALBUM
+                        || contextKind === LuminaAudioPlayer.PlayContextKind.ARTIST) {
+                        this.queue.setContinuationEnabled(this.preferences.shouldAutoplay === true);
+                        if (this.preferences.shouldAutoplay === true)
+                            this.maybeExtendQueueAsync();
+                    }
+                }
             }
             if (playbackState) {
                 // The state the server holds is recorded before it is applied, so a change the user makes while this
@@ -2495,13 +3876,107 @@
          */
         renderTransportState() {
             const isPlaying = this.state === LuminaAudioPlayer.PlayerState.PLAYING;
-            if (!this.dom.playPause)
-                return;
-            this.dom.playPause.classList.toggle('is-playing', isPlaying);
             const strings = this.getStrings();
-            const label = isPlaying ? strings.pause : strings.play;
-            if (label)
-                this.dom.playPause.setAttribute('aria-label', label);
+            if (this.dom.playPause) {
+                this.dom.playPause.classList.toggle('is-playing', isPlaying);
+                const label = isPlaying ? strings.pause : strings.play;
+                if (label)
+                    this.dom.playPause.setAttribute('aria-label', label);
+            }
+            // The repeat, shuffle and skip controls share the transport state, so their labels and pressed state move with it.
+            this.renderQueueControls();
+        }
+
+        /**
+         * Renders the queue controls: the shuffle menu button, the repeat toggle and the skip controls.
+         *
+         * When the bar provides a shuffle scope menu, the shuffle control is a menu button: it exposes 'aria-haspopup',
+         * 'aria-expanded', the 'is-active' class while shuffle is on, and no 'aria-pressed'. Each scope item, including the
+         * 'off' item, exposes 'aria-checked' and the 'is-selected' class. When a theme provides no menu, the control falls back
+         * to a plain toggle that exposes 'aria-pressed' instead. The repeat control exposes 'aria-pressed', the 'is-active' and
+         * 'is-one' classes, and the current mode as 'data-audio-player-repeat-mode' ('off', 'all' or 'one'). The labels come
+         * from the localized strings of the configuration, so a theme that renders the controls with its own text still gets
+         * the correct accessible name.
+         */
+        renderQueueControls() {
+            const strings = this.getStrings();
+            const isShuffled = this.queue.isShuffleEnabled();
+            if (this.dom.shuffle) {
+                this.dom.shuffle.classList.toggle('is-active', isShuffled);
+                if (this.dom.shuffleMenu) {
+                    // A menu button does not carry a pressed state; the selected menu item carries the checked state instead.
+                    this.dom.shuffle.removeAttribute('aria-pressed');
+                    this.dom.shuffle.setAttribute('aria-haspopup', 'menu');
+                    this.dom.shuffle.setAttribute('aria-expanded', this.dom.shuffleMenu.hasAttribute('hidden') ? 'false' : 'true');
+                } else {
+                    this.dom.shuffle.setAttribute('aria-pressed', isShuffled ? 'true' : 'false');
+                    this.dom.shuffle.removeAttribute('aria-haspopup');
+                    this.dom.shuffle.removeAttribute('aria-expanded');
+                }
+                if (strings.shuffle)
+                    this.dom.shuffle.setAttribute('aria-label', strings.shuffle);
+            }
+            if (this.dom.shuffleMenu) {
+                const scopeLabels = {
+                    off: strings.shuffleOff,
+                    release: strings.shuffleRelease,
+                    artist: strings.shuffleArtist,
+                    library: strings.shuffleLibrary
+                };
+                for (const item of this.dom.shuffleMenu.querySelectorAll('[data-audio-player-shuffle-scope]')) {
+                    const scope = item.getAttribute('data-audio-player-shuffle-scope');
+                    const isSelected = scope === 'off'
+                        ? !isShuffled
+                        : isShuffled && scope === this.queue.getShuffleScope();
+                    const isAvailable = scope === 'off' || this.canUseShuffleScope(scope);
+                    item.setAttribute('aria-checked', isSelected ? 'true' : 'false');
+                    item.setAttribute('aria-disabled', isAvailable ? 'false' : 'true');
+                    item.disabled = !isAvailable;
+                    item.classList.toggle('is-selected', isSelected);
+                    item.classList.toggle('is-disabled', !isAvailable);
+                    if (scopeLabels[scope])
+                        item.setAttribute('aria-label', scopeLabels[scope]);
+                }
+            }
+            // The previous action normally has a meaning while the queue has an entry: it either walks back or restarts the
+            // current track. A failed entry is not restarted, so after an error the control is only enabled when there is a real previous entry to recover to.
+            if (this.dom.previous) {
+                const hasPrevious = this.queue.entries.length > 0
+                    && (this.state !== LuminaAudioPlayer.PlayerState.ERROR || this.queue.getPreviousEntry() !== null);
+                this.dom.previous.disabled = !hasPrevious;
+                this.dom.previous.classList.toggle('is-disabled', this.dom.previous.disabled);
+            }
+            if (this.dom.next) {
+                const repeatMode = this.queue.getRepeatMode();
+                const isRepeatOne = repeatMode === LuminaAudioPlayer.QueueRepeatMode.ONE;
+                // Repeat one makes the continuation a no-op, so a continuation at the end of the queue must not advertise a next action that cannot start.
+                const canContinue = !isRepeatOne
+                    && this.queue.isContinuationEnabled()
+                    && this.preferences.shouldAutoplay === true
+                    && this.queue.isContinuationExhausted() !== true;
+                const hasNext = this.queue.entries.length > 0
+                    && (this.queue.currentIndex + 1 < this.queue.entries.length
+                        || repeatMode === LuminaAudioPlayer.QueueRepeatMode.ALL
+                        || canContinue
+                        || (this.queue.isShuffleEnabled() && this.queue.isShuffleSourceExhausted() !== true));
+                this.dom.next.disabled = !hasNext;
+                this.dom.next.classList.toggle('is-disabled', this.dom.next.disabled);
+            }
+            if (this.dom.repeat) {
+                const mode = this.queue.getRepeatMode();
+                const labels = {
+                    off: strings.repeatOff,
+                    all: strings.repeatAll,
+                    one: strings.repeatOne
+                };
+                this.dom.repeat.dataset.audioPlayerRepeatMode = mode;
+                this.dom.repeat.setAttribute('aria-pressed', mode === LuminaAudioPlayer.QueueRepeatMode.OFF ? 'false' : 'true');
+                this.dom.repeat.classList.toggle('is-active', mode !== LuminaAudioPlayer.QueueRepeatMode.OFF);
+                this.dom.repeat.classList.toggle('is-one', mode === LuminaAudioPlayer.QueueRepeatMode.ONE);
+                const label = labels[mode] || strings.repeat;
+                if (label)
+                    this.dom.repeat.setAttribute('aria-label', label);
+            }
         }
 
         /**
@@ -2552,16 +4027,72 @@
          * provides one, so that the theme owns the structure of a queue item, and the built-in markup is used otherwise.
          */
         renderQueue() {
-            if (!this.dom.queue)
+            if (!this.dom.queue || !this.isExpanded())
                 return;
-            this.dom.queue.innerHTML = '';
-            const items = this.queueEntries.length > 1 ? this.queueEntries : [];
+            const items = this.queue.entries.length > 1 ? this.queue.entries : [];
+            // The items are built into a detached fragment first, so a large context produces one insertion and one layout
+            // pass instead of one per item. A host without a fragment falls back to the direct append path.
+            const fragment = typeof document.createDocumentFragment === 'function' ? document.createDocumentFragment() : null;
+            const target = fragment || this.dom.queue;
+            const previousScrollTop = this.dom.queue.scrollTop;
+            if (!fragment)
+                this.dom.queue.innerHTML = '';
             for (let index = 0; index < items.length; index++) {
-                const entry = this.renderQueueItem(items[index].descriptor, index, items.length);
+                const entry = this.renderQueueItem(items[index], index, items.length);
                 if (entry)
-                    this.dom.queue.appendChild(entry);
+                    target.appendChild(entry);
             }
+            if (fragment) {
+                this.dom.queue.innerHTML = '';
+                this.dom.queue.appendChild(fragment);
+            }
+            // Rebuilding the list must not throw the panel back to the top, especially when a trim renumbered it.
+            this.dom.queue.scrollTop = previousScrollTop;
             this.renderedQueueOrder = items.map((entry) => entry.entryId);
+        }
+
+        /**
+         * Appends the entries a batch added to the rendered queue, without rebuilding the items that were already rendered.
+         *
+         * It is used while the expanded bar is open and a continuation or a shuffle batch appends entries at the end. When the rendered list is not exactly the entries before the new tail, because the cursor was trimmed, the
+         * bar was collapsed, or a theme changed the markup, it falls back to a full render.
+         * @param {number} firstNewIndex - The index of the first entry the batch appended.
+         */
+        appendQueueTail(firstNewIndex) {
+            if (!this.dom.queue || !this.isExpanded())
+                return;
+            const total = this.queue.entries.length;
+            if (!Number.isInteger(firstNewIndex) || firstNewIndex < 0) {
+                this.renderQueue();
+                return;
+            }
+            const existingCount = this.renderedQueueOrder.length;
+            const children = this.dom.queue.children;
+            if (total <= 1) {
+                this.dom.queue.innerHTML = '';
+                this.renderedQueueOrder = [];
+                return;
+            }
+            // The tail can only be appended when the rendered children are exactly the entries before it. A changed order,
+            // a trimmed cursor or a list that was never rendered needs the full render.
+            if (existingCount === 0 || existingCount !== firstNewIndex || !children || children.length !== existingCount) {
+                this.renderQueue();
+                return;
+            }
+            // The item that was last before the batch is no longer last, and a theme may style the last item differently, so it
+            // is re-rendered once with the new total before the tail is appended.
+            const previousLastIndex = existingCount - 1;
+            if (previousLastIndex >= 0) {
+                const updatedLast = this.renderQueueItem(this.queue.entries[previousLastIndex], previousLastIndex, total);
+                if (updatedLast && children && children[previousLastIndex])
+                    this.dom.queue.replaceChild(updatedLast, children[previousLastIndex]);
+            }
+            for (let index = firstNewIndex; index < total; index++) {
+                const item = this.renderQueueItem(this.queue.entries[index], index, total);
+                if (item)
+                    this.dom.queue.appendChild(item);
+            }
+            this.renderedQueueOrder = this.queue.entries.map((entry) => entry.entryId);
         }
 
         /**
@@ -2573,12 +4104,12 @@
         updateQueueSelection(previousIndex) {
             if (!this.dom.queue)
                 return;
-            const total = this.queueEntries.length;
+            const total = this.queue.entries.length;
             const children = this.dom.queue.children;
             // A changed order means the rendered child at an index no longer describes the entry at that index, so the
             // list is rebuilt instead of updating the wrong items. The same fallback covers a list that was never rendered.
             const hasSameOrder = this.renderedQueueOrder.length === total
-                && this.renderedQueueOrder.every((entryId, index) => entryId === this.queueEntries[index].entryId);
+                && this.renderedQueueOrder.every((entryId, index) => entryId === this.queue.entries[index].entryId);
             if (total <= 1 || !children || children.length !== total || !hasSameOrder
                 || typeof this.dom.queue.replaceChild !== 'function') {
                 this.renderQueue();
@@ -2591,9 +4122,18 @@
                 return;
             }
             // isPlayed flips for every position between the old and the new cursor, inclusive, and isCurrent flips at
-            // both ends, so that inclusive range is exactly the set of items whose state changed.
+            // both ends. Only the two ends need a template render; the items in between only change their played class, so
+            // a click far from the current entry does not parse every item template on the way.
             for (let index = from; index <= to; index++) {
-                const item = this.renderQueueItem(this.queueEntries[index].descriptor, index, total);
+                if (index !== from && index !== to) {
+                    const child = children[index];
+                    if (child) {
+                        child.classList.toggle('is-played', index < this.currentIndex);
+                        child.classList.remove('is-current');
+                    }
+                    continue;
+                }
+                const item = this.renderQueueItem(this.queue.entries[index], index, total);
                 if (item)
                     this.dom.queue.replaceChild(item, children[index]);
             }
@@ -2601,15 +4141,18 @@
 
         /**
          * Renders one queue item, from the theme sub template when the theme provides one and from the built-in markup
-         * otherwise.
-         * @param {Object} item - The play descriptor of the item.
+         * otherwise. The rendered root always carries the 'data-audio-player-queue-entry-id' attribute, whatever the theme
+         * markup is, so the queue list can start the entry the user clicked without the theme repeating the identity.
+         * @param {Object} entry - The queue entry, with an entryId, a descriptor and a source.
          * @param {number} index - The zero based position of the item in the queue.
          * @param {number} totalItems - The number of items in the queue.
          * @returns {HTMLElement|null} The rendered queue item, or null when the markup produced no element.
          */
-        renderQueueItem(item, index, totalItems) {
+        renderQueueItem(entry, index, totalItems) {
+            const item = entry.descriptor;
             // The model exposes only what a queue item can show, so a theme template never reaches into the player internals.
             const viewModel = {
+                entryId: entry.entryId,
                 index: index + 1,
                 trackId: item.trackId,
                 albumId: item.albumId,
@@ -2621,21 +4164,28 @@
                 coverArtUrl: item.coverArtUrl || '',
                 isCurrent: index === this.currentIndex,
                 isPlayed: index < this.currentIndex,
-                isLast: index === totalItems - 1
+                isLast: index === totalItems - 1,
+                isContinuation: entry.source === 'continuation',
+                isShuffled: entry.source === 'shuffle'
             };
+            let rendered = null;
             if (this.subTemplates.queueItem) {
                 try {
                     const container = document.createElement('div');
                     container.innerHTML = window.renderThemeTemplate(this.subTemplates.queueItem, viewModel);
-                    const entry = container.firstElementChild;
-                    if (entry)
-                        return entry;
+                    rendered = container.firstElementChild;
                 } catch (error) {
                     // A broken theme sub template falls through to the built-in markup, so the queue never disappears.
                     console.error('Audio player: the theme queue item template could not be rendered.', error);
                 }
             }
-            return this.buildDefaultQueueItem(viewModel);
+            if (!rendered)
+                rendered = this.buildDefaultQueueItem(viewModel);
+            rendered.setAttribute('data-audio-player-queue-entry-id', entry.entryId);
+            // The item is reachable by keyboard, so a user who cannot point can still start an entry. A control the theme rendered inside the item keeps its own focus and keyboard behavior.
+            if (!rendered.hasAttribute('tabindex'))
+                rendered.setAttribute('tabindex', '0');
+            return rendered;
         }
 
         /**
@@ -2649,6 +4199,12 @@
             entry.dataset.trackId = viewModel.trackId;
             if (viewModel.isCurrent)
                 entry.classList.add('is-current');
+            if (viewModel.isPlayed)
+                entry.classList.add('is-played');
+            if (viewModel.isContinuation)
+                entry.classList.add('is-continuation');
+            if (viewModel.isShuffled)
+                entry.classList.add('is-shuffled');
             const title = document.createElement('span');
             title.className = 'audio-player-queue-item-title';
             title.textContent = viewModel.title;

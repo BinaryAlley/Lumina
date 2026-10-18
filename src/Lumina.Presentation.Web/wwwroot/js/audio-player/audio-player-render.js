@@ -39,7 +39,7 @@
  * markStreamComplete. Completion is never inferred from the duration of the manifest, because that duration is a whole
  * number of seconds and a decode that is still on its way near the end would then have its last frames cut off. A drained
  * schedule that is not complete is a gap: the renderer keeps playing, reports the playhead pinned to the frontier of the
- * scheduled audio, and waits for more, which is what lets the later stages treat a gap as an underrun and recover from
+ * scheduled audio, and waits for more, which is what lets the pipeline treat a gap as an underrun and recover from
  * it instead of ending the track. The end is also detected from the end of the last source, so a tab that the browser
  * hides, and whose animation frame loop it suspends, still reaches the end while the audio keeps playing. The end is
  * reported through onEnded once per configured track: a buffer scheduled after an end resumes playback, but the callback

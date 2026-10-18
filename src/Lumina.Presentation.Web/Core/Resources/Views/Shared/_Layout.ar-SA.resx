@@ -180,4 +180,40 @@
   <data name="Yes" xml:space="preserve">
     <value>نعم</value>
   </data>
+  <data name="AudioPlayerPrevious" xml:space="preserve">
+    <value>المقطع السابق</value>
+  </data>
+  <data name="AudioPlayerNext" xml:space="preserve">
+    <value>المقطع التالي</value>
+  </data>
+  <data name="AudioPlayerShuffle" xml:space="preserve">
+    <value>تشغيل عشوائي</value>
+  </data>
+  <data name="AudioPlayerShuffleRelease" xml:space="preserve">
+    <value>تشغيل الألبوم عشوائياً</value>
+  </data>
+  <data name="AudioPlayerShuffleArtist" xml:space="preserve">
+    <value>تشغيل الفنان عشوائياً</value>
+  </data>
+  <data name="AudioPlayerShuffleLibrary" xml:space="preserve">
+    <value>تشغيل المكتبة عشوائياً</value>
+  </data>
+  <data name="AudioPlayerRepeat" xml:space="preserve">
+    <value>تكرار</value>
+  </data>
+  <data name="AudioPlayerRepeatOff" xml:space="preserve">
+    <value>التكرار متوقف</value>
+  </data>
+  <data name="AudioPlayerRepeatAll" xml:space="preserve">
+    <value>تكرار الكل</value>
+  </data>
+  <data name="AudioPlayerRepeatOne" xml:space="preserve">
+    <value>تكرار مقطع واحد</value>
+  </data>
+  <data name="AudioPlayerQueue" xml:space="preserve">
+    <value>قائمة التشغيل</value>
+  </data>
+  <data name="AudioPlayerShuffleOff" xml:space="preserve">
+    <value>تشغيل عشوائي متوقف</value>
+  </data>
 </root>

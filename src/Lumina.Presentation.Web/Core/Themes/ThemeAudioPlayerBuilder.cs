@@ -42,7 +42,19 @@ public sealed class ThemeAudioPlayerBuilder
         Dictionary<string, object?> strings = new()
         {
             ["toggleFullHeight"] = Localize("ToggleFullHeight"),
-            ["toggleVisibility"] = Localize("ToggleVisibility")
+            ["toggleVisibility"] = Localize("ToggleVisibility"),
+            ["previous"] = Localize("AudioPlayerPrevious"),
+            ["next"] = Localize("AudioPlayerNext"),
+            ["shuffle"] = Localize("AudioPlayerShuffle"),
+            ["shuffleOff"] = Localize("AudioPlayerShuffleOff"),
+            ["shuffleRelease"] = Localize("AudioPlayerShuffleRelease"),
+            ["shuffleArtist"] = Localize("AudioPlayerShuffleArtist"),
+            ["shuffleLibrary"] = Localize("AudioPlayerShuffleLibrary"),
+            ["repeat"] = Localize("AudioPlayerRepeat"),
+            ["repeatOff"] = Localize("AudioPlayerRepeatOff"),
+            ["repeatAll"] = Localize("AudioPlayerRepeatAll"),
+            ["repeatOne"] = Localize("AudioPlayerRepeatOne"),
+            ["queue"] = Localize("AudioPlayerQueue")
         };
 
         return new ThemeAudioPlayerDto(

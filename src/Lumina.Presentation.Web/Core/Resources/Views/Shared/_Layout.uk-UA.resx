@@ -180,4 +180,40 @@
   <data name="Yes" xml:space="preserve">
     <value>Так</value>
   </data>
+  <data name="AudioPlayerPrevious" xml:space="preserve">
+    <value>Попередній трек</value>
+  </data>
+  <data name="AudioPlayerNext" xml:space="preserve">
+    <value>Наступний трек</value>
+  </data>
+  <data name="AudioPlayerShuffle" xml:space="preserve">
+    <value>Перемішати</value>
+  </data>
+  <data name="AudioPlayerShuffleRelease" xml:space="preserve">
+    <value>Перемішати альбом</value>
+  </data>
+  <data name="AudioPlayerShuffleArtist" xml:space="preserve">
+    <value>Перемішати виконавця</value>
+  </data>
+  <data name="AudioPlayerShuffleLibrary" xml:space="preserve">
+    <value>Перемішати бібліотеку</value>
+  </data>
+  <data name="AudioPlayerRepeat" xml:space="preserve">
+    <value>Повтор</value>
+  </data>
+  <data name="AudioPlayerRepeatOff" xml:space="preserve">
+    <value>Повтор вимкнено</value>
+  </data>
+  <data name="AudioPlayerRepeatAll" xml:space="preserve">
+    <value>Повторити все</value>
+  </data>
+  <data name="AudioPlayerRepeatOne" xml:space="preserve">
+    <value>Повторити трек</value>
+  </data>
+  <data name="AudioPlayerQueue" xml:space="preserve">
+    <value>Черга відтворення</value>
+  </data>
+  <data name="AudioPlayerShuffleOff" xml:space="preserve">
+    <value>Перемішування вимкнено</value>
+  </data>
 </root>

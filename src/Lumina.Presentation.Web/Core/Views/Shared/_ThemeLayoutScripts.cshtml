@@ -44,6 +44,12 @@
         getPlaybackManifestUrl: '@_urlService.GetRelativeUrl(WebRoutes.Music.GET_PLAYBACK_MANIFEST)',
         streamTrackRouteTemplate: '@_urlService.GetRelativeUrl(WebRoutes.Music.STREAM_TRACK)',
         streamTrackSegmentRouteTemplate: '@_urlService.GetRelativeUrl(WebRoutes.Music.STREAM_TRACK_SEGMENT)',
+        // The endpoints the queue of the player is built from: the releases of an artist, the tracks of a release, and the
+        // artists of a library, which are also the endpoints the autoplay continuation and the library shuffle use. The
+        // queue script documents which context uses which endpoint, and appends the library and pagination query parameters.
+        getArtistsUrl: '@_urlService.GetRelativeUrl(WebRoutes.Music.GET_ARTISTS)',
+        getArtistAlbumsUrl: '@_urlService.GetRelativeUrl(WebRoutes.Music.GET_ARTIST_ALBUMS)',
+        getAlbumTracksUrl: '@_urlService.GetRelativeUrl(WebRoutes.Music.GET_ALBUM_TRACKS)',
         strings: {
             play: '@localizer["AudioPlayerPlay"]',
             pause: '@localizer["AudioPlayerPause"]',
@@ -51,7 +57,19 @@
             unmute: '@localizer["AudioPlayerUnmute"]',
             volume: '@localizer["AudioPlayerVolume"]',
             seek: '@localizer["AudioPlayerSeek"]',
-            buffering: '@localizer["AudioPlayerBuffering"]'
+            buffering: '@localizer["AudioPlayerBuffering"]',
+            previous: '@localizer["AudioPlayerPrevious"]',
+            next: '@localizer["AudioPlayerNext"]',
+            shuffle: '@localizer["AudioPlayerShuffle"]',
+            shuffleOff: '@localizer["AudioPlayerShuffleOff"]',
+            shuffleRelease: '@localizer["AudioPlayerShuffleRelease"]',
+            shuffleArtist: '@localizer["AudioPlayerShuffleArtist"]',
+            shuffleLibrary: '@localizer["AudioPlayerShuffleLibrary"]',
+            repeat: '@localizer["AudioPlayerRepeat"]',
+            repeatOff: '@localizer["AudioPlayerRepeatOff"]',
+            repeatAll: '@localizer["AudioPlayerRepeatAll"]',
+            repeatOne: '@localizer["AudioPlayerRepeatOne"]',
+            queue: '@localizer["AudioPlayerQueue"]'
         }
     };
 </script>
@@ -71,6 +89,7 @@
 <script defer src="~/js/audio-player/audio-player-utils.js" asp-append-version="true"></script>
 <script defer src="~/js/audio-player/audio-player-errors.js" asp-append-version="true"></script>
 <script defer src="~/js/audio-player/audio-player-events.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-queue.js" asp-append-version="true"></script>
 <script defer src="~/js/audio-player/audio-player-download.js" asp-append-version="true"></script>
 <script defer src="~/js/audio-player/audio-player-render.js" asp-append-version="true"></script>
 <script defer src="~/js/audio-player/audio-player-decode.js" asp-append-version="true"></script>

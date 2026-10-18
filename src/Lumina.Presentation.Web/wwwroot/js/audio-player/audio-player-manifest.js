@@ -17,16 +17,6 @@
     const MANIFEST_REQUEST_TIMEOUT_MS = 20000;
 
     /**
-     * Checks whether a value is a Guid, the only form the manifest route accepts for its Ids.
-     * @param {*} value - The value to check.
-     * @returns {boolean} True when the value is a Guid string.
-     */
-    function isGuid(value) {
-        return typeof value === 'string'
-            && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
-    }
-
-    /**
      * Gets the origin this module resolves relative URLs against. The page origin is used in a browser; a fixed local
      * origin keeps the route and origin checks testable in a host without a DOM.
      * @returns {string} The base origin.
@@ -148,11 +138,11 @@
                 if (!Object.prototype.hasOwnProperty.call(expectedIds, name))
                     throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The stream route template carries an unknown placeholder.');
                 const expected = expectedIds[name];
-                if (!isGuid(expected))
+                if (!LuminaAudioPlayer.isGuid(expected))
                     throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, `The play descriptor carries no valid ${name}.`, { field: name });
                 const actual = streamSegments[index];
                 // The path must describe the track of this descriptor, not merely another track of the same library.
-                if (!isGuid(actual) || actual.toLowerCase() !== expected.toLowerCase())
+                if (!LuminaAudioPlayer.isGuid(actual) || actual.toLowerCase() !== expected.toLowerCase())
                     throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The stream path does not belong to the expected track.');
                 continue;
             }
@@ -167,7 +157,7 @@
                 throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The stream path does not match the stream route.');
         }
         const libraryId = descriptor && descriptor.libraryId;
-        if (!isGuid(libraryId))
+        if (!LuminaAudioPlayer.isGuid(libraryId))
             throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The play descriptor carries no valid library Id.', { field: 'libraryId' });
         const requestedLibraryIds = url.searchParams.getAll('libraryId');
         if (requestedLibraryIds.length !== 1 || requestedLibraryIds[0].toLowerCase() !== libraryId.toLowerCase())
@@ -256,10 +246,10 @@
                 if (!Object.prototype.hasOwnProperty.call(expectedIds, name))
                     throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment route template carries an unknown placeholder.');
                 const expected = expectedIds[name];
-                if (!isGuid(expected))
+                if (!LuminaAudioPlayer.isGuid(expected))
                     throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, `The play descriptor carries no valid ${name}.`, { field: name });
                 // The path must describe the track of this descriptor, not merely another track of the same library.
-                if (!isGuid(actualSegment) || actualSegment.toLowerCase() !== expected.toLowerCase())
+                if (!LuminaAudioPlayer.isGuid(actualSegment) || actualSegment.toLowerCase() !== expected.toLowerCase())
                     throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment path does not belong to the expected track.');
                 continue;
             }
@@ -267,7 +257,7 @@
                 throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment path does not match the segment route.');
         }
         const libraryId = descriptor && descriptor.libraryId;
-        if (!isGuid(libraryId))
+        if (!LuminaAudioPlayer.isGuid(libraryId))
             throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The play descriptor carries no valid library Id.', { field: 'libraryId' });
         const requestedLibraryIds = url.searchParams.getAll('libraryId');
         if (requestedLibraryIds.length !== 1 || requestedLibraryIds[0].toLowerCase() !== libraryId.toLowerCase())
@@ -325,7 +315,7 @@
             if (!ids[name])
                 throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, `The play descriptor carries no ${name}.`, { field: name });
             // The manifest route only accepts Guids, and a value that is not a Guid must never be interpolated into a path the browser resolves against this origin.
-            if (!isGuid(ids[name]))
+            if (!LuminaAudioPlayer.isGuid(ids[name]))
                 throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, `The play descriptor carries an invalid ${name}.`, { field: name });
         }
         let url = String(template)

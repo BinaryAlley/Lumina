@@ -1274,6 +1274,12 @@ body {
     border-top-width: 0px;
 }
 
+/* The shuffle scope menu opens above the bar, so the bar lets it overflow while the menu is open. Every other state keeps
+   the overflow hidden that collapses the bar to its height. */
+.audio-player-container.is-menu-open {
+    overflow: visible;
+}
+
 /* The 'hidden' attribute keeps the bar unrendered until the audio player script takes over, so that a page load
    never shows it, not even for a frame while the stylesheets settle. The script removes it once the bar is already
    in its hidden state, so the removal is never visible. */
@@ -1412,13 +1418,21 @@ html.audio-player-initializing .audio-player-container {
     cursor: grabbing;
 }
 
-.audio-player-transport {
+/* The queue controls hold the shuffle scope menu, the skip controls and the repeat toggle. They sit next to the play
+   control, so the bar reads as one transport row. */
+.audio-player-queue-controls {
+    position: relative;
     flex: 0 0 auto;
     display: flex;
     align-items: center;
+    gap: 2px;
 }
 
-.audio-player-play-pause {
+/* The button class is the current hook; the play-pause and mute class names are kept as aliases so a theme that targets
+   those older hooks directly still gets the same box. */
+.audio-player-button,
+.audio-player-play-pause,
+.audio-player-mute {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1427,7 +1441,111 @@ html.audio-player-initializing .audio-player-container {
     padding: 0px;
     background-color: transparent;
     border: 0px;
+    color: inherit;
     cursor: pointer;
+}
+
+.audio-player-button:disabled,
+.audio-player-button.is-disabled,
+.audio-player-play-pause:disabled,
+.audio-player-play-pause.is-disabled,
+.audio-player-mute:disabled,
+.audio-player-mute.is-disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+/* The skip icons are drawn with CSS, so a theme restyles them without an image. */
+.audio-player-previous-icon,
+.audio-player-next-icon {
+    display: block;
+    width: 0px;
+    height: 0px;
+    border-style: solid;
+    border-width: 5px 8px 5px 0px;
+    border-color: transparent #E6E6E6 transparent transparent;
+}
+
+.audio-player-previous-icon {
+    box-shadow: -3px 0px 0px #E6E6E6;
+}
+
+.audio-player-next-icon {
+    border-width: 5px 0px 5px 8px;
+    border-color: transparent transparent transparent #E6E6E6;
+    box-shadow: 3px 0px 0px #E6E6E6;
+}
+
+/* The shuffle and repeat glyphs are text, so a theme can replace them with its own imagery while keeping the hooks. */
+.audio-player-shuffle-control {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.audio-player-shuffle-icon,
+.audio-player-repeat-icon {
+    display: block;
+    font-size: 17px;
+    line-height: 1;
+    color: #E6E6E6;
+}
+
+.audio-player-shuffle.is-active .audio-player-shuffle-icon,
+.audio-player-repeat.is-active .audio-player-repeat-icon {
+    color: #6DCBFE;
+}
+
+.audio-player-repeat {
+    position: relative;
+}
+
+.audio-player-repeat-one-badge {
+    display: none;
+    position: absolute;
+    right: 3px;
+    bottom: 2px;
+    font-size: 9px;
+    line-height: 1;
+    color: #6DCBFE;
+}
+
+.audio-player-repeat.is-one .audio-player-repeat-one-badge {
+    display: block;
+}
+
+/* The shuffle scope menu opens above the control, because the bar is anchored to the bottom of the page. */
+.audio-player-shuffle-menu {
+    position: absolute;
+    right: 0px;
+    bottom: calc(100% + 6px);
+    z-index: 998;
+    display: flex;
+    flex-direction: column;
+    min-width: 150px;
+    padding: 4px;
+    background-color: #1C1C1C;
+    border: 1px solid #444444;
+}
+
+.audio-player-shuffle-menu[hidden] {
+    display: none;
+}
+
+.audio-player-shuffle-menu button {
+    padding: 6px 8px;
+    background: none;
+    border: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.audio-player-shuffle-menu button:hover,
+.audio-player-shuffle-menu button.is-selected {
+    background-color: #2A2A2A;
+    color: #6DCBFE;
 }
 
 /* The play affordance is a right pointing triangle, and the pause affordance two bars, both drawn with CSS
@@ -1454,18 +1572,6 @@ html.audio-player-initializing .audio-player-container {
     display: flex;
     align-items: center;
     gap: 6px;
-}
-
-.audio-player-mute {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    padding: 0px;
-    background-color: transparent;
-    border: 0px;
-    cursor: pointer;
 }
 
 /* The speaker cone of the mute toggle is drawn with CSS, so that a theme restyles it without an image. */
@@ -1558,6 +1664,19 @@ html.audio-player-initializing .audio-player-container {
     gap: 12px;
     padding: 6px 8px;
     border-bottom: 1px solid #333333;
+    cursor: pointer;
+}
+
+.audio-player-queue-item.is-played .audio-player-queue-item-title {
+    color: #8A8A8A;
+}
+
+.audio-player-queue-item.is-current .audio-player-queue-item-title {
+    color: #6DCBFE;
+}
+
+.audio-player-queue-item:focus {
+    outline: 1px solid #6DCBFE;
 }
 
 .audio-player-queue-item-title {

@@ -180,4 +180,40 @@
   <data name="Yes" xml:space="preserve">
     <value>Oui</value>
   </data>
+  <data name="AudioPlayerPrevious" xml:space="preserve">
+    <value>Piste précédente</value>
+  </data>
+  <data name="AudioPlayerNext" xml:space="preserve">
+    <value>Piste suivante</value>
+  </data>
+  <data name="AudioPlayerShuffle" xml:space="preserve">
+    <value>Lecture aléatoire</value>
+  </data>
+  <data name="AudioPlayerShuffleRelease" xml:space="preserve">
+    <value>Aléatoire sur la sortie</value>
+  </data>
+  <data name="AudioPlayerShuffleArtist" xml:space="preserve">
+    <value>Aléatoire sur l’artiste</value>
+  </data>
+  <data name="AudioPlayerShuffleLibrary" xml:space="preserve">
+    <value>Aléatoire sur la bibliothèque</value>
+  </data>
+  <data name="AudioPlayerRepeat" xml:space="preserve">
+    <value>Répéter</value>
+  </data>
+  <data name="AudioPlayerRepeatOff" xml:space="preserve">
+    <value>Répétition désactivée</value>
+  </data>
+  <data name="AudioPlayerRepeatAll" xml:space="preserve">
+    <value>Tout répéter</value>
+  </data>
+  <data name="AudioPlayerRepeatOne" xml:space="preserve">
+    <value>Répéter la piste</value>
+  </data>
+  <data name="AudioPlayerQueue" xml:space="preserve">
+    <value>File de lecture</value>
+  </data>
+  <data name="AudioPlayerShuffleOff" xml:space="preserve">
+    <value>Lecture aléatoire désactivée</value>
+  </data>
 </root>

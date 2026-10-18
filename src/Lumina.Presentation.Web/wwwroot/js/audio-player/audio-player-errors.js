@@ -37,7 +37,9 @@
         // The container of a track could not be parsed into encoded packets, or the bytes it holds do not describe a stream the demuxer supports.
         DEMUX_FAILED: 'demux-failed',
         // The stored playback preferences of the user could not be read.
-        PREFERENCES_LOAD_FAILED: 'preferences-load-failed'
+        PREFERENCES_LOAD_FAILED: 'preferences-load-failed',
+        // A play context, a queue batch or a shuffle batch could not be built from the web endpoints.
+        QUEUE_LOAD_FAILED: 'queue-load-failed'
     });
 
     /**

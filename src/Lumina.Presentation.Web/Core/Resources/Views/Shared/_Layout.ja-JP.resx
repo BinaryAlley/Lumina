@@ -180,4 +180,40 @@
   <data name="Yes" xml:space="preserve">
     <value>はい</value>
   </data>
+  <data name="AudioPlayerPrevious" xml:space="preserve">
+    <value>前の曲</value>
+  </data>
+  <data name="AudioPlayerNext" xml:space="preserve">
+    <value>次の曲</value>
+  </data>
+  <data name="AudioPlayerShuffle" xml:space="preserve">
+    <value>シャッフル</value>
+  </data>
+  <data name="AudioPlayerShuffleRelease" xml:space="preserve">
+    <value>アルバムをシャッフル</value>
+  </data>
+  <data name="AudioPlayerShuffleArtist" xml:space="preserve">
+    <value>アーティストをシャッフル</value>
+  </data>
+  <data name="AudioPlayerShuffleLibrary" xml:space="preserve">
+    <value>ライブラリをシャッフル</value>
+  </data>
+  <data name="AudioPlayerRepeat" xml:space="preserve">
+    <value>リピート</value>
+  </data>
+  <data name="AudioPlayerRepeatOff" xml:space="preserve">
+    <value>リピートなし</value>
+  </data>
+  <data name="AudioPlayerRepeatAll" xml:space="preserve">
+    <value>すべてリピート</value>
+  </data>
+  <data name="AudioPlayerRepeatOne" xml:space="preserve">
+    <value>1曲リピート</value>
+  </data>
+  <data name="AudioPlayerQueue" xml:space="preserve">
+    <value>再生キュー</value>
+  </data>
+  <data name="AudioPlayerShuffleOff" xml:space="preserve">
+    <value>シャッフルなし</value>
+  </data>
 </root>

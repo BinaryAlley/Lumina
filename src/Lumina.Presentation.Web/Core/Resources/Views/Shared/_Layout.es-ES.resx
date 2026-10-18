@@ -180,4 +180,40 @@
   <data name="Yes" xml:space="preserve">
     <value>Sí</value>
   </data>
+  <data name="AudioPlayerPrevious" xml:space="preserve">
+    <value>Pista anterior</value>
+  </data>
+  <data name="AudioPlayerNext" xml:space="preserve">
+    <value>Pista siguiente</value>
+  </data>
+  <data name="AudioPlayerShuffle" xml:space="preserve">
+    <value>Reproducción aleatoria</value>
+  </data>
+  <data name="AudioPlayerShuffleRelease" xml:space="preserve">
+    <value>Aleatorio por álbum</value>
+  </data>
+  <data name="AudioPlayerShuffleArtist" xml:space="preserve">
+    <value>Aleatorio por artista</value>
+  </data>
+  <data name="AudioPlayerShuffleLibrary" xml:space="preserve">
+    <value>Aleatorio por biblioteca</value>
+  </data>
+  <data name="AudioPlayerRepeat" xml:space="preserve">
+    <value>Repetir</value>
+  </data>
+  <data name="AudioPlayerRepeatOff" xml:space="preserve">
+    <value>Repetición desactivada</value>
+  </data>
+  <data name="AudioPlayerRepeatAll" xml:space="preserve">
+    <value>Repetir todo</value>
+  </data>
+  <data name="AudioPlayerRepeatOne" xml:space="preserve">
+    <value>Repetir pista</value>
+  </data>
+  <data name="AudioPlayerQueue" xml:space="preserve">
+    <value>Cola de reproducción</value>
+  </data>
+  <data name="AudioPlayerShuffleOff" xml:space="preserve">
+    <value>Reproducción aleatoria desactivada</value>
+  </data>
 </root>

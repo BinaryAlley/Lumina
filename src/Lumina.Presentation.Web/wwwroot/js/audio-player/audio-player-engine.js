@@ -23,6 +23,8 @@
  *     whether a seek target is buffered, in which case the player never shows a loading state for a seek.
  *   - discardCurrentAsync() (optional): releases the currently prepared track without destroying the engine, so a stop
  *     during an automatic continuation does not leave the track it started loaded behind an idle player.
+ *   - cancelUpcomingAsync() (optional): drops a prefetched or appended handoff of the current track when the player queue is
+ *     replaced under it, for example when shuffle is turned on or off, so audio prepared from the old queue never plays.
  *   - destroyAsync(): releases every resource the engine holds, including any audio context.
  *
  * The engine host
@@ -175,8 +177,7 @@
 
     /**
      * A registry of engine factories, keyed by name, used to resolve the engine the player runs with.
-     * The later stages of the player register the real download, decode and render engine here; the
-     * core module only registers the silent engine.
+     * The real download, decode and render engine is registered here; the core module only registers the silent engine.
      */
     class PlayerEngineRegistry {
         /**

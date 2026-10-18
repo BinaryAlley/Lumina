@@ -11,6 +11,28 @@
     'use strict';
 
     /**
+     * Checks whether a value is a Guid string, the only form the routes and the player descriptors accept for their Ids.
+     * @param {*} value - The value to check.
+     * @returns {boolean} True when the value is a Guid string.
+     */
+    LuminaAudioPlayer.isGuid = function isGuid(value) {
+        return typeof value === 'string'
+            && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+    };
+
+    /**
+     * Coerces an Id into a non empty string, or an empty string when it carries no value.
+     * @param {*} value - The Id to coerce.
+     * @returns {string} The Id as a string, or an empty string.
+     */
+    LuminaAudioPlayer.toIdString = function toIdString(value) {
+        if (value === null || value === undefined)
+            return '';
+        const text = String(value).trim();
+        return text === '' ? '' : text;
+    };
+
+    /**
      * Clamps a number into an inclusive range, defaulting a non finite value to the lower bound.
      * @param {number} value - The value to clamp.
      * @param {number} minimum - The inclusive lower bound.

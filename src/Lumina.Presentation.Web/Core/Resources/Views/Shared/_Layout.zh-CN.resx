@@ -180,4 +180,40 @@
   <data name="Yes" xml:space="preserve">
     <value>是</value>
   </data>
+  <data name="AudioPlayerPrevious" xml:space="preserve">
+    <value>上一首</value>
+  </data>
+  <data name="AudioPlayerNext" xml:space="preserve">
+    <value>下一首</value>
+  </data>
+  <data name="AudioPlayerShuffle" xml:space="preserve">
+    <value>随机播放</value>
+  </data>
+  <data name="AudioPlayerShuffleRelease" xml:space="preserve">
+    <value>随机播放专辑</value>
+  </data>
+  <data name="AudioPlayerShuffleArtist" xml:space="preserve">
+    <value>随机播放艺术家</value>
+  </data>
+  <data name="AudioPlayerShuffleLibrary" xml:space="preserve">
+    <value>随机播放音乐库</value>
+  </data>
+  <data name="AudioPlayerRepeat" xml:space="preserve">
+    <value>循环播放</value>
+  </data>
+  <data name="AudioPlayerRepeatOff" xml:space="preserve">
+    <value>不循环</value>
+  </data>
+  <data name="AudioPlayerRepeatAll" xml:space="preserve">
+    <value>列表循环</value>
+  </data>
+  <data name="AudioPlayerRepeatOne" xml:space="preserve">
+    <value>单曲循环</value>
+  </data>
+  <data name="AudioPlayerQueue" xml:space="preserve">
+    <value>播放队列</value>
+  </data>
+  <data name="AudioPlayerShuffleOff" xml:space="preserve">
+    <value>关闭随机播放</value>
+  </data>
 </root>

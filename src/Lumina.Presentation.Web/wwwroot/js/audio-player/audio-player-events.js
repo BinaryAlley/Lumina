@@ -1,7 +1,7 @@
 ﻿/**
  * Event bus of the audio player.
  *
- * The player is decoupled from its consumers (the player bar, the transport UI, the queue panel, themes) through a single observable. 
+ * The player is decoupled from its consumers (the player bar, the transport UI, the queue panel, themes) through a single observable.
  * Every module of the player publishes to this bus, and every consumer subscribes to it, so that no module needs a direct reference to another one.
  */
 (function (LuminaAudioPlayer) {
@@ -17,7 +17,11 @@
         STATE_CHANGED: 'statechange',
         // The currently playing track changed. Payload: the play descriptor.
         DESCRIPTOR_CHANGED: 'descriptorchange',
-        // The queue changed. Payload: the ordered list of play descriptors.
+        // The playable state of the queue changed: cursor, current entry, counts, repeat mode, shuffle mode or context.
+        // Payload: the compact summary returned by getQueueStateSummary(), not the full queue.
+        QUEUE_STATE_CHANGED: 'queuestatechange',
+        // Deprecated legacy queue event. It keeps its original payload, the ordered list of play descriptors, and is emitted
+        // only when a legacy consumer is subscribed. New code must use QUEUE_STATE_CHANGED and its compact summary.
         QUEUE_CHANGED: 'queuechange',
         // The playhead moved. Payload: { currentTime, duration }.
         TIME_UPDATE: 'timeupdate',
@@ -79,6 +83,16 @@
             }
             handlers.add(handler);
             return () => this.off(event, handler);
+        }
+
+        /**
+         * Checks whether an event currently has any subscriber, so a producer can skip an expensive payload nobody reads.
+         * @param {string} event - One of the {@link LuminaAudioPlayer.PlayerEvent} values.
+         * @returns {boolean} True when the event has at least one handler.
+         */
+        hasListeners(event) {
+            const handlers = this.listeners.get(event);
+            return !!handlers && handlers.size > 0;
         }
 
         /**

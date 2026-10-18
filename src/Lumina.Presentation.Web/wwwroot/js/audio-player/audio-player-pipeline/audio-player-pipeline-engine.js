@@ -273,6 +273,40 @@
         }
 
         /**
+         * Drops the next item and the prefetch of the current track, without touching the audio that is already playing.
+         *
+         * The player calls it when it replaces the queue under a playing track, for example when the user turns shuffle on or
+         * off. A prefetched or appended handoff was prepared from the queue that no longer exists, so leaving it in place
+         * would play a track the queue no longer describes. When the handoff is already audible it is left alone, because
+         * truncating it would rewind audio that has played.
+         * @returns {Promise<void>} A promise that completes when the upcoming handoff was released.
+         */
+        async cancelUpcomingAsync() {
+            if (this.destroyed)
+                return;
+            const item = this.current;
+            if (!item)
+                return;
+            await this.cancelPrefetchAsync(item);
+            item.continueToEntry = null;
+            const next = this.nextItem;
+            if (!next)
+                return;
+            // A handoff that has not reached the playhead can be removed from the schedule; one that is already audible stays.
+            if (typeof this.renderer.truncateScheduleAt !== 'function'
+                || next.base <= this.renderer.getCurrentTime())
+                return;
+            this.nextItem = null;
+            if (typeof this.renderer.cancelTrackGainChange === 'function')
+                this.renderer.cancelTrackGainChange();
+            this.renderer.truncateScheduleAt(next.base);
+            this.renderer.markStreamComplete();
+            this.disposeItemAsync(next).catch((error) => {
+                console.debug('Audio player: the upcoming track of the replaced queue could not be released.', error);
+            });
+        }
+
+        /**
          * Starts, or resumes, audible playback.
          * @returns {Promise<void>} A promise that completes when the renderer is running.
          */
