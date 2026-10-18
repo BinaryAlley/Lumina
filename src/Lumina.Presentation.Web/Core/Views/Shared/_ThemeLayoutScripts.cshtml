@@ -43,6 +43,7 @@
         updatePlaybackStateUrl: '@_urlService.GetRelativeUrl(WebRoutes.Settings.UPDATE_PLAYBACK_STATE)',
         getPlaybackManifestUrl: '@_urlService.GetRelativeUrl(WebRoutes.Music.GET_PLAYBACK_MANIFEST)',
         streamTrackRouteTemplate: '@_urlService.GetRelativeUrl(WebRoutes.Music.STREAM_TRACK)',
+        streamTrackSegmentRouteTemplate: '@_urlService.GetRelativeUrl(WebRoutes.Music.STREAM_TRACK_SEGMENT)',
         strings: {
             play: '@localizer["AudioPlayerPlay"]',
             pause: '@localizer["AudioPlayerPause"]',
@@ -85,5 +86,6 @@
 <script defer src="~/js/audio-player/audio-player.js" asp-append-version="true"></script>
 <script defer src="~/js/audio-player/audio-player-manifest.js" asp-append-version="true"></script>
 <script defer src="~/js/audio-player/audio-player-pipeline/audio-player-pipeline-byte-source.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-pipeline/audio-player-pipeline-normalized.js" asp-append-version="true"></script>
 <script defer src="~/js/audio-player/audio-player-pipeline/audio-player-pipeline-schedulers.js" asp-append-version="true"></script>
 <script defer src="~/js/audio-player/audio-player-pipeline/audio-player-pipeline-engine.js" asp-append-version="true"></script>

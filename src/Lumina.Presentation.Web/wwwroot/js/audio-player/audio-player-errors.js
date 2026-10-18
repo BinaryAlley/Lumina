@@ -74,12 +74,25 @@
         // which reads it as end of file rather than as a failure, so a rename on either side cannot silently turn a
         // drained window into a fatal read error.
         WINDOW_UNAVAILABLE: 'window-unavailable',
+        // A normalized segment that the production says exists could not be read, because the track, the library or the
+        // audio file is gone, or the cache entry was evicted. Unlike the end of the audio, which is declared by the
+        // segment count of the production, this is a playback failure; the player refreshes the manifest once and resumes.
+        SEGMENT_NOT_FOUND: 'segment-not-found',
+        // A normalized segment belongs to a delivery the server no longer accepts, because the delivery handle expired or the source changed.
+        // The player refetches the manifest and resumes at the current position instead of failing the track.
+        PLAYBACK_DELIVERY_CHANGED: 'playback-delivery-changed',
+        // Every normalization job slot was in use for the whole retry window, so the segment of a normalized track could
+        // not be produced in time. The request is transient and a later play can succeed.
+        NORMALIZATION_UNAVAILABLE: 'normalization-unavailable',
+        // A segment request failed for an HTTP reason that is neither a transient normalization limit nor a missing segment.
+        // Unlike WINDOW_UNAVAILABLE, which the demuxer byte source reads as end of file, this is always a playback failure.
+        HTTP_REQUEST_FAILED: 'http-request-failed',
         // A range request exceeded its timeout. Unlike an intentional abort, this is a failed request and is not retried
         // by the seek recovery.
         REQUEST_TIMEOUT: 'request-timeout',
-        // The playback manifest says the track is not a direct play, so the server has to normalize its container or its
-        // codec before the bundled player can play it. Published by the media pipeline engine while the normalized
-        // delivery pipeline does not exist yet, instead of playing the stored bytes.
+        // The stored format of a track cannot be demuxed and decoded by the bundled player, so the server has to normalize
+        // its container or its codec. Published by the media pipeline engine instead of playing bytes whose format the
+        // bundled demuxers cannot read; a normalized manifest is played through the segment pipeline.
         NORMALIZED_DELIVERY_REQUIRED: 'normalized-delivery-required',
         // A load was overtaken by a newer play request before it finished. The player ignores it, because the newer
         // request owns the player state and the queue.

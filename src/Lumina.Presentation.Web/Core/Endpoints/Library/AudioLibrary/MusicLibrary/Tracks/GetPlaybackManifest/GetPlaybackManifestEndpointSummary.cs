@@ -18,7 +18,7 @@ public class GetPlaybackManifestEndpointSummary : Summary<GetPlaybackManifestEnd
     public GetPlaybackManifestEndpointSummary()
     {
         Summary = "Retrieves the playback manifest of a music track.";
-        Description = "Retrieves the playback manifest of the music track identified by the route, with the stream path replaced by the URL of the streaming proxy of this application.";
+        Description = "Retrieves the playback manifest of the music track identified by the route, with the stream path and the segment path template replaced by the URLs of the streaming proxies of this application. A normalized delivery also carries the opaque delivery handle the segment proxy forwards, so the segments are addressed by the delivery the manifest declared.";
 
         RequestParam(r => r.ArtistId, "The unique identifier of the artist the album belongs to. Required.");
         RequestParam(r => r.AlbumId, "The unique identifier of the album the track belongs to. Required.");

@@ -40,13 +40,13 @@
  *
  * Gapless transitions
  * -------------------
- * When the user enabled gapless playback and the player queue holds another item, the engine prefetches the next item as
- * soon as the current one is loaded: it fetches the next manifest, opens its demuxer, and pre-decodes the first seconds of
- * its audio into memory. The prefetch does not run an open-ended download next to the current one: it fetches only the
- * windows its pre-decode needs, as bounded range requests, and leaves the sequential download of the next track stopped
- * until the handoff. Once the current decoder has scheduled its last frame, the pre-decoded audio is appended to the
- * renderer schedule, exactly after the audio of the current track, the download of the next track resumes from its first
- * missing byte, and the rest of the track is decoded into the same schedule. The engine then switches the current item at the exact media position where the next
+ * When the user enabled gapless playback and the player queue holds another item, the engine waits until the current track is within a short lead
+ * of its end, then fetches the next manifest and pre-decodes its first audio. Nothing is requested at load time: a normalized next track would start
+ * a full server side production that is expensive and bounded in concurrency, and a direct track would hold bytes for a track the user may never
+ * reach. Normalized gapless therefore only happens when the production is already cached or finishes within the lead; otherwise the next track
+ * starts normally at the boundary. Once the current decoder has scheduled its last frame, the pre-decoded audio is appended to the renderer
+ * schedule, exactly after the audio of the current track, the download of the next track resumes from its first missing byte, and the rest of the
+ * track is decoded into the same schedule. The engine then switches the current item at the exact media position where the next
  * audio starts, reports the new duration and asks the player to advance its queue, so the bar shows the new track while
  * the audio never stops. Only the last track of a continuous chain declares the stream complete, which is what keeps the
  * renderer from reporting an end between two gapless items.
@@ -56,10 +56,11 @@
  * A download, demux or decode failure that happens mid-stream is reported once, through host.reportError, and stops the
  * pipeline cleanly; it never escapes as an unhandled rejection and never leaves the renderer or the downloader running.
  * A failure of a prefetch is dropped instead, because it must not interrupt the track that is playing. A track whose
- * manifest is not a direct play needs the normalized delivery pipeline, which this engine does not implement yet, so it
- * is reported as an engine load failure with the {@link LuminaAudioPlayer.PlayerErrorReason.NORMALIZED_DELIVERY_REQUIRED}
- * reason. A play descriptor must name a track, not an album or an artist, because the manifest endpoint is addressed by the
- * track and its album and artist; expanding an album or an artist context into its tracks is the queue engine's job.
+ * manifest is not a direct play is played from the fixed duration segments the server produces, through the normalized
+ * delivery pipeline (audio-player-pipeline-normalized.js), and it is seeked by segment index exactly like a direct play is
+ * seeked by byte range. A play descriptor must name a track, not an album or an artist, because the manifest endpoint is
+ * addressed by the track and its album and artist; expanding an album or an artist context into its tracks is the queue
+ * engine's job.
  */
 (function (LuminaAudioPlayer) {
     'use strict';
@@ -107,6 +108,15 @@
      * @type {number}
      */
     const PREFETCH_HANDOFF_MAX_WAIT_SECONDS = 5;
+
+    /**
+     * The playback time, in seconds, before the end of the current track at which the next item is prefetched. A direct play needs a few seconds
+     * to pre-decode its first audio, and a normalized production is expensive and bounded in concurrency, so starting either at load time would
+     * hold resources for a track the user may never reach.
+     * @readonly
+     * @type {number}
+     */
+    const PREFETCH_LEAD_SECONDS = 15;
 
     /**
      * Coerces a value to a finite number, or null when it is absent or not finite.
@@ -195,10 +205,6 @@
                 const manifest = await this.fetchManifestAsync(descriptor, signal);
                 if (!this.isLoadCurrent(token))
                     throw this.createSupersededLoadError();
-                if (manifest.directPlay !== true) {
-                    // The normalized delivery pipeline is a later stage; until it exists, the track is reported instead of being played as its stored bytes, which would produce noise or a decoder error.
-                    throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The track needs a normalized delivery the player does not support yet.', { reason: LuminaAudioPlayer.PlayerErrorReason.NORMALIZED_DELIVERY_REQUIRED });
-                }
                 this.renderer.configure(manifest);
                 const item = await this.buildItemAsync(descriptor, manifest, false);
                 if (!this.isLoadCurrent(token) || this.destroyed) {
@@ -705,39 +711,83 @@
                 disposed: false,
                 failed: false,
                 stopped: false,
-                hasScheduledAudio: false
+                hasScheduledAudio: false,
+                // A delivery refresh is attempted once per item. If the refreshed handle is rejected again, the failure is terminal, so a stale or
+                // broken delivery cannot make the player refetch the manifest forever.
+                deliveryRecoveryAttempted: false,
+                deliveryRecoveryInProgress: false
             };
-            const streamPath = LuminaAudioPlayer.resolveStreamUrl(manifest, descriptor, this.getConfiguration());
-            item.downloader = LuminaAudioPlayer.createTrackDownloader({
-                url: streamPath,
-                durationInSeconds: duration,
-                shouldKeepDownloadingWhilePaused: preferences.shouldKeepDownloadingWhilePaused,
-                events: this.events,
-                onProgress: (downloadedFraction) => {
-                    if (item === this.current)
-                        this.host.reportProgress(downloadedFraction);
-                },
-                onError: (error) => this.handleDownloadFailure(item, error)
-            });
-            if (typeof onItemCreated === 'function')
-                onItemCreated(item);
-            // The demuxer reads through the seek aware source, so a seek can fetch a window below the byte target of the download loop instead of waiting for bytes the loop never fetches.
-            item.source = new LuminaAudioPlayer.SeekAwareByteSource(item.downloader);
-            if (isPrefetch) {
-                // A prefetch fetches only the windows its pre-decode needs, through one-shot range requests, instead of
-                // running a second open-ended download from the moment the current track starts. Its sequential download is
-                // started at the handoff, from the first byte that is still missing.
-                item.source.setSeeking(true);
-            } else {
-                item.downloader.startAsync();
-            }
             try {
-                const demuxer = await LuminaAudioPlayer.createDemuxerForManifest(manifest, {
-                    source: item.source,
-                    capabilities: this.capabilities,
-                    events: this.events,
-                    onError: (error) => this.failItem(item, error)
-                });
+                const isNormalizedDelivery = manifest.isDirectPlay !== true;
+                let demuxer = null;
+                if (isNormalizedDelivery) {
+                    const segmentDurationSeconds = Number(manifest.segmentDurationSeconds);
+                    if (!manifest.deliveryContainer || !manifest.deliveryCodec || !Number.isInteger(segmentDurationSeconds) || segmentDurationSeconds <= 0)
+                        throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The normalized delivery of the track is incomplete.');
+                    const configuration = this.getConfiguration();
+                    item.downloader = LuminaAudioPlayer.createNormalizedSegmentDownloader({
+                        durationInSeconds: duration,
+                        segmentDurationSeconds: segmentDurationSeconds,
+                        urlBuilder: (segmentIndex) => LuminaAudioPlayer.resolveSegmentStreamUrl(manifest, descriptor, configuration, segmentIndex),
+                        shouldRetryUnavailable: !isPrefetch,
+                        shouldKeepDownloadingWhilePaused: preferences.shouldKeepDownloadingWhilePaused,
+                        events: this.events,
+                        onProgress: (downloadedFraction) => {
+                            if (item === this.current)
+                                this.host.reportProgress(downloadedFraction);
+                        },
+                        onError: (error) => this.handleDownloadFailure(item, error)
+                    });
+                    if (typeof onItemCreated === 'function')
+                        onItemCreated(item);
+                    // The normalized demuxer fetches complete segments itself, so it needs no byte source. The engine still drives a source on
+                    // seek and teardown, so a no-op source of the same shape keeps that path uniform without a download loop behind it.
+                    item.source = {
+                        setSeeking: () => {},
+                        destroy: () => {}
+                    };
+                    if (!isPrefetch)
+                        item.downloader.startAsync();
+                    demuxer = await LuminaAudioPlayer.createNormalizedSegmentDemuxer(manifest, {
+                        downloader: item.downloader,
+                        capabilities: this.capabilities,
+                        events: this.events,
+                        onError: (error) => this.failItem(item, error)
+                    });
+                } else {
+                    const streamPath = LuminaAudioPlayer.resolveStreamUrl(manifest, descriptor, this.getConfiguration());
+                    item.downloader = LuminaAudioPlayer.createTrackDownloader({
+                        url: streamPath,
+                        durationInSeconds: duration,
+                        shouldKeepDownloadingWhilePaused: preferences.shouldKeepDownloadingWhilePaused,
+                        events: this.events,
+                        onProgress: (downloadedFraction) => {
+                            if (item === this.current)
+                                this.host.reportProgress(downloadedFraction);
+                        },
+                        onError: (error) => this.handleDownloadFailure(item, error)
+                    });
+                    if (typeof onItemCreated === 'function')
+                        onItemCreated(item);
+                    // The demuxer reads through the seek aware source, so a seek can fetch a window below the byte target of the download loop instead of waiting for bytes the loop never fetches.
+                    item.source = new LuminaAudioPlayer.SeekAwareByteSource(item.downloader);
+                    if (isPrefetch) {
+                        // A prefetch fetches only the windows its pre-decode needs, through one-shot range requests, instead of
+                        // running a second open-ended download from the moment the current track starts. Its sequential download is
+                        // started at the handoff, from the first byte that is still missing.
+                        item.source.setSeeking(true);
+                    } else {
+                        item.downloader.startAsync();
+                    }
+                }
+                if (!demuxer) {
+                    demuxer = await LuminaAudioPlayer.createDemuxerForManifest(manifest, {
+                        source: item.source,
+                        capabilities: this.capabilities,
+                        events: this.events,
+                        onError: (error) => this.failItem(item, error)
+                    });
+                }
                 if (!demuxer) {
                     // A cancelled or aborted header probe and a transport failure are not properties of the track, so
                     // they are reported as themselves. Only a probe that actually concluded the bundled player cannot
@@ -1112,9 +1162,14 @@
             item.prefetch = token;
             const phase = (async () => {
                 try {
+                    // The prefetch waits for the monitor to report that the current track is close enough to its end. No manifest is requested and no
+                    // normalized production is started before then, so a skipped or abandoned track never holds a delivery handle or a normalization slot.
+                    const isWindowOpen = await this.waitForPrefetchWindowAsync(item, token);
+                    if (!isWindowOpen)
+                        return null;
                     const signal = token.abortController ? token.abortController.signal : undefined;
                     const manifest = await this.fetchManifestAsync(nextDescriptor, signal);
-                    if (token.cancelled || this.destroyed || item.stopped || manifest.directPlay !== true)
+                    if (token.cancelled || this.destroyed || item.stopped)
                         return null;
                     const prefetched = await this.buildItemAsync(nextDescriptor, manifest, true, (created) => {
                         token.item = created;
@@ -1158,6 +1213,70 @@
         }
 
         /**
+         * Waits until the current track is close enough to its end for the prefetch to start. The wait is resolved by the playback monitor when it
+         * crosses the lead, and is rejected as false when the prefetch is cancelled, so no timer polls the whole track and a paused track starts nothing until it resumes near the end.
+         * @param {Object} item - The current item whose successor is prefetched.
+         * @param {Object} token - The prefetch token of the current item.
+         * @returns {Promise<boolean>} True when the prefetch window opened, false when the prefetch was cancelled or the item stopped.
+         */
+        waitForPrefetchWindowAsync(item, token) {
+            return new Promise((resolve) => {
+                token.windowResolve = resolve;
+                this.tryOpenPrefetchWindow(item, token);
+            });
+        }
+
+        /**
+         * Opens the prefetch window when the current track is within the lead of its end, or closes it when the prefetch is no longer wanted.
+         * @param {Object} item - The current item whose successor is prefetched.
+         * @param {Object} token - The prefetch token of the current item.
+         */
+        tryOpenPrefetchWindow(item, token) {
+            if (!token || !token.windowResolve)
+                return;
+            if (token.cancelled || this.destroyed || !item || item.stopped || item.disposed || this.current !== item) {
+                this.closePrefetchWindow(token);
+                return;
+            }
+            // A completion that already fell back to a normal next-track start has no use for a prefetch, so it is not started only to be thrown away.
+            if (item.continueToEntry) {
+                this.closePrefetchWindow(token);
+                return;
+            }
+            if (this.getRemainingPlaybackSeconds(item) > PREFETCH_LEAD_SECONDS)
+                return;
+            const resolve = token.windowResolve;
+            token.windowResolve = null;
+            resolve(true);
+        }
+
+        /**
+         * Closes a pending prefetch window as false, so the prefetch phase ends instead of waiting for a track that is no longer current.
+         * @param {Object} token - The prefetch token whose window is closed.
+         */
+        closePrefetchWindow(token) {
+            if (!token || !token.windowResolve)
+                return;
+            const resolve = token.windowResolve;
+            token.windowResolve = null;
+            resolve(false);
+        }
+
+        /**
+         * Gets how much playback time is left in an item, from the shared renderer playhead.
+         * @param {Object} item - The item whose remaining time is read.
+         * @returns {number} The remaining time, in seconds, or zero when the duration is unknown or already reached.
+         */
+        getRemainingPlaybackSeconds(item) {
+            const duration = Number(item && item.duration);
+            if (!Number.isFinite(duration) || duration <= 0)
+                return 0;
+            const absolute = Number(this.renderer.getCurrentTime());
+            const local = Number.isFinite(absolute) ? Math.max(0, absolute - Number(item.base || 0)) : 0;
+            return Math.max(0, duration - local);
+        }
+
+        /**
          * Appends the pre-decoded audio of the next item to the renderer schedule, exactly after the audio of the current
          * track, and lets its decode continue into the same schedule. The current item stays current until the media position of the next item begins.
          * @param {Object} current - The item that is finishing.
@@ -1180,6 +1299,10 @@
                 next.downloader.setPlaybackPaused(false);
                 next.downloader.startAsync();
             }
+            // Prefetches are built with retries disabled, because an unavailable production abandons the prefetch instead of holding it open.
+            // After the handoff this item is the track that owns the playhead, so a temporarily unavailable segment is retried like any current track.
+            if (typeof next.downloader.setShouldRetryUnavailable === 'function')
+                next.downloader.setShouldRetryUnavailable(true);
             // The end of the scheduled audio of the current track is the exact media position the next track starts at.
             next.base = this.renderer.getScheduledMediaDuration();
             this.nextItem = next;
@@ -1350,6 +1473,8 @@
                 return;
             item.prefetch = null;
             token.cancelled = true;
+            // A prefetch that is still waiting for its window is released immediately instead of keeping the teardown open.
+            this.closePrefetchWindow(token);
             if (token.abortController) {
                 try {
                     token.abortController.abort();
@@ -1426,6 +1551,7 @@
             // the monitor neither pauses the renderer nor advances a boundary of the timeline that is being replaced.
             if (this.current.isSeeking || this.isLoadingTrack)
                 return;
+            this.tryOpenPrefetchWindow(this.current, this.current.prefetch);
             this.isMonitoring = true;
             try {
                 const absolute = this.renderer.getCurrentTime();
@@ -1604,6 +1730,138 @@
         }
 
         /**
+         * Checks whether a failure is a delivery that the server no longer accepts, which the player can fix by fetching the manifest again.
+         * @param {Object} item - The item that failed.
+         * @param {*} error - The failure.
+         * @returns {boolean} True when the delivery should be refreshed and playback resumed at the current position.
+         */
+        shouldRecoverDelivery(item, error) {
+            if (!item || item !== this.current || item.deliveryRecoveryAttempted || item.deliveryRecoveryInProgress || this.destroyed)
+                return false;
+            if (!error || error.code !== LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED || !error.details)
+                return false;
+            const reason = error.details.reason;
+            return reason === LuminaAudioPlayer.PlayerErrorReason.SEGMENT_NOT_FOUND
+                || reason === LuminaAudioPlayer.PlayerErrorReason.PLAYBACK_DELIVERY_CHANGED;
+        }
+
+        /**
+         * Refetches the manifest of the current track and rebuilds the normalized pipeline at the current playback position, used when the
+         * delivery handle expired, the API restarted, or the source file changed since the manifest was read.
+         * @param {Object} item - The item whose delivery must be refreshed.
+         * @param {*} originalError - The failure that triggered the refresh.
+         * @returns {Promise<void>} A promise that completes when playback resumed on the refreshed delivery.
+         */
+        async recoverDeliveryAsync(item, originalError) {
+            // The attempt is marked before the first await, because the teardown below can raise failures, and a second recovery started
+            // from one of them would race this one for the same item.
+            item.deliveryRecoveryInProgress = true;
+            item.deliveryRecoveryAttempted = true;
+            // An underrun pause is a temporary buffer stall, not a user pause, so it must be resumed after the refresh just like active playback.
+            const wasPlaying = !this.isUserPaused && (this.renderer.isPlaying() || this.isUnderrunPaused);
+            // The renderer time is shared by the whole queue, while the position to resume at is relative to this track.
+            const position = Math.max(0, Number(this.renderer.getCurrentTime()) - Number(item.base || 0));
+            // Stop observing the old pipeline before pausing it, so the monitor does not treat the intentional pause as an underrun and does
+            // not schedule more work against the delivery that is being replaced.
+            this.stopMonitor();
+            this.isUnderrunPaused = false;
+            this.host.reportBuffering(true);
+            try {
+                await this.renderer.pauseAsync();
+            } catch (pauseError) {
+                // The old item is released below regardless, so a renderer that refuses to pause must not abort the recovery.
+                console.debug('Audio player: the renderer could not be paused before refreshing the delivery.', pauseError);
+            }
+            // A prefetched successor was built from the old manifest, so keeping it would hand off to the expired delivery handle.
+            this.cancelPrefetchWait(item);
+            if (item.prefetch) {
+                try {
+                    await this.cancelPrefetchAsync(item);
+                } catch (prefetchError) {
+                    console.debug('Audio player: the prefetch of the failed delivery could not be released.', prefetchError);
+                }
+            }
+            // An already attached next track may have audio scheduled from the old delivery, so it is released before the new manifest
+            // is read instead of letting two deliveries meet at the track boundary.
+            if (this.nextItem) {
+                const attachedNextItem = this.nextItem;
+                this.nextItem = null;
+                await this.disposeItemAsync(attachedNextItem).catch((disposeError) => {
+                    console.debug('Audio player: the attached next track of the failed delivery could not be released.', disposeError);
+                });
+            }
+            // The old decode loop and downloads must stop before the replacement is built, because their aborts and failures belong to the
+            // delivery being replaced and must not be mistaken for failures of the new one.
+            item.loopToken = null;
+            if (item.downloader)
+                item.downloader.abort();
+
+            let manifest;
+            try {
+                manifest = await this.fetchManifestAsync(item.descriptor);
+            } catch (manifestError) {
+                // The user needs the failure that interrupted playback, not the recovery attempt that also failed.
+                console.debug('Audio player: the manifest of the failed delivery could not be refreshed.', manifestError);
+                throw originalError;
+            }
+            // The awaits above can be overtaken by a new load or by teardown, and recovery must never touch a different current item.
+            if (this.destroyed || this.current !== item)
+                return;
+            if (manifest.isDirectPlay === true) {
+                // The server now considers the track a direct play. Converting the running normalized pipeline to the direct stream is a different
+                // transition, so the track ends with the original failure instead of playing mixed deliveries.
+                throw originalError;
+            }
+            try {
+                // ReplayGain and timeline metadata can change with the refreshed manifest, so the renderer is configured before the
+                // replacement pipeline starts producing audio.
+                this.renderer.configure(manifest);
+            } catch (configureError) {
+                console.debug('Audio player: the renderer could not be configured for the refreshed delivery.', configureError);
+                throw originalError;
+            }
+
+            let replacement;
+            try {
+                // The replacement owns fresh downloader, demuxer and decoder state bound to the new delivery handle.
+                replacement = await this.buildItemAsync(item.descriptor, manifest, false);
+            } catch (buildError) {
+                console.debug('Audio player: the refreshed delivery could not be prepared.', buildError);
+                throw originalError;
+            }
+            // Building the replacement took another await, so it is discarded if the user left this track in the meantime.
+            if (this.destroyed || this.current !== item) {
+                await this.disposeItemAsync(replacement);
+                return;
+            }
+            // The replacement starts at the beginning of this track on the shared timeline. The attempted flag is carried over so a delivery
+            // that is still rejected after the refresh cannot make the player refetch the manifest forever.
+            replacement.base = 0;
+            replacement.deliveryRecoveryAttempted = true;
+            this.current = replacement;
+            if (replacement.duration > 0)
+                this.renderer.setTimelineDuration(replacement.duration);
+            this.host.reportDuration(replacement.duration);
+            await this.disposeItemAsync(item);
+            // A seek rebuilds every stage at the requested position. At zero there is nothing to seek, so the decode loop and its prefetch are started explicitly.
+            if (position > 0)
+                await this.seekAsync(position);
+            else {
+                this.startDecodeLoop(replacement);
+                this.startGaplessPrefetch(replacement);
+            }
+            // Seeking is asynchronous, so the user may have paused, stopped or replaced the track while it ran. Do not resume a pipeline that no longer owns the playhead.
+            if (this.current !== replacement || replacement.failed || replacement.stopped || this.destroyed)
+                return;
+            // Resume only if audio was actually being heard before the refresh and the user has not paused since. A user pause must stay a pause, while an underrun pause is restored.
+            if (wasPlaying && !this.isUserPaused) {
+                await this.renderer.playAsync();
+                this.startMonitor();
+            }
+            this.host.reportBuffering(false);
+        }
+
+        /**
          * Records a failure of an item once and reports it to the player when the item is the current one.
          * @param {Object} item - The item that failed.
          * @param {*} error - The failure.
@@ -1613,6 +1871,17 @@
                 return;
             if (LuminaAudioPlayer.isDownloadAbort(error))
                 return;
+            // Errors raised by the old pipeline while it is being replaced by a refreshed delivery belong to that teardown, not to a new failure.
+            if (item.deliveryRecoveryInProgress)
+                return;
+            if (this.shouldRecoverDelivery(item, error)) {
+                this.recoverDeliveryAsync(item, error).catch((recoveryError) => {
+                    console.debug('Audio player: the refreshed delivery could not be applied.', recoveryError);
+                    item.deliveryRecoveryInProgress = false;
+                    this.failItem(item, error);
+                });
+                return;
+            }
             item.failed = true;
             item.stopped = true;
             try {
@@ -1719,10 +1988,12 @@
         async disposeItemAsync(item) {
             if (!item || item.disposed)
                 return;
+            // The flags are set before any await, so callbacks raised by the teardown itself see the item as dead instead of failing it again.
             item.disposed = true;
             item.stopped = true;
             item.loopToken = null;
             this.cancelPrefetchWait(item);
+            // Stop scheduling before the decoder is torn down, so a frame produced during teardown can never enter the renderer schedule.
             if (item.scheduler)
                 item.scheduler.stop();
             // The item may itself have prefetched the track after it, which must not keep downloading or decoding once the
@@ -1751,6 +2022,7 @@
                 }
             }
             await this.waitForDecodeLoopAsync(item);
+            // The loop has exited, so the scheduler and the demuxer it could still touch are released next.
             if (item.scheduler) {
                 try {
                     item.scheduler.dispose();
@@ -1767,6 +2039,7 @@
             }
             if (item.source)
                 item.source.destroy();
+            // The downloader is destroyed last, because the demuxer and the byte source may hold its reads until they are released.
             if (item.downloader) {
                 try {
                     await item.downloader.destroyAsync();

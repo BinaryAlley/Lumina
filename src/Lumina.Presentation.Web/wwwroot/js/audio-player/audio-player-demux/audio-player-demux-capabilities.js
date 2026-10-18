@@ -37,11 +37,13 @@
  * The needs normalization event
  * -----------------------------
  * It is published on the player event bus as {@link LuminaAudioPlayer.PlayerEvent.NEEDS_NORMALIZATION}, with the payload
- * { container, codec, reason }, plus directPlay when the caller supplied it, where the reason is one of the
+ * { container, codec, reason }, plus isDirectPlay when the caller supplied it, where the reason is one of the
  * {@link LuminaAudioPlayer.PlayerErrorReason} values NO_DEMUXER, CODEC_UNSUPPORTED or DEMUXER_FAILED. A consumer that
- * asked for a normalized delivery uses it to request one. A normalized manifest, whose directPlay flag is false, is
+ * asked for a normalized delivery uses it to request one. A normalized manifest, whose isDirectPlay flag is false, is
  * refused by {@link LuminaAudioPlayer.createDemuxerForManifest} without an event, because the server already normalized
- * such a track on purpose and its stream is not in the stored container.
+ * such a track on purpose and its stream is not in the stored container. The normalized delivery is parsed by
+ * {@link LuminaAudioPlayer.NormalizedSegmentDemuxer}, which builds one of these same demuxers per segment from the
+ * delivery container and codec of the manifest.
  */
 (function (LuminaAudioPlayer) {
     'use strict';
@@ -82,9 +84,9 @@
      * @param {string} container - The canonical container of the track.
      * @param {string} codec - The canonical codec of the track.
      * @param {string} reason - One of the {@link LuminaAudioPlayer.PlayerErrorReason} values.
-     * @param {boolean} [directPlay] - The direct play flag of the manifest, when the caller has one.
+     * @param {boolean} [isDirectPlay] - The direct play flag of the manifest, when the caller has one.
      */
-    function publishNeedsNormalization(events, container, codec, reason, directPlay) {
+    function publishNeedsNormalization(events, container, codec, reason, isDirectPlay) {
         if (!events || !LuminaAudioPlayer.PlayerEvent || typeof events.emit !== 'function')
             return;
         const payload = {
@@ -96,8 +98,8 @@
         // know, which is not the same as a false flag, the documented signal that the server already normalized the
         // track. Coercing an omitted flag to false would make every caller that has no manifest look like one whose
         // track the server chose to normalize.
-        if (directPlay !== undefined)
-            payload.directPlay = directPlay === true;
+        if (isDirectPlay !== undefined)
+            payload.isDirectPlay = isDirectPlay === true;
         events.emit(LuminaAudioPlayer.PlayerEvent.NEEDS_NORMALIZATION, Object.freeze(payload));
     }
 
@@ -176,20 +178,20 @@
          * would silently drop the only signal that says which delivery to request.
          * @param {string} container - The container of the track.
          * @param {string} codec - The codec of the track.
-         * @param {boolean} [directPlay] - The direct play flag of the manifest, carried into the event.
+         * @param {boolean} [isDirectPlay] - The direct play flag of the manifest, carried into the event.
          * @returns {Promise<boolean>} True when a demuxer exists and the browser can decode the codec.
          * @throws {TypeError} When no capability detector or no event bus was injected. It is a composition error, not a
          *     property of the track, so it rejects rather than classifying the track.
          */
-        async canPlayDirectlyAsync(container, codec, directPlay) {
+        async canPlayDirectlyAsync(container, codec, isDirectPlay) {
             const events = requireInjected(this.events, 'event bus');
             const descriptor = this.match(container, codec);
             if (!descriptor) {
-                publishNeedsNormalization(events, container, codec, LuminaAudioPlayer.PlayerErrorReason.NO_DEMUXER, directPlay);
+                publishNeedsNormalization(events, container, codec, LuminaAudioPlayer.PlayerErrorReason.NO_DEMUXER, isDirectPlay);
                 return false;
             }
             if (!await this.isCodecSupportedAsync(descriptor)) {
-                publishNeedsNormalization(events, container, codec, LuminaAudioPlayer.PlayerErrorReason.CODEC_UNSUPPORTED, directPlay);
+                publishNeedsNormalization(events, container, codec, LuminaAudioPlayer.PlayerErrorReason.CODEC_UNSUPPORTED, isDirectPlay);
                 return false;
             }
             return true;
@@ -204,7 +206,7 @@
         async canPlayManifestDirectlyAsync(manifest) {
             if (!manifest)
                 return false;
-            return await this.canPlayDirectlyAsync(manifest.sourceContainer, manifest.sourceCodec, manifest.directPlay);
+            return await this.canPlayDirectlyAsync(manifest.sourceContainer, manifest.sourceCodec, manifest.isDirectPlay);
         }
 
         /**
@@ -288,7 +290,7 @@
         const events = requireInjected(dependencies.events, 'event bus');
         const descriptor = dependencies.registry ? dependencies.registry.find(container, codec) : null;
         if (!descriptor) {
-            publishNeedsNormalization(events, container, codec, LuminaAudioPlayer.PlayerErrorReason.NO_DEMUXER, settings.directPlay);
+            publishNeedsNormalization(events, container, codec, LuminaAudioPlayer.PlayerErrorReason.NO_DEMUXER, settings.isDirectPlay);
             return null;
         }
         let demuxer = null;
@@ -307,7 +309,7 @@
             // whose bytes could not be fetched, so the failure is propagated and reported as the download failure it is.
             if (error instanceof LuminaAudioPlayer.PlayerError && error.code === LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED)
                 throw error;
-            publishNeedsNormalization(events, container, codec, LuminaAudioPlayer.PlayerErrorReason.DEMUXER_FAILED, settings.directPlay);
+            publishNeedsNormalization(events, container, codec, LuminaAudioPlayer.PlayerErrorReason.DEMUXER_FAILED, settings.isDirectPlay);
             return null;
         }
         const configuration = demuxer.getConfiguration();
@@ -323,7 +325,7 @@
         }
         if (!isConfigurationSupported) {
             await demuxer.destroyAsync();
-            publishNeedsNormalization(events, container, codec, LuminaAudioPlayer.PlayerErrorReason.CODEC_UNSUPPORTED, settings.directPlay);
+            publishNeedsNormalization(events, container, codec, LuminaAudioPlayer.PlayerErrorReason.CODEC_UNSUPPORTED, settings.isDirectPlay);
             return null;
         }
         // The demuxer is usable, so the caller's error callback is attached from here on: a failure while reading is a
@@ -344,9 +346,9 @@
      * @returns {Promise<LuminaAudioPlayer.Demuxer|null>} The ready demuxer, or null for a manifest that is not a direct play, or one that must be normalized.
      */
     LuminaAudioPlayer.createDemuxerForManifest = function (manifest, options) {
-        if (!manifest || manifest.directPlay !== true)
+        if (!manifest || manifest.isDirectPlay !== true)
             return Promise.resolve(null);
-        return LuminaAudioPlayer.createDemuxerFor(manifest.sourceContainer, manifest.sourceCodec, Object.assign({}, options, { directPlay: true }));
+        return LuminaAudioPlayer.createDemuxerFor(manifest.sourceContainer, manifest.sourceCodec, Object.assign({}, options, { isDirectPlay: true }));
     };
 
     /**

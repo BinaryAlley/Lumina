@@ -34,13 +34,15 @@ public class GetPlaybackManifestEndpointSummary : Summary<GetPlaybackManifestEnd
         ResponseParam<PlaybackManifestResponse>(r => r.ReplayGainTrackPeak, "The ReplayGain track peak of the track, if applicable.");
         ResponseParam<PlaybackManifestResponse>(r => r.ReplayGainAlbumGain, "The ReplayGain album gain of the track, in decibels, if applicable.");
         ResponseParam<PlaybackManifestResponse>(r => r.ReplayGainAlbumPeak, "The ReplayGain album peak of the track, if applicable.");
-        ResponseParam<PlaybackManifestResponse>(r => r.DirectPlay, "Whether the player can play the stored audio as it is, without the server changing its container or its codec.");
+        ResponseParam<PlaybackManifestResponse>(r => r.IsDirectPlay, "Whether the player can play the stored audio as it is, without the server changing its container or its codec.");
         ResponseParam<PlaybackManifestResponse>(r => r.DeliveryContainer, "The container of the audio the server delivers, when the delivery is not a direct play.");
         ResponseParam<PlaybackManifestResponse>(r => r.DeliveryCodec, "The codec of the audio the server delivers, when the delivery is not a direct play.");
         ResponseParam<PlaybackManifestResponse>(r => r.DeliveryShape, "The shape the delivered audio is addressed and seeked by, when the delivery is not a direct play.");
         ResponseParam<PlaybackManifestResponse>(r => r.SegmentDurationSeconds, "The duration of each segment of the delivered audio, in seconds, when the delivery is addressed as time addressed segments.");
-        ResponseParam<PlaybackManifestResponse>(r => r.Seekable, "Whether the delivered audio can be seeked by the player.");
+        ResponseParam<PlaybackManifestResponse>(r => r.IsSeekable, "Whether the delivered audio can be seeked by the player.");
         ResponseParam<PlaybackManifestResponse>(r => r.StreamPath, "The path of the track stream, relative to the API, without a host or a scheme.");
+        ResponseParam<PlaybackManifestResponse>(r => r.DeliveryId, "The opaque handle of the normalized delivery, which the segment route accepts. Null for a direct play.");
+        ResponseParam<PlaybackManifestResponse>(r => r.SegmentStreamPathTemplate, "The path template of the segment route of the normalized delivery, relative to the API, with {deliveryId} and {segmentIndex} placeholders. Null for a direct play.");
 
         Response(200, "The playback manifest of the track is returned.",
             example: new PlaybackManifestResponse(
@@ -55,13 +57,15 @@ public class GetPlaybackManifestEndpointSummary : Summary<GetPlaybackManifestEnd
                 ReplayGainTrackPeak: 0.9877m,
                 ReplayGainAlbumGain: -6.8m,
                 ReplayGainAlbumPeak: 0.9999m,
-                DirectPlay: false,
+                IsDirectPlay: false,
                 DeliveryContainer: "MP3",
                 DeliveryCodec: "MP3",
                 DeliveryShape: PlaybackDeliveryShape.TimeAddressedSegments,
                 SegmentDurationSeconds: 6,
-                Seekable: true,
-                StreamPath: "/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/albums/e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f/tracks/9f0e1d2c-3b4a-4c6d-8e7f-9a0b1c2d3e4f/stream"
+                IsSeekable: true,
+                StreamPath: "/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/albums/e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f/tracks/9f0e1d2c-3b4a-4c6d-8e7f-9a0b1c2d3e4f/stream",
+                DeliveryId: "8f14e45fceea167a5a36dedd4bea2543",
+                SegmentStreamPathTemplate: "/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/albums/e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f/tracks/9f0e1d2c-3b4a-4c6d-8e7f-9a0b1c2d3e4f/stream/deliveries/{deliveryId}/segments/{segmentIndex}"
             )
         );
 

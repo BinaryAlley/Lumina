@@ -4,10 +4,10 @@ using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
 using Lumina.Presentation.Web.Common.DTO.Common;
 using Lumina.Presentation.Web.Common.Exceptions;
+using Lumina.Presentation.Web.Common.Playback;
 using Lumina.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Common;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Net;
@@ -72,9 +72,31 @@ public class GetPlaybackManifestEndpoint : BaseEndpoint<GetPlaybackManifestReque
                 Detail = "InternalServerError",
                 Status = StatusCodes.Status502BadGateway
             }, HttpStatusCode.BadGateway, endpoint);
-        // The API only knows the relative path of its own stream endpoint, and the browser only reaches this application, so the path is
-        // replaced with the path of the streaming proxy of this application, which is the URL the player actually consumes.
+        // The API only knows the relative paths of its own stream and segment endpoints, and the browser only reaches this application, so
+        // they are replaced with the paths of the streaming proxies of this application, which are the URLs the player actually consumes.
         manifest.StreamPath = BuildBrowserStreamPath(request.LibraryId, normalizedArtistId, normalizedAlbumId, normalizedTrackId);
+        if (string.IsNullOrEmpty(manifest.SegmentStreamPathTemplate))
+        {
+            manifest.DeliveryId = null;
+            manifest.SegmentStreamPathTemplate = null;
+        }
+        else
+        {
+            // The API decides how its delivery is addressed: the web app only rewrites the path it reported, and only requires the opaque
+            // handle the path needs. It never infers the addressing from the direct play flag.
+            if (!PlaybackDeliveryId.IsValid(manifest.DeliveryId))
+                throw new ApiException(new ProblemDetailsDto
+                {
+                    Title = "General.Failure",
+                    Detail = "InternalServerError",
+                    Status = StatusCodes.Status502BadGateway
+                }, HttpStatusCode.BadGateway, endpoint);
+            manifest.SegmentStreamPathTemplate = BuildBrowserSegmentStreamPath(request.LibraryId, normalizedArtistId, normalizedAlbumId, normalizedTrackId);
+        }
+        // The manifest is specific to the authenticated user and carries a stateful delivery handle, so the browser hop never stores it publicly and
+        // it varies by the cookie that authenticates this hop.
+        HttpContext.Response.Headers["Cache-Control"] = "private, no-store";
+        HttpContext.Response.Headers["Vary"] = "Cookie";
         return JsonSuccess(manifest);
     }
 
@@ -105,11 +127,36 @@ public class GetPlaybackManifestEndpoint : BaseEndpoint<GetPlaybackManifestReque
     }
 
     /// <summary>
+    /// Builds the browser facing relative path template of the segment streaming proxy of this application for the track identified by the given Ids.
+    /// </summary>
+    /// <remarks>
+    /// The placeholders of the route template are replaced with the Ids the manifest was requested for, and the delivery handle and segment index
+    /// placeholders are kept for the player to expand. The player substitutes the handle the manifest reported, so the segment request addresses
+    /// exactly the delivery that manifest declared, and the path is built exactly like the track stream path, so it can only ever point at this origin.
+    /// </remarks>
+    /// <param name="libraryId">The Id of the media library the track belongs to.</param>
+    /// <param name="artistId">The normalized Id of the artist the album belongs to.</param>
+    /// <param name="albumId">The normalized Id of the album the track belongs to.</param>
+    /// <param name="trackId">The normalized Id of the track.</param>
+    /// <returns>The root relative path template the browser fetches a segment from, on its own origin.</returns>
+    private string BuildBrowserSegmentStreamPath(Guid libraryId, string artistId, string albumId, string trackId)
+    {
+        string culture = IsSafePathSegment(Culture) ? Culture : "en-US";
+        string pathBase = IsSafePathBase(HttpContext.Request.PathBase.ToString()) ? HttpContext.Request.PathBase.ToString().TrimEnd('/') : string.Empty;
+        string segmentPath = WebRoutes.Music.STREAM_TRACK_SEGMENT
+            .Replace("{culture}", culture, StringComparison.OrdinalIgnoreCase)
+            .Replace("{artistId}", artistId, StringComparison.Ordinal)
+            .Replace("{albumId}", albumId, StringComparison.Ordinal)
+            .Replace("{trackId}", trackId, StringComparison.Ordinal);
+        return $"{pathBase}/{segmentPath}?libraryId={libraryId}";
+    }
+
+    /// <summary>
     /// Checks whether a value can be used safely as a single segment of a path the browser resolves against its own origin.
     /// </summary>
     /// <param name="value">The value to check.</param>
     /// <returns><see langword="true"/> when the value cannot introduce a path separator, a query, a fragment, or a control character, <see langword="false"/> otherwise.</returns>
-    private static bool IsSafePathSegment(string value)
+    private static bool IsSafePathSegment(string? value)
     {
         if (string.IsNullOrEmpty(value))
             return false;

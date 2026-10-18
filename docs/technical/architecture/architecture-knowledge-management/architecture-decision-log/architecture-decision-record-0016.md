@@ -43,7 +43,20 @@ GET /api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{tr
 
 ### Delivery shape
 
-The `TimeAddressedSegments` delivery shape is a sequence of fixed duration segments addressed and seeked by time, so that finding a time never requires mapping a byte range to it. The segment duration is 6 seconds, and it is carried in the delivery decision so that the producer of the segments and the player agree on it. Direct play is `ByteRangeSeekable`, because the original file is served by the existing range-capable stream endpoint.
+The `TimeAddressedSegments` delivery shape is a sequence of approximately fixed duration segments addressed and seeked by time, so that finding a time never requires mapping a byte range to it. The nominal segment duration is 6 seconds, and it is carried in the delivery decision so that the producer of the segments and the player agree on it. A segment is cut at the first packet at or after its nominal boundary, so its real start is not always an exact multiple of the nominal duration; the producer records the real start in its index, and the segment route reports it in a response header. Direct play is `ByteRangeSeekable`, because the original file is served by the existing range-capable stream endpoint.
+
+### Segment addressing
+
+The segments are exposed through a dedicated segment route, `.../stream/deliveries/{deliveryId}/segments/{segmentIndex}`, which extends the track stream endpoint's contract. The playback manifest carries its relative path in `segmentStreamPathTemplate`, with `{deliveryId}` and `{segmentIndex}` placeholders, and the web application rewrites that path to its own segment proxy so that the browser never reaches the API server. The manifest also reports the opaque `deliveryId` the placeholders are expanded with.
+
+- An index addresses a whole segment, so no byte range is ever sent for a normalized delivery.
+- The delivery handle the manifest issued is the only authority on the delivery of the segments. It is a random, opaque value bound to the user and the track, and it captures the delivery decision, the quality cap and the source file version the manifest declared. The segment route resolves it instead of recomputing the decision from a capability list, rereading the user's quality setting, or restating a file that may have changed. A changed file is rejected as a conflict rather than starting a second production whose segments would be mixed with the declared one.
+- Library ownership is still evaluated on every segment request, so revoked access stops playback immediately. The track membership and the library content locations are the ones captured when the manifest was issued, so deleting a track row while its file remains, or removing a content location, can keep that media streamable until the handle expires. That is the deliberate trade-off for not reloading the track and library graph for every six second segment; the handle lifetime is bounded to 12 hours.
+- The handles are process local, like the normalized audio cache they address. They expire after a bounded lifetime, are bounded globally and per user, and a repeated manifest for the same delivery inputs reuses the existing handle, so the registry cannot grow without bound. Expired handles are removed in issue order from a queue, so the sweep is amortized constant time rather than a scan of every handle.
+- A production is atomic: the first segment request may wait for the whole normalized track to be produced and cached, and the following segment requests are served from that cache.
+- The player keeps a bounded lookahead of one segment ahead of the segment the demuxer consumed, so the link is not idle between segments and the streamed indicator can run ahead. The lookahead stops while playback is paused unless the user enabled the keep-downloading-while-paused preference, and it never advances itself, so it cannot turn into a full download of the track.
+- Gapless prefetch starts only near the end of the current track, not at load time. A normalized next track therefore transitions without a gap only when its production is already cached or finishes within that lead; otherwise it starts normally at the boundary. The lead is deliberately shorter than a long production, because holding a normalization slot for a track the user may never reach is worse than a small gap.
+- The player keeps every segment it has fetched for the lifetime of the track, so seeking back into a fetched segment does not fetch it again. A seek reads the target segment from its first packet and drops the packets that end before the target, instead of seeking inside the segment: a container that numbers its frames across the whole track would otherwise add that number to the segment offset twice. A segment is short, so reading it from its start is exact for every delivered container.
 
 ## Consequences
 
@@ -63,7 +76,7 @@ The `TimeAddressedSegments` delivery shape is a sequence of fixed duration segme
 |---|---|
 | The probe reports a codec as a free form description that does not name the codec the player advertises | The stored description is canonicalized to the advertised codec names before comparison, and the MPEG layer is matched by its layer number, so a description that names no decodable codec is left unmatched and forces a transcode |
 | A player advertises a container the server cannot produce | The delivered container is always chosen from the containers the server produces the codec in, never from the container the player names, so a client supplied container never reaches the transcoder or a cache name; a codec the player cannot be served in any server container is not used |
-| The segment duration drifts between the server and the player | It is part of the delivery decision carried by the manifest, not a constant duplicated on both sides |
+| The real segment start drifts from the nominal grid | The nominal duration is carried by the manifest, and the exact indexed start of each segment is reported in `X-Segment-Start-Seconds` and used by the player, so neither side assumes an exact grid |
 
 ## Alternatives Considered
 

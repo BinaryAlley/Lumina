@@ -73,6 +73,7 @@ internal sealed class TrackNormalizationService : ITrackNormalizationService, ID
     private const decimal SEGMENT_TIME_TOLERANCE_SECONDS = 0.001m;
     private const decimal DURATION_TOLERANCE_MIN_SECONDS = 1m;
     private const decimal DURATION_TOLERANCE_RATIO = 0.02m;
+    private const int MAX_TRACK_PROJECTIONS = 1024;
 
     // The demuxer of each container the probe can report. Pinning the demuxer stops ffmpeg from probing the content of the file and selecting a
     // demuxer that can open a playlist or another indirection; the file protocol whitelist is the backstop for a container that is not listed here.
@@ -124,8 +125,15 @@ internal sealed class TrackNormalizationService : ITrackNormalizationService, ID
     private readonly TimeSpan _touchThrottleInterval;
     private readonly SemaphoreSlim _jobSlots;
     private readonly ConcurrentDictionary<int, Process> _runningProcesses = new();
+    // The projection of a cache index is reused between segment requests, so a cached track is not re-projected for every segment. The bound keeps
+    // the retained metadata small; a cleared cache is repopulated lazily from the index on the next request.
+    private readonly ConcurrentDictionary<(string CacheRoot, string CacheId), NormalizedTrackDto> _trackProjections = new();
     private readonly CancellationTokenSource _shutdownCancellation = new();
     private readonly Lock _lifecycleSync = new();
+    // The global job slots are shared, but one user must not be able to take all of them and block another user's playback. These two fields guard
+    // the per-user admission count; they are not part of the cache identity, because a production is shared by every user that requests it.
+    private readonly Lock _userProductionLock = new();
+    private readonly Dictionary<Guid, int> _activeProductionsPerUser = [];
     private readonly ManualResetEventSlim _productionsDrained = new(initialState: true);
     private readonly string _cacheRoot;
     private int _activeProductionCount;
@@ -176,6 +184,8 @@ internal sealed class TrackNormalizationService : ITrackNormalizationService, ID
             return Errors.Playback.NormalizationUnavailable;
         if (request.TrackId == Guid.Empty)
             return Errors.Playback.NormalizationFailed;
+        if (request.UserId == Guid.Empty)
+            return Errors.Playback.NormalizationFailed;
         if (string.IsNullOrWhiteSpace(request.SourcePath))
             return Errors.Music.TrackPathCannotBeEmpty;
         // The caller authorizes the request, and the service re-validates the source path against the content locations carried by the request. A path
@@ -211,6 +221,11 @@ internal sealed class TrackNormalizationService : ITrackNormalizationService, ID
         {           
             return Errors.Music.TrackFileNotFound; // A file that cannot be read is indistinguishable, to the caller, from a file that does not exist.
         }
+
+        // The delivery was declared against a specific version of the source file. A file that changed since then would produce a new cache
+        // entry with a different identity, so its segments would be mixed with the segments of the declared delivery. It is rejected instead.
+        if (request.SourceLength != sourceLength || request.SourceLastModifiedUtc != sourceLastModifiedUtc)
+            return Errors.Playback.PlaybackDeliveryChanged;
 
         string cacheId = BuildCacheId(request, sourceFile.FullName, sourceLength, sourceLastModifiedUtc, format);
         // The entry is touched before its index is read, so that a cache hit can never race an eviction that is deciding on the entry at the same time:
@@ -433,30 +448,79 @@ internal sealed class TrackNormalizationService : ITrackNormalizationService, ID
     /// <returns>An <see cref="Result{TValue}"/> containing either the normalized audio of the track, or an error message.</returns>
     private async Task<Result<NormalizedTrackDto>> ProduceAsync(string cacheId, NormalizedTrackRequestDto request, NormalizedAudioFormatDto format, long sourceLength, DateTime sourceLastModifiedUtc)
     {
-        lock (_lifecycleSync)
-        {
-            // A production that arrives after shutdown has started must not touch the cancellation source, the job slots or the coordinator, because shutdown may already have disposed them.
-            if (_isDisposed)
-                return Errors.Playback.NormalizationUnavailable;
-            // Dispose waits on _productionsDrained before it releases the coordinator and job slots. Counting the production here closes the race
-            // between the disposal check above and the resources being released while the production is still using them.
-            _activeProductionCount++;
-            if (_activeProductionCount == 1)
-                _productionsDrained.Reset();
-        }
+        // The global job slots are shared by every user, so a user who starts many productions at once could occupy all of them and make
+        // another user's playback fail. The per-user admission happens before the production is registered, and a request that joins a
+        // production another user already started does not reach this method, so a shared production is never charged twice.
+        if (!TryAcquireUserProductionSlot(request.UserId))
+            return Errors.Playback.NormalizationUnavailable;
 
         try
         {
-            return await ProduceCoreAsync(cacheId, request, format, sourceLength, sourceLastModifiedUtc).ConfigureAwait(false);
+            lock (_lifecycleSync)
+            {
+                // A production that arrives after shutdown has started must not touch the cancellation source, the job slots or the coordinator, because shutdown may already have disposed them.
+                if (_isDisposed)
+                    return Errors.Playback.NormalizationUnavailable;
+                // Dispose waits on _productionsDrained before it releases the coordinator and job slots. Counting the production here closes the race
+                // between the disposal check above and the resources being released while the production is still using them.
+                _activeProductionCount++;
+                if (_activeProductionCount == 1)
+                    _productionsDrained.Reset();
+            }
+
+            try
+            {
+                return await ProduceCoreAsync(cacheId, request, format, sourceLength, sourceLastModifiedUtc).ConfigureAwait(false);
+            }
+            finally
+            {
+                lock (_lifecycleSync)
+                {
+                    _activeProductionCount--;
+                    if (_activeProductionCount == 0)
+                        _productionsDrained.Set();
+                }
+            }
         }
         finally
         {
-            lock (_lifecycleSync)
-            {
-                _activeProductionCount--;
-                if (_activeProductionCount == 0)
-                    _productionsDrained.Set();
-            }
+            ReleaseUserProductionSlot(request.UserId);
+        }
+    }
+
+    /// <summary>
+    /// Reserves one of the per-user production slots before a production is admitted, so one user can never occupy every global job slot.
+    /// </summary>
+    /// <param name="userId">The Id of the user whose request starts the production.</param>
+    /// <returns><see langword="true"/> when the slot was reserved, <see langword="false"/> otherwise.</returns>
+    private bool TryAcquireUserProductionSlot(Guid userId)
+    {
+        lock (_userProductionLock)
+        {
+            if (userId == Guid.Empty)
+                return false;
+            int activeProductions = _activeProductionsPerUser.GetValueOrDefault(userId);
+            if (activeProductions >= _settings.MaxConcurrentJobsPerUser)
+                return false;
+            _activeProductionsPerUser[userId] = activeProductions + 1;
+            return true;
+        }
+    }
+
+    /// <summary>
+    /// Releases a per-user production slot that was reserved by <see cref="TryAcquireUserProductionSlot"/>.
+    /// </summary>
+    /// <param name="userId">The Id of the user whose production ended.</param>
+    private void ReleaseUserProductionSlot(Guid userId)
+    {
+        lock (_userProductionLock)
+        {
+            if (!_activeProductionsPerUser.TryGetValue(userId, out int activeProductions))
+                return;
+            if (activeProductions <= 1)
+                _activeProductionsPerUser.Remove(userId);
+            else
+                _activeProductionsPerUser[userId] = activeProductions - 1;
         }
     }
 
@@ -616,7 +680,7 @@ internal sealed class TrackNormalizationService : ITrackNormalizationService, ID
                 if (isKeptOverCapacity)
                     _logger.LogWarning("The normalized audio of track {TrackId} in cache entry {CacheId} was produced successfully but exceeds the configured normalized audio cache limit. It is kept readable and will be evicted when it is no longer in use.", request.TrackId, cacheId);
 
-                return CreateNormalizedTrackDto(cacheId, index);
+                return GetOrCreateTrackProjection(cacheId, index);
             }
             catch (OperationCanceledException)
             {
@@ -1047,8 +1111,27 @@ internal sealed class TrackNormalizationService : ITrackNormalizationService, ID
         if (!TryReadIndex(cacheId, out NormalizedTrackIndexDto? index) || index is null)
             return false;
 
-        normalizedTrack = CreateNormalizedTrackDto(cacheId, index);
+        normalizedTrack = GetOrCreateTrackProjection(cacheId, index);
         return true;
+    }
+
+    /// <summary>
+    /// Projects a validated cache index once and reuses the projection for the following segment requests of the same cached track.
+    /// </summary>
+    /// <param name="cacheId">The opaque identifier of the cache entry that holds the normalized audio.</param>
+    /// <param name="index">The validated index of the cache entry.</param>
+    /// <returns>The normalized track described by the index.</returns>
+    private NormalizedTrackDto GetOrCreateTrackProjection(string cacheId, NormalizedTrackIndexDto index)
+    {
+        (string CacheRoot, string CacheId) key = (_cacheRoot, cacheId);
+        if (_trackProjections.TryGetValue(key, out NormalizedTrackDto? existing) && existing.TrackId == index.TrackId)
+            return existing;
+        NormalizedTrackDto projection = CreateNormalizedTrackDto(cacheId, index);
+        // The projection is metadata only, but unbounded retention is not useful: when the bound is reached, the cache is dropped and rebuilt lazily.
+        if (_trackProjections.Count >= MAX_TRACK_PROJECTIONS)
+            _trackProjections.Clear();
+        _trackProjections[key] = projection;
+        return projection;
     }
 
     /// <summary>

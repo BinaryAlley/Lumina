@@ -53,6 +53,19 @@ public class TranscodingSettingsDtoValidator : AbstractValidator<TranscodingSett
             .Must(maxConcurrentJobs => maxConcurrentJobs <= MAX_CONCURRENT_JOBS)
             .WithError(Errors.Errors.Configuration.TranscodingMaxConcurrentJobsIsTooLarge);
 
+        RuleFor(settings => settings.MaxConcurrentJobsPerUser)
+            .GreaterThan(0)
+            .WithError(Errors.Errors.Configuration.TranscodingMaxConcurrentJobsPerUserMustBePositive);
+
+        RuleFor(settings => settings.MaxConcurrentJobsPerUser)
+            .Must(maxConcurrentJobsPerUser => maxConcurrentJobsPerUser <= MAX_CONCURRENT_JOBS)
+            .WithError(Errors.Errors.Configuration.TranscodingMaxConcurrentJobsPerUserIsTooLarge);
+
+        // A per-user limit above the global one can never be reached, and would hide a misconfiguration that looks like a working cap.
+        RuleFor(settings => settings.MaxConcurrentJobsPerUser)
+            .Must((settings, maxConcurrentJobsPerUser) => maxConcurrentJobsPerUser <= settings.MaxConcurrentJobs)
+            .WithError(Errors.Errors.Configuration.TranscodingMaxConcurrentJobsPerUserExceedsGlobal);
+
         RuleFor(settings => settings.MaxCacheBytes)
             .GreaterThan(0)
             .WithError(Errors.Errors.Configuration.TranscodingMaxCacheBytesMustBePositive);

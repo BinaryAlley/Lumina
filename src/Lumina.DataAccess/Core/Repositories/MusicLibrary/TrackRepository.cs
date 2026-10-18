@@ -341,19 +341,18 @@ internal sealed class TrackRepository : ITrackRepository
         return await _luminaDbContext.Tracks
             .AsNoTracking()
             .Where(track => track.Id == trackId && track.LibraryId == libraryId && track.AlbumId == albumId && track.Album!.ArtistId == artistId)
-            .Select(track => new TrackStreamDto
-            {
-                Path = track.Path,
-                LibraryId = track.LibraryId,
-                AlbumId = track.AlbumId,
-                ArtistId = track.Album!.ArtistId,
-                AudioCodec = track.AudioCodec,
-                DurationInSeconds = track.DurationInSeconds,
-                SampleRate = track.SampleRate,
-                Channels = track.Channels,
-                BitDepth = track.BitDepth,
-                Bitrate = track.Bitrate
-            })
+            .Select(track => new TrackStreamDto(
+                track.Path,
+                track.LibraryId,
+                track.AlbumId,
+                track.Album!.ArtistId,
+                track.Container,
+                track.AudioCodec,
+                track.DurationInSeconds,
+                track.SampleRate,
+                track.Channels,
+                track.BitDepth,
+                track.Bitrate))
             .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
     }
 
@@ -378,19 +377,19 @@ internal sealed class TrackRepository : ITrackRepository
         return await _luminaDbContext.Tracks
             .AsNoTracking()
             .Where(track => track.Id == trackId && track.LibraryId == libraryId && track.AlbumId == albumId && track.Album!.ArtistId == artistId)
-            .Select(track => new TrackPlaybackManifestDto
-            {
-                Container = track.Container,
-                AudioCodec = track.AudioCodec,
-                DurationInSeconds = track.DurationInSeconds,
-                SampleRate = track.SampleRate,
-                Channels = track.Channels,
-                BitDepth = track.BitDepth,
-                ReplayGainTrackGain = track.ReplayGainTrackGain,
-                ReplayGainTrackPeak = track.ReplayGainTrackPeak,
-                ReplayGainAlbumGain = track.ReplayGainAlbumGain,
-                ReplayGainAlbumPeak = track.ReplayGainAlbumPeak
-            })
+            .Select(track => new TrackPlaybackManifestDto(
+                track.Path,
+                track.Container,
+                track.AudioCodec,
+                track.DurationInSeconds,
+                track.SampleRate,
+                track.Channels,
+                track.BitDepth,
+                track.Bitrate,
+                track.ReplayGainTrackGain,
+                track.ReplayGainTrackPeak,
+                track.ReplayGainAlbumGain,
+                track.ReplayGainAlbumPeak))
             .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
     }
 

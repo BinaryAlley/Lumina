@@ -36,6 +36,9 @@ public static partial class Errors
         public static Error TranscodingFfmpegPathCannotBeEmpty => Error.Validation(description: nameof(TranscodingFfmpegPathCannotBeEmpty));
         public static Error TranscodingMaxConcurrentJobsMustBePositive => Error.Validation(description: nameof(TranscodingMaxConcurrentJobsMustBePositive));
         public static Error TranscodingMaxConcurrentJobsIsTooLarge => Error.Validation(description: nameof(TranscodingMaxConcurrentJobsIsTooLarge));
+        public static Error TranscodingMaxConcurrentJobsPerUserMustBePositive => Error.Validation(description: nameof(TranscodingMaxConcurrentJobsPerUserMustBePositive));
+        public static Error TranscodingMaxConcurrentJobsPerUserIsTooLarge => Error.Validation(description: nameof(TranscodingMaxConcurrentJobsPerUserIsTooLarge));
+        public static Error TranscodingMaxConcurrentJobsPerUserExceedsGlobal => Error.Validation(description: nameof(TranscodingMaxConcurrentJobsPerUserExceedsGlobal));
         public static Error TranscodingMaxCacheBytesMustBePositive => Error.Validation(description: nameof(TranscodingMaxCacheBytesMustBePositive));
         public static Error TranscodingJobTimeoutMustBePositive => Error.Validation(description: nameof(TranscodingJobTimeoutMustBePositive));
         public static Error TranscodingJobTimeoutIsTooLong => Error.Validation(description: nameof(TranscodingJobTimeoutIsTooLong));

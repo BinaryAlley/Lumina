@@ -9,7 +9,7 @@ namespace Lumina.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
 /// <summary>
 /// Data transfer object for the playback manifest of a track, describing the format of its stored audio, the delivery the server decided on for the requesting player, and the path of its stream.
 /// </summary>
-[DebuggerDisplay("TrackId: {TrackId} DirectPlay: {DirectPlay}")]
+[DebuggerDisplay("TrackId: {TrackId} IsDirectPlay: {IsDirectPlay}")]
 public class PlaybackManifestDto
 {
     /// <summary>
@@ -70,7 +70,7 @@ public class PlaybackManifestDto
     /// <summary>
     /// Gets or sets whether the player can play the stored audio as it is, without the server changing its container or its codec.
     /// </summary>
-    public bool DirectPlay { get; set; }
+    public bool IsDirectPlay { get; set; }
 
     /// <summary>
     /// Gets or sets the container of the audio the server delivers, when the delivery is not a direct play.
@@ -95,11 +95,24 @@ public class PlaybackManifestDto
     /// <summary>
     /// Gets or sets whether the delivered audio can be seeked by the player.
     /// </summary>
-    public bool Seekable { get; set; }
+    public bool IsSeekable { get; set; }
 
     /// <summary>
     /// Gets or sets the path of the track stream. The API returns it relative to itself; this web application replaces it with
     /// the URL of its own streaming proxy, so that the browser never reaches the API server directly.
     /// </summary>
     public string StreamPath { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the opaque handle of the normalized delivery. The API returns it so the segment route can address exactly the delivery
+    /// the manifest declared. It is <see langword="null"/> for a direct play.
+    /// </summary>
+    public string? DeliveryId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the path template of the segment route of the normalized delivery. The API returns it relative to itself with a
+    /// <c>{deliveryId}</c> and a <c>{segmentIndex}</c> placeholder; this web application replaces it with the URL of its own segment proxy, so
+    /// that the browser never reaches the API server directly. It is <see langword="null"/> for a direct play.
+    /// </summary>
+    public string? SegmentStreamPathTemplate { get; set; }
 }

@@ -82,7 +82,7 @@ public class GetPlaybackManifestEndpointTests : IClassFixture<AuthenticatedLumin
         PlaybackManifestResponse? manifest = await ReadManifestAsync(response);
         Assert.NotNull(manifest);
         Assert.Equal(trackId, manifest!.TrackId);
-        Assert.True(manifest.DirectPlay);
+        Assert.True(manifest.IsDirectPlay);
         Assert.Equal("FLAC", manifest.SourceContainer);
         Assert.Equal("FLAC", manifest.SourceCodec);
         Assert.Equal(-7.5m, manifest.ReplayGainTrackGain);
@@ -93,7 +93,7 @@ public class GetPlaybackManifestEndpointTests : IClassFixture<AuthenticatedLumin
         Assert.Null(manifest.DeliveryCodec);
         Assert.Null(manifest.DeliveryShape);
         Assert.Null(manifest.SegmentDurationSeconds);
-        Assert.True(manifest.Seekable);
+        Assert.True(manifest.IsSeekable);
         Assert.Equal($"/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}/stream", manifest.StreamPath);
         Assert.DoesNotContain("http", manifest.StreamPath, StringComparison.OrdinalIgnoreCase);
     }
@@ -113,12 +113,12 @@ public class GetPlaybackManifestEndpointTests : IClassFixture<AuthenticatedLumin
         PlaybackManifestResponse? manifest = await ReadManifestAsync(response);
         Assert.NotNull(manifest);
         Assert.Equal(trackId, manifest!.TrackId);
-        Assert.False(manifest.DirectPlay);
+        Assert.False(manifest.IsDirectPlay);
         Assert.Equal("MP3", manifest.DeliveryContainer);
         Assert.Equal("MP3", manifest.DeliveryCodec);
         Assert.Equal(PlaybackDeliveryShape.TimeAddressedSegments, manifest.DeliveryShape);
         Assert.Equal(6, manifest.SegmentDurationSeconds);
-        Assert.True(manifest.Seekable);
+        Assert.True(manifest.IsSeekable);
     }
 
     [Fact]

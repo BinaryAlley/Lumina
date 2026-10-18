@@ -1,6 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -15,6 +18,21 @@ namespace Lumina.Presentation.Web.Common.Api;
 /// </summary>
 public sealed class ApiStreamResult : IAsyncDisposable
 {
+    /// <summary>
+    /// The response header that carries the number of segments of a normalized audio production. It must match the name the API sends.
+    /// </summary>
+    public const string SEGMENT_COUNT_HEADER_NAME = "X-Lumina-Segment-Count";
+
+    /// <summary>
+    /// The response header that carries the exact start of a segment on the track timeline, in seconds. It must match the name the API sends.
+    /// </summary>
+    public const string SEGMENT_START_SECONDS_HEADER_NAME = "X-Segment-Start-Seconds";
+
+    /// <summary>
+    /// The response header that carries the produced duration of the normalized track, in seconds. It must match the name the API sends.
+    /// </summary>
+    public const string TRACK_DURATION_SECONDS_HEADER_NAME = "X-Lumina-Track-Duration-Seconds";
+
     private readonly HttpResponseMessage _response;
 
     /// <summary>
@@ -63,6 +81,22 @@ public sealed class ApiStreamResult : IAsyncDisposable
     public string? CacheControl { get; }
 
     /// <summary>
+    /// Gets the number of segments the normalized audio production holds, when the response is a segment of one and declares it.
+    /// </summary>
+    public int? SegmentCount { get; }
+
+    /// <summary>
+    /// Gets the exact start of the segment on the track timeline, in seconds, as declared by the API, or <see langword="null"/> when the response
+    /// declares none.
+    /// </summary>
+    public string? SegmentStartSeconds { get; }
+
+    /// <summary>
+    /// Gets the produced duration of the normalized track, in seconds, as declared by the API, or <see langword="null"/> when the response declares none.
+    /// </summary>
+    public int? TrackDurationSeconds { get; }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="ApiStreamResult"/> class.
     /// </summary>
     /// <param name="response">The response returned by the remote API.</param>
@@ -79,6 +113,22 @@ public sealed class ApiStreamResult : IAsyncDisposable
         ETag = response.Headers.ETag?.ToString();
         LastModified = response.Content.Headers.LastModified;
         CacheControl = response.Headers.CacheControl?.ToString();
+        // The count is optional, because the same result also represents a track stream, which has no segments. A malformed or negative
+        // value is treated as absent instead of being passed to a caller that would use it to decide where the audio ends.
+        SegmentCount = response.Headers.TryGetValues(SEGMENT_COUNT_HEADER_NAME, out IEnumerable<string>? segmentCountValues)
+            && int.TryParse(segmentCountValues.FirstOrDefault(), NumberStyles.None, CultureInfo.InvariantCulture, out int parsedSegmentCount)
+            && parsedSegmentCount >= 0
+                ? parsedSegmentCount
+                : null;
+        // The start is forwarded as the API wrote it, so the web hop never reinterprets a decimal with the culture of this application.
+        SegmentStartSeconds = response.Headers.TryGetValues(SEGMENT_START_SECONDS_HEADER_NAME, out IEnumerable<string>? segmentStartValues)
+            ? segmentStartValues.FirstOrDefault()
+            : null;
+        TrackDurationSeconds = response.Headers.TryGetValues(TRACK_DURATION_SECONDS_HEADER_NAME, out IEnumerable<string>? trackDurationValues)
+            && int.TryParse(trackDurationValues.FirstOrDefault(), NumberStyles.None, CultureInfo.InvariantCulture, out int parsedTrackDuration)
+            && parsedTrackDuration > 0
+                ? parsedTrackDuration
+                : null;
     }
 
     /// <summary>

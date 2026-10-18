@@ -191,6 +191,119 @@
     }
 
     /**
+     * Checks that a resolved segment path matches the segment route template this application emitted and belongs to the expected track, library and segment index.
+     * @param {URL} url - The resolved segment URL.
+     * @param {Object} descriptor - The play descriptor the manifest belongs to.
+     * @param {Object} configuration - The endpoints configuration of the player.
+     * @param {number} segmentIndex - The zero based index of the segment.
+     * @param {string} deliveryId - The opaque delivery handle the manifest reported.
+     * @throws {LuminaAudioPlayer.PlayerError} When the route template is missing, is on another origin, or the path does not
+     * match the route, the expected track and library, the expected segment index, or the expected delivery handle.
+     */
+    function validateSegmentStreamRoute(url, descriptor, configuration, segmentIndex, deliveryId) {
+        const templateValue = configuration && configuration.streamTrackSegmentRouteTemplate;
+        if (typeof templateValue !== 'string' || templateValue.length === 0)
+            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment stream route template is not configured.');
+        let template;
+        try {
+            template = new URL(templateValue, getBaseOrigin());
+        } catch (error) {
+            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment stream route template is not a valid URL.', { cause: error });
+        }
+        if ((template.protocol !== 'http:' && template.protocol !== 'https:')
+            || (hasWindowOrigin() && template.origin !== window.location.origin)
+            || template.origin !== url.origin
+            || template.username !== ''
+            || template.password !== '')
+            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment stream route template is not on this origin.');
+        const expectedIds = {
+            artistId: descriptor && descriptor.artistId,
+            albumId: descriptor && descriptor.albumId,
+            trackId: descriptor && descriptor.trackId
+        };
+        const templateSegments = template.pathname.split('/');
+        const streamSegments = url.pathname.split('/');
+        if (templateSegments.length !== streamSegments.length)
+            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment path does not match the segment route.');
+        for (let index = 0; index < templateSegments.length; index++) {
+            let templateSegment;
+            try {
+                templateSegment = decodeURIComponent(templateSegments[index]);
+            } catch (error) {
+                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment route template carries an invalid escape.', { cause: error });
+            }
+            const placeholder = /^\{([A-Za-z0-9_]+)\}$/.exec(templateSegment);
+            let actualSegment;
+            try {
+                // Decode the actual segment too, so a path base or a static segment that contains an encoded character still compares equal to the template it came from.
+                actualSegment = decodeURIComponent(streamSegments[index]);
+            } catch (error) {
+                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment path carries an invalid escape.', { cause: error });
+            }
+            if (placeholder) {
+                const name = placeholder[1];
+                if (name === 'segmentIndex') {
+                    if (!Number.isInteger(segmentIndex) || segmentIndex < 0 || actualSegment !== String(segmentIndex))
+                        throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment path does not belong to the expected segment index.');
+                    continue;
+                }
+                if (name === 'deliveryId') {
+                    // The path must name the delivery handle the manifest reported, not another delivery of the same track.
+                    if (typeof deliveryId !== 'string' || actualSegment !== deliveryId)
+                        throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment path does not belong to the expected delivery.');
+                    continue;
+                }
+                if (!Object.prototype.hasOwnProperty.call(expectedIds, name))
+                    throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment route template carries an unknown placeholder.');
+                const expected = expectedIds[name];
+                if (!isGuid(expected))
+                    throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, `The play descriptor carries no valid ${name}.`, { field: name });
+                // The path must describe the track of this descriptor, not merely another track of the same library.
+                if (!isGuid(actualSegment) || actualSegment.toLowerCase() !== expected.toLowerCase())
+                    throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment path does not belong to the expected track.');
+                continue;
+            }
+            if (templateSegment !== actualSegment)
+                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment path does not match the segment route.');
+        }
+        const libraryId = descriptor && descriptor.libraryId;
+        if (!isGuid(libraryId))
+            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The play descriptor carries no valid library Id.', { field: 'libraryId' });
+        const requestedLibraryIds = url.searchParams.getAll('libraryId');
+        if (requestedLibraryIds.length !== 1 || requestedLibraryIds[0].toLowerCase() !== libraryId.toLowerCase())
+            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment path does not belong to the expected library.');
+    }
+
+    /**
+     * Resolves the segment path template of a normalized playback manifest into the URL of one segment.
+     * @param {Object} manifest - The playback manifest.
+     * @param {Object} descriptor - The play descriptor the manifest belongs to.
+     * @param {Object} configuration - The endpoints configuration of the player.
+     * @param {number} segmentIndex - The zero based index of the segment to fetch.
+     * @returns {string} The validated resolved segment URL.
+     * @throws {LuminaAudioPlayer.PlayerError} When the manifest carries no safe segment path, the index is invalid, or the
+     * path is not the segment route of the expected track, library and index.
+     */
+    function resolveSegmentStreamUrl(manifest, descriptor, configuration, segmentIndex) {
+        if (!Number.isInteger(segmentIndex) || segmentIndex < 0)
+            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment index is not valid.');
+        const deliveryId = manifest && manifest.deliveryId;
+        // The delivery handle is an opaque server issued token, so it is confined to the characters a path segment can carry and never contains a
+        // separator, a query, a fragment or a control character that could change the route it is substituted into.
+        if (typeof deliveryId !== 'string' || !/^[0-9a-f]{32}$/.test(deliveryId))
+            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The manifest carries no valid delivery handle.');
+        const template = manifest && manifest.segmentStreamPathTemplate;
+        if (typeof template !== 'string' || !template.includes('{deliveryId}') || !template.includes('{segmentIndex}'))
+            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The manifest carries no segment stream path template.');
+        const value = template
+            .split('{deliveryId}').join(deliveryId)
+            .split('{segmentIndex}').join(String(segmentIndex));
+        const resolved = resolveSameOriginUrl(value);
+        validateSegmentStreamRoute(resolved.url, descriptor, configuration, segmentIndex, deliveryId);
+        return resolved.href;
+    }
+
+    /**
      * Builds the URL of the playback manifest endpoint for a descriptor, including the capability list.
      * @param {Object} configuration - The endpoints configuration of the player.
      * @param {Object} descriptor - The play descriptor of the track.
@@ -317,5 +430,6 @@
     }
 
     LuminaAudioPlayer.resolveStreamUrl = resolveStreamUrl;
+    LuminaAudioPlayer.resolveSegmentStreamUrl = resolveSegmentStreamUrl;
     LuminaAudioPlayer.fetchPlaybackManifestAsync = fetchPlaybackManifestAsync;
 })(window.LuminaAudioPlayer = window.LuminaAudioPlayer || {});

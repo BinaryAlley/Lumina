@@ -62,8 +62,23 @@ public class GetPlaybackManifestEndpoint : BaseEndpoint<EmptyRequest, IResult>
             .Replace("{artistId}", artistId, StringComparison.Ordinal)
             .Replace("{albumId}", albumId, StringComparison.Ordinal)
             .Replace("{trackId}", trackId, StringComparison.Ordinal);
-        GetPlaybackManifestQuery query = new(libraryId, artistId, albumId, trackId, capabilities, streamPath);
+        // The segment route is filled in from the same route values, and its delivery handle and segment index placeholders are kept for the player
+        // to expand, so the manifest and the segment route can never disagree on the shape of the path either. The delivery handle is what binds
+        // the segments to the delivery this manifest declared; the capabilities are not repeated in the path.
+        string segmentStreamPathTemplate = ApiRoutes.Tracks.STREAM_TRACK_SEGMENT
+            .Replace("{libraryId}", libraryId, StringComparison.Ordinal)
+            .Replace("{artistId}", artistId, StringComparison.Ordinal)
+            .Replace("{albumId}", albumId, StringComparison.Ordinal)
+            .Replace("{trackId}", trackId, StringComparison.Ordinal);
+        GetPlaybackManifestQuery query = new(libraryId, artistId, albumId, trackId, capabilities, streamPath, segmentStreamPathTemplate);
         Result<PlaybackManifestResponse> result = await _getPlaybackManifestQueryHandler.HandleAsync(query, cancellationToken).ConfigureAwait(false);
-        return result.Match(success => TypedResults.Ok(success), Problem);
+        return result.Match(success =>
+        {
+            // The manifest carries delivery metadata specific to the authenticated user, so no intermediary may store it and every response varies by
+            // the bearer token that authorized it.
+            HttpContext.Response.Headers["Cache-Control"] = "private, no-store";
+            HttpContext.Response.Headers["Vary"] = "Authorization";
+            return TypedResults.Ok(success);
+        }, Problem);
     }
 }

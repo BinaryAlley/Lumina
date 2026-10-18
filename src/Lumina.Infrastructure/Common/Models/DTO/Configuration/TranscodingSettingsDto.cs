@@ -23,6 +23,12 @@ public sealed class TranscodingSettingsDto
     public int MaxConcurrentJobs { get; set; } = 2;
 
     /// <summary>
+    /// Gets or sets the maximum number of normalization jobs a single user may have running at the same time. A production that was
+    /// started by another user can still be waited for, because it is shared by every request for the same track and delivery.
+    /// </summary>
+    public int MaxConcurrentJobsPerUser { get; set; } = 1;
+
+    /// <summary>
     /// Gets or sets the maximum total size of the normalized audio cache, in bytes.
     /// </summary>
     public long MaxCacheBytes { get; set; } = 2L * 1024 * 1024 * 1024;

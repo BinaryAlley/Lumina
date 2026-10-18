@@ -7,55 +7,27 @@ namespace Lumina.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.T
 /// <summary>
 /// Data transfer object for a track, containing the data needed to stream, or to describe the streaming of, its audio file.
 /// </summary>
-public sealed record TrackStreamDto
-{
-    /// <summary>
-    /// Gets the file system path of the track.
-    /// </summary>
-    public required string Path { get; init; }
-
-    /// <summary>
-    /// Gets the Id of the media library the track belongs to.
-    /// </summary>
-    public required Guid LibraryId { get; init; }
-
-    /// <summary>
-    /// Gets the Id of the album the track belongs to.
-    /// </summary>
-    public required Guid AlbumId { get; init; }
-
-    /// <summary>
-    /// Gets the Id of the artist that owns the album the track belongs to.
-    /// </summary>
-    public required Guid ArtistId { get; init; }
-
-    /// <summary>
-    /// Gets the audio codec used by the audio file of the track, if applicable.
-    /// </summary>
-    public string? AudioCodec { get; init; }
-
-    /// <summary>
-    /// Gets the duration of the audio of the track in seconds.
-    /// </summary>
-    public int DurationInSeconds { get; init; }
-
-    /// <summary>
-    /// Gets the sample rate of the audio of the track in Hz.
-    /// </summary>
-    public int SampleRate { get; init; }
-
-    /// <summary>
-    /// Gets the number of audio channels of the track.
-    /// </summary>
-    public int Channels { get; init; }
-
-    /// <summary>
-    /// Gets the bit depth of the audio of the track, if applicable.
-    /// </summary>
-    public int? BitDepth { get; init; }
-
-    /// <summary>
-    /// Gets the bitrate of the audio of the track in kbps, if applicable.
-    /// </summary>
-    public int? Bitrate { get; init; }
-}
+/// <param name="Path">The file system path of the track.</param>
+/// <param name="LibraryId">The Id of the media library the track belongs to.</param>
+/// <param name="AlbumId">The Id of the album the track belongs to.</param>
+/// <param name="ArtistId">The Id of the artist that owns the album the track belongs to.</param>
+/// <param name="Container">The container of the audio file of the track, for example MP3, FLAC, OGG, AAC, MP4 or WAV, if applicable.</param>
+/// <param name="AudioCodec">The audio codec used by the audio file of the track, if applicable.</param>
+/// <param name="DurationInSeconds">The duration of the audio of the track in seconds.</param>
+/// <param name="SampleRate">The sample rate of the audio of the track in Hz.</param>
+/// <param name="Channels">The number of audio channels of the track.</param>
+/// <param name="BitDepth">The bit depth of the audio of the track, if applicable.</param>
+/// <param name="Bitrate">The bitrate of the audio of the track, in kbps, if applicable.</param>
+public sealed record TrackStreamDto(
+    string Path,
+    Guid LibraryId,
+    Guid AlbumId,
+    Guid ArtistId,
+    string? Container,
+    string? AudioCodec,
+    int DurationInSeconds,
+    int SampleRate,
+    int Channels,
+    int? BitDepth,
+    int? Bitrate
+);

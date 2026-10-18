@@ -152,12 +152,16 @@ public static class InfrastructureLayerServices
         // repackaged into another container, or re-encoded into another codec.
         services.AddSingleton<IPlaybackFormatService, PlaybackFormatService>();
 
+        // Music playback: issues and resolves the opaque delivery handles reported by a playback manifest, so the segment route never has to
+        // recompute the delivery decision, the quality cap or the source file identity from values that can change while the track plays.
+        services.AddSingleton<IPlaybackDeliveryHandleService, PlaybackDeliveryHandleService>();
+
         // Music playback: records the outcome of the ffmpeg probe, so a missing binary or encoder is reported as unavailable for the affected formats.
         services.AddSingleton<TranscodingToolchainStatus>();
 
         // Music playback: produces the normalized (remuxed or transcoded) audio of a track with ffmpeg, caches it as fixed duration
-        // segments and serves it from the cache, bounded in concurrency, cancellable and capped in disk usage. The playback stream surface
-        // is its intended consumer; no API request path calls it yet.
+        // segments and serves it from the cache, bounded in concurrency, cancellable and capped in disk usage. The segment route of the
+        // playback stream surface is its consumer.
         services.AddSingleton<ITrackNormalizationService, TrackNormalizationService>();
 
         // Music playback: owns the normalized audio cache lifecycle and verifies the ffmpeg encoders at startup, so a missing or changed toolchain
