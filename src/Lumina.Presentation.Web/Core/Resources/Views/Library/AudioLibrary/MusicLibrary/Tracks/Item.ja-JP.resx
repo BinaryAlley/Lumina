@@ -1179,4 +1179,7 @@
   <data name="AddWorkIswc" xml:space="preserve">
     <value>ISWC を追加</value>
   </data>
+  <data name="PlayTrack" xml:space="preserve">
+    <value>トラックを再生</value>
+  </data>
 </root>

@@ -38,6 +38,7 @@ public class AlbumResponseFixture
     /// </summary>
     /// <param name="id">Optional. The Id of the album.</param>
     /// <param name="artistId">Optional. The Id of the artist the album belongs to.</param>
+    /// <param name="artistName">Optional. The name of the artist the album belongs to.</param>
     /// <param name="libraryId">Optional. The Id of the media library the album belongs to.</param>
     /// <param name="metadata">Optional. The album metadata of the album.</param>
     /// <param name="mediaFormat">Optional. The physical or digital medium of the album.</param>
@@ -75,6 +76,7 @@ public class AlbumResponseFixture
     public AlbumResponse Create(
         Guid? id = null,
         Guid? artistId = null,
+        string? artistName = null,
         Guid? libraryId = null,
         MusicAlbumMetadataDto? metadata = null,
         MusicMediaFormat? mediaFormat = null,
@@ -116,6 +118,7 @@ public class AlbumResponseFixture
         return new AlbumResponse(
             id ?? Guid.NewGuid(),
             artistId ?? Guid.NewGuid(),
+            artistName ?? _faker.Name.FullName(),
             libraryId ?? Guid.NewGuid(),
             metadata ?? _musicAlbumMetadataDtoFixture.Create(),
             includeMediaFormat ? (mediaFormat ?? _faker.PickRandom<MusicMediaFormat>()) : null,

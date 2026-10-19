@@ -843,4 +843,10 @@
   <data name="StreamingQualityCannotBeNull" xml:space="preserve">
     <value>The streaming quality cannot be null!</value>
   </data>
+  <data name="ShuffleTrackCountMustBeGreaterThanZero" xml:space="preserve">
+    <value>The shuffle track count must be greater than zero!</value>
+  </data>
+  <data name="ShuffleTrackCountMustBeAtMost500" xml:space="preserve">
+    <value>The shuffle track count must be at most 500!</value>
+  </data>
 </root>

@@ -168,8 +168,8 @@
   <data name="Retry" xml:space="preserve">
     <value>重试</value>
   </data>
-  <data name="ToggleFullHeight" xml:space="preserve">
-    <value>切换全高</value>
+  <data name="ToggleExpanded" xml:space="preserve">
+    <value>展开或折叠播放器</value>
   </data>
   <data name="ToggleVisibility" xml:space="preserve">
     <value>切换可见性</value>
@@ -215,5 +215,11 @@
   </data>
   <data name="AudioPlayerShuffleOff" xml:space="preserve">
     <value>关闭随机播放</value>
+  </data>
+  <data name="AudioPlayerStop" xml:space="preserve">
+    <value>停止</value>
+  </data>
+  <data name="AudioPlayerAlbumArtwork" xml:space="preserve">
+    <value>专辑插图</value>
   </data>
 </root>

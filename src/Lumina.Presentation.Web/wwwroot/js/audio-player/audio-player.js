@@ -14,12 +14,17 @@
  * Public control API (window.LuminaAudioPlayer.instance)
  * ----------------------------------------
  * Methods:
- *   - playAsync(descriptor): starts playback of a track. The descriptor is documented by createPlayDescriptor.
+ *   - playAsync(descriptor, options): starts playback of a track. The descriptor is documented by createPlayDescriptor.
  *                            When the descriptor carries a queue, that queue becomes the player queue. When it names only
  *                            an album or an artist, the album or the discography is loaded into the queue through the
- *                            music endpoints documented in audio-player-queue.js.
+ *                            music endpoints documented in audio-player-queue.js. The optional `shouldStartRandomTrack`
+ *                            option starts a random track of that context instead of its first track.
  *   - playNextAsync(descriptor): queues a track or an album after the current entry, without starting playback. It
  *                            discards the pending autoplay continuation, because an explicit play next is a manual queue.
+ *   - playShuffledAsync(descriptor, scope): starts the described context and turns shuffle on for the given scope. When the
+ *                            scope is omitted, it shuffles the release of the started context.
+ *   - playLibraryShuffledAsync(libraryId): starts a shuffled playback of a whole media library, drawing the first track
+ *                            and every later track from the library shuffle source.
  *   - nextAsync(): starts the next entry of the queue, wrapping at the end only when repeat all is on.
  *   - previousAsync(): returns to the previous entry from the navigation history. When the playhead is past 3 seconds
  *                      it restarts the current track instead, and pressing it again at the start walks back.
@@ -41,7 +46,7 @@
  *                             playback state of the user, so they survive a reload.
  *   - setMutedAsync(muted): sets the mute state. Volume and mute are independent: unmuting restores the volume.
  *   - toggleMuteAsync(): flips the mute state.
- *   - toggleFullHeight(): expands or collapses the bar.
+ *   - toggleExpanded(): expands or collapses the bar.
  *   - toggleVisibility(): shows or hides the bar.
  *   - on(event, handler): subscribes to a player event, returns an unsubscribe function.
  *   - once(event, handler), off(event, handler): one shot subscribe, and unsubscribe.
@@ -196,6 +201,38 @@
     LuminaAudioPlayer.PLAY_NEXT_ATTRIBUTE = 'data-audio-player-play-next';
 
     /**
+     * The attribute that marks an element as a shuffled play trigger the player handles by event delegation. The trigger
+     * starts the described context and turns shuffle on for the scope in {@link LuminaAudioPlayer.PLAY_SHUFFLE_SCOPE_ATTRIBUTE}.
+     * @readonly
+     * @type {string}
+     */
+    LuminaAudioPlayer.PLAY_SHUFFLED_ATTRIBUTE = 'data-audio-player-play-shuffled';
+
+    /**
+     * The attribute that carries the shuffle scope of a shuffled play trigger. It holds one of the
+     * {@link LuminaAudioPlayer.QueueShuffleScope} values.
+     * @readonly
+     * @type {string}
+     */
+    LuminaAudioPlayer.PLAY_SHUFFLE_SCOPE_ATTRIBUTE = 'data-audio-player-shuffle-scope';
+
+    /**
+     * The attribute that marks an element as a library play trigger the player handles by event delegation. It carries
+     * only a library Id, because a whole library play context starts at the first artist of the library.
+     * @readonly
+     * @type {string}
+     */
+    LuminaAudioPlayer.PLAY_LIBRARY_ATTRIBUTE = 'data-audio-player-play-library';
+
+    /**
+     * The attribute that marks an element as a library shuffle trigger the player handles by event delegation. It carries
+     * only a library Id, because a whole library shuffle has no track, album or artist context to start from.
+     * @readonly
+     * @type {string}
+     */
+    LuminaAudioPlayer.PLAY_LIBRARY_SHUFFLED_ATTRIBUTE = 'data-audio-player-play-library-shuffled';
+
+    /**
      * Maps each play descriptor field to the data attribute the pages set on a play trigger, so the
      * pages and the player share a single documented set of names.
      * @readonly
@@ -207,6 +244,7 @@
         artistId: 'artistId',
         libraryId: 'libraryId',
         title: 'title',
+        albumTitle: 'albumTitle',
         durationInSeconds: 'duration',
         coverArtPath: 'coverArtPath',
         coverArtUrl: 'coverArtUrl'
@@ -219,6 +257,61 @@
      * @type {string}
      */
     const UNKNOWN_TIME = '--:--';
+
+    /**
+     * The artwork the bar and the queue show when a track has no cover art.
+     * @readonly
+     * @type {string}
+     */
+    const MUSIC_PLACEHOLDER_URL = '/images/ui/music-placeholder.svg';
+
+    /**
+     * The placeholder album title the scanner stores for a track whose tags carry no release name. The bar leaves the
+     * album line empty for it, so a track without an album shows only its own name.
+     * @readonly
+     * @type {string}
+     */
+    const UNKNOWN_ALBUM_TITLE = 'Unknown Album';
+
+    /**
+     * Gets the album title a bar shows for the provided descriptor value, or an empty string when there is none.
+     *
+     * The scanner stores a placeholder release name for a track whose tags carry no album, so the placeholder is treated
+     * as an absent album. The comparison is case insensitive and ignores surrounding whitespace, because the stored
+     * value can be edited or re-read from a file.
+     * @param {string} albumTitle - The raw album title of the descriptor.
+     * @returns {string} The album title to show, or an empty string when the track has no album name to show.
+     */
+    function getDisplayAlbumTitle(albumTitle) {
+        const title = typeof albumTitle === 'string' ? albumTitle.trim() : '';
+        return title.toLowerCase() === UNKNOWN_ALBUM_TITLE.toLowerCase() ? '' : title;
+    }
+
+    /**
+     * Normalizes a stored artwork path for comparison. The stored paths can use either directory separator, and the
+     * server stores them with the casing of the file system, so the comparison ignores both.
+     * @param {string} path - The artwork path.
+     * @returns {string} The normalized path, or an empty string.
+     */
+    function normalizeArtworkPath(path) {
+        return typeof path === 'string' ? path.trim().replace(/\\/g, '/').toLowerCase() : '';
+    }
+
+    /**
+     * Formats a music release type for display, expanding the compound enum names and the common abbreviations.
+     * @param {string} type - The release type, as returned by the API.
+     * @returns {string} The display label of the release type.
+     */
+    function formatReleaseType(type) {
+        const value = typeof type === 'string' ? type.trim() : '';
+        if (!value)
+            return '';
+        if (value === 'Ep')
+            return 'EP';
+        if (value === 'DjMix')
+            return 'DJ Mix';
+        return value.replace(/([a-z])([A-Z])/g, '$1 $2');
+    }
 
     /**
      * The number of seconds the left and right arrow keys move the playhead by, matching the seek step of the
@@ -368,12 +461,14 @@
      *     because the playback manifest route needs all four Ids.
      *   - albumId (string, optional): the Id of the album. An album play context requires albumId and artistId.
      *   - artistId (string, optional): the Id of the artist. An artist play context is identified by artistId alone.
+     *   - isLibraryContext (boolean, optional): true for a library play context, which is identified by libraryId alone.
      *   - title (string, optional): the display title of the track or context.
+     *   - albumTitle (string, optional): the display title of the album the track belongs to, shown under the track name.
      *   - durationInSeconds (number, optional): the duration of the track, in seconds.
      *   - coverArtPath (string, optional): the relative artwork path of the album, resolved against the server base path.
      *   - coverArtUrl (string, optional): an absolute cover art URL, or a relative artwork path.
      *   - queue (Array, optional): the ordered track descriptors of the play context, used to render the expanded bar.
-     *     A descriptor without any track, album or artist Id is valid only when it carries a non empty queue.
+     *     A descriptor without any track, album or artist Id is valid when it is a library play context or when it carries a non empty queue.
      * @param {Object} input - The descriptor to normalize.
      * @returns {Object|null} The normalized descriptor, or null when the required Ids of its context are missing.
      */
@@ -394,15 +489,16 @@
                 .filter(item => item !== null && item.trackId && item.albumId && item.artistId && item.libraryId)
             : null;
         const hasQueue = queue !== null && queue.length > 0;
-        // A track descriptor must carry all four Ids the manifest route needs. An album context must carry its artist,
-        // and only a pure queue list may omit the context Ids.
+        const isLibraryContext = input.isLibraryContext === true;
+        // A track descriptor must carry all four Ids the manifest route needs, and an album context must carry its
+        // artist. A context without any of them is valid only when it is an explicit library context or a queue.
         if (trackId) {
             if (!albumId || !artistId)
                 return null;
         } else if (albumId) {
             if (!artistId)
                 return null;
-        } else if (!artistId && !hasQueue) {
+        } else if (!artistId && !hasQueue && !isLibraryContext) {
             return null;
         }
         const coverArtSource = input.coverArtUrl || input.coverArtPath || '';
@@ -411,7 +507,9 @@
             libraryId,
             albumId,
             artistId,
+            isLibraryContext,
             title: typeof input.title === 'string' ? input.title : '',
+            albumTitle: typeof input.albumTitle === 'string' ? input.albumTitle : '',
             durationInSeconds: Number.isFinite(Number(input.durationInSeconds)) ? Number(input.durationInSeconds) : 0,
             coverArtPath: typeof input.coverArtPath === 'string' ? input.coverArtPath : '',
             coverArtUrl: resolveCoverArtUrl(coverArtSource)
@@ -443,9 +541,10 @@
 
     /**
      * Reads a play descriptor from the data attributes of a play trigger element, per
-     * {@link LuminaAudioPlayer.PLAY_DESCRIPTOR_DATA_KEYS}.
+     * {@link LuminaAudioPlayer.PLAY_DESCRIPTOR_DATA_KEYS}. A trigger can describe a track, an album context or an artist
+     * context, so the descriptor is valid whenever its context Ids are complete, not only when it names a track.
      * @param {Element} element - The element carrying the descriptor attributes.
-     * @returns {Object|null} The normalized descriptor, or null when the element does not describe a valid track.
+     * @returns {Object|null} The normalized descriptor, or null when the element does not describe a valid track, album or artist context.
      */
     function readPlayDescriptorFromElement(element) {
         if (!element || !element.dataset)
@@ -457,9 +556,11 @@
             artistId: element.dataset[keys.artistId],
             libraryId: element.dataset[keys.libraryId],
             title: element.dataset[keys.title],
+            albumTitle: element.dataset[keys.albumTitle],
             durationInSeconds: element.dataset[keys.durationInSeconds],
             coverArtPath: element.dataset[keys.coverArtPath],
-            coverArtUrl: element.dataset[keys.coverArtUrl]
+            coverArtUrl: element.dataset[keys.coverArtUrl],
+            isLibraryContext: element.hasAttribute(LuminaAudioPlayer.PLAY_LIBRARY_ATTRIBUTE)
         });
     }
 
@@ -495,10 +596,20 @@
             // source a shuffle draws its batches from. Both are created lazily when a context or a shuffle needs them.
             this.queueService = options.queueService || new LuminaAudioPlayer.QueueContextService({
                 fetchJsonAsync: (url, signal, label) => this.fetchJsonAsync(url, signal, label),
+                postJsonAsync: (url, data, requestOptions) => this.postJsonAsync(url, data, requestOptions),
                 getConfiguration: () => this.getConfiguration(),
                 getShouldIgnoreThePrefix: () => this.preferences.shouldIgnoreThePrefixForAlphaPicker === true
             });
             this.shuffleSource = null;
+            // The expanded player presents the current track's album details. They are loaded only while the bar is expanded,
+            // cached per album, and ignored when the descriptor has moved to another album before the request settled.
+            this.nowPlayingAlbumKey = '';
+            this.nowPlayingDetailsToken = 0;
+            this.nowPlayingDetailsAbortController = null;
+            this.nowPlayingDetailsRequestKey = '';
+            this.nowPlayingDetails = null;
+            this.nowPlayingDetailsCache = new Map();
+            this.nowPlayingArtworkPath = '';
             // The generation of the queue, incremented whenever the queue is replaced, so a batch that was requested from the
             // previous queue can never be appended to the queue that replaced it.
             this.queueGeneration = 0;
@@ -601,9 +712,6 @@
             this.pendingPlayNext = [];
             // True while the end of a track is being resolved, so two end reports of the same timeline cannot both continue.
             this.isHandlingEnded = false;
-            // The handler that closes the shuffle scope menu on an outside click, and the handler that closes it on Escape.
-            this.shuffleMenuClickHandler = null;
-            this.shuffleMenuKeyHandler = null;
         }
 
         /**
@@ -642,7 +750,6 @@
             this.bindUnloadFlush();
             this.bindDescriptorDelegation();
             this.bindQueueInteraction();
-            this.bindShuffleMenuDismissal();
             // A page load starts with a hidden bar and an empty queue. Nothing is restored and nothing is auto played.
             this.suppressInitialTransitions();
             this.applyHiddenState();
@@ -665,6 +772,7 @@
         collectDomReferences() {
             const query = (selector) => this.container.querySelector(selector);
             this.dom.trackName = query('[data-audio-player-track-name]');
+            this.dom.albumName = query('[data-audio-player-album-name]');
             this.dom.coverThumbnail = query('[data-audio-player-cover-thumbnail]');
             this.dom.coverImage = query('[data-audio-player-cover-image]');
             this.dom.currentTime = query('[data-audio-player-current-time]');
@@ -674,15 +782,19 @@
             this.dom.progressDownloaded = query('[data-audio-player-progress-downloaded]');
             this.dom.progressUndownloaded = query('[data-audio-player-progress-undownloaded]');
             this.dom.playPause = query('[data-audio-player-play-pause]');
+            this.dom.stop = query('[data-audio-player-stop]');
             this.dom.previous = query('[data-audio-player-previous]');
             this.dom.next = query('[data-audio-player-next]');
-            this.dom.shuffle = query('[data-audio-player-shuffle]');
-            this.dom.shuffleControl = query('[data-audio-player-shuffle-control]');
-            this.dom.shuffleMenu = query('[data-audio-player-shuffle-menu]');
             this.dom.repeat = query('[data-audio-player-repeat]');
             this.dom.volume = query('[data-audio-player-volume]');
             this.dom.mute = query('[data-audio-player-mute]');
             this.dom.queue = query('[data-audio-player-queue]');
+            this.dom.nowPlayingTitle = query('[data-audio-player-now-playing-title]');
+            this.dom.nowPlayingReleaseType = query('[data-audio-player-now-playing-release-type]');
+            this.dom.nowPlayingRelease = query('[data-audio-player-now-playing-release]');
+            this.dom.nowPlayingYear = query('[data-audio-player-now-playing-year]');
+            this.dom.nowPlayingArtist = query('[data-audio-player-now-playing-artist]');
+            this.dom.artworkCarousel = query('[data-audio-player-artwork-carousel]');
             // The sub template sources are read once, with the bar elements, because the theme markup is part of the bar
             // the player was bound to, and the player is never recreated by a navigation.
             this.subTemplates = {
@@ -693,24 +805,20 @@
 
         /**
          * Binds the transport controls the player owns: the play and pause toggle, the scrub of the progress bar and
-         * of the volume control, and the mute toggle. The full height and close affordances are bound by the global
-         * site script, which delegates them to this player, so that a single click never toggles them twice.
+         * of the volume control, and the mute toggle. The expand and close affordances are bound by the global site
+         * script, which delegates them to this player, so that a single click never toggles them twice.
          */
         bindPlaybackControls() {
             if (this.dom.playPause)
                 this.addControlHandler(this.dom.playPause, 'click', () => this.toggleAsync());
+            if (this.dom.stop)
+                this.addControlHandler(this.dom.stop, 'click', () => this.stopAsync());
             if (this.dom.previous)
                 this.addControlHandler(this.dom.previous, 'click', () => this.previousAsync());
             if (this.dom.next)
                 this.addControlHandler(this.dom.next, 'click', () => this.nextAsync());
-            if (this.dom.shuffle)
-                this.addControlHandler(this.dom.shuffle, 'click', () => this.handleShuffleControlClick());
             if (this.dom.repeat)
                 this.addControlHandler(this.dom.repeat, 'click', () => this.cycleRepeatModeAsync());
-            if (this.dom.shuffleMenu) {
-                // The scope items are delegated, so a theme can render them as its own elements as long as each carries the documented scope attribute.
-                this.addControlHandler(this.dom.shuffleMenu, 'click', (event) => this.handleShuffleScopeClick(event));
-            }
             if (this.dom.progress) {
                 // The progress bar is scrubbed with pointer events rather than clicks, so that a drag moves the
                 // playhead continuously; the pointer is captured, so a drag that leaves the bar keeps scrubbing. A
@@ -781,6 +889,29 @@
                     this.playNextAsync(descriptor).catch((error) => this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED));
                     return;
                 }
+                const shuffledTrigger = event.target.closest(`[${LuminaAudioPlayer.PLAY_SHUFFLED_ATTRIBUTE}]`);
+                if (shuffledTrigger) {
+                    event.preventDefault();
+                    const descriptor = readPlayDescriptorFromElement(shuffledTrigger);
+                    const scope = shuffledTrigger.getAttribute(LuminaAudioPlayer.PLAY_SHUFFLE_SCOPE_ATTRIBUTE)
+                        || LuminaAudioPlayer.QueueShuffleScope.RELEASE;
+                    this.playShuffledAsync(descriptor, scope).catch((error) => this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED));
+                    return;
+                }
+                const libraryTrigger = event.target.closest(`[${LuminaAudioPlayer.PLAY_LIBRARY_ATTRIBUTE}]`);
+                if (libraryTrigger) {
+                    event.preventDefault();
+                    const descriptor = readPlayDescriptorFromElement(libraryTrigger);
+                    this.playAsync(descriptor).catch((error) => this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR));
+                    return;
+                }
+                const libraryShuffledTrigger = event.target.closest(`[${LuminaAudioPlayer.PLAY_LIBRARY_SHUFFLED_ATTRIBUTE}]`);
+                if (libraryShuffledTrigger) {
+                    event.preventDefault();
+                    const libraryId = libraryShuffledTrigger.dataset.libraryId || '';
+                    this.playLibraryShuffledAsync(libraryId).catch((error) => this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED));
+                    return;
+                }
                 const trigger = event.target.closest(`[${LuminaAudioPlayer.PLAY_DESCRIPTOR_ATTRIBUTE}]`);
                 if (!trigger)
                     return;
@@ -794,20 +925,22 @@
         /**
          * Starts playback of a track, an album or an artist, and shows the bar.
          *
-         * A descriptor that already carries a queue is played as is. A descriptor that names only an album or an artist is
-         * resolved into the ordered tracks of that context through {@link LuminaAudioPlayer.QueueContextService}, which also
-         * documents the endpoints and the order it uses. Starting any new context discards the previous queue, its history,
-         * its autoplay continuation and its shuffle, because a play now is an explicit choice.
+         * A descriptor that already carries a queue is played as is. A descriptor that names only an album, an artist or a
+         * library is resolved into the ordered tracks of that context through {@link LuminaAudioPlayer.QueueContextService},
+         * which also documents the endpoints and the order it uses. Starting any new context discards the previous queue,
+         * its history, its autoplay continuation and its shuffle, because a play now is an explicit choice.
          * @param {Object} descriptorInput - The play descriptor to play, per {@link LuminaAudioPlayer.createPlayDescriptor}.
+         * @param {Object} [options] - The play options.
+         * @param {boolean} [options.shouldStartRandomTrack] - True to start a random track of the resolved context instead of its first track. Used by the shuffled play actions, so the first track of a shuffle is random too.
          * @returns {Promise<boolean>} True when playback started, false when the request was rejected.
          */
-        async playAsync(descriptorInput) {
+        async playAsync(descriptorInput, options = {}) {
             // The player is only available when the layout rendered the bar, so a caller on a page without one is ignored instead of failing.
             if (!this.isAvailable)
                 return false;
             const descriptor = createPlayDescriptor(descriptorInput);
             if (!descriptor) {
-                this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The play descriptor identifies no library, or no track, album or artist.'));
+                this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The play descriptor identifies no library, or no playable context.'));
                 return false;
             }
             // The token invalidates this request if a later play, skip or stop takes the player while the context is loading.
@@ -910,10 +1043,18 @@
                 await this.flushPendingPlayNext(requestToken);
                 return false;
             }
+            // A shuffled play starts a random track of the context, so the first entry of a shuffle is random as well. The ordered context still becomes the queue, which is what turning shuffle off restores.
+            const startTrackId = options && options.shouldStartRandomTrack === true
+                ? built.descriptors[Math.floor(Math.random() * built.descriptors.length)].trackId
+                : descriptor.trackId;
             const current = this.queue.replaceContext(built.descriptors, {
-                startTrackId: descriptor.trackId,
+                startTrackId,
                 context: built.context,
-                continuationEnabled: built.continuationEnabled && this.preferences.shouldAutoplay === true
+                // A whole library is materialized lazily, one artist at a time, so its continuation is part of the explicit
+                // play action rather than an optional autoplay. Album and artist contexts load in full before playback.
+                continuationEnabled: built.continuationEnabled
+                    && (built.context.kind === LuminaAudioPlayer.PlayContextKind.LIBRARY
+                        || this.preferences.shouldAutoplay === true)
             });
             // A new context is explicit and ordered, so it starts unshuffled; the model owns that reset together with the
             // continuation flags. The repeat mode is a listening preference and is kept.
@@ -931,6 +1072,7 @@
             this.renderDescriptor();
             this.renderProgress();
             this.renderQueue();
+            this.scrollQueueToCurrentEntry();
             this.renderQueueControls();
             this.events.emit(LuminaAudioPlayer.PlayerEvent.DESCRIPTOR_CHANGED, current.descriptor);
             this.emitQueueStateChanged();
@@ -941,6 +1083,81 @@
             if (started)
                 this.maybeExtendQueueAsync();
             return started;
+        }
+
+        /**
+         * Starts playback of a track, an album or an artist, then turns shuffle on for the requested scope.
+         *
+         * The context is resolved like {@link AudioPlayer#playAsync}, but playback starts on a random track of it, so the
+         * first entry of the shuffle is random too. The ordered context remains the queue that turning shuffle off
+         * restores. An unknown or missing scope falls back to the release scope, because a trigger without a scope is
+         * asking to shuffle what it just started.
+         * @param {Object} descriptorInput - The play descriptor to play, per {@link LuminaAudioPlayer.createPlayDescriptor}.
+         * @param {string} [scope] - One of the {@link LuminaAudioPlayer.QueueShuffleScope} values.
+         * @returns {Promise<boolean>} True when playback started and the shuffle was applied, false otherwise.
+         */
+        async playShuffledAsync(descriptorInput, scope) {
+            const targetScope = Object.values(LuminaAudioPlayer.QueueShuffleScope).includes(scope)
+                ? scope
+                : LuminaAudioPlayer.QueueShuffleScope.RELEASE;
+            const started = await this.playAsync(descriptorInput, { shouldStartRandomTrack: true });
+            if (!started)
+                return false;
+            return this.setShuffleAsync(true, targetScope);
+        }
+
+        /**
+         * Starts a shuffled playback of a whole media library.
+         *
+         * A library shuffle has no ordered track to start from, so the method draws one random track from the library shuffle
+         * source, starts that track, then turns the shuffle on for the library scope. The first track is the one the random
+         * draw picked, and every later track is drawn from the library as the queue approaches its end.
+         * @param {string} libraryId - The Id of the media library to shuffle.
+         * @returns {Promise<boolean>} True when playback started and the shuffle was applied, false otherwise.
+         */
+        async playLibraryShuffledAsync(libraryId) {
+            if (!this.isAvailable || !LuminaAudioPlayer.isGuid(libraryId))
+                return false;
+            // A newer play, skip or stop supersedes this request while its first random batch is resolved.
+            const requestToken = ++this.playRequestToken;
+            const report = await this.capabilitiesReady;
+            if (requestToken !== this.playRequestToken)
+                return false;
+            if (report && !report.isSupported) {
+                this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING, 'The browser is missing a capability the player requires.',
+                    { missing: report.missing }));
+                return false;
+            }
+            const buildHandle = this.createQueueBuildHandle();
+            let batch;
+            try {
+                const source = await this.queueService.createShuffleSourceAsync(
+                    LuminaAudioPlayer.QueueShuffleScope.LIBRARY,
+                    null,
+                    { libraryId },
+                    buildHandle.signal);
+                batch = await source.nextBatchAsync(new Set(), 1, buildHandle.signal);
+            } catch (error) {
+                if (buildHandle.signal && buildHandle.signal.aborted)
+                    return false;
+                if (error && error.details && error.details.reason === LuminaAudioPlayer.PlayerErrorReason.SESSION_EXPIRED)
+                    return false;
+                this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED);
+                return false;
+            } finally {
+                buildHandle.dispose();
+            }
+            if (requestToken !== this.playRequestToken)
+                return false;
+            if (!Array.isArray(batch) || batch.length === 0) {
+                this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The library holds no playable track.'));
+                return false;
+            }
+            const start = batch[0];
+            const started = await this.playAsync({ ...start });
+            if (!started)
+                return false;
+            return this.setShuffleAsync(true, LuminaAudioPlayer.QueueShuffleScope.LIBRARY);
         }
 
         /**
@@ -1386,16 +1603,29 @@
         }
 
         /**
+         * Checks whether the queue may continue past its current entries. The stored autoplay preference controls the
+         * optional continuation of an album or an artist, while a whole library is materialized lazily, one artist at a
+         * time, so its continuation is part of the explicit library play action and always runs.
+         * @returns {boolean} True when the continuation may extend the queue.
+         */
+        isQueueContinuationAllowed() {
+            if (!this.queue)
+                return false;
+            const contextKind = this.queue.context ? this.queue.context.kind : '';
+            return this.preferences.shouldAutoplay === true || contextKind === LuminaAudioPlayer.PlayContextKind.LIBRARY;
+        }
+
+        /**
          * Checks whether the next action may wrap from the last entry to the first one. A repeat all wraps, unless an
-         * autoplay continuation of an album or an artist is still available: that continuation is the true next content,
-         * and the wrap only happens once the continuation is exhausted.
+         * autoplay continuation of an album, an artist or a library is still available: that continuation is the true
+         * next content, and the wrap only happens once the continuation is exhausted.
          * @returns {boolean} True when the next action may wrap.
          */
         canWrapToFirstEntry() {
             if (this.queue.getRepeatMode() !== LuminaAudioPlayer.QueueRepeatMode.ALL)
                 return false;
             const canContinue = this.queue.isContinuationEnabled()
-                && this.preferences.shouldAutoplay === true
+                && this.isQueueContinuationAllowed()
                 && this.queue.isContinuationExhausted() !== true;
             const canExtendShuffle = this.queue.isShuffleEnabled() && this.queue.isShuffleSourceExhausted() !== true;
             return !canContinue && !canExtendShuffle;
@@ -1644,18 +1874,26 @@
         }
 
         /**
-         * Expands the bar into its full height form, or collapses it back to the condensed bar.
+         * Expands the bar, or collapses it back to the condensed bar. The expanded state is layout-neutral: the theme decides what expansion changes and in which direction.
          * @returns {boolean} True when the bar is expanded after the toggle.
          */
-        toggleFullHeight() {
+        toggleExpanded() {
             if (!this.container)
                 return false;
-            const isExpanded = this.container.classList.toggle('full-height');
+            const isExpanded = !this.container.classList.contains('expanded');
+            this.container.classList.toggle('expanded', isExpanded);
             if (this.main)
-                this.main.classList.toggle('audio-player-full-height', isExpanded);
+                this.main.classList.toggle('audio-player-bar-expanded', isExpanded);
             // The queue is only rendered while the bar is expanded, so a fresh expansion draws the current queue and a collapse stops paying for a list that is not visible.
-            if (isExpanded)
+            if (isExpanded) {
                 this.renderQueue();
+                // An expansion can happen long after playback started, when the current entry is far below the top of a
+                // long queue. Showing it first makes the expanded queue describe what is playing instead of where it ended.
+                this.scrollQueueToCurrentEntry();
+                // The album details are only needed by the expanded view, so a collapsed player does not request them.
+                this.renderNowPlayingDetails();
+            } else
+                this.cancelNowPlayingDetailsRequest();
             return isExpanded;
         }
 
@@ -1727,7 +1965,7 @@
          * @returns {boolean} True when the bar is expanded.
          */
         isExpanded() {
-            return this.container !== null && this.container.classList.contains('full-height');
+            return this.container !== null && this.container.classList.contains('expanded');
         }
 
         /**
@@ -1880,34 +2118,6 @@
         }
 
         /**
-         * Checks whether a shuffle scope can resolve the category it needs from the current queue and playing descriptor.
-         * A scope that cannot resolve its Ids is disabled in the menu instead of failing when it is selected.
-         * @param {string} scope - One of the {@link LuminaAudioPlayer.QueueShuffleScope} values.
-         * @returns {boolean} True when the scope has the Ids it needs.
-         */
-        canUseShuffleScope(scope) {
-            const descriptor = this.queue.getCurrentDescriptor() || this.descriptor;
-            if (!descriptor)
-                return false;
-            const context = this.queue.context;
-            const libraryId = (context && context.libraryId) || descriptor.libraryId;
-            if (!LuminaAudioPlayer.isGuid(libraryId))
-                return false;
-            if (scope === LuminaAudioPlayer.QueueShuffleScope.LIBRARY)
-                return true;
-            const artistId = descriptor.artistId || (context && context.artistId);
-            if (!LuminaAudioPlayer.isGuid(artistId))
-                return false;
-            if (scope === LuminaAudioPlayer.QueueShuffleScope.ARTIST)
-                return true;
-            if (scope === LuminaAudioPlayer.QueueShuffleScope.RELEASE) {
-                const albumId = descriptor.albumId || (context && context.albumId);
-                return LuminaAudioPlayer.isGuid(albumId);
-            }
-            return false;
-        }
-
-        /**
          * Cancels a shuffle whose scope is still resolving, without turning an already enabled shuffle off.
          * @returns {boolean} True when a pending shuffle was cancelled.
          */
@@ -1928,7 +2138,9 @@
          * Shuffle never materializes the whole category: it queues a batch of randomized tracks of the scope, keeps the
          * track that is playing first, and appends another batch while the queue approaches the end of the previous one.
          * A release draws from its own tracks, an artist from all releases of the artist, and a library from all releases of
-         * all artists, one artist and one release at a time. Turning shuffle off restores the queue the shuffle replaced.
+         * all artists. Each batch is a uniform random sample selected by the server from every track of the scope, excluding
+         * the tracks already queued, so artists and albums are interleaved instead of being played one after another.
+         * Turning shuffle off restores the queue the shuffle replaced.
          * @param {boolean} enabled - True to enable shuffle, false to disable it.
          * @param {string} [scope] - One of the {@link LuminaAudioPlayer.QueueShuffleScope} values. Kept when omitted.
          * @returns {Promise<boolean>} True when the shuffle state was applied.
@@ -1964,6 +2176,7 @@
                 this.shuffleSource = null;
                 await this.cancelUpcomingTransitionAsync();
                 this.renderQueue();
+                this.scrollQueueToCurrentEntry();
                 this.renderQueueControls();
                 this.emitQueueStateChanged();
                 if (this.queue.getCurrentEntry())
@@ -2016,6 +2229,7 @@
                     this.renderDescriptor();
                 }
                 this.renderQueue();
+                this.scrollQueueToCurrentEntry();
                 this.renderQueueControls();
                 this.emitQueueStateChanged();
                 return true;
@@ -2065,7 +2279,7 @@
                 return false;
             const descriptor = createPlayDescriptor(descriptorInput);
             if (!descriptor) {
-                this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The play descriptor identifies no library, or no track, album or artist.'));
+                this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The play descriptor identifies no library, or no playable context.'));
                 return false;
             }
             // When nothing is current there is no "next" to queue after, so the request starts a new context instead and reports whether playback actually started.
@@ -2271,6 +2485,9 @@
                     this.updateQueueSelection(previousIndex);
                 else
                     this.renderQueue();
+                // A long queue can be scrolled far above the entry that just became current. Moving it to the top keeps the
+                // queue anchored to playback, so a listener never has to search for the current track after an advance.
+                this.scrollQueueToCurrentEntry();
             }
             this.events.emit(LuminaAudioPlayer.PlayerEvent.DESCRIPTOR_CHANGED, descriptor);
             this.emitQueueStateChanged();
@@ -2422,14 +2639,6 @@
             if (this.unloadHandler) {
                 window.removeEventListener('pagehide', this.unloadHandler);
                 this.unloadHandler = null;
-            }
-            if (this.shuffleMenuClickHandler) {
-                document.removeEventListener('click', this.shuffleMenuClickHandler);
-                this.shuffleMenuClickHandler = null;
-            }
-            if (this.shuffleMenuKeyHandler) {
-                document.removeEventListener('keydown', this.shuffleMenuKeyHandler);
-                this.shuffleMenuKeyHandler = null;
             }
             // A change that is still inside its debounce window is flushed before the timer is dropped, so a teardown
             // never loses the last volume, mute or queue the user set. The flush clears the timer itself.
@@ -2786,7 +2995,7 @@
             } else {
                 if (this.queue.getRepeatMode() === LuminaAudioPlayer.QueueRepeatMode.ONE)
                     return;
-                if (!this.queue.isContinuationEnabled() || this.preferences.shouldAutoplay !== true || this.queue.isContinuationExhausted())
+                if (!this.queue.isContinuationEnabled() || !this.isQueueContinuationAllowed() || this.queue.isContinuationExhausted())
                     return;
                 if (!force && this.queue.getRemainingCount() > 0)
                     return;
@@ -2842,7 +3051,7 @@
                     this.emitQueueStateChanged();
                     return;
                 }
-                if (!this.queue.isContinuationEnabled() || this.preferences.shouldAutoplay !== true)
+                if (!this.queue.isContinuationEnabled() || !this.isQueueContinuationAllowed())
                     return;
                 const batch = await this.queueService.buildContinuationBatchAsync(this.queue.context, this.queue, buildHandle.signal);
                 // A new play context replaced the queue, or an explicit play next discarded the continuation, while the batch
@@ -2886,94 +3095,6 @@
             } finally {
                 this.closeQueueBatchBuild(buildHandle);
             }
-        }
-
-        /**
-         * Handles a click on the shuffle control. A shuffled queue turns shuffle off, while an unshuffled one opens the
-         * scope menu when the bar provides one, or turns the release scope on directly when it does not.
-         */
-        handleShuffleControlClick() {
-            if (this.dom.shuffleMenu) {
-                // The control is a menu button, so it always opens the scope menu. Turning shuffle off is the 'off' item of
-                // that menu, and the selected scope can be changed without first turning shuffle off.
-                this.toggleShuffleMenu();
-                return;
-            }
-            if (this.isShufflePending || this.queue.isShuffleEnabled()) {
-                this.setShuffleAsync(false).catch((error) => this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED));
-                return;
-            }
-            this.setShuffleAsync(true).catch((error) => this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED));
-        }
-
-        /**
-         * Opens or closes the shuffle scope menu.
-         * @returns {boolean} True when the menu is open after the toggle.
-         */
-        toggleShuffleMenu() {
-            if (!this.dom.shuffleMenu)
-                return false;
-            const willOpen = this.dom.shuffleMenu.hasAttribute('hidden');
-            if (willOpen)
-                this.dom.shuffleMenu.removeAttribute('hidden');
-            else
-                this.dom.shuffleMenu.setAttribute('hidden', '');
-            if (this.container)
-                this.container.classList.toggle('is-menu-open', willOpen);
-            if (this.dom.shuffle)
-                this.dom.shuffle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
-            return willOpen;
-        }
-
-        /**
-         * Closes the shuffle scope menu, when it is open.
-         */
-        closeShuffleMenu() {
-            if (!this.dom.shuffleMenu || this.dom.shuffleMenu.hasAttribute('hidden'))
-                return;
-            this.dom.shuffleMenu.setAttribute('hidden', '');
-            if (this.container)
-                this.container.classList.remove('is-menu-open');
-            if (this.dom.shuffle)
-                this.dom.shuffle.setAttribute('aria-expanded', 'false');
-        }
-
-        /**
-         * Handles a click on a shuffle scope item, including the 'off' item that turns shuffle back off.
-         * @param {MouseEvent} event - The click event.
-         */
-        handleShuffleScopeClick(event) {
-            if (!(event.target instanceof Element))
-                return;
-            const item = event.target.closest('[data-audio-player-shuffle-scope]');
-            if (!item || item.disabled || item.getAttribute('aria-disabled') === 'true')
-                return;
-            const scope = item.getAttribute('data-audio-player-shuffle-scope');
-            const isOff = scope === 'off';
-            if (!isOff && (!Object.values(LuminaAudioPlayer.QueueShuffleScope).includes(scope) || !this.canUseShuffleScope(scope)))
-                return;
-            event.preventDefault();
-            this.closeShuffleMenu();
-            const request = isOff ? this.setShuffleAsync(false) : this.setShuffleAsync(true, scope);
-            request.catch((error) => this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED));
-        }
-
-        /**
-         * Closes the shuffle scope menu when the user clicks outside it or presses Escape, so a menu that a theme renders never stays open over the page.
-         */
-        bindShuffleMenuDismissal() {
-            this.shuffleMenuClickHandler = (event) => {
-                if (!this.dom.shuffleControl || !(event.target instanceof Node)
-                    || this.dom.shuffleControl.contains(event.target))
-                    return;
-                this.closeShuffleMenu();
-            };
-            this.shuffleMenuKeyHandler = (event) => {
-                if (event.key === 'Escape')
-                    this.closeShuffleMenu();
-            };
-            document.addEventListener('click', this.shuffleMenuClickHandler);
-            document.addEventListener('keydown', this.shuffleMenuKeyHandler);
         }
 
         /**
@@ -3066,16 +3187,19 @@
                 // The payload is a frozen copy, so a subscriber that mutates it cannot change the preferences the player uses.
                 this.events.emit(LuminaAudioPlayer.PlayerEvent.PREFERENCES_CHANGED, Object.freeze({ ...this.preferences }));
                 // The autoplay continuation is enabled by the preference, so a queue that was built before the preferences
-                // arrived follows the stored value instead of the default of the player. A shuffled queue extends itself with
-                // its next shuffle batch instead, so it is never given an autoplay continuation.
+                // arrived follows the stored value instead of the default of the player. A library context always keeps its
+                // continuation, because it holds only the first artist until that continuation appends the next ones. A
+                // shuffled queue extends itself with its next shuffle batch instead, so it is never given an autoplay continuation.
                 const contextKind = this.queue.context ? this.queue.context.kind : '';
                 if (this.queue.entries.length > 0) {
                     if (this.queue.isShuffleEnabled()) {
                         this.maybeExtendQueueAsync();
                     } else if (contextKind === LuminaAudioPlayer.PlayContextKind.ALBUM
-                        || contextKind === LuminaAudioPlayer.PlayContextKind.ARTIST) {
-                        this.queue.setContinuationEnabled(this.preferences.shouldAutoplay === true);
-                        if (this.preferences.shouldAutoplay === true)
+                        || contextKind === LuminaAudioPlayer.PlayContextKind.ARTIST
+                        || contextKind === LuminaAudioPlayer.PlayContextKind.LIBRARY) {
+                        const isLibrary = contextKind === LuminaAudioPlayer.PlayContextKind.LIBRARY;
+                        this.queue.setContinuationEnabled(isLibrary || this.preferences.shouldAutoplay === true);
+                        if (isLibrary || this.preferences.shouldAutoplay === true)
                             this.maybeExtendQueueAsync();
                     }
                 }
@@ -3193,6 +3317,8 @@
          * @param {Object} data - The payload to send as the JSON body.
          * @param {Object} [options] - The request options.
          * @param {boolean} [options.keepalive=false] - True to let the browser finish the request after the page is gone, used by the unload flush.
+         * @param {AbortSignal} [options.signal] - An optional signal that cancels the request when the player supersedes or stops it.
+         * @param {string} [options.label] - The description used in the failure log, so a caller such as the queue reports its own request.
          * @returns {Promise<*|null|undefined|Object>} The unwrapped data, null when the endpoint answered without data, undefined when the request failed, or the REDIRECTED marker when the session expired and the page is navigating away.
          */
         async postJsonAsync(url, data, options = {}) {
@@ -3218,8 +3344,8 @@
                     method: 'POST',
                     headers: headers,
                     body: JSON.stringify(data ?? {}),
-                    // A keepalive request is not cancelled when the page unloads, so the last volume or mute set before
-                    // leaving the page is not lost to the navigation.
+                    signal: options.signal,
+                    // A keepalive request is not cancelled when the page unloads, so the last volume or mute set before leaving the page is not lost to the navigation.
                     keepalive: options.keepalive === true
                 });
                 if (response.redirected) {
@@ -3232,7 +3358,10 @@
                 const payload = await response.json();
                 return payload && payload.success === true ? payload.data : null;
             } catch (error) {
-                console.error('Audio player: a playback state request failed.', error);
+                // A request a superseded play, stop or timeout aborted is an expected stop, not a failed request.
+                if (LuminaAudioPlayer.isAbortError(error))
+                    return undefined;
+                console.error(`Audio player: ${options.label || 'a playback state request'} failed.`, error);
                 return undefined;
             }
         }
@@ -3775,16 +3904,302 @@
             const descriptor = this.descriptor;
             if (this.dom.trackName)
                 this.dom.trackName.textContent = descriptor ? descriptor.title : '';
+            if (this.dom.albumName)
+                this.dom.albumName.textContent = descriptor ? getDisplayAlbumTitle(descriptor.albumTitle) : '';
             const coverArtUrl = descriptor && descriptor.coverArtUrl
                 ? descriptor.coverArtUrl
-                : '/images/ui/music-placeholder.svg';
+                : MUSIC_PLACEHOLDER_URL;
             if (this.dom.coverThumbnail)
                 this.dom.coverThumbnail.src = coverArtUrl;
             if (this.dom.coverImage)
                 this.dom.coverImage.src = coverArtUrl;
+            // The artwork chosen from the carousel belongs to the album that was showing when it was chosen. A new track resets the selection to the cover of its own album.
+            this.nowPlayingArtworkPath = descriptor ? (descriptor.coverArtPath || '') : '';
+            this.renderNowPlayingDetails();
             if (this.dom.totalTime)
                 this.dom.totalTime.textContent = formatDuration(this.duration);
             this.renderTransportState();
+        }
+
+        /**
+         * Renders the now playing labels and the album artwork carousel of the expanded player. The track, release and
+         * artist labels fall back to the play descriptor until the album details arrive, and the carousel is hidden while the album has no stored artwork.
+         */
+        renderNowPlayingDetails() {
+            // An older custom theme can omit the now playing area entirely. In that case there is nothing to label and no reason to fetch the album details.
+            if (!this.dom.nowPlayingTitle
+                && !this.dom.nowPlayingReleaseType
+                && !this.dom.nowPlayingRelease
+                && !this.dom.nowPlayingYear
+                && !this.dom.nowPlayingArtist
+                && !this.dom.artworkCarousel)
+                return;
+            const descriptor = this.descriptor;
+            if (this.dom.nowPlayingTitle)
+                this.dom.nowPlayingTitle.textContent = descriptor ? descriptor.title : '';
+            if (!descriptor) {
+                this.setNowPlayingDetailsText('', '', '');
+                this.renderNowPlayingArtwork([]);
+                this.nowPlayingAlbumKey = '';
+                this.nowPlayingDetails = null;
+                this.nowPlayingDetailsToken += 1;
+                this.cancelNowPlayingDetailsRequest();
+                return;
+            }
+            const albumKey = this.getNowPlayingAlbumKey(descriptor);
+            if (!albumKey) {
+                this.setNowPlayingDetailsText(getDisplayAlbumTitle(descriptor.albumTitle), '', '');
+                this.renderNowPlayingArtwork([]);
+                this.nowPlayingAlbumKey = '';
+                this.nowPlayingDetails = null;
+                this.nowPlayingDetailsToken += 1;
+                this.cancelNowPlayingDetailsRequest();
+                return;
+            }
+            if (albumKey !== this.nowPlayingAlbumKey) {
+                this.nowPlayingAlbumKey = albumKey;
+                this.nowPlayingDetails = null;
+                this.nowPlayingDetailsToken += 1;
+                this.cancelNowPlayingDetailsRequest();
+                this.setNowPlayingDetailsText(getDisplayAlbumTitle(descriptor.albumTitle), '', '');
+                this.renderNowPlayingArtwork([]);
+                const cached = this.readNowPlayingDetailsCache(albumKey);
+                if (cached)
+                    this.applyNowPlayingDetails(cached);
+                else if (this.isExpanded())
+                    this.loadNowPlayingDetailsAsync(albumKey, descriptor);
+                return;
+            }
+            if (this.nowPlayingDetails)
+                this.applyNowPlayingDetails(this.nowPlayingDetails);
+            else if (this.isExpanded())
+                this.loadNowPlayingDetailsAsync(albumKey, descriptor);
+        }
+
+        /**
+         * Writes the now playing labels of the expanded player. Empty values are left to the stylesheet, which hides the label of an empty value instead of leaving a gap in the column.
+         * @param {string} release - The release name.
+         * @param {number|string} year - The release year.
+         * @param {string} artist - The artist name.
+         * @param {string} [releaseType] - The display label of the release type.
+         */
+        setNowPlayingDetailsText(release, year, artist, releaseType = '') {
+            if (this.dom.nowPlayingReleaseType)
+                this.dom.nowPlayingReleaseType.textContent = releaseType || '';
+            if (this.dom.nowPlayingRelease)
+                this.dom.nowPlayingRelease.textContent = release || '';
+            if (this.dom.nowPlayingYear)
+                this.dom.nowPlayingYear.textContent = year === null || year === undefined || year === '' ? '' : String(year);
+            if (this.dom.nowPlayingArtist)
+                this.dom.nowPlayingArtist.textContent = artist || '';
+        }
+
+        /**
+         * Builds the album identity used to cache and cancel the now playing album details.
+         * @param {Object} descriptor - The current play descriptor.
+         * @returns {string} The album identity, or an empty string when the descriptor names no album.
+         */
+        getNowPlayingAlbumKey(descriptor) {
+            if (!descriptor || !descriptor.libraryId || !descriptor.artistId || !descriptor.albumId)
+                return '';
+            return `${descriptor.libraryId}|${descriptor.artistId}|${descriptor.albumId}`.toLowerCase();
+        }
+
+        /**
+         * Loads the details of the current album and applies its release labels and artwork.
+         * @param {string} albumKey - The album identity the request belongs to.
+         * @param {Object} descriptor - The descriptor the album identity was read from.
+         * @returns {Promise<void>} A promise that completes when the request settled.
+         */
+        async loadNowPlayingDetailsAsync(albumKey, descriptor) {
+            if (!this.isExpanded() || !descriptor)
+                return;
+            // A request for the same album is already in flight, so a track change inside that album does not repeat it.
+            if (this.nowPlayingDetailsRequestKey === albumKey && this.nowPlayingDetailsAbortController)
+                return;
+            this.cancelNowPlayingDetailsRequest();
+            const token = ++this.nowPlayingDetailsToken;
+            const controller = typeof AbortController === 'function' ? new AbortController() : null;
+            this.nowPlayingDetailsAbortController = controller;
+            this.nowPlayingDetailsRequestKey = albumKey;
+            try {
+                const details = await this.queueService.fetchAlbumDetailsAsync(
+                    descriptor.artistId, descriptor.albumId, descriptor.libraryId, controller ? controller.signal : undefined);
+                if (token !== this.nowPlayingDetailsToken
+                    || !this.isExpanded()
+                    || this.getNowPlayingAlbumKey(this.descriptor) !== albumKey)
+                    return;
+                const summary = this.createNowPlayingDetails(details);
+                this.writeNowPlayingDetailsCache(albumKey, summary);
+                this.applyNowPlayingDetails(summary);
+            } catch (error) {
+                if (token !== this.nowPlayingDetailsToken)
+                    return;
+                if (error && error.details && error.details.reason === LuminaAudioPlayer.PlayerErrorReason.SESSION_EXPIRED)
+                    return;
+                if ((controller && controller.signal.aborted) || LuminaAudioPlayer.isAbortError(error))
+                    return;
+                // The album details are decorative. A failure leaves the descriptor fallback labels in place and does not interrupt playback with a notification.
+                console.debug('Audio player: the now playing album details could not be loaded.', error);
+            } finally {
+                if (token === this.nowPlayingDetailsToken) {
+                    this.nowPlayingDetailsAbortController = null;
+                    this.nowPlayingDetailsRequestKey = '';
+                }
+            }
+        }
+
+        /**
+         * Cancels a now playing album details request that a newer track, a collapse or a stop superseded.
+         */
+        cancelNowPlayingDetailsRequest() {
+            if (this.nowPlayingDetailsAbortController) {
+                this.nowPlayingDetailsAbortController.abort();
+                this.nowPlayingDetailsAbortController = null;
+            }
+            this.nowPlayingDetailsRequestKey = '';
+        }
+
+        /**
+         * Converts an album response to the small model the expanded player keeps, so the full album payload, with all of its tracks and ratings, is not retained per cached album.
+         * @param {Object} details - The album response.
+         * @returns {Object} The now playing album model.
+         */
+        createNowPlayingDetails(details) {
+            const metadata = details && details.metadata && typeof details.metadata === 'object' ? details.metadata : {};
+            const releaseInfo = metadata.releaseInfo && typeof metadata.releaseInfo === 'object' ? metadata.releaseInfo : {};
+            const releaseYear = releaseInfo.reReleaseYear !== null && releaseInfo.reReleaseYear !== undefined && Number.isFinite(Number(releaseInfo.reReleaseYear))
+                ? Number(releaseInfo.reReleaseYear)
+                : (releaseInfo.originalReleaseYear !== null && releaseInfo.originalReleaseYear !== undefined && Number.isFinite(Number(releaseInfo.originalReleaseYear))
+                    ? Number(releaseInfo.originalReleaseYear)
+                    : '');
+            const artwork = Array.isArray(details && details.artwork)
+                ? details.artwork
+                    .filter((item) => item && typeof item.path === 'string' && item.path.trim().length > 0)
+                    .map((item, index) => ({
+                        path: item.path.trim(),
+                        type: item.type,
+                        ordinal: Number.isFinite(Number(item.ordinal)) ? Number(item.ordinal) : index
+                    }))
+                : [];
+            const releaseTypes = Array.isArray(metadata.releaseTypes)
+                ? metadata.releaseTypes.map(formatReleaseType).filter((type) => type !== '')
+                : [];
+            return {
+                artistName: details && typeof details.artistName === 'string' ? details.artistName.trim() : '',
+                releaseName: typeof metadata.title === 'string' ? metadata.title.trim() : '',
+                releaseYear,
+                releaseTypes,
+                artwork
+            };
+        }
+
+        /**
+         * Applies a now playing album model to the labels and artwork carousel.
+         * @param {Object} details - The now playing album model.
+         */
+        applyNowPlayingDetails(details) {
+            if (!details)
+                return;
+            this.nowPlayingDetails = details;
+            const descriptor = this.descriptor;
+            const fallbackRelease = descriptor ? getDisplayAlbumTitle(descriptor.albumTitle) : '';
+            const releaseName = getDisplayAlbumTitle(details.releaseName) || fallbackRelease;
+            const releaseType = Array.isArray(details.releaseTypes) ? details.releaseTypes.join(', ') : '';
+            this.setNowPlayingDetailsText(releaseName, details.releaseYear, details.artistName, releaseType);
+            this.renderNowPlayingArtwork(details.artwork);
+            this.syncNowPlayingArtworkSelection();
+        }
+
+        /**
+         * Renders the thumbnails of the stored album artwork, reusing the same carousel classes as the album editor.
+         * @param {Array<Object>} artwork - The stored artwork of the album.
+         */
+        renderNowPlayingArtwork(artwork) {
+            const carousel = this.dom.artworkCarousel;
+            if (!carousel)
+                return;
+            carousel.innerHTML = '';
+            const items = Array.isArray(artwork) ? artwork : [];
+            const label = this.getStrings().albumArtwork || 'Album artwork';
+            for (let index = 0; index < items.length; index++) {
+                const path = items[index].path;
+                const url = resolveCoverArtUrl(path);
+                if (!url)
+                    continue;
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'artwork-carousel-item';
+                button.title = items.length > 1 ? `${label} ${index + 1}` : label;
+                button.setAttribute('aria-label', button.title);
+                button.setAttribute('aria-pressed', 'false');
+                button.dataset.artworkPath = path;
+                const image = document.createElement('img');
+                image.src = url;
+                image.alt = '';
+                image.loading = 'lazy';
+                button.appendChild(image);
+                button.addEventListener('click', () => this.selectNowPlayingArtwork(path, url));
+                carousel.appendChild(button);
+            }
+            carousel.hidden = carousel.children.length === 0;
+            if (carousel.hidden)
+                this.nowPlayingArtworkPath = '';
+        }
+
+        /**
+         * Shows one of the album artwork pieces in the expanded cover and the condensed thumbnail.
+         * @param {string} path - The stored path of the chosen artwork.
+         * @param {string} [url] - The resolved URL of the artwork.
+         */
+        selectNowPlayingArtwork(path, url) {
+            this.nowPlayingArtworkPath = path || '';
+            const resolved = url || resolveCoverArtUrl(path) || MUSIC_PLACEHOLDER_URL;
+            if (this.dom.coverImage)
+                this.dom.coverImage.src = resolved;
+            if (this.dom.coverThumbnail)
+                this.dom.coverThumbnail.src = resolved;
+            this.syncNowPlayingArtworkSelection();
+        }
+
+        /**
+         * Marks the carousel item that matches the artwork currently shown.
+         */
+        syncNowPlayingArtworkSelection() {
+            if (!this.dom.artworkCarousel)
+                return;
+            const selected = normalizeArtworkPath(this.nowPlayingArtworkPath);
+            const items = this.dom.artworkCarousel.querySelectorAll('.artwork-carousel-item');
+            for (const item of items) {
+                const isSelected = selected !== '' && normalizeArtworkPath(item.dataset.artworkPath) === selected;
+                item.classList.toggle('selected', isSelected);
+                item.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+            }
+        }
+
+        /**
+         * Reads cached now playing album details and marks them as the most recently used.
+         * @param {string} albumKey - The album identity.
+         * @returns {Object|null} The cached model, or null when it is not cached.
+         */
+        readNowPlayingDetailsCache(albumKey) {
+            if (!this.nowPlayingDetailsCache.has(albumKey))
+                return null;
+            const value = this.nowPlayingDetailsCache.get(albumKey);
+            this.nowPlayingDetailsCache.delete(albumKey);
+            this.nowPlayingDetailsCache.set(albumKey, value);
+            return value;
+        }
+
+        /**
+         * Writes now playing album details to the bounded cache.
+         * @param {string} albumKey - The album identity.
+         * @param {Object} details - The now playing album model.
+         */
+        writeNowPlayingDetailsCache(albumKey, details) {
+            this.nowPlayingDetailsCache.set(albumKey, details);
+            while (this.nowPlayingDetailsCache.size > 32)
+                this.nowPlayingDetailsCache.delete(this.nowPlayingDetailsCache.keys().next().value);
         }
 
         /**
@@ -3883,61 +4298,19 @@
                 if (label)
                     this.dom.playPause.setAttribute('aria-label', label);
             }
-            // The repeat, shuffle and skip controls share the transport state, so their labels and pressed state move with it.
+            // The repeat and skip controls share the transport state, so their labels and pressed state move with it.
             this.renderQueueControls();
         }
 
         /**
-         * Renders the queue controls: the shuffle menu button, the repeat toggle and the skip controls.
+         * Renders the queue controls: the repeat toggle and the skip controls.
          *
-         * When the bar provides a shuffle scope menu, the shuffle control is a menu button: it exposes 'aria-haspopup',
-         * 'aria-expanded', the 'is-active' class while shuffle is on, and no 'aria-pressed'. Each scope item, including the
-         * 'off' item, exposes 'aria-checked' and the 'is-selected' class. When a theme provides no menu, the control falls back
-         * to a plain toggle that exposes 'aria-pressed' instead. The repeat control exposes 'aria-pressed', the 'is-active' and
-         * 'is-one' classes, and the current mode as 'data-audio-player-repeat-mode' ('off', 'all' or 'one'). The labels come
-         * from the localized strings of the configuration, so a theme that renders the controls with its own text still gets
-         * the correct accessible name.
+         * The repeat control exposes 'aria-pressed', the 'is-active' and 'is-one' classes, and the current mode as
+         * 'data-audio-player-repeat-mode' ('off', 'all' or 'one'). The labels come from the localized strings of the
+         * configuration, so a theme that renders the controls with its own text still gets the correct accessible name.
          */
         renderQueueControls() {
             const strings = this.getStrings();
-            const isShuffled = this.queue.isShuffleEnabled();
-            if (this.dom.shuffle) {
-                this.dom.shuffle.classList.toggle('is-active', isShuffled);
-                if (this.dom.shuffleMenu) {
-                    // A menu button does not carry a pressed state; the selected menu item carries the checked state instead.
-                    this.dom.shuffle.removeAttribute('aria-pressed');
-                    this.dom.shuffle.setAttribute('aria-haspopup', 'menu');
-                    this.dom.shuffle.setAttribute('aria-expanded', this.dom.shuffleMenu.hasAttribute('hidden') ? 'false' : 'true');
-                } else {
-                    this.dom.shuffle.setAttribute('aria-pressed', isShuffled ? 'true' : 'false');
-                    this.dom.shuffle.removeAttribute('aria-haspopup');
-                    this.dom.shuffle.removeAttribute('aria-expanded');
-                }
-                if (strings.shuffle)
-                    this.dom.shuffle.setAttribute('aria-label', strings.shuffle);
-            }
-            if (this.dom.shuffleMenu) {
-                const scopeLabels = {
-                    off: strings.shuffleOff,
-                    release: strings.shuffleRelease,
-                    artist: strings.shuffleArtist,
-                    library: strings.shuffleLibrary
-                };
-                for (const item of this.dom.shuffleMenu.querySelectorAll('[data-audio-player-shuffle-scope]')) {
-                    const scope = item.getAttribute('data-audio-player-shuffle-scope');
-                    const isSelected = scope === 'off'
-                        ? !isShuffled
-                        : isShuffled && scope === this.queue.getShuffleScope();
-                    const isAvailable = scope === 'off' || this.canUseShuffleScope(scope);
-                    item.setAttribute('aria-checked', isSelected ? 'true' : 'false');
-                    item.setAttribute('aria-disabled', isAvailable ? 'false' : 'true');
-                    item.disabled = !isAvailable;
-                    item.classList.toggle('is-selected', isSelected);
-                    item.classList.toggle('is-disabled', !isAvailable);
-                    if (scopeLabels[scope])
-                        item.setAttribute('aria-label', scopeLabels[scope]);
-                }
-            }
             // The previous action normally has a meaning while the queue has an entry: it either walks back or restarts the
             // current track. A failed entry is not restarted, so after an error the control is only enabled when there is a real previous entry to recover to.
             if (this.dom.previous) {
@@ -3952,7 +4325,7 @@
                 // Repeat one makes the continuation a no-op, so a continuation at the end of the queue must not advertise a next action that cannot start.
                 const canContinue = !isRepeatOne
                     && this.queue.isContinuationEnabled()
-                    && this.preferences.shouldAutoplay === true
+                    && this.isQueueContinuationAllowed()
                     && this.queue.isContinuationExhausted() !== true;
                 const hasNext = this.queue.entries.length > 0
                     && (this.queue.currentIndex + 1 < this.queue.entries.length
@@ -4020,8 +4393,32 @@
         }
 
         /**
-         * Renders the ordered queue in the expanded bar. The list is only shown when the play context
-         * holds more than one track, so that a single track never renders a one item list.
+         * Scrolls the expanded queue so the current entry is the first visible item. The queue can be vertical or
+         * horizontal, depending on the theme layout, so the browser aligns it on both axes rather than this code assuming
+         * a vertical list. A shuffle queue can hold many more tracks than the panel can show, so without this the current
+         * track would drift off screen as playback advances.
+         */
+        scrollQueueToCurrentEntry() {
+            if (!this.dom.queue || !this.isExpanded() || this.currentIndex < 0)
+                return;
+            const item = this.dom.queue.children[this.currentIndex];
+            if (!item)
+                return;
+            if (typeof item.scrollIntoView === 'function') {
+                item.scrollIntoView({ block: 'start', inline: 'start', behavior: 'auto' });
+                return;
+            }
+            // A host without scrollIntoView keeps the vertical fallback of the application layout.
+            if (typeof item.getBoundingClientRect !== 'function' || typeof this.dom.queue.getBoundingClientRect !== 'function')
+                return;
+            const queueBounds = this.dom.queue.getBoundingClientRect();
+            const itemBounds = item.getBoundingClientRect();
+            this.dom.queue.scrollTop += itemBounds.top - queueBounds.top;
+        }
+
+        /**
+         * Renders the ordered queue in the expanded bar. The current queue is always shown, including a single track, so
+         * the expanded bar always lists what is playing now and what will play next.
          *
          * Each item is rendered from the 'shared/audio-player/queue-item' sub template of the active theme when it
          * provides one, so that the theme owns the structure of a queue item, and the built-in markup is used otherwise.
@@ -4029,7 +4426,7 @@
         renderQueue() {
             if (!this.dom.queue || !this.isExpanded())
                 return;
-            const items = this.queue.entries.length > 1 ? this.queue.entries : [];
+            const items = this.queue.entries;
             // The items are built into a detached fragment first, so a large context produces one insertion and one layout
             // pass instead of one per item. A host without a fragment falls back to the direct append path.
             const fragment = typeof document.createDocumentFragment === 'function' ? document.createDocumentFragment() : null;
@@ -4161,7 +4558,7 @@
                 title: item.title || '',
                 duration: formatDuration(item.durationInSeconds),
                 durationSeconds: item.durationInSeconds,
-                coverArtUrl: item.coverArtUrl || '',
+                coverArtUrl: item.coverArtUrl || MUSIC_PLACEHOLDER_URL,
                 isCurrent: index === this.currentIndex,
                 isPlayed: index < this.currentIndex,
                 isLast: index === totalItems - 1,
@@ -4182,6 +4579,11 @@
             if (!rendered)
                 rendered = this.buildDefaultQueueItem(viewModel);
             rendered.setAttribute('data-audio-player-queue-entry-id', entry.entryId);
+            // The player writes the state classes on the item root itself, so a theme queue item template keeps the current and played distinction even when its markup omits the state classes.
+            rendered.classList.toggle('is-current', viewModel.isCurrent);
+            rendered.classList.toggle('is-played', viewModel.isPlayed);
+            rendered.classList.toggle('is-continuation', viewModel.isContinuation);
+            rendered.classList.toggle('is-shuffled', viewModel.isShuffled);
             // The item is reachable by keyboard, so a user who cannot point can still start an entry. A control the theme rendered inside the item keeps its own focus and keyboard behavior.
             if (!rendered.hasAttribute('tabindex'))
                 rendered.setAttribute('tabindex', '0');
@@ -4205,12 +4607,18 @@
                 entry.classList.add('is-continuation');
             if (viewModel.isShuffled)
                 entry.classList.add('is-shuffled');
+            const cover = document.createElement('img');
+            cover.className = 'audio-player-queue-item-cover';
+            cover.src = viewModel.coverArtUrl;
+            cover.alt = '';
+            cover.loading = 'lazy';
             const title = document.createElement('span');
             title.className = 'audio-player-queue-item-title';
             title.textContent = viewModel.title;
             const duration = document.createElement('span');
             duration.className = 'audio-player-queue-item-duration';
             duration.textContent = viewModel.duration;
+            entry.appendChild(cover);
             entry.appendChild(title);
             entry.appendChild(duration);
             return entry;

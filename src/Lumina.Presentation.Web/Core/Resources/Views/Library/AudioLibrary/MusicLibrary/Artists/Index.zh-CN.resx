@@ -57,4 +57,13 @@
   <data name="DeleteFailed" xml:space="preserve">
     <value>无法删除该项目。</value>
   </data>
+  <data name="Shuffle" xml:space="preserve">
+    <value>随机播放</value>
+  </data>
+  <data name="Play" xml:space="preserve">
+    <value>播放</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>æ“ä½œ</value>
+  </data>
 </root>

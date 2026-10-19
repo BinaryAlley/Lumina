@@ -168,8 +168,8 @@
   <data name="Retry" xml:space="preserve">
     <value>Reîncercare</value>
   </data>
-  <data name="ToggleFullHeight" xml:space="preserve">
-    <value>Comutare Înălțime Completă</value>
+  <data name="ToggleExpanded" xml:space="preserve">
+    <value>Extinde sau restrânge playerul</value>
   </data>
   <data name="ToggleVisibility" xml:space="preserve">
     <value>Comutare Vizibilitate</value>
@@ -215,5 +215,11 @@
   </data>
   <data name="AudioPlayerShuffleOff" xml:space="preserve">
     <value>Redare aleatorie oprită</value>
+  </data>
+  <data name="AudioPlayerStop" xml:space="preserve">
+    <value>Oprește</value>
+  </data>
+  <data name="AudioPlayerAlbumArtwork" xml:space="preserve">
+    <value>Ilustrații album</value>
   </data>
 </root>

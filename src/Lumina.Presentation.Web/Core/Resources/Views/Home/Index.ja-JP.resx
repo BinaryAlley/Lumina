@@ -120,4 +120,13 @@
   <data name="NoLibraries" xml:space="preserve">
     <value>ライブラリがありません</value>
   </data>
+  <data name="Shuffle" xml:space="preserve">
+    <value>シャッフル</value>
+  </data>
+  <data name="Play" xml:space="preserve">
+    <value>再生</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>æ“ä½œ</value>
+  </data>
 </root>

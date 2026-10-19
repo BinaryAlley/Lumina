@@ -843,4 +843,10 @@
   <data name="StreamingQualityCannotBeNull" xml:space="preserve">
     <value>Якість потокового передавання не може бути порожньою!</value>
   </data>
+  <data name="ShuffleTrackCountMustBeGreaterThanZero" xml:space="preserve">
+    <value>Кількість треків для перемішування має бути більшою за нуль!</value>
+  </data>
+  <data name="ShuffleTrackCountMustBeAtMost500" xml:space="preserve">
+    <value>Кількість треків для перемішування не може перевищувати 500!</value>
+  </data>
 </root>

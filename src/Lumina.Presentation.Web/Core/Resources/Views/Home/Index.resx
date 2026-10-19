@@ -120,4 +120,13 @@
   <data name="NoLibraries" xml:space="preserve">
     <value>No libraries</value>
   </data>
+  <data name="Shuffle" xml:space="preserve">
+    <value>Shuffle</value>
+  </data>
+  <data name="Play" xml:space="preserve">
+    <value>Play</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
 </root>

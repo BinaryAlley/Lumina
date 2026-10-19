@@ -8,6 +8,9 @@
     - [Get Track](#get-track)
       - [Get Track Request](#get-track-request)
       - [Get Track Response](#get-track-response)
+    - [Shuffle Tracks](#shuffle-tracks)
+      - [Shuffle Tracks Request](#shuffle-tracks-request)
+      - [Shuffle Tracks Response](#shuffle-tracks-response)
     - [Stream Track](#stream-track)
       - [Stream Track Request](#stream-track-request)
       - [Stream Track Response](#stream-track-response)
@@ -319,6 +322,50 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
   ]
 }
 ```
+
+
+### Shuffle Tracks
+
+#### Shuffle Tracks Request
+
+```js
+POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/tracks/shuffle
+```
+
+```json
+{
+  "count": 100,
+  "artistId": null,
+  "albumId": null,
+  "excludedTrackIds": [
+    "9f0e1d2c-3b4a-4c6d-8e7f-9a0b1c2d3e4f"
+  ]
+}
+```
+
+Returns a uniformly random selection of tracks from every track of the library, optionally scoped to one artist or one album, and excludes the tracks in `excludedTrackIds`. The database picks the rows at random, so the result is not limited to the albums or artists that happen to be stored or loaded first. `count` must be between 1 and 500. When `artistId` is present, only tracks whose album belongs to that artist are sampled; when `albumId` is present, only tracks of that album are sampled. The tracks are returned to an Admin, who can shuffle all libraries, or to the owner of the library.
+
+#### Shuffle Tracks Response
+
+```js
+200 Ok
+```
+
+```json
+[
+  {
+    "trackId": "9f0e1d2c-3b4a-4c6d-8e7f-9a0b1c2d3e4f",
+    "title": "Bohemian Rhapsody",
+    "durationInSeconds": 354,
+    "albumId": "e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f",
+    "albumTitle": "A Night at the Opera",
+    "artistId": "d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a",
+    "coverPath": "\\media\\music\\music-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a\\QUEEN\\Album\\A night at the opera-e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f\\cover.jpg"
+  }
+]
+```
+
+The response holds at most `count` tracks, and fewer when the scope has fewer tracks that are not excluded. A repeated request returns a different random selection and a different order.
 
 
 ### Stream Track

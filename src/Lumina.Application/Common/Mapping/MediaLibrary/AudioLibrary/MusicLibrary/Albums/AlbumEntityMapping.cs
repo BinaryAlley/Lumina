@@ -170,7 +170,7 @@ public static class AlbumEntityMapping
             repositoryEntity.ReleaseCountry,
             repositoryEntity.ReleaseVersion
         );
-        // language and original language make sense only if their subproperties have values
+        // Language and original language make sense only if their subproperties have values.
         LanguageInfoDto? languageInfo = !string.IsNullOrWhiteSpace(repositoryEntity.LanguageCode) ||
                                         !string.IsNullOrWhiteSpace(repositoryEntity.LanguageName) ||
                                         !string.IsNullOrWhiteSpace(repositoryEntity.LanguageNativeName)
@@ -207,6 +207,7 @@ public static class AlbumEntityMapping
         return new AlbumResponse(
             repositoryEntity.Id,
             repositoryEntity.ArtistId,
+            repositoryEntity.Artist?.Name ?? string.Empty,
             repositoryEntity.LibraryId,
             metadata,
             repositoryEntity.MediaFormat,

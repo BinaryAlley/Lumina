@@ -1251,9 +1251,9 @@ body {
     border-color: #FFFFFF;
 }
 
-/* Audio player bar. This is the application fallback styling: the themes own the final look, and the
-   audio player script owns the state. The 'not-shown' and 'full-height' classes on the container, and
-   the matching 'audio-player-not-shown' and 'audio-player-full-height' classes on main, are the contract. */
+/* Audio player bar. This is the application fallback styling: the themes own the final look and layout, and the
+   audio player script owns the state. The container carries 'not-shown' and 'expanded'; main carries the matching
+   'audio-player-not-shown' and 'audio-player-bar-expanded' classes. A theme is free to replace every rule below. */
 .audio-player-container {
     position: fixed;
     left: 0px;
@@ -1262,22 +1262,20 @@ body {
     z-index: 997;
     display: flex;
     flex-direction: column;
+    /* The bar stays anchored to the bottom of the viewport while the expanded area above it grows and shrinks. */
+    justify-content: flex-end;
     height: 50px;
     overflow: hidden;
     background-color: #1C1C1C;
     border-top: 1px solid #444444;
-    transition: height 0.4s ease;
+    /* The expand and collapse duration is one value, so a theme can keep the height, fade and padding transitions in step by overriding this property on the container. */
+    --audio-player-expanded-duration: 0.4s;
+    transition: height var(--audio-player-expanded-duration) ease;
 }
 
 .audio-player-container.not-shown {
     height: 0px;
     border-top-width: 0px;
-}
-
-/* The shuffle scope menu opens above the bar, so the bar lets it overflow while the menu is open. Every other state keeps
-   the overflow hidden that collapses the bar to its height. */
-.audio-player-container.is-menu-open {
-    overflow: visible;
 }
 
 /* The 'hidden' attribute keeps the bar unrendered until the audio player script takes over, so that a page load
@@ -1306,8 +1304,8 @@ html.audio-player-initializing .audio-player-container {
     padding-bottom: 0px;
 }
 
-.audio-player-container.full-height {
-    height: calc(100% - 22px); /* full height minus the height of the menu bar */
+.audio-player-container.expanded {
+    height: calc(100% - 22px); /* expanded height, less the height of the menu bar */
 }
 
 .audio-player-bar {
@@ -1327,12 +1325,29 @@ html.audio-player-initializing .audio-player-container {
     object-fit: cover;
 }
 
-.audio-player-track-name {
+.audio-player-track-labels {
+    display: flex;
     flex: 1 1 20%;
+    min-width: 0px;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.audio-player-track-name,
+.audio-player-album-name {
     min-width: 0px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.audio-player-album-name {
+    font-size: 11px;
+    color: #9AA7B0;
+}
+
+.audio-player-album-name:empty {
+    display: none;
 }
 
 .audio-player-time {
@@ -1418,8 +1433,7 @@ html.audio-player-initializing .audio-player-container {
     cursor: grabbing;
 }
 
-/* The queue controls hold the shuffle scope menu, the skip controls and the repeat toggle. They sit next to the play
-   control, so the bar reads as one transport row. */
+/* The queue controls hold the skip controls and the repeat toggle. They sit next to the play control, so the bar reads as one transport row. */
 .audio-player-queue-controls {
     position: relative;
     flex: 0 0 auto;
@@ -1476,14 +1490,7 @@ html.audio-player-initializing .audio-player-container {
     box-shadow: 3px 0px 0px #E6E6E6;
 }
 
-/* The shuffle and repeat glyphs are text, so a theme can replace them with its own imagery while keeping the hooks. */
-.audio-player-shuffle-control {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.audio-player-shuffle-icon,
+/* The repeat glyph is text, so a theme can replace it with its own imagery while keeping the hook. */
 .audio-player-repeat-icon {
     display: block;
     font-size: 17px;
@@ -1491,7 +1498,6 @@ html.audio-player-initializing .audio-player-container {
     color: #E6E6E6;
 }
 
-.audio-player-shuffle.is-active .audio-player-shuffle-icon,
 .audio-player-repeat.is-active .audio-player-repeat-icon {
     color: #6DCBFE;
 }
@@ -1514,40 +1520,6 @@ html.audio-player-initializing .audio-player-container {
     display: block;
 }
 
-/* The shuffle scope menu opens above the control, because the bar is anchored to the bottom of the page. */
-.audio-player-shuffle-menu {
-    position: absolute;
-    right: 0px;
-    bottom: calc(100% + 6px);
-    z-index: 998;
-    display: flex;
-    flex-direction: column;
-    min-width: 150px;
-    padding: 4px;
-    background-color: #1C1C1C;
-    border: 1px solid #444444;
-}
-
-.audio-player-shuffle-menu[hidden] {
-    display: none;
-}
-
-.audio-player-shuffle-menu button {
-    padding: 6px 8px;
-    background: none;
-    border: none;
-    color: inherit;
-    font: inherit;
-    text-align: left;
-    cursor: pointer;
-}
-
-.audio-player-shuffle-menu button:hover,
-.audio-player-shuffle-menu button.is-selected {
-    background-color: #2A2A2A;
-    color: #6DCBFE;
-}
-
 /* The play affordance is a right pointing triangle, and the pause affordance two bars, both drawn with CSS
    so that a theme can restyle them without an image. */
 .audio-player-play-pause-icon {
@@ -1565,6 +1537,14 @@ html.audio-player-initializing .audio-player-container {
     border-width: 0px;
     border-right: 3px solid #E6E6E6;
     border-left: 3px solid #E6E6E6;
+}
+
+/* The stop affordance is a filled square, drawn with CSS so a theme can restyle it without an image. */
+.audio-player-stop-icon {
+    display: block;
+    width: 10px;
+    height: 10px;
+    background-color: #E6E6E6;
 }
 
 .audio-player-volume-control {
@@ -1621,33 +1601,181 @@ html.audio-player-initializing .audio-player-container {
 }
 
 .audio-player-controls button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0px;
     background: none;
     border: none;
-    padding: 0px;
     color: inherit;
     font: inherit;
     cursor: pointer;
 }
 
-.audio-player-expanded {
-    display: none;
-    flex: 1 1 auto;
-    min-height: 0px;
-    gap: 16px;
-    padding: 16px;
-    overflow-y: auto;
+/* The expand control is a pair of chevrons: they point up while the bar is collapsed, because activating the
+   control expands the bar, and down while it is expanded, because activating it collapses the bar again. */
+.audio-player-expand-icon {
+    position: relative;
+    display: block;
+    width: 12px;
+    height: 14px;
 }
 
-.audio-player-container.full-height .audio-player-expanded {
+.audio-player-expand-icon::before,
+.audio-player-expand-icon::after {
+    content: "";
+    position: absolute;
+    left: 1px;
+    width: 8px;
+    height: 8px;
+    border-top: 2px solid #E6E6E6;
+    border-left: 2px solid #E6E6E6;
+    transform: rotate(45deg);
+}
+
+.audio-player-expand-icon::before {
+    top: 0px;
+}
+
+.audio-player-expand-icon::after {
+    top: 5px;
+}
+
+.audio-player-container.expanded .audio-player-expand-icon::before,
+.audio-player-container.expanded .audio-player-expand-icon::after {
+    transform: rotate(225deg);
+}
+
+/* Fallback layout only. The expanded area stays in the flex column so the condensed bar remains anchored to the bottom
+   while this area grows and shrinks above it. A theme can replace this with a vertical bar, a horizontal queue, an
+   overlay, or any other layout; the player only toggles the state classes. Its vertical padding is zero while collapsed,
+   because padding cannot shrink with the flex item and would otherwise push the bar out of the viewport during the
+   fallback collapse transition. */
+.audio-player-expanded {
     display: flex;
+    flex: 1 1 auto;
     flex-direction: row;
+    min-height: 0px;
+    gap: 16px;
+    padding: 0px 16px;
+    overflow-y: auto;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+        opacity var(--audio-player-expanded-duration) ease,
+        visibility 0s linear var(--audio-player-expanded-duration),
+        padding-top var(--audio-player-expanded-duration) ease,
+        padding-bottom var(--audio-player-expanded-duration) ease;
+}
+
+.audio-player-container.expanded .audio-player-expanded {
+    padding-top: 16px;
+    padding-bottom: 16px;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition-delay: 0s, 0s, 0s, 0s;
+}
+
+/* The expanded player presents the current track's cover, labels and stored album artwork in one column beside the queue. */
+.audio-player-now-playing {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 240px;
+    min-width: 0px;
 }
 
 .audio-player-cover-image {
+    display: block;
     flex: 0 0 auto;
     width: 240px;
     height: 240px;
     object-fit: cover;
+}
+
+.audio-player-now-playing .audio-player-cover-image {
+    width: 100%;
+}
+
+.audio-player-now-playing-labels {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0px;
+}
+
+.audio-player-now-playing-title {
+    min-width: 0px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 14px;
+    font-weight: 700;
+    color: #E6E6E6;
+}
+
+.audio-player-now-playing-release-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    min-width: 0px;
+}
+
+.audio-player-now-playing-release,
+.audio-player-now-playing-year,
+.audio-player-now-playing-artist {
+    min-width: 0px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+    color: #9AA7B0;
+}
+
+.audio-player-now-playing-release-type {
+    flex: 0 0 auto;
+    align-self: center;
+    padding: 1px 5px;
+    border: 1px solid #555555;
+    border-radius: 3px;
+    background-color: #2A2A2A;
+    color: #E6E6E6;
+    font-size: 10px;
+    line-height: 1.3;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.audio-player-now-playing-release-type:empty {
+    display: none;
+}
+
+.audio-player-now-playing-release {
+    flex: 1 1 auto;
+}
+
+.audio-player-now-playing-year {
+    flex: 0 0 auto;
+}
+
+.audio-player-now-playing-release:empty,
+.audio-player-now-playing-year:empty,
+.audio-player-now-playing-artist:empty {
+    display: none;
+}
+
+.audio-player-artwork-carousel {
+    max-width: 100%;
+    margin-top: 2px;
+}
+
+.audio-player-artwork-carousel[hidden] {
+    display: none;
 }
 
 .audio-player-queue {
@@ -1658,13 +1786,26 @@ html.audio-player-initializing .audio-player-container {
     list-style: none;
 }
 
+/* A queue item carries its album cover, so a queue built from a whole library shuffle stays readable when consecutive
+   entries come from different artists and releases. The row is slightly taller than the plain text rows it replaced. */
 .audio-player-queue-item {
     display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 6px 8px;
+    align-items: center;
+    gap: 10px;
+    min-height: 52px;
+    padding: 8px;
+    box-sizing: border-box;
     border-bottom: 1px solid #333333;
     cursor: pointer;
+}
+
+.audio-player-queue-item-cover {
+    display: block;
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+    background-color: #333333;
 }
 
 .audio-player-queue-item.is-played .audio-player-queue-item-title {
@@ -1673,6 +1814,7 @@ html.audio-player-initializing .audio-player-container {
 
 .audio-player-queue-item.is-current .audio-player-queue-item-title {
     color: #6DCBFE;
+    font-weight: 700;
 }
 
 .audio-player-queue-item:focus {
@@ -1680,7 +1822,16 @@ html.audio-player-initializing .audio-player-container {
 }
 
 .audio-player-queue-item-title {
+    flex: 1 1 auto;
+    min-width: 0px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.audio-player-queue-item-duration {
+    flex: 0 0 auto;
+    font-size: 12px;
+    color: #9AA7B0;
+    font-variant-numeric: tabular-nums;
 }

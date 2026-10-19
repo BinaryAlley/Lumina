@@ -546,6 +546,7 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                     new AlbumResponse(
                         Id: albumId,
                         ArtistId: artistId,
+                        ArtistName: "Queen",
                         LibraryId: libraryId,
                         Metadata: new MusicAlbumMetadataDto(
                             Title: "A Night at the Opera",

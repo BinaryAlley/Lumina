@@ -1083,4 +1083,13 @@
   <data name="AddIsni" xml:space="preserve">
     <value>Add ISNI</value>
   </data>
+  <data name="PlayAll" xml:space="preserve">
+    <value>Play all</value>
+  </data>
+  <data name="Play" xml:space="preserve">
+    <value>Play</value>
+  </data>
+  <data name="Shuffle" xml:space="preserve">
+    <value>Shuffle</value>
+  </data>
 </root>

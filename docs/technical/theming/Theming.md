@@ -14,6 +14,7 @@ The web client of Lumina is a themed shell: every page is rendered inside the te
     - [Template Resolution](#template-resolution)
     - [The Layout Template (shared/layout)](#the-layout-template-sharedlayout)
     - [The Audio Player Bar](#the-audio-player-bar)
+      - [Play Affordances on the Music Pages](#play-affordances-on-the-music-pages)
       - [The audio player sub templates](#the-audio-player-sub-templates)
     - [The Navigation Template (shared/nav-menu)](#the-navigation-template-sharednav-menu)
     - [Page Templates](#page-templates)
@@ -231,17 +232,18 @@ The rendered page content, navigation and scripts are inserted unescaped with `{
 
 Every authenticated page renders the audio player bar through the `audioPlayer` field of the layout model. The bar starts hidden, and the global audio player script shows it when playback starts, expands it and hides it again. The markup comes from the `shared/audio-player` template of the active theme; when the theme does not provide that template, the application renders its own fallback markup, so the player always has a bar to bind to.
 
-The bar is fixed to the bottom of the viewport, so the theme owns the room reserved for it on the main content element. A layout must keep these element hooks, which the audio player drives (the two id controls are bound by the global site script, which routes them to the audio player):
+The theme owns the position, orientation and size of the bar, and it owns the room reserved for it on the main content element. The application fallback happens to fix the bar to the bottom, but that is only the fallback layout: a theme can make it a vertical bar on a side, a horizontal bar at the bottom, or any other placement, and can expand its queue in any direction. A layout must keep these element hooks, which the audio player drives (the id control is bound by the global site script, which routes it to the audio player):
 
 | Element | Hook | Meaning |
 | --- | --- | --- |
-| The bar container, with the `audio-player-container` class | `not-shown` class | The bar is hidden, and its height collapses. |
-| The bar container | `full-height` class | The bar is expanded to its full height form. |
+| The bar container, with the `audio-player-container` class | `not-shown` class | The bar is hidden. The theme decides how that state is presented and which space it releases. |
+| The bar container | `expanded` class | The bar is expanded. This is the layout-neutral state a theme styles for its own layout. |
 | The bar container | `inert` attribute | Set while the bar is hidden and removed when it is shown, so a collapsed bar keeps none of its focusable controls in the tab order. |
-| The main content element | `audio-player-not-shown` class | The bar is hidden, so the content area uses the full height. |
-| The main content element | `audio-player-full-height` class | The bar is expanded, so the content area gives it the full height. |
-| The full height control | `id="audio-player-full-height-toggle"` | A focusable control, such as a `button`, that expands or collapses the bar. |
-| The close control | `id="audio-player-close"` | A focusable control, such as a `button`, that stops playback and hides the bar while it is condensed. |
+| The expanded area, with the `audio-player-expanded` class | Layout child of the bar container | The cover art, now playing details and queue of the expanded bar. Its position is theme-owned. The fallback stylesheet places it above the bar in a flex column, but the player does not require that layout. A theme that animates the area should keep it in the DOM while the transition runs. |
+| The condensed bar, with the `audio-player-bar` class | Layout child of the bar container | The row of controls. Its position is theme-owned; the fallback stylesheet places it at the bottom edge of the container. |
+| The main content element | `audio-player-not-shown` class | The bar is hidden, so the content area releases the room the theme reserved for the bar. |
+| The main content element | `audio-player-bar-expanded` class | The bar is expanded. This is the layout-neutral state for the main content element's own adjustment. |
+| The expand and collapse control | `id="audio-player-expand-toggle"` | A focusable control, such as a `button`, that expands or collapses the bar. Its label may describe the action in the theme's own layout. |
 
 The `shared/audio-player` template receives the following model:
 
@@ -251,9 +253,9 @@ The `shared/audio-player` template receives the following model:
 | `assetBase` | The base URL of the theme assets, used by the theme template to reference its own assets. |
 | `queueItemTemplate` | The raw source of the `shared/audio-player/queue-item` sub template, inlined by the application into a plain text script element. |
 | `playlistItemTemplate` | The raw source of the `shared/audio-player/playlist-item` sub template, inlined by the application into a plain text script element. |
-| `strings` | The localized strings of the bar, keyed by their resource names. A shell template uses `toggleFullHeight`, `toggleVisibility`, `previous`, `next`, `shuffle`, `shuffleOff`, `shuffleRelease`, `shuffleArtist`, `shuffleLibrary`, `repeat`, `repeatOff`, `repeatAll`, `repeatOne` and `queue` for its controls; the player reads the play, pause, mute, unmute, volume, seek and buffering labels from the global scripts configuration instead, so a themed shell does not need to render them. |
+| `strings` | The localized strings of the bar, keyed by their resource names. A shell template uses `toggleExpanded`, `previous`, `next`, `stop`, `repeat`, `repeatOff`, `repeatAll`, `repeatOne`, `queue` and `albumArtwork` for its controls; the player reads the play, pause, mute, unmute, volume, seek and buffering labels from the global scripts configuration instead, so a themed shell does not need to render them. |
 
-A theme must reserve the space for the bar itself, as the bundled themes do:
+The bundled themes reserve the room for their bottom bar like this. It is an example of a bottom layout, not a required layout:
 
 ```css
 main {
@@ -265,24 +267,25 @@ main.audio-player-not-shown {
     bottom: 0;
 }
 
-main.audio-player-full-height {
-    bottom: calc(100% - 22px); /* full height minus the menu height */
+main.audio-player-bar-expanded {
+    bottom: calc(100% - 22px); /* expanded height, less the menu height */
 }
 ```
 
-The application fallback layout, which renders when the active theme cannot be loaded, reserves the room itself, because the application stylesheet does not position the content area of a theme. A theme that omits the rules above leaves the fixed bar overlapping the bottom of the page.
+A theme with a vertical bar instead reserves a side column, a theme with a bar on top reserves top space, and a theme whose expanded bar overlays the content reserves no space at all. The application fallback layout reserves the room itself, because the application stylesheet does not position the content area of a theme. A theme that omits its own space reservation leaves its bar overlapping its content.
 
-The markup inside the bar exposes the hook attributes the audio player script binds. A theme that replaces the bar markup must keep all of them; the part of the bar whose hook is missing stays inert. The play affordances of the pages use the `data-audio-player-play` trigger attribute, and a play next affordance uses `data-audio-player-play-next`; both read the same descriptor attributes. A track trigger must supply `libraryId`, `trackId`, `albumId` and `artistId`, because the playback manifest route needs all four Ids. An album context trigger supplies `libraryId`, `albumId` and `artistId`, and an artist context trigger supplies `libraryId` and `artistId`. The deprecated `queuechange` event keeps its ordered descriptor array payload for older theme scripts; new code must use `queuestatechange`, whose payload is the compact queue summary.
+The flex column used by the application fallback is also only a default. The player toggles the state classes and never reads the geometry of the bar, so a theme can lay the container out in any direction, place the expanded area to the left, right, above or below the condensed bar, and make the queue scroll vertically or horizontally. The player's only layout-dependent behavior is scrolling the `data-audio-player-queue` element so the current entry aligns to its start on both axes.
+
+A theme that restyles the fallback transition can set `--audio-player-expanded-duration` on `.audio-player-container` to keep its height, fade and padding transitions on the same duration. The bundled themes set it to `1s`, matching their own height transition; the application fallback uses `0.4s`. A theme that uses a different transition can ignore the property.
+
+The markup inside the bar exposes the hook attributes the audio player script binds. A theme that replaces the bar markup must keep all of them; the part of the bar whose hook is missing stays inert. The deprecated `queuechange` event keeps its ordered descriptor array payload for older theme scripts; new code must use `queuestatechange`, whose payload is the compact queue summary.
 
 | Hook attribute | Meaning |
 | --- | --- |
 | `data-audio-player-play-pause` | The play and pause control. The player adds the `is-playing` class to it while a track plays. |
+| `data-audio-player-stop` | The stop control. Clicking it stops playback; a condensed bar then slides out of view, while an expanded bar stays on screen. |
 | `data-audio-player-previous` | The previous control. It either returns to the previous queue entry or restarts the current track, following the navigation history. |
 | `data-audio-player-next` | The next control. It starts the next queue entry and loads another shuffle or autoplay batch when the queue is at its end. The player sets `disabled` and the `is-disabled` class when there is no next entry. |
-| `data-audio-player-shuffle-control` | The wrapper of the shuffle toggle and its scope menu, so the player can position the menu and close it on an outside click. The player adds `is-menu-open` to the bar container while the menu is open, so a theme can let the menu overflow the bar. |
-| `data-audio-player-shuffle` | The shuffle menu button when a scope menu is present: clicking it always opens the menu, the player sets `aria-haspopup="menu"`, `aria-expanded`, and the `is-active` class while shuffle is on, and it does not set `aria-pressed`. Without a scope menu the control is a plain toggle that exposes `aria-pressed` instead. |
-| `data-audio-player-shuffle-menu` | The shuffle scope menu, hidden with the `hidden` attribute while it is closed. |
-| `data-audio-player-shuffle-scope` | A scope item inside the menu, with the value `off`, `release`, `artist` or `library`. The player toggles `aria-checked` and the `is-selected` class on it; the `off` item is selected while shuffle is off. A scope whose required Ids cannot be resolved from the current queue is disabled with `disabled`, `aria-disabled="true"` and the `is-disabled` class. |
 | `data-audio-player-repeat` | The repeat toggle. The player writes `data-audio-player-repeat-mode` (`off`, `all` or `one`), toggles `aria-pressed`, the `is-active` class and, for one, the `is-one` class. |
 | `data-audio-player-progress` | The progress bar, a `role="slider"` element with `tabindex="0"` that the player scrubs and whose ARIA value attributes it writes. It carries `data-audio-player-progress-state` (`idle`, `ready` or `buffering`) and the `is-buffering` class while it loads. |
 | `data-audio-player-progress-played` | The played layer of the bar. The player publishes its start and width as the custom properties `--audio-player-progress-played-start` and `--audio-player-progress-played-width`. |
@@ -291,13 +294,66 @@ The markup inside the bar exposes the hook attributes the audio player script bi
 | `data-audio-player-current-time` | The current position, written as `m:ss`. |
 | `data-audio-player-total-time` | The duration, written as `m:ss`, or `--:--` while it is unknown. |
 | `data-audio-player-track-name` | The track name. |
-| `data-audio-player-cover-thumbnail`, `data-audio-player-cover-image` | The cover art of the condensed bar and of the expanded bar. |
+| `data-audio-player-album-name` | The album name, shown underneath the track name. The player leaves it empty when the descriptor has no album title, including when the title is the stored `Unknown Album` placeholder, so a track without an album shows only its name. |
+| `data-audio-player-now-playing-title` | The current track name of the expanded player, under its cover. |
+| `data-audio-player-now-playing-release-type` | The release type of the current track's album, such as Album, Live or EP. Multiple types are joined with commas. It is left empty when the album has no release type. |
+| `data-audio-player-now-playing-release` | The release name of the current track's album in the expanded player. It is left empty when the album has no displayable title. |
+| `data-audio-player-now-playing-year` | The release year of the current track's album in the expanded player. It is left empty when the year is not known. |
+| `data-audio-player-now-playing-artist` | The artist name of the current track's album in the expanded player. It is left empty until the album details are available. |
+| `data-audio-player-artwork-carousel` | The carousel of the stored artwork of the current track's album. The player appends one `button.artwork-carousel-item` per stored image, carrying `data-artwork-path`, and toggles the `selected` class and `aria-pressed` on the chosen item. The element is hidden with the `hidden` attribute while the album has no stored artwork. |
+| `data-audio-player-cover-thumbnail`, `data-audio-player-cover-image` | The cover art of the condensed bar and of the expanded bar. Choosing an album artwork in the carousel replaces both images until the next track. |
 | `data-audio-player-volume` | The volume slider, a `role="slider"` element with `tabindex="0"` that the player scrubs and whose ARIA value attributes it writes. The fill is published as `--audio-player-volume-start` and `--audio-player-volume-width`. |
 | `data-audio-player-volume-level` | The volume fill. It carries no geometry of its own: the stylesheet drives it from the custom properties above. |
 | `data-audio-player-mute` | The mute toggle. The player toggles the `is-muted` class and the `aria-pressed` state on it. |
-| `data-audio-player-queue` | The queue list of the expanded bar. The player writes `data-audio-player-queue-entry-id` on every rendered item root, whether it comes from the theme sub template or from the built-in markup, and makes the root focusable, so clicking an item or pressing Enter or Space on it starts that entry. |
+| `data-audio-player-queue` | The queue list of the expanded bar. The player writes `data-audio-player-queue-entry-id` on every rendered item root, whether it comes from the theme sub template or from the built-in markup, and makes the root focusable, so clicking an item or pressing Enter or Space on it starts that entry. The element must stay the scroll container of the list, because the player scrolls the current entry to the start of whichever axis the theme makes scrollable when playback advances or the bar expands. |
 
 Each progress layer also carries `data-audio-player-progress-layer` (`played`, `downloaded` or `undownloaded`) in the markup, so a theme can select a layer by its state as well as by its class. The player writes no inline geometry on any of the bar elements: it publishes the geometry of each state as the custom properties above, which the application stylesheet consumes, so a theme restyles or reorients either bar by consuming the same properties.
+
+#### Play Affordances on the Music Pages
+
+The artist page, the album page and the track page render play triggers, and the card actions menus render play and shuffle triggers, all handled by the global audio player script through event delegation. The music library cards on the home page, the artist cards and the album cards offer both actions, so the whole library, an artist or a release can be started in order or shuffled. A theme template that replaces one of those pages or menus opts in by rendering the same trigger attributes: the player binds one listener on the document, so a trigger works anywhere in the swapped page content and the page needs no script of its own.
+
+The trigger attributes are:
+
+| Attribute | Meaning |
+| --- | --- |
+| `data-audio-player-play` | Marks the element as a play trigger. Clicking it replaces the queue with the described context and starts playback. |
+| `data-audio-player-play-next` | Marks the element as a play next trigger. While something is current, clicking it inserts the described track or context after the current entry without starting playback and discards the pending autoplay continuation. When nothing is current, the player starts the described context instead, because there is no entry to queue after. |
+| `data-audio-player-play-shuffled` | Marks the element as a shuffled play trigger. Clicking it starts the described context and turns shuffle on for the scope in `data-audio-player-shuffle-scope`. |
+| `data-audio-player-play-library` | Marks the element as a library play trigger. Clicking it starts the whole library named by `data-library-id` in artist page order, without needing a track, album or artist context. |
+| `data-audio-player-play-library-shuffled` | Marks the element as a library shuffle trigger. Clicking it starts a shuffled playback of the whole library named by `data-library-id`, without needing a track, album or artist context. |
+| `data-audio-player-shuffle-scope` | The scope of a shuffled play trigger: `release`, `artist` or `library`. A shuffled play trigger without this attribute shuffles the release it started. |
+
+All triggers read the play descriptor from the same `data-*` attributes:
+
+| Attribute | Meaning |
+| --- | --- |
+| `data-library-id` | The Id of the media library the context belongs to. Required by every trigger. |
+| `data-track-id` | The Id of the track. Required by a track trigger. |
+| `data-album-id` | The Id of the album. Required by a track trigger and by an album context trigger. |
+| `data-artist-id` | The Id of the artist. Required by a track trigger, an album context trigger and an artist context trigger. |
+| `data-title` | The display title of the track or context, shown in the bar while the context loads. Optional. |
+| `data-album-title` | The display title of the album the track belongs to, shown under the track name in the bar. Optional, and meaningful on a track trigger. An album context already uses its `data-title` as the album title while the context loads, so it does not need this attribute. |
+| `data-duration` | The duration of the track in seconds. Optional, and meaningful on a track trigger. |
+| `data-cover-art-path` | The artwork path of the cover, relative to the API server base, exactly like the artwork path the album page uses. Optional. |
+| `data-cover-art-url` | An absolute cover art URL, or a relative artwork path. Optional, and used in preference to `data-cover-art-path` when both are present. |
+
+The context a trigger describes decides the required parameters and the queue it builds:
+
+| Trigger | Required attributes | Queue |
+| --- | --- | --- |
+| Track | `data-library-id`, `data-track-id`, `data-album-id`, `data-artist-id` | The single track. |
+| Album | `data-library-id`, `data-album-id`, `data-artist-id` | The tracks of the release, in disc and then track number order. |
+| Artist | `data-library-id`, `data-artist-id` | Every release of the artist in the order the artist page presents them, each in disc and track number order. |
+| Library | `data-library-id` | Every track of the first artist of the library that has tracks, in artist page order, followed by the remaining artists in the same order. |
+
+The album queue is read through `api-get-tracks`, the artist queue through `api-get-albums` and then `api-get-tracks`, and a track trigger uses the descriptor alone. A library trigger reads `api-get-artists` to find the first artist that has tracks and then builds that artist's queue; when playback reaches the end, the continuation walks the remaining artists in library order. The queue script documents these endpoints and their order in full.
+
+An album or artist trigger carries its effective cover into the entries it queues. A `data-cover-art-url` is kept as the resolved cover URL of the context, so a theme that supplies only that attribute does not lose the cover when the queue is built. An album trigger falls back to the context cover for a release without one. An artist trigger falls back to the artist cover, and a library trigger falls back to the cover of the artist the release belongs to, so a release with its own cover always keeps that cover. The `data-cover-art-path` is kept on every entry for artwork matching, even when the trigger supplies a cover URL.
+
+Each page exposes the values its own triggers need. The album page provides `artistId`, `albumId`, `libraryId`, `albumTitle`, `albumCoverPath` and `albumHasTracks` for the album trigger. Its per-track triggers are rendered from the track rows the page loads from `tracksUrl`, which returns the `id`, `title`, `trackNumber`, `discNumber` and `durationInSeconds` of each track; `albumJson` carries the album model the template script starts from, and `trackUrl` is the template of a track page route. The artist page provides `artistId`, `libraryId`, `artistName`, `artistCoverPath` and `artistHasReleases` for the play all trigger, and `albumsUrl` and `albumUrl` for the release list and its cards. The release rows returned by `albumsUrl` carry the `id`, `title` and `coverPath` used by the album card Play and Shuffle actions. The track page provides `artistId`, `albumId`, `trackId`, `libraryId`, `trackTitle`, `trackDurationInSeconds`, `albumTitle` and `albumCoverPath` for its trigger. The artist index page provides `libraryId` and `itemsUrl` for its artist cards, and each row of `itemsUrl` carries the `id`, `name` and `coverPath` used by the artist card Play and Shuffle actions. The home page library cards are application markup, and each music library card uses the library `id` for its Play and Shuffle actions. A theme template that changes these pages uses the same values and endpoints to render equivalent triggers.
+
+The application fallback templates render the triggers on the existing `confirm-button` controls: the page-level controls carry their localized label, and the per-track control carries a text play glyph with an accessible label. The card actions menus of music libraries, artists and albums render Play and Shuffle; the album card menu also keeps Remove beside them. A theme may use any markup and classes; only the trigger and descriptor attributes are required, and a trigger must be a focusable element, such as a `button`. The bundled themes render these triggers on the pages and card menus they provide, so a custom theme that replaces one of those templates must render them again to keep playback and shuffle reachable from that page.
 
 #### The audio player sub templates
 
@@ -312,10 +368,10 @@ The sub templates are rendered client side by the audio player script with the s
 
 | Template | Fields |
 | --- | --- |
-| `queue-item` | `entryId` (the identity of this occurrence in the queue), `index` (the one based position in the queue), `trackId`, `albumId`, `artistId`, `libraryId`, `title`, `duration` (the formatted `m:ss` duration), `durationSeconds`, `coverArtUrl`, `isCurrent`, `isPlayed`, `isLast`, `isContinuation` (the entry was added by the autoplay continuation) and `isShuffled` (the entry was added by a shuffle batch). The item root must keep the `audio-player-queue-item` class, the stylesheet hook of a queue item: the player appends the rendered element as-is, so the class is what lets the theme style it. The built-in item also adds `is-current`, `is-played`, `is-continuation` and `is-shuffled` to the root. The player writes `data-audio-player-queue-entry-id` on the root itself, so a theme item does not need to render the identity. |
+| `queue-item` | `entryId` (the identity of this occurrence in the queue), `index` (the one based position in the queue), `trackId`, `albumId`, `artistId`, `libraryId`, `title`, `duration` (the formatted `m:ss` duration), `durationSeconds`, `coverArtUrl` (the resolved cover art URL, which is the music placeholder when the entry has no artwork), `isCurrent`, `isPlayed`, `isLast`, `isContinuation` (the entry was added by the autoplay continuation) and `isShuffled` (the entry was added by a shuffle batch). The item root must keep the `audio-player-queue-item` class, the stylesheet hook of a queue item: the player appends the rendered element as-is, so the class is what lets the theme style it. The player writes `is-current`, `is-played`, `is-continuation` and `is-shuffled` on the root itself, so a theme item does not need to render those state classes, and it writes `data-audio-player-queue-entry-id`, so a theme item does not need to render the identity either. |
 | `playlist-item` | `index`, `trackId`, `albumId`, `artistId`, `libraryId`, `title`, `duration`, `durationSeconds`, `coverArtUrl` and `isCurrent`. The item root must keep the `audio-player-playlist-item` class, the stylesheet hook of a playlist item. Saved playlists do not exist yet, so the shell inlines this sub template for theme authors, but nothing renders it yet; the playlist feature renders the entries of a playlist from it. |
 
-A theme can omit either sub template: the player then renders that part with its own built-in markup. When a theme replaces the shell, it must keep the two plain text script element ids above, the element hooks of the bar, and the `audio-player-container`, `not-shown` and `full-height` classes the player toggles.
+A theme can omit either sub template: the player then renders that part with its own built-in markup. When a theme replaces the shell, it must keep the two plain text script element ids above, the element hooks of the bar, and the `audio-player-container`, `not-shown` and `expanded` classes the player toggles.
 
 Every field of the `queue-item` and `playlist-item` models is untrusted: titles and identifiers come from file metadata and the music endpoints. Render these fields with the escaped form, `{{field}}`. The template engine also supports the unescaped form `{{{field}}}`, but these models contain no trusted HTML, so unescaped tags must not be used for them. Escaping does not neutralise whitespace in an unquoted attribute, so every model value placed in an attribute must sit inside quoted attribute marks, for example `data-track-id="{{trackId}}"` and never `data-track-id={{trackId}}`.
 

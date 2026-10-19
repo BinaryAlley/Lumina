@@ -120,4 +120,13 @@
   <data name="NoLibraries" xml:space="preserve">
     <value>Nicio bibliotecă</value>
   </data>
+  <data name="Shuffle" xml:space="preserve">
+    <value>Aleatoriu</value>
+  </data>
+  <data name="Play" xml:space="preserve">
+    <value>Redare</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>AcÈ›iuni</value>
+  </data>
 </root>

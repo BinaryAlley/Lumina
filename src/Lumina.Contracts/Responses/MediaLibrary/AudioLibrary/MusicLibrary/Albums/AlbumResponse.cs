@@ -17,6 +17,7 @@ namespace Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Albu
 /// </summary>
 /// <param name="Id">The Id of the album.</param>
 /// <param name="ArtistId">The Id of the artist the album belongs to.</param>
+/// <param name="ArtistName">The name of the artist the album belongs to.</param>
 /// <param name="LibraryId">The Id of the media library this album belongs to.</param>
 /// <param name="Metadata">The album metadata of the album.</param>
 /// <param name="MediaFormat">The physical or digital medium of the album, if applicable.</param>
@@ -39,6 +40,7 @@ namespace Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Albu
 public record AlbumResponse(
     Guid Id,
     Guid ArtistId,
+    string ArtistName,
     Guid LibraryId,
     MusicAlbumMetadataDto Metadata,
     MusicMediaFormat? MediaFormat,

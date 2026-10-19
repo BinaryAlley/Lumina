@@ -4,8 +4,7 @@ const progressIndicator = document.getElementById('progress-indicator');
 const progressIndicatorValue = document.getElementById('progress-indicator-value');
 const progressIndicatorValueShadow = document.getElementById('progress-indicator-value-shadow');
 const progressIndicatorValueText = document.getElementById('progress-indicator-value-text');
-const audioPlayerFullHeightToggle = document.getElementById('audio-player-full-height-toggle');
-const audioPlayerClose = document.getElementById('audio-player-close');
+const audioPlayerExpandToggle = document.getElementById('audio-player-expand-toggle');
 
 let enableConsoleDebugMessages = false; // whether to display debug messages at the developer console, or not
 
@@ -648,32 +647,16 @@ function getElementOffset(id) {
 }
 
 /**
- * Closes the audio player, by routing to the audio player that owns the bar.
- *
- * The player bar is the single owner of its own classes, its state and its visibility, so this control, and the full
- * height control below, only route to it. The two controls exist only when the bar is rendered, which is only for an
- * authenticated visitor, for whom the audio player is always created, so there is no separate no-player fallback to
- * keep in sync with the player.
+ * Expands the audio player, or collapses it back, by routing to the audio player that owns the bar.
  */
-function toggleAudioPlayerVisibility() {
+function toggleAudioPlayerExpanded() {
     const player = window.LuminaAudioPlayer && window.LuminaAudioPlayer.instance;
-    if (player && typeof player.stopAsync === 'function')
-        player.stopAsync();
+    if (player && typeof player.toggleExpanded === 'function')
+        player.toggleExpanded();
 }
 
-/**
- * Expands the audio player into its full height form, or collapses it back, by routing to the audio player that owns the bar.
- */
-function toggleAudioPlayerFullHeight() {
-    const player = window.LuminaAudioPlayer && window.LuminaAudioPlayer.instance;
-    if (player && typeof player.toggleFullHeight === 'function')
-        player.toggleFullHeight();
-}
-
-if (audioPlayerFullHeightToggle)
-    audioPlayerFullHeightToggle.addEventListener('click', toggleAudioPlayerFullHeight);
-if (audioPlayerClose)
-    audioPlayerClose.addEventListener('click', toggleAudioPlayerVisibility);
+if (audioPlayerExpandToggle)
+    audioPlayerExpandToggle.addEventListener('click', toggleAudioPlayerExpanded);
 
 
 /**

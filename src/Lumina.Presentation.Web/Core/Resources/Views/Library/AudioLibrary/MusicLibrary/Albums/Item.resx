@@ -1506,4 +1506,10 @@
   <data name="Identifiers" xml:space="preserve">
     <value>Identifiers</value>
   </data>
+  <data name="PlayAlbum" xml:space="preserve">
+    <value>Play album</value>
+  </data>
+  <data name="PlayTrack" xml:space="preserve">
+    <value>Play track</value>
+  </data>
 </root>

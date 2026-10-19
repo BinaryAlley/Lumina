@@ -50,6 +50,12 @@
         getArtistsUrl: '@_urlService.GetRelativeUrl(WebRoutes.Music.GET_ARTISTS)',
         getArtistAlbumsUrl: '@_urlService.GetRelativeUrl(WebRoutes.Music.GET_ARTIST_ALBUMS)',
         getAlbumTracksUrl: '@_urlService.GetRelativeUrl(WebRoutes.Music.GET_ALBUM_TRACKS)',
+        // The full album details, used by the expanded player for the release labels and the artwork carousel of the
+        // current track's album. The route carries the artist and album Ids, and the library Id is a query parameter.
+        getAlbumUrl: '@_urlService.GetRelativeUrl(WebRoutes.Music.GET_ALBUM)',
+        // The endpoint that draws a uniformly random batch of tracks of a library, artist or album. The server samples the
+        // database, so a shuffle of a large library never has to enumerate its albums and tracks in the browser.
+        shuffleTracksUrl: '@_urlService.GetRelativeUrl(WebRoutes.Music.SHUFFLE_TRACKS)',
         strings: {
             play: '@localizer["AudioPlayerPlay"]',
             pause: '@localizer["AudioPlayerPause"]',
@@ -60,16 +66,12 @@
             buffering: '@localizer["AudioPlayerBuffering"]',
             previous: '@localizer["AudioPlayerPrevious"]',
             next: '@localizer["AudioPlayerNext"]',
-            shuffle: '@localizer["AudioPlayerShuffle"]',
-            shuffleOff: '@localizer["AudioPlayerShuffleOff"]',
-            shuffleRelease: '@localizer["AudioPlayerShuffleRelease"]',
-            shuffleArtist: '@localizer["AudioPlayerShuffleArtist"]',
-            shuffleLibrary: '@localizer["AudioPlayerShuffleLibrary"]',
             repeat: '@localizer["AudioPlayerRepeat"]',
             repeatOff: '@localizer["AudioPlayerRepeatOff"]',
             repeatAll: '@localizer["AudioPlayerRepeatAll"]',
             repeatOne: '@localizer["AudioPlayerRepeatOne"]',
-            queue: '@localizer["AudioPlayerQueue"]'
+            queue: '@localizer["AudioPlayerQueue"]',
+            albumArtwork: '@localizer["AudioPlayerAlbumArtwork"]'
         }
     };
 </script>

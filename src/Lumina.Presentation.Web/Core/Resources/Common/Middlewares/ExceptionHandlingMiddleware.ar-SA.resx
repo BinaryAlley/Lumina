@@ -843,4 +843,10 @@
   <data name="StreamingQualityCannotBeNull" xml:space="preserve">
     <value>لا يمكن أن تكون جودة البث فارغة!</value>
   </data>
+  <data name="ShuffleTrackCountMustBeGreaterThanZero" xml:space="preserve">
+    <value>يجب أن يكون عدد المقطوعات العشوائية أكبر من صفر!</value>
+  </data>
+  <data name="ShuffleTrackCountMustBeAtMost500" xml:space="preserve">
+    <value>يجب ألا يتجاوز عدد المقطوعات العشوائية 500!</value>
+  </data>
 </root>

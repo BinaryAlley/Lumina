@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -88,6 +89,13 @@ public class EditMusicAlbumViewEndpoint : BaseEndpoint<GetMusicAlbumViewRequest,
         request = request with { AlbumId = Guid.TryParse(request.AlbumId, out Guid albumId) ? albumId.ToString() : Guid.Empty.ToString() };
         MusicAlbumDto album = await _apiHttpClient.GetAsync<MusicAlbumDto>(ApiRoutes.Music.GET_ALBUM.Replace("{libraryId}", request.LibraryId.ToString()).Replace("{artistId}", request.ArtistId).Replace("{albumId}", request.AlbumId), cancellationToken).ConfigureAwait(false);
         string title = album.Metadata?.Title ?? string.Empty;
+        // The play album trigger presents the album, so it carries the same cover this page displays: the stored cover, or the first stored artwork when the album has no cover.
+        string albumCoverPath = album.CoverPath ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(albumCoverPath))
+            albumCoverPath = (album.Artwork ?? []).FirstOrDefault(artwork => !string.IsNullOrWhiteSpace(artwork.Path))?.Path ?? string.Empty;
+        // A release the API already reported as empty has nothing to play, so the themed play trigger starts disabled. The
+        // release list the page loads later only refines this state, and a failed request never changes it.
+        bool albumHasTracks = (album.Tracks?.Count ?? 0) > 0;
 
         // The themed view is a regular page that submits its own requests, so a fresh anti-forgery token must be issued for it.
         AntiforgeryTokenSet antiforgeryTokens = _antiforgery.GetAndStoreTokens(HttpContext);
@@ -109,6 +117,9 @@ public class EditMusicAlbumViewEndpoint : BaseEndpoint<GetMusicAlbumViewRequest,
                 ["trackUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Music.TRACK, new { artistId = default(Guid), albumId = default(Guid), trackId = default(Guid) }) ?? string.Empty,
                 ["coverUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Music.UPDATE_ALBUM_COVER, new { artistId = default(Guid), albumId = default(Guid) }) ?? string.Empty,
                 ["backUrl"] = (_urlService.GetAbsoluteUrl(WebRoutes.Music.ARTIST, new { artistId = album.ArtistId }) ?? string.Empty) + "?libraryId=" + album.LibraryId,
+                ["albumTitle"] = title,
+                ["albumCoverPath"] = albumCoverPath,
+                ["albumHasTracks"] = albumHasTracks,
                 ["albumJson"] = JsonSerializer.Serialize(album, s_camelCaseJsonOptions),
                 ["strings"] = ThemePageDataFactory.CreateLocalizedStrings(_localizer),
                 ["stringsJson"] = JsonSerializer.Serialize(ThemePageDataFactory.CreateLocalizedStrings(_localizer), s_camelCaseJsonOptions)

@@ -168,8 +168,8 @@
   <data name="Retry" xml:space="preserve">
     <value>Reintentar</value>
   </data>
-  <data name="ToggleFullHeight" xml:space="preserve">
-    <value>Alternar Altura Completa</value>
+  <data name="ToggleExpanded" xml:space="preserve">
+    <value>Expandir o contraer el reproductor</value>
   </data>
   <data name="ToggleVisibility" xml:space="preserve">
     <value>Alternar Visibilidad</value>
@@ -215,5 +215,11 @@
   </data>
   <data name="AudioPlayerShuffleOff" xml:space="preserve">
     <value>Reproducción aleatoria desactivada</value>
+  </data>
+  <data name="AudioPlayerStop" xml:space="preserve">
+    <value>Detener</value>
+  </data>
+  <data name="AudioPlayerAlbumArtwork" xml:space="preserve">
+    <value>Ilustraciones del álbum</value>
   </data>
 </root>

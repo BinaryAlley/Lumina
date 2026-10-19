@@ -10,6 +10,9 @@
     The audio properties, the release information, the language and original language, the work, the
     contributors, the ratings, the moods and the ISRCs are all editable, and they are all round-tripped on save.
 
+    The track header exposes a play trigger for the global audio player. The player handles the trigger by event
+    delegation, so this view binds no playback listener; the trigger attribute contract lives in docs/technical/theming/Theming.md.
+
     To change the behavior of the page, edit this script (and the theme template, when present). To restyle
     the page, edit the theme files. This fallback keeps every feature working without styling, so that a
     broken theme is obvious to the user while the page still functions.
@@ -35,8 +38,10 @@
     var libraryId = Model.LibraryId.ToString();
     // The cover shown on the left is the cover of the album the track belongs to, passed in by the endpoint.
     var albumCoverPath = ViewData["AlbumCoverPath"]?.ToString() ?? string.Empty;
-    // The track DTO does not carry the Id of its artist, so it is taken from the route that rendered the view.
-    var artistId = Context.Request.RouteValues["artistId"]?.ToString() ?? string.Empty;
+    var albumTitle = ViewData["AlbumTitle"]?.ToString() ?? string.Empty;
+    // The track DTO does not carry the Id of its artist, so the endpoint passes the normalized route value it used to load
+    // the track and its album. Both render paths therefore hand the player the same artist Id.
+    var artistId = ViewData["ArtistId"]?.ToString() ?? string.Empty;
     var metadata = Model.Metadata;
     var work = Model.Work;
     var releaseInfo = metadata?.ReleaseInfo;
@@ -82,6 +87,19 @@
         <div class="shine-effect"></div>
         <div class="form-row">
             <button id="btn-back-to-album" type="button" class="abort-button">@_localizer["BackToAlbum"]</button>
+            <!-- The play trigger is handled by the global audio player script through event delegation, so this page binds no click handler of its own. -->
+            <button id="btn-play-track" type="button" class="confirm-button"
+                    data-audio-player-play
+                    data-library-id="@libraryId"
+                    data-track-id="@trackId"
+                    data-album-id="@Model.AlbumId"
+                    data-artist-id="@artistId"
+                    data-title="@(metadata?.Title ?? string.Empty)"
+                    data-album-title="@albumTitle"
+                    data-duration="@(metadata?.DurationInSeconds?.ToString(CultureInfo.InvariantCulture) ?? string.Empty)"
+                    data-cover-art-path="@albumCoverPath">
+                @_localizer["PlayTrack"]
+            </button>
         </div>
         <div class="form-row">
             <h1 class="text-light-two w-100 text-center pt-0 pb-0 engraved-title">@_localizer["EditTrack"]</h1>

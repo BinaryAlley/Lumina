@@ -57,4 +57,13 @@
   <data name="DeleteFailed" xml:space="preserve">
     <value>L'élément n'a pas pu être supprimé.</value>
   </data>
+  <data name="Shuffle" xml:space="preserve">
+    <value>Lecture aléatoire</value>
+  </data>
+  <data name="Play" xml:space="preserve">
+    <value>Lecture</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
 </root>

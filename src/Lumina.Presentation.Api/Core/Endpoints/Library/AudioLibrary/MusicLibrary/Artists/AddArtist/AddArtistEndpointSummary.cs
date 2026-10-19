@@ -549,6 +549,7 @@ public class AddArtistEndpointSummary : Summary<AddArtistEndpoint, AddArtistRequ
                     new(
                         Id: albumId,
                         ArtistId: artistId,
+                        ArtistName: "Queen",
                         LibraryId: libraryId,
                         Metadata: new(
                             Title: "A Night at the Opera",

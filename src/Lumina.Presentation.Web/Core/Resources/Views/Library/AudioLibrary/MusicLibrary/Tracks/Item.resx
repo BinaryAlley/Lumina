@@ -1179,4 +1179,7 @@
   <data name="AddWorkIswc" xml:space="preserve">
     <value>Add ISWC</value>
   </data>
+  <data name="PlayTrack" xml:space="preserve">
+    <value>Play track</value>
+  </data>
 </root>

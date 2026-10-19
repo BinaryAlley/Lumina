@@ -87,6 +87,9 @@ public class EditMusicArtistViewEndpoint : BaseEndpoint<GetMusicArtistViewReques
         request = request with { ArtistId = Guid.TryParse(request.ArtistId, out Guid artistId) ? artistId.ToString() : Guid.Empty.ToString() };
         MusicArtistDto artist = await _apiHttpClient.GetAsync<MusicArtistDto>(ApiRoutes.Music.GET_ARTIST.Replace("{libraryId}", request.LibraryId.ToString()).Replace("{artistId}", request.ArtistId), cancellationToken).ConfigureAwait(false);
         string title = artist.Metadata?.Name ?? string.Empty;
+        // An artist the API already reported without releases has nothing to play, so the themed play trigger starts disabled.
+        // The release list the page loads later only refines this state, and a failed request never changes it.
+        bool artistHasReleases = (artist.Albums?.Count ?? 0) > 0;
 
         // The themed view is a regular page that submits its own requests, so a fresh anti-forgery token must be issued for it.
         AntiforgeryTokenSet antiforgeryTokens = _antiforgery.GetAndStoreTokens(HttpContext);
@@ -108,6 +111,9 @@ public class EditMusicArtistViewEndpoint : BaseEndpoint<GetMusicArtistViewReques
                 ["deleteAlbumUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Music.DELETE_ALBUM, new { artistId = default(Guid), albumId = default(Guid) }) ?? string.Empty,
                 ["coverUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Music.UPDATE_ARTIST_COVER, new { artistId = default(Guid) }) ?? string.Empty,
                 ["backUrl"] = (_urlService.GetAbsoluteUrl(WebRoutes.Music.ARTISTS_INDEX) ?? string.Empty) + "?libraryId=" + artist.LibraryId,
+                ["artistName"] = title,
+                ["artistCoverPath"] = artist.CoverPath ?? string.Empty,
+                ["artistHasReleases"] = artistHasReleases,
                 ["artistJson"] = JsonSerializer.Serialize(artist, s_camelCaseJsonOptions),
                 ["strings"] = ThemePageDataFactory.CreateLocalizedStrings(_localizer),
                 ["stringsJson"] = JsonSerializer.Serialize(ThemePageDataFactory.CreateLocalizedStrings(_localizer), s_camelCaseJsonOptions)

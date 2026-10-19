@@ -22,12 +22,23 @@
  *     small concurrency bound so a prolific artist does not turn into hundreds of sequential requests.
  *   - Track context (libraryId, trackId):
  *     The descriptor itself is the only item. A track page does not load the album or the discography around it.
+ *   - Library context (libraryId, without a trackId, albumId or artistId):
+ *     WebRoutes.Music.GET_ARTISTS ("api-get-artists") returns the artists in artist page order. The first artist that has
+ *     tracks starts the queue with its whole discography; the autoplay continuation then moves through the remaining artists in the same order.
+ *   - Shuffle (release, artist or library scope):
+ *     WebRoutes.Music.SHUFFLE_TRACKS ("api-shuffle-tracks") returns a uniformly random batch of tracks of the
+ *     scope, selected by the API database, together with the album, artist and cover data of each track. The request
+ *     carries the tracks the queue already holds, so consecutive batches do not repeat a track.
+ *   - Now playing album details:
+ *     WebRoutes.Music.GET_ALBUM ("api-get-album") returns the metadata and stored artwork of the current track's album,
+ *     which the expanded player shows under its cover. The player requests it only while expanded and caches its small summary per album.
  *
- * The autoplay continuation at the end of an album or an artist uses the same endpoints:
+ * The autoplay continuation at the end of an album, an artist or a library uses the same endpoints:
  *   - After an album, the remaining releases of the artist, in the release order this module applies (primary release
  *     type group, then release year, title and Id). When those are exhausted, the next artists of the library, in the
  *     artist order of GET_ARTISTS ("api-get-artists"), one artist at a time, each with all of its releases and tracks.
  *   - After an artist, the next artists of the library, one at a time.
+ *   - After the first artist of a library context, the next artists of the library, one at a time.
  * A continuation batch is never built for a track context or for an explicit queue, and it is dropped as soon as the user
  * queues an explicit play next item.
  *
@@ -35,11 +46,8 @@
  * --------------
  * Shuffle is offered per release, per artist and per library. It does not materialize a whole category: it appends a
  * batch of {@link SHUFFLE_BATCH_SIZE} randomized tracks and, while the queue approaches the end of that batch, appends
- * another batch of the same category. The release and artist scopes only load the lightweight release metadata of the
- * category and prefetch the track lists of a small, bounded number of releases in parallel, never the whole category.
- * The library scope only loads the lightweight artist metadata and the releases of one artist at a time, so choosing
- * shuffle on an entire library never puts every track of the library into the queue and never fetches every track of the
- * library at once.
+ * another batch of the same category. The server selects each batch uniformly at random from every matching track of the
+ * scope and excludes the tracks the queue already holds, so a shuffle of a large library is not limited to the albums or artists that happen to be loaded first.
  *
  * Lifetime
  * --------
@@ -85,6 +93,7 @@
     LuminaAudioPlayer.PlayContextKind = Object.freeze({
         ALBUM: 'album',
         ARTIST: 'artist',
+        LIBRARY: 'library',
         TRACK: 'track',
         QUEUE: 'queue'
     });
@@ -104,14 +113,6 @@
      * @type {number}
      */
     const SHUFFLE_LOOKAHEAD = 10;
-
-    /**
-     * The number of release track lists a shuffle batch fetches at the same time. A batch of 100 tracks spans about nine
-     * releases, so resolving their track lists concurrently removes most of the sequential wait before the batch is ready.
-     * @readonly
-     * @type {number}
-     */
-    const SHUFFLE_PREFETCH_CONCURRENCY = 4;
 
     /**
      * The number of history entries the queue keeps, so a very long session cannot grow the queue without bound.
@@ -216,23 +217,6 @@
         const leftId = String((left && left.id) || '');
         const rightId = String((right && right.id) || '');
         return leftId === rightId ? 0 : (leftId < rightId ? -1 : 1);
-    }
-
-    /**
-     * Shuffles a copy of a list with the Fisher-Yates algorithm.
-     * @template T
-     * @param {Array<T>} items - The items to shuffle.
-     * @returns {Array<T>} A new, shuffled list; the input is never mutated.
-     */
-    function shuffleCopy(items) {
-        const result = Array.isArray(items) ? [...items] : [];
-        for (let index = result.length - 1; index > 0; index--) {
-            const swapIndex = Math.floor(Math.random() * (index + 1));
-            const value = result[index];
-            result[index] = result[swapIndex];
-            result[swapIndex] = value;
-        }
-        return result;
     }
 
     /**
@@ -354,7 +338,7 @@
             // the autoplay continuation.
             this.shuffle = false;
             this.shuffleScope = LuminaAudioPlayer.QueueShuffleScope.RELEASE;
-            // The play context the queue was built from: { kind, libraryId, albumId, artistId, title, coverArtPath }.
+            // The play context the queue was built from: { kind, libraryId, albumId, artistId, title, coverArtPath, coverArtUrl }.
             this.context = null;
             // True while the autoplay continuation of an album or artist may still append entries.
             this.continuationEnabled = false;
@@ -1057,6 +1041,7 @@
          * Creates an instance of QueueContextService.
          * @param {Object} options - The service options.
          * @param {Function} options.fetchJsonAsync - The JSON transport, in the shape of the player's fetchJsonAsync.
+         * @param {Function} options.postJsonAsync - The JSON POST transport, in the shape of the player's postJsonAsync.
          * @param {Function} options.getConfiguration - A function returning the endpoints configuration of the player.
          * @param {Function} [options.getShouldIgnoreThePrefix] - A function returning the user's alpha picker prefix preference,
          * so the artist order the queue uses matches the order the artist page shows.
@@ -1064,11 +1049,12 @@
         constructor(options) {
             const settings = options || {};
             this.fetchJsonAsync = settings.fetchJsonAsync;
+            this.postJsonAsync = settings.postJsonAsync;
             this.getConfiguration = settings.getConfiguration;
             this.getShouldIgnoreThePrefix = settings.getShouldIgnoreThePrefix || (() => false);
             // The ordered release list of an artist is reused by the artist context and by the continuation, so a long
-            // discography does not re-fetch the same ordered list. Both caches are bounded LRUs, because a library shuffle
-            // can otherwise visit every artist of the library for the whole page lifetime.
+            // discography does not re-fetch the same ordered list. Both caches are bounded LRUs, because a long session can
+            // otherwise visit every artist of a library for the whole page lifetime.
             this.releaseCache = new Map();
             this.artistCache = new Map();
         }
@@ -1083,7 +1069,7 @@
         }
 
         /**
-         * Builds the queue of a play descriptor.
+         * Builds the queue of a play descriptor. A descriptor that names only a library builds the ordered library context, starting with the first artist that has tracks.
          * @param {Object} descriptor - The normalized play descriptor.
          * @param {AbortSignal} [signal] - The signal that cancels the request when the player supersedes or stops it.
          * @returns {Promise<{ descriptors: Array<Object>, context: Object, continuationEnabled: boolean }>} The queue.
@@ -1126,7 +1112,9 @@
                     libraryId: context.libraryId,
                     artistId: context.artistId,
                     albumId: context.albumId,
-                    coverArtPath: context.coverArtPath
+                    albumTitle: context.title,
+                    coverArtPath: context.coverArtPath,
+                    coverArtUrl: context.coverArtUrl
                 });
                 return { descriptors, context, continuationEnabled: descriptors.length > 0 };
             }
@@ -1135,10 +1123,41 @@
                 this.assertContextIds(context, false);
                 // An artist context is the whole discography in artist page order. The track lists are fetched with a small
                 // concurrency bound, so a prolific artist does not turn into hundreds of sequential requests.
-                const descriptors = await this.fetchArtistDescriptorsAsync(context.artistId, context.libraryId, context.coverArtPath, signal);
+                const descriptors = await this.fetchArtistDescriptorsAsync(context.artistId, context.libraryId, context.coverArtPath, context.coverArtUrl, signal);
                 return { descriptors, context, continuationEnabled: descriptors.length > 0 };
             }
-            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The play descriptor identifies no track, album or artist.');
+            // A descriptor with only a library Id plays the whole library in artist page order. The first artist with
+            // tracks starts the queue, and the library continuation moves through the remaining artists.
+            const context = this.createContext(descriptor, LuminaAudioPlayer.PlayContextKind.LIBRARY);
+            const descriptors = await this.buildLibraryDescriptorsAsync(context, signal);
+            return { descriptors, context, continuationEnabled: descriptors.length > 0 };
+        }
+
+        /**
+         * Builds the first ordered batch of a whole library, using the first artist that has tracks. The artist storage
+         * order is the order of the artist page, so playback continues through the library the same way the page lists it.
+         * @param {Object} context - The library play context.
+         * @param {AbortSignal} [signal] - The signal that cancels the request when the player supersedes or stops it.
+         * @returns {Promise<Array<Object>>} The play descriptors of the first artist that has tracks.
+         * @throws {LuminaAudioPlayer.PlayerError} When the session expired or an endpoint failed.
+         */
+        async buildLibraryDescriptorsAsync(context, signal) {
+            const artists = await this.fetchArtistsAsync(context.libraryId, signal);
+            for (const artist of artists) {
+                const artistId = String(artist.id);
+                const descriptors = await this.fetchArtistDescriptorsAsync(
+                    artistId,
+                    context.libraryId,
+                    artist.coverPath || '',
+                    '',
+                    signal);
+                if (descriptors.length > 0) {
+                    // The continuation starts after this artist, so the library context remembers where playback began.
+                    context.artistId = artistId;
+                    return descriptors;
+                }
+            }
+            return [];
         }
 
         /**
@@ -1164,7 +1183,7 @@
                     // Empty releases are skipped, never treated as the end of the discography: a partially scanned release must
                     // not truncate the releases and artists that follow it.
                     for (const candidate of candidates) {
-                        const descriptors = await this.fetchAlbumDescriptorsAsync(candidate, context.artistId, context.libraryId, context.coverArtPath, signal);
+                        const descriptors = await this.fetchAlbumDescriptorsAsync(candidate, context.artistId, context.libraryId, context.coverArtPath, context.coverArtUrl, signal);
                         if (descriptors.length > 0)
                             return { descriptors, isExhausted: false };
                     }
@@ -1172,7 +1191,8 @@
                 // The discography of the artist is over, so autoplay continues with the next artist of the library.
                 return this.buildNextArtistBatchAsync(context, queue, signal);
             }
-            if (context.kind === LuminaAudioPlayer.PlayContextKind.ARTIST)
+            if (context.kind === LuminaAudioPlayer.PlayContextKind.ARTIST
+                || context.kind === LuminaAudioPlayer.PlayContextKind.LIBRARY)
                 return this.buildNextArtistBatchAsync(context, queue, signal);
             return { descriptors: [], isExhausted: true };
         }
@@ -1195,7 +1215,12 @@
                 .slice(currentIndex >= 0 ? currentIndex + 1 : 0)
                 .filter((artist) => !queue.hasQueuedArtist(artist.id));
             for (const artist of candidates) {
-                const descriptors = await this.fetchArtistDescriptorsAsync(String(artist.id), context.libraryId, artist.coverPath || context.coverArtPath, signal);
+                const descriptors = await this.fetchArtistDescriptorsAsync(
+                    String(artist.id),
+                    context.libraryId,
+                    artist.coverPath || '',
+                    '',
+                    signal);
                 if (descriptors.length > 0)
                     return { descriptors, isExhausted: false };
             }
@@ -1203,58 +1228,66 @@
         }
 
         /**
-         * Creates the shuffle source of a scope.
+         * Creates the shuffle source of a scope. The source requests each batch from the shuffle endpoint, which samples the
+         * database uniformly at random from every track of the scope and excludes the tracks already queued.
          * @param {string} scope - One of the {@link LuminaAudioPlayer.QueueShuffleScope} values.
          * @param {AudioQueue} queue - The queue the shuffle replaces.
          * @param {Object|null} descriptor - The descriptor that is playing, used to resolve the category when the context is incomplete.
-         * @param {AbortSignal} [signal] - The signal that cancels the request when the player supersedes or stops it.
          * @returns {Promise<LuminaAudioPlayer.ShuffleSource>} The shuffle source.
          * @throws {LuminaAudioPlayer.PlayerError} When the scope cannot be resolved for this queue.
          */
-        async createShuffleSourceAsync(scope, queue, descriptor, signal) {
+        async createShuffleSourceAsync(scope, queue, descriptor) {
             const context = queue && queue.context ? queue.context : null;
             const libraryId = (context && context.libraryId) || (descriptor && descriptor.libraryId);
             const artistId = (descriptor && descriptor.artistId) || (context && context.artistId);
             const albumId = (descriptor && descriptor.albumId) || (context && context.albumId);
             if (!LuminaAudioPlayer.isGuid(libraryId))
                 throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The shuffle scope carries no valid library Id.', { field: 'libraryId' });
-            if (scope === LuminaAudioPlayer.QueueShuffleScope.RELEASE) {
-                if (!LuminaAudioPlayer.isGuid(artistId) || !LuminaAudioPlayer.isGuid(albumId))
-                    throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The release shuffle scope needs an album and its artist.');
-                const tracks = await this.fetchAlbumTracksAsync(artistId, albumId, libraryId, signal);
-                return new LuminaAudioPlayer.ShuffleSource({
-                    scope,
-                    albums: [{ id: albumId, artistId, coverPath: (descriptor && descriptor.coverArtPath) || (context && context.coverArtPath) || '' }],
-                    tracksByAlbum: { [albumId]: tracks },
-                    fetchAlbumsAsync: null,
-                    fetchTracksAsync: null,
-                    libraryId
-                });
-            }
-            if (scope === LuminaAudioPlayer.QueueShuffleScope.ARTIST) {
-                if (!LuminaAudioPlayer.isGuid(artistId))
-                    throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The artist shuffle scope needs an artist Id.');
-                const albums = await this.fetchArtistAlbumsAsync(artistId, libraryId, signal);
-                return new LuminaAudioPlayer.ShuffleSource({
-                    scope,
-                    albums: albums.map((album) => ({ id: String(album.id), artistId, coverPath: album.coverPath || '', title: album.title || '' })),
-                    tracksByAlbum: null,
-                    fetchAlbumsAsync: null,
-                    fetchTracksAsync: (albumArtistId, albumId, albumLibraryId, batchSignal) => this.fetchAlbumTracksAsync(albumArtistId, albumId, albumLibraryId, batchSignal),
-                    libraryId
-                });
-            }
-            if (scope === LuminaAudioPlayer.QueueShuffleScope.LIBRARY)
-                return new LuminaAudioPlayer.ShuffleSource({
-                    scope,
-                    albums: [],
-                    tracksByAlbum: null,
-                    fetchArtistsAsync: (shuffleLibraryId, batchSignal) => this.fetchArtistsAsync(shuffleLibraryId, batchSignal),
-                    fetchAlbumsAsync: (albumArtistId, albumLibraryId, batchSignal) => this.fetchArtistAlbumsAsync(albumArtistId, albumLibraryId, batchSignal),
-                    fetchTracksAsync: (albumArtistId, albumId, albumLibraryId, batchSignal) => this.fetchAlbumTracksAsync(albumArtistId, albumId, albumLibraryId, batchSignal),
-                    libraryId
-                });
-            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The shuffle scope is not known.');
+            if (scope === LuminaAudioPlayer.QueueShuffleScope.RELEASE && (!LuminaAudioPlayer.isGuid(artistId) || !LuminaAudioPlayer.isGuid(albumId)))
+                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The release shuffle scope needs an album and its artist.');
+            if (scope === LuminaAudioPlayer.QueueShuffleScope.ARTIST && !LuminaAudioPlayer.isGuid(artistId))
+                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The artist shuffle scope needs an artist Id.');
+            if (scope !== LuminaAudioPlayer.QueueShuffleScope.RELEASE
+                && scope !== LuminaAudioPlayer.QueueShuffleScope.ARTIST
+                && scope !== LuminaAudioPlayer.QueueShuffleScope.LIBRARY)
+                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The shuffle scope is not known.');
+
+            const url = this.buildUrl('shuffleTracksUrl', {}, {});
+            return new LuminaAudioPlayer.ShuffleSource({
+                // The server picks the random tracks from every matching row of the database, so the browser never has to enumerate the albums and tracks of a library before it can draw a batch.
+                fetchBatchAsync: async (excludedTrackIds, count, signal) => {
+                    if (typeof this.postJsonAsync !== 'function')
+                        throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The shuffle endpoint is not available.');
+                    const request = {
+                        libraryId,
+                        count,
+                        excludedTrackIds: excludedTrackIds instanceof Set ? [...excludedTrackIds] : []
+                    };
+                    if (scope === LuminaAudioPlayer.QueueShuffleScope.RELEASE || scope === LuminaAudioPlayer.QueueShuffleScope.ARTIST)
+                        request.artistId = artistId;
+                    if (scope === LuminaAudioPlayer.QueueShuffleScope.RELEASE)
+                        request.albumId = albumId;
+                    const rows = await this.postJsonAsync(url, request, { signal, label: 'the shuffled tracks' });
+                    if (signal && signal.aborted)
+                        throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The request for the shuffled tracks was aborted.');
+                    if (rows === LuminaAudioPlayer.REDIRECTED)
+                        throwSessionExpired();
+                    if (rows === undefined || rows === null)
+                        throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The shuffled tracks could not be loaded.');
+                    if (!Array.isArray(rows))
+                        throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The shuffled tracks response is not a list.');
+                    return rows.map((row) => LuminaAudioPlayer.createPlayDescriptor({
+                        trackId: row.trackId,
+                        albumId: row.albumId,
+                        artistId: row.artistId,
+                        libraryId,
+                        title: row.title || '',
+                        albumTitle: row.albumTitle || '',
+                        durationInSeconds: row.durationInSeconds,
+                        coverArtPath: row.coverPath || ''
+                    })).filter((entry) => entry !== null);
+                }
+            });
         }
 
         /**
@@ -1270,7 +1303,8 @@
                 albumId: descriptor.albumId || '',
                 artistId: descriptor.artistId || '',
                 title: descriptor.title || '',
-                coverArtPath: descriptor.coverArtPath || ''
+                coverArtPath: descriptor.coverArtPath || '',
+                coverArtUrl: descriptor.coverArtUrl || ''
             };
         }
 
@@ -1353,21 +1387,51 @@
         }
 
         /**
+         * Fetches the full details of an album, used by the expanded player for its now playing labels and artwork.
+         * @param {string} artistId - The Id of the artist the album belongs to.
+         * @param {string} albumId - The Id of the album.
+         * @param {string} libraryId - The Id of the library.
+         * @param {AbortSignal} [signal] - The signal that cancels the request when the player supersedes or stops it.
+         * @returns {Promise<Object>} The album details, with its metadata and stored artwork.
+         * @throws {LuminaAudioPlayer.PlayerError} When the album details cannot be loaded.
+         */
+        async fetchAlbumDetailsAsync(artistId, albumId, libraryId, signal) {
+            if (!LuminaAudioPlayer.isGuid(artistId) || !LuminaAudioPlayer.isGuid(albumId) || !LuminaAudioPlayer.isGuid(libraryId))
+                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The album details request carries no valid album context.');
+            const url = this.buildUrl('getAlbumUrl', { artistId, albumId }, { libraryId });
+            const data = await this.fetchJsonAsync(url, signal, 'the album details');
+            if (signal && signal.aborted)
+                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The request for the album details was aborted.');
+            if (data === LuminaAudioPlayer.REDIRECTED)
+                throwSessionExpired();
+            if (data === undefined || data === null || typeof data !== 'object')
+                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The album details could not be loaded.');
+            return data;
+        }
+
+        /**
          * Fetches every track of an album and turns it into play descriptors.
          * @param {Object} album - The release row.
          * @param {string} artistId - The Id of the artist.
          * @param {string} libraryId - The Id of the library.
-         * @param {string} fallbackCoverPath - The cover to use when the release has none.
+         * @param {string} fallbackCoverPath - The cover path to use when the release has none.
+         * @param {string} [fallbackCoverUrl] - The resolved cover URL to use when the release has neither a cover path nor a fallback path.
          * @param {AbortSignal} [signal] - The signal that cancels the request when the player supersedes or stops it.
          * @returns {Promise<Array<Object>>} The play descriptors of the release.
          */
-        async fetchAlbumDescriptorsAsync(album, artistId, libraryId, fallbackCoverPath, signal) {
+        async fetchAlbumDescriptorsAsync(album, artistId, libraryId, fallbackCoverPath, fallbackCoverUrl, signal) {
             const tracks = await this.fetchAlbumTracksAsync(artistId, String(album.id), libraryId, signal);
+            const coverArtPath = album.coverPath || fallbackCoverPath || '';
+            // A release with its own stored cover path keeps that cover. The fallback URL is only a stand-in for a scope,
+            // such as an artist image, and must not replace the cover of a release that has one.
+            const coverArtUrl = album.coverPath ? '' : (fallbackCoverUrl || '');
             return this.createTrackDescriptors(tracks, {
                 libraryId,
                 artistId,
                 albumId: String(album.id),
-                coverArtPath: album.coverPath || fallbackCoverPath || ''
+                albumTitle: album.title || '',
+                coverArtPath,
+                coverArtUrl
             });
         }
 
@@ -1377,16 +1441,17 @@
          * and Id.
          * @param {string} artistId - The Id of the artist.
          * @param {string} libraryId - The Id of the library.
-         * @param {string} fallbackCoverPath - The cover to use when a release has none.
+         * @param {string} fallbackCoverPath - The cover path to use when a release has none.
+         * @param {string} [fallbackCoverUrl] - The resolved cover URL to use when a release has neither a cover path nor a fallback path.
          * @param {AbortSignal} [signal] - The signal that cancels the request when the player supersedes or stops it.
          * @returns {Promise<Array<Object>>} The play descriptors of the artist.
          */
-        async fetchArtistDescriptorsAsync(artistId, libraryId, fallbackCoverPath, signal) {
+        async fetchArtistDescriptorsAsync(artistId, libraryId, fallbackCoverPath, fallbackCoverUrl, signal) {
             const albums = await this.fetchArtistAlbumsAsync(artistId, libraryId, signal);
             // The releases are fetched with a small concurrency bound, so a prolific artist does not produce hundreds of
             // sequential requests, while the API is not flooded with one request per release either.
             const perAlbum = await mapWithConcurrencyAsync(albums, ALBUM_FETCH_CONCURRENCY, (album) =>
-                this.fetchAlbumDescriptorsAsync(album, artistId, libraryId, fallbackCoverPath, signal));
+                this.fetchAlbumDescriptorsAsync(album, artistId, libraryId, fallbackCoverPath, fallbackCoverUrl, signal));
             return perAlbum.flat();
         }
 
@@ -1408,8 +1473,10 @@
                     artistId: album.artistId,
                     libraryId: album.libraryId,
                     title: track.title || '',
+                    albumTitle: album.albumTitle || '',
                     durationInSeconds: track.durationInSeconds,
-                    coverArtPath: album.coverArtPath || ''
+                    coverArtPath: album.coverArtPath || '',
+                    coverArtUrl: album.coverArtUrl || ''
                 });
                 if (descriptor)
                     descriptors.push(descriptor);
@@ -1503,38 +1570,19 @@
     /**
      * Draws randomized tracks of one shuffle scope, one batch at a time.
      *
-     * The source keeps the tracks of a release it has not queued yet in a pool, so a batch never repeats a queued track and
-     * a release that straddles two batches is not fetched twice. The artist and library scopes only fetch the lightweight
-     * release metadata up front, or discover the releases of one artist at a time, and prefetch the track lists of a bounded
-     * number of releases in parallel, which is what keeps a library shuffle from loading every track of the library.
+     * The tracks are selected by the server from every matching row of the database, so each batch is a uniform random
+     * sample across the whole library, artist or album, no matter how the tracks are grouped into albums. The source only
+     * remembers whether the previous batch exhausted the scope.
      */
     class ShuffleSource {
         /**
          * Creates an instance of ShuffleSource.
          * @param {Object} options - The source options.
-         * @param {string} options.scope - One of the {@link LuminaAudioPlayer.QueueShuffleScope} values.
-         * @param {Array<Object>} options.albums - The releases the scope draws from, already known when the scope is a release or an artist.
-         * @param {Object|null} options.tracksByAlbum - The track rows of a release, keyed by album Id, when they are already known.
-         * @param {Function|null} options.fetchArtistsAsync - The function that fetches the artists of the library, used by the library scope.
-         * @param {Function|null} options.fetchAlbumsAsync - The function that fetches the releases of an artist, used by the library scope.
-         * @param {Function|null} options.fetchTracksAsync - The function that fetches the tracks of a release.
-         * @param {string} options.libraryId - The Id of the library.
+         * @param {Function} options.fetchBatchAsync - The function that requests a random batch, in the shape <c>(excludedTrackIds, count, signal)</c>.
          */
         constructor(options) {
             const settings = options || {};
-            this.scope = settings.scope;
-            this.libraryId = settings.libraryId;
-            this.albumQueue = shuffleCopy(settings.albums || []);
-            this.loadedAlbums = settings.tracksByAlbum ? { ...settings.tracksByAlbum } : {};
-            this.trackPools = new Map();
-            // The release pools that were already fetched and are not drawn empty yet, so a batch that stops mid-release keeps
-            // the remaining tracks ready for the next batch.
-            this.readyPools = [];
-            this.fetchArtistsAsync = settings.fetchArtistsAsync || null;
-            this.fetchAlbumsAsync = settings.fetchAlbumsAsync || null;
-            this.fetchTracksAsync = settings.fetchTracksAsync || null;
-            // The library scope discovers artists lazily, and never holds more than one artist's releases at a time.
-            this.artistQueue = null;
+            this.fetchBatchAsync = settings.fetchBatchAsync;
             this.isExhausted = false;
         }
 
@@ -1546,168 +1594,16 @@
          * @returns {Promise<Array<Object>>} The descriptors of the batch, never longer than the count.
          */
         async nextBatchAsync(excludedTrackIds, count = SHUFFLE_BATCH_SIZE, signal) {
-            const excluded = excludedTrackIds instanceof Set ? excludedTrackIds : new Set();
-            const batch = [];
             if (this.isExhausted)
-                return batch;
-            while (batch.length < count) {
-                await this.ensureReadyPoolsAsync(signal);
-                if (this.readyPools.length === 0) {
-                    this.isExhausted = true;
-                    break;
-                }
-                const ready = this.readyPools.shift();
-                const pool = ready.pool;
-                while (pool.length > 0 && batch.length < count) {
-                    const descriptor = pool.pop();
-                    const identity = getTrackIdentity(descriptor);
-                    if (!identity || excluded.has(identity))
-                        continue;
-                    excluded.add(identity);
-                    batch.push(descriptor);
-                }
-                // A release that straddled the batch keeps its remaining tracks ready, so the next batch finishes it instead
-                // of leaving those tracks unreachable.
-                if (pool.length > 0) {
-                    this.readyPools.push(ready);
-                    // The other ready releases are still offered before the batch ends, but a release that is only half drawn
-                    // must not starve them when the next batch starts.
-                    if (this.readyPools.length > 1)
-                        this.readyPools.push(this.readyPools.shift());
-                } else {
-                    // A drained release is never drawn again, so its pool does not stay in the per release map for the rest
-                    // of the shuffle session.
-                    this.trackPools.delete(String(ready.album.id));
-                }
-            }
-            return batch;
-        }
-
-        /**
-         * Fills the ready release pools, fetching the track lists of several releases at the same time. The batch filler then
-         * draws from the ready pools, so filling 100 tracks does not wait for one release track list at a time.
-         * @param {AbortSignal} [signal] - The signal that cancels the request when the player supersedes or stops it.
-         * @returns {Promise<void>} A promise that completes when at least one pool is ready, or the category is exhausted.
-         */
-        async ensureReadyPoolsAsync(signal) {
-            if (this.readyPools.length > 0 || this.isExhausted)
-                return;
-            const albums = [];
-            while (albums.length < SHUFFLE_PREFETCH_CONCURRENCY) {
-                let album = this.albumQueue.shift();
-                if (!album) {
-                    album = await this.loadNextAlbumAsync(signal);
-                    if (!album)
-                        break;
-                }
-                albums.push(album);
-            }
-            if (albums.length === 0) {
+                return [];
+            if (typeof this.fetchBatchAsync !== 'function')
+                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The shuffle source has no endpoint.');
+            const batch = await this.fetchBatchAsync(excludedTrackIds instanceof Set ? excludedTrackIds : new Set(), count, signal);
+            const result = Array.isArray(batch) ? batch : [];
+            // A short batch means the server ran out of tracks that are not already queued, so the scope is exhausted.
+            if (result.length < count)
                 this.isExhausted = true;
-                return;
-            }
-            const results = await Promise.allSettled(albums.map((album) => this.getTrackPoolAsync(album, signal)));
-            const readyPools = [];
-            const failedAlbums = [];
-            for (let index = 0; index < results.length; index++) {
-                if (results[index].status === 'fulfilled')
-                    readyPools.push({ album: albums[index], pool: results[index].value });
-                else
-                    failedAlbums.push(albums[index]);
-            }
-            const isAborted = signal && signal.aborted;
-            const failure = results.find((result) => result.status === 'rejected');
-            // A batch that was aborted while its prefetches were settling belongs to a shuffle that is already gone. It is
-            // reported as the same abort the caller expects, so no partial pool of it is drawn.
-            if (isAborted)
-                throw failure ? failure.reason : new Error('The shuffle prefetch was aborted.');
-            // A release whose track list failed is put back into the queue instead of being lost for the rest of the shuffle.
-            if (failedAlbums.length > 0)
-                this.albumQueue.push(...failedAlbums);
-            if (readyPools.length === 0) {
-                if (failure)
-                    throw failure.reason;
-                this.isExhausted = true;
-                return;
-            }
-            this.readyPools = readyPools;
-        }
-
-        /**
-         * Loads the next release of the category.
-         * @param {AbortSignal} [signal] - The signal that cancels the request when the player supersedes or stops it.
-         * @returns {Promise<Object|null>} The release, or null when the category has no more releases.
-         */
-        async loadNextAlbumAsync(signal) {
-            if (this.scope !== LuminaAudioPlayer.QueueShuffleScope.LIBRARY)
-                return null;
-            while (true) {
-                // The releases of the current artist come first, and the next artist is only discovered when those are
-                // exhausted, so one artist's releases are never mixed with a second fetch of the artist list.
-                const album = this.albumQueue.shift();
-                if (album)
-                    return album;
-                const artist = await this.loadNextArtistAsync(signal);
-                if (!artist)
-                    return null;
-                const albums = typeof this.fetchAlbumsAsync === 'function'
-                    ? await this.fetchAlbumsAsync(String(artist.id), this.libraryId, signal)
-                    : [];
-                this.albumQueue = shuffleCopy(albums.map((albumRow) => ({
-                    id: String(albumRow.id),
-                    artistId: String(artist.id),
-                    coverPath: albumRow.coverPath || '',
-                    title: albumRow.title || ''
-                })));
-            }
-        }
-
-        /**
-         * Loads the next artist of the library, one at a time, so the library is never enumerated as a whole set of tracks.
-         * @param {AbortSignal} [signal] - The signal that cancels the request when the player supersedes or stops it.
-         * @returns {Promise<Object|null>} The artist, or null when the library has no more artists.
-         */
-        async loadNextArtistAsync(signal) {
-            if (this.scope !== LuminaAudioPlayer.QueueShuffleScope.LIBRARY || typeof this.fetchArtistsAsync !== 'function')
-                return null;
-            if (this.artistQueue === null) {
-                const artists = await this.fetchArtistsAsync(this.libraryId, signal);
-                this.artistQueue = shuffleCopy(artists.map((artist) => ({ id: String(artist.id), coverPath: artist.coverPath || '' })));
-            }
-            return this.artistQueue.length > 0 ? this.artistQueue.shift() : null;
-        }
-
-        /**
-         * Gets the randomized pool of the tracks of a release that the queue has not drawn yet.
-         * @param {Object} album - The release.
-         * @param {AbortSignal} [signal] - The signal that cancels the request when the player supersedes or stops it.
-         * @returns {Promise<Array<Object>>} The remaining descriptors of the release.
-         */
-        async getTrackPoolAsync(album, signal) {
-            const albumId = String(album.id);
-            if (this.trackPools.has(albumId))
-                return this.trackPools.get(albumId);
-            let tracks = this.loadedAlbums[albumId];
-            // The raw rows are released as soon as they are turned into descriptors, so a long library shuffle keeps only the
-            // remaining pool of the releases it has open, not every row it has already fetched.
-            if (tracks)
-                delete this.loadedAlbums[albumId];
-            if (!tracks && typeof this.fetchTracksAsync === 'function')
-                tracks = await this.fetchTracksAsync(album.artistId, albumId, this.libraryId, signal);
-            const descriptors = Array.isArray(tracks)
-                ? tracks.map((track) => LuminaAudioPlayer.createPlayDescriptor({
-                    trackId: track.id,
-                    albumId,
-                    artistId: album.artistId,
-                    libraryId: this.libraryId,
-                    title: track.title || '',
-                    durationInSeconds: track.durationInSeconds,
-                    coverArtPath: album.coverPath || ''
-                })).filter((descriptor) => descriptor !== null)
-                : [];
-            const pool = shuffleCopy(descriptors);
-            this.trackPools.set(albumId, pool);
-            return pool;
+            return result;
         }
     }
 

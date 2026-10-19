@@ -168,8 +168,8 @@
   <data name="Retry" xml:space="preserve">
     <value>إعادة المحاولة</value>
   </data>
-  <data name="ToggleFullHeight" xml:space="preserve">
-    <value>تبديل الارتفاع الكامل</value>
+  <data name="ToggleExpanded" xml:space="preserve">
+    <value>توسيع المشغل أو طيه</value>
   </data>
   <data name="ToggleVisibility" xml:space="preserve">
     <value>تبديل الرؤية</value>
@@ -215,5 +215,11 @@
   </data>
   <data name="AudioPlayerShuffleOff" xml:space="preserve">
     <value>تشغيل عشوائي متوقف</value>
+  </data>
+  <data name="AudioPlayerStop" xml:space="preserve">
+    <value>إيقاف</value>
+  </data>
+  <data name="AudioPlayerAlbumArtwork" xml:space="preserve">
+    <value>أعمال فنية للألبوم</value>
   </data>
 </root>

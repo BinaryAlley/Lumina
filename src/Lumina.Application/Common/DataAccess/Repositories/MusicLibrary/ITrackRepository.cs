@@ -50,6 +50,19 @@ public interface ITrackRepository : IRepository<TrackEntity>,
     Task<Result<PaginatedResultDto<TrackLiteRow>>> GetTracksLiteByAlbumIdAsync(Guid albumId, PaginationDataDto? paginationData, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Gets a uniformly random selection of tracks of the library identified by <paramref name="libraryId"/>, optionally scoped to
+    /// an artist or an album, excluding the tracks in <paramref name="excludedTrackIds"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the library whose tracks are sampled.</param>
+    /// <param name="artistId">The Id of the artist whose tracks are sampled, or <see langword="null"/> for every artist of the library.</param>
+    /// <param name="albumId">The Id of the album whose tracks are sampled, or <see langword="null"/> for every album of the scope.</param>
+    /// <param name="excludedTrackIds">The tracks that must not be returned.</param>
+    /// <param name="count">The maximum number of tracks to return.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="ShuffleTrackRowDto"/>, or an error.</returns>
+    Task<Result<IReadOnlyList<ShuffleTrackRowDto>>> GetShuffleTracksLiteAsync(Guid libraryId, Guid? artistId, Guid? albumId, IReadOnlyCollection<Guid> excludedTrackIds, int count, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Gets the track of the library identified by <paramref name="libraryId"/> that is stored at the provided <paramref name="path"/>.
     /// </summary>
     /// <param name="libraryId">The Id of the library whose track is retrieved.</param>

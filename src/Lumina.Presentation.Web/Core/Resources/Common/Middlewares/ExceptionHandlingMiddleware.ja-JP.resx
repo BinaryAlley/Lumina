@@ -843,4 +843,10 @@
   <data name="StreamingQualityCannotBeNull" xml:space="preserve">
     <value>ストリーミング品質は null にできません。</value>
   </data>
+  <data name="ShuffleTrackCountMustBeGreaterThanZero" xml:space="preserve">
+    <value>シャッフルするトラック数は 0 より大きい必要があります。</value>
+  </data>
+  <data name="ShuffleTrackCountMustBeAtMost500" xml:space="preserve">
+    <value>シャッフルするトラック数は 500 以下である必要があります。</value>
+  </data>
 </root>

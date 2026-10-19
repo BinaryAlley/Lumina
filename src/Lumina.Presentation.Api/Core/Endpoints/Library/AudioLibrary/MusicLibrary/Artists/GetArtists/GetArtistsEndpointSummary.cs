@@ -91,6 +91,7 @@ public class GetArtistsEndpointSummary : Summary<GetArtistsEndpoint, GetArtistsR
                             new(
                                 Id: Guid.NewGuid(),
                                 ArtistId: Guid.NewGuid(),
+                                ArtistName: "Queen",
                                 LibraryId: Guid.NewGuid(),
                                 Metadata: new(
                                     Title: "A Night at the Opera",
@@ -216,6 +217,7 @@ public class GetArtistsEndpointSummary : Summary<GetArtistsEndpoint, GetArtistsR
                             new(
                                 Id: Guid.NewGuid(),
                                 ArtistId: Guid.NewGuid(),
+                                ArtistName: "Queen",
                                 LibraryId: Guid.NewGuid(),
                                 Metadata: new(
                                     Title: "Heroes",

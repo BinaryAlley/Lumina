@@ -79,6 +79,7 @@ public class GetArtistEndpointSummary : Summary<GetArtistEndpoint, EmptyRequest>
                     new(
                         Id: Guid.NewGuid(),
                         ArtistId: Guid.NewGuid(),
+                        ArtistName: "Queen",
                         LibraryId: Guid.NewGuid(),
                         Metadata: new(
                             Title: "A Night at the Opera",

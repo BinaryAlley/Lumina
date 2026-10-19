@@ -1083,4 +1083,13 @@
   <data name="AddIsni" xml:space="preserve">
     <value>添加 ISNI</value>
   </data>
+  <data name="PlayAll" xml:space="preserve">
+    <value>全部播放</value>
+  </data>
+  <data name="Play" xml:space="preserve">
+    <value>播放</value>
+  </data>
+  <data name="Shuffle" xml:space="preserve">
+    <value>随机播放</value>
+  </data>
 </root>

@@ -843,4 +843,10 @@
   <data name="StreamingQualityCannotBeNull" xml:space="preserve">
     <value>Calitatea fluxului nu poate fi nulă!</value>
   </data>
+  <data name="ShuffleTrackCountMustBeGreaterThanZero" xml:space="preserve">
+    <value>Numărul de piste pentru redare aleatorie trebuie să fie mai mare decât zero!</value>
+  </data>
+  <data name="ShuffleTrackCountMustBeAtMost500" xml:space="preserve">
+    <value>Numărul de piste pentru redare aleatorie nu poate depăși 500!</value>
+  </data>
 </root>

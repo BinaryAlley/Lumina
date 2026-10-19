@@ -57,4 +57,13 @@
   <data name="DeleteFailed" xml:space="preserve">
     <value>Не вдалося видалити елемент.</value>
   </data>
+  <data name="Shuffle" xml:space="preserve">
+    <value>Перемішати</value>
+  </data>
+  <data name="Play" xml:space="preserve">
+    <value>Відтворити</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Ð”Ñ–Ñ—</value>
+  </data>
 </root>

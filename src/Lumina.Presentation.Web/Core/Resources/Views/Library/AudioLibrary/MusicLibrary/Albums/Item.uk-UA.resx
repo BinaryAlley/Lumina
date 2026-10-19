@@ -1506,4 +1506,10 @@
   <data name="Identifiers" xml:space="preserve">
     <value>Ідентифікатори</value>
   </data>
+  <data name="PlayAlbum" xml:space="preserve">
+    <value>Відтворити альбом</value>
+  </data>
+  <data name="PlayTrack" xml:space="preserve">
+    <value>Відтворити трек</value>
+  </data>
 </root>

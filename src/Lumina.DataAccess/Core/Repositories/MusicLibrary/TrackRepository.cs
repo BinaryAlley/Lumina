@@ -8,6 +8,7 @@ using Lumina.DataAccess.Common.Persistence;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -304,6 +305,53 @@ internal sealed class TrackRepository : ITrackRepository
             Count = count,
             NumberOfPages = numberOfPages
         };
+    }
+
+    /// <summary>
+    /// Gets a uniformly random selection of tracks of the library identified by <paramref name="libraryId"/>, optionally scoped to
+    /// an artist or an album, excluding the tracks in <paramref name="excludedTrackIds"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the library whose tracks are sampled.</param>
+    /// <param name="artistId">The Id of the artist whose tracks are sampled, or <see langword="null"/> for every artist of the library.</param>
+    /// <param name="albumId">The Id of the album whose tracks are sampled, or <see langword="null"/> for every album of the scope.</param>
+    /// <param name="excludedTrackIds">The tracks that must not be returned.</param>
+    /// <param name="count">The maximum number of tracks to return.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="ShuffleTrackRowDto"/>, or an error.</returns>
+    public async Task<Result<IReadOnlyList<ShuffleTrackRowDto>>> GetShuffleTracksLiteAsync(Guid libraryId, Guid? artistId, Guid? albumId, IReadOnlyCollection<Guid> excludedTrackIds, int count, CancellationToken cancellationToken)
+    {
+        IQueryable<TrackEntity> query = _luminaDbContext.Tracks
+            .AsNoTracking()
+            .Where(track => track.LibraryId == libraryId);
+
+        if (artistId is not null)
+            query = query.Where(track => track.Album!.ArtistId == artistId.Value);
+        if (albumId is not null)
+            query = query.Where(track => track.AlbumId == albumId.Value);
+        // The exclusions are materialized as an array, so EF translates them the same way as the other Id collections it already parameterizes.
+        Guid[] excludedIds = excludedTrackIds is Guid[] ids ? ids : [.. excludedTrackIds];
+        if (excludedIds.Length > 0)
+            query = query.Where(track => !excludedIds.Contains(track.Id));
+
+        // SQLite randomizes the rows before the limit, so the result is a uniform sample of every matching track.
+        return await query
+            .OrderBy(_ => EF.Functions.Random())
+            .Take(count)
+            .Select(track => new ShuffleTrackRowDto
+            {
+                TrackId = track.Id,
+                Title = track.Title,
+                DurationInSeconds = track.DurationInSeconds,
+                AlbumId = track.AlbumId,
+                AlbumTitle = track.Album!.Title,
+                ArtistId = track.Album!.ArtistId,
+                // The cover is the cover artwork stored for the album, exactly like the album cards expose it.
+                CoverPath = _luminaDbContext.MusicArtwork
+                    .Where(artwork => artwork.OwnerType == MusicArtworkOwnerType.Album && artwork.OwnerId == track.AlbumId && artwork.ArtworkType == ArtworkType.Cover)
+                    .Select(artwork => artwork.FileName)
+                    .FirstOrDefault()
+            })
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
