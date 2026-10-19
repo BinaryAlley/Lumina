@@ -96,6 +96,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "music-library", "music-libr
 	ProjectSection(SolutionItems) = preProject
 		..\docs\technical\api\library\audio-library\music-library\Api.Albums.md = ..\docs\technical\api\library\audio-library\music-library\Api.Albums.md
 		..\docs\technical\api\library\audio-library\music-library\Api.Artists.md = ..\docs\technical\api\library\audio-library\music-library\Api.Artists.md
+		..\docs\technical\api\library\audio-library\music-library\Api.PlayHistory.md = ..\docs\technical\api\library\audio-library\music-library\Api.PlayHistory.md
 		..\docs\technical\api\library\audio-library\music-library\Api.Tracks.md = ..\docs\technical\api\library\audio-library\music-library\Api.Tracks.md
 	EndProjectSection
 EndProject
@@ -292,6 +293,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tracks", "tracks", "{B1B657
 		..\docs\technical\requests\library\audio-library\music-library\tracks\StreamTrackSegment.http = ..\docs\technical\requests\library\audio-library\music-library\tracks\StreamTrackSegment.http
 		..\docs\technical\requests\library\audio-library\music-library\tracks\StreamTrack.http = ..\docs\technical\requests\library\audio-library\music-library\tracks\StreamTrack.http
 		..\docs\technical\requests\library\audio-library\music-library\tracks\UpdateTrack.http = ..\docs\technical\requests\library\audio-library\music-library\tracks\UpdateTrack.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "play-history", "play-history", "{9402C854-E845-4F86-BECB-F708E0C7CB2E}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\library\audio-library\music-library\play-history\CompletePlay.http = ..\docs\technical\requests\library\audio-library\music-library\play-history\CompletePlay.http
+		..\docs\technical\requests\library\audio-library\music-library\play-history\GetPlayRecord.http = ..\docs\technical\requests\library\audio-library\music-library\play-history\GetPlayRecord.http
+		..\docs\technical\requests\library\audio-library\music-library\play-history\ReportPlayProgress.http = ..\docs\technical\requests\library\audio-library\music-library\play-history\ReportPlayProgress.http
+		..\docs\technical\requests\library\audio-library\music-library\play-history\StartPlay.http = ..\docs\technical\requests\library\audio-library\music-library\play-history\StartPlay.http
+		..\docs\technical\requests\library\audio-library\music-library\play-history\StopPlay.http = ..\docs\technical\requests\library\audio-library\music-library\play-history\StopPlay.http
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "management", "management", "{FDED0D4B-3FB6-42CA-AC73-76038F9DDF5E}"
@@ -1413,6 +1423,7 @@ Global
 		{B4DF8E8D-C245-4E7C-B85B-B52935EDA93B} = {A65199DD-543E-4C18-A16A-215BD34962A5}
 		{F3818697-E304-491D-8BF3-4DAA1733B5F5} = {A65199DD-543E-4C18-A16A-215BD34962A5}
 		{B1B657B1-60DC-4E22-89D2-6212154D6BA8} = {A65199DD-543E-4C18-A16A-215BD34962A5}
+		{9402C854-E845-4F86-BECB-F708E0C7CB2E} = {A65199DD-543E-4C18-A16A-215BD34962A5}
 		{FDED0D4B-3FB6-42CA-AC73-76038F9DDF5E} = {38048ADA-6830-4575-BDA6-C6D77E6D3E09}
 		{61824D19-B08C-45C6-95F8-716B5FDA183C} = {38048ADA-6830-4575-BDA6-C6D77E6D3E09}
 		{0C975F46-8A47-48EC-91A0-2B222032C043} = {61824D19-B08C-45C6-95F8-716B5FDA183C}

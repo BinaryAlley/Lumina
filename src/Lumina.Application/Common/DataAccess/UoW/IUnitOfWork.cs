@@ -151,6 +151,11 @@ public interface IUnitOfWork
     IUserSettingsRepository UserSettingsRepository { get; }
 
     /// <summary>
+    /// Gets the music play record repository.
+    /// </summary>
+    IMusicPlayRecordRepository MusicPlayRecordRepository { get; }
+
+    /// <summary>
     /// Saves the changes made to the database.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
