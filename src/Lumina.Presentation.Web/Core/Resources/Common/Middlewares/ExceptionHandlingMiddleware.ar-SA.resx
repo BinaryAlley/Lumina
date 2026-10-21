@@ -849,4 +849,58 @@
   <data name="ShuffleTrackCountMustBeAtMost500" xml:space="preserve">
     <value>يجب ألا يتجاوز عدد المقطوعات العشوائية 500!</value>
   </data>
+  <data name="VuMeterReleasePerSecondCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن يكون انخفاض مقياس VU فارغًا!</value>
+  </data>
+  <data name="VuMeterSegmentCountCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن يكون عدد مقاطع مقياس VU فارغًا!</value>
+  </data>
+  <data name="VuMeterReleasePerSecondMustBeBetweenZeroAndOneHundred" xml:space="preserve">
+    <value>يجب أن يكون انخفاض مقياس VU بين 0 و100 في الثانية!</value>
+  </data>
+  <data name="VuMeterPeakHoldDurationMustBeBetweenZeroAndTenThousandMilliseconds" xml:space="preserve">
+    <value>يجب أن تكون مدة تثبيت القمم لمقياس VU بين 0 و10000 مللي ثانية!</value>
+  </data>
+  <data name="InvalidVuMeterOrientation" xml:space="preserve">
+    <value>اتجاه مقياس VU غير صالح!</value>
+  </data>
+  <data name="VuMeterSegmentCountMustBeBetweenOneAndOneHundredTwentyEight" xml:space="preserve">
+    <value>يجب أن يكون عدد مقاطع مقياس VU بين 1 و128!</value>
+  </data>
+  <data name="VuMeterShowPeakCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن يكون تفضيل عرض القمم لمقياس VU فارغًا!</value>
+  </data>
+  <data name="VuMeterMediumThresholdMustBeBetweenZeroAndOne" xml:space="preserve">
+    <value>يجب أن تكون العتبة المتوسطة لمقياس VU بين 0 و1!</value>
+  </data>
+  <data name="VuMeterPeakReleasePerSecondMustBeBetweenZeroAndOneHundred" xml:space="preserve">
+    <value>يجب أن يكون انخفاض القمم لمقياس VU بين 0 و100 في الثانية!</value>
+  </data>
+  <data name="VuMeterSegmentGapCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن تكون المسافة بين مقاطع مقياس VU فارغة!</value>
+  </data>
+  <data name="VuMeterSegmentGapMustBeBetweenZeroAndThirtyTwo" xml:space="preserve">
+    <value>يجب أن تكون المسافة بين مقاطع مقياس VU بين 0 و32!</value>
+  </data>
+  <data name="VuMeterPeakHoldDurationCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن تكون مدة تثبيت القمم لمقياس VU فارغة!</value>
+  </data>
+  <data name="VuMeterOrientationCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن تكون اتجاهات مقياس VU فارغة!</value>
+  </data>
+  <data name="VuMeterMediumThresholdCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن تكون العتبة المتوسطة لمقياس VU فارغة!</value>
+  </data>
+  <data name="VuMeterHighThresholdMustBeBetweenZeroAndOne" xml:space="preserve">
+    <value>يجب أن تكون العتبة العالية لمقياس VU بين 0 و1!</value>
+  </data>
+  <data name="VuMeterPeakReleasePerSecondCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن يكون انخفاض القمم لمقياس VU فارغًا!</value>
+  </data>
+  <data name="VuMeterHighThresholdMustBeGreaterThanOrEqualToMediumThreshold" xml:space="preserve">
+    <value>يجب أن تكون العتبة العالية لمقياس VU أكبر من أو تساوي العتبة المتوسطة!</value>
+  </data>
+  <data name="VuMeterHighThresholdCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن تكون العتبة العالية لمقياس VU فارغة!</value>
+  </data>
 </root>

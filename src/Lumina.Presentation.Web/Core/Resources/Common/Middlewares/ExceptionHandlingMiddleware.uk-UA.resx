@@ -849,4 +849,58 @@
   <data name="ShuffleTrackCountMustBeAtMost500" xml:space="preserve">
     <value>Кількість треків для перемішування не може перевищувати 500!</value>
   </data>
+  <data name="VuMeterReleasePerSecondCannotBeNull" xml:space="preserve">
+    <value>Спад VU-метра не може бути порожнім!</value>
+  </data>
+  <data name="VuMeterSegmentCountCannotBeNull" xml:space="preserve">
+    <value>Кількість сегментів VU-метра не може бути порожньою!</value>
+  </data>
+  <data name="VuMeterReleasePerSecondMustBeBetweenZeroAndOneHundred" xml:space="preserve">
+    <value>Спад VU-метра має бути від 0 до 100 за секунду!</value>
+  </data>
+  <data name="VuMeterPeakHoldDurationMustBeBetweenZeroAndTenThousandMilliseconds" xml:space="preserve">
+    <value>Тривалість утримання піків VU-метра має бути від 0 до 10000 мілісекунд!</value>
+  </data>
+  <data name="InvalidVuMeterOrientation" xml:space="preserve">
+    <value>Недійсна орієнтація VU-метра!</value>
+  </data>
+  <data name="VuMeterSegmentCountMustBeBetweenOneAndOneHundredTwentyEight" xml:space="preserve">
+    <value>Кількість сегментів VU-метра має бути від 1 до 128!</value>
+  </data>
+  <data name="VuMeterShowPeakCannotBeNull" xml:space="preserve">
+    <value>Налаштування показу піків VU-метра не може бути порожнім!</value>
+  </data>
+  <data name="VuMeterMediumThresholdMustBeBetweenZeroAndOne" xml:space="preserve">
+    <value>Середній поріг VU-метра має бути від 0 до 1!</value>
+  </data>
+  <data name="VuMeterPeakReleasePerSecondMustBeBetweenZeroAndOneHundred" xml:space="preserve">
+    <value>Спад піків VU-метра має бути від 0 до 100 за секунду!</value>
+  </data>
+  <data name="VuMeterSegmentGapCannotBeNull" xml:space="preserve">
+    <value>Проміжок між сегментами VU-метра не може бути порожнім!</value>
+  </data>
+  <data name="VuMeterSegmentGapMustBeBetweenZeroAndThirtyTwo" xml:space="preserve">
+    <value>Проміжок між сегментами VU-метра має бути від 0 до 32!</value>
+  </data>
+  <data name="VuMeterPeakHoldDurationCannotBeNull" xml:space="preserve">
+    <value>Тривалість утримання піків VU-метра не може бути порожньою!</value>
+  </data>
+  <data name="VuMeterOrientationCannotBeNull" xml:space="preserve">
+    <value>Орієнтація VU-метра не може бути порожньою!</value>
+  </data>
+  <data name="VuMeterMediumThresholdCannotBeNull" xml:space="preserve">
+    <value>Середній поріг VU-метра не може бути порожнім!</value>
+  </data>
+  <data name="VuMeterHighThresholdMustBeBetweenZeroAndOne" xml:space="preserve">
+    <value>Високий поріг VU-метра має бути від 0 до 1!</value>
+  </data>
+  <data name="VuMeterPeakReleasePerSecondCannotBeNull" xml:space="preserve">
+    <value>Спад піків VU-метра не може бути порожнім!</value>
+  </data>
+  <data name="VuMeterHighThresholdMustBeGreaterThanOrEqualToMediumThreshold" xml:space="preserve">
+    <value>Високий поріг VU-метра має бути більшим або дорівнювати середньому порогу!</value>
+  </data>
+  <data name="VuMeterHighThresholdCannotBeNull" xml:space="preserve">
+    <value>Високий поріг VU-метра не може бути порожнім!</value>
+  </data>
 </root>

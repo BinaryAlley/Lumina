@@ -14,6 +14,7 @@ The web client of Lumina is a themed shell: every page is rendered inside the te
     - [Template Resolution](#template-resolution)
     - [The Layout Template (shared/layout)](#the-layout-template-sharedlayout)
     - [The Audio Player Bar](#the-audio-player-bar)
+      - [The VU Meter](#the-vu-meter)
       - [Play Affordances on the Music Pages](#play-affordances-on-the-music-pages)
       - [The audio player sub templates](#the-audio-player-sub-templates)
     - [The Navigation Template (shared/nav-menu)](#the-navigation-template-sharednav-menu)
@@ -306,12 +307,41 @@ The markup inside the bar exposes the hook attributes the audio player script bi
 | `data-audio-player-now-playing-artist` | The artist name of the current track's album in the expanded player. It is left empty until the album details are available. |
 | `data-audio-player-artwork-carousel` | The carousel of the stored artwork of the current track's album. The player appends one `button.artwork-carousel-item` per stored image, carrying `data-artwork-path`, and toggles the `selected` class and `aria-pressed` on the chosen item. The element is hidden with the `hidden` attribute while the album has no stored artwork. |
 | `data-audio-player-cover-thumbnail`, `data-audio-player-cover-image` | The cover art of the condensed bar and of the expanded bar. Choosing an album artwork in the carousel replaces both images until the next track. |
+| `data-audio-player-vu-meter` | The root of the VU meter of the condensed bar, between the album art and the current time label. The player fills it with its channels, segments and peak markers, exactly as described in [The VU Meter](#the-vu-meter). A theme that does not render the hook gets the built-in meter inserted in that place. |
 | `data-audio-player-volume` | The volume slider, a `role="slider"` element with `tabindex="0"` that the player scrubs and whose ARIA value attributes it writes. The fill is published as `--audio-player-volume-start` and `--audio-player-volume-width`. |
 | `data-audio-player-volume-level` | The volume fill. It carries no geometry of its own: the stylesheet drives it from the custom properties above. |
 | `data-audio-player-mute` | The mute toggle. The player toggles the `is-muted` class and the `aria-pressed` state on it. |
 | `data-audio-player-queue` | The queue list of the expanded bar. The player writes `data-audio-player-queue-entry-id` on every rendered item root, whether it comes from the theme sub template or from the built-in markup, and makes the root focusable, so clicking an item or pressing Enter or Space on it starts that entry. The element must stay the scroll container of the list, because the player scrolls the current entry to the start of whichever axis the theme makes scrollable when playback advances or the bar expands. |
 
 Each progress layer also carries `data-audio-player-progress-layer` (`played`, `downloaded` or `undownloaded`) in the markup, so a theme can select a layer by its state as well as by its class. The player writes no inline geometry on any of the bar elements: it publishes the geometry of each state as the custom properties above, which the application stylesheet consumes, so a theme restyles or reorients either bar by consuming the same properties.
+
+#### The VU Meter
+
+The condensed bar shows a segmented VU meter that follows the level of the track itself. The renderer taps it after the track's ReplayGain normalization and before the output volume and mute stage, so lowering the volume or muting the player never changes the height of the meter for the same moment of audio. The meter is a spectrum meter with one channel per frequency band, with 24 logarithmically spaced bands between 40 Hz and 16 kHz, each drawn as a stack of segments. The number of segments, the gap between them, the two threshold zones, the peak marker and its hold and falloff times, and the orientation are per-user settings, so the meter reflects the values the user saved on the settings page.
+
+The meter is built from elements rather than a canvas, exactly like the three state progress bar, so a theme restyles every part of it. The root carries the `audio-player-vu-meter` class and the `data-audio-player-vu-meter` hook, and the player fills it with:
+
+| Element | Class and hook | State the player writes |
+| --- | --- | --- |
+| A channel, one per band | `audio-player-vu-channel`, `data-audio-player-vu-channel` (the zero based band index) | None. The channel is a layout container. |
+| A segment, one per configured segment of a channel | `audio-player-vu-segment`, `data-audio-player-vu-segment` | `data-audio-player-vu-segment-state` (`active` or `inactive`) and `data-audio-player-vu-segment-zone` (`normal`, `medium` or `high`). The zone is derived from the position of the segment and the two thresholds of the settings. |
+| A peak marker, one per channel | `audio-player-vu-peak`, `data-audio-player-vu-peak` | `data-audio-player-vu-peak-state` (`active` or `inactive`). The marker is removed with the `hidden` attribute while the show peak setting is off. |
+
+The segments are rendered in ascending level order, so the first segment of a channel is the quietest one. The root also carries `data-audio-player-vu-meter-orientation` (`vertical` or `horizontal`), `data-audio-player-vu-meter-segments` (the configured segment count) and `data-audio-player-vu-meter-show-peak` (`true` or `false`), so a theme can select a state or a layout from the root as well.
+
+The player publishes no geometry other than two custom properties, which a theme maps to whichever axis its own layout uses:
+
+| Custom property | Published on | Meaning |
+| --- | --- | --- |
+| `--audio-player-vu-segment-gap` | The meter root | The configured gap between segments and between channels, as a CSS length in pixels. |
+| `--audio-player-vu-segment-count` | The meter root | The configured number of segments per channel, as a plain number, so a stylesheet can size the meter from it. |
+| `--audio-player-vu-peak-position` | Each peak marker | The held peak of its channel, as a percentage of the channel axis, from `0%` at the quiet end to `100%` at the loud end. |
+
+The fallback stylesheet sizes the vertical meter from whole pixel square cells rather than stretching it over a box, because a box divided into rows gives fractional heights that browsers snap unevenly. The cell is the largest whole pixel size that fits the configured segments in `--audio-player-vu-extent` (48px by default), capped by `--audio-player-vu-max-cell` (4px), and a theme can override either property. With the default 12 segments and a 1px gap the cells are 3px squares.
+
+The application fallback stylesheet gives the meter its own default look: 24 columns of segments whose active state uses one of three colors, with the inactive segments transparent, and a peak line that spans the short axis of the channel. A theme can replace all of it. The colors are custom properties declared on the bar container (`--audio-player-vu-normal-color`, `--audio-player-vu-medium-color`, `--audio-player-vu-high-color`, `--audio-player-vu-inactive-color`, `--audio-player-vu-peak-color` and `--audio-player-vu-background-color`), so a theme recolors the meter without touching the markup, and it can give each zone, each state and each orientation its own shape, image or animation.
+
+The meter is decorative for assistive technology and carries `aria-hidden="true"`, because the same information is available through the now playing labels and the progress bar. It reads the analyzer that the player renderer taps after the track's ReplayGain normalization and before the output volume, so it needs no extra request and no extra decode, it is unaffected by the volume and mute controls, and it never affects playback. When the player is paused, stopped, ended or failed, the displayed levels fall to zero instead of freezing.
 
 #### Play Affordances on the Music Pages
 

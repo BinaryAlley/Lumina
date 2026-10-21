@@ -53,12 +53,30 @@ public class UserSettingsConfigurationTests
         IProperty isPaginationEnabledProperty = entityType.GetProperty(nameof(UserSettingsEntity.IsPaginationEnabled));
         IProperty itemsPerPageProperty = entityType.GetProperty(nameof(UserSettingsEntity.ItemsPerPage));
         IProperty ignoreThePrefixProperty = entityType.GetProperty(nameof(UserSettingsEntity.ShouldIgnoreThePrefixForAlphaPicker));
+        IProperty vuMeterOrientationProperty = entityType.GetProperty(nameof(UserSettingsEntity.VuMeterOrientation));
+        IProperty vuMeterSegmentCountProperty = entityType.GetProperty(nameof(UserSettingsEntity.VuMeterSegmentCount));
+        IProperty vuMeterSegmentGapProperty = entityType.GetProperty(nameof(UserSettingsEntity.VuMeterSegmentGap));
+        IProperty vuMeterMediumThresholdProperty = entityType.GetProperty(nameof(UserSettingsEntity.VuMeterMediumThreshold));
+        IProperty vuMeterHighThresholdProperty = entityType.GetProperty(nameof(UserSettingsEntity.VuMeterHighThreshold));
+        IProperty vuMeterShowPeakProperty = entityType.GetProperty(nameof(UserSettingsEntity.VuMeterShowPeak));
+        IProperty vuMeterPeakHoldDurationProperty = entityType.GetProperty(nameof(UserSettingsEntity.VuMeterPeakHoldDurationInMilliseconds));
+        IProperty vuMeterReleasePerSecondProperty = entityType.GetProperty(nameof(UserSettingsEntity.VuMeterReleasePerSecond));
+        IProperty vuMeterPeakReleasePerSecondProperty = entityType.GetProperty(nameof(UserSettingsEntity.VuMeterPeakReleasePerSecond));
 
         // Assert
         Assert.False(userIdProperty.IsNullable);
         Assert.False(isPaginationEnabledProperty.IsNullable);
         Assert.False(itemsPerPageProperty.IsNullable);
         Assert.False(ignoreThePrefixProperty.IsNullable);
+        Assert.False(vuMeterOrientationProperty.IsNullable);
+        Assert.False(vuMeterSegmentCountProperty.IsNullable);
+        Assert.False(vuMeterSegmentGapProperty.IsNullable);
+        Assert.False(vuMeterMediumThresholdProperty.IsNullable);
+        Assert.False(vuMeterHighThresholdProperty.IsNullable);
+        Assert.False(vuMeterShowPeakProperty.IsNullable);
+        Assert.False(vuMeterPeakHoldDurationProperty.IsNullable);
+        Assert.False(vuMeterReleasePerSecondProperty.IsNullable);
+        Assert.False(vuMeterPeakReleasePerSecondProperty.IsNullable);
     }
 
     [Fact]

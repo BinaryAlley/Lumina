@@ -124,6 +124,15 @@ public class UpdateUserSettingsCommandHandler : ICommandHandler<UpdateUserSettin
             command.ShouldAutoplay!.Value,
             command.IsGaplessPlaybackEnabled!.Value,
             command.ReplayGainMode!.Value,
-            command.StreamingQuality!.Value);
+            command.StreamingQuality!.Value,
+            command.VuMeterOrientation!.Value,
+            command.VuMeterSegmentCount!.Value,
+            command.VuMeterSegmentGap!.Value,
+            command.VuMeterMediumThreshold!.Value,
+            command.VuMeterHighThreshold!.Value,
+            command.VuMeterShowPeak!.Value,
+            command.VuMeterPeakHoldDurationInMilliseconds!.Value,
+            command.VuMeterReleasePerSecond!.Value,
+            command.VuMeterPeakReleasePerSecond!.Value);
     }
 }

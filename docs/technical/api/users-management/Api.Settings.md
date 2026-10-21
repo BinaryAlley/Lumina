@@ -47,7 +47,16 @@ Returns the settings of the currently authenticated user.
   "shouldAutoplay": true,
   "isGaplessPlaybackEnabled": true,
   "replayGainMode": "Off",
-  "streamingQuality": "Auto"
+  "streamingQuality": "Auto",
+  "vuMeterOrientation": "Vertical",
+  "vuMeterSegmentCount": 12,
+  "vuMeterSegmentGap": 1,
+  "vuMeterMediumThreshold": 0.6,
+  "vuMeterHighThreshold": 0.8,
+  "vuMeterShowPeak": true,
+  "vuMeterPeakHoldDurationInMilliseconds": 650,
+  "vuMeterReleasePerSecond": 3,
+  "vuMeterPeakReleasePerSecond": 0.65
 }
 ```
 
@@ -60,6 +69,8 @@ PUT api/v1/users/me/settings
 ```
 
 Updates the settings of the currently authenticated user.
+
+The VU meter settings configure the segmented meter of the player bar: `vuMeterOrientation` is `Vertical` or `Horizontal`, `vuMeterSegmentCount` is between 1 and 128, `vuMeterSegmentGap` is between 0 and 32 pixels, `vuMeterMediumThreshold` and `vuMeterHighThreshold` are between 0 and 1 and the high threshold must not be lower than the medium one, `vuMeterPeakHoldDurationInMilliseconds` is between 0 and 10000, and `vuMeterReleasePerSecond` and `vuMeterPeakReleasePerSecond` are between 0 and 100 level units per second. All of them are required.
 
 ```json
 {
@@ -74,7 +85,16 @@ Updates the settings of the currently authenticated user.
   "shouldAutoplay": true,
   "isGaplessPlaybackEnabled": true,
   "replayGainMode": "Off",
-  "streamingQuality": "Auto"
+  "streamingQuality": "Auto",
+  "vuMeterOrientation": "Vertical",
+  "vuMeterSegmentCount": 12,
+  "vuMeterSegmentGap": 1,
+  "vuMeterMediumThreshold": 0.6,
+  "vuMeterHighThreshold": 0.8,
+  "vuMeterShowPeak": true,
+  "vuMeterPeakHoldDurationInMilliseconds": 650,
+  "vuMeterReleasePerSecond": 3,
+  "vuMeterPeakReleasePerSecond": 0.65
 }
 ```
 

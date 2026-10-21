@@ -849,4 +849,58 @@
   <data name="ShuffleTrackCountMustBeAtMost500" xml:space="preserve">
     <value>Le nombre de pistes du shuffle ne doit pas dépasser 500 !</value>
   </data>
+  <data name="VuMeterReleasePerSecondCannotBeNull" xml:space="preserve">
+    <value>La décroissance du vumètre ne peut pas être nulle !</value>
+  </data>
+  <data name="VuMeterSegmentCountCannotBeNull" xml:space="preserve">
+    <value>Le nombre de segments du vumètre ne peut pas être nul !</value>
+  </data>
+  <data name="VuMeterReleasePerSecondMustBeBetweenZeroAndOneHundred" xml:space="preserve">
+    <value>La décroissance du vumètre doit être comprise entre 0 et 100 par seconde !</value>
+  </data>
+  <data name="VuMeterPeakHoldDurationMustBeBetweenZeroAndTenThousandMilliseconds" xml:space="preserve">
+    <value>La durée de maintien des crêtes du vumètre doit être comprise entre 0 et 10000 millisecondes !</value>
+  </data>
+  <data name="InvalidVuMeterOrientation" xml:space="preserve">
+    <value>Orientation du vumètre non valide !</value>
+  </data>
+  <data name="VuMeterSegmentCountMustBeBetweenOneAndOneHundredTwentyEight" xml:space="preserve">
+    <value>Le nombre de segments du vumètre doit être compris entre 1 et 128 !</value>
+  </data>
+  <data name="VuMeterShowPeakCannotBeNull" xml:space="preserve">
+    <value>La préférence d'affichage des crêtes du vumètre ne peut pas être nulle !</value>
+  </data>
+  <data name="VuMeterMediumThresholdMustBeBetweenZeroAndOne" xml:space="preserve">
+    <value>Le seuil moyen du vumètre doit être compris entre 0 et 1 !</value>
+  </data>
+  <data name="VuMeterPeakReleasePerSecondMustBeBetweenZeroAndOneHundred" xml:space="preserve">
+    <value>La décroissance des crêtes du vumètre doit être comprise entre 0 et 100 par seconde !</value>
+  </data>
+  <data name="VuMeterSegmentGapCannotBeNull" xml:space="preserve">
+    <value>L'espacement des segments du vumètre ne peut pas être nul !</value>
+  </data>
+  <data name="VuMeterSegmentGapMustBeBetweenZeroAndThirtyTwo" xml:space="preserve">
+    <value>L'espacement des segments du vumètre doit être compris entre 0 et 32 !</value>
+  </data>
+  <data name="VuMeterPeakHoldDurationCannotBeNull" xml:space="preserve">
+    <value>La durée de maintien des crêtes du vumètre ne peut pas être nulle !</value>
+  </data>
+  <data name="VuMeterOrientationCannotBeNull" xml:space="preserve">
+    <value>L'orientation du vumètre ne peut pas être nulle !</value>
+  </data>
+  <data name="VuMeterMediumThresholdCannotBeNull" xml:space="preserve">
+    <value>Le seuil moyen du vumètre ne peut pas être nul !</value>
+  </data>
+  <data name="VuMeterHighThresholdMustBeBetweenZeroAndOne" xml:space="preserve">
+    <value>Le seuil élevé du vumètre doit être compris entre 0 et 1 !</value>
+  </data>
+  <data name="VuMeterPeakReleasePerSecondCannotBeNull" xml:space="preserve">
+    <value>La décroissance des crêtes du vumètre ne peut pas être nulle !</value>
+  </data>
+  <data name="VuMeterHighThresholdMustBeGreaterThanOrEqualToMediumThreshold" xml:space="preserve">
+    <value>Le seuil élevé du vumètre doit être supérieur ou égal au seuil moyen !</value>
+  </data>
+  <data name="VuMeterHighThresholdCannotBeNull" xml:space="preserve">
+    <value>Le seuil élevé du vumètre ne peut pas être nul !</value>
+  </data>
 </root>

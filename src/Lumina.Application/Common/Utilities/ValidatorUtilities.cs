@@ -175,6 +175,26 @@ public static class ValidatorUtilities
     }
 
     /// <summary>
+    /// Defines a validation rule that ensures the nullable double property is greater than or equal to the value another property of the request selects.
+    /// </summary>
+    /// <remarks>
+    /// If either the property or the selected comparison value is <see langword="null"/>, this rule passes (use
+    /// <see cref="NotNull{TRequest, TProperty}(IRuleBuilder{TRequest, TProperty})"/> to check for missing values).
+    /// </remarks>
+    /// <typeparam name="TRequest">The type of the request being validated.</typeparam>
+    /// <param name="ruleBuilder">The rule builder instance.</param>
+    /// <param name="comparisonSelector">A function that selects the value the property must be greater than or equal to.</param>
+    /// <returns>The current <see cref="IRuleBuilder{TRequest, TProperty}"/> instance for method chaining.</returns>
+    public static IRuleBuilder<TRequest, double?> GreaterThanOrEqualTo<TRequest>(this IRuleBuilder<TRequest, double?> ruleBuilder, Func<TRequest, double?> comparisonSelector)
+    {
+        return ruleBuilder.Must((request, value) =>
+        {
+            double? comparisonValue = comparisonSelector(request);
+            return !value.HasValue || !comparisonValue.HasValue || value.Value >= comparisonValue.Value;
+        });
+    }
+
+    /// <summary>
     /// Defines a validation rule that ensures the property is not <see langword="null"/>.
     /// </summary>
     /// <remarks>
@@ -361,6 +381,22 @@ public static class ValidatorUtilities
     /// <param name="maximumValue">The maximum allowed value of the property.</param>
     /// <returns>The current <see cref="IRuleBuilder{TRequest, TProperty}"/> instance for method chaining.</returns>
     public static IRuleBuilder<TRequest, int?> InclusiveBetween<TRequest>(this IRuleBuilder<TRequest, int?> ruleBuilder, int minimumValue, int maximumValue)
+    {
+        return ruleBuilder.Must(value => !value.HasValue || (value.Value >= minimumValue && value.Value <= maximumValue));
+    }
+
+    /// <summary>
+    /// Defines a validation rule that ensures the nullable double property is within the specified inclusive range.
+    /// </summary>
+    /// <remarks>
+    /// If the property is <see langword="null"/>, this rule passes (use <see cref="NotNull{TRequest, TProperty}(IRuleBuilder{TRequest, TProperty})"/> to check for missing values).
+    /// </remarks>
+    /// <typeparam name="TRequest">The type of the request being validated.</typeparam>
+    /// <param name="ruleBuilder">The rule builder instance.</param>
+    /// <param name="minimumValue">The minimum allowed value of the property.</param>
+    /// <param name="maximumValue">The maximum allowed value of the property.</param>
+    /// <returns>The current <see cref="IRuleBuilder{TRequest, TProperty}"/> instance for method chaining.</returns>
+    public static IRuleBuilder<TRequest, double?> InclusiveBetween<TRequest>(this IRuleBuilder<TRequest, double?> ruleBuilder, double minimumValue, double maximumValue)
     {
         return ruleBuilder.Must(value => !value.HasValue || (value.Value >= minimumValue && value.Value <= maximumValue));
     }

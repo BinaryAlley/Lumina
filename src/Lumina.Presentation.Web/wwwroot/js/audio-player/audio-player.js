@@ -57,6 +57,8 @@
  *   - getState(), getDescriptor(), getQueue(), getCurrentTime(), getDuration(), getVolume(),
  *     isMuted(), isBuffering(), getBufferedTimeRanges(), getPreferences(), getCapabilities(), getLastError(),
  *     getSubTemplates().
+ *   - reloadPreferencesAsync(): re-reads the stored settings and playback state of the user, so a change saved on the
+ *                              settings page applies to the running player, including the VU meter settings.
  *   - getNextDescriptor(): the identity and descriptor of the next queue entry, or null.
  *   - advanceQueueTo(entryId): moves the queue cursor to the entry with that identity without starting playback, so a
  *                           linear advance, a wrap, a reordered queue and a gapless handoff share one commit. The advance
@@ -646,7 +648,16 @@
                 isGaplessPlaybackEnabled: false,
                 replayGainMode: 'Off',
                 streamingQuality: 'Auto',
-                shouldIgnoreThePrefixForAlphaPicker: false
+                shouldIgnoreThePrefixForAlphaPicker: false,
+                vuMeterOrientation: 'Vertical',
+                vuMeterSegmentCount: 12,
+                vuMeterSegmentGap: 1,
+                vuMeterMediumThreshold: 0.6,
+                vuMeterHighThreshold: 0.8,
+                vuMeterShowPeak: true,
+                vuMeterPeakHoldDurationInMilliseconds: 650,
+                vuMeterReleasePerSecond: 3,
+                vuMeterPeakReleasePerSecond: 0.65
             };
             this.capabilityReport = null;
             this.capabilitiesReady = null;
@@ -704,6 +715,12 @@
             this.container = null;
             this.main = null;
             this.dom = {};
+            // The VU meter of the bar, created with the bar elements, and the subscription that follows the stored settings.
+            // Both are null when the VU meter module was not loaded, so a bare player composition, or a test, still works.
+            this.vuMeter = null;
+            this.vuMeterUnsubscribe = null;
+            // The analyzer the meter was bound to, so a load replaces it only when the engine exposes a different one.
+            this.vuMeterAnalyser = null;
             // The raw theme sub templates of the dynamic content, read once with the bar elements and null when the theme does not provide them.
             this.subTemplates = { queueItem: null, playlistItem: null };
             // The playlists of the user, used by the control that adds the current queue to a playlist, and the in flight load of
@@ -754,6 +771,7 @@
             this.isAvailable = true;
 
             this.collectDomReferences();
+            this.ensureVuMeter();
             this.bindPlaybackControls();
             this.bindKeyboardShortcuts();
             this.bindUnloadFlush();
@@ -784,6 +802,7 @@
             this.dom.albumName = query('[data-audio-player-album-name]');
             this.dom.coverThumbnail = query('[data-audio-player-cover-thumbnail]');
             this.dom.coverImage = query('[data-audio-player-cover-image]');
+            this.dom.vuMeter = query('[data-audio-player-vu-meter]');
             this.dom.currentTime = query('[data-audio-player-current-time]');
             this.dom.totalTime = query('[data-audio-player-total-time]');
             this.dom.progress = query('[data-audio-player-progress]');
@@ -814,6 +833,92 @@
             // built-in control, placed in a queue area wrapper above the queue, exactly as a missing queue item sub template falls back
             // to built-in markup. The wrapper takes the flex slot of the queue, so the action never becomes an extra column.
             this.ensurePlaylistControls();
+        }
+
+        /**
+         * Creates the VU meter of the bar, building its root when the active theme does not render the hook.
+         *
+         * The meter is part of the bar rather than of the page, so it is created once with the bar elements and survives
+         * every in place navigation. A theme that renders the 'data-audio-player-vu-meter' hook decides where the meter
+         * sits; a theme that does not gets the built-in meter inserted directly before the current time label, which is the place the bar reserves for it.
+         * The module is optional: a composition that omits it keeps a playable bar with no meter.
+         */
+        ensureVuMeter() {
+            if (typeof LuminaAudioPlayer.createVuMeter !== 'function')
+                return;
+            if (!this.dom.vuMeter) {
+                const bar = this.container.querySelector('.audio-player-bar');
+                if (!bar)
+                    return;
+                const meterElement = document.createElement('div');
+                meterElement.className = 'audio-player-vu-meter';
+                meterElement.dataset.audioPlayerVuMeter = '';
+                meterElement.setAttribute('aria-hidden', 'true');
+                // The current time label is the anchor the bar reserves for the meter: the meter sits between the album art
+                // and the label that shows the current playback time. Only a label that is a direct child of the bar can be
+                // used as an insertion reference, so a theme with a nested label appends the meter to the bar instead.
+                const reference = this.dom.currentTime && this.dom.currentTime.parentNode === bar ? this.dom.currentTime : null;
+                bar.insertBefore(meterElement, reference);
+                this.dom.vuMeter = meterElement;
+            }
+            this.vuMeter = LuminaAudioPlayer.createVuMeter({
+                container: this.dom.vuMeter,
+                settings: this.preferences
+            });
+            if (this.events && typeof this.events.on === 'function')
+                this.vuMeterUnsubscribe = this.events.on(LuminaAudioPlayer.PlayerEvent.PREFERENCES_CHANGED, () => this.applyVuMeterSettings());
+        }
+
+        /**
+         * Applies the current preferences to the VU meter, so a settings change that arrives after the bar was built, or
+         * a change saved on the settings page, takes effect without recreating the player.
+         */
+        applyVuMeterSettings() {
+            if (!this.vuMeter)
+                return;
+            this.vuMeter.configure(this.preferences);
+        }
+
+        /**
+         * Binds the meter to the output analyzer of the engine once a track was loaded. The renderer creates its audio
+         * context, and with it the analyzer, when it configures a track, so the analyzer only exists from that point on.
+         * An engine that exposes no analyzer, or a renderer whose context cannot create one, leaves the meter empty.
+         * @param {Object} engine - The engine the track was loaded into.
+         */
+        attachVuMeter(engine) {
+            if (!this.vuMeter || !engine || typeof engine.getOutputAnalyser !== 'function')
+                return;
+            let analyser = null;
+            try {
+                analyser = engine.getOutputAnalyser();
+            } catch (error) {
+                console.debug('Audio player: the engine output analyzer could not be read.', error);
+                return;
+            }
+            if (!analyser || analyser === this.vuMeterAnalyser)
+                return;
+            this.vuMeterAnalyser = analyser;
+            this.vuMeter.setAnalyser(analyser);
+            // The state may already be PLAYING when a load replaced the engine under a running player, so a fresh analyzer
+            // starts reading immediately instead of waiting for the next state change.
+            if (this.state === LuminaAudioPlayer.PlayerState.PLAYING)
+                this.vuMeter.start();
+        }
+
+        /**
+         * Starts or stops the VU meter with the player state. A playing, visible player reads the analyzer, and every
+         * other case lets the meter fall to zero, so a pause, a stop, an end, a failure, or a hidden bar never leaves a
+         * frozen meter on screen and a hidden meter costs no animation frames.
+         * @param {string} state - One of the {@link LuminaAudioPlayer.PlayerState} values.
+         */
+        updateVuMeterState(state) {
+            if (!this.vuMeter)
+                return;
+            const isVisible = !this.container || !this.container.classList.contains('not-shown');
+            if (state === LuminaAudioPlayer.PlayerState.PLAYING && isVisible)
+                this.vuMeter.start();
+            else
+                this.vuMeter.stop();
         }
 
         /**
@@ -1394,6 +1499,9 @@
                 await engine.loadAsync(descriptor, options);
                 if (!isRequestCurrent())
                     return false;
+                // The load configured the renderer of the engine, which creates its audio context and the output analyzer of
+                // the VU meter. Binding it here, once per load, also covers an engine swap under a running player.
+                this.attachVuMeter(engine);
                 if (this.state !== LuminaAudioPlayer.PlayerState.LOADING) {
                     // A stop during the load already paused the engine; a newer request owns the player state and must not be touched by this stale continuation.
                     if (this.state === LuminaAudioPlayer.PlayerState.IDLE)
@@ -1950,6 +2058,8 @@
                 this.main.classList.remove('audio-player-not-shown');
             if (wasHidden)
                 this.events.emit(LuminaAudioPlayer.PlayerEvent.VISIBILITY_CHANGED, { isVisible: true });
+            // A bar that becomes visible while a track plays starts the VU meter, which was stopped while the bar was out of sight.
+            this.updateVuMeterState(this.state);
         }
 
         /**
@@ -1968,6 +2078,8 @@
             if (this.main)
                 this.main.classList.add('audio-player-not-shown');
             this.events.emit(LuminaAudioPlayer.PlayerEvent.VISIBILITY_CHANGED, { isVisible: false });
+            // A bar that is out of sight stops reading the analyzer, so a hidden meter costs no animation frames.
+            this.updateVuMeterState(this.state);
         }
 
         /**
@@ -2670,6 +2782,20 @@
         }
 
         /**
+         * Re-reads the stored settings and playback state of the user, without recreating the player.
+         *
+         * It is meant for a consumer that knows the stored settings changed while the player is running, such as the
+         * settings page after it saved them, so the change applies immediately instead of on the next full page load. The
+         * read is the same one the player performs at startup, so it never overwrites a volume or a mute state the user changed in the meantime.
+         * @returns {Promise<void>} A promise that completes when the preferences were read.
+         */
+        async reloadPreferencesAsync() {
+            if (!this.isAvailable)
+                return;
+            await this.loadPreferencesAsync();
+        }
+
+        /**
          * Gets the last capability report, or null when detection has not completed yet.
          * @returns {Object|null} The capability report.
          */
@@ -2751,6 +2877,15 @@
                 }
                 this.engine = null;
             }
+            if (this.vuMeterUnsubscribe) {
+                this.vuMeterUnsubscribe();
+                this.vuMeterUnsubscribe = null;
+            }
+            if (this.vuMeter) {
+                this.vuMeter.destroy();
+                this.vuMeter = null;
+            }
+            this.vuMeterAnalyser = null;
             this.events.clear();
             this.setState(LuminaAudioPlayer.PlayerState.IDLE);
             // The singleton is no longer usable, so it is cleared, and a later createDefaultPlayer builds a fresh one.
@@ -2775,6 +2910,7 @@
                 console.warn(`Audio player: the transition '${previousState}' -> '${nextState}' is not part of the state machine.`);
             this.state = nextState;
             this.events.emit(LuminaAudioPlayer.PlayerEvent.STATE_CHANGED, { previousState, state: nextState });
+            this.updateVuMeterState(nextState);
         }
 
         /**
@@ -3277,7 +3413,16 @@
                     isGaplessPlaybackEnabled: settings.isGaplessPlaybackEnabled === true,
                     replayGainMode: settings.replayGainMode || 'Off',
                     streamingQuality: settings.streamingQuality || 'Auto',
-                    shouldIgnoreThePrefixForAlphaPicker: settings.shouldIgnoreThePrefixForAlphaPicker === true
+                    shouldIgnoreThePrefixForAlphaPicker: settings.shouldIgnoreThePrefixForAlphaPicker === true,
+                    vuMeterOrientation: settings.vuMeterOrientation || 'Vertical',
+                    vuMeterSegmentCount: LuminaAudioPlayer.toFiniteNumber(settings.vuMeterSegmentCount) ?? 12,
+                    vuMeterSegmentGap: LuminaAudioPlayer.toFiniteNumber(settings.vuMeterSegmentGap) ?? 1,
+                    vuMeterMediumThreshold: LuminaAudioPlayer.toFiniteNumber(settings.vuMeterMediumThreshold) ?? 0.6,
+                    vuMeterHighThreshold: LuminaAudioPlayer.toFiniteNumber(settings.vuMeterHighThreshold) ?? 0.8,
+                    vuMeterShowPeak: settings.vuMeterShowPeak !== false,
+                    vuMeterPeakHoldDurationInMilliseconds: LuminaAudioPlayer.toFiniteNumber(settings.vuMeterPeakHoldDurationInMilliseconds) ?? 650,
+                    vuMeterReleasePerSecond: LuminaAudioPlayer.toFiniteNumber(settings.vuMeterReleasePerSecond) ?? 3,
+                    vuMeterPeakReleasePerSecond: LuminaAudioPlayer.toFiniteNumber(settings.vuMeterPeakReleasePerSecond) ?? 0.65
                 };
                 // The payload is a frozen copy, so a subscriber that mutates it cannot change the preferences the player uses.
                 this.events.emit(LuminaAudioPlayer.PlayerEvent.PREFERENCES_CHANGED, Object.freeze({ ...this.preferences }));

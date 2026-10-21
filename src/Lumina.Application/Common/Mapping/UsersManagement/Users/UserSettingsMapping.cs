@@ -35,6 +35,15 @@ public static class UserSettingsMapping
             IsGaplessPlaybackEnabled = domainEntity.IsGaplessPlaybackEnabled,
             ReplayGainMode = domainEntity.ReplayGainMode,
             StreamingQuality = domainEntity.StreamingQuality,
+            VuMeterOrientation = domainEntity.VuMeterOrientation,
+            VuMeterSegmentCount = domainEntity.VuMeterSegmentCount,
+            VuMeterSegmentGap = domainEntity.VuMeterSegmentGap,
+            VuMeterMediumThreshold = domainEntity.VuMeterMediumThreshold,
+            VuMeterHighThreshold = domainEntity.VuMeterHighThreshold,
+            VuMeterShowPeak = domainEntity.VuMeterShowPeak,
+            VuMeterPeakHoldDurationInMilliseconds = domainEntity.VuMeterPeakHoldDurationInMilliseconds,
+            VuMeterReleasePerSecond = domainEntity.VuMeterReleasePerSecond,
+            VuMeterPeakReleasePerSecond = domainEntity.VuMeterPeakReleasePerSecond,
             Volume = domainEntity.Volume,
             IsMuted = domainEntity.IsMuted
         };
@@ -61,7 +70,16 @@ public static class UserSettingsMapping
             domainEntity.ShouldAutoplay,
             domainEntity.IsGaplessPlaybackEnabled,
             domainEntity.ReplayGainMode,
-            domainEntity.StreamingQuality
+            domainEntity.StreamingQuality,
+            domainEntity.VuMeterOrientation,
+            domainEntity.VuMeterSegmentCount,
+            domainEntity.VuMeterSegmentGap,
+            domainEntity.VuMeterMediumThreshold,
+            domainEntity.VuMeterHighThreshold,
+            domainEntity.VuMeterShowPeak,
+            domainEntity.VuMeterPeakHoldDurationInMilliseconds,
+            domainEntity.VuMeterReleasePerSecond,
+            domainEntity.VuMeterPeakReleasePerSecond
         );
     }
 }

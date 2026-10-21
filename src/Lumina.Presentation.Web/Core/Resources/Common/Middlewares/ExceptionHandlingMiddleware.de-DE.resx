@@ -849,4 +849,58 @@
   <data name="ShuffleTrackCountMustBeAtMost500" xml:space="preserve">
     <value>Die Anzahl der Shuffle-Titel darf höchstens 500 betragen!</value>
   </data>
+  <data name="VuMeterReleasePerSecondCannotBeNull" xml:space="preserve">
+    <value>Der Rückgang des VU-Meters darf nicht null sein!</value>
+  </data>
+  <data name="VuMeterSegmentCountCannotBeNull" xml:space="preserve">
+    <value>Die Segmentanzahl des VU-Meters darf nicht null sein!</value>
+  </data>
+  <data name="VuMeterReleasePerSecondMustBeBetweenZeroAndOneHundred" xml:space="preserve">
+    <value>Der Rückgang des VU-Meters muss zwischen 0 und 100 pro Sekunde liegen!</value>
+  </data>
+  <data name="VuMeterPeakHoldDurationMustBeBetweenZeroAndTenThousandMilliseconds" xml:space="preserve">
+    <value>Die Haltedauer der Spitzenwerte des VU-Meters muss zwischen 0 und 10000 Millisekunden liegen!</value>
+  </data>
+  <data name="InvalidVuMeterOrientation" xml:space="preserve">
+    <value>Ungültige Ausrichtung des VU-Meters!</value>
+  </data>
+  <data name="VuMeterSegmentCountMustBeBetweenOneAndOneHundredTwentyEight" xml:space="preserve">
+    <value>Die Segmentanzahl des VU-Meters muss zwischen 1 und 128 liegen!</value>
+  </data>
+  <data name="VuMeterShowPeakCannotBeNull" xml:space="preserve">
+    <value>Die Einstellung zum Anzeigen der Spitzenwerte des VU-Meters darf nicht null sein!</value>
+  </data>
+  <data name="VuMeterMediumThresholdMustBeBetweenZeroAndOne" xml:space="preserve">
+    <value>Der mittlere Schwellenwert des VU-Meters muss zwischen 0 und 1 liegen!</value>
+  </data>
+  <data name="VuMeterPeakReleasePerSecondMustBeBetweenZeroAndOneHundred" xml:space="preserve">
+    <value>Der Rückgang der Spitzenwerte des VU-Meters muss zwischen 0 und 100 pro Sekunde liegen!</value>
+  </data>
+  <data name="VuMeterSegmentGapCannotBeNull" xml:space="preserve">
+    <value>Der Segmentabstand des VU-Meters darf nicht null sein!</value>
+  </data>
+  <data name="VuMeterSegmentGapMustBeBetweenZeroAndThirtyTwo" xml:space="preserve">
+    <value>Der Segmentabstand des VU-Meters muss zwischen 0 und 32 liegen!</value>
+  </data>
+  <data name="VuMeterPeakHoldDurationCannotBeNull" xml:space="preserve">
+    <value>Die Haltedauer der Spitzenwerte des VU-Meters darf nicht null sein!</value>
+  </data>
+  <data name="VuMeterOrientationCannotBeNull" xml:space="preserve">
+    <value>Die Ausrichtung des VU-Meters darf nicht null sein!</value>
+  </data>
+  <data name="VuMeterMediumThresholdCannotBeNull" xml:space="preserve">
+    <value>Der mittlere Schwellenwert des VU-Meters darf nicht null sein!</value>
+  </data>
+  <data name="VuMeterHighThresholdMustBeBetweenZeroAndOne" xml:space="preserve">
+    <value>Der hohe Schwellenwert des VU-Meters muss zwischen 0 und 1 liegen!</value>
+  </data>
+  <data name="VuMeterPeakReleasePerSecondCannotBeNull" xml:space="preserve">
+    <value>Der Rückgang der Spitzenwerte des VU-Meters darf nicht null sein!</value>
+  </data>
+  <data name="VuMeterHighThresholdMustBeGreaterThanOrEqualToMediumThreshold" xml:space="preserve">
+    <value>Der hohe Schwellenwert des VU-Meters muss größer oder gleich dem mittleren Schwellenwert sein!</value>
+  </data>
+  <data name="VuMeterHighThresholdCannotBeNull" xml:space="preserve">
+    <value>Der hohe Schwellenwert des VU-Meters darf nicht null sein!</value>
+  </data>
 </root>

@@ -123,4 +123,67 @@
   <data name="StreamingQualityHigh" xml:space="preserve">
     <value>高 (320 kbps)</value>
   </data>
+  <data name="DescriptionVuMeterSegmentCount" xml:space="preserve">
+    <value>VU 表的每个通道分为多少段，介于 1 到 128 之间。</value>
+  </data>
+  <data name="VuMeterPeakReleasePerSecond" xml:space="preserve">
+    <value>峰值衰落</value>
+  </data>
+  <data name="DescriptionVuMeterHighThreshold" xml:space="preserve">
+    <value>以高状态绘制段时所超过的电平，介于 0 到 1 之间。它必须大于或等于中等阈值。</value>
+  </data>
+  <data name="DescriptionVuMeterOrientation" xml:space="preserve">
+    <value>VU 表的通道是从下向上增长，还是从左向右增长。</value>
+  </data>
+  <data name="DescriptionVuMeterMediumThreshold" xml:space="preserve">
+    <value>以中等状态绘制段时所超过的电平，介于 0 到 1 之间。</value>
+  </data>
+  <data name="VuMeterOrientationVertical" xml:space="preserve">
+    <value>垂直</value>
+  </data>
+  <data name="VuMeterReleasePerSecond" xml:space="preserve">
+    <value>电平衰落</value>
+  </data>
+  <data name="VuMeterOrientationHorizontal" xml:space="preserve">
+    <value>水平</value>
+  </data>
+  <data name="VuMeterOrientation" xml:space="preserve">
+    <value>方向</value>
+  </data>
+  <data name="VuMeterHighThreshold" xml:space="preserve">
+    <value>高阈值</value>
+  </data>
+  <data name="VuMeterSegmentCount" xml:space="preserve">
+    <value>每通道段数</value>
+  </data>
+  <data name="VuMeterMediumThreshold" xml:space="preserve">
+    <value>中等阈值</value>
+  </data>
+  <data name="VuMeter" xml:space="preserve">
+    <value>VU 表</value>
+  </data>
+  <data name="VuMeterPeakHoldDuration" xml:space="preserve">
+    <value>峰值保持（毫秒）</value>
+  </data>
+  <data name="DescriptionVuMeterShowPeak" xml:space="preserve">
+    <value>每个通道是否在其最近的最大电平处保留标记。</value>
+  </data>
+  <data name="DescriptionVuMeterPeakReleasePerSecond" xml:space="preserve">
+    <value>峰值标记在保持时间过后每秒下降的电平单位数，介于 0 到 100 之间。数值越大下降越快。</value>
+  </data>
+  <data name="DescriptionVuMeterPeakHoldDuration" xml:space="preserve">
+    <value>峰值标记在开始下降之前保持的时间（以毫秒为单位），介于 0 到 10000 之间。</value>
+  </data>
+  <data name="VuMeterShowPeak" xml:space="preserve">
+    <value>显示峰值</value>
+  </data>
+  <data name="DescriptionVuMeterSegmentGap" xml:space="preserve">
+    <value>VU 表的段与通道之间的间距（以像素为单位），介于 0 到 32 之间。</value>
+  </data>
+  <data name="VuMeterSegmentGap" xml:space="preserve">
+    <value>段间距</value>
+  </data>
+  <data name="DescriptionVuMeterReleasePerSecond" xml:space="preserve">
+    <value>声音下降后通道每秒下降的电平单位数，介于 0 到 100 之间。数值越大下降越快。</value>
+  </data>
 </root>

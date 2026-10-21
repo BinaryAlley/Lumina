@@ -654,6 +654,16 @@
         }
 
         /**
+         * Gets the analyzer that taps the track level of the engine, which the VU meter of the bar reads. The analyzer of
+         * the shared renderer sits before the output volume, so the meter does not change with the volume setting, and it
+         * stays valid across the tracks the engine plays, because the renderer and its audio context are reused.
+         * @returns {AnalyserNode|null} The output analyzer, or null while no audio context has been created yet.
+         */
+        getOutputAnalyser() {
+            return this.renderer.getOutputAnalyser();
+        }
+
+        /**
          * Checks whether the engine was destroyed.
          * @returns {boolean} True when the engine was destroyed.
          */

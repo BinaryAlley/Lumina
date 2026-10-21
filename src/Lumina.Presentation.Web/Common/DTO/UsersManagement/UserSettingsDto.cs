@@ -84,4 +84,49 @@ public class UserSettingsDto
     /// Gets or sets the quality cap applied to the audio the server normalizes for the user.
     /// </summary>
     public PlaybackStreamingQuality? StreamingQuality { get; set; }
+
+    /// <summary>
+    /// Gets or sets the direction in which each channel of the VU meter of the audio player grows.
+    /// </summary>
+    public VuMeterOrientation? VuMeterOrientation { get; set; } = Enums.AudioLibrary.VuMeterOrientation.Vertical;
+
+    /// <summary>
+    /// Gets or sets the number of segments each channel of the VU meter is divided into.
+    /// </summary>
+    public int? VuMeterSegmentCount { get; set; } = 12;
+
+    /// <summary>
+    /// Gets or sets the gap, in pixels, between the segments and the channels of the VU meter.
+    /// </summary>
+    public int? VuMeterSegmentGap { get; set; } = 1;
+
+    /// <summary>
+    /// Gets or sets the level, between 0 and 1, above which a segment of the VU meter is drawn with its medium state.
+    /// </summary>
+    public double? VuMeterMediumThreshold { get; set; } = 0.6;
+
+    /// <summary>
+    /// Gets or sets the level, between 0 and 1, above which a segment of the VU meter is drawn with its high state.
+    /// </summary>
+    public double? VuMeterHighThreshold { get; set; } = 0.8;
+
+    /// <summary>
+    /// Gets or sets whether the VU meter holds the peak level of each channel after it falls, or not.
+    /// </summary>
+    public bool? VuMeterShowPeak { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets the time, in milliseconds, a peak of the VU meter is held before it starts falling.
+    /// </summary>
+    public int? VuMeterPeakHoldDurationInMilliseconds { get; set; } = 650;
+
+    /// <summary>
+    /// Gets or sets the number of level units the display of the VU meter falls per second when the input level drops.
+    /// </summary>
+    public double? VuMeterReleasePerSecond { get; set; } = 3.0;
+
+    /// <summary>
+    /// Gets or sets the number of level units the peak of the VU meter falls per second after its hold time elapsed.
+    /// </summary>
+    public double? VuMeterPeakReleasePerSecond { get; set; } = 0.65;
 }

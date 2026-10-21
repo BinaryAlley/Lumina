@@ -21,6 +21,12 @@
  *   - getBufferedTimeRanges(): the time ranges, in seconds, the engine already downloaded, as a list of objects with
  *     a 'start' and an 'end'. It is optional: an engine that does not implement it makes the player unable to tell
  *     whether a seek target is buffered, in which case the player never shows a loading state for a seek.
+ *   - getOutputAnalyser() (optional): the AnalyserNode that taps the sound the engine outputs, after its ReplayGain
+ *     normalization but before its output volume and mute state, or null when the engine cannot expose one. The player
+ *     hands it to the VU meter of the bar, which reads it on every animation frame; tapping before the volume is what
+ *     keeps the meter height independent of the volume setting. The node must stay valid for as long as the engine lives:
+ *     the player binds it once, when a track was loaded, and the renderer keeps the same node across the tracks it plays.
+ *     An engine that does not implement this method, or that returns null, makes the bar render an empty meter.
  *   - discardCurrentAsync() (optional): releases the currently prepared track without destroying the engine, so a stop
  *     during an automatic continuation does not leave the track it started loaded behind an idle player.
  *   - cancelUpcomingAsync() (optional): drops a prefetched or appended handoff of the current track when the player queue is

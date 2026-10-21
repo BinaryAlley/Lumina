@@ -79,7 +79,7 @@ public class ErrorsTests
     {
         // Assert
         // The count assertion fails when an error is added or removed, reminding to update the assertions below.
-        Assert.Equal(13, typeof(DomainErrors.UserSettings).GetProperties().Length);
+        Assert.Equal(31, typeof(DomainErrors.UserSettings).GetProperties().Length);
         AssertError(DomainErrors.UserSettings.UserSettingsAlreadyExists, ErrorType.Conflict);
         AssertError(DomainErrors.UserSettings.UserSettingsNotFound, ErrorType.NotFound);
         AssertError(DomainErrors.UserSettings.ItemsPerPageMustBeGreaterThanZero, ErrorType.Validation);
@@ -93,6 +93,24 @@ public class ErrorsTests
         AssertError(DomainErrors.UserSettings.StreamingQualityCannotBeNull, ErrorType.Validation);
         AssertError(DomainErrors.UserSettings.InvalidReplayGainMode, ErrorType.Validation);
         AssertError(DomainErrors.UserSettings.InvalidStreamingQuality, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterOrientationCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.InvalidVuMeterOrientation, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterSegmentCountCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterSegmentCountMustBeBetweenOneAndOneHundredTwentyEight, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterSegmentGapCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterSegmentGapMustBeBetweenZeroAndThirtyTwo, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterMediumThresholdCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterMediumThresholdMustBeBetweenZeroAndOne, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterHighThresholdCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterHighThresholdMustBeBetweenZeroAndOne, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterHighThresholdMustBeGreaterThanOrEqualToMediumThreshold, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterShowPeakCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterPeakHoldDurationCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterPeakHoldDurationMustBeBetweenZeroAndTenThousandMilliseconds, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterReleasePerSecondCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterReleasePerSecondMustBeBetweenZeroAndOneHundred, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterPeakReleasePerSecondCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterPeakReleasePerSecondMustBeBetweenZeroAndOneHundred, ErrorType.Validation);
     }
 
     [Fact]

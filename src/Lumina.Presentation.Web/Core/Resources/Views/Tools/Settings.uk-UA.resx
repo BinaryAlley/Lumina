@@ -123,4 +123,67 @@
   <data name="StreamingQualityHigh" xml:space="preserve">
     <value>Висока (320 kbps)</value>
   </data>
+  <data name="DescriptionVuMeterSegmentCount" xml:space="preserve">
+    <value>На скільки сегментів поділено кожен канал VU-метра, від 1 до 128.</value>
+  </data>
+  <data name="VuMeterPeakReleasePerSecond" xml:space="preserve">
+    <value>Спад піків</value>
+  </data>
+  <data name="DescriptionVuMeterHighThreshold" xml:space="preserve">
+    <value>Рівень від 0 до 1, вище якого сегмент малюється у високому стані. Він має бути не меншим за середній поріг.</value>
+  </data>
+  <data name="DescriptionVuMeterOrientation" xml:space="preserve">
+    <value>Чи ростуть канали VU-метра знизу вгору або зліва направо.</value>
+  </data>
+  <data name="DescriptionVuMeterMediumThreshold" xml:space="preserve">
+    <value>Рівень від 0 до 1, вище якого сегмент малюється в середньому стані.</value>
+  </data>
+  <data name="VuMeterOrientationVertical" xml:space="preserve">
+    <value>Вертикальна</value>
+  </data>
+  <data name="VuMeterReleasePerSecond" xml:space="preserve">
+    <value>Спад рівня</value>
+  </data>
+  <data name="VuMeterOrientationHorizontal" xml:space="preserve">
+    <value>Горизонтальна</value>
+  </data>
+  <data name="VuMeterOrientation" xml:space="preserve">
+    <value>Орієнтація</value>
+  </data>
+  <data name="VuMeterHighThreshold" xml:space="preserve">
+    <value>Високий поріг</value>
+  </data>
+  <data name="VuMeterSegmentCount" xml:space="preserve">
+    <value>Сегментів на канал</value>
+  </data>
+  <data name="VuMeterMediumThreshold" xml:space="preserve">
+    <value>Середній поріг</value>
+  </data>
+  <data name="VuMeter" xml:space="preserve">
+    <value>VU-метр</value>
+  </data>
+  <data name="VuMeterPeakHoldDuration" xml:space="preserve">
+    <value>Утримання піків (мс)</value>
+  </data>
+  <data name="DescriptionVuMeterShowPeak" xml:space="preserve">
+    <value>Чи залишає кожен канал позначку на своєму найгучнішому недавньому рівні.</value>
+  </data>
+  <data name="DescriptionVuMeterPeakReleasePerSecond" xml:space="preserve">
+    <value>Скільки одиниць рівня позначка піку спадає за секунду після часу утримання, від 0 до 100. Більші значення спадають швидше.</value>
+  </data>
+  <data name="DescriptionVuMeterPeakHoldDuration" xml:space="preserve">
+    <value>Скільки мілісекунд позначка піку утримується перед тим, як почати спадати, від 0 до 10000.</value>
+  </data>
+  <data name="VuMeterShowPeak" xml:space="preserve">
+    <value>Показувати піки</value>
+  </data>
+  <data name="DescriptionVuMeterSegmentGap" xml:space="preserve">
+    <value>Проміжок у пікселях між сегментами та каналами VU-метра, від 0 до 32.</value>
+  </data>
+  <data name="VuMeterSegmentGap" xml:space="preserve">
+    <value>Проміжок між сегментами</value>
+  </data>
+  <data name="DescriptionVuMeterReleasePerSecond" xml:space="preserve">
+    <value>Скільки одиниць рівня канал спадає за секунду після зниження звуку, від 0 до 100. Більші значення спадають швидше.</value>
+  </data>
 </root>

@@ -849,4 +849,58 @@
   <data name="ShuffleTrackCountMustBeAtMost500" xml:space="preserve">
     <value>¡La cantidad de pistas de reproducción aleatoria no debe superar 500!</value>
   </data>
+  <data name="VuMeterReleasePerSecondCannotBeNull" xml:space="preserve">
+    <value>La caída del vúmetro no puede ser nula.</value>
+  </data>
+  <data name="VuMeterSegmentCountCannotBeNull" xml:space="preserve">
+    <value>El número de segmentos del vúmetro no puede ser nulo.</value>
+  </data>
+  <data name="VuMeterReleasePerSecondMustBeBetweenZeroAndOneHundred" xml:space="preserve">
+    <value>La caída del vúmetro debe estar entre 0 y 100 por segundo.</value>
+  </data>
+  <data name="VuMeterPeakHoldDurationMustBeBetweenZeroAndTenThousandMilliseconds" xml:space="preserve">
+    <value>La duración de retención de los picos del vúmetro debe estar entre 0 y 10000 milisegundos.</value>
+  </data>
+  <data name="InvalidVuMeterOrientation" xml:space="preserve">
+    <value>¡Orientación del vúmetro no válida!</value>
+  </data>
+  <data name="VuMeterSegmentCountMustBeBetweenOneAndOneHundredTwentyEight" xml:space="preserve">
+    <value>El número de segmentos del vúmetro debe estar entre 1 y 128.</value>
+  </data>
+  <data name="VuMeterShowPeakCannotBeNull" xml:space="preserve">
+    <value>La preferencia de mostrar los picos del vúmetro no puede ser nula.</value>
+  </data>
+  <data name="VuMeterMediumThresholdMustBeBetweenZeroAndOne" xml:space="preserve">
+    <value>El umbral medio del vúmetro debe estar entre 0 y 1.</value>
+  </data>
+  <data name="VuMeterPeakReleasePerSecondMustBeBetweenZeroAndOneHundred" xml:space="preserve">
+    <value>La caída de los picos del vúmetro debe estar entre 0 y 100 por segundo.</value>
+  </data>
+  <data name="VuMeterSegmentGapCannotBeNull" xml:space="preserve">
+    <value>La separación de los segmentos del vúmetro no puede ser nula.</value>
+  </data>
+  <data name="VuMeterSegmentGapMustBeBetweenZeroAndThirtyTwo" xml:space="preserve">
+    <value>La separación de los segmentos del vúmetro debe estar entre 0 y 32.</value>
+  </data>
+  <data name="VuMeterPeakHoldDurationCannotBeNull" xml:space="preserve">
+    <value>La duración de retención de los picos del vúmetro no puede ser nula.</value>
+  </data>
+  <data name="VuMeterOrientationCannotBeNull" xml:space="preserve">
+    <value>La orientación del vúmetro no puede ser nula.</value>
+  </data>
+  <data name="VuMeterMediumThresholdCannotBeNull" xml:space="preserve">
+    <value>El umbral medio del vúmetro no puede ser nulo.</value>
+  </data>
+  <data name="VuMeterHighThresholdMustBeBetweenZeroAndOne" xml:space="preserve">
+    <value>El umbral alto del vúmetro debe estar entre 0 y 1.</value>
+  </data>
+  <data name="VuMeterPeakReleasePerSecondCannotBeNull" xml:space="preserve">
+    <value>La caída de los picos del vúmetro no puede ser nula.</value>
+  </data>
+  <data name="VuMeterHighThresholdMustBeGreaterThanOrEqualToMediumThreshold" xml:space="preserve">
+    <value>El umbral alto del vúmetro debe ser mayor o igual que el umbral medio.</value>
+  </data>
+  <data name="VuMeterHighThresholdCannotBeNull" xml:space="preserve">
+    <value>El umbral alto del vúmetro no puede ser nulo.</value>
+  </data>
 </root>

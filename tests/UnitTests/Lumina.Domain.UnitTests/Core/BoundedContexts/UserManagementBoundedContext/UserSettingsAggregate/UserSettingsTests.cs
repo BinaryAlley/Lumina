@@ -80,7 +80,7 @@ public class UserSettingsTests
         UserId userId = _userIdFixture.Create();
 
         // Act
-        Result<UserSettings> result = UserSettings.Create(userId, isPaginationEnabled: false, itemsPerPage: 24, shouldIgnoreThePrefixForAlphaPicker: true, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: true, shouldAggregateArtworkWhenMissing: true, shouldRenderPdfAsImages: true, shouldPreserveBookStyles: true, shouldKeepDownloadingWhilePaused: true, shouldAutoplay: true, isGaplessPlaybackEnabled: true, replayGainMode: ReplayGainMode.Off, streamingQuality: PlaybackStreamingQuality.Auto, volume: 1.0, isMuted: false);
+        Result<UserSettings> result = UserSettings.Create(userId, isPaginationEnabled: false, itemsPerPage: 24, shouldIgnoreThePrefixForAlphaPicker: true, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: true, shouldAggregateArtworkWhenMissing: true, shouldRenderPdfAsImages: true, shouldPreserveBookStyles: true, shouldKeepDownloadingWhilePaused: true, shouldAutoplay: true, isGaplessPlaybackEnabled: true, replayGainMode: ReplayGainMode.Off, streamingQuality: PlaybackStreamingQuality.Auto, vuMeterOrientation: VuMeterOrientation.Vertical, vuMeterSegmentCount: 12, vuMeterSegmentGap: 1, vuMeterMediumThreshold: 0.6, vuMeterHighThreshold: 0.8, vuMeterShowPeak: true, vuMeterPeakHoldDurationInMilliseconds: 650, vuMeterReleasePerSecond: 1.5, vuMeterPeakReleasePerSecond: 0.65, volume: 1.0, isMuted: false);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -116,7 +116,7 @@ public class UserSettingsTests
         UserSettingsId id = _userSettingsIdFixture.Create();
 
         // Act
-        Result<UserSettings> result = UserSettings.Create(id, userId, isPaginationEnabled: true, itemsPerPage: 24, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false, shouldAggregateArtworkWhenMissing: false, shouldRenderPdfAsImages: false, shouldPreserveBookStyles: true, shouldKeepDownloadingWhilePaused: true, shouldAutoplay: true, isGaplessPlaybackEnabled: true, replayGainMode: ReplayGainMode.Off, streamingQuality: PlaybackStreamingQuality.Auto, volume: 1.0, isMuted: false);
+        Result<UserSettings> result = UserSettings.Create(id, userId, isPaginationEnabled: true, itemsPerPage: 24, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false, shouldAggregateArtworkWhenMissing: false, shouldRenderPdfAsImages: false, shouldPreserveBookStyles: true, shouldKeepDownloadingWhilePaused: true, shouldAutoplay: true, isGaplessPlaybackEnabled: true, replayGainMode: ReplayGainMode.Off, streamingQuality: PlaybackStreamingQuality.Auto, vuMeterOrientation: VuMeterOrientation.Vertical, vuMeterSegmentCount: 12, vuMeterSegmentGap: 1, vuMeterMediumThreshold: 0.6, vuMeterHighThreshold: 0.8, vuMeterShowPeak: true, vuMeterPeakHoldDurationInMilliseconds: 650, vuMeterReleasePerSecond: 1.5, vuMeterPeakReleasePerSecond: 0.65, volume: 1.0, isMuted: false);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -132,7 +132,7 @@ public class UserSettingsTests
         UserSettings userSettings = _userSettingsFixture.Create();
 
         // Act
-        Result<Updated> result = userSettings.UpdateSettings(isPaginationEnabled: false, itemsPerPage: 12, shouldIgnoreThePrefixForAlphaPicker: true, isThemeCachingEnabled: false, shouldAggregateMetadataWhenMissing: true, shouldAggregateArtworkWhenMissing: true, shouldRenderPdfAsImages: true, shouldPreserveBookStyles: true, shouldKeepDownloadingWhilePaused: true, shouldAutoplay: true, isGaplessPlaybackEnabled: true, replayGainMode: ReplayGainMode.Off, streamingQuality: PlaybackStreamingQuality.Auto);
+        Result<Updated> result = userSettings.UpdateSettings(isPaginationEnabled: false, itemsPerPage: 12, shouldIgnoreThePrefixForAlphaPicker: true, isThemeCachingEnabled: false, shouldAggregateMetadataWhenMissing: true, shouldAggregateArtworkWhenMissing: true, shouldRenderPdfAsImages: true, shouldPreserveBookStyles: true, shouldKeepDownloadingWhilePaused: true, shouldAutoplay: true, isGaplessPlaybackEnabled: true, replayGainMode: ReplayGainMode.Off, streamingQuality: PlaybackStreamingQuality.Auto, vuMeterOrientation: VuMeterOrientation.Vertical, vuMeterSegmentCount: 12, vuMeterSegmentGap: 1, vuMeterMediumThreshold: 0.6, vuMeterHighThreshold: 0.8, vuMeterShowPeak: true, vuMeterPeakHoldDurationInMilliseconds: 650, vuMeterReleasePerSecond: 1.5, vuMeterPeakReleasePerSecond: 0.65);
 
         // Assert
         Assert.False(result.IsFailure);

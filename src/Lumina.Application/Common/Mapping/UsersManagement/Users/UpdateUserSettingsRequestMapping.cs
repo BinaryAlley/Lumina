@@ -30,7 +30,16 @@ public static class UpdateUserSettingsRequestMapping
             request.ShouldAutoplay,
             request.IsGaplessPlaybackEnabled,
             request.ReplayGainMode,
-            request.StreamingQuality
+            request.StreamingQuality,
+            request.VuMeterOrientation,
+            request.VuMeterSegmentCount,
+            request.VuMeterSegmentGap,
+            request.VuMeterMediumThreshold,
+            request.VuMeterHighThreshold,
+            request.VuMeterShowPeak,
+            request.VuMeterPeakHoldDurationInMilliseconds,
+            request.VuMeterReleasePerSecond,
+            request.VuMeterPeakReleasePerSecond
         );
     }
 }

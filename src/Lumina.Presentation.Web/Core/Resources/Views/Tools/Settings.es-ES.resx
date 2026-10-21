@@ -123,4 +123,67 @@
   <data name="StreamingQualityHigh" xml:space="preserve">
     <value>Alta (320 kbps)</value>
   </data>
+  <data name="DescriptionVuMeterSegmentCount" xml:space="preserve">
+    <value>En cuántos segmentos se divide cada canal del vúmetro, entre 1 y 128.</value>
+  </data>
+  <data name="VuMeterPeakReleasePerSecond" xml:space="preserve">
+    <value>Caída de los picos</value>
+  </data>
+  <data name="DescriptionVuMeterHighThreshold" xml:space="preserve">
+    <value>El nivel, entre 0 y 1, por encima del cual un segmento se dibuja con el estado alto. Debe ser al menos el umbral medio.</value>
+  </data>
+  <data name="DescriptionVuMeterOrientation" xml:space="preserve">
+    <value>Indica si los canales del vúmetro crecen de abajo hacia arriba o de izquierda a derecha.</value>
+  </data>
+  <data name="DescriptionVuMeterMediumThreshold" xml:space="preserve">
+    <value>El nivel, entre 0 y 1, por encima del cual un segmento se dibuja con el estado medio.</value>
+  </data>
+  <data name="VuMeterOrientationVertical" xml:space="preserve">
+    <value>Vertical</value>
+  </data>
+  <data name="VuMeterReleasePerSecond" xml:space="preserve">
+    <value>Caída del nivel</value>
+  </data>
+  <data name="VuMeterOrientationHorizontal" xml:space="preserve">
+    <value>Horizontal</value>
+  </data>
+  <data name="VuMeterOrientation" xml:space="preserve">
+    <value>Orientación</value>
+  </data>
+  <data name="VuMeterHighThreshold" xml:space="preserve">
+    <value>Umbral alto</value>
+  </data>
+  <data name="VuMeterSegmentCount" xml:space="preserve">
+    <value>Segmentos por canal</value>
+  </data>
+  <data name="VuMeterMediumThreshold" xml:space="preserve">
+    <value>Umbral medio</value>
+  </data>
+  <data name="VuMeter" xml:space="preserve">
+    <value>Vúmetro</value>
+  </data>
+  <data name="VuMeterPeakHoldDuration" xml:space="preserve">
+    <value>Retención de picos (ms)</value>
+  </data>
+  <data name="DescriptionVuMeterShowPeak" xml:space="preserve">
+    <value>Indica si cada canal mantiene una marca en su nivel reciente más alto.</value>
+  </data>
+  <data name="DescriptionVuMeterPeakReleasePerSecond" xml:space="preserve">
+    <value>Cuántas unidades de nivel cae una marca de pico por segundo después de su tiempo de retención, entre 0 y 100. Los valores más altos caen más rápido.</value>
+  </data>
+  <data name="DescriptionVuMeterPeakHoldDuration" xml:space="preserve">
+    <value>Cuánto tiempo, en milisegundos, se mantiene una marca de pico antes de empezar a caer, entre 0 y 10000.</value>
+  </data>
+  <data name="VuMeterShowPeak" xml:space="preserve">
+    <value>Mostrar picos</value>
+  </data>
+  <data name="DescriptionVuMeterSegmentGap" xml:space="preserve">
+    <value>La separación, en píxeles, entre los segmentos y los canales del vúmetro, entre 0 y 32.</value>
+  </data>
+  <data name="VuMeterSegmentGap" xml:space="preserve">
+    <value>Separación de segmentos</value>
+  </data>
+  <data name="DescriptionVuMeterReleasePerSecond" xml:space="preserve">
+    <value>Cuántas unidades de nivel cae un canal por segundo después de que el sonido baje, entre 0 y 100. Los valores más altos caen más rápido.</value>
+  </data>
 </root>

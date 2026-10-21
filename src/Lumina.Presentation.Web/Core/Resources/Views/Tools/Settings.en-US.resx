@@ -123,4 +123,67 @@
   <data name="StreamingQualityHigh" xml:space="preserve">
     <value>High (320 kbps)</value>
   </data>
+  <data name="DescriptionVuMeterSegmentCount" xml:space="preserve">
+    <value>How many segments each channel of the VU meter is divided into, between 1 and 128.</value>
+  </data>
+  <data name="VuMeterPeakReleasePerSecond" xml:space="preserve">
+    <value>Peak falloff</value>
+  </data>
+  <data name="DescriptionVuMeterHighThreshold" xml:space="preserve">
+    <value>The level, between 0 and 1, above which a segment is drawn with the high state. It must be at least the medium threshold.</value>
+  </data>
+  <data name="DescriptionVuMeterOrientation" xml:space="preserve">
+    <value>Whether the channels of the VU meter grow upwards from the bottom, or rightwards from the left.</value>
+  </data>
+  <data name="DescriptionVuMeterMediumThreshold" xml:space="preserve">
+    <value>The level, between 0 and 1, above which a segment is drawn with the medium state.</value>
+  </data>
+  <data name="VuMeterOrientationVertical" xml:space="preserve">
+    <value>Vertical</value>
+  </data>
+  <data name="VuMeterReleasePerSecond" xml:space="preserve">
+    <value>Level falloff</value>
+  </data>
+  <data name="VuMeterOrientationHorizontal" xml:space="preserve">
+    <value>Horizontal</value>
+  </data>
+  <data name="VuMeterOrientation" xml:space="preserve">
+    <value>Orientation</value>
+  </data>
+  <data name="VuMeterHighThreshold" xml:space="preserve">
+    <value>High threshold</value>
+  </data>
+  <data name="VuMeterSegmentCount" xml:space="preserve">
+    <value>Segments per channel</value>
+  </data>
+  <data name="VuMeterMediumThreshold" xml:space="preserve">
+    <value>Medium threshold</value>
+  </data>
+  <data name="VuMeter" xml:space="preserve">
+    <value>VU meter</value>
+  </data>
+  <data name="VuMeterPeakHoldDuration" xml:space="preserve">
+    <value>Peak hold (ms)</value>
+  </data>
+  <data name="DescriptionVuMeterShowPeak" xml:space="preserve">
+    <value>Whether each channel holds a mark at its loudest recent level.</value>
+  </data>
+  <data name="DescriptionVuMeterPeakReleasePerSecond" xml:space="preserve">
+    <value>How many level units a peak mark falls per second after its hold time, between 0 and 100. Higher values fall faster.</value>
+  </data>
+  <data name="DescriptionVuMeterPeakHoldDuration" xml:space="preserve">
+    <value>How long, in milliseconds, a peak mark is held before it starts falling, between 0 and 10000.</value>
+  </data>
+  <data name="VuMeterShowPeak" xml:space="preserve">
+    <value>Show peak</value>
+  </data>
+  <data name="DescriptionVuMeterSegmentGap" xml:space="preserve">
+    <value>The gap, in pixels, between the segments and the channels of the VU meter, between 0 and 32.</value>
+  </data>
+  <data name="VuMeterSegmentGap" xml:space="preserve">
+    <value>Segment gap</value>
+  </data>
+  <data name="DescriptionVuMeterReleasePerSecond" xml:space="preserve">
+    <value>How many level units a channel falls per second after the sound drops, between 0 and 100. Higher values fall faster.</value>
+  </data>
 </root>

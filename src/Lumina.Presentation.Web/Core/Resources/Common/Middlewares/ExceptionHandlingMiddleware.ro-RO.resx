@@ -849,4 +849,58 @@
   <data name="ShuffleTrackCountMustBeAtMost500" xml:space="preserve">
     <value>Numărul de piste pentru redare aleatorie nu poate depăși 500!</value>
   </data>
+  <data name="VuMeterReleasePerSecondCannotBeNull" xml:space="preserve">
+    <value>Scăderea vumetrului nu poate fi nulă!</value>
+  </data>
+  <data name="VuMeterSegmentCountCannotBeNull" xml:space="preserve">
+    <value>Numărul de segmente al vumetrului nu poate fi nul!</value>
+  </data>
+  <data name="VuMeterReleasePerSecondMustBeBetweenZeroAndOneHundred" xml:space="preserve">
+    <value>Scăderea vumetrului trebuie să fie între 0 și 100 pe secundă!</value>
+  </data>
+  <data name="VuMeterPeakHoldDurationMustBeBetweenZeroAndTenThousandMilliseconds" xml:space="preserve">
+    <value>Durata de menținere a vârfurilor vumetrului trebuie să fie între 0 și 10000 de milisecunde!</value>
+  </data>
+  <data name="InvalidVuMeterOrientation" xml:space="preserve">
+    <value>Orientare nevalidă a vumetrului!</value>
+  </data>
+  <data name="VuMeterSegmentCountMustBeBetweenOneAndOneHundredTwentyEight" xml:space="preserve">
+    <value>Numărul de segmente al vumetrului trebuie să fie între 1 și 128!</value>
+  </data>
+  <data name="VuMeterShowPeakCannotBeNull" xml:space="preserve">
+    <value>Preferința de afișare a vârfurilor vumetrului nu poate fi nulă!</value>
+  </data>
+  <data name="VuMeterMediumThresholdMustBeBetweenZeroAndOne" xml:space="preserve">
+    <value>Pragul mediu al vumetrului trebuie să fie între 0 și 1!</value>
+  </data>
+  <data name="VuMeterPeakReleasePerSecondMustBeBetweenZeroAndOneHundred" xml:space="preserve">
+    <value>Scăderea vârfurilor vumetrului trebuie să fie între 0 și 100 pe secundă!</value>
+  </data>
+  <data name="VuMeterSegmentGapCannotBeNull" xml:space="preserve">
+    <value>Spațiul dintre segmentele vumetrului nu poate fi nul!</value>
+  </data>
+  <data name="VuMeterSegmentGapMustBeBetweenZeroAndThirtyTwo" xml:space="preserve">
+    <value>Spațiul dintre segmentele vumetrului trebuie să fie între 0 și 32!</value>
+  </data>
+  <data name="VuMeterPeakHoldDurationCannotBeNull" xml:space="preserve">
+    <value>Durata de menținere a vârfurilor vumetrului nu poate fi nulă!</value>
+  </data>
+  <data name="VuMeterOrientationCannotBeNull" xml:space="preserve">
+    <value>Orientarea vumetrului nu poate fi nulă!</value>
+  </data>
+  <data name="VuMeterMediumThresholdCannotBeNull" xml:space="preserve">
+    <value>Pragul mediu al vumetrului nu poate fi nul!</value>
+  </data>
+  <data name="VuMeterHighThresholdMustBeBetweenZeroAndOne" xml:space="preserve">
+    <value>Pragul ridicat al vumetrului trebuie să fie între 0 și 1!</value>
+  </data>
+  <data name="VuMeterPeakReleasePerSecondCannotBeNull" xml:space="preserve">
+    <value>Scăderea vârfurilor vumetrului nu poate fi nulă!</value>
+  </data>
+  <data name="VuMeterHighThresholdMustBeGreaterThanOrEqualToMediumThreshold" xml:space="preserve">
+    <value>Pragul ridicat al vumetrului trebuie să fie mai mare sau egal cu pragul mediu!</value>
+  </data>
+  <data name="VuMeterHighThresholdCannotBeNull" xml:space="preserve">
+    <value>Pragul ridicat al vumetrului nu poate fi nul!</value>
+  </data>
 </root>

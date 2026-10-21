@@ -54,6 +54,14 @@
         geometry, so a theme consumes the properties to style each state and to give either bar its own shape and
         orientation. The player marks the bar with 'is-buffering' while it is loading, and carries the state in
         'data-audio-player-progress-state' ('idle', 'ready' or 'buffering') together with the slider ARIA attributes.
+      - The VU meter root carries 'data-audio-player-vu-meter'. The player fills it with one 'audio-player-vu-channel'
+        element per band, one 'audio-player-vu-segment' per segment of the channel, and one 'audio-player-vu-peak' per
+        channel, and writes 'data-audio-player-vu-segment-state' ('active' or 'inactive'),
+        'data-audio-player-vu-segment-zone' ('normal', 'medium' or 'high') and 'data-audio-player-vu-peak-state'
+        ('active' or 'inactive'). It publishes the segment gap and the peak position as the custom properties
+        '--audio-player-vu-segment-gap' and '--audio-player-vu-peak-position'. The root sits between the album art and
+        the current time label; a theme that does not render the hook gets the meter inserted there when the bar is bound.
+        The meter is entirely theme-owned: the stylesheet decides its shape, orientation, size and colors.
       - Themed shells only: the plain text script elements that carry the raw source of the
         'shared/audio-player/queue-item' and 'shared/audio-player/playlist-item' sub templates, with the ids
         'audio-player-template-queue-item' and 'audio-player-template-playlist-item'. This application fallback partial
@@ -102,9 +110,11 @@
             <ul class="audio-player-queue" data-audio-player-queue aria-label="@localizer["AudioPlayerQueue"]"></ul>
         </div>
     </div>
-    <!-- Condensed bar: transport controls, three state progress bar, volume, and track name. -->
+    <!-- Condensed bar: transport controls, three state progress bar, volume, VU meter and track name. -->
     <div class="audio-player-bar">
         <img class="audio-player-cover-thumbnail" data-audio-player-cover-thumbnail alt="" />
+        <!-- VU meter: one segmented channel per band. The script fills it, and a theme restyles every part. -->
+        <div class="audio-player-vu-meter" data-audio-player-vu-meter aria-hidden="true"></div>
         <div class="audio-player-track-labels">
             <span class="audio-player-track-name" data-audio-player-track-name></span>
             <span class="audio-player-album-name" data-audio-player-album-name></span>

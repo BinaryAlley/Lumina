@@ -2552,7 +2552,7 @@ namespace Lumina.DataAccess.Common.Migrations
 
                     b.Property<bool>("IsMuted")
                         .HasColumnType("INTEGER")
-                        .HasColumnOrder(20);
+                        .HasColumnOrder(29);
 
                     b.Property<bool>("IsPaginationEnabled")
                         .HasColumnType("INTEGER")
@@ -2616,7 +2616,43 @@ namespace Lumina.DataAccess.Common.Migrations
 
                     b.Property<double>("Volume")
                         .HasColumnType("REAL")
+                        .HasColumnOrder(28);
+
+                    b.Property<double>("VuMeterHighThreshold")
+                        .HasColumnType("REAL")
+                        .HasColumnOrder(23);
+
+                    b.Property<double>("VuMeterMediumThreshold")
+                        .HasColumnType("REAL")
+                        .HasColumnOrder(22);
+
+                    b.Property<int>("VuMeterOrientation")
+                        .HasColumnType("INTEGER")
                         .HasColumnOrder(19);
+
+                    b.Property<int>("VuMeterPeakHoldDurationInMilliseconds")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(25);
+
+                    b.Property<double>("VuMeterPeakReleasePerSecond")
+                        .HasColumnType("REAL")
+                        .HasColumnOrder(27);
+
+                    b.Property<double>("VuMeterReleasePerSecond")
+                        .HasColumnType("REAL")
+                        .HasColumnOrder(26);
+
+                    b.Property<int>("VuMeterSegmentCount")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(20);
+
+                    b.Property<int>("VuMeterSegmentGap")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(21);
+
+                    b.Property<bool>("VuMeterShowPeak")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(24);
 
                     b.HasKey("Id");
 

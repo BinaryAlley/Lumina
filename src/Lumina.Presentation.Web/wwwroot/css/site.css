@@ -1,4 +1,4 @@
-﻿html,
+html,
 body {
     margin: 0px;
     padding: 0px;
@@ -1380,6 +1380,14 @@ body {
     /* The expand and collapse duration is one value, so a theme can keep the height, fade and padding transitions in step by overriding this property on the container. */
     --audio-player-expanded-duration: 0.4s;
     transition: height var(--audio-player-expanded-duration) ease;
+    /* The VU meter palette is declared on the container so a theme overrides it on the
+       container or on the meter root, and every channel, segment and peak marker inherits the override. */
+    --audio-player-vu-normal-color: #0099FF;
+    --audio-player-vu-medium-color: #FFD166;
+    --audio-player-vu-high-color: #FF5D5D;
+    --audio-player-vu-inactive-color: transparent;
+    --audio-player-vu-peak-color: #F4F7FA;
+    --audio-player-vu-background-color: transparent;
 }
 
 .audio-player-container.not-shown {
@@ -1457,6 +1465,118 @@ html.audio-player-initializing .audio-player-container {
 
 .audio-player-album-name:empty {
     display: none;
+}
+
+/* VU meter. The player renders one channel per band and one segment per channel, and writes only the state and zone of
+   each segment and the position of each peak, so a theme restyles the whole meter from these rules or replaces them. The
+   colors are custom properties declared on the container, so overriding them on the container or on a theme selector is
+   enough to recolor every segment. The meter publishes the configured segment gap as '--audio-player-vu-segment-gap', the
+   segment count as '--audio-player-vu-segment-count', the channel count as '--audio-player-vu-band-count' and the peak position as '--audio-player-vu-peak-position'. */
+.audio-player-vu-meter {
+    --audio-player-vu-cell: 3px;
+    --audio-player-vu-extent: 48px;
+    --audio-player-vu-max-cell: 4px;
+    --audio-player-vu-row: 1px;
+    --audio-player-vu-run: 8px;
+    flex: 0 0 auto;
+    display: flex;
+    gap: var(--audio-player-vu-segment-gap, 1px);
+    overflow: hidden;
+    background-color: var(--audio-player-vu-background-color, transparent);
+}
+
+@supports (width: round(down, 5px, 1px)) {
+    .audio-player-vu-meter {
+        --audio-player-vu-cell: max(1px, round(down, min(var(--audio-player-vu-max-cell), calc((var(--audio-player-vu-extent) - (var(--audio-player-vu-segment-count, 12) - 1) * var(--audio-player-vu-segment-gap, 1px)) / var(--audio-player-vu-segment-count, 12))), 1px));
+        --audio-player-vu-row: max(1px, round(down, calc((var(--audio-player-vu-extent) - (var(--audio-player-vu-band-count, 24) - 1) * var(--audio-player-vu-segment-gap, 1px)) / var(--audio-player-vu-band-count, 24)), 1px));
+    }
+}
+
+.audio-player-vu-meter[data-audio-player-vu-meter-orientation="vertical"] {
+    flex-direction: row;
+    width: calc(var(--audio-player-vu-band-count, 24) * var(--audio-player-vu-cell) + (var(--audio-player-vu-band-count, 24) - 1) * var(--audio-player-vu-segment-gap, 1px));
+    height: calc(var(--audio-player-vu-segment-count, 12) * var(--audio-player-vu-cell) + (var(--audio-player-vu-segment-count, 12) - 1) * var(--audio-player-vu-segment-gap, 1px));
+}
+
+.audio-player-vu-meter[data-audio-player-vu-meter-orientation="horizontal"] {
+    flex-direction: column;
+    width: calc(var(--audio-player-vu-segment-count, 12) * var(--audio-player-vu-run) + (var(--audio-player-vu-segment-count, 12) - 1) * var(--audio-player-vu-segment-gap, 1px));
+    height: calc(var(--audio-player-vu-band-count, 24) * var(--audio-player-vu-row) + (var(--audio-player-vu-band-count, 24) - 1) * var(--audio-player-vu-segment-gap, 1px));
+}
+
+.audio-player-vu-channel {
+    position: relative;
+    display: flex;
+    flex: 0 0 auto;
+    gap: var(--audio-player-vu-segment-gap, 1px);
+}
+
+.audio-player-vu-meter[data-audio-player-vu-meter-orientation="vertical"] .audio-player-vu-channel {
+    flex-direction: column-reverse;
+    width: var(--audio-player-vu-cell);
+}
+
+.audio-player-vu-meter[data-audio-player-vu-meter-orientation="horizontal"] .audio-player-vu-channel {
+    flex-direction: row;
+    height: var(--audio-player-vu-row);
+}
+
+/* A segment is inactive until the level reaches it, and it takes its zone color only while it is active. The zone is
+   part of the markup, so a theme can give each of the three independently. */
+.audio-player-vu-segment {
+    flex: 0 0 auto;
+    background-color: var(--audio-player-vu-inactive-color, transparent);
+}
+
+.audio-player-vu-meter[data-audio-player-vu-meter-orientation="vertical"] .audio-player-vu-segment {
+    width: var(--audio-player-vu-cell);
+    height: var(--audio-player-vu-cell);
+}
+
+.audio-player-vu-meter[data-audio-player-vu-meter-orientation="horizontal"] .audio-player-vu-segment {
+    width: var(--audio-player-vu-run);
+    height: var(--audio-player-vu-row);
+}
+
+.audio-player-vu-segment[data-audio-player-vu-segment-state="active"][data-audio-player-vu-segment-zone="normal"] {
+    background-color: var(--audio-player-vu-normal-color, #0099FF);
+}
+
+.audio-player-vu-segment[data-audio-player-vu-segment-state="active"][data-audio-player-vu-segment-zone="medium"] {
+    background-color: var(--audio-player-vu-medium-color, #FFD166);
+}
+
+.audio-player-vu-segment[data-audio-player-vu-segment-state="active"][data-audio-player-vu-segment-zone="high"] {
+    background-color: var(--audio-player-vu-high-color, #FF5D5D);
+}
+
+/* The peak marker spans the short axis of its channel and is placed on the long axis from the custom property, so the
+   same markup serves both orientations: a theme only maps the property to whichever edge its own layout grows from. */
+.audio-player-vu-peak {
+    position: absolute;
+    background-color: var(--audio-player-vu-peak-color, #F4F7FA);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.audio-player-vu-peak[data-audio-player-vu-peak-state="active"] {
+    opacity: 1;
+}
+
+.audio-player-vu-meter[data-audio-player-vu-meter-orientation="vertical"] .audio-player-vu-peak {
+    left: 0px;
+    right: 0px;
+    bottom: var(--audio-player-vu-peak-position, 0%);
+    height: 2px;
+    transform: translateY(50%);
+}
+
+.audio-player-vu-meter[data-audio-player-vu-meter-orientation="horizontal"] .audio-player-vu-peak {
+    top: 0px;
+    bottom: 0px;
+    left: var(--audio-player-vu-peak-position, 0%);
+    width: 2px;
+    transform: translateX(-50%);
 }
 
 .audio-player-time {

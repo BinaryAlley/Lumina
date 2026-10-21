@@ -28,6 +28,15 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     private const bool DEFAULT_IS_GAPLESS_PLAYBACK_ENABLED = true;
     private const ReplayGainMode DEFAULT_REPLAY_GAIN_MODE = ReplayGainMode.Off;
     private const PlaybackStreamingQuality DEFAULT_STREAMING_QUALITY = PlaybackStreamingQuality.Auto;
+    private const VuMeterOrientation DEFAULT_VU_METER_ORIENTATION = VuMeterOrientation.Vertical;
+    private const int DEFAULT_VU_METER_SEGMENT_COUNT = 12;
+    private const int DEFAULT_VU_METER_SEGMENT_GAP = 1;
+    private const double DEFAULT_VU_METER_MEDIUM_THRESHOLD = 0.6;
+    private const double DEFAULT_VU_METER_HIGH_THRESHOLD = 0.8;
+    private const bool DEFAULT_VU_METER_SHOW_PEAK = true;
+    private const int DEFAULT_VU_METER_PEAK_HOLD_DURATION_IN_MILLISECONDS = 650;
+    private const double DEFAULT_VU_METER_RELEASE_PER_SECOND = 3.0;
+    private const double DEFAULT_VU_METER_PEAK_RELEASE_PER_SECOND = 0.65;
     private const double DEFAULT_VOLUME = 1.0;
     private const bool DEFAULT_IS_MUTED = false;
 
@@ -105,6 +114,51 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     public PlaybackStreamingQuality StreamingQuality { get; private set; }
 
     /// <summary>
+    /// Gets the direction in which each channel of the VU meter of the audio player grows.
+    /// </summary>
+    public VuMeterOrientation VuMeterOrientation { get; private set; }
+
+    /// <summary>
+    /// Gets the number of segments each channel of the VU meter is divided into.
+    /// </summary>
+    public int VuMeterSegmentCount { get; private set; }
+
+    /// <summary>
+    /// Gets the gap, in pixels, between the segments and the channels of the VU meter.
+    /// </summary>
+    public int VuMeterSegmentGap { get; private set; }
+
+    /// <summary>
+    /// Gets the level, between 0 and 1, above which a segment of the VU meter is drawn with its medium state.
+    /// </summary>
+    public double VuMeterMediumThreshold { get; private set; }
+
+    /// <summary>
+    /// Gets the level, between 0 and 1, above which a segment of the VU meter is drawn with its high state.
+    /// </summary>
+    public double VuMeterHighThreshold { get; private set; }
+
+    /// <summary>
+    /// Gets whether the VU meter holds the peak level of each channel after it falls, or not.
+    /// </summary>
+    public bool VuMeterShowPeak { get; private set; }
+
+    /// <summary>
+    /// Gets the time, in milliseconds, a peak of the VU meter is held before it starts falling.
+    /// </summary>
+    public int VuMeterPeakHoldDurationInMilliseconds { get; private set; }
+
+    /// <summary>
+    /// Gets the number of level units the display of the VU meter falls per second when the input level drops.
+    /// </summary>
+    public double VuMeterReleasePerSecond { get; private set; }
+
+    /// <summary>
+    /// Gets the number of level units the peak of the VU meter falls per second after its hold time elapsed.
+    /// </summary>
+    public double VuMeterPeakReleasePerSecond { get; private set; }
+
+    /// <summary>
     /// Gets the last volume the player reported for the user. It is written automatically by the player, and is not part of the settings the user edits.
     /// </summary>
     public double Volume { get; private set; }
@@ -132,6 +186,15 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     /// <param name="isGaplessPlaybackEnabled">Whether the player transitions between consecutive tracks without a gap, or not.</param>
     /// <param name="replayGainMode">The way ReplayGain normalization is applied to the tracks the user plays.</param>
     /// <param name="streamingQuality">The quality cap applied to the audio the server normalizes for the user.</param>
+    /// <param name="vuMeterOrientation">The direction in which each channel of the VU meter of the audio player grows.</param>
+    /// <param name="vuMeterSegmentCount">The number of segments each channel of the VU meter is divided into.</param>
+    /// <param name="vuMeterSegmentGap">The gap, in pixels, between the segments and the channels of the VU meter.</param>
+    /// <param name="vuMeterMediumThreshold">The level above which a segment of the VU meter is drawn with its medium state.</param>
+    /// <param name="vuMeterHighThreshold">The level above which a segment of the VU meter is drawn with its high state.</param>
+    /// <param name="vuMeterShowPeak">Whether the VU meter holds the peak level of each channel after it falls, or not.</param>
+    /// <param name="vuMeterPeakHoldDurationInMilliseconds">The time a peak of the VU meter is held before it starts falling.</param>
+    /// <param name="vuMeterReleasePerSecond">The number of level units the display of the VU meter falls per second when the input level drops.</param>
+    /// <param name="vuMeterPeakReleasePerSecond">The number of level units the peak of the VU meter falls per second after its hold time elapsed.</param>
     /// <param name="volume">The last volume the player reported for the user.</param>
     /// <param name="isMuted">The last mute state the player reported for the user.</param>
     private UserSettings(
@@ -150,6 +213,15 @@ public class UserSettings : AggregateRoot<UserSettingsId>
         bool isGaplessPlaybackEnabled,
         ReplayGainMode replayGainMode,
         PlaybackStreamingQuality streamingQuality,
+        VuMeterOrientation vuMeterOrientation,
+        int vuMeterSegmentCount,
+        int vuMeterSegmentGap,
+        double vuMeterMediumThreshold,
+        double vuMeterHighThreshold,
+        bool vuMeterShowPeak,
+        int vuMeterPeakHoldDurationInMilliseconds,
+        double vuMeterReleasePerSecond,
+        double vuMeterPeakReleasePerSecond,
         double volume,
         bool isMuted) : base(id)
     {
@@ -167,6 +239,15 @@ public class UserSettings : AggregateRoot<UserSettingsId>
         IsGaplessPlaybackEnabled = isGaplessPlaybackEnabled;
         ReplayGainMode = replayGainMode;
         StreamingQuality = streamingQuality;
+        VuMeterOrientation = vuMeterOrientation;
+        VuMeterSegmentCount = vuMeterSegmentCount;
+        VuMeterSegmentGap = vuMeterSegmentGap;
+        VuMeterMediumThreshold = vuMeterMediumThreshold;
+        VuMeterHighThreshold = vuMeterHighThreshold;
+        VuMeterShowPeak = vuMeterShowPeak;
+        VuMeterPeakHoldDurationInMilliseconds = vuMeterPeakHoldDurationInMilliseconds;
+        VuMeterReleasePerSecond = vuMeterReleasePerSecond;
+        VuMeterPeakReleasePerSecond = vuMeterPeakReleasePerSecond;
         Volume = volume;
         IsMuted = isMuted;
     }
@@ -194,6 +275,15 @@ public class UserSettings : AggregateRoot<UserSettingsId>
             DEFAULT_IS_GAPLESS_PLAYBACK_ENABLED,
             DEFAULT_REPLAY_GAIN_MODE,
             DEFAULT_STREAMING_QUALITY,
+            DEFAULT_VU_METER_ORIENTATION,
+            DEFAULT_VU_METER_SEGMENT_COUNT,
+            DEFAULT_VU_METER_SEGMENT_GAP,
+            DEFAULT_VU_METER_MEDIUM_THRESHOLD,
+            DEFAULT_VU_METER_HIGH_THRESHOLD,
+            DEFAULT_VU_METER_SHOW_PEAK,
+            DEFAULT_VU_METER_PEAK_HOLD_DURATION_IN_MILLISECONDS,
+            DEFAULT_VU_METER_RELEASE_PER_SECOND,
+            DEFAULT_VU_METER_PEAK_RELEASE_PER_SECOND,
             DEFAULT_VOLUME,
             DEFAULT_IS_MUTED
         );
@@ -223,6 +313,15 @@ public class UserSettings : AggregateRoot<UserSettingsId>
             DEFAULT_IS_GAPLESS_PLAYBACK_ENABLED,
             DEFAULT_REPLAY_GAIN_MODE,
             DEFAULT_STREAMING_QUALITY,
+            DEFAULT_VU_METER_ORIENTATION,
+            DEFAULT_VU_METER_SEGMENT_COUNT,
+            DEFAULT_VU_METER_SEGMENT_GAP,
+            DEFAULT_VU_METER_MEDIUM_THRESHOLD,
+            DEFAULT_VU_METER_HIGH_THRESHOLD,
+            DEFAULT_VU_METER_SHOW_PEAK,
+            DEFAULT_VU_METER_PEAK_HOLD_DURATION_IN_MILLISECONDS,
+            DEFAULT_VU_METER_RELEASE_PER_SECOND,
+            DEFAULT_VU_METER_PEAK_RELEASE_PER_SECOND,
             DEFAULT_VOLUME,
             DEFAULT_IS_MUTED
         );
@@ -245,6 +344,15 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     /// <param name="isGaplessPlaybackEnabled">Whether the player transitions between consecutive tracks without a gap, or not.</param>
     /// <param name="replayGainMode">The way ReplayGain normalization is applied to the tracks the user plays.</param>
     /// <param name="streamingQuality">The quality cap applied to the audio the server normalizes for the user.</param>
+    /// <param name="vuMeterOrientation">The direction in which each channel of the VU meter of the audio player grows.</param>
+    /// <param name="vuMeterSegmentCount">The number of segments each channel of the VU meter is divided into.</param>
+    /// <param name="vuMeterSegmentGap">The gap, in pixels, between the segments and the channels of the VU meter.</param>
+    /// <param name="vuMeterMediumThreshold">The level above which a segment of the VU meter is drawn with its medium state.</param>
+    /// <param name="vuMeterHighThreshold">The level above which a segment of the VU meter is drawn with its high state.</param>
+    /// <param name="vuMeterShowPeak">Whether the VU meter holds the peak level of each channel after it falls, or not.</param>
+    /// <param name="vuMeterPeakHoldDurationInMilliseconds">The time a peak of the VU meter is held before it starts falling.</param>
+    /// <param name="vuMeterReleasePerSecond">The number of level units the display of the VU meter falls per second when the input level drops.</param>
+    /// <param name="vuMeterPeakReleasePerSecond">The number of level units the peak of the VU meter falls per second after its hold time elapsed.</param>
     /// <param name="volume">The last volume the player reported for the user.</param>
     /// <param name="isMuted">The last mute state the player reported for the user.</param>
     /// <returns>
@@ -265,6 +373,15 @@ public class UserSettings : AggregateRoot<UserSettingsId>
         bool isGaplessPlaybackEnabled,
         ReplayGainMode replayGainMode,
         PlaybackStreamingQuality streamingQuality,
+        VuMeterOrientation vuMeterOrientation,
+        int vuMeterSegmentCount,
+        int vuMeterSegmentGap,
+        double vuMeterMediumThreshold,
+        double vuMeterHighThreshold,
+        bool vuMeterShowPeak,
+        int vuMeterPeakHoldDurationInMilliseconds,
+        double vuMeterReleasePerSecond,
+        double vuMeterPeakReleasePerSecond,
         double volume,
         bool isMuted)
     {
@@ -284,6 +401,15 @@ public class UserSettings : AggregateRoot<UserSettingsId>
             isGaplessPlaybackEnabled,
             replayGainMode,
             streamingQuality,
+            vuMeterOrientation,
+            vuMeterSegmentCount,
+            vuMeterSegmentGap,
+            vuMeterMediumThreshold,
+            vuMeterHighThreshold,
+            vuMeterShowPeak,
+            vuMeterPeakHoldDurationInMilliseconds,
+            vuMeterReleasePerSecond,
+            vuMeterPeakReleasePerSecond,
             volume,
             isMuted);
     }
@@ -306,6 +432,15 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     /// <param name="isGaplessPlaybackEnabled">Whether the player transitions between consecutive tracks without a gap, or not.</param>
     /// <param name="replayGainMode">The way ReplayGain normalization is applied to the tracks the user plays.</param>
     /// <param name="streamingQuality">The quality cap applied to the audio the server normalizes for the user.</param>
+    /// <param name="vuMeterOrientation">The direction in which each channel of the VU meter of the audio player grows.</param>
+    /// <param name="vuMeterSegmentCount">The number of segments each channel of the VU meter is divided into.</param>
+    /// <param name="vuMeterSegmentGap">The gap, in pixels, between the segments and the channels of the VU meter.</param>
+    /// <param name="vuMeterMediumThreshold">The level above which a segment of the VU meter is drawn with its medium state.</param>
+    /// <param name="vuMeterHighThreshold">The level above which a segment of the VU meter is drawn with its high state.</param>
+    /// <param name="vuMeterShowPeak">Whether the VU meter holds the peak level of each channel after it falls, or not.</param>
+    /// <param name="vuMeterPeakHoldDurationInMilliseconds">The time a peak of the VU meter is held before it starts falling.</param>
+    /// <param name="vuMeterReleasePerSecond">The number of level units the display of the VU meter falls per second when the input level drops.</param>
+    /// <param name="vuMeterPeakReleasePerSecond">The number of level units the peak of the VU meter falls per second after its hold time elapsed.</param>
     /// <param name="volume">The last volume the player reported for the user.</param>
     /// <param name="isMuted">The last mute state the player reported for the user.</param>
     /// <returns>
@@ -327,10 +462,45 @@ public class UserSettings : AggregateRoot<UserSettingsId>
         bool isGaplessPlaybackEnabled,
         ReplayGainMode replayGainMode,
         PlaybackStreamingQuality streamingQuality,
+        VuMeterOrientation vuMeterOrientation,
+        int vuMeterSegmentCount,
+        int vuMeterSegmentGap,
+        double vuMeterMediumThreshold,
+        double vuMeterHighThreshold,
+        bool vuMeterShowPeak,
+        int vuMeterPeakHoldDurationInMilliseconds,
+        double vuMeterReleasePerSecond,
+        double vuMeterPeakReleasePerSecond,
         double volume,
         bool isMuted)
     {
-        return new UserSettings(id, userId, isPaginationEnabled, itemsPerPage, shouldIgnoreThePrefixForAlphaPicker, isThemeCachingEnabled, shouldAggregateMetadataWhenMissing, shouldAggregateArtworkWhenMissing, shouldRenderPdfAsImages, shouldPreserveBookStyles, shouldKeepDownloadingWhilePaused, shouldAutoplay, isGaplessPlaybackEnabled, replayGainMode, streamingQuality, volume, isMuted);
+        return new UserSettings(
+            id, 
+            userId, 
+            isPaginationEnabled, 
+            itemsPerPage, 
+            shouldIgnoreThePrefixForAlphaPicker, 
+            isThemeCachingEnabled, 
+            shouldAggregateMetadataWhenMissing, 
+            shouldAggregateArtworkWhenMissing, 
+            shouldRenderPdfAsImages, 
+            shouldPreserveBookStyles, 
+            shouldKeepDownloadingWhilePaused, 
+            shouldAutoplay, 
+            isGaplessPlaybackEnabled, 
+            replayGainMode, 
+            streamingQuality, 
+            vuMeterOrientation, 
+            vuMeterSegmentCount, 
+            vuMeterSegmentGap, 
+            vuMeterMediumThreshold, 
+            vuMeterHighThreshold, 
+            vuMeterShowPeak, 
+            vuMeterPeakHoldDurationInMilliseconds, 
+            vuMeterReleasePerSecond, 
+            vuMeterPeakReleasePerSecond, 
+            volume, 
+            isMuted);
     }
 
     /// <summary>
@@ -353,6 +523,15 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     /// <param name="isGaplessPlaybackEnabled">Whether the player transitions between consecutive tracks without a gap, or not.</param>
     /// <param name="replayGainMode">The way ReplayGain normalization is applied to the tracks the user plays.</param>
     /// <param name="streamingQuality">The quality cap applied to the audio the server normalizes for the user.</param>
+    /// <param name="vuMeterOrientation">The direction in which each channel of the VU meter of the audio player grows.</param>
+    /// <param name="vuMeterSegmentCount">The number of segments each channel of the VU meter is divided into.</param>
+    /// <param name="vuMeterSegmentGap">The gap, in pixels, between the segments and the channels of the VU meter.</param>
+    /// <param name="vuMeterMediumThreshold">The level above which a segment of the VU meter is drawn with its medium state.</param>
+    /// <param name="vuMeterHighThreshold">The level above which a segment of the VU meter is drawn with its high state.</param>
+    /// <param name="vuMeterShowPeak">Whether the VU meter holds the peak level of each channel after it falls, or not.</param>
+    /// <param name="vuMeterPeakHoldDurationInMilliseconds">The time a peak of the VU meter is held before it starts falling.</param>
+    /// <param name="vuMeterReleasePerSecond">The number of level units the display of the VU meter falls per second when the input level drops.</param>
+    /// <param name="vuMeterPeakReleasePerSecond">The number of level units the peak of the VU meter falls per second after its hold time elapsed.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful update, or an error.</returns>
     public Result<Updated> UpdateSettings(
         bool isPaginationEnabled,
@@ -367,7 +546,16 @@ public class UserSettings : AggregateRoot<UserSettingsId>
         bool shouldAutoplay,
         bool isGaplessPlaybackEnabled,
         ReplayGainMode replayGainMode,
-        PlaybackStreamingQuality streamingQuality)
+        PlaybackStreamingQuality streamingQuality,
+        VuMeterOrientation vuMeterOrientation,
+        int vuMeterSegmentCount,
+        int vuMeterSegmentGap,
+        double vuMeterMediumThreshold,
+        double vuMeterHighThreshold,
+        bool vuMeterShowPeak,
+        int vuMeterPeakHoldDurationInMilliseconds,
+        double vuMeterReleasePerSecond,
+        double vuMeterPeakReleasePerSecond)
     {
         IsPaginationEnabled = isPaginationEnabled;
         ItemsPerPage = itemsPerPage;
@@ -382,6 +570,15 @@ public class UserSettings : AggregateRoot<UserSettingsId>
         IsGaplessPlaybackEnabled = isGaplessPlaybackEnabled;
         ReplayGainMode = replayGainMode;
         StreamingQuality = streamingQuality;
+        VuMeterOrientation = vuMeterOrientation;
+        VuMeterSegmentCount = vuMeterSegmentCount;
+        VuMeterSegmentGap = vuMeterSegmentGap;
+        VuMeterMediumThreshold = vuMeterMediumThreshold;
+        VuMeterHighThreshold = vuMeterHighThreshold;
+        VuMeterShowPeak = vuMeterShowPeak;
+        VuMeterPeakHoldDurationInMilliseconds = vuMeterPeakHoldDurationInMilliseconds;
+        VuMeterReleasePerSecond = vuMeterReleasePerSecond;
+        VuMeterPeakReleasePerSecond = vuMeterPeakReleasePerSecond;
         return Result.Updated;
     }
 

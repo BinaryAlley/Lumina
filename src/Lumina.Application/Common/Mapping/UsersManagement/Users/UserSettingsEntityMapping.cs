@@ -39,6 +39,15 @@ public static class UserSettingsEntityMapping
             repositoryEntity.IsGaplessPlaybackEnabled,
             repositoryEntity.ReplayGainMode,
             repositoryEntity.StreamingQuality,
+            repositoryEntity.VuMeterOrientation,
+            repositoryEntity.VuMeterSegmentCount,
+            repositoryEntity.VuMeterSegmentGap,
+            repositoryEntity.VuMeterMediumThreshold,
+            repositoryEntity.VuMeterHighThreshold,
+            repositoryEntity.VuMeterShowPeak,
+            repositoryEntity.VuMeterPeakHoldDurationInMilliseconds,
+            repositoryEntity.VuMeterReleasePerSecond,
+            repositoryEntity.VuMeterPeakReleasePerSecond,
             repositoryEntity.Volume,
             repositoryEntity.IsMuted
         );
@@ -65,7 +74,16 @@ public static class UserSettingsEntityMapping
             repositoryEntity.ShouldAutoplay,
             repositoryEntity.IsGaplessPlaybackEnabled,
             repositoryEntity.ReplayGainMode,
-            repositoryEntity.StreamingQuality
+            repositoryEntity.StreamingQuality,
+            repositoryEntity.VuMeterOrientation,
+            repositoryEntity.VuMeterSegmentCount,
+            repositoryEntity.VuMeterSegmentGap,
+            repositoryEntity.VuMeterMediumThreshold,
+            repositoryEntity.VuMeterHighThreshold,
+            repositoryEntity.VuMeterShowPeak,
+            repositoryEntity.VuMeterPeakHoldDurationInMilliseconds,
+            repositoryEntity.VuMeterReleasePerSecond,
+            repositoryEntity.VuMeterPeakReleasePerSecond
         );
     }
 }

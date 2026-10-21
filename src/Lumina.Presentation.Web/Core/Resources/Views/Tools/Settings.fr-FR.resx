@@ -123,4 +123,67 @@
   <data name="StreamingQualityHigh" xml:space="preserve">
     <value>Élevée (320 kbit/s)</value>
   </data>
+  <data name="DescriptionVuMeterSegmentCount" xml:space="preserve">
+    <value>Le nombre de segments dans lesquels chaque canal du vumètre est divisé, entre 1 et 128.</value>
+  </data>
+  <data name="VuMeterPeakReleasePerSecond" xml:space="preserve">
+    <value>Décroissance des crêtes</value>
+  </data>
+  <data name="DescriptionVuMeterHighThreshold" xml:space="preserve">
+    <value>Le niveau, entre 0 et 1, au-dessus duquel un segment est dessiné avec l'état élevé. Il doit être au moins égal au seuil moyen.</value>
+  </data>
+  <data name="DescriptionVuMeterOrientation" xml:space="preserve">
+    <value>Indique si les canaux du vumètre croissent du bas vers le haut ou de la gauche vers la droite.</value>
+  </data>
+  <data name="DescriptionVuMeterMediumThreshold" xml:space="preserve">
+    <value>Le niveau, entre 0 et 1, au-dessus duquel un segment est dessiné avec l'état moyen.</value>
+  </data>
+  <data name="VuMeterOrientationVertical" xml:space="preserve">
+    <value>Verticale</value>
+  </data>
+  <data name="VuMeterReleasePerSecond" xml:space="preserve">
+    <value>Décroissance du niveau</value>
+  </data>
+  <data name="VuMeterOrientationHorizontal" xml:space="preserve">
+    <value>Horizontale</value>
+  </data>
+  <data name="VuMeterOrientation" xml:space="preserve">
+    <value>Orientation</value>
+  </data>
+  <data name="VuMeterHighThreshold" xml:space="preserve">
+    <value>Seuil élevé</value>
+  </data>
+  <data name="VuMeterSegmentCount" xml:space="preserve">
+    <value>Segments par canal</value>
+  </data>
+  <data name="VuMeterMediumThreshold" xml:space="preserve">
+    <value>Seuil moyen</value>
+  </data>
+  <data name="VuMeter" xml:space="preserve">
+    <value>Vumètre</value>
+  </data>
+  <data name="VuMeterPeakHoldDuration" xml:space="preserve">
+    <value>Maintien des crêtes (ms)</value>
+  </data>
+  <data name="DescriptionVuMeterShowPeak" xml:space="preserve">
+    <value>Indique si chaque canal conserve un repère à son niveau récent le plus fort.</value>
+  </data>
+  <data name="DescriptionVuMeterPeakReleasePerSecond" xml:space="preserve">
+    <value>Le nombre d'unités de niveau dont un repère de crête descend par seconde après sa durée de maintien, entre 0 et 100. Des valeurs plus élevées descendent plus vite.</value>
+  </data>
+  <data name="DescriptionVuMeterPeakHoldDuration" xml:space="preserve">
+    <value>La durée, en millisecondes, pendant laquelle un repère de crête est maintenu avant de commencer à descendre, entre 0 et 10000.</value>
+  </data>
+  <data name="VuMeterShowPeak" xml:space="preserve">
+    <value>Afficher les crêtes</value>
+  </data>
+  <data name="DescriptionVuMeterSegmentGap" xml:space="preserve">
+    <value>L'espacement, en pixels, entre les segments et les canaux du vumètre, entre 0 et 32.</value>
+  </data>
+  <data name="VuMeterSegmentGap" xml:space="preserve">
+    <value>Espacement des segments</value>
+  </data>
+  <data name="DescriptionVuMeterReleasePerSecond" xml:space="preserve">
+    <value>Le nombre d'unités de niveau dont un canal descend par seconde après la baisse du son, entre 0 et 100. Des valeurs plus élevées descendent plus vite.</value>
+  </data>
 </root>

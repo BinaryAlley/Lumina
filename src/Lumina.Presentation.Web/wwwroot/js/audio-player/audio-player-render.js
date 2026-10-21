@@ -9,14 +9,16 @@
  *
  * Signal chain
  * ------------
- * Every scheduled source is connected to the per-track GainNode, which feeds the master GainNode, which feeds the
- * destination, so:
+ * Every scheduled source is connected to the per-track GainNode, which feeds an AnalyserNode, which feeds the master GainNode, which feeds the destination, so:
  *   - the master gain is the output volume, and it is zero while the player is muted, which is how mute is honored;
- *   - the per-track gain is the ReplayGain linear gain of the current track, chosen by the user's ReplayGain mode among
- *     the values the playback manifest carries.
+ *   - the per-track gain is the ReplayGain linear gain of the current track, chosen by the user's ReplayGain mode among the values the playback manifest carries;
+ *   - the analyzer sits after the per-track gain and before the master gain, so it observes the level of the track itself,
+ *     after its ReplayGain normalization but before the output volume. The VU meter of the bar reads it, which is why
+ *     changing the volume, or muting the player, never changes the height of the meter for the same moment of audio.
  * Keeping the master gain and the ReplayGain gain on two separate nodes lets either change without disturbing the other.
  * The engine of the player folds the mute state into the volume it passes, so it delivers a mute as setVolumeAsync(0)
  * and never calls setMutedAsync; that setter exists for a caller that owns both the volume and the mute state itself.
+ * The analyzer is created only when the audio context exposes createAnalyser, so a reduced context, or a test double, still builds the gain graph and simply exposes no analyzer.
  *
  * Scheduling model
  * ----------------
@@ -256,6 +258,13 @@
     const REPORTER_FALLBACK_INTERVAL_MS = 16;
 
     /**
+     * The transform size of the analyzer that taps the output for the VU meter. It is the smallest size that resolves the low bands the meter starts at.
+     * @readonly
+     * @type {number}
+     */
+    const OUTPUT_ANALYSER_FFT_SIZE = 2048;
+
+    /**
      * Coerces a value to a finite number, or null when it is absent or not finite.
      * @param {*} value - The value to coerce.
      * @returns {number|null} The finite number, or null.
@@ -268,8 +277,7 @@
     }
 
     /**
-     * Normalizes a ReplayGain mode into one of the {@link LuminaAudioPlayer.PlayerReplayGainMode} values, defaulting an
-     * absent or unrecognized value to no normalization.
+     * Normalizes a ReplayGain mode into one of the {@link LuminaAudioPlayer.PlayerReplayGainMode} values, defaulting an absent or unrecognized value to no normalization.
      * @param {string} value - The mode to normalize, as the user settings or the manifest spell it.
      * @returns {string} One of the {@link LuminaAudioPlayer.PlayerReplayGainMode} values.
      */
@@ -287,8 +295,7 @@
                 return LuminaAudioPlayer.PlayerReplayGainMode.ALBUM;
         }
         // A value the renderer does not know is very likely a mode the server added and this list does not carry yet, so it
-        // is reported, whatever its type, instead of being dropped silently; the sync of the two lists is documented on the
-        // enum.
+        // is reported, whatever its type, instead of being dropped silently; the sync of the two lists is documented on the enum.
         console.warn(`Audio player: the ReplayGain mode '${String(value)}' is not known to the renderer, so no normalization is applied.`);
         return LuminaAudioPlayer.PlayerReplayGainMode.OFF;
     }
@@ -299,8 +306,7 @@
      * ReplayGain carries a track, or album, gain to bring the loudness of the audio to the reference level, and a peak,
      * the highest sample amplitude of the audio. A gain that would push the peak above the full scale would clip, so the
      * gain is limited to the largest value that keeps the normalized peak at or below the full scale, exactly as the
-     * ReplayGain specification prescribes. A missing gain means no normalization, and a missing or non positive peak
-     * leaves the gain uncapped.
+     * ReplayGain specification prescribes. A missing gain means no normalization, and a missing or non positive peak leaves the gain uncapped.
      * @param {number|null} gainDb - The ReplayGain value, in decibels.
      * @param {number|null} peak - The peak amplitude the gain is applied to.
      * @returns {number} The linear gain, one when there is nothing to apply.
@@ -326,8 +332,7 @@
      * a unit. The track mode uses the track pair and falls back to the album pair, the album mode does the opposite, and
      * the off mode selects nothing. The fallback matters because a track whose album was not analyzed can carry only one
      * of the two pairs, and normalizing with the pair that exists is better than not normalizing at all. A peak is never
-     * taken from one pair while the gain comes from the other, because the anti-clip ceiling would then be computed from a
-     * peak the applied gain does not belong to.
+     * taken from one pair while the gain comes from the other, because the anti-clip ceiling would then be computed from a peak the applied gain does not belong to.
      * @param {Object|null} manifest - The playback manifest of the track.
      * @param {string} mode - One of the {@link LuminaAudioPlayer.PlayerReplayGainMode} values.
      * @returns {{ gainDb: number|null, peak: number|null }} The selected pair, null when nothing is selected.
@@ -408,6 +413,10 @@
 
             this.masterGain = null;
             this.trackGain = null;
+            // The analyzer that taps the track level for the VU meter of the bar, after the ReplayGain gain and before the
+            // master gain that carries the volume and the mute state. It is null when the audio context of the environment
+            // cannot create one, in which case the meter renders empty instead of failing.
+            this.analyser = null;
             this.manifest = null;
             this.duration = 0;
             // The media duration of the whole shared timeline. It equals the duration of the current track until a gapless
@@ -441,12 +450,10 @@
             // detection, so a schedule that was just reset to a media position does not report the end of the track
             // before a single buffer has been scheduled at that position.
             this.hasScheduledSinceReset = false;
-            // True once the decode pipeline has fed the last decoded frame of the track, which is what tells a drained
-            // schedule apart from the end of the track.
+            // True once the decode pipeline has fed the last decoded frame of the track, which is what tells a drained schedule apart from the end of the track.
             this.streamComplete = false;
             // True once the current track has reached its end, that is once the schedule drained while the track was known
-            // to be complete. It drives whether a newly scheduled buffer resumes playback; a configure, a seek or a newly
-            // scheduled buffer clears it.
+            // to be complete. It drives whether a newly scheduled buffer resumes playback; a configure, a seek or a newly scheduled buffer clears it.
             this.reachedEnd = false;
             // True once the end of the current configured track has been reported through onEnded. It is a latch of its
             // own, so the callback fires once per configured track even when audio is scheduled after the end; only a
@@ -566,8 +573,7 @@
         }
 
         /**
-         * Cancels a scheduled gapless ReplayGain change and restores the gain of the current manifest. It is used when the
-         * handoff is abandoned before the next track starts.
+         * Cancels a scheduled gapless ReplayGain change and restores the gain of the current manifest. It is used when the handoff is abandoned before the next track starts.
          * @returns {LuminaAudioPlayer.TrackRenderer} This renderer, for chaining.
          */
         cancelTrackGainChange() {
@@ -600,8 +606,7 @@
         }
 
         /**
-         * Releases every resource of the renderer: the schedule, the gain nodes, the event subscriptions and, when the
-         * renderer owns it, the audio context.
+         * Releases every resource of the renderer: the schedule, the gain nodes, the event subscriptions and, when the renderer owns it, the audio context.
          * @returns {Promise<void>} A promise that completes when the context is closed.
          */
         async destroyAsync() {
@@ -627,6 +632,14 @@
                 }
                 this.trackGain = null;
             }
+            if (this.analyser) {
+                try {
+                    this.analyser.disconnect();
+                } catch (error) {
+                    console.debug('Audio player: the output analyzer could not be disconnected.', error);
+                }
+                this.analyser = null;
+            }
             if (this.masterGain) {
                 try {
                     this.masterGain.disconnect();
@@ -648,8 +661,7 @@
                 } catch (error) {
                     // The context is still live. Its reference is kept rather than dropped, and the failure is recorded, so a
                     // caller can still reach the context through getContext() and close it itself; the renderer itself is
-                    // destroyed and never uses it again. Dropping the only reference would lose a context that the browser
-                    // counts until it is closed.
+                    // destroyed and never uses it again. Dropping the only reference would lose a context that the browser counts until it is closed.
                     this.raise(error, LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR);
                     console.error('Audio player: the audio context could not be closed.', error);
                     return;
@@ -1176,6 +1188,16 @@
             return this.context;
         }
 
+        /**
+         * Gets the analyzer that taps the output of the track gain, which is what the VU meter of the bar reads. The
+         * analyzer sits after the ReplayGain normalization of the track and before the master gain that carries the
+         * volume and the mute state, so it observes the level of the track itself and never the level of the speaker.
+         * @returns {AnalyserNode|null} The output analyzer, or null when the context has none, when it has not been created yet, or once the renderer was destroyed.
+         */
+        getOutputAnalyser() {
+            return this.analyser;
+        }
+
         //+======================================================================================+
         //|                                     Internal helpers                                 |
         //+======================================================================================+
@@ -1205,16 +1227,42 @@
         }
 
         /**
-         * Builds the two gain nodes of the output and connects them: the sources feed the per-track gain, which feeds the
-         * master gain, which feeds the destination.
+         * Builds the gain nodes of the output and connects them: the sources feed the per-track gain, which feeds the
+         * output analyzer, which feeds the master gain, which feeds the destination. The analyzer is optional and is
+         * skipped when the context cannot create one, in which case the per-track gain feeds the master gain directly.
+         * Putting the analyzer before the master gain keeps the meter independent of the output volume and of the mute
+         * state, so it measures the level of the track instead of the level of the speaker.
          */
         buildGainGraph() {
             this.masterGain = this.context.createGain();
             this.trackGain = this.context.createGain();
-            this.trackGain.connect(this.masterGain);
+            this.analyser = this.createOutputAnalyser();
+            if (this.analyser) {
+                this.trackGain.connect(this.analyser);
+                this.analyser.connect(this.masterGain);
+            } else 
+                this.trackGain.connect(this.masterGain);
             this.masterGain.connect(this.context.destination);
             this.applyMasterGain(0);
             this.applyTrackGain(0);
+        }
+
+        /**
+         * Creates the analyzer that taps the output for the VU meter. Only its time domain buffer is used: the meter
+         * applies its own window and transform to those samples, so the analyzer is configured with the transform size that buffer must have and nothing else.
+         * @returns {AnalyserNode|null} The analyzer, or null when the context cannot create one.
+         */
+        createOutputAnalyser() {
+            if (typeof this.context.createAnalyser !== 'function')
+                return null;
+            try {
+                const analyser = this.context.createAnalyser();
+                analyser.fftSize = OUTPUT_ANALYSER_FFT_SIZE;
+                return analyser;
+            } catch (error) {
+                console.debug('Audio player: the output analyzer of the VU meter could not be created.', error);
+                return null;
+            }
         }
 
         /**
