@@ -47,7 +47,13 @@ internal static class EditableValuesCopier
         {
             if (excludedProperties.Contains(property.Name))
                 continue;
-            trackedEntry.Property(property.Name).CurrentValue = incomingEntry.Property(property.Name).CurrentValue;
+            PropertyEntry trackedProperty = trackedEntry.Property(property.Name);
+            object? incomingValue = incomingEntry.Property(property.Name).CurrentValue;
+            // Only an actual change is assigned and marked modified. Assigning every value unconditionally, or relying on change detection that has not run yet, would make the caller unable to tell a no-op save from a real edit.
+            if (Equals(trackedProperty.CurrentValue, incomingValue))
+                continue;
+            trackedProperty.CurrentValue = incomingValue;
+            trackedProperty.IsModified = true;
         }
     }
 }

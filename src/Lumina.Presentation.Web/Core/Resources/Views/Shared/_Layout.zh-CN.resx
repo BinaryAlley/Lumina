@@ -222,4 +222,37 @@
   <data name="AudioPlayerAlbumArtwork" xml:space="preserve">
     <value>专辑插图</value>
   </data>
+  <data name="AudioPlayerAddQueueToPlaylist" xml:space="preserve">
+    <value>将队列添加到播放列表</value>
+  </data>
+  <data name="AudioPlayerPlaylistQueueAddFailed" xml:space="preserve">
+    <value>无法将队列添加到播放列表。</value>
+  </data>
+  <data name="AudioPlayerSelectPlaylist" xml:space="preserve">
+    <value>选择播放列表</value>
+  </data>
+  <data name="AudioPlayerAdd" xml:space="preserve">
+    <value>添加</value>
+  </data>
+  <data name="AudioPlayerPlaylistQueueAdded" xml:space="preserve">
+    <value>队列已添加到播放列表。</value>
+  </data>
+  <data name="AudioPlayerNoPlaylists" xml:space="preserve">
+    <value>你还没有播放列表。</value>
+  </data>
+  <data name="PlaylistAddToPlaylist" xml:space="preserve">
+    <value>添加到播放列表</value>
+  </data>
+  <data name="PlaylistCreate" xml:space="preserve">
+    <value>创建播放列表</value>
+  </data>
+  <data name="PlaylistTracksAdded" xml:space="preserve">
+    <value>曲目已添加到播放列表。</value>
+  </data>
+  <data name="PlaylistTracksAddFailed" xml:space="preserve">
+    <value>无法将曲目添加到播放列表。</value>
+  </data>
+  <data name="PlaylistNoTracksToAdd" xml:space="preserve">
+    <value>没有可添加的曲目。</value>
+  </data>
 </root>

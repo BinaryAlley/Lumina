@@ -655,7 +655,7 @@
     <value>Switzerland</value>
   </data>
 <data name="Country.CI" xml:space="preserve">
-    <value>CÃ´te dâ€™Ivoire</value>
+    <value>Côte d’Ivoire</value>
   </data>
 <data name="Country.CL" xml:space="preserve">
     <value>Chile</value>
@@ -1048,7 +1048,7 @@
     <value>South Sudan</value>
   </data>
 <data name="Country.ST" xml:space="preserve">
-    <value>SÃ£o TomÃ© &amp; PrÃ­ncipe</value>
+    <value>São Tomé &amp; Príncipe</value>
   </data>
 <data name="Country.SV" xml:space="preserve">
     <value>El Salvador</value>
@@ -1084,7 +1084,7 @@
     <value>Tonga</value>
   </data>
 <data name="Country.TR" xml:space="preserve">
-    <value>TÃ¼rkiye</value>
+    <value>Türkiye</value>
   </data>
 <data name="Country.TT" xml:space="preserve">
     <value>Trinidad &amp; Tobago</value>

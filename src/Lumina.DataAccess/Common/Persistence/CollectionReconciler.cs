@@ -16,8 +16,9 @@ internal static class CollectionReconciler
     /// </summary>
     /// <remarks>
     /// Existing items that are absent from the desired set are removed, desired items that are absent are added, and matched items are left untouched, unless
-    /// <paramref name="shouldReplace"/> reports that their non-key values changed, in which case only that item is replaced. Because the tracked instances are
-    /// never rebuilt as a whole, the rows that did not change keep their identity and their audit columns.
+    /// <paramref name="shouldReplace"/> reports that their non-key values changed, in which case only that item is replaced, or <paramref name="applyMatched"/> is
+    /// provided, in which case the matched tracked item is updated in place. Because the tracked instances are never rebuilt as a whole, the rows that did not change
+    /// keep their identity and their audit columns.
     /// </remarks>
     /// <typeparam name="TExisting">The type of the tracked items.</typeparam>
     /// <typeparam name="TIncoming">The type of the desired items.</typeparam>
@@ -28,13 +29,15 @@ internal static class CollectionReconciler
     /// <param name="incomingKeySelector">Selects the matching key of a desired item.</param>
     /// <param name="shouldReplace">Determines whether a matched tracked item must be replaced, because a non-key value changed.</param>
     /// <param name="createNew">Creates the entity used for a desired item that is not matched by any tracked item.</param>
+    /// <param name="applyMatched">Applies the incoming non-key values onto a matched tracked item, when the caller updates matched items in place instead of replacing them.</param>
     public static void Reconcile<TExisting, TIncoming, TKey>(
         ICollection<TExisting> existingItems,
         IEnumerable<TIncoming> incomingItems,
         Func<TExisting, TKey> existingKeySelector,
         Func<TIncoming, TKey> incomingKeySelector,
         Func<TExisting, TIncoming, bool> shouldReplace,
-        Func<TIncoming, TExisting> createNew)
+        Func<TIncoming, TExisting> createNew,
+        Action<TExisting, TIncoming>? applyMatched = null)
         where TExisting : class
         where TKey : notnull
     {
@@ -65,6 +68,10 @@ internal static class CollectionReconciler
                     existingItems.Add(replacementItem);
                     existingByKey[incomingKey] = replacementItem;
                 }
+                else if (applyMatched is not null)
+                    // The caller updates the matched instance in place. This keeps the tracked instance and its key, which is the only
+                    // safe option when the key is user-assigned and the tracked instance is still in the change tracker.
+                    applyMatched(matchedItem, incomingItem);
             }
             else
             {

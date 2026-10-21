@@ -127,6 +127,9 @@
     <value>تشغيل</value>
   </data>
   <data name="Actions" xml:space="preserve">
-    <value>Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª</value>
+    <value>الإجراءات</value>
+  </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>إضافة إلى قائمة التشغيل</value>
   </data>
 </root>

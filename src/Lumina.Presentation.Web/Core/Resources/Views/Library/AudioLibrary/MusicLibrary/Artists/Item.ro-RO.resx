@@ -1092,4 +1092,7 @@
   <data name="Shuffle" xml:space="preserve">
     <value>Aleatoriu</value>
   </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>Adaugă în listă de redare</value>
+  </data>
 </root>

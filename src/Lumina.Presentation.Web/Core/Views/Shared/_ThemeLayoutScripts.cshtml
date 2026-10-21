@@ -56,6 +56,10 @@
         // The endpoint that draws a uniformly random batch of tracks of a library, artist or album. The server samples the
         // database, so a shuffle of a large library never has to enumerate its albums and tracks in the browser.
         shuffleTracksUrl: '@_urlService.GetRelativeUrl(WebRoutes.Music.SHUFFLE_TRACKS)',
+        // The playlists of the user, and the route that appends the current queue to one of them. The queue action in the
+        // expanded bar uses the first to fill its select and the second to send the ordered track Ids in one request.
+        getPlaylistsUrl: '@_urlService.GetRelativeUrl(WebRoutes.Playlists.GET_PLAYLISTS)',
+        addPlaylistEntriesRouteTemplate: '@_urlService.GetRelativeUrl(WebRoutes.Playlists.ADD_PLAYLIST_ENTRIES, new { playlistId = default(Guid) })',
         strings: {
             play: '@localizer["AudioPlayerPlay"]',
             pause: '@localizer["AudioPlayerPause"]',
@@ -71,7 +75,33 @@
             repeatAll: '@localizer["AudioPlayerRepeatAll"]',
             repeatOne: '@localizer["AudioPlayerRepeatOne"]',
             queue: '@localizer["AudioPlayerQueue"]',
-            albumArtwork: '@localizer["AudioPlayerAlbumArtwork"]'
+            albumArtwork: '@localizer["AudioPlayerAlbumArtwork"]',
+            addQueueToPlaylist: '@localizer["AudioPlayerAddQueueToPlaylist"]',
+            selectPlaylist: '@localizer["AudioPlayerSelectPlaylist"]',
+            playlistQueueAdded: '@localizer["AudioPlayerPlaylistQueueAdded"]',
+            playlistQueueAddFailed: '@localizer["AudioPlayerPlaylistQueueAddFailed"]',
+            noPlaylists: '@localizer["AudioPlayerNoPlaylists"]',
+            add: '@localizer["AudioPlayerAdd"]',
+            addToPlaylist: '@localizer["PlaylistAddToPlaylist"]'
+        }
+    };
+    // The endpoints and dialog labels of the add-to-playlist actions that the music library, artist and album cards share. The route
+    // that returns the track Ids of a scope lets a whole library, artist or album be added in one batch request, and the batch
+    // route is the same one the player uses for its queue. The routes are culture aware web routes, so the pages never hardcode
+    // a path, and the dialog labels come from the global resources.
+    var playlistConfiguration = {
+        getPlaylistsUrl: '@_urlService.GetRelativeUrl(WebRoutes.Playlists.GET_PLAYLISTS)',
+        addPlaylistEntryUrl: '@_urlService.GetRelativeUrl(WebRoutes.Playlists.ADD_PLAYLIST_ENTRY, new { playlistId = default(Guid) })',
+        addScopeEntriesUrl: '@_urlService.GetRelativeUrl(WebRoutes.Playlists.ADD_PLAYLIST_SCOPE_ENTRIES, new { playlistId = default(Guid) })',
+        createPlaylistUrl: '@_urlService.GetRelativeUrl(WebRoutes.Playlists.ADD)',
+        strings: {
+            selectPlaylist: '@localizer["AudioPlayerSelectPlaylist"]',
+            noPlaylists: '@localizer["AudioPlayerNoPlaylists"]',
+            createPlaylist: '@localizer["PlaylistCreate"]',
+            tracksAdded: '@localizer["PlaylistTracksAdded"]',
+            tracksAddFailed: '@localizer["PlaylistTracksAddFailed"]',
+            noTracksToAdd: '@localizer["PlaylistNoTracksToAdd"]',
+            add: '@localizer["AudioPlayerAdd"]'
         }
     };
 </script>
@@ -87,6 +117,7 @@
 <script defer src="~/js/dialogs.js" asp-append-version="true"></script>
 <script defer src="~/js/image-viewer.js" asp-append-version="true"></script>
 <script defer src="~/js/site.js" asp-append-version="true"></script>
+<script defer src="~/js/playlists.js" asp-append-version="true"></script>
 <script defer src="~/js/theme-client-template-engine.js" asp-append-version="true"></script>
 <script defer src="~/js/audio-player/audio-player-utils.js" asp-append-version="true"></script>
 <script defer src="~/js/audio-player/audio-player-errors.js" asp-append-version="true"></script>

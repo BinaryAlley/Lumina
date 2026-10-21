@@ -1202,6 +1202,115 @@ body {
         width: 64px;
     }
 
+    .tracks-table .track-play-column,
+    .tracks-table .track-actions-column {
+        width: 40px;
+    }
+
+    .tracks-table .track-play-cell,
+    .tracks-table .track-actions-cell {
+        width: 40px;
+        padding-left: 0;
+        padding-right: 0;
+        text-align: center;
+    }
+
+/* The play control of an album track row stays a small square, so its column cannot widen the table. */
+.track-play-button {
+    width: 24px;
+    min-width: 24px;
+    height: 24px;
+    padding: 0;
+    line-height: 1;
+}
+
+/* The card actions menu, reused by the actions menu of an album track row. */
+.card-actions-trigger {
+    position: absolute;
+    right: 2px;
+    bottom: 28px;
+    width: 22px;
+    height: 22px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #6DCBFE;
+    border: 1px solid #777777;
+    border-bottom-color: #000000;
+    border-right-color: #000000;
+    background: linear-gradient(to bottom, #505050 0%, #464646 35%, #404040 55%, #363636 100%);
+    font-size: 16px;
+    line-height: 1;
+}
+
+.card-actions-trigger::after {
+    content: '\22EE';
+}
+
+.media-card:hover .card-actions-trigger,
+.media-card.open .card-actions-trigger {
+    display: flex;
+}
+
+.card-actions-trigger:hover {
+    color: #FFFFFF;
+}
+
+/* The track row places the same trigger inline and always visible, instead of on a media card. */
+.track-actions-cell .card-actions-trigger {
+    position: static;
+    display: flex;
+    margin: 0 auto;
+}
+
+.card-actions-menu {
+    display: none;
+    position: fixed;
+    z-index: 901;
+    min-width: 150px;
+    background: #4F4F4F;
+    border: 1px solid #777777;
+    border-bottom-color: #000000;
+    border-right-color: #000000;
+    padding: 4px;
+    margin: 0;
+    list-style-type: none;
+}
+
+.media-card.open .card-actions-menu,
+.card-actions-menu.open {
+    display: block;
+}
+
+.card-actions-menu a {
+    display: block;
+    padding: 3px 10px;
+    text-decoration: none;
+    cursor: default;
+    color: #6DCBFE;
+    background: #232323;
+    border-left: 1px solid #000000;
+    border-right: 1px solid #777777;
+    user-select: none;
+}
+
+.card-actions-menu a:first-child {
+    border-top: 1px solid #000000;
+}
+
+.card-actions-menu a:last-child {
+    border-bottom: 1px solid #777777;
+}
+
+.card-actions-menu a:hover {
+    background: linear-gradient(to bottom, #505050 0%, #464646 35%, #404040 55%, #363636 100%);
+    border: 1px solid #777777;
+    border-right-color: #000000;
+    border-bottom-color: #000000;
+    color: #FFFFFF;
+}
+
 .track-name-link {
     text-decoration: none;
     color: #E6E6E6;
@@ -1778,8 +1887,38 @@ html.audio-player-initializing .audio-player-container {
     display: none;
 }
 
+/* The queue area takes the flex slot of the queue itself, so the queue action row above the list never becomes a new
+   sibling column of the expanded layout. The queue keeps filling the remaining height inside the area. */
+.audio-player-queue-area {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-width: 0px;
+    min-height: 0px;
+}
+
+.audio-player-queue-actions {
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 8px;
+}
+
+.audio-player-queue-actions .enlightenment-combobox {
+    flex: 1 1 200px;
+    min-width: 160px;
+}
+
+.audio-player-queue-actions .enlightenment-combobox.is-disabled {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
 .audio-player-queue {
     flex: 1 1 auto;
+    min-height: 0px;
     margin: 0px;
     padding: 0px;
     overflow-y: auto;
@@ -1834,4 +1973,41 @@ html.audio-player-initializing .audio-player-container {
     font-size: 12px;
     color: #9AA7B0;
     font-variant-numeric: tabular-nums;
+}
+
+/* The shared playlist picker of the add-to-playlist card actions. It reuses the application dialog surface on its own
+   overlay, so it never takes part in the queue of the global dialog service. */
+.playlist-picker-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.playlist-picker-overlay .dialog {
+    width: 400px;
+    max-width: 100%;
+}
+
+.playlist-picker-body {
+    padding-top: 4px;
+}
+
+.playlist-picker-scope {
+    margin: 0px 0px 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #9AA7B0;
+    font-size: 12px;
+}
+
+.playlist-picker-empty {
+    margin: 10px 0px 0px;
+    color: #9AA7B0;
+    font-size: 12px;
 }

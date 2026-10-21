@@ -129,4 +129,12 @@ public interface ITrackRepository : IRepository<TrackEntity>,
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     Task<Result<Updated>> ResetMetadataStatusForLibraryAsync(Guid libraryId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets the number of tracks in <paramref name="trackIds"/> that exist, together with the distinct Ids of the libraries that contain them.
+    /// </summary>
+    /// <param name="trackIds">The Ids of the tracks whose access information is retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the access summary of the existing tracks, or an error.</returns>
+    Task<Result<TrackAccessSummaryDto>> GetAccessInfoByIdsAsync(IReadOnlyCollection<Guid> trackIds, CancellationToken cancellationToken);
 }

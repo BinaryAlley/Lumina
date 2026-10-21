@@ -219,4 +219,7 @@
   <data name="ScheduledJobs" xml:space="preserve">
     <value>المهام المجدولة</value>
   </data>
+  <data name="Playlists" xml:space="preserve">
+    <value>قوائم التشغيل</value>
+  </data>
 </root>

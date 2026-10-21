@@ -266,14 +266,12 @@ internal sealed class TrackRepository : ITrackRepository
             .OrderBy(track => track.DiscNumber ?? 1) // some releases don't have a disc number, assume 1
             .ThenBy(track => track.TrackNumber)
             .ThenBy(track => track.Id)
-            .Select(track => new TrackLiteRow
-            {
-                Id = track.Id,
-                Title = track.Title,
-                TrackNumber = track.TrackNumber,
-                DiscNumber = track.DiscNumber,
-                DurationInSeconds = track.DurationInSeconds
-            });
+            .Select(track => new TrackLiteRow(
+                track.Id,
+                track.Title,
+                track.TrackNumber,
+                track.DiscNumber,
+                track.DurationInSeconds));
 
         if (paginationData is null)
         {
@@ -333,24 +331,21 @@ internal sealed class TrackRepository : ITrackRepository
         if (excludedIds.Length > 0)
             query = query.Where(track => !excludedIds.Contains(track.Id));
 
-        // SQLite randomizes the rows before the limit, so the result is a uniform sample of every matching track.
+        // SQLite randomizes the rows before the limit, so the result is a uniform sample of every matching track. The cover is the cover artwork stored for the album, exactly like the album cards expose it.
         return await query
             .OrderBy(_ => EF.Functions.Random())
             .Take(count)
-            .Select(track => new ShuffleTrackRowDto
-            {
-                TrackId = track.Id,
-                Title = track.Title,
-                DurationInSeconds = track.DurationInSeconds,
-                AlbumId = track.AlbumId,
-                AlbumTitle = track.Album!.Title,
-                ArtistId = track.Album!.ArtistId,
-                // The cover is the cover artwork stored for the album, exactly like the album cards expose it.
-                CoverPath = _luminaDbContext.MusicArtwork
+            .Select(track => new ShuffleTrackRowDto(
+                track.Id,
+                track.Title,
+                track.DurationInSeconds,
+                track.AlbumId,
+                track.Album!.Title,
+                track.Album!.ArtistId,
+                _luminaDbContext.MusicArtwork
                     .Where(artwork => artwork.OwnerType == MusicArtworkOwnerType.Album && artwork.OwnerId == track.AlbumId && artwork.ArtworkType == ArtworkType.Cover)
                     .Select(artwork => artwork.FileName)
-                    .FirstOrDefault()
-            })
+                    .FirstOrDefault()))
             .ToListAsync(cancellationToken).ConfigureAwait(false);
     }
 
@@ -528,5 +523,55 @@ internal sealed class TrackRepository : ITrackRepository
             .Where(track => track.LibraryId == libraryId)
             .ExecuteUpdateAsync(setters => setters.SetProperty(track => track.MetadataStatus, MetadataStatus.Pending), cancellationToken).ConfigureAwait(false);
         return Result.Updated;
+    }
+
+    /// <summary>
+    /// Gets the number of tracks in <paramref name="trackIds"/> that exist, together with the distinct Ids of the libraries that contain them.
+    /// </summary>
+    /// <param name="trackIds">The Ids of the tracks whose access information is retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the access summary of the existing tracks, or an error.</returns>
+    public async Task<Result<TrackAccessSummaryDto>> GetAccessInfoByIdsAsync(IReadOnlyCollection<Guid> trackIds, CancellationToken cancellationToken)
+    {
+        if (trackIds.Count == 0)
+            return Result.From(new TrackAccessSummaryDto(0, []));
+
+        // The chunk is deliberately large: it stays below the SQLite parameter limit while keeping a 100k queue to a handful of sequential round trips.
+        // The projection groups by library, so the storage medium returns one row per library instead of one row per requested track.
+        const int LOOKUP_CHUNK_SIZE = 20_000;
+        int trackCount = 0;
+        HashSet<Guid> libraryIds = [];
+        foreach (Guid[] chunk in trackIds.Chunk(LOOKUP_CHUNK_SIZE))
+        {
+            List<TrackLibraryCount> chunkCounts = await _luminaDbContext.Tracks
+                .AsNoTracking()
+                .Where(track => chunk.Contains(track.Id))
+                .GroupBy(track => track.LibraryId)
+                .Select(group => new TrackLibraryCount
+                {
+                    LibraryId = group.Key,
+                    TrackCount = group.Count()
+                })
+                .ToListAsync(cancellationToken).ConfigureAwait(false);
+            trackCount += chunkCounts.Sum(count => count.TrackCount);
+            libraryIds.UnionWith(chunkCounts.Select(count => count.LibraryId));
+        }
+        return Result.From(new TrackAccessSummaryDto(trackCount, [.. libraryIds]));
+    }
+
+    /// <summary>
+    /// The number of requested tracks that exist in one library.
+    /// </summary>
+    private sealed class TrackLibraryCount
+    {
+        /// <summary>
+        /// Gets or sets the Id of the library.
+        /// </summary>
+        public Guid LibraryId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of requested tracks in the library.
+        /// </summary>
+        public int TrackCount { get; set; }
     }
 }

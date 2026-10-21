@@ -7,40 +7,19 @@ namespace Lumina.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.T
 /// <summary>
 /// Read model of a track returned by a randomized shuffle query, carrying everything the client needs to queue and play it.
 /// </summary>
-public sealed record ShuffleTrackRowDto
-{
-    /// <summary>
-    /// Gets the Id of the track.
-    /// </summary>
-    public required Guid TrackId { get; init; }
-
-    /// <summary>
-    /// Gets the title of the track.
-    /// </summary>
-    public required string Title { get; init; }
-
-    /// <summary>
-    /// Gets the duration of the track in seconds.
-    /// </summary>
-    public int DurationInSeconds { get; init; }
-
-    /// <summary>
-    /// Gets the Id of the album the track belongs to.
-    /// </summary>
-    public required Guid AlbumId { get; init; }
-
-    /// <summary>
-    /// Gets the title of the album the track belongs to.
-    /// </summary>
-    public required string AlbumTitle { get; init; }
-
-    /// <summary>
-    /// Gets the Id of the artist the album belongs to.
-    /// </summary>
-    public required Guid ArtistId { get; init; }
-
-    /// <summary>
-    /// Gets the path of the cover of the album, if available.
-    /// </summary>
-    public string? CoverPath { get; init; }
-}
+/// <param name="TrackId">The Id of the track.</param>
+/// <param name="Title">The title of the track.</param>
+/// <param name="DurationInSeconds">The duration of the track in seconds.</param>
+/// <param name="AlbumId">The Id of the album the track belongs to.</param>
+/// <param name="AlbumTitle">The title of the album the track belongs to.</param>
+/// <param name="ArtistId">The Id of the artist the album belongs to.</param>
+/// <param name="CoverPath">The path of the cover of the album, if available.</param>
+public sealed record ShuffleTrackRowDto(
+    Guid TrackId,
+    string Title,
+    int DurationInSeconds,
+    Guid AlbumId,
+    string AlbumTitle,
+    Guid ArtistId,
+    string? CoverPath
+);

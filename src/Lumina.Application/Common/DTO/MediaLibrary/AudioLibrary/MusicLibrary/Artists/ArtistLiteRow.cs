@@ -7,20 +7,11 @@ namespace Lumina.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.A
 /// <summary>
 /// Lightweight read model of an artist, containing only the fields needed to display the artist in a card-based grid or a list.
 /// </summary>
-public sealed record ArtistLiteRow
-{
-    /// <summary>
-    /// Gets the Id of the artist.
-    /// </summary>
-    public required Guid Id { get; init; }
-
-    /// <summary>
-    /// Gets the name of the artist.
-    /// </summary>
-    public required string Name { get; init; }
-
-    /// <summary>
-    /// Gets the path of the image representing the artist, if available.
-    /// </summary>
-    public string? CoverPath { get; init; }
-}
+/// <param name="Id">The Id of the artist.</param>
+/// <param name="Name">The name of the artist.</param>
+/// <param name="CoverPath">The path of the image representing the artist, if available.</param>
+public sealed record ArtistLiteRow(
+    Guid Id,
+    string Name,
+    string? CoverPath
+);

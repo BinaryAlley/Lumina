@@ -222,4 +222,37 @@
   <data name="AudioPlayerAlbumArtwork" xml:space="preserve">
     <value>Illustrations de l'album</value>
   </data>
+  <data name="AudioPlayerAddQueueToPlaylist" xml:space="preserve">
+    <value>Ajouter la file d&apos;attente à une liste de lecture</value>
+  </data>
+  <data name="AudioPlayerPlaylistQueueAddFailed" xml:space="preserve">
+    <value>La file d&apos;attente n&apos;a pas pu être ajoutée à la liste de lecture.</value>
+  </data>
+  <data name="AudioPlayerSelectPlaylist" xml:space="preserve">
+    <value>Choisir une liste de lecture</value>
+  </data>
+  <data name="AudioPlayerAdd" xml:space="preserve">
+    <value>Ajouter</value>
+  </data>
+  <data name="AudioPlayerPlaylistQueueAdded" xml:space="preserve">
+    <value>La file d&apos;attente a été ajoutée à la liste de lecture.</value>
+  </data>
+  <data name="AudioPlayerNoPlaylists" xml:space="preserve">
+    <value>Vous n&apos;avez encore aucune liste de lecture.</value>
+  </data>
+  <data name="PlaylistAddToPlaylist" xml:space="preserve">
+    <value>Ajouter à la liste de lecture</value>
+  </data>
+  <data name="PlaylistCreate" xml:space="preserve">
+    <value>Créer une liste de lecture</value>
+  </data>
+  <data name="PlaylistTracksAdded" xml:space="preserve">
+    <value>Les pistes ont été ajoutées à la liste de lecture.</value>
+  </data>
+  <data name="PlaylistTracksAddFailed" xml:space="preserve">
+    <value>Les pistes n'ont pas pu être ajoutées à la liste de lecture.</value>
+  </data>
+  <data name="PlaylistNoTracksToAdd" xml:space="preserve">
+    <value>Il n'y a aucune piste à ajouter.</value>
+  </data>
 </root>

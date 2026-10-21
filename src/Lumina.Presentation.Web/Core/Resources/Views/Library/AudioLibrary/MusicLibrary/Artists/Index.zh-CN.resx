@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -64,6 +64,9 @@
     <value>播放</value>
   </data>
   <data name="Actions" xml:space="preserve">
-    <value>æ“ä½œ</value>
+    <value>操作</value>
+  </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>添加到播放列表</value>
   </data>
 </root>

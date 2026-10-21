@@ -1512,4 +1512,16 @@
   <data name="PlayTrack" xml:space="preserve">
     <value>Titel abspielen</value>
   </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Aktionen</value>
+  </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>Zur Wiedergabeliste hinzufügen</value>
+  </data>
+  <data name="AddToPlayQueue" xml:space="preserve">
+    <value>Zur Warteschlange hinzufügen</value>
+  </data>
+  <data name="PlayAllFromHere" xml:space="preserve">
+    <value>Alles ab hier abspielen</value>
+  </data>
 </root>

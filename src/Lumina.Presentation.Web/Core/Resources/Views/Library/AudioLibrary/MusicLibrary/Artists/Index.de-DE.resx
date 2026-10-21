@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -65,5 +65,8 @@
   </data>
   <data name="Actions" xml:space="preserve">
     <value>Aktionen</value>
+  </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>Zur Wiedergabeliste hinzufügen</value>
   </data>
 </root>

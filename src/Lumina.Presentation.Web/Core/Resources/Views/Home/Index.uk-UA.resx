@@ -127,6 +127,9 @@
     <value>Відтворити</value>
   </data>
   <data name="Actions" xml:space="preserve">
-    <value>Ð”Ñ–Ñ—</value>
+    <value>Дії</value>
+  </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>Додати до списку відтворення</value>
   </data>
 </root>

@@ -31,13 +31,11 @@ public class BookLiteRowFixture
         int? releaseYear = null,
         string? coverPath = null)
     {
-        return new BookLiteRow
-        {
-            Id = id ?? _faker.Random.Guid(),
-            Title = title ?? _faker.Lorem.Sentence(),
-            ReleaseYear = releaseYear,
-            CoverPath = coverPath
-        };
+        return new BookLiteRow(
+            id ?? _faker.Random.Guid(),
+            title ?? _faker.Lorem.Sentence(),
+            releaseYear,
+            coverPath);
     }
 
     /// <summary>

@@ -222,4 +222,37 @@
   <data name="AudioPlayerAlbumArtwork" xml:space="preserve">
     <value>Ilustrații album</value>
   </data>
+  <data name="AudioPlayerAddQueueToPlaylist" xml:space="preserve">
+    <value>Adaugă coada la o listă de redare</value>
+  </data>
+  <data name="AudioPlayerPlaylistQueueAddFailed" xml:space="preserve">
+    <value>Coada nu a putut fi adăugată în lista de redare.</value>
+  </data>
+  <data name="AudioPlayerSelectPlaylist" xml:space="preserve">
+    <value>Selectează o listă de redare</value>
+  </data>
+  <data name="AudioPlayerAdd" xml:space="preserve">
+    <value>Adaugă</value>
+  </data>
+  <data name="AudioPlayerPlaylistQueueAdded" xml:space="preserve">
+    <value>Coada a fost adăugată în lista de redare.</value>
+  </data>
+  <data name="AudioPlayerNoPlaylists" xml:space="preserve">
+    <value>Nu ai încă liste de redare.</value>
+  </data>
+  <data name="PlaylistAddToPlaylist" xml:space="preserve">
+    <value>Adaugă în listă de redare</value>
+  </data>
+  <data name="PlaylistCreate" xml:space="preserve">
+    <value>Creează listă de redare</value>
+  </data>
+  <data name="PlaylistTracksAdded" xml:space="preserve">
+    <value>Piesele au fost adăugate în lista de redare.</value>
+  </data>
+  <data name="PlaylistTracksAddFailed" xml:space="preserve">
+    <value>Piesele nu au putut fi adăugate în lista de redare.</value>
+  </data>
+  <data name="PlaylistNoTracksToAdd" xml:space="preserve">
+    <value>Nu există piese de adăugat.</value>
+  </data>
 </root>

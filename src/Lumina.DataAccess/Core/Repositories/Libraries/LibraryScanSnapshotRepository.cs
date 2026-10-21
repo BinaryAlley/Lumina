@@ -102,7 +102,7 @@ internal sealed class LibraryScanSnapshotRepository : ILibraryScanSnapshotReposi
         DateTime nowUtc = DateTime.UtcNow;
         object parameters = new { libraryId, scanId, userId, nowUtc };
 
-        // the Id of the inserted rows is generated in SQL as a random 16 byte value formatted as lowercase hex (hex(randomblob(16))), which the storage layer parses as a Guid;
+        // the Id of the inserted rows is generated in SQL as a random 16 byte value formatted as upper case hex (hex(randomblob(16))), which the storage layer parses as a Guid;
         // generating the Ids in code would defeat the purpose of these single statement bulk inserts
 
         // add an audit entry for every media library scan snapshot item that is no longer present in the current scan, meaning it was deleted from the storage medium

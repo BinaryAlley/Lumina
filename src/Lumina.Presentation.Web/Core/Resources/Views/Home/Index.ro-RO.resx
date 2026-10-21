@@ -127,6 +127,9 @@
     <value>Redare</value>
   </data>
   <data name="Actions" xml:space="preserve">
-    <value>AcÈ›iuni</value>
+    <value>Acțiuni</value>
+  </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>Adaugă în listă de redare</value>
   </data>
 </root>

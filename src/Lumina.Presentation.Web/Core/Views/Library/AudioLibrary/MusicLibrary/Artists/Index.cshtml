@@ -115,7 +115,8 @@
             shuffle: '@_localizer["Shuffle"]',
             deleteItem: '@_localizer["Delete"]',
             deleteConfirm: '@_localizer["DeleteConfirm"]',
-            deleteFailed: '@_localizer["DeleteFailed"]'
+            deleteFailed: '@_localizer["DeleteFailed"]',
+            addToPlaylist: '@_localizer["AddToPlaylist"]'
         };
 
         function buildItemsUrl() {
@@ -252,6 +253,19 @@
             if (artist.coverPath)
                 shuffleAction.dataset.coverArtPath = artist.coverPath;
 
+            const addToPlaylistAction = document.createElement('a');
+            addToPlaylistAction.setAttribute('role', 'menuitem');
+            addToPlaylistAction.href = '#';
+            addToPlaylistAction.className = 'card-action-add-to-playlist';
+            addToPlaylistAction.textContent = jsLocalizedStrings.addToPlaylist;
+            addToPlaylistAction.addEventListener('click', async event => {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                closeCardMenus();
+                if (window.LuminaPlaylists)
+                    await window.LuminaPlaylists.showAddScopeDialogAsync({ libraryId: libraryId, artistId: artist.id, title: artist.name || '', addToPlaylistLabel: jsLocalizedStrings.addToPlaylist, returnFocus: trigger });
+            });
+
             const deleteAction = document.createElement('a');
             deleteAction.setAttribute('role', 'menuitem');
             deleteAction.href = '#';
@@ -261,6 +275,7 @@
             menu.appendChild(detailsAction);
             menu.appendChild(playAction);
             menu.appendChild(shuffleAction);
+            menu.appendChild(addToPlaylistAction);
             menu.appendChild(deleteAction);
 
             menu.addEventListener('click', async event => {

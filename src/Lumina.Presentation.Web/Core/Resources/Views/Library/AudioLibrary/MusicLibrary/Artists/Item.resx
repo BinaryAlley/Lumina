@@ -445,7 +445,7 @@
     <value>Costa Rica</value>
   </data>
   <data name="Country.CI" xml:space="preserve">
-    <value>CÃ´te dâ€™Ivoire</value>
+    <value>Côte d’Ivoire</value>
   </data>
   <data name="Country.HR" xml:space="preserve">
     <value>Croatia</value>
@@ -772,7 +772,7 @@
     <value>San Marino</value>
   </data>
   <data name="Country.ST" xml:space="preserve">
-    <value>SÃ£o TomÃ© &amp; PrÃ­ncipe</value>
+    <value>São Tomé &amp; Príncipe</value>
   </data>
   <data name="Country.SA" xml:space="preserve">
     <value>Saudi Arabia</value>
@@ -859,7 +859,7 @@
     <value>Tunisia</value>
   </data>
   <data name="Country.TR" xml:space="preserve">
-    <value>TÃ¼rkiye</value>
+    <value>Türkiye</value>
   </data>
   <data name="Country.TM" xml:space="preserve">
     <value>Turkmenistan</value>
@@ -1091,5 +1091,8 @@
   </data>
   <data name="Shuffle" xml:space="preserve">
     <value>Shuffle</value>
+  </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>Add to playlist</value>
   </data>
 </root>

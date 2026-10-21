@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Play" xml:space="preserve">
+    <value>Riproduci</value>
+  </data>
+  <data name="PlayPlaylist" xml:space="preserve">
+    <value>Riproduci playlist</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Salva</value>
+  </data>
+  <data name="Saved" xml:space="preserve">
+    <value>La playlist è stata salvata.</value>
+  </data>
+  <data name="SaveFailed" xml:space="preserve">
+    <value>Non è stato possibile salvare la playlist.</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Elimina</value>
+  </data>
+  <data name="DeleteConfirm" xml:space="preserve">
+    <value>Eliminare questa playlist? L&apos;operazione non può essere annullata.</value>
+  </data>
+  <data name="DeleteFailed" xml:space="preserve">
+    <value>Non è stato possibile eliminare la playlist.</value>
+  </data>
+  <data name="BackToPlaylists" xml:space="preserve">
+    <value>Torna alle playlist</value>
+  </data>
+  <data name="Tracks" xml:space="preserve">
+    <value>Brani</value>
+  </data>
+  <data name="NoTracks" xml:space="preserve">
+    <value>Questa playlist non contiene ancora brani.</value>
+  </data>
+  <data name="AddTrack" xml:space="preserve">
+    <value>Aggiungi un brano</value>
+  </data>
+  <data name="Library" xml:space="preserve">
+    <value>Libreria</value>
+  </data>
+  <data name="Artist" xml:space="preserve">
+    <value>Artista</value>
+  </data>
+  <data name="Album" xml:space="preserve">
+    <value>Album</value>
+  </data>
+  <data name="Track" xml:space="preserve">
+    <value>Brano</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Aggiungi</value>
+  </data>
+  <data name="AddFailed" xml:space="preserve">
+    <value>Non è stato possibile aggiungere il brano.</value>
+  </data>
+  <data name="SelectLibrary" xml:space="preserve">
+    <value>Seleziona una libreria</value>
+  </data>
+  <data name="SelectArtist" xml:space="preserve">
+    <value>Seleziona un artista</value>
+  </data>
+  <data name="SelectAlbum" xml:space="preserve">
+    <value>Seleziona un album</value>
+  </data>
+  <data name="SelectTrack" xml:space="preserve">
+    <value>Seleziona un brano</value>
+  </data>
+  <data name="MoveUp" xml:space="preserve">
+    <value>Sposta su</value>
+  </data>
+  <data name="MoveDown" xml:space="preserve">
+    <value>Sposta giù</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Rimuovi</value>
+  </data>
+  <data name="RemoveConfirm" xml:space="preserve">
+    <value>Rimuovere questo brano dalla playlist?</value>
+  </data>
+  <data name="RemoveFailed" xml:space="preserve">
+    <value>Non è stato possibile rimuovere il brano.</value>
+  </data>
+  <data name="ReorderFailed" xml:space="preserve">
+    <value>Non è stato possibile riordinare la playlist.</value>
+  </data>
+  <data name="UnavailableTrack" xml:space="preserve">
+    <value>Brano non disponibile</value>
+  </data>
+  <data name="PlaylistNameRequired" xml:space="preserve">
+    <value>Una playlist deve avere un nome.</value>
+  </data>
+  <data name="NothingToPlay" xml:space="preserve">
+    <value>Questa playlist non contiene brani riproducibili.</value>
+  </data>
+  <data name="PlayerUnavailable" xml:space="preserve">
+    <value>Il lettore audio non è disponibile.</value>
+  </data>
+  <data name="EditDetails" xml:space="preserve">
+    <value>Dettagli della playlist</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Nome</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Descrizione</value>
+  </data>
+  <data name="NoMusicLibraries" xml:space="preserve">
+    <value>Non hai ancora librerie musicali.</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Caricamento...</value>
+  </data>
+  <data name="DragToReorder" xml:space="preserve">
+    <value>Trascina per riordinare</value>
+  </data>
+  <data name="CreatePlaylist" xml:space="preserve">
+    <value>Crea playlist</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Annulla</value>
+  </data>
+  <data name="LoadMore" xml:space="preserve">
+    <value>Carica altro</value>
+  </data>
+</root>

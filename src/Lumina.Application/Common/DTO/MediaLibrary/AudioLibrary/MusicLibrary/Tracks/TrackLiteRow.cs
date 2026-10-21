@@ -7,30 +7,15 @@ namespace Lumina.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.T
 /// <summary>
 /// Lightweight read model of a track, containing only the fields needed to display the track in a list.
 /// </summary>
-public sealed record TrackLiteRow
-{
-    /// <summary>
-    /// Gets the Id of the track.
-    /// </summary>
-    public required Guid Id { get; init; }
-
-    /// <summary>
-    /// Gets the title of the track.
-    /// </summary>
-    public required string Title { get; init; }
-
-    /// <summary>
-    /// Gets the number of the track on its disc.
-    /// </summary>
-    public int TrackNumber { get; init; }
-
-    /// <summary>
-    /// Gets the number of the disc the track belongs to, if applicable.
-    /// </summary>
-    public int? DiscNumber { get; init; }
-
-    /// <summary>
-    /// Gets the duration of the track in seconds.
-    /// </summary>
-    public int DurationInSeconds { get; init; }
-}
+/// <param name="Id">The Id of the track.</param>
+/// <param name="Title">The title of the track.</param>
+/// <param name="TrackNumber">The number of the track on its disc.</param>
+/// <param name="DiscNumber">The number of the disc the track belongs to, if applicable.</param>
+/// <param name="DurationInSeconds">The duration of the track in seconds.</param>
+public sealed record TrackLiteRow(
+    Guid Id,
+    string Title,
+    int TrackNumber,
+    int? DiscNumber,
+    int DurationInSeconds
+);

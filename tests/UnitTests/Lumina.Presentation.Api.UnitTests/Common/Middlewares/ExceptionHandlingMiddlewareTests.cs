@@ -112,7 +112,7 @@ public class ExceptionHandlingMiddlewareTests
     }
 
     [Fact]
-    public async Task InvokeAsync_WhenNextThrowsOperationCanceledException_ShouldRethrow()
+    public async Task InvokeAsync_WhenNextThrowsOperationCanceledException_ShouldRethrowAndReportTheRequestAsAborted()
     {
         // Arrange
         DefaultHttpContext context = new()
@@ -125,7 +125,8 @@ public class ExceptionHandlingMiddlewareTests
         await Assert.ThrowsAsync<OperationCanceledException>(() => _sut.InvokeAsync(context));
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, context.Response.StatusCode);
+        // An aborted request is still reported as a non-success status, so the eventual consistency middleware rolls its writes back.
+        Assert.Equal(StatusCodes.Status499ClientClosedRequest, context.Response.StatusCode);
         Assert.Equal(0, context.Response.Body.Length);
     }
 

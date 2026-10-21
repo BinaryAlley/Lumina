@@ -222,4 +222,37 @@
   <data name="AudioPlayerAlbumArtwork" xml:space="preserve">
     <value>Albumcover</value>
   </data>
+  <data name="AudioPlayerAddQueueToPlaylist" xml:space="preserve">
+    <value>Warteschlange zu Wiedergabeliste hinzufügen</value>
+  </data>
+  <data name="AudioPlayerPlaylistQueueAddFailed" xml:space="preserve">
+    <value>Die Warteschlange konnte nicht zur Wiedergabeliste hinzugefügt werden.</value>
+  </data>
+  <data name="AudioPlayerSelectPlaylist" xml:space="preserve">
+    <value>Wiedergabeliste auswählen</value>
+  </data>
+  <data name="AudioPlayerAdd" xml:space="preserve">
+    <value>Hinzufügen</value>
+  </data>
+  <data name="AudioPlayerPlaylistQueueAdded" xml:space="preserve">
+    <value>Die Warteschlange wurde der Wiedergabeliste hinzugefügt.</value>
+  </data>
+  <data name="AudioPlayerNoPlaylists" xml:space="preserve">
+    <value>Du hast noch keine Wiedergabelisten.</value>
+  </data>
+  <data name="PlaylistAddToPlaylist" xml:space="preserve">
+    <value>Zur Wiedergabeliste hinzufügen</value>
+  </data>
+  <data name="PlaylistCreate" xml:space="preserve">
+    <value>Wiedergabeliste erstellen</value>
+  </data>
+  <data name="PlaylistTracksAdded" xml:space="preserve">
+    <value>Die Titel wurden zur Wiedergabeliste hinzugefügt.</value>
+  </data>
+  <data name="PlaylistTracksAddFailed" xml:space="preserve">
+    <value>Die Titel konnten nicht zur Wiedergabeliste hinzugefügt werden.</value>
+  </data>
+  <data name="PlaylistNoTracksToAdd" xml:space="preserve">
+    <value>Es gibt keine Titel zum Hinzufügen.</value>
+  </data>
 </root>

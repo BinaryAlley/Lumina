@@ -133,10 +133,11 @@
                 <div class="form-row">
                     <table class="w-100 form-table tracks-table">
                         <colgroup>
-                            <col />
+                            <col class="track-play-column" />
                             <col class="track-number-column" />
                             <col />
                             <col class="track-duration-column" />
+                            <col class="track-actions-column" />
                         </colgroup>
                         <tbody id="tracks-body"></tbody>
                     </table>
@@ -658,6 +659,10 @@
             coverSaved: @Json.Serialize(_localizer["CoverSaved"].Value),
             coverUploadFailed: @Json.Serialize(_localizer["CoverUploadFailed"].Value),
             playTrack: @Json.Serialize(_localizer["PlayTrack"].Value),
+            actions: @Json.Serialize(_localizer["Actions"].Value),
+            addToPlaylist: @Json.Serialize(_localizer["AddToPlaylist"].Value),
+            addToPlayQueue: @Json.Serialize(_localizer["AddToPlayQueue"].Value),
+            playAllFromHere: @Json.Serialize(_localizer["PlayAllFromHere"].Value),
             remove: @Json.Serialize(_localizer["Remove"].Value)
         };
 
@@ -668,6 +673,10 @@
 
         // The cover path the play affordances hand to the player, kept in step with the artwork the page currently displays.
         let currentCoverPath = normalizeCoverPath(@Json.Serialize(playCoverPath ?? string.Empty));
+        // The ordered tracks of the album, kept for the "play all from here" action of the track menu.
+        let albumTracks = [];
+        // The track actions menu that is currently open, so the page opens one menu at a time and closes it on dismissal.
+        let openTrackActionsMenu = null;
 
         // Writes the cover of a play descriptor onto a trigger, dropping the attribute when the context has no artwork.
         function applyDescriptorCover(trigger, coverPath) {
@@ -954,6 +963,7 @@
                 return;
             tracksBody.innerHTML = '';
             const tracks = response.data;
+            albumTracks = tracks;
             noTracksMessage.classList.toggle('hidden', tracks.length !== 0);
             // Only a successful empty list disables the play album trigger. The player can still build the queue itself when
             // the track list could not be loaded.
@@ -966,7 +976,7 @@
         function createTrackPlayButton(track) {
             const button = document.createElement('button');
             button.type = 'button';
-            button.className = 'confirm-button';
+            button.className = 'confirm-button track-play-button';
             button.setAttribute('data-audio-player-play', '');
             button.dataset.libraryId = libraryId;
             button.dataset.trackId = track.id;
@@ -984,12 +994,14 @@
             return button;
         }
 
-        // Creates a row of the tracks table, with the play trigger, the number, the name of the track linking to its own page and the duration.
+        // Creates a row of the tracks table, with the play trigger, the number, the name of the track linking to its own page,
+        // the duration and the actions menu of the track.
         function createTrackRow(track) {
             const row = document.createElement('tr');
             row.className = 'track-row';
 
             const playCell = document.createElement('td');
+            playCell.className = 'track-play-cell';
             playCell.appendChild(createTrackPlayButton(track));
 
             const numberCell = document.createElement('td');
@@ -1009,7 +1021,168 @@
             row.appendChild(numberCell);
             row.appendChild(nameCell);
             row.appendChild(durationCell);
+            row.appendChild(createTrackActionsCell(track));
             return row;
+        }
+
+        // Gets the singleton audio player, or null when the layout did not render it.
+        function getAudioPlayer() {
+            return window.LuminaAudioPlayer && window.LuminaAudioPlayer.instance
+                ? window.LuminaAudioPlayer.instance
+                : null;
+        }
+
+        // Builds the play descriptor of a track of this album, with the cover the page currently displays.
+        function buildTrackDescriptor(track) {
+            return {
+                libraryId: libraryId,
+                trackId: track.id,
+                albumId: albumId,
+                artistId: artistId,
+                title: track.title || '',
+                albumTitle: albumTitle,
+                durationInSeconds: Number(track.durationInSeconds) || 0,
+                coverArtPath: currentCoverPath
+            };
+        }
+
+        // Closes the open track actions menu, optionally returning the focus to its trigger.
+        function closeTrackActionsMenu(shouldRestoreFocus) {
+            if (!openTrackActionsMenu)
+                return;
+            const menu = openTrackActionsMenu.menu;
+            const trigger = openTrackActionsMenu.trigger;
+            openTrackActionsMenu = null;
+            menu.remove();
+            trigger.setAttribute('aria-expanded', 'false');
+            if (shouldRestoreFocus && trigger.isConnected)
+                trigger.focus();
+        }
+
+        // Places the track actions menu next to its trigger, right aligned and below it when there is room.
+        function positionTrackActionsMenu(menu, trigger) {
+            const margin = 4;
+            const triggerRect = trigger.getBoundingClientRect();
+            const width = menu.offsetWidth;
+            const height = menu.offsetHeight;
+            const left = Math.min(Math.max(margin, triggerRect.right - width), Math.max(margin, window.innerWidth - width - margin));
+            const below = triggerRect.bottom + margin;
+            const top = below + height <= window.innerHeight - margin
+                ? below
+                : Math.max(margin, triggerRect.top - height - margin);
+            menu.style.left = `${left}px`;
+            menu.style.top = `${top}px`;
+        }
+
+        // Creates one entry of the track actions menu, using the same menu item markup as the card actions menus.
+        function createTrackMenuAction(label, className, handler) {
+            const link = document.createElement('a');
+            link.href = '#';
+            link.className = className;
+            link.setAttribute('role', 'menuitem');
+            link.textContent = label;
+            link.addEventListener('click', event => {
+                event.preventDefault();
+                event.stopPropagation();
+                closeTrackActionsMenu(false);
+                handler();
+            });
+            return link;
+        }
+
+        // Opens the actions menu of a track, or closes it when the same trigger is clicked again.
+        function openTrackActionsMenuFor(trigger, track) {
+            const wasOpen = openTrackActionsMenu && openTrackActionsMenu.trigger === trigger;
+            closeTrackActionsMenu(false);
+            if (wasOpen)
+                return;
+            const menu = document.createElement('nav');
+            menu.className = 'card-actions-menu';
+            menu.setAttribute('role', 'menu');
+            menu.appendChild(createTrackMenuAction(jsLocalizedStrings.addToPlaylist, 'card-action-add-to-playlist', () => addTrackToPlaylist(track, trigger)));
+            menu.appendChild(createTrackMenuAction(jsLocalizedStrings.addToPlayQueue, 'card-action-add-to-queue', () => addTrackToQueueAsync(track)));
+            menu.appendChild(createTrackMenuAction(jsLocalizedStrings.playAllFromHere, 'card-action-play-all-from-here', () => playAllFromHereAsync(track)));
+            document.body.appendChild(menu);
+            menu.classList.add('open');
+            positionTrackActionsMenu(menu, trigger);
+            trigger.setAttribute('aria-expanded', 'true');
+            openTrackActionsMenu = { trigger, menu };
+            const firstAction = menu.querySelector('a[role="menuitem"]');
+            if (firstAction)
+                firstAction.focus();
+        }
+
+        // Creates the actions cell of a track row, using the same trigger and dots as the card actions menus.
+        function createTrackActionsCell(track) {
+            const cell = document.createElement('td');
+            cell.className = 'track-actions-cell';
+            const trigger = document.createElement('button');
+            trigger.type = 'button';
+            trigger.className = 'card-actions-trigger track-actions-trigger';
+            trigger.setAttribute('aria-haspopup', 'menu');
+            trigger.setAttribute('aria-expanded', 'false');
+            trigger.setAttribute('aria-label', jsLocalizedStrings.actions);
+            trigger.title = jsLocalizedStrings.actions;
+            trigger.addEventListener('click', event => {
+                event.preventDefault();
+                event.stopPropagation();
+                openTrackActionsMenuFor(trigger, track);
+            });
+            cell.appendChild(trigger);
+            return cell;
+        }
+
+        // Closes the track actions menu when the user clicks elsewhere, presses Escape, scrolls or resizes the window.
+        function handleTrackActionsMenuDismiss(event) {
+            if (!openTrackActionsMenu)
+                return;
+            if (event.type === 'keydown') {
+                if (event.key === 'Escape') {
+                    event.preventDefault();
+                    closeTrackActionsMenu(true);
+                }
+                return;
+            }
+            if (event.type === 'click' && event.target.closest('.card-actions-menu, .track-actions-trigger'))
+                return;
+            closeTrackActionsMenu(false);
+        }
+
+        // Appends one track to the play queue, or starts it when the queue is empty.
+        async function addTrackToQueueAsync(track) {
+            const player = getAudioPlayer();
+            if (!player || typeof player.appendToQueueAsync !== 'function')
+                return;
+            await player.appendToQueueAsync(buildTrackDescriptor(track));
+        }
+
+        // Starts a new queue with the clicked track and every track that follows it in the album track list.
+        async function playAllFromHereAsync(track) {
+            const player = getAudioPlayer();
+            if (!player)
+                return;
+            const index = albumTracks.findIndex(candidate => candidate.id === track.id);
+            if (index < 0)
+                return;
+            const descriptors = albumTracks.slice(index).map(buildTrackDescriptor);
+            if (descriptors.length === 0)
+                return;
+            await player.playAsync({ ...descriptors[0], queue: descriptors });
+        }
+
+        // Opens the shared add-to-playlist dialog for this single track.
+        function addTrackToPlaylist(track, trigger) {
+            if (!window.LuminaPlaylists || typeof window.LuminaPlaylists.showAddScopeDialogAsync !== 'function')
+                return;
+            window.LuminaPlaylists.showAddScopeDialogAsync({
+                libraryId: libraryId,
+                artistId: artistId,
+                albumId: albumId,
+                trackId: track.id,
+                title: track.title || '',
+                addToPlaylistLabel: jsLocalizedStrings.addToPlaylist,
+                returnFocus: trigger
+            });
         }
 
         // Sends the edited album data to the server.
@@ -1160,6 +1333,10 @@
         ratingsBody.addEventListener('click', handleRowRemoval);
         btnChangeCover.addEventListener('click', handleChangeCoverClick);
         coverInput.addEventListener('change', handleCoverChangeAsync);
+        document.addEventListener('click', handleTrackActionsMenuDismiss);
+        document.addEventListener('keydown', handleTrackActionsMenuDismiss);
+        window.addEventListener('scroll', handleTrackActionsMenuDismiss, true);
+        window.addEventListener('resize', handleTrackActionsMenuDismiss);
         document.addEventListener('DOMContentLoaded', InitializeAsync);
 
         // Register cleanup for these listeners.
@@ -1181,6 +1358,11 @@
             ratingsBody.removeEventListener('click', handleRowRemoval);
             btnChangeCover.removeEventListener('click', handleChangeCoverClick);
             coverInput.removeEventListener('change', handleCoverChangeAsync);
+            closeTrackActionsMenu(false);
+            document.removeEventListener('click', handleTrackActionsMenuDismiss);
+            document.removeEventListener('keydown', handleTrackActionsMenuDismiss);
+            window.removeEventListener('scroll', handleTrackActionsMenuDismiss, true);
+            window.removeEventListener('resize', handleTrackActionsMenuDismiss);
             document.removeEventListener('DOMContentLoaded', InitializeAsync);
         });
 

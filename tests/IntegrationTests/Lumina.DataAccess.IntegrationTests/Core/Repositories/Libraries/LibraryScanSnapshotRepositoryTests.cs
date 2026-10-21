@@ -3,6 +3,7 @@ using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Lumina.DataAccess.Common.Dapper;
 using Lumina.DataAccess.Core.Repositories.Libraries;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Primitives;
@@ -49,6 +50,8 @@ public class LibraryScanSnapshotRepositoryTests : IDisposable
         _anchorConnection.Open();
         _context = new LuminaDbContext(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(_connectionString).Options);
         _context.Database.EnsureCreated();
+        // The production composition root registers this handler, so the integration tests must exercise the same Guid representation.
+        DapperTypeHandlers.Register();
         _sut = new LibraryScanSnapshotRepository(_context);
     }
 

@@ -168,6 +168,8 @@ Known page keys:
 | `shared/audio-player/queue-item` | The queue item of the audio player bar. |
 | `shared/audio-player/playlist-item` | The playlist item of the audio player bar. |
 | `library/written-content-library/book-library/books/index` | The books browsing page. |
+| `playlists/index` | The page that lists and deletes the playlists of the current user. |
+| `playlists/item` | The page that creates a playlist, or edits, reorders, plays and deletes an existing playlist of the current user. The `isNew` page data field tells the two modes apart. |
 | `shared/file-system-browser` | The file system browser component shell. |
 | `shared/file-system-browser/tree-node` | The tree view node of the file system browser. |
 | `shared/file-system-browser/explorer-item` | The file system entry of the file system browser. |
@@ -244,6 +246,8 @@ The theme owns the position, orientation and size of the bar, and it owns the ro
 | The main content element | `audio-player-not-shown` class | The bar is hidden, so the content area releases the room the theme reserved for the bar. |
 | The main content element | `audio-player-bar-expanded` class | The bar is expanded. This is the layout-neutral state for the main content element's own adjustment. |
 | The expand and collapse control | `id="audio-player-expand-toggle"` | A focusable control, such as a `button`, that expands or collapses the bar. Its label may describe the action in the theme's own layout. |
+| The queue-to-playlist combo box | `data-audio-player-playlist-combobox` | A standard application combo box (`enlightenment-combobox`) in the expanded area that lists the playlists of the current user. Its root carries the hook; its selected text carries the chosen playlist Id in `data-value`. When the theme does not render the hook, the player builds a built-in combo box of the same markup and places it in a `audio-player-queue-area` wrapper above the queue, so the action never becomes a new column of the expanded layout. |
+| The queue-to-playlist button | `data-audio-player-add-queue-to-playlist` | A focusable control in the expanded area that appends the current queue, in order, to the playlist selected in the combo box. When the theme does not render it, the player builds a built-in button next to the combo box. The player disables it while the queue is empty, while no playlist exists, and while an add is in flight. |
 
 The `shared/audio-player` template receives the following model:
 
@@ -253,7 +257,7 @@ The `shared/audio-player` template receives the following model:
 | `assetBase` | The base URL of the theme assets, used by the theme template to reference its own assets. |
 | `queueItemTemplate` | The raw source of the `shared/audio-player/queue-item` sub template, inlined by the application into a plain text script element. |
 | `playlistItemTemplate` | The raw source of the `shared/audio-player/playlist-item` sub template, inlined by the application into a plain text script element. |
-| `strings` | The localized strings of the bar, keyed by their resource names. A shell template uses `toggleExpanded`, `previous`, `next`, `stop`, `repeat`, `repeatOff`, `repeatAll`, `repeatOne`, `queue` and `albumArtwork` for its controls; the player reads the play, pause, mute, unmute, volume, seek and buffering labels from the global scripts configuration instead, so a themed shell does not need to render them. |
+| `strings` | The localized strings of the bar, keyed by their resource names. A shell template uses `toggleExpanded`, `previous`, `next`, `stop`, `repeat`, `repeatOff`, `repeatAll`, `repeatOne`, `queue`, `albumArtwork`, `addQueueToPlaylist`, `addToPlaylist`, `selectPlaylist` and `add` for its controls; the player reads the play, pause, mute, unmute, volume, seek, buffering, success and failure labels from the global scripts configuration instead, so a themed shell does not need to render them. |
 
 The bundled themes reserve the room for their bottom bar like this. It is an example of a bottom layout, not a required layout:
 
@@ -369,7 +373,7 @@ The sub templates are rendered client side by the audio player script with the s
 | Template | Fields |
 | --- | --- |
 | `queue-item` | `entryId` (the identity of this occurrence in the queue), `index` (the one based position in the queue), `trackId`, `albumId`, `artistId`, `libraryId`, `title`, `duration` (the formatted `m:ss` duration), `durationSeconds`, `coverArtUrl` (the resolved cover art URL, which is the music placeholder when the entry has no artwork), `isCurrent`, `isPlayed`, `isLast`, `isContinuation` (the entry was added by the autoplay continuation) and `isShuffled` (the entry was added by a shuffle batch). The item root must keep the `audio-player-queue-item` class, the stylesheet hook of a queue item: the player appends the rendered element as-is, so the class is what lets the theme style it. The player writes `is-current`, `is-played`, `is-continuation` and `is-shuffled` on the root itself, so a theme item does not need to render those state classes, and it writes `data-audio-player-queue-entry-id`, so a theme item does not need to render the identity either. |
-| `playlist-item` | `index`, `trackId`, `albumId`, `artistId`, `libraryId`, `title`, `duration`, `durationSeconds`, `coverArtUrl` and `isCurrent`. The item root must keep the `audio-player-playlist-item` class, the stylesheet hook of a playlist item. Saved playlists do not exist yet, so the shell inlines this sub template for theme authors, but nothing renders it yet; the playlist feature renders the entries of a playlist from it. |
+| `playlist-item` | `index`, `trackId`, `albumId`, `artistId`, `libraryId`, `title`, `duration`, `durationSeconds`, `coverArtUrl` and `isCurrent`. The item root must keep the `audio-player-playlist-item` class, the stylesheet hook of a playlist item. The shell inlines this sub template for theme authors, but the player does not render a saved playlist list with it yet; the saved playlist page renders its own rows from the page data described below. |
 
 A theme can omit either sub template: the player then renders that part with its own built-in markup. When a theme replaces the shell, it must keep the two plain text script element ids above, the element hooks of the bar, and the `audio-player-container`, `not-shown` and `expanded` classes the player toggles.
 
@@ -469,6 +473,71 @@ Page templates are rendered into a content section that the layout wraps. A page
 </script>
 {{/scripts}}
 ```
+
+#### The Playlist Pages
+
+`playlists/index` receives a model with the following fields:
+
+| Field | Content |
+| --- | --- |
+| `getPlaylistsUrl` | The route that returns the playlists of the current user. |
+| `addUrl` | The route of the dedicated page that creates a playlist. |
+| `itemUrl` | The route template of a playlist page. The trailing `00000000-0000-0000-0000-000000000000` is replaced by the Id of the playlist. |
+| `deleteUrl` | The route template that deletes a playlist. The trailing `00000000-0000-0000-0000-000000000000` is replaced by the Id of the playlist. |
+| `antiforgeryToken` | The anti-forgery token the page submits with its mutating requests. |
+| `strings` | The localized strings of the page, keyed by their resource names. |
+
+`playlists/item` receives a model with the following fields:
+
+| Field | Content |
+| --- | --- |
+| `isNew` | `true` on the create page, `false` on the page of an existing playlist. The same page key serves both modes. |
+| `playlistId` | The Id of the playlist the page shows, or the empty Id on the create page. |
+| `playlistJson` | The playlist metadata and only the first window of its ordered entries, serialized as JSON. `entryCount` is the total number of entries. Each entry carries `mediaItemId` and `mediaItemType`, which are generic across media kinds, together with the generic display fields `libraryId`, `collectionId`, `creatorId`, `mediaItemTitle`, `collectionTitle`, `creatorName`, `durationInSeconds` and `coverPath`. For a music entry, the collection is the album and the creator is the artist. On the create page it is an empty music playlist. |
+| `entriesWindowSize` | The number of entries in the first window. The page fetches the next windows with `getPlaylistUrl` and the same size. |
+| `createPlaylistUrl` | The route that creates a playlist. Only meaningful when `isNew` is `true`. |
+| `itemUrl` | The route template of the page of an existing playlist. The trailing `00000000-0000-0000-0000-000000000000` is replaced by the Id of the playlist, and the page script navigates to it after a successful create. |
+| `getPlaylistUrl` | The route that returns a window of the playlist. It takes `offset` and `limit` query parameters and returns `entryCount` with the window. The limit is a response-window bound of at most 1000 entries, not a cap on the playlist size. |
+| `updatePlaylistUrl` | The route that updates the name and description of the playlist. |
+| `deletePlaylistUrl` | The route that deletes the playlist. |
+| `addEntryUrl` | The route that adds a track to the playlist. |
+| `removeEntryUrl` | The route template that removes an entry. The trailing `00000000-0000-0000-0000-000000000000` is replaced by the Id of the entry. |
+| `moveEntryUrl` | The route that moves one entry of the playlist to a new position. The empty `00000000-0000-0000-0000-000000000000` entry segment is replaced by the entry Id; the body carries `targetPosition`. |
+| `getEnabledLibrariesUrl` | The route that lists the media libraries the current user can browse. |
+| `getArtistsUrl` | The route that lists the artists of a music library. It takes `libraryId` as a query parameter. |
+| `getArtistAlbumsUrl` | The route template that lists the releases of an artist. The trailing `00000000-0000-0000-0000-000000000000` is replaced by the Id of the artist, and the library Id is passed as a query parameter. |
+| `getAlbumTracksUrl` | The route template that lists the tracks of an album. The two `00000000-0000-0000-0000-000000000000` segments are replaced by the Ids of the artist and the album, and the library Id is passed as a query parameter. |
+| `indexUrl` | The route of the playlists page. |
+| `antiforgeryToken` | The anti-forgery token the page submits with its mutating requests. |
+| `strings` | The localized strings of the page, keyed by their resource names. |
+
+The fallback views keep these element hooks, which the application script drives: on the list page, `playlists-container`, `no-playlists` and `playlist-count`; on the item page, `playlist-details-form`, `playlist-title`, `playlist-name-input`, `playlist-description-input`, `save-playlist-button`, `cancel-playlist-button`, `play-playlist-button`, `delete-playlist-button`, `playlist-entries`, `no-tracks`, `load-more-entries-button`, `playlist-library-combobox`, `playlist-artist-combobox`, `playlist-album-combobox`, `playlist-track-combobox`, `add-track-button` and `no-music-libraries`. The four track picker controls are standard application combo boxes, not native `select` elements. A theme that restructures a page must keep the hooks the page script needs for that page.
+
+The playlist rows use the same play affordance contract as the music pages: an element with `data-audio-player-play` and the `data-track-id`, `data-library-id`, `data-album-id`, `data-artist-id`, `data-title`, `data-album-title`, `data-duration` and `data-cover-art-path` attributes is handed to the global player by event delegation. The page fills `data-track-id` from the entry `mediaItemId`, because a music entry references a track. The Play playlist control fetches every window of the playlist in order, builds an explicit queue from the playable entries and starts it through the player control API, so a theme template must keep the `play-playlist-button` hook for that control.
+
+The playlist rows are reordered by dragging the handle with the `playlist-entry-drag-handle` class, and the row carries the `is-dragging` class while it is being dragged. The up and down controls remain available for keyboard and touch users, and the page uses the `playlist-entry-move-up`, `playlist-entry-move-down` and `playlist-entry-remove` classes to disable them while an entry mutation is in flight. A theme template that changes the row structure must keep the `playlist-entry` class and the `data-entry-id` attribute on the row, so the page script can find the row and commit its new position.
+
+#### The Shared Add to Playlist Action
+
+The music library card on the home page, the artist cards, the album cards and the actions menu of an album track row share one add-to-playlist action. The action is a menu item with the `card-action-add-to-playlist` class in both cases. Their click handler calls `window.LuminaPlaylists.showAddScopeDialogAsync(scope)`, where `scope` carries `libraryId`, the optional `artistId`, `albumId` and `trackId`, the `title` shown in the dialog, the page-local `addToPlaylistLabel`, and the optional `returnFocus` element that gets the focus back when the dialog closes. The helper is provided by `wwwroot/js/playlists.js`, which every layout loads. The page passes its own localized label from its page resource as `addToPlaylistLabel`.
+
+The dialog is rendered by the application, not by the theme: it is a standard application dialog surface with a standard `enlightenment-combobox` of the playlists of the current user. When the scope carries a `trackId`, the dialog appends that single track through the single entry route. Otherwise, the server resolves the ordered track Ids of the scope and appends them to the selected playlist in one batch request. In both cases it shows the result notification and dispatches the `lumina:playlist-updated` event so an open playlist page refreshes. A theme that renders the dialog itself does not get this behavior; it must keep the action wired to the shared helper or reimplement the whole flow.
+
+The layout provides the shared configuration as `window.playlistConfiguration`:
+
+| Field | Content |
+| --- | --- |
+| `getPlaylistsUrl` | The route that returns the playlists of the current user. |
+| `addPlaylistEntryUrl` | The route that appends one track to a playlist. The empty `00000000-0000-0000-0000-000000000000` segment is replaced by the playlist Id; the body carries `trackId`. |
+| `addScopeEntriesUrl` | The route that appends a whole library, artist or album scope to a playlist. The empty `00000000-0000-0000-0000-000000000000` segment is replaced by the playlist Id; the body carries `libraryId` and the optional `artistId` and `albumId`, and the server resolves and appends the tracks in catalogue order in the database. |
+| `createPlaylistUrl` | The route of the dedicated create playlist page, linked from the empty state of the dialog. |
+| `strings` | The localized dialog labels, including `selectPlaylist`, `noPlaylists`, `createPlaylist`, `tracksAdded`, `tracksAddFailed` and `noTracksToAdd`. |
+
+The player queue action does not use `addToPlaylistLabel`. Its label comes from the `PlaylistAddToPlaylist` layout resource, exposed to the player as `strings.addToPlaylist` in the audio player configuration.
+
+#### The Album Track Actions Menu
+
+Every rendered track row of the album details page carries the same `card-actions-trigger` button with the vertical dots as the card menus, plus the `track-actions-trigger` class that places it inline in the row. The page script creates the same `card-actions-menu` markup on demand. The menu has three application actions: `card-action-add-to-playlist` opens the shared add-to-playlist dialog for that track, `card-action-add-to-queue` calls `window.LuminaAudioPlayer.instance.appendToQueueAsync(descriptor)`, and `card-action-play-all-from-here` calls `playAsync` with an explicit queue built from the clicked track and every track that follows it in the album order. The player starts the clicked track for the last action, and replaces the queue. A theme that renders the album page must keep the track row markup and the script behavior, or provide its own equivalent.
 
 ### The Scripts Section
 

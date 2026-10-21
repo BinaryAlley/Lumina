@@ -226,16 +226,14 @@ internal sealed class BookRepository : IBookRepository
         // Apply sorting based on the specified sortBy and sortOrder parameters.
         booksQuery = ApplySorting(booksQuery, sortBy, sortOrder ?? SortOrder.Ascending, libraryFilter.ShouldIgnoreThePrefixForAlphaPicker);
 
-        IQueryable<BookLiteRow> liteRowsQuery = booksQuery.Select(book => new BookLiteRow
-        {
-            Id = book.Id,
-            Title = book.Title,
-            ReleaseYear = book.ReReleaseYear ?? book.OriginalReleaseYear,
-            CoverPath = book.Artwork
+        IQueryable<BookLiteRow> liteRowsQuery = booksQuery.Select(book => new BookLiteRow(
+            book.Id,
+            book.Title,
+            book.ReReleaseYear ?? book.OriginalReleaseYear,
+            book.Artwork
                 .Where(artwork => artwork.ArtworkType == ArtworkType.Cover)
                 .Select(artwork => artwork.FileName)
-                .FirstOrDefault()
-        });
+                .FirstOrDefault()));
 
         // If no pagination was requested, return all the books of the library.
         if (paginationData is null)

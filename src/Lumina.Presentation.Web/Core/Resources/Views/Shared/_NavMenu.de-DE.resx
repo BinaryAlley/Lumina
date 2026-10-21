@@ -219,4 +219,7 @@
   <data name="ScheduledJobs" xml:space="preserve">
     <value>Geplante Aufgaben</value>
   </data>
+  <data name="Playlists" xml:space="preserve">
+    <value>Wiedergabelisten</value>
+  </data>
 </root>

@@ -127,6 +127,9 @@
     <value>再生</value>
   </data>
   <data name="Actions" xml:space="preserve">
-    <value>æ“ä½œ</value>
+    <value>操作</value>
+  </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>プレイリストに追加</value>
   </data>
 </root>

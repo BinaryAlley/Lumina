@@ -163,6 +163,7 @@ public sealed class ThemeNavBuilder
         items.Add(new ThemeNavEntryDto(Localize("Audio"), Url: null, CssClass: null,
         [
             new ThemeNavEntryDto(Localize("Music"), $"{librariesCatalogUrl}?category=music", "nav-link", []),
+            new ThemeNavEntryDto(Localize("Playlists"), _urlService.GetAbsoluteUrl(WebRoutes.Playlists.INDEX), "nav-link", []),
             new ThemeNavEntryDto(Localize("Interviews"), "library/audio/interviews", "nav-link", [])
         ]));
         items.Add(new ThemeNavEntryDto(Localize("Video"), Url: null, CssClass: null,

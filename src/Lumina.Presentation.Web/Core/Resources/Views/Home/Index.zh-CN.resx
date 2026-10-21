@@ -127,6 +127,9 @@
     <value>播放</value>
   </data>
   <data name="Actions" xml:space="preserve">
-    <value>æ“ä½œ</value>
+    <value>操作</value>
+  </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>添加到播放列表</value>
   </data>
 </root>

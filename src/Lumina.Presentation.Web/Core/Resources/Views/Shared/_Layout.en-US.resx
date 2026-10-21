@@ -222,4 +222,37 @@
   <data name="AudioPlayerAlbumArtwork" xml:space="preserve">
     <value>Album artwork</value>
   </data>
+  <data name="AudioPlayerAddQueueToPlaylist" xml:space="preserve">
+    <value>Add queue to playlist</value>
+  </data>
+  <data name="AudioPlayerPlaylistQueueAddFailed" xml:space="preserve">
+    <value>The queue could not be added to the playlist.</value>
+  </data>
+  <data name="AudioPlayerSelectPlaylist" xml:space="preserve">
+    <value>Select a playlist</value>
+  </data>
+  <data name="AudioPlayerAdd" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="AudioPlayerPlaylistQueueAdded" xml:space="preserve">
+    <value>The queue was added to the playlist.</value>
+  </data>
+  <data name="AudioPlayerNoPlaylists" xml:space="preserve">
+    <value>You have no playlists yet.</value>
+  </data>
+  <data name="PlaylistAddToPlaylist" xml:space="preserve">
+    <value>Add to playlist</value>
+  </data>
+  <data name="PlaylistCreate" xml:space="preserve">
+    <value>Create playlist</value>
+  </data>
+  <data name="PlaylistTracksAdded" xml:space="preserve">
+    <value>The tracks were added to the playlist.</value>
+  </data>
+  <data name="PlaylistTracksAddFailed" xml:space="preserve">
+    <value>The tracks could not be added to the playlist.</value>
+  </data>
+  <data name="PlaylistNoTracksToAdd" xml:space="preserve">
+    <value>There are no tracks to add.</value>
+  </data>
 </root>

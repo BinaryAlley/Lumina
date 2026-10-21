@@ -4,6 +4,7 @@ using Lumina.Application.Common.DataAccess.Repositories.BookLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.MediaContributors;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
+using Lumina.Application.Common.DataAccess.Repositories.Playlists;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Scheduling;
 using Lumina.Application.Common.DataAccess.Repositories.Themes;
@@ -15,6 +16,7 @@ using Lumina.DataAccess.Core.Repositories.BookLibrary;
 using Lumina.DataAccess.Core.Repositories.Libraries;
 using Lumina.DataAccess.Core.Repositories.MediaContributors;
 using Lumina.DataAccess.Core.Repositories.MusicLibrary;
+using Lumina.DataAccess.Core.Repositories.Playlists;
 using Lumina.DataAccess.Core.Repositories.Plugins;
 using Lumina.DataAccess.Core.Repositories.Scheduling;
 using Lumina.DataAccess.Core.Repositories.Themes;
@@ -65,6 +67,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     private IUserRepository? _userRepository;
     private IUserSettingsRepository? _userSettingsRepository;
     private IMusicPlayRecordRepository? _musicPlayRecordRepository;
+    private IPlaylistRepository? _playlistRepository;
 
     /// <summary>
     /// Gets the permission repository.
@@ -384,6 +387,18 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         {
             _musicPlayRecordRepository ??= new MusicPlayRecordRepository(_luminaDbContext);
             return _musicPlayRecordRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the playlist repository.
+    /// </summary>
+    public IPlaylistRepository PlaylistRepository
+    {
+        get
+        {
+            _playlistRepository ??= new PlaylistRepository(_luminaDbContext);
+            return _playlistRepository;
         }
     }
 

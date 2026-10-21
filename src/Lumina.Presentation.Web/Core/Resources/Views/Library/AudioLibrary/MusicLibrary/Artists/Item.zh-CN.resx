@@ -1092,4 +1092,7 @@
   <data name="Shuffle" xml:space="preserve">
     <value>随机播放</value>
   </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>添加到播放列表</value>
+  </data>
 </root>

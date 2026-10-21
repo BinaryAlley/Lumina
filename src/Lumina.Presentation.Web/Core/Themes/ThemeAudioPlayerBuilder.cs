@@ -50,7 +50,14 @@ public sealed class ThemeAudioPlayerBuilder
             ["repeatAll"] = Localize("AudioPlayerRepeatAll"),
             ["repeatOne"] = Localize("AudioPlayerRepeatOne"),
             ["queue"] = Localize("AudioPlayerQueue"),
-            ["albumArtwork"] = Localize("AudioPlayerAlbumArtwork")
+            ["albumArtwork"] = Localize("AudioPlayerAlbumArtwork"),
+            ["addQueueToPlaylist"] = Localize("AudioPlayerAddQueueToPlaylist"),
+            ["addToPlaylist"] = Localize("PlaylistAddToPlaylist"),
+            ["selectPlaylist"] = Localize("AudioPlayerSelectPlaylist"),
+            ["noPlaylists"] = Localize("AudioPlayerNoPlaylists"),
+            ["add"] = Localize("AudioPlayerAdd"),
+            ["playlistQueueAdded"] = Localize("AudioPlayerPlaylistQueueAdded"),
+            ["playlistQueueAddFailed"] = Localize("AudioPlayerPlaylistQueueAddFailed")
         };
 
         return new ThemeAudioPlayerDto(

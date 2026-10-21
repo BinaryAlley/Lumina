@@ -1512,4 +1512,16 @@
   <data name="PlayTrack" xml:space="preserve">
     <value>Redă piesa</value>
   </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Acțiuni</value>
+  </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>Adaugă în listă de redare</value>
+  </data>
+  <data name="AddToPlayQueue" xml:space="preserve">
+    <value>Adaugă la coada de redare</value>
+  </data>
+  <data name="PlayAllFromHere" xml:space="preserve">
+    <value>Redă tot de aici</value>
+  </data>
 </root>

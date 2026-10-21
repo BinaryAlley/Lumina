@@ -4,6 +4,7 @@ using Lumina.Application.Common.DataAccess.Repositories.BookLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.MediaContributors;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
+using Lumina.Application.Common.DataAccess.Repositories.Playlists;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Scheduling;
 using Lumina.Application.Common.DataAccess.Repositories.Themes;
@@ -154,6 +155,11 @@ public interface IUnitOfWork
     /// Gets the music play record repository.
     /// </summary>
     IMusicPlayRecordRepository MusicPlayRecordRepository { get; }
+
+    /// <summary>
+    /// Gets the playlist repository.
+    /// </summary>
+    IPlaylistRepository PlaylistRepository { get; }
 
     /// <summary>
     /// Saves the changes made to the database.

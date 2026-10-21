@@ -112,7 +112,8 @@
 - PodcastLibrary (root: PodcastLibrary, entities: Podcast, PodcastEpisode)
 - WrittenContentLibrary (root: WrittenContentLibrary, entities: Book, EBook, BookSeries, ComicBook, ComicSeries, Magazine, MagazineIssue, Newspaper, Manga, GraphicNovel, AcademicPaper, SheetMusic, Screenplay)
 - PhotoLibrary (root: PhotoLibrary, entities: Photo, PhotoAlbum, AlbumArtwork, MoviePoster)
-- UserProfile (root: User, entities: Playlist, Collection)
+- UserProfile (root: User, entities: Collection)
+- PlaylistManagement (root: Playlist, entities: PlaylistEntry)
 - SupplementaryContentLibrary (root: SupplementaryContentLibrary, entities: SubtitleFile, Lyrics, LanguageTrack)
 - FileSystemManagement (root: File, entities: Stream)
 
@@ -208,6 +209,10 @@
 - MediaItemRemoved
 - PlaylistCreated
 - PlaylistUpdated
+- PlaylistEntryAdded
+- PlaylistEntryRemoved
+- PlaylistEntriesReordered
+- PlaylistDeleted
 - UserPreferencesChanged
 - MetadataUpdated
 - FileTranscoded
@@ -222,6 +227,8 @@
 - UserExperience
   - Aggregates: UserProfile
   - Services: RecommendationEngine, ContentCurationService, UserActivityTrackingService
+- PlaylistManagement
+  - Aggregates: Playlist
 - ContentDelivery
   - Aggregates: FileSystemManagement
   - Services: StreamingService, ContentSynchronizationService

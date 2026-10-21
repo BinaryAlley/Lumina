@@ -222,4 +222,37 @@
   <data name="AudioPlayerAlbumArtwork" xml:space="preserve">
     <value>Обкладинки альбому</value>
   </data>
+  <data name="AudioPlayerAddQueueToPlaylist" xml:space="preserve">
+    <value>Додати чергу до списку відтворення</value>
+  </data>
+  <data name="AudioPlayerPlaylistQueueAddFailed" xml:space="preserve">
+    <value>Не вдалося додати чергу до списку відтворення.</value>
+  </data>
+  <data name="AudioPlayerSelectPlaylist" xml:space="preserve">
+    <value>Виберіть список відтворення</value>
+  </data>
+  <data name="AudioPlayerAdd" xml:space="preserve">
+    <value>Додати</value>
+  </data>
+  <data name="AudioPlayerPlaylistQueueAdded" xml:space="preserve">
+    <value>Чергу додано до списку відтворення.</value>
+  </data>
+  <data name="AudioPlayerNoPlaylists" xml:space="preserve">
+    <value>У вас ще немає списків відтворення.</value>
+  </data>
+  <data name="PlaylistAddToPlaylist" xml:space="preserve">
+    <value>Додати до списку відтворення</value>
+  </data>
+  <data name="PlaylistCreate" xml:space="preserve">
+    <value>Створити список відтворення</value>
+  </data>
+  <data name="PlaylistTracksAdded" xml:space="preserve">
+    <value>Треки додано до списку відтворення.</value>
+  </data>
+  <data name="PlaylistTracksAddFailed" xml:space="preserve">
+    <value>Не вдалося додати треки до списку відтворення.</value>
+  </data>
+  <data name="PlaylistNoTracksToAdd" xml:space="preserve">
+    <value>Немає треків для додавання.</value>
+  </data>
 </root>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -64,6 +64,9 @@
     <value>Відтворити</value>
   </data>
   <data name="Actions" xml:space="preserve">
-    <value>Ð”Ñ–Ñ—</value>
+    <value>Дії</value>
+  </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>Додати до списку відтворення</value>
   </data>
 </root>

@@ -31,7 +31,11 @@
       - The hook attributes the audio player binds: 'data-audio-player-play-pause', '-stop', '-previous', '-next', '-repeat',
         '-progress', '-progress-played', '-progress-downloaded', '-progress-undownloaded', '-current-time', '-total-time',
         '-track-name', '-album-name', '-now-playing-title', '-now-playing-release-type', '-now-playing-release',
-        '-now-playing-year', '-now-playing-artist', '-artwork-carousel', '-cover-thumbnail', '-cover-image', '-volume', '-volume-level', '-mute' and '-queue'.
+        '-now-playing-year', '-now-playing-artist', '-artwork-carousel', '-cover-thumbnail', '-cover-image', '-volume', '-volume-level', '-mute', '-queue', '-playlist-combobox' and '-add-queue-to-playlist'.
+        The queue-to-playlist action is a standard application combo box, so a theme renders the usual 'enlightenment-combobox'
+        markup and puts the '-playlist-combobox' hook on its root. The player only reads the 'data-value' of the selected text
+        when the add button is pressed. A theme that renders one half of the action gets a complete built-in pair, placed in a
+        queue area wrapper above the queue so that it never becomes a new column of the expanded layout.
         The volume fill element ('-volume-level') is a styling hook the stylesheet drives from the custom properties below,
         not one the script writes to. The repeat toggle carries 'data-audio-player-repeat' and the player writes
         'data-audio-player-repeat-mode' ('off', 'all' or 'one') and toggles the 'is-active' and 'is-one' classes on it.
@@ -80,7 +84,23 @@
             </div>
             <div class="audio-player-artwork-carousel artwork-carousel" data-audio-player-artwork-carousel role="group" aria-label="@localizer["AudioPlayerAlbumArtwork"]" hidden></div>
         </div>
-        <ul class="audio-player-queue" data-audio-player-queue aria-label="@localizer["AudioPlayerQueue"]"></ul>
+        <div class="audio-player-queue-area">
+            <div class="audio-player-queue-actions">
+                <div class="enlightenment-combobox audio-player-queue-playlist-combobox" id="audio-player-playlist-combobox" data-audio-player-playlist-combobox>
+                    <div class="shine-effect" style="top: 1px;"></div>
+                    <input type="checkbox" class="enlightenment-toggle-checkbox" id="audio-player-playlist-combobox-toggle" />
+                    <label class="enlightenment-toggle" for="audio-player-playlist-combobox-toggle">
+                        <span class="enlightenment-selected-text" data-value="">@localizer["AudioPlayerSelectPlaylist"]</span>
+                    </label>
+                    <div class="enlightenment-dropdown" id="audio-player-playlist-combobox-dropdown">
+                        <div class="shine-effect" style="top: -4px;"></div>
+                        <div class="enlightenment-option first-option disabled">@localizer["AudioPlayerSelectPlaylist"]</div>
+                    </div>
+                </div>
+                <button type="button" class="confirm-button h-22px audio-player-add-queue-to-playlist" data-audio-player-add-queue-to-playlist aria-label="@localizer["AudioPlayerAddQueueToPlaylist"]">@localizer["PlaylistAddToPlaylist"]</button>
+            </div>
+            <ul class="audio-player-queue" data-audio-player-queue aria-label="@localizer["AudioPlayerQueue"]"></ul>
+        </div>
     </div>
     <!-- Condensed bar: transport controls, three state progress bar, volume, and track name. -->
     <div class="audio-player-bar">

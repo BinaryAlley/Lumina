@@ -674,7 +674,8 @@
             coverUploadFailed: @Json.Serialize(_localizer["CoverUploadFailed"].Value),
             play: @Json.Serialize(_localizer["Play"].Value),
             shuffle: @Json.Serialize(_localizer["Shuffle"].Value),
-            remove: @Json.Serialize(_localizer["Remove"].Value)
+            remove: @Json.Serialize(_localizer["Remove"].Value),
+            addToPlaylist: @Json.Serialize(_localizer["AddToPlaylist"].Value)
         };
 
         // Reads the trimmed value of the element with the provided id.
@@ -1127,10 +1128,20 @@
             shuffleAction.setAttribute('data-audio-player-shuffle-scope', 'release');
             applyAlbumPlayDescriptor(shuffleAction, album);
 
+            const addToPlaylistAction = createAlbumMenuAction(jsLocalizedStrings.addToPlaylist, 'card-action-add-to-playlist');
+            addToPlaylistAction.addEventListener('click', async event => {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                closeCardMenus();
+                if (window.LuminaPlaylists)
+                    await window.LuminaPlaylists.showAddScopeDialogAsync({ libraryId: libraryId, artistId: artistId, albumId: album.id, title: album.title || '', addToPlaylistLabel: jsLocalizedStrings.addToPlaylist, returnFocus: trigger });
+            });
+
             const deleteAction = createAlbumMenuAction(jsLocalizedStrings.remove, 'card-action-delete');
 
             menu.appendChild(playAction);
             menu.appendChild(shuffleAction);
+            menu.appendChild(addToPlaylistAction);
             menu.appendChild(deleteAction);
 
             menu.addEventListener('click', async event => {

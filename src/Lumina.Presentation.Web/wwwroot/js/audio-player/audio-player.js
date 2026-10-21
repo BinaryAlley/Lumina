@@ -9,7 +9,9 @@
  * public API. The download, decode and render pipeline is plugged in as a swappable engine. The bar holds
  * the three state progress bar (played, downloaded but not played, and not yet downloaded), the volume and mute
  * controls, the keyboard shortcuts, and the loading state a seek into a not yet downloaded position shows; the volume
- * and mute the controls change are persisted to the stored playback state of the user on their own.
+ * and mute the controls change are persisted to the stored playback state of the user on their own. The expanded bar also
+ * offers appending the current queue, in order, to one of the playlists of the user, through a theme hook with a built-in
+ * fallback when the theme does not render it.
  *
  * Public control API (window.LuminaAudioPlayer.instance)
  * ----------------------------------------
@@ -21,6 +23,8 @@
  *                            option starts a random track of that context instead of its first track.
  *   - playNextAsync(descriptor): queues a track or an album after the current entry, without starting playback. It
  *                            discards the pending autoplay continuation, because an explicit play next is a manual queue.
+ *   - appendToQueueAsync(descriptor): appends a track or a context at the end of the queue, without starting playback. It
+ *                            discards the pending autoplay continuation. When nothing is current, it starts the descriptor.
  *   - playShuffledAsync(descriptor, scope): starts the described context and turns shuffle on for the given scope. When the
  *                            scope is omitted, it shuffles the release of the started context.
  *   - playLibraryShuffledAsync(libraryId): starts a shuffled playback of a whole media library, drawing the first track
@@ -702,6 +706,11 @@
             this.dom = {};
             // The raw theme sub templates of the dynamic content, read once with the bar elements and null when the theme does not provide them.
             this.subTemplates = { queueItem: null, playlistItem: null };
+            // The playlists of the user, used by the control that adds the current queue to a playlist, and the in flight load of
+            // them, so an expansion and a focus on the select share one request instead of racing each other.
+            this.playlists = [];
+            this.playlistsLoadPromise = null;
+            this.isAddingQueueToPlaylist = false;
             this.descriptorClickHandler = null;
             this.controlHandlers = [];
             this.isProgressRenderScheduled = false;
@@ -801,6 +810,10 @@
                 queueItem: readSubTemplate('audio-player-template-queue-item'),
                 playlistItem: readSubTemplate('audio-player-template-playlist-item')
             };
+            // The queue action that adds the current queue to a playlist is a theme hook. A theme that does not render it gets the
+            // built-in control, placed in a queue area wrapper above the queue, exactly as a missing queue item sub template falls back
+            // to built-in markup. The wrapper takes the flex slot of the queue, so the action never becomes an extra column.
+            this.ensurePlaylistControls();
         }
 
         /**
@@ -837,6 +850,12 @@
             }
             if (this.dom.mute)
                 this.addControlHandler(this.dom.mute, 'click', () => this.toggleMuteAsync());
+            if (this.dom.addQueueToPlaylistButton)
+                this.addControlHandler(this.dom.addQueueToPlaylistButton, 'click', () => this.addQueueToPlaylistAsync());
+            if (this.dom.playlistCombobox)
+                // Loading on the first focus makes the control usable without waiting for an expansion. The shared load
+                // promise makes a focus and an expansion that happen together issue one request.
+                this.addControlHandler(this.dom.playlistCombobox, 'focusin', () => this.loadPlaylistsAsync());
         }
 
         /**
@@ -1892,6 +1911,10 @@
                 this.scrollQueueToCurrentEntry();
                 // The album details are only needed by the expanded view, so a collapsed player does not request them.
                 this.renderNowPlayingDetails();
+                // The playlist choices are only visible in the expanded view, so they are loaded when it opens. The load is shared
+                // with a focus of the combo box, and a failure leaves the playlists the bar already knows. It is deliberately
+                // not awaited: the bar must expand immediately, and the action stays disabled until the choices arrive.
+                this.loadPlaylistsAsync();
             } else
                 this.cancelNowPlayingDetailsRequest();
             return isExpanded;
@@ -2356,6 +2379,78 @@
                 if (next)
                     await this.startQueuedEntryAsync(next.entryId);
             }
+            return true;
+        }
+
+        /**
+         * Appends a descriptor or the tracks of a context at the end of the current queue, as an explicit add to queue action.
+         *
+         * The pending autoplay continuation is discarded, because an explicit add to queue is a manual queue: the user chose
+         * what should follow the entries already queued, so autopicking more of the album or artist would override that choice.
+         * When nothing is current there is no queue to append to, so the descriptor is started instead.
+         *
+         * Unlike playNextAsync, which reserves the slot right after the current entry, this appends after everything the user
+         * already queued. Both are explicit manual queue actions, so both discard the pending autoplay continuation.
+         * @param {Object} descriptorInput - The play descriptor to append, per {@link LuminaAudioPlayer.createPlayDescriptor}.
+         * @returns {Promise<boolean>} True when at least one entry was appended, or when playback started because the queue was empty.
+         */
+        async appendToQueueAsync(descriptorInput) {
+            if (!this.isAvailable)
+                return false;
+            const descriptor = createPlayDescriptor(descriptorInput);
+            if (!descriptor) {
+                this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The play descriptor identifies no library, or no playable context.'));
+                return false;
+            }
+            // The queue is empty, so there is nothing to append to. Starting the descriptor is the only useful outcome.
+            if (this.queue.entries.length === 0)
+                return this.playAsync(descriptor);
+            // An explicit add to queue is a later user action than a shuffle that is still resolving, so the shuffle is cancelled and cannot replace the queue under the manual item.
+            this.cancelPendingShuffle();
+            const generation = this.queueGeneration;
+            // A context build that still owns the player is the play request the manual item belongs to. Appending to the
+            // queue it is about to replace would lose the item, so it is refused while that build owns the player.
+            const pendingContextToken = this.state === LuminaAudioPlayer.PlayerState.LOADING && this.playContextBuildHandle !== null
+                ? this.playRequestToken
+                : null;
+            const buildHandle = this.openPlayNextBuild();
+            // Appending also resolves its descriptor asynchronously, so it reuses the play-next build handle for the same
+            // timeout, abort and cleanup rules. Only the place where the resolved entries are inserted differs.
+            let descriptors;
+            try {
+                descriptors = (await this.queueService.buildQueueAsync(descriptor, buildHandle.signal)).descriptors;
+            } catch (error) {
+                if (buildHandle.signal && buildHandle.signal.aborted) {
+                    if (buildHandle.timedOut)
+                        this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The track to append could not be loaded in time.'));
+                    return false;
+                }
+                if (error && error.details && error.details.reason === LuminaAudioPlayer.PlayerErrorReason.SESSION_EXPIRED)
+                    return false;
+                this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED);
+                return false;
+            } finally {
+                this.closePlayNextBuild(buildHandle);
+            }
+            if (descriptors.length === 0)
+                return false;
+            if (pendingContextToken !== null && this.playRequestToken === pendingContextToken && this.playContextBuildHandle !== null)
+                return false;
+            // A new play request replaced the queue while the item was resolved, so the item belongs to a queue the user already left and must not be appended to the new one.
+            const isOwnedContextResolution = pendingContextToken !== null && this.playRequestToken === pendingContextToken;
+            if (generation !== this.queueGeneration && !isOwnedContextResolution)
+                return false;
+            // A handoff the engine already prepared from the continuation is dropped, so the explicit item is truly queued after the entries the user already had.
+            await this.cancelUpcomingTransitionAsync();
+            if (generation !== this.queueGeneration && !isOwnedContextResolution)
+                return false;
+            this.queue.removePendingContinuation();
+            const appended = this.queue.append(descriptors, 'manual');
+            if (appended === 0)
+                return false;
+            this.renderQueue();
+            this.renderQueueControls();
+            this.emitQueueStateChanged();
             return true;
         }
 
@@ -4350,6 +4445,326 @@
                 if (label)
                     this.dom.repeat.setAttribute('aria-label', label);
             }
+            // The queue-to-playlist action depends on whether the queue has an entry, so it is refreshed with the rest of
+            // the queue controls.
+            this.updatePlaylistControlsState();
+        }
+
+        /**
+         * Finds the theme hooks of the queue-to-playlist action, or builds the built-in control when the theme does not provide it.
+         *
+         * The action belongs to the queue column, because it acts on the queue the expanded bar shows. A theme may render the
+         * documented combobox hook and button, in which case both are used as they are. When either is missing, both are replaced
+         * with the built-in pair, so a theme never ends up with half of an action. The built-in pair is placed in a queue area
+         * wrapper around the queue, never as a new sibling column of the expanded layout, so it does not take horizontal space
+         * away from the queue. A theme that places its own hooks is responsible for the same layout decision.
+         */
+        ensurePlaylistControls() {
+            if (!this.container)
+                return;
+            const existingCombobox = this.container.querySelector('[data-audio-player-playlist-combobox]');
+            const existingButton = this.container.querySelector('[data-audio-player-add-queue-to-playlist]');
+            if (existingCombobox && existingButton) {
+                // Both hooks are present, so the theme owns the markup and the layout; the player only binds behavior.
+                this.dom.playlistCombobox = existingCombobox;
+                this.dom.addQueueToPlaylistButton = existingButton;
+                return;
+            }
+            if (!this.dom.queue || !this.dom.queue.parentElement)
+                return;
+            // A lone hook cannot complete the action: a button without a combobox has nothing to add to, and a combobox
+            // without a button cannot submit. Replace the half pair so the theme never renders a dead control.
+            if (existingCombobox)
+                existingCombobox.remove();
+            if (existingButton)
+                existingButton.remove();
+
+            const strings = this.getStrings();
+            const queue = this.dom.queue;
+            let area = queue.parentElement;
+            // The expanded layout is a grid of columns. Inserting the action as a sibling would add a new column and
+            // take width from the queue, so the queue and the action share the queue's column through this wrapper.
+            if (!area.classList.contains('audio-player-queue-area')) {
+                area = document.createElement('div');
+                area.className = 'audio-player-queue-area';
+                queue.parentElement.insertBefore(area, queue);
+                area.appendChild(queue);
+            }
+
+            const actions = document.createElement('div');
+            actions.className = 'audio-player-queue-actions audio-player-queue-actions-fallback';
+
+            const combobox = this.createPlaylistCombobox(strings);
+            // The fallback button carries the same data attribute and class as the theme hook, so the existing binding and
+            // the theme styling work with either markup.
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'confirm-button h-22px audio-player-add-queue-to-playlist';
+            button.setAttribute('data-audio-player-add-queue-to-playlist', '');
+            button.textContent = strings.addToPlaylist || strings.add || strings.addQueueToPlaylist || '+';
+            if (strings.addQueueToPlaylist)
+                button.setAttribute('aria-label', strings.addQueueToPlaylist);
+
+            actions.appendChild(combobox);
+            actions.appendChild(button);
+            area.insertBefore(actions, queue);
+            this.dom.playlistCombobox = combobox;
+            this.dom.addQueueToPlaylistButton = button;
+        }
+
+        /**
+         * Builds the built-in playlist chooser with the same markup and behavior as every other combo box in the application: a
+         * checkbox toggle, a selected text span that carries the value in 'data-value', and a dropdown of options. The global site
+         * script updates the selected text and closes the dropdown when an option is clicked, so the player only reads the value.
+         * @param {Object} strings - The localized strings of the player.
+         * @returns {HTMLElement} The combo box root.
+         */
+        createPlaylistCombobox(strings) {
+            const combobox = document.createElement('div');
+            combobox.className = 'enlightenment-combobox audio-player-queue-playlist-combobox';
+            combobox.setAttribute('data-audio-player-playlist-combobox', '');
+            if (strings.addQueueToPlaylist)
+                combobox.setAttribute('aria-label', strings.addQueueToPlaylist);
+
+            const shine = document.createElement('div');
+            shine.className = 'shine-effect';
+            shine.style.top = '1px';
+            combobox.appendChild(shine);
+
+            const toggleId = 'audio-player-playlist-combobox-toggle';
+            // The player is a singleton in the layout, so the fixed id cannot collide with a second built-in picker.
+            const toggle = document.createElement('input');
+            toggle.type = 'checkbox';
+            toggle.id = toggleId;
+            toggle.className = 'enlightenment-toggle-checkbox';
+            combobox.appendChild(toggle);
+
+            const label = document.createElement('label');
+            label.className = 'enlightenment-toggle';
+            label.htmlFor = toggleId;
+            const selected = document.createElement('span');
+            selected.className = 'enlightenment-selected-text';
+            selected.setAttribute('data-value', '');
+            selected.textContent = strings.selectPlaylist || '';
+            label.appendChild(selected);
+            combobox.appendChild(label);
+
+            const dropdown = document.createElement('div');
+            dropdown.className = 'enlightenment-dropdown';
+            const dropdownShine = document.createElement('div');
+            dropdownShine.className = 'shine-effect';
+            dropdownShine.style.top = '-4px';
+            dropdown.appendChild(dropdownShine);
+            const placeholder = document.createElement('div');
+            placeholder.className = 'enlightenment-option first-option disabled';
+            placeholder.setAttribute('data-value', '');
+            placeholder.textContent = strings.selectPlaylist || '';
+            dropdown.appendChild(placeholder);
+            combobox.appendChild(dropdown);
+            // The player deliberately does not bind option clicks. The global site script owns opening, closing and copying
+            // the chosen option into data-value; the player only reads the selected value when the action is pressed.
+            return combobox;
+        }
+
+        /**
+         * Refreshes the enabled state of the queue-to-playlist action.
+         *
+         * The action needs a queue to send and at least one playlist to send it to, so it is disabled while either is
+         * missing, and while a request is already in flight, which prevents the same queue from being appended twice by
+         * a double click. The combobox has different rules: choosing a playlist is harmless without a queue, and the user
+         * may pick one before starting playback, so it is only disabled while an add is in flight.
+         */
+        updatePlaylistControlsState() {
+            const isBusy = this.isAddingQueueToPlaylist === true;
+            // Without a queue or a playlist, pressing the action could only produce an error.
+            const isDisabled = isBusy || this.queue.entries.length === 0 || this.playlists.length === 0;
+            if (this.dom.addQueueToPlaylistButton) {
+                this.dom.addQueueToPlaylistButton.disabled = isDisabled;
+                this.dom.addQueueToPlaylistButton.classList.toggle('is-disabled', isDisabled);
+            }
+            if (this.dom.playlistCombobox) {
+                // The combobox is disabled only while a request is in flight; its list can be selected before a queue exists.
+                const toggle = this.dom.playlistCombobox.querySelector('.enlightenment-toggle-checkbox');
+                if (toggle)
+                    toggle.disabled = isBusy;
+                this.dom.playlistCombobox.classList.toggle('is-disabled', isBusy);
+            }
+        }
+
+        /**
+         * Loads the playlists of the current user into the queue action combo box. The request is shared by every caller, so a
+         * focus and an expansion that happen together issue one request, and the choices are refreshed every time the expanded bar
+         * opens, because a playlist may have been created or deleted on another page since the last opening.
+         * @returns {Promise<void>} A promise that completes when the choices were refreshed or the request settled.
+         */
+        async loadPlaylistsAsync() {
+            if (!this.dom.playlistCombobox)
+                return;
+            // A focus and an expansion can call this together. Sharing the in-flight promise avoids two requests and two
+            // dropdown rebuilds that would race each other.
+            if (this.playlistsLoadPromise)
+                return this.playlistsLoadPromise;
+            const configuration = this.getConfiguration();
+            const url = configuration && configuration.getPlaylistsUrl;
+            if (!url)
+                return;
+
+            this.playlistsLoadPromise = (async () => {
+                const playlists = await this.fetchJsonAsync(url, null, 'the playlists request');
+                // A redirect means the session expired and the page is navigating, and undefined means the request failed.
+                // In both cases keeping the choices the bar already knows is better than replacing them with an empty dropdown.
+                if (playlists === REDIRECTED || playlists === undefined)
+                    return;
+                this.playlists = Array.isArray(playlists) ? playlists : [];
+                const combobox = this.dom.playlistCombobox;
+                if (!combobox)
+                    return;
+                const selected = combobox.querySelector('.enlightenment-selected-text');
+                const dropdown = combobox.querySelector('.enlightenment-dropdown');
+                if (!selected || !dropdown)
+                    return;
+                const strings = this.getStrings();
+                // Remember the selected playlist by id, not by position: the list can be reordered or shortened by a
+                // deletion made on another page.
+                const previous = selected.getAttribute('data-value') || '';
+                const placeholderText = this.playlists.length === 0
+                    ? (strings.noPlaylists || strings.selectPlaylist || '')
+                    : (strings.selectPlaylist || '');
+                // Keep the decorative shine element; only the option rows are rebuilt, so the dropdown keeps the structure
+                // the global site script expects.
+                for (const child of Array.from(dropdown.children)) {
+                    if (!child.classList.contains('shine-effect'))
+                        child.remove();
+                }
+                const placeholder = document.createElement('div');
+                placeholder.className = 'enlightenment-option first-option disabled';
+                placeholder.setAttribute('data-value', '');
+                placeholder.textContent = placeholderText;
+                dropdown.appendChild(placeholder);
+                let selectedPlaylist = null;
+                for (let index = 0; index < this.playlists.length; index++) {
+                    const playlist = this.playlists[index];
+                    const option = document.createElement('div');
+                    option.className = 'enlightenment-option' + (index === this.playlists.length - 1 ? ' last-option' : '');
+                    option.setAttribute('data-value', String(playlist.id));
+                    option.textContent = playlist.name || '';
+                    dropdown.appendChild(option);
+                    if (String(playlist.id) === previous)
+                        selectedPlaylist = playlist;
+                }
+                if (selectedPlaylist) {
+                    selected.textContent = selectedPlaylist.name || '';
+                    selected.setAttribute('data-value', String(selectedPlaylist.id));
+                } else {
+                    // The selected playlist no longer exists. Clear the selection instead of leaving a stale id that the
+                    // server would reject when the user presses Add.
+                    selected.textContent = placeholderText;
+                    selected.setAttribute('data-value', '');
+                }
+                // The action depends on whether the user has any playlist, so refresh it after the list is replaced.
+                this.updatePlaylistControlsState();
+            })().finally(() => {
+                this.playlistsLoadPromise = null;
+            });
+            return this.playlistsLoadPromise;
+        }
+
+        /**
+         * Appends the current queue to the selected playlist, in queue order, including repeated tracks.
+         *
+         * The whole queue is sent as one request, so a queue that references a track that disappeared or moved out of reach is rejected
+         * as a whole instead of leaving a part of the queue in the playlist. A success or failure is reported with the global notification service when the page provides it.
+         * @returns {Promise<void>} A promise that completes when the add settled.
+         */
+        async addQueueToPlaylistAsync() {
+            // A second click while the first request is in flight would append the same queue twice. The flag makes the
+            // action single-flight; the controls below are disabled for the same reason.
+            if (this.isAddingQueueToPlaylist)
+                return;
+            const strings = this.getStrings();
+            const combobox = this.dom.playlistCombobox;
+            if (!combobox)
+                return;
+            const selected = combobox.querySelector('.enlightenment-selected-text');
+            const playlistId = selected ? (selected.getAttribute('data-value') || '') : '';
+            if (!playlistId) {
+                // The placeholder row is selectable in the markup but carries an empty value; it means no playlist is chosen.
+                this.showPlaylistNotification(strings.selectPlaylist, true);
+                return;
+            }
+            // Only entries that reference a track can be addressed by the playlist entry route. A queue can contain entries
+            // without a track id; sending one would make the whole request fail, so they are filtered out here.
+            const trackIds = this.queue.entries
+                .map(entry => entry.descriptor && entry.descriptor.trackId)
+                .filter(trackId => typeof trackId === 'string' && trackId.length > 0);
+            if (trackIds.length === 0) {
+                this.showPlaylistNotification(strings.playlistQueueAddFailed, true);
+                return;
+            }
+            const configuration = this.getConfiguration();
+            const routeTemplate = configuration && configuration.addPlaylistEntriesRouteTemplate;
+            if (!routeTemplate) {
+                // The layout renders the route template with an empty Guid. Without it there is no URL to post to.
+                this.showPlaylistNotification(strings.playlistQueueAddFailed, true);
+                return;
+            }
+            const url = routeTemplate.replace('00000000-0000-0000-0000-000000000000', encodeURIComponent(playlistId));
+            this.isAddingQueueToPlaylist = true;
+            this.updatePlaylistControlsState();
+            try {
+                const addedEntries = await this.postJsonAsync(url, { trackIds: trackIds }, { label: 'the add queue to playlist request' });
+                // The session expired and the page is navigating. The add did not happen, but a failure notification during
+                // the navigation would be noise.
+                if (addedEntries === REDIRECTED)
+                    return;
+                if (addedEntries) {
+                    // The queue is server-owned content now. The player leaves its local queue untouched and announces the
+                    // result so an open playlist page can refresh its window.
+                    this.showPlaylistNotification(strings.playlistQueueAdded, false);
+                    this.notifyPlaylistUpdated(addedEntries);
+                } else
+                    this.showPlaylistNotification(strings.playlistQueueAddFailed, true);
+            } finally {
+                // Always clear the busy state and re-enable the controls, including after a failure, so the user can retry.
+                this.isAddingQueueToPlaylist = false;
+                this.updatePlaylistControlsState();
+            }
+        }
+
+        /**
+         * Announces the playlist that the queue was added to, so an open playlist page can refresh it.
+         *
+         * The player is global and must not import a page module. A DOM event lets any interested page refresh itself
+         * without creating a direct dependency between the player and the playlist page.
+         * @param {Object} addedEntries - The minimal result with the playlist Id, the added count and the activity time.
+         */
+        notifyPlaylistUpdated(addedEntries) {
+            // CustomEvent and document are absent in some non-browser test hosts; the announcement is optional there.
+            if (!addedEntries || typeof document === 'undefined' || typeof CustomEvent !== 'function')
+                return;
+            document.dispatchEvent(new CustomEvent('lumina:playlist-updated', { detail: addedEntries }));
+        }
+
+        /**
+         * Shows a notification for the queue-to-playlist action when the page provides the global notification service.
+         *
+         * The service is global but not guaranteed on every page or test host. The console fallback keeps a failure
+         * visible without throwing from a player action, which would leave the controls stuck in their busy state.
+         * @param {string} message - The localized message to show.
+         * @param {boolean} isError - True to show the message as an error, false for a success.
+         */
+        showPlaylistNotification(message, isError) {
+            if (!message)
+                return;
+            if (typeof notificationService !== 'undefined' && typeof NotificationType !== 'undefined') {
+                notificationService.show(message, isError ? NotificationType.ERROR : NotificationType.SUCCESS);
+                return;
+            }
+            // Minimal pages and tests may not load the notification service; a console entry is still useful and safe.
+            if (isError)
+                console.error(`Audio player: ${message}`);
+            else
+                console.info(`Audio player: ${message}`);
         }
 
         /**

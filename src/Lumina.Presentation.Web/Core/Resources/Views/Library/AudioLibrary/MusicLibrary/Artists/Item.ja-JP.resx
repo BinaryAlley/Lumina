@@ -1092,4 +1092,7 @@
   <data name="Shuffle" xml:space="preserve">
     <value>シャッフル</value>
   </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>プレイリストに追加</value>
+  </data>
 </root>

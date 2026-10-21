@@ -41,12 +41,16 @@ public class ExceptionHandlingMiddleware
         }
         catch (OperationCanceledException)
         {
-            // the request was aborted, so there is no client left to write a response to
+            // The request was aborted, so there is no client left to write a response to. The status is still set to a non-success value,
+            // because the eventual consistency middleware decides whether to commit from it, and the writes of an aborted request must be
+            // rolled back instead of being reported as a success.
+            if (!context.Response.HasStarted)
+                context.Response.StatusCode = StatusCodes.Status499ClientClosedRequest;
             throw;
         }
         catch (Exception ex)
         {
-            // once the response has started, it is no longer possible to replace it with a ProblemDetails response
+            // Once the response has started, it is no longer possible to replace it with a ProblemDetails response.
             if (context.Response.HasStarted)
                 throw;
             _logger.LogError(ex, "Unhandled exception occurred while processing request {Method} {Path}", context.Request.Method, context.Request.Path);
