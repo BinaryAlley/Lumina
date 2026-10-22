@@ -23,7 +23,5 @@ public static partial class Errors
         public static Error PlaylistEntryNotFound => Error.NotFound(description: nameof(PlaylistEntryNotFound));
         public static Error PlaylistEntryPositionsAreInvalid => Error.Validation(description: nameof(PlaylistEntryPositionsAreInvalid));
         public static Error PlaylistMoveTargetPositionIsInvalid => Error.Validation(description: nameof(PlaylistMoveTargetPositionIsInvalid));
-        public static Error PlaylistEntryWindowOffsetIsInvalid => Error.Validation(description: nameof(PlaylistEntryWindowOffsetIsInvalid));
-        public static Error PlaylistEntryWindowLimitIsInvalid => Error.Validation(description: nameof(PlaylistEntryWindowLimitIsInvalid));
     }
 }

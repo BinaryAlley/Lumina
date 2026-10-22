@@ -255,4 +255,10 @@
   <data name="PlaylistNoTracksToAdd" xml:space="preserve">
     <value>Немає треків для додавання.</value>
   </data>
+  <data name="FavoritesAdd" xml:space="preserve">
+    <value>Додати до улюбленого</value>
+  </data>
+  <data name="FavoritesRemove" xml:space="preserve">
+    <value>Видалити з улюбленого</value>
+  </data>
 </root>

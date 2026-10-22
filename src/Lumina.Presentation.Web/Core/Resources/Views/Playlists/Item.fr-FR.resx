@@ -66,6 +66,9 @@
   <data name="AddFailed" xml:space="preserve">
     <value>La piste n&apos;a pas pu être ajoutée.</value>
   </data>
+  <data name="RefreshFailed" xml:space="preserve">
+    <value>La liste de lecture a été mise à jour, mais la liste n&apos;a pas pu être actualisée. Rechargez la page pour voir la modification.</value>
+  </data>
   <data name="SelectLibrary" xml:space="preserve">
     <value>Choisir une bibliothèque</value>
   </data>

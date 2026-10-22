@@ -66,6 +66,9 @@
   <data name="AddFailed" xml:space="preserve">
     <value>Non è stato possibile aggiungere il brano.</value>
   </data>
+  <data name="RefreshFailed" xml:space="preserve">
+    <value>La playlist è stata aggiornata, ma non è stato possibile aggiornare l&apos;elenco. Ricarica la pagina per vedere la modifica.</value>
+  </data>
   <data name="SelectLibrary" xml:space="preserve">
     <value>Seleziona una libreria</value>
   </data>

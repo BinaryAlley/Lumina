@@ -2,6 +2,7 @@
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Application.Common.DataAccess.Entities.Playlists;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.DTO.Playlists;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Time;
@@ -189,12 +190,20 @@ public class PlaylistRepositoryTests
         Assert.Equal(orderedTracks.Count, storedPlaylist.EntryCount);
         Assert.Equal(1L, storedPlaylist.Version);
         Assert.Equal(updatedOnUtc, storedPlaylist.UpdatedOnUtc);
-        // A window read reports the stored count of the whole playlist while materializing only the requested window.
-        Result<PlaylistDetailsDto?> detailsResult = await sut.GetDetailsForUserAsync(playlist.Id, userId, offset: 0, limit: 2, CancellationToken.None);
+        // A paginated read reports the count of the whole playlist while materializing only the requested page.
+        Result<PlaylistDetailsDto?> detailsResult = await sut.GetDetailsForUserAsync(
+            playlist.Id,
+            userId,
+            new PaginationDataDto { CurrentPage = 1, PerPage = 2 },
+            CancellationToken.None);
         Assert.False(detailsResult.IsFailure);
         Assert.NotNull(detailsResult.Value);
         Assert.Equal(orderedTracks.Count, detailsResult.Value!.Playlist.EntryCount);
-        Assert.Equal(2, detailsResult.Value.Entries.Count);
+        Assert.Equal(orderedTracks.Count, detailsResult.Value.Entries.Count);
+        Assert.Equal(2, detailsResult.Value.Entries.Data.Count);
+        Assert.Equal(1, detailsResult.Value.Entries.CurrentPage);
+        Assert.Equal(2, detailsResult.Value.Entries.PerPage);
+        Assert.Equal((int)Math.Ceiling(orderedTracks.Count / 2d), detailsResult.Value.Entries.NumberOfPages);
     }
 
     [Fact]

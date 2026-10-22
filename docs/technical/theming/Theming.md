@@ -19,6 +19,11 @@ The web client of Lumina is a themed shell: every page is rendered inside the te
       - [The audio player sub templates](#the-audio-player-sub-templates)
     - [The Navigation Template (shared/nav-menu)](#the-navigation-template-sharednav-menu)
     - [Page Templates](#page-templates)
+      - [The Playlist Pages](#the-playlist-pages)
+      - [The Shared Add to Playlist Action](#the-shared-add-to-playlist-action)
+      - [The Album Track Actions Menu](#the-album-track-actions-menu)
+      - [The Favorites Page](#the-favorites-page)
+      - [Favorite Toggles](#favorite-toggles)
     - [The Scripts Section](#the-scripts-section)
   - [Assets](#assets)
   - [Configuration Options](#configuration-options)
@@ -171,6 +176,7 @@ Known page keys:
 | `library/written-content-library/book-library/books/index` | The books browsing page. |
 | `playlists/index` | The page that lists and deletes the playlists of the current user. |
 | `playlists/item` | The page that creates a playlist, or edits, reorders, plays and deletes an existing playlist of the current user. The `isNew` page data field tells the two modes apart. |
+| `favorites/index` | The page that lists, filters and removes the favorites of the current user across media kinds. |
 | `shared/file-system-browser` | The file system browser component shell. |
 | `shared/file-system-browser/tree-node` | The tree view node of the file system browser. |
 | `shared/file-system-browser/explorer-item` | The file system entry of the file system browser. |
@@ -523,11 +529,11 @@ Page templates are rendered into a content section that the layout wraps. A page
 | --- | --- |
 | `isNew` | `true` on the create page, `false` on the page of an existing playlist. The same page key serves both modes. |
 | `playlistId` | The Id of the playlist the page shows, or the empty Id on the create page. |
-| `playlistJson` | The playlist metadata and only the first window of its ordered entries, serialized as JSON. `entryCount` is the total number of entries. Each entry carries `mediaItemId` and `mediaItemType`, which are generic across media kinds, together with the generic display fields `libraryId`, `collectionId`, `creatorId`, `mediaItemTitle`, `collectionTitle`, `creatorName`, `durationInSeconds` and `coverPath`. For a music entry, the collection is the album and the creator is the artist. On the create page it is an empty music playlist. |
-| `entriesWindowSize` | The number of entries in the first window. The page fetches the next windows with `getPlaylistUrl` and the same size. |
+| `playlistJson` | The playlist metadata and only the first page of its ordered entries, serialized as JSON. `entries.count` is the total number of entries, and `entries.currentPage`, `entries.perPage` and `entries.numberOfPages` describe the page. Each entry carries `mediaItemId` and `mediaItemType`, which are generic across media kinds, together with the generic display fields `libraryId`, `collectionId`, `creatorId`, `mediaItemTitle`, `collectionTitle`, `creatorName`, `durationInSeconds` and `coverPath`. For a music entry, the collection is the album and the creator is the artist. On the create page it is an empty music playlist. |
+| `entriesPerPage` | The number of entries per page the page requests. The page fetches the next pages with `getPlaylistUrl` and the same size. |
 | `createPlaylistUrl` | The route that creates a playlist. Only meaningful when `isNew` is `true`. |
 | `itemUrl` | The route template of the page of an existing playlist. The trailing `00000000-0000-0000-0000-000000000000` is replaced by the Id of the playlist, and the page script navigates to it after a successful create. |
-| `getPlaylistUrl` | The route that returns a window of the playlist. It takes `offset` and `limit` query parameters and returns `entryCount` with the window. The limit is a response-window bound of at most 1000 entries, not a cap on the playlist size. |
+| `getPlaylistUrl` | The route that returns a page of the playlist. It takes `currentPage` and `perPage` query parameters and returns `entries` with `data`, `currentPage`, `perPage`, `count` and `numberOfPages`. When both pagination parameters are omitted, every entry is returned in one page. The `perPage` is the page size the theme requests. |
 | `updatePlaylistUrl` | The route that updates the name and description of the playlist. |
 | `deletePlaylistUrl` | The route that deletes the playlist. |
 | `addEntryUrl` | The route that adds a track to the playlist. |
@@ -543,7 +549,7 @@ Page templates are rendered into a content section that the layout wraps. A page
 
 The fallback views keep these element hooks, which the application script drives: on the list page, `playlists-container`, `no-playlists` and `playlist-count`; on the item page, `playlist-details-form`, `playlist-title`, `playlist-name-input`, `playlist-description-input`, `save-playlist-button`, `cancel-playlist-button`, `play-playlist-button`, `delete-playlist-button`, `playlist-entries`, `no-tracks`, `load-more-entries-button`, `playlist-library-combobox`, `playlist-artist-combobox`, `playlist-album-combobox`, `playlist-track-combobox`, `add-track-button` and `no-music-libraries`. The four track picker controls are standard application combo boxes, not native `select` elements. A theme that restructures a page must keep the hooks the page script needs for that page.
 
-The playlist rows use the same play affordance contract as the music pages: an element with `data-audio-player-play` and the `data-track-id`, `data-library-id`, `data-album-id`, `data-artist-id`, `data-title`, `data-album-title`, `data-duration` and `data-cover-art-path` attributes is handed to the global player by event delegation. The page fills `data-track-id` from the entry `mediaItemId`, because a music entry references a track. The Play playlist control fetches every window of the playlist in order, builds an explicit queue from the playable entries and starts it through the player control API, so a theme template must keep the `play-playlist-button` hook for that control.
+The playlist rows use the same play affordance contract as the music pages: an element with `data-audio-player-play` and the `data-track-id`, `data-library-id`, `data-album-id`, `data-artist-id`, `data-title`, `data-album-title`, `data-duration` and `data-cover-art-path` attributes is handed to the global player by event delegation. The page fills `data-track-id` from the entry `mediaItemId`, because a music entry references a track. The Play playlist control fetches every page of the playlist in order, builds an explicit queue from the playable entries and starts it through the player control API, so a theme template must keep the `play-playlist-button` hook for that control.
 
 The playlist rows are reordered by dragging the handle with the `playlist-entry-drag-handle` class, and the row carries the `is-dragging` class while it is being dragged. The up and down controls remain available for keyboard and touch users, and the page uses the `playlist-entry-move-up`, `playlist-entry-move-down` and `playlist-entry-remove` classes to disable them while an entry mutation is in flight. A theme template that changes the row structure must keep the `playlist-entry` class and the `data-entry-id` attribute on the row, so the page script can find the row and commit its new position.
 
@@ -568,6 +574,82 @@ The player queue action does not use `addToPlaylistLabel`. Its label comes from 
 #### The Album Track Actions Menu
 
 Every rendered track row of the album details page carries the same `card-actions-trigger` button with the vertical dots as the card menus, plus the `track-actions-trigger` class that places it inline in the row. The page script creates the same `card-actions-menu` markup on demand. The menu has three application actions: `card-action-add-to-playlist` opens the shared add-to-playlist dialog for that track, `card-action-add-to-queue` calls `window.LuminaAudioPlayer.instance.appendToQueueAsync(descriptor)`, and `card-action-play-all-from-here` calls `playAsync` with an explicit queue built from the clicked track and every track that follows it in the album order. The player starts the clicked track for the last action, and replaces the queue. A theme that renders the album page must keep the track row markup and the script behavior, or provide its own equivalent.
+
+#### The Favorites Page
+
+`favorites/index` receives a model with the following fields:
+
+| Field | Content |
+| --- | --- |
+| `getFavoritesUrl` | The route that returns a page of the favorites of the current user. It takes the optional `mediaKind`, `currentPage` and `perPage` query parameters, and returns `data`, `currentPage`, `perPage`, `count` and `numberOfPages`. When both pagination parameters are omitted, every matching favorite is returned in one page. The `perPage` is the page size the theme requests; the server has no separate maximum page size, like every other paginated collection of the API. |
+| `getFavoriteStatusUrl` | The route that tells which of a list of media items of one kind are favorites of the current user. It takes the `mediaKind` query parameter and one `mediaItemIds` parameter per Id, with at most 100 Ids. |
+| `addFavoriteUrl` | The route that marks a media item as a favorite. The body carries `mediaKind` and `mediaItemId`. |
+| `removeFavoriteUrl` | The route template that removes a favorite. Its named `{mediaKind}` and `{mediaItemId}` placeholders are replaced by the media kind name and the Id of the media item. |
+| `artistUrl` | The route template of an artist page. The trailing `00000000-0000-0000-0000-000000000000` is replaced by the Id of the artist. |
+| `albumUrl` | The route template of an album page. The two `00000000-0000-0000-0000-000000000000` segments are replaced, in order, by the Ids of the artist and the album. |
+| `trackUrl` | The route template of a track page. The three `00000000-0000-0000-0000-000000000000` segments are replaced, in order, by the Ids of the artist, the album and the track. |
+| `bookUrl` | The route template of a book page. The trailing `00000000-0000-0000-0000-000000000000` is replaced by the Id of the book. |
+| `antiforgeryToken` | The anti-forgery token the page submits with its mutating requests. |
+| `strings` | The localized strings of the page, keyed by their resource names. |
+
+The pages of the media items read the library of the item from the `libraryId` query parameter, so the page script appends `libraryId` to the link of an item from the `libraryId` of the favorite. The link of a track needs the artist and the album of the item, which are the `creatorId` and the `collectionId` of the favorite. An item of the response with `isAvailable` set to `false` has no library and no display fields, so the page shows it as an unavailable item, without a link, and keeps its heart so the favorite can still be removed. The generic display fields of an item are `title`, `collectionTitle`, `creatorName` and `coverPath`; for a track the collection is the album and the creator is the artist, for an album the creator is the artist, for a book the creator is its first author, and for an artist there is neither. The series of a book is not catalogued yet, so a book has no collection.
+
+The fallback view keeps these element hooks, which the application script drives: `favorites-container`, `no-favorites`, `favorite-count`, `favorites-kind-filter`, `load-more-favorites-button` and `retry-favorites-button`. The bundled themes ship no template for `favorites/index`, so the fallback view is what a healthy site shows, and a theme that wants its own page provides `templates/favorites/index.html` and must keep the hooks the page script needs.
+
+The fallback view renders one card per favorite, from the most recently favorited, in pages of 50 that `load-more-favorites-button` extends. Each card carries a favorite heart (a `card-favorite-toggle` button, described below), already in the favorited state, and a favorite is removed from the page by unfavoriting its card: the page script does not call the remove route itself, the global favorites script does, and the page listens to the `lumina:favorite-changed` event described below, removes the card of an item that is no longer a favorite, and updates the counter and the empty state without another request. A failed first page or reload clears the rendered cards and shows the localized failure message with `retry-favorites-button`, so the user can load the current filter again instead of being left with a truncated list. A theme template that renders the page itself gets the same behavior by rendering hearts on its cards and handling that event.
+
+#### Favorite Toggles
+
+A favorite toggle is the heart of a media card or of a track row. It is rendered by a page or by a theme template, and it is driven entirely by the global script `wwwroot/js/favorites.js`, which every layout loads next to `playlists.js`. The script binds one click listener and one mutation observer on the document, so a toggle works anywhere in the swapped page content, including toggles that a page script adds later, and a page needs no script of its own. A theme owns the look of the toggle, and the script never renders markup: it only writes the attributes, the class and the texts described below.
+
+A toggle is any focusable element, normally a `button`, that carries these attributes:
+
+| Attribute | Meaning |
+| --- | --- |
+| `data-favorite-toggle` | Required. Marks the element as a favorite toggle. |
+| `data-favorite-media-kind` | Required. The media kind of the item: `MusicArtist`, `MusicAlbum`, `MusicTrack` or `Book`. The name is matched case insensitively. The planned kinds `Video` and `Photo` cannot be favorited yet, so a toggle that carries one stays in the `failed` state. |
+| `data-favorite-media-item-id` | Required. The Id of the media item. An empty or malformed Id leaves the toggle in the `failed` state. |
+
+The script reads which items the current user favorited with `getFavoriteStatusUrl` and writes the result on the toggle. It collects the toggles of a tick and sends one status request per kind, deduplicates the Ids, and splits the Ids of a kind into requests of at most 100, so a page that renders many toggles costs few requests. The script writes these on the element:
+
+| Written on the toggle | Meaning |
+| --- | --- |
+| `aria-pressed` | `true` when the item is a favorite, `false` otherwise. It keeps the previous value while a request is in flight. |
+| `data-favorite-state` | `favorited` or `not-favorited` when the state is known, `loading` while the state is read or a change is in flight, and `failed` when the state could not be read or the attributes are invalid. |
+| `is-favorite` class | Present exactly when the item is a favorite. |
+| `aria-busy` | `true` only while the state is loading or a change is in flight. |
+| `aria-label` | The localized name of the action the next click performs: the `remove` string when the item is a favorite, the `add` string otherwise. |
+| `title` | The same localized text as the `aria-label`. It is the hover text of a heart, which has no visible text. |
+| The text of `.favorite-toggle-label` | When the toggle contains an element with the `favorite-toggle-label` class, the same localized text as the `aria-label`. The bundled themes and the application views render no such element. |
+
+A theme restyles a toggle from the `is-favorite` class or from the `aria-pressed` and `data-favorite-state` attributes. Until the first state arrives the toggle shows `loading`, so a theme should not style a toggle that has no state yet as pressed.
+
+A click on a toggle adds the favorite when the item is not one, and removes it otherwise, through the add and remove routes of the configuration. A click is ignored while a request for the same item is in flight, whichever toggle of the item it comes from, and a click on a toggle whose state is unknown reads the state again instead of guessing. The script keeps every toggle of the same item on the page in sync. When a change fails, every toggle returns to the state it had, and the global API helper shows the failure as a notification. When a state read fails, the global API helper shows the failure as a notification. The click handler prevents the default action, so a toggle inside a link or a card does not also navigate.
+
+After every successful change the script dispatches the `lumina:favorite-changed` event on `document`, with `detail` carrying `mediaKind` (the canonical kind name), `mediaItemId` (the lowercase Id) and `isFavorite` (the new state), so a page that lists favorites can react while it stays decoupled from the toggle that caused the change.
+
+The layout provides the shared configuration as `window.favoritesConfiguration`:
+
+| Field | Content |
+| --- | --- |
+| `getFavoriteStatusUrl` | The route that tells which of the checked media items are favorites. |
+| `addFavoriteUrl` | The route that marks a media item as a favorite. The body carries `mediaKind` and `mediaItemId`. |
+| `removeFavoriteUrlTemplate` | The route template that removes a favorite. Its named `{mediaKind}` and `{mediaItemId}` placeholders are replaced by the media kind name and the Id of the media item. |
+| `strings` | The localized labels: `add` and `remove`. |
+
+The script also exposes `window.LuminaFavorites` for page scripts that need more than the markup contract:
+
+| Member | Behavior |
+| --- | --- |
+| `hydrate(rootElement)` | Reads the state of the toggles inside the element, the whole document by default, and writes it on them. It never rejects. The script already hydrates the toggles of the page and the ones added to it, so this is only needed for toggles in an element that is not attached to the document. |
+| `isFavorite(mediaKind, mediaItemId)` | Returns a promise of whether the item is a favorite. The answer always comes from the server, and the check is batched with the others of the same tick. It rejects when the kind or the Id is invalid, or when the request failed. |
+| `setFavoriteAsync(mediaKind, mediaItemId, shouldFavorite)` | Adds or removes the favorite, with the same in-flight rule, synchronization and failure notification from the global API helper as a click, and returns a promise of whether the item now has the requested state. A call for an item that is already being changed returns the running change when it asks for the same state, and `false` otherwise. |
+
+The hearts are rendered on the cards of the books list, of the artists list and of the albums on the artist page (the kinds `Book`, `MusicArtist` and `MusicAlbum`), on the cards of the favorites page, and on the rows of the track table of the album page (the kind `MusicTrack`, after the duration). The detail pages of an artist, an album, a track and a book render no toggle. The audio player bar and the playlist rows have none either, so a theme should not assume they exist.
+
+A card heart is a plain `button` with the `card-favorite-toggle` class, with the three data attributes and nothing else, appended to the `media-card` element as a sibling of the `media-panel` link and of the `card-actions-trigger`. The stylesheet draws the heart with `::after`, like the dots of the actions trigger. The heart has the box of the actions trigger, sits immediately on its left, is shown on hover, while the actions menu of the card is open, and while any control of the card has the focus, shows the heart in the blue of the trigger, and shows it in red when the item is a favorite (`aria-pressed="true"` or the `is-favorite` class). A heart in the `loading` state is dimmed, and one in the `failed` state has an error border. A `media-card` that has no `card-actions-trigger`, like the cards of the favorites page, gets the heart in the place of the trigger, always visible so that it stays reachable by keyboard and on touch screens. A track row heart is a `button` with the `card-favorite-toggle track-favorite-toggle` classes inside a `td` with the `track-favorite-cell` class that follows the duration cell, and the `colgroup` of the table gets a `col` with the `track-favorite-column` class after the duration column. It is static, always visible and centered, like the actions trigger of the row. The hover text of every heart is the `title` that the script writes.
+
+The bundled themes render the hearts on those cards and rows, and carry the card rules in their `assets/site.css`; the rules of the track row and of its columns are in the application stylesheet, `wwwroot/css/site.css`, which every page loads. The application fallback views render the same hearts. A custom theme that replaces one of these templates must render the hearts again to keep favoriting reachable from that page.
 
 ### The Scripts Section
 

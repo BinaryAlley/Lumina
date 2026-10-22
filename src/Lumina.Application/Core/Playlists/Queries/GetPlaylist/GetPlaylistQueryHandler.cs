@@ -70,7 +70,7 @@ public class GetPlaylistQueryHandler : IQueryHandler<GetPlaylistQuery, Result<Pl
 
         // The playlist is scoped to the current user by the repository, so a playlist of another user is indistinguishable from a missing one.
         Result<PlaylistDetailsDto?> getPlaylistResult = await _unitOfWork.PlaylistRepository
-            .GetDetailsForUserAsync(playlistId, userId, query.Offset, query.Limit, cancellationToken).ConfigureAwait(false);
+            .GetDetailsForUserAsync(playlistId, userId, query.PaginationData, cancellationToken).ConfigureAwait(false);
         if (getPlaylistResult.IsFailure)
             return getPlaylistResult.Errors;
         if (getPlaylistResult.Value is null)
@@ -78,7 +78,7 @@ public class GetPlaylistQueryHandler : IQueryHandler<GetPlaylistQuery, Result<Pl
 
         // Check the access permissions for each library that the tracks in the playlist might belong to.
         PlaylistDetailsDto playlist = getPlaylistResult.Value;
-        List<Guid> libraryIds = [.. playlist.Entries
+        List<Guid> libraryIds = [.. playlist.Entries.Data
             .Select(entry => entry.Display?.LibraryId ?? Guid.Empty)
             .Where(libraryId => libraryId != Guid.Empty)
             .Distinct()];
@@ -93,7 +93,7 @@ public class GetPlaylistQueryHandler : IQueryHandler<GetPlaylistQuery, Result<Pl
         if (libraryAccess.Values.Any(canAccessLibrary => !canAccessLibrary))
         {
             List<PlaylistEntryDto> entries = [];
-            foreach (PlaylistEntryDto entry in playlist.Entries)
+            foreach (PlaylistEntryDto entry in playlist.Entries.Data)
             {
                 Guid libraryId = entry.Display?.LibraryId ?? Guid.Empty;
                 if (libraryId == Guid.Empty || libraryAccess[libraryId])
@@ -102,7 +102,7 @@ public class GetPlaylistQueryHandler : IQueryHandler<GetPlaylistQuery, Result<Pl
                     // Keep the row so its owner can see and remove it, but do not expose display data from a library the user cannot access.
                     entries.Add(entry with { Display = null });
             }
-            playlist = playlist with { Entries = entries };
+            playlist = playlist with { Entries = playlist.Entries with { Data = entries } };
         }
 
         return playlist.ToResponse();

@@ -66,6 +66,9 @@
   <data name="AddFailed" xml:space="preserve">
     <value>曲を追加できませんでした。</value>
   </data>
+  <data name="RefreshFailed" xml:space="preserve">
+    <value>プレイリストは更新されましたが、一覧を更新できませんでした。変更を確認するにはページを再読み込みしてください。</value>
+  </data>
   <data name="SelectLibrary" xml:space="preserve">
     <value>ライブラリを選択</value>
   </data>

@@ -255,4 +255,10 @@
   <data name="PlaylistNoTracksToAdd" xml:space="preserve">
     <value>There are no tracks to add.</value>
   </data>
+  <data name="FavoritesAdd" xml:space="preserve">
+    <value>Add to favorites</value>
+  </data>
+  <data name="FavoritesRemove" xml:space="preserve">
+    <value>Remove from favorites</value>
+  </data>
 </root>

@@ -3,6 +3,7 @@ using Dapper;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Application.Common.DataAccess.Entities.Playlists;
 using Lumina.Application.Common.DataAccess.Repositories.Playlists;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.DTO.Playlists;
 using Lumina.DataAccess.Common.Persistence;
 using Lumina.DataAccess.Core.UoW;
@@ -169,18 +170,17 @@ internal sealed class PlaylistRepository : IPlaylistRepository
     }
 
     /// <summary>
-    /// Gets the playlist identified by <paramref name="id"/> together with a window of the display details of the media items its entries reference,
-    /// when the playlist belongs to the user identified by <paramref name="userId"/>.
+    /// Gets the playlist identified by <paramref name="id"/> together with a page of the display details of the media items its entries reference,
+    /// when the playlist belongs to the user identified by <paramref name="userId"/>, or all the entries when the pagination data is <see langword="null"/>.
     /// </summary>
     /// <param name="id">The Id of the playlist to get.</param>
     /// <param name="userId">The Id of the user the playlist must belong to.</param>
-    /// <param name="offset">The zero based position of the first entry to return.</param>
-    /// <param name="limit">The maximum number of entries to return in this window.</param>
+    /// <param name="paginationData">The pagination data that includes the current page and the number of items per page to retrieve. If <see langword="null"/>, all matching entries are returned.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="Result{TValue}"/> containing either the playlist details and its entry count, <see langword="null"/> when no such playlist exists, or an error.
+    /// An <see cref="Result{TValue}"/> containing either the playlist details and the paginated entries, <see langword="null"/> when no such playlist exists, or an error.
     /// </returns>
-    public async Task<Result<PlaylistDetailsDto?>> GetDetailsForUserAsync(Guid id, Guid userId, int offset, int limit, CancellationToken cancellationToken)
+    public async Task<Result<PlaylistDetailsDto?>> GetDetailsForUserAsync(Guid id, Guid userId, PaginationDataDto? paginationData = null, CancellationToken cancellationToken = default)
     {
         // The user is part of the filter rather than a check performed after the read, so the storage medium never returns a playlist that belongs to another user in the first place.
         PlaylistEntity? playlist = await _luminaDbContext.Playlists
@@ -189,16 +189,58 @@ internal sealed class PlaylistRepository : IPlaylistRepository
         if (playlist is null)
             return Result<PlaylistDetailsDto?>.Success(null);
 
-        // Only the requested window is materialized. A playlist can hold any number of entries, so the page never loads the whole list.
-        List<PlaylistEntryEntity> windowEntries = await _luminaDbContext.PlaylistEntries
+        IQueryable<PlaylistEntryEntity> entriesQuery = _luminaDbContext.PlaylistEntries
             .AsNoTracking()
             .Where(entry => entry.PlaylistId == id)
-            .OrderBy(entry => entry.Position)
-            .Skip(offset)
-            .Take(limit)
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
+            .OrderBy(entry => entry.Position);
 
-        List<Guid> trackIds = [.. windowEntries
+        // If no pagination was requested, return all the entries of the playlist.
+        if (paginationData is null)
+        {
+            IReadOnlyList<PlaylistEntryDto> allEntries = await ToPlaylistEntriesAsync(entriesQuery, offset: 0, cancellationToken).ConfigureAwait(false);
+            return new PlaylistDetailsDto(playlist, new PaginatedResultDto<PlaylistEntryDto>
+            {
+                Data = allEntries,
+                CurrentPage = 1,
+                PerPage = allEntries.Count,
+                Count = allEntries.Count,
+                NumberOfPages = 1
+            });
+        }
+
+        int count = await entriesQuery.Select(entry => entry.Id).CountAsync(cancellationToken).ConfigureAwait(false);
+        int numberOfPages = (int)Math.Ceiling((double)count / paginationData.PerPage);
+        int currentPage = Math.Min(paginationData.CurrentPage, Math.Max(1, numberOfPages)); // Make sure current page doesn't exceed maximum number of pages.
+        int offset = (currentPage - 1) * paginationData.PerPage;
+
+        // Only the requested page is materialized. A playlist can hold any number of entries, so the page never loads the whole list.
+        IQueryable<PlaylistEntryEntity> pageQuery = entriesQuery
+            .Skip(offset)
+            .Take(paginationData.PerPage);
+        IReadOnlyList<PlaylistEntryDto> paginatedResult = await ToPlaylistEntriesAsync(pageQuery, offset, cancellationToken).ConfigureAwait(false);
+
+        return new PlaylistDetailsDto(playlist, new PaginatedResultDto<PlaylistEntryDto>
+        {
+            Data = paginatedResult,
+            CurrentPage = currentPage,
+            PerPage = paginationData.PerPage,
+            Count = count,
+            NumberOfPages = numberOfPages
+        });
+    }
+
+    /// <summary>
+    /// Reads the display data of the tracks referenced by the entries of <paramref name="entriesQuery"/>.
+    /// </summary>
+    /// <param name="entriesQuery">The ordered query of the entries to read the display data for.</param>
+    /// <param name="offset">The zero based position of the first entry of the page, used to compute the dense display position.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>The entries together with the display data of the tracks they reference.</returns>
+    private async Task<IReadOnlyList<PlaylistEntryDto>> ToPlaylistEntriesAsync(IQueryable<PlaylistEntryEntity> entriesQuery, int offset, CancellationToken cancellationToken)
+    {
+        List<PlaylistEntryEntity> entries = await entriesQuery.ToListAsync(cancellationToken).ConfigureAwait(false);
+
+        List<Guid> trackIds = [.. entries
             .Where(entry => entry.MediaItemType == PlaylistMediaItemType.MusicTrack)
             .Select(entry => entry.MediaItemId)
             .Distinct()];
@@ -206,15 +248,14 @@ internal sealed class PlaylistRepository : IPlaylistRepository
 
         // An entry whose track was deleted is kept with no display data, so its owner can still see and remove it instead of it silently
         // disappearing from the playlist. The sparse order key is converted to a dense display position for the response.
-        List<PlaylistEntryDto> entries = [];
-        for (int index = 0; index < windowEntries.Count; index++)
+        List<PlaylistEntryDto> items = [];
+        for (int index = 0; index < entries.Count; index++)
         {
-            PlaylistEntryEntity entry = windowEntries[index];
+            PlaylistEntryEntity entry = entries[index];
             displayDataByTrackId.TryGetValue(entry.MediaItemId, out PlaylistEntryDisplayDto? displayData);
-            entries.Add(new PlaylistEntryDto(entry, displayData, offset + index));
+            items.Add(new PlaylistEntryDto(entry, displayData, offset + index));
         }
-
-        return new PlaylistDetailsDto(playlist, entries);
+        return items;
     }
 
     /// <summary>

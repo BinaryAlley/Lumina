@@ -5,12 +5,12 @@ using System.Diagnostics;
 namespace Lumina.Contracts.Requests.Playlists;
 
 /// <summary>
-/// Represents a request for getting a window of the entries of a playlist of the current user.
+/// Represents a request for getting a page of the entries of a playlist of the current user.
 /// </summary>
-/// <param name="Offset">The zero based position of the first entry to return. Optional; defaults to 0.</param>
-/// <param name="Limit">The maximum number of entries to return, from 1 to 1000. Optional; defaults to 200.</param>
-[DebuggerDisplay("Offset: {Offset}; Limit: {Limit}")]
+/// <param name="CurrentPage">The one based page of entries to return. Optional; defaults to 1 when a page size is provided.</param>
+/// <param name="PerPage">The number of entries per page. Optional; defaults to 200 when a page is provided. When both pagination parameters are omitted, every entry is returned.</param>
+[DebuggerDisplay("CurrentPage: {CurrentPage}; PerPage: {PerPage}")]
 public record GetPlaylistRequest(
-    int? Offset,
-    int? Limit
+    int? CurrentPage,
+    int? PerPage
 );

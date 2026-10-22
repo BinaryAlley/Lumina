@@ -222,4 +222,7 @@
   <data name="Playlists" xml:space="preserve">
     <value>قوائم التشغيل</value>
   </data>
+  <data name="Favorites" xml:space="preserve">
+    <value>المفضلة</value>
+  </data>
 </root>

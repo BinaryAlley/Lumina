@@ -66,6 +66,9 @@
   <data name="AddFailed" xml:space="preserve">
     <value>تعذر إضافة المقطع.</value>
   </data>
+  <data name="RefreshFailed" xml:space="preserve">
+    <value>تم تحديث قائمة التشغيل، لكن تعذر تحديث القائمة. أعد تحميل الصفحة لرؤية التغيير.</value>
+  </data>
   <data name="SelectLibrary" xml:space="preserve">
     <value>اختر مكتبة</value>
   </data>

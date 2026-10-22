@@ -137,6 +137,7 @@
                             <col class="track-number-column" />
                             <col />
                             <col class="track-duration-column" />
+                            <col class="track-favorite-column" />
                             <col class="track-actions-column" />
                         </colgroup>
                         <tbody id="tracks-body"></tbody>
@@ -995,7 +996,7 @@
         }
 
         // Creates a row of the tracks table, with the play trigger, the number, the name of the track linking to its own page,
-        // the duration and the actions menu of the track.
+        // the duration, the favorite heart and the actions menu of the track.
         function createTrackRow(track) {
             const row = document.createElement('tr');
             row.className = 'track-row';
@@ -1021,8 +1022,24 @@
             row.appendChild(numberCell);
             row.appendChild(nameCell);
             row.appendChild(durationCell);
+            row.appendChild(createTrackFavoriteCell(track));
             row.appendChild(createTrackActionsCell(track));
             return row;
+        }
+
+        // Creates the favorite cell of a track row, right after the duration. The heart is a plain button: the global favorites
+        // script finds it by its data attributes, hydrates its state and handles its click.
+        function createTrackFavoriteCell(track) {
+            const cell = document.createElement('td');
+            cell.className = 'track-favorite-cell';
+            const favoriteToggle = document.createElement('button');
+            favoriteToggle.type = 'button';
+            favoriteToggle.className = 'card-favorite-toggle track-favorite-toggle';
+            favoriteToggle.setAttribute('data-favorite-toggle', '');
+            favoriteToggle.setAttribute('data-favorite-media-kind', 'MusicTrack');
+            favoriteToggle.setAttribute('data-favorite-media-item-id', track.id);
+            cell.appendChild(favoriteToggle);
+            return cell;
         }
 
         // Gets the singleton audio player, or null when the layout did not render it.

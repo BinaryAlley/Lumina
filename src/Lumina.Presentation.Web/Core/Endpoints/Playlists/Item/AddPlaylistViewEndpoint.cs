@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
+using Lumina.Presentation.Web.Common.DTO.Common;
 using Lumina.Presentation.Web.Common.DTO.Playlists;
 using Lumina.Presentation.Web.Common.DTO.Themes;
 using Lumina.Presentation.Web.Common.Enums.Playlists;
@@ -31,6 +32,8 @@ public class AddPlaylistViewEndpoint : BaseEndpoint<EmptyRequest, IResult>
     private const string VIEW_RESOURCE_LOCATION = "Lumina.Presentation.Web";
     // The page key mirrors the path of the Razor view under Core/Views, so that theme templates can override it at the page, section or default scope.
     private const string VIEW_PAGE_KEY = "playlists/item";
+    // A new playlist has no entries yet, but its serialized page still carries the shape the page script expects.
+    private const int DEFAULT_ENTRY_PAGE_SIZE = 200;
 
     private static readonly JsonSerializerOptions s_camelCaseJsonOptions = new()
     {
@@ -88,8 +91,12 @@ public class AddPlaylistViewEndpoint : BaseEndpoint<EmptyRequest, IResult>
             Name: string.Empty,
             Description: null,
             Type: PlaylistType.Music,
-            EntryCount: 0,
-            Entries: [],
+            Entries: new PaginatedDto<PlaylistEntryDto>(
+                Data: [],
+                CurrentPage: 1,
+                PerPage: DEFAULT_ENTRY_PAGE_SIZE,
+                Count: 0,
+                NumberOfPages: 0),
             CreatedOnUtc: default,
             UpdatedOnUtc: null
         );
@@ -105,6 +112,7 @@ public class AddPlaylistViewEndpoint : BaseEndpoint<EmptyRequest, IResult>
                 ["isNew"] = true,
                 ["playlistId"] = playlist.Id.ToString(),
                 ["playlistJson"] = JsonSerializer.Serialize(playlist, s_camelCaseJsonOptions),
+                ["entriesPerPage"] = DEFAULT_ENTRY_PAGE_SIZE,
                 ["createPlaylistUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Playlists.CREATE_PLAYLIST) ?? string.Empty,
                 ["itemUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Playlists.ITEM, new { playlistId = default(Guid) }) ?? string.Empty,
                 ["getEnabledLibrariesUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.GET_ENABLED_LIBRARIES) ?? string.Empty,

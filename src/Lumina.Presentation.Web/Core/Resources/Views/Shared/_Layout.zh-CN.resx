@@ -255,4 +255,10 @@
   <data name="PlaylistNoTracksToAdd" xml:space="preserve">
     <value>没有可添加的曲目。</value>
   </data>
+  <data name="FavoritesAdd" xml:space="preserve">
+    <value>添加到收藏</value>
+  </data>
+  <data name="FavoritesRemove" xml:space="preserve">
+    <value>取消收藏</value>
+  </data>
 </root>

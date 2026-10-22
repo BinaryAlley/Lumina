@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Contracts.Requests.Playlists;
+using Lumina.Contracts.Responses.Common;
 using Lumina.Contracts.Responses.Playlists;
 using Lumina.Domain.SharedKernel.Common.Enums.Playlists;
 using System;
@@ -37,8 +38,7 @@ public class CreatePlaylistEndpointSummary : Summary<CreatePlaylistEndpoint, Cre
         ResponseParam<PlaylistResponse>(response => response.Name, "The name of the playlist.");
         ResponseParam<PlaylistResponse>(response => response.Description, "The description of the playlist, if applicable.");
         ResponseParam<PlaylistResponse>(response => response.Type, "The kind of media the playlist holds.");
-        ResponseParam<PlaylistResponse>(response => response.Entries, "The ordered entries of the playlist.");
-        ResponseParam<PlaylistResponse>(response => response.EntryCount, "The total number of entries the playlist holds, even when only a window of them is returned.");
+        ResponseParam<PlaylistResponse>(response => response.Entries, "The page of ordered entries of the playlist, with its pagination metadata.");
         ResponseParam<PlaylistResponse>(response => response.CreatedOnUtc, "The date and time when the playlist was created.");
         ResponseParam<PlaylistResponse>(response => response.UpdatedOnUtc, "The date and time when the playlist was last updated, if applicable.");
 
@@ -48,8 +48,14 @@ public class CreatePlaylistEndpointSummary : Summary<CreatePlaylistEndpoint, Cre
                 Name: "Evening listening",
                 Description: "Quiet tracks for the end of the day.",
                 Type: PlaylistType.Music,
-                Entries: [],
-                EntryCount: 0,
+                Entries: new PaginatedResponse<PlaylistEntryResponse>
+                {
+                    Data = [],
+                    CurrentPage = 1,
+                    PerPage = 200,
+                    Count = 0,
+                    NumberOfPages = 0
+                },
                 CreatedOnUtc: new DateTime(2026, 10, 21, 12, 0, 0, DateTimeKind.Utc),
                 UpdatedOnUtc: null
             )

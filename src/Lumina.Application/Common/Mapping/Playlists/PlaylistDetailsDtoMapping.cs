@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DTO.Playlists;
 using Lumina.Contracts.Responses.Playlists;
-using System.Linq;
 #endregion
 
 namespace Lumina.Application.Common.Mapping.Playlists;
@@ -23,8 +22,7 @@ public static class PlaylistDetailsDtoMapping
             data.Playlist.Name,
             data.Playlist.Description,
             data.Playlist.Type,
-            [.. data.Entries.Select(entry => entry.ToResponse())],
-            data.Playlist.EntryCount,
+            data.Entries.ToResponses(),
             data.Playlist.CreatedOnUtc,
             data.Playlist.UpdatedOnUtc);
     }

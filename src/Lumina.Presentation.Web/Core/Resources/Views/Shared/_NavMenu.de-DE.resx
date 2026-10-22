@@ -222,4 +222,7 @@
   <data name="Playlists" xml:space="preserve">
     <value>Wiedergabelisten</value>
   </data>
+  <data name="Favorites" xml:space="preserve">
+    <value>Favoriten</value>
+  </data>
 </root>

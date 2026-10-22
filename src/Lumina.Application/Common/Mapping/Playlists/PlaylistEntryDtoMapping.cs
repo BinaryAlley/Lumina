@@ -1,7 +1,10 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.DTO.Playlists;
+using Lumina.Contracts.Responses.Common;
 using Lumina.Contracts.Responses.Playlists;
 using System;
+using System.Linq;
 #endregion
 
 namespace Lumina.Application.Common.Mapping.Playlists;
@@ -47,5 +50,22 @@ public static class PlaylistEntryDtoMapping
             display.ArtistName,
             display.DurationInSeconds,
             display.CoverPath);
+    }
+
+    /// <summary>
+    /// Converts <paramref name="data"/> to a paginated collection of <see cref="PlaylistEntryResponse"/>.
+    /// </summary>
+    /// <param name="data">The paginated playlist entry data to be converted.</param>
+    /// <returns>The converted paginated responses.</returns>
+    public static PaginatedResponse<PlaylistEntryResponse> ToResponses(this PaginatedResultDto<PlaylistEntryDto> data)
+    {
+        return new PaginatedResponse<PlaylistEntryResponse>
+        {
+            Data = [.. data.Data.Select(entry => entry.ToResponse())],
+            CurrentPage = data.CurrentPage,
+            PerPage = data.PerPage,
+            Count = data.Count,
+            NumberOfPages = data.NumberOfPages
+        };
     }
 }

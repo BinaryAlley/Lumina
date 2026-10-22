@@ -66,6 +66,9 @@
   <data name="AddFailed" xml:space="preserve">
     <value>无法添加曲目。</value>
   </data>
+  <data name="RefreshFailed" xml:space="preserve">
+    <value>播放列表已更新，但无法刷新列表。请重新加载页面以查看更改。</value>
+  </data>
   <data name="SelectLibrary" xml:space="preserve">
     <value>选择库</value>
   </data>

@@ -19,8 +19,7 @@ namespace Lumina.Presentation.Web.Core.Endpoints.Playlists.GetPlaylist;
 /// </summary>
 public class GetPlaylistEndpoint : BaseEndpoint<GetPlaylistRequest, IResult>
 {
-    private const int DEFAULT_ENTRY_WINDOW_SIZE = 200;
-    private const int MAXIMUM_ENTRY_WINDOW_SIZE = 1000;
+    private const int DEFAULT_ENTRY_PAGE_SIZE = 200;
 
     private readonly IApiHttpClient _apiHttpClient;
 
@@ -46,7 +45,7 @@ public class GetPlaylistEndpoint : BaseEndpoint<GetPlaylistRequest, IResult>
     }
 
     /// <summary>
-    /// Retrieves a window of the entries of a playlist of the current user.
+    /// Retrieves a page of the entries of a playlist of the current user.
     /// </summary>
     /// <param name="request">The request object.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
@@ -58,11 +57,10 @@ public class GetPlaylistEndpoint : BaseEndpoint<GetPlaylistRequest, IResult>
         // The route value is normalized to a Guid before it is substituted into the upstream URL, so that a crafted value can never escape its URL segment.
         string routePlaylistId = HttpContext.Request.RouteValues["playlistId"]?.ToString() ?? string.Empty;
         string playlistId = Guid.TryParse(routePlaylistId, out Guid parsedPlaylistId) ? parsedPlaylistId.ToString() : Guid.Empty.ToString();
-        int offset = request.Offset ?? 0;
-        // The web tier enforces the same response-window bound before forwarding, so a crafted value cannot make this proxy buffer an
-        // unbounded playlist response even if it never reaches the API validator.
-        int limit = Math.Clamp(request.Limit ?? DEFAULT_ENTRY_WINDOW_SIZE, 1, MAXIMUM_ENTRY_WINDOW_SIZE);
-        string url = ApiRoutes.Playlists.GET_PLAYLIST.Replace("{playlistId}", playlistId) + $"?offset={offset}&limit={limit}";
+        int currentPage = request.CurrentPage ?? 1;
+        // The page bounds are normalized by the API pagination data.
+        int perPage = request.PerPage ?? DEFAULT_ENTRY_PAGE_SIZE;
+        string url = ApiRoutes.Playlists.GET_PLAYLIST.Replace("{playlistId}", playlistId) + $"?currentPage={currentPage}&perPage={perPage}";
         PlaylistDto playlist = await _apiHttpClient.GetAsync<PlaylistDto>(url, cancellationToken).ConfigureAwait(false);
         return JsonSuccess(playlist);
     }

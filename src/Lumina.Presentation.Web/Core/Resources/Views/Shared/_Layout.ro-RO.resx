@@ -255,4 +255,10 @@
   <data name="PlaylistNoTracksToAdd" xml:space="preserve">
     <value>Nu există piese de adăugat.</value>
   </data>
+  <data name="FavoritesAdd" xml:space="preserve">
+    <value>Adaugă la favorite</value>
+  </data>
+  <data name="FavoritesRemove" xml:space="preserve">
+    <value>Elimină din favorite</value>
+  </data>
 </root>

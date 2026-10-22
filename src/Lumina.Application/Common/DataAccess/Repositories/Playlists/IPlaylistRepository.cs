@@ -2,6 +2,7 @@
 using Lumina.Application.Common.DataAccess.Entities.Playlists;
 using Lumina.Application.Common.DataAccess.Repositories.Common.Actions;
 using Lumina.Application.Common.DataAccess.Repositories.Common.Base;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.DTO.Playlists;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Playlists;
@@ -44,16 +45,17 @@ public interface IPlaylistRepository : IRepository<PlaylistEntity>,
     Task<Result<IReadOnlyList<PlaylistSummaryDto>>> GetAllForUserAsync(Guid userId, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Gets the playlist identified by <paramref name="id"/> together with the display details of the media items its entries reference,
-    /// when the playlist belongs to the user identified by <paramref name="userId"/>.
+    /// Gets the playlist identified by <paramref name="id"/> together with a page of the display details of the media items its entries reference,
+    /// when the playlist belongs to the user identified by <paramref name="userId"/>, or all the entries when the pagination data is <see langword="null"/>.
     /// </summary>
     /// <param name="id">The Id of the playlist to get.</param>
     /// <param name="userId">The Id of the user the playlist must belong to.</param>
+    /// <param name="paginationData">The pagination data that includes the current page and the number of items per page to retrieve. If <see langword="null"/>, all matching entries are returned.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either the playlist details, <see langword="null"/> when no such playlist exists, or an error.
     /// </returns>
-    Task<Result<PlaylistDetailsDto?>> GetDetailsForUserAsync(Guid id, Guid userId, int offset, int limit, CancellationToken cancellationToken);
+    Task<Result<PlaylistDetailsDto?>> GetDetailsForUserAsync(Guid id, Guid userId, PaginationDataDto? paginationData = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Appends a batch of media items of one kind to the end of the ordered entries of a playlist of the user identified by

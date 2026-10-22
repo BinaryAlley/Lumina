@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
+using Lumina.Application.Common.Mapping.Playlists;
 using Lumina.Application.Core.Playlists.Queries.GetPlaylist;
 using Lumina.Contracts.Requests.Playlists;
 using Lumina.Contracts.Responses.Playlists;
@@ -7,7 +8,6 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Common.Routes.Playlists;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -45,7 +45,7 @@ public class GetPlaylistEndpoint : BaseEndpoint<GetPlaylistRequest, IResult>
     }
 
     /// <summary>
-    /// Gets a window of the entries of a playlist of the current user.
+    /// Gets a page of the entries of a playlist of the current user.
     /// </summary>
     /// <param name="request">The request object.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
@@ -57,12 +57,7 @@ public class GetPlaylistEndpoint : BaseEndpoint<GetPlaylistRequest, IResult>
         HttpContext.Response.Headers["Vary"] = "Authorization";
         // Take the unique identifier from the route.
         string? playlistId = HttpContext.Request.RouteValues["playlistId"]?.ToString();
-        int offset = request.Offset ?? 0;
-        // The limit bounds one response window, not the size of the playlist. Clamping it keeps a crafted limit from turning the
-        // windowed read into one unbounded response, while the handler still validates the value independently.
-        int limit = Math.Clamp(request.Limit ?? PlaylistWindow.DEFAULT_ENTRY_WINDOW_SIZE, 1, PlaylistWindow.MAXIMUM_ENTRY_WINDOW_SIZE);
-        Result<PlaylistResponse> result = await _getPlaylistQueryHandler
-            .HandleAsync(new GetPlaylistQuery(playlistId, offset, limit), cancellationToken).ConfigureAwait(false);
+        Result<PlaylistResponse> result = await _getPlaylistQueryHandler.HandleAsync(request.ToQuery(playlistId), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

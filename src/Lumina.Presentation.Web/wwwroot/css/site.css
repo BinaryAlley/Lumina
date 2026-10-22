@@ -1203,11 +1203,13 @@ body {
     }
 
     .tracks-table .track-play-column,
+    .tracks-table .track-favorite-column,
     .tracks-table .track-actions-column {
         width: 40px;
     }
 
     .tracks-table .track-play-cell,
+    .tracks-table .track-favorite-cell,
     .tracks-table .track-actions-cell {
         width: 40px;
         padding-left: 0;
@@ -1259,6 +1261,68 @@ body {
 
 /* The track row places the same trigger inline and always visible, instead of on a media card. */
 .track-actions-cell .card-actions-trigger {
+    position: static;
+    display: flex;
+    margin: 0 auto;
+}
+
+/* The favorite heart of a media card: the box of the actions trigger, placed immediately on its left. The global favorites script writes the state attributes. */
+.card-favorite-toggle {
+    position: absolute;
+    right: 28px;
+    bottom: 28px;
+    width: 22px;
+    height: 22px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #6DCBFE;
+    border: 1px solid #777777;
+    border-bottom-color: #000000;
+    border-right-color: #000000;
+    background: linear-gradient(to bottom, #505050 0%, #464646 35%, #404040 55%, #363636 100%);
+    font-size: 16px;
+    line-height: 1;
+}
+
+.card-favorite-toggle::after {
+    content: '\2665';
+}
+
+.media-card:hover .card-favorite-toggle,
+.media-card.open .card-favorite-toggle,
+.media-card:focus-within .card-favorite-toggle {
+    display: flex;
+}
+
+.card-favorite-toggle:hover {
+    color: #FFFFFF;
+}
+
+.card-favorite-toggle[aria-pressed="true"],
+.card-favorite-toggle.is-favorite {
+    color: #FF5D5D;
+}
+
+.card-favorite-toggle[data-favorite-state="loading"] {
+    opacity: 0.5;
+    cursor: progress;
+}
+
+.card-favorite-toggle[data-favorite-state="failed"] {
+    border-color: #FF5D5D;
+}
+
+/* A card without an actions trigger, like the cards of the favorites page, gives its place to the heart. The heart is the
+   only action of such a card, so it is always visible: a touch screen has no hover to reveal it, and a display: none control cannot be reached with the keyboard. */
+.media-card:not(:has(.card-actions-trigger)) > .card-favorite-toggle {
+    right: 2px;
+    display: flex;
+}
+
+/* The track row places the same heart inline and always visible, instead of on a media card. */
+.track-favorite-cell .card-favorite-toggle {
     position: static;
     display: flex;
     margin: 0 auto;

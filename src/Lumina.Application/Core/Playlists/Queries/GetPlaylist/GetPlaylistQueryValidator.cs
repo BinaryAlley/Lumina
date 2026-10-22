@@ -25,13 +25,5 @@ public class GetPlaylistQueryValidator : AbstractValidator<GetPlaylistQuery>
             .Must(playlistId => Guid.TryParse(playlistId, out Guid parsedPlaylistId) && parsedPlaylistId != Guid.Empty)
             .When(query => query.PlaylistId is not null && query.PlaylistId.Length > 0)
             .WithError(Errors.Playlists.PlaylistIdCannotBeEmpty);
-
-        RuleFor(query => query.Offset)
-            .GreaterThanOrEqualTo(0)
-            .WithError(Errors.Playlists.PlaylistEntryWindowOffsetIsInvalid);
-
-        RuleFor(query => query.Limit)
-            .InclusiveBetween(1, PlaylistWindow.MAXIMUM_ENTRY_WINDOW_SIZE)
-            .WithError(Errors.Playlists.PlaylistEntryWindowLimitIsInvalid);
     }
 }

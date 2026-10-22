@@ -54,6 +54,7 @@
         ["track"] = _localizer["Track"].Value,
         ["add"] = _localizer["Add"].Value,
         ["addFailed"] = _localizer["AddFailed"].Value,
+        ["refreshFailed"] = _localizer["RefreshFailed"].Value,
         ["selectLibrary"] = _localizer["SelectLibrary"].Value,
         ["selectArtist"] = _localizer["SelectArtist"].Value,
         ["selectAlbum"] = _localizer["SelectAlbum"].Value,
@@ -276,10 +277,23 @@
         const addTrackButton = document.getElementById('add-track-button');
         const noMusicLibrariesMessage = document.getElementById('no-music-libraries');
         const loadMoreEntriesButton = document.getElementById('load-more-entries-button');
-        const entriesWindowSize = 200;
-        // The global position of the first row currently on screen. Local row indexes are only meaningful after adding this offset, which
-        // is why the move and Load more logic use it for every comparison against the whole playlist.
+        const DEFAULT_PAGE_SIZE = 200;
+        // The page the first rendered row belongs to, the size of each page and the total number of pages. The global position of the
+        // first row currently on screen is derived from the page, and local row indexes are only meaningful after adding this offset,
+        // which is why the move and Load more logic use it for every comparison against the whole playlist.
+        let currentPage = 1;
+        let perPage = DEFAULT_PAGE_SIZE;
+        let numberOfPages = 0;
         let entriesOffset = 0;
+        if (playlist && playlist.entries) {
+            if (Number.isInteger(playlist.entries.currentPage) && playlist.entries.currentPage > 0)
+                currentPage = playlist.entries.currentPage;
+            if (Number.isInteger(playlist.entries.perPage) && playlist.entries.perPage > 0)
+                perPage = playlist.entries.perPage;
+            if (Number.isInteger(playlist.entries.numberOfPages))
+                numberOfPages = playlist.entries.numberOfPages;
+            entriesOffset = (currentPage - 1) * perPage;
+        }
         let isInitialized = false;
         let draggedEntryId = null;
         let dragWasDropped = false;
@@ -287,6 +301,32 @@
 
         function buildItemUrl(playlistId) {
             return itemUrlTemplate.replace(`/${EMPTY_GUID}`, `/${playlistId}`);
+        }
+
+        // The entries of the page currently rendered, and the total the server reported for the whole playlist.
+        function getPlaylistEntries() {
+            return playlist && playlist.entries && Array.isArray(playlist.entries.data) ? playlist.entries.data : [];
+        }
+
+        function getPlaylistEntryCount() {
+            return playlist && playlist.entries && Number.isFinite(playlist.entries.count) ? playlist.entries.count : getPlaylistEntries().length;
+        }
+
+        function findEntryRow(entryId) {
+            if (!entriesContainer)
+                return null;
+            return Array.from(entriesContainer.querySelectorAll('.playlist-entry'))
+                .find(row => row.dataset.entryId === entryId) || null;
+        }
+
+        // Applies a playlist read back from the server and derives the global position of its first row.
+        function applyPlaylistPage(page) {
+            playlist = page;
+            const entries = page && page.entries ? page.entries : null;
+            currentPage = entries && Number.isInteger(entries.currentPage) && entries.currentPage > 0 ? entries.currentPage : 1;
+            perPage = entries && Number.isInteger(entries.perPage) && entries.perPage > 0 ? entries.perPage : DEFAULT_PAGE_SIZE;
+            numberOfPages = entries && Number.isInteger(entries.numberOfPages) ? entries.numberOfPages : 0;
+            entriesOffset = (currentPage - 1) * perPage;
         }
 
         function formatDuration(totalSeconds) {
@@ -387,12 +427,12 @@
             }
         }
 
-        // Shows the load more control only while the page has entry windows left to fetch.
+        // Shows the load more control only while the page has entry pages left to fetch.
         function updateLoadMoreButton() {
             if (!loadMoreEntriesButton)
                 return;
-            const loaded = Array.isArray(playlist.entries) ? playlist.entries.length : 0;
-            const total = Number.isFinite(playlist.entryCount) ? playlist.entryCount : loaded;
+            const loaded = getPlaylistEntries().length;
+            const total = getPlaylistEntryCount();
             // The rows on screen start at entriesOffset, not at the beginning of the playlist, so the loaded count alone cannot tell
             // whether the whole playlist is on screen.
             const hasMore = entriesOffset + loaded < total;
@@ -413,37 +453,89 @@
             if (!entriesContainer)
                 return;
             entriesContainer.querySelectorAll('.playlist-entry').forEach(row => row.remove());
-            const entries = Array.isArray(playlist.entries) ? playlist.entries : [];
-            const total = Number.isFinite(playlist.entryCount) ? playlist.entryCount : entries.length;
+            const entries = getPlaylistEntries();
+            const total = getPlaylistEntryCount();
             if (total === 0) {
                 noTracksMessage.classList.remove('hidden');
                 return;
             }
             noTracksMessage.classList.add('hidden');
-            entries.forEach((entry, index) => entriesContainer.appendChild(createEntryRow(entry, index, entries.length)));
+            entries.forEach((entry, index) => entriesContainer.appendChild(createEntryRow(entry, index)));
             updateLoadMoreButton();
         }
 
-        // Fetches the next window of entries and appends it to the rows already on screen.
+        // Whether the fetched page proves that the rendered window no longer matches the server. A page behind the requested one means
+        // the server clamped it because the playlist shrank, and a total smaller than the rendered rows means the rows themselves are
+        // stale. Neither can be fixed by appending, so the caller reloads the first page instead.
+        function pageShrankBeforeWindow(page, requestedPage) {
+            if (!page || !page.entries)
+                return false;
+            const resolvedPage = Number.isInteger(page.entries.currentPage) && page.entries.currentPage > 0
+                ? page.entries.currentPage
+                : requestedPage;
+            return resolvedPage < requestedPage
+                || (Number.isInteger(page.entries.count) && page.entries.count < entriesOffset + getPlaylistEntries().length);
+        }
+
+        // Replaces the rendered rows with the first page, which is the only window that is valid after the playlist shrank.
+        async function reloadFirstPageAsync() {
+            const page = await callApiGetAsync(`${getPlaylistUrl}?currentPage=1&perPage=${perPage}`);
+            if (!page || !page.entries || !Array.isArray(page.entries.data))
+                return false;
+            applyPlaylistPage(page);
+            renderPlaylist();
+            return true;
+        }
+
+        // Merges the entries of one fetched page into the rows already on screen, without replacing them. A page that starts after the
+        // first entry that is not on screen would leave a hole in the rendered rows, so it is not merged and the Load more state stays
+        // responsible for reaching it. The rows are numbered from entriesOffset, which is only valid while the rendered entries are
+        // contiguous, so a page that overlaps the rendered rows is merged by Id and a page after a gap is left for Load more.
+        function mergeEntriesPage(page, pageNumber) {
+            if (!entriesContainer || !page || !page.entries || !Array.isArray(page.entries.data))
+                return false;
+            // The server can clamp the requested page to the last one, so its answer is the page that actually arrived.
+            const resolvedPage = Number.isInteger(page.entries.currentPage) && page.entries.currentPage > 0 ? page.entries.currentPage : pageNumber;
+            const pageStart = (resolvedPage - 1) * perPage;
+            const entries = getPlaylistEntries();
+            if (pageStart < entriesOffset || pageStart > entriesOffset + entries.length)
+                return false;
+            page.entries.data.forEach(entry => {
+                if (findEntryRow(entry.id))
+                    return;
+                entries.push(entry);
+                entriesContainer.appendChild(createEntryRow(entry, entries.length - 1));
+            });
+            playlist.entries.count = page.entries.count;
+            playlist.entries.numberOfPages = page.entries.numberOfPages;
+            numberOfPages = Number.isInteger(page.entries.numberOfPages) ? page.entries.numberOfPages : numberOfPages;
+            refreshEntryRows();
+            return true;
+        }
+
+        // Fetches the next page of entries and appends it to the rows already on screen.
         async function loadMoreEntriesAsync() {
             if (!entriesContainer || !loadMoreEntriesButton || isEntryMutationInFlight)
                 return;
-            const loaded = Array.isArray(playlist.entries) ? playlist.entries.length : 0;
-            const total = Number.isFinite(playlist.entryCount) ? playlist.entryCount : loaded;
+            const loaded = getPlaylistEntries().length;
+            const total = getPlaylistEntryCount();
             // The loaded rows begin at entriesOffset, so they cover the playlist only when offset plus loaded reaches the total.
             if (entriesOffset + loaded >= total)
                 return;
+            // The next page is the one that contains the first entry that is not on screen yet. A removal shifts the entries by one,
+            // so this page can overlap the rows already rendered; rows are appended by Id, so the overlap is skipped and the shifted entry is not lost.
+            const nextPage = Math.floor((entriesOffset + loaded) / perPage) + 1;
+            if (numberOfPages > 0 && nextPage > numberOfPages)
+                return;
             setEntryMutationInFlight(true);
             try {
-                const page = await callApiGetAsync(`${getPlaylistUrl}?offset=${entriesOffset + loaded}&limit=${entriesWindowSize}`);
-                if (!page || !Array.isArray(page.entries))
+                const page = await callApiGetAsync(`${getPlaylistUrl}?currentPage=${nextPage}&perPage=${perPage}`);
+                if (pageShrankBeforeWindow(page, nextPage)) {
+                    if (!await reloadFirstPageAsync())
+                        notificationService.show(strings.refreshFailed, NotificationType.ERROR);
                     return;
-                playlist.entryCount = page.entryCount;
-                page.entries.forEach(entry => {
-                    playlist.entries.push(entry);
-                    entriesContainer.appendChild(createEntryRow(entry, playlist.entries.length - 1, playlist.entries.length));
-                });
-                refreshEntryRows();
+                }
+                mergeEntriesPage(page, nextPage);
             } finally {
                 setEntryMutationInFlight(false);
             }
@@ -454,7 +546,7 @@
             if (!entriesContainer)
                 return;
             const rows = Array.from(entriesContainer.querySelectorAll('.playlist-entry'));
-            const total = Number.isFinite(playlist.entryCount) ? playlist.entryCount : rows.length;
+            const total = getPlaylistEntryCount();
             rows.forEach((row, index) => {
                 // The move controls are guarded by the global position of the row, not by its index inside the loaded window.
                 const globalIndex = entriesOffset + index;
@@ -483,7 +575,7 @@
                 return;
             // Use the rows already on screen, not the post-push entries length, so the new row is numbered correctly before refreshEntryRows.
             const index = entriesContainer.querySelectorAll('.playlist-entry').length;
-            entriesContainer.appendChild(createEntryRow(entry, index, index + 1));
+            entriesContainer.appendChild(createEntryRow(entry, index));
             refreshEntryRows();
         }
 
@@ -514,11 +606,11 @@
 
         // Keeps the in-memory entries in the same order as the rows, so playback and later moves use the order on screen.
         function syncPlaylistEntriesFromOrder(orderedEntryIds) {
-            const entriesById = new Map((playlist.entries || []).map(entry => [entry.id, entry]));
-            playlist.entries = orderedEntryIds
+            const entriesById = new Map(getPlaylistEntries().map(entry => [entry.id, entry]));
+            playlist.entries.data = orderedEntryIds
                 .map(entryId => entriesById.get(entryId))
                 .filter(entry => !!entry);
-            playlist.entries.forEach((entry, index) => entry.position = entriesOffset + index);
+            playlist.entries.data.forEach((entry, index) => entry.position = entriesOffset + index);
         }
 
         // Applies a details update without touching the rows of the playlist.
@@ -534,7 +626,7 @@
                 playlistDescriptionInput.value = playlist.description;
         }
 
-        function createEntryRow(entry, index, count) {
+        function createEntryRow(entry, index) {
             const row = document.createElement('div');
             row.className = 'playlist-entry form-row';
             row.dataset.entryId = entry.id;
@@ -576,7 +668,7 @@
                 else
                     // Escape, or a drop outside the list, cancels the drag. The DOM was already reordered while dragging, so it is
                     // restored to the last order the server accepted instead of persisting the cancelled order.
-                    applyEntryOrderByIds((playlist.entries || []).map(entry => entry.id));
+                    applyEntryOrderByIds(getPlaylistEntries().map(entry => entry.id));
             });
             row.appendChild(dragHandle);
 
@@ -663,7 +755,7 @@
 
             // The index passed to this function is local to the rendered rows. Disabling the move controls requires the global position,
             // otherwise the first row of a window that does not start at zero looks like the first row of the whole playlist.
-            const total = Number.isFinite(playlist.entryCount) ? playlist.entryCount : entriesOffset + count;
+            const total = getPlaylistEntryCount();
             const globalIndex = entriesOffset + index;
 
             const moveUpButton = document.createElement('button');
@@ -701,7 +793,7 @@
                 return;
             const orderedEntryIds = Array.from(entriesContainer.querySelectorAll('.playlist-entry'))
                 .map(row => row.dataset.entryId);
-            const currentEntryIds = (playlist.entries || []).map(entry => entry.id);
+            const currentEntryIds = getPlaylistEntries().map(entry => entry.id);
             if (orderedEntryIds.length !== currentEntryIds.length) {
                 applyEntryOrderByIds(currentEntryIds);
                 return;
@@ -748,26 +840,40 @@
                 return;
             if (detail.playlist && detail.playlist.id && detail.playlist.id !== playlist.id)
                 return;
-            // An append made elsewhere only announces the playlist Id. Re-read the window the user is currently looking at, instead of
-            // resetting the view to the first window and throwing a user who is deep in a large playlist back to the top.
-            const currentOffset = entriesOffset;
-            const updatedPlaylist = await callApiGetAsync(`${getPlaylistUrl}?offset=${currentOffset}&limit=${entriesWindowSize}`);
-            if (!updatedPlaylist)
+            // A local mutation already refreshes the view, so an external event that arrives while one is running must not read a
+            // playlist that the mutation is still changing. Dropping it avoids replacing the rows with an answer taken mid-write.
+            if (isEntryMutationInFlight)
                 return;
-            if (currentOffset > 0 && updatedPlaylist.entries.length === 0 && updatedPlaylist.entryCount > 0) {
-                // The playlist shrank past this window. Show the last window instead of an empty page.
-                const lastWindowOffset = Math.max(0, updatedPlaylist.entryCount - entriesWindowSize);
-                const lastWindow = await callApiGetAsync(`${getPlaylistUrl}?offset=${lastWindowOffset}&limit=${entriesWindowSize}`);
-                if (!lastWindow)
+            setEntryMutationInFlight(true);
+            try {
+                // An append made elsewhere announces either a batch result with addedCount, or a single entry result with entry.
+                // The rows on screen start at currentPage, which is the first rendered page and never advances when more pages are
+                // loaded. The page to read is therefore the first page that is not fully rendered, not currentPage. Reading it merges
+                // the appended entries into the rows already on screen instead of replacing pages 2 and later with page 1.
+                const addedCount = Number.isInteger(detail.addedCount) ? detail.addedCount : (detail.entry ? 1 : 0);
+                if (addedCount > 0) {
+                    playlist.entries.count = getPlaylistEntryCount() + addedCount;
+                    playlist.entries.numberOfPages = perPage > 0 ? Math.ceil(playlist.entries.count / perPage) : 0;
+                    numberOfPages = playlist.entries.numberOfPages;
+                }
+                if (detail.updatedOnUtc)
+                    playlist.updatedOnUtc = detail.updatedOnUtc;
+                const loaded = getPlaylistEntries().length;
+                const nextPage = Math.floor((entriesOffset + loaded) / perPage) + 1;
+                if (nextPage > numberOfPages)
                     return;
-                entriesOffset = lastWindowOffset;
-                playlist = lastWindow;
-                renderPlaylist();
-                return;
+                const page = await callApiGetAsync(`${getPlaylistUrl}?currentPage=${nextPage}&perPage=${perPage}`);
+                if (!page || !page.entries || !Array.isArray(page.entries.data))
+                    return;
+                if (pageShrankBeforeWindow(page, nextPage)) {
+                    if (!await reloadFirstPageAsync())
+                        notificationService.show(strings.refreshFailed, NotificationType.ERROR);
+                    return;
+                }
+                mergeEntriesPage(page, nextPage);
+            } finally {
+                setEntryMutationInFlight(false);
             }
-            entriesOffset = currentOffset;
-            playlist = updatedPlaylist;
-            renderPlaylist();
         }
 
         async function saveDetailsAsync(event) {
@@ -823,7 +929,7 @@
             // The server accepts a target position anywhere in the whole playlist. The target is therefore compared with the global
             // position of the row, so the first row of a shifted window can still move up and the last loaded row can still move down into
             // the entries that are not loaded yet.
-            const total = Number.isFinite(playlist.entryCount) ? playlist.entryCount : orderedEntryIds.length;
+            const total = getPlaylistEntryCount();
             const targetGlobalIndex = entriesOffset + index + offset;
             if (targetGlobalIndex < 0 || targetGlobalIndex >= total)
                 return;
@@ -834,11 +940,11 @@
                     playlist.updatedOnUtc = result.data.updatedOnUtc;
                     const isOutsideLoadedWindow = targetGlobalIndex < entriesOffset || targetGlobalIndex >= entriesOffset + orderedEntryIds.length;
                     if (isOutsideLoadedWindow) {
-                        // The row moved into a window that is not loaded, so another entry moved into its place. Re-read the current window
+                        // The row moved into a page that is not loaded, so another entry moved into its place. Re-read the current page
                         // instead of leaving an order on screen that the next Load more would duplicate.
-                        const refreshedWindow = await callApiGetAsync(`${getPlaylistUrl}?offset=${entriesOffset}&limit=${entriesWindowSize}`);
-                        if (refreshedWindow && Array.isArray(refreshedWindow.entries)) {
-                            playlist = refreshedWindow;
+                        const refreshedWindow = await callApiGetAsync(`${getPlaylistUrl}?currentPage=${currentPage}&perPage=${perPage}`);
+                        if (refreshedWindow && refreshedWindow.entries && Array.isArray(refreshedWindow.entries.data)) {
+                            applyPlaylistPage(refreshedWindow);
                             renderPlaylist();
                         } else 
                             notificationService.show(strings.reorderFailed, NotificationType.ERROR);
@@ -867,11 +973,13 @@
             try {
                 const removed = await callApiDeleteAsync(buildRemoveEntryUrl(entryId));
                 if (removed) {
-                    // The row is removed from the existing DOM and the remaining rows are renumbered, so the page does not read the whole
-                    // playlist back for a single removed entry.
-                    playlist.entries = (playlist.entries || []).filter(entry => entry.id !== entryId);
-                    playlist.entries.forEach((entry, index) => entry.position = entriesOffset + index);
-                    playlist.entryCount = Math.max(0, (Number.isFinite(playlist.entryCount) ? playlist.entryCount : playlist.entries.length) - 1);
+                    // The row is removed from the existing DOM and the remaining rows are renumbered, so the page does not read the whole playlist back for a single removed entry.
+                    const totalBefore = getPlaylistEntryCount();
+                    playlist.entries.data = getPlaylistEntries().filter(entry => entry.id !== entryId);
+                    playlist.entries.data.forEach((entry, index) => entry.position = entriesOffset + index);
+                    playlist.entries.count = Math.max(0, totalBefore - 1);
+                    playlist.entries.numberOfPages = perPage > 0 ? Math.ceil(playlist.entries.count / perPage) : 0;
+                    numberOfPages = playlist.entries.numberOfPages;
                     removeEntryRow(entryId);
                 } else 
                     notificationService.show(strings.removeFailed, NotificationType.ERROR);
@@ -880,18 +988,21 @@
             }
         }
 
-        // Fetches every entry of the playlist in windows, for the explicit play action. A large playlist is never loaded for the page itself.
+        // Fetches every entry of the playlist page by page, for the explicit play action. A large playlist is never loaded for the page itself.
         async function fetchAllPlaylistEntriesAsync() {
             const allEntries = [];
-            let offset = 0;
+            let pageNumber = 1;
             while (true) {
-                const page = await callApiGetAsync(`${getPlaylistUrl}?offset=${offset}&limit=1000`);
-                if (!page || !Array.isArray(page.entries) || page.entries.length === 0)
+                const page = await callApiGetAsync(`${getPlaylistUrl}?currentPage=${pageNumber}&perPage=1000`);
+                if (!page || !page.entries || !Array.isArray(page.entries.data) || page.entries.data.length === 0)
                     break;
-                allEntries.push(...page.entries);
-                offset += page.entries.length;
-                if (offset >= page.entryCount)
+                allEntries.push(...page.entries.data);
+                const totalPages = Number.isInteger(page.entries.numberOfPages) && page.entries.numberOfPages > 0
+                    ? page.entries.numberOfPages
+                    : Math.max(1, Math.ceil(page.entries.count / 1000));
+                if (allEntries.length >= page.entries.count || pageNumber >= totalPages)
                     break;
+                pageNumber++;
             }
             return allEntries;
         }
@@ -984,22 +1095,45 @@
             try {
                 const added = await callApiPostAsync(addEntryUrl, { trackId });
                 if (added && added.entry) {
-                    playlist.entries = Array.isArray(playlist.entries) ? playlist.entries : [];
-                    const totalBefore = Number.isFinite(playlist.entryCount) ? playlist.entryCount : playlist.entries.length;
-                    if (playlist.entries.length >= totalBefore) {
-                        playlist.entries.push(added.entry);
-                        playlist.entryCount = totalBefore + 1;
+                    const entries = getPlaylistEntries();
+                    const totalBefore = getPlaylistEntryCount();
+                    if (entries.length >= totalBefore) {
+                        entries.push(added.entry);
+                        playlist.entries.count = totalBefore + 1;
+                        playlist.entries.numberOfPages = perPage > 0 ? Math.ceil(playlist.entries.count / perPage) : 0;
+                        numberOfPages = playlist.entries.numberOfPages;
                         playlist.updatedOnUtc = added.updatedOnUtc;
                         appendEntryRow(added.entry);
                     } else {
-                        // The new entry is at the global end, beyond the loaded window, so the last window is loaded to show it.
+                        // The new entry is at the global end, beyond the rendered rows. The count and the number of pages change even
+                        // when the page that contains the new entry cannot be merged, because that page may start after the first entry
+                        // that is not on screen. Keeping the optimistic values means Load more still leads to it.
                         const newCount = totalBefore + 1;
-                        const newOffset = Math.max(0, newCount - entriesWindowSize);
-                        const page = await callApiGetAsync(`${getPlaylistUrl}?offset=${newOffset}&limit=${entriesWindowSize}`);
-                        if (page) {
-                            entriesOffset = newOffset;
-                            playlist = page;
-                            renderPlaylist();
+                        const newNumberOfPages = perPage > 0 ? Math.ceil(newCount / perPage) : 0;
+                        playlist.entries.count = newCount;
+                        playlist.entries.numberOfPages = newNumberOfPages;
+                        numberOfPages = newNumberOfPages;
+                        playlist.updatedOnUtc = added.updatedOnUtc;
+                        // The last page is fetched to show the new entry, and merged only when it is the page that directly follows the
+                        // rendered rows. When several pages are not on screen, replacing the rows with only the last page would hide the
+                        // entries that were already rendered, so the page is left to Load more instead.
+                        const lastPage = Math.max(1, Math.ceil(newCount / perPage));
+                        const page = await callApiGetAsync(`${getPlaylistUrl}?currentPage=${lastPage}&perPage=${perPage}`);
+                        if (!page || !page.entries || !Array.isArray(page.entries.data)) {
+                            // The add is committed and the counts above already include it, but the rows could not be read back. Saying so
+                            // is what keeps the user from adding the same track again because the list still looks unchanged.
+                            notificationService.show(strings.refreshFailed, NotificationType.ERROR);
+                        } else if (pageShrankBeforeWindow(page, lastPage)) {
+                            // Another client shrank the playlist while the rows were on screen, and the server clamped the requested page
+                            // behind them. Appending would keep rows that no longer exist, so the whole window is read again.
+                            if (!await reloadFirstPageAsync())
+                                notificationService.show(strings.refreshFailed, NotificationType.ERROR);
+                        } else {
+                            // The fetched page is authoritative for the totals, which can differ from the optimistic values when another request changed the playlist in the meantime.
+                            playlist.entries.count = page.entries.count;
+                            playlist.entries.numberOfPages = page.entries.numberOfPages;
+                            numberOfPages = Number.isInteger(page.entries.numberOfPages) ? page.entries.numberOfPages : numberOfPages;
+                            mergeEntriesPage(page, lastPage);
                         }
                     }
                     resetCombobox(trackCombobox, strings.selectTrack);

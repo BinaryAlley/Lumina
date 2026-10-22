@@ -222,4 +222,7 @@
   <data name="Playlists" xml:space="preserve">
     <value>播放列表</value>
   </data>
+  <data name="Favorites" xml:space="preserve">
+    <value>收藏夹</value>
+  </data>
 </root>

@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.BookLibrary;
+using Lumina.Application.Common.DataAccess.Repositories.Favorites;
 using Lumina.Application.Common.DataAccess.Repositories.MediaContributors;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
@@ -13,6 +14,7 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Errors;
 using Lumina.DataAccess.Core.Repositories.Authorization;
 using Lumina.DataAccess.Core.Repositories.BookLibrary;
+using Lumina.DataAccess.Core.Repositories.Favorites;
 using Lumina.DataAccess.Core.Repositories.Libraries;
 using Lumina.DataAccess.Core.Repositories.MediaContributors;
 using Lumina.DataAccess.Core.Repositories.MusicLibrary;
@@ -68,6 +70,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     private IUserSettingsRepository? _userSettingsRepository;
     private IMusicPlayRecordRepository? _musicPlayRecordRepository;
     private IPlaylistRepository? _playlistRepository;
+    private IFavoriteRepository? _favoriteRepository;
 
     /// <summary>
     /// Gets the permission repository.
@@ -399,6 +402,18 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         {
             _playlistRepository ??= new PlaylistRepository(_luminaDbContext);
             return _playlistRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the favorite repository.
+    /// </summary>
+    public IFavoriteRepository FavoriteRepository
+    {
+        get
+        {
+            _favoriteRepository ??= new FavoriteRepository(_luminaDbContext);
+            return _favoriteRepository;
         }
     }
 

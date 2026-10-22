@@ -104,6 +104,20 @@
             add: '@localizer["AudioPlayerAdd"]'
         }
     };
+    // The endpoints and labels of the favorite toggles that every media page and theme template can render. The script reads which
+    // items of a kind are favorites of the current user, adds a favorite, and removes one through the culture aware web routes, so
+    // the pages never hardcode a path. The remove route is rendered with its named mediaKind and mediaItemId placeholders intact, which
+    // the script fills in, so the two values keep their meaning even if the route segment order changes. The labels are serialized as
+    // script literals, because a localized text can contain characters that would end a quoted literal.
+    var favoritesConfiguration = {
+        getFavoriteStatusUrl: '@_urlService.GetRelativeUrl(WebRoutes.Favorites.GET_FAVORITE_STATUS)',
+        addFavoriteUrl: '@_urlService.GetRelativeUrl(WebRoutes.Favorites.ADD_FAVORITE)',
+        removeFavoriteUrlTemplate: '@_urlService.GetRelativeUrl(WebRoutes.Favorites.REMOVE_FAVORITE)',
+        strings: {
+            add: @Json.Serialize(localizer["FavoritesAdd"].Value),
+            remove: @Json.Serialize(localizer["FavoritesRemove"].Value)
+        }
+    };
 </script>
 @if (User?.Identity?.IsAuthenticated == true)
 {
@@ -118,6 +132,7 @@
 <script defer src="~/js/image-viewer.js" asp-append-version="true"></script>
 <script defer src="~/js/site.js" asp-append-version="true"></script>
 <script defer src="~/js/playlists.js" asp-append-version="true"></script>
+<script defer src="~/js/favorites.js" asp-append-version="true"></script>
 <script defer src="~/js/theme-client-template-engine.js" asp-append-version="true"></script>
 <script defer src="~/js/audio-player/audio-player-utils.js" asp-append-version="true"></script>
 <script defer src="~/js/audio-player/audio-player-errors.js" asp-append-version="true"></script>

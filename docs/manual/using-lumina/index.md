@@ -90,11 +90,24 @@ From the playlists page you can open a playlist or select **Create** to open the
 
 The playlist reflects the catalogue at the moment you open it. If a track is deleted from a library after it was added to a playlist, its row stays in the playlist as an unavailable track so you can remove it deliberately. Long playlists are shown in pages; select **Load more** to show the next page.
 
+## Favorites
+
+A favorite is a mark you place on an artist, album, track or book so you can find it again quickly. Favorites belong to your account and are not shared with other users. Marking an item never changes the item or its files. Videos and photos are not available as favorites yet.
+
+Select the heart on an item's card, or on its row on an album page, to add or remove the mark. A blue heart means the item is not a favorite; a red heart means it is.
+
+The **Favorites** page in the library section lists everything you marked, most recent first, with a count that follows the filter.
+
+- **Filter by kind** with the **Show** picker.
+- **Open an item** from its card.
+- **Remove a favorite** with the heart on its card.
+- **Load more** when the list is long, or **Retry** if it does not load.
+
+A favorite whose item was deleted, or whose library you can no longer access, stays in the list as an unavailable card so you can still remove it.
+
 ## Editing what is catalogued
 
-Both book and music pages double as editors for the items that were scanned in. A book's details page groups its fields into general and release information, language and original language, genres, tags, identifiers, ISBNs, contributors and ratings, and lets you replace its cover. An artist's page lists the artist's albums first, then groups its fields into general information, contributors, ratings, genres, tags, aliases, areas and identifiers, and lets you replace the artist's cover. An album page groups its fields into general information, contributors, ratings, genres, tags, release types, release information, language and original language, and identifiers, and lets you replace the album's cover. A track page groups its fields into general information, contributors, ratings, genres, tags, moods, release information, language and original language, work, ISRCs, identifiers and audio properties. Saving sends the changes back to the server, and a confirmation or an error is shown in the corner of the screen.
-
-Changes you make here live in Lumina's catalogue.
+Both book and music pages double as editors for the items that were scanned in. A book's details page groups its fields into general and release information, language and original language, genres, tags, identifiers, ISBNs, contributors and ratings, and lets you replace its cover. An artist's page lists the artist's albums first, then groups its fields into general information, contributors, ratings, genres, tags, aliases, areas and identifiers, and lets you replace the artist's cover. An album page groups its fields into general information, contributors, ratings, genres, tags, release types, release information, language and original language, and identifiers, and lets you replace the album's cover. A track page groups its fields into general information, contributors, ratings, genres, tags, moods, release information, language and original language, work, ISRCs, identifiers and audio properties. Saving applies the changes to Lumina's catalogue.
 
 ## The file system browser
 

@@ -66,6 +66,9 @@
   <data name="AddFailed" xml:space="preserve">
     <value>Piesa nu a putut fi adăugată.</value>
   </data>
+  <data name="RefreshFailed" xml:space="preserve">
+    <value>Lista de redare a fost actualizată, dar lista nu a putut fi reîmprospătată. Reîncarcă pagina pentru a vedea modificarea.</value>
+  </data>
   <data name="SelectLibrary" xml:space="preserve">
     <value>Selectează o bibliotecă</value>
   </data>

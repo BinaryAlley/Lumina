@@ -299,6 +299,54 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.ToTable("Tags", (string)null);
                 });
 
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.Favorites.FavoriteEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(0);
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(5);
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(4);
+
+                    b.Property<Guid>("MediaItemId")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(3);
+
+                    b.Property<string>("MediaKind")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(2);
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(7);
+
+                    b.Property<DateTime?>("UpdatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(6);
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(1);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "CreatedOnUtc");
+
+                    b.HasIndex("UserId", "MediaKind", "CreatedOnUtc");
+
+                    b.HasIndex("UserId", "MediaKind", "MediaItemId")
+                        .IsUnique();
+
+                    b.ToTable("Favorites", (string)null);
+                });
+
             modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaContributors.MediaContributorEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2837,6 +2885,15 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.Navigation("Role");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.Favorites.FavoriteEntity", b =>
+                {
+                    b.HasOne("Lumina.Application.Common.DataAccess.Entities.UsersManagement.UserEntity", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary.AlbumContributorEntity", b =>

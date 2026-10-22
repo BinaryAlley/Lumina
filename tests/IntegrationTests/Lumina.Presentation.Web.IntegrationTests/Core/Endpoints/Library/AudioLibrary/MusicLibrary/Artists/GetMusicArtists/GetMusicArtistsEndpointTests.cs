@@ -1,7 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
+using Lumina.Presentation.Web.Common.DTO.Common;
 using Lumina.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.GetMusicArtists;
 using Lumina.Presentation.Web.Fixtures.Common.DTO.AudioLibrary.MusicLibrary;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
@@ -22,7 +24,7 @@ namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.AudioL
 public class GetMusicArtistsEndpointTests : IClassFixture<LuminaWebFactory>
 {
     private readonly LuminaWebFactory _apiFactory;
-    private readonly PaginatedMusicArtistLiteDtoFixture _paginatedMusicArtistLiteDtoFixture = new();
+    private readonly PaginatedDtoFixture<MusicArtistLiteDto> _paginatedMusicArtistLiteDtoFixture = new();
     private readonly MusicArtistLiteDtoFixture _musicArtistLiteDtoFixture = new();
 
     /// <summary>

@@ -2,10 +2,12 @@
 using FastEndpoints;
 using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
+using Lumina.Presentation.Web.Common.DTO.Common;
 using Lumina.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetAlbumTracks;
 using Lumina.Presentation.Web.Fixtures.Common.DTO.AudioLibrary.MusicLibrary;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
 using Lumina.Presentation.Web.Fixtures.Common.Requests.Library.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
@@ -28,7 +30,7 @@ public class GetAlbumTracksEndpointTests
     private readonly IApiHttpClient _mockApiHttpClient;
     private readonly GetAlbumTracksEndpoint _sut;
     private readonly GetAlbumTracksLiteRequestFixture _getAlbumTracksLiteRequestFixture = new();
-    private readonly PaginatedMusicTrackLiteDtoFixture _paginatedMusicTrackLiteDtoFixture = new();
+    private readonly PaginatedDtoFixture<MusicTrackLiteDto> _paginatedMusicTrackLiteDtoFixture = new();
     private readonly MusicTrackLiteDtoFixture _musicTrackLiteDtoFixture = new();
 
     /// <summary>
@@ -45,14 +47,14 @@ public class GetAlbumTracksEndpointTests
     {
         // Arrange
         GetAlbumTracksLiteRequest request = _getAlbumTracksLiteRequestFixture.Create(currentPage: 2, perPage: 48);
-        _mockApiHttpClient.GetAsync<PaginatedMusicTrackLiteDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.GetAsync<PaginatedDto<MusicTrackLiteDto>>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(_paginatedMusicTrackLiteDtoFixture.Create());
 
         // Act
         await _sut.ExecuteAsync(request, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).GetAsync<PaginatedMusicTrackLiteDto>(
+        await _mockApiHttpClient.Received(1).GetAsync<PaginatedDto<MusicTrackLiteDto>>(
             Arg.Is<string>(endpoint => endpoint == $"{BuildExpectedEndpoint(request.LibraryId, Guid.Parse(request.ArtistId), Guid.Parse(request.AlbumId))}?currentPage=2&perPage=48"),
             Arg.Any<CancellationToken>());
     }
@@ -62,14 +64,14 @@ public class GetAlbumTracksEndpointTests
     {
         // Arrange
         GetAlbumTracksLiteRequest request = _getAlbumTracksLiteRequestFixture.Create();
-        _mockApiHttpClient.GetAsync<PaginatedMusicTrackLiteDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.GetAsync<PaginatedDto<MusicTrackLiteDto>>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(_paginatedMusicTrackLiteDtoFixture.Create());
 
         // Act
         await _sut.ExecuteAsync(request, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).GetAsync<PaginatedMusicTrackLiteDto>(
+        await _mockApiHttpClient.Received(1).GetAsync<PaginatedDto<MusicTrackLiteDto>>(
             Arg.Is<string>(endpoint => endpoint == BuildExpectedEndpoint(request.LibraryId, Guid.Parse(request.ArtistId), Guid.Parse(request.AlbumId))),
             Arg.Any<CancellationToken>());
     }
@@ -79,14 +81,14 @@ public class GetAlbumTracksEndpointTests
     {
         // Arrange
         GetAlbumTracksLiteRequest request = _getAlbumTracksLiteRequestFixture.Create(currentPage: 3);
-        _mockApiHttpClient.GetAsync<PaginatedMusicTrackLiteDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.GetAsync<PaginatedDto<MusicTrackLiteDto>>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(_paginatedMusicTrackLiteDtoFixture.Create());
 
         // Act
         await _sut.ExecuteAsync(request, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).GetAsync<PaginatedMusicTrackLiteDto>(
+        await _mockApiHttpClient.Received(1).GetAsync<PaginatedDto<MusicTrackLiteDto>>(
             Arg.Is<string>(endpoint => endpoint == $"{BuildExpectedEndpoint(request.LibraryId, Guid.Parse(request.ArtistId), Guid.Parse(request.AlbumId))}?currentPage=3"),
             Arg.Any<CancellationToken>());
     }
@@ -96,14 +98,14 @@ public class GetAlbumTracksEndpointTests
     {
         // Arrange
         GetAlbumTracksLiteRequest request = _getAlbumTracksLiteRequestFixture.Create(perPage: 24);
-        _mockApiHttpClient.GetAsync<PaginatedMusicTrackLiteDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.GetAsync<PaginatedDto<MusicTrackLiteDto>>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(_paginatedMusicTrackLiteDtoFixture.Create());
 
         // Act
         await _sut.ExecuteAsync(request, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).GetAsync<PaginatedMusicTrackLiteDto>(
+        await _mockApiHttpClient.Received(1).GetAsync<PaginatedDto<MusicTrackLiteDto>>(
             Arg.Is<string>(endpoint => endpoint == $"{BuildExpectedEndpoint(request.LibraryId, Guid.Parse(request.ArtistId), Guid.Parse(request.AlbumId))}?perPage=24"),
             Arg.Any<CancellationToken>());
     }
@@ -113,14 +115,14 @@ public class GetAlbumTracksEndpointTests
     {
         // Arrange
         GetAlbumTracksLiteRequest request = _getAlbumTracksLiteRequestFixture.Create(artistId: "not-a-guid", currentPage: 1, perPage: 20);
-        _mockApiHttpClient.GetAsync<PaginatedMusicTrackLiteDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.GetAsync<PaginatedDto<MusicTrackLiteDto>>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(_paginatedMusicTrackLiteDtoFixture.Create());
 
         // Act
         await _sut.ExecuteAsync(request, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).GetAsync<PaginatedMusicTrackLiteDto>(
+        await _mockApiHttpClient.Received(1).GetAsync<PaginatedDto<MusicTrackLiteDto>>(
             Arg.Is<string>(endpoint => endpoint == $"{BuildExpectedEndpoint(request.LibraryId, Guid.Empty, Guid.Parse(request.AlbumId))}?currentPage=1&perPage=20"),
             Arg.Any<CancellationToken>());
     }
@@ -130,14 +132,14 @@ public class GetAlbumTracksEndpointTests
     {
         // Arrange
         GetAlbumTracksLiteRequest request = _getAlbumTracksLiteRequestFixture.Create(albumId: "' OR '1'='1", currentPage: 1, perPage: 20);
-        _mockApiHttpClient.GetAsync<PaginatedMusicTrackLiteDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.GetAsync<PaginatedDto<MusicTrackLiteDto>>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(_paginatedMusicTrackLiteDtoFixture.Create());
 
         // Act
         await _sut.ExecuteAsync(request, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).GetAsync<PaginatedMusicTrackLiteDto>(
+        await _mockApiHttpClient.Received(1).GetAsync<PaginatedDto<MusicTrackLiteDto>>(
             Arg.Is<string>(endpoint => endpoint == $"{BuildExpectedEndpoint(request.LibraryId, Guid.Parse(request.ArtistId), Guid.Empty)}?currentPage=1&perPage=20"),
             Arg.Any<CancellationToken>());
     }
@@ -147,14 +149,14 @@ public class GetAlbumTracksEndpointTests
     {
         // Arrange
         GetAlbumTracksLiteRequest request = _getAlbumTracksLiteRequestFixture.Create(artistId: string.Empty, albumId: string.Empty, currentPage: 1, perPage: 20);
-        _mockApiHttpClient.GetAsync<PaginatedMusicTrackLiteDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.GetAsync<PaginatedDto<MusicTrackLiteDto>>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(_paginatedMusicTrackLiteDtoFixture.Create());
 
         // Act
         await _sut.ExecuteAsync(request, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).GetAsync<PaginatedMusicTrackLiteDto>(
+        await _mockApiHttpClient.Received(1).GetAsync<PaginatedDto<MusicTrackLiteDto>>(
             Arg.Is<string>(endpoint => endpoint == $"{BuildExpectedEndpoint(request.LibraryId, Guid.Empty, Guid.Empty)}?currentPage=1&perPage=20"),
             Arg.Any<CancellationToken>());
     }
@@ -164,13 +166,13 @@ public class GetAlbumTracksEndpointTests
     {
         // Arrange
         GetAlbumTracksLiteRequest request = _getAlbumTracksLiteRequestFixture.Create();
-        PaginatedMusicTrackLiteDto expectedResponse = _paginatedMusicTrackLiteDtoFixture.Create(
+        PaginatedDto<MusicTrackLiteDto> expectedResponse = _paginatedMusicTrackLiteDtoFixture.Create(
             data: [_musicTrackLiteDtoFixture.Create(title: "Test Track")],
             currentPage: 1,
             perPage: 20,
             count: 1,
             numberOfPages: 1);
-        _mockApiHttpClient.GetAsync<PaginatedMusicTrackLiteDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.GetAsync<PaginatedDto<MusicTrackLiteDto>>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(expectedResponse);
 
         // Act

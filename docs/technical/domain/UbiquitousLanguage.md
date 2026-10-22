@@ -5,6 +5,8 @@
 - _**Metadata**_: Information describing a media item
 - _**User**_: A person who interacts with the media library
 - _**Playlist**_: A curated list of media items, potentially cross-media-type
+- _**Favorite**_: The marker a user places on a media item of any media kind, private to that user. It references the item only by its kind and its Id, so one concept serves music, books and the media kinds that are planned
+- _**FavoriteMediaKind**_: The set of media item kinds that can be marked as a favorite
 - _**Tag**_: A label for categorizing and organizing media items
 - _**Collection**_: A user-defined group of any media items
 - _**File**_: The actual digital file of a media item
@@ -95,6 +97,7 @@
 - PhotoAlbum
 - User
 - Playlist
+- Favorite
 - Collection
 - SubtitleFile
 - Lyrics
@@ -114,6 +117,7 @@
 - PhotoLibrary (root: PhotoLibrary, entities: Photo, PhotoAlbum, AlbumArtwork, MoviePoster)
 - UserProfile (root: User, entities: Collection)
 - PlaylistManagement (root: Playlist, entities: PlaylistEntry)
+- Favorites (root: Favorite, no entities)
 - SupplementaryContentLibrary (root: SupplementaryContentLibrary, entities: SubtitleFile, Lyrics, LanguageTrack)
 - FileSystemManagement (root: File, entities: Stream)
 
@@ -213,6 +217,8 @@
 - PlaylistEntryRemoved
 - PlaylistEntriesReordered
 - PlaylistDeleted
+- FavoriteAdded
+- FavoriteRemoved
 - UserPreferencesChanged
 - MetadataUpdated
 - FileTranscoded
@@ -229,6 +235,8 @@
   - Services: RecommendationEngine, ContentCurationService, UserActivityTrackingService
 - PlaylistManagement
   - Aggregates: Playlist
+- Favorites
+  - Aggregates: Favorite
 - ContentDelivery
   - Aggregates: FileSystemManagement
   - Services: StreamingService, ContentSynchronizationService
@@ -244,6 +252,7 @@
 - PhotoRepository
 - UserRepository
 - PlaylistRepository
+- FavoriteRepository
 - CollectionRepository
 - FileRepository
 - StreamRepository

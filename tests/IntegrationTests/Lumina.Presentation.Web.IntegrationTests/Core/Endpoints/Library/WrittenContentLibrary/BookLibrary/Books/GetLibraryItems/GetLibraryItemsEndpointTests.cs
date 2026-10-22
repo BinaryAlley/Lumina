@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Presentation.Web.Common.DTO.Common;
 using Lumina.Presentation.Web.Common.DTO.Libraries;
 using Lumina.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetLibraryItems;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
 using Lumina.Presentation.Web.Fixtures.Common.DTO.Libraries;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
@@ -22,7 +24,7 @@ namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Writte
 public class GetLibraryItemsEndpointTests : IClassFixture<LuminaWebFactory>
 {
     private readonly LuminaWebFactory _apiFactory;
-    private readonly PaginatedBookLiteDtoFixture _paginatedBookLiteDtoFixture = new();
+    private readonly PaginatedDtoFixture<BookLiteDto> _paginatedBookLiteDtoFixture = new();
     private readonly BookLiteDtoFixture _bookLiteDtoFixture = new();
 
     /// <summary>
@@ -41,7 +43,7 @@ public class GetLibraryItemsEndpointTests : IClassFixture<LuminaWebFactory>
         _apiFactory.ApiClientStub.Reset();
         Guid libraryId = Guid.NewGuid();
         string searchTerm = "Harry";
-        PaginatedBookLiteDto expectedResponse = _paginatedBookLiteDtoFixture.Create(data: [_bookLiteDtoFixture.Create(title: "Harry Potter")]);
+        PaginatedDto<BookLiteDto> expectedResponse = _paginatedBookLiteDtoFixture.Create(data: [_bookLiteDtoFixture.Create(title: "Harry Potter")]);
         string expectedEndpoint = $"libraries/{libraryId}/books/lite?currentPage=1&perPage=20&searchTerm={searchTerm}&shouldIgnoreThePrefixForAlphaPicker=True";
         _apiFactory.ApiClientStub.RegisterGetResponse(expectedEndpoint, expectedResponse);
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);

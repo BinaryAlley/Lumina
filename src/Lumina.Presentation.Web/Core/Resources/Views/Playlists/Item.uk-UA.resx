@@ -66,6 +66,9 @@
   <data name="AddFailed" xml:space="preserve">
     <value>Не вдалося додати трек.</value>
   </data>
+  <data name="RefreshFailed" xml:space="preserve">
+    <value>Список відтворення оновлено, але список не вдалося оновити. Перезавантажте сторінку, щоб побачити зміну.</value>
+  </data>
   <data name="SelectLibrary" xml:space="preserve">
     <value>Виберіть бібліотеку</value>
   </data>

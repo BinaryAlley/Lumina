@@ -1159,7 +1159,16 @@
                 await deleteAlbumAsync(card.dataset.albumId);
             });
 
+            // The favorite heart is a plain button: the global favorites script finds it by its data attributes, hydrates its state and handles its click.
+            const favoriteToggle = document.createElement('button');
+            favoriteToggle.type = 'button';
+            favoriteToggle.className = 'card-favorite-toggle';
+            favoriteToggle.setAttribute('data-favorite-toggle', '');
+            favoriteToggle.setAttribute('data-favorite-media-kind', 'MusicAlbum');
+            favoriteToggle.setAttribute('data-favorite-media-item-id', album.id);
+
             card.appendChild(cardLink);
+            card.appendChild(favoriteToggle);
             card.appendChild(trigger);
             card.appendChild(menu);
 

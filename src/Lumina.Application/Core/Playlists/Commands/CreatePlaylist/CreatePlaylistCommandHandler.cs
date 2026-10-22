@@ -2,11 +2,11 @@
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.DomainEvents;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.DTO.Playlists;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.Playlists;
-using Lumina.Application.Core.Playlists.Queries.GetPlaylist;
 using Lumina.Contracts.Responses.Playlists;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Primitives;
@@ -94,7 +94,7 @@ public class CreatePlaylistCommandHandler : ICommandHandler<CreatePlaylistComman
 
         // The persisted row is read back, so the response carries the timestamps the auditing interceptor actually stored.
         Result<PlaylistDetailsDto?> getDetailsResult = await _unitOfWork.PlaylistRepository
-            .GetDetailsForUserAsync(playlist.Id.Value, userId, 0, PlaylistWindow.DEFAULT_ENTRY_WINDOW_SIZE, cancellationToken).ConfigureAwait(false);
+            .GetDetailsForUserAsync(playlist.Id.Value, userId, new PaginationDataDto(), cancellationToken).ConfigureAwait(false);
         if (getDetailsResult.IsFailure)
             return getDetailsResult.Errors;
         if (getDetailsResult.Value is null)

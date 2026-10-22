@@ -44,6 +44,6 @@ public class GetLibraryItemsEndpointSummary : Summary<GetLibraryItemsEndpoint, G
             SortOrder: SortOrder.Ascending
         );
 
-        Response(200, "The lightweight details of the books of the media library are returned.", example: new SuccessResponse<PaginatedBookLiteDto>(true, default));
+        Response(200, "The lightweight details of the books of the media library are returned.", example: new SuccessResponse<PaginatedDto<BookLiteDto>>(true, default));
     }
 }

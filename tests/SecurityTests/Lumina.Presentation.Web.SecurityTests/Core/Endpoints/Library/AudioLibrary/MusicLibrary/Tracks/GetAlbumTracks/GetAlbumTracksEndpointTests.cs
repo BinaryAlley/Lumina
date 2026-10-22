@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
 using Lumina.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetAlbumTracks;
 using Lumina.Presentation.Web.Fixtures.Common.DTO.AudioLibrary.MusicLibrary;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.SecurityTests.Common.Setup;
 using System;
@@ -20,7 +22,7 @@ namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.AudioLibr
 public class GetAlbumTracksEndpointTests : IClassFixture<LuminaWebFactory>
 {
     private readonly LuminaWebFactory _apiFactory;
-    private readonly PaginatedMusicTrackLiteDtoFixture _paginatedMusicTrackLiteDtoFixture = new();
+    private readonly PaginatedDtoFixture<MusicTrackLiteDto> _paginatedMusicTrackLiteDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetAlbumTracksEndpointTests"/> class.

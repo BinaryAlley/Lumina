@@ -2,11 +2,13 @@
 using FastEndpoints;
 using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
+using Lumina.Presentation.Web.Common.DTO.Common;
 using Lumina.Presentation.Web.Common.Enums.Common;
 using Lumina.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Artists;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.GetMusicArtists;
 using Lumina.Presentation.Web.Fixtures.Common.DTO.AudioLibrary.MusicLibrary;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
 using Lumina.Presentation.Web.Fixtures.Common.Requests.Library.AudioLibrary.MusicLibrary.Artists;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
@@ -29,7 +31,7 @@ public class GetMusicArtistsEndpointTests
     private readonly IApiHttpClient _mockApiHttpClient;
     private readonly GetMusicArtistsEndpoint _sut;
     private readonly GetMusicArtistsLiteRequestFixture _getMusicArtistsLiteRequestFixture = new();
-    private readonly PaginatedMusicArtistLiteDtoFixture _paginatedMusicArtistLiteDtoFixture = new();
+    private readonly PaginatedDtoFixture<MusicArtistLiteDto> _paginatedMusicArtistLiteDtoFixture = new();
     private readonly MusicArtistLiteDtoFixture _musicArtistLiteDtoFixture = new();
 
     /// <summary>
@@ -58,7 +60,7 @@ public class GetMusicArtistsEndpointTests
             shouldIgnoreThePrefixForAlphaPicker: true,
             sortBy: SORT_BY,
             sortOrder: SortOrder.Descending);
-        _mockApiHttpClient.GetAsync<PaginatedMusicArtistLiteDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.GetAsync<PaginatedDto<MusicArtistLiteDto>>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(_paginatedMusicArtistLiteDtoFixture.Create());
         string expectedEndpoint = $"{BuildExpectedEndpoint(libraryId)}?currentPage=2&perPage=48" +
             $"&searchTerm={Uri.EscapeDataString(SEARCH_TERM)}" +
@@ -71,7 +73,7 @@ public class GetMusicArtistsEndpointTests
         await _sut.ExecuteAsync(request, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).GetAsync<PaginatedMusicArtistLiteDto>(
+        await _mockApiHttpClient.Received(1).GetAsync<PaginatedDto<MusicArtistLiteDto>>(
             Arg.Is<string>(endpoint => endpoint == expectedEndpoint),
             Arg.Any<CancellationToken>());
     }
@@ -89,7 +91,7 @@ public class GetMusicArtistsEndpointTests
             includeFilterAlphaKey: false,
             includeSortBy: false,
             includeSortOrder: false);
-        _mockApiHttpClient.GetAsync<PaginatedMusicArtistLiteDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.GetAsync<PaginatedDto<MusicArtistLiteDto>>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(_paginatedMusicArtistLiteDtoFixture.Create());
         string expectedEndpoint = $"{BuildExpectedEndpoint(libraryId)}?shouldIgnoreThePrefixForAlphaPicker=False";
 
@@ -97,7 +99,7 @@ public class GetMusicArtistsEndpointTests
         await _sut.ExecuteAsync(request, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).GetAsync<PaginatedMusicArtistLiteDto>(
+        await _mockApiHttpClient.Received(1).GetAsync<PaginatedDto<MusicArtistLiteDto>>(
             Arg.Is<string>(endpoint => endpoint == expectedEndpoint),
             Arg.Any<CancellationToken>());
     }
@@ -116,7 +118,7 @@ public class GetMusicArtistsEndpointTests
             includeFilterAlphaKey: false,
             includeSortBy: false,
             includeSortOrder: false);
-        _mockApiHttpClient.GetAsync<PaginatedMusicArtistLiteDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.GetAsync<PaginatedDto<MusicArtistLiteDto>>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(_paginatedMusicArtistLiteDtoFixture.Create());
         string expectedEndpoint = $"{BuildExpectedEndpoint(libraryId)}?searchTerm={Uri.EscapeDataString(SEARCH_TERM)}&shouldIgnoreThePrefixForAlphaPicker=False";
 
@@ -124,7 +126,7 @@ public class GetMusicArtistsEndpointTests
         await _sut.ExecuteAsync(request, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).GetAsync<PaginatedMusicArtistLiteDto>(
+        await _mockApiHttpClient.Received(1).GetAsync<PaginatedDto<MusicArtistLiteDto>>(
             Arg.Is<string>(endpoint => endpoint == expectedEndpoint),
             Arg.Any<CancellationToken>());
     }
@@ -142,7 +144,7 @@ public class GetMusicArtistsEndpointTests
             includeCurrentPage: false,
             includePerPage: false,
             includeSortOrder: false);
-        _mockApiHttpClient.GetAsync<PaginatedMusicArtistLiteDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.GetAsync<PaginatedDto<MusicArtistLiteDto>>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(_paginatedMusicArtistLiteDtoFixture.Create());
         string expectedEndpoint = $"{BuildExpectedEndpoint(libraryId)}?shouldIgnoreThePrefixForAlphaPicker=False";
 
@@ -150,7 +152,7 @@ public class GetMusicArtistsEndpointTests
         await _sut.ExecuteAsync(request, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).GetAsync<PaginatedMusicArtistLiteDto>(
+        await _mockApiHttpClient.Received(1).GetAsync<PaginatedDto<MusicArtistLiteDto>>(
             Arg.Is<string>(endpoint => endpoint == expectedEndpoint),
             Arg.Any<CancellationToken>());
     }
@@ -168,7 +170,7 @@ public class GetMusicArtistsEndpointTests
             includeFilterAlphaKey: false,
             includeSortBy: false,
             includeSortOrder: false);
-        _mockApiHttpClient.GetAsync<PaginatedMusicArtistLiteDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.GetAsync<PaginatedDto<MusicArtistLiteDto>>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(_paginatedMusicArtistLiteDtoFixture.Create());
         string expectedEndpoint = $"{BuildExpectedEndpoint(libraryId)}?currentPage=3&shouldIgnoreThePrefixForAlphaPicker=False";
 
@@ -176,7 +178,7 @@ public class GetMusicArtistsEndpointTests
         await _sut.ExecuteAsync(request, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).GetAsync<PaginatedMusicArtistLiteDto>(
+        await _mockApiHttpClient.Received(1).GetAsync<PaginatedDto<MusicArtistLiteDto>>(
             Arg.Is<string>(endpoint => endpoint == expectedEndpoint),
             Arg.Any<CancellationToken>());
     }
@@ -186,13 +188,13 @@ public class GetMusicArtistsEndpointTests
     {
         // Arrange
         GetMusicArtistsLiteRequest request = _getMusicArtistsLiteRequestFixture.Create();
-        PaginatedMusicArtistLiteDto expectedResponse = _paginatedMusicArtistLiteDtoFixture.Create(
+        PaginatedDto<MusicArtistLiteDto> expectedResponse = _paginatedMusicArtistLiteDtoFixture.Create(
             data: [_musicArtistLiteDtoFixture.Create(name: "Test Artist")],
             currentPage: 1,
             perPage: 20,
             count: 1,
             numberOfPages: 1);
-        _mockApiHttpClient.GetAsync<PaginatedMusicArtistLiteDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.GetAsync<PaginatedDto<MusicArtistLiteDto>>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(expectedResponse);
 
         // Act

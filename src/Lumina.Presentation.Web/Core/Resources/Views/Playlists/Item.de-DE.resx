@@ -66,6 +66,9 @@
   <data name="AddFailed" xml:space="preserve">
     <value>Der Titel konnte nicht hinzugefügt werden.</value>
   </data>
+  <data name="RefreshFailed" xml:space="preserve">
+    <value>Die Wiedergabeliste wurde aktualisiert, aber die Liste konnte nicht neu geladen werden. Laden Sie die Seite neu, um die Änderung zu sehen.</value>
+  </data>
   <data name="SelectLibrary" xml:space="preserve">
     <value>Bibliothek auswählen</value>
   </data>
