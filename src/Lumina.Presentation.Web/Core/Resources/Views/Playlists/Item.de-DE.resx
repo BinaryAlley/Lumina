@@ -138,4 +138,7 @@
   <data name="LoadMore" xml:space="preserve">
     <value>Mehr laden</value>
   </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>Zur Wiedergabeliste hinzufügen</value>
+  </data>
 </root>

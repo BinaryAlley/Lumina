@@ -31,7 +31,10 @@
       - The hook attributes the audio player binds: 'data-audio-player-play-pause', '-stop', '-previous', '-next', '-repeat',
         '-progress', '-progress-played', '-progress-downloaded', '-progress-undownloaded', '-current-time', '-total-time',
         '-track-name', '-album-name', '-now-playing-title', '-now-playing-release-type', '-now-playing-release',
-        '-now-playing-year', '-now-playing-artist', '-artwork-carousel', '-cover-thumbnail', '-cover-image', '-volume', '-volume-level', '-mute', '-queue', '-playlist-combobox' and '-add-queue-to-playlist'.
+        '-now-playing-year', '-now-playing-artist', '-favorite', '-artwork-carousel', '-cover-thumbnail', '-cover-image',
+        '-volume', '-volume-level', '-mute', '-queue', '-playlist-combobox' and '-add-queue-to-playlist'.
+        The favorite toggle ('-favorite') sits in the condensed bar, between repeat and mute. The player sets its media kind
+        and current track Id and hides it while no track is loaded. A missing hook gets the built-in toggle in that place.
         The queue-to-playlist action is a standard application combo box, so a theme renders the usual 'enlightenment-combobox'
         markup and puts the '-playlist-combobox' hook on its root. The player only reads the 'data-value' of the selected text
         when the add button is pressed. A theme that renders one half of the action gets a complete built-in pair, placed in a
@@ -72,8 +75,11 @@
     'library'), a whole library play affordance uses 'data-audio-player-play-library' with 'data-library-id', a whole library
     shuffle affordance uses 'data-audio-player-play-library-shuffled' with 'data-library-id', and a play next affordance uses
     'data-audio-player-play-next'. A track trigger must carry libraryId, trackId, albumId and artistId, because the playback
-    manifest route needs all four Ids. The 'Play Affordances on the Music Pages' section of
-    docs/technical/theming/Theming.md documents this contract for theme authors.
+    manifest route needs all four Ids. The add-to-playlist actions of the music pages and playlist rows use the
+    'data-playlist-add' marker with the 'data-playlist-library-id', '-track-id', '-album-id', '-artist-id' and '-title'
+    scope attributes, handled by the global playlist script the layout loads. The 'Play Affordances on the Music Pages'
+    and 'The Shared Add to Playlist Action' sections of docs/technical/theming/Theming.md document both contracts for
+    theme authors.
 *@
 
 <div class="audio-player-container not-shown" hidden>
@@ -146,6 +152,11 @@
                 <span class="audio-player-repeat-one-badge" aria-hidden="true">1</span>
             </button>
         </div>
+        <!-- Favorite toggle of the current track: icon only, no rectangle, between repeat and mute. The player writes its favorite attributes when a track plays. -->
+        <button type="button" class="audio-player-button audio-player-favorite" data-audio-player-favorite
+                aria-label="@localizer["FavoritesAdd"]" hidden>
+            <span class="audio-player-favorite-icon" aria-hidden="true"></span>
+        </button>
         <div class="audio-player-volume-control">
             <button type="button" class="audio-player-button audio-player-mute" data-audio-player-mute aria-label="@localizer["AudioPlayerMute"]" aria-pressed="false">
                 <span class="audio-player-mute-icon"></span>

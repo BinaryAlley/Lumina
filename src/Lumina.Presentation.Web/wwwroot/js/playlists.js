@@ -4,7 +4,9 @@
  * The module owns one modal playlist picker. A page opens it with the scope or the single track it wants to add. A scope
  * is resolved by the server into its ordered track Ids and appended in one request; a single track is appended through
  * the single entry route. The actual card and track menu items are small wrappers that give the menu item its scope and
- * call <c>LuminaPlaylists.showAddScopeDialogAsync</c>.
+ * call <c>LuminaPlaylists.showAddScopeDialogAsync</c>. A theme template or a page script can also render a declarative
+ * action, which needs no script of its own: an element with the `data-playlist-add` marker and the scope attributes
+ * documented in the theming guide opens the same picker through the delegated click listener of this module.
  *
  * The scope is resolved on the server so the browser never enumerates a whole library, and the server can add all of its
  * tracks to the playlist atomically. A single track is already identified, so it uses the cheaper single-entry route
@@ -14,6 +16,15 @@
  */
 (function () {
     'use strict';
+
+    // The layout may render this script on a page that already ran it, and the in-place navigation can evaluate scripts
+    // again. A second set of listeners would send every request twice, so the first load owns the document.
+    if (window.LuminaPlaylists)
+        return;
+
+    // The declarative add action: an element that carries the marker and the scope attributes documented in the theming
+    // guide. The listener reads them when the user clicks, so a page can render the action before its data is known.
+    const ADD_TRIGGER_SELECTOR = '[data-playlist-add]';
 
     // The layout renders the playlist id of the route as an empty Guid because the id is not known until the user picks
     // a playlist here. Replacing this sentinel keeps the route construction in one place and avoids hand-built paths.
@@ -442,6 +453,63 @@
             }
         });
     }
+
+    /**
+     * Reads the scope of a declarative add action from its data attributes.
+     *
+     * The attributes are read when the click happens, so a page or a theme may render the action before the scope is
+     * known and write the values later, which is what the audio player does for the current track. A missing library Id
+     * makes the action a no-op, because every scope is resolved inside one library.
+     * @param {Element} trigger - The element that carries the `data-playlist-add` marker.
+     * @returns {Object|null} The scope, or null when the action has no library to resolve the scope in.
+     */
+    function readScopeFromTrigger(trigger) {
+        const dataset = trigger && trigger.dataset ? trigger.dataset : null;
+        if (!dataset || !dataset.playlistLibraryId)
+            return null;
+        return {
+            libraryId: dataset.playlistLibraryId,
+            trackId: dataset.playlistTrackId || '',
+            albumId: dataset.playlistAlbumId || '',
+            artistId: dataset.playlistArtistId || '',
+            title: dataset.playlistTitle || '',
+            addToPlaylistLabel: getStrings().addToPlaylist || '',
+            returnFocus: trigger
+        };
+    }
+
+    /**
+     * Opens the picker for a declarative add action, through event delegation.
+     *
+     * The module binds one listener on the document, so a control works anywhere in the swapped page content and inside
+     * the player bar, including controls that a page or a theme renders later. The default action is prevented, so a link
+     * does not navigate, and further bubbling is stopped once the event reaches the document. A handler on an ancestor
+     * that already ran before the document listener is not undone; the player queue ignores controls inside its entries,
+     * and a menu that hosts such an action closes itself in its own handler.
+     * @param {MouseEvent} event - The click event.
+     */
+    function handleAddTriggerClick(event) {
+        const target = event.target;
+        if (!target || typeof target.closest !== 'function')
+            return;
+        const trigger = target.closest(ADD_TRIGGER_SELECTOR);
+        if (!trigger)
+            return;
+        // A disabled control explains itself through its text; opening a picker from it would be a surprising action.
+        if (trigger.disabled === true || trigger.getAttribute('aria-disabled') === 'true')
+            return;
+        const scope = readScopeFromTrigger(trigger);
+        if (!scope)
+            return;
+        event.preventDefault();
+        event.stopPropagation();
+        showAddScopeDialogAsync(scope).catch(error => {
+            console.error('Playlists: opening the add-to-playlist picker failed.', error);
+            showNotification(getStrings().tracksAddFailed, true);
+        });
+    }
+
+    document.addEventListener('click', handleAddTriggerClick);
 
     window.LuminaPlaylists = {
         showAddScopeDialogAsync

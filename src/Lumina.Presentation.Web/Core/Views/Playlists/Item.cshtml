@@ -53,6 +53,7 @@
         ["album"] = _localizer["Album"].Value,
         ["track"] = _localizer["Track"].Value,
         ["add"] = _localizer["Add"].Value,
+        ["addToPlaylist"] = _localizer["AddToPlaylist"].Value,
         ["addFailed"] = _localizer["AddFailed"].Value,
         ["refreshFailed"] = _localizer["RefreshFailed"].Value,
         ["selectLibrary"] = _localizer["SelectLibrary"].Value,
@@ -751,6 +752,33 @@
                 if (entry.coverPath)
                     playButton.dataset.coverArtPath = entry.coverPath;
                 row.appendChild(playButton);
+
+                // The favorite heart and the add-to-playlist action of the row work through the global favorites and playlist
+                // scripts, so the row binds no listener of its own and a themed row only has to render the same attributes.
+                const favoriteToggle = document.createElement('button');
+                favoriteToggle.type = 'button';
+                favoriteToggle.className = 'card-favorite-toggle playlist-entry-favorite';
+                favoriteToggle.setAttribute('data-favorite-toggle', '');
+                favoriteToggle.setAttribute('data-favorite-media-kind', 'MusicTrack');
+                favoriteToggle.setAttribute('data-favorite-media-item-id', entry.mediaItemId);
+                row.appendChild(favoriteToggle);
+
+                const addToPlaylistButton = document.createElement('button');
+                addToPlaylistButton.type = 'button';
+                addToPlaylistButton.className = 'confirm-button playlist-entry-add-to-playlist';
+                addToPlaylistButton.textContent = '+';
+                // An empty localized string must not replace the accessible name and the hover text with empty values.
+                if (strings.addToPlaylist) {
+                    addToPlaylistButton.setAttribute('aria-label', strings.addToPlaylist);
+                    addToPlaylistButton.title = strings.addToPlaylist;
+                }
+                addToPlaylistButton.dataset.playlistAdd = '';
+                addToPlaylistButton.dataset.playlistLibraryId = entry.libraryId;
+                addToPlaylistButton.dataset.playlistTrackId = entry.mediaItemId;
+                addToPlaylistButton.dataset.playlistAlbumId = entry.collectionId;
+                addToPlaylistButton.dataset.playlistArtistId = entry.creatorId;
+                addToPlaylistButton.dataset.playlistTitle = entry.mediaItemTitle || '';
+                row.appendChild(addToPlaylistButton);
             }
 
             // The index passed to this function is local to the rendered rows. Disabling the move controls requires the global position,

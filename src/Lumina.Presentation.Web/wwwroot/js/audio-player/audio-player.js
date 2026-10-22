@@ -11,7 +11,8 @@
  * controls, the keyboard shortcuts, and the loading state a seek into a not yet downloaded position shows; the volume
  * and mute the controls change are persisted to the stored playback state of the user on their own. The expanded bar also
  * offers appending the current queue, in order, to one of the playlists of the user, through a theme hook with a built-in
- * fallback when the theme does not render it.
+ * fallback when the theme does not render it. The condensed bar also renders the favorite toggle of the current track,
+ * and every queue item carries its own favorite toggle, so a user can favorite what is playing and what is queued without leaving the bar.
  *
  * Public control API (window.LuminaAudioPlayer.instance)
  * ----------------------------------------
@@ -723,6 +724,9 @@
             this.vuMeterAnalyser = null;
             // The raw theme sub templates of the dynamic content, read once with the bar elements and null when the theme does not provide them.
             this.subTemplates = { queueItem: null, playlistItem: null };
+            // The track whose favorite toggle is currently shown in the bar, so a repeated render of the same track does
+            // not rewrite the attributes the favorites script already hydrated.
+            this.renderedFavoriteTrackId = null;
             // The playlists of the user, used by the control that adds the current queue to a playlist, and the in flight load of
             // them, so an expansion and a focus on the select share one request instead of racing each other.
             this.playlists = [];
@@ -771,6 +775,7 @@
             this.isAvailable = true;
 
             this.collectDomReferences();
+            this.ensureFavoriteControl();
             this.ensureVuMeter();
             this.bindPlaybackControls();
             this.bindKeyboardShortcuts();
@@ -781,8 +786,7 @@
             this.suppressInitialTransitions();
             this.applyHiddenState();
             this.releaseInitialHiddenState();
-            // The volume and mute controls are rendered from the state the player already holds, so the bar shows the
-            // default volume even before the stored state is read.
+            // The volume and mute controls are rendered from the state the player already holds, so the bar shows the default volume even before the stored state is read.
             this.renderVolume();
             this.renderTransportState();
 
@@ -823,6 +827,7 @@
             this.dom.nowPlayingYear = query('[data-audio-player-now-playing-year]');
             this.dom.nowPlayingArtist = query('[data-audio-player-now-playing-artist]');
             this.dom.artworkCarousel = query('[data-audio-player-artwork-carousel]');
+            this.dom.favorite = query('[data-audio-player-favorite]');
             // The sub template sources are read once, with the bar elements, because the theme markup is part of the bar
             // the player was bound to, and the player is never recreated by a navigation.
             this.subTemplates = {
@@ -867,6 +872,75 @@
             });
             if (this.events && typeof this.events.on === 'function')
                 this.vuMeterUnsubscribe = this.events.on(LuminaAudioPlayer.PlayerEvent.PREFERENCES_CHANGED, () => this.applyVuMeterSettings());
+        }
+
+        /**
+         * Creates the favorite toggle of the condensed bar when the active theme does not render the hook.
+         *
+         * The favorite belongs to the bar rather than to a page, so it is created once with the bar elements and survives
+         * every in-place navigation. A theme that renders the 'data-audio-player-favorite' hook owns where the control
+         * sits; a theme that does not gets a built-in icon-only button between the repeat and mute controls.
+         */
+        ensureFavoriteControl() {
+            if (this.dom.favorite)
+                return;
+            const bar = this.container.querySelector('.audio-player-bar');
+            if (!bar)
+                return;
+            const favorite = document.createElement('button');
+            favorite.type = 'button';
+            favorite.className = 'audio-player-button audio-player-favorite';
+            favorite.dataset.audioPlayerFavorite = '';
+            favorite.hidden = true;
+            const icon = document.createElement('span');
+            icon.className = 'audio-player-favorite-icon';
+            icon.setAttribute('aria-hidden', 'true');
+            favorite.appendChild(icon);
+            // The volume control follows the repeat control in the bar. Inserting before it keeps the built-in favorite
+            // between the two, exactly where the fallback markup places it.
+            const volumeControl = this.container.querySelector('.audio-player-volume-control');
+            if (volumeControl && volumeControl.parentNode === bar)
+                bar.insertBefore(favorite, volumeControl);
+            else
+                bar.appendChild(favorite);
+            this.dom.favorite = favorite;
+        }
+
+        /**
+         * Shows the favorite toggle of the current track in the condensed bar.
+         *
+         * The favorites script hydrates the toggle when the player writes the Id of a new track. Writing the same Id again
+         * would make the script observe an attribute change and request a state it already shows, so an unchanged track
+         * skips the write. The toggle is hidden while there is no track to favorite.
+         */
+        renderFavorite() {
+            const favorite = this.dom.favorite;
+            if (!favorite)
+                return;
+            const descriptor = this.descriptor;
+            const trackId = descriptor && descriptor.trackId ? descriptor.trackId : '';
+            if (!trackId) {
+                favorite.hidden = true;
+                favorite.removeAttribute('data-favorite-toggle');
+                favorite.removeAttribute('data-favorite-media-kind');
+                favorite.removeAttribute('data-favorite-media-item-id');
+                this.renderedFavoriteTrackId = null;
+                return;
+            }
+            favorite.hidden = false;
+            if (this.renderedFavoriteTrackId === trackId)
+                return;
+            // The player shows the toggle before the favorites script hydrates it, so it borrows the label of the action
+            // once. The script replaces it with the add or remove label as soon as the state arrives.
+            const favoritesStrings = window.favoritesConfiguration && window.favoritesConfiguration.strings;
+            if (favoritesStrings && favoritesStrings.add && !favorite.hasAttribute('aria-label'))
+                favorite.setAttribute('aria-label', favoritesStrings.add);
+            // The favorites script owns the state, the labels and the pressed state from this point on. The attributes are
+            // written together, so the observer sees one item change and hydrates it once.
+            favorite.setAttribute('data-favorite-toggle', '');
+            favorite.setAttribute('data-favorite-media-kind', 'MusicTrack');
+            favorite.setAttribute('data-favorite-media-item-id', trackId);
+            this.renderedFavoriteTrackId = trackId;
         }
 
         /**
@@ -4156,6 +4230,7 @@
             // The artwork chosen from the carousel belongs to the album that was showing when it was chosen. A new track resets the selection to the cover of its own album.
             this.nowPlayingArtworkPath = descriptor ? (descriptor.coverArtPath || '') : '';
             this.renderNowPlayingDetails();
+            this.renderFavorite();
             if (this.dom.totalTime)
                 this.dom.totalTime.textContent = formatDuration(this.duration);
             this.renderTransportState();
@@ -5100,6 +5175,7 @@
          * Renders one queue item, from the theme sub template when the theme provides one and from the built-in markup
          * otherwise. The rendered root always carries the 'data-audio-player-queue-entry-id' attribute, whatever the theme
          * markup is, so the queue list can start the entry the user clicked without the theme repeating the identity.
+         * Every entry that references a track also carries its favorite toggle and add-to-playlist action, either from the theme sub template or from the built-in markup.
          * @param {Object} entry - The queue entry, with an entryId, a descriptor and a source.
          * @param {number} index - The zero based position of the item in the queue.
          * @param {number} totalItems - The number of items in the queue.
@@ -5138,6 +5214,16 @@
             }
             if (!rendered)
                 rendered = this.buildDefaultQueueItem(viewModel);
+            // An older theme queue item may predate the favorite toggle. Appending the built-in one keeps every queue entry
+            // favoritable, exactly as the condensed bar always falls back. querySelector does not match the root itself, so
+            // a theme that puts the marker on the item root is checked with matches as well.
+            const hasFavoriteToggle = rendered.matches('[data-favorite-toggle]')
+                || rendered.querySelector('[data-favorite-toggle]') !== null;
+            if (!hasFavoriteToggle) {
+                const favorite = this.buildQueueItemFavorite(viewModel);
+                if (favorite)
+                    rendered.appendChild(favorite);
+            }
             rendered.setAttribute('data-audio-player-queue-entry-id', entry.entryId);
             // The player writes the state classes on the item root itself, so a theme queue item template keeps the current and played distinction even when its markup omits the state classes.
             rendered.classList.toggle('is-current', viewModel.isCurrent);
@@ -5181,7 +5267,32 @@
             entry.appendChild(cover);
             entry.appendChild(title);
             entry.appendChild(duration);
+            entry.appendChild(this.buildQueueItemFavorite(viewModel));
             return entry;
+        }
+
+        /**
+         * Builds the favorite toggle of a queue item.
+         *
+         * Every queue entry that references a track can be favorited without starting it. The control is built through the
+         * DOM, so the track title cannot break out of an attribute, and it carries the same attributes a theme sub template
+         * renders, so both paths use the global favorites script.
+         * @param {Object} viewModel - The queue item model, per {@link LuminaAudioPlayer.AudioPlayer#renderQueueItem}.
+         * @returns {HTMLElement} The favorite container of the item.
+         */
+        buildQueueItemFavorite(viewModel) {
+            const actions = document.createElement('span');
+            actions.className = 'audio-player-queue-item-actions';
+            if (!viewModel.trackId)
+                return actions;
+            const favoriteToggle = document.createElement('button');
+            favoriteToggle.type = 'button';
+            favoriteToggle.className = 'card-favorite-toggle audio-player-queue-item-favorite';
+            favoriteToggle.setAttribute('data-favorite-toggle', '');
+            favoriteToggle.setAttribute('data-favorite-media-kind', 'MusicTrack');
+            favoriteToggle.setAttribute('data-favorite-media-item-id', viewModel.trackId);
+            actions.appendChild(favoriteToggle);
+            return actions;
         }
     }
 

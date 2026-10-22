@@ -1,6 +1,7 @@
 /**
- * Favorite toggles: the hearts of the media cards (books, artists and albums, and the cards of the favorites page) and of the
- * track rows of the album page. The detail pages of an item have no toggle.
+ * Favorite toggles: the hearts of the media cards (books, artists and albums, and the cards of the favorites page), of the
+ * track rows of the album page, of the rows of a saved playlist, and of the current track and the queue items of the audio
+ * player bar. The detail pages of an item have no toggle.
  *
  * A toggle is any focusable element, normally a button, that carries the `data-favorite-toggle` marker together with the
  * `data-favorite-media-kind` (`MusicArtist`, `MusicAlbum`, `MusicTrack` or `Book`) and `data-favorite-media-item-id`
@@ -142,19 +143,46 @@
     }
 
     /**
-     * Finds every toggle of the document that refers to an item.
+     * Builds the index of every toggle of the document, grouped by item key.
      *
-     * A page can render the same item more than once, for example the artist in a header and in a list, and every one of
-     * them must show the same state. The toggles are looked up when a state is written, not remembered, so a toggle that
-     * was added while a request was in flight is also updated and a removed one is not touched.
-     * @param {string} key - The key of the item.
-     * @returns {Array<Element>} The toggles of the item.
+     * A status flush resolves many items at once, and every resolved item has to write its state on all of its toggles.
+     * Reading the document once and grouping the toggles by key keeps that write linear in the number of toggles,
+     * instead of rescanning the whole document for every item. The toggles a caller passes in are added as well, so an
+     * element that is not attached to the document yet is still updated.
+     * @param {Array<Element>} [additionalToggles] - The toggles to include besides the ones of the document.
+     * @returns {Map<string, Array<Element>>} The toggles of each item key.
      */
-    function findToggles(key) {
-        return collectToggles(document).filter(toggle => {
+    function buildToggleIndex(additionalToggles) {
+        const index = new Map();
+        const seenToggles = new Set();
+        const addToggle = toggle => {
+            // The document pass and the list a caller passed in can hold the same element, so it is added only once.
+            if (seenToggles.has(toggle))
+                return;
+            seenToggles.add(toggle);
             const item = readToggleItem(toggle);
-            return item !== null && item.key === key;
-        });
+            if (!item)
+                return;
+            const toggles = index.get(item.key);
+            if (toggles)
+                toggles.push(toggle);
+            else
+                index.set(item.key, [toggle]);
+        };
+        collectToggles(document).forEach(addToggle);
+        if (Array.isArray(additionalToggles))
+            additionalToggles.forEach(addToggle);
+        return index;
+    }
+
+    /**
+     * Gets the toggles of an item from a built index.
+     * @param {Map<string, Array<Element>>} index - The index built by {@link buildToggleIndex}.
+     * @param {string} key - The key of the item.
+     * @returns {Array<Element>} The toggles of the item, or an empty array when the item has none.
+     */
+    function getIndexedToggles(index, key) {
+        return index.get(key) || [];
     }
 
     /**
@@ -215,9 +243,12 @@
      * Writes the settled state of an item on every toggle that shows it.
      * @param {string} key - The key of the item.
      * @param {boolean} isFavorite - Whether the item is a favorite of the current user.
+     * @param {Map<string, Array<Element>>} [index] - An already built toggle index, so a batch of items does not scan the document once per item.
      */
-    function applyFavoriteState(key, isFavorite) {
-        findToggles(key).forEach(toggle => renderToggle(toggle, isFavorite ? 'favorited' : 'not-favorited', isFavorite));
+    function applyFavoriteState(key, isFavorite, index) {
+        const toggleIndex = index || buildToggleIndex();
+        getIndexedToggles(toggleIndex, key)
+            .forEach(toggle => renderToggle(toggle, isFavorite ? 'favorited' : 'not-favorited', isFavorite));
     }
 
     /**
@@ -353,13 +384,20 @@
             if (!checks.has(item.key))
                 checks.set(item.key, { item, revision: getRevision(item.key) });
         }
+        // Nothing to ask and nothing to write, so the document is not scanned for an empty batch.
+        if (checks.size === 0)
+            return;
+        // One document pass serves every item of the batch, so hydrating a queue of N tracks with one toggle per item
+        // costs one scan of the document instead of N scans, which is what made the previous lookup quadratic. A toggle
+        // added while the requests are in flight is picked up by the observer of the document and hydrated on its own.
+        const index = buildToggleIndex(toggles);
         await Promise.all(Array.from(checks.values(), check => queueStatusCheck(check.item).then(
             isFavorite => {
                 if (getRevision(check.item.key) === check.revision && !mutationsInFlight.has(check.item.key))
-                    applyFavoriteState(check.item.key, isFavorite);
+                    applyFavoriteState(check.item.key, isFavorite, index);
             },
             () => {
-                findToggles(check.item.key)
+                getIndexedToggles(index, check.item.key)
                     .filter(toggle => toggle.getAttribute('data-favorite-state') === 'loading')
                     .forEach(toggle => renderToggle(toggle, 'failed', isPressed(toggle)));
             })));
@@ -376,7 +414,8 @@
      */
     async function changeFavoriteAsync(item, shouldFavorite) {
         const previousStates = new Map();
-        findToggles(item.key).forEach(toggle => {
+        const initialIndex = buildToggleIndex();
+        getIndexedToggles(initialIndex, item.key).forEach(toggle => {
             previousStates.set(toggle, { state: toggle.getAttribute('data-favorite-state'), isFavorite: isPressed(toggle) });
             renderToggle(toggle, 'loading', isPressed(toggle));
         });
@@ -412,7 +451,8 @@
         }
 
         // A toggle added while the request was in flight has no remembered state, so it gets the state that was true before the change.
-        findToggles(item.key).forEach(toggle => {
+        const restoreIndex = buildToggleIndex();
+        getIndexedToggles(restoreIndex, item.key).forEach(toggle => {
             const previous = previousStates.get(toggle) || { state: shouldFavorite ? 'not-favorited' : 'favorited', isFavorite: !shouldFavorite };
             const state = previous.state === 'favorited' || previous.state === 'not-favorited' ? previous.state : 'failed';
             renderToggle(toggle, state, previous.isFavorite);
@@ -526,8 +566,15 @@
                 continue;
             }
             mutation.addedNodes.forEach(node => {
-                if (node.nodeType === Node.ELEMENT_NODE)
-                    collectToggles(node).forEach(toggle => toggles.add(toggle));
+                if (node.nodeType !== Node.ELEMENT_NODE)
+                    return;
+                collectToggles(node).forEach(toggle => {
+                    // A re-appended row, such as the rows of a playlist after a drag reorder, keeps the state it already
+                    // shows. Re-checking it would send a status request for a heart that is already settled on screen.
+                    const state = toggle.getAttribute('data-favorite-state');
+                    if (state !== 'favorited' && state !== 'not-favorited')
+                        toggles.add(toggle);
+                });
             });
         }
         if (toggles.size > 0)

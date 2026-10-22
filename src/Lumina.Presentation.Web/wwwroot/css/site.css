@@ -1328,6 +1328,24 @@ body {
     margin: 0 auto;
 }
 
+/* The hearts of a playlist row and of a player queue item are inline actions, so they are always visible and never take the position of a card heart. */
+.playlist-entry-favorite.card-favorite-toggle,
+.audio-player-queue-item-actions .card-favorite-toggle {
+    position: static;
+    display: flex;
+    flex: 0 0 auto;
+    margin: 0;
+}
+
+/* The add-to-playlist action of a playlist row is compact, because it sits in a row that already carries the playback, reordering and removal controls. */
+.playlist-entry-add-to-playlist {
+    width: 22px;
+    min-width: 22px;
+    height: 22px;
+    padding: 0;
+    line-height: 1;
+}
+
 .card-actions-menu {
     display: none;
     position: fixed;
@@ -1762,6 +1780,35 @@ html.audio-player-initializing .audio-player-container {
     cursor: default;
 }
 
+/* The favorite toggle of the condensed bar is icon only, with no rectangle of its own: it reuses the transparent box of a transport button, and the stylesheet draws the heart. */
+.audio-player-favorite[hidden] {
+    display: none;
+}
+
+.audio-player-favorite-icon {
+    display: block;
+    font-size: 16px;
+    line-height: 1;
+    color: #E6E6E6;
+}
+
+.audio-player-favorite-icon::after {
+    content: '\2665';
+}
+
+.audio-player-favorite:hover .audio-player-favorite-icon {
+    color: #FFFFFF;
+}
+
+.audio-player-favorite.is-favorite .audio-player-favorite-icon {
+    color: #FF5D5D;
+}
+
+.audio-player-favorite[data-favorite-state="loading"] {
+    opacity: 0.5;
+    cursor: progress;
+}
+
 /* The skip icons are drawn with CSS, so a theme restyles them without an image. */
 .audio-player-previous-icon,
 .audio-player-next-icon {
@@ -2157,6 +2204,18 @@ html.audio-player-initializing .audio-player-container {
     font-size: 12px;
     color: #9AA7B0;
     font-variant-numeric: tabular-nums;
+}
+
+/* The favorite and add-to-playlist actions of a queue item sit after its duration, so a queued track can be saved without starting it. A queue item without a track renders the container empty. */
+.audio-player-queue-item-actions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 4px;
+}
+
+.audio-player-queue-item-actions:empty {
+    display: none;
 }
 
 /* The shared playlist picker of the add-to-playlist card actions. It reuses the application dialog surface on its own
