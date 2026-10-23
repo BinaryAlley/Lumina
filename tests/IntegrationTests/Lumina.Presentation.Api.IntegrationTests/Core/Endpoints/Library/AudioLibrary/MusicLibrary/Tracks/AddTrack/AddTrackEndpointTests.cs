@@ -212,10 +212,10 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
 
         // Genres and tags checks.
         Assert.Equal(
-            metadata.Genres!.Select(genre => genre.Name).OrderBy(name => name),
+            metadata.Genres!.Select(genre => genre.Name!.ToLowerInvariant()).OrderBy(name => name),
             trackResponse.Metadata.Genres!.Select(genre => genre.Name).OrderBy(name => name));
         Assert.Equal(
-            metadata.Tags!.Select(tag => tag.Name).OrderBy(name => name),
+            metadata.Tags!.Select(tag => tag.Name!.ToLowerInvariant()).OrderBy(name => name),
             trackResponse.Metadata.Tags!.Select(tag => tag.Name).OrderBy(name => name));
 
         // Moods, ISRCs, contributors and ratings checks.

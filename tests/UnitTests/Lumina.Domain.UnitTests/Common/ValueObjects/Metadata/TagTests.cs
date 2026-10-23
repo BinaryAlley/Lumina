@@ -17,10 +17,10 @@ public class TagTests
     private readonly TagFixture _tagFixture = new();
 
     [Fact]
-    public void Create_WhenCalledWithValidName_ShouldCreateTagWithTrimmedName()
+    public void Create_WhenCalledWithValidName_ShouldCreateTagWithTrimmedLowercaseInvariantName()
     {
         // Act
-        Result<Tag> result = Tag.Create("  bestseller  ");
+        Result<Tag> result = Tag.Create("  BeStSeLLeR  ");
 
         // Assert
         Assert.False(result.IsFailure);
@@ -46,6 +46,20 @@ public class TagTests
     {
         // Arrange
         Tag firstTag = _tagFixture.Create(name: "bestseller");
+        Tag secondTag = _tagFixture.Create(name: "bestseller");
+
+        // Act
+        bool result = firstTag.Equals(secondTag);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void Equals_WithNamesDifferingOnlyByCasing_ShouldReturnTrue()
+    {
+        // Arrange
+        Tag firstTag = _tagFixture.Create(name: "BestSeller");
         Tag secondTag = _tagFixture.Create(name: "bestseller");
 
         // Act

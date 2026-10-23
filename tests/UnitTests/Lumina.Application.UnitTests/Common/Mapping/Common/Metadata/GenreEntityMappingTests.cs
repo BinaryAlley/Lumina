@@ -81,7 +81,7 @@ public class GenreEntityMappingTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
-        Assert.Equal(entity.Name, result.Value.Name);
+        Assert.Equal("fiction", result.Value.Name);
     }
 
     [Theory]
@@ -120,11 +120,11 @@ public class GenreEntityMappingTests
         Assert.NotNull(results);
         Assert.Equal(entities.Count, results.Count());
 
-        List<Result<Genre>> resultList = results.ToList();
+        List<Result<Genre>> resultList = [.. results];
         for (int i = 0; i < entities.Count; i++)
         {
             Assert.False(resultList[i].IsFailure);
-            Assert.Equal(entities[i].Name, resultList[i].Value.Name);
+            Assert.Equal(entities[i].Name!.ToLowerInvariant(), resultList[i].Value.Name);
         }
     }
 
@@ -147,7 +147,7 @@ public class GenreEntityMappingTests
         Assert.NotNull(results);
         Assert.Equal(entities.Count, results.Count());
 
-        List<GenreDto> resultList = results.ToList();
+        List<GenreDto> resultList = [.. results];
         for (int i = 0; i < entities.Count; i++)
             Assert.Equal(entities[i].Name, resultList[i].Name);
     }

@@ -23,7 +23,7 @@ public class TagDtoMappingTests
     public void ToDomainValueObject_WhenMappingValidTagDto_ShouldMapCorrectly()
     {
         // Arrange
-        TagDto tagDto = _tagDtoFixture.Create(name: "indie");
+        TagDto tagDto = _tagDtoFixture.Create(name: "Indie");
 
         // Act
         Result<Tag> result = tagDto.ToDomainValueObject();
@@ -31,15 +31,15 @@ public class TagDtoMappingTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
-        Assert.Equal(tagDto.Name, result.Value.Name);
+        Assert.Equal("indie", result.Value.Name);
     }
 
     [Theory]
-    [InlineData("indie")]
-    [InlineData("electronic")]
-    [InlineData("instrumental")]
-    [InlineData("live")]
-    [InlineData("acoustic")]
+    [InlineData("Indie")]
+    [InlineData("Electronic")]
+    [InlineData("Instrumental")]
+    [InlineData("Live")]
+    [InlineData("Acoustic")]
     public void ToDomainValueObject_WhenMappingDifferentValidTagDtos_ShouldMapCorrectly(string name)
     {
         // Arrange
@@ -51,7 +51,7 @@ public class TagDtoMappingTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
-        Assert.Equal(tagDto.Name, result.Value.Name);
+        Assert.Equal(name.ToLowerInvariant(), result.Value.Name);
     }
 
     [Theory]
@@ -76,10 +76,10 @@ public class TagDtoMappingTests
         // Arrange
         List<TagDto> tagDtos =
         [
-            _tagDtoFixture.Create(name: "indie"),
-            _tagDtoFixture.Create(name: "electronic"),
-            _tagDtoFixture.Create(name: "instrumental"),
-            _tagDtoFixture.Create(name: "live")
+            _tagDtoFixture.Create(name: "Indie"),
+            _tagDtoFixture.Create(name: "Electronic"),
+            _tagDtoFixture.Create(name: "Instrumental"),
+            _tagDtoFixture.Create(name: "Live")
         ];
 
         // Act
@@ -93,7 +93,7 @@ public class TagDtoMappingTests
         for (int i = 0; i < tagDtos.Count; i++)
         {
             Assert.False(resultList[i].IsFailure);
-            Assert.Equal(tagDtos[i].Name, resultList[i].Value.Name);
+            Assert.Equal(tagDtos[i].Name!.ToLowerInvariant(), resultList[i].Value.Name);
         }
     }
 
@@ -103,9 +103,9 @@ public class TagDtoMappingTests
         // Arrange
         List<TagDto> tagDtos =
         [
-            _tagDtoFixture.Create(name: "indie"),
+            _tagDtoFixture.Create(name: "Indie"),
             _tagDtoFixture.Create(name: ""),
-            _tagDtoFixture.Create(name: "electronic"),
+            _tagDtoFixture.Create(name: "Electronic"),
             _tagDtoFixture.Create(name: " ")
         ];
 

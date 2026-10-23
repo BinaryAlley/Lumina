@@ -17,14 +17,14 @@ public class GenreTests
     private readonly GenreFixture _genreFixture = new();
 
     [Fact]
-    public void Create_WhenCalledWithValidName_ShouldCreateGenreWithTrimmedName()
+    public void Create_WhenCalledWithValidName_ShouldCreateGenreWithTrimmedLowercaseInvariantName()
     {
         // Act
-        Result<Genre> result = Genre.Create("  Science Fiction  ");
+        Result<Genre> result = Genre.Create("  Science FICTION  ");
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Equal("Science Fiction", result.Value.Name);
+        Assert.Equal("science fiction", result.Value.Name);
     }
 
     [Theory]
@@ -47,6 +47,20 @@ public class GenreTests
         // Arrange
         Genre firstGenre = _genreFixture.Create(name: "Science Fiction");
         Genre secondGenre = _genreFixture.Create(name: "Science Fiction");
+
+        // Act
+        bool result = firstGenre.Equals(secondGenre);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void Equals_WithNamesDifferingOnlyByCasing_ShouldReturnTrue()
+    {
+        // Arrange
+        Genre firstGenre = _genreFixture.Create(name: "Science Fiction");
+        Genre secondGenre = _genreFixture.Create(name: "science fiction");
 
         // Act
         bool result = firstGenre.Equals(secondGenre);
@@ -79,6 +93,6 @@ public class GenreTests
         string result = genre.ToString();
 
         // Assert
-        Assert.Equal("Science Fiction", result);
+        Assert.Equal("science fiction", result);
     }
 }

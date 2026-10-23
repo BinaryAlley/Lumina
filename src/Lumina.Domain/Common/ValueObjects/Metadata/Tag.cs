@@ -15,17 +15,17 @@ namespace Lumina.Domain.Common.ValueObjects.Metadata;
 public class Tag : ValueObject
 {
     /// <summary>
-    /// Gets the name of the tag element of the media item.
+    /// Gets the name of the tag element of the media item, in lowercase and culture-invariant form.
     /// </summary>
     public string Name { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Tag"/> class.
     /// </summary>
-    /// <param name="name">The value representing this object.</param>
+    /// <param name="name">The value representing this object, which is trimmed and lowercased with the invariant culture.</param>
     private Tag(string name)
     {
-        Name = name.Trim();
+        Name = name.Trim().ToLowerInvariant();
     }
 
     /// <summary>

@@ -133,14 +133,14 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
         // genres checks
         Assert.Equal(bookRequest.Metadata.Genres!.Count, bookResponse.Metadata.Genres!.Count);
         Assert.Equal(
-            bookRequest.Metadata.Genres.Select(genre => genre.Name).OrderBy(x => x),
-            bookResponse.Metadata.Genres.Select(genre => genre.Name).OrderBy(x => x));
+            bookRequest.Metadata.Genres.Select(genre => genre.Name!.ToLowerInvariant()).OrderBy(name => name),
+            bookResponse.Metadata.Genres.Select(genre => genre.Name).OrderBy(name => name));
 
         // tags checks
         Assert.Equal(bookRequest.Metadata.Tags!.Count, bookResponse.Metadata.Tags!.Count);
         Assert.Equal(
-            bookRequest.Metadata.Tags.Select(tag => tag.Name).OrderBy(x => x),
-            bookResponse.Metadata.Tags.Select(tag => tag.Name).OrderBy(x => x));
+            bookRequest.Metadata.Tags.Select(tag => tag.Name!.ToLowerInvariant()).OrderBy(name => name),
+            bookResponse.Metadata.Tags.Select(tag => tag.Name).OrderBy(name => name));
 
         // book specific properties
         Assert.Equal(bookRequest.Format, bookResponse.Format);
