@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Themes;
-using Lumina.Application.Common.DataAccess.Repositories.Themes;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Models.DTO.Themes;
@@ -16,8 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.Core.Themes.Management.Commands.InstallTheme;
@@ -71,12 +69,12 @@ public class InstallThemeCommandHandler : ICommandHandler<InstallThemeCommand, R
 
         Guid? currentUserId = _currentUserService.UserId;
         if (currentUserId is null)
-            return ApplicationErrors.Authorization.NotAuthorized;
+            return Errors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
         // Only admins can install themes.
-        if (!await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false))
-            return ApplicationErrors.Authorization.NotAuthorized;
+        if (!await _authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false))
+            return Errors.Authorization.NotAuthorized;
 
         // Store the theme pack files on the server, replacing the files of an existing theme with the same manifest id.
         Result<ThemeManifestDto> installResult = await _themeService.InstallAsync(command.Archive!, cancellationToken).ConfigureAwait(false);

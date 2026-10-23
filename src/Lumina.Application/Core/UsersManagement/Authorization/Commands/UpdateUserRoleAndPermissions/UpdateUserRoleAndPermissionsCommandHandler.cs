@@ -1,10 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DataAccess.Repositories.Authorization;
-using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.DTO.Filtering;
 using Lumina.Application.Common.DTO.Pagination;
@@ -12,6 +9,7 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Contracts.Responses.Authorization;
+using Lumina.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -69,7 +67,7 @@ public class UpdateUserRoleAndPermissionsCommandHandler : ICommandHandler<Update
         Guid userId = currentUserId.Value;
 
         // Only admins can update user authorizations.
-        bool isAdmin = await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false);
+        bool isAdmin = await _authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false);
         if (!isAdmin)
             return ApplicationErrors.Authorization.NotAuthorized;
 
@@ -88,14 +86,14 @@ public class UpdateUserRoleAndPermissionsCommandHandler : ICommandHandler<Update
             newRole = getRoleResult.Value;
 
             // Check if changing the role of an admin would leave the application without any admin.
-            if (getUserResult.Value.UserRole?.Role.RoleName == "Admin" && newRole.RoleName != "Admin")
+            if (getUserResult.Value.UserRole?.Role.RoleName == AuthorizationRoles.ADMIN && newRole.RoleName != AuthorizationRoles.ADMIN)
             {
                 // Count how many admins exist, so the last one is never demoted.
                 Result<PaginatedResultDto<UserEntity>> getAllUsersResult = await _unitOfWork.UserRepository.GetAllAsync<BaseFilterDto>(cancellationToken: cancellationToken).ConfigureAwait(false);
                 if (getAllUsersResult.IsFailure)
                     return getAllUsersResult.Errors;
 
-                int adminCount = getAllUsersResult.Value.Data.Count(user => user.UserRole?.Role.RoleName == "Admin");
+                int adminCount = getAllUsersResult.Value.Data.Count(user => user.UserRole?.Role.RoleName == AuthorizationRoles.ADMIN);
                 if (adminCount <= 1)
                     return ApplicationErrors.Authorization.CannotRemoveLastAdmin;
             }

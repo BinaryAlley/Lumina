@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
+using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
@@ -33,7 +34,7 @@ public class GetUserRoleEndpointSummary : Summary<GetUserRoleEndpoint, GetUserRo
         Response(200, "The authorization role of the user is returned.",
             example: new RoleResponse(
                 Id: Guid.NewGuid(),
-                RoleName: "Admin"
+                RoleName: AuthorizationRoles.ADMIN
             ));
 
         Response(401, "Authentication required.", "application/problem+json",

@@ -61,7 +61,7 @@ public class UpdateSchedulerDisplayPreferencesCommandHandler : ICommandHandler<U
         Guid userId = currentUserId.Value;
 
         // Only administrators can use the scheduler page.
-        if (!await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false))
+        if (!await _authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false))
             return ApplicationErrors.Authorization.NotAuthorized;
 
         // Upsert the display preferences of the scheduler page of the current user.

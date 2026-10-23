@@ -76,7 +76,7 @@ public class ScanLibrariesCommandHandler : ICommandHandler<ScanLibrariesCommand,
         IEnumerable<Result<Library>> domainEntitiesResult = getLibrariesResult.Value.ToDomainEntities();
 
         // If the current user is not an admin, they can only scan the libraries that belong to them.
-        if (!await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false))
+        if (!await _authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false))
             domainEntitiesResult = domainEntitiesResult.Where(libraryResult => libraryResult.Value.UserId.Value == userId);
 
         List<MediaLibraryScanResponse> responses = [];

@@ -58,7 +58,7 @@ public class GetRolesQueryHandler : IQueryHandler<GetRolesQuery, Result<IEnumera
         Guid userId = currentUserId.Value;
 
         // Only admins can see the list of authorization roles.
-        bool isAdmin = await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false);
+        bool isAdmin = await _authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false);
         if (!isAdmin)
             return Errors.Authorization.NotAuthorized;
 

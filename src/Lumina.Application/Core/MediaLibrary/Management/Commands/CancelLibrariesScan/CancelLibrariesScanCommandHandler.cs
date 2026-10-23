@@ -72,7 +72,7 @@ public class CancelLibrariesScanCommandHandler : ICommandHandler<CancelLibraries
         // Filter the library scans to process.
         List<LibraryScanEntity> authorizedLibraryScans = [];
         // Admins can see all library scans.
-        if (await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false))
+        if (await _authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false))
             authorizedLibraryScans.AddRange(getRunningLibraryScansResult.Value);
         else // For regular users, only take the library scans that belong to them.
             authorizedLibraryScans.AddRange(getRunningLibraryScansResult.Value.Where(libraryScan => libraryScan.UserId == userId));

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
+using Lumina.Application.Common.Infrastructure.Authorization;
 using System;
 using System.Security.Claims;
 using System.Threading;
@@ -60,6 +61,6 @@ public class ScheduledJobsHub : Hub<IScheduledJobsClient>
     {
         await using AsyncServiceScope scope = _serviceScopeFactory.CreateAsyncScope();
         ApplicationAuthorizationService authorizationService = scope.ServiceProvider.GetRequiredService<ApplicationAuthorizationService>();
-        return await authorizationService.IsInRoleAsync(userId, "Admin", CancellationToken.None).ConfigureAwait(false);
+        return await authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, CancellationToken.None).ConfigureAwait(false);
     }
 }

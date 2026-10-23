@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
+using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
@@ -33,7 +34,7 @@ public class GetAuthorizationEndpointSummary : Summary<GetAuthorizationEndpoint,
         Response(200, "The authorization role and permissions of the account are returned.",
             example: new AuthorizationResponse(
                 UserId: Guid.NewGuid(),
-                Role: "Admin",
+                Role: AuthorizationRoles.ADMIN,
                 Permissions: new HashSet<AuthorizationPermission>() { AuthorizationPermission.CanRegisterUsers, AuthorizationPermission.CanDeleteUsers }
             ));
 

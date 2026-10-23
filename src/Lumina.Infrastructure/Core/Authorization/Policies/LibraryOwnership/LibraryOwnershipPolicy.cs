@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Domain.Common.Primitives;
@@ -57,7 +58,7 @@ public class LibraryOwnershipPolicy : ILibraryOwnershipPolicy
                 return false;
             }
             // Admins can access any media library.
-            _canAccessAllLibraries = getUserResult.Value.UserRole?.Role.RoleName == "Admin";
+            _canAccessAllLibraries = getUserResult.Value.UserRole?.Role.RoleName == AuthorizationRoles.ADMIN;
             // The user graph already carries the libraries owned by this user, so answering the policy needs no second library read.
             _ownedLibraryIds = [.. getUserResult.Value.Libraries.Select(library => library.Id)];
             _loadedUserId = userId;

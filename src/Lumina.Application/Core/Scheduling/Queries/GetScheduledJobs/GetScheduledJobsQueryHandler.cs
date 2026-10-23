@@ -61,7 +61,7 @@ public class GetScheduledJobsQueryHandler : IQueryHandler<GetScheduledJobsQuery,
         Guid userId = currentUserId.Value;
 
         // Only administrators can get the list of scheduled jobs.
-        if (!await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false))
+        if (!await _authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false))
             return ApplicationErrors.Authorization.NotAuthorized;
 
         // Get the scheduled jobs from the storage medium.

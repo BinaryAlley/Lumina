@@ -57,7 +57,7 @@ public class GetPermissionsQueryHandler : IQueryHandler<GetPermissionsQuery, Res
         Guid userId = currentUserId.Value;
 
         // Only admins can see the list of authorization permissions.
-        bool isAdmin = await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false);
+        bool isAdmin = await _authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false);
         if (!isAdmin)
             return Errors.Authorization.NotAuthorized;
         Result<PaginatedResultDto<PermissionEntity>> getPermissionsResult = await _unitOfWork.PermissionRepository.GetAllAsync<BaseFilterDto>(cancellationToken: cancellationToken).ConfigureAwait(false);

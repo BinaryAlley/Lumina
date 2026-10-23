@@ -71,7 +71,7 @@ public class RestoreThemeCommandHandler : ICommandHandler<RestoreThemeCommand, R
         Guid userId = currentUserId.Value;
 
         // Only admins can restore themes.
-        if (!await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false))
+        if (!await _authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false))
             return ApplicationErrors.Authorization.NotAuthorized;
 
         Result<ThemeEntity?> getThemeResult = await _unitOfWork.ThemeRepository.GetByThemeIdAsync(command.ThemeId!, cancellationToken).ConfigureAwait(false);

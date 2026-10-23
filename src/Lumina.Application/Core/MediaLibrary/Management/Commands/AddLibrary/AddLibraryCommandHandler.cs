@@ -96,7 +96,7 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Resul
         Guid userId = currentUserId.Value;
 
         // Only admins or users with the permission to manage media libraries can create them.
-        if (!await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false) &&
+        if (!await _authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false) &&
             !await _authorizationService.HasPermissionAsync(userId, AuthorizationPermission.CanCreateLibraries, cancellationToken).ConfigureAwait(false))
             return ApplicationErrors.Authorization.NotAuthorized;
 

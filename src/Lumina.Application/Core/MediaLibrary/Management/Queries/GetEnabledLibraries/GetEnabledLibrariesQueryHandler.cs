@@ -53,23 +53,23 @@ public class GetEnabledLibrariesQueryHandler : IQueryHandler<GetEnabledLibraries
     /// </returns>
     public async Task<Result<LibraryResponse[]>> HandleAsync(GetEnabledLibrariesQuery query, CancellationToken cancellationToken)
     {
-        // an authenticated request must always carry a user identity
+        // An authenticated request must always carry a user identity.
         Guid? currentUserId = _currentUserService.UserId;
         if (currentUserId is null)
             return Errors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // get the enabled libraries from the repository
+        // Get the enabled libraries from the repository.
         Result<IEnumerable<LibraryEntity>> getEnabledLibrariesResult = await _unitOfWork.LibraryRepository.GetAllEnabledAsync(cancellationToken).ConfigureAwait(false);
         if (getEnabledLibrariesResult.IsFailure)
             return getEnabledLibrariesResult.Errors;
 
-        // admins can see all libraries
-        if (await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false))
+        // Admins can see all libraries.
+        if (await _authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false))
             return Result.From(getEnabledLibrariesResult.Value.Select(library => library.ToResponse()).ToArray());
         else
         {
-            // for regular users, only take the libraries that belong to them
+            // For regular users, only take the libraries that belong to them.
             LibraryResponse[] userEnabledLibraries = [.. getEnabledLibrariesResult.Value
                 .Where(library => library.UserId == userId)
                 .Select(library => library.ToResponse())];

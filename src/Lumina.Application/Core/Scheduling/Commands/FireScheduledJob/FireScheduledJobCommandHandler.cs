@@ -75,7 +75,7 @@ public class FireScheduledJobCommandHandler : ICommandHandler<FireScheduledJobCo
         Guid userId = currentUserId.Value;
 
         // Only administrators can fire scheduled jobs.
-        if (!await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false))
+        if (!await _authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false))
             return ApplicationErrors.Authorization.NotAuthorized;
 
         // Get the scheduled job from the storage medium.

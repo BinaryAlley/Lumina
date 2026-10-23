@@ -58,8 +58,8 @@ public class DeleteRoleCommandHandler : ICommandHandler<DeleteRoleCommand, Resul
             return Errors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // only admins can delete authorization roles
-        bool isAdmin = await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false);
+        // Only admins can delete authorization roles.
+        bool isAdmin = await _authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false);
         if (!isAdmin)
             return Errors.Authorization.NotAuthorized;
 
@@ -69,7 +69,7 @@ public class DeleteRoleCommandHandler : ICommandHandler<DeleteRoleCommand, Resul
             return getExistingRoleResult.Errors;
         else if (getExistingRoleResult.Value is null)
             return Errors.Authorization.RoleNotFound;
-        else if (getExistingRoleResult.Value.RoleName == "Admin")
+        else if (getExistingRoleResult.Value.RoleName == AuthorizationRoles.ADMIN)
             return Errors.Authorization.AdminRoleCannotBeDeleted;
 
         // Delete the role and its permissions.
