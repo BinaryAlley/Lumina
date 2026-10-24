@@ -14,6 +14,8 @@ public static partial class Errors
         public static Error UnsupportedMediaKind => Error.Validation(description: nameof(UnsupportedMediaKind));
         public static Error MediaKindCannotStartCompleted => Error.Forbidden(description: nameof(MediaKindCannotStartCompleted));
         public static Error MediaKindCannotResume => Error.Forbidden(description: nameof(MediaKindCannotResume));
+        public static Error ConsumptionRecordNotFound => Error.NotFound(description: nameof(ConsumptionRecordNotFound));
+        public static Error MediaResumePointNotFound => Error.NotFound(description: nameof(MediaResumePointNotFound));
         public static Error InvalidMediaPosition => Error.Validation(description: nameof(InvalidMediaPosition));
         public static Error InvalidProgressFraction => Error.Validation(description: nameof(InvalidProgressFraction));
         public static Error ConsumedDurationMustBeNonNegative => Error.Validation(description: nameof(ConsumedDurationMustBeNonNegative));
