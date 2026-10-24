@@ -41,6 +41,11 @@ public abstract class MediaConsumptionRule : ValueObject
     public bool CanResume => PositionKind.HasValue;
 
     /// <summary>
+    /// Gets a value indicating whether a consumption session of this kind of media is a one-shot session, which completes at the moment it starts.
+    /// </summary>
+    public abstract bool IsOneShot { get; }
+
+    /// <summary>
     /// Determines whether a consumption session of this kind of media counts towards statistics.
     /// </summary>
     /// <param name="status">The status of the consumption session.</param>

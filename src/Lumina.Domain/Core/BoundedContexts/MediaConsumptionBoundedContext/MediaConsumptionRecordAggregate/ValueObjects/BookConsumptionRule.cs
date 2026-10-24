@@ -28,6 +28,11 @@ public sealed class BookConsumptionRule : PageThresholdConsumptionRule
     public override Optional<MediaPositionKind> PositionKind { get; } = MediaPositionKind.Location;
 
     /// <summary>
+    /// Gets a value indicating whether a consumption session of this kind of media is a one-shot session, which completes at the moment it starts.
+    /// </summary>
+    public override bool IsOneShot { get; } = false;
+
+    /// <summary>
     /// Gets the minimum number of consecutive pages that a session of this kind of media must read to be counted, when it is not completed.
     /// </summary>
     public override int MinimumConsecutivePages { get; } = 5;

@@ -29,6 +29,11 @@ public sealed class TvEpisodeConsumptionRule : DurationThresholdConsumptionRule
     public override Optional<MediaPositionKind> PositionKind { get; } = MediaPositionKind.TimeOffset;
 
     /// <summary>
+    /// Gets a value indicating whether a consumption session of this kind of media is a one-shot session, which completes at the moment it starts.
+    /// </summary>
+    public override bool IsOneShot { get; } = false;
+
+    /// <summary>
     /// Gets the minimum consumed duration that a session of this kind of media must reach to be counted, when it is not completed.
     /// </summary>
     public override TimeSpan MinimumCountedDuration { get; } = TimeSpan.FromMinutes(3);
