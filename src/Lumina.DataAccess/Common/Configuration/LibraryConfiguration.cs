@@ -71,6 +71,14 @@ public class LibraryConfiguration : IEntityTypeConfiguration<LibraryEntity>
             .HasDefaultValue(null)
             .HasColumnOrder(11);
 
+        builder.Property(library => library.ShouldTrackConsumptionProgress)
+            .HasDefaultValue(false)
+            .HasColumnOrder(12);
+
+        builder.Property(library => library.CompletionThresholdPercentage)
+            .HasDefaultValue(null)
+            .HasColumnOrder(13);
+
         // one user with many libraries
         builder.HasOne(library => library.User)
             .WithMany(user => user.Libraries)
@@ -130,18 +138,18 @@ public class LibraryConfiguration : IEntityTypeConfiguration<LibraryEntity>
         // audit
         builder.Property(library => library.CreatedOnUtc)
             .IsRequired()
-            .HasColumnOrder(12);
+            .HasColumnOrder(14);
 
         builder.Property(library => library.CreatedBy)
             .IsRequired()
-            .HasColumnOrder(13);
+            .HasColumnOrder(15);
 
         builder.Property(library => library.UpdatedOnUtc)
             .HasDefaultValue(null)
-            .HasColumnOrder(14);
+            .HasColumnOrder(16);
 
         builder.Property(library => library.UpdatedBy)
             .HasDefaultValue(null)
-            .HasColumnOrder(15);
+            .HasColumnOrder(17);
     }
 }

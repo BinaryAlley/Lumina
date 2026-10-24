@@ -65,6 +65,8 @@ POST api/v1/libraries
   "canDownloadMetadataFromWeb": true,
   "shouldSaveMetadataInMediaDirectories": true,
   "shouldSkipUnchangedDirectoriesDuringScan": true,
+  "shouldTrackConsumptionProgress": true,
+  "completionThresholdPercentage": 100,
   "pathTemplateParts": []
 }
 ```
@@ -90,6 +92,8 @@ POST api/v1/libraries
   "canDownloadMetadataFromWeb": true,
   "shouldSaveMetadataInMediaDirectories": true,
   "shouldSkipUnchangedDirectoriesDuringScan": true,
+  "shouldTrackConsumptionProgress": true,
+  "completionThresholdPercentage": 100,
   "pathTemplateParts": [],
   "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
   "updatedOnUtc": null
@@ -126,6 +130,8 @@ GET api/v1/libraries
     "canDownloadMetadataFromWeb": true,
     "shouldSaveMetadataInMediaDirectories": true,
     "shouldSkipUnchangedDirectoriesDuringScan": true,
+    "shouldTrackConsumptionProgress": true,
+    "completionThresholdPercentage": 100,
     "pathTemplateParts": [],
     "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
     "updatedOnUtc": null
@@ -163,6 +169,8 @@ GET api/v1/libraries/enabled
     "canDownloadMetadataFromWeb": true,
     "shouldSaveMetadataInMediaDirectories": true,
     "shouldSkipUnchangedDirectoriesDuringScan": true,
+    "shouldTrackConsumptionProgress": true,
+    "completionThresholdPercentage": 100,
     "pathTemplateParts": [],
     "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
     "updatedOnUtc": null
@@ -199,6 +207,8 @@ GET api/v1/libraries/{id}
   "canDownloadMetadataFromWeb": true,
   "shouldSaveMetadataInMediaDirectories": true,
   "shouldSkipUnchangedDirectoriesDuringScan": true,
+  "shouldTrackConsumptionProgress": true,
+  "completionThresholdPercentage": 100,
   "pathTemplateParts": [],
   "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
   "updatedOnUtc": null
@@ -228,6 +238,8 @@ PUT api/v1/libraries/{id}
   "canDownloadMetadataFromWeb": true,
   "shouldSaveMetadataInMediaDirectories": true,
   "shouldSkipUnchangedDirectoriesDuringScan": true,
+  "shouldTrackConsumptionProgress": true,
+  "completionThresholdPercentage": 100,
   "pathTemplateParts": []
 }
 ```
@@ -253,6 +265,8 @@ PUT api/v1/libraries/{id}
   "canDownloadMetadataFromWeb": true,
   "shouldSaveMetadataInMediaDirectories": true,
   "shouldSkipUnchangedDirectoriesDuringScan": true,
+  "shouldTrackConsumptionProgress": true,
+  "completionThresholdPercentage": 100,
   "pathTemplateParts": [],
   "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
   "updatedOnUtc": null

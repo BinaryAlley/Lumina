@@ -21,6 +21,8 @@ namespace Lumina.Contracts.Responses.MediaLibrary.Management;
 /// <param name="CanDownloadMetadataFromWeb">Whether the media library should update the metadata of its elements from the web, or not.</param>
 /// <param name="ShouldSaveMetadataInMediaDirectories">Whether the media library should copy the downloaded metadata into the media library content locations, or not.</param>
 /// <param name="ShouldSkipUnchangedDirectoriesDuringScan">Whether the media library should skip the directories whose contents have not changed since the last scan, during the scan.</param>
+/// <param name="ShouldTrackConsumptionProgress">Whether the consumption progress of the media library items is tracked.</param>
+/// <param name="CompletionThresholdPercentage">The percentage of a media library item that must be consumed for its session to be considered completed, when progress tracking is enabled.</param>
 /// <param name="PathTemplateParts">The ordered parts of the template describing the structure of the media library on disk.</param>
 /// <param name="CreatedOnUtc">The date and time when the library was created.</param>
 /// <param name="UpdatedOnUtc">The optional date and time when the library was updated.</param>
@@ -37,6 +39,8 @@ public record LibraryResponse(
     bool CanDownloadMetadataFromWeb,
     bool ShouldSaveMetadataInMediaDirectories,
     bool ShouldSkipUnchangedDirectoriesDuringScan,
+    bool ShouldTrackConsumptionProgress,
+    int? CompletionThresholdPercentage,
     List<LibraryPathTemplatePartResponse> PathTemplateParts,
     DateTime CreatedOnUtc,
     DateTime? UpdatedOnUtc

@@ -32,6 +32,8 @@ public class LibraryResponseFixture
     /// <param name="canDownloadMetadataFromWeb">Optional. Whether metadata should be downloaded from the web.</param>
     /// <param name="shouldSaveMetadataInMediaDirectories">Optional. Whether metadata should be saved in the media directories.</param>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Optional. Whether unchanged directories should be skipped during scan.</param>
+    /// <param name="shouldTrackConsumptionProgress">Optional. Whether the consumption progress of the media library items is tracked.</param>
+    /// <param name="completionThresholdPercentage">Optional. The percentage of a media library item that must be consumed for its session to be considered completed.</param>
     /// <param name="pathTemplateParts">Optional. The ordered parts of the path template of the media library.</param>
     /// <param name="createdOnUtc">Optional. The date and time when the library was created.</param>
     /// <param name="updatedOnUtc">Optional. The date and time when the library was updated.</param>
@@ -48,10 +50,14 @@ public class LibraryResponseFixture
         bool? canDownloadMetadataFromWeb = null,
         bool? shouldSaveMetadataInMediaDirectories = null,
         bool? shouldSkipUnchangedDirectoriesDuringScan = null,
+        bool? shouldTrackConsumptionProgress = null,
+        int? completionThresholdPercentage = null,
         List<LibraryPathTemplatePartResponse>? pathTemplateParts = null,
         DateTime? createdOnUtc = null,
         DateTime? updatedOnUtc = null)
     {
+        bool resolvedShouldTrackConsumptionProgress = shouldTrackConsumptionProgress ?? _faker.Random.Bool();
+        int? resolvedCompletionThresholdPercentage = completionThresholdPercentage ?? (resolvedShouldTrackConsumptionProgress ? _faker.Random.Int(0, 100) : null);
         return new LibraryResponse(
             id ?? Guid.NewGuid(),
             userId ?? Guid.NewGuid(),
@@ -64,6 +70,8 @@ public class LibraryResponseFixture
             canDownloadMetadataFromWeb ?? _faker.Random.Bool(),
             shouldSaveMetadataInMediaDirectories ?? _faker.Random.Bool(),
             shouldSkipUnchangedDirectoriesDuringScan ?? _faker.Random.Bool(),
+            resolvedShouldTrackConsumptionProgress,
+            resolvedCompletionThresholdPercentage,
             pathTemplateParts ?? [],
             createdOnUtc ?? _faker.Date.Past().ToUniversalTime(),
             updatedOnUtc

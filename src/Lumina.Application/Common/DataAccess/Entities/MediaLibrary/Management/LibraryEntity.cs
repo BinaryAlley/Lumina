@@ -81,6 +81,16 @@ public class LibraryEntity : IStorageEntity, IAuditableEntity
     public bool ShouldSkipUnchangedDirectoriesDuringScan { get; init; }
 
     /// <summary>
+    /// Gets a value indicating whether the consumption progress of the media library items is tracked.
+    /// </summary>
+    public bool ShouldTrackConsumptionProgress { get; init; }
+
+    /// <summary>
+    /// Gets the percentage of a media library item that must be consumed for its session to be considered completed, when progress tracking is enabled.
+    /// </summary>
+    public int? CompletionThresholdPercentage { get; init; }
+
+    /// <summary>
     /// Gets or sets the fingerprint of the metadata provider configuration of the media library, used to detect
     /// whether the configuration changed since the last scan, and thus whether the books need re-enrichment.
     /// </summary>

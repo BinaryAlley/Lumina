@@ -27,6 +27,7 @@ public class LibraryFixture
     private readonly LibraryIdFixture _libraryIdFixture = new();
     private readonly UserIdFixture _userIdFixture = new();
     private readonly ScanIdFixture _scanIdFixture = new();
+    private readonly LibraryConsumptionSettingsFixture _libraryConsumptionSettingsFixture = new();
 
     /// <summary>
     /// Creates a random valid <see cref="Library"/> domain aggregate.
@@ -42,6 +43,7 @@ public class LibraryFixture
     /// <param name="canDownloadMetadataFromWeb">Whether metadata download from the web is enabled.</param>
     /// <param name="shouldSaveMetadataInMediaDirectories">Whether metadata should be saved in the media directories.</param>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether unchanged directories should be skipped during scan.</param>
+    /// <param name="consumptionSettings">Optional. The consumption settings of the library.</param>
     /// <param name="scanIds">Optional. The scan Ids associated with the library.</param>
     /// <param name="pathTemplate">Optional. The path template of the library.</param>
     /// <param name="includeCoverImage">Whether the cover image should be included, or left unset, meaning the library has no cover.</param>
@@ -58,6 +60,7 @@ public class LibraryFixture
         bool canDownloadMetadataFromWeb = true,
         bool shouldSaveMetadataInMediaDirectories = false,
         bool shouldSkipUnchangedDirectoriesDuringScan = false,
+        LibraryConsumptionSettings? consumptionSettings = null,
         IEnumerable<Guid>? scanIds = null,
         LibraryPathTemplate? pathTemplate = null,
         bool includeCoverImage = true)
@@ -71,6 +74,8 @@ public class LibraryFixture
         ];
 
         UserId resolvedUserId = userId is null ? _userIdFixture.Create() : _userIdFixture.Create(userId.Value);
+        LibraryType resolvedLibraryType = libraryType ?? _faker.PickRandom<LibraryType>();
+        LibraryConsumptionSettings resolvedConsumptionSettings = consumptionSettings ?? _libraryConsumptionSettingsFixture.Create(resolvedLibraryType);
         List<ScanId> resolvedScanIds = scanIds is null ? [.. _scanIdFixture.CreateMany(2)] : [.. scanIds.Select(scanId => _scanIdFixture.Create(scanId))];
         string? resolvedCoverImage = includeCoverImage ? (coverImage ?? _faker.System.FilePath()) : null;
 
@@ -78,7 +83,7 @@ public class LibraryFixture
             Library.Create(
                 resolvedUserId,
                 title ?? _faker.Random.String2(_faker.Random.Number(1, 50)),
-                libraryType ?? _faker.PickRandom<LibraryType>(),
+                resolvedLibraryType,
                 contentLocations ?? validPaths.Take(Random.Shared.Next(1, validPaths.Count)),
                 Optional<string>.FromNullable(resolvedCoverImage),
                 isEnabled,
@@ -86,6 +91,7 @@ public class LibraryFixture
                 canDownloadMetadataFromWeb,
                 shouldSaveMetadataInMediaDirectories,
                 shouldSkipUnchangedDirectoriesDuringScan,
+                resolvedConsumptionSettings,
                 pathTemplate ?? LibraryPathTemplate.Empty(),
                 resolvedScanIds
             ) :
@@ -93,7 +99,7 @@ public class LibraryFixture
                 _libraryIdFixture.Create(id.Value),
                 resolvedUserId,
                 title ?? _faker.Random.String2(_faker.Random.Number(1, 50)),
-                libraryType ?? _faker.PickRandom<LibraryType>(),
+                resolvedLibraryType,
                 contentLocations ?? validPaths.Take(Random.Shared.Next(1, validPaths.Count)),
                 Optional<string>.FromNullable(resolvedCoverImage),
                 isEnabled,
@@ -101,6 +107,7 @@ public class LibraryFixture
                 canDownloadMetadataFromWeb,
                 shouldSaveMetadataInMediaDirectories,
                 shouldSkipUnchangedDirectoriesDuringScan,
+                resolvedConsumptionSettings,
                 pathTemplate ?? LibraryPathTemplate.Empty(),
                 resolvedScanIds
             );

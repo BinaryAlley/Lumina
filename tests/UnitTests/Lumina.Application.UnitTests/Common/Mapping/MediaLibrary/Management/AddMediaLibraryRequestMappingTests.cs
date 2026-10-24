@@ -31,7 +31,9 @@ public class AddMediaLibraryRequestMappingTests
             isLocked: false,
             canDownloadMetadataFromWeb: true,
             shouldSaveMetadataInMediaDirectories: false,
-            shouldSkipUnchangedDirectoriesDuringScan: false
+            shouldSkipUnchangedDirectoriesDuringScan: false,
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: 90
         );
 
         // Act
@@ -47,6 +49,8 @@ public class AddMediaLibraryRequestMappingTests
         Assert.Equal(request.IsLocked, result.IsLocked);
         Assert.Equal(request.CanDownloadMetadataFromWeb, result.CanDownloadMetadataFromWeb);
         Assert.Equal(request.ShouldSaveMetadataInMediaDirectories, result.ShouldSaveMetadataInMediaDirectories);
+        Assert.Equal(request.ShouldTrackConsumptionProgress, result.ShouldTrackConsumptionProgress);
+        Assert.Equal(request.CompletionThresholdPercentage, result.CompletionThresholdPercentage);
     }
 
     [Theory]

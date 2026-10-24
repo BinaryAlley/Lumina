@@ -28,6 +28,7 @@ public class LibraryTests
     private readonly UserIdFixture _userIdFixture = new();
     private readonly ScanIdFixture _scanIdFixture = new();
     private readonly LibraryIdFixture _libraryIdFixture = new();
+    private readonly LibraryConsumptionSettingsFixture _libraryConsumptionSettingsFixture = new();
 
     [Fact]
     public void Create_WhenCalledWithValidData_ShouldCreateLibraryWithAllPropertiesSet()
@@ -39,6 +40,9 @@ public class LibraryTests
         List<string> contentLocations = ["C:/Media/Books", "D:/Books"];
         string coverImageSourcePath = "C:/Cover/cover.jpg";
         List<ScanId> scanIds = [_scanIdFixture.Create(), _scanIdFixture.Create()];
+        LibraryConsumptionSettings consumptionSettings = _libraryConsumptionSettingsFixture.Create(
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: 75);
 
         // Act
         Result<Library> result = Library.Create(
@@ -52,6 +56,7 @@ public class LibraryTests
             canDownloadMetadataFromWeb: false,
             shouldSaveMetadataInMediaDirectories: true,
             shouldSkipUnchangedDirectoriesDuringScan: true,
+            consumptionSettings,
             LibraryPathTemplate.Empty(),
             scanIds);
 
@@ -68,6 +73,7 @@ public class LibraryTests
         Assert.False(result.Value.CanDownloadMetadataFromWeb);
         Assert.True(result.Value.ShouldSaveMetadataInMediaDirectories);
         Assert.True(result.Value.ShouldSkipUnchangedDirectoriesDuringScan);
+        Assert.Equal(consumptionSettings, result.Value.ConsumptionSettings);
         Assert.Equal(scanIds, result.Value.ScanIds);
     }
 
@@ -91,6 +97,7 @@ public class LibraryTests
             canDownloadMetadataFromWeb: true,
             shouldSaveMetadataInMediaDirectories: false,
             shouldSkipUnchangedDirectoriesDuringScan: false,
+            _libraryConsumptionSettingsFixture.Create(),
             LibraryPathTemplate.Empty(),
             scanIds);
 
@@ -118,6 +125,7 @@ public class LibraryTests
             canDownloadMetadataFromWeb: true,
             shouldSaveMetadataInMediaDirectories: false,
             shouldSkipUnchangedDirectoriesDuringScan: false,
+            _libraryConsumptionSettingsFixture.Create(),
             LibraryPathTemplate.Empty(),
             []);
 
@@ -154,6 +162,7 @@ public class LibraryTests
             canDownloadMetadataFromWeb: true,
             shouldSaveMetadataInMediaDirectories: false,
             shouldSkipUnchangedDirectoriesDuringScan: false,
+            _libraryConsumptionSettingsFixture.Create(),
             LibraryPathTemplate.Empty(),
             []);
 
@@ -182,6 +191,7 @@ public class LibraryTests
             canDownloadMetadataFromWeb: true,
             shouldSaveMetadataInMediaDirectories: false,
             shouldSkipUnchangedDirectoriesDuringScan: false,
+            _libraryConsumptionSettingsFixture.Create(),
             LibraryPathTemplate.Empty(),
             []);
 

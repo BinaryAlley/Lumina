@@ -54,6 +54,14 @@ public class UpdateLibraryCommandValidator : AbstractValidator<UpdateLibraryComm
             .MaximumLength(255)
             .WithError(Errors.Library.TitleMustBeMaximum255CharactersLong);
 
+        RuleFor(command => command.CompletionThresholdPercentage)
+            .Must((command, completionThresholdPercentage) => command.ShouldTrackConsumptionProgress != false || completionThresholdPercentage is null)
+            .WithError(Errors.Library.CompletionThresholdPercentageMustBeNullWhenProgressTrackingIsOff);
+
+        RuleFor(command => command.CompletionThresholdPercentage)
+            .InclusiveBetween(0, 100)
+            .WithError(Errors.Library.CompletionThresholdPercentageMustBeBetweenZeroAndOneHundred);
+
         RuleForEach(command => command.PathTemplateParts)
             .ChildRules(part =>
             {

@@ -59,6 +59,8 @@ public class LibraryMappingTests
         Assert.False(result.IsLocked);
         Assert.True(result.CanDownloadMetadataFromWeb);
         Assert.False(result.ShouldSaveMetadataInMediaDirectories);
+        Assert.Equal(library.ConsumptionSettings.ShouldTrackConsumptionProgress, result.ShouldTrackConsumptionProgress);
+        Assert.Equal(library.ConsumptionSettings.CompletionThresholdPercentage.HasValue ? library.ConsumptionSettings.CompletionThresholdPercentage.Value : null, result.CompletionThresholdPercentage);
         Assert.Equal(library.ScanIds.Select(scanId => scanId.Value), result.LibraryScans.Select(libraryScan => libraryScan.Id));
     }
 

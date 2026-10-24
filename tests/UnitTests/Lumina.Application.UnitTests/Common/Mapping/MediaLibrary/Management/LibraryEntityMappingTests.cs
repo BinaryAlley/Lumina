@@ -45,6 +45,8 @@ public class LibraryEntityMappingTests
         Assert.Equal(entity.LibraryType, result.LibraryType);
         Assert.Equal(entity.ContentLocations.Select(l => l.Path), result.ContentLocations);
         Assert.Equal(entity.CoverImage, result.CoverImage);
+        Assert.Equal(entity.ShouldTrackConsumptionProgress, result.ShouldTrackConsumptionProgress);
+        Assert.Equal(entity.CompletionThresholdPercentage, result.CompletionThresholdPercentage);
         Assert.Equal(entity.CreatedOnUtc, result.CreatedOnUtc);
         Assert.Equal(entity.UpdatedOnUtc, result.UpdatedOnUtc);
     }
@@ -198,6 +200,8 @@ public class LibraryEntityMappingTests
         Assert.Equal(entity.Title, result.Value.Title);
         Assert.Equal(entity.LibraryType, result.Value.LibraryType);
         Assert.Equal("D:/cover.jpg", result.Value.CoverImage.Value);
+        Assert.Equal(entity.ShouldTrackConsumptionProgress, result.Value.ConsumptionSettings.ShouldTrackConsumptionProgress);
+        Assert.Equal(entity.CompletionThresholdPercentage, result.Value.ConsumptionSettings.CompletionThresholdPercentage.HasValue ? result.Value.ConsumptionSettings.CompletionThresholdPercentage.Value : null);
         Assert.Equal(2, result.Value.PathTemplate.Parts.Count);
         Assert.Equal(LibraryPathPartKind.Literal, result.Value.PathTemplate.Parts[0].Kind);
         Assert.Equal("Various Artists", result.Value.PathTemplate.Parts[0].Representation);

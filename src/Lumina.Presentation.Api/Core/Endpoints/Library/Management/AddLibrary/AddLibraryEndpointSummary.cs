@@ -37,6 +37,8 @@ public class AddLibraryEndpointSummary : Summary<AddLibraryEndpoint, AddLibraryR
             CanDownloadMetadataFromWeb: true,
             ShouldSaveMetadataInMediaDirectories: false,
             ShouldSkipUnchangedDirectoriesDuringScan: false,
+            ShouldTrackConsumptionProgress: true,
+            CompletionThresholdPercentage: 90,
             PathTemplateParts: null
         );
 
@@ -49,6 +51,8 @@ public class AddLibraryEndpointSummary : Summary<AddLibraryEndpoint, AddLibraryR
         RequestParam(r => r.CanDownloadMetadataFromWeb, "Whether this media library should update the metadata of its elements from the web, or not. Optional.");
         RequestParam(r => r.ShouldSaveMetadataInMediaDirectories, "Whether this media library should copy the downloaded metadata into the media library content locations, or not. Optional.");
         RequestParam(r => r.ShouldSkipUnchangedDirectoriesDuringScan, "Whether this media library should skip the directories whose contents have not changed since the last scan, during the scan, or not. Optional.");
+        RequestParam(r => r.ShouldTrackConsumptionProgress, "Whether the consumption progress of the media library items should be tracked, or not. Optional, the default of the library type is used when absent.");
+        RequestParam(r => r.CompletionThresholdPercentage, "The percentage of a media library item that must be consumed for its session to be considered completed. Optional, the default of the library type is used when absent.");
         RequestParam(r => r.PathTemplateParts, "The ordered parts of the template describing the structure of the media library on disk. Optional, the ideal structure of the library type is used when absent.");
 
         ResponseParam<LibraryResponse>(r => r.Id, "The unique identifier of the entity.");
@@ -62,6 +66,8 @@ public class AddLibraryEndpointSummary : Summary<AddLibraryEndpoint, AddLibraryR
         ResponseParam<LibraryResponse>(r => r.CanDownloadMetadataFromWeb, "Whether this media library should update the metadata of its elements from the web, or not.");
         ResponseParam<LibraryResponse>(r => r.ShouldSaveMetadataInMediaDirectories, "Whether this media library should copy the downloaded metadata into the media library content locations, or not.");
         ResponseParam<LibraryResponse>(r => r.ShouldSkipUnchangedDirectoriesDuringScan, "Whether this media library should skip the directories whose contents have not changed since the last scan, during the scan, or not.");
+        ResponseParam<LibraryResponse>(r => r.ShouldTrackConsumptionProgress, "Whether the consumption progress of the media library items is tracked.");
+        ResponseParam<LibraryResponse>(r => r.CompletionThresholdPercentage, "The percentage of a media library item that must be consumed for its session to be considered completed, when progress tracking is enabled.");
         ResponseParam<LibraryResponse>(r => r.PathTemplateParts, "The ordered parts of the template describing the structure of the media library on disk.");
         ResponseParam<LibraryResponse>(r => r.CreatedOnUtc, "The date and time when the entity was created.");
         ResponseParam<LibraryResponse>(r => r.UpdatedOnUtc, "The date and time when the entity was last updated.");
@@ -79,6 +85,8 @@ public class AddLibraryEndpointSummary : Summary<AddLibraryEndpoint, AddLibraryR
                 CanDownloadMetadataFromWeb: true,
                 ShouldSaveMetadataInMediaDirectories: false,
                 ShouldSkipUnchangedDirectoriesDuringScan: false,
+                ShouldTrackConsumptionProgress: true,
+                CompletionThresholdPercentage: 90,
                 PathTemplateParts: [],
                 CreatedOnUtc: DateTime.UtcNow,
                 UpdatedOnUtc: default
@@ -158,6 +166,8 @@ public class AddLibraryEndpointSummary : Summary<AddLibraryEndpoint, AddLibraryR
                             "PathMustBeMaximum260CharactersLong",
                             "TitleCannotBeEmpty",
                             "TitleMustBeMaximum255CharactersLong",
+                            "CompletionThresholdPercentageMustBeNullWhenProgressTrackingIsOff",
+                            "CompletionThresholdPercentageMustBeBetweenZeroAndOneHundred",
                             "CoverFileMustBeAnImage"
                         }
                     }

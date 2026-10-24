@@ -1402,6 +1402,10 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasDefaultValue(true)
                         .HasColumnOrder(6);
 
+                    b.Property<int?>("CompletionThresholdPercentage")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(17);
+
                     b.Property<string>("CoverImage")
                         .HasMaxLength(255)
                         .HasColumnType("TEXT")
@@ -1447,6 +1451,12 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.Property<bool>("ShouldSkipUnchangedDirectoriesDuringScan")
                         .HasColumnType("INTEGER")
                         .HasColumnOrder(8);
+
+                    b.Property<bool>("ShouldTrackConsumptionProgress")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false)
+                        .HasColumnOrder(16);
 
                     b.Property<string>("Title")
                         .IsRequired()

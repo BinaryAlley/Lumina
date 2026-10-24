@@ -60,6 +60,8 @@ public class LibraryConfigurationTests
         IProperty libraryTypeProperty = entityType.GetProperty(nameof(LibraryEntity.LibraryType));
         IProperty isEnabledProperty = entityType.GetProperty(nameof(LibraryEntity.IsEnabled));
         IProperty downloadMetadataProperty = entityType.GetProperty(nameof(LibraryEntity.CanDownloadMetadataFromWeb));
+        IProperty shouldTrackConsumptionProgressProperty = entityType.GetProperty(nameof(LibraryEntity.ShouldTrackConsumptionProgress));
+        IProperty completionThresholdPercentageProperty = entityType.GetProperty(nameof(LibraryEntity.CompletionThresholdPercentage));
 
         // Assert
         Assert.False(titleProperty.IsNullable);
@@ -68,6 +70,8 @@ public class LibraryConfigurationTests
         Assert.Equal("TEXT", libraryTypeProperty.GetColumnType());
         Assert.Equal(true, isEnabledProperty.GetDefaultValue());
         Assert.Equal(true, downloadMetadataProperty.GetDefaultValue());
+        Assert.Equal(false, shouldTrackConsumptionProgressProperty.GetDefaultValue());
+        Assert.True(completionThresholdPercentageProperty.IsNullable);
     }
 
     [Fact]
@@ -84,6 +88,21 @@ public class LibraryConfigurationTests
         Assert.Equal(typeof(string), fingerprintProperty.ClrType);
         Assert.Equal(64, fingerprintProperty.GetMaxLength());
         Assert.Equal(11, fingerprintProperty.GetColumnOrder());
+    }
+
+    [Fact]
+    public void Configure_WhenApplied_ShouldConfigureConsumptionSettingsColumnOrders()
+    {
+        // Arrange
+        IEntityType entityType = DesignTimeModel.FindEntityType(typeof(LibraryEntity))!;
+
+        // Act
+        IProperty shouldTrackProperty = entityType.GetProperty(nameof(LibraryEntity.ShouldTrackConsumptionProgress));
+        IProperty completionThresholdProperty = entityType.GetProperty(nameof(LibraryEntity.CompletionThresholdPercentage));
+
+        // Assert
+        Assert.Equal(16, shouldTrackProperty.GetColumnOrder());
+        Assert.Equal(17, completionThresholdProperty.GetColumnOrder());
     }
 
     [Fact]

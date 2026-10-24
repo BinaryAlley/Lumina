@@ -31,7 +31,9 @@ public class UpdateLibraryRequestMappingTests
             isLocked: false,
             canDownloadMetadataFromWeb: true,
             shouldSaveMetadataInMediaDirectories: false,
-            shouldSkipUnchangedDirectoriesDuringScan: false);
+            shouldSkipUnchangedDirectoriesDuringScan: false,
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: 90);
 
         // Act
         UpdateLibraryCommand result = request.ToCommand();
@@ -47,6 +49,8 @@ public class UpdateLibraryRequestMappingTests
         Assert.Equal(request.CanDownloadMetadataFromWeb, result.CanDownloadMetadataFromWeb);
         Assert.Equal(request.ShouldSaveMetadataInMediaDirectories, result.ShouldSaveMetadataInMediaDirectories);
         Assert.Equal(request.ShouldSkipUnchangedDirectoriesDuringScan, result.ShouldSkipUnchangedDirectoriesDuringScan);
+        Assert.Equal(request.ShouldTrackConsumptionProgress, result.ShouldTrackConsumptionProgress);
+        Assert.Equal(request.CompletionThresholdPercentage, result.CompletionThresholdPercentage);
     }
 
     [Fact]

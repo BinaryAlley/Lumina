@@ -114,6 +114,49 @@ public class AddLibraryCommandHandlerTests
     }
 
     [Fact]
+    public async Task HandleAsync_WhenThresholdIsSuppliedWhileEffectiveTrackingIsOff_ShouldReturnThresholdMustBeNullError()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(
+            libraryType: nameof(LibraryType.Music),
+            shouldTrackConsumptionProgress: null,
+            completionThresholdPercentage: 50);
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(DomainErrors.Library.CompletionThresholdPercentageMustBeNullWhenProgressTrackingIsOff, result.FirstError);
+        await _mockLibraryRepository.DidNotReceive().InsertAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenProgressTrackingIsEnabledWithoutThreshold_ShouldUseLibraryTypeDefaultThreshold()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(
+            libraryType: nameof(LibraryType.Book),
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: null);
+        LibraryEntity persistedLibrary = _libraryEntityFixture.Create(userId: _userId);
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(persistedLibrary));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockLibraryRepository.Received(1).InsertAsync(
+            Arg.Is<LibraryEntity>(library =>
+                library.ShouldTrackConsumptionProgress &&
+                library.CompletionThresholdPercentage == 100),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task HandleAsync_WhenProviderConfigurationSeedingFails_ShouldReturnErrorWithoutSaving()
     {
         // Arrange

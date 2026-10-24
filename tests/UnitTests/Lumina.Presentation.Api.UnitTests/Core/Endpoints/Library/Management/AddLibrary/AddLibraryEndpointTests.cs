@@ -105,7 +105,9 @@ public class AddLibraryEndpointTests
                 command.IsLocked == request.IsLocked &&
                 command.CanDownloadMetadataFromWeb == request.CanDownloadMetadataFromWeb &&
                 command.ShouldSaveMetadataInMediaDirectories == request.ShouldSaveMetadataInMediaDirectories &&
-                command.ShouldSkipUnchangedDirectoriesDuringScan == request.ShouldSkipUnchangedDirectoriesDuringScan),
+                command.ShouldSkipUnchangedDirectoriesDuringScan == request.ShouldSkipUnchangedDirectoriesDuringScan &&
+                command.ShouldTrackConsumptionProgress == request.ShouldTrackConsumptionProgress &&
+                command.CompletionThresholdPercentage == request.CompletionThresholdPercentage),
             Arg.Is(cancellationToken));
     }
 

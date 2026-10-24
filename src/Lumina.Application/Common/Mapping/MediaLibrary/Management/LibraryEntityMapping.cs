@@ -36,6 +36,8 @@ public static class LibraryEntityMapping
             repositoryEntity.CanDownloadMetadataFromWeb,
             repositoryEntity.ShouldSaveMetadataInMediaDirectories,
             repositoryEntity.ShouldSkipUnchangedDirectoriesDuringScan,
+            repositoryEntity.ShouldTrackConsumptionProgress,
+            repositoryEntity.CompletionThresholdPercentage,
             [.. repositoryEntity.PathTemplateParts
                 .OrderBy(part => part.Position)
                 .Select(part => new LibraryPathTemplatePartResponse(part.Kind.ToString(), part.Representation, part.IsOptional))],
@@ -57,6 +59,10 @@ public static class LibraryEntityMapping
         if (pathTemplateResult.IsFailure)
             return pathTemplateResult.Errors;
 
+        LibraryConsumptionSettings consumptionSettings = LibraryConsumptionSettings.Create(
+            repositoryEntity.ShouldTrackConsumptionProgress,
+            Optional<int>.FromNullable(repositoryEntity.CompletionThresholdPercentage));
+
         return Library.Create(
             LibraryId.Create(repositoryEntity.Id),
             UserId.Create(repositoryEntity.UserId),
@@ -69,6 +75,7 @@ public static class LibraryEntityMapping
             repositoryEntity.CanDownloadMetadataFromWeb,
             repositoryEntity.ShouldSaveMetadataInMediaDirectories,
             repositoryEntity.ShouldSkipUnchangedDirectoriesDuringScan,
+            consumptionSettings,
             pathTemplateResult.Value,
             [.. repositoryEntity.LibraryScans.Select(libraryScan => ScanId.Create(libraryScan.Id))]
         );

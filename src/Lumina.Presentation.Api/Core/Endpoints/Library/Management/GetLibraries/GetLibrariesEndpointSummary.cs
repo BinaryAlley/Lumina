@@ -33,6 +33,8 @@ public class GetLibrariesEndpointSummary : Summary<GetLibrariesEndpoint, EmptyRe
         ResponseParam<LibraryResponse>(r => r.CanDownloadMetadataFromWeb, "Whether this media library should update the metadata of its elements from the web, or not.");
         ResponseParam<LibraryResponse>(r => r.ShouldSaveMetadataInMediaDirectories, "Whether this media library should copy the downloaded metadata into the media library content locations, or not.");
         ResponseParam<LibraryResponse>(r => r.ShouldSkipUnchangedDirectoriesDuringScan, "Whether this media library should skip the directories whose contents have not changed since the last scan, during the scan, or not.");
+        ResponseParam<LibraryResponse>(r => r.ShouldTrackConsumptionProgress, "Whether the consumption progress of the media library items is tracked.");
+        ResponseParam<LibraryResponse>(r => r.CompletionThresholdPercentage, "The percentage of a media library item that must be consumed for its session to be considered completed, when progress tracking is enabled.");
         ResponseParam<LibraryResponse>(r => r.PathTemplateParts, "The ordered parts of the template describing the structure of the media library on disk.");
         ResponseParam<LibraryResponse>(r => r.CreatedOnUtc, "The date and time when the entity was created.");
         ResponseParam<LibraryResponse>(r => r.UpdatedOnUtc, "The date and time when the entity was last updated.");
@@ -51,6 +53,8 @@ public class GetLibrariesEndpointSummary : Summary<GetLibrariesEndpoint, EmptyRe
                 CanDownloadMetadataFromWeb: true,
                 ShouldSaveMetadataInMediaDirectories: false,
                 ShouldSkipUnchangedDirectoriesDuringScan: false,
+                ShouldTrackConsumptionProgress: true,
+                CompletionThresholdPercentage: 90,
                 PathTemplateParts: [],
                 CreatedOnUtc: DateTime.UtcNow,
                 UpdatedOnUtc: default
@@ -67,6 +71,8 @@ public class GetLibrariesEndpointSummary : Summary<GetLibrariesEndpoint, EmptyRe
                 CanDownloadMetadataFromWeb: true,
                 ShouldSaveMetadataInMediaDirectories: true,
                 ShouldSkipUnchangedDirectoriesDuringScan: false,
+                ShouldTrackConsumptionProgress: true,
+                CompletionThresholdPercentage: 90,
                 PathTemplateParts: [],
                 CreatedOnUtc: DateTime.UtcNow,
                 UpdatedOnUtc: default
