@@ -1,0 +1,7 @@
+### Music track session
+GET {{host}}/api/v1/users/me/consumption-records/2c1b0a9f-8e7d-4c6b-5a4f-3e2d1c0b9a8f
+Authorization: Bearer {{ACCESS_TOKEN}}
+
+### Book session
+GET {{host}}/api/v1/users/me/consumption-records/8f7e6d5c-4b3a-4928-8170-6f5e4d3c2b1a
+Authorization: Bearer {{ACCESS_TOKEN}}

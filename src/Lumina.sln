@@ -83,6 +83,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "favorites", "favorites", "{
 		..\docs\technical\api\favorites\Api.Favorites.md = ..\docs\technical\api\favorites\Api.Favorites.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "media-consumption", "media-consumption", "{A3E6B1C4-7D2F-4A98-8B5C-1F0D3E6A9C42}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\api\media-consumption\Api.MediaConsumption.md = ..\docs\technical\api\media-consumption\Api.MediaConsumption.md
+	EndProjectSection
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "file-system-management", "file-system-management", "{2FA735A6-2141-44AB-B34C-F65E4195B1EB}"
 	ProjectSection(SolutionItems) = preProject
 		..\docs\technical\api\file-system-management\Api.Directories.md = ..\docs\technical\api\file-system-management\Api.Directories.md
@@ -226,6 +231,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "favorites", "favorites", "{
 		..\docs\technical\requests\favorites\GetFavoriteStatus.http = ..\docs\technical\requests\favorites\GetFavoriteStatus.http
 		..\docs\technical\requests\favorites\GetFavorites.http = ..\docs\technical\requests\favorites\GetFavorites.http
 		..\docs\technical\requests\favorites\RemoveFavorite.http = ..\docs\technical\requests\favorites\RemoveFavorite.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "media-consumption", "media-consumption", "{B4F7C2D5-8E3A-4B69-9C6D-2A1E4F7B0D53}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\media-consumption\CompleteConsumption.http = ..\docs\technical\requests\media-consumption\CompleteConsumption.http
+		..\docs\technical\requests\media-consumption\GetConsumptionRecord.http = ..\docs\technical\requests\media-consumption\GetConsumptionRecord.http
+		..\docs\technical\requests\media-consumption\GetResumePoint.http = ..\docs\technical\requests\media-consumption\GetResumePoint.http
+		..\docs\technical\requests\media-consumption\ReportConsumptionProgress.http = ..\docs\technical\requests\media-consumption\ReportConsumptionProgress.http
+		..\docs\technical\requests\media-consumption\StartConsumption.http = ..\docs\technical\requests\media-consumption\StartConsumption.http
+		..\docs\technical\requests\media-consumption\StopConsumption.http = ..\docs\technical\requests\media-consumption\StopConsumption.http
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "file-system-management", "file-system-management", "{6D5C6E19-67A1-4327-A958-1EC0DA6E9D7D}"
@@ -1404,6 +1419,7 @@ Global
 		{459EF701-AB73-40ED-81E6-144D3587C667} = {D78A725D-C3AE-420B-ABA8-255A000D7324}
 		{08113205-695B-4DA4-8355-6C5377BBD8C0} = {459EF701-AB73-40ED-81E6-144D3587C667}
 		{A841E8D2-F3C9-403D-BAE1-A087B8040C61} = {D78A725D-C3AE-420B-ABA8-255A000D7324}
+		{A3E6B1C4-7D2F-4A98-8B5C-1F0D3E6A9C42} = {D78A725D-C3AE-420B-ABA8-255A000D7324}
 		{2FA735A6-2141-44AB-B34C-F65E4195B1EB} = {D78A725D-C3AE-420B-ABA8-255A000D7324}
 		{6A5D3BED-AE4A-4D26-B12A-5DE996152A64} = {D78A725D-C3AE-420B-ABA8-255A000D7324}
 		{252D7F8D-991F-4C62-9BB1-D13988D7B4E2} = {6A5D3BED-AE4A-4D26-B12A-5DE996152A64}
@@ -1426,6 +1442,7 @@ Global
 		{7DC07C5C-4877-45DF-86C2-D93069EA7608} = {A9BD996E-E8E8-4C34-B792-5E6A00BD5938}
 		{3BCFBE37-A64D-4F3C-9D18-E37E89CB490F} = {A9BD996E-E8E8-4C34-B792-5E6A00BD5938}
 		{8D16AB83-DE2B-4527-AFFC-9F3292AC4CA9} = {B45637D3-840C-4898-A047-C6FB568FFFE6}
+		{B4F7C2D5-8E3A-4B69-9C6D-2A1E4F7B0D53} = {B45637D3-840C-4898-A047-C6FB568FFFE6}
 		{6D5C6E19-67A1-4327-A958-1EC0DA6E9D7D} = {B45637D3-840C-4898-A047-C6FB568FFFE6}
 		{B6A1AB2C-766F-4DC2-894A-4DF1FE102AED} = {6D5C6E19-67A1-4327-A958-1EC0DA6E9D7D}
 		{82D80C8B-593E-4E54-BDC2-26931EA3E2D6} = {6D5C6E19-67A1-4327-A958-1EC0DA6E9D7D}

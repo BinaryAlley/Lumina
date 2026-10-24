@@ -4,6 +4,7 @@ using Lumina.Application.Common.Utilities;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
+using System.Linq;
 #endregion
 
 namespace Lumina.Application.Core.MediaConsumption.Queries.GetResumePoint;
@@ -18,13 +19,13 @@ public class GetResumePointQueryValidator : AbstractValidator<GetResumePointQuer
     /// </summary>
     public GetResumePointQueryValidator()
     {
-        // Validates the kind of media to resume, taken from the route.
+        // Validates the kind of media to resume, taken from the route. Only the member names are accepted, so a numeric route value that happens to parse as an enumeration value is rejected.
         RuleFor(query => query.MediaKind)
             .NotEmpty()
             .WithError(Errors.MediaConsumption.UnsupportedMediaKind);
 
         RuleFor(query => query.MediaKind)
-            .Must(mediaKind => Enum.TryParse(mediaKind, ignoreCase: true, out MediaKind parsedMediaKind) && Enum.IsDefined(parsedMediaKind))
+            .Must(mediaKind => Enum.GetNames<MediaKind>().Contains(mediaKind, StringComparer.OrdinalIgnoreCase))
             .When(query => query.MediaKind is not null && query.MediaKind.Length > 0)
             .WithError(Errors.MediaConsumption.UnsupportedMediaKind);
 

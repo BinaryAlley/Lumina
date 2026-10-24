@@ -76,6 +76,10 @@ public class GetResumePointQueryHandler : IQueryHandler<GetResumePointQuery, Res
             return DomainErrors.MediaConsumption.UnsupportedMediaKind;
         if (!ruleResult.Value.CanResume)
             return DomainErrors.MediaConsumption.MediaKindCannotResume;
+        // A planned kind cannot have a resume point, because its catalogue does not exist yet and start rejects it. Report it as unsupported instead of
+        // as a missing resume point, so the response does not imply that the kind is usable.
+        if (!ruleResult.Value.IsSupportedByCurrentCatalogues)
+            return DomainErrors.MediaConsumption.UnsupportedMediaKind;
 
         // The resume point is read without tracking and scoped to the current user, so a resume point of another user is indistinguishable from a missing one.
         Result<MediaResumePointEntity?> getResumePointResult = await _unitOfWork.MediaResumePointRepository

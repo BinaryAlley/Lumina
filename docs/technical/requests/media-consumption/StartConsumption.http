@@ -1,0 +1,7 @@
+### Music track
+POST {{host}}/api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/media-items/MusicTrack/9f0e1d2c-3b4a-4c6d-8e7f-9a0b1c2d3e4f/consumption-records
+Authorization: Bearer {{ACCESS_TOKEN}}
+
+### Book
+POST {{host}}/api/v1/libraries/5c6d7e8f-9a0b-4c1d-8e2f-3a4b5c6d7e8f/media-items/Book/7a6b5c4d-3e2f-4a1b-8c9d-0e1f2a3b4c5d/consumption-records
+Authorization: Bearer {{ACCESS_TOKEN}}

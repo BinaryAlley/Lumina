@@ -4,6 +4,7 @@ using Lumina.Application.Common.Utilities;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
+using System.Linq;
 #endregion
 
 namespace Lumina.Application.Core.MediaConsumption.Commands.StartConsumption;
@@ -28,13 +29,13 @@ public class StartConsumptionCommandValidator : AbstractValidator<StartConsumpti
             .When(command => command.LibraryId is not null && command.LibraryId.Length > 0)
             .WithError(Errors.Library.LibraryIdCannotBeEmpty);
 
-        // Validates the kind of media that is consumed, taken from the route. Kinds that are not supported by the current catalogues are rejected by the handler, because that is a business rule.
+        // Validates the kind of media that is consumed, taken from the route. Only the member names are accepted, so a numeric route value that happens to parse as an enumeration value is rejected. Kinds that are not supported by the current catalogues are rejected by the handler, because that is a business rule.
         RuleFor(command => command.MediaKind)
             .NotEmpty()
             .WithError(Errors.MediaConsumption.UnsupportedMediaKind);
 
         RuleFor(command => command.MediaKind)
-            .Must(mediaKind => Enum.TryParse<MediaKind>(mediaKind, ignoreCase: true, out MediaKind parsedMediaKind) && Enum.IsDefined(parsedMediaKind))
+            .Must(mediaKind => Enum.GetNames<MediaKind>().Contains(mediaKind, StringComparer.OrdinalIgnoreCase))
             .When(command => command.MediaKind is not null && command.MediaKind.Length > 0)
             .WithError(Errors.MediaConsumption.UnsupportedMediaKind);
 
