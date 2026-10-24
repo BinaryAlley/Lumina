@@ -484,18 +484,55 @@ internal sealed class BookRepository : IBookRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either the display names of the authors of the books, keyed by book Id, or an error.</returns>
     public async Task<Result<IReadOnlyDictionary<Guid, string?>>> GetAuthorsDisplayNamesByBookIdsAsync(IReadOnlyCollection<Guid> bookIds, CancellationToken cancellationToken)
     {
-        List<AuthorRow> authorRows = await _luminaDbContext.BookContributors
-            .Where(bookContributor => bookIds.Contains(bookContributor.BookId) && bookContributor.Role == MediaContributorRole.Author)
-            .Join(_luminaDbContext.MediaContributors,
-                bookContributor => bookContributor.MediaContributorId,
-                contributor => contributor.Id,
-                (bookContributor, contributor) => new AuthorRow(bookContributor.BookId, contributor.DisplayName))
-            .ToListAsync(cancellationToken)
-            .ConfigureAwait(false);
+        List<AuthorRow> authorRows = [];
+        // The lookup is split into bounded chunks, so an unpaginated history never exceeds the storage parameter limit.
+        const int LOOKUP_CHUNK_SIZE = 500;
+        foreach (Guid[] chunk in bookIds.Chunk(LOOKUP_CHUNK_SIZE))
+        {
+            authorRows.AddRange(await _luminaDbContext.BookContributors
+                .Where(bookContributor => chunk.Contains(bookContributor.BookId) && bookContributor.Role == MediaContributorRole.Author)
+                .Join(_luminaDbContext.MediaContributors,
+                    bookContributor => bookContributor.MediaContributorId,
+                    contributor => contributor.Id,
+                    (bookContributor, contributor) => new AuthorRow(bookContributor.BookId, contributor.DisplayName))
+                .ToListAsync(cancellationToken)
+                .ConfigureAwait(false));
+        }
 
         return authorRows
             .GroupBy(row => row.BookId)
             .ToDictionary(group => group.Key, group => group.Min(row => row.DisplayName));
+    }
+
+    /// <summary>
+    /// Gets the books identified by <paramref name="bookIds"/>, optionally together with their navigation properties.
+    /// </summary>
+    /// <param name="bookIds">The Ids of the books to get.</param>
+    /// <param name="shouldIncludeNavigationProperties">Whether the navigation properties of the books should be loaded together with the books themselves.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the existing books, or an error.</returns>
+    public async Task<Result<IReadOnlyList<BookEntity>>> GetByIdsAsync(IReadOnlyCollection<Guid> bookIds, bool shouldIncludeNavigationProperties, CancellationToken cancellationToken)
+    {
+        List<BookEntity> books = [];
+        // The lookup is split into bounded chunks, so even an unpaginated history never exceeds the storage parameter limit.
+        const int LOOKUP_CHUNK_SIZE = 500;
+        foreach (Guid[] chunk in bookIds.Chunk(LOOKUP_CHUNK_SIZE))
+        {
+            IQueryable<BookEntity> query = _luminaDbContext.Books.AsNoTracking();
+            if (shouldIncludeNavigationProperties)
+            {
+                query = query
+                    .Include(book => book.Tags)
+                    .Include(book => book.Genres)
+                    .Include(book => book.ISBNs)
+                    .Include(book => book.Ratings)
+                    .Include(book => book.Contributors)
+                    .Include(book => book.Artwork)
+                    .AsSplitQuery();
+            }
+            books.AddRange(await query.Where(book => chunk.Contains(book.Id)).ToListAsync(cancellationToken).ConfigureAwait(false));
+        }
+        return Result.From<IReadOnlyList<BookEntity>>(books);
     }
 
     /// <summary>

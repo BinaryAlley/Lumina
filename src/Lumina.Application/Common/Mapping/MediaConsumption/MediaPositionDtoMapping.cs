@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DTO.MediaConsumption;
+using Lumina.Application.Common.Utilities;
 using Lumina.Contracts.Responses.MediaConsumption;
-using System;
 #endregion
 
 namespace Lumina.Application.Common.Mapping.MediaConsumption;
@@ -20,7 +20,7 @@ public static class MediaPositionDtoMapping
     {
         return new MediaPositionResponse(
             data.Kind,
-            data.TimeOffsetMilliseconds.HasValue ? TimeSpan.FromMilliseconds(data.TimeOffsetMilliseconds.Value).TotalSeconds : null,
+            data.TimeOffsetMilliseconds.HasValue ? data.TimeOffsetMilliseconds.Value.ToClampedTimeSpan().TotalSeconds : null,
             data.Location
         );
     }

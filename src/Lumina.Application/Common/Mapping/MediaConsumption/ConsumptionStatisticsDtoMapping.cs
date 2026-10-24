@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DTO.MediaConsumption;
+using Lumina.Application.Common.Utilities;
 using Lumina.Contracts.Responses.MediaConsumption;
-using System;
 using System.Linq;
 #endregion
 
@@ -21,7 +21,7 @@ public static class ConsumptionStatisticsDtoMapping
     {
         return new ConsumptionSummaryResponse(
             data.UserId,
-            TimeSpan.FromMilliseconds(data.TotalConsumedDurationMilliseconds).TotalSeconds,
+            data.TotalConsumedDurationMilliseconds.ToClampedTimeSpan().TotalSeconds,
             data.CountedSessionCount,
             data.CompletedSessionCount,
             data.StoppedSessionCount,

@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DTO.MediaConsumption;
+using Lumina.Application.Common.Utilities;
 using Lumina.Contracts.Responses.MediaConsumption;
-using System;
 #endregion
 
 namespace Lumina.Application.Common.Mapping.MediaConsumption;
@@ -20,7 +20,7 @@ public static class MediaKindConsumptionStatisticsDtoMapping
     {
         return new MediaKindConsumptionSummaryResponse(
             data.MediaKind,
-            TimeSpan.FromMilliseconds(data.TotalConsumedDurationMilliseconds).TotalSeconds,
+            data.TotalConsumedDurationMilliseconds.ToClampedTimeSpan().TotalSeconds,
             data.CountedSessionCount,
             data.CompletedSessionCount,
             data.StoppedSessionCount,

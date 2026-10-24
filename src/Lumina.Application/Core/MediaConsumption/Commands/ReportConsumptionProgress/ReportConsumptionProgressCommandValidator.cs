@@ -14,6 +14,12 @@ namespace Lumina.Application.Core.MediaConsumption.Commands.ReportConsumptionPro
 public class ReportConsumptionProgressCommandValidator : AbstractValidator<ReportConsumptionProgressCommand>
 {
     /// <summary>
+    /// The maximum active duration, in seconds, that a client can report for one session or as a position within a media item. The limit keeps
+    /// accumulated totals representable as a <see cref="TimeSpan"/> and rejects durations that cannot describe real media.
+    /// </summary>
+    private const double MAXIMUM_REPORTED_DURATION_IN_SECONDS = 31 * 24 * 60 * 60;
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="ReportConsumptionProgressCommandValidator"/> class.
     /// </summary>
     public ReportConsumptionProgressCommandValidator()
@@ -54,7 +60,7 @@ public class ReportConsumptionProgressCommandValidator : AbstractValidator<Repor
 
         RuleFor(command => command.ConsumedDurationInSeconds)
             .Must(consumedDuration => consumedDuration is null ||
-                consumedDuration.Value <= TimeSpan.MaxValue.TotalSeconds)
+                consumedDuration.Value <= MAXIMUM_REPORTED_DURATION_IN_SECONDS)
             .WithError(Errors.MediaConsumption.ConsumedDurationIsOutOfRange);
 
         RuleFor(command => command.ConsecutivePagesRead)
@@ -78,14 +84,13 @@ public class ReportConsumptionProgressCommandValidator : AbstractValidator<Repor
         if (!Enum.TryParse(positionKind, ignoreCase: true, out MediaPositionKind parsedPositionKind) || !Enum.IsDefined(parsedPositionKind))
             return false;
 
-        // A position uses exactly one representation, because MediaPosition stores one kind and one value, so the fields of the other
-        // representation must be absent instead of ignored.
+        // A position uses exactly one representation, because MediaPosition stores one kind and one value, so the fields of the other representation must be absent instead of ignored.
         return parsedPositionKind switch
         {
             MediaPositionKind.TimeOffset => timeOffsetInSeconds.HasValue &&
                 double.IsFinite(timeOffsetInSeconds.Value) &&
                 timeOffsetInSeconds.Value >= 0 &&
-                timeOffsetInSeconds.Value <= TimeSpan.MaxValue.TotalSeconds &&
+                timeOffsetInSeconds.Value <= MAXIMUM_REPORTED_DURATION_IN_SECONDS &&
                 string.IsNullOrWhiteSpace(location),
             MediaPositionKind.Location => !timeOffsetInSeconds.HasValue &&
                 !string.IsNullOrWhiteSpace(location) &&

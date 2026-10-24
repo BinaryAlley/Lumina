@@ -137,4 +137,13 @@ public interface ITrackRepository : IRepository<TrackEntity>,
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either the access summary of the existing tracks, or an error.</returns>
     Task<Result<TrackAccessSummaryDto>> GetAccessInfoByIdsAsync(IReadOnlyCollection<Guid> trackIds, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets the tracks identified by <paramref name="trackIds"/>, optionally together with their navigation properties.
+    /// </summary>
+    /// <param name="trackIds">The Ids of the tracks to get.</param>
+    /// <param name="shouldIncludeNavigationProperties">Whether the navigation properties of the tracks should be loaded together with the tracks themselves.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the existing tracks, or an error.</returns>
+    Task<Result<IReadOnlyList<TrackEntity>>> GetByIdsAsync(IReadOnlyCollection<Guid> trackIds, bool shouldIncludeNavigationProperties, CancellationToken cancellationToken);
 }

@@ -32,8 +32,11 @@ public static class MediaResumePointEntityMapping
         MediaPosition lastPosition;
         if (repositoryEntity.LastPositionKind == MediaPositionKind.TimeOffset)
         {
+            // A stored position outside the representable range is rejected like a negative one, instead of being silently clamped to a position that no client ever reported.
+            long maximumTimeOffsetMilliseconds = TimeSpan.MaxValue.Ticks / TimeSpan.TicksPerMillisecond;
             if (!repositoryEntity.LastPositionTimeOffsetMilliseconds.HasValue ||
                 repositoryEntity.LastPositionTimeOffsetMilliseconds.Value < 0 ||
+                repositoryEntity.LastPositionTimeOffsetMilliseconds.Value > maximumTimeOffsetMilliseconds ||
                 repositoryEntity.LastPositionLocation is not null)
                 return DomainErrors.MediaConsumption.InvalidMediaPosition;
             lastPosition = MediaPosition.CreateTimeOffset(TimeSpan.FromMilliseconds(repositoryEntity.LastPositionTimeOffsetMilliseconds.Value));

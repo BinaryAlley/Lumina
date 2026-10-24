@@ -179,6 +179,11 @@ public interface IUnitOfWork
     IMediaResumePointRepository MediaResumePointRepository { get; }
 
     /// <summary>
+    /// Gets the repository for the consumption records used to build consumption statistics.
+    /// </summary>
+    IConsumptionStatisticsRepository ConsumptionStatisticsRepository { get; }
+
+    /// <summary>
     /// Saves the changes made to the database.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>

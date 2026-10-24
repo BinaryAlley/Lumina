@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.DTO.MediaConsumption;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Contracts.DTO.Common;
@@ -13,6 +14,7 @@ using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibrary
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +29,33 @@ namespace Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibra
 /// </summary>
 public static class TrackEntityMapping
 {
+    /// <summary>
+    /// Converts <paramref name="repositoryEntity"/> to the consumption history row of a music track.
+    /// </summary>
+    /// <param name="repositoryEntity">The repository entity to be converted.</param>
+    /// <param name="lastConsumedOnUtc">The date and time when the track was last consumed.</param>
+    /// <param name="countedSessionCount">The number of sessions of the track that count towards statistics.</param>
+    /// <param name="completedSessionCount">The number of sessions of the track that completed.</param>
+    /// <param name="consumedDurationMilliseconds">The active duration consumed in the track, over all of its sessions, in milliseconds.</param>
+    /// <param name="coverPath">The path of the cover art of the album that contains the track, if available.</param>
+    /// <returns>The converted consumption history row.</returns>
+    public static ConsumedItemDto ToDto(this TrackEntity repositoryEntity, DateTime lastConsumedOnUtc, int countedSessionCount, int completedSessionCount, long consumedDurationMilliseconds, string? coverPath)
+    {
+        return new ConsumedItemDto(
+            MediaKind.MusicTrack,
+            repositoryEntity.Id,
+            repositoryEntity.LibraryId,
+            true,
+            repositoryEntity.Title,
+            repositoryEntity.Album?.Title ?? string.Empty,
+            repositoryEntity.Album?.Artist?.Name ?? string.Empty,
+            coverPath,
+            lastConsumedOnUtc,
+            countedSessionCount,
+            completedSessionCount,
+            consumedDurationMilliseconds);
+    }
+
     /// <summary>
     /// Converts <paramref name="repositoryEntity"/> to <see cref="Track"/>.
     /// </summary>

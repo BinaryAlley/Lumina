@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DTO.MediaConsumption;
 using Lumina.Application.Common.DTO.Pagination;
+using Lumina.Application.Common.Utilities;
 using Lumina.Contracts.Responses.Common;
 using Lumina.Contracts.Responses.MediaConsumption;
 using System;
@@ -33,7 +34,7 @@ public static class ConsumedItemDtoMapping
             DateTime.SpecifyKind(data.LastConsumedOnUtc, DateTimeKind.Utc),
             data.CountedSessionCount,
             data.CompletedSessionCount,
-            TimeSpan.FromMilliseconds(data.ConsumedDurationMilliseconds).TotalSeconds
+            data.ConsumedDurationMilliseconds.ToClampedTimeSpan().TotalSeconds
         );
     }
 

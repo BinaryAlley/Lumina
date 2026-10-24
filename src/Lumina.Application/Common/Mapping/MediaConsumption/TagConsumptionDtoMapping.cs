@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DTO.MediaConsumption;
+using Lumina.Application.Common.Utilities;
 using Lumina.Contracts.Responses.MediaConsumption;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 #endregion
@@ -24,7 +24,7 @@ public static class TagConsumptionDtoMapping
             data.Name,
             data.TagKind,
             data.ConsumedItemCount,
-            TimeSpan.FromMilliseconds(data.ConsumedDurationMilliseconds).TotalSeconds
+            data.ConsumedDurationMilliseconds.ToClampedTimeSpan().TotalSeconds
         );
     }
 

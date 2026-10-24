@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DTO.MediaConsumption;
+using Lumina.Application.Common.Utilities;
 using Lumina.Contracts.Responses.MediaConsumption;
 using System;
 #endregion
@@ -28,7 +29,7 @@ public static class ConsumptionRecordDtoMapping
             DateTime.SpecifyKind(data.StartedOnUtc, DateTimeKind.Utc),
             DateTime.SpecifyKind(data.LastActivityOnUtc, DateTimeKind.Utc),
             data.EndedOnUtc.HasValue ? DateTime.SpecifyKind(data.EndedOnUtc.Value, DateTimeKind.Utc) : null,
-            TimeSpan.FromMilliseconds(data.ConsumedDurationMilliseconds).TotalSeconds,
+            data.ConsumedDurationMilliseconds.ToClampedTimeSpan().TotalSeconds,
             data.LastPosition?.ToResponse(),
             data.LastProgressFraction,
             data.ConsecutivePagesRead

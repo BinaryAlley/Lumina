@@ -75,6 +75,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     private IFavoriteRepository? _favoriteRepository;
     private IMediaConsumptionRecordRepository? _mediaConsumptionRecordRepository;
     private IMediaResumePointRepository? _mediaResumePointRepository;
+    private IConsumptionStatisticsRepository? _consumptionStatisticsRepository;
 
     /// <summary>
     /// Gets the permission repository.
@@ -442,6 +443,18 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         {
             _mediaResumePointRepository ??= new MediaResumePointRepository(_luminaDbContext);
             return _mediaResumePointRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the repository for the consumption records used to build consumption statistics.
+    /// </summary>
+    public IConsumptionStatisticsRepository ConsumptionStatisticsRepository
+    {
+        get
+        {
+            _consumptionStatisticsRepository ??= new ConsumptionStatisticsRepository(_luminaDbContext);
+            return _consumptionStatisticsRepository;
         }
     }
 

@@ -560,6 +560,39 @@ internal sealed class TrackRepository : ITrackRepository
     }
 
     /// <summary>
+    /// Gets the tracks identified by <paramref name="trackIds"/>, optionally together with their navigation properties.
+    /// </summary>
+    /// <param name="trackIds">The Ids of the tracks to get.</param>
+    /// <param name="shouldIncludeNavigationProperties">Whether the navigation properties of the tracks should be loaded together with the tracks themselves.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the existing tracks, or an error.</returns>
+    public async Task<Result<IReadOnlyList<TrackEntity>>> GetByIdsAsync(IReadOnlyCollection<Guid> trackIds, bool shouldIncludeNavigationProperties, CancellationToken cancellationToken)
+    {
+        List<TrackEntity> tracks = [];
+        // The lookup is split into bounded chunks, so even an unpaginated history never exceeds the storage parameter limit.
+        const int LOOKUP_CHUNK_SIZE = 500;
+        foreach (Guid[] chunk in trackIds.Chunk(LOOKUP_CHUNK_SIZE))
+        {
+            IQueryable<TrackEntity> query = _luminaDbContext.Tracks.AsNoTracking();
+            if (shouldIncludeNavigationProperties)
+            {
+                query = query
+                    .Include(track => track.Album)
+                    .ThenInclude(album => album!.Artist)
+                    .Include(track => track.Ratings)
+                    .Include(track => track.Tags)
+                    .Include(track => track.Genres)
+                    .Include(track => track.Moods)
+                    .Include(track => track.Isrcs)
+                    .Include(track => track.Contributors)
+                    .AsSplitQuery();
+            }
+            tracks.AddRange(await query.Where(track => chunk.Contains(track.Id)).ToListAsync(cancellationToken).ConfigureAwait(false));
+        }
+        return Result.From<IReadOnlyList<TrackEntity>>(tracks);
+    }
+
+    /// <summary>
     /// The number of requested tracks that exist in one library.
     /// </summary>
     private sealed class TrackLibraryCount

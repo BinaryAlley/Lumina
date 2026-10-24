@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.MediaConsumption;
 using Lumina.Application.Common.DTO.MediaConsumption;
+using Lumina.Application.Common.Utilities;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.MediaConsumptionBoundedContext.Common.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.MediaConsumptionBoundedContext.ExternalIdentifiers.LibraryManagementBoundedContext.LibraryAggregate;
@@ -39,8 +40,11 @@ public static class MediaConsumptionRecordEntityMapping
             MediaPositionKind positionKind = repositoryEntity.LastPositionKind.Value;
             if (positionKind == MediaPositionKind.TimeOffset)
             {
+                // A stored position outside the representable range is rejected like a negative one, instead of being silently clamped to a position that no client ever reported.
+                long maximumTimeOffsetMilliseconds = TimeSpan.MaxValue.Ticks / TimeSpan.TicksPerMillisecond;
                 if (!repositoryEntity.LastPositionTimeOffsetMilliseconds.HasValue ||
                     repositoryEntity.LastPositionTimeOffsetMilliseconds.Value < 0 ||
+                    repositoryEntity.LastPositionTimeOffsetMilliseconds.Value > maximumTimeOffsetMilliseconds ||
                     repositoryEntity.LastPositionLocation is not null)
                     return DomainErrors.MediaConsumption.InvalidMediaPosition;
                 lastPosition = Optional<MediaPosition>.Some(
@@ -67,7 +71,7 @@ public static class MediaConsumptionRecordEntityMapping
             DateTime.SpecifyKind(repositoryEntity.StartedOnUtc, DateTimeKind.Utc),
             DateTime.SpecifyKind(repositoryEntity.LastActivityOnUtc, DateTimeKind.Utc),
             endedOnUtc,
-            TimeSpan.FromMilliseconds(repositoryEntity.ConsumedDurationMilliseconds),
+            repositoryEntity.ConsumedDurationMilliseconds.ToClampedTimeSpan(),
             lastPosition,
             repositoryEntity.LastProgressFraction,
             repositoryEntity.ConsecutivePagesRead

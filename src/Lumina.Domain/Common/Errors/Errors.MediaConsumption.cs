@@ -18,6 +18,9 @@ public static partial class Errors
         public static Error MediaResumePointNotFound => Error.NotFound(description: nameof(MediaResumePointNotFound));
         public static Error ConsumptionRecordIdCannotBeEmpty => Error.Validation(description: nameof(ConsumptionRecordIdCannotBeEmpty));
         public static Error MediaItemIdCannotBeEmpty => Error.Validation(description: nameof(MediaItemIdCannotBeEmpty));
+        public static Error TargetUserIdIsInvalid => Error.Validation(description: nameof(TargetUserIdIsInvalid));
+        public static Error TagKindIsInvalid => Error.Validation(description: nameof(TagKindIsInvalid));
+        public static Error ConsumptionDateRangeIsInvalid => Error.Validation(description: nameof(ConsumptionDateRangeIsInvalid));
         public static Error InvalidMediaPosition => Error.Validation(description: nameof(InvalidMediaPosition));
         public static Error InvalidProgressFraction => Error.Validation(description: nameof(InvalidProgressFraction));
         public static Error ConsumedDurationMustBeNonNegative => Error.Validation(description: nameof(ConsumedDurationMustBeNonNegative));
