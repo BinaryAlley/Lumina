@@ -59,9 +59,7 @@ public static class LibraryEntityMapping
         if (pathTemplateResult.IsFailure)
             return pathTemplateResult.Errors;
 
-        LibraryConsumptionSettings consumptionSettings = LibraryConsumptionSettings.Create(
-            repositoryEntity.ShouldTrackConsumptionProgress,
-            Optional<int>.FromNullable(repositoryEntity.CompletionThresholdPercentage));
+        LibraryConsumptionSettings consumptionSettings = repositoryEntity.ToDomainValueObject();
 
         return Library.Create(
             LibraryId.Create(repositoryEntity.Id),
@@ -79,6 +77,18 @@ public static class LibraryEntityMapping
             pathTemplateResult.Value,
             [.. repositoryEntity.LibraryScans.Select(libraryScan => ScanId.Create(libraryScan.Id))]
         );
+    }
+
+    /// <summary>
+    /// Converts the consumption settings stored on <paramref name="repositoryEntity"/> to <see cref="LibraryConsumptionSettings"/>.
+    /// </summary>
+    /// <param name="repositoryEntity">The repository entity whose consumption settings are converted.</param>
+    /// <returns>The converted consumption settings.</returns>
+    public static LibraryConsumptionSettings ToDomainValueObject(this LibraryEntity repositoryEntity)
+    {
+        return LibraryConsumptionSettings.Create(
+            repositoryEntity.ShouldTrackConsumptionProgress,
+            Optional<int>.FromNullable(repositoryEntity.CompletionThresholdPercentage));
     }
 
     /// <summary>

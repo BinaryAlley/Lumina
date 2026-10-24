@@ -16,9 +16,12 @@ public static partial class Errors
         public static Error MediaKindCannotResume => Error.Forbidden(description: nameof(MediaKindCannotResume));
         public static Error ConsumptionRecordNotFound => Error.NotFound(description: nameof(ConsumptionRecordNotFound));
         public static Error MediaResumePointNotFound => Error.NotFound(description: nameof(MediaResumePointNotFound));
+        public static Error ConsumptionRecordIdCannotBeEmpty => Error.Validation(description: nameof(ConsumptionRecordIdCannotBeEmpty));
+        public static Error MediaItemIdCannotBeEmpty => Error.Validation(description: nameof(MediaItemIdCannotBeEmpty));
         public static Error InvalidMediaPosition => Error.Validation(description: nameof(InvalidMediaPosition));
         public static Error InvalidProgressFraction => Error.Validation(description: nameof(InvalidProgressFraction));
         public static Error ConsumedDurationMustBeNonNegative => Error.Validation(description: nameof(ConsumedDurationMustBeNonNegative));
+        public static Error ConsumedDurationIsOutOfRange => Error.Validation(description: nameof(ConsumedDurationIsOutOfRange));
         public static Error ConsumedDurationCannotDecrease => Error.Forbidden(description: nameof(ConsumedDurationCannotDecrease));
         public static Error ConsecutivePagesReadMustBeNonNegative => Error.Validation(description: nameof(ConsecutivePagesReadMustBeNonNegative));
         public static Error ConsecutivePagesReadIsOnlySupportedForPageBasedMedia => Error.Forbidden(description: nameof(ConsecutivePagesReadIsOnlySupportedForPageBasedMedia));

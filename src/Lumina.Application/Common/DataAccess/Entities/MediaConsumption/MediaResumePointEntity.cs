@@ -20,24 +20,24 @@ public class MediaResumePointEntity : IStorageEntity, IAuditableEntity
     public required Guid Id { get; init; }
 
     /// <summary>
-    /// Gets the Id of the user that owns the resume point.
+    /// Gets or sets the Id of the user that owns the resume point.
     /// </summary>
-    public required Guid UserId { get; init; }
+    public required Guid UserId { get; set; }
 
     /// <summary>
-    /// Gets the Id of the media library that contains the media item.
+    /// Gets or sets the Id of the media library that contains the media item.
     /// </summary>
-    public required Guid LibraryId { get; init; }
+    public required Guid LibraryId { get; set; }
 
     /// <summary>
-    /// Gets the kind of media that is resumed.
+    /// Gets or sets the kind of media that is resumed.
     /// </summary>
-    public required MediaKind MediaKind { get; init; }
+    public required MediaKind MediaKind { get; set; }
 
     /// <summary>
-    /// Gets the Id of the media item to resume.
+    /// Gets or sets the Id of the media item to resume.
     /// </summary>
-    public required Guid MediaItemId { get; init; }
+    public required Guid MediaItemId { get; set; }
 
     /// <summary>
     /// Gets the kind of representation used by the position at which the media item can be resumed.

@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.Favorites;
+using Lumina.Application.Common.DataAccess.Entities.MediaConsumption;
 using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
@@ -56,6 +57,8 @@ public class LuminaDbContext : DbContext
     public virtual DbSet<PlaylistEntity> Playlists { get; set; } = null!;
     public virtual DbSet<PlaylistEntryEntity> PlaylistEntries { get; set; } = null!;
     public virtual DbSet<FavoriteEntity> Favorites { get; set; } = null!;
+    public virtual DbSet<MediaConsumptionRecordEntity> MediaConsumptionRecords { get; set; } = null!;
+    public virtual DbSet<MediaResumePointEntity> MediaResumePoints { get; set; } = null!;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LuminaDbContext"/> class.

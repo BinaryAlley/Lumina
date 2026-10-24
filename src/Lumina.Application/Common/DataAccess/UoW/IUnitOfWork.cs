@@ -2,6 +2,7 @@
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.BookLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.Favorites;
+using Lumina.Application.Common.DataAccess.Repositories.MediaConsumption;
 using Lumina.Application.Common.DataAccess.Repositories.MediaContributors;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
@@ -166,6 +167,16 @@ public interface IUnitOfWork
     /// Gets the favorite repository.
     /// </summary>
     IFavoriteRepository FavoriteRepository { get; }
+
+    /// <summary>
+    /// Gets the media consumption record repository.
+    /// </summary>
+    IMediaConsumptionRecordRepository MediaConsumptionRecordRepository { get; }
+
+    /// <summary>
+    /// Gets the media resume point repository.
+    /// </summary>
+    IMediaResumePointRepository MediaResumePointRepository { get; }
 
     /// <summary>
     /// Saves the changes made to the database.

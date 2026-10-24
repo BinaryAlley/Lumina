@@ -20,24 +20,24 @@ public class MediaConsumptionRecordEntity : IStorageEntity, IAuditableEntity
     public required Guid Id { get; init; }
 
     /// <summary>
-    /// Gets the Id of the user that started the consumption session.
+    /// Gets or sets the Id of the user that started the consumption session.
     /// </summary>
-    public required Guid UserId { get; init; }
+    public required Guid UserId { get; set; }
 
     /// <summary>
-    /// Gets the Id of the media library that contains the consumed media item.
+    /// Gets or sets the Id of the media library that contains the consumed media item.
     /// </summary>
-    public required Guid LibraryId { get; init; }
+    public required Guid LibraryId { get; set; }
 
     /// <summary>
-    /// Gets the kind of media that was consumed.
+    /// Gets or sets the kind of media that was consumed.
     /// </summary>
-    public required MediaKind MediaKind { get; init; }
+    public required MediaKind MediaKind { get; set; }
 
     /// <summary>
-    /// Gets the Id of the consumed media item.
+    /// Gets or sets the Id of the consumed media item.
     /// </summary>
-    public required Guid MediaItemId { get; init; }
+    public required Guid MediaItemId { get; set; }
 
     /// <summary>
     /// Gets or sets the state of the consumption session.
@@ -45,9 +45,9 @@ public class MediaConsumptionRecordEntity : IStorageEntity, IAuditableEntity
     public ConsumptionStatus Status { get; set; }
 
     /// <summary>
-    /// Gets the date and time when the consumption session started.
+    /// Gets or sets the date and time when the consumption session started.
     /// </summary>
-    public required DateTime StartedOnUtc { get; init; }
+    public required DateTime StartedOnUtc { get; set; }
 
     /// <summary>
     /// Gets or sets the date and time when the consumption session last received activity.

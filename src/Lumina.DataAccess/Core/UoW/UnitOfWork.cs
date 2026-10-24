@@ -2,6 +2,7 @@
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.BookLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.Favorites;
+using Lumina.Application.Common.DataAccess.Repositories.MediaConsumption;
 using Lumina.Application.Common.DataAccess.Repositories.MediaContributors;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
@@ -16,6 +17,7 @@ using Lumina.DataAccess.Core.Repositories.Authorization;
 using Lumina.DataAccess.Core.Repositories.BookLibrary;
 using Lumina.DataAccess.Core.Repositories.Favorites;
 using Lumina.DataAccess.Core.Repositories.Libraries;
+using Lumina.DataAccess.Core.Repositories.MediaConsumption;
 using Lumina.DataAccess.Core.Repositories.MediaContributors;
 using Lumina.DataAccess.Core.Repositories.MusicLibrary;
 using Lumina.DataAccess.Core.Repositories.Playlists;
@@ -71,6 +73,8 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     private IMusicPlayRecordRepository? _musicPlayRecordRepository;
     private IPlaylistRepository? _playlistRepository;
     private IFavoriteRepository? _favoriteRepository;
+    private IMediaConsumptionRecordRepository? _mediaConsumptionRecordRepository;
+    private IMediaResumePointRepository? _mediaResumePointRepository;
 
     /// <summary>
     /// Gets the permission repository.
@@ -414,6 +418,30 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         {
             _favoriteRepository ??= new FavoriteRepository(_luminaDbContext);
             return _favoriteRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the media consumption record repository.
+    /// </summary>
+    public IMediaConsumptionRecordRepository MediaConsumptionRecordRepository
+    {
+        get
+        {
+            _mediaConsumptionRecordRepository ??= new MediaConsumptionRecordRepository(_luminaDbContext);
+            return _mediaConsumptionRecordRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the media resume point repository.
+    /// </summary>
+    public IMediaResumePointRepository MediaResumePointRepository
+    {
+        get
+        {
+            _mediaResumePointRepository ??= new MediaResumePointRepository(_luminaDbContext);
+            return _mediaResumePointRepository;
         }
     }
 

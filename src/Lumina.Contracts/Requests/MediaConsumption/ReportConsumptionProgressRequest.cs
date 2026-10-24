@@ -14,7 +14,7 @@ namespace Lumina.Contracts.Requests.MediaConsumption;
 [DebuggerDisplay("ProgressFraction: {ProgressFraction}; ConsumedDurationInSeconds: {ConsumedDurationInSeconds}; ConsecutivePagesRead: {ConsecutivePagesRead}")]
 public sealed record ReportConsumptionProgressRequest(
     MediaPositionRequest? Position,
-    double ProgressFraction,
-    double ConsumedDurationInSeconds,
+    double? ProgressFraction,
+    double? ConsumedDurationInSeconds,
     int ConsecutivePagesRead = 0
 );
