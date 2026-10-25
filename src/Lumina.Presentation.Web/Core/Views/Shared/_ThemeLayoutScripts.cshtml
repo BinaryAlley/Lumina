@@ -36,7 +36,8 @@
     // The endpoints the audio player reads the stored playback preferences of the user from, writes the volume and mute
     // state it changes back to, and fetches the playback manifest of a track from, together with the stream route
     // template the manifest path must match. The routes are the culture aware web routes, so the player never hardcodes
-    // a path, and it never reaches the API server directly.
+    // a path, and it never reaches the API server directly. The consumption route templates carry their named identifiers
+    // unreplaced, so the player fills in the library, the kind, the item, or the record of the session it reports.
     var audioPlayerConfiguration = {
         getUserSettingsUrl: '@_urlService.GetRelativeUrl(WebRoutes.Settings.GET_USER_SETTINGS)',
         getPlaybackStateUrl: '@_urlService.GetRelativeUrl(WebRoutes.Settings.GET_PLAYBACK_STATE)',
@@ -44,6 +45,10 @@
         getPlaybackManifestUrl: '@_urlService.GetRelativeUrl(WebRoutes.Music.GET_PLAYBACK_MANIFEST)',
         streamTrackRouteTemplate: '@_urlService.GetRelativeUrl(WebRoutes.Music.STREAM_TRACK)',
         streamTrackSegmentRouteTemplate: '@_urlService.GetRelativeUrl(WebRoutes.Music.STREAM_TRACK_SEGMENT)',
+        startConsumptionRouteTemplate: '@_urlService.GetRelativeUrl(WebRoutes.MediaConsumption.START_CONSUMPTION)',
+        reportConsumptionProgressRouteTemplate: '@_urlService.GetRelativeUrl(WebRoutes.MediaConsumption.REPORT_CONSUMPTION_PROGRESS)',
+        completeConsumptionRouteTemplate: '@_urlService.GetRelativeUrl(WebRoutes.MediaConsumption.COMPLETE_CONSUMPTION)',
+        stopConsumptionRouteTemplate: '@_urlService.GetRelativeUrl(WebRoutes.MediaConsumption.STOP_CONSUMPTION)',
         // The endpoints the queue of the player is built from: the releases of an artist, the tracks of a release, and the
         // artists of a library, which are also the endpoints the autoplay continuation and the library shuffle use. The
         // queue script documents which context uses which endpoint, and appends the library and pagination query parameters.

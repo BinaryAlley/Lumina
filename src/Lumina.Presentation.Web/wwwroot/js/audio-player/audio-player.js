@@ -5,14 +5,25 @@
  * in-place navigation manager swaps. Because it is never torn down by a page swap, playback and its
  * UI survive navigation. It produces no audio itself: audio is delegated to a swappable engine that
  * fulfills the interface documented in audio-player-engine.js. This module only owns the state machine, the
- * event bus, capability detection, the play descriptor, the bar, the transport controls it binds and renders, and the
- * public API. The download, decode and render pipeline is plugged in as a swappable engine. The bar holds
- * the three state progress bar (played, downloaded but not played, and not yet downloaded), the volume and mute
- * controls, the keyboard shortcuts, and the loading state a seek into a not yet downloaded position shows; the volume
- * and mute the controls change are persisted to the stored playback state of the user on their own. The expanded bar also
- * offers appending the current queue, in order, to one of the playlists of the user, through a theme hook with a built-in
- * fallback when the theme does not render it. The condensed bar also renders the favorite toggle of the current track,
- * and every queue item carries its own favorite toggle, so a user can favorite what is playing and what is queued without leaving the bar.
+ * event bus, capability detection, the play descriptor, the bar, the transport controls it binds and renders, the
+ * public API, and the consumption reporting of the tracks it plays. The download, decode and render pipeline is plugged
+ * in as a swappable engine. The bar holds the three state progress bar (played, downloaded but not played, and not yet
+ * downloaded), the volume and mute controls, the keyboard shortcuts, and the loading state a seek into a not yet
+ * downloaded position shows; the volume and mute the controls change are persisted to the stored playback state of the
+ * user on their own. The expanded bar also offers appending the current queue, in order, to one of the playlists of the
+ * user, through a theme hook with a built-in fallback when the theme does not render it. The condensed bar also renders
+ * the favorite toggle of the current track, and every queue item carries its own favorite toggle, so a user can favorite
+ * what is playing and what is queued without leaving the bar.
+ *
+ * Consumption reporting
+ * ---------------------
+ * A consumption record starts when a track actually begins playback, reports its active playback time and playhead on a
+ * throttle and on every pause, seek, skip, stop and end, and is completed when the track reaches its end or stopped when
+ * playback leaves it early. A failed playback and a page unload stop it as well, so an idle error state or a closed tab
+ * never keeps counting as listening time. Reporting is a background concern: a failed report is only logged and never
+ * interrupts, pauses, or fails playback. The record identifier of the current track is discarded on stop, complete, skip
+ * and replace, so a paused and resumed track keeps reporting to the same record. When the library of the track tracks
+ * progress, the start response carries the stored resume position and the player seeks to it once playback started.
  *
  * Public control API (window.LuminaAudioPlayer.instance)
  * ----------------------------------------
@@ -370,6 +381,64 @@
     const SEEK_SETTLE_TOLERANCE_SECONDS = 0.25;
 
     /**
+     * The interval, in milliseconds, at which the consumption record of the current track reports its progress while the
+     * player keeps playing. A pause, a skip, a stop and an end report immediately as well, so the interval only bounds how
+     * much of a long uninterrupted track can be lost if the page disappears.
+     * @readonly
+     * @type {number}
+     */
+    const CONSUMPTION_REPORT_INTERVAL_MS = 15000;
+
+    /**
+     * The shortest interval, in milliseconds, between two consumption reports caused by seeking. Holding an arrow key
+     * repeats the seek at the rate of the operating system, so the newest position is coalesced into at most one report
+     * per interval instead of one API command and one database write per key repeat.
+     * @readonly
+     * @type {number}
+     */
+    const CONSUMPTION_SEEK_REPORT_INTERVAL_MS = 1500;
+
+    /**
+     * The time, in milliseconds, after which a consumption progress report is abandoned. The report is a background
+     * best effort, so a slow or hung request must never suppress the next periodic report of the same track.
+     * @readonly
+     * @type {number}
+     */
+    const CONSUMPTION_REPORT_TIMEOUT_MS = 5000;
+
+    /**
+     * The longest wall clock interval, in milliseconds, that one accumulation may add to the consumed duration. The
+     * periodic report is the expected accumulation cadence, so a much larger interval comes from a suspended tab, a device
+     * sleep, or a frozen engine, and is not active playback time. The margin covers a late timer while still bounding how much idle time can be counted.
+     * @readonly
+     * @type {number}
+     */
+    const CONSUMPTION_MAX_ACCUMULATED_INTERVAL_MS = CONSUMPTION_REPORT_INTERVAL_MS + 5000;
+
+    /**
+     * The playhead, in seconds, up to which a resume position returned by the consumption start response is applied.
+     * The response arrives after playback already began, so a slow response must not pull a listener backwards after they
+     * have been listening for a while, or after they chose a position of their own.
+     * @readonly
+     * @type {number}
+     */
+    const CONSUMPTION_RESUME_APPLY_WINDOW_SECONDS = 5;
+
+    /**
+     * The media kind the player reports, as the consumption API names it.
+     * @readonly
+     * @type {string}
+     */
+    const MUSIC_TRACK_MEDIA_KIND = 'MusicTrack';
+
+    /**
+     * The position kind of a playhead time offset, as the consumption API names it.
+     * @readonly
+     * @type {string}
+     */
+    const TIME_OFFSET_POSITION_KIND = 'TimeOffset';
+
+    /**
      * Formats a known, positive time in seconds as m:ss, or h:mm:ss when it is an hour or longer.
      * @param {number} totalSeconds - The time to format, in seconds.
      * @returns {string} The formatted time.
@@ -524,6 +593,50 @@
         if (queue !== null)
             descriptor.queue = Object.freeze(queue);
         return Object.freeze(descriptor);
+    }
+
+    /**
+     * Builds a route from a configured route template by replacing each named placeholder with an encoded value. The
+     * template comes from the culture aware web routes, so the player never hardcodes a path.
+     * @param {string} routeTemplate - The route template, with named `{placeholder}` segments.
+     * @param {Object<string, string>} routeValues - The value of each placeholder, by name.
+     * @returns {string} The route with every placeholder replaced, or an empty string when the template or a value is missing, or a placeholder was left unreplaced.
+     */
+    function buildRouteUrl(routeTemplate, routeValues) {
+        if (typeof routeTemplate !== 'string' || routeTemplate.length === 0)
+            return '';
+        let route = routeTemplate;
+        for (const [name, value] of Object.entries(routeValues)) {
+            if (value === null || value === undefined || value === '')
+                return '';
+            route = route.split(`{${name}}`).join(encodeURIComponent(String(value)));
+        }
+        // A template that still carries a placeholder cannot describe a real endpoint, so it is dropped instead of being requested as a literal path.
+        return /\{[^}]+\}/.test(route) ? '' : route;
+    }
+
+    /**
+     * Rounds a reported consumption measurement, so a playhead of a high resolution media clock is sent as a stable, readable number instead of a long floating point fraction.
+     * @param {number} value - The measurement to round.
+     * @returns {number} The measurement rounded to milliseconds and fractions of a thousandth.
+     */
+    function roundConsumptionValue(value) {
+        const number = Number(value);
+        return Number.isFinite(number) ? Math.round(number * 1000) / 1000 : 0;
+    }
+
+    /**
+     * Gets the time offset of a consumption position, if it is a time offset position.
+     * @param {*} position - The position of a consumption record or a start response.
+     * @returns {number} The non negative time offset in seconds, or 0 when the position is missing or is not a time offset.
+     */
+    function getConsumptionTimeOffset(position) {
+        if (!position || typeof position !== 'object')
+            return 0;
+        if (String(position.kind || '').toLowerCase() !== TIME_OFFSET_POSITION_KIND.toLowerCase())
+            return 0;
+        const seconds = Number(position.timeOffsetSeconds);
+        return Number.isFinite(seconds) && seconds > 0 ? seconds : 0;
     }
 
     /**
@@ -713,6 +826,7 @@
             this.lastPersistedPlaybackState = null;
             this.keyboardHandler = null;
             this.unloadHandler = null;
+            this.pageshowHandler = null;
             this.container = null;
             this.main = null;
             this.dom = {};
@@ -742,6 +856,11 @@
             this.pendingPlayNext = [];
             // True while the end of a track is being resolved, so two end reports of the same timeline cannot both continue.
             this.isHandlingEnded = false;
+            // The consumption session of the track that is playing, or null when no track is reported. It holds the record
+            // identifier, the identity of the track it belongs to, the active playback time, the last playhead, and the
+            // timer of the next periodic report. The session object itself identifies a start response that belongs to a
+            // track that was stopped, skipped or replaced in the meantime.
+            this.consumptionSession = null;
         }
 
         /**
@@ -779,7 +898,7 @@
             this.ensureVuMeter();
             this.bindPlaybackControls();
             this.bindKeyboardShortcuts();
-            this.bindUnloadFlush();
+            this.bindPageLifecycleHandlers();
             this.bindDescriptorDelegation();
             this.bindQueueInteraction();
             // A page load starts with a hidden bar and an empty queue. Nothing is restored and nothing is auto played.
@@ -1049,13 +1168,38 @@
         }
 
         /**
-         * Binds the page unload flush, so a volume or mute change that is still inside its debounce window is written
-         * before the page goes away. The write is sent with <c>keepalive</c>, so the browser finishes it after the page
-         * is gone instead of cancelling it with the page's other requests.
+         * Binds the page lifecycle handlers, so a volume or mute change that is still inside its debounce window is written
+         * before the page goes away, and so the consumption record follows the page across the back forward cache.
+         *
+         * The pagehide stop is sent with <c>keepalive</c>, so the browser finishes it after the page is gone instead of
+         * cancelling it with the page's other requests. A page restored from the back forward cache is the same player
+         * singleton on the same track, but its record was stopped, so a new record starts for the rest of the track.
          */
-        bindUnloadFlush() {
-            this.unloadHandler = () => this.flushPlaybackStateAsync({ keepalive: true });
+        bindPageLifecycleHandlers() {
+            this.unloadHandler = () => {
+                this.flushPlaybackStateAsync({ keepalive: true });
+                // A closed, reloaded or navigated away page never runs the stop control of the player, so the listening
+                // session is closed here. The session is detached immediately, so a page restored from the back forward
+                // cache does not report to a record that was already stopped.
+                this.stopConsumptionSession();
+            };
+            this.pageshowHandler = (event) => {
+                // Only a restore from the back forward cache keeps the player singleton and its playback state alive.
+                // A normal page show belongs to a fresh player, whose record starts with the first actual playback.
+                if (!event || event.persisted !== true)
+                    return;
+                if (this.consumptionSession || !this.descriptor)
+                    return;
+                if (this.state !== LuminaAudioPlayer.PlayerState.PLAYING && this.state !== LuminaAudioPlayer.PlayerState.PAUSED)
+                    return;
+                // The record of the previous page was stopped by the pagehide handler. The track continues from the
+                // position it had, so a new record covers the rest of the listening session.
+                this.startConsumptionAsync(this.descriptor).catch((error) => {
+                    console.debug('Audio player: the consumption record of the restored page could not be started.', error);
+                });
+            };
             window.addEventListener('pagehide', this.unloadHandler);
+            window.addEventListener('pageshow', this.pageshowHandler);
         }
 
         /**
@@ -1174,6 +1318,12 @@
                 currentTime: this.currentTime,
                 downloadedFraction: this.downloadedFraction
             };
+
+            // An explicit play replaces the track that is playing, so its record stops with the timeline it actually had.
+            // It must stop before the descriptor and the duration below are reset, because a session that outlived that
+            // reset would report the playhead of the old track paired with the duration of the new one. A replacement that
+            // then fails to load keeps its record stopped, because the play action already ended that listening session.
+            this.stopConsumptionSession();
 
             // A new descriptor starts a new timeline, so the playhead and the progress of the previous track are dropped.
             this.descriptor = descriptor;
@@ -1592,6 +1742,17 @@
                         await this.pauseEngineQuietlyAsync(engine);
                     return false;
                 }
+                // The play control resumed the READY track while this continuation was awaiting engine.playAsync, so the
+                // state is already PLAYING. The engine is producing audio and no other path started the record, so it starts
+                // here instead of being skipped by the READY branch below.
+                if (this.state === LuminaAudioPlayer.PlayerState.PLAYING) {
+                    if (!this.isConsumptionSessionCurrent(this.consumptionSession)) {
+                        this.startConsumptionAsync(descriptor).catch((error) => {
+                            console.debug('Audio player: the consumption record of the resumed track could not be started.', error);
+                        });
+                    }
+                    return true;
+                }
                 if (this.state !== LuminaAudioPlayer.PlayerState.READY) {
                     if (this.state === LuminaAudioPlayer.PlayerState.IDLE)
                         await this.pauseEngineQuietlyAsync(engine);
@@ -1599,6 +1760,11 @@
                 }
                 this.setState(LuminaAudioPlayer.PlayerState.PLAYING);
                 this.renderTransportState();
+                // The record starts with actual playback, never with a load that may still fail. Reporting is a background
+                // concern, so the start is deliberately not awaited and a failure never affects the playback that just started.
+                this.startConsumptionAsync(descriptor).catch((error) => {
+                    console.debug('Audio player: the consumption record could not be started.', error);
+                });
             } catch (error) {
                 // A load that a newer play request overtook, and a session that expired and is already navigating to the
                 // sign in page, are expected outcomes. They must not move the player to its error state, and they must not
@@ -1641,6 +1807,9 @@
             // A paused or stopped player has made an explicit choice that the end of a track must not override.
             if (this.state !== LuminaAudioPlayer.PlayerState.PLAYING)
                 return false;
+            // The engine asks for the next entry only after the current one ended and its gapless handoff could not be
+            // prepared, so the record of the finished track completes before the next one starts its own.
+            this.completeConsumptionSession();
             // The capability gate is part of the player's play path, so an auto advance never starts a track the browser
             // cannot decode.
             const report = await this.capabilitiesReady;
@@ -1706,8 +1875,15 @@
             if (requestToken !== this.playRequestToken)
                 return false;
             if (report && !report.isSupported) {
-                this.fail(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING, 'The browser is missing a capability the player requires.',
-                    { missing: report.missing }), LuminaAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING);
+                const capabilityError = new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING,
+                    'The browser is missing a capability the player requires.', { missing: report.missing });
+                // A missing capability rejects this transition, not the track that is still playing. Its playback and its
+                // record stay untouched, so the error is raised without moving the player to its error state. A transition
+                // that starts after the previous track already ended owns no active session, so it still fails normally.
+                if (this.isConsumptionSessionCurrent(this.consumptionSession))
+                    this.raiseError(capabilityError);
+                else
+                    this.fail(capabilityError, LuminaAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING);
                 return false;
             }
             const target = this.queue.findEntry(entryId);
@@ -1721,6 +1897,9 @@
             });
             if (!committed)
                 return false;
+            // The transition is committed, so the track that was playing is replaced and its record stops with the position
+            // it actually reached. A rejection above leaves the old track and its record untouched, because it keeps playing.
+            this.stopConsumptionSession();
             // Restarting the entry that is already current must still reload its timeline, but it is not a queue move, so the
             // state and the bar are reset by the committed entry and no history entry is produced.
             this.showBar();
@@ -1853,8 +2032,11 @@
                 return;
             if (this.engine)
                 await this.engine.pauseAsync();
+            // A pause ends the active playback time of the record but not the record itself, so the session is reported and keeps its identity for the resume.
+            this.pauseConsumptionClock();
             this.setState(LuminaAudioPlayer.PlayerState.PAUSED);
             this.renderTransportState();
+            this.reportConsumptionProgress();
         }
 
         /**
@@ -1871,6 +2053,8 @@
             await this.engine.playAsync();
             this.setState(LuminaAudioPlayer.PlayerState.PLAYING);
             this.renderTransportState();
+            // A resume continues the record of the track that was paused, so it only restarts the active playback clock and the periodic report; it never starts a second record.
+            this.resumeConsumptionClock();
         }
 
         /**
@@ -1923,6 +2107,8 @@
                     console.error('Audio player: the engine failed while stopping.', error);
                 }
             }
+            // The stop of the user ends the consumption record with the playhead it reached, before the bar resets the timeline it shows.
+            this.stopConsumptionSession();
             // The playhead and the progress are reset while the descriptor is kept, so the bar can still show what was stopped.
             this.currentTime = 0;
             this.downloadedFraction = 0;
@@ -1945,9 +2131,12 @@
          * the seek needs the range of that position, so the bar shows a loading state until the engine reports the
          * range arrived. The engine's seekAsync is what triggers that range fetch.
          * @param {number} seconds - The target position, in seconds.
+         * @param {Object} [options] - The seek options.
+         * @param {boolean} [options.isConsumptionResume=false] - True when the seek applies the resume position of a
+         * consumption start response, so it is not treated as a seek the listener made.
          * @returns {Promise<void>} A promise that completes when the seek was requested.
          */
-        async seekAsync(seconds) {
+        async seekAsync(seconds, options = {}) {
             // Without a descriptor there is no timeline to seek in. A finished, failed or still loading track is not
             // seekable either: its pipeline is either released or not yet the one the seek would address. Seeking a
             // finished track is deliberately a no-op rather than a replay, and no resume is reported for it; a new play starts the next timeline.
@@ -1969,6 +2158,11 @@
             // apart from the pre-seek position the engine reports first.
             const fromPosition = this.currentTime;
             this.currentTime = position;
+            // The consumption session adopts the seek target before the engine starts catching up, so the pre-seek playhead
+            // report the engine sends first, or a stop during the seek, cannot store the old position as the resume point.
+            this.noteConsumptionSeek(position, fromPosition, options.isConsumptionResume === true);
+            const consumptionSession = this.consumptionSession;
+            const consumptionSeekSequence = consumptionSession ? consumptionSession.seekSequence : null;
             // A track that is not loaded yet, or an engine that does not report its downloaded ranges, has no range to
             // wait for, so no loading state is shown; only a known-to-be-missing range produces one.
             const knowsBufferedRanges = this.engine !== null && typeof this.engine.getBufferedTimeRanges === 'function';
@@ -1980,6 +2174,9 @@
                 try {
                     await this.engine.seekAsync(position);
                 } catch (error) {
+                    // The engine never reached the target, so the session returns to the position the seek started from.
+                    // Otherwise the pending target would reject every later playhead report and freeze the record on a position that playback never reached.
+                    this.revertFailedConsumptionSeek(consumptionSession, consumptionSeekSequence, position, fromPosition);
                     this.clearSeekPending();
                     this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR);
                 }
@@ -2717,13 +2914,32 @@
             if (!committed)
                 return null;
             // Moving to the entry that is already current is not a transition. Applying its descriptor again would reset the
-            // playhead, the streamed fraction and the scrubbing state while the audio keeps playing.
-            if (!committed.changed)
+            // playhead, the streamed fraction and the scrubbing state while the audio keeps playing. It is still a gapless
+            // handoff of one playback loop, for example with repeat all on a single entry queue, so the finished record
+            // completes and the new loop starts its own record even though the descriptor and the timeline stay the same.
+            if (!committed.changed) {
+                this.completeConsumptionSession();
+                // The completion deletes the resume point asynchronously, so the start of the new loop must not read the
+                // position of the loop that just finished. A repeat starts from the beginning of the track.
+                this.startConsumptionAsync(committed.entry.descriptor, { shouldIgnoreResumePosition: true }).catch((error) => {
+                    console.debug('Audio player: the consumption record of the repeated track could not be started.', error);
+                });
                 return committed.entry.descriptor;
+            }
+            // A gapless handoff commits the entry the engine already scheduled, and it happens only because the previous
+            // track reached its end. Its record completes before the new descriptor replaces the one the player describes.
+            this.completeConsumptionSession();
             const applied = this.applyCommittedEntry(committed.entry, committed.previousIndex, committed.removedCount);
             // The commit may have trimmed the played part of the queue, which changes what the next control can do.
             this.renderQueueControls();
             this.maybeExtendQueueAsync();
+            // Audio of the handed off entry is already scheduled, so the new record starts with the committed descriptor
+            // instead of waiting for a play call that never happens for a gapless transition.
+            if (applied) {
+                this.startConsumptionAsync(applied).catch((error) => {
+                    console.debug('Audio player: the consumption record of the handed off track could not be started.', error);
+                });
+            }
             return applied;
         }
 
@@ -2935,6 +3151,10 @@
                 window.removeEventListener('pagehide', this.unloadHandler);
                 this.unloadHandler = null;
             }
+            if (this.pageshowHandler) {
+                window.removeEventListener('pageshow', this.pageshowHandler);
+                this.pageshowHandler = null;
+            }
             // A change that is still inside its debounce window is flushed before the timer is dropped, so a teardown
             // never loses the last volume, mute or queue the user set. The flush clears the timer itself.
             await this.flushPlaybackStateAsync();
@@ -2960,6 +3180,9 @@
                 this.vuMeter = null;
             }
             this.vuMeterAnalyser = null;
+            // A teardown stops the record of the track that was playing, so an explicit destroy does not leave a session in
+            // progress on the server while the player no longer exists to complete or stop it.
+            this.stopConsumptionSession();
             this.events.clear();
             this.setState(LuminaAudioPlayer.PlayerState.IDLE);
             // The singleton is no longer usable, so it is cleared, and a later createDefaultPlayer builds a fresh one.
@@ -3003,11 +3226,17 @@
 
         /**
          * Raises a typed error and moves the state machine to the error state.
+         *
+         * A failed playback no longer produces sound, so its consumption record is stopped at the last position the
+         * engine reported. Keeping it open would count the idle error state as active playback time at the next report.
          * @param {*} error - The error to raise.
          * @param {string} [code] - The code to use when the error is not already typed.
          * @returns {LuminaAudioPlayer.PlayerError} The raised typed error.
          */
         fail(error, code = LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR) {
+            // A failed playback no longer produces sound, so its record stops at the last position it actually reached.
+            // Leaving it open would keep the active playback clock running and turn the whole idle error state into consumed duration of the next stop report.
+            this.stopConsumptionSession();
             const typed = this.raiseError(error, code);
             this.clearBuffering();
             this.setState(LuminaAudioPlayer.PlayerState.ERROR);
@@ -3051,7 +3280,9 @@
                 const previous = this.engine;
                 this.engine = null;
                 // The engine that was playing is gone, so the player returns to idle instead of claiming it is still playing.
+                // The listening session of that engine stops with it, because no later control can report its final position.
                 if (this.state !== LuminaAudioPlayer.PlayerState.IDLE) {
+                    this.stopConsumptionSession();
                     this.setState(LuminaAudioPlayer.PlayerState.IDLE);
                     this.renderTransportState();
                 }
@@ -3137,6 +3368,11 @@
             // is left untouched here.
             if (this.pendingSeekTime !== null && this.hasReachedPendingSeek())
                 this.clearSeekPending();
+            // The record follows the playhead of the current track, so a stop, skip or pause that happens without a fresh
+            // report still carries the last position the engine reported. While a seek is still settling, the pre-seek
+            // report the engine sends first is ignored, because the session already holds the target of that seek.
+            if (this.isConsumptionSeekSettled(this.currentTime))
+                this.trackConsumptionPlayhead(this.currentTime, this.duration);
             this.scheduleProgressRender();
         }
 
@@ -3159,10 +3395,18 @@
          * Handles a buffering report from the engine, so an engine that fetches a range on its own can show the same
          * loading state the player shows for its own seeks. The state is kept on its own flag, so a playhead report
          * never clears a buffering state the engine reported.
+         *
+         * Waiting for data produces no sound, so the active playback clock of the consumption session pauses with it and
+         * resumes once the engine has enough to play again. An engine underrun therefore does not become listened time.
          * @param {boolean} isBuffering - True when the engine is waiting for data, false when it has enough to play.
          */
         handleEngineBuffering(isBuffering) {
-            this.setEngineBuffering(isBuffering === true);
+            const isWaitingForData = isBuffering === true;
+            this.setEngineBuffering(isWaitingForData);
+            if (isWaitingForData) 
+                this.pauseConsumptionClock();
+            else if (this.state === LuminaAudioPlayer.PlayerState.PLAYING) 
+                this.resumeConsumptionClock();
         }
 
         /**
@@ -3176,6 +3420,9 @@
             if (!Number.isFinite(value) || value <= 0 || value === this.duration)
                 return;
             this.duration = value;
+            // The consumption record uses the duration the engine knows, which can be longer than the duration a page
+            // described, so its progress fraction stays correct for the track that is actually playing.
+            this.trackConsumptionDuration(this.duration);
             // The total time is written by the coalesced progress render, so it is not written twice for one report.
             this.scheduleProgressRender();
             this.events.emit(LuminaAudioPlayer.PlayerEvent.DURATION_CHANGED, { duration: this.duration });
@@ -3239,6 +3486,9 @@
                 return;
             this.isHandlingEnded = true;
             try {
+                // The track reached its end, so its record completes before the player starts the next entry, repeats the
+                // entry, or stays on its ended state. The completion is a background report and never blocks the transition.
+                this.completeConsumptionSession();
                 const endedEntryId = this.queue.getCurrentEntry() ? this.queue.getCurrentEntry().entryId : null;
                 const queueGeneration = this.queueGeneration;
                 const requestToken = this.playRequestToken;
@@ -3678,6 +3928,631 @@
                 console.error(`Audio player: ${options.label || 'a playback state request'} failed.`, error);
                 return undefined;
             }
+        }
+
+        /**
+         * Starts a consumption record for a track whose playback just began.
+         *
+         * The record is created only after the track actually produced playback, so a queue change, a paused player and a
+         * failed load never create one. A record of a previous track is stopped first. The request runs in the background:
+         * a failure only drops the session and never touches playback.
+         * @param {Object} descriptor - The descriptor of the track that started playing.
+         * @param {Object} [options] - The start options.
+         * @param {boolean} [options.shouldIgnoreResumePosition=false] - True when the session starts a repeat of the same
+         * track from its beginning, so neither the resume position nor the end playhead of the previous loop is adopted.
+         * @returns {Promise<void>} A promise that completes when the start request was resolved.
+         */
+        async startConsumptionAsync(descriptor, options = {}) {
+            const trackId = descriptor && descriptor.trackId ? String(descriptor.trackId) : '';
+            const libraryId = descriptor && descriptor.libraryId ? String(descriptor.libraryId) : '';
+            if (!trackId || !libraryId)
+                return;
+            // A track that replaces another one stops the record of the track it replaced before starting its own. A record
+            // that already completed or stopped during the transition is detached, so this is a no-op for it.
+            this.finishConsumptionSession('stop');
+            const route = buildRouteUrl(this.getConfiguration().startConsumptionRouteTemplate, {
+                libraryId,
+                mediaKind: MUSIC_TRACK_MEDIA_KIND,
+                mediaItemId: trackId
+            });
+            if (!route)
+                return;
+            const durationInSeconds = Number(descriptor.durationInSeconds);
+            // A record that starts for a track that is already loaded, such as the track of a page restored from the back
+            // forward cache, starts at the playhead the player shows instead of at the beginning of the file. A repeated
+            // loop is the exception, because its audio starts at the beginning while the player still shows the old end.
+            const currentPosition = Number(this.currentTime);
+            const initialPositionSeconds = options.shouldIgnoreResumePosition === true
+                ? 0
+                : Number.isFinite(currentPosition) && currentPosition > 0 ? currentPosition : 0;
+            const session = {
+                recordId: null,
+                trackId,
+                libraryId,
+                durationSeconds: Number.isFinite(durationInSeconds) && durationInSeconds > 0 ? durationInSeconds : 0,
+                lastPositionSeconds: initialPositionSeconds,
+                lastProgressFraction: 0,
+                consumedDurationInSeconds: 0,
+                playingSinceMs: Date.now(),
+                reportTimer: null,
+                seekReportTimer: null,
+                lastSeekReportAtMs: 0,
+                progressReportInFlight: false,
+                shouldReportProgressAfterSettle: false,
+                hasUserSeeked: false,
+                isFinished: false,
+                pendingEndPayload: null,
+                pendingEndOutcome: null,
+                pendingResumeSeconds: 0,
+                pendingSeekSeconds: null,
+                pendingSeekFromSeconds: null,
+                seekSequence: 0
+            };
+            this.consumptionSession = session;
+            const record = await this.postJsonAsync(route, {}, { label: 'a consumption start request' });
+            // A redirect means the session expired and the page is already navigating to the sign in page, so there is no record to report to and nothing to clean up.
+            if (record === REDIRECTED) {
+                if (this.consumptionSession === session)
+                    this.consumptionSession = null;
+                return;
+            }
+            const recordId = record && record.id ? String(record.id) : '';
+            if (!recordId) {
+                // A failed start leaves no record to report to. The session is dropped and playback continues untouched.
+                if (this.consumptionSession === session)
+                    this.consumptionSession = null;
+                return;
+            }
+            session.recordId = recordId;
+            // A track that was stopped, skipped or replaced while the start request was in flight owns no current session,
+            // so the record it created is closed immediately instead of staying in progress forever.
+            if (this.consumptionSession !== session) {
+                // The outcome is carried together with the payload, because a track that reached its end before the start
+                // response arrived must still be completed, not stopped through the endpoint that only promotes a stop when the library has a completion threshold.
+                const endPayload = session.pendingEndPayload || this.buildConsumptionPayload(session, 'stop');
+                const endOutcome = session.pendingEndOutcome || 'stop';
+                this.sendConsumptionEndRequest(session, endOutcome, endPayload);
+                return;
+            }
+            // The session is still attached but no longer describes the track the player shows. Detaching it through the
+            // regular stop removes its timers and its running clock, so it can never send a second terminal request later.
+            if (!this.isConsumptionSessionCurrent(session)) {
+                this.finishConsumptionSession('stop');
+                return;
+            }
+            // The start response arrives after playback already began, so a pause, a stop or a failure that happened in that
+            // window is respected instead of being overwritten by a session that assumes the player is still playing.
+            if (this.state !== LuminaAudioPlayer.PlayerState.PLAYING && this.state !== LuminaAudioPlayer.PlayerState.PAUSED) {
+                this.finishConsumptionSession('stop');
+                return;
+            }
+            // The position returned by the start response belongs to the session until it is applied. A pause in the
+            // window of the start request must not report the near-zero paused position, or the server would overwrite the
+            // resume point with it before the listener ever resumes and the player seeks to the returned position.
+            // A repeated loop starts from the beginning, so the resume point of the loop that just completed is ignored:
+            // the completion and the start are independent requests, and the start may still read the old resume point.
+            session.pendingResumeSeconds = options.shouldIgnoreResumePosition === true ? 0 : getConsumptionTimeOffset(record.lastPosition);
+            // The fraction of the returned position is the only fraction available while the duration of the track is still
+            // unknown, so it is kept until the engine reports a duration the fraction can be computed from.
+            if (options.shouldIgnoreResumePosition !== true && session.durationSeconds <= 0) {
+                const resumeFraction = Number(record.lastProgressFraction);
+                if (Number.isFinite(resumeFraction))
+                    session.lastProgressFraction = clamp(resumeFraction, 0, 1);
+            }
+            // A pause before the response leaves the engine on the position it paused at, so the session keeps the returned
+            // resume position as its own position until the resume seek runs. A late pre-seek report is ignored until that
+            // seek reaches it, and a stop while still paused therefore keeps the resume position instead of the paused one.
+            if (this.state === LuminaAudioPlayer.PlayerState.PAUSED
+                && session.pendingResumeSeconds > 0
+                && !session.hasUserSeeked
+                && this.currentTime <= CONSUMPTION_RESUME_APPLY_WINDOW_SECONDS) {
+                session.lastPositionSeconds = session.pendingResumeSeconds;
+                if (session.durationSeconds > 0)
+                    session.lastProgressFraction = clamp(session.pendingResumeSeconds / session.durationSeconds, 0, 1);
+                session.pendingSeekSeconds = session.pendingResumeSeconds;
+                session.pendingSeekFromSeconds = this.currentTime;
+            }
+            if (this.state === LuminaAudioPlayer.PlayerState.PLAYING && this.engineBuffering) {
+                // The engine was already waiting for data while this session was being created, so the clock stays paused
+                // until it reports that it can play again. Starting it here would count the buffer wait as listened time.
+                session.playingSinceMs = null;
+                this.clearConsumptionReportTimer(session);
+                this.clearConsumptionSeekReportTimer(session);
+            } else if (this.state === LuminaAudioPlayer.PlayerState.PLAYING) {
+                // A pause and a resume that both happened while the request was in flight may have left the clock running, so the interval is only opened when it is not already open.
+                if (session.playingSinceMs === null)
+                    session.playingSinceMs = Date.now();
+                this.scheduleConsumptionReport();
+            } else {
+                this.pauseConsumptionClock();
+            }
+            // A seek the listener made while the start request was in flight belongs to the record that was just created, so
+            // it is reported immediately instead of leaving the server on the start position until the next periodic report.
+            if (session.hasUserSeeked) {
+                // A seek the listener made during the start request supersedes the returned resume position, so it is
+                // discarded instead of staying on a session that can never apply it.
+                session.pendingResumeSeconds = 0;
+                this.reportConsumptionProgress();
+                return;
+            }
+            // Only a library that tracks progress stores a resume point, so a position returned by the start response is the
+            // position the listener left the track at. It is applied now when playback is running, and on the next resume
+            // when the listener already paused, so the paused record keeps the returned position until then.
+            if (this.state === LuminaAudioPlayer.PlayerState.PLAYING)
+                await this.applyConsumptionResumeAsync(session);
+        }
+
+        /**
+         * Applies the resume position returned by the consumption start response to the track that just started playing.
+         *
+         * The response arrives after playback began, so the resume position is applied only while the track is still at its
+         * beginning and the listener has not chosen a position of their own in the meantime. A resume position that was
+         * returned while the player was paused is kept on the session and applied by the next resume. A missing or non time
+         * offset position, which a library that does not track progress returns, is left untouched.
+         * @param {Object} session - The consumption session the response belongs to.
+         * @returns {Promise<void>} A promise that completes when the resume seek was requested.
+         */
+        async applyConsumptionResumeAsync(session) {
+            const resumeSeconds = session.pendingResumeSeconds;
+            if (resumeSeconds <= 0 || session.hasUserSeeked || !this.isConsumptionSessionCurrent(session))
+                return;
+            if (this.consumptionSession !== session || this.state !== LuminaAudioPlayer.PlayerState.PLAYING)
+                return;
+            // The start response arrived after the listener already listened past the beginning, so the resume position is
+            // no longer useful and must not pull the playhead backwards later. A target left by the paused start response
+            // is cleared with it, or it would reject every later playhead report and freeze the record on the abandoned resume position.
+            if (this.currentTime > CONSUMPTION_RESUME_APPLY_WINDOW_SECONDS) {
+                session.pendingResumeSeconds = 0;
+                if (session.pendingSeekSeconds === resumeSeconds) {
+                    session.pendingSeekSeconds = null;
+                    session.pendingSeekFromSeconds = null;
+                    this.trackConsumptionPlayhead(this.currentTime, this.duration);
+                }
+                return;
+            }
+            session.pendingResumeSeconds = 0;
+            try {
+                await this.seekAsync(resumeSeconds, { isConsumptionResume: true });
+            } catch (error) {
+                console.debug('Audio player: the resume position of the consumption record could not be applied.', error);
+            }
+        }
+
+        /**
+         * Stops the consumption record of the track that was playing, if there is one. It is used when playback is stopped, skipped or replaced before the track reached its end.
+         */
+        stopConsumptionSession() {
+            this.finishConsumptionSession('stop');
+        }
+
+        /**
+         * Completes the consumption record of the track that was playing, if there is one. It is used when the track reached its end or its gapless handoff committed.
+         */
+        completeConsumptionSession() {
+            this.finishConsumptionSession('complete');
+        }
+
+        /**
+         * Detaches the current consumption session and reports its final state, either as completed or as stopped.
+         *
+         * The session is detached before the report is sent, so a transition that happens while the report is in flight
+         * cannot attach the answer of the old session to the track that replaced it. A session whose start request is still
+         * in flight keeps the final payload and its outcome, and the start response closes the record it creates with that outcome instead of assuming it stopped.
+         * @param {string} outcome - 'complete' to complete the record, or 'stop' to stop it.
+         * @returns {Object|null} The detached session, or null when no session was active.
+         */
+        finishConsumptionSession(outcome) {
+            const session = this.consumptionSession;
+            if (!session)
+                return null;
+            this.consumptionSession = null;
+            session.isFinished = true;
+            this.clearConsumptionReportTimer(session);
+            this.clearConsumptionSeekReportTimer(session);
+            // A report that is still in flight belongs to a finished session, so it must not ask for a newer one when it settles.
+            session.shouldReportProgressAfterSettle = false;
+            this.accumulateConsumptionDuration(session);
+            session.playingSinceMs = null;
+            // The position of the session is the last playhead the engine reported, or the target of the last seek the
+            // listener made, so a replacement that already reset the player timeline cannot move a finished session back.
+            const payload = this.buildConsumptionPayload(session, outcome);
+            if (session.recordId) 
+                this.sendConsumptionEndRequest(session, outcome, payload);
+            else {
+                session.pendingEndPayload = payload;
+                session.pendingEndOutcome = outcome;
+            }
+            return session;
+        }
+
+        /**
+         * Reports the current consumption session as a progress report, without waiting for it.
+         */
+        reportConsumptionProgress() {
+            this.reportConsumptionProgressAsync().catch((error) => {
+                console.debug('Audio player: a consumption progress report could not be sent.', error);
+            });
+        }
+
+        /**
+         * Sends a progress report of the current consumption session. A missing record or a finished session makes the report a no-op.
+         *
+         * Only one progress report per session is in flight at a time. A report requested while one is running is folded
+         * into a single follow-up report, which reads the session when it runs, so the server always ends on the newest
+         * position without receiving a burst of overlapping writes.
+         * @returns {Promise<void>} A promise that completes when the report was resolved.
+         */
+        async reportConsumptionProgressAsync() {
+            const session = this.consumptionSession;
+            if (!session || !session.recordId || !this.isConsumptionSessionCurrent(session))
+                return;
+            if (session.progressReportInFlight) {
+                session.shouldReportProgressAfterSettle = true;
+                return;
+            }
+            session.progressReportInFlight = true;
+            session.shouldReportProgressAfterSettle = false;
+            let timeoutTimer = null;
+            let abortController = null;
+            try {
+                this.accumulateConsumptionDuration(session);
+                this.syncConsumptionPositionWithPlayer(session);
+                const route = buildRouteUrl(this.getConfiguration().reportConsumptionProgressRouteTemplate, { recordId: session.recordId });
+                if (!route)
+                    return;
+                const payload = this.buildConsumptionPayload(session, 'progress');
+                const options = { label: 'a consumption progress request' };
+                if (typeof AbortController === 'function') {
+                    abortController = new AbortController();
+                    options.signal = abortController.signal;
+                    timeoutTimer = setTimeout(() => {
+                        try {
+                            abortController.abort();
+                        } catch (error) {
+                            console.debug('Audio player: the consumption progress request could not be aborted.', error);
+                        }
+                    }, CONSUMPTION_REPORT_TIMEOUT_MS);
+                }
+                await this.postJsonAsync(route, payload, options);
+            } finally {
+                if (timeoutTimer !== null)
+                    clearTimeout(timeoutTimer);
+                session.progressReportInFlight = false;
+                // A report requested while this one was running carries a newer state, so it is sent once this one settled.
+                if (session.shouldReportProgressAfterSettle) {
+                    session.shouldReportProgressAfterSettle = false;
+                    if (this.consumptionSession === session && !session.isFinished)
+                        this.reportConsumptionProgress();
+                }
+            }
+        }
+
+        /**
+         * Schedules the next periodic progress report of the current consumption session.
+         *
+         * The next report is armed before the current one is sent, so a slow or timed out request can never suppress the
+         * periodic reporting of the track for the rest of its playback. A timer that is already armed is kept, so the
+         * cadence stays fixed instead of being reset by every seek or pause report.
+         */
+        scheduleConsumptionReport() {
+            const session = this.consumptionSession;
+            if (!session || !session.recordId || !this.isConsumptionSessionCurrent(session))
+                return;
+            if (session.reportTimer !== null)
+                return;
+            session.reportTimer = setTimeout(() => {
+                session.reportTimer = null;
+                if (this.consumptionSession !== session || session.isFinished)
+                    return;
+                // Re-arm first, then report, so a report that hangs until its timeout cannot leave the track without a periodic report for the rest of its playback.
+                if (this.state === LuminaAudioPlayer.PlayerState.PLAYING)
+                    this.scheduleConsumptionReport();
+                this.reportConsumptionProgress();
+            }, CONSUMPTION_REPORT_INTERVAL_MS);
+        }
+
+        /**
+         * Clears the pending periodic report of a session, when there is one.
+         * @param {Object} session - The consumption session whose timer to clear.
+         */
+        clearConsumptionReportTimer(session) {
+            if (!session || session.reportTimer === null)
+                return;
+            clearTimeout(session.reportTimer);
+            session.reportTimer = null;
+        }
+
+        /**
+         * Adds the active playback time elapsed since the last accumulation to the consumed duration of a session.
+         *
+         * Only wall clock time spent playing is counted, never the download progress or the playhead, so seeking around a
+         * track cannot inflate the time the listener actually listened to it.
+         * @param {Object} session - The consumption session to accumulate into.
+         */
+        accumulateConsumptionDuration(session) {
+            if (!session || session.playingSinceMs === null)
+                return;
+            const now = Date.now();
+            // A suspended tab, a device sleep, or a frozen engine leaves a wall clock gap that is much longer than the
+            // reporting cadence. Only the expected cadence is counted, so the idle interval never becomes listening time.
+            const elapsedMilliseconds = Math.min(Math.max(0, now - session.playingSinceMs), CONSUMPTION_MAX_ACCUMULATED_INTERVAL_MS);
+            const elapsedSeconds = elapsedMilliseconds / 1000;
+            if (elapsedSeconds > 0)
+                session.consumedDurationInSeconds += elapsedSeconds;
+            session.playingSinceMs = now;
+        }
+
+        /**
+         * Ends the active playback interval of a session without ending the session itself, used by a pause and by a start response that arrives after the listener already paused.
+         */
+        pauseConsumptionClock() {
+            const session = this.consumptionSession;
+            if (!this.isConsumptionSessionCurrent(session))
+                return;
+            this.accumulateConsumptionDuration(session);
+            session.playingSinceMs = null;
+            this.clearConsumptionReportTimer(session);
+            // A trailing seek report is superseded by the immediate pause report, which carries the same position.
+            this.clearConsumptionSeekReportTimer(session);
+        }
+
+        /**
+         * Restarts the active playback interval of a session and its periodic report after a pause, keeping the record of the track that was paused.
+         */
+        resumeConsumptionClock() {
+            const session = this.consumptionSession;
+            if (!this.isConsumptionSessionCurrent(session))
+                return;
+            if (session.playingSinceMs === null)
+                session.playingSinceMs = Date.now();
+            if (session.recordId)
+                this.scheduleConsumptionReport();
+            // A resume position returned while the player was paused is applied now, before the listener hears the start
+            // again. The session was not reported at the paused position, so the server still holds that position.
+            if (session.pendingResumeSeconds > 0) {
+                this.applyConsumptionResumeAsync(session).catch((error) => {
+                    console.debug('Audio player: the pending resume position of the consumption record could not be applied.', error);
+                });
+            }
+        }
+
+        /**
+         * Checks whether a consumption session still belongs to the track the player currently describes.
+         *
+         * A session outlives the player timeline for the short window between the moment a new track is announced and the
+         * moment its own session starts, and a stop or a complete report sent in that window must never adopt the playhead or the duration of the track that replaced it.
+         * @param {Object} session - The consumption session to check.
+         * @returns {boolean} True when the session is active and describes the current track.
+         */
+        isConsumptionSessionCurrent(session) {
+            if (!session || session.isFinished || !this.descriptor)
+                return false;
+            return this.descriptor.trackId === session.trackId && this.descriptor.libraryId === session.libraryId;
+        }
+
+        /**
+         * Checks whether the playhead reported by the engine has reached the target of a seek that the consumption session adopted before the engine caught up.
+         *
+         * The engine reports the pre-seek playhead first, and that report must not overwrite the position the listener
+         * chose. The check is directional, exactly like the buffering check of the player, so a forward and a backward seek both settle once the playhead crosses their target.
+         * @param {number} position - The playhead reported by the engine, in seconds.
+         * @returns {boolean} True when no seek target is pending, or the reported playhead reached it.
+         */
+        isConsumptionSeekSettled(position) {
+            const session = this.consumptionSession;
+            if (!this.isConsumptionSessionCurrent(session) || session.pendingSeekSeconds === null)
+                return true;
+            const target = session.pendingSeekSeconds;
+            const from = session.pendingSeekFromSeconds;
+            const reached = from === null
+                ? Math.abs(position - target) <= SEEK_SETTLE_TOLERANCE_SECONDS
+                : target >= from
+                    ? position >= target - SEEK_SETTLE_TOLERANCE_SECONDS
+                    : position <= target + SEEK_SETTLE_TOLERANCE_SECONDS;
+            if (!reached)
+                return false;
+            session.pendingSeekSeconds = null;
+            session.pendingSeekFromSeconds = null;
+            return true;
+        }
+
+        /**
+         * Follows the playhead and the duration the engine reports for the current track, so the session always carries the latest position a stop, skip, pause or end reports.
+         * @param {number} position - The current playhead, in seconds.
+         * @param {number} duration - The known duration of the track, in seconds.
+         */
+        trackConsumptionPlayhead(position, duration) {
+            const session = this.consumptionSession;
+            if (!this.isConsumptionSessionCurrent(session))
+                return;
+            const positionSeconds = Number(position);
+            session.lastPositionSeconds = Number.isFinite(positionSeconds) && positionSeconds > 0 ? positionSeconds : 0;
+            this.trackConsumptionDuration(duration);
+        }
+
+        /**
+         * Follows the duration the engine reports for the current track.
+         * @param {number} duration - The known duration of the track, in seconds.
+         */
+        trackConsumptionDuration(duration) {
+            const session = this.consumptionSession;
+            if (!this.isConsumptionSessionCurrent(session))
+                return;
+            const durationSeconds = Number(duration);
+            if (!Number.isFinite(durationSeconds) || durationSeconds <= 0)
+                return;
+            session.durationSeconds = durationSeconds;
+            session.lastProgressFraction = clamp(session.lastPositionSeconds / durationSeconds, 0, 1);
+        }
+
+        /**
+         * Records a seek of the listener and reports it. A seek applies to the track that was current when the seek was
+         * requested, so the session position is updated from the requested target before the engine reports it.
+         * @param {number} position - The target playhead of the seek, in seconds.
+         * @param {number|null} [fromPosition=null] - The playhead the seek started from, so the pre-seek report the engine
+         * sends first can be told apart from the target.
+         * @param {boolean} [isConsumptionResume=false] - True when the seek applies the resume position of a consumption
+         * start response, so it is not treated as a seek the listener made.
+         */
+        noteConsumptionSeek(position, fromPosition = null, isConsumptionResume = false) {
+            const session = this.consumptionSession;
+            if (!this.isConsumptionSessionCurrent(session))
+                return;
+            // The sequence identifies this seek, so a rejection of an older engine seek can never revert a newer one.
+            session.seekSequence += 1;
+            // The session adopts the target before the engine catches up, so a pre-seek report, an immediate progress
+            // report or a stop during the seek keeps the position the listener chose instead of the old one.
+            session.pendingSeekSeconds = position;
+            session.pendingSeekFromSeconds = fromPosition;
+            this.trackConsumptionPlayhead(position, this.duration);
+            // The resume seek of a start response is not a user choice: it carries the position the session already holds,
+            // so it must not mark the session as seeked or report a position it already has.
+            if (isConsumptionResume)
+                return;
+            session.hasUserSeeked = true;
+            session.pendingResumeSeconds = 0;
+            this.scheduleConsumptionSeekReport();
+        }
+
+        /**
+         * Reverts a seek target that the engine rejected, so the session does not stay frozen on a position playback never reached.
+         *
+         * The state is only reverted when the rejected seek is still the newest one of the same session, so a rejection that settles after a newer seek cannot clear the newer target.
+         * @param {Object} session - The consumption session the rejected seek belonged to.
+         * @param {number|null} seekSequence - The sequence of the rejected seek, captured before the engine was awaited.
+         * @param {number} position - The target that the engine rejected.
+         * @param {number} fromPosition - The playhead the rejected seek started from.
+         */
+        revertFailedConsumptionSeek(session, seekSequence, position, fromPosition) {
+            if (!session
+                || this.consumptionSession !== session
+                || session.seekSequence !== seekSequence
+                || session.pendingSeekSeconds !== position
+                || !this.isConsumptionSessionCurrent(session))
+                return;
+            session.pendingSeekSeconds = null;
+            session.pendingSeekFromSeconds = null;
+            // The engine did not move, so the player and its record return to the position the seek started from. The next
+            // engine report can correct the small difference if the engine moved before it failed.
+            this.currentTime = Number.isFinite(fromPosition) && fromPosition > 0 ? fromPosition : 0;
+            this.trackConsumptionPlayhead(this.currentTime, this.duration);
+        }
+
+        /**
+         * Reports a seek as soon as the throttle allows, and always with the newest position of the session.
+         *
+         * The operating system repeats a held arrow key many times per second, so a report per seek would run one API command
+         * and one database write per repeat. The first seek of a window reports immediately, and seeks inside the window
+         * share a single trailing report that reads the session when it fires, so the position that is sent is the latest one.
+         */
+        scheduleConsumptionSeekReport() {
+            const session = this.consumptionSession;
+            if (!session || !session.recordId || !this.isConsumptionSessionCurrent(session))
+                return;
+            const now = Date.now();
+            const elapsedMilliseconds = now - session.lastSeekReportAtMs;
+            if (elapsedMilliseconds >= CONSUMPTION_SEEK_REPORT_INTERVAL_MS) {
+                // An overdue trailing report is replaced by this immediate one, so the newest position is not sent twice.
+                this.clearConsumptionSeekReportTimer(session);
+                session.lastSeekReportAtMs = now;
+                this.reportConsumptionProgress();
+                return;
+            }
+            // A trailing report is already armed, and it reads the session when it fires, so it already carries every newer seek. Arming another one would only duplicate the same position.
+            if (session.seekReportTimer !== null)
+                return;
+            session.seekReportTimer = setTimeout(() => {
+                session.seekReportTimer = null;
+                if (this.consumptionSession !== session || session.isFinished)
+                    return;
+                session.lastSeekReportAtMs = Date.now();
+                this.reportConsumptionProgress();
+            }, CONSUMPTION_SEEK_REPORT_INTERVAL_MS - elapsedMilliseconds);
+        }
+
+        /**
+         * Clears the pending trailing report of a seek, when there is one.
+         * @param {Object} session - The consumption session whose seek report timer to clear.
+         */
+        clearConsumptionSeekReportTimer(session) {
+            if (!session || session.seekReportTimer === null)
+                return;
+            clearTimeout(session.seekReportTimer);
+            session.seekReportTimer = null;
+        }
+
+        /**
+         * Aligns the position and the fraction of a session with the timeline the player shows, when the session belongs to
+         * the track that is still current. A session of a track that was already replaced keeps its own last report.
+         * @param {Object} session - The consumption session to align.
+         */
+        syncConsumptionPositionWithPlayer(session) {
+            if (this.consumptionSession !== session || !this.isConsumptionSessionCurrent(session))
+                return;
+            // A seek target the engine has not reached yet is newer than the playhead the player still shows, so the
+            // session is left on the target instead of being pulled back to the pre-seek position.
+            if (session.pendingSeekSeconds !== null)
+                return;
+            const positionSeconds = Number(this.currentTime);
+            session.lastPositionSeconds = Number.isFinite(positionSeconds) && positionSeconds > 0 ? positionSeconds : 0;
+            const durationSeconds = Number(this.duration);
+            if (!Number.isFinite(durationSeconds) || durationSeconds <= 0)
+                return;
+            session.durationSeconds = durationSeconds;
+            session.lastProgressFraction = clamp(session.lastPositionSeconds / durationSeconds, 0, 1);
+        }
+
+        /**
+         * Builds the request body of a consumption report.
+         * @param {Object} session - The consumption session to describe.
+         * @param {string} outcome - 'progress', 'stop', or 'complete'.
+         * @returns {Object} The request body of the report.
+         */
+        buildConsumptionPayload(session, outcome) {
+            const isCompleted = outcome === 'complete';
+            const durationSeconds = session.durationSeconds > 0 ? session.durationSeconds : 0;
+            // A completed track ends at its full duration even when the last playhead report stopped a fraction of a second before the end, because the end is what the engine reported.
+            const positionSeconds = isCompleted && durationSeconds > 0
+                ? durationSeconds
+                : Math.max(0, session.lastPositionSeconds);
+            const progressFraction = isCompleted
+                ? 1
+                : durationSeconds > 0
+                    ? clamp(positionSeconds / durationSeconds, 0, 1)
+                    : clamp(session.lastProgressFraction, 0, 1);
+            return {
+                position: {
+                    kind: TIME_OFFSET_POSITION_KIND,
+                    timeOffsetSeconds: roundConsumptionValue(positionSeconds),
+                    location: null
+                },
+                progressFraction: roundConsumptionValue(progressFraction),
+                consumedDurationInSeconds: roundConsumptionValue(Math.max(0, session.consumedDurationInSeconds))
+            };
+        }
+
+        /**
+         * Sends the final report of a detached consumption session, either as completed or as stopped.
+         * @param {Object} session - The detached session, which must carry the record identifier.
+         * @param {string} outcome - 'complete' to complete the record, or 'stop' to stop it.
+         * @param {Object} payload - The request body of the report.
+         */
+        sendConsumptionEndRequest(session, outcome, payload) {
+            if (!session || !session.recordId)
+                return;
+            const configuration = this.getConfiguration();
+            const routeTemplate = outcome === 'complete'
+                ? configuration.completeConsumptionRouteTemplate
+                : configuration.stopConsumptionRouteTemplate;
+            const route = buildRouteUrl(routeTemplate, { recordId: session.recordId });
+            if (!route)
+                return;
+            const label = outcome === 'complete' ? 'a consumption completion request' : 'a consumption stop request';
+            // A stop or a complete is terminal, so it must reach the server even when the page is already going away. The
+            // keepalive flag makes the browser finish the request after the page unloads, exactly like the playback state flush.
+            this.postJsonAsync(route, payload, { label, keepalive: true }).catch((error) => {
+                console.debug(`Audio player: ${label} could not be sent.`, error);
+            });
         }
 
         /**
