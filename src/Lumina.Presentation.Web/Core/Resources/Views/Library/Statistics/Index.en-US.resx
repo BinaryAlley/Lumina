@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Title" xml:space="preserve">
+    <value>Statistics</value>
+  </data>
+  <data name="TotalListeningTime" xml:space="preserve">
+    <value>Total listening time</value>
+  </data>
+  <data name="TotalPlays" xml:space="preserve">
+    <value>Plays</value>
+  </data>
+  <data name="CompletedPlays" xml:space="preserve">
+    <value>Completed plays</value>
+  </data>
+  <data name="CompletionRate" xml:space="preserve">
+    <value>Completion rate</value>
+  </data>
+  <data name="RecentlyPlayed" xml:space="preserve">
+    <value>Recently played</value>
+  </data>
+  <data name="MostPlayed" xml:space="preserve">
+    <value>Most played</value>
+  </data>
+  <data name="NoPlaysYet" xml:space="preserve">
+    <value>There are no counted plays yet.</value>
+  </data>
+  <data name="Unavailable" xml:space="preserve">
+    <value>This track is no longer available.</value>
+  </data>
+  <data name="LoadFailed" xml:space="preserve">
+    <value>The statistics could not be loaded.</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>Retry</value>
+  </data>
+  <data name="Plays" xml:space="preserve">
+    <value>plays</value>
+  </data>
+  <data name="Completed" xml:space="preserve">
+    <value>completed</value>
+  </data>
+  <data name="LastPlayed" xml:space="preserve">
+    <value>Last played</value>
+  </data>
+  <data name="PlayTrack" xml:space="preserve">
+    <value>Play track</value>
+  </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>Add to playlist</value>
+  </data>
+  <data name="HoursShort" xml:space="preserve">
+    <value>h</value>
+  </data>
+  <data name="MinutesShort" xml:space="preserve">
+    <value>m</value>
+  </data>
+  <data name="SecondsShort" xml:space="preserve">
+    <value>s</value>
+  </data>
+</root>

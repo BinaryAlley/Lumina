@@ -6,6 +6,7 @@ using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -50,6 +51,22 @@ internal sealed class MusicPlayRecordRepository : IMusicPlayRecordRepository
         if (!shouldTrackEntities)
             query = query.AsNoTracking();
         return await query.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Gets the play records of the user identified by <paramref name="userId"/>.
+    /// </summary>
+    /// <param name="userId">The Id of the user whose play records are retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the play records of the user, or an error.</returns>
+    public async Task<Result<IReadOnlyList<MusicPlayRecordEntity>>> GetForUserAsync(Guid userId, CancellationToken cancellationToken)
+    {
+        // The user is part of the query, so the storage medium never returns the plays of another user.
+        List<MusicPlayRecordEntity> playRecords = await _luminaDbContext.MusicPlayRecords
+            .AsNoTracking()
+            .Where(playRecord => playRecord.UserId == userId)
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+        return Result.From<IReadOnlyList<MusicPlayRecordEntity>>(playRecords);
     }
 
     /// <summary>

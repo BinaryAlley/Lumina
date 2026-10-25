@@ -1,0 +1,398 @@
+@*
+    FALLBACK STATISTICS PAGE - READ BEFORE EDITING
+
+    This view is the application fallback of the statistics page, rendered when the active theme provides no template for the page
+    or its template cannot be loaded. It keeps the DOM contract and the client script a theme template would mirror.
+
+    The page summarizes the plays of the current user: the total listening time, the counted plays, the completed plays and the
+    completion rate, followed by the recently played tracks and the most played tracks. A play counts when it completed or when the
+    listened duration reached 30 seconds, which the server applies. The script loads the three sections in parallel and renders a row per
+    track, with a play trigger, a favorite heart and an add to playlist action, so the page behaves like the other track lists.
+
+    The element hooks the script needs are statistics-total-listening-time, statistics-total-plays, statistics-completed-plays,
+    statistics-completion-rate, recently-played-list, most-played-list, statistics-empty-state, statistics-load-failed and
+    retry-statistics-button.
+
+    To restyle the page, edit the theme files. This fallback is intentionally plain, so that a broken theme is obvious to the user while the page still functions.
+
+    /library/statistics
+*@
+
+@using Lumina.Presentation.Web.Common.Services
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System
+@using System.Collections.Generic
+@using System.Globalization
+@using System.Text.Json
+@using System.Text.Json.Serialization
+
+@inject IViewLocalizer _localizer
+@inject IUrlService _urlService
+
+@{
+    // Generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler.
+    var scriptId = ScriptIdentifierHelper.GenerateScriptId();
+    var strings = new Dictionary<string, string>
+    {
+        ["title"] = _localizer["Title"].Value,
+        ["totalListeningTime"] = _localizer["TotalListeningTime"].Value,
+        ["totalPlays"] = _localizer["TotalPlays"].Value,
+        ["completedPlays"] = _localizer["CompletedPlays"].Value,
+        ["completionRate"] = _localizer["CompletionRate"].Value,
+        ["recentlyPlayed"] = _localizer["RecentlyPlayed"].Value,
+        ["mostPlayed"] = _localizer["MostPlayed"].Value,
+        ["noPlaysYet"] = _localizer["NoPlaysYet"].Value,
+        ["unavailable"] = _localizer["Unavailable"].Value,
+        ["loadFailed"] = _localizer["LoadFailed"].Value,
+        ["retry"] = _localizer["Retry"].Value,
+        ["plays"] = _localizer["Plays"].Value,
+        ["completed"] = _localizer["Completed"].Value,
+        ["lastPlayed"] = _localizer["LastPlayed"].Value,
+        ["playTrack"] = _localizer["PlayTrack"].Value,
+        ["addToPlaylist"] = _localizer["AddToPlaylist"].Value,
+        ["hoursShort"] = _localizer["HoursShort"].Value,
+        ["minutesShort"] = _localizer["MinutesShort"].Value,
+        ["secondsShort"] = _localizer["SecondsShort"].Value
+    };
+    var jsonOptions = new JsonSerializerOptions
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        Converters = { new JsonStringEnumConverter() }
+    };
+}
+
+<div class="cotton-candy">
+    <div style="display: grid; grid-template-rows: auto 1fr;">
+        <div style="min-height: 1rem;"></div>
+        <div class="pl-10 pr-10 pb-10">
+            <div class="text-center">
+                <h1 class="text-light-two engraved-title">@_localizer["Title"]</h1>
+            </div>
+            <!-- Summary totals. -->
+            <div class="statistics-summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                <div class="statistics-summary-tile">
+                    <span class="text-disabled form-label">@_localizer["TotalListeningTime"]</span>
+                    <strong id="statistics-total-listening-time" class="text-light-two" aria-live="polite">-</strong>
+                </div>
+                <div class="statistics-summary-tile">
+                    <span class="text-disabled form-label">@_localizer["TotalPlays"]</span>
+                    <strong id="statistics-total-plays" class="text-light-two" aria-live="polite">-</strong>
+                </div>
+                <div class="statistics-summary-tile">
+                    <span class="text-disabled form-label">@_localizer["CompletedPlays"]</span>
+                    <strong id="statistics-completed-plays" class="text-light-two" aria-live="polite">-</strong>
+                </div>
+                <div class="statistics-summary-tile">
+                    <span class="text-disabled form-label">@_localizer["CompletionRate"]</span>
+                    <strong id="statistics-completion-rate" class="text-light-two" aria-live="polite">-</strong>
+                </div>
+            </div>
+            <!-- Recently played tracks. -->
+            <h2 class="text-light-two">@_localizer["RecentlyPlayed"]</h2>
+            <div id="recently-played-list" class="statistics-track-list"></div>
+            <!-- Most played tracks. -->
+            <h2 class="text-light-two">@_localizer["MostPlayed"]</h2>
+            <div id="most-played-list" class="statistics-track-list"></div>
+            <p id="statistics-empty-state" class="hidden text-light-two text-center" aria-live="polite" aria-atomic="true" tabindex="-1">@_localizer["NoPlaysYet"]</p>
+            <p id="statistics-load-failed" class="hidden text-light-two text-center" aria-live="polite" aria-atomic="true" tabindex="-1">@_localizer["LoadFailed"]</p>
+            <div class="form-row">
+                <button id="retry-statistics-button" type="button" class="confirm-button hidden">@_localizer["Retry"]</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- The "text/plain" type is a design choice, not a mistake: it keeps the browser from executing this view script during HTML parsing, before site.js defines the API helpers it calls. site.js (which loads deferred) executes these scripts once it is loaded, both on the initial page load and during AJAX navigation. -->
+    <script type="text/plain" data-form="@scriptId">
+        const strings = @Html.Raw(JsonSerializer.Serialize(strings, jsonOptions));
+        const getRecentlyPlayedUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_RECENTLY_PLAYED)';
+        const getMostPlayedUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_MOST_PLAYED)';
+        const getStatisticsUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_MUSIC_PLAY_STATISTICS)';
+        const trackUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Music.TRACK, new { artistId = default(Guid), albumId = default(Guid), trackId = default(Guid) })';
+        const culture = '@CultureInfo.CurrentUICulture.Name';
+        const EMPTY_GUID = '00000000-0000-0000-0000-000000000000';
+        const totalListeningTimeValue = document.getElementById('statistics-total-listening-time');
+        const totalPlaysValue = document.getElementById('statistics-total-plays');
+        const completedPlaysValue = document.getElementById('statistics-completed-plays');
+        const completionRateValue = document.getElementById('statistics-completion-rate');
+        const recentlyPlayedList = document.getElementById('recently-played-list');
+        const mostPlayedList = document.getElementById('most-played-list');
+        const emptyState = document.getElementById('statistics-empty-state');
+        const loadFailedMessage = document.getElementById('statistics-load-failed');
+        const retryButton = document.getElementById('retry-statistics-button');
+        let isInitialized = false;
+        let isLoading = false;
+        let hasLoaded = false;
+        let hasLoadFailed = false;
+        let renderedTrackCount = 0;
+
+        function isKnownId(id) {
+            return typeof id === 'string' && id !== '' && id !== EMPTY_GUID;
+        }
+
+        function buildTrackUrl(track) {
+            if (!track.title || !isKnownId(track.libraryId) || !isKnownId(track.artistId) || !isKnownId(track.albumId) || !isKnownId(track.trackId))
+                return '';
+            return trackUrlTemplate
+                .replace(`/${EMPTY_GUID}`, `/${track.artistId}`)
+                .replace(`/${EMPTY_GUID}`, `/${track.albumId}`)
+                .replace(`/${EMPTY_GUID}`, `/${track.trackId}`) + `?libraryId=${encodeURIComponent(track.libraryId)}`;
+        }
+
+        // Formats a duration in seconds as hours and minutes, minutes and seconds, or seconds, using the page's short unit suffixes.
+        function formatListeningTime(totalSeconds) {
+            const total = Math.max(0, Math.round(Number(totalSeconds) || 0));
+            const hours = Math.floor(total / 3600);
+            const minutes = Math.floor((total % 3600) / 60);
+            const seconds = total % 60;
+            if (hours > 0)
+                return `${hours}${strings.hoursShort} ${minutes}${strings.minutesShort}`;
+            if (minutes > 0)
+                return `${minutes}${strings.minutesShort} ${seconds}${strings.secondsShort}`;
+            return `${seconds}${strings.secondsShort}`;
+        }
+
+        // The API stores the last activity time in UTC, but the persistence medium (SQLite) stores it as plain text, so the JSON the browser
+        // receives carries no time zone offset (no "Z"). Without an explicit offset, new Date(...) interprets the value as a local time, which
+        // shifts every value by the local UTC offset. Appending "Z" keeps those values anchored to UTC, where they were recorded.
+        function parseUtcTimestamp(timestampValue) {
+            if (!timestampValue)
+                return null;
+            const value = String(timestampValue);
+            const hasOffset = /(?:Z|[+-]\d{2}:\d{2})$/i.test(value);
+            return new Date(hasOffset ? value : value + 'Z');
+        }
+
+        // Formats a date and time in the language of the page, falling back to the browser's own format when the culture is not available.
+        function formatDateTime(value) {
+            const date = parseUtcTimestamp(value);
+            if (!date || Number.isNaN(date.getTime()))
+                return '';
+            try {
+                return new Intl.DateTimeFormat(culture, { dateStyle: 'medium', timeStyle: 'short' }).format(date);
+            } catch {
+                return date.toLocaleString();
+            }
+        }
+
+        function formatPercentage(value) {
+            const fraction = Math.max(0, Math.min(1, Number(value) || 0));
+            try {
+                return new Intl.NumberFormat(culture, { style: 'percent', maximumFractionDigits: 1 }).format(fraction);
+            } catch {
+                return `${Math.round(fraction * 100)}%`;
+            }
+        }
+
+        function createCover(track) {
+            const image = document.createElement('img');
+            image.className = 'statistics-track-cover';
+            image.src = track.coverPath
+                ? `${globalConfiguration.serverBasePath}${track.coverPath}`
+                : '/images/ui/music-placeholder.svg';
+            image.alt = '';
+            image.style.width = '48px';
+            image.style.height = '48px';
+            image.style.objectFit = 'cover';
+            image.style.borderRadius = '4px';
+            image.style.flexShrink = '0';
+            return image;
+        }
+
+        function createPlayButton(track) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'confirm-button statistics-action-button';
+            button.setAttribute('data-audio-player-play', '');
+            button.dataset.libraryId = track.libraryId;
+            button.dataset.trackId = track.trackId;
+            button.dataset.albumId = track.albumId;
+            button.dataset.artistId = track.artistId;
+            button.dataset.title = track.title || '';
+            button.dataset.albumTitle = track.albumTitle || '';
+            if (track.coverPath)
+                button.dataset.coverArtPath = track.coverPath;
+            // The button carries no visible text, so its accessible name names both the action and the track it plays.
+            const label = `${strings.playTrack}: ${track.title || ''}`;
+            button.setAttribute('aria-label', label);
+            button.title = label;
+            button.textContent = '\u25B6';
+            return button;
+        }
+
+        // Creates the heart of a track row. The global favorites script finds it by its data attributes, hydrates its state and handles its click.
+        function createFavoriteToggle(track) {
+            const toggle = document.createElement('button');
+            toggle.type = 'button';
+            toggle.className = 'card-favorite-toggle statistics-favorite-toggle';
+            toggle.setAttribute('data-favorite-toggle', '');
+            toggle.setAttribute('data-favorite-media-kind', 'MusicTrack');
+            toggle.setAttribute('data-favorite-media-item-id', track.trackId);
+            return toggle;
+        }
+
+        // Creates the add to playlist action. The global playlists script opens the playlist picker from its data attributes.
+        function createPlaylistAddButton(track) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'confirm-button statistics-action-button';
+            button.setAttribute('data-playlist-add', '');
+            button.dataset.playlistLibraryId = track.libraryId;
+            button.dataset.playlistTrackId = track.trackId;
+            button.dataset.playlistTitle = track.title || '';
+            const label = `${strings.addToPlaylist}: ${track.title || ''}`;
+            button.setAttribute('aria-label', label);
+            button.title = label;
+            button.textContent = '+';
+            return button;
+        }
+
+        // Builds the cell that describes how the track was played: its counted plays, its completed plays and when it was last active.
+        function createMetrics(track) {
+            const metrics = document.createElement('div');
+            metrics.className = 'statistics-track-metrics';
+            const counts = document.createElement('span');
+            counts.className = 'text-light-two';
+            counts.textContent = `${track.playCount} ${strings.plays} - ${track.completedPlayCount} ${strings.completed}`;
+            const lastPlayed = document.createElement('span');
+            lastPlayed.className = 'text-disabled';
+            lastPlayed.textContent = `${strings.lastPlayed}: ${formatDateTime(track.lastPlayedOnUtc)}`;
+            metrics.appendChild(counts);
+            metrics.appendChild(lastPlayed);
+            return metrics;
+        }
+
+        function createTrackRow(track, rank) {
+            const row = document.createElement('div');
+            row.className = 'statistics-track-row';
+            row.dataset.trackId = track.trackId;
+            row.style.display = 'flex';
+            row.style.alignItems = 'center';
+            row.style.gap = '0.75rem';
+            row.style.padding = '0.5rem 0';
+            row.style.borderBottom = '1px solid rgba(255, 255, 255, 0.08)';
+
+            if (rank)
+            {
+                const rankLabel = document.createElement('span');
+                rankLabel.className = 'text-disabled';
+                rankLabel.style.minWidth = '1.5rem';
+                rankLabel.style.textAlign = 'right';
+                rankLabel.textContent = rank;
+                row.appendChild(rankLabel);
+            }
+            row.appendChild(createCover(track));
+
+            const details = document.createElement('div');
+            details.style.display = 'flex';
+            details.style.flexDirection = 'column';
+            details.style.flexGrow = '1';
+            details.style.minWidth = '0';
+            const trackUrl = buildTrackUrl(track);
+            const title = document.createElement(trackUrl ? 'a' : 'span');
+            title.className = trackUrl ? 'nav-link text-light-two' : 'text-light-two';
+            if (trackUrl)
+                title.href = trackUrl;
+            title.textContent = track.title || strings.unavailable;
+            title.title = title.textContent;
+            title.style.whiteSpace = 'nowrap';
+            title.style.overflow = 'hidden';
+            title.style.textOverflow = 'ellipsis';
+            details.appendChild(title);
+            const subtitleText = [track.artistName, track.albumTitle].filter(value => value).join(' - ');
+            if (subtitleText)
+            {
+                const subtitle = document.createElement('span');
+                subtitle.className = 'text-disabled';
+                subtitle.textContent = subtitleText;
+                subtitle.style.whiteSpace = 'nowrap';
+                subtitle.style.overflow = 'hidden';
+                subtitle.style.textOverflow = 'ellipsis';
+                details.appendChild(subtitle);
+            }
+            row.appendChild(details);
+            row.appendChild(createMetrics(track));
+
+            const actions = document.createElement('div');
+            actions.className = 'statistics-track-actions';
+            actions.style.display = 'flex';
+            actions.style.alignItems = 'center';
+            actions.style.gap = '0.25rem';
+            // A track that no longer exists, or whose library the user cannot access, has no display data and no play context left to describe.
+            if (track.title)
+            {
+                actions.appendChild(createPlayButton(track));
+                actions.appendChild(createFavoriteToggle(track));
+                actions.appendChild(createPlaylistAddButton(track));
+            }
+            row.appendChild(actions);
+            return row;
+        }
+
+        function renderTracks(container, tracks, isRanked) {
+            container.innerHTML = '';
+            tracks.forEach((track, index) => container.appendChild(createTrackRow(track, isRanked ? index + 1 : 0)));
+            renderedTrackCount += tracks.length;
+        }
+
+        function renderStatistics(statistics) {
+            totalListeningTimeValue.textContent = formatListeningTime(statistics.totalListeningDurationInSeconds);
+            totalPlaysValue.textContent = String(statistics.totalPlayCount);
+            completedPlaysValue.textContent = String(statistics.completedPlayCount);
+            completionRateValue.textContent = formatPercentage(statistics.completionRate);
+        }
+
+        function updateState() {
+            // The empty state appears only after a successful load that returned no track at all, so it never flashes while the page is loading.
+            emptyState.classList.toggle('hidden', !hasLoaded || hasLoadFailed || renderedTrackCount > 0);
+            loadFailedMessage.classList.toggle('hidden', !hasLoadFailed);
+            retryButton.classList.toggle('hidden', !hasLoadFailed);
+            retryButton.disabled = isLoading;
+        }
+
+        async function loadStatisticsAsync() {
+            if (isLoading)
+                return;
+            isLoading = true;
+            hasLoadFailed = false;
+            updateState();
+            const [statistics, recentlyPlayed, mostPlayed] = await Promise.all([
+                callApiGetAsync(getStatisticsUrl),
+                callApiGetAsync(`${getRecentlyPlayedUrl}?currentPage=1&perPage=10`),
+                callApiGetAsync(`${getMostPlayedUrl}?currentPage=1&perPage=10`)
+            ]);
+            isLoading = false;
+            if (!statistics || !recentlyPlayed || !Array.isArray(recentlyPlayed.data) || !mostPlayed || !Array.isArray(mostPlayed.data)) {
+                // The API helper already reported each failure. The page keeps whatever it had rendered and offers a retry.
+                hasLoadFailed = true;
+                updateState();
+                return;
+            }
+            renderedTrackCount = 0;
+            renderStatistics(statistics);
+            renderTracks(recentlyPlayedList, recentlyPlayed.data, false);
+            renderTracks(mostPlayedList, mostPlayed.data, true);
+            hasLoaded = true;
+            hasLoadFailed = false;
+            bindNavigationLinks();
+            updateState();
+        }
+
+        retryButton.addEventListener('click', loadStatisticsAsync);
+
+        async function InitializeAsync() {
+            if (isInitialized)
+                return;
+            isInitialized = true;
+            await loadStatisticsAsync();
+        }
+
+        window.viewCleanups = window.viewCleanups || {};
+        window.viewCleanups['@scriptId'] = () => {
+            retryButton.removeEventListener('click', loadStatisticsAsync);
+            console.log(`Unloaded @scriptId`);
+        };
+        console.log(`Loaded @scriptId`);
+    </script>
+}

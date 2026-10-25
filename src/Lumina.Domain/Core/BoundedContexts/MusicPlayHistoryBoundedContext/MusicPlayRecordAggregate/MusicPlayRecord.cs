@@ -26,6 +26,11 @@ namespace Lumina.Domain.Core.BoundedContexts.MusicPlayHistoryBoundedContext.Musi
 public sealed class MusicPlayRecord : AggregateRoot<MusicPlayRecordId>
 {
     /// <summary>
+    /// The minimum number of seconds a user must listen to a track for the play to count, unless the play completed first.
+    /// </summary>
+    private const int MINIMUM_COUNTED_LISTENED_DURATION_SECONDS = 30;
+
+    /// <summary>
     /// Gets the object representing the unique identifier of the user that started the play.
     /// </summary>
     public UserId UserId { get; private set; }
@@ -206,6 +211,17 @@ public sealed class MusicPlayRecord : AggregateRoot<MusicPlayRecordId>
             endedOnUtc,
             createdOnUtc,
             updatedOnUtc);
+    }
+
+    /// <summary>
+    /// Determines whether a play with the provided <paramref name="status"/> and <paramref name="listenedDuration"/> counts as a play for the listening statistics.
+    /// </summary>
+    /// <param name="status">The state of the recorded play.</param>
+    /// <param name="listenedDuration">The duration that the user has listened to.</param>
+    /// <returns><see langword="true"/> when the play counts, <see langword="false"/> otherwise.</returns>
+    public static bool DoesCountAsPlay(PlaybackRecordStatus status, TimeSpan listenedDuration)
+    {
+        return status == PlaybackRecordStatus.Completed || listenedDuration.TotalSeconds >= MINIMUM_COUNTED_LISTENED_DURATION_SECONDS;
     }
 
     /// <summary>

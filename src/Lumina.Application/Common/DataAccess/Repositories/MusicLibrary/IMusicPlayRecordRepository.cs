@@ -4,6 +4,7 @@ using Lumina.Application.Common.DataAccess.Repositories.Common.Actions;
 using Lumina.Application.Common.DataAccess.Repositories.Common.Base;
 using Lumina.Domain.Common.Primitives;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -14,7 +15,7 @@ namespace Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
 /// Interface for the repository for recorded music plays.
 /// </summary>
 public interface IMusicPlayRecordRepository : IRepository<MusicPlayRecordEntity>,
-                                               IInsertRepositoryAction<MusicPlayRecordEntity>
+                                              IInsertRepositoryAction<MusicPlayRecordEntity>
 {
     /// <summary>
     /// Gets the play record identified by <paramref name="id"/> when it belongs to the user identified by <paramref name="userId"/>, if it exists.
@@ -28,6 +29,14 @@ public interface IMusicPlayRecordRepository : IRepository<MusicPlayRecordEntity>
     /// <see langword="null"/> when no such record exists, or an error.
     /// </returns>
     Task<Result<MusicPlayRecordEntity?>> GetByIdForUserAsync(Guid id, Guid userId, bool shouldTrackEntities = true, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets the play records of the user identified by <paramref name="userId"/>.
+    /// </summary>
+    /// <param name="userId">The Id of the user whose play records are retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the play records of the user, or an error.</returns>
+    Task<Result<IReadOnlyList<MusicPlayRecordEntity>>> GetForUserAsync(Guid userId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Updates the play record of the user identified by <paramref name="userId"/>, when the record belongs to that user and still holds the

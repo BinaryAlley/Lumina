@@ -2254,3 +2254,49 @@ html.audio-player-initializing .audio-player-container {
     color: #9AA7B0;
     font-size: 12px;
 }
+
+/* The statistics page: summary tiles, and the track rows of the recently played and most played lists. A row is a
+   track list, so its favorite heart is an inline action and never takes the place of a card heart. */
+.statistics-summary-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px;
+    border: 1px solid #777777;
+    border-bottom-color: #000000;
+    border-right-color: #000000;
+    background: linear-gradient(to bottom, #505050 0%, #464646 35%, #404040 55%, #363636 100%);
+}
+
+.statistics-track-list {
+    margin-bottom: 1.5rem;
+}
+
+.statistics-track-list:empty {
+    display: none;
+}
+
+/* The play counts and the last played time of a statistics row are separate lines, so the two values never run together. */
+.statistics-track-metrics {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    text-align: right;
+}
+
+.statistics-track-actions .card-favorite-toggle {
+    position: static;
+    display: flex;
+    flex: 0 0 auto;
+    margin: 0;
+}
+
+.statistics-action-button {
+    width: 28px;
+    min-width: 28px;
+    height: 28px;
+    padding: 0;
+    line-height: 1;
+}

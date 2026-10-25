@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Title" xml:space="preserve">
+    <value>统计</value>
+  </data>
+  <data name="TotalListeningTime" xml:space="preserve">
+    <value>总收听时间</value>
+  </data>
+  <data name="TotalPlays" xml:space="preserve">
+    <value>播放次数</value>
+  </data>
+  <data name="CompletedPlays" xml:space="preserve">
+    <value>完整播放次数</value>
+  </data>
+  <data name="CompletionRate" xml:space="preserve">
+    <value>完成率</value>
+  </data>
+  <data name="RecentlyPlayed" xml:space="preserve">
+    <value>最近播放</value>
+  </data>
+  <data name="MostPlayed" xml:space="preserve">
+    <value>最常播放</value>
+  </data>
+  <data name="NoPlaysYet" xml:space="preserve">
+    <value>还没有计入的播放。</value>
+  </data>
+  <data name="Unavailable" xml:space="preserve">
+    <value>此曲目已不可用。</value>
+  </data>
+  <data name="LoadFailed" xml:space="preserve">
+    <value>无法加载统计。</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>重试</value>
+  </data>
+  <data name="Plays" xml:space="preserve">
+    <value>次播放</value>
+  </data>
+  <data name="Completed" xml:space="preserve">
+    <value>次完整播放</value>
+  </data>
+  <data name="LastPlayed" xml:space="preserve">
+    <value>上次播放</value>
+  </data>
+  <data name="PlayTrack" xml:space="preserve">
+    <value>播放曲目</value>
+  </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>添加到播放列表</value>
+  </data>
+  <data name="HoursShort" xml:space="preserve">
+    <value>小时</value>
+  </data>
+  <data name="MinutesShort" xml:space="preserve">
+    <value>分钟</value>
+  </data>
+  <data name="SecondsShort" xml:space="preserve">
+    <value>秒</value>
+  </data>
+</root>

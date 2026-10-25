@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Lumina.Application.Common.Utilities;
 using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.PlayHistory;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.MusicPlayHistoryBoundedContext.ExternalIdentifiers.AudioLibraryBoundedContext.MusicLibraryAggregate;
@@ -34,8 +35,8 @@ public static class MusicPlayRecordEntityMapping
             AlbumId.Create(repositoryEntity.AlbumId),
             ArtistId.Create(repositoryEntity.ArtistId),
             repositoryEntity.Status,
-            MusicPlayPosition.Create(TimeSpan.FromMilliseconds(repositoryEntity.LastPositionMilliseconds)),
-            TimeSpan.FromMilliseconds(repositoryEntity.ListenedDurationMilliseconds),
+            MusicPlayPosition.Create(repositoryEntity.LastPositionMilliseconds.ToClampedTimeSpan()),
+            repositoryEntity.ListenedDurationMilliseconds.ToClampedTimeSpan(),
             Optional<DateTime>.FromNullable(repositoryEntity.EndedOnUtc),
             repositoryEntity.CreatedOnUtc,
             Optional<DateTime>.FromNullable(repositoryEntity.UpdatedOnUtc)
@@ -56,8 +57,8 @@ public static class MusicPlayRecordEntityMapping
             repositoryEntity.AlbumId,
             repositoryEntity.ArtistId,
             repositoryEntity.Status,
-            TimeSpan.FromMilliseconds(repositoryEntity.LastPositionMilliseconds).TotalSeconds,
-            TimeSpan.FromMilliseconds(repositoryEntity.ListenedDurationMilliseconds).TotalSeconds,
+            repositoryEntity.LastPositionMilliseconds.ToClampedTimeSpan().TotalSeconds,
+            repositoryEntity.ListenedDurationMilliseconds.ToClampedTimeSpan().TotalSeconds,
             repositoryEntity.CreatedOnUtc,
             repositoryEntity.EndedOnUtc,
             repositoryEntity.UpdatedOnUtc

@@ -43,7 +43,13 @@ public class GetUserConsumptionStatisticsEndpointSummary : Summary<GetUserConsum
         ResponseParam<ConsumptionSummaryResponse>(response => response.CompletedSessionCount, "The number of recorded sessions that completed.");
         ResponseParam<ConsumptionSummaryResponse>(response => response.StoppedSessionCount, "The number of recorded sessions that stopped before they completed and count towards statistics.");
         ResponseParam<ConsumptionSummaryResponse>(response => response.CompletionRate, "The fraction of the counted sessions that completed, between 0 and 1, or 0 when there is no counted session.");
-        ResponseParam<ConsumptionSummaryResponse>(response => response.MediaKindSummaries, "The consumption statistics broken down by media kind. Each entry carries the media kind, the consumed duration, the counted, completed and stopped session counts, and the completion rate of that kind.");
+        ResponseParam<ConsumptionSummaryResponse>(response => response.MediaKindSummaries, "The consumption statistics broken down by media kind.");
+        ResponseParam<MediaKindConsumptionSummaryResponse>(response => response.MediaKind, "The kind of media the breakdown entry belongs to.");
+        ResponseParam<MediaKindConsumptionSummaryResponse>(response => response.TotalConsumedDurationInSeconds, "The total duration consumed over every recorded session of the media kind, in seconds.");
+        ResponseParam<MediaKindConsumptionSummaryResponse>(response => response.CountedSessionCount, "The number of recorded sessions of the media kind that count towards statistics.");
+        ResponseParam<MediaKindConsumptionSummaryResponse>(response => response.CompletedSessionCount, "The number of recorded sessions of the media kind that completed.");
+        ResponseParam<MediaKindConsumptionSummaryResponse>(response => response.StoppedSessionCount, "The number of recorded sessions of the media kind that stopped before they completed and count towards statistics.");
+        ResponseParam<MediaKindConsumptionSummaryResponse>(response => response.CompletionRate, "The fraction of the counted sessions of the media kind that completed, between 0 and 1.");
 
         Response<ConsumptionSummaryResponse>(statusCode: 200, description: "The consumption statistics of the user are returned.", contentType: "application/json",
             example: new ConsumptionSummaryResponse(

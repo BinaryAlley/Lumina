@@ -225,4 +225,7 @@
   <data name="Favorites" xml:space="preserve">
     <value>お気に入り</value>
   </data>
+  <data name="Statistics" xml:space="preserve">
+    <value>統計</value>
+  </data>
 </root>

@@ -225,4 +225,7 @@
   <data name="Favorites" xml:space="preserve">
     <value>المفضلة</value>
   </data>
+  <data name="Statistics" xml:space="preserve">
+    <value>الإحصائيات</value>
+  </data>
 </root>
