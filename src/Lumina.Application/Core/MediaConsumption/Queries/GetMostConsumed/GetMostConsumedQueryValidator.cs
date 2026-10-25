@@ -37,5 +37,10 @@ public class GetMostConsumedQueryValidator : AbstractValidator<GetMostConsumedQu
         RuleFor(query => query.MediaKind)
             .Must(mediaKind => mediaKind is null || mediaKind != MediaKind.None)
             .WithError(Errors.MediaConsumption.UnsupportedMediaKind);
+
+        // An inverted range would silently return no records, so it is rejected as an invalid request instead.
+        RuleFor(query => query.FromUtc)
+            .Must((query, fromUtc) => !fromUtc.HasValue || !query.ToUtc.HasValue || fromUtc.Value <= query.ToUtc.Value)
+            .WithError(Errors.MediaConsumption.ConsumptionDateRangeIsInvalid);
     }
 }

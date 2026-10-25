@@ -23,19 +23,23 @@ public class GetRecentlyConsumedEndpointSummary : Summary<GetRecentlyConsumedEnd
     public GetRecentlyConsumedEndpointSummary()
     {
         Summary = "Gets the recently consumed media items of the current user.";
-        Description = "Gets one page of the media items the current user consumed, from the most recently consumed, across every kind of media or restricted to one kind and one library. Music and book sessions appear in the same list. An item whose sessions fall below the counting threshold of its kind is still listed, because the list shows the sessions that were really recorded; countedSessionCount reports only the sessions that count towards the statistics. Each item carries the display details of the media item it references: the title, the collection, the creator and the cover art. An item whose media item was deleted, or whose media library the user can no longer access, is still returned, with isAvailable set to false and empty display details, so the user can see it and delete the session. The history of another user is never returned by this route.";
+        Description = "Gets one page of the media items the current user consumed, from the most recently consumed, across every kind of media or restricted to one kind, one library, and a date range. Music and book sessions appear in the same list. An item whose sessions fall below the counting threshold of its kind is still listed, because the list shows the sessions that were really recorded; countedSessionCount reports only the sessions that count towards the statistics. Each item carries the display details of the media item it references: the title, the collection, the creator and the cover art. An item whose media item was deleted, or whose media library the user can no longer access, is still returned, with isAvailable set to false and empty display details, so the user can see it and delete it from the history. The history of another user is never returned by this route.";
 
         ExampleRequest = new GetRecentlyConsumedRequest(
             LibraryId: null,
             MediaKind: MediaKind.MusicTrack,
             CurrentPage: 1,
-            PerPage: 50
+            PerPage: 50,
+            FromUtc: new DateTime(2026, 10, 1, 0, 0, 0, DateTimeKind.Utc),
+            ToUtc: new DateTime(2026, 10, 31, 23, 59, 59, DateTimeKind.Utc)
         );
 
         RequestParam(request => request.LibraryId, "The Id of the media library to restrict the history to. Optional.");
         RequestParam(request => request.MediaKind, "The kind of media to restrict the history to. Optional.");
         RequestParam(request => request.CurrentPage, "The one based page of media items to return. Optional.");
         RequestParam(request => request.PerPage, "The number of media items per page. Optional.");
+        RequestParam(request => request.FromUtc, "The inclusive start of the date range. Optional.");
+        RequestParam(request => request.ToUtc, "The inclusive end of the date range. Optional.");
 
         ResponseParam<PaginatedResponse<ConsumedItemResponse>>(response => response.Data, "The recently consumed media items of the requested page, from the most recently consumed.");
         ResponseParam<PaginatedResponse<ConsumedItemResponse>>(response => response.CurrentPage, "The current page number.");
@@ -55,7 +59,7 @@ public class GetRecentlyConsumedEndpointSummary : Summary<GetRecentlyConsumedEnd
         ResponseParam<ConsumedItemResponse>(response => response.CompletedSessionCount, "The number of consumption sessions of the media item that completed.");
         ResponseParam<ConsumedItemResponse>(response => response.ConsumedDurationInSeconds, "The active duration consumed in the media item, over all of its sessions, in seconds.");
 
-        Response(statusCode: 200, description: "The recently consumed media items of the current user are returned.", contentType: "application/json",
+        Response(200, "The recently consumed media items of the current user are returned.", "application/json",
             example: new PaginatedResponse<ConsumedItemResponse>
             {
                 Data =
@@ -144,7 +148,8 @@ public class GetRecentlyConsumedEndpointSummary : Summary<GetRecentlyConsumedEnd
                         "General.Validation", new[]
                         {
                             "LibraryIdCannotBeEmpty",
-                            "UnsupportedMediaKind"
+                            "UnsupportedMediaKind",
+                            "ConsumptionDateRangeIsInvalid"
                         }
                     }
                 },

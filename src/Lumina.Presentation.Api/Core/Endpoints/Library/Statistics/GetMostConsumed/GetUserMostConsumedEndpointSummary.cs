@@ -23,13 +23,15 @@ public class GetUserMostConsumedEndpointSummary : Summary<GetUserMostConsumedEnd
     public GetUserMostConsumedEndpointSummary()
     {
         Summary = "Gets the most consumed media items of a user.";
-        Description = "Gets one page of the media items a user consumed the most, across every kind of media or restricted to one kind and one library. A user can read only their own history, while an Admin can select any user with the userId route parameter; a regular user targeting another user receives the same not authorized result as a route that names no accessible user. The items are ordered by the number of sessions that count towards statistics, then by the consumed duration, then by the last consumption date, and finally by the media item Id so the order is stable. Music and book sessions appear in the same list, and an item consumed many times appears once. An item whose sessions all fall below the counting threshold of its kind still appears in this list with a countedSessionCount of zero, but it is ordered after every item that has at least one counted session, so it normally appears on a later page. Each item carries the display details of the media item it references: the title, the collection, the creator and the cover art. An item whose media item was deleted, or whose media library the user can no longer access, is still returned, with isAvailable set to false and empty display details, so the user can see it and delete the session.";
+        Description = "Gets one page of the media items a user consumed the most, across every kind of media or restricted to one kind, one library, and a date range. A user can read only their own history, while an Admin can select any user with the userId route parameter; a regular user targeting another user receives the same not authorized result as a route that names no accessible user. The items are ordered by the number of sessions that count towards statistics, then by the consumed duration, then by the last consumption date, and finally by the media item Id so the order is stable. Music and book sessions appear in the same list, and an item consumed many times appears once. An item whose sessions all fall below the counting threshold of its kind still appears in this list with a countedSessionCount of zero, but it is ordered after every item that has at least one counted session, so it normally appears on a later page. Each item carries the display details of the media item it references: the title, the collection, the creator and the cover art. An item whose media item was deleted, or whose media library the user can no longer access, is still returned, with isAvailable set to false and empty display details, so the user can see it and delete it from the history.";
 
         ExampleRequest = new GetMostConsumedRequest(
             LibraryId: null,
             MediaKind: MediaKind.MusicTrack,
             CurrentPage: 1,
-            PerPage: 50
+            PerPage: 50,
+            FromUtc: new DateTime(2026, 10, 1, 0, 0, 0, DateTimeKind.Utc),
+            ToUtc: new DateTime(2026, 10, 31, 23, 59, 59, DateTimeKind.Utc)
         );
 
         Params["userId"] = "The Id of the user whose history is retrieved. An Admin can name any user; a regular user can only name themselves.";
@@ -37,6 +39,8 @@ public class GetUserMostConsumedEndpointSummary : Summary<GetUserMostConsumedEnd
         RequestParam(request => request.MediaKind, "The kind of media to restrict the history to. Optional.");
         RequestParam(request => request.CurrentPage, "The one based page of media items to return. Optional.");
         RequestParam(request => request.PerPage, "The number of media items per page. Optional.");
+        RequestParam(request => request.FromUtc, "The inclusive start of the date range. Optional.");
+        RequestParam(request => request.ToUtc, "The inclusive end of the date range. Optional.");
 
         ResponseParam<PaginatedResponse<ConsumedItemResponse>>(response => response.Data, "The most consumed media items of the requested page, ordered by counted sessions, consumed duration, and last consumption date.");
         ResponseParam<PaginatedResponse<ConsumedItemResponse>>(response => response.CurrentPage, "The current page number.");
@@ -56,7 +60,7 @@ public class GetUserMostConsumedEndpointSummary : Summary<GetUserMostConsumedEnd
         ResponseParam<ConsumedItemResponse>(response => response.CompletedSessionCount, "The number of consumption sessions of the media item that completed.");
         ResponseParam<ConsumedItemResponse>(response => response.ConsumedDurationInSeconds, "The active duration consumed in the media item, over all of its sessions, in seconds.");
 
-        Response(statusCode: 200, description: "The most consumed media items of the user are returned.", contentType: "application/json",
+        Response(200, "The most consumed media items of the user are returned.", "application/json",
             example: new PaginatedResponse<ConsumedItemResponse>
             {
                 Data =
@@ -146,7 +150,8 @@ public class GetUserMostConsumedEndpointSummary : Summary<GetUserMostConsumedEnd
                         {
                             "TargetUserIdIsInvalid",
                             "LibraryIdCannotBeEmpty",
-                            "UnsupportedMediaKind"
+                            "UnsupportedMediaKind",
+                            "ConsumptionDateRangeIsInvalid"
                         }
                     }
                 },

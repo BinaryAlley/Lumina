@@ -1,5 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
+using Lumina.Presentation.Web.Common.Authorization;
+using Lumina.Presentation.Web.Common.DTO.MediaConsumption;
 using Lumina.Presentation.Web.Common.DTO.Themes;
 using Lumina.Presentation.Web.Common.Primitives;
 using Lumina.Presentation.Web.Common.Routes;
@@ -10,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -30,6 +33,7 @@ public class StatisticsIndexViewEndpoint : BaseEndpoint<EmptyRequest, IResult>
     private readonly IUrlService _urlService;
     private readonly ThemePageRenderer _themePageRenderer;
     private readonly IStringLocalizer _localizer;
+    private readonly IAuthorizationService _authorizationService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="StatisticsIndexViewEndpoint"/> class.
@@ -37,11 +41,13 @@ public class StatisticsIndexViewEndpoint : BaseEndpoint<EmptyRequest, IResult>
     /// <param name="urlService">Injected service for generating URLs from action and controller names, with localization.</param>
     /// <param name="themePageRenderer">Injected service for rendering themed pages.</param>
     /// <param name="stringLocalizerFactory">Injected factory used to create the localizer of the view resources.</param>
-    public StatisticsIndexViewEndpoint(IUrlService urlService, ThemePageRenderer themePageRenderer, IStringLocalizerFactory stringLocalizerFactory)
+    /// <param name="authorizationService">Injected service used to resolve the role of the current user.</param>
+    public StatisticsIndexViewEndpoint(IUrlService urlService, ThemePageRenderer themePageRenderer, IStringLocalizerFactory stringLocalizerFactory, IAuthorizationService authorizationService)
     {
         _urlService = urlService;
         _themePageRenderer = themePageRenderer;
         _localizer = stringLocalizerFactory.Create(VIEW_RESOURCE_BASE_NAME, VIEW_RESOURCE_LOCATION);
+        _authorizationService = authorizationService;
     }
 
     /// <summary>
@@ -57,7 +63,7 @@ public class StatisticsIndexViewEndpoint : BaseEndpoint<EmptyRequest, IResult>
     }
 
     /// <summary>
-    /// Displays the statistics of the current user, rendered by the active theme with a fallback to the Razor view.
+    /// Displays the statistics page, rendered by the active theme with a fallback to the Razor view.
     /// </summary>
     /// <param name="request">The request object.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
@@ -67,9 +73,28 @@ public class StatisticsIndexViewEndpoint : BaseEndpoint<EmptyRequest, IResult>
         HttpContext.Response.Headers["Cache-Control"] = "private, no-store";
         HttpContext.Response.Headers["Vary"] = "Cookie";
         string title = _localizer["Title"].Value;
+        bool isAdmin = await _authorizationService.IsInRoleAsync("Admin", cancellationToken).ConfigureAwait(false);
+        string? currentUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        Guid? parsedCurrentUserId = Guid.TryParse(currentUserId, out Guid userId) ? userId : null;
 
-        // The track link template carries the all-zero Guid placeholders of its route values, in route order (artist, album and track), which the
-        // page replaces one at a time. The detail page of a track expects the Id of its media library in the libraryId query parameter.
+        StatisticsPageDto page = new(
+            Title: title,
+            IsAdmin: isAdmin,
+            CurrentUserId: parsedCurrentUserId,
+            Culture: Culture,
+            GetStatisticsUrl: _urlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_STATISTICS) ?? string.Empty,
+            GetAllUsersStatisticsUrl: _urlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_ALL_USERS_STATISTICS) ?? string.Empty,
+            GetRecentlyConsumedUrl: _urlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_RECENTLY_CONSUMED) ?? string.Empty,
+            GetMostConsumedUrl: _urlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_MOST_CONSUMED) ?? string.Empty,
+            GetTagConsumptionUrl: _urlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_TAG_CONSUMPTION) ?? string.Empty,
+            GetGenreConsumptionUrl: _urlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_GENRE_CONSUMPTION) ?? string.Empty,
+            GetLibrariesUrl: _urlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_LIBRARIES) ?? string.Empty,
+            GetUsersUrl: isAdmin ? _urlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_USERS) ?? string.Empty : string.Empty,
+            DeleteConsumptionItemHistoryUrl: _urlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.DELETE_CONSUMPTION_ITEM_HISTORY) ?? string.Empty,
+            ClearConsumptionHistoryUrl: _urlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.CLEAR_CONSUMPTION_HISTORY) ?? string.Empty,
+            ClearResumePointsUrl: _urlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.CLEAR_RESUME_POINTS) ?? string.Empty
+        );
+
         ThemePageDto pageModel = new()
         {
             PageKey = VIEW_PAGE_KEY,
@@ -77,18 +102,27 @@ public class StatisticsIndexViewEndpoint : BaseEndpoint<EmptyRequest, IResult>
             Description = string.Empty,
             PageData = new Dictionary<string, object?>
             {
-                ["getRecentlyPlayedUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_RECENTLY_PLAYED) ?? string.Empty,
-                ["getMostPlayedUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_MOST_PLAYED) ?? string.Empty,
-                ["getStatisticsUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_MUSIC_PLAY_STATISTICS) ?? string.Empty,
-                ["trackUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Music.TRACK, new { artistId = default(Guid), albumId = default(Guid), trackId = default(Guid) }) ?? string.Empty,
-                ["culture"] = Culture,
+                ["getStatisticsUrl"] = page.GetStatisticsUrl,
+                ["getAllUsersStatisticsUrl"] = page.GetAllUsersStatisticsUrl,
+                ["getRecentlyConsumedUrl"] = page.GetRecentlyConsumedUrl,
+                ["getMostConsumedUrl"] = page.GetMostConsumedUrl,
+                ["getTagConsumptionUrl"] = page.GetTagConsumptionUrl,
+                ["getGenreConsumptionUrl"] = page.GetGenreConsumptionUrl,
+                ["getLibrariesUrl"] = page.GetLibrariesUrl,
+                ["getUsersUrl"] = page.GetUsersUrl,
+                ["deleteConsumptionItemHistoryUrl"] = page.DeleteConsumptionItemHistoryUrl,
+                ["clearConsumptionHistoryUrl"] = page.ClearConsumptionHistoryUrl,
+                ["clearResumePointsUrl"] = page.ClearResumePointsUrl,
+                ["culture"] = page.Culture,
+                ["isAdmin"] = page.IsAdmin,
+                ["currentUserId"] = page.CurrentUserId,
                 ["strings"] = ThemePageDataFactory.CreateLocalizedStrings(_localizer)
             }
         };
 
         Result<ThemePageRenderResultDto> sectionResult = await _themePageRenderer.RenderAsync(pageModel, requestedThemeId: null, cancellationToken).ConfigureAwait(false);
         if (sectionResult.IsFailure)
-            return View("/Core/Views/Library/Statistics/Index.cshtml", viewData: new Dictionary<string, object?> { ["Title"] = title });
+            return View("/Core/Views/Library/Statistics/Index.cshtml", page, new Dictionary<string, object?> { ["Title"] = title });
 
         return View("/Core/Views/Shared/_ThemedView.cshtml", new ThemeViewDto(sectionResult.Value.Content, sectionResult.Value.Script), new Dictionary<string, object?> { ["Title"] = title });
     }

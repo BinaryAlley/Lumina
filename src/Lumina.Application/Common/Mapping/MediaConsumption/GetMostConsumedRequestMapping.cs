@@ -27,6 +27,6 @@ public static class GetMostConsumedRequestMapping
                 PerPage = request.PerPage ?? 50
             };
 
-        return new GetMostConsumedQuery(targetUserId, request.LibraryId, request.MediaKind, paginationData);
+        return new GetMostConsumedQuery(targetUserId, request.LibraryId, request.MediaKind, request.FromUtc, request.ToUtc, paginationData);
     }
 }

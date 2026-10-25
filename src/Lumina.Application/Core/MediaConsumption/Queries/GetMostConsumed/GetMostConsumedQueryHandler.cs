@@ -93,7 +93,7 @@ public class GetMostConsumedQueryHandler : IQueryHandler<GetMostConsumedQuery, R
         Guid? libraryId = query.LibraryId is null ? null : Guid.Parse(query.LibraryId);
 
         Result<IReadOnlyList<MediaConsumptionRecordEntity>> getRecordsResult = await _unitOfWork.ConsumptionStatisticsRepository
-            .GetForUserAsync(targetUserId, libraryId, query.MediaKind, fromUtc: null, toUtc: null, cancellationToken).ConfigureAwait(false);
+            .GetForUserAsync(targetUserId, libraryId, query.MediaKind, query.FromUtc, query.ToUtc, cancellationToken).ConfigureAwait(false);
         if (getRecordsResult.IsFailure)
             return getRecordsResult.Errors;
 

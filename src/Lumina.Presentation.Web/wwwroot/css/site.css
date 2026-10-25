@@ -2255,8 +2255,53 @@ html.audio-player-initializing .audio-player-container {
     font-size: 12px;
 }
 
-/* The statistics page: summary tiles, and the track rows of the recently played and most played lists. A row is a
-   track list, so its favorite heart is an inline action and never takes the place of a card heart. */
+/* The statistics page: filters, summary tiles, breakdown tables, tag and genre bars, and the history rows. */
+.statistics-page {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    min-height: 100%;
+    padding: 0 2.5rem 2.5rem;
+}
+
+.statistics-user-selector {
+    display: flex;
+    align-items: flex-end;
+    margin-top: 1rem;
+}
+
+.statistics-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.statistics-filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.statistics-filter-buttons {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
+.statistics-state {
+    color: #9AA7B0;
+    text-align: center;
+    margin: 1rem 0;
+}
+
+.statistics-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
 .statistics-summary-tile {
     display: flex;
     flex-direction: column;
@@ -2268,35 +2313,160 @@ html.audio-player-initializing .audio-player-container {
     background: linear-gradient(to bottom, #505050 0%, #464646 35%, #404040 55%, #363636 100%);
 }
 
-.statistics-track-list {
+.statistics-table-wrapper {
+    overflow-x: auto;
     margin-bottom: 1.5rem;
 }
 
-.statistics-track-list:empty {
-    display: none;
+.statistics-table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
-/* The play counts and the last played time of a statistics row are separate lines, so the two values never run together. */
-.statistics-track-metrics {
+.statistics-table th,
+.statistics-table td {
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    white-space: nowrap;
+}
+
+.statistics-table th {
+    color: #9AA7B0;
+    font-weight: normal;
+}
+
+.statistics-media-kind-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border: 1px solid #777777;
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.15);
+    color: #d8d8d8;
+    font-size: 12px;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+
+.statistics-terms {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.statistics-terms-column {
+    min-width: 0;
+}
+
+.statistics-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.statistics-bar-row {
+    display: grid;
+    grid-template-columns: minmax(90px, 1fr) minmax(80px, 2fr) auto;
+    align-items: center;
+    gap: 10px;
+}
+
+.statistics-term-name {
+    color: #d8d8d8;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.statistics-bar-track {
+    height: 10px;
+    border: 1px solid #777777;
+    background: rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+}
+
+.statistics-bar-fill {
+    height: 100%;
+    background: #8fb5c9;
+}
+
+.statistics-term-meta {
+    color: #9AA7B0;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.statistics-history-section {
+    margin-top: 1.5rem;
+}
+
+.statistics-history-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.statistics-item-list {
+    margin-bottom: 1.5rem;
+}
+
+.statistics-item-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.statistics-item-cover {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.statistics-item-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.statistics-item-title {
+    color: #d8d8d8;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.statistics-item-meta {
+    color: #9AA7B0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.statistics-item-metrics {
     display: flex;
     flex: 0 0 auto;
     flex-direction: column;
     align-items: flex-end;
     gap: 2px;
     text-align: right;
+    white-space: nowrap;
 }
 
-.statistics-track-actions .card-favorite-toggle {
-    position: static;
+.statistics-item-actions {
     display: flex;
-    flex: 0 0 auto;
-    margin: 0;
+    align-items: center;
+    gap: 0.25rem;
+    flex-shrink: 0;
 }
 
-.statistics-action-button {
-    width: 28px;
-    min-width: 28px;
-    height: 28px;
-    padding: 0;
-    line-height: 1;
+.statistics-delete-button {
+    white-space: nowrap;
 }

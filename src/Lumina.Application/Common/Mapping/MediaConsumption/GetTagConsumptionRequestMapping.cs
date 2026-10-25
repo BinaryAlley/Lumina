@@ -22,7 +22,6 @@ public static class GetTagConsumptionRequestMapping
             targetUserId,
             request.LibraryId,
             request.MediaKind,
-            request.TagKind,
             request.FromUtc,
             request.ToUtc
         );

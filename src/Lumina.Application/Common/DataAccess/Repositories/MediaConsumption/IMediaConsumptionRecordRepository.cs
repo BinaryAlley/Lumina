@@ -3,6 +3,7 @@ using Lumina.Application.Common.DataAccess.Entities.MediaConsumption;
 using Lumina.Application.Common.DataAccess.Repositories.Common.Actions;
 using Lumina.Application.Common.DataAccess.Repositories.Common.Base;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -48,6 +49,17 @@ public interface IMediaConsumptionRecordRepository : IRepository<MediaConsumptio
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful deletion, or an error.</returns>
     Task<Result<Deleted>> DeleteForUserAsync(Guid id, Guid userId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Deletes every consumption record of a media item of the user identified by <paramref name="userId"/>.
+    /// </summary>
+    /// <param name="userId">The Id of the user whose consumption records are deleted.</param>
+    /// <param name="mediaKind">The kind of the consumed media item.</param>
+    /// <param name="mediaItemId">The Id of the consumed media item.</param>
+    /// <param name="libraryId">The Id of the media library that contains the media item.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful deletion, or an error.</returns>
+    Task<Result<Deleted>> DeleteAllByMediaItemIdForUserAsync(Guid userId, MediaKind mediaKind, Guid mediaItemId, Guid libraryId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Deletes every consumption record of the user identified by <paramref name="userId"/>.

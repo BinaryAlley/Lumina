@@ -4,55 +4,83 @@
     This view is the application fallback of the statistics page, rendered when the active theme provides no template for the page
     or its template cannot be loaded. It keeps the DOM contract and the client script a theme template would mirror.
 
-    The page summarizes the plays of the current user: the total listening time, the counted plays, the completed plays and the
-    completion rate, followed by the recently played tracks and the most played tracks. A play counts when it completed or when the
-    listened duration reached 30 seconds, which the server applies. The script loads the three sections in parallel and renders a row per
-    track, with a play trigger, a favorite heart and an add to playlist action, so the page behaves like the other track lists.
+    The page shows the consumption statistics of the selected user, across every media kind: the total consumed duration, the
+    counted sessions, the completed sessions, the completion rate, the per media kind breakdown, the tags and genres, and the
+    recently consumed and most consumed media items. An administrator can select another user or all users; a regular user sees
+    only their own statistics. The filter bar restricts every section by library, media kind, and date range. The history actions
+    delete one row, clear the history, or remove the resume points, after a confirmation.
 
-    The element hooks the script needs are statistics-total-listening-time, statistics-total-plays, statistics-completed-plays,
-    statistics-completion-rate, recently-played-list, most-played-list, statistics-empty-state, statistics-load-failed and
-    retry-statistics-button.
+    The element hooks the script needs are statistics-user-filter, statistics-user-filter-toggle,
+    statistics-user-filter-dropdown, statistics-library-filter, statistics-library-filter-toggle,
+    statistics-library-filter-dropdown, statistics-kind-filter, statistics-kind-filter-toggle, statistics-from-date,
+    statistics-to-date, statistics-apply-filters, statistics-reset-filters, statistics-loading, statistics-load-failed,
+    retry-statistics-button, statistics-content, statistics-total-duration, statistics-counted-sessions,
+    statistics-completed-sessions, statistics-completion-rate, statistics-media-kind-breakdown, statistics-no-media-kind,
+    statistics-users-section, statistics-users-table, statistics-no-users, statistics-terms, statistics-genres,
+    statistics-tags, statistics-no-genres, statistics-no-tags, statistics-history-section, statistics-clear-history,
+    statistics-clear-resume-points, statistics-recently-consumed, statistics-no-recently-consumed, statistics-most-consumed,
+    statistics-no-most-consumed, statistics-all-users-note and statistics-empty-state.
 
-    To restyle the page, edit the theme files. This fallback is intentionally plain, so that a broken theme is obvious to the user while the page still functions.
+    To restyle the page, edit the theme files. This fallback is intentionally plain, so that a broken theme is obvious to the user
+    while the page still functions.
 
     /library/statistics
 *@
 
+@model Lumina.Presentation.Web.Common.DTO.MediaConsumption.StatisticsPageDto
+
+@using Lumina.Presentation.Web.Common.Enums.MediaConsumption
 @using Lumina.Presentation.Web.Common.Services
 @using Microsoft.AspNetCore.Mvc.Localization
 @using System
 @using System.Collections.Generic
-@using System.Globalization
+@using System.Linq
 @using System.Text.Json
 @using System.Text.Json.Serialization
 
 @inject IViewLocalizer _localizer
-@inject IUrlService _urlService
 
 @{
     // Generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler.
     var scriptId = ScriptIdentifierHelper.GenerateScriptId();
+    MediaKind[] mediaKinds = [.. Enum.GetValues<MediaKind>().Where(mediaKind => mediaKind != MediaKind.None)];
     var strings = new Dictionary<string, string>
     {
-        ["title"] = _localizer["Title"].Value,
-        ["totalListeningTime"] = _localizer["TotalListeningTime"].Value,
-        ["totalPlays"] = _localizer["TotalPlays"].Value,
-        ["completedPlays"] = _localizer["CompletedPlays"].Value,
-        ["completionRate"] = _localizer["CompletionRate"].Value,
-        ["recentlyPlayed"] = _localizer["RecentlyPlayed"].Value,
-        ["mostPlayed"] = _localizer["MostPlayed"].Value,
-        ["noPlaysYet"] = _localizer["NoPlaysYet"].Value,
-        ["unavailable"] = _localizer["Unavailable"].Value,
-        ["loadFailed"] = _localizer["LoadFailed"].Value,
-        ["retry"] = _localizer["Retry"].Value,
-        ["plays"] = _localizer["Plays"].Value,
-        ["completed"] = _localizer["Completed"].Value,
-        ["lastPlayed"] = _localizer["LastPlayed"].Value,
-        ["playTrack"] = _localizer["PlayTrack"].Value,
-        ["addToPlaylist"] = _localizer["AddToPlaylist"].Value,
         ["hoursShort"] = _localizer["HoursShort"].Value,
         ["minutesShort"] = _localizer["MinutesShort"].Value,
-        ["secondsShort"] = _localizer["SecondsShort"].Value
+        ["secondsShort"] = _localizer["SecondsShort"].Value,
+        ["invalidDateRange"] = _localizer["InvalidDateRange"].Value,
+        ["mediaKind"] = _localizer["MediaKind"].Value,
+        ["duration"] = _localizer["Duration"].Value,
+        ["countedSessions"] = _localizer["CountedSessions"].Value,
+        ["completedSessions"] = _localizer["CompletedSessions"].Value,
+        ["stopped"] = _localizer["Stopped"].Value,
+        ["completionRate"] = _localizer["CompletionRate"].Value,
+        ["user"] = _localizer["User"].Value,
+        ["items"] = _localizer["Items"].Value,
+        ["unavailable"] = _localizer["Unavailable"].Value,
+        ["lastConsumed"] = _localizer["LastConsumed"].Value,
+        ["counted"] = _localizer["Counted"].Value,
+        ["completed"] = _localizer["Completed"].Value,
+        ["deleteFromHistory"] = _localizer["DeleteFromHistory"].Value,
+        ["deleteFromHistoryConfirm"] = _localizer["DeleteFromHistoryConfirm"].Value,
+        ["historyEntryDeleted"] = _localizer["HistoryEntryDeleted"].Value,
+        ["clearHistoryConfirm"] = _localizer["ClearHistoryConfirm"].Value,
+        ["historyCleared"] = _localizer["HistoryCleared"].Value,
+        ["clearResumePointsConfirm"] = _localizer["ClearResumePointsConfirm"].Value,
+        ["resumePointsCleared"] = _localizer["ResumePointsCleared"].Value,
+        ["allLibraries"] = _localizer["AllLibraries"].Value,
+        ["allMediaKinds"] = _localizer["AllMediaKinds"].Value,
+        ["allUsers"] = _localizer["AllUsers"].Value,
+        ["me"] = _localizer["Me"].Value,
+        ["kindMusicTrack"] = _localizer["KindMusicTrack"].Value,
+        ["kindPodcastEpisode"] = _localizer["KindPodcastEpisode"].Value,
+        ["kindAudiobook"] = _localizer["KindAudiobook"].Value,
+        ["kindMovie"] = _localizer["KindMovie"].Value,
+        ["kindTvEpisode"] = _localizer["KindTvEpisode"].Value,
+        ["kindBook"] = _localizer["KindBook"].Value,
+        ["kindPhoto"] = _localizer["KindPhoto"].Value,
+        ["kindVideo"] = _localizer["KindVideo"].Value
     };
     var jsonOptions = new JsonSerializerOptions
     {
@@ -61,43 +89,152 @@
     };
 }
 
+@Html.AntiForgeryToken()
+
 <div class="cotton-candy">
-    <div style="display: grid; grid-template-rows: auto 1fr;">
-        <div style="min-height: 1rem;"></div>
-        <div class="pl-10 pr-10 pb-10">
-            <div class="text-center">
-                <h1 class="text-light-two engraved-title">@_localizer["Title"]</h1>
+    <div class="statistics-page">
+        <div class="text-center">
+            <h1 class="text-light-two engraved-title">@_localizer["Title"]</h1>
+        </div>
+
+        @if (Model.IsAdmin)
+        {
+            <div class="statistics-user-selector">
+                <div class="statistics-filter-field">
+                    <span class="text-disabled form-label">@_localizer["User"]</span>
+                    <div class="enlightenment-combobox inline-block w-250px" id="statistics-user-filter">
+                        <div class="shine-effect" style="top: 1px;"></div>
+                        <input type="checkbox" class="enlightenment-toggle-checkbox" id="statistics-user-filter-toggle" />
+                        <label class="enlightenment-toggle" for="statistics-user-filter-toggle">
+                            <span class="enlightenment-selected-text" data-value="@(Model.CurrentUserId?.ToString() ?? string.Empty)">@_localizer["Me"]</span>
+                        </label>
+                        <div class="enlightenment-dropdown" id="statistics-user-filter-dropdown">
+                            <div class="shine-effect" style="top: -4px;"></div>
+                            <div class="enlightenment-option first-option" data-value="all">@_localizer["AllUsers"]</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <!-- Summary totals. -->
-            <div class="statistics-summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+        }
+
+        <div class="statistics-filters">
+            <div class="statistics-filter-field">
+                <span class="text-disabled form-label">@_localizer["Library"]</span>
+                <div class="enlightenment-combobox inline-block w-250px" id="statistics-library-filter">
+                    <div class="shine-effect" style="top: 1px;"></div>
+                    <input type="checkbox" class="enlightenment-toggle-checkbox" id="statistics-library-filter-toggle" />
+                    <label class="enlightenment-toggle" for="statistics-library-filter-toggle">
+                        <span class="enlightenment-selected-text" data-value="">@_localizer["AllLibraries"]</span>
+                    </label>
+                    <div class="enlightenment-dropdown" id="statistics-library-filter-dropdown">
+                        <div class="shine-effect" style="top: -4px;"></div>
+                        <div class="enlightenment-option first-option" data-value="">@_localizer["AllLibraries"]</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="statistics-filter-field">
+                <span class="text-disabled form-label">@_localizer["MediaKind"]</span>
+                <div class="enlightenment-combobox inline-block w-220px" id="statistics-kind-filter">
+                    <div class="shine-effect" style="top: 1px;"></div>
+                    <input type="checkbox" class="enlightenment-toggle-checkbox" id="statistics-kind-filter-toggle" />
+                    <label class="enlightenment-toggle" for="statistics-kind-filter-toggle">
+                        <span class="enlightenment-selected-text" data-value="">@_localizer["AllMediaKinds"]</span>
+                    </label>
+                    <div class="enlightenment-dropdown">
+                        <div class="shine-effect" style="top: -4px;"></div>
+                        <div class="enlightenment-option first-option" data-value="">@_localizer["AllMediaKinds"]</div>
+                        @for (int index = 0; index < mediaKinds.Length; index++)
+                        {
+                            <div class="enlightenment-option @(index == mediaKinds.Length - 1 ? "last-option" : string.Empty)" data-value="@mediaKinds[index]">@_localizer["Kind" + mediaKinds[index]]</div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <label class="statistics-filter-field" for="statistics-from-date">
+                <span class="text-disabled form-label">@_localizer["From"]</span>
+                <input type="date" id="statistics-from-date" class="enlightenment-input" />
+            </label>
+
+            <label class="statistics-filter-field" for="statistics-to-date">
+                <span class="text-disabled form-label">@_localizer["To"]</span>
+                <input type="date" id="statistics-to-date" class="enlightenment-input" />
+            </label>
+
+            <div class="statistics-filter-buttons">
+                <button id="statistics-apply-filters" type="button" class="confirm-button h-22px">@_localizer["Apply"]</button>
+                <button id="statistics-reset-filters" type="button" class="abort-button h-22px">@_localizer["Reset"]</button>
+            </div>
+        </div>
+
+        <p id="statistics-loading" class="statistics-state" aria-live="polite">@_localizer["Loading"]</p>
+        <p id="statistics-load-failed" class="statistics-state hidden" aria-live="polite">@_localizer["LoadFailed"]</p>
+        <div class="form-row">
+            <button id="retry-statistics-button" type="button" class="confirm-button hidden">@_localizer["Retry"]</button>
+        </div>
+
+        <div id="statistics-content" class="hidden">
+            <div class="statistics-summary">
                 <div class="statistics-summary-tile">
-                    <span class="text-disabled form-label">@_localizer["TotalListeningTime"]</span>
-                    <strong id="statistics-total-listening-time" class="text-light-two" aria-live="polite">-</strong>
+                    <span class="text-disabled form-label">@_localizer["TotalConsumedDuration"]</span>
+                    <strong id="statistics-total-duration" class="text-light-two" aria-live="polite">-</strong>
                 </div>
                 <div class="statistics-summary-tile">
-                    <span class="text-disabled form-label">@_localizer["TotalPlays"]</span>
-                    <strong id="statistics-total-plays" class="text-light-two" aria-live="polite">-</strong>
+                    <span class="text-disabled form-label">@_localizer["CountedSessions"]</span>
+                    <strong id="statistics-counted-sessions" class="text-light-two" aria-live="polite">-</strong>
                 </div>
                 <div class="statistics-summary-tile">
-                    <span class="text-disabled form-label">@_localizer["CompletedPlays"]</span>
-                    <strong id="statistics-completed-plays" class="text-light-two" aria-live="polite">-</strong>
+                    <span class="text-disabled form-label">@_localizer["CompletedSessions"]</span>
+                    <strong id="statistics-completed-sessions" class="text-light-two" aria-live="polite">-</strong>
                 </div>
                 <div class="statistics-summary-tile">
                     <span class="text-disabled form-label">@_localizer["CompletionRate"]</span>
                     <strong id="statistics-completion-rate" class="text-light-two" aria-live="polite">-</strong>
                 </div>
             </div>
-            <!-- Recently played tracks. -->
-            <h2 class="text-light-two">@_localizer["RecentlyPlayed"]</h2>
-            <div id="recently-played-list" class="statistics-track-list"></div>
-            <!-- Most played tracks. -->
-            <h2 class="text-light-two">@_localizer["MostPlayed"]</h2>
-            <div id="most-played-list" class="statistics-track-list"></div>
-            <p id="statistics-empty-state" class="hidden text-light-two text-center" aria-live="polite" aria-atomic="true" tabindex="-1">@_localizer["NoPlaysYet"]</p>
-            <p id="statistics-load-failed" class="hidden text-light-two text-center" aria-live="polite" aria-atomic="true" tabindex="-1">@_localizer["LoadFailed"]</p>
-            <div class="form-row">
-                <button id="retry-statistics-button" type="button" class="confirm-button hidden">@_localizer["Retry"]</button>
+
+            <h2 class="text-light-two">@_localizer["ByMediaKind"]</h2>
+            <div id="statistics-media-kind-breakdown" class="statistics-table-wrapper"></div>
+            <p id="statistics-no-media-kind" class="statistics-state hidden">@_localizer["NoMediaKindData"]</p>
+
+            <div id="statistics-users-section" class="hidden">
+                <h2 class="text-light-two">@_localizer["PerUser"]</h2>
+                <div id="statistics-users-table" class="statistics-table-wrapper"></div>
+                <p id="statistics-no-users" class="statistics-state hidden">@_localizer["NoUsers"]</p>
             </div>
+
+            <div id="statistics-terms" class="statistics-terms">
+                <div class="statistics-terms-column">
+                    <h2 class="text-light-two">@_localizer["Genres"]</h2>
+                    <div id="statistics-genres" class="statistics-bars" role="list"></div>
+                    <p id="statistics-no-genres" class="statistics-state hidden">@_localizer["NoGenres"]</p>
+                </div>
+                <div class="statistics-terms-column">
+                    <h2 class="text-light-two">@_localizer["Tags"]</h2>
+                    <div id="statistics-tags" class="statistics-bars" role="list"></div>
+                    <p id="statistics-no-tags" class="statistics-state hidden">@_localizer["NoTags"]</p>
+                </div>
+            </div>
+
+            <p id="statistics-all-users-note" class="statistics-state hidden">@_localizer["AllUsersHistoryUnavailable"]</p>
+
+            <div id="statistics-history-section" class="statistics-history-section">
+                <div class="statistics-history-actions">
+                    <button id="statistics-clear-history" type="button" class="abort-button h-22px">@_localizer["ClearHistory"]</button>
+                    <button id="statistics-clear-resume-points" type="button" class="abort-button h-22px">@_localizer["ClearResumePoints"]</button>
+                </div>
+
+                <h2 class="text-light-two">@_localizer["RecentlyConsumed"]</h2>
+                <div id="statistics-recently-consumed" class="statistics-item-list"></div>
+                <p id="statistics-no-recently-consumed" class="statistics-state hidden">@_localizer["NoRecentlyConsumed"]</p>
+
+                <h2 class="text-light-two">@_localizer["MostConsumed"]</h2>
+                <div id="statistics-most-consumed" class="statistics-item-list"></div>
+                <p id="statistics-no-most-consumed" class="statistics-state hidden">@_localizer["NoMostConsumed"]</p>
+            </div>
+
+            <p id="statistics-empty-state" class="statistics-state hidden">@_localizer["NoConsumption"]</p>
         </div>
     </div>
 </div>
@@ -106,42 +243,79 @@
     <!-- The "text/plain" type is a design choice, not a mistake: it keeps the browser from executing this view script during HTML parsing, before site.js defines the API helpers it calls. site.js (which loads deferred) executes these scripts once it is loaded, both on the initial page load and during AJAX navigation. -->
     <script type="text/plain" data-form="@scriptId">
         const strings = @Html.Raw(JsonSerializer.Serialize(strings, jsonOptions));
-        const getRecentlyPlayedUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_RECENTLY_PLAYED)';
-        const getMostPlayedUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_MOST_PLAYED)';
-        const getStatisticsUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_MUSIC_PLAY_STATISTICS)';
-        const trackUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Music.TRACK, new { artistId = default(Guid), albumId = default(Guid), trackId = default(Guid) })';
-        const culture = '@CultureInfo.CurrentUICulture.Name';
-        const EMPTY_GUID = '00000000-0000-0000-0000-000000000000';
-        const totalListeningTimeValue = document.getElementById('statistics-total-listening-time');
-        const totalPlaysValue = document.getElementById('statistics-total-plays');
-        const completedPlaysValue = document.getElementById('statistics-completed-plays');
-        const completionRateValue = document.getElementById('statistics-completion-rate');
-        const recentlyPlayedList = document.getElementById('recently-played-list');
-        const mostPlayedList = document.getElementById('most-played-list');
-        const emptyState = document.getElementById('statistics-empty-state');
+        const getStatisticsUrl = '@Model.GetStatisticsUrl';
+        const getAllUsersStatisticsUrl = '@Model.GetAllUsersStatisticsUrl';
+        const getRecentlyConsumedUrl = '@Model.GetRecentlyConsumedUrl';
+        const getMostConsumedUrl = '@Model.GetMostConsumedUrl';
+        const getTagConsumptionUrl = '@Model.GetTagConsumptionUrl';
+        const getGenreConsumptionUrl = '@Model.GetGenreConsumptionUrl';
+        const getLibrariesUrl = '@Model.GetLibrariesUrl';
+        const getUsersUrl = '@Model.GetUsersUrl';
+        const deleteConsumptionItemHistoryUrl = '@Model.DeleteConsumptionItemHistoryUrl';
+        const clearConsumptionHistoryUrl = '@Model.ClearConsumptionHistoryUrl';
+        const clearResumePointsUrl = '@Model.ClearResumePointsUrl';
+        const culture = '@Model.Culture';
+        const isAdmin = @(Model.IsAdmin ? "true" : "false");
+        const currentUserId = '@(Model.CurrentUserId?.ToString() ?? string.Empty)';
+        const PAGE_SIZE = 10;
+
+        const loadingMessage = document.getElementById('statistics-loading');
         const loadFailedMessage = document.getElementById('statistics-load-failed');
         const retryButton = document.getElementById('retry-statistics-button');
+        const content = document.getElementById('statistics-content');
+        const applyButton = document.getElementById('statistics-apply-filters');
+        const resetButton = document.getElementById('statistics-reset-filters');
+        const fromDateInput = document.getElementById('statistics-from-date');
+        const toDateInput = document.getElementById('statistics-to-date');
+        const userToggle = document.getElementById('statistics-user-filter-toggle');
+        const libraryToggle = document.getElementById('statistics-library-filter-toggle');
+        const kindToggle = document.getElementById('statistics-kind-filter-toggle');
+        const userDropdown = document.getElementById('statistics-user-filter-dropdown');
+        const libraryDropdown = document.getElementById('statistics-library-filter-dropdown');
+        const totalDurationValue = document.getElementById('statistics-total-duration');
+        const countedSessionsValue = document.getElementById('statistics-counted-sessions');
+        const completedSessionsValue = document.getElementById('statistics-completed-sessions');
+        const completionRateValue = document.getElementById('statistics-completion-rate');
+        const mediaKindBreakdown = document.getElementById('statistics-media-kind-breakdown');
+        const noMediaKindMessage = document.getElementById('statistics-no-media-kind');
+        const usersSection = document.getElementById('statistics-users-section');
+        const usersTable = document.getElementById('statistics-users-table');
+        const noUsersMessage = document.getElementById('statistics-no-users');
+        const termsSection = document.getElementById('statistics-terms');
+        const genresContainer = document.getElementById('statistics-genres');
+        const tagsContainer = document.getElementById('statistics-tags');
+        const noGenresMessage = document.getElementById('statistics-no-genres');
+        const noTagsMessage = document.getElementById('statistics-no-tags');
+        const allUsersNote = document.getElementById('statistics-all-users-note');
+        const historySection = document.getElementById('statistics-history-section');
+        const clearHistoryButton = document.getElementById('statistics-clear-history');
+        const clearResumePointsButton = document.getElementById('statistics-clear-resume-points');
+        const recentlyConsumedContainer = document.getElementById('statistics-recently-consumed');
+        const noRecentlyConsumedMessage = document.getElementById('statistics-no-recently-consumed');
+        const mostConsumedContainer = document.getElementById('statistics-most-consumed');
+        const noMostConsumedMessage = document.getElementById('statistics-no-most-consumed');
+        const emptyStateMessage = document.getElementById('statistics-empty-state');
+
         let isInitialized = false;
-        let isLoading = false;
-        let hasLoaded = false;
-        let hasLoadFailed = false;
-        let renderedTrackCount = 0;
+        let requestSequence = 0;
+        let isDeletingHistory = false;
+        const userNamesById = new Map();
 
-        function isKnownId(id) {
-            return typeof id === 'string' && id !== '' && id !== EMPTY_GUID;
+        function getSelectedValue(comboboxId) {
+            const selectedText = document.querySelector(`#${comboboxId} .enlightenment-selected-text`);
+            return selectedText?.getAttribute('data-value') ?? '';
         }
 
-        function buildTrackUrl(track) {
-            if (!track.title || !isKnownId(track.libraryId) || !isKnownId(track.artistId) || !isKnownId(track.albumId) || !isKnownId(track.trackId))
-                return '';
-            return trackUrlTemplate
-                .replace(`/${EMPTY_GUID}`, `/${track.artistId}`)
-                .replace(`/${EMPTY_GUID}`, `/${track.albumId}`)
-                .replace(`/${EMPTY_GUID}`, `/${track.trackId}`) + `?libraryId=${encodeURIComponent(track.libraryId)}`;
+        function setSelectedValue(comboboxId, value, text) {
+            const selectedText = document.querySelector(`#${comboboxId} .enlightenment-selected-text`);
+            if (!selectedText)
+                return;
+            selectedText.setAttribute('data-value', value);
+            if (text)
+                selectedText.textContent = text;
         }
 
-        // Formats a duration in seconds as hours and minutes, minutes and seconds, or seconds, using the page's short unit suffixes.
-        function formatListeningTime(totalSeconds) {
+        function formatDuration(totalSeconds) {
             const total = Math.max(0, Math.round(Number(totalSeconds) || 0));
             const hours = Math.floor(total / 3600);
             const minutes = Math.floor((total % 3600) / 60);
@@ -153,9 +327,15 @@
             return `${seconds}${strings.secondsShort}`;
         }
 
-        // The API stores the last activity time in UTC, but the persistence medium (SQLite) stores it as plain text, so the JSON the browser
-        // receives carries no time zone offset (no "Z"). Without an explicit offset, new Date(...) interprets the value as a local time, which
-        // shifts every value by the local UTC offset. Appending "Z" keeps those values anchored to UTC, where they were recorded.
+        function formatPercentage(value) {
+            const fraction = Math.max(0, Math.min(1, Number(value) || 0));
+            try {
+                return new Intl.NumberFormat(culture, { style: 'percent', maximumFractionDigits: 1 }).format(fraction);
+            } catch {
+                return `${Math.round(fraction * 100)}%`;
+            }
+        }
+
         function parseUtcTimestamp(timestampValue) {
             if (!timestampValue)
                 return null;
@@ -164,7 +344,6 @@
             return new Date(hasOffset ? value : value + 'Z');
         }
 
-        // Formats a date and time in the language of the page, falling back to the browser's own format when the culture is not available.
         function formatDateTime(value) {
             const date = parseUtcTimestamp(value);
             if (!date || Number.isNaN(date.getTime()))
@@ -176,221 +355,571 @@
             }
         }
 
-        function formatPercentage(value) {
-            const fraction = Math.max(0, Math.min(1, Number(value) || 0));
-            try {
-                return new Intl.NumberFormat(culture, { style: 'percent', maximumFractionDigits: 1 }).format(fraction);
-            } catch {
-                return `${Math.round(fraction * 100)}%`;
+        function toUtcStart(dateText) {
+            if (!dateText)
+                return null;
+            const date = new Date(`${dateText}T00:00:00`);
+            return Number.isNaN(date.getTime()) ? null : date.toISOString();
+        }
+
+        function toUtcEnd(dateText) {
+            if (!dateText)
+                return null;
+            const date = new Date(`${dateText}T23:59:59.999`);
+            return Number.isNaN(date.getTime()) ? null : date.toISOString();
+        }
+
+        function buildUrl(baseUrl, parameters) {
+            const query = new URLSearchParams();
+            Object.entries(parameters).forEach(([name, value]) => {
+                if (value !== null && value !== undefined && value !== '')
+                    query.set(name, value);
+            });
+            const queryString = query.toString();
+            return queryString ? `${baseUrl}?${queryString}` : baseUrl;
+        }
+
+        function createKindBadge(mediaKind) {
+            const badge = document.createElement('span');
+            badge.className = 'statistics-media-kind-badge';
+            badge.textContent = strings[`kind${mediaKind}`] || mediaKind;
+            return badge;
+        }
+
+        function createTextCell(text) {
+            const cell = document.createElement('td');
+            cell.textContent = text;
+            return cell;
+        }
+
+        function createKindCell(mediaKind) {
+            const cell = document.createElement('td');
+            cell.appendChild(createKindBadge(mediaKind));
+            return cell;
+        }
+
+        function populateUsers(users) {
+            if (!userDropdown)
+                return;
+            while (userDropdown.children.length > 2)
+                userDropdown.removeChild(userDropdown.lastElementChild);
+            users.forEach((user, index) => {
+                const option = document.createElement('div');
+                option.className = 'enlightenment-option' + (index === users.length - 1 ? ' last-option' : '');
+                option.dataset.value = user.id;
+                option.textContent = user.username;
+                userDropdown.appendChild(option);
+                userNamesById.set(String(user.id).toLowerCase(), user.username);
+            });
+            const selectedUser = getSelectedValue('statistics-user-filter');
+            const currentUser = users.find(user => String(user.id).toLowerCase() === selectedUser.toLowerCase());
+            if (currentUser)
+                setSelectedValue('statistics-user-filter', currentUser.id, currentUser.username);
+        }
+
+        function populateLibraries(libraries) {
+            if (!libraryDropdown)
+                return;
+            while (libraryDropdown.children.length > 2)
+                libraryDropdown.removeChild(libraryDropdown.lastElementChild);
+            libraries.forEach((library, index) => {
+                if (!library.id)
+                    return;
+                const option = document.createElement('div');
+                option.className = 'enlightenment-option' + (index === libraries.length - 1 ? ' last-option' : '');
+                option.dataset.value = library.id;
+                option.textContent = library.title || library.id;
+                libraryDropdown.appendChild(option);
+            });
+        }
+
+        async function loadLookupsAsync() {
+            const requests = [callApiGetAsync(getLibrariesUrl)];
+            if (isAdmin && getUsersUrl)
+                requests.push(callApiGetAsync(getUsersUrl));
+            const [libraries, users] = await Promise.all(requests);
+            if (libraries)
+                populateLibraries(libraries);
+            if (users)
+                populateUsers(users);
+        }
+
+        function getFilters() {
+            const selectedUser = isAdmin ? getSelectedValue('statistics-user-filter') : '';
+            const isAllUsers = isAdmin && selectedUser === 'all';
+            return {
+                isAllUsers,
+                userId: isAdmin && !isAllUsers ? selectedUser : null,
+                libraryId: getSelectedValue('statistics-library-filter') || null,
+                mediaKind: getSelectedValue('statistics-kind-filter') || null,
+                fromDate: fromDateInput.value,
+                toDate: toDateInput.value
+            };
+        }
+
+        function areFiltersValid(filters) {
+            if (filters.fromDate && filters.toDate && filters.fromDate > filters.toDate) {
+                notificationService.show(strings.invalidDateRange, NotificationType.ERROR);
+                return false;
             }
+            return true;
         }
 
-        function createCover(track) {
-            const image = document.createElement('img');
-            image.className = 'statistics-track-cover';
-            image.src = track.coverPath
-                ? `${globalConfiguration.serverBasePath}${track.coverPath}`
-                : '/images/ui/music-placeholder.svg';
-            image.alt = '';
-            image.style.width = '48px';
-            image.style.height = '48px';
-            image.style.objectFit = 'cover';
-            image.style.borderRadius = '4px';
-            image.style.flexShrink = '0';
-            return image;
+        function buildFilterParameters(filters) {
+            return {
+                libraryId: filters.libraryId,
+                mediaKind: filters.mediaKind,
+                fromUtc: toUtcStart(filters.fromDate),
+                toUtc: toUtcEnd(filters.toDate)
+            };
         }
 
-        function createPlayButton(track) {
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.className = 'confirm-button statistics-action-button';
-            button.setAttribute('data-audio-player-play', '');
-            button.dataset.libraryId = track.libraryId;
-            button.dataset.trackId = track.trackId;
-            button.dataset.albumId = track.albumId;
-            button.dataset.artistId = track.artistId;
-            button.dataset.title = track.title || '';
-            button.dataset.albumTitle = track.albumTitle || '';
-            if (track.coverPath)
-                button.dataset.coverArtPath = track.coverPath;
-            // The button carries no visible text, so its accessible name names both the action and the track it plays.
-            const label = `${strings.playTrack}: ${track.title || ''}`;
-            button.setAttribute('aria-label', label);
-            button.title = label;
-            button.textContent = '\u25B6';
-            return button;
+        function buildStatisticsUrl(filters) {
+            const parameters = buildFilterParameters(filters);
+            parameters.userId = filters.userId;
+            return buildUrl(getStatisticsUrl, parameters);
         }
 
-        // Creates the heart of a track row. The global favorites script finds it by its data attributes, hydrates its state and handles its click.
-        function createFavoriteToggle(track) {
-            const toggle = document.createElement('button');
-            toggle.type = 'button';
-            toggle.className = 'card-favorite-toggle statistics-favorite-toggle';
-            toggle.setAttribute('data-favorite-toggle', '');
-            toggle.setAttribute('data-favorite-media-kind', 'MusicTrack');
-            toggle.setAttribute('data-favorite-media-item-id', track.trackId);
-            return toggle;
+        function buildAllUsersStatisticsUrl(filters) {
+            return buildUrl(getAllUsersStatisticsUrl, buildFilterParameters(filters));
         }
 
-        // Creates the add to playlist action. The global playlists script opens the playlist picker from its data attributes.
-        function createPlaylistAddButton(track) {
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.className = 'confirm-button statistics-action-button';
-            button.setAttribute('data-playlist-add', '');
-            button.dataset.playlistLibraryId = track.libraryId;
-            button.dataset.playlistTrackId = track.trackId;
-            button.dataset.playlistTitle = track.title || '';
-            const label = `${strings.addToPlaylist}: ${track.title || ''}`;
-            button.setAttribute('aria-label', label);
-            button.title = label;
-            button.textContent = '+';
-            return button;
+        function buildHistoryUrl(baseUrl, filters) {
+            const parameters = buildFilterParameters(filters);
+            parameters.userId = filters.userId;
+            parameters.currentPage = 1;
+            parameters.perPage = PAGE_SIZE;
+            return buildUrl(baseUrl, parameters);
         }
 
-        // Builds the cell that describes how the track was played: its counted plays, its completed plays and when it was last active.
-        function createMetrics(track) {
-            const metrics = document.createElement('div');
-            metrics.className = 'statistics-track-metrics';
-            const counts = document.createElement('span');
-            counts.className = 'text-light-two';
-            counts.textContent = `${track.playCount} ${strings.plays} - ${track.completedPlayCount} ${strings.completed}`;
-            const lastPlayed = document.createElement('span');
-            lastPlayed.className = 'text-disabled';
-            lastPlayed.textContent = `${strings.lastPlayed}: ${formatDateTime(track.lastPlayedOnUtc)}`;
-            metrics.appendChild(counts);
-            metrics.appendChild(lastPlayed);
-            return metrics;
+        function buildTagConsumptionUrl(filters) {
+            const parameters = buildFilterParameters(filters);
+            parameters.userId = filters.userId;
+            return buildUrl(getTagConsumptionUrl, parameters);
         }
 
-        function createTrackRow(track, rank) {
+        function buildGenreConsumptionUrl(filters) {
+            const parameters = buildFilterParameters(filters);
+            parameters.userId = filters.userId;
+            return buildUrl(getGenreConsumptionUrl, parameters);
+        }
+
+        function buildDeleteItemHistoryUrl(item, userId) {
+            return buildUrl(deleteConsumptionItemHistoryUrl, {
+                userId,
+                mediaKind: item.mediaKind,
+                mediaItemId: item.mediaItemId,
+                libraryId: item.libraryId
+            });
+        }
+
+        function buildClearHistoryUrl(userId) {
+            return userId ? buildUrl(clearConsumptionHistoryUrl, { userId }) : clearConsumptionHistoryUrl;
+        }
+
+        function buildClearResumePointsUrl(userId) {
+            return userId ? buildUrl(clearResumePointsUrl, { userId }) : clearResumePointsUrl;
+        }
+
+        function renderSummary(summary) {
+            totalDurationValue.textContent = formatDuration(summary.totalConsumedDurationInSeconds);
+            countedSessionsValue.textContent = String(summary.countedSessionCount);
+            completedSessionsValue.textContent = String(summary.completedSessionCount);
+            completionRateValue.textContent = formatPercentage(summary.completionRate);
+        }
+
+        function renderMediaKindBreakdown(summaries) {
+            mediaKindBreakdown.innerHTML = '';
+            const hasData = Array.isArray(summaries) && summaries.length > 0;
+            noMediaKindMessage.classList.toggle('hidden', hasData);
+            if (!hasData)
+                return;
+            const table = document.createElement('table');
+            table.className = 'statistics-table';
+            const head = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            [strings.mediaKind, strings.duration, strings.countedSessions, strings.completedSessions, strings.stopped, strings.completionRate]
+                .forEach(label => {
+                    const header = document.createElement('th');
+                    header.scope = 'col';
+                    header.textContent = label;
+                    headerRow.appendChild(header);
+                });
+            head.appendChild(headerRow);
+            table.appendChild(head);
+            const body = document.createElement('tbody');
+            summaries.forEach(summary => {
+                const row = document.createElement('tr');
+                row.appendChild(createKindCell(summary.mediaKind));
+                row.appendChild(createTextCell(formatDuration(summary.totalConsumedDurationInSeconds)));
+                row.appendChild(createTextCell(String(summary.countedSessionCount)));
+                row.appendChild(createTextCell(String(summary.completedSessionCount)));
+                row.appendChild(createTextCell(String(summary.stoppedSessionCount)));
+                row.appendChild(createTextCell(formatPercentage(summary.completionRate)));
+                body.appendChild(row);
+            });
+            table.appendChild(body);
+            mediaKindBreakdown.appendChild(table);
+        }
+
+        function renderUsersTable(users) {
+            usersTable.innerHTML = '';
+            const hasData = Array.isArray(users) && users.length > 0;
+            noUsersMessage.classList.toggle('hidden', hasData);
+            if (!hasData)
+                return;
+            const table = document.createElement('table');
+            table.className = 'statistics-table';
+            const head = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            [strings.user, strings.duration, strings.countedSessions, strings.completedSessions, strings.stopped, strings.completionRate]
+                .forEach(label => {
+                    const header = document.createElement('th');
+                    header.scope = 'col';
+                    header.textContent = label;
+                    headerRow.appendChild(header);
+                });
+            head.appendChild(headerRow);
+            table.appendChild(head);
+            const body = document.createElement('tbody');
+            users.forEach(summary => {
+                const row = document.createElement('tr');
+                const userName = userNamesById.get(String(summary.userId).toLowerCase()) || summary.userId;
+                row.appendChild(createTextCell(userName));
+                row.appendChild(createTextCell(formatDuration(summary.totalConsumedDurationInSeconds)));
+                row.appendChild(createTextCell(String(summary.countedSessionCount)));
+                row.appendChild(createTextCell(String(summary.completedSessionCount)));
+                row.appendChild(createTextCell(String(summary.stoppedSessionCount)));
+                row.appendChild(createTextCell(formatPercentage(summary.completionRate)));
+                body.appendChild(row);
+            });
+            table.appendChild(body);
+            usersTable.appendChild(table);
+        }
+
+        function renderBars(container, entries, emptyMessage) {
+            container.innerHTML = '';
+            const hasData = Array.isArray(entries) && entries.length > 0;
+            emptyMessage.classList.toggle('hidden', hasData);
+            if (!hasData)
+                return;
+            const maxDuration = Math.max(...entries.map(entry => Number(entry.consumedDurationInSeconds) || 0), 0);
+            entries.forEach(entry => {
+                const row = document.createElement('div');
+                row.className = 'statistics-bar-row';
+                row.setAttribute('role', 'listitem');
+
+                const name = document.createElement('span');
+                name.className = 'statistics-term-name';
+                name.textContent = entry.name;
+
+                const barTrack = document.createElement('div');
+                barTrack.className = 'statistics-bar-track';
+                barTrack.setAttribute('aria-hidden', 'true');
+                const barFill = document.createElement('div');
+                barFill.className = 'statistics-bar-fill';
+                const width = maxDuration > 0 ? Math.round((Number(entry.consumedDurationInSeconds) / maxDuration) * 100) : 0;
+                barFill.style.width = `${width}%`;
+                barTrack.appendChild(barFill);
+
+                const metadata = document.createElement('span');
+                metadata.className = 'statistics-term-meta';
+                metadata.textContent = `${entry.consumedItemCount} ${strings.items} - ${formatDuration(entry.consumedDurationInSeconds)}`;
+
+                row.appendChild(name);
+                row.appendChild(barTrack);
+                row.appendChild(metadata);
+                container.appendChild(row);
+            });
+        }
+
+        function renderTerms(genreConsumption, tagConsumption) {
+            renderBars(genresContainer, Array.isArray(genreConsumption) ? genreConsumption : [], noGenresMessage);
+            renderBars(tagsContainer, Array.isArray(tagConsumption) ? tagConsumption : [], noTagsMessage);
+        }
+
+        function createItemRow(item) {
             const row = document.createElement('div');
-            row.className = 'statistics-track-row';
-            row.dataset.trackId = track.trackId;
-            row.style.display = 'flex';
-            row.style.alignItems = 'center';
-            row.style.gap = '0.75rem';
-            row.style.padding = '0.5rem 0';
-            row.style.borderBottom = '1px solid rgba(255, 255, 255, 0.08)';
+            row.className = 'statistics-item-row';
 
-            if (rank)
-            {
-                const rankLabel = document.createElement('span');
-                rankLabel.className = 'text-disabled';
-                rankLabel.style.minWidth = '1.5rem';
-                rankLabel.style.textAlign = 'right';
-                rankLabel.textContent = rank;
-                row.appendChild(rankLabel);
-            }
-            row.appendChild(createCover(track));
+            const image = document.createElement('img');
+            image.className = 'statistics-item-cover';
+            image.alt = '';
+            if (item.isAvailable && item.coverPath)
+                image.src = `${globalConfiguration.serverBasePath}${item.coverPath}`;
+            else
+                image.src = item.mediaKind === 'Book' ? '/images/ui/book-placeholder.svg' : '/images/ui/music-placeholder.svg';
 
             const details = document.createElement('div');
-            details.style.display = 'flex';
-            details.style.flexDirection = 'column';
-            details.style.flexGrow = '1';
-            details.style.minWidth = '0';
-            const trackUrl = buildTrackUrl(track);
-            const title = document.createElement(trackUrl ? 'a' : 'span');
-            title.className = trackUrl ? 'nav-link text-light-two' : 'text-light-two';
-            if (trackUrl)
-                title.href = trackUrl;
-            title.textContent = track.title || strings.unavailable;
+            details.className = 'statistics-item-details';
+            details.appendChild(createKindBadge(item.mediaKind));
+
+            const title = document.createElement('span');
+            title.className = 'statistics-item-title';
+            title.textContent = item.isAvailable ? item.title : strings.unavailable;
             title.title = title.textContent;
-            title.style.whiteSpace = 'nowrap';
-            title.style.overflow = 'hidden';
-            title.style.textOverflow = 'ellipsis';
             details.appendChild(title);
-            const subtitleText = [track.artistName, track.albumTitle].filter(value => value).join(' - ');
-            if (subtitleText)
-            {
+
+            const subtitleText = [item.creatorName, item.collectionTitle].filter(value => value).join(' - ');
+            if (subtitleText) {
                 const subtitle = document.createElement('span');
-                subtitle.className = 'text-disabled';
+                subtitle.className = 'statistics-item-meta';
                 subtitle.textContent = subtitleText;
-                subtitle.style.whiteSpace = 'nowrap';
-                subtitle.style.overflow = 'hidden';
-                subtitle.style.textOverflow = 'ellipsis';
                 details.appendChild(subtitle);
             }
-            row.appendChild(details);
-            row.appendChild(createMetrics(track));
+
+            const metrics = document.createElement('div');
+            metrics.className = 'statistics-item-metrics';
+            const lastConsumed = document.createElement('span');
+            lastConsumed.className = 'text-disabled';
+            lastConsumed.textContent = `${strings.lastConsumed}: ${formatDateTime(item.lastConsumedOnUtc)}`;
+            const counts = document.createElement('span');
+            counts.className = 'text-light-two';
+            counts.textContent = `${item.countedSessionCount} ${strings.counted} - ${item.completedSessionCount} ${strings.completed}`;
+            const duration = document.createElement('span');
+            duration.className = 'text-light-two';
+            duration.textContent = formatDuration(item.consumedDurationInSeconds);
+            metrics.appendChild(lastConsumed);
+            metrics.appendChild(counts);
+            metrics.appendChild(duration);
 
             const actions = document.createElement('div');
-            actions.className = 'statistics-track-actions';
-            actions.style.display = 'flex';
-            actions.style.alignItems = 'center';
-            actions.style.gap = '0.25rem';
-            // A track that no longer exists, or whose library the user cannot access, has no display data and no play context left to describe.
-            if (track.title)
-            {
-                actions.appendChild(createPlayButton(track));
-                actions.appendChild(createFavoriteToggle(track));
-                actions.appendChild(createPlaylistAddButton(track));
-            }
+            actions.className = 'statistics-item-actions';
+            const deleteButton = document.createElement('button');
+            deleteButton.type = 'button';
+            deleteButton.className = 'abort-button statistics-delete-button';
+            deleteButton.textContent = strings.deleteFromHistory;
+            deleteButton.addEventListener('click', () => deleteItemHistoryAsync(item, deleteButton));
+            actions.appendChild(deleteButton);
+
+            row.appendChild(image);
+            row.appendChild(details);
+            row.appendChild(metrics);
             row.appendChild(actions);
             return row;
         }
 
-        function renderTracks(container, tracks, isRanked) {
+        function renderItemList(container, items, emptyMessage) {
             container.innerHTML = '';
-            tracks.forEach((track, index) => container.appendChild(createTrackRow(track, isRanked ? index + 1 : 0)));
-            renderedTrackCount += tracks.length;
+            const hasData = Array.isArray(items) && items.length > 0;
+            emptyMessage.classList.toggle('hidden', hasData);
+            if (!hasData)
+                return;
+            items.forEach(item => container.appendChild(createItemRow(item)));
         }
 
-        function renderStatistics(statistics) {
-            totalListeningTimeValue.textContent = formatListeningTime(statistics.totalListeningDurationInSeconds);
-            totalPlaysValue.textContent = String(statistics.totalPlayCount);
-            completedPlaysValue.textContent = String(statistics.completedPlayCount);
-            completionRateValue.textContent = formatPercentage(statistics.completionRate);
+        function updateEmptyState(summary, hasListData, hasTagData, hasUserData) {
+            const hasData = summary.countedSessionCount > 0 ||
+                summary.totalConsumedDurationInSeconds > 0 ||
+                hasListData ||
+                hasTagData ||
+                hasUserData;
+            emptyStateMessage.classList.toggle('hidden', hasData);
         }
 
-        function updateState() {
-            // The empty state appears only after a successful load that returned no track at all, so it never flashes while the page is loading.
-            emptyState.classList.toggle('hidden', !hasLoaded || hasLoadFailed || renderedTrackCount > 0);
-            loadFailedMessage.classList.toggle('hidden', !hasLoadFailed);
-            retryButton.classList.toggle('hidden', !hasLoadFailed);
-            retryButton.disabled = isLoading;
+        function renderAllUsers(data) {
+            renderSummary(data.total);
+            renderMediaKindBreakdown(data.total.mediaKindSummaries);
+            renderUsersTable(data.users);
+            usersSection.classList.remove('hidden');
+            termsSection.classList.add('hidden');
+            allUsersNote.classList.remove('hidden');
+            historySection.classList.add('hidden');
+            recentlyConsumedContainer.innerHTML = '';
+            mostConsumedContainer.innerHTML = '';
+            noRecentlyConsumedMessage.classList.add('hidden');
+            noMostConsumedMessage.classList.add('hidden');
+            updateEmptyState(
+                data.total,
+                false,
+                false,
+                Array.isArray(data.users) && data.users.length > 0);
+        }
+
+        function renderUserStatistics(statistics, recentlyConsumed, mostConsumed, genreConsumption, tagConsumption) {
+            renderSummary(statistics);
+            renderMediaKindBreakdown(statistics.mediaKindSummaries);
+            renderTerms(genreConsumption, tagConsumption);
+            renderItemList(recentlyConsumedContainer, recentlyConsumed.data, noRecentlyConsumedMessage);
+            renderItemList(mostConsumedContainer, mostConsumed.data, noMostConsumedMessage);
+            usersSection.classList.add('hidden');
+            termsSection.classList.remove('hidden');
+            allUsersNote.classList.add('hidden');
+            historySection.classList.remove('hidden');
+            const hasListData = (recentlyConsumed.data?.length ?? 0) > 0 || (mostConsumed.data?.length ?? 0) > 0;
+            const hasTermData = (Array.isArray(genreConsumption) && genreConsumption.length > 0) ||
+                (Array.isArray(tagConsumption) && tagConsumption.length > 0);
+            updateEmptyState(statistics, hasListData, hasTermData, false);
+        }
+
+        async function deleteItemHistoryAsync(item, deleteButton) {
+            if (isDeletingHistory)
+                return;
+            isDeletingHistory = true;
+            deleteButton.disabled = true;
+            try {
+                const confirmed = await dialogService.show(
+                    strings.deleteFromHistoryConfirm,
+                    jsLocalizedDialogs.confirmation,
+                    DialogButtons.YES_NO,
+                    DialogIcon.QUESTION) === DialogButton.YES;
+                if (!confirmed)
+                    return;
+                const filters = getFilters();
+                const userId = filters.isAllUsers ? null : filters.userId;
+                const deleted = await callApiDeleteAsync(buildDeleteItemHistoryUrl(item, userId));
+                if (deleted)
+                    notificationService.show(strings.historyEntryDeleted, NotificationType.SUCCESS);
+                await loadStatisticsAsync();
+            } finally {
+                isDeletingHistory = false;
+                deleteButton.disabled = false;
+            }
+        }
+
+        async function clearHistoryAsync() {
+            const filters = getFilters();
+            if (filters.isAllUsers)
+                return;
+            const confirmed = await dialogService.show(
+                strings.clearHistoryConfirm,
+                jsLocalizedDialogs.confirmation,
+                DialogButtons.YES_NO,
+                DialogIcon.QUESTION) === DialogButton.YES;
+            if (!confirmed)
+                return;
+            const deleted = await callApiDeleteAsync(buildClearHistoryUrl(filters.userId));
+            if (deleted) {
+                notificationService.show(strings.historyCleared, NotificationType.SUCCESS);
+                await loadStatisticsAsync();
+            }
+        }
+
+        async function clearResumePointsAsync() {
+            const filters = getFilters();
+            if (filters.isAllUsers)
+                return;
+            const confirmed = await dialogService.show(
+                strings.clearResumePointsConfirm,
+                jsLocalizedDialogs.confirmation,
+                DialogButtons.YES_NO,
+                DialogIcon.QUESTION) === DialogButton.YES;
+            if (!confirmed)
+                return;
+            const deleted = await callApiDeleteAsync(buildClearResumePointsUrl(filters.userId));
+            if (deleted) {
+                notificationService.show(strings.resumePointsCleared, NotificationType.SUCCESS);
+                await loadStatisticsAsync();
+            }
+        }
+
+        function setFilterControlsDisabled(isDisabled) {
+            applyButton.disabled = isDisabled;
+            resetButton.disabled = isDisabled;
+            fromDateInput.disabled = isDisabled;
+            toDateInput.disabled = isDisabled;
+            if (userToggle)
+                userToggle.disabled = isDisabled;
+            if (libraryToggle)
+                libraryToggle.disabled = isDisabled;
+            if (kindToggle)
+                kindToggle.disabled = isDisabled;
+        }
+
+        function showLoadingState() {
+            loadingMessage.classList.remove('hidden');
+            loadFailedMessage.classList.add('hidden');
+            retryButton.classList.add('hidden');
+            content.classList.add('hidden');
+            setFilterControlsDisabled(true);
+        }
+
+        function showLoadFailedState() {
+            loadingMessage.classList.add('hidden');
+            content.classList.add('hidden');
+            loadFailedMessage.classList.remove('hidden');
+            retryButton.classList.remove('hidden');
+            setFilterControlsDisabled(false);
+        }
+
+        function showContentState() {
+            loadingMessage.classList.add('hidden');
+            loadFailedMessage.classList.add('hidden');
+            retryButton.classList.add('hidden');
+            content.classList.remove('hidden');
+            setFilterControlsDisabled(false);
         }
 
         async function loadStatisticsAsync() {
-            if (isLoading)
+            const filters = getFilters();
+            if (!areFiltersValid(filters))
                 return;
-            isLoading = true;
-            hasLoadFailed = false;
-            updateState();
-            const [statistics, recentlyPlayed, mostPlayed] = await Promise.all([
-                callApiGetAsync(getStatisticsUrl),
-                callApiGetAsync(`${getRecentlyPlayedUrl}?currentPage=1&perPage=10`),
-                callApiGetAsync(`${getMostPlayedUrl}?currentPage=1&perPage=10`)
-            ]);
-            isLoading = false;
-            if (!statistics || !recentlyPlayed || !Array.isArray(recentlyPlayed.data) || !mostPlayed || !Array.isArray(mostPlayed.data)) {
-                // The API helper already reported each failure. The page keeps whatever it had rendered and offers a retry.
-                hasLoadFailed = true;
-                updateState();
-                return;
+            const sequence = ++requestSequence;
+            showLoadingState();
+            if (filters.isAllUsers) {
+                const data = await callApiGetAsync(buildAllUsersStatisticsUrl(filters));
+                if (sequence !== requestSequence)
+                    return;
+                if (!data) {
+                    showLoadFailedState();
+                    return;
+                }
+                renderAllUsers(data);
+            } else {
+                const [statistics, recentlyConsumed, mostConsumed, genreConsumption, tagConsumption] = await Promise.all([
+                    callApiGetAsync(buildStatisticsUrl(filters)),
+                    callApiGetAsync(buildHistoryUrl(getRecentlyConsumedUrl, filters)),
+                    callApiGetAsync(buildHistoryUrl(getMostConsumedUrl, filters)),
+                    callApiGetAsync(buildGenreConsumptionUrl(filters)),
+                    callApiGetAsync(buildTagConsumptionUrl(filters))
+                ]);
+                if (sequence !== requestSequence)
+                    return;
+                if (!statistics || !recentlyConsumed || !mostConsumed || !genreConsumption || !tagConsumption) {
+                    showLoadFailedState();
+                    return;
+                }
+                renderUserStatistics(statistics, recentlyConsumed, mostConsumed, genreConsumption, tagConsumption);
             }
-            renderedTrackCount = 0;
-            renderStatistics(statistics);
-            renderTracks(recentlyPlayedList, recentlyPlayed.data, false);
-            renderTracks(mostPlayedList, mostPlayed.data, true);
-            hasLoaded = true;
-            hasLoadFailed = false;
-            bindNavigationLinks();
-            updateState();
+            showContentState();
+        }
+
+        function resetFilters() {
+            setSelectedValue('statistics-library-filter', '', strings.allLibraries);
+            setSelectedValue('statistics-kind-filter', '', strings.allMediaKinds);
+            fromDateInput.value = '';
+            toDateInput.value = '';
+            loadStatisticsAsync();
+        }
+
+        function handleDocumentClick(event) {
+            if (event.target.closest('#statistics-user-filter .enlightenment-option'))
+                loadStatisticsAsync();
         }
 
         retryButton.addEventListener('click', loadStatisticsAsync);
+        applyButton.addEventListener('click', loadStatisticsAsync);
+        resetButton.addEventListener('click', resetFilters);
+        clearHistoryButton.addEventListener('click', clearHistoryAsync);
+        clearResumePointsButton.addEventListener('click', clearResumePointsAsync);
+        document.addEventListener('click', handleDocumentClick);
 
         async function InitializeAsync() {
             if (isInitialized)
                 return;
             isInitialized = true;
+            await loadLookupsAsync();
             await loadStatisticsAsync();
         }
 
         window.viewCleanups = window.viewCleanups || {};
         window.viewCleanups['@scriptId'] = () => {
             retryButton.removeEventListener('click', loadStatisticsAsync);
+            applyButton.removeEventListener('click', loadStatisticsAsync);
+            resetButton.removeEventListener('click', resetFilters);
+            clearHistoryButton.removeEventListener('click', clearHistoryAsync);
+            clearResumePointsButton.removeEventListener('click', clearResumePointsAsync);
+            document.removeEventListener('click', handleDocumentClick);
             console.log(`Unloaded @scriptId`);
         };
         console.log(`Loaded @scriptId`);

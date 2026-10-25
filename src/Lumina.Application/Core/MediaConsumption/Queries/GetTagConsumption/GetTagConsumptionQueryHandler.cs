@@ -15,7 +15,6 @@ using Lumina.Application.Common.Utilities;
 using Lumina.Contracts.Responses.MediaConsumption;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.MediaConsumptionBoundedContext.Common.ValueObjects;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaConsumption;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
@@ -28,7 +27,7 @@ using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
 namespace Lumina.Application.Core.MediaConsumption.Queries.GetTagConsumption;
 
 /// <summary>
-/// Handler for the query to get the consumption statistics of the tags and genres of a user.
+/// Handler for the query to get the consumption statistics of the tags of a user.
 /// </summary>
 public class GetTagConsumptionQueryHandler : IQueryHandler<GetTagConsumptionQuery, Result<IReadOnlyList<TagConsumptionResponse>>>
 {
@@ -57,12 +56,12 @@ public class GetTagConsumptionQueryHandler : IQueryHandler<GetTagConsumptionQuer
     }
 
     /// <summary>
-    /// Handles the query to get the consumption statistics of the tags and genres of a user.
+    /// Handles the query to get the consumption statistics of the tags of a user.
     /// </summary>
     /// <param name="query">The query to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="Result{TValue}"/> containing either the requested tag and genre statistics, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either the requested tag statistics, or an error message.
     /// </returns>
     public async Task<Result<IReadOnlyList<TagConsumptionResponse>>> HandleAsync(GetTagConsumptionQuery query, CancellationToken cancellationToken)
     {
@@ -90,8 +89,8 @@ public class GetTagConsumptionQueryHandler : IQueryHandler<GetTagConsumptionQuer
         if (getRecordsResult.IsFailure)
             return getRecordsResult.Errors;
 
-        // The access decision only needs the library Id that the records already carry, so it is made once per distinct library before any term is
-        // loaded. Terms of a library the caller cannot access are never read.
+        // The access decision only needs the library Id that the records already carry, so it is made once per distinct library before any tag is
+        // loaded. Tags of a library the caller cannot access are never read.
         Dictionary<Guid, bool> libraryAccess = [];
         foreach (Guid recordLibraryId in getRecordsResult.Value.Select(record => record.LibraryId).Distinct())
             libraryAccess[recordLibraryId] = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
@@ -126,40 +125,36 @@ public class GetTagConsumptionQueryHandler : IQueryHandler<GetTagConsumptionQuer
             books = [.. getBooksResult.Value];
         }
 
-        Dictionary<(MediaKind MediaKind, Guid MediaItemId, Guid LibraryId), List<(TagKind TagKind, string Name)>> termsByItem = [];
+        Dictionary<(MediaKind MediaKind, Guid MediaItemId, Guid LibraryId), List<string>> tagNamesByItem = [];
         foreach (TrackEntity track in tracks)
         {
-            List<(TagKind TagKind, string Name)> itemTerms = [];
-            itemTerms.AddRange(track.Tags.Select(tag => tag.Name).OfType<string>().Select(name => (TagKind.Tag, name)));
-            itemTerms.AddRange(track.Genres.Select(genre => genre.Name).OfType<string>().Select(name => (TagKind.Genre, name)));
-            if (itemTerms.Count > 0)
-                termsByItem[(MediaKind.MusicTrack, track.Id, track.LibraryId)] = itemTerms;
+            List<string> itemTags = [.. track.Tags.Select(tag => tag.Name).OfType<string>()];
+            if (itemTags.Count > 0)
+                tagNamesByItem[(MediaKind.MusicTrack, track.Id, track.LibraryId)] = itemTags;
         }
         foreach (BookEntity book in books)
         {
-            List<(TagKind TagKind, string Name)> itemTerms = [];
-            itemTerms.AddRange(book.Tags.Select(tag => tag.Name).OfType<string>().Select(name => (TagKind.Tag, name)));
-            itemTerms.AddRange(book.Genres.Select(genre => genre.Name).OfType<string>().Select(name => (TagKind.Genre, name)));
-            if (itemTerms.Count > 0)
-                termsByItem[(MediaKind.Book, book.Id, book.LibraryId)] = itemTerms;
+            List<string> itemTags = [.. book.Tags.Select(tag => tag.Name).OfType<string>()];
+            if (itemTags.Count > 0)
+                tagNamesByItem[(MediaKind.Book, book.Id, book.LibraryId)] = itemTags;
         }
 
-        // The records are aggregated to one row per item and library first, so an item with several sessions contributes its terms once, not once per
+        // The records are aggregated to one row per item and library first, so an item with several sessions contributes its tags once, not once per
         // session. The library is part of the key because the item is resolved in its current library, and a record from another library must not
-        // borrow the terms or the access decision of the current one. An item that moved libraries after consumption is therefore excluded from the
+        // borrow the tags or the access decision of the current one. An item that moved libraries after consumption is therefore excluded from the
         // breakdown, matching the history lists that blank display data when the record and item libraries disagree.
-        Dictionary<(TagKind TagKind, string Name), (int ConsumedItemCount, long ConsumedDurationMilliseconds)> terms = [];
+        Dictionary<string, (int ConsumedItemCount, long ConsumedDurationMilliseconds)> tags = [];
         foreach (IGrouping<(MediaKind MediaKind, Guid MediaItemId, Guid LibraryId), MediaConsumptionRecordEntity> itemGroup in getRecordsResult.Value
             .GroupBy(record => (record.MediaKind, record.MediaItemId, record.LibraryId)))
         {
             if (!libraryAccess[itemGroup.Key.LibraryId])
                 continue;
-            if (!termsByItem.TryGetValue((itemGroup.Key.MediaKind, itemGroup.Key.MediaItemId, itemGroup.Key.LibraryId), out List<(TagKind TagKind, string Name)>? itemTerms) ||
-                itemTerms.Count == 0)
+            if (!tagNamesByItem.TryGetValue((itemGroup.Key.MediaKind, itemGroup.Key.MediaItemId, itemGroup.Key.LibraryId), out List<string>? itemTags) ||
+                itemTags.Count == 0)
                 continue;
 
             // The breakdown mirrors the statistics, so an item whose sessions all fall below the counting threshold of their media kind does not
-            // contribute its terms or its duration to the breakdown.
+            // contribute its tags or its duration to the breakdown.
             Optional<MediaConsumptionRule> ruleResult = MediaConsumptionRule.For(itemGroup.Key.MediaKind);
             if (!ruleResult.HasValue)
                 continue;
@@ -171,47 +166,29 @@ public class GetTagConsumptionQueryHandler : IQueryHandler<GetTagConsumptionQuer
                 continue;
 
             long consumedDurationMilliseconds = itemGroup.Sum(record => record.ConsumedDurationMilliseconds);
-
-            if (query.TagKind is null || query.TagKind == TagKind.Tag)
-            {
-                List<string> tagNames = [.. itemTerms
-                    .Where(termRow => termRow.TagKind == TagKind.Tag)
-                    .Select(termRow => termRow.Name)];
-                AddTerms(terms, TagKind.Tag, tagNames, consumedDurationMilliseconds);
-            }
-            if (query.TagKind is null || query.TagKind == TagKind.Genre)
-            {
-                List<string> genreNames = [.. itemTerms
-                    .Where(termRow => termRow.TagKind == TagKind.Genre)
-                    .Select(termRow => termRow.Name)];
-                AddTerms(terms, TagKind.Genre, genreNames, consumedDurationMilliseconds);
-            }
+            AddTags(tags, itemTags, consumedDurationMilliseconds);
         }
 
-        List<TagConsumptionDto> tagConsumptions = [.. terms
-            .Select(term => new TagConsumptionDto(
-                term.Key.Name,
-                term.Key.TagKind,
-                term.Value.ConsumedItemCount,
-                term.Value.ConsumedDurationMilliseconds))
+        List<TagConsumptionDto> tagConsumptions = [.. tags
+            .Select(tag => new TagConsumptionDto(
+                tag.Key,
+                tag.Value.ConsumedItemCount,
+                tag.Value.ConsumedDurationMilliseconds))
             .OrderByDescending(tagConsumption => tagConsumption.ConsumedItemCount)
             .ThenByDescending(tagConsumption => tagConsumption.ConsumedDurationMilliseconds)
-            .ThenBy(tagConsumption => tagConsumption.TagKind)
             .ThenBy(tagConsumption => tagConsumption.Name)];
 
         return Result.From(tagConsumptions.ToResponses());
     }
 
     /// <summary>
-    /// Adds the lowercase <paramref name="names"/> of one item to the accumulated <paramref name="terms"/>.
+    /// Adds the lowercase <paramref name="names"/> of one item to the accumulated <paramref name="tags"/>.
     /// </summary>
-    /// <param name="terms">The accumulated terms, keyed by tag kind and lowercase name.</param>
-    /// <param name="tagKind">Whether the names are tags or genres.</param>
-    /// <param name="names">The names carried by the item.</param>
+    /// <param name="tags">The accumulated tags, keyed by lowercase name.</param>
+    /// <param name="names">The tag names carried by the item.</param>
     /// <param name="consumedDurationMilliseconds">The duration consumed in the item, over all of its sessions, in milliseconds.</param>
-    private static void AddTerms(
-        Dictionary<(TagKind TagKind, string Name), (int ConsumedItemCount, long ConsumedDurationMilliseconds)> terms,
-        TagKind tagKind,
+    private static void AddTags(
+        Dictionary<string, (int ConsumedItemCount, long ConsumedDurationMilliseconds)> tags,
         List<string> names,
         long consumedDurationMilliseconds)
     {
@@ -220,11 +197,10 @@ public class GetTagConsumptionQueryHandler : IQueryHandler<GetTagConsumptionQuer
         {
             if (name.Length == 0)
                 continue;
-            (TagKind TagKind, string Name) key = (tagKind, name);
-            if (terms.TryGetValue(key, out (int ConsumedItemCount, long ConsumedDurationMilliseconds) current))
-                terms[key] = (current.ConsumedItemCount + 1, current.ConsumedDurationMilliseconds + consumedDurationMilliseconds);
+            if (tags.TryGetValue(name, out (int ConsumedItemCount, long ConsumedDurationMilliseconds) current))
+                tags[name] = (current.ConsumedItemCount + 1, current.ConsumedDurationMilliseconds + consumedDurationMilliseconds);
             else
-                terms[key] = (1, consumedDurationMilliseconds);
+                tags[name] = (1, consumedDurationMilliseconds);
         }
     }
 }

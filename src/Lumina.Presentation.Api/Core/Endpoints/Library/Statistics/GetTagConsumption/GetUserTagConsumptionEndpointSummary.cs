@@ -2,7 +2,6 @@
 using FastEndpoints;
 using Lumina.Contracts.Requests.MediaConsumption;
 using Lumina.Contracts.Responses.MediaConsumption;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaConsumption;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -21,13 +20,12 @@ public class GetUserTagConsumptionEndpointSummary : Summary<GetUserTagConsumptio
     /// </summary>
     public GetUserTagConsumptionEndpointSummary()
     {
-        Summary = "Gets the consumption statistics of the tags and genres of a user.";
-        Description = "Gets the tags and genres carried by the media items a user consumed, grouped by lowercase name across every media kind, or restricted to one kind, one library, one term kind, and a date range. A user can read only their own statistics, while an Admin can select any user with the userId route parameter; a regular user targeting another user receives the same not authorized result as a route that names no accessible user. Only an item with at least one session that counts towards statistics contributes, and each item contributes its terms once regardless of how many sessions it had, so a multi-genre item adds one to each of its genres, not one per session. The names are always lowercase and culture invariant, so a tag or genre that is shared by a book and a track appears in one bucket. Tags and genres of an item whose media item was deleted, or whose media library the user can no longer access, are not included, because their terms cannot be resolved, while their sessions still count in the summary.";
+        Summary = "Gets the consumption statistics of the tags of a user.";
+        Description = "Gets the tags carried by the media items a user consumed, grouped by lowercase name across every media kind, or restricted to one kind, one library, and a date range. A user can read only their own statistics, while an Admin can select any user with the userId route parameter; a regular user targeting another user receives the same not authorized result as a route that names no accessible user. Only an item with at least one session that counts towards statistics contributes, and each item contributes its tags once regardless of how many sessions it had, so a multi-tag item adds one to each of its tags, not one per session. The names are always lowercase and culture invariant, so a tag that is shared by a book and a track appears in one bucket. Tags of an item whose media item was deleted, or whose media library the user can no longer access, are not included, because their tags cannot be resolved, while their sessions still count in the summary.";
 
         ExampleRequest = new GetTagConsumptionRequest(
             LibraryId: null,
             MediaKind: null,
-            TagKind: null,
             FromUtc: new DateTime(2026, 10, 1, 0, 0, 0, DateTimeKind.Utc),
             ToUtc: new DateTime(2026, 10, 31, 23, 59, 59, DateTimeKind.Utc)
         );
@@ -35,33 +33,28 @@ public class GetUserTagConsumptionEndpointSummary : Summary<GetUserTagConsumptio
         Params["userId"] = "The Id of the user whose statistics are retrieved. An Admin can name any user; a regular user can only name themselves.";
         RequestParam(request => request.LibraryId, "The Id of the media library to restrict the statistics to. Optional.");
         RequestParam(request => request.MediaKind, "The kind of media to restrict the statistics to. Optional.");
-        RequestParam(request => request.TagKind, "Whether to return genres or tags. Optional.");
         RequestParam(request => request.FromUtc, "The inclusive start of the date range. Optional.");
         RequestParam(request => request.ToUtc, "The inclusive end of the date range. Optional.");
 
-        ResponseParam<TagConsumptionResponse>(response => response.Name, "The lowercase name of the tag or genre.");
-        ResponseParam<TagConsumptionResponse>(response => response.TagKind, "Whether the entry is a genre or a tag.");
-        ResponseParam<TagConsumptionResponse>(response => response.ConsumedItemCount, "The number of distinct media items that carry the term and were consumed.");
-        ResponseParam<TagConsumptionResponse>(response => response.ConsumedDurationInSeconds, "The active duration consumed in the media items that carry the term, in seconds.");
+        ResponseParam<TagConsumptionResponse>(response => response.Name, "The lowercase name of the tag.");
+        ResponseParam<TagConsumptionResponse>(response => response.ConsumedItemCount, "The number of distinct media items that carry the tag and were consumed.");
+        ResponseParam<TagConsumptionResponse>(response => response.ConsumedDurationInSeconds, "The active duration consumed in the media items that carry the tag, in seconds.");
 
-        Response<IReadOnlyList<TagConsumptionResponse>>(statusCode: 200, description: "The consumption statistics of the tags and genres of the user are returned.", contentType: "application/json",
+        Response<IReadOnlyList<TagConsumptionResponse>>(statusCode: 200, description: "The consumption statistics of the tags of the user are returned.", contentType: "application/json",
             example:
             [
                 new TagConsumptionResponse(
-                    Name: "horror",
-                    TagKind: TagKind.Genre,
+                    Name: "favourite",
                     ConsumedItemCount: 3,
                     ConsumedDurationInSeconds: 5400
                 ),
                 new TagConsumptionResponse(
-                    Name: "fantasy",
-                    TagKind: TagKind.Genre,
+                    Name: "book-club",
                     ConsumedItemCount: 2,
                     ConsumedDurationInSeconds: 7320
                 ),
                 new TagConsumptionResponse(
-                    Name: "favourite",
-                    TagKind: TagKind.Tag,
+                    Name: "comfort-read",
                     ConsumedItemCount: 1,
                     ConsumedDurationInSeconds: 1424.5
                 )
@@ -118,7 +111,6 @@ public class GetUserTagConsumptionEndpointSummary : Summary<GetUserTagConsumptio
                             "TargetUserIdIsInvalid",
                             "LibraryIdCannotBeEmpty",
                             "UnsupportedMediaKind",
-                            "TagKindIsInvalid",
                             "ConsumptionDateRangeIsInvalid"
                         }
                     }

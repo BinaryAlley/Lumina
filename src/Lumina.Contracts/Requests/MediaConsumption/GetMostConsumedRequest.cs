@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using System;
 using System.Diagnostics;
 #endregion
 
@@ -12,10 +13,14 @@ namespace Lumina.Contracts.Requests.MediaConsumption;
 /// <param name="MediaKind">The kind of media to restrict the history to. Optional.</param>
 /// <param name="CurrentPage">The one based page of media items to return. Optional.</param>
 /// <param name="PerPage">The number of media items per page. Optional.</param>
+/// <param name="FromUtc">The inclusive start of the date range. Optional.</param>
+/// <param name="ToUtc">The inclusive end of the date range. Optional.</param>
 [DebuggerDisplay("MediaKind: {MediaKind}; CurrentPage: {CurrentPage}; PerPage: {PerPage}")]
 public sealed record GetMostConsumedRequest(
     string? LibraryId,
     MediaKind? MediaKind,
     int? CurrentPage,
-    int? PerPage
+    int? PerPage,
+    DateTime? FromUtc,
+    DateTime? ToUtc
 );

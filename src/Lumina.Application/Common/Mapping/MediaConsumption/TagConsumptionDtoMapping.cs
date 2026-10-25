@@ -22,7 +22,6 @@ public static class TagConsumptionDtoMapping
     {
         return new TagConsumptionResponse(
             data.Name,
-            data.TagKind,
             data.ConsumedItemCount,
             data.ConsumedDurationMilliseconds.ToClampedTimeSpan().TotalSeconds
         );

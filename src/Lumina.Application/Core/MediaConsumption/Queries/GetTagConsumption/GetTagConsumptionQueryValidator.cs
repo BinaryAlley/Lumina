@@ -2,7 +2,6 @@
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Utilities;
 using Lumina.Domain.Common.Errors;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaConsumption;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 #endregion
@@ -38,11 +37,6 @@ public class GetTagConsumptionQueryValidator : AbstractValidator<GetTagConsumpti
         RuleFor(query => query.MediaKind)
             .Must(mediaKind => mediaKind is null || mediaKind != MediaKind.None)
             .WithError(Errors.MediaConsumption.UnsupportedMediaKind);
-
-        RuleFor(query => query.TagKind)
-            .IsInEnum()
-            .WithError(Errors.MediaConsumption.TagKindIsInvalid)
-            .When(query => query.TagKind is not null);
 
         // An inverted range would silently return no records, so it is rejected as an invalid request instead.
         RuleFor(query => query.FromUtc)

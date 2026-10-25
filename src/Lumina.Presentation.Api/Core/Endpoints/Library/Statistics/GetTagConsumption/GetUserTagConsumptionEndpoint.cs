@@ -43,7 +43,7 @@ public class GetUserTagConsumptionEndpoint : BaseEndpoint<GetTagConsumptionReque
     }
 
     /// <summary>
-    /// Gets the consumption statistics of the tags and genres of a user.
+    /// Gets the consumption statistics of the tags of a user.
     /// </summary>
     /// <param name="request">The request containing the optional filters and the date range.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>

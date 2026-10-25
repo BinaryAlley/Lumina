@@ -131,6 +131,28 @@ internal sealed class MediaConsumptionRecordRepository : IMediaConsumptionRecord
     }
 
     /// <summary>
+    /// Deletes every consumption record of a media item of the user identified by <paramref name="userId"/>.
+    /// </summary>
+    /// <param name="userId">The Id of the user whose consumption records are deleted.</param>
+    /// <param name="mediaKind">The kind of the consumed media item.</param>
+    /// <param name="mediaItemId">The Id of the consumed media item.</param>
+    /// <param name="libraryId">The Id of the media library that contains the media item.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful deletion, or an error.</returns>
+    public async Task<Result<Deleted>> DeleteAllByMediaItemIdForUserAsync(Guid userId, MediaKind mediaKind, Guid mediaItemId, Guid libraryId, CancellationToken cancellationToken)
+    {
+        List<MediaConsumptionRecordEntity> records = await _luminaDbContext.MediaConsumptionRecords
+            .Where(record => record.UserId == userId &&
+                             record.MediaKind == mediaKind &&
+                             record.MediaItemId == mediaItemId &&
+                             record.LibraryId == libraryId)
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+        if (records.Count > 0)
+            _luminaDbContext.MediaConsumptionRecords.RemoveRange(records);
+        return Result.Deleted;
+    }
+
+    /// <summary>
     /// Deletes every consumption record of the user identified by <paramref name="userId"/>.
     /// </summary>
     /// <param name="userId">The Id of the user whose consumption records are deleted.</param>
