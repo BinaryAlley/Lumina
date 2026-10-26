@@ -69,6 +69,17 @@ public class LibraryDto
     public bool ShouldSkipUnchangedDirectoriesDuringScan { get; set; } = false;
 
     /// <summary>
+    /// Gets or sets whether the consumption progress of the media library items is tracked, or not. When absent, the default of the library type is used on create, and the stored value is kept on update.
+    /// </summary>
+    public bool? ShouldTrackConsumptionProgress { get; set; }
+
+    /// <summary>
+    /// Gets or sets the percentage of a media library item that must be consumed for its session to be considered completed. When absent, the default of the library type is used on create,
+    /// and the stored value is kept on update.
+    /// </summary>
+    public int? CompletionThresholdPercentage { get; set; }
+
+    /// <summary>
     /// Gets or sets the ordered parts of the template describing the structure of the media library on disk.
     /// </summary>
     public List<LibraryPathTemplatePartDto> PathTemplateParts { get; set; } = [];

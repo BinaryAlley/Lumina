@@ -414,4 +414,19 @@
   <data name="PathPartBookId" xml:space="preserve">
     <value>Id du livre</value>
   </data>
+  <data name="ShouldTrackConsumptionProgress" xml:space="preserve">
+    <value>Suivre La Progression De Consommation</value>
+  </data>
+  <data name="DescriptionShouldTrackConsumptionProgress" xml:space="preserve">
+    <value>Si la position de lecture ou de visionnage des éléments de cette bibliothèque est mémorisée, afin que l'utilisateur puisse reprendre là où il s'est arrêté.</value>
+  </data>
+  <data name="CompletionThresholdPercentage" xml:space="preserve">
+    <value>Seuil d'achèvement (%)</value>
+  </data>
+  <data name="DescriptionCompletionThresholdPercentage" xml:space="preserve">
+    <value>Le pourcentage d'un élément qui doit être consommé pour que sa session soit considérée comme terminée. S'il est vide, la valeur par défaut du type de bibliothèque est utilisée lors de la création d'une bibliothèque ou de l'activation du suivi de la progression, et la valeur enregistrée est conservée lors de la modification d'une bibliothèque qui suit déjà la progression. Les types sans seuil par défaut enregistrent l'achèvement uniquement lorsqu'il est signalé explicitement.</value>
+  </data>
+  <data name="CompletionThresholdPercentageValidation" xml:space="preserve">
+    <value>Le seuil d'achèvement doit être un nombre entier compris entre 0 et 100.</value>
+  </data>
 </root>

@@ -414,4 +414,19 @@
   <data name="PathPartBookId" xml:space="preserve">
     <value>معرف الكتاب</value>
   </data>
+  <data name="ShouldTrackConsumptionProgress" xml:space="preserve">
+    <value>تتبع تقدم الاستهلاك</value>
+  </data>
+  <data name="DescriptionShouldTrackConsumptionProgress" xml:space="preserve">
+    <value>ما إذا كان يتم تذكر موضع التشغيل أو القراءة لعناصر هذه المكتبة، حتى يتمكن المستخدم من المتابعة من حيث توقف.</value>
+  </data>
+  <data name="CompletionThresholdPercentage" xml:space="preserve">
+    <value>حد الإكمال (%)</value>
+  </data>
+  <data name="DescriptionCompletionThresholdPercentage" xml:space="preserve">
+    <value>النسبة المئوية من العنصر التي يجب استهلاكها لاعتبار جلسته مكتملة. عند تركه فارغًا، تُستخدم القيمة الافتراضية لنوع المكتبة عند إنشاء مكتبة أو عند تفعيل تتبع التقدم، وتُحتفظ القيمة المخزنة عند تحرير مكتبة تتبع التقدم بالفعل. الأنواع التي ليس لها حد افتراضي تسجل الإكمال فقط عند الإبلاغ عنه صراحةً.</value>
+  </data>
+  <data name="CompletionThresholdPercentageValidation" xml:space="preserve">
+    <value>يجب أن يكون حد الإكمال عددًا صحيحًا بين 0 و100.</value>
+  </data>
 </root>

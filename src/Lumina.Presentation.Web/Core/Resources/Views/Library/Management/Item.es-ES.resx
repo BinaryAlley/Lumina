@@ -414,4 +414,19 @@
   <data name="PathPartBookId" xml:space="preserve">
     <value>Id del libro</value>
   </data>
+  <data name="ShouldTrackConsumptionProgress" xml:space="preserve">
+    <value>Rastrear El Progreso Del Consumo</value>
+  </data>
+  <data name="DescriptionShouldTrackConsumptionProgress" xml:space="preserve">
+    <value>Si se recuerda la posición de reproducción o lectura de los elementos de esta biblioteca, para que el usuario pueda continuar donde lo dejó.</value>
+  </data>
+  <data name="CompletionThresholdPercentage" xml:space="preserve">
+    <value>Umbral De Finalización (%)</value>
+  </data>
+  <data name="DescriptionCompletionThresholdPercentage" xml:space="preserve">
+    <value>El porcentaje de un elemento que debe consumirse para que su sesión se considere completada. Si se deja vacío, se usa el valor predeterminado del tipo de biblioteca al crear una biblioteca o al activar el seguimiento del progreso, y se conserva el valor almacenado al editar una biblioteca que ya lo sigue. Los tipos sin umbral predeterminado registran la finalización solo cuando se informa explícitamente.</value>
+  </data>
+  <data name="CompletionThresholdPercentageValidation" xml:space="preserve">
+    <value>El umbral de finalización debe ser un número entero entre 0 y 100.</value>
+  </data>
 </root>

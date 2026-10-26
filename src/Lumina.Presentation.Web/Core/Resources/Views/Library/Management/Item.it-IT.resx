@@ -414,4 +414,19 @@
   <data name="PathPartBookId" xml:space="preserve">
     <value>Id del libro</value>
   </data>
+  <data name="ShouldTrackConsumptionProgress" xml:space="preserve">
+    <value>Monitora Il Progresso Di Consumo</value>
+  </data>
+  <data name="DescriptionShouldTrackConsumptionProgress" xml:space="preserve">
+    <value>Se la posizione di riproduzione o di lettura degli elementi di questa libreria viene ricordata, così che l'utente possa riprendere da dove si era interrotto.</value>
+  </data>
+  <data name="CompletionThresholdPercentage" xml:space="preserve">
+    <value>Soglia Di Completamento (%)</value>
+  </data>
+  <data name="DescriptionCompletionThresholdPercentage" xml:space="preserve">
+    <value>La percentuale di un elemento che deve essere consumata perché la sua sessione sia considerata completata. Se lasciato vuoto, viene usato il valore predefinito del tipo di libreria quando si crea una libreria o si attiva il monitoraggio del progresso, mentre il valore salvato viene mantenuto quando si modifica una libreria che monitora già il progresso. I tipi senza soglia predefinita registrano il completamento solo quando viene segnalato esplicitamente.</value>
+  </data>
+  <data name="CompletionThresholdPercentageValidation" xml:space="preserve">
+    <value>La soglia di completamento deve essere un numero intero compreso tra 0 e 100.</value>
+  </data>
 </root>

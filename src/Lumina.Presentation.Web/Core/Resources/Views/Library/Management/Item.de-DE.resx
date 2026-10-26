@@ -414,4 +414,19 @@
   <data name="PathPartBookId" xml:space="preserve">
     <value>Buch-ID</value>
   </data>
+  <data name="ShouldTrackConsumptionProgress" xml:space="preserve">
+    <value>Konsumfortschritt Verfolgen</value>
+  </data>
+  <data name="DescriptionShouldTrackConsumptionProgress" xml:space="preserve">
+    <value>Ob die Wiedergabe- oder Leseposition der Elemente dieser Bibliothek gespeichert wird, damit der Benutzer dort fortsetzen kann, wo er aufgehört hat.</value>
+  </data>
+  <data name="CompletionThresholdPercentage" xml:space="preserve">
+    <value>Abschlussschwelle (%)</value>
+  </data>
+  <data name="DescriptionCompletionThresholdPercentage" xml:space="preserve">
+    <value>Der Prozentsatz eines Elements, der konsumiert werden muss, damit seine Sitzung als abgeschlossen gilt. Wenn das Feld leer bleibt, wird der Standardwert des Bibliothekstyps beim Erstellen einer Bibliothek oder beim Aktivieren der Fortschrittsverfolgung verwendet; beim Bearbeiten einer Bibliothek, die den Fortschritt bereits verfolgt, bleibt die gespeicherte Schwelle erhalten. Typen ohne Standardschwelle erfassen den Abschluss nur bei ausdrücklicher Meldung.</value>
+  </data>
+  <data name="CompletionThresholdPercentageValidation" xml:space="preserve">
+    <value>Die Abschlussschwelle muss eine ganze Zahl zwischen 0 und 100 sein.</value>
+  </data>
 </root>
