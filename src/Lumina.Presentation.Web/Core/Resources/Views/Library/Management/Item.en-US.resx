@@ -429,4 +429,7 @@
   <data name="CompletionThresholdPercentageValidation" xml:space="preserve">
     <value>The completion threshold must be a whole number between 0 and 100.</value>
   </data>
+  <data name="Youtube" xml:space="preserve">
+    <value>YouTube</value>
+  </data>
 </root>

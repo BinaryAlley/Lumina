@@ -429,4 +429,7 @@
   <data name="CompletionThresholdPercentageValidation" xml:space="preserve">
     <value>完了しきい値は 0 から 100 の間の整数である必要があります。</value>
   </data>
+  <data name="Youtube" xml:space="preserve">
+    <value>YouTube</value>
+  </data>
 </root>

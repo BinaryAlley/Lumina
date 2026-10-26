@@ -429,4 +429,7 @@
   <data name="CompletionThresholdPercentageValidation" xml:space="preserve">
     <value>Le seuil d'achèvement doit être un nombre entier compris entre 0 et 100.</value>
   </data>
+  <data name="Youtube" xml:space="preserve">
+    <value>YouTube</value>
+  </data>
 </root>

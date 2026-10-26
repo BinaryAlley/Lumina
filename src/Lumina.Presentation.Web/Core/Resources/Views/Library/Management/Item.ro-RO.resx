@@ -429,4 +429,7 @@
   <data name="CompletionThresholdPercentageValidation" xml:space="preserve">
     <value>Pragul de finalizare trebuie să fie un număr întreg între 0 și 100.</value>
   </data>
+  <data name="Youtube" xml:space="preserve">
+    <value>YouTube</value>
+  </data>
 </root>

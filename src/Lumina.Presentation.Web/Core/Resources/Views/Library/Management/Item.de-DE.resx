@@ -429,4 +429,7 @@
   <data name="CompletionThresholdPercentageValidation" xml:space="preserve">
     <value>Die Abschlussschwelle muss eine ganze Zahl zwischen 0 und 100 sein.</value>
   </data>
+  <data name="Youtube" xml:space="preserve">
+    <value>YouTube</value>
+  </data>
 </root>

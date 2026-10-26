@@ -903,4 +903,406 @@
   <data name="VuMeterHighThresholdCannotBeNull" xml:space="preserve">
     <value>لا يمكن أن تكون العتبة العالية لمقياس VU فارغة!</value>
   </data>
+  <data name="AlbumAlreadyExists" xml:space="preserve">
+    <value>الألبوم موجود بالفعل!</value>
+  </data>
+  <data name="AlbumIdCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون معرف الألبوم فارغًا!</value>
+  </data>
+  <data name="AlbumNotFound" xml:space="preserve">
+    <value>لم يتم العثور على الألبوم!</value>
+  </data>
+  <data name="AlbumTitleCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون عنوان الألبوم فارغًا!</value>
+  </data>
+  <data name="AlbumTitleMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>يجب أن يكون طول عنوان الألبوم 255 حرفًا كحد أقصى!</value>
+  </data>
+  <data name="AlbumsListCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن تكون قائمة الألبومات فارغة!</value>
+  </data>
+  <data name="AreaNameCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون اسم المنطقة فارغًا!</value>
+  </data>
+  <data name="AreaNameMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>يجب أن يبلغ طول اسم المنطقة 255 حرفًا كحد أقصى!</value>
+  </data>
+  <data name="ArtistAliasNameCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون الاسم المستعار للفنان فارغًا!</value>
+  </data>
+  <data name="ArtistAliasNameMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>يجب أن يبلغ طول الاسم المستعار للفنان 255 حرفًا كحد أقصى!</value>
+  </data>
+  <data name="ArtistAlreadyExists" xml:space="preserve">
+    <value>الفنان موجود بالفعل!</value>
+  </data>
+  <data name="ArtistIdCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون معرف الفنان فارغًا!</value>
+  </data>
+  <data name="ArtistMustHaveAtLeastOneAlbum" xml:space="preserve">
+    <value>يجب أن يكون لدى الفنان ألبوم واحد على الأقل!</value>
+  </data>
+  <data name="ArtistNameCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون اسم الفنان فارغًا!</value>
+  </data>
+  <data name="ArtistNameMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>يجب أن لا يزيد طول اسم الفنان عن 255 حرفًا!</value>
+  </data>
+  <data name="ArtistNotFound" xml:space="preserve">
+    <value>لم يتم العثور على الفنان!</value>
+  </data>
+  <data name="ArtistWebsiteMustBeMaximum2048CharactersLong" xml:space="preserve">
+    <value>يجب أن يبلغ طول موقع الفنان 2048 حرفًا كحد أقصى!</value>
+  </data>
+  <data name="BarcodeValueCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن تكون قيمة الباركود فارغة!</value>
+  </data>
+  <data name="BpmMustBeGreaterThanZero" xml:space="preserve">
+    <value>يجب أن يكون BPM أكبر من الصفر!</value>
+  </data>
+  <data name="CatalogNumberMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>يجب أن يبلغ طول رقم الكتالوج 50 حرفًا كحد أقصى!</value>
+  </data>
+  <data name="CompletionThresholdPercentageMustBeBetweenZeroAndOneHundred" xml:space="preserve">
+    <value>يجب أن يكون حد الإكمال بين 0 و100!</value>
+  </data>
+  <data name="CompletionThresholdPercentageMustBeNullWhenProgressTrackingIsOff" xml:space="preserve">
+    <value>يجب أن يكون حد الإكمال فارغًا عندما يكون تتبع التقدم معطلاً!</value>
+  </data>
+  <data name="ConcurrencyConflict" xml:space="preserve">
+    <value>حدث تعارض في التزامن أثناء حفظ التغييرات!</value>
+  </data>
+  <data name="ConsecutivePagesReadIsOnlySupportedForPageBasedMedia" xml:space="preserve">
+    <value>عدد الصفحات المتتالية المقروءة مدعوم فقط للوسائط ذات الصفحات!</value>
+  </data>
+  <data name="ConsecutivePagesReadMustBeNonNegative" xml:space="preserve">
+    <value>لا يمكن أن يكون عدد الصفحات المتتالية المقروءة سالبًا!</value>
+  </data>
+  <data name="ConsumedDurationCannotDecrease" xml:space="preserve">
+    <value>لا يمكن أن تنخفض المدة المستهلكة!</value>
+  </data>
+  <data name="ConsumedDurationIsOutOfRange" xml:space="preserve">
+    <value>المدة المستهلكة خارج النطاق!</value>
+  </data>
+  <data name="ConsumedDurationMustBeNonNegative" xml:space="preserve">
+    <value>لا يمكن أن تكون المدة المستهلكة سالبة!</value>
+  </data>
+  <data name="ConsumptionDateRangeIsInvalid" xml:space="preserve">
+    <value>نطاق تواريخ الاستهلاك غير صالح!</value>
+  </data>
+  <data name="ConsumptionIsAlreadyTerminal" xml:space="preserve">
+    <value>انتهى الاستهلاك بالفعل!</value>
+  </data>
+  <data name="ConsumptionIsNotInProgress" xml:space="preserve">
+    <value>الاستهلاك ليس قيد التقدم!</value>
+  </data>
+  <data name="ConsumptionRecordIdCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون معرّف سجل الاستهلاك فارغًا!</value>
+  </data>
+  <data name="ConsumptionRecordNotFound" xml:space="preserve">
+    <value>لم يتم العثور على سجل الاستهلاك!</value>
+  </data>
+  <data name="CountryMustBeMaximum2CharactersLong" xml:space="preserve">
+    <value>يجب أن يتكون البلد من حرفين كحد أقصى!</value>
+  </data>
+  <data name="CoverCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن يكون الغلاف فارغًا!</value>
+  </data>
+  <data name="DeliveryIdCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون معرف التسليم فارغًا!</value>
+  </data>
+  <data name="DeliveryIdIsInvalid" xml:space="preserve">
+    <value>معرف التسليم غير صالح!</value>
+  </data>
+  <data name="DiscNumberMustBeGreaterThanZero" xml:space="preserve">
+    <value>يجب أن يكون رقم القرص أكبر من الصفر!</value>
+  </data>
+  <data name="EndedConsumptionCannotPrecedeLastActivity" xml:space="preserve">
+    <value>لا يمكن أن يسبق وقت الانتهاء آخر نشاط!</value>
+  </data>
+  <data name="EndedConsumptionMustHaveEndTime" xml:space="preserve">
+    <value>يجب أن يكون للاستهلاك المنتهي وقت انتهاء!</value>
+  </data>
+  <data name="FavoriteAlreadyExists" xml:space="preserve">
+    <value>المفضلة موجودة بالفعل!</value>
+  </data>
+  <data name="FavoriteMediaItemIdCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون معرف عنصر الوسائط المفضل فارغًا!</value>
+  </data>
+  <data name="FavoriteMediaItemIdsCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن تكون قائمة معرفات عناصر الوسائط المفضلة فارغة!</value>
+  </data>
+  <data name="FavoriteMediaItemIdsExceedMaximumCount" xml:space="preserve">
+    <value>قائمة معرفات عناصر الوسائط المفضلة تتجاوز الحد الأقصى!</value>
+  </data>
+  <data name="FavoriteMediaKindIsInvalid" xml:space="preserve">
+    <value>نوع الوسائط المفضل غير صالح!</value>
+  </data>
+  <data name="FavoriteMediaKindIsNotSupported" xml:space="preserve">
+    <value>نوع الوسائط المفضل غير مدعوم!</value>
+  </data>
+  <data name="FavoriteNotFound" xml:space="preserve">
+    <value>لم يتم العثور على المفضلة!</value>
+  </data>
+  <data name="FileTooLarge" xml:space="preserve">
+    <value>الملف كبير جدًا!</value>
+  </data>
+  <data name="InProgressConsumptionCannotHaveEndTime" xml:space="preserve">
+    <value>لا يمكن أن يكون للاستهلاك قيد التقدم وقت انتهاء!</value>
+  </data>
+  <data name="InvalidFormatForBarcode" xml:space="preserve">
+    <value>تنسيق الباركود غير صالح!</value>
+  </data>
+  <data name="InvalidMediaPosition" xml:space="preserve">
+    <value>موضع الوسائط غير صالح!</value>
+  </data>
+  <data name="InvalidProgressFraction" xml:space="preserve">
+    <value>كسر التقدم غير صالح!</value>
+  </data>
+  <data name="IpiValueCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن تكون قيمة IPI فارغة!</value>
+  </data>
+  <data name="IpiValueMustBeMaximum20CharactersLong" xml:space="preserve">
+    <value>يجب أن يبلغ طول قيمة IPI 20 حرفًا كحد أقصى!</value>
+  </data>
+  <data name="IsniValueCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن تكون قيمة ISNI فارغة!</value>
+  </data>
+  <data name="IsniValueMustBeMaximum20CharactersLong" xml:space="preserve">
+    <value>يجب أن تكون قيمة ISNI بحد أقصى 20 حرفًا!</value>
+  </data>
+  <data name="IsrcInvalidFormat" xml:space="preserve">
+    <value>تنسيق ISRC غير صالح!</value>
+  </data>
+  <data name="IsrcValueCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن تكون قيمة ISRC فارغة!</value>
+  </data>
+  <data name="LastActivityCannotPrecedeStart" xml:space="preserve">
+    <value>لا يمكن أن يسبق آخر نشاط البداية!</value>
+  </data>
+  <data name="LocationRefCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون مرجع الموقع فارغًا!</value>
+  </data>
+  <data name="MediaContributorAlreadyExists" xml:space="preserve">
+    <value>المساهم الإعلامي موجود بالفعل!</value>
+  </data>
+  <data name="MediaContributorNameCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون اسم المساهم بالوسائط فارغًا!</value>
+  </data>
+  <data name="MediaContributorRoleNameCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون اسم دور المساهم الإعلامي فارغًا!</value>
+  </data>
+  <data name="MediaItemIdCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون معرّف عنصر الوسائط فارغًا!</value>
+  </data>
+  <data name="MediaKindCannotResume" xml:space="preserve">
+    <value>لا يمكن استئناف الوسائط من هذا النوع!</value>
+  </data>
+  <data name="MediaKindCannotStartCompleted" xml:space="preserve">
+    <value>لا يمكن بدء الوسائط من هذا النوع كمكتملة!</value>
+  </data>
+  <data name="MediaResumePointNotFound" xml:space="preserve">
+    <value>لم يتم العثور على نقطة استئناف الوسائط!</value>
+  </data>
+  <data name="MoodNameCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون اسم الحالة فارغًا!</value>
+  </data>
+  <data name="MusicBrainzIdInvalidFormat" xml:space="preserve">
+    <value>تنسيق معرف MusicBrainz غير صالح!</value>
+  </data>
+  <data name="NoReaderAvailable" xml:space="preserve">
+    <value>لا يوجد قارئ متاح لهذا الكتاب!</value>
+  </data>
+  <data name="NoSupportedPlaybackFormat" xml:space="preserve">
+    <value>لم يتم العثور على تنسيق تشغيل مدعوم!</value>
+  </data>
+  <data name="NormalizationCacheLimitExceeded" xml:space="preserve">
+    <value>تم تجاوز حد ذاكرة التخزين المؤقت للتطبيع!</value>
+  </data>
+  <data name="NormalizationFailed" xml:space="preserve">
+    <value>فشل تطبيع المقطع!</value>
+  </data>
+  <data name="NormalizationIsNotRequiredForDirectPlay" xml:space="preserve">
+    <value>التطبيع غير مطلوب للتشغيل المباشر!</value>
+  </data>
+  <data name="NormalizationTimedOut" xml:space="preserve">
+    <value>انتهت مهلة تطبيع المقطع!</value>
+  </data>
+  <data name="NormalizationUnavailable" xml:space="preserve">
+    <value>تطبيع المقطع غير متوفر حاليًا!</value>
+  </data>
+  <data name="NormalizedTrackCacheEntryNotFound" xml:space="preserve">
+    <value>لم يتم العثور على إدخال ذاكرة التخزين المؤقت للمقطع المطبع!</value>
+  </data>
+  <data name="NormalizedTrackSegmentNotFound" xml:space="preserve">
+    <value>لم يتم العثور على المقطع المطبع!</value>
+  </data>
+  <data name="PathTemplateIsNotSupportedForLibraryType" xml:space="preserve">
+    <value>قالب المسار غير مدعوم لهذا النوع من المكتبة!</value>
+  </data>
+  <data name="PathTemplateLiteralCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون الجزء الحرفي من قالب المسار فارغًا!</value>
+  </data>
+  <data name="PathTemplatePartKindNotSupportedForLibraryType" xml:space="preserve">
+    <value>نوع جزء قالب المسار غير مدعوم لهذا النوع من المكتبة!</value>
+  </data>
+  <data name="PathTemplateValuePartMustContainSinglePlaceholder" xml:space="preserve">
+    <value>يجب أن يحتوي جزء القيمة من قالب المسار على عنصر نائب واحد بالضبط!</value>
+  </data>
+  <data name="PermissionNotFound" xml:space="preserve">
+    <value>لم يتم العثور على الإذن!</value>
+  </data>
+  <data name="PlaybackDeliveryChanged" xml:space="preserve">
+    <value>لقد تغير تسليم التشغيل!</value>
+  </data>
+  <data name="PlaybackDeliveryNotFound" xml:space="preserve">
+    <value>لم يتم العثور على تسليم التشغيل!</value>
+  </data>
+  <data name="PlaybackFormatNotImplemented" xml:space="preserve">
+    <value>لم يتم تنفيذ تنسيق التشغيل!</value>
+  </data>
+  <data name="PlaylistAlreadyExists" xml:space="preserve">
+    <value>قائمة التشغيل موجودة بالفعل!</value>
+  </data>
+  <data name="PlaylistDescriptionMustBeMaximum2000CharactersLong" xml:space="preserve">
+    <value>يجب أن يبلغ طول وصف قائمة التشغيل 2000 حرف كحد أقصى!</value>
+  </data>
+  <data name="PlaylistDoesNotAcceptMediaItems" xml:space="preserve">
+    <value>قائمة التشغيل لا تقبل عناصر الوسائط!</value>
+  </data>
+  <data name="PlaylistEntryIdCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون معرف إدخال قائمة التشغيل فارغًا!</value>
+  </data>
+  <data name="PlaylistEntryNotFound" xml:space="preserve">
+    <value>لم يتم العثور على إدخال قائمة التشغيل!</value>
+  </data>
+  <data name="PlaylistEntryPositionsAreInvalid" xml:space="preserve">
+    <value>مواضع إدخال قائمة التشغيل غير صالحة!</value>
+  </data>
+  <data name="PlaylistIdCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون معرف قائمة التشغيل فارغًا!</value>
+  </data>
+  <data name="PlaylistMoveTargetPositionIsInvalid" xml:space="preserve">
+    <value>موضع هدف نقل قائمة التشغيل غير صالح!</value>
+  </data>
+  <data name="PlaylistNameCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون اسم قائمة التشغيل فارغًا!</value>
+  </data>
+  <data name="PlaylistNameMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>يجب أن يبلغ طول اسم قائمة التشغيل 255 حرفًا كحد أقصى!</value>
+  </data>
+  <data name="PlaylistNotFound" xml:space="preserve">
+    <value>لم يتم العثور على قائمة التشغيل!</value>
+  </data>
+  <data name="PlaylistTypeIsInvalid" xml:space="preserve">
+    <value>نوع قائمة التشغيل غير صالح!</value>
+  </data>
+  <data name="ReaderDisabled" xml:space="preserve">
+    <value>تم تعطيل القارئ لهذه المكتبة!</value>
+  </data>
+  <data name="ResourceKeyCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون مفتاح المورد فارغًا!</value>
+  </data>
+  <data name="ResourceNotFound" xml:space="preserve">
+    <value>لم يتم العثور على المورد!</value>
+  </data>
+  <data name="ScriptMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>يجب أن يبلغ طول النص 50 حرفًا كحد أقصى!</value>
+  </data>
+  <data name="SectionNotFound" xml:space="preserve">
+    <value>لم يتم العثور على القسم!</value>
+  </data>
+  <data name="SegmentDurationMustBePositive" xml:space="preserve">
+    <value>يجب أن تكون مدة المقطع موجبة!</value>
+  </data>
+  <data name="SegmentIndexCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون فهرس المقطع فارغًا!</value>
+  </data>
+  <data name="SegmentIndexMustBeValid" xml:space="preserve">
+    <value>فهرس المقطع غير صالح!</value>
+  </data>
+  <data name="TargetUserIdIsInvalid" xml:space="preserve">
+    <value>معرّف المستخدم الهدف غير صالح!</value>
+  </data>
+  <data name="TheArtistAlreadyHasTheAlbum" xml:space="preserve">
+    <value>الفنان لديه الألبوم بالفعل!</value>
+  </data>
+  <data name="TheArtistDoesNotHaveTheAlbum" xml:space="preserve">
+    <value>الفنان ليس لديه الألبوم!</value>
+  </data>
+  <data name="TheTrackIsAlreadyInTheAlbum" xml:space="preserve">
+    <value>المقطع موجود بالفعل في الألبوم!</value>
+  </data>
+  <data name="TheTrackIsNotInTheAlbum" xml:space="preserve">
+    <value>المقطع ليس في الألبوم!</value>
+  </data>
+  <data name="ThemeTemplateNotFound" xml:space="preserve">
+    <value>لم يتم العثور على قالب الموضوع!</value>
+  </data>
+  <data name="TotalDiscsMustBeGreaterThanZero" xml:space="preserve">
+    <value>يجب أن يكون العدد الإجمالي للأقراص أكبر من الصفر!</value>
+  </data>
+  <data name="TotalTracksMustBeGreaterThanZero" xml:space="preserve">
+    <value>يجب أن يكون العدد الإجمالي للمقاطع أكبر من صفر!</value>
+  </data>
+  <data name="TrackAlreadyExists" xml:space="preserve">
+    <value>المقطع موجود بالفعل!</value>
+  </data>
+  <data name="TrackDurationMustBePositive" xml:space="preserve">
+    <value>يجب أن تكون مدة المقطع موجبة!</value>
+  </data>
+  <data name="TrackFileNotFound" xml:space="preserve">
+    <value>لم يتم العثور على ملف المقطع!</value>
+  </data>
+  <data name="TrackIdCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون معرّف المقطع فارغًا!</value>
+  </data>
+  <data name="TrackNotFound" xml:space="preserve">
+    <value>لم يتم العثور على المقطع!</value>
+  </data>
+  <data name="TrackNumberMustBeGreaterThanZero" xml:space="preserve">
+    <value>يجب أن يكون رقم المقطع أكبر من صفر!</value>
+  </data>
+  <data name="TrackPathCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون مسار المقطع فارغًا!</value>
+  </data>
+  <data name="TrackPathMustBeMaximum2048CharactersLong" xml:space="preserve">
+    <value>يجب ألا يتجاوز مسار المقطع 2048 حرفًا!</value>
+  </data>
+  <data name="TrackPathMustBeWithinLibraryContentLocations" xml:space="preserve">
+    <value>يجب أن يكون مسار المقطع داخل أحد مواقع محتوى المكتبة!</value>
+  </data>
+  <data name="TracksListCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن تكون قائمة المقاطع فارغة!</value>
+  </data>
+  <data name="UnknownMusicArtistGender" xml:space="preserve">
+    <value>جنس الفنان الموسيقي غير معروف!</value>
+  </data>
+  <data name="UnknownMusicArtistType" xml:space="preserve">
+    <value>نوع فنان الموسيقى غير معروف!</value>
+  </data>
+  <data name="UnknownMusicKey" xml:space="preserve">
+    <value>مفتاح الموسيقى غير معروف!</value>
+  </data>
+  <data name="UnknownMusicMediaFormat" xml:space="preserve">
+    <value>تنسيق الوسائط الموسيقية غير معروف!</value>
+  </data>
+  <data name="UnknownMusicReleasePackaging" xml:space="preserve">
+    <value>عبوة إصدار الموسيقى غير معروفة!</value>
+  </data>
+  <data name="UnknownMusicReleaseStatus" xml:space="preserve">
+    <value>حالة إصدار الموسيقى غير معروفة!</value>
+  </data>
+  <data name="UnknownMusicReleaseType" xml:space="preserve">
+    <value>نوع إصدار الموسيقى غير معروف!</value>
+  </data>
+  <data name="UnsupportedMediaKind" xml:space="preserve">
+    <value>نوع الوسائط غير مدعوم!</value>
+  </data>
+  <data name="WorkMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>يجب أن يبلغ طول العمل 255 حرفًا كحد أقصى!</value>
+  </data>
+  <data name="WorkTitleCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون عنوان العمل فارغًا!</value>
+  </data>
 </root>

@@ -297,4 +297,7 @@
   <data name="YouTube" xml:space="preserve">
     <value>يوتيوب</value>
   </data>
+  <data name="Youtube" xml:space="preserve">
+    <value>YouTube</value>
+  </data>
 </root>

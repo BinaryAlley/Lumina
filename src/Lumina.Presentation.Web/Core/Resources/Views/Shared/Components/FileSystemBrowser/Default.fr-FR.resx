@@ -147,7 +147,7 @@
   <data name="Forward" xml:space="preserve">
     <value>Suivant</value>
   </data>
-  <data name="Large Icons View" xml:space="preserve">
+  <data name="LargeIconsView" xml:space="preserve">
     <value>Vue grandes icônes</value>
   </data>
   <data name="ListView" xml:space="preserve">
