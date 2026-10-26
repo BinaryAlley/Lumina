@@ -70,7 +70,6 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     private IThemeRepository? _themeRepository;
     private IUserRepository? _userRepository;
     private IUserSettingsRepository? _userSettingsRepository;
-    private IMusicPlayRecordRepository? _musicPlayRecordRepository;
     private IPlaylistRepository? _playlistRepository;
     private IFavoriteRepository? _favoriteRepository;
     private IMediaConsumptionRecordRepository? _mediaConsumptionRecordRepository;
@@ -383,18 +382,6 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         {
             _userSettingsRepository ??= new UserSettingsRepository(_luminaDbContext);
             return _userSettingsRepository;
-        }
-    }
-
-    /// <summary>
-    /// Gets the music play record repository.
-    /// </summary>
-    public IMusicPlayRecordRepository MusicPlayRecordRepository
-    {
-        get
-        {
-            _musicPlayRecordRepository ??= new MusicPlayRecordRepository(_luminaDbContext);
-            return _musicPlayRecordRepository;
         }
     }
 

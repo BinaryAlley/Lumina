@@ -154,11 +154,6 @@ public interface IUnitOfWork
     IUserSettingsRepository UserSettingsRepository { get; }
 
     /// <summary>
-    /// Gets the music play record repository.
-    /// </summary>
-    IMusicPlayRecordRepository MusicPlayRecordRepository { get; }
-
-    /// <summary>
     /// Gets the playlist repository.
     /// </summary>
     IPlaylistRepository PlaylistRepository { get; }

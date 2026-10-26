@@ -53,7 +53,6 @@ public class LuminaDbContext : DbContext
     public virtual DbSet<ScheduledJobEntity> ScheduledJobs { get; set; } = null!;
     public virtual DbSet<ScheduledJobExecutionEntity> ScheduledJobExecutions { get; set; } = null!;
     public virtual DbSet<SchedulerDisplayPreferencesEntity> SchedulerDisplayPreferences { get; set; } = null!;
-    public virtual DbSet<MusicPlayRecordEntity> MusicPlayRecords { get; set; } = null!;
     public virtual DbSet<PlaylistEntity> Playlists { get; set; } = null!;
     public virtual DbSet<PlaylistEntryEntity> PlaylistEntries { get; set; } = null!;
     public virtual DbSet<FavoriteEntity> Favorites { get; set; } = null!;

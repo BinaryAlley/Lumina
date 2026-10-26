@@ -48,7 +48,7 @@ public class LuminaDbContextTests : IDisposable
 
         // Assert
         // The count assertion fails when a table is added or removed, reminding to update the assertions below.
-        Assert.Equal(67, tableNames.Length);
+        Assert.Equal(66, tableNames.Length);
         Assert.Contains("Books", tableNames);
         Assert.Contains("Users", tableNames);
         Assert.Contains("UserSettings", tableNames);
@@ -108,7 +108,7 @@ public class LuminaDbContextTests : IDisposable
         Assert.Contains("AlbumContributors", tableNames);
         Assert.Contains("MusicArtwork", tableNames);
         Assert.Contains("MusicLibraryScanItemMetadata", tableNames);
-        Assert.Contains("MusicPlayRecords", tableNames);
+        Assert.DoesNotContain("MusicPlayRecords", tableNames);
         Assert.Contains("MediaConsumptionRecords", tableNames);
         Assert.Contains("MediaResumePoints", tableNames);
         Assert.Contains("Playlists", tableNames);
