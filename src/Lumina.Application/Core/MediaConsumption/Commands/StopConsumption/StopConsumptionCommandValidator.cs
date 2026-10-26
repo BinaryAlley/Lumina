@@ -62,6 +62,10 @@ public class StopConsumptionCommandValidator : AbstractValidator<StopConsumption
             .Must(consumedDuration => consumedDuration is null ||
                 consumedDuration.Value <= MAXIMUM_REPORTED_DURATION_IN_SECONDS)
             .WithError(Errors.MediaConsumption.ConsumedDurationIsOutOfRange);
+
+        RuleFor(command => command.ConsecutivePagesRead)
+            .Must(consecutivePagesRead => consecutivePagesRead is null || consecutivePagesRead.Value >= 0)
+            .WithError(Errors.MediaConsumption.ConsecutivePagesReadMustBeNonNegative);
     }
 
     /// <summary>

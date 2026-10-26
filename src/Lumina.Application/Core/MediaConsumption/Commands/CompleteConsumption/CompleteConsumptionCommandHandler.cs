@@ -14,6 +14,7 @@ using Lumina.Domain.Core.BoundedContexts.MediaConsumptionBoundedContext.MediaCon
 using Lumina.Domain.SharedKernel.Common.Enums.MediaConsumption;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
@@ -27,6 +28,12 @@ namespace Lumina.Application.Core.MediaConsumption.Commands.CompleteConsumption;
 /// </summary>
 public class CompleteConsumptionCommandHandler : ICommandHandler<CompleteConsumptionCommand, Result<ConsumptionRecordResponse>>
 {
+    /// <summary>
+    /// The maximum number of times the terminal state is applied when a concurrent progress report changes the record between its
+    /// read and its save.
+    /// </summary>
+    private const int MAXIMUM_TERMINAL_SAVE_ATTEMPTS = 3;
+
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
     private readonly IDomainEventsQueue _domainEventsQueue;
@@ -74,53 +81,74 @@ public class CompleteConsumptionCommandHandler : ICommandHandler<CompleteConsump
         // The validator guarantees that the route identifier and the reported measurements are valid before this point.
         Guid consumptionRecordId = Guid.Parse(command.ConsumptionRecordId!);
 
-        // The record is loaded scoped to the current user, so a record of another user is indistinguishable from a missing one.
-        Result<MediaConsumptionRecordEntity?> getRecordResult = await _unitOfWork.MediaConsumptionRecordRepository
-            .GetByIdForUserAsync(consumptionRecordId, userId, cancellationToken: cancellationToken).ConfigureAwait(false);
-        if (getRecordResult.IsFailure)
-            return getRecordResult.Errors;
-        if (getRecordResult.Value is null)
-            return DomainErrors.MediaConsumption.ConsumptionRecordNotFound;
-
-        Result<MediaConsumptionRecord> toDomainEntityResult = getRecordResult.Value.ToDomainEntity();
-        if (toDomainEntityResult.IsFailure)
-            return toDomainEntityResult.Errors;
-        MediaConsumptionRecord record = toDomainEntityResult.Value;
-
         Optional<MediaPosition> position = ToMediaPosition(command.PositionKind, command.PositionTimeOffsetInSeconds, command.PositionLocation);
+        Optional<int> consecutivePagesRead = command.ConsecutivePagesRead.HasValue
+            ? Optional<int>.Some(command.ConsecutivePagesRead.Value)
+            : Optional<int>.None();
 
-        Result<Updated> completeResult = record.Complete(position, command.ProgressFraction!.Value, TimeSpan.FromSeconds(command.ConsumedDurationInSeconds!.Value));
-        if (completeResult.IsFailure)
-            return completeResult.Errors;
+        // A terminal report can race with an in-flight progress report on the same record. The record is read, then saved with the
+        // version it was read with, so a progress report that commits in between makes the save fail with a concurrency conflict.
+        // The terminal payload is absolute, so the record is reloaded and the terminal state is applied again to the fresh version.
+        for (int attempt = 1; attempt <= MAXIMUM_TERMINAL_SAVE_ATTEMPTS; attempt++)
+        {
+            // The record is loaded scoped to the current user, so a record of another user is indistinguishable from a missing one.
+            Result<MediaConsumptionRecordEntity?> getRecordResult = await _unitOfWork.MediaConsumptionRecordRepository
+                .GetByIdForUserAsync(consumptionRecordId, userId, cancellationToken: cancellationToken).ConfigureAwait(false);
+            if (getRecordResult.IsFailure)
+                return getRecordResult.Errors;
+            if (getRecordResult.Value is null)
+                return DomainErrors.MediaConsumption.ConsumptionRecordNotFound;
 
-        // Completion discards the resume point, because the media item no longer has a point to continue from. A missing resume point is not an
-        // error, so an explicit completion after a completion that already deleted it stays idempotent.
-        Result<Deleted> deleteResumePointResult = await _unitOfWork.MediaResumePointRepository
-            .DeleteForUserAndMediaItemAsync(userId, record.MediaKind, record.MediaItemId.Value, cancellationToken).ConfigureAwait(false);
-        if (deleteResumePointResult.IsFailure)
-            return deleteResumePointResult.Errors;
+            Result<MediaConsumptionRecord> toDomainEntityResult = getRecordResult.Value.ToDomainEntity();
+            if (toDomainEntityResult.IsFailure)
+                return toDomainEntityResult.Errors;
+            MediaConsumptionRecord record = toDomainEntityResult.Value;
 
-        Result<Updated> updateResult = await _unitOfWork.MediaConsumptionRecordRepository.UpdateForUserAsync(record.ToRepositoryEntity(), userId, cancellationToken).ConfigureAwait(false);
-        if (updateResult.IsFailure)
-            return updateResult.Errors;
+            Result<Updated> completeResult = record.Complete(position, command.ProgressFraction!.Value, TimeSpan.FromSeconds(command.ConsumedDurationInSeconds!.Value), consecutivePagesRead);
+            if (completeResult.IsFailure)
+                return completeResult.Errors;
 
-        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        if (saveChangesResult.IsFailure)
-            return saveChangesResult.Errors;
+            // Completion discards the resume point, because the media item no longer has a point to continue from. A missing resume point is not an
+            // error, so an explicit completion after a completion that already deleted it stays idempotent.
+            Result<Deleted> deleteResumePointResult = await _unitOfWork.MediaResumePointRepository
+                .DeleteForUserAndMediaItemAsync(userId, record.MediaKind, record.MediaItemId.Value, cancellationToken).ConfigureAwait(false);
+            if (deleteResumePointResult.IsFailure)
+                return deleteResumePointResult.Errors;
 
-        // Queue any domain events, to be published after the request has completed successfully.
-        foreach (IDomainEvent domainEvent in record.GetDomainEvents())
-            _domainEventsQueue.Enqueue(domainEvent);
+            Result<Updated> updateResult = await _unitOfWork.MediaConsumptionRecordRepository.UpdateForUserAsync(record.ToRepositoryEntity(), userId, cancellationToken).ConfigureAwait(false);
+            if (updateResult.IsFailure)
+                return updateResult.Errors;
 
-        // The persisted row is read back, so the response carries the timestamps and version the persistence medium actually stored.
-        Result<MediaConsumptionRecordEntity?> getPersistedRecordResult = await _unitOfWork.MediaConsumptionRecordRepository
-            .GetByIdForUserAsync(record.Id.Value, userId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
-        if (getPersistedRecordResult.IsFailure)
-            return getPersistedRecordResult.Errors;
-        if (getPersistedRecordResult.Value is null)
-            return DomainErrors.MediaConsumption.ConsumptionRecordNotFound;
+            Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            if (saveChangesResult.IsFailure)
+            {
+                // Only a concurrency conflict is worth retrying. The failed attempt is discarded, so the next loop reads the version
+                // the progress report committed and applies the terminal state to it.
+                if (attempt < MAXIMUM_TERMINAL_SAVE_ATTEMPTS && saveChangesResult.Errors.Any(error => error == ApplicationErrors.Persistence.ConcurrencyConflict))
+                {
+                    _unitOfWork.ClearTrackedEntities();
+                    continue;
+                }
+                return saveChangesResult.Errors;
+            }
 
-        return getPersistedRecordResult.Value.ToDto().ToResponse();
+            // Queue any domain events, to be published after the request has completed successfully.
+            foreach (IDomainEvent domainEvent in record.GetDomainEvents())
+                _domainEventsQueue.Enqueue(domainEvent);
+
+            // The persisted row is read back, so the response carries the timestamps and version the persistence medium actually stored.
+            Result<MediaConsumptionRecordEntity?> getPersistedRecordResult = await _unitOfWork.MediaConsumptionRecordRepository
+                .GetByIdForUserAsync(record.Id.Value, userId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
+            if (getPersistedRecordResult.IsFailure)
+                return getPersistedRecordResult.Errors;
+            if (getPersistedRecordResult.Value is null)
+                return DomainErrors.MediaConsumption.ConsumptionRecordNotFound;
+
+            return getPersistedRecordResult.Value.ToDto().ToResponse();
+        }
+
+        // Every attempt conflicted with a concurrent write, so the terminal state could not be stored.
+        return ApplicationErrors.Persistence.ConcurrencyConflict;
     }
 
     /// <summary>

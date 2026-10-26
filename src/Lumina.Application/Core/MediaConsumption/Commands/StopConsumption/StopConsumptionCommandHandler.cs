@@ -18,6 +18,7 @@ using Lumina.Domain.Core.BoundedContexts.MediaConsumptionBoundedContext.MediaRes
 using Lumina.Domain.SharedKernel.Common.Enums.MediaConsumption;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
@@ -31,6 +32,12 @@ namespace Lumina.Application.Core.MediaConsumption.Commands.StopConsumption;
 /// </summary>
 public class StopConsumptionCommandHandler : ICommandHandler<StopConsumptionCommand, Result<ConsumptionRecordResponse>>
 {
+    /// <summary>
+    /// The maximum number of times the terminal state is applied when a concurrent progress report changes the record between its
+    /// read and its save.
+    /// </summary>
+    private const int MAXIMUM_TERMINAL_SAVE_ATTEMPTS = 3;
+
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
     private readonly IDomainEventsQueue _domainEventsQueue;
@@ -78,85 +85,106 @@ public class StopConsumptionCommandHandler : ICommandHandler<StopConsumptionComm
         // The validator guarantees that the route identifier and the reported measurements are valid before this point.
         Guid consumptionRecordId = Guid.Parse(command.ConsumptionRecordId!);
 
-        // The record is loaded scoped to the current user, so a record of another user is indistinguishable from a missing one.
-        Result<MediaConsumptionRecordEntity?> getRecordResult = await _unitOfWork.MediaConsumptionRecordRepository.GetByIdForUserAsync(consumptionRecordId, userId, cancellationToken: cancellationToken).ConfigureAwait(false);
-        if (getRecordResult.IsFailure)
-            return getRecordResult.Errors;
-        if (getRecordResult.Value is null)
-            return DomainErrors.MediaConsumption.ConsumptionRecordNotFound;
-
-        Result<MediaConsumptionRecord> toDomainEntityResult = getRecordResult.Value.ToDomainEntity();
-        if (toDomainEntityResult.IsFailure)
-            return toDomainEntityResult.Errors;
-        MediaConsumptionRecord record = toDomainEntityResult.Value;
-
-        // The settings of the library decide whether reaching a threshold turns the stop into a completion. If the library was deleted after
-        // the session started, the defaults of the media kind are used instead, so the reported session can still be closed consistently.
-        Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository
-            .GetByIdAsync(record.LibraryId.Value, shouldIncludeNavigationProperties: false, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
-        if (getLibraryResult.IsFailure)
-            return getLibraryResult.Errors;
-        LibraryConsumptionSettings consumptionSettings = getLibraryResult.Value is null
-            ? LibraryConsumptionSettings.CreateDefault(record.MediaKind)
-            : getLibraryResult.Value.ToDomainValueObject();
-
         Optional<MediaPosition> position = ToMediaPosition(command.PositionKind, command.PositionTimeOffsetInSeconds, command.PositionLocation);
+        Optional<int> consecutivePagesRead = command.ConsecutivePagesRead.HasValue
+            ? Optional<int>.Some(command.ConsecutivePagesRead.Value)
+            : Optional<int>.None();
         double progressFraction = command.ProgressFraction!.Value;
         TimeSpan consumedDuration = TimeSpan.FromSeconds(command.ConsumedDurationInSeconds!.Value);
 
-        // A session stopped at or after the completion threshold of its library is recorded as completed, not stopped, and loses its resume
-        // point. Tracking on without a threshold, and tracking off, never complete a session implicitly. The percentage is divided instead of
-        // multiplying the fraction by one hundred, because the multiplication can round a fraction that is exactly at the threshold below it.
-        bool isAtCompletionThreshold = consumptionSettings.ShouldTrackConsumptionProgress &&
-                                       consumptionSettings.CompletionThresholdPercentage.HasValue &&
-                                       progressFraction >= consumptionSettings.CompletionThresholdPercentage.Value / 100.0;
-
-        Result<Updated> terminalResult = isAtCompletionThreshold
-            ? record.Complete(position, progressFraction, consumedDuration)
-            : record.Stop(position, progressFraction, consumedDuration);
-        if (terminalResult.IsFailure)
-            return terminalResult.Errors;
-
-        Optional<MediaConsumptionRule> ruleResult = MediaConsumptionRule.For(record.MediaKind);
-        if (!ruleResult.HasValue)
-            return DomainErrors.MediaConsumption.UnsupportedMediaKind;
-
-        if (isAtCompletionThreshold)
+        // A terminal report can race with an in-flight progress report on the same record. The record is read, then saved with the
+        // version it was read with, so a progress report that commits in between makes the save fail with a concurrency conflict.
+        // The terminal payload is absolute, so the record is reloaded and the terminal state is applied again to the fresh version.
+        for (int attempt = 1; attempt <= MAXIMUM_TERMINAL_SAVE_ATTEMPTS; attempt++)
         {
-            // Completion discards the resume point, because the media item no longer has a point to continue from.
-            Result<Deleted> deleteResumePointResult = await _unitOfWork.MediaResumePointRepository.DeleteForUserAndMediaItemAsync(userId, record.MediaKind, record.MediaItemId.Value, cancellationToken).ConfigureAwait(false);
-            if (deleteResumePointResult.IsFailure)
-                return deleteResumePointResult.Errors;
+            // The record is loaded scoped to the current user, so a record of another user is indistinguishable from a missing one.
+            Result<MediaConsumptionRecordEntity?> getRecordResult = await _unitOfWork.MediaConsumptionRecordRepository.GetByIdForUserAsync(consumptionRecordId, userId, cancellationToken: cancellationToken).ConfigureAwait(false);
+            if (getRecordResult.IsFailure)
+                return getRecordResult.Errors;
+            if (getRecordResult.Value is null)
+                return DomainErrors.MediaConsumption.ConsumptionRecordNotFound;
+
+            Result<MediaConsumptionRecord> toDomainEntityResult = getRecordResult.Value.ToDomainEntity();
+            if (toDomainEntityResult.IsFailure)
+                return toDomainEntityResult.Errors;
+            MediaConsumptionRecord record = toDomainEntityResult.Value;
+
+            // The settings of the library decide whether reaching a threshold turns the stop into a completion. If the library was deleted after
+            // the session started, the defaults of the media kind are used instead, so the reported session can still be closed consistently.
+            Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository
+                .GetByIdAsync(record.LibraryId.Value, shouldIncludeNavigationProperties: false, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
+            if (getLibraryResult.IsFailure)
+                return getLibraryResult.Errors;
+            LibraryConsumptionSettings consumptionSettings = getLibraryResult.Value is null
+                ? LibraryConsumptionSettings.CreateDefault(record.MediaKind)
+                : getLibraryResult.Value.ToDomainValueObject();
+
+            // A session stopped at or after the completion threshold of its library is recorded as completed, not stopped, and loses its resume
+            // point. Tracking on without a threshold, and tracking off, never complete a session implicitly. The percentage is divided instead of
+            // multiplying the fraction by one hundred, because the multiplication can round a fraction that is exactly at the threshold below it.
+            bool isAtCompletionThreshold = consumptionSettings.ShouldTrackConsumptionProgress &&
+                                           consumptionSettings.CompletionThresholdPercentage.HasValue &&
+                                           progressFraction >= consumptionSettings.CompletionThresholdPercentage.Value / 100.0;
+
+            Result<Updated> terminalResult = isAtCompletionThreshold
+                ? record.Complete(position, progressFraction, consumedDuration, consecutivePagesRead)
+                : record.Stop(position, progressFraction, consumedDuration, consecutivePagesRead);
+            if (terminalResult.IsFailure)
+                return terminalResult.Errors;
+
+            Optional<MediaConsumptionRule> ruleResult = MediaConsumptionRule.For(record.MediaKind);
+            if (!ruleResult.HasValue)
+                return DomainErrors.MediaConsumption.UnsupportedMediaKind;
+
+            if (isAtCompletionThreshold)
+            {
+                // Completion discards the resume point, because the media item no longer has a point to continue from.
+                Result<Deleted> deleteResumePointResult = await _unitOfWork.MediaResumePointRepository.DeleteForUserAndMediaItemAsync(userId, record.MediaKind, record.MediaItemId.Value, cancellationToken).ConfigureAwait(false);
+                if (deleteResumePointResult.IsFailure)
+                    return deleteResumePointResult.Errors;
+            }
+            else if (consumptionSettings.ShouldTrackConsumptionProgress && ruleResult.Value.CanResume && record.LastPosition.HasValue)
+            {
+                // A stopped session that did not reach the completion threshold keeps a resume point. Without a known position there is nothing to resume from, so no resume point is written.
+                Result<Updated> upsertResumePointResult = await UpsertResumePointAsync(record, record.LastPosition.Value, record.LastProgressFraction, userId, cancellationToken).ConfigureAwait(false);
+                if (upsertResumePointResult.IsFailure)
+                    return upsertResumePointResult.Errors;
+            }
+
+            Result<Updated> updateResult = await _unitOfWork.MediaConsumptionRecordRepository.UpdateForUserAsync(record.ToRepositoryEntity(), userId, cancellationToken).ConfigureAwait(false);
+            if (updateResult.IsFailure)
+                return updateResult.Errors;
+
+            Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            if (saveChangesResult.IsFailure)
+            {
+                // Only a concurrency conflict is worth retrying. The failed attempt is discarded, so the next loop reads the version
+                // the progress report committed and applies the terminal state to it.
+                if (attempt < MAXIMUM_TERMINAL_SAVE_ATTEMPTS && saveChangesResult.Errors.Any(error => error == ApplicationErrors.Persistence.ConcurrencyConflict))
+                {
+                    _unitOfWork.ClearTrackedEntities();
+                    continue;
+                }
+                return saveChangesResult.Errors;
+            }
+
+            // Queue any domain events, to be published after the request has completed successfully.
+            foreach (IDomainEvent domainEvent in record.GetDomainEvents())
+                _domainEventsQueue.Enqueue(domainEvent);
+
+            // The persisted row is read back, so the response carries the timestamps and version the persistence medium actually stored.
+            Result<MediaConsumptionRecordEntity?> getPersistedRecordResult = await _unitOfWork.MediaConsumptionRecordRepository
+                .GetByIdForUserAsync(record.Id.Value, userId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
+            if (getPersistedRecordResult.IsFailure)
+                return getPersistedRecordResult.Errors;
+            if (getPersistedRecordResult.Value is null)
+                return DomainErrors.MediaConsumption.ConsumptionRecordNotFound;
+
+            return getPersistedRecordResult.Value.ToDto().ToResponse();
         }
-        else if (consumptionSettings.ShouldTrackConsumptionProgress && ruleResult.Value.CanResume && record.LastPosition.HasValue)
-        {
-            // A stopped session that did not reach the completion threshold keeps a resume point. Without a known position there is nothing to resume from, so no resume point is written.
-            Result<Updated> upsertResumePointResult = await UpsertResumePointAsync(record, record.LastPosition.Value, record.LastProgressFraction, userId, cancellationToken).ConfigureAwait(false);
-            if (upsertResumePointResult.IsFailure)
-                return upsertResumePointResult.Errors;
-        }
 
-        Result<Updated> updateResult = await _unitOfWork.MediaConsumptionRecordRepository.UpdateForUserAsync(record.ToRepositoryEntity(), userId, cancellationToken).ConfigureAwait(false);
-        if (updateResult.IsFailure)
-            return updateResult.Errors;
-
-        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        if (saveChangesResult.IsFailure)
-            return saveChangesResult.Errors;
-
-        // Queue any domain events, to be published after the request has completed successfully.
-        foreach (IDomainEvent domainEvent in record.GetDomainEvents())
-            _domainEventsQueue.Enqueue(domainEvent);
-
-        // The persisted row is read back, so the response carries the timestamps and version the persistence medium actually stored.
-        Result<MediaConsumptionRecordEntity?> getPersistedRecordResult = await _unitOfWork.MediaConsumptionRecordRepository
-            .GetByIdForUserAsync(record.Id.Value, userId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
-        if (getPersistedRecordResult.IsFailure)
-            return getPersistedRecordResult.Errors;
-        if (getPersistedRecordResult.Value is null)
-            return DomainErrors.MediaConsumption.ConsumptionRecordNotFound;
-
-        return getPersistedRecordResult.Value.ToDto().ToResponse();
+        // Every attempt conflicted with a concurrent write, so the terminal state could not be stored.
+        return ApplicationErrors.Persistence.ConcurrencyConflict;
     }
 
     /// <summary>

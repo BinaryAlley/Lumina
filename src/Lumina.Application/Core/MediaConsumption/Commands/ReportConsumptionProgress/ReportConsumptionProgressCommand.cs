@@ -14,7 +14,7 @@ namespace Lumina.Application.Core.MediaConsumption.Commands.ReportConsumptionPro
 /// <param name="PositionLocation">The opaque locator within the media item, when the position is not a time offset.</param>
 /// <param name="ProgressFraction">The fraction of the media item that the client reached, between 0 and 1.</param>
 /// <param name="ConsumedDurationInSeconds">The active duration consumed by the session, in seconds.</param>
-/// <param name="ConsecutivePagesRead">The number of consecutive pages read in the current session, used by page based media such as books.</param>
+/// <param name="ConsecutivePagesRead">The number of consecutive pages read in the current session, used by page based media such as books. It must be zero for other kinds. Defaults to 0. Optional.</param>
 [DebuggerDisplay("ConsumptionRecordId: {ConsumptionRecordId}; ProgressFraction: {ProgressFraction}")]
 public record ReportConsumptionProgressCommand(
     string? ConsumptionRecordId,

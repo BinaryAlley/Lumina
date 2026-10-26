@@ -275,12 +275,8 @@ public sealed class MediaConsumptionRecord : AggregateRoot<MediaConsumptionRecor
         Optional<MediaConsumptionRule> ruleResult = MediaConsumptionRule.For(mediaKind);
         if (!ruleResult.HasValue)
             return Errors.MediaConsumption.UnsupportedMediaKind;
-        if (consumedDuration < TimeSpan.Zero)
-            return Errors.MediaConsumption.ConsumedDurationMustBeNonNegative;
         if (!IsProgressFractionValid(lastProgressFraction))
             return Errors.MediaConsumption.InvalidProgressFraction;
-        if (consecutivePagesRead < 0)
-            return Errors.MediaConsumption.ConsecutivePagesReadMustBeNonNegative;
         if (consecutivePagesRead > 0 && !IsPageBased(ruleResult.Value))
             return Errors.MediaConsumption.ConsecutivePagesReadIsOnlySupportedForPageBasedMedia;
         if (!DoesPositionMatchRule(ruleResult.Value, lastPosition))
@@ -328,12 +324,8 @@ public sealed class MediaConsumptionRecord : AggregateRoot<MediaConsumptionRecor
             return Errors.MediaConsumption.UnsupportedMediaKind;
         if (!IsProgressFractionValid(lastProgressFraction))
             return Errors.MediaConsumption.InvalidProgressFraction;
-        if (consumedDuration < TimeSpan.Zero)
-            return Errors.MediaConsumption.ConsumedDurationMustBeNonNegative;
         if (consumedDuration < ConsumedDuration)
             return Errors.MediaConsumption.ConsumedDurationCannotDecrease;
-        if (consecutivePagesRead < 0)
-            return Errors.MediaConsumption.ConsecutivePagesReadMustBeNonNegative;
         if (consecutivePagesRead > 0 && !IsPageBased(ruleResult.Value))
             return Errors.MediaConsumption.ConsecutivePagesReadIsOnlySupportedForPageBasedMedia;
         if (!DoesPositionMatchRule(ruleResult.Value, lastPosition))
@@ -369,8 +361,9 @@ public sealed class MediaConsumptionRecord : AggregateRoot<MediaConsumptionRecor
     /// <param name="lastPosition">The final position reported by the client, if the call carries one. When it is absent, the last known position is kept.</param>
     /// <param name="lastProgressFraction">The final progress fraction reported by the client.</param>
     /// <param name="consumedDuration">The active duration consumed by the session.</param>
+    /// <param name="consecutivePagesRead">The number of consecutive pages read in the session, when the client reported it. When it is absent, the count of the last progress report is kept.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful completion, or an error.</returns>
-    public Result<Updated> Complete(Optional<MediaPosition> lastPosition, double lastProgressFraction, TimeSpan consumedDuration)
+    public Result<Updated> Complete(Optional<MediaPosition> lastPosition, double lastProgressFraction, TimeSpan consumedDuration, Optional<int> consecutivePagesRead)
     {
         if (Status != ConsumptionStatus.InProgress)
             return Errors.MediaConsumption.ConsumptionIsAlreadyTerminal;
@@ -380,10 +373,10 @@ public sealed class MediaConsumptionRecord : AggregateRoot<MediaConsumptionRecor
             return Errors.MediaConsumption.UnsupportedMediaKind;
         if (!IsProgressFractionValid(lastProgressFraction))
             return Errors.MediaConsumption.InvalidProgressFraction;
-        if (consumedDuration < TimeSpan.Zero)
-            return Errors.MediaConsumption.ConsumedDurationMustBeNonNegative;
         if (consumedDuration < ConsumedDuration)
             return Errors.MediaConsumption.ConsumedDurationCannotDecrease;
+        if (consecutivePagesRead.HasValue && consecutivePagesRead.Value > 0 && !IsPageBased(ruleResult.Value))
+            return Errors.MediaConsumption.ConsecutivePagesReadIsOnlySupportedForPageBasedMedia;
         if (!DoesPositionMatchRule(ruleResult.Value, lastPosition))
             return Errors.MediaConsumption.InvalidMediaPosition;
 
@@ -391,6 +384,8 @@ public sealed class MediaConsumptionRecord : AggregateRoot<MediaConsumptionRecor
             LastPosition = lastPosition;
         LastProgressFraction = lastProgressFraction;
         ConsumedDuration = consumedDuration;
+        if (consecutivePagesRead.HasValue)
+            ConsecutivePagesRead = consecutivePagesRead.Value;
         Status = ConsumptionStatus.Completed;
 
         DateTime occurredOnUtc = GetNextActivityOnUtc();
@@ -418,8 +413,9 @@ public sealed class MediaConsumptionRecord : AggregateRoot<MediaConsumptionRecor
     /// <param name="lastPosition">The final position reported by the client, if the call carries one. When it is absent, the last known position is kept.</param>
     /// <param name="lastProgressFraction">The final progress fraction reported by the client.</param>
     /// <param name="consumedDuration">The active duration consumed by the session.</param>
+    /// <param name="consecutivePagesRead">The number of consecutive pages read in the session, when the client reported it. When it is absent, the count of the last progress report is kept.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful stop, or an error.</returns>
-    public Result<Updated> Stop(Optional<MediaPosition> lastPosition, double lastProgressFraction, TimeSpan consumedDuration)
+    public Result<Updated> Stop(Optional<MediaPosition> lastPosition, double lastProgressFraction, TimeSpan consumedDuration, Optional<int> consecutivePagesRead)
     {
         if (Status != ConsumptionStatus.InProgress)
             return Errors.MediaConsumption.ConsumptionIsAlreadyTerminal;
@@ -429,10 +425,10 @@ public sealed class MediaConsumptionRecord : AggregateRoot<MediaConsumptionRecor
             return Errors.MediaConsumption.UnsupportedMediaKind;
         if (!IsProgressFractionValid(lastProgressFraction))
             return Errors.MediaConsumption.InvalidProgressFraction;
-        if (consumedDuration < TimeSpan.Zero)
-            return Errors.MediaConsumption.ConsumedDurationMustBeNonNegative;
         if (consumedDuration < ConsumedDuration)
             return Errors.MediaConsumption.ConsumedDurationCannotDecrease;
+        if (consecutivePagesRead.HasValue && consecutivePagesRead.Value > 0 && !IsPageBased(ruleResult.Value))
+            return Errors.MediaConsumption.ConsecutivePagesReadIsOnlySupportedForPageBasedMedia;
         if (!DoesPositionMatchRule(ruleResult.Value, lastPosition))
             return Errors.MediaConsumption.InvalidMediaPosition;
 
@@ -440,6 +436,8 @@ public sealed class MediaConsumptionRecord : AggregateRoot<MediaConsumptionRecor
             LastPosition = lastPosition;
         LastProgressFraction = lastProgressFraction;
         ConsumedDuration = consumedDuration;
+        if (consecutivePagesRead.HasValue)
+            ConsecutivePagesRead = consecutivePagesRead.Value;
         Status = ConsumptionStatus.Stopped;
 
         DateTime occurredOnUtc = GetNextActivityOnUtc();

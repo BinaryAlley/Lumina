@@ -28,18 +28,21 @@ public class StopConsumptionEndpointSummary : Summary<StopConsumptionEndpoint, S
         ExampleRequest = new StopConsumptionRequest(
             Position: new MediaPositionRequest("TimeOffset", 60, null),
             ProgressFraction: 0.6,
-            ConsumedDurationInSeconds: 60
+            ConsumedDurationInSeconds: 60,
+            ConsecutivePagesRead: 0
         );
         RequestExamples.Add(new RequestExample(new StopConsumptionRequest(
             Position: new MediaPositionRequest("Location", null, "epubcfi(/6/6[chapter-2]!/4/2/2)"),
             ProgressFraction: 0.18,
-            ConsumedDurationInSeconds: 300
+            ConsumedDurationInSeconds: 300,
+            ConsecutivePagesRead: 6
         )));
         Params["recordId"] = "The Id of the consumption record.";
 
         RequestParam(request => request.Position, "The final position reported for the media item, if the client knows it. It carries the position Kind, and either TimeOffsetSeconds or Location. Optional.");
         RequestParam(request => request.ProgressFraction, "The final fraction of the media item that the client reached, between 0 and 1. Required.");
         RequestParam(request => request.ConsumedDurationInSeconds, "The active duration consumed by the session, in seconds. Required.");
+        RequestParam(request => request.ConsecutivePagesRead, "The number of consecutive pages read in the session, used by page based media such as books. It must be omitted or zero for other kinds; a positive value is rejected with a forbidden error. When omitted, the count stored by the last progress report is kept. Optional.");
 
         ResponseParam<ConsumptionRecordResponse>(record => record.Id, "The Id of the consumption record.");
         ResponseParam<ConsumptionRecordResponse>(record => record.LibraryId, "The Id of the media library that contains the consumed media item.");
@@ -93,7 +96,7 @@ public class StopConsumptionEndpointSummary : Summary<StopConsumptionEndpoint, S
             }
         );
 
-        Response(403, "The request failed because the authenticated request does not carry the identity of a user, or because the reported consumed duration is lower than the duration already stored for the session.", "application/problem+json",
+        Response(403, "The request failed because the authenticated request does not carry the identity of a user, because the reported consumed duration is lower than the duration already stored for the session, or because a positive consecutive page count was reported for a kind of media that is not page based.", "application/problem+json",
             example: new[]
             {
                 new
@@ -111,6 +114,15 @@ public class StopConsumptionEndpointSummary : Summary<StopConsumptionEndpoint, S
                     title = "General.Forbidden",
                     status = 403,
                     detail = "ConsumedDurationCannotDecrease",
+                    instance = "/api/v1/users/me/consumption-records/2c1b0a9f-8e7d-4c6b-5a4f-3e2d1c0b9a8f/stop",
+                    traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.4",
+                    title = "General.Forbidden",
+                    status = 403,
+                    detail = "ConsecutivePagesReadIsOnlySupportedForPageBasedMedia",
                     instance = "/api/v1/users/me/consumption-records/2c1b0a9f-8e7d-4c6b-5a4f-3e2d1c0b9a8f/stop",
                     traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
                 }
@@ -170,7 +182,8 @@ public class StopConsumptionEndpointSummary : Summary<StopConsumptionEndpoint, S
                             "InvalidMediaPosition",
                             "InvalidProgressFraction",
                             "ConsumedDurationMustBeNonNegative",
-                            "ConsumedDurationIsOutOfRange"
+                            "ConsumedDurationIsOutOfRange",
+                            "ConsecutivePagesReadMustBeNonNegative"
                         }
                     }
                 },

@@ -6,7 +6,7 @@ namespace Lumina.Presentation.Web.Common.Routes;
 public static partial class ApiRoutes
 {
     /// <summary>
-    /// Routes for the media consumption lifecycle endpoints of the remote API.
+    /// Routes for the media consumption lifecycle and resume point endpoints of the remote API.
     /// </summary>
     public static class MediaConsumption
     {
@@ -14,5 +14,6 @@ public static partial class ApiRoutes
         public const string REPORT_CONSUMPTION_PROGRESS = "users/me/consumption-records/{recordId}/progress";
         public const string COMPLETE_CONSUMPTION = "users/me/consumption-records/{recordId}/complete";
         public const string STOP_CONSUMPTION = "users/me/consumption-records/{recordId}/stop";
+        public const string GET_RESUME_POINT = "users/me/media-resume-points/{mediaKind}/{mediaItemId}";
     }
 }

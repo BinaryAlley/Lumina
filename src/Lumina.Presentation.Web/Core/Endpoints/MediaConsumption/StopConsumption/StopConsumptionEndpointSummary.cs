@@ -29,11 +29,13 @@ public class StopConsumptionEndpointSummary : Summary<StopConsumptionEndpoint, S
         ExampleRequest = new StopConsumptionRequest(
             Position: new MediaPositionRequest("TimeOffset", 92.5, null),
             ProgressFraction: 0.31,
-            ConsumedDurationInSeconds: 92.5
+            ConsumedDurationInSeconds: 92.5,
+            ConsecutivePagesRead: 0
         );
         RequestParam(request => request.Position, "The final position reported for the media item, if the client knows it. It carries the position Kind, and either TimeOffsetSeconds or Location. Optional.");
         RequestParam(request => request.ProgressFraction, "The fraction of the media item that the client reached, between 0 and 1. Required.");
         RequestParam(request => request.ConsumedDurationInSeconds, "The active duration consumed by the session, in seconds. Required.");
+        RequestParam(request => request.ConsecutivePagesRead, "The number of consecutive pages read in the session, used by page based media such as books. It must be omitted or zero for other kinds; a positive value is rejected with a forbidden error. When omitted, the count stored by the last progress report is kept. Optional.");
 
         Response(200, "The consumption session is stopped and the updated record is returned.",
             example: new SuccessResponse<ConsumptionRecordDto>(true, new ConsumptionRecordDto(

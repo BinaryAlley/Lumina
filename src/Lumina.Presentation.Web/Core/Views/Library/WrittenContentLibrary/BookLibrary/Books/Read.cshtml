@@ -48,6 +48,33 @@
         const libraryIndexUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.INDEX)';
         const sectionUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_READING_SECTION, new { bookId = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`) + `?libraryId=${libraryId}&locationRef=`;
         const resourceUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_READING_RESOURCE, new { bookId = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`) + `?libraryId=${libraryId}&resourceKey=`;
+        const startConsumptionUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.MediaConsumption.START_CONSUMPTION, new { libraryId = Model.LibraryId, mediaKind = "Book", mediaItemId = Model.BookId })';
+        const resumePointUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.MediaConsumption.GET_RESUME_POINT, new { mediaKind = "Book", mediaItemId = Model.BookId })';
+        const reportConsumptionProgressUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.MediaConsumption.REPORT_CONSUMPTION_PROGRESS, new { recordId = default(Guid) })';
+        const completeConsumptionUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.MediaConsumption.COMPLETE_CONSUMPTION, new { recordId = default(Guid) })';
+        const stopConsumptionUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.MediaConsumption.STOP_CONSUMPTION, new { recordId = default(Guid) })';
+        const EMPTY_GUID = '00000000-0000-0000-0000-000000000000';
+        // The position kind of an opaque book location, as the consumption API names it.
+        const LOCATION_POSITION_KIND = 'Location';
+        // The interval, in milliseconds, at which the heartbeat advances the active reading clock. The clock is paused while
+        // the tab is hidden, so time spent on another tab is not counted as reading time.
+        const READING_HEARTBEAT_INTERVAL_MS = 1000;
+        // The longest wall clock interval, in milliseconds, that one heartbeat may add to the active reading time. A much larger
+        // interval comes from a device sleep, a closed lid, or a frozen tab, so it is not active reading time. The margin covers
+        // a late heartbeat while still bounding how much idle time can be counted.
+        const READING_MAX_ACCUMULATED_INTERVAL_MS = READING_HEARTBEAT_INTERVAL_MS + 5000;
+        // The time, in milliseconds, after which a background consumption request is abandoned. Reporting is best effort, so a slow
+        // or hung request must never stop the next report of the reading session from being sent.
+        const CONSUMPTION_REQUEST_TIMEOUT_MS = 5000;
+        // The time, in milliseconds, after which the optional resume point lookup is abandoned. The lookup is awaited before the
+        // first section, because its result chooses that section, so this bounds the wait. The manifest fetch itself is bounded only
+        // by the browser and the server, not by the reader.
+        const RESUME_POINT_REQUEST_TIMEOUT_MS = 5000;
+        // Marks a section request that was redirected to the sign in page, so its caller navigates instead of reporting a failure.
+        const REDIRECTED = Symbol('redirected');
+        // Marks a start request that did not settle within the bounded recovery wait, so the reader shows its failure state instead
+        // of opening a provisional first section that could overwrite the saved place.
+        const START_TIMED_OUT = Symbol('startTimedOut');
 
         // Escapes a string for safe interpolation into HTML markup; the table of contents labels and location references come from
         // the book file itself, so they are escaped before they are placed into innerHTML, keeping a malicious book from injecting markup.
@@ -80,11 +107,475 @@
 
         let manifest = null;
         let currentIndex = -1;
+        // The section the reader was last asked to open. It advances when navigation starts, so a second Next or Previous click
+        // during a section load targets the next section instead of requesting the section that is already loading again.
+        let requestedIndex = -1;
+        // Identifies the newest section request, so a slow response that was superseded by a later navigation is ignored.
+        let sectionLoadSequence = 0;
+        // Aborts the section request that was superseded, so its failure never reaches the error notification after the reader left it.
+        let sectionLoadAbortController = null;
         let fontSize = 18;
+        // The consumption record of the current reader session. The object identity keeps a session that was replaced, such as a
+        // page restored from the back forward cache while its start request is still in flight, from writing into the session that
+        // replaced it.
+        let consumptionSession = null;
+        // A session whose start request was still in flight when the page was hidden. A restored page revives it instead of
+        // starting a second record for the same reading session.
+        let pendingConsumptionSession = null;
+        let isConsumptionSessionFinished = false;
+        let isConsumptionSessionCompleted = false;
+        // The number of pages read consecutively in the current forward run, including the page the run starts on. The reader
+        // paginates by spine section: a PDF page is a section of its own, and a reflowable book advances one section at a time.
+        let consecutivePagesRead = 0;
+        // The active reading clock. Only the time during which the reader is visible is accumulated.
+        let activeReadingMilliseconds = 0;
+        let readingClockStartedOnMs = null;
+        let readingHeartbeatTimer = null;
 
-        // Loads the reading manifest of the book, and opens the first reading section.
+        // Builds the URL of a consumption record route from its template and the Id of the record.
+        function buildConsumptionRecordUrl(routeTemplate, recordId) {
+            return routeTemplate.replace(EMPTY_GUID, encodeURIComponent(recordId));
+        }
+
+        // Rounds the accumulated reading duration, so it is sent as a stable, readable number of seconds.
+        function roundConsumptionDuration(value) {
+            const number = Number(value);
+            return Number.isFinite(number) ? Math.round(number * 1000) / 1000 : 0;
+        }
+
+        // Gets the position of the section the reader currently shows, as the opaque location the consumption API stores for books.
+        function buildReadingPosition() {
+            if (!manifest || !manifest.spine || currentIndex < 0 || currentIndex >= manifest.spine.length)
+                return null;
+            return {
+                kind: LOCATION_POSITION_KIND,
+                timeOffsetSeconds: null,
+                location: manifest.spine[currentIndex].locationRef
+            };
+        }
+
+        // Gets the fraction of the book read so far. The current section counts as read, so the last section is the whole book.
+        function getReadingProgressFraction() {
+            if (!manifest || !manifest.spine || manifest.spine.length === 0 || currentIndex < 0)
+                return 0;
+            return Math.min(1, (currentIndex + 1) / manifest.spine.length);
+        }
+
+        // Starts the active reading clock, unless it is already running.
+        function startReadingClock() {
+            if (readingClockStartedOnMs === null)
+                readingClockStartedOnMs = Date.now();
+        }
+
+        // Adds the reading time elapsed since the clock was last advanced, and restarts the measured interval.
+        function accumulateActiveReadingTime() {
+            if (readingClockStartedOnMs === null)
+                return;
+            const now = Date.now();
+            const elapsedMilliseconds = Math.max(0, now - readingClockStartedOnMs);
+            activeReadingMilliseconds += Math.min(elapsedMilliseconds, READING_MAX_ACCUMULATED_INTERVAL_MS);
+            readingClockStartedOnMs = now;
+        }
+
+        // Stops the active reading clock, keeping the time accumulated so far.
+        function pauseReadingClock() {
+            accumulateActiveReadingTime();
+            readingClockStartedOnMs = null;
+        }
+
+        // Gets the active reading duration, in seconds, accumulated while the reader was visible.
+        function getActiveReadingSeconds() {
+            accumulateActiveReadingTime();
+            return roundConsumptionDuration(Math.max(0, activeReadingMilliseconds / 1000));
+        }
+
+        // Pauses the active reading clock when the tab goes to the background, and resumes it when the reader is shown again,
+        // so reading in another tab or waiting while the tab is hidden never counts as active reading time.
+        function handleVisibilityChange() {
+            // The heartbeat only exists while a reading session is active, so before the first section starts it there is no clock to pause.
+            if (readingHeartbeatTimer === null)
+                return;
+            if (document.visibilityState === 'hidden')
+                pauseReadingClock();
+            else
+                startReadingClock();
+        }
+
+        // Starts the heartbeat that advances the active reading clock while the reader is open.
+        function startReadingHeartbeat() {
+            if (document.visibilityState !== 'hidden')
+                startReadingClock();
+            if (readingHeartbeatTimer === null)
+                readingHeartbeatTimer = window.setInterval(accumulateActiveReadingTime, READING_HEARTBEAT_INTERVAL_MS);
+        }
+
+        // Stops the heartbeat and the active reading clock when the reader session ends.
+        function stopReadingHeartbeat() {
+            if (readingHeartbeatTimer !== null) {
+                window.clearInterval(readingHeartbeatTimer);
+                readingHeartbeatTimer = null;
+            }
+            pauseReadingClock();
+        }
+
+        // Sends a consumption request in the background, with the anti-forgery token the page rendered. Reporting is a background
+        // concern, so a failed request is only logged and never interrupts or fails the reading itself.
+        async function sendConsumptionRequestAsync(url, payload, options = {}) {
+            if (!url)
+                return null;
+            // A terminal report is sent with keepalive so the browser finishes it after the page is gone, and it is not aborted,
+            // because the page may already be unloading while it is still in flight. The start request is also not aborted, because
+            // a slow start can still succeed and its response carries the only record identifier the client can report against.
+            const shouldAbortOnTimeout = options.keepalive !== true && options.shouldAbortOnTimeout !== false;
+            const abortController = shouldAbortOnTimeout ? new AbortController() : null;
+            const abortTimeoutIdentifier = abortController === null
+                ? null
+                : window.setTimeout(() => abortController.abort(), CONSUMPTION_REQUEST_TIMEOUT_MS);
+            try {
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                };
+                const token = document.querySelector('input[name="__RequestVerificationToken"]');
+                if (token && token.value)
+                    headers['RequestVerificationToken'] = token.value;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(payload ?? {}),
+                    signal: abortController === null ? undefined : abortController.signal,
+                    keepalive: options.keepalive === true
+                });
+                // An expired session is redirected to the sign in page. Following it in the background would parse an HTML page as
+                // JSON and silently drop the rest of the history, so the reader navigates to the sign in page instead.
+                if (response.redirected) {
+                    window.location.href = response.url;
+                    return null;
+                }
+                if (!response.ok)
+                    return null;
+                const jsonResponse = await response.json();
+                return jsonResponse && jsonResponse.success === true ? jsonResponse.data : null;
+            } catch (error) {
+                console.debug('Book reader: a consumption request could not be sent.', error);
+                return null;
+            } finally {
+                if (abortTimeoutIdentifier !== null)
+                    window.clearTimeout(abortTimeoutIdentifier);
+            }
+        }
+
+        // Fetches the resume point of the current user for the book. It returns the resume point, null when the user has none, or
+        // undefined when the optional lookup failed. A failed lookup must not be treated as an absent one, because opening the first
+        // section and reporting it would overwrite the saved place with the start of the book.
+        async function fetchResumePointAsync() {
+            if (!resumePointUrl)
+                return undefined;
+            const abortController = new AbortController();
+            const abortTimeoutIdentifier = window.setTimeout(() => abortController.abort(), RESUME_POINT_REQUEST_TIMEOUT_MS);
+            try {
+                const response = await fetch(resumePointUrl, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    signal: abortController.signal
+                });
+                if (response.redirected) {
+                    window.location.href = response.url;
+                    return undefined;
+                }
+                if (!response.ok)
+                    return undefined;
+                const jsonResponse = await response.json();
+                // The web endpoint answers an absent resume point with a successful response that carries no data. Any other
+                // response shape is a failure of the optional lookup, not a statement that the user has no saved place.
+                if (!jsonResponse || jsonResponse.success !== true)
+                    return undefined;
+                return jsonResponse.data;
+            } catch (error) {
+                console.debug('Book reader: the resume point could not be fetched.', error);
+                return undefined;
+            } finally {
+                window.clearTimeout(abortTimeoutIdentifier);
+            }
+        }
+
+        // Resolves the section the resume point refers to. A locator that is missing, or that is no longer part of the spine,
+        // falls back to the first section, so a stale resume point never keeps the reader from opening the book.
+        function getInitialSectionIndex(resumePoint) {
+            const position = resumePoint ? resumePoint.lastPosition : null;
+            const location = position ? position.location : null;
+            if (!manifest || !manifest.spine || !location)
+                return 0;
+            const index = manifest.spine.findIndex(item => item.locationRef === location);
+            return index >= 0 ? index : 0;
+        }
+
+        // Creates the state of one consumption session. The object identity is what lets a session that was replaced, such as one
+        // whose start request is still in flight when the page is restored from the back forward cache, still close the record it
+        // created instead of writing into the session that replaced it.
+        function createConsumptionSession() {
+            return {
+                recordId: null,
+                startPromise: null,
+                startSettled: false,
+                pendingEndPayload: null,
+                pendingEndOutcome: null,
+                progressSender: null,
+                pendingProgressPayload: null
+            };
+        }
+
+        // Gets the consumption session of the reader session, creating it when the first section opens.
+        function ensureConsumptionSession() {
+            if (consumptionSession === null)
+                consumptionSession = createConsumptionSession();
+            return consumptionSession;
+        }
+
+        // Starts the consumption record of the reader session, once the first section is displayed. The start is attempted once
+        // per session; a restored page starts a new session only when the previous start settled without a record.
+        function ensureConsumptionSessionStartedAsync() {
+            const session = ensureConsumptionSession();
+            if (session.startPromise === null)
+                session.startPromise = startConsumptionSessionAsync(session);
+            return session.startPromise;
+        }
+
+        async function startConsumptionSessionAsync(session) {
+            // The start is not aborted by the progress report timeout: a slow start can still succeed, and aborting it would resolve
+            // the session to no record id permanently even when the server created the record.
+            const record = await sendConsumptionRequestAsync(startConsumptionUrl, {}, { shouldAbortOnTimeout: false });
+            session.startSettled = true;
+            const recordId = record && record.id ? String(record.id) : '';
+            if (!recordId)
+                return null;
+            session.recordId = recordId;
+            // The session was ended and detached while the start request was in flight, so it still has a terminal payload to send.
+            // The record this request created is closed here with that payload, so it never stays in progress.
+            if (session.pendingEndPayload !== null)
+                finishEndedConsumptionSessionAsync(session).catch((error) => {
+                    console.debug('Book reader: the consumption record of the replaced session could not be ended.', error);
+                });
+            return record;
+        }
+
+        // Queues a progress report of a session. The payloads are absolute, so only the newest queued report matters: a fast skip
+        // through many sections replaces the pending payload instead of appending one write per section. The sender is per session,
+        // so the reports of an ended session can never delay the reports of the session that replaced it.
+        function queueConsumptionSessionProgressReport(session, payload) {
+            if (session === null || session.recordId === null)
+                return Promise.resolve();
+            session.pendingProgressPayload = payload;
+            if (session.progressSender === null)
+                session.progressSender = sendPendingConsumptionProgressAsync(session);
+            return session.progressSender;
+        }
+
+        async function sendPendingConsumptionProgressAsync(session) {
+            try {
+                while (session.pendingProgressPayload !== null) {
+                    const payload = session.pendingProgressPayload;
+                    session.pendingProgressPayload = null;
+                    const url = buildConsumptionRecordUrl(reportConsumptionProgressUrlTemplate, session.recordId);
+                    await sendConsumptionRequestAsync(url, payload);
+                }
+            } catch (error) {
+                console.debug('Book reader: a consumption progress report could not be sent.', error);
+            } finally {
+                session.progressSender = null;
+            }
+        }
+
+        // Sends the terminal request of an ended session. The terminal request carries the final page count and reading time, so it
+        // does not depend on a progress report that the document destruction of a page unload could cancel. It is also used by a start
+        // that resolves after its session was detached.
+        async function finishEndedConsumptionSessionAsync(session) {
+            if (session === null || session.recordId === null || session.pendingEndPayload === null || session.pendingEndOutcome === null)
+                return;
+            const endTemplate = session.pendingEndOutcome === 'complete' ? completeConsumptionUrlTemplate : stopConsumptionUrlTemplate;
+            await sendConsumptionRequestAsync(buildConsumptionRecordUrl(endTemplate, session.recordId), session.pendingEndPayload, { keepalive: true });
+        }
+
+        // Builds the body of a progress report: the section the reader shows, the fraction it represents, the active reading
+        // duration, and the number of consecutive pages read.
+        function buildReadingProgressPayload() {
+            return {
+                position: buildReadingPosition(),
+                // The fraction is not rounded: a page just before the last one of a large book would round up to 1, and a stop at
+                // that fraction would trip a 100 percent completion threshold and delete the resume point one page too early.
+                progressFraction: getReadingProgressFraction(),
+                consumedDurationInSeconds: getActiveReadingSeconds(),
+                consecutivePagesRead: consecutivePagesRead
+            };
+        }
+
+        // Builds the body of the terminal report of the session. It carries the page count as well, so a stop does not depend on a
+        // progress report that may still be in flight or that the page unload could cancel.
+        function buildReadingEndPayload() {
+            return {
+                position: buildReadingPosition(),
+                progressFraction: getReadingProgressFraction(),
+                consumedDurationInSeconds: getActiveReadingSeconds(),
+                consecutivePagesRead: consecutivePagesRead
+            };
+        }
+
+        // Ends the current consumption session, either as completed or as stopped. The payload is captured before the session is
+        // detached, so a restored page can reset the reading clock and the page count without changing what this session reports.
+        // When the start request is still in flight, its continuation either sends the captured terminal payload once the record
+        // identifier is known, or continues the revived session if the page is restored before that.
+        function finishConsumptionSession(outcome) {
+            if (isConsumptionSessionFinished)
+                return;
+            isConsumptionSessionFinished = true;
+            isConsumptionSessionCompleted = outcome === 'complete';
+            stopReadingHeartbeat();
+            const session = consumptionSession;
+            // No section was opened, so the reader never created a record to end.
+            if (session === null)
+                return;
+            session.pendingEndPayload = buildReadingEndPayload();
+            session.pendingEndOutcome = outcome;
+            // The terminal request carries the final state, so a progress report that has not been sent yet is obsolete.
+            session.pendingProgressPayload = null;
+            consumptionSession = null;
+            // A record whose start already resolved is closed now. A record whose start is still in flight is closed by the start
+            // continuation, which uses the payload captured above. A session whose start is still in flight is remembered, so a page
+            // restored from the back forward cache revives it instead of creating a second record for the same reading session.
+            if (session.recordId !== null)
+                finishEndedConsumptionSessionAsync(session).catch((error) => {
+                    console.debug('Book reader: the consumption record could not be ended.', error);
+                });
+            else if (outcome === 'stop' && !session.startSettled)
+                pendingConsumptionSession = session;
+        }
+
+        // Reports the progress of the reading session at the section the reader currently shows. The identity check ensures a
+        // report that was awaiting the start request cannot write into a session that replaced it.
+        async function reportReadingProgressAsync() {
+            if (isConsumptionSessionFinished)
+                return;
+            const session = ensureConsumptionSession();
+            await ensureConsumptionSessionStartedAsync();
+            if (isConsumptionSessionFinished || session !== consumptionSession || session.recordId === null)
+                return;
+            await queueConsumptionSessionProgressReport(session, buildReadingProgressPayload());
+        }
+
+        // Completes the reading session, because the reader reached the last section of the book. The terminal request carries the
+        // final page count and reading time, and the completion deletes the resume point of the book.
+        async function completeReadingSessionAsync() {
+            if (isConsumptionSessionFinished)
+                return;
+            // Starting is not awaited: when the start request is still in flight, the session captures the completion and its start
+            // continuation sends it once the record identifier is known.
+            ensureConsumptionSessionStartedAsync();
+            finishConsumptionSession('complete');
+        }
+
+        // Stops the reading session when the reader is left before the last section was reached. Stopping is best effort and must
+        // never keep the reader from leaving the page.
+        function stopReadingSession() {
+            finishConsumptionSession('stop');
+        }
+
+        // Stops the reading session during an AJAX navigation, when the page remains alive. The coalesced progress sender is awaited
+        // before the terminal, so the two writes do not race on the record version. The unload path keeps the immediate stop, and the
+        // server retries the terminal if it still conflicts.
+        async function stopReadingSessionOnNavigationAsync() {
+            if (isConsumptionSessionFinished)
+                return;
+            // The clock is stopped before the wait, so the terminal duration does not include the time spent flushing reports.
+            stopReadingHeartbeat();
+            const session = consumptionSession;
+            if (session !== null && session.progressSender !== null)
+                await session.progressSender;
+            finishConsumptionSession('stop');
+        }
+
+        // A page restored from the back forward cache keeps the reader on the section it showed. Its session was stopped when the
+        // page left, so a new session is started for the rest of the reading session, or the session whose start was still in flight
+        // is revived. A completed session is not restarted, because reaching the last section already ended the book. The finished
+        // state is reset even when the manifest or the first section has not resolved yet.
+        function handlePageShow(event) {
+            if (!event || event.persisted !== true)
+                return;
+            // A section load that was in flight when the page was frozen is invalidated, and navigation continues from the section
+            // that is actually displayed, not from a section that was requested but never shown. This is done even for a completed
+            // session, so a stale load cannot change the page the reader is left on, without restarting its reporting.
+            if (isInitialized && manifest && currentIndex >= 0) {
+                sectionLoadSequence++;
+                requestedIndex = currentIndex;
+                readerStatus.classList.add('hidden');
+                if (sectionLoadAbortController !== null) {
+                    sectionLoadAbortController.abort();
+                    sectionLoadAbortController = null;
+                }
+            }
+            if (isConsumptionSessionCompleted || !isConsumptionSessionFinished)
+                return;
+            isConsumptionSessionFinished = false;
+            // A session whose start request was still in flight when the page was hidden never received its record id, so it was
+            // neither stopped nor replaced. Reviving it keeps one record for the reading session. A session whose start already
+            // settled is not revived, because it either has a record that was closed or a start that cannot be retried from the
+            // same session.
+            const pendingSession = pendingConsumptionSession;
+            pendingConsumptionSession = null;
+            const canRevive = pendingSession !== null && pendingSession.recordId === null && !pendingSession.startSettled;
+            if (canRevive) {
+                pendingSession.pendingEndPayload = null;
+                pendingSession.pendingEndOutcome = null;
+                consumptionSession = pendingSession;
+            }
+            else
+                consumptionSession = null;
+            consecutivePagesRead = 1;
+            activeReadingMilliseconds = 0;
+            readingClockStartedOnMs = null;
+            if (!isInitialized || !manifest || currentIndex < 0)
+                return;
+            startReadingHeartbeat();
+            reportReadingProgressAsync().catch((error) => {
+                console.debug('Book reader: the reading session of the restored page could not be started.', error);
+            });
+        }
+
+        // Updates the page count and reports the section the reader just opened. The first section opens the reader session, a
+        // forward page advance into the last section completes it, and every other section reports its progress.
+        async function handleSectionOpenedAsync(previousIndex, index) {
+            // A section that finishes loading after the reader was left belongs to a finished session and must not open a new one.
+            if (isConsumptionSessionFinished)
+                return;
+            // The count follows pages read, not forward jumps alone: the first displayed page starts a run at one, and a backward
+            // navigation starts a new run at the page it lands on, so a run that begins after a backward jump counts that page as
+            // its first. This is what makes a six page read count in both cases, instead of one page short after going back.
+            if (previousIndex < 0 || index < previousIndex)
+                consecutivePagesRead = 1;
+            else if (index > previousIndex)
+                consecutivePagesRead += 1;
+            if (readingHeartbeatTimer === null)
+                startReadingHeartbeat();
+            // Only a forward page advance into the last section proves that the reading reached the end of the book. Opening
+            // the last section directly, such as on a single section book or from the table of contents, is not that proof, so it
+            // only reports progress and leaves the session open for the pages the reader turns afterwards. The Next control can
+            // still end the book explicitly from the last section.
+            const isForwardAdvance = previousIndex >= 0 && index === previousIndex + 1;
+            if (index === manifest.spine.length - 1 && isForwardAdvance)
+                await completeReadingSessionAsync();
+            else
+                await reportReadingProgressAsync();
+        }
+
+        // Loads the reading manifest of the book, and opens the section the user resumes at, or the first section when there is
+        // no resume point.
         async function loadManifestAsync() {
             readerStatus.textContent = jsLocalizedStrings.loading;
+            // The resume point is requested together with the manifest, so opening a book costs one round trip instead of two. A
+            // missing or stale resume point only means that the first section is opened.
+            const resumePointPromise = fetchResumePointAsync();
             const response = await fetch(manifestUrl, {
                 headers: {
                     'Accept': 'application/json',
@@ -122,11 +613,40 @@
                 readerStatus.textContent = jsLocalizedStrings.readFailed;
                 return;
             }
+            // The resume lookup, and the start it may need to recover a lost resume position, are resolved before the manifest is
+            // exposed to the navigation controls. Until then the toolbar and the table of contents cannot start a navigation, so the
+            // resume jump cannot discard a section the user already requested.
+            let resumePointResult = null;
+            let initialSectionRecord = null;
+            if (manifestResponse.spine && manifestResponse.spine.length > 0) {
+                resumePointResult = await resumePointPromise;
+                if (resumePointResult === undefined) {
+                    // The optional lookup failed, so the saved position is only available from the start response. The wait for it is
+                    // bounded, so a slow or hung start cannot hold the reader on the loading state. The start continues in the
+                    // background, but no section is opened provisionally, because reporting the first section could overwrite the
+                    // saved place.
+                    let startTimeoutIdentifier = null;
+                    const startTimeoutPromise = new Promise(resolve => {
+                        startTimeoutIdentifier = window.setTimeout(() => resolve(START_TIMED_OUT), RESUME_POINT_REQUEST_TIMEOUT_MS);
+                    });
+                    initialSectionRecord = await Promise.race([ensureConsumptionSessionStartedAsync(), startTimeoutPromise]);
+                    window.clearTimeout(startTimeoutIdentifier);
+                    if (initialSectionRecord === START_TIMED_OUT || initialSectionRecord === null) {
+                        readerStatus.textContent = jsLocalizedStrings.readFailed;
+                        notificationService.show(jsLocalizedStrings.readFailed, NotificationType.ERROR);
+                        return;
+                    }
+                }
+            }
             manifest = manifestResponse;
             readerTitle.textContent = manifest.title || '';
             renderTableOfContents(manifest.tableOfContents || []);
-            if (manifest.spine && manifest.spine.length > 0)
-                await goToIndexAsync(0);
+            if (manifest.spine && manifest.spine.length > 0) {
+                const initialIndex = resumePointResult === undefined
+                    ? getInitialSectionIndex(initialSectionRecord)
+                    : getInitialSectionIndex(resumePointResult);
+                await goToIndexAsync(initialIndex);
+            }
             else
                 readerStatus.textContent = jsLocalizedStrings.readFailed;
 
@@ -167,25 +687,81 @@
             }
         }
 
-        // Opens the reading section at the given spine index.
+        // Fetches the content of a reading section. A superseded request is aborted, so a failure of a section the reader already
+        // left never reaches the error notification. The caller decides when a genuine failure is shown.
+        async function fetchReadingSectionAsync(locationRef, signal) {
+            try {
+                const response = await fetch(sectionUrlTemplate + encodeURIComponent(locationRef), {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    signal
+                });
+                if (response.redirected) {
+                    window.location.href = response.url;
+                    return REDIRECTED;
+                }
+                if (!response.ok)
+                    return null;
+                const jsonResponse = await response.json();
+                return jsonResponse && jsonResponse.success === true ? jsonResponse.data : null;
+            } catch (error) {
+                if (!error || error.name !== 'AbortError')
+                    console.debug('Book reader: the reading section could not be fetched.', error);
+                return null;
+            }
+        }
+
+        // Opens the reading section at the given spine index, and reports the reading session for it.
         async function goToIndexAsync(index) {
             if (!manifest || index < 0 || index >= manifest.spine.length)
                 return;
-            currentIndex = index;
+            // The requested index advances before the section loads, so the navigation controls derive their next target from it
+            // instead of from the section that is still displayed.
+            requestedIndex = index;
+            const loadSequence = ++sectionLoadSequence;
+            // A new navigation aborts the previous section request, so its response can no longer render or report a failure the
+            // reader has already left.
+            if (sectionLoadAbortController !== null)
+                sectionLoadAbortController.abort();
+            const abortController = new AbortController();
+            sectionLoadAbortController = abortController;
             // The status line lives outside the content container, so that replacing the section content cannot destroy it; it is
             // shown while a section loads and hidden once the section is rendered, and a failing section load leaves it visible with
             // the failure message.
             readerStatus.classList.remove('hidden');
             readerStatus.textContent = jsLocalizedStrings.loading;
-            const response = await callApiGetAsync(sectionUrlTemplate + encodeURIComponent(manifest.spine[index].locationRef));
-            if (!response) {
+            const section = await fetchReadingSectionAsync(manifest.spine[index].locationRef, abortController.signal);
+            if (sectionLoadAbortController === abortController)
+                sectionLoadAbortController = null;
+            // A navigation made after this one supersedes its result, so a slow section can never overwrite the newer one or
+            // report the same page advance twice. An aborted request is silent, even when its failure arrives after the abort.
+            if (loadSequence !== sectionLoadSequence || abortController.signal.aborted || section === REDIRECTED)
+                return;
+            if (!section) {
                 readerStatus.textContent = jsLocalizedStrings.readFailed;
+                notificationService.show(jsLocalizedStrings.readFailed, NotificationType.ERROR);
+                // The failed section was never displayed, so the navigation controls retry from the section that is still shown.
+                requestedIndex = currentIndex;
                 return;
             }
-            readerContent.innerHTML = response.contentHtml || '';
+            const previousIndex = currentIndex;
+            currentIndex = index;
+            readerContent.innerHTML = section.contentHtml || '';
             resolveResources();
             updatePosition();
             readerStatus.classList.add('hidden');
+            // Reporting runs in the background, so a slow consumption endpoint never delays showing the section.
+            handleSectionOpenedAsync(previousIndex, index).catch((error) => {
+                console.debug('Book reader: the reading session could not be reported.', error);
+            });
+        }
+
+        // Gets the section the navigation controls move from: the section already requested while another one is loading, or
+        // the section that is currently displayed.
+        function getRequestedSectionIndex() {
+            return requestedIndex >= 0 ? requestedIndex : currentIndex;
         }
 
         // Resolves the resource marker attributes of the rendered content, pointing them at the reading resource endpoint.
@@ -254,12 +830,22 @@
 
         // On previous button click, opens the previous reading section.
         function handlePrevClick() {
-            goToIndexAsync(currentIndex - 1);
+            goToIndexAsync(getRequestedSectionIndex() - 1);
         }
 
-        // On next button click, opens the next reading section.
+        // On next button click, opens the next reading section. At the requested last section, once it is also the displayed
+        // section, it ends the book explicitly. Both values are checked, so a Next pressed while a backward navigation is loading
+        // moves back to the requested section instead of completing the book the user is leaving.
         function handleNextClick() {
-            goToIndexAsync(currentIndex + 1);
+            const requestedSectionIndex = getRequestedSectionIndex();
+            if (manifest && requestedSectionIndex >= 0 && requestedSectionIndex === manifest.spine.length - 1 &&
+                currentIndex === requestedSectionIndex) {
+                completeReadingSessionAsync().catch((error) => {
+                    console.debug('Book reader: the reading session could not be completed.', error);
+                });
+                return;
+            }
+            goToIndexAsync(requestedSectionIndex + 1);
         }
 
         // Applies the current font size to the reading content.
@@ -288,6 +874,10 @@
         btnFontDecrease.addEventListener('click', handleFontDecreaseClick);
         btnFontIncrease.addEventListener('click', handleFontIncreaseClick);
         document.addEventListener('DOMContentLoaded', InitializeAsync);
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        // A full page unload does not run the view cleanups, so the last reading time and page are also stopped on pagehide.
+        window.addEventListener('pagehide', stopReadingSession);
+        window.addEventListener('pageshow', handlePageShow);
 
         // Register cleanup for these listeners.
         cleanupFunctions.push(() => {
@@ -299,6 +889,16 @@
             btnFontDecrease.removeEventListener('click', handleFontDecreaseClick);
             btnFontIncrease.removeEventListener('click', handleFontIncreaseClick);
             document.removeEventListener('DOMContentLoaded', InitializeAsync);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            window.removeEventListener('pagehide', stopReadingSession);
+            window.removeEventListener('pageshow', handlePageShow);
+            // Abort a section that is still loading, so its failure cannot show a notification after the reader is gone.
+            if (sectionLoadAbortController !== null)
+                sectionLoadAbortController.abort();
+            // The page remains alive during an AJAX navigation, so the progress sender is awaited before the terminal request.
+            stopReadingSessionOnNavigationAsync().catch((error) => {
+                console.debug('Book reader: the consumption record could not be stopped.', error);
+            });
         });
 
         // Initializes the reader, loading the reading manifest of the book; the DOMContentLoaded listener covers the initial

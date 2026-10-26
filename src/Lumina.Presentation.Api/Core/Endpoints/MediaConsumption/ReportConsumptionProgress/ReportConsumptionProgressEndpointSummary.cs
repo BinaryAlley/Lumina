@@ -42,7 +42,7 @@ public class ReportConsumptionProgressEndpointSummary : Summary<ReportConsumptio
         RequestParam(request => request.Position, "The last position reported for the media item, if the client knows it. It carries the position Kind, and either TimeOffsetSeconds or Location. Optional.");
         RequestParam(request => request.ProgressFraction, "The fraction of the media item that the client reached, between 0 and 1. Required.");
         RequestParam(request => request.ConsumedDurationInSeconds, "The active duration consumed by the session, in seconds. Required.");
-        RequestParam(request => request.ConsecutivePagesRead, "The number of consecutive pages read in the current session, used by page based media such as books. Optional, defaults to 0.");
+        RequestParam(request => request.ConsecutivePagesRead, "The number of consecutive pages read in the current session, used by page based media such as books. It must be zero for other kinds; a positive value is rejected with a forbidden error. Optional, defaults to 0.");
 
         ResponseParam<ConsumptionRecordResponse>(record => record.Id, "The Id of the consumption record.");
         ResponseParam<ConsumptionRecordResponse>(record => record.LibraryId, "The Id of the media library that contains the consumed media item.");

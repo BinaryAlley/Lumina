@@ -6,7 +6,7 @@ namespace Lumina.Presentation.Web.Common.Routes;
 public static partial class WebRoutes
 {
     /// <summary>
-    /// Routes for the media consumption lifecycle actions the browser clients report to, proxied to the remote API.
+    /// Routes for the media consumption lifecycle actions and resume points the browser clients report to, proxied to the remote API.
     /// </summary>
     public static class MediaConsumption
     {
@@ -14,5 +14,6 @@ public static partial class WebRoutes
         public const string REPORT_CONSUMPTION_PROGRESS = "{culture}/media-consumption/api-report-consumption-progress/{recordId}";
         public const string COMPLETE_CONSUMPTION = "{culture}/media-consumption/api-complete-consumption/{recordId}";
         public const string STOP_CONSUMPTION = "{culture}/media-consumption/api-stop-consumption/{recordId}";
+        public const string GET_RESUME_POINT = "{culture}/media-consumption/api-get-resume-point/{mediaKind}/{mediaItemId}";
     }
 }

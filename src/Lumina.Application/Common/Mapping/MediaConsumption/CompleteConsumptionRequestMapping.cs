@@ -24,7 +24,8 @@ public static class CompleteConsumptionRequestMapping
             request.Position?.TimeOffsetSeconds,
             request.Position?.Location,
             request.ProgressFraction,
-            request.ConsumedDurationInSeconds
+            request.ConsumedDurationInSeconds,
+            request.ConsecutivePagesRead
         );
     }
 }
