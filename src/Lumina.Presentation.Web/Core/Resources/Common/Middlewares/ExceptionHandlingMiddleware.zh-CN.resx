@@ -217,22 +217,22 @@
     <value>已完成扫描任务数量必须为正数！</value>
   </data>
   <data name="ContributorDisplayNameCannotBeEmpty" xml:space="preserve">
-    <value>参与者显示名称不能为空！</value>
+    <value>贡献者显示名称不能为空！</value>
   </data>
   <data name="ContributorDisplayNameMustBeMaximum100CharactersLong" xml:space="preserve">
-    <value>参与者显示名称最多只能有100个字符！</value>
+    <value>贡献者显示名称最多只能有100个字符！</value>
   </data>
   <data name="ContributorLegalNameMustBeMaximum100CharactersLong" xml:space="preserve">
-    <value>参与者法定姓名最多只能有100个字符！</value>
+    <value>贡献者法定姓名最多只能有100个字符！</value>
   </data>
   <data name="ContributorNameCannotBeEmpty" xml:space="preserve">
-    <value>参与者姓名不能为空！</value>
+    <value>贡献者姓名不能为空！</value>
   </data>
   <data name="ContributorRoleCannotBeNull" xml:space="preserve">
-    <value>参与者角色不能为空！</value>
+    <value>贡献者角色不能为空！</value>
   </data>
   <data name="ContributorsListCannotBeNull" xml:space="preserve">
-    <value>参与者列表不能为空！</value>
+    <value>贡献者列表不能为空！</value>
   </data>
   <data name="CorsOriginIsInvalid" xml:space="preserve">
     <value>CORS来源无效！</value>
@@ -907,7 +907,7 @@
     <value>该专辑已经存在！</value>
   </data>
   <data name="AlbumIdCannotBeEmpty" xml:space="preserve">
-    <value>相册ID不能为空！</value>
+    <value>专辑ID不能为空！</value>
   </data>
   <data name="AlbumNotFound" xml:space="preserve">
     <value>找不到专辑！</value>
@@ -1024,25 +1024,25 @@
     <value>已结束的消费必须有结束时间！</value>
   </data>
   <data name="FavoriteAlreadyExists" xml:space="preserve">
-    <value>最喜欢的已经存在了！</value>
+    <value>收藏已存在！</value>
   </data>
   <data name="FavoriteMediaItemIdCannotBeEmpty" xml:space="preserve">
     <value>收藏的媒体项 ID 不能为空！</value>
   </data>
   <data name="FavoriteMediaItemIdsCannotBeEmpty" xml:space="preserve">
-    <value>最喜欢的媒体项目 ID 列表不能为空！</value>
+    <value>收藏的媒体项 ID 列表不能为空！</value>
   </data>
   <data name="FavoriteMediaItemIdsExceedMaximumCount" xml:space="preserve">
-    <value>最喜欢的媒体项目 ID 列表超出了最大计数！</value>
+    <value>收藏的媒体项 ID 列表超出最大数量！</value>
   </data>
   <data name="FavoriteMediaKindIsInvalid" xml:space="preserve">
-    <value>最喜欢的媒体类型无效！</value>
+    <value>收藏的媒体类型无效！</value>
   </data>
   <data name="FavoriteMediaKindIsNotSupported" xml:space="preserve">
-    <value>不支持最喜欢的媒体类型！</value>
+    <value>不支持收藏的媒体类型！</value>
   </data>
   <data name="FavoriteNotFound" xml:space="preserve">
-    <value>没有找到最喜欢的！</value>
+    <value>找不到收藏！</value>
   </data>
   <data name="FileTooLarge" xml:space="preserve">
     <value>文件太大！</value>
@@ -1084,13 +1084,13 @@
     <value>位置参考不能为空！</value>
   </data>
   <data name="MediaContributorAlreadyExists" xml:space="preserve">
-    <value>媒体投稿人已经存在！</value>
+    <value>媒体贡献者已存在！</value>
   </data>
   <data name="MediaContributorNameCannotBeEmpty" xml:space="preserve">
-    <value>媒体投稿人姓名不能为空！</value>
+    <value>媒体贡献者名称不能为空！</value>
   </data>
   <data name="MediaContributorRoleNameCannotBeEmpty" xml:space="preserve">
-    <value>媒体投稿人角色名称不能为空！</value>
+    <value>媒体贡献者角色名称不能为空！</value>
   </data>
   <data name="MediaItemIdCannotBeEmpty" xml:space="preserve">
     <value>媒体项 Id不能为空！</value>
@@ -1111,7 +1111,7 @@
     <value>MusicBrainz Id 格式无效！</value>
   </data>
   <data name="NoReaderAvailable" xml:space="preserve">
-    <value>没有读者可以阅读这本书！</value>
+    <value>没有可用的图书阅读器能够打开此图书。</value>
   </data>
   <data name="NoSupportedPlaybackFormat" xml:space="preserve">
     <value>未找到支持的播放格式！</value>
@@ -1123,7 +1123,7 @@
     <value>曲目规范化失败！</value>
   </data>
   <data name="NormalizationIsNotRequiredForDirectPlay" xml:space="preserve">
-    <value>直接播放不需要标准化！</value>
+    <value>直接播放不需要规范化！</value>
   </data>
   <data name="NormalizationTimedOut" xml:space="preserve">
     <value>曲目规范化超时！</value>
@@ -1198,7 +1198,7 @@
     <value>播放列表类型无效！</value>
   </data>
   <data name="ReaderDisabled" xml:space="preserve">
-    <value>该库的读者已被禁用！</value>
+    <value>打开此图书的图书阅读器已在此媒体库中禁用。在媒体库设置中启用它即可阅读该图书。</value>
   </data>
   <data name="ResourceKeyCannotBeEmpty" xml:space="preserve">
     <value>资源键不能为空！</value>

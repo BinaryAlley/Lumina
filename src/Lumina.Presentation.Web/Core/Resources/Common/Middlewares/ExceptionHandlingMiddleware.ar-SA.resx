@@ -1111,7 +1111,7 @@
     <value>تنسيق معرف MusicBrainz غير صالح!</value>
   </data>
   <data name="NoReaderAvailable" xml:space="preserve">
-    <value>لا يوجد قارئ متاح لهذا الكتاب!</value>
+    <value>لا يوجد قارئ كتب متاح لهذا الكتاب!</value>
   </data>
   <data name="NoSupportedPlaybackFormat" xml:space="preserve">
     <value>لم يتم العثور على تنسيق تشغيل مدعوم!</value>
@@ -1198,7 +1198,7 @@
     <value>نوع قائمة التشغيل غير صالح!</value>
   </data>
   <data name="ReaderDisabled" xml:space="preserve">
-    <value>تم تعطيل القارئ لهذه المكتبة!</value>
+    <value>قارئ الكتب معطل لهذه المكتبة!</value>
   </data>
   <data name="ResourceKeyCannotBeEmpty" xml:space="preserve">
     <value>لا يمكن أن يكون مفتاح المورد فارغًا!</value>

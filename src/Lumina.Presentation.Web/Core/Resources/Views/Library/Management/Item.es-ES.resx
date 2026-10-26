@@ -312,9 +312,6 @@
   <data name="WrittenContent" xml:space="preserve">
     <value>Contenido Escrito</value>
   </data>
-  <data name="YouTube" xml:space="preserve">
-    <value>YouTube</value>
-  </data>
   <data name="Name" xml:space="preserve">
     <value>Nombre</value>
   </data>

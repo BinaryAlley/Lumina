@@ -35,7 +35,7 @@
     <div id="reader-content" class="reader-content"></div>
 </div>
 @section Scripts {
-    <!-- The "text/plain" type is a design choice, not a mistake: it keeps the browser from executing this view script during HTML parsing, before site.js defines the API helpers it calls (callApiGetAsync, callApiPutAsync, ...). site.js (which loads deferred) executes these scripts once it is loaded, both on the initial page load and during AJAX navigation. -->
+    <!-- The "text/plain" type is a design choice, not a mistake: it keeps the browser from executing this view script during HTML parsing, before the deferred global scripts define the helpers it calls (notificationService, updateContentAsync, ...). Those scripts execute these view scripts once they are loaded, both on the initial page load and during AJAX navigation. -->
     <script type="text/plain" data-form="@scriptId">
         // Create cleanup registry for this view.
         const cleanupFunctions = [];
@@ -46,6 +46,9 @@
         const manifestUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_READING_MANIFEST, new { bookId = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`) + `?libraryId=${libraryId}`;
         const availabilityUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_READING_AVAILABILITY, new { bookId = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`) + `?libraryId=${libraryId}`;
         const libraryIndexUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.INDEX)';
+        // The login route takes the page to return to as an optional route value. The template is kept, so the reader can append
+        // the current page to it when a JSON request discovers that the session ended.
+        const signInUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Authentication.LOGIN_VIEW)';
         const sectionUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_READING_SECTION, new { bookId = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`) + `?libraryId=${libraryId}&locationRef=`;
         const resourceUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_READING_RESOURCE, new { bookId = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`) + `?libraryId=${libraryId}&resourceKey=`;
         const startConsumptionUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.MediaConsumption.START_CONSUMPTION, new { libraryId = Model.LibraryId, mediaKind = "Book", mediaItemId = Model.BookId })';
@@ -70,7 +73,8 @@
         // first section, because its result chooses that section, so this bounds the wait. The manifest fetch itself is bounded only
         // by the browser and the server, not by the reader.
         const RESUME_POINT_REQUEST_TIMEOUT_MS = 5000;
-        // Marks a section request that was redirected to the sign in page, so its caller navigates instead of reporting a failure.
+        // Marks a request that ended the reading session and is navigating to the sign in page, so its caller does not report a
+        // failure. It is used by the resume point lookup and by the section request.
         const REDIRECTED = Symbol('redirected');
         // Marks a start request that did not settle within the bounded recovery wait, so the reader shows its failure state instead
         // of opening a provisional first section that could overwrite the saved place.
@@ -124,9 +128,12 @@
         let pendingConsumptionSession = null;
         let isConsumptionSessionFinished = false;
         let isConsumptionSessionCompleted = false;
-        // The number of pages read consecutively in the current forward run, including the page the run starts on. The reader
-        // paginates by spine section: a PDF page is a section of its own, and a reflowable book advances one section at a time.
+        // The number of pages read consecutively in the current forward run, including the page the run starts on. A page is one
+        // visible reader viewport: a PDF page is a section of its own, while a reflowable section can hold several viewport pages.
+        // Scrolling forward through a section adds one page per viewport crossed, and scrolling back starts a new run.
         let consecutivePagesRead = 0;
+        // The zero based viewport page of the current section that is visible. It is reset at the top of each newly opened section.
+        let currentReaderPageIndex = 0;
         // The active reading clock. Only the time during which the reader is visible is accumulated.
         let activeReadingMilliseconds = 0;
         let readingClockStartedOnMs = null;
@@ -143,22 +150,79 @@
             return Number.isFinite(number) ? Math.round(number * 1000) / 1000 : 0;
         }
 
-        // Gets the position of the section the reader currently shows, as the opaque location the consumption API stores for books.
-        function buildReadingPosition() {
-            if (!manifest || !manifest.spine || currentIndex < 0 || currentIndex >= manifest.spine.length)
+        // Gets the position and fraction a consumption record was recovered with before any section of the book was displayed.
+        // The record starts before the first section on the recovery path, so the reader can be left while that section is still
+        // loading. Reporting the recovered values in that window keeps the position and the fraction describing the same place,
+        // instead of resetting the fraction to zero while the position stays at the recovered one.
+        function getRecoveredReadingState(session) {
+            if (session === null || session.recoveredPosition === null || !session.recoveredPosition.location)
                 return null;
             return {
-                kind: LOCATION_POSITION_KIND,
-                timeOffsetSeconds: null,
-                location: manifest.spine[currentIndex].locationRef
+                // The recovered position is rebuilt as the opaque location the reader reports for its sections, so the terminal
+                // report does not depend on how the start response represented the kind of the stored position.
+                position: {
+                    kind: LOCATION_POSITION_KIND,
+                    timeOffsetSeconds: null,
+                    location: session.recoveredPosition.location
+                },
+                progressFraction: session.recoveredProgressFraction
             };
+        }
+
+        // Gets the position of the section the reader currently shows, as the opaque location the consumption API stores for books.
+        function buildReadingPosition() {
+            if (manifest && manifest.spine && currentIndex >= 0 && currentIndex < manifest.spine.length) {
+                return {
+                    kind: LOCATION_POSITION_KIND,
+                    timeOffsetSeconds: null,
+                    location: manifest.spine[currentIndex].locationRef
+                };
+            }
+            const recoveredState = getRecoveredReadingState(consumptionSession);
+            return recoveredState === null ? null : recoveredState.position;
         }
 
         // Gets the fraction of the book read so far. The current section counts as read, so the last section is the whole book.
         function getReadingProgressFraction() {
-            if (!manifest || !manifest.spine || manifest.spine.length === 0 || currentIndex < 0)
-                return 0;
-            return Math.min(1, (currentIndex + 1) / manifest.spine.length);
+            if (manifest && manifest.spine && manifest.spine.length > 0 && currentIndex >= 0)
+                return Math.min(1, (currentIndex + 1) / manifest.spine.length);
+            const recoveredState = getRecoveredReadingState(consumptionSession);
+            return recoveredState === null ? 0 : recoveredState.progressFraction;
+        }
+
+        // Gets the number of viewport pages of the current section, at least one, and the zero based page the reader shows.
+        function getReaderPageMetrics() {
+            const viewportHeight = readerContent.clientHeight;
+            if (viewportHeight <= 0)
+                return { pageIndex: 0, pageCount: 1 };
+            const pageCount = Math.max(1, Math.ceil(readerContent.scrollHeight / viewportHeight));
+            const maximumScrollTop = Math.max(0, readerContent.scrollHeight - viewportHeight);
+            const scrollTop = Math.min(Math.max(0, readerContent.scrollTop), maximumScrollTop);
+            return {
+                pageIndex: Math.min(pageCount - 1, Math.floor((scrollTop + viewportHeight / 2) / viewportHeight)),
+                pageCount: pageCount
+            };
+        }
+
+        // Follows the visible page of the current section. A forward page movement counts as the next consecutive page, while a
+        // backward movement starts a new run at the page the reader landed on.
+        function syncReaderPageIndex() {
+            const pageIndex = getReaderPageMetrics().pageIndex;
+            if (pageIndex === currentReaderPageIndex)
+                return;
+            if (pageIndex > currentReaderPageIndex)
+                consecutivePagesRead += 1;
+            else
+                consecutivePagesRead = 1;
+            currentReaderPageIndex = pageIndex;
+            reportReadingProgressAsync().catch((error) => {
+                console.debug('Book reader: the reading page could not be reported.', error);
+            });
+        }
+
+        // Resets the visible page baseline after a layout change that is not a page read, such as a font size change.
+        function resetReaderPageIndex() {
+            currentReaderPageIndex = getReaderPageMetrics().pageIndex;
         }
 
         // Starts the active reading clock, unless it is already running.
@@ -218,6 +282,27 @@
             pauseReadingClock();
         }
 
+        // Follows the navigation of a response that ended the session, and returns true when the caller must stop handling it. A
+        // page navigation is redirected by the server to the sign in page, but these requests ask for JSON, so an expired session
+        // is answered with a JSON 401 after the authentication cookie has been cleared. The explicit navigation is what shows the
+        // sign in prompt in that case, with the reading page as the return URL. The return URL is passed as a query value, like the
+        // redirects of the authentication middleware do, so the reader page is not encoded into the path of the login route.
+        function redirectIfSessionEnded(response) {
+            if (response.status === 401) {
+                if (!signInUrlTemplate)
+                    return true;
+                const returnUrl = encodeURIComponent(window.location.pathname + window.location.search + window.location.hash);
+                const signInUrl = signInUrlTemplate.replace('/{returnUrl?}', '');
+                window.location.href = `${signInUrl}?returnUrl=${returnUrl}`;
+                return true;
+            }
+            if (response.redirected) {
+                window.location.href = response.url;
+                return true;
+            }
+            return false;
+        }
+
         // Sends a consumption request in the background, with the anti-forgery token the page rendered. Reporting is a background
         // concern, so a failed request is only logged and never interrupts or fails the reading itself.
         async function sendConsumptionRequestAsync(url, payload, options = {}) {
@@ -247,12 +332,8 @@
                     signal: abortController === null ? undefined : abortController.signal,
                     keepalive: options.keepalive === true
                 });
-                // An expired session is redirected to the sign in page. Following it in the background would parse an HTML page as
-                // JSON and silently drop the rest of the history, so the reader navigates to the sign in page instead.
-                if (response.redirected) {
-                    window.location.href = response.url;
+                if (redirectIfSessionEnded(response))
                     return null;
-                }
                 if (!response.ok)
                     return null;
                 const jsonResponse = await response.json();
@@ -266,9 +347,10 @@
             }
         }
 
-        // Fetches the resume point of the current user for the book. It returns the resume point, null when the user has none, or
-        // undefined when the optional lookup failed. A failed lookup must not be treated as an absent one, because opening the first
-        // section and reporting it would overwrite the saved place with the start of the book.
+        // Fetches the resume point of the current user for the book. It returns the resume point, null when the user has none,
+        // undefined when the optional lookup failed, or REDIRECTED when the session ended and the sign in page is being opened.
+        // A failed lookup must not be treated as an absent one, because opening the first section and reporting it would overwrite
+        // the saved place with the start of the book.
         async function fetchResumePointAsync() {
             if (!resumePointUrl)
                 return undefined;
@@ -282,10 +364,8 @@
                     },
                     signal: abortController.signal
                 });
-                if (response.redirected) {
-                    window.location.href = response.url;
-                    return undefined;
-                }
+                if (redirectIfSessionEnded(response))
+                    return REDIRECTED;
                 if (!response.ok)
                     return undefined;
                 const jsonResponse = await response.json();
@@ -319,6 +399,10 @@
         function createConsumptionSession() {
             return {
                 recordId: null,
+                // The position and fraction the start response recovered from the stored resume point. They stand in for the
+                // displayed section until the first section of the book is really shown.
+                recoveredPosition: null,
+                recoveredProgressFraction: 0,
                 startPromise: null,
                 startSettled: false,
                 pendingEndPayload: null,
@@ -353,12 +437,26 @@
             if (!recordId)
                 return null;
             session.recordId = recordId;
+            // A record that was started before the first section is displayed carries the stored position and fraction that the
+            // start recovered. They are the position and fraction of the session until a section is shown.
+            session.recoveredPosition = record.lastPosition || null;
+            const recoveredProgressFraction = Number(record.lastProgressFraction);
+            session.recoveredProgressFraction = Number.isFinite(recoveredProgressFraction) ? recoveredProgressFraction : 0;
             // The session was ended and detached while the start request was in flight, so it still has a terminal payload to send.
             // The record this request created is closed here with that payload, so it never stays in progress.
-            if (session.pendingEndPayload !== null)
+            if (session.pendingEndPayload !== null) {
+                // The payload was captured before this response supplied the recovered values, and before any section could be
+                // displayed. A terminal report without a position therefore takes the recovered position and fraction, so the
+                // stop cannot keep the recovered position while resetting its fraction to zero.
+                const recoveredState = getRecoveredReadingState(session);
+                if (session.pendingEndPayload.position === null && recoveredState !== null) {
+                    session.pendingEndPayload.position = recoveredState.position;
+                    session.pendingEndPayload.progressFraction = recoveredState.progressFraction;
+                }
                 finishEndedConsumptionSessionAsync(session).catch((error) => {
                     console.debug('Book reader: the consumption record of the replaced session could not be ended.', error);
                 });
+            }
             return record;
         }
 
@@ -427,6 +525,11 @@
         // detached, so a restored page can reset the reading clock and the page count without changing what this session reports.
         // When the start request is still in flight, its continuation either sends the captured terminal payload once the record
         // identifier is known, or continues the revived session if the page is restored before that.
+        //
+        // Closing the record is best effort. A full page unload can destroy this page while the start request is still in flight,
+        // and the browser may finish that start after the page is gone. The record it creates is then never closed, because the
+        // pending session exists only in this page's memory. The server does not expire or reuse such a record, so it can remain
+        // InProgress indefinitely.
         function finishConsumptionSession(outcome) {
             if (isConsumptionSessionFinished)
                 return;
@@ -543,8 +646,9 @@
             });
         }
 
-        // Updates the page count and reports the section the reader just opened. The first section opens the reader session, a
-        // forward page advance into the last section completes it, and every other section reports its progress.
+        // Updates the page count and reports the section the reader just opened. The first displayed page starts a run at one, a
+        // backward navigation starts a new run at the page it lands on, and a forward section advance adds its first page. Scrolling
+        // within a section adds the viewport pages crossed, and a forward advance into the last section completes the session.
         async function handleSectionOpenedAsync(previousIndex, index) {
             // A section that finishes loading after the reader was left belongs to a finished session and must not open a new one.
             if (isConsumptionSessionFinished)
@@ -556,6 +660,7 @@
                 consecutivePagesRead = 1;
             else if (index > previousIndex)
                 consecutivePagesRead += 1;
+            currentReaderPageIndex = 0;
             if (readingHeartbeatTimer === null)
                 startReadingHeartbeat();
             // Only a forward page advance into the last section proves that the reading reached the end of the book. Opening
@@ -582,10 +687,8 @@
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             });
-            if (response.redirected) {
-                window.location.href = response.url;
+            if (redirectIfSessionEnded(response))
                 return;
-            }
             if (!response.ok) {
                 readerStatus.textContent = jsLocalizedStrings.readFailed;
                 return;
@@ -620,6 +723,9 @@
             let initialSectionRecord = null;
             if (manifestResponse.spine && manifestResponse.spine.length > 0) {
                 resumePointResult = await resumePointPromise;
+                // The lookup already navigated to the sign in page, so no section and no record is started for a session that ended.
+                if (resumePointResult === REDIRECTED)
+                    return;
                 if (resumePointResult === undefined) {
                     // The optional lookup failed, so the saved position is only available from the start response. The wait for it is
                     // bounded, so a slow or hung start cannot hold the reader on the loading state. The start continues in the
@@ -661,7 +767,33 @@
         // render-as-images setting is off, since enabling that setting is the way to make such a book readable, and navigates back
         // to the library page, because the reading page cannot display anything for such a book.
         async function notifyIfPdfImageOnlyAsync() {
-            const settings = await callApiGetAsync('@_urlService.GetAbsoluteUrl(WebRoutes.Settings.GET_USER_SETTINGS)');
+            // The shared callApiGetAsync helper answers a JSON 401 with an error notification, but a reader whose session ended must
+            // be taken to the sign in prompt like the other reader requests, so this lookup is made here and checks the status first.
+            let response;
+            try {
+                response = await fetch('@_urlService.GetAbsoluteUrl(WebRoutes.Settings.GET_USER_SETTINGS)', {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+            } catch (error) {
+                console.debug('Book reader: the user settings could not be fetched.', error);
+                notificationService.show(jsLocalizedStrings.readFailed, NotificationType.ERROR);
+                return;
+            }
+            if (redirectIfSessionEnded(response))
+                return;
+            if (!response.ok) {
+                notificationService.show(jsLocalizedStrings.readFailed, NotificationType.ERROR);
+                return;
+            }
+            const jsonResponse = await response.json();
+            if (!jsonResponse || jsonResponse.success !== true) {
+                notificationService.show(jsonResponse && jsonResponse.errorMessage ? jsonResponse.errorMessage : jsLocalizedStrings.readFailed, NotificationType.ERROR);
+                return;
+            }
+            const settings = jsonResponse.data;
             if (settings && settings.shouldRenderPdfAsImages !== true) {
                 notificationService.show(jsLocalizedStrings.imageOnlyPdf, NotificationType.WARNING);
                 await redirectToLibraryPageAsync();
@@ -678,6 +810,8 @@
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             });
+            if (redirectIfSessionEnded(response))
+                return;
             if (!response.ok)
                 return;
             const jsonResponse = await response.json();
@@ -698,10 +832,8 @@
                     },
                     signal
                 });
-                if (response.redirected) {
-                    window.location.href = response.url;
+                if (redirectIfSessionEnded(response))
                     return REDIRECTED;
-                }
                 if (!response.ok)
                     return null;
                 const jsonResponse = await response.json();
@@ -749,6 +881,7 @@
             const previousIndex = currentIndex;
             currentIndex = index;
             readerContent.innerHTML = section.contentHtml || '';
+            currentReaderPageIndex = 0;
             resolveResources();
             updatePosition();
             readerStatus.classList.add('hidden');
@@ -851,6 +984,7 @@
         // Applies the current font size to the reading content.
         function applyFontSize() {
             readerContent.style.fontSize = `${fontSize}px`;
+            resetReaderPageIndex();
         }
 
         // On font size decrease button click, decreases the font size of the reading content.
@@ -873,6 +1007,7 @@
         btnNext.addEventListener('click', handleNextClick);
         btnFontDecrease.addEventListener('click', handleFontDecreaseClick);
         btnFontIncrease.addEventListener('click', handleFontIncreaseClick);
+        readerContent.addEventListener('scroll', syncReaderPageIndex, { passive: true });
         document.addEventListener('DOMContentLoaded', InitializeAsync);
         document.addEventListener('visibilitychange', handleVisibilityChange);
         // A full page unload does not run the view cleanups, so the last reading time and page are also stopped on pagehide.
@@ -888,6 +1023,7 @@
             btnNext.removeEventListener('click', handleNextClick);
             btnFontDecrease.removeEventListener('click', handleFontDecreaseClick);
             btnFontIncrease.removeEventListener('click', handleFontIncreaseClick);
+            readerContent.removeEventListener('scroll', syncReaderPageIndex);
             document.removeEventListener('DOMContentLoaded', InitializeAsync);
             document.removeEventListener('visibilitychange', handleVisibilityChange);
             window.removeEventListener('pagehide', stopReadingSession);

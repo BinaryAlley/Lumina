@@ -312,9 +312,6 @@
   <data name="WrittenContent" xml:space="preserve">
     <value>文字コンテンツ</value>
   </data>
-  <data name="YouTube" xml:space="preserve">
-    <value>ユーチューブ</value>
-  </data>
   <data name="Name" xml:space="preserve">
     <value>名前</value>
   </data>

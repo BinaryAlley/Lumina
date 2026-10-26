@@ -128,7 +128,7 @@ public class GetGenreConsumptionQueryHandler : IQueryHandler<GetGenreConsumption
         Dictionary<(MediaKind MediaKind, Guid MediaItemId, Guid LibraryId), List<string>> genreNamesByItem = [];
         foreach (TrackEntity track in tracks)
         {
-            List<string> itemGenres = [.. track.Genres.Select(genre => genre.Name).OfType<string>()];
+            List<string> itemGenres = GetTrackGenreNames(track);
             if (itemGenres.Count > 0)
                 genreNamesByItem[(MediaKind.MusicTrack, track.Id, track.LibraryId)] = itemGenres;
         }
@@ -179,6 +179,21 @@ public class GetGenreConsumptionQueryHandler : IQueryHandler<GetGenreConsumption
             .ThenBy(genreConsumption => genreConsumption.Name)];
 
         return Result.From(genreConsumptions.ToResponses());
+    }
+
+    /// <summary>
+    /// Gets the genre names of <paramref name="track"/>, falling back to the genres of its album and then its artist.
+    /// </summary>
+    /// <param name="track">The track whose genres are resolved.</param>
+    /// <returns>The genre names of the track, its album, or its artist, in the first level that has any.</returns>
+    private static List<string> GetTrackGenreNames(TrackEntity track)
+    {
+        List<string> genreNames = [.. track.Genres.Select(genre => genre.Name).OfType<string>()];
+        if (genreNames.Count == 0 && track.Album is not null)
+            genreNames = [.. track.Album.Genres.Select(genre => genre.Name).OfType<string>()];
+        if (genreNames.Count == 0 && track.Album is not null && track.Album.Artist is not null)
+            genreNames = [.. track.Album.Artist.Genres.Select(genre => genre.Name).OfType<string>()];
+        return genreNames;
     }
 
     /// <summary>

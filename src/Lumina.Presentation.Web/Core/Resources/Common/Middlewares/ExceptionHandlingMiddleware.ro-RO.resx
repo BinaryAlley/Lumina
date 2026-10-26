@@ -844,10 +844,10 @@
     <value>Calitatea fluxului nu poate fi nulă!</value>
   </data>
   <data name="ShuffleTrackCountMustBeGreaterThanZero" xml:space="preserve">
-    <value>Numărul de piste pentru redare aleatorie trebuie să fie mai mare decât zero!</value>
+    <value>Numărul de piese pentru redare aleatorie trebuie să fie mai mare decât zero!</value>
   </data>
   <data name="ShuffleTrackCountMustBeAtMost500" xml:space="preserve">
-    <value>Numărul de piste pentru redare aleatorie nu poate depăși 500!</value>
+    <value>Numărul de piese pentru redare aleatorie nu poate depăși 500!</value>
   </data>
   <data name="VuMeterReleasePerSecondCannotBeNull" xml:space="preserve">
     <value>Scăderea vumetrului nu poate fi nulă!</value>
@@ -1111,7 +1111,7 @@
     <value>Formatul MusicBrainz Id este nevalid!</value>
   </data>
   <data name="NoReaderAvailable" xml:space="preserve">
-    <value>Niciun cititor nu este disponibil pentru această carte!</value>
+    <value>Niciun cititor de cărți nu este disponibil pentru această carte!</value>
   </data>
   <data name="NoSupportedPlaybackFormat" xml:space="preserve">
     <value>Nu a fost găsit niciun format de redare acceptat!</value>
@@ -1120,13 +1120,13 @@
     <value>Limita cache-ului de normalizare a fost depășită!</value>
   </data>
   <data name="NormalizationFailed" xml:space="preserve">
-    <value>Normalizarea pistei a eșuat!</value>
+    <value>Normalizarea piesei a eșuat!</value>
   </data>
   <data name="NormalizationIsNotRequiredForDirectPlay" xml:space="preserve">
     <value>Normalizarea nu este necesară pentru redarea directă!</value>
   </data>
   <data name="NormalizationTimedOut" xml:space="preserve">
-    <value>Normalizarea pistei a expirat!</value>
+    <value>Normalizarea piesei a expirat!</value>
   </data>
   <data name="NormalizationUnavailable" xml:space="preserve">
     <value>Normalizarea piesei este indisponibilă momentan!</value>
@@ -1198,7 +1198,7 @@
     <value>Tipul playlistului este nevalid!</value>
   </data>
   <data name="ReaderDisabled" xml:space="preserve">
-    <value>Cititorul este dezactivat pentru această bibliotecă!</value>
+    <value>Cititorul de cărți este dezactivat pentru această bibliotecă!</value>
   </data>
   <data name="ResourceKeyCannotBeEmpty" xml:space="preserve">
     <value>Cheia de resurse nu poate fi goală!</value>
@@ -1249,7 +1249,7 @@
     <value>Piesa există deja!</value>
   </data>
   <data name="TrackDurationMustBePositive" xml:space="preserve">
-    <value>Durata pistei trebuie să fie pozitivă!</value>
+    <value>Durata piesei trebuie să fie pozitivă!</value>
   </data>
   <data name="TrackFileNotFound" xml:space="preserve">
     <value>Fișierul piesei nu a fost găsit!</value>
@@ -1264,13 +1264,13 @@
     <value>Numărul piesei trebuie să fie mai mare decât zero!</value>
   </data>
   <data name="TrackPathCannotBeEmpty" xml:space="preserve">
-    <value>Calea pistei nu poate fi goală!</value>
+    <value>Calea piesei nu poate fi goală!</value>
   </data>
   <data name="TrackPathMustBeMaximum2048CharactersLong" xml:space="preserve">
-    <value>Calea pistei trebuie să aibă maximum 2048 de caractere!</value>
+    <value>Calea piesei trebuie să aibă maximum 2048 de caractere!</value>
   </data>
   <data name="TrackPathMustBeWithinLibraryContentLocations" xml:space="preserve">
-    <value>Calea pistei trebuie să fie în interiorul uneia dintre locațiile conținutului bibliotecii!</value>
+    <value>Calea piesei trebuie să fie în interiorul uneia dintre locațiile conținutului bibliotecii!</value>
   </data>
   <data name="TracksListCannotBeNull" xml:space="preserve">
     <value>Lista de piese nu poate fi nulă!</value>

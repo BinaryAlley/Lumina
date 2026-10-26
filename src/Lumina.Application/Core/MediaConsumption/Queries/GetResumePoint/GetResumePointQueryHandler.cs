@@ -2,6 +2,7 @@
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.MediaConsumption;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Authentication;
@@ -88,6 +89,25 @@ public class GetResumePointQueryHandler : IQueryHandler<GetResumePointQuery, Res
             return getResumePointResult.Errors;
         if (getResumePointResult.Value is null)
             return DomainErrors.MediaConsumption.MediaResumePointNotFound;
+
+        // A resume point stored before progress tracking was turned off must not be served, because the library no longer remembers positions.
+        // It is deleted as stale data, so turning tracking on again starts from a fresh position instead of an old one.
+        Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository
+            .GetByIdAsync(getResumePointResult.Value.LibraryId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (getLibraryResult.IsFailure)
+            return getLibraryResult.Errors;
+        if (getLibraryResult.Value is not null && !getLibraryResult.Value.ShouldTrackConsumptionProgress)
+        {
+            Result<Deleted> deleteStaleResumePointResult = await _unitOfWork.MediaResumePointRepository.DeleteForUserAndMediaItemAsync(userId, mediaKind, mediaItemId, cancellationToken).ConfigureAwait(false);
+            if (deleteStaleResumePointResult.IsFailure)
+                return deleteStaleResumePointResult.Errors;
+            Result<Success> saveStaleResumePointDeletionResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            // A concurrent deletion of the same stale resume point is the desired outcome, so only other persistence failures are returned.
+            if (saveStaleResumePointDeletionResult.IsFailure &&
+                !saveStaleResumePointDeletionResult.Errors.Any(error => error == ApplicationErrors.Persistence.ConcurrencyConflict))
+                return saveStaleResumePointDeletionResult.Errors;
+            return DomainErrors.MediaConsumption.MediaResumePointNotFound;
+        }
 
         // The media item must still exist in the library the resume point was recorded in. A resume point whose item was deleted, or whose item no
         // longer belongs to that library, is an orphan, so it is removed before the same not-found result as a missing item is returned.

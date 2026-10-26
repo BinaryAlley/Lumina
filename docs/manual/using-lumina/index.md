@@ -113,7 +113,7 @@ A favorite whose item was deleted, or whose library you can no longer access, st
 
 The **Statistics** entry under Library opens your consumption statistics. It covers every media kind the server can consume, with music and book sessions appearing side by side and more kinds joining as their catalogues arrive. The statistics are built from the sessions your player and reader report, belong to your account, and are not shared with other regular users; administrators can view any user's statistics.
 
-A session counts towards the statistics when it completes, or when it reaches the counting rule of its kind. A music track counts after 30 seconds, and a book counts after more than 5 consecutive pages. A stopped session below the rule is stored but not counted, while the total consumed time still includes the time you spent. Completion is separate from counting: a session can count without the library considering the item complete.
+A session counts towards the statistics when it completes, or when it reaches the counting rule of its kind. A music track counts after 30 seconds, and a book counts after more than 5 consecutive pages in the reader. A stopped session below the rule is stored but not counted, while the total consumed time still includes the time you spent. Completion is separate from counting: a session can count without the library considering the item complete.
 
 The page shows:
 

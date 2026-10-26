@@ -1111,7 +1111,7 @@
     <value>Le format MusicBrainz Id n’est pas valide !</value>
   </data>
   <data name="NoReaderAvailable" xml:space="preserve">
-    <value>Aucun lecteur n'est disponible pour ce livre !</value>
+    <value>Aucun lecteur de livres n'est disponible pour ce livre !</value>
   </data>
   <data name="NoSupportedPlaybackFormat" xml:space="preserve">
     <value>Aucun format de lecture pris en charge n'a été trouvé !</value>
@@ -1150,7 +1150,7 @@
     <value>Une partie valeur du modèle de chemin doit contenir exactement un espace réservé !</value>
   </data>
   <data name="PermissionNotFound" xml:space="preserve">
-    <value>L'autorisation n'a pas été trouvée !</value>
+    <value>La permission n'a pas été trouvée !</value>
   </data>
   <data name="PlaybackDeliveryChanged" xml:space="preserve">
     <value>La diffusion de la lecture a changé !</value>
@@ -1198,7 +1198,7 @@
     <value>Le type de liste de lecture est invalide !</value>
   </data>
   <data name="ReaderDisabled" xml:space="preserve">
-    <value>Le lecteur est désactivé pour cette bibliothèque !</value>
+    <value>Le lecteur de livres est désactivé pour cette bibliothèque !</value>
   </data>
   <data name="ResourceKeyCannotBeEmpty" xml:space="preserve">
     <value>La clé de ressource ne peut pas être vide !</value>

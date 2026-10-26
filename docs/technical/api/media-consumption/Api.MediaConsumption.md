@@ -243,7 +243,7 @@ A session of a non-page-based kind cannot report consecutive pages above zero. A
 
 A book page count of 5 does not count as a session for statistics, while 6 does, but that counting rule belongs to the statistics read model and does not change the stored progress.
 
-The book reader counts spine sections as pages, because the reader exposes no pagination finer than a section. A PDF page is a section of its own, but a reflowable book can put a whole chapter, or several pages, in one section, so the reported page count approximates the pages a reader saw and the threshold counts sections rather than printed or viewport pages.
+The book reader counts a page as one visible reader viewport. A PDF page is a section of its own, while a reflowable section can hold several viewport pages, so the reported page count follows the pages the reader actually scrolled through rather than the printed pages of the source book.
 
 #### Report Consumption Progress Response
 
@@ -463,6 +463,8 @@ Returns the resume point of the current user for the item named by the route. A 
 
 When the media item no longer exists, or no longer belongs to the library recorded in the resume point, the resume point is an orphan. It is deleted before the item is reported as not found. A client that reopens the item must therefore fall back to the beginning instead of assuming the stored point still exists.
 
+When the library that recorded the resume point no longer tracks consumption progress, the stored resume point is deleted and reported as `MediaResumePointNotFound`, so turning tracking off takes effect for an existing position as well.
+
 A kind whose catalogue does not exist yet is rejected with `UnsupportedMediaKind`, so a planned kind cannot return a resume point that start would never create. A photo is the exception among the planned kinds: it has no position representation, so it is rejected with `MediaKindCannotResume`. The invalid `None` kind is rejected with `UnsupportedMediaKind`.
 
 #### Get Resume Point Response
@@ -620,7 +622,7 @@ Errors are returned as problem details. A request without a valid token is rejec
 | `404` | `TrackNotFound` | The start route names a music track that does not exist, or that does not belong to the route library, or a resume point names a track that no longer exists or no longer belongs to its recorded library. |
 | `404` | `BookNotFound` | The start route names a book that does not exist, or that does not belong to the route library, or a resume point names a book that no longer exists or no longer belongs to its recorded library. |
 | `404` | `ConsumptionRecordNotFound` | The record does not exist, or it belongs to another user. |
-| `404` | `MediaResumePointNotFound` | The resume point does not exist, or it belongs to another user. |
+| `404` | `MediaResumePointNotFound` | The resume point does not exist, belongs to another user, or belongs to a library that no longer tracks consumption progress. |
 | `409` | `ConsumptionIsNotInProgress` | A progress report targets a session that is already completed or stopped. |
 | `409` | `ConsumptionIsAlreadyTerminal` | A complete or stop request targets a session that is already completed or stopped. |
 | `409` | `ConcurrencyConflict` | Another request changed the same row after this request read it, or the storage reported a busy or locked database. Repeating the request is safe when it reports the current values. |

@@ -365,7 +365,7 @@ The optional `libraryId`, `mediaKind`, `fromUtc` and `toUtc` filters are the sam
 ]
 ```
 
-The records are grouped to one row per media kind, media item and library first, so an item with several sessions contributes its tags once, not once per session. Only items in an accessible library with at least one counted session contribute. A name that appears twice on the same item contributes once. Names are normalized to lowercase, so `Horror` and `horror` share one bucket across media kinds. The rows are ordered by consumed item count, then consumed duration, both descending, with the name ascending as the tiebreaker. An item that no longer exists, or that moved to another library after it was consumed, does not contribute to the breakdown, because its terms cannot be resolved for the recorded library.
+The records are grouped to one row per media kind, media item and library first, so an item with several sessions contributes its tags once, not once per session. A music track with no tags of its own contributes the tags of its album, and then the tags of its artist when the album has none. Only items in an accessible library with at least one counted session contribute. A name that appears twice on the same item contributes once. Names are normalized to lowercase, so `Horror` and `horror` share one bucket across media kinds. The rows are ordered by consumed item count, then consumed duration, both descending, with the name ascending as the tiebreaker. An item that no longer exists, or that moved to another library after it was consumed, does not contribute to the breakdown, because its terms cannot be resolved for the recorded library.
 
 `consumedItemCount` is the number of distinct items that carry the tag, not the number of sessions. `consumedDurationInSeconds` is the consumed duration of those items, over all of their sessions.
 
@@ -408,7 +408,7 @@ The optional `libraryId`, `mediaKind`, `fromUtc` and `toUtc` filters are the sam
 ]
 ```
 
-The genre breakdown follows the same item level aggregation, lowercase normalization, ordering and availability rules as the tag breakdown.
+The genre breakdown follows the same item level aggregation, lowercase normalization, ordering and availability rules as the tag breakdown. A music track with no genres of its own contributes the genres of its album, and then the genres of its artist when the album has none.
 
 ### Delete Consumption Record
 
@@ -554,7 +554,7 @@ Every route in this document requires authentication.
 
 The statistics and lists never expose the history of another user to a regular user. Display data is resolved per distinct library through the library ownership policy. An item in a library the current user can no longer access keeps its counts but has blank display data, so the history lists reveal no inaccessible title, collection, creator or cover. The service wide totals never include the records of a user that the caller cannot target.
 
-Deleting a record, every record of an item, the whole history, or the resume points belongs to the same access rule. An administrator can delete any user's consumption activity through the per-user routes, and a regular user can delete only their own.
+Deleting a record, every record of an item, the whole history, or the resume points belongs to the same access rule. An administrator can delete any user's consumption activity through the per-user routes, and a regular user can delete only their own. Reading a resume point is not part of this surface; it stays owner only, as documented in [Media Consumption](../../media-consumption/Api.MediaConsumption.md).
 
 ### Private Responses
 

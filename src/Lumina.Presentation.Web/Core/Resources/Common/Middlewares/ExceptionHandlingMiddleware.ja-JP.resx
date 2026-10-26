@@ -217,22 +217,22 @@
     <value>完了したスキャンジョブ数は正の値でなければなりません！</value>
   </data>
   <data name="ContributorDisplayNameCannotBeEmpty" xml:space="preserve">
-    <value>出演者の表示名を空にすることはできません！</value>
+    <value>寄稿者の表示名を空にすることはできません。</value>
   </data>
   <data name="ContributorDisplayNameMustBeMaximum100CharactersLong" xml:space="preserve">
-    <value>出演者の表示名は最大100文字までです！</value>
+    <value>寄稿者の表示名は最大100文字までです！</value>
   </data>
   <data name="ContributorLegalNameMustBeMaximum100CharactersLong" xml:space="preserve">
-    <value>出演者の本名は最大100文字までです！</value>
+    <value>寄稿者の本名は最大100文字までです！</value>
   </data>
   <data name="ContributorNameCannotBeEmpty" xml:space="preserve">
-    <value>出演者名を空にすることはできません！</value>
+    <value>寄稿者名を空にすることはできません。</value>
   </data>
   <data name="ContributorRoleCannotBeNull" xml:space="preserve">
-    <value>出演者の役割をnullにすることはできません！</value>
+    <value>寄稿者の役割をnullにすることはできません。</value>
   </data>
   <data name="ContributorsListCannotBeNull" xml:space="preserve">
-    <value>出演者リストをnullにすることはできません！</value>
+    <value>寄稿者リストをnullにすることはできません。</value>
   </data>
   <data name="CorsOriginIsInvalid" xml:space="preserve">
     <value>CORSオリジンが無効です！</value>
@@ -1090,7 +1090,7 @@
     <value>メディア寄稿者名を空にすることはできません。</value>
   </data>
   <data name="MediaContributorRoleNameCannotBeEmpty" xml:space="preserve">
-    <value>メディア投稿者のロール名を空にすることはできません。</value>
+    <value>メディア寄稿者のロール名を空にすることはできません。</value>
   </data>
   <data name="MediaItemIdCannotBeEmpty" xml:space="preserve">
     <value>メディア項目 Idは空にできません。</value>
@@ -1111,7 +1111,7 @@
     <value>MusicBrainz ID の形式が無効です。</value>
   </data>
   <data name="NoReaderAvailable" xml:space="preserve">
-    <value>この本にはリーダーがいません!</value>
+    <value>この本の形式を開けるブックリーダーがありません。</value>
   </data>
   <data name="NoSupportedPlaybackFormat" xml:space="preserve">
     <value>サポートされている再生フォーマットが見つかりませんでした。</value>
@@ -1123,7 +1123,7 @@
     <value>トラックの正規化に失敗しました!</value>
   </data>
   <data name="NormalizationIsNotRequiredForDirectPlay" xml:space="preserve">
-    <value>直接再生する場合はノーマライズは必要ありません。</value>
+    <value>直接再生する場合は正規化は必要ありません。</value>
   </data>
   <data name="NormalizationTimedOut" xml:space="preserve">
     <value>トラックの正規化がタイムアウトになりました。</value>
@@ -1150,7 +1150,7 @@
     <value>パス テンプレートの値部分には、プレースホルダーを 1 つだけ含める必要があります。</value>
   </data>
   <data name="PermissionNotFound" xml:space="preserve">
-    <value>許可が見つかりませんでした!</value>
+    <value>権限が見つかりませんでした。</value>
   </data>
   <data name="PlaybackDeliveryChanged" xml:space="preserve">
     <value>再生配信が変わりました！</value>
@@ -1198,7 +1198,7 @@
     <value>プレイリストのタイプが無効です。</value>
   </data>
   <data name="ReaderDisabled" xml:space="preserve">
-    <value>このライブラリではリーダーが無効になっています。</value>
+    <value>この本を開くブックリーダーは、このライブラリで無効になっています。ライブラリ設定で有効にすると本を読めます。</value>
   </data>
   <data name="ResourceKeyCannotBeEmpty" xml:space="preserve">
     <value>リソース キーを空にすることはできません。</value>

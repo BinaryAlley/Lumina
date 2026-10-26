@@ -934,7 +934,7 @@
     <value>Псевдонім виконавця має містити максимум 255 символів!</value>
   </data>
   <data name="ArtistAlreadyExists" xml:space="preserve">
-    <value>Артист вже є!</value>
+    <value>Виконавець уже існує!</value>
   </data>
   <data name="ArtistIdCannotBeEmpty" xml:space="preserve">
     <value>Ідентифікатор виконавця не може бути порожнім!</value>
@@ -949,7 +949,7 @@
     <value>Ім'я виконавця має містити максимум 255 символів!</value>
   </data>
   <data name="ArtistNotFound" xml:space="preserve">
-    <value>Художника не знайшли!</value>
+    <value>Виконавця не знайдено!</value>
   </data>
   <data name="ArtistWebsiteMustBeMaximum2048CharactersLong" xml:space="preserve">
     <value>Веб-сайт виконавця має містити максимум 2048 символів!</value>
@@ -1111,7 +1111,7 @@
     <value>Формат ідентифікатора MusicBrainz недійсний!</value>
   </data>
   <data name="NoReaderAvailable" xml:space="preserve">
-    <value>Немає читача для цієї книги!</value>
+    <value>Немає читача книг для цієї книги!</value>
   </data>
   <data name="NoSupportedPlaybackFormat" xml:space="preserve">
     <value>Не знайдено жодного підтримуваного формату відтворення!</value>
@@ -1198,7 +1198,7 @@
     <value>Тип списку відтворення недійсний!</value>
   </data>
   <data name="ReaderDisabled" xml:space="preserve">
-    <value>Читач вимкнено для цієї бібліотеки!</value>
+    <value>Читач книг вимкнено для цієї бібліотеки!</value>
   </data>
   <data name="ResourceKeyCannotBeEmpty" xml:space="preserve">
     <value>Ключ ресурсу не може бути порожнім!</value>

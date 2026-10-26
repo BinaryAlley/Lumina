@@ -128,7 +128,7 @@ public class GetTagConsumptionQueryHandler : IQueryHandler<GetTagConsumptionQuer
         Dictionary<(MediaKind MediaKind, Guid MediaItemId, Guid LibraryId), List<string>> tagNamesByItem = [];
         foreach (TrackEntity track in tracks)
         {
-            List<string> itemTags = [.. track.Tags.Select(tag => tag.Name).OfType<string>()];
+            List<string> itemTags = GetTrackTagNames(track);
             if (itemTags.Count > 0)
                 tagNamesByItem[(MediaKind.MusicTrack, track.Id, track.LibraryId)] = itemTags;
         }
@@ -179,6 +179,21 @@ public class GetTagConsumptionQueryHandler : IQueryHandler<GetTagConsumptionQuer
             .ThenBy(tagConsumption => tagConsumption.Name)];
 
         return Result.From(tagConsumptions.ToResponses());
+    }
+
+    /// <summary>
+    /// Gets the tag names of <paramref name="track"/>, falling back to the tags of its album and then its artist.
+    /// </summary>
+    /// <param name="track">The track whose tags are resolved.</param>
+    /// <returns>The tag names of the track, its album, or its artist, in the first level that has any.</returns>
+    private static List<string> GetTrackTagNames(TrackEntity track)
+    {
+        List<string> tagNames = [.. track.Tags.Select(tag => tag.Name).OfType<string>()];
+        if (tagNames.Count == 0 && track.Album is not null)
+            tagNames = [.. track.Album.Tags.Select(tag => tag.Name).OfType<string>()];
+        if (tagNames.Count == 0 && track.Album is not null && track.Album.Artist is not null)
+            tagNames = [.. track.Album.Artist.Tags.Select(tag => tag.Name).OfType<string>()];
+        return tagNames;
     }
 
     /// <summary>

@@ -1111,7 +1111,7 @@
     <value>Das MusicBrainz-Id-Format ist ungültig!</value>
   </data>
   <data name="NoReaderAvailable" xml:space="preserve">
-    <value>Für dieses Buch ist kein Reader verfügbar!</value>
+    <value>Für dieses Buch ist kein Buchleser verfügbar!</value>
   </data>
   <data name="NoSupportedPlaybackFormat" xml:space="preserve">
     <value>Es wurde kein unterstütztes Wiedergabeformat gefunden!</value>
@@ -1198,7 +1198,7 @@
     <value>Der Wiedergabelistentyp ist ungültig!</value>
   </data>
   <data name="ReaderDisabled" xml:space="preserve">
-    <value>Der Reader ist für diese Bibliothek deaktiviert!</value>
+    <value>Der Buchleser, der dieses Buch öffnet, ist für diese Bibliothek deaktiviert!</value>
   </data>
   <data name="ResourceKeyCannotBeEmpty" xml:space="preserve">
     <value>Der Ressourcenschlüssel darf nicht leer sein!</value>

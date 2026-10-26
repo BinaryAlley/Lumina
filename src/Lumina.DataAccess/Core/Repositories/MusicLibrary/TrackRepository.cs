@@ -578,7 +578,15 @@ internal sealed class TrackRepository : ITrackRepository
             {
                 query = query
                     .Include(track => track.Album)
-                    .ThenInclude(album => album!.Artist)
+                        .ThenInclude(album => album!.Tags)
+                    .Include(track => track.Album)
+                        .ThenInclude(album => album!.Genres)
+                    .Include(track => track.Album)
+                        .ThenInclude(album => album!.Artist)
+                    .ThenInclude(artist => artist!.Tags)
+                    .Include(track => track.Album)
+                        .ThenInclude(album => album!.Artist)
+                        .ThenInclude(artist => artist!.Genres)
                     .Include(track => track.Ratings)
                     .Include(track => track.Tags)
                     .Include(track => track.Genres)
