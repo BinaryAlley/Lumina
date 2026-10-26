@@ -1,8 +1,0 @@
-PUT {{host}}/api/v1/users/me/music-play-history/plays/2c1b0a9f-8e7d-4c6b-5a4f-3e2d1c0b9a8f/progress
-Authorization: Bearer {{ACCESS_TOKEN}}
-Content-Type: application/json
-
-{
-  "positionInSeconds": 92.5,
-  "listenedDurationInSeconds": 92.5
-}

@@ -1,0 +1,3 @@
+### All users (admin)
+GET {{host}}/api/v1/users/consumption-statistics?fromUtc=2026-10-01T00:00:00Z&toUtc=2026-10-31T23:59:59Z
+Authorization: Bearer {{ACCESS_TOKEN}}

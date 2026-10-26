@@ -18,6 +18,13 @@
 - _**Transcode**_: Delivery of a track's audio re-encoded into a codec the player can decode
 - _**Playback Capabilities**_: The container and codec combinations a player advertises it can demux and decode directly
 - _**Delivery Shape**_: The way delivered audio is addressed and seeked, by byte range or as fixed duration, time addressed segments
+- _**Media Consumption**_: The recording of what a user consumed, how far they reached and how long they consumed it, across every media kind
+- _**Media Consumption Record**_: The record of one consumption session of a media item by a user, from its start to its progress, completion or stop, private to that user. It stores no queue, current index, repeat or shuffle state
+- _**Media Resume Point**_: The latest position of one media item for one user, stored separately from the consumption history so the user can resume the item. There is at most one per user, media kind and media item
+- _**Consumption Statistics**_: The read model derived from the consumption records on every request. It is not an aggregate, it is not stored, and it has no counter or rollup table
+- _**Counted Session**_: A consumption record that counts towards the statistics, because it completed or because its media kind's counting rule was reached
+- _**ShouldTrackConsumptionProgress**_: The per-library setting that decides whether the latest position of an item is remembered, so the user can resume it
+- _**CompletionThresholdPercentage**_: The optional per-library percentage of an item that must be consumed for a session to count as completed when it stops. When it is absent and tracking is on, completion is recorded only when it is reported explicitly
 
 ## Video Content
 - _**TV Show**_: A series of episodes typically organized into seasons
@@ -95,6 +102,8 @@
 - SheetMusic
 - Photo
 - PhotoAlbum
+- MediaConsumptionRecord
+- MediaResumePoint
 - User
 - Playlist
 - Favorite
@@ -118,6 +127,7 @@
 - UserProfile (root: User, entities: Collection)
 - PlaylistManagement (root: Playlist, entities: PlaylistEntry)
 - Favorites (root: Favorite, no entities)
+- MediaConsumption (roots: MediaConsumptionRecord, MediaResumePoint, no entities)
 - SupplementaryContentLibrary (root: SupplementaryContentLibrary, entities: SubtitleFile, Lyrics, LanguageTrack)
 - FileSystemManagement (root: File, entities: Stream)
 
@@ -170,6 +180,14 @@
 - StreamInfo
 - StreamingQuality
 - UserPreferences
+- LibraryConsumptionSettings
+- MediaConsumptionRecordId
+- MediaResumePointId
+- MediaPosition
+- MediaConsumptionRule (abstract)
+- DurationThresholdConsumptionRule (abstract)
+- PageThresholdConsumptionRule (abstract)
+- EverySessionConsumptionRule (abstract)
 - Rating (abstract)
 - AudioRating
 - Genre
@@ -219,6 +237,10 @@
 - PlaylistDeleted
 - FavoriteAdded
 - FavoriteRemoved
+- MediaConsumptionStarted
+- MediaConsumptionProgressed
+- MediaConsumptionCompleted
+- MediaConsumptionStopped
 - UserPreferencesChanged
 - MetadataUpdated
 - FileTranscoded
@@ -237,6 +259,9 @@
   - Aggregates: Playlist
 - Favorites
   - Aggregates: Favorite
+- MediaConsumption
+  - Aggregates: MediaConsumptionRecord, MediaResumePoint
+  - Read models: ConsumptionStatistics
 - ContentDelivery
   - Aggregates: FileSystemManagement
   - Services: StreamingService, ContentSynchronizationService
@@ -253,6 +278,9 @@
 - UserRepository
 - PlaylistRepository
 - FavoriteRepository
+- MediaConsumptionRecordRepository
+- MediaResumePointRepository
+- ConsumptionStatisticsRepository
 - CollectionRepository
 - FileRepository
 - StreamRepository

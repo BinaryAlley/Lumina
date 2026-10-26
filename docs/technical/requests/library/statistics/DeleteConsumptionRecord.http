@@ -1,0 +1,7 @@
+### Current user
+DELETE {{host}}/api/v1/users/me/consumption-history/2c1b0a9f-8e7d-4c6b-5a4f-3e2d1c0b9a8f
+Authorization: Bearer {{ACCESS_TOKEN}}
+
+### Another user (admin)
+DELETE {{host}}/api/v1/users/2cff0c0f-3a67-4e30-b94f-f4e948a3b64f/consumption-history/2c1b0a9f-8e7d-4c6b-5a4f-3e2d1c0b9a8f
+Authorization: Bearer {{ACCESS_TOKEN}}

@@ -1,0 +1,7 @@
+### Current user
+GET {{host}}/api/v1/users/me/consumption-history/most-consumed?currentPage=1&perPage=50
+Authorization: Bearer {{ACCESS_TOKEN}}
+
+### Another user (admin)
+GET {{host}}/api/v1/users/2cff0c0f-3a67-4e30-b94f-f4e948a3b64f/consumption-history/most-consumed?currentPage=1&perPage=50
+Authorization: Bearer {{ACCESS_TOKEN}}

@@ -60,6 +60,8 @@ The reader opens the book in the browser and gives you a small toolbar and the b
 
 A book opens only through an enabled reader for its format. The EPUB and PDF readers are bundled and can be enabled for a library. A scanned PDF has no text to extract, so it can only be shown as page images, which is what the `Render PDFs as images` setting turns on.
 
+Book libraries track consumption progress by default. Reopening a book continues from the last section of a tracked reading session. A short reading, such as opening a book, turning a few pages and closing it, may not reach the minimum needed to be tracked, so it can leave no saved position and the book opens at the beginning. Reaching the library's completion threshold, 100 percent for a book library by default, completes the reading session and removes the saved position. The threshold is a per-library setting, described in [Managing Libraries](../managing-libraries/index.md).
+
 ## Browsing your music
 
 Opening a music library shows a page with the library title, a search box, a sort toggle, a count of items, a grid of artist cards, an alphabetical picker down the side, and pagination at the bottom.
@@ -74,6 +76,8 @@ Each artist is a card; selecting it opens the artist's page, and the card's acti
 The artist page is also where you edit the artist. It lists the artist's albums as cards, each leading to its own album page, followed by the artist's general information, contributors, ratings, genres, tags, aliases, areas and identifiers. The album page holds the album's information and its tracks, and the track page holds the track's details. The album page also shows the artwork Lumina stored for the album as a strip of thumbnails beside the main image, and selecting a thumbnail displays that image in place of the cover. Deleting an artist, album or track removes it from Lumina's catalogue; your files are not touched.
 
 The music pages also play what they show. The artist page has a **Play all** control that plays the artist's releases in the order the page presents them, one release after another. The actions menu of a music library card on the home page, of an artist card, and of an album card offers **Play** and **Shuffle**. Play starts the library at its first artist and continues through the remaining artists in artist page order, starts the artist's discography in the order the artist page presents it, or starts the release in disc and track order. Shuffle starts the library, the artist's discography or the release with a list of up to 100 tracks sampled uniformly at random from every track of that scope, and continues in random order without repeating a track that is already queued. The album page has a **Play album** control that plays the release in disc and track order, and every track row has its own play control that plays just that track. The track page has a **Play track** control for the track it shows. Every track row on the album page also has an actions menu: **Add to playlist** opens the playlist picker for that track, **Add to play queue** appends it to the end of the player queue or starts it when the queue is empty, and **Play all from here** replaces the queue with that track and the rest of the album and starts playing. Starting playback opens the player bar at the bottom of the window. It keeps playing while you move between pages, and the bar shows the track name, with the album name underneath when the track belongs to a named album, the progress of the current track, a segmented VU meter that follows the level of the track, and the volume, together with previous, play or pause, stop, next and repeat controls. When you expand it, it also shows the cover art, the current track name, the release type, the release name and year, the artist name, and a carousel of the album's stored artwork, next to the queue, where every entry carries its album cover, including when only one track is queued. Selecting an artwork in the carousel shows it as the main cover. The expanded queue moves the current track to the top whenever playback advances, so it stays visible even in a long list. The current track's favorite is the heart on the bar between the repeat and mute controls, and every entry of the expanded queue carries its own heart. The queue's own playlist picker appends the whole queue, in order, to one of your playlists. The double chevron at the right points up to expand the bar and down to collapse it. Stop is the square control next to play or pause; in the condensed bar it stops playback and slides the bar out of view.
+
+Music libraries do not remember positions by default. When progress tracking is turned on for a music library, starting a track resumes it from the last reported position, and stopping it at or above the library's completion threshold, when one is set, completes the session instead of saving a position.
 
 ## Playlists
 
@@ -104,6 +108,26 @@ The **Favorites** page in the library section lists everything you marked, most 
 - **Load more** when the list is long, or **Retry** if it does not load.
 
 A favorite whose item was deleted, or whose library you can no longer access, stays in the list as an unavailable card so you can still remove it.
+
+## Statistics
+
+The **Statistics** entry under Library opens your consumption statistics. It covers every media kind the server can consume, with music and book sessions appearing side by side and more kinds joining as their catalogues arrive. The statistics are built from the sessions your player and reader report, belong to your account, and are not shared with other regular users; administrators can view any user's statistics.
+
+A session counts towards the statistics when it completes, or when it reaches the counting rule of its kind. A music track counts after 30 seconds, and a book counts after more than 5 consecutive pages. A stopped session below the rule is stored but not counted, while the total consumed time still includes the time you spent. Completion is separate from counting: a session can count without the library considering the item complete.
+
+The page shows:
+
+- **Total consumed time**, **counted sessions**, **completed sessions** and the **completion rate** of the selected user.
+- **By media kind**, the same totals broken down per kind.
+- **Genres** and **tags** as bars, grouped across media kinds and shown lowercase. A genre or tag shared by a book and a track appears once.
+- **Recently consumed** and **most consumed**, with the kind of each item, its title, creator, collection, cover, last consumption time, counted sessions, completed sessions and consumed time.
+- **Filters** for the library, the media kind and a date range, applied to every section.
+
+Each history row has **Delete from history**, which removes every recorded session of that item. The page also has **Clear history**, which removes every recorded session of the selected user, and **Remove from continue watching**, which removes every saved resume point of the selected user. Each action asks for confirmation, and the page reloads after it. Deleting history does not remove resume points, and removing resume points does not delete history. The resume points themselves are the saved positions described under reading and listening; the statistics page does not list them, it only clears them.
+
+An administrator sees a user picker with **Me**, every user, and **All users**. Selecting another user shows that user's statistics. Selecting **All users** shows the combined totals and a per-user table, because the history lists and the genre and tag breakdown are only meaningful per user. A regular user sees no picker and only their own statistics. Administrators can read and delete the history of any user; regular users can only read and delete their own.
+
+An item that was deleted, or whose library you can no longer access, keeps its place in the counts but is shown as unavailable, without display details. Select **Retry** when a section does not load.
 
 ## Editing what is catalogued
 

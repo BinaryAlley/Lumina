@@ -23,6 +23,7 @@ The web client of Lumina is a themed shell: every page is rendered inside the te
       - [The Shared Add to Playlist Action](#the-shared-add-to-playlist-action)
       - [The Album Track Actions Menu](#the-album-track-actions-menu)
       - [The Favorites Page](#the-favorites-page)
+      - [The Statistics Page](#the-statistics-page)
       - [Favorite Toggles](#favorite-toggles)
     - [The Scripts Section](#the-scripts-section)
   - [Assets](#assets)
@@ -177,6 +178,7 @@ Known page keys:
 | `playlists/index` | The page that lists and deletes the playlists of the current user. |
 | `playlists/item` | The page that creates a playlist, or edits, reorders, plays and deletes an existing playlist of the current user. The `isNew` page data field tells the two modes apart. |
 | `favorites/index` | The page that lists, filters and removes the favorites of the current user across media kinds. |
+| `library/statistics/index` | The page that shows the consumption statistics of the current user or, for an administrator, of another user or every user, across every media kind. |
 | `shared/file-system-browser` | The file system browser component shell. |
 | `shared/file-system-browser/tree-node` | The tree view node of the file system browser. |
 | `shared/file-system-browser/explorer-item` | The file system entry of the file system browser. |
@@ -611,6 +613,38 @@ The pages of the media items read the library of the item from the `libraryId` q
 The fallback view keeps these element hooks, which the application script drives: `favorites-container`, `no-favorites`, `favorite-count`, `favorites-kind-filter`, `load-more-favorites-button` and `retry-favorites-button`. The bundled themes ship no template for `favorites/index`, so the fallback view is what a healthy site shows, and a theme that wants its own page provides `templates/favorites/index.html` and must keep the hooks the page script needs.
 
 The fallback view renders one card per favorite, from the most recently favorited, in pages of 50 that `load-more-favorites-button` extends. Each card carries a favorite heart (a `card-favorite-toggle` button, described below), already in the favorited state, and a favorite is removed from the page by unfavoriting its card: the page script does not call the remove route itself, the global favorites script does, and the page listens to the `lumina:favorite-changed` event described below, removes the card of an item that is no longer a favorite, and updates the counter and the empty state without another request. A failed first page or reload clears the rendered cards and shows the localized failure message with `retry-favorites-button`, so the user can load the current filter again instead of being left with a truncated list. A theme template that renders the page itself gets the same behavior by rendering hearts on its cards and handling that event.
+
+#### The Statistics Page
+
+`library/statistics/index` receives a model with the following fields:
+
+The five URLs that return the data of a selected user accept an optional `userId` query parameter. The page script appends it when an administrator selected a user, including `Me`, and omits it for a regular user. The Web proxy calls the `/users/{userId}/...` API route when `userId` is present and the `/users/me/...` route when it is absent.
+
+| Field | Content |
+| --- | --- |
+| `getStatisticsUrl` | The route that returns the statistics of the selected user. It takes the optional `userId`, `libraryId`, `mediaKind`, `fromUtc` and `toUtc` query parameters, and returns the summary of that user. |
+| `getAllUsersStatisticsUrl` | The route that returns the statistics of every user. It takes the optional `libraryId`, `mediaKind`, `fromUtc` and `toUtc` filters, and returns the combined totals and one summary per user. |
+| `getRecentlyConsumedUrl` | The route that returns a page of the recently consumed items of the selected user. It takes the optional `userId`, the same filters, and the optional `currentPage` and `perPage` query parameters, and returns `data`, `currentPage`, `perPage`, `count` and `numberOfPages`. |
+| `getMostConsumedUrl` | The route that returns a page of the most consumed items of the selected user, with the same query parameters and response shape. |
+| `getTagConsumptionUrl` | The route that returns the tag breakdown of the selected user. It takes the optional `userId`, `libraryId`, `mediaKind`, `fromUtc` and `toUtc` query parameters. |
+| `getGenreConsumptionUrl` | The route that returns the genre breakdown of the selected user, with the same query parameters as the tag route. |
+| `getLibrariesUrl` | The route that returns the libraries available for the library filter. |
+| `getUsersUrl` | The route that returns the users available for the administrator user selector, or an empty string for a regular user. |
+| `deleteConsumptionItemHistoryUrl` | The route that deletes every consumption record of one media item. It is extended with `mediaKind`, `mediaItemId` and `libraryId`, and with `userId` when a user is named. |
+| `clearConsumptionHistoryUrl` | The route that deletes the consumption history of the selected user. It is extended with `userId` when the administrator selected a user. |
+| `clearResumePointsUrl` | The route that deletes the resume points of the selected user. It is extended with `userId` when the administrator selected a user. |
+| `culture` | The culture of the page, for example `en-US`, used to format dates and percentages in the browser. |
+| `isAdmin` | Whether the current user is an administrator and can select another user or all users. |
+| `currentUserId` | The Id of the current user, or `null` when it cannot be determined. |
+| `strings` | The localized strings of the page, keyed by their resource names. |
+
+A summary carries `userId` on a per-user result, plus `totalConsumedDurationInSeconds`, `countedSessionCount`, `completedSessionCount`, `stoppedSessionCount`, `completionRate` and `mediaKindSummaries`. The all-users result carries a `total` summary without `userId` and a `users` list of per-user summaries. A media kind summary carries `mediaKind` and the same totals without `userId`.
+
+A row of the recently consumed or most consumed list carries `mediaKind`, `mediaItemId`, `libraryId`, `isAvailable`, `title`, `collectionTitle`, `creatorName`, `coverPath`, `lastConsumedOnUtc`, `countedSessionCount`, `completedSessionCount` and `consumedDurationInSeconds`. A tag or genre row carries `name`, `consumedItemCount` and `consumedDurationInSeconds`. Names are lowercase and grouped across media kinds. An item that is no longer available keeps its counts and duration but has blank display fields, so the page shows it as unavailable without a link.
+
+The page script loads the libraries for the filter, and the users only when the current user is an administrator. The user selector offers the current user, every other user, and `All users`. The all-users selection loads the combined totals and the per-user table, and hides the tag breakdown and the history lists, which are only meaningful per user. Any other selection loads the summary, the media kind breakdown, the tag and genre bars, and the two history lists. Applying the filters reloads every section with the selected library, media kind and date range. Clearing the history or the resume points asks for confirmation first, and refreshing after a deletion reloads every section.
+
+The fallback view keeps these element hooks, which the application script drives: `statistics-user-filter`, `statistics-user-filter-toggle`, `statistics-user-filter-dropdown`, `statistics-library-filter`, `statistics-library-filter-toggle`, `statistics-library-filter-dropdown`, `statistics-kind-filter`, `statistics-kind-filter-toggle`, `statistics-from-date`, `statistics-to-date`, `statistics-apply-filters`, `statistics-reset-filters`, `statistics-loading`, `statistics-load-failed`, `retry-statistics-button`, `statistics-content`, `statistics-total-duration`, `statistics-counted-sessions`, `statistics-completed-sessions`, `statistics-completion-rate`, `statistics-media-kind-breakdown`, `statistics-no-media-kind`, `statistics-users-section`, `statistics-users-table`, `statistics-no-users`, `statistics-terms`, `statistics-genres`, `statistics-tags`, `statistics-no-genres`, `statistics-no-tags`, `statistics-history-section`, `statistics-clear-history`, `statistics-clear-resume-points`, `statistics-recently-consumed`, `statistics-no-recently-consumed`, `statistics-most-consumed`, `statistics-no-most-consumed`, `statistics-all-users-note` and `statistics-empty-state`. A theme template that renders the page itself gets the same behavior by keeping these hooks and rendering the localized strings from the page model.
 
 #### Favorite Toggles
 

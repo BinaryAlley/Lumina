@@ -33,7 +33,7 @@
 
 ## Media Consumption
 
-The media consumption API records what the current user consumed, how far they reached, how long they consumed it, and where they can resume it. It is media neutral: the same routes serve a music track and a book, and future catalogues use the same routes without a per-kind endpoint.
+The media consumption API records what the current user consumed, how far they reached, how long they consumed it, and where they can resume it. It is media neutral: the same routes serve a music track and a book, and every future catalogue uses the same routes without a per-kind endpoint. The statistics read these records; see [Library Statistics](../library/statistics/Api.LibraryStatistics.md) for the counting rules and the aggregated reads.
 
 A consumption session is stored as a `MediaConsumptionRecord`. It carries the kind of media, the library and the item, the start and end times, the latest position and progress fraction, the active consumed duration, and the number of consecutive pages read for page based media. It is not a playback session: it stores no queue, no current index, no repeat or shuffle state, and it never restores playback.
 
@@ -64,7 +64,7 @@ Authorization: Bearer <token>
 | Route value | Meaning |
 | --- | --- |
 | `libraryId` | The Id of the media library that contains the item. It must be a Guid and cannot be the empty Guid. |
-| `mediaKind` | The kind of media, matched case insensitively. Only the member names are accepted: `MusicTrack` and `Book` today. Numeric values such as `1`, `6` or `0` are rejected, even when they are defined enumeration values. |
+| `mediaKind` | The kind of media, matched case insensitively. Only the member names are accepted: `MusicTrack` and `Book` for now. Numeric values such as `1`, `6` or `0` are rejected, even when they are defined enumeration values. |
 | `mediaItemId` | The Id of the consumed item. It must be a Guid and cannot be the empty Guid. |
 
 Starts a consumption session for the item named by the route. The request has no body: every identifier is taken from the route, so a client cannot substitute the library, kind or item with a body value.
@@ -242,6 +242,8 @@ Reports the latest measurements of an in-progress session of the current user. T
 A session of a non-page-based kind cannot report consecutive pages above zero. A music client that sends `consecutivePagesRead` above zero is rejected with `ConsecutivePagesReadIsOnlySupportedForPageBasedMedia`, even though the request contract has the field for every kind.
 
 A book page count of 5 does not count as a session for statistics, while 6 does, but that counting rule belongs to the statistics read model and does not change the stored progress.
+
+The book reader counts spine sections as pages, because the reader exposes no pagination finer than a section. A PDF page is a section of its own, but a reflowable book can put a whole chapter, or several pages, in one section, so the reported page count approximates the pages a reader saw and the threshold counts sections rather than printed or viewport pages.
 
 #### Report Consumption Progress Response
 
@@ -513,7 +515,7 @@ A missing resume point returns `MediaResumePointNotFound`. A deleted item, or an
 | `Photo` | Planned | A photo. Its catalogue does not exist yet, and it has no position, so it cannot resume. |
 | `Video` | Planned | A video. Its catalogue does not exist yet. |
 
-Only the supported kinds can start a consumption session today. A planned kind is rejected with `UnsupportedMediaKind`, and a `None` kind is rejected by validation. The planned kinds are listed so that clients can map the shared enumeration, not because their routes are available.
+Only the supported kinds can start a consumption session for now. A planned kind is rejected with `UnsupportedMediaKind`, and a `None` kind is rejected by validation. The planned kinds are listed so that clients can map the shared enumeration, not because their routes are available.
 
 ### Session Statuses
 
@@ -561,6 +563,8 @@ A session moves through one lifecycle:
 A resume point is separate from the history. It is created or updated by progress and stop when the library tracks progress, the kind can resume, and a position is known. It is read by start to initialize a new session. It is deleted by completion and by a stop that reaches the completion threshold. A stopped session that did not reach the threshold keeps it for the next start. Deleting a history record does not delete the resume point, because the two are separate actions in the product.
 
 The business key of a resume point is the user, the media kind and the media item. There is at most one resume point per key, so a progress report updates the existing row instead of inserting a second one.
+
+Ending a session is best effort on the client side. A client can disappear between its start request and its first terminal request, for example when a full page unload happens while the start is still in flight. The record created by such a start remains `InProgress`: the API does not expire it, and start is not idempotent, so the next session creates a new record instead of closing or reusing the lost one. A lost session therefore remains in the stored history as a record that was never ended.
 
 ### Completion Threshold
 

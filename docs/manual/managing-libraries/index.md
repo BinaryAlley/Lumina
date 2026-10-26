@@ -51,6 +51,8 @@ Open the Libraries management page, choose to add a library, and fill in the for
 | Download metadata from the web | on | Whether Lumina may look up the metadata of the items online. This only has an effect when a metadata provider is enabled for the library (see [Plugins](../plugins/index.md)). |
 | Save metadata in media directories | off | Whether the metadata Lumina fetches is also written next to your media files, so other tools can read it. This is the one option that writes into your media folders. |
 | Skip unchanged directories during scan | off | An opt-in speedup that skips folders whose own last-modified time has not changed since the last scan. Editing the contents of an existing file in place, without adding, removing or renaming anything in that folder, leaves the folder's time untouched, so that edit can be missed while it is on. |
+| Track consumption progress | the type default | Whether the latest playback or reading position of the library's items is remembered, so a user can resume where they left off. |
+| Completion threshold | the type default | The percentage of an item that must be consumed for a stopped session to be recorded as completed. Empty means completion is recorded only when it is reported explicitly. |
 | Path template | the type's ideal structure | Tells Lumina how your folders are arranged on disk. Unless you customize it, it holds the default template of the library type, which is exactly the structure Lumina expects. Optional, and explained in full below. |
 
 A library that is disabled or locked is never scanned, so those two settings double as a pause switch, and `Locked` also freezes edits.
@@ -130,6 +132,36 @@ Editing a library reopens the same form, and changes take effect on the next sca
 - Changing the **type** of an existing library also reconciles the metadata, artwork and reader provider settings of that library, so they match the plugins that support the new type.
 - Changing the **content locations** takes effect on the next scan. Items found under a location you removed are dropped from the catalogue, along with the metadata and artwork Lumina had stored for them, and items under a location you added are picked up.
 
+## Progress tracking and completion thresholds
+
+Two settings on a library decide whether Lumina remembers where you stopped and when a session is complete. They apply to every user of that library.
+
+- **Track consumption progress** decides whether the latest playback or reading position of an item is remembered and offered as the resume position. When it is off, Lumina stores no resume point for the library's items.
+- **Completion threshold** is the percentage of an item at which a stopped session is recorded as completed instead of stopped. It is set only while tracking is on, and it can be left empty.
+
+When a session ends, the settings decide its status:
+
+- **Tracking off**: the session is recorded as stopped, its position is not saved, and the completion threshold is not checked.
+- **Tracking on, no threshold**: the session is recorded as stopped and its position is saved, so it can be resumed. It is completed only when completion is reported explicitly.
+- **Tracking on with a threshold**: a stop at or above the threshold is recorded as completed and removes the resume point. A stop below the threshold is recorded as stopped and keeps the resume point.
+
+The defaults by library type are:
+
+| Library category | Track progress | Completion threshold |
+| --- | --- | --- |
+| Music audio (Music, Remix, SoundEffect, CoverSongAudio, LiveRecordingAudio, InterviewAudio) | no | none |
+| Photo | no | none |
+| Written content (Book, EBook, ComicBook, Magazine, Newspaper, Manga, GraphicNovel, AcademicPaper, SheetMusic) | yes | 100 |
+| Video (TvShow, Movie, Documentary, Anime, ConcertVideo, TutorialVideo, HomeVideo, YouTubeVideo, MusicVideo, LiveRecordingVideo, InterviewVideo, CoverSongVideo) | yes | 90 |
+| Audiobook and podcast (Audiobook, PodcastAudio, PodcastVideo) | yes | 95 |
+| Other, non-media or unknown | no | none |
+
+For now, only Book and Music libraries produce a working catalogue, so the written content and music defaults are the ones you will meet. Other library types can still be created, and their rows are the defaults they will use when their catalogues arrive. A value you set on a library always wins after the library is created.
+
+When you add a library without changing these fields, Lumina applies the default of its type. When you turn tracking on for a library whose type has no default threshold, the threshold stays empty and completion is recorded only when it is reported explicitly. An empty threshold is not zero: zero would complete every stopped session as soon as it stops.
+
+The threshold must be a whole number from 0 to 100, and the form refuses any other value. Changing it affects sessions that stop afterwards; a session that was already recorded keeps the status it was recorded with. Turning tracking off clears the threshold. The setting does not change what a library can play or read, only whether a resume point is kept and how a stopped session is recorded.
+
 ## Deleting a library
 
 Deleting a library removes it from Lumina: its configuration, its scan history, the items in its catalogue, their metadata and the artwork Lumina stored for them, and its provider settings. The cover image Lumina copied into its own storage is removed as well. Your original files are left untouched.
@@ -160,8 +192,11 @@ These are per user settings, each user changes their own from the settings page 
 - **`Skip unchanged directories during scan` can miss in-place edits.** It trusts each folder's own last-modified time, so editing the contents of an existing file without adding, removing or renaming anything in its folder leaves the folder unchanged and it gets skipped. Adding, removing or renaming a file does change the folder, and is still seen.
 - **`Locked` blocks everything.** A locked library is not scanned and not updated, including by the scheduler.
 - **`Disabled` hides the library.** A disabled library is neither shown on the dashboard nor touched.
-- **Deleting a library removes Lumina's catalogue for it.** The files remain, but the metadata, artwork and history Lumina held for that library do not.
+- **Deleting a library removes Lumina's catalogue for it.** The files remain, but the metadata and artwork Lumina held for that library do not. Consumption history and resume points are kept as records of what was consumed. The history shows the items as unavailable until you delete it. **Remove from continue watching** removes every resume point of the selected user, not only the ones from the deleted library.
 - **Removing a folder from a library, or deleting a file, removes its catalogued items on the next scan.** The catalogue tracks what is on disk, so what disappears from disk also disappears from Lumina, along with the metadata and artwork Lumina stored for it.
 - **Changing the path template can change how items are read.** Re-scan and check the results after a change.
-- **Only Book and Music libraries scan today.** Other types cannot be created into a working library yet.
+- **Tracking off means no resume points.** A library that does not track consumption progress never offers a saved position, even if a client reports one.
+- **An empty completion threshold is not zero.** Empty means completion is recorded only when it is reported explicitly, while zero completes a stopped session immediately.
+- **Deleting history and removing resume points are separate.** Clearing a user's history removes all of that user's recorded sessions and keeps their resume points, while **Remove from continue watching** removes all of that user's resume points and keeps their history. Neither action is limited by the library, media kind or date filters of the statistics page.
+- **For now, only Book and Music libraries produce a working catalogue.** Other types can be created, but they do not scan into a usable catalogue yet.
 - **Not every book format is readable.** Recognized formats are indexed, but only those with an enabled reader plugin can be opened in the browser.
