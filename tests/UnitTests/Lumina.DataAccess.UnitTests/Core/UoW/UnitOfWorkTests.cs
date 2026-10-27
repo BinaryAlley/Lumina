@@ -74,6 +74,8 @@ public class UnitOfWorkTests
         yield return new object[] { nameof(IUnitOfWork.ThemeRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.ThemeRepository) };
         yield return new object[] { nameof(IUnitOfWork.UserRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.UserRepository) };
         yield return new object[] { nameof(IUnitOfWork.UserSettingsRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.UserSettingsRepository) };
+        yield return new object[] { nameof(IUnitOfWork.MediaConsumptionRecordRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.MediaConsumptionRecordRepository) };
+        yield return new object[] { nameof(IUnitOfWork.MediaResumePointRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.MediaResumePointRepository) };
     }
 
     [Theory]
