@@ -53,6 +53,21 @@ public class GenreDtoMappingTests
         Assert.Equal(name.ToLowerInvariant(), result.Value.Name);
     }
 
+    [Fact]
+    public void ToDomainValueObject_WhenGenreNameHasSurroundingWhitespaceAndMixedCase_ShouldStoreTheTrimmedLowercaseInvariantName()
+    {
+        // Arrange
+        GenreDto genreDto = _genreDtoFixture.Create(name: "  ÉLECTRO  ");
+
+        // Act
+        Result<Genre> result = genreDto.ToDomainValueObject();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Equal("électro", result.Value.Name);
+    }
+
     [Theory]
     [InlineData("")]
     [InlineData(" ")]

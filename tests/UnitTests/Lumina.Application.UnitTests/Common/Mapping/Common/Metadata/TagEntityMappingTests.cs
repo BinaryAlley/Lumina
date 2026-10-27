@@ -84,6 +84,21 @@ public class TagEntityMappingTests
         Assert.Equal("fantasy", result.Value.Name);
     }
 
+    [Fact]
+    public void ToDomainValueObject_WhenTagNameHasSurroundingWhitespaceAndMixedCase_ShouldStoreTheTrimmedLowercaseInvariantName()
+    {
+        // Arrange
+        TagEntity entity = _tagEntityFixture.Create(name: "  InDiE  ");
+
+        // Act
+        Result<Tag> result = entity.ToDomainValueObject();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Equal("indie", result.Value.Name);
+    }
+
     [Theory]
     [InlineData("")]
     [InlineData(" ")]

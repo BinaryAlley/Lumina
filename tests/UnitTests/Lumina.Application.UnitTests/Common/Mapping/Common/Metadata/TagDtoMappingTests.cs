@@ -54,6 +54,21 @@ public class TagDtoMappingTests
         Assert.Equal(name.ToLowerInvariant(), result.Value.Name);
     }
 
+    [Fact]
+    public void ToDomainValueObject_WhenTagNameHasSurroundingWhitespaceAndMixedCase_ShouldStoreTheTrimmedLowercaseInvariantName()
+    {
+        // Arrange
+        TagDto tagDto = _tagDtoFixture.Create(name: "  InDiE  ");
+
+        // Act
+        Result<Tag> result = tagDto.ToDomainValueObject();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Equal("indie", result.Value.Name);
+    }
+
     [Theory]
     [InlineData("")]
     [InlineData(" ")]

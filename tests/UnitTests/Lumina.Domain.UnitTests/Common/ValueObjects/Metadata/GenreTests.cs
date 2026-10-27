@@ -4,6 +4,7 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using Lumina.Domain.Fixtures.Common.ValueObjects.Metadata;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 #endregion
 
 namespace Lumina.Domain.UnitTests.Common.ValueObjects.Metadata;
@@ -25,6 +26,47 @@ public class GenreTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.Equal("science fiction", result.Value.Name);
+    }
+
+    [Theory]
+    [InlineData("  Science FICTION  ", "science fiction")] // ASCII mixed case with surrounding whitespace
+    [InlineData("ÉLECTRO", "électro")] // non-ASCII Latin uppercase
+    [InlineData("ЖАНР", "жанр")] // non-Latin uppercase
+    [InlineData("   indie   ", "indie")] // surrounding whitespace
+    public void Create_WhenNameHasMixedCaseOrSurroundingWhitespace_ShouldNormalizeIt(string name, string expectedName)
+    {
+        // Act
+        Result<Genre> result = Genre.Create(name);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(expectedName, result.Value.Name);
+    }
+
+    [Fact]
+    public void Create_WhenCurrentCultureIsTurkish_ShouldLowercaseWithTheInvariantCulture()
+    {
+        CultureInfo originalCulture = CultureInfo.CurrentCulture;
+        CultureInfo originalUiCulture = CultureInfo.CurrentUICulture;
+        try
+        {
+            // Arrange
+            CultureInfo.CurrentCulture = new CultureInfo("tr-TR");
+            CultureInfo.CurrentUICulture = new CultureInfo("tr-TR");
+
+            // Act
+            Result<Genre> result = Genre.Create("INDIE");
+
+            // Assert
+            Assert.False(result.IsFailure);
+            // The Turkish culture maps an uppercase I to a dotless lowercase i, so this proves the invariant culture is used.
+            Assert.Equal("indie", result.Value.Name);
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = originalCulture;
+            CultureInfo.CurrentUICulture = originalUiCulture;
+        }
     }
 
     [Theory]

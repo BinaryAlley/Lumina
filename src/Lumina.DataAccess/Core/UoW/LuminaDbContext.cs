@@ -11,7 +11,6 @@ using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Entities.Scheduling;
 using Lumina.Application.Common.DataAccess.Entities.Themes;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.DataAccess.Common.Interceptors;
 using Microsoft.EntityFrameworkCore;
 #endregion
 
@@ -65,16 +64,6 @@ public class LuminaDbContext : DbContext
     /// <param name="options">The options for configuring the database context.</param>
     public LuminaDbContext(DbContextOptions<LuminaDbContext> options) : base(options)
     {
-    }
-
-    /// <summary>
-    /// Configures the database context options, including the interceptors that apply to every connection.
-    /// </summary>
-    /// <param name="optionsBuilder">The builder used to configure the database context.</param>
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        base.OnConfiguring(optionsBuilder);
-        optionsBuilder.AddInterceptors(new SqliteSharedReferenceNormalizationInterceptor());
     }
 
     /// <summary>

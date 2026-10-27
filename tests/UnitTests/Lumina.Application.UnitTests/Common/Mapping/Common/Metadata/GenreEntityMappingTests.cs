@@ -84,6 +84,21 @@ public class GenreEntityMappingTests
         Assert.Equal("fiction", result.Value.Name);
     }
 
+    [Fact]
+    public void ToDomainValueObject_WhenGenreNameHasSurroundingWhitespaceAndMixedCase_ShouldStoreTheTrimmedLowercaseInvariantName()
+    {
+        // Arrange
+        GenreEntity entity = _genreEntityFixture.Create(name: "  ÉLECTRO  ");
+
+        // Act
+        Result<Genre> result = entity.ToDomainValueObject();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Equal("électro", result.Value.Name);
+    }
+
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
