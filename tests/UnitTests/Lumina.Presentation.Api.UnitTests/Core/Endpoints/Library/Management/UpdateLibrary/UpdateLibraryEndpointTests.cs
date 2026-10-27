@@ -86,7 +86,9 @@ public class UpdateLibraryEndpointTests
     public async Task ExecuteAsync_WhenCalled_ShouldSendUpdateLibraryCommandToSender()
     {
         // Arrange
-        UpdateLibraryRequest request = _updateLibraryRequestFixture.Create();
+        UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: 65);
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<UpdateLibraryCommand>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(_libraryResponseFixture.Create(id: request.Id, userId: request.UserId)));
@@ -110,6 +112,28 @@ public class UpdateLibraryEndpointTests
                 command.ShouldSkipUnchangedDirectoriesDuringScan == request.ShouldSkipUnchangedDirectoriesDuringScan &&
                 command.ShouldTrackConsumptionProgress == request.ShouldTrackConsumptionProgress &&
                 command.CompletionThresholdPercentage == request.CompletionThresholdPercentage),
+            Arg.Is(cancellationToken));
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenConsumptionSettingsAreAbsent_ShouldSendNullConsumptionSettings()
+    {
+        // Arrange
+        UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
+            shouldTrackConsumptionProgress: null,
+            completionThresholdPercentage: null);
+        CancellationToken cancellationToken = CancellationToken.None;
+        _mockHandler.HandleAsync(Arg.Any<UpdateLibraryCommand>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(_libraryResponseFixture.Create(id: request.Id, userId: request.UserId)));
+
+        // Act
+        await _sut.ExecuteAsync(request, cancellationToken);
+
+        // Assert
+        await _mockHandler.Received(1).HandleAsync(
+            Arg.Is<UpdateLibraryCommand>(command =>
+                command.ShouldTrackConsumptionProgress == null &&
+                command.CompletionThresholdPercentage == null),
             Arg.Is(cancellationToken));
     }
 

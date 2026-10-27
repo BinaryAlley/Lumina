@@ -25,6 +25,7 @@ public class LibraryMappingTests
     private readonly LibraryFixture _libraryFixture = new();
     private readonly LibraryPathPartFixture _libraryPathPartFixture = new();
     private readonly LibraryPathTemplateFixture _libraryPathTemplateFixture = new();
+    private readonly LibraryConsumptionSettingsFixture _libraryConsumptionSettingsFixture = new();
 
     [Fact]
     public void ToRepositoryEntity_WhenMappingValidLibrary_ShouldMapCorrectly()
@@ -243,5 +244,47 @@ public class LibraryMappingTests
 
         // Assert
         Assert.Empty(result.PathTemplateParts);
+    }
+
+    [Fact]
+    public void ToRepositoryEntity_WhenProgressTrackingIsEnabled_ShouldMapTrackingAndThreshold()
+    {
+        // Arrange
+        LibraryConsumptionSettings consumptionSettings = _libraryConsumptionSettingsFixture.Create(
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: 70);
+        Library library = _libraryFixture.Create(
+            title: "Test Library",
+            libraryType: LibraryType.Book,
+            contentLocations: ["C:/Books"],
+            consumptionSettings: consumptionSettings);
+
+        // Act
+        LibraryEntity result = library.ToRepositoryEntity();
+
+        // Assert
+        Assert.True(result.ShouldTrackConsumptionProgress);
+        Assert.Equal(70, result.CompletionThresholdPercentage);
+    }
+
+    [Fact]
+    public void ToRepositoryEntity_WhenProgressTrackingIsDisabled_ShouldMapTrackingOffWithoutThreshold()
+    {
+        // Arrange
+        LibraryConsumptionSettings consumptionSettings = _libraryConsumptionSettingsFixture.Create(
+            shouldTrackConsumptionProgress: false,
+            completionThresholdPercentage: 70);
+        Library library = _libraryFixture.Create(
+            title: "Test Library",
+            libraryType: LibraryType.Book,
+            contentLocations: ["C:/Books"],
+            consumptionSettings: consumptionSettings);
+
+        // Act
+        LibraryEntity result = library.ToRepositoryEntity();
+
+        // Assert
+        Assert.False(result.ShouldTrackConsumptionProgress);
+        Assert.Null(result.CompletionThresholdPercentage);
     }
 }

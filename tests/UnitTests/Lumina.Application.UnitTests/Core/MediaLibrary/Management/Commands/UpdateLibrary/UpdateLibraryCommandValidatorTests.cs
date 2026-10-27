@@ -358,4 +358,109 @@ public class UpdateLibraryCommandValidatorTests
         // Assert
         result.ShouldNotHaveAnyValidationErrors();
     }
+
+    [Theory]
+    [InlineData(-1)] // just below the allowed range
+    [InlineData(int.MinValue)] // the lowest possible value
+    public void Validate_WhenThresholdIsBelowZero_ShouldHaveValidationError(int completionThresholdPercentage)
+    {
+        // Arrange
+        UpdateLibraryCommand command = _updateLibraryCommandFixture.Create(
+            libraryType: nameof(LibraryType.Book),
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: completionThresholdPercentage);
+
+        // Act
+        List<Error> result = _validator.TestValidate(command);
+
+        // Assert
+        result.ShouldHaveValidationError(Errors.Library.CompletionThresholdPercentageMustBeBetweenZeroAndOneHundred);
+    }
+
+    [Theory]
+    [InlineData(101)] // just above the allowed range
+    [InlineData(int.MaxValue)] // the highest possible value
+    public void Validate_WhenThresholdIsAboveOneHundred_ShouldHaveValidationError(int completionThresholdPercentage)
+    {
+        // Arrange
+        UpdateLibraryCommand command = _updateLibraryCommandFixture.Create(
+            libraryType: nameof(LibraryType.Book),
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: completionThresholdPercentage);
+
+        // Act
+        List<Error> result = _validator.TestValidate(command);
+
+        // Assert
+        result.ShouldHaveValidationError(Errors.Library.CompletionThresholdPercentageMustBeBetweenZeroAndOneHundred);
+    }
+
+    [Theory]
+    [InlineData(0)] // the lowest allowed boundary
+    [InlineData(100)] // the highest allowed boundary
+    public void Validate_WhenThresholdIsAtAnAllowedBoundary_ShouldNotHaveValidationError(int completionThresholdPercentage)
+    {
+        // Arrange
+        UpdateLibraryCommand command = _updateLibraryCommandFixture.Create(
+            libraryType: nameof(LibraryType.Book),
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: completionThresholdPercentage);
+
+        // Act
+        List<Error> result = _validator.TestValidate(command);
+
+        // Assert
+        result.ShouldNotHaveValidationError(Errors.Library.CompletionThresholdPercentageMustBeBetweenZeroAndOneHundred);
+        result.ShouldNotHaveValidationError(Errors.Library.CompletionThresholdPercentageMustBeNullWhenProgressTrackingIsOff);
+    }
+
+    [Fact]
+    public void Validate_WhenThresholdIsSuppliedWhileProgressTrackingIsDisabled_ShouldHaveValidationError()
+    {
+        // Arrange
+        UpdateLibraryCommand command = _updateLibraryCommandFixture.Create(
+            libraryType: nameof(LibraryType.Book),
+            shouldTrackConsumptionProgress: false,
+            completionThresholdPercentage: 50);
+
+        // Act
+        List<Error> result = _validator.TestValidate(command);
+
+        // Assert
+        result.ShouldHaveValidationError(Errors.Library.CompletionThresholdPercentageMustBeNullWhenProgressTrackingIsOff);
+    }
+
+    [Fact]
+    public void Validate_WhenThresholdIsSuppliedWhileProgressTrackingIsNotSpecified_ShouldNotHaveValidationError()
+    {
+        // Arrange
+        UpdateLibraryCommand command = _updateLibraryCommandFixture.Create(
+            libraryType: nameof(LibraryType.Book),
+            shouldTrackConsumptionProgress: null,
+            completionThresholdPercentage: 50);
+
+        // Act
+        List<Error> result = _validator.TestValidate(command);
+
+        // Assert
+        result.ShouldNotHaveValidationError(Errors.Library.CompletionThresholdPercentageMustBeNullWhenProgressTrackingIsOff);
+        result.ShouldNotHaveValidationError(Errors.Library.CompletionThresholdPercentageMustBeBetweenZeroAndOneHundred);
+    }
+
+    [Fact]
+    public void Validate_WhenProgressTrackingIsDisabledWithoutThreshold_ShouldNotHaveValidationError()
+    {
+        // Arrange
+        UpdateLibraryCommand command = _updateLibraryCommandFixture.Create(
+            libraryType: nameof(LibraryType.Book),
+            shouldTrackConsumptionProgress: false,
+            completionThresholdPercentage: null);
+
+        // Act
+        List<Error> result = _validator.TestValidate(command);
+
+        // Assert
+        result.ShouldNotHaveValidationError(Errors.Library.CompletionThresholdPercentageMustBeNullWhenProgressTrackingIsOff);
+        result.ShouldNotHaveValidationError(Errors.Library.CompletionThresholdPercentageMustBeBetweenZeroAndOneHundred);
+    }
 }

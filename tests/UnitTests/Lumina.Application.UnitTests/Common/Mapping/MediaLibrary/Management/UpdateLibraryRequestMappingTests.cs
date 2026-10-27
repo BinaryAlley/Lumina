@@ -93,4 +93,57 @@ public class UpdateLibraryRequestMappingTests
         // Assert
         Assert.Null(result.PathTemplateParts);
     }
+
+    [Fact]
+    public void ToCommand_WhenConsumptionSettingsAreSupplied_ShouldMapThem()
+    {
+        // Arrange
+        UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
+            libraryType: "Book",
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: 75);
+
+        // Act
+        UpdateLibraryCommand result = request.ToCommand();
+
+        // Assert
+        Assert.NotNull(result.ShouldTrackConsumptionProgress);
+        Assert.True(result.ShouldTrackConsumptionProgress.Value);
+        Assert.Equal(75, result.CompletionThresholdPercentage);
+    }
+
+    [Fact]
+    public void ToCommand_WhenConsumptionSettingsAreAbsent_ShouldPreserveThemAsNull()
+    {
+        // Arrange
+        UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
+            libraryType: "Book",
+            shouldTrackConsumptionProgress: null,
+            completionThresholdPercentage: null);
+
+        // Act
+        UpdateLibraryCommand result = request.ToCommand();
+
+        // Assert
+        Assert.Null(result.ShouldTrackConsumptionProgress);
+        Assert.Null(result.CompletionThresholdPercentage);
+    }
+
+    [Fact]
+    public void ToCommand_WhenProgressTrackingIsExplicitlyDisabled_ShouldPreserveTheDisabledFlagWithoutThreshold()
+    {
+        // Arrange
+        UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
+            libraryType: "Book",
+            shouldTrackConsumptionProgress: false,
+            completionThresholdPercentage: null);
+
+        // Act
+        UpdateLibraryCommand result = request.ToCommand();
+
+        // Assert
+        Assert.NotNull(result.ShouldTrackConsumptionProgress);
+        Assert.False(result.ShouldTrackConsumptionProgress.Value);
+        Assert.Null(result.CompletionThresholdPercentage);
+    }
 }

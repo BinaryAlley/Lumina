@@ -70,8 +70,12 @@ public class LibraryConfigurationTests
         Assert.Equal("TEXT", libraryTypeProperty.GetColumnType());
         Assert.Equal(true, isEnabledProperty.GetDefaultValue());
         Assert.Equal(true, downloadMetadataProperty.GetDefaultValue());
+        Assert.Equal(typeof(bool), shouldTrackConsumptionProgressProperty.ClrType);
+        Assert.False(shouldTrackConsumptionProgressProperty.IsNullable);
         Assert.Equal(false, shouldTrackConsumptionProgressProperty.GetDefaultValue());
+        Assert.Equal(typeof(int?), completionThresholdPercentageProperty.ClrType);
         Assert.True(completionThresholdPercentageProperty.IsNullable);
+        Assert.Null(completionThresholdPercentageProperty.GetDefaultValue());
     }
 
     [Fact]
@@ -103,6 +107,42 @@ public class LibraryConfigurationTests
         // Assert
         Assert.Equal(16, shouldTrackProperty.GetColumnOrder());
         Assert.Equal(17, completionThresholdProperty.GetColumnOrder());
+        Assert.Equal(nameof(LibraryEntity.ShouldTrackConsumptionProgress), shouldTrackProperty.GetColumnName());
+        Assert.Equal(nameof(LibraryEntity.CompletionThresholdPercentage), completionThresholdProperty.GetColumnName());
+    }
+
+    [Fact]
+    public void Configure_WhenApplied_ShouldMapConsumptionSettingsAsScalarProperties()
+    {
+        // Arrange
+        IEntityType entityType = _context.Model.FindEntityType(typeof(LibraryEntity))!;
+
+        // Act
+        IProperty shouldTrackConsumptionProgressProperty = entityType.GetProperty(nameof(LibraryEntity.ShouldTrackConsumptionProgress));
+        IProperty completionThresholdPercentageProperty = entityType.GetProperty(nameof(LibraryEntity.CompletionThresholdPercentage));
+        List<INavigation> navigations = [.. entityType.GetNavigations()];
+
+        // Assert
+        Assert.Equal(typeof(LibraryEntity), shouldTrackConsumptionProgressProperty.DeclaringType.ClrType);
+        Assert.Equal(typeof(LibraryEntity), completionThresholdPercentageProperty.DeclaringType.ClrType);
+        Assert.DoesNotContain(navigations, navigation => navigation.Name == nameof(LibraryEntity.ShouldTrackConsumptionProgress));
+        Assert.DoesNotContain(navigations, navigation => navigation.Name == nameof(LibraryEntity.CompletionThresholdPercentage));
+    }
+
+    [Fact]
+    public void Configure_WhenApplied_ShouldMapConsumptionSettingsToTheirOwnColumns()
+    {
+        // Arrange
+        IEntityType entityType = DesignTimeModel.FindEntityType(typeof(LibraryEntity))!;
+
+        // Act
+        string shouldTrackConsumptionProgressColumnName = entityType.GetProperty(nameof(LibraryEntity.ShouldTrackConsumptionProgress)).GetColumnName();
+        string completionThresholdPercentageColumnName = entityType.GetProperty(nameof(LibraryEntity.CompletionThresholdPercentage)).GetColumnName();
+
+        // Assert
+        Assert.Equal(nameof(LibraryEntity.ShouldTrackConsumptionProgress), shouldTrackConsumptionProgressColumnName);
+        Assert.Equal(nameof(LibraryEntity.CompletionThresholdPercentage), completionThresholdPercentageColumnName);
+        Assert.NotEqual(shouldTrackConsumptionProgressColumnName, completionThresholdPercentageColumnName);
     }
 
     [Fact]

@@ -96,6 +96,171 @@ public class LibraryRepositoryTests
         Assert.Equal(keptLocationId, context.Entry(library.ContentLocations.Single(location => location.Path == "/media/keep")).Property<Guid>("Id").CurrentValue);
     }
 
+    [Fact]
+    public async Task InsertAsync_WhenLibraryTracksConsumptionProgress_ShouldPersistTheTrackingAndThreshold()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-libraryrepo-insert-consumption-tracking-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        Guid userId = Guid.NewGuid();
+        DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
+        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        LibraryRepository sut = new(context);
+        context.Users.Add(_userEntityFixture.Create(id: userId));
+        LibraryEntity library = _libraryEntityFixture.Create(userId: userId, shouldTrackConsumptionProgress: true, completionThresholdPercentage: 75, contentLocations: []);
+
+        // Act
+        Result<Created> result = await sut.InsertAsync(library, CancellationToken.None);
+        await context.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Created, result.Value);
+        LibraryEntity? storedLibrary = await context.Libraries.AsNoTracking().FirstOrDefaultAsync(candidate => candidate.Id == library.Id);
+        Assert.NotNull(storedLibrary);
+        Assert.True(storedLibrary!.ShouldTrackConsumptionProgress);
+        Assert.Equal(75, storedLibrary.CompletionThresholdPercentage);
+    }
+
+    [Fact]
+    public async Task InsertAsync_WhenLibraryDoesNotTrackConsumptionProgress_ShouldPersistTrackingOffWithoutThreshold()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-libraryrepo-insert-consumption-off-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        Guid userId = Guid.NewGuid();
+        DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
+        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        LibraryRepository sut = new(context);
+        context.Users.Add(_userEntityFixture.Create(id: userId));
+        LibraryEntity library = _libraryEntityFixture.Create(userId: userId, shouldTrackConsumptionProgress: false, completionThresholdPercentage: null, contentLocations: []);
+
+        // Act
+        Result<Created> result = await sut.InsertAsync(library, CancellationToken.None);
+        await context.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Created, result.Value);
+        LibraryEntity? storedLibrary = await context.Libraries.AsNoTracking().FirstOrDefaultAsync(candidate => candidate.Id == library.Id);
+        Assert.NotNull(storedLibrary);
+        Assert.False(storedLibrary!.ShouldTrackConsumptionProgress);
+        Assert.Null(storedLibrary.CompletionThresholdPercentage);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WhenConsumptionSettingsAreEnabled_ShouldPersistTheTrackingAndThreshold()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-libraryrepo-update-consumption-on-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        Guid userId = Guid.NewGuid();
+        DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
+        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        LibraryRepository sut = new(context);
+        context.Users.Add(_userEntityFixture.Create(id: userId));
+        LibraryEntity library = _libraryEntityFixture.Create(userId: userId, shouldTrackConsumptionProgress: false, completionThresholdPercentage: null, contentLocations: []);
+        context.Libraries.Add(library);
+        await context.SaveChangesAsync();
+        LibraryEntity incoming = _libraryEntityFixture.Create(
+            id: library.Id,
+            userId: userId,
+            title: library.Title,
+            coverImage: library.CoverImage,
+            libraryType: library.LibraryType,
+            contentLocations: [],
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: 60);
+
+        // Act
+        Result<Updated> result = await sut.UpdateAsync(incoming, CancellationToken.None);
+        await context.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Updated, result.Value);
+        LibraryEntity? storedLibrary = await context.Libraries.AsNoTracking().FirstOrDefaultAsync(candidate => candidate.Id == library.Id);
+        Assert.NotNull(storedLibrary);
+        Assert.True(storedLibrary!.ShouldTrackConsumptionProgress);
+        Assert.Equal(60, storedLibrary.CompletionThresholdPercentage);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WhenConsumptionSettingsAreDisabled_ShouldPersistTrackingOffWithoutThreshold()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-libraryrepo-update-consumption-off-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        Guid userId = Guid.NewGuid();
+        DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
+        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        LibraryRepository sut = new(context);
+        context.Users.Add(_userEntityFixture.Create(id: userId));
+        LibraryEntity library = _libraryEntityFixture.Create(userId: userId, shouldTrackConsumptionProgress: true, completionThresholdPercentage: 80, contentLocations: []);
+        context.Libraries.Add(library);
+        await context.SaveChangesAsync();
+        LibraryEntity incoming = _libraryEntityFixture.Create(
+            id: library.Id,
+            userId: userId,
+            title: library.Title,
+            coverImage: library.CoverImage,
+            libraryType: library.LibraryType,
+            contentLocations: [],
+            shouldTrackConsumptionProgress: false,
+            completionThresholdPercentage: null);
+
+        // Act
+        Result<Updated> result = await sut.UpdateAsync(incoming, CancellationToken.None);
+        await context.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Updated, result.Value);
+        LibraryEntity? storedLibrary = await context.Libraries.AsNoTracking().FirstOrDefaultAsync(candidate => candidate.Id == library.Id);
+        Assert.NotNull(storedLibrary);
+        Assert.False(storedLibrary!.ShouldTrackConsumptionProgress);
+        Assert.Null(storedLibrary.CompletionThresholdPercentage);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WhenOnlyConsumptionSettingsChange_ShouldStampTheUpdateAudit()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-libraryrepo-update-consumption-audit-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        Guid userId = Guid.NewGuid();
+        DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
+        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        LibraryRepository sut = new(context);
+        context.Users.Add(_userEntityFixture.Create(id: userId));
+        LibraryEntity library = _libraryEntityFixture.Create(userId: userId, shouldTrackConsumptionProgress: false, completionThresholdPercentage: null, contentLocations: []);
+        context.Libraries.Add(library);
+        await context.SaveChangesAsync();
+        LibraryEntity incoming = _libraryEntityFixture.Create(
+            id: library.Id,
+            userId: userId,
+            title: library.Title,
+            coverImage: library.CoverImage,
+            libraryType: library.LibraryType,
+            contentLocations: [],
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: 55);
+
+        // Act
+        Result<Updated> result = await sut.UpdateAsync(incoming, CancellationToken.None);
+        await context.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Updated, result.Value);
+        LibraryEntity? storedLibrary = await context.Libraries.AsNoTracking().FirstOrDefaultAsync(candidate => candidate.Id == library.Id);
+        Assert.NotNull(storedLibrary);
+        Assert.True(storedLibrary!.ShouldTrackConsumptionProgress);
+        Assert.Equal(55, storedLibrary.CompletionThresholdPercentage);
+        Assert.Equal(utcNow, storedLibrary.UpdatedOnUtc);
+        Assert.Equal(userId, storedLibrary.UpdatedBy);
+    }
+
     /// <summary>
     /// Creates a real SQLite backed context with the auditing interceptor attached, so that audit columns behave exactly like in production.
     /// </summary>

@@ -459,4 +459,153 @@ public class AddLibraryCommandHandlerTests
         await _mockLibraryRepository.DidNotReceive().InsertAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
+
+    [Fact]
+    public async Task HandleAsync_WhenProgressTrackingIsNotSpecifiedAndLibraryTypeTracksByDefault_ShouldUseTheTypeDefaults()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(
+            libraryType: nameof(LibraryType.EBook),
+            shouldTrackConsumptionProgress: null,
+            completionThresholdPercentage: null);
+        LibraryEntity persistedLibrary = _libraryEntityFixture.Create(userId: _userId);
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(persistedLibrary));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockLibraryRepository.Received(1).InsertAsync(
+            Arg.Is<LibraryEntity>(library =>
+                library.LibraryType == LibraryType.EBook &&
+                library.ShouldTrackConsumptionProgress &&
+                library.CompletionThresholdPercentage == 100),
+            Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenProgressTrackingIsNotSpecifiedAndLibraryTypeDoesNotTrackByDefault_ShouldStoreTrackingOffWithoutThreshold()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(
+            libraryType: nameof(LibraryType.Music),
+            shouldTrackConsumptionProgress: null,
+            completionThresholdPercentage: null);
+        LibraryEntity persistedLibrary = _libraryEntityFixture.Create(userId: _userId);
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(persistedLibrary));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockLibraryRepository.Received(1).InsertAsync(
+            Arg.Is<LibraryEntity>(library =>
+                library.LibraryType == LibraryType.Music &&
+                !library.ShouldTrackConsumptionProgress &&
+                library.CompletionThresholdPercentage == null),
+            Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenProgressTrackingIsExplicitlyEnabledOnATypeWithoutDefaultThreshold_ShouldStoreTrackingOnWithoutThreshold()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(
+            libraryType: nameof(LibraryType.Music),
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: null);
+        LibraryEntity persistedLibrary = _libraryEntityFixture.Create(userId: _userId);
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(persistedLibrary));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockLibraryRepository.Received(1).InsertAsync(
+            Arg.Is<LibraryEntity>(library =>
+                library.LibraryType == LibraryType.Music &&
+                library.ShouldTrackConsumptionProgress &&
+                library.CompletionThresholdPercentage == null),
+            Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenExplicitThresholdIsSuppliedWhileProgressTrackingIsEnabled_ShouldStoreTheSuppliedThreshold()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(
+            libraryType: nameof(LibraryType.Book),
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: 42);
+        LibraryEntity persistedLibrary = _libraryEntityFixture.Create(userId: _userId);
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(persistedLibrary));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockLibraryRepository.Received(1).InsertAsync(
+            Arg.Is<LibraryEntity>(library =>
+                library.LibraryType == LibraryType.Book &&
+                library.ShouldTrackConsumptionProgress &&
+                library.CompletionThresholdPercentage == 42),
+            Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenProgressTrackingIsExplicitlyDisabledWithoutThreshold_ShouldStoreTrackingOffWithoutThreshold()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(
+            libraryType: nameof(LibraryType.Book),
+            shouldTrackConsumptionProgress: false,
+            completionThresholdPercentage: null);
+        LibraryEntity persistedLibrary = _libraryEntityFixture.Create(userId: _userId);
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(persistedLibrary));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockLibraryRepository.Received(1).InsertAsync(
+            Arg.Is<LibraryEntity>(library =>
+                library.LibraryType == LibraryType.Book &&
+                !library.ShouldTrackConsumptionProgress &&
+                library.CompletionThresholdPercentage == null),
+            Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenProgressTrackingIsExplicitlyDisabledButThresholdIsSupplied_ShouldReturnThresholdMustBeNullError()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(
+            libraryType: nameof(LibraryType.Book),
+            shouldTrackConsumptionProgress: false,
+            completionThresholdPercentage: 50);
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(DomainErrors.Library.CompletionThresholdPercentageMustBeNullWhenProgressTrackingIsOff, result.FirstError);
+        await _mockLibraryRepository.DidNotReceive().InsertAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
 }
