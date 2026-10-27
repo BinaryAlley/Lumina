@@ -42,7 +42,7 @@ public class ErrorsTests
     {
         // Assert
         // The count assertion fails when an error is added or removed, reminding to update the assertions below.
-        Assert.Equal(18, typeof(DomainErrors.Library).GetProperties().Length);
+        Assert.Equal(20, typeof(DomainErrors.Library).GetProperties().Length);
         AssertError(DomainErrors.Library.CannotScanLockedLibrary, ErrorType.Forbidden);
         AssertError(DomainErrors.Library.CannotScanDisabledLibrary, ErrorType.Forbidden);
         AssertError(DomainErrors.Library.LibraryIdCannotBeEmpty, ErrorType.Validation);
@@ -61,6 +61,8 @@ public class ErrorsTests
         AssertError(DomainErrors.Library.PathTemplateValuePartMustContainSinglePlaceholder, ErrorType.Validation);
         AssertError(DomainErrors.Library.PathTemplatePartKindNotSupportedForLibraryType, ErrorType.Validation);
         AssertError(DomainErrors.Library.PathTemplateIsNotSupportedForLibraryType, ErrorType.Validation);
+        AssertError(DomainErrors.Library.CompletionThresholdPercentageMustBeNullWhenProgressTrackingIsOff, ErrorType.Validation);
+        AssertError(DomainErrors.Library.CompletionThresholdPercentageMustBeBetweenZeroAndOneHundred, ErrorType.Validation);
     }
 
     [Fact]
