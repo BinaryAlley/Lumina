@@ -225,6 +225,36 @@ public class ErrorsTests
     }
 
     [Fact]
+    public void MediaConsumption_WhenAccessed_ShouldExposeErrorsWithExpectedTypes()
+    {
+        // Assert
+        // The count assertion fails when an error is added or removed, reminding to update the assertions below.
+        Assert.Equal(22, typeof(DomainErrors.MediaConsumption).GetProperties().Length);
+        AssertError(DomainErrors.MediaConsumption.UnsupportedMediaKind, ErrorType.Validation);
+        AssertError(DomainErrors.MediaConsumption.MediaKindCannotStartCompleted, ErrorType.Forbidden);
+        AssertError(DomainErrors.MediaConsumption.MediaKindCannotResume, ErrorType.Forbidden);
+        AssertError(DomainErrors.MediaConsumption.ConsumptionRecordNotFound, ErrorType.NotFound);
+        AssertError(DomainErrors.MediaConsumption.MediaResumePointNotFound, ErrorType.NotFound);
+        AssertError(DomainErrors.MediaConsumption.ConsumptionRecordIdCannotBeEmpty, ErrorType.Validation);
+        AssertError(DomainErrors.MediaConsumption.MediaItemIdCannotBeEmpty, ErrorType.Validation);
+        AssertError(DomainErrors.MediaConsumption.TargetUserIdIsInvalid, ErrorType.Validation);
+        AssertError(DomainErrors.MediaConsumption.ConsumptionDateRangeIsInvalid, ErrorType.Validation);
+        AssertError(DomainErrors.MediaConsumption.InvalidMediaPosition, ErrorType.Validation);
+        AssertError(DomainErrors.MediaConsumption.InvalidProgressFraction, ErrorType.Validation);
+        AssertError(DomainErrors.MediaConsumption.ConsumedDurationMustBeNonNegative, ErrorType.Validation);
+        AssertError(DomainErrors.MediaConsumption.ConsumedDurationIsOutOfRange, ErrorType.Validation);
+        AssertError(DomainErrors.MediaConsumption.ConsumedDurationCannotDecrease, ErrorType.Forbidden);
+        AssertError(DomainErrors.MediaConsumption.ConsecutivePagesReadMustBeNonNegative, ErrorType.Validation);
+        AssertError(DomainErrors.MediaConsumption.ConsecutivePagesReadIsOnlySupportedForPageBasedMedia, ErrorType.Forbidden);
+        AssertError(DomainErrors.MediaConsumption.ConsumptionIsNotInProgress, ErrorType.Conflict);
+        AssertError(DomainErrors.MediaConsumption.ConsumptionIsAlreadyTerminal, ErrorType.Conflict);
+        AssertError(DomainErrors.MediaConsumption.InProgressConsumptionCannotHaveEndTime, ErrorType.Validation);
+        AssertError(DomainErrors.MediaConsumption.EndedConsumptionMustHaveEndTime, ErrorType.Validation);
+        AssertError(DomainErrors.MediaConsumption.LastActivityCannotPrecedeStart, ErrorType.Forbidden);
+        AssertError(DomainErrors.MediaConsumption.EndedConsumptionCannotPrecedeLastActivity, ErrorType.Forbidden);
+    }
+
+    [Fact]
     public void FileSystemManagement_WhenAccessed_ShouldExposeErrorsWithExpectedTypes()
     {
         // Assert
