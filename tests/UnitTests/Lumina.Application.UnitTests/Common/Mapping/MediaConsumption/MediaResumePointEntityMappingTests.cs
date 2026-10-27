@@ -69,6 +69,26 @@ public class MediaResumePointEntityMappingTests
     }
 
     [Fact]
+    public void ToDomainEntity_WhenTimeOffsetPositionIsExactlyTheMaximumRepresentableValue_ShouldMapTheMaximumPosition()
+    {
+        // Arrange
+        long maximumTimeOffsetMilliseconds = TimeSpan.MaxValue.Ticks / TimeSpan.TicksPerMillisecond;
+        MediaResumePointEntity entity = _mediaResumePointEntityFixture.Create(
+            mediaKind: MediaKind.MusicTrack,
+            lastPositionKind: MediaPositionKind.TimeOffset,
+            lastPositionTimeOffsetMilliseconds: maximumTimeOffsetMilliseconds);
+
+        // Act
+        Result<MediaResumePoint> result = entity.ToDomainEntity();
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.Equal(MediaPositionKind.TimeOffset, result.Value.LastPosition.Kind);
+        Assert.True(result.Value.LastPosition.TimeOffset.HasValue);
+        Assert.Equal(TimeSpan.FromMilliseconds(maximumTimeOffsetMilliseconds), result.Value.LastPosition.TimeOffset.Value);
+    }
+
+    [Fact]
     public void ToDomainEntity_WhenLocationResumePointIsValid_ShouldMapAllPropertiesCorrectly()
     {
         // Arrange
@@ -194,6 +214,23 @@ public class MediaResumePointEntityMappingTests
             mediaKind: MediaKind.MusicTrack,
             lastPositionKind: MediaPositionKind.TimeOffset,
             lastPositionTimeOffsetMilliseconds: maximumTimeOffsetMilliseconds + 1);
+
+        // Act
+        Result<MediaResumePoint> result = entity.ToDomainEntity();
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.MediaConsumption.InvalidMediaPosition, result.FirstError);
+    }
+
+    [Fact]
+    public void ToDomainEntity_WhenTimeOffsetPositionIsLongMaxValue_ShouldReturnInvalidMediaPosition()
+    {
+        // Arrange
+        MediaResumePointEntity entity = _mediaResumePointEntityFixture.Create(
+            mediaKind: MediaKind.MusicTrack,
+            lastPositionKind: MediaPositionKind.TimeOffset,
+            lastPositionTimeOffsetMilliseconds: long.MaxValue);
 
         // Act
         Result<MediaResumePoint> result = entity.ToDomainEntity();

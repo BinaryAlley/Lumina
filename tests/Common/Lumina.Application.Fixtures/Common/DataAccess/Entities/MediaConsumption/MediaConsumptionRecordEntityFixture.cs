@@ -57,22 +57,22 @@ public class MediaConsumptionRecordEntityFixture
     /// <param name="startedOnUtc">Optional. The date and time when the session started. Defaults to a moment in the past, or before the last activity when it is supplied.</param>
     /// <param name="lastActivityOnUtc">Optional. The date and time when the session last received activity. Defaults to a moment at or after the start.</param>
     /// <param name="endedOnUtc">Optional. The date and time when the session ended. Defaults to no value for an in-progress session, and to a moment at or after the last activity for a terminal session.</param>
-    /// <param name="includeEndedOnUtc">Whether the end time should be included, or forced to <see langword="null"/>.</param>
     /// <param name="consumedDurationMilliseconds">Optional. The active duration consumed by the session, in milliseconds. Defaults to a bounded random duration.</param>
     /// <param name="lastPositionKind">Optional. The kind of the last known position. Defaults to no position for a photo, a location for a book, and a time offset for every other kind.</param>
-    /// <param name="includeLastPositionKind">Whether the position kind should be included, or forced to <see langword="null"/>.</param>
     /// <param name="lastPositionTimeOffsetMilliseconds">Optional. The last known position, in milliseconds. Defaults to a bounded random offset for a time offset position, and to <see langword="null"/> otherwise.</param>
-    /// <param name="includeLastPositionTimeOffsetMilliseconds">Whether the time offset should be included, or forced to <see langword="null"/>.</param>
     /// <param name="lastPositionLocation">Optional. The last known opaque locator. Defaults to a random word for a location position, and to <see langword="null"/> otherwise.</param>
-    /// <param name="includeLastPositionLocation">Whether the location should be included, or forced to <see langword="null"/>.</param>
     /// <param name="lastProgressFraction">Optional. The latest reported progress fraction. Defaults to a bounded random fraction between zero and one.</param>
     /// <param name="consecutivePagesRead">Optional. The number of consecutive pages read. Defaults to a bounded random count for a book, and to zero for every other kind.</param>
     /// <param name="version">Optional. The optimistic concurrency version of the row. Defaults to a bounded random positive version.</param>
     /// <param name="createdOnUtc">Optional. The date and time when the row was created. Defaults to the start of the session.</param>
     /// <param name="createdBy">Optional. The Id of the user that created the row.</param>
     /// <param name="updatedOnUtc">Optional. The date and time when the row was last updated. Defaults to no value.</param>
-    /// <param name="includeUpdatedOnUtc">Whether the update time should be included, or forced to <see langword="null"/>.</param>
     /// <param name="updatedBy">Optional. The Id of the user that last updated the row. Defaults to <see langword="null"/>.</param>
+    /// <param name="includeEndedOnUtc">Whether the end time should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeLastPositionKind">Whether the position kind should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeLastPositionTimeOffsetMilliseconds">Whether the time offset should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeLastPositionLocation">Whether the location should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeUpdatedOnUtc">Whether the update time should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeUpdatedBy">Whether the updating user Id should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="MediaConsumptionRecordEntity"/>.</returns>
     public MediaConsumptionRecordEntity Create(
@@ -85,22 +85,22 @@ public class MediaConsumptionRecordEntityFixture
         DateTime? startedOnUtc = null,
         DateTime? lastActivityOnUtc = null,
         DateTime? endedOnUtc = null,
-        bool includeEndedOnUtc = true,
         long? consumedDurationMilliseconds = null,
         MediaPositionKind? lastPositionKind = null,
-        bool includeLastPositionKind = true,
         long? lastPositionTimeOffsetMilliseconds = null,
-        bool includeLastPositionTimeOffsetMilliseconds = true,
         string? lastPositionLocation = null,
-        bool includeLastPositionLocation = true,
         double? lastProgressFraction = null,
         int? consecutivePagesRead = null,
         long? version = null,
         DateTime? createdOnUtc = null,
         Guid? createdBy = null,
         DateTime? updatedOnUtc = null,
-        bool includeUpdatedOnUtc = true,
         Guid? updatedBy = null,
+        bool includeEndedOnUtc = true,
+        bool includeLastPositionKind = true,
+        bool includeLastPositionTimeOffsetMilliseconds = true,
+        bool includeLastPositionLocation = true,
+        bool includeUpdatedOnUtc = true,
         bool includeUpdatedBy = true)
     {
         MediaKind resolvedMediaKind = mediaKind ?? _faker.Random.ArrayElement(_supportedMediaKinds);

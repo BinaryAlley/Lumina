@@ -46,17 +46,17 @@ public class MediaResumePointEntityFixture
     /// <param name="mediaItemId">Optional. The Id of the media item to resume.</param>
     /// <param name="lastPositionKind">Optional. The kind of the position at which the media item can be resumed. Defaults to a location for a book, and to a time offset for every other kind.</param>
     /// <param name="lastPositionTimeOffsetMilliseconds">Optional. The position, in milliseconds. Defaults to a bounded random offset for a time offset position, and to <see langword="null"/> otherwise.</param>
-    /// <param name="includeLastPositionTimeOffsetMilliseconds">Whether the time offset should be included, or forced to <see langword="null"/>.</param>
     /// <param name="lastPositionLocation">Optional. The opaque locator. Defaults to a random word for a location position, and to <see langword="null"/> otherwise.</param>
-    /// <param name="includeLastPositionLocation">Whether the location should be included, or forced to <see langword="null"/>.</param>
     /// <param name="lastProgressFraction">Optional. The progress fraction at which the media item can be resumed. Defaults to a bounded random fraction between zero and one.</param>
     /// <param name="lastConsumedOnUtc">Optional. The date and time when the media item was last consumed. Defaults to a moment in the past.</param>
     /// <param name="version">Optional. The optimistic concurrency version of the row. Defaults to a bounded random positive version.</param>
     /// <param name="createdOnUtc">Optional. The date and time when the row was created. Defaults to the last consumption time.</param>
     /// <param name="createdBy">Optional. The Id of the user that created the row.</param>
     /// <param name="updatedOnUtc">Optional. The date and time when the row was last updated. Defaults to no value.</param>
-    /// <param name="includeUpdatedOnUtc">Whether the update time should be included, or forced to <see langword="null"/>.</param>
     /// <param name="updatedBy">Optional. The Id of the user that last updated the row. Defaults to <see langword="null"/>.</param>
+    /// <param name="includeLastPositionTimeOffsetMilliseconds">Whether the time offset should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeLastPositionLocation">Whether the location should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeUpdatedOnUtc">Whether the update time should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeUpdatedBy">Whether the updating user Id should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="MediaResumePointEntity"/>.</returns>
     public MediaResumePointEntity Create(
@@ -67,17 +67,17 @@ public class MediaResumePointEntityFixture
         Guid? mediaItemId = null,
         MediaPositionKind? lastPositionKind = null,
         long? lastPositionTimeOffsetMilliseconds = null,
-        bool includeLastPositionTimeOffsetMilliseconds = true,
         string? lastPositionLocation = null,
-        bool includeLastPositionLocation = true,
         double? lastProgressFraction = null,
         DateTime? lastConsumedOnUtc = null,
         long? version = null,
         DateTime? createdOnUtc = null,
         Guid? createdBy = null,
         DateTime? updatedOnUtc = null,
-        bool includeUpdatedOnUtc = true,
         Guid? updatedBy = null,
+        bool includeLastPositionTimeOffsetMilliseconds = true,
+        bool includeLastPositionLocation = true,
+        bool includeUpdatedOnUtc = true,
         bool includeUpdatedBy = true)
     {
         MediaKind resolvedMediaKind = mediaKind ?? _faker.Random.ArrayElement(_resumableMediaKinds);

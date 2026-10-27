@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Application.Common.DTO.MediaConsumption;
 using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
@@ -10,6 +11,8 @@ using Lumina.Contracts.Responses.Common;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -27,6 +30,7 @@ public class BookEntityMappingTests
     private readonly IsbnDtoFixture _isbnDtoFixture = new();
     private readonly BookRatingDtoFixture _bookRatingDtoFixture = new();
     private readonly PaginatedResultDtoFixture<BookEntity> _paginatedResultDtoFixture = new();
+    private readonly BookArtworkEntityFixture _bookArtworkEntityFixture = new();
 
     [Fact]
     public void ToDomainEntity_WhenMappingValidBookEntity_ShouldMapCorrectly()
@@ -256,6 +260,80 @@ public class BookEntityMappingTests
         }
         else
             Assert.False(result.Value.UpdatedOnUtc.HasValue);
+    }
+
+    [Fact]
+    public void ToDto_WhenMappingABook_ShouldMapTheConsumptionHistoryRow()
+    {
+        // Arrange
+        BookEntity bookEntity = _bookEntityFixture.Create();
+        BookArtworkEntity backArtwork = _bookArtworkEntityFixture.Create(
+            bookId: bookEntity.Id,
+            artworkType: ArtworkType.Back,
+            fileName: "artwork/back.jpg");
+        BookArtworkEntity frontArtwork = _bookArtworkEntityFixture.Create(
+            bookId: bookEntity.Id,
+            artworkType: ArtworkType.Front,
+            fileName: "artwork/front.jpg");
+        BookArtworkEntity coverArtwork = _bookArtworkEntityFixture.Create(
+            bookId: bookEntity.Id,
+            artworkType: ArtworkType.Cover,
+            fileName: "artwork/cover.jpg");
+        bookEntity.Artwork = [backArtwork, frontArtwork, coverArtwork];
+        DateTime lastConsumedOnUtc = new(2026, 5, 6, 7, 8, 9, DateTimeKind.Utc);
+
+        // Act
+        ConsumedItemDto result = bookEntity.ToDto(lastConsumedOnUtc, 6, 2, 180_000, "Author Name");
+
+        // Assert
+        Assert.Equal(MediaKind.Book, result.MediaKind);
+        Assert.Equal(bookEntity.Id, result.MediaItemId);
+        Assert.Equal(bookEntity.LibraryId, result.LibraryId);
+        Assert.True(result.IsAvailable);
+        Assert.Equal(bookEntity.Title, result.Title);
+        Assert.Equal(string.Empty, result.CollectionTitle);
+        Assert.Equal("Author Name", result.CreatorName);
+        Assert.Equal(coverArtwork.FileName, result.CoverPath);
+        Assert.Equal(lastConsumedOnUtc, result.LastConsumedOnUtc);
+        Assert.Equal(6, result.CountedSessionCount);
+        Assert.Equal(2, result.CompletedSessionCount);
+        Assert.Equal(180_000L, result.ConsumedDurationMilliseconds);
+    }
+
+    [Fact]
+    public void ToDto_WhenTheBookHasNoArtwork_ShouldMapANullCoverPath()
+    {
+        // Arrange
+        BookEntity bookEntity = _bookEntityFixture.Create();
+        bookEntity.Artwork = [];
+        DateTime lastConsumedOnUtc = new(2026, 5, 6, 7, 8, 9, DateTimeKind.Utc);
+
+        // Act
+        ConsumedItemDto result = bookEntity.ToDto(lastConsumedOnUtc, 1, 0, 15_000, "Author Name");
+
+        // Assert
+        Assert.Null(result.CoverPath);
+        Assert.Equal(bookEntity.Id, result.MediaItemId);
+        Assert.Equal(bookEntity.LibraryId, result.LibraryId);
+    }
+
+    [Fact]
+    public void ToDto_WhenTheBookHasNoCoverArtwork_ShouldMapANullCoverPath()
+    {
+        // Arrange
+        BookEntity bookEntity = _bookEntityFixture.Create();
+        bookEntity.Artwork =
+        [
+            _bookArtworkEntityFixture.Create(bookId: bookEntity.Id, artworkType: ArtworkType.Booklet, fileName: "artwork/booklet.jpg"),
+            _bookArtworkEntityFixture.Create(bookId: bookEntity.Id, artworkType: ArtworkType.Backdrop, fileName: "artwork/backdrop.jpg")
+        ];
+        DateTime lastConsumedOnUtc = new(2026, 5, 6, 7, 8, 9, DateTimeKind.Utc);
+
+        // Act
+        ConsumedItemDto result = bookEntity.ToDto(lastConsumedOnUtc, 1, 0, 15_000, "Author Name");
+
+        // Assert
+        Assert.Null(result.CoverPath);
     }
 
     [Fact]

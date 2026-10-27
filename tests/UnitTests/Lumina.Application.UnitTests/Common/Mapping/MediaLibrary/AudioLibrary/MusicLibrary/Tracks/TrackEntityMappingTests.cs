@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Lumina.Application.Common.DTO.MediaConsumption;
 using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Common;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
@@ -13,6 +14,7 @@ using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Entities;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -35,6 +37,8 @@ public class TrackEntityMappingTests
     private readonly TrackIsrcEntityFixture _trackIsrcEntityFixture = new();
     private readonly MediaContributorReferenceDtoFixture _mediaContributorReferenceDtoFixture = new();
     private readonly AudioRatingDtoFixture _audioRatingDtoFixture = new();
+    private readonly AlbumEntityFixture _albumEntityFixture = new();
+    private readonly ArtistEntityFixture _artistEntityFixture = new();
 
     [Fact]
     public void ToDomainEntity_WhenMappingValidTrackEntity_ShouldMapAllPropertiesCorrectly()
@@ -199,6 +203,91 @@ public class TrackEntityMappingTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Metadata.RatingValueCannotBeGreaterThanMaxValue, result.FirstError);
+    }
+
+    [Fact]
+    public void ToDto_WhenMappingATrack_ShouldMapTheConsumptionHistoryRow()
+    {
+        // Arrange
+        Guid trackId = Guid.NewGuid();
+        Guid trackLibraryId = Guid.NewGuid();
+        ArtistEntity artist = _artistEntityFixture.Create(includeAlbums: false);
+        AlbumEntity album = _albumEntityFixture.Create(includeTracks: false, libraryId: Guid.NewGuid());
+        album.Artist = artist;
+        TrackEntity entity = _trackEntityFixture.Create(id: trackId, libraryId: trackLibraryId);
+        entity.Album = album;
+        DateTime lastConsumedOnUtc = new(2026, 2, 3, 4, 5, 6, DateTimeKind.Utc);
+
+        // Act
+        ConsumedItemDto result = entity.ToDto(lastConsumedOnUtc, 7, 3, 240_000, "covers/track.jpg");
+
+        // Assert
+        Assert.Equal(MediaKind.MusicTrack, result.MediaKind);
+        Assert.Equal(trackId, result.MediaItemId);
+        Assert.Equal(trackLibraryId, result.LibraryId);
+        Assert.True(result.IsAvailable);
+        Assert.Equal(entity.Title, result.Title);
+        Assert.Equal(album.Title, result.CollectionTitle);
+        Assert.Equal(artist.Name, result.CreatorName);
+        Assert.Equal("covers/track.jpg", result.CoverPath);
+        Assert.Equal(lastConsumedOnUtc, result.LastConsumedOnUtc);
+        Assert.Equal(7, result.CountedSessionCount);
+        Assert.Equal(3, result.CompletedSessionCount);
+        Assert.Equal(240_000L, result.ConsumedDurationMilliseconds);
+    }
+
+    [Fact]
+    public void ToDto_WhenTheTrackHasNoAlbum_ShouldMapEmptyCollectionAndCreatorNames()
+    {
+        // Arrange
+        TrackEntity entity = _trackEntityFixture.Create();
+        entity.Album = null;
+        DateTime lastConsumedOnUtc = new(2026, 2, 3, 4, 5, 6, DateTimeKind.Utc);
+
+        // Act
+        ConsumedItemDto result = entity.ToDto(lastConsumedOnUtc, 1, 0, 15_000, null);
+
+        // Assert
+        Assert.Equal(entity.Id, result.MediaItemId);
+        Assert.Equal(entity.LibraryId, result.LibraryId);
+        Assert.Equal(string.Empty, result.CollectionTitle);
+        Assert.Equal(string.Empty, result.CreatorName);
+        Assert.Null(result.CoverPath);
+    }
+
+    [Fact]
+    public void ToDto_WhenTheAlbumHasNoArtist_ShouldMapAnEmptyCreatorName()
+    {
+        // Arrange
+        AlbumEntity album = _albumEntityFixture.Create(includeTracks: false);
+        album.Artist = null;
+        TrackEntity entity = _trackEntityFixture.Create();
+        entity.Album = album;
+        DateTime lastConsumedOnUtc = new(2026, 2, 3, 4, 5, 6, DateTimeKind.Utc);
+
+        // Act
+        ConsumedItemDto result = entity.ToDto(lastConsumedOnUtc, 1, 0, 15_000, "covers/track.jpg");
+
+        // Assert
+        Assert.Equal(album.Title, result.CollectionTitle);
+        Assert.Equal(string.Empty, result.CreatorName);
+    }
+
+    [Fact]
+    public void ToDto_WhenTheCoverPathIsNotSupplied_ShouldPreserveTheNullCoverPath()
+    {
+        // Arrange
+        TrackEntity entity = _trackEntityFixture.Create();
+        DateTime lastConsumedOnUtc = new(2026, 2, 3, 4, 5, 6, DateTimeKind.Utc);
+
+        // Act
+        ConsumedItemDto result = entity.ToDto(lastConsumedOnUtc, 2, 1, 30_000, null);
+
+        // Assert
+        Assert.Null(result.CoverPath);
+        Assert.Equal(2, result.CountedSessionCount);
+        Assert.Equal(1, result.CompletedSessionCount);
+        Assert.Equal(30_000L, result.ConsumedDurationMilliseconds);
     }
 
     [Fact]

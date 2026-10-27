@@ -768,6 +768,193 @@ public class TrackRepositoryTests
         Assert.Equal(367, row.DurationInSeconds);
     }
 
+    [Fact]
+    public async Task GetByIdsAsync_WhenIdsIsEmpty_ShouldReturnAnEmptyList()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyids-empty-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = new(context);
+        Guid libraryId = Guid.NewGuid();
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId);
+        context.Tracks.Add(_trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, includeMetadata: false));
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<TrackEntity>> result = await sut.GetByIdsAsync([], false, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Empty(result.Value);
+    }
+
+    [Fact]
+    public async Task GetByIdsAsync_WhenCalled_ShouldReturnOnlyTheRequestedTracks()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyids-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = new(context);
+        Guid libraryId = Guid.NewGuid();
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId);
+        TrackEntity firstTrack = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, path: "/music/queen/first.flac", includeMetadata: false);
+        TrackEntity secondTrack = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, path: "/music/queen/second.flac", includeMetadata: false);
+        TrackEntity thirdTrack = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, path: "/music/queen/third.flac", includeMetadata: false);
+        context.Tracks.AddRange(firstTrack, secondTrack, thirdTrack);
+        await context.SaveChangesAsync();
+        context.ChangeTracker.Clear();
+
+        // Act
+        Result<IReadOnlyList<TrackEntity>> result = await sut.GetByIdsAsync([firstTrack.Id, thirdTrack.Id], false, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(2, result.Value.Count);
+        Assert.Contains(result.Value, track => track.Id == firstTrack.Id);
+        Assert.Contains(result.Value, track => track.Id == thirdTrack.Id);
+        Assert.DoesNotContain(result.Value, track => track.Id == secondTrack.Id);
+    }
+
+    [Fact]
+    public async Task GetByIdsAsync_WhenNavigationPropertiesShouldNotBeIncluded_ShouldNotLoadTheNonOwnedNavigationProperties()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyids-notracking-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = new(context);
+        Guid libraryId = Guid.NewGuid();
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId);
+        TrackEntity track = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, path: "/music/queen/hidden.flac", includeMetadata: false);
+        track.Tags = [_tagEntityFixture.Create(name: "HiddenTag")];
+        track.Genres = [_genreEntityFixture.Create(name: "HiddenGenre")];
+        track.Moods = [_trackMoodEntityFixture.Create(name: "HiddenMood")];
+        track.Isrcs = [_trackIsrcEntityFixture.Create(value: "USRC12345678")];
+        track.Ratings = [_audioRatingEntityFixture.Create(value: 4, maxValue: 5, source: AudioRatingSource.MusicBrainz, voteCount: 100)];
+        track.Contributors = [_trackContributorEntityFixture.Create(trackId: track.Id, mediaContributorId: Guid.NewGuid(), role: MediaContributorRole.Vocals)];
+        context.Tracks.Add(track);
+        await context.SaveChangesAsync();
+        context.ChangeTracker.Clear();
+
+        // Act
+        Result<IReadOnlyList<TrackEntity>> result = await sut.GetByIdsAsync([track.Id], false, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        TrackEntity returnedTrack = Assert.Single(result.Value);
+        Assert.Equal(track.Id, returnedTrack.Id);
+        Assert.Null(returnedTrack.Album);
+        Assert.Empty(returnedTrack.Tags);
+        Assert.Empty(returnedTrack.Genres);
+        Assert.Empty(returnedTrack.Contributors);
+        // Moods, ISRCs and Ratings are owned collections, so EF Core materializes them together with the track even when the optional graph
+        // is not included. The flag only controls the non-owned navigation properties, which is why those are asserted unloaded above.
+        Assert.Single(returnedTrack.Moods);
+        Assert.Single(returnedTrack.Isrcs);
+        Assert.Single(returnedTrack.Ratings);
+        // The rows are read without tracking, so the read statistics never leak into the unit of work.
+        Assert.Empty(context.ChangeTracker.Entries<TrackEntity>());
+        Assert.Equal(EntityState.Detached, context.Entry(returnedTrack).State);
+    }
+
+    [Fact]
+    public async Task GetByIdsAsync_WhenNavigationPropertiesShouldBeIncluded_ShouldLoadTheAlbumArtistAndRelatedCollections()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyids-include-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = new(context);
+        Guid libraryId = Guid.NewGuid();
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId);
+        ArtistEntity artist = await context.Artists.AsNoTracking().FirstAsync(candidate => candidate.Id == album.ArtistId);
+        TrackEntity track = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, path: "/music/queen/loaded.flac", includeMetadata: false);
+        track.Tags = [_tagEntityFixture.Create(name: "LoadedTag"), _tagEntityFixture.Create(name: "SecondLoadedTag")];
+        track.Genres = [_genreEntityFixture.Create(name: "LoadedGenre")];
+        track.Moods = [_trackMoodEntityFixture.Create(name: "Calm")];
+        track.Isrcs = [_trackIsrcEntityFixture.Create(value: "USRC12345678")];
+        track.Ratings = [_audioRatingEntityFixture.Create(value: 4, maxValue: 5, source: AudioRatingSource.MusicBrainz, voteCount: 100)];
+        track.Contributors = [_trackContributorEntityFixture.Create(trackId: track.Id, mediaContributorId: Guid.NewGuid(), role: MediaContributorRole.Vocals)];
+        context.Tracks.Add(track);
+        await context.SaveChangesAsync();
+        context.ChangeTracker.Clear();
+
+        // Act
+        Result<IReadOnlyList<TrackEntity>> result = await sut.GetByIdsAsync([track.Id], true, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        TrackEntity returnedTrack = Assert.Single(result.Value);
+        Assert.NotNull(returnedTrack.Album);
+        Assert.Equal(album.Id, returnedTrack.Album!.Id);
+        Assert.NotNull(returnedTrack.Album.Artist);
+        Assert.Equal(artist.Id, returnedTrack.Album.Artist!.Id);
+        Assert.Equal(2, returnedTrack.Tags.Count);
+        Assert.Single(returnedTrack.Genres);
+        Assert.Single(returnedTrack.Moods);
+        Assert.Single(returnedTrack.Isrcs);
+        Assert.Single(returnedTrack.Ratings);
+        Assert.Single(returnedTrack.Contributors);
+    }
+
+    [Fact]
+    public async Task GetByIdsAsync_WhenMoreThanFiveHundredIdsAreRequested_ShouldReturnEveryTrack()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyids-chunks-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = new(context);
+        Guid libraryId = Guid.NewGuid();
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId);
+        const int trackCount = 501;
+        List<TrackEntity> tracks = CreateTracks(trackCount, album.Id, libraryId);
+        context.Tracks.AddRange(tracks);
+        await context.SaveChangesAsync();
+        context.ChangeTracker.Clear();
+
+        // Act
+        // The lookup is chunked in batches of 500, so the 501st Id proves the second chunk is queried as well.
+        Result<IReadOnlyList<TrackEntity>> result = await sut.GetByIdsAsync([.. tracks.Select(track => track.Id)], false, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(trackCount, result.Value.Count);
+        Assert.Equal(
+            tracks.Select(track => track.Id).OrderBy(id => id),
+            result.Value.Select(track => track.Id).OrderBy(id => id));
+    }
+
+    /// <summary>
+    /// Creates a list of tracks with distinct paths and empty metadata collections, so that the chunked lookup can be exercised without extra graph data.
+    /// </summary>
+    /// <param name="count">The number of tracks to create.</param>
+    /// <param name="albumId">The Id of the album that owns the tracks.</param>
+    /// <param name="libraryId">The Id of the library that owns the tracks.</param>
+    /// <returns>The created tracks.</returns>
+    private List<TrackEntity> CreateTracks(int count, Guid albumId, Guid libraryId)
+    {
+        return [.. Enumerable.Range(0, count).Select(_ => _trackEntityFixture.Create(
+            albumId: albumId, libraryId: libraryId, path: $"/music/generated-{Guid.NewGuid():N}.flac", includeMetadata: false))];
+    }
+
+    /// <summary>
+    /// Creates a real SQLite backed context, so that the stored values are read exactly as they were written.
+    /// </summary>
+    /// <param name="anchorConnection">The open in-memory SQLite connection that keeps the database alive for the duration of the test.</param>
+    /// <returns>The created context.</returns>
+    private static LuminaDbContext CreateContext(SqliteConnection anchorConnection)
+    {
+        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>()
+            .UseSqlite(anchorConnection.ConnectionString)
+            .Options);
+        context.Database.EnsureCreated();
+        return context;
+    }
+
     /// <summary>
     /// Seeds an artist and the album that owns the tracks of the library identified by <paramref name="libraryId"/>, so that the required foreign keys of a track are satisfied.
     /// </summary>

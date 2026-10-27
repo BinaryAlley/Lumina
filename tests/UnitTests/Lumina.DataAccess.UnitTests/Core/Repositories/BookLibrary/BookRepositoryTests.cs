@@ -1451,4 +1451,240 @@ public class BookRepositoryTests
         BookLiteRow row = Assert.Single(result.Value.Data);
         Assert.Null(row.CoverPath);
     }
+
+    [Fact]
+    public async Task GetByIdsAsync_WhenIdsIsEmpty_ShouldReturnAnEmptyList()
+    {
+        // Arrange
+        BookEntity book = _bookEntityFixture.Create(includeMetadata: false);
+        _mockContext.Books.Add(book);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<BookEntity>> result = await _sut.GetByIdsAsync([], false, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Empty(result.Value);
+    }
+
+    [Fact]
+    public async Task GetByIdsAsync_WhenCalled_ShouldReturnOnlyTheRequestedBooksOnceEach()
+    {
+        // Arrange
+        BookEntity firstBook = _bookEntityFixture.Create(includeMetadata: false);
+        BookEntity secondBook = _bookEntityFixture.Create(includeMetadata: false);
+        BookEntity thirdBook = _bookEntityFixture.Create(includeMetadata: false);
+        _mockContext.Books.AddRange(firstBook, secondBook, thirdBook);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        // A repeated Id is only ever part of a set, so the same book is never returned twice.
+        Result<IReadOnlyList<BookEntity>> result = await _sut.GetByIdsAsync([firstBook.Id, thirdBook.Id, firstBook.Id], false, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(2, result.Value.Count);
+        Assert.Contains(result.Value, book => book.Id == firstBook.Id);
+        Assert.Contains(result.Value, book => book.Id == thirdBook.Id);
+        Assert.DoesNotContain(result.Value, book => book.Id == secondBook.Id);
+    }
+
+    [Fact]
+    public async Task GetByIdsAsync_WhenNavigationPropertiesShouldNotBeIncluded_ShouldReturnTheRequestedBooks()
+    {
+        // Arrange
+        BookEntity book = _bookEntityFixture.Create(includeMetadata: false);
+        _mockContext.Books.Add(book);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<BookEntity>> result = await _sut.GetByIdsAsync([book.Id], false, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        BookEntity returnedBook = Assert.Single(result.Value);
+        Assert.Equal(book.Id, returnedBook.Id);
+        // The mocked in-memory provider may reuse the seeded instance, so the emptiness of the navigation collections of a non-including
+        // read is asserted against the real SQLite provider in the integration tests.
+    }
+
+    [Fact]
+    public async Task GetByIdsAsync_WhenNavigationPropertiesShouldBeIncluded_ShouldLoadTheRelatedCollections()
+    {
+        // Arrange
+        MediaContributorEntity author = _mediaContributorEntityFixture.Create(displayName: "Frank Herbert");
+        BookEntity book = _bookEntityFixture.Create(includeMetadata: false);
+        book.Tags = [_tagEntityFixture.Create(name: "Tag1"), _tagEntityFixture.Create(name: "Tag2")];
+        book.Genres = [_genreEntityFixture.Create(name: "Genre1")];
+        book.ISBNs = [_isbnEntityFixture.Create(value: "9783161484100", format: IsbnFormat.Isbn13)];
+        book.Ratings = [_bookRatingEntityFixture.Create(value: 4.5M, maxValue: 5, source: BookRatingSource.Goodreads, voteCount: 100)];
+        book.Contributors = [_bookContributorEntityFixture.Create(bookId: book.Id, mediaContributorId: author.Id, role: MediaContributorRole.Author)];
+        book.Artwork = [_bookArtworkEntityFixture.Create(bookId: book.Id, artworkType: ArtworkType.Cover, ordinal: 0, status: ArtworkStatus.Enriched)];
+        _mockContext.Books.Add(book);
+        _mockContext.MediaContributors.Add(author);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<BookEntity>> result = await _sut.GetByIdsAsync([book.Id], true, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        BookEntity returnedBook = Assert.Single(result.Value);
+        Assert.Equal(2, returnedBook.Tags.Count);
+        Assert.Single(returnedBook.Genres);
+        Assert.Single(returnedBook.ISBNs);
+        Assert.Single(returnedBook.Ratings);
+        Assert.Single(returnedBook.Contributors);
+        Assert.Single(returnedBook.Artwork);
+    }
+
+    [Fact]
+    public async Task GetByIdsAsync_WhenExactlyFiveHundredIdsAreRequested_ShouldReturnEveryBook()
+    {
+        // Arrange
+        const int bookCount = 500;
+        List<BookEntity> books = CreateBooks(bookCount);
+        _mockContext.Books.AddRange(books);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        // A single full chunk proves the boundary does not drop the last chunk.
+        Result<IReadOnlyList<BookEntity>> result = await _sut.GetByIdsAsync([.. books.Select(book => book.Id)], false, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(bookCount, result.Value.Count);
+        Assert.Equal(
+            books.Select(book => book.Id).OrderBy(id => id),
+            result.Value.Select(book => book.Id).OrderBy(id => id));
+    }
+
+    [Fact]
+    public async Task GetByIdsAsync_WhenMoreThanFiveHundredIdsAreRequested_ShouldReturnEveryBook()
+    {
+        // Arrange
+        const int bookCount = 501;
+        List<BookEntity> books = CreateBooks(bookCount);
+        _mockContext.Books.AddRange(books);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        // The lookup is chunked in batches of 500, so the 501st Id proves the second chunk is queried as well.
+        Result<IReadOnlyList<BookEntity>> result = await _sut.GetByIdsAsync([.. books.Select(book => book.Id)], false, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(bookCount, result.Value.Count);
+        Assert.Equal(
+            books.Select(book => book.Id).OrderBy(id => id),
+            result.Value.Select(book => book.Id).OrderBy(id => id));
+    }
+
+    [Fact]
+    public async Task GetAuthorsDisplayNamesByBookIdsAsync_WhenBookHasMultipleAuthors_ShouldReturnTheMinimumDisplayName()
+    {
+        // Arrange
+        BookEntity book = _bookEntityFixture.Create(includeMetadata: false);
+        _mockContext.Books.Add(book);
+        MediaContributorEntity firstAuthor = _mediaContributorEntityFixture.Create(displayName: "Zoe Author");
+        MediaContributorEntity secondAuthor = _mediaContributorEntityFixture.Create(displayName: "Alice Author");
+        _mockContext.MediaContributors.AddRange(firstAuthor, secondAuthor);
+        await _mockContext.SaveChangesAsync();
+        _mockContext.BookContributors.AddRange(
+            _bookContributorEntityFixture.Create(bookId: book.Id, mediaContributorId: firstAuthor.Id, role: MediaContributorRole.Author),
+            _bookContributorEntityFixture.Create(bookId: book.Id, mediaContributorId: secondAuthor.Id, role: MediaContributorRole.Author));
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyDictionary<Guid, string?>> result = await _sut.GetAuthorsDisplayNamesByBookIdsAsync([book.Id], CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal("Alice Author", result.Value[book.Id]);
+    }
+
+    [Fact]
+    public async Task GetAuthorsDisplayNamesByBookIdsAsync_WhenABookIsNotRequested_ShouldNotReturnIt()
+    {
+        // Arrange
+        BookEntity requestedBook = _bookEntityFixture.Create(includeMetadata: false);
+        BookEntity bookNotRequested = _bookEntityFixture.Create(includeMetadata: false);
+        _mockContext.Books.AddRange(requestedBook, bookNotRequested);
+        MediaContributorEntity requestedAuthor = _mediaContributorEntityFixture.Create(displayName: "Requested Author");
+        MediaContributorEntity otherAuthor = _mediaContributorEntityFixture.Create(displayName: "Other Author");
+        _mockContext.MediaContributors.AddRange(requestedAuthor, otherAuthor);
+        await _mockContext.SaveChangesAsync();
+        _mockContext.BookContributors.AddRange(
+            _bookContributorEntityFixture.Create(bookId: requestedBook.Id, mediaContributorId: requestedAuthor.Id, role: MediaContributorRole.Author),
+            _bookContributorEntityFixture.Create(bookId: bookNotRequested.Id, mediaContributorId: otherAuthor.Id, role: MediaContributorRole.Author));
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyDictionary<Guid, string?>> result = await _sut.GetAuthorsDisplayNamesByBookIdsAsync([requestedBook.Id], CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal("Requested Author", result.Value[requestedBook.Id]);
+        Assert.DoesNotContain(bookNotRequested.Id, result.Value.Keys);
+    }
+
+    [Fact]
+    public async Task GetAuthorsDisplayNamesByBookIdsAsync_WhenBookIdsIsEmpty_ShouldReturnAnEmptyDictionary()
+    {
+        // Arrange
+        BookEntity book = _bookEntityFixture.Create(includeMetadata: false);
+        _mockContext.Books.Add(book);
+        MediaContributorEntity author = _mediaContributorEntityFixture.Create();
+        _mockContext.MediaContributors.Add(author);
+        await _mockContext.SaveChangesAsync();
+        _mockContext.BookContributors.Add(
+            _bookContributorEntityFixture.Create(bookId: book.Id, mediaContributorId: author.Id, role: MediaContributorRole.Author));
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyDictionary<Guid, string?>> result = await _sut.GetAuthorsDisplayNamesByBookIdsAsync([], CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Empty(result.Value);
+    }
+
+    [Fact]
+    public async Task GetAuthorsDisplayNamesByBookIdsAsync_WhenMoreThanFiveHundredIdsAreRequested_ShouldReturnTheAuthorOfEveryRequestedBook()
+    {
+        // Arrange
+        const int bookCount = 501;
+        List<BookEntity> books = CreateBooks(bookCount);
+        _mockContext.Books.AddRange(books);
+        MediaContributorEntity author = _mediaContributorEntityFixture.Create(displayName: "Shared Author");
+        _mockContext.MediaContributors.Add(author);
+        await _mockContext.SaveChangesAsync();
+        _mockContext.BookContributors.AddRange([.. books.Select(book =>
+            _bookContributorEntityFixture.Create(bookId: book.Id, mediaContributorId: author.Id, role: MediaContributorRole.Author))]);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        // The lookup is chunked in batches of 500, so the 501st book proves the second chunk is queried as well.
+        Result<IReadOnlyDictionary<Guid, string?>> result = await _sut.GetAuthorsDisplayNamesByBookIdsAsync(
+            [.. books.Select(book => book.Id)], CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(bookCount, result.Value.Count);
+        Assert.All(result.Value.Keys, bookId => Assert.Equal("Shared Author", result.Value[bookId]));
+    }
+
+    /// <summary>
+    /// Creates a list of books with distinct paths and empty metadata collections, so that the chunked lookups can be exercised without extra graph data.
+    /// </summary>
+    /// <param name="count">The number of books to create.</param>
+    /// <returns>The created books.</returns>
+    private List<BookEntity> CreateBooks(int count)
+    {
+        return [.. Enumerable.Range(0, count).Select(_ => _bookEntityFixture.Create(
+            path: $"/books/generated-{Guid.NewGuid():N}.epub", includeMetadata: false))];
+    }
 }

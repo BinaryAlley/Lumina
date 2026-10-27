@@ -308,6 +308,166 @@ public class MusicArtworkRepositoryTests : IDisposable
         Assert.Equal(ArtworkStatus.Enriched, cover.Status);
     }
 
+    [Fact]
+    public async Task GetByOwnersAsync_WhenCalled_ShouldReturnOnlyTheArtworkOfTheRequestedOwnerTypeAndOwnerIds()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-musicartworkrepo-getbyowners-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        MusicArtworkRepository sut = new(context);
+        MusicArtworkOwnerType ownerType = MusicArtworkOwnerType.Album;
+        Guid firstOwnerId = Guid.NewGuid();
+        Guid secondOwnerId = Guid.NewGuid();
+        MusicArtworkEntity firstOwnerCover = _musicArtworkEntityFixture.Create(
+            ownerType: ownerType, ownerId: firstOwnerId, artworkType: ArtworkType.Cover, ordinal: 0);
+        MusicArtworkEntity firstOwnerFront = _musicArtworkEntityFixture.Create(
+            ownerType: ownerType, ownerId: firstOwnerId, artworkType: ArtworkType.Front, ordinal: 1);
+        MusicArtworkEntity secondOwnerCover = _musicArtworkEntityFixture.Create(
+            ownerType: ownerType, ownerId: secondOwnerId, artworkType: ArtworkType.Cover, ordinal: 0);
+        MusicArtworkEntity artworkOfAnotherOwner = _musicArtworkEntityFixture.Create(
+            ownerType: ownerType, ownerId: Guid.NewGuid(), artworkType: ArtworkType.Cover, ordinal: 0);
+        MusicArtworkEntity artworkOfAnotherOwnerType = _musicArtworkEntityFixture.Create(
+            ownerType: MusicArtworkOwnerType.Artist, ownerId: firstOwnerId, artworkType: ArtworkType.Cover, ordinal: 0);
+        context.MusicArtwork.AddRange(firstOwnerCover, firstOwnerFront, secondOwnerCover, artworkOfAnotherOwner, artworkOfAnotherOwnerType);
+        await context.SaveChangesAsync();
+        context.ChangeTracker.Clear();
+
+        // Act
+        Result<IReadOnlyList<MusicArtworkEntity>> result = await sut.GetByOwnersAsync(ownerType, [firstOwnerId, secondOwnerId], CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(3, result.Value.Count);
+        Assert.Contains(result.Value, artwork => artwork.Id == firstOwnerCover.Id);
+        Assert.Contains(result.Value, artwork => artwork.Id == firstOwnerFront.Id);
+        Assert.Contains(result.Value, artwork => artwork.Id == secondOwnerCover.Id);
+        Assert.DoesNotContain(result.Value, artwork => artwork.Id == artworkOfAnotherOwner.Id);
+        Assert.DoesNotContain(result.Value, artwork => artwork.Id == artworkOfAnotherOwnerType.Id);
+    }
+
+    [Fact]
+    public async Task GetByOwnersAsync_WhenOwnerIdsIsEmpty_ShouldReturnAnEmptyList()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-musicartworkrepo-getbyowners-empty-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        MusicArtworkRepository sut = new(context);
+        context.MusicArtwork.Add(_musicArtworkEntityFixture.Create(ownerType: MusicArtworkOwnerType.Album));
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<MusicArtworkEntity>> result = await sut.GetByOwnersAsync(MusicArtworkOwnerType.Album, [], CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Empty(result.Value);
+    }
+
+    [Fact]
+    public async Task GetByOwnersAsync_WhenCalled_ShouldOrderTheArtworkByTypeThenOrdinal()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-musicartworkrepo-getbyowners-order-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        MusicArtworkRepository sut = new(context);
+        MusicArtworkOwnerType ownerType = MusicArtworkOwnerType.Album;
+        Guid ownerId = Guid.NewGuid();
+        MusicArtworkEntity frontSecond = _musicArtworkEntityFixture.Create(
+            ownerType: ownerType, ownerId: ownerId, artworkType: ArtworkType.Front, ordinal: 1);
+        MusicArtworkEntity frontFirst = _musicArtworkEntityFixture.Create(
+            ownerType: ownerType, ownerId: ownerId, artworkType: ArtworkType.Front, ordinal: 0);
+        MusicArtworkEntity cover = _musicArtworkEntityFixture.Create(
+            ownerType: ownerType, ownerId: ownerId, artworkType: ArtworkType.Cover, ordinal: 0);
+        context.MusicArtwork.AddRange(frontSecond, frontFirst, cover);
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<MusicArtworkEntity>> result = await sut.GetByOwnersAsync(ownerType, [ownerId], CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal([cover.Id, frontFirst.Id, frontSecond.Id], result.Value.Select(artwork => artwork.Id));
+    }
+
+    [Fact]
+    public async Task GetByOwnersAsync_WhenMoreThanFiveHundredOwnerIdsAreRequested_ShouldReturnTheArtworkOfEveryOwner()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-musicartworkrepo-getbyowners-chunks-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        MusicArtworkRepository sut = new(context);
+        const int OWNER_COUNT = 501;
+        List<Guid> ownerIds = [.. Enumerable.Range(0, OWNER_COUNT).Select(_ => Guid.NewGuid())];
+        List<MusicArtworkEntity> artwork = [.. ownerIds.Select(ownerId => _musicArtworkEntityFixture.Create(
+            ownerType: MusicArtworkOwnerType.Album, ownerId: ownerId, artworkType: ArtworkType.Cover, ordinal: 0))];
+        context.MusicArtwork.AddRange(artwork);
+        await context.SaveChangesAsync();
+        context.ChangeTracker.Clear();
+
+        // Act
+        // The lookup is chunked in batches of 500, so the 501st owner proves the second chunk is queried as well.
+        Result<IReadOnlyList<MusicArtworkEntity>> result = await sut.GetByOwnersAsync(MusicArtworkOwnerType.Album, ownerIds, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(OWNER_COUNT, result.Value.Count);
+        Assert.Equal(
+            artwork.Select(candidate => candidate.Id).OrderBy(id => id),
+            result.Value.Select(candidate => candidate.Id).OrderBy(id => id));
+    }
+
+    [Fact]
+    public async Task GetByOwnersAsync_WhenCalled_ShouldReturnDetachedArtwork()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-musicartworkrepo-getbyowners-notracking-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        MusicArtworkRepository sut = new(context);
+        MusicArtworkOwnerType ownerType = MusicArtworkOwnerType.Album;
+        Guid ownerId = Guid.NewGuid();
+        MusicArtworkEntity artwork = _musicArtworkEntityFixture.Create(
+            ownerType: ownerType, ownerId: ownerId, artworkType: ArtworkType.Cover, ordinal: 0);
+        context.MusicArtwork.Add(artwork);
+        await context.SaveChangesAsync();
+        context.ChangeTracker.Clear();
+
+        // Act
+        Result<IReadOnlyList<MusicArtworkEntity>> firstResult = await sut.GetByOwnersAsync(ownerType, [ownerId], CancellationToken.None);
+        Result<IReadOnlyList<MusicArtworkEntity>> secondResult = await sut.GetByOwnersAsync(ownerType, [ownerId], CancellationToken.None);
+
+        // Assert
+        Assert.False(firstResult.IsFailure);
+        Assert.False(secondResult.IsFailure);
+        // The read is untracked, so the returned rows never leak into the unit of work, and a second read works the same way.
+        Assert.Empty(context.ChangeTracker.Entries<MusicArtworkEntity>());
+        MusicArtworkEntity firstReturnedArtwork = Assert.Single(firstResult.Value);
+        MusicArtworkEntity secondReturnedArtwork = Assert.Single(secondResult.Value);
+        Assert.Equal(artwork.Id, firstReturnedArtwork.Id);
+        Assert.Equal(artwork.Id, secondReturnedArtwork.Id);
+        Assert.Equal(EntityState.Detached, context.Entry(firstReturnedArtwork).State);
+        Assert.Empty(context.ChangeTracker.Entries<MusicArtworkEntity>());
+    }
+
+    /// <summary>
+    /// Creates a real SQLite backed context, so that the stored values are read exactly as they were written.
+    /// </summary>
+    /// <param name="anchorConnection">The open in-memory SQLite connection that keeps the database alive for the duration of the test.</param>
+    /// <returns>The created context.</returns>
+    private static LuminaDbContext CreateContext(SqliteConnection anchorConnection)
+    {
+        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>()
+            .UseSqlite(anchorConnection.ConnectionString)
+            .Options);
+        context.Database.EnsureCreated();
+        return context;
+    }
+
     /// <summary>
     /// Disposes the database context and its underlying connection.
     /// </summary>

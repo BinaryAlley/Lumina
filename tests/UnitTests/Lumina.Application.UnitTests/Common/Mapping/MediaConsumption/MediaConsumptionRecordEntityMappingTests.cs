@@ -115,6 +115,27 @@ public class MediaConsumptionRecordEntityMappingTests
     }
 
     [Fact]
+    public void ToDomainEntity_WhenTimeOffsetPositionIsExactlyTheMaximumRepresentableValue_ShouldMapTheMaximumPosition()
+    {
+        // Arrange
+        long maximumTimeOffsetMilliseconds = TimeSpan.MaxValue.Ticks / TimeSpan.TicksPerMillisecond;
+        MediaConsumptionRecordEntity entity = _mediaConsumptionRecordEntityFixture.Create(
+            mediaKind: MediaKind.MusicTrack,
+            status: ConsumptionStatus.InProgress,
+            lastPositionKind: MediaPositionKind.TimeOffset,
+            lastPositionTimeOffsetMilliseconds: maximumTimeOffsetMilliseconds);
+
+        // Act
+        Result<MediaConsumptionRecord> result = entity.ToDomainEntity();
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.True(result.Value.LastPosition.HasValue);
+        Assert.Equal(MediaPositionKind.TimeOffset, result.Value.LastPosition.Value.Kind);
+        Assert.Equal(TimeSpan.FromMilliseconds(maximumTimeOffsetMilliseconds), result.Value.LastPosition.Value.TimeOffset.Value);
+    }
+
+    [Fact]
     public void ToDomainEntity_WhenPositionIsLocation_ShouldMapTheSameLocation()
     {
         // Arrange
@@ -265,6 +286,24 @@ public class MediaConsumptionRecordEntityMappingTests
             status: ConsumptionStatus.InProgress,
             lastPositionKind: MediaPositionKind.TimeOffset,
             lastPositionTimeOffsetMilliseconds: maximumTimeOffsetMilliseconds + 1);
+
+        // Act
+        Result<MediaConsumptionRecord> result = entity.ToDomainEntity();
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.MediaConsumption.InvalidMediaPosition, result.FirstError);
+    }
+
+    [Fact]
+    public void ToDomainEntity_WhenTimeOffsetPositionIsLongMaxValue_ShouldReturnInvalidMediaPosition()
+    {
+        // Arrange
+        MediaConsumptionRecordEntity entity = _mediaConsumptionRecordEntityFixture.Create(
+            mediaKind: MediaKind.MusicTrack,
+            status: ConsumptionStatus.InProgress,
+            lastPositionKind: MediaPositionKind.TimeOffset,
+            lastPositionTimeOffsetMilliseconds: long.MaxValue);
 
         // Act
         Result<MediaConsumptionRecord> result = entity.ToDomainEntity();
