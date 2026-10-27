@@ -38,6 +38,7 @@ public class GetResumePointQueryValidatorTests
     [InlineData("   ")] // the media kind is whitespace only
     [InlineData("not-a-media-kind")] // the media kind is not the name of a defined kind
     [InlineData("99999")] // a numeric value that is not the name of a defined kind
+    [InlineData("1")] // a numeric value that parses to the defined MusicTrack member, which the old Enum.TryParse and Enum.IsDefined logic accepted
     public void Validate_WhenMediaKindIsNotTheNameOfADefinedKind_ShouldHaveValidationError(string mediaKind)
     {
         // Arrange

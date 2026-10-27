@@ -106,6 +106,8 @@ public class GetResumePointQueryHandler : IQueryHandler<GetResumePointQuery, Res
             if (saveStaleResumePointDeletionResult.IsFailure &&
                 !saveStaleResumePointDeletionResult.Errors.Any(error => error == ApplicationErrors.Persistence.ConcurrencyConflict))
                 return saveStaleResumePointDeletionResult.Errors;
+            // The response is a not-found one, which the request pipeline does not commit, so the deletion is committed here to survive the request.
+            await CommitResumePointDeletionAsync(saveStaleResumePointDeletionResult, cancellationToken).ConfigureAwait(false);
             return DomainErrors.MediaConsumption.MediaResumePointNotFound;
         }
 
@@ -127,6 +129,8 @@ public class GetResumePointQueryHandler : IQueryHandler<GetResumePointQuery, Res
                 // concurrency conflict is treated as success; any other persistence failure is still returned.
                 if (saveChangesResult.IsFailure && !saveChangesResult.Errors.Any(error => error == ApplicationErrors.Persistence.ConcurrencyConflict))
                     return saveChangesResult.Errors;
+                // The response is a not-found one, which the request pipeline does not commit, so the deletion is committed here to survive the request.
+                await CommitResumePointDeletionAsync(saveChangesResult, cancellationToken).ConfigureAwait(false);
                 return DomainErrors.Music.TrackNotFound;
             }
         }
@@ -146,6 +150,8 @@ public class GetResumePointQueryHandler : IQueryHandler<GetResumePointQuery, Res
                 // concurrency conflict is treated as success; any other persistence failure is still returned.
                 if (saveChangesResult.IsFailure && !saveChangesResult.Errors.Any(error => error == ApplicationErrors.Persistence.ConcurrencyConflict))
                     return saveChangesResult.Errors;
+                // The response is a not-found one, which the request pipeline does not commit, so the deletion is committed here to survive the request.
+                await CommitResumePointDeletionAsync(saveChangesResult, cancellationToken).ConfigureAwait(false);
                 return DomainErrors.WrittenContent.BookNotFound;
             }
         }
@@ -153,5 +159,22 @@ public class GetResumePointQueryHandler : IQueryHandler<GetResumePointQuery, Res
             return DomainErrors.MediaConsumption.UnsupportedMediaKind;
 
         return getResumePointResult.Value.ToDto().ToResponse();
+    }
+
+    /// <summary>
+    /// Commits the deletion of a stale or orphan resume point, so that the cleanup survives the not-found response of this query.
+    /// </summary>
+    /// <remarks>
+    /// The request transaction is committed by <see cref="EventualConsistencyMiddleware"/> only when the response is a success, and this query intentionally
+    /// responds with a not-found error after it cleans up, so the deletion is committed here. A failed save has nothing to persist, and a concurrency
+    /// conflict means that the row is already gone, which is the desired outcome. Committing when no transaction is open is a no-op, which keeps the handler usable outside of the HTTP pipeline.
+    /// </remarks>
+    /// <param name="saveChangesResult">The result of saving the resume point deletion.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    private async Task CommitResumePointDeletionAsync(Result<Success> saveChangesResult, CancellationToken cancellationToken)
+    {
+        if (saveChangesResult.IsFailure)
+            return;
+        await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
     }
 }

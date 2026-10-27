@@ -266,6 +266,8 @@ public class GetResumePointQueryHandlerTests
         Assert.Equal(DomainErrors.MediaConsumption.MediaResumePointNotFound, result.FirstError);
         await _mockMediaResumePointRepository.Received(1).DeleteForUserAndMediaItemAsync(_userId, MediaKind.MusicTrack, mediaItemId, Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        // The query answers with a not-found result, which the request pipeline does not commit, so the cleanup is committed explicitly.
+        await _mockUnitOfWork.Received(1).CommitTransactionAsync(Arg.Any<CancellationToken>());
         await _mockTrackRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
     }
 
@@ -289,6 +291,7 @@ public class GetResumePointQueryHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().CommitTransactionAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -309,6 +312,8 @@ public class GetResumePointQueryHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(DomainErrors.MediaConsumption.MediaResumePointNotFound, result.FirstError);
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        // A concurrency conflict means the row is already gone, which is the desired outcome, so there is nothing to commit.
+        await _mockUnitOfWork.DidNotReceive().CommitTransactionAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -329,6 +334,7 @@ public class GetResumePointQueryHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
+        await _mockUnitOfWork.DidNotReceive().CommitTransactionAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -352,6 +358,7 @@ public class GetResumePointQueryHandlerTests
         Assert.Equal(error, result.FirstError);
         await _mockMediaResumePointRepository.DidNotReceive().DeleteForUserAndMediaItemAsync(Arg.Any<Guid>(), Arg.Any<MediaKind>(), Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().CommitTransactionAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -374,6 +381,7 @@ public class GetResumePointQueryHandlerTests
         Assert.Equal(DomainErrors.Music.TrackNotFound, result.FirstError);
         await _mockMediaResumePointRepository.Received(1).DeleteForUserAndMediaItemAsync(_userId, MediaKind.MusicTrack, mediaItemId, Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).CommitTransactionAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -395,6 +403,7 @@ public class GetResumePointQueryHandlerTests
         Assert.Equal(DomainErrors.Music.TrackNotFound, result.FirstError);
         await _mockMediaResumePointRepository.Received(1).DeleteForUserAndMediaItemAsync(_userId, MediaKind.MusicTrack, mediaItemId, Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).CommitTransactionAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -419,6 +428,7 @@ public class GetResumePointQueryHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().CommitTransactionAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -441,6 +451,7 @@ public class GetResumePointQueryHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(DomainErrors.Music.TrackNotFound, result.FirstError);
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().CommitTransactionAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -463,6 +474,7 @@ public class GetResumePointQueryHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
+        await _mockUnitOfWork.DidNotReceive().CommitTransactionAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -511,6 +523,7 @@ public class GetResumePointQueryHandlerTests
             cancellationToken: Arg.Any<CancellationToken>());
         await _mockMediaResumePointRepository.DidNotReceive().DeleteForUserAndMediaItemAsync(Arg.Any<Guid>(), Arg.Any<MediaKind>(), Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().CommitTransactionAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -529,6 +542,7 @@ public class GetResumePointQueryHandlerTests
         // Assert
         Assert.False(result.IsFailure);
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().CommitTransactionAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -554,6 +568,7 @@ public class GetResumePointQueryHandlerTests
         Assert.Equal(error, result.FirstError);
         await _mockMediaResumePointRepository.DidNotReceive().DeleteForUserAndMediaItemAsync(Arg.Any<Guid>(), Arg.Any<MediaKind>(), Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().CommitTransactionAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -578,6 +593,7 @@ public class GetResumePointQueryHandlerTests
         Assert.Equal(DomainErrors.WrittenContent.BookNotFound, result.FirstError);
         await _mockMediaResumePointRepository.Received(1).DeleteForUserAndMediaItemAsync(_userId, MediaKind.Book, mediaItemId, Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).CommitTransactionAsync(Arg.Any<CancellationToken>());
         await _mockTrackRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
     }
 
@@ -603,6 +619,7 @@ public class GetResumePointQueryHandlerTests
         Assert.Equal(DomainErrors.WrittenContent.BookNotFound, result.FirstError);
         await _mockMediaResumePointRepository.Received(1).DeleteForUserAndMediaItemAsync(_userId, MediaKind.Book, mediaItemId, Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).CommitTransactionAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -654,6 +671,7 @@ public class GetResumePointQueryHandlerTests
             cancellationToken: Arg.Any<CancellationToken>());
         await _mockMediaResumePointRepository.DidNotReceive().DeleteForUserAndMediaItemAsync(Arg.Any<Guid>(), Arg.Any<MediaKind>(), Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().CommitTransactionAsync(Arg.Any<CancellationToken>());
     }
 
     /// <summary>

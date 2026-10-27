@@ -80,6 +80,7 @@ public class StartConsumptionCommandValidatorTests
     [InlineData("   ")] // the media kind is whitespace only
     [InlineData("Hologram")] // the media kind is not a member of the enumeration
     [InlineData("0")] // the media kind is a numeric route value, which the validator rejects by name
+    [InlineData("1")] // a numeric route value that parses to the defined MusicTrack member, which the old Enum.TryParse and Enum.IsDefined logic accepted
     public void Validate_WhenMediaKindIsEmptyOrUnsupported_ShouldHaveValidationError(string mediaKind)
     {
         // Arrange
