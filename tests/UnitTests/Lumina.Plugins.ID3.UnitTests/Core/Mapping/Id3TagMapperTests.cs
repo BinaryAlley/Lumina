@@ -673,6 +673,7 @@ public class Id3TagMapperTests
             bitDepth: 24,
             bitrate: 320,
             audioCodec: "MPEG Audio",
+            container: "FLAC",
             originalReleaseDate: new DateOnly(1975, 11, 21),
             originalReleaseYear: 1975,
             releaseCountry: "US",
@@ -719,6 +720,7 @@ public class Id3TagMapperTests
         Assert.Equal(24, result.BitDepth);
         Assert.Equal(320, result.Bitrate);
         Assert.Equal("MPEG Audio", result.AudioCodec);
+        Assert.Equal("FLAC", result.Container);
         Assert.Equal(recordingId, result.MusicBrainzRecordingId);
         Assert.Equal(releaseTrackId, result.MusicBrainzTrackId);
         Assert.Null(result.Ratings);
@@ -749,6 +751,7 @@ public class Id3TagMapperTests
             includeBitDepth: false,
             includeBitrate: false,
             includeAudioCodec: false,
+            includeContainer: false,
             includeOriginalReleaseDate: false,
             includeOriginalReleaseYear: false,
             includeReleaseCountry: false,
@@ -783,9 +786,23 @@ public class Id3TagMapperTests
         Assert.Null(result.BitDepth);
         Assert.Null(result.Bitrate);
         Assert.Null(result.AudioCodec);
+        Assert.Null(result.Container);
         Assert.Null(result.MusicBrainzRecordingId);
         Assert.Null(result.MusicBrainzTrackId);
         Assert.Null(result.Contributors);
+    }
+
+    [Fact]
+    public void MapTrack_WhenTheContainerIsWhiteSpace_ShouldReturnNullContainer()
+    {
+        // Arrange
+        Id3TagDto data = _id3TagDtoFixture.Create(container: "   ");
+
+        // Act
+        AudioMetadataDto result = Id3TagMapper.MapTrack(data);
+
+        // Assert
+        Assert.Null(result.Container);
     }
 
     [Fact]
