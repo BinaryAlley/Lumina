@@ -3883,6 +3883,7 @@
          * @param {boolean} [options.keepalive=false] - True to let the browser finish the request after the page is gone, used by the unload flush.
          * @param {AbortSignal} [options.signal] - An optional signal that cancels the request when the player supersedes or stops it.
          * @param {string} [options.label] - The description used in the failure log, so a caller such as the queue reports its own request.
+         * @param {string} [options.method='POST'] - The HTTP method of the request, used by a caller whose route only accepts another verb.
          * @returns {Promise<*|null|undefined|Object>} The unwrapped data, null when the endpoint answered without data, undefined when the request failed, or the REDIRECTED marker when the session expired and the page is navigating away.
          */
         async postJsonAsync(url, data, options = {}) {
@@ -3905,7 +3906,7 @@
                 if (token && token.value)
                     headers['RequestVerificationToken'] = token.value;
                 const response = await fetch(requestUrl, {
-                    method: 'POST',
+                    method: options.method || 'POST',
                     headers: headers,
                     body: JSON.stringify(data ?? {}),
                     signal: options.signal,
@@ -4201,7 +4202,8 @@
                 if (!route)
                     return;
                 const payload = this.buildConsumptionPayload(session, 'progress');
-                const options = { label: 'a consumption progress request' };
+                // The progress route is a PUT, unlike the start, complete and stop routes of the same lifecycle.
+                const options = { label: 'a consumption progress request', method: 'PUT' };
                 if (typeof AbortController === 'function') {
                     abortController = new AbortController();
                     options.signal = abortController.signal;

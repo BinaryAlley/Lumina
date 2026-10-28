@@ -326,7 +326,8 @@
                 if (token && token.value)
                     headers['RequestVerificationToken'] = token.value;
                 const response = await fetch(url, {
-                    method: 'POST',
+                    // The progress route is a PUT, unlike the start, complete and stop routes of the same lifecycle.
+                    method: options.method || 'POST',
                     headers: headers,
                     body: JSON.stringify(payload ?? {}),
                     signal: abortController === null ? undefined : abortController.signal,
@@ -478,7 +479,7 @@
                     const payload = session.pendingProgressPayload;
                     session.pendingProgressPayload = null;
                     const url = buildConsumptionRecordUrl(reportConsumptionProgressUrlTemplate, session.recordId);
-                    await sendConsumptionRequestAsync(url, payload);
+                    await sendConsumptionRequestAsync(url, payload, { method: 'PUT' });
                 }
             } catch (error) {
                 console.debug('Book reader: a consumption progress report could not be sent.', error);

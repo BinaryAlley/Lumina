@@ -36,7 +36,7 @@ public class ReportConsumptionProgressEndpoint : BaseEndpoint<ReportConsumptionP
     public override void Configure()
     {
         base.Configure();
-        Verbs(Http.POST);
+        Verbs(Http.PUT);
         Routes(WebRoutes.MediaConsumption.REPORT_CONSUMPTION_PROGRESS);
         DontAutoTag();
         Options(options => options.WithTags("MediaConsumption"));
