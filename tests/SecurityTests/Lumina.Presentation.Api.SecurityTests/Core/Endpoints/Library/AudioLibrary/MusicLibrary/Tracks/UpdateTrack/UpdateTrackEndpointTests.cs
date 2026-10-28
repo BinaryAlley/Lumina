@@ -3,9 +3,10 @@ using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.Mu
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
+using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.UpdateTrack;
@@ -13,16 +14,13 @@ using Lumina.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 #endregion
 
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.UpdateTrack;
@@ -114,6 +112,54 @@ public class UpdateTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
         TrackEntity? storedTrack = await dbContext.Tracks.FirstOrDefaultAsync(track => track.Id == trackId);
         Assert.NotNull(storedTrack);
         Assert.Equal(maliciousTitle, storedTrack!.Title);
+    }
+
+    [Theory]
+    [InlineData("C:\\Windows\\System32\\drivers\\etc\\hosts")] // Windows sensitive file
+    [InlineData("/etc/passwd")] // Unix sensitive file
+    public async Task UpdateTrack_WhenRequestBodyAttemptsToRedirectTheTrackFilePath_ShouldPreserveTheStoredPathAndNotLeakIt(string attemptedPath)
+    {
+        // Arrange
+        HttpClient client = _apiFactory.CreateClient();
+        (Guid userId, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(client);
+        _seededUsernames.Add(username);
+        Guid libraryId = Guid.NewGuid();
+        SeedLibrary(libraryId, userId);
+        string originalPath = Path.Combine(s_contentRootPath, "bohemian-rhapsody.flac");
+        (Guid artistId, Guid albumId, Guid trackId) = SeedArtistGraph(libraryId, originalPath);
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(
+            moods: [],
+            isrcs: [],
+            contributors: [],
+            ratings: []);
+        JsonSerializerOptions serializationOptions = new(JsonSerializerDefaults.Web)
+        {
+            Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+        };
+        JsonObject body = JsonSerializer.SerializeToNode(request, serializationOptions)!.AsObject();
+        body["path"] = attemptedPath;
+        using StringContent jsonContent = new(body.ToJsonString(serializationOptions), Encoding.UTF8, "application/json");
+
+        // Act
+        HttpResponseMessage response = await client.PutAsync($"/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}", jsonContent);
+
+        // Assert
+        // A client can never point an existing track at an arbitrary host file: the posted path is ignored, the stored path is left untouched,
+        // and the response must not report the attempted path nor leak database details.
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
+        TrackResponse? trackResponse = JsonSerializer.Deserialize<TrackResponse>(content, serializationOptions);
+        Assert.NotNull(trackResponse);
+        Assert.Equal(originalPath, trackResponse!.Path);
+        Assert.NotEqual(attemptedPath, trackResponse.Path);
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        TrackEntity? storedTrack = await dbContext.Tracks.FirstOrDefaultAsync(track => track.Id == trackId);
+        Assert.NotNull(storedTrack);
+        Assert.Equal(originalPath, storedTrack!.Path);
     }
 
     [Theory]
@@ -319,14 +365,15 @@ public class UpdateTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
     /// Seeds an artist that owns a single album, which in turn owns a single track, all belonging to <paramref name="libraryId"/>.
     /// </summary>
     /// <param name="libraryId">The Id of the media library the artist belongs to.</param>
+    /// <param name="trackPath">Optional. The file system path of the seeded track. Defaults to a file inside the test content root path.</param>
     /// <returns>The Ids of the seeded artist, album and track.</returns>
-    private (Guid artistId, Guid albumId, Guid trackId) SeedArtistGraph(Guid libraryId)
+    private (Guid artistId, Guid albumId, Guid trackId) SeedArtistGraph(Guid libraryId, string? trackPath = null)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         Guid albumId = Guid.NewGuid();
         Guid trackId = Guid.NewGuid();
-        TrackEntity track = _trackEntityFixture.Create(id: trackId, albumId: albumId, libraryId: libraryId, path: Path.Combine(s_contentRootPath, "bohemian-rhapsody.flac"), includeMetadata: false);
+        TrackEntity track = _trackEntityFixture.Create(id: trackId, albumId: albumId, libraryId: libraryId, path: trackPath ?? Path.Combine(s_contentRootPath, "bohemian-rhapsody.flac"), includeMetadata: false);
         AlbumEntity album = _albumEntityFixture.Create(id: albumId, libraryId: libraryId, tracks: [track], includeMetadata: false);
         ArtistEntity artist = _artistEntityFixture.Create(libraryId: libraryId, albums: [album], includeContributors: false);
         dbContext.Artists.Add(artist);

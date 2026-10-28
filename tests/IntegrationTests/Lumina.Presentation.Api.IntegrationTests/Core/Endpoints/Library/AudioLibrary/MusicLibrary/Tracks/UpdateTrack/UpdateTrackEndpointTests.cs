@@ -41,7 +41,9 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -149,6 +151,56 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         TrackEntity storedTrack = dbContext.Tracks.Single(track => track.Id == trackId);
         Assert.Equal("Somebody to Love", storedTrack.Title);
         Assert.Equal(originalPath, storedTrack.Path);
+    }
+
+    [Fact]
+    public async Task UpdateTrack_WhenRequestBodyCarriesAFilePath_ShouldIgnoreItAndPreserveTheStoredPath()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = await SeedLibraryAsync(userId);
+        string originalPath = Path.Combine(s_contentRootPath, "bohemian-rhapsody.flac");
+        string attemptedPath = Path.Combine(Path.GetTempPath(), "lumina-outside-content-root", "etc", "hosts");
+        (Guid artistId, Guid albumId, Guid trackId) = await SeedArtistGraphAsync(libraryId, originalPath);
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(
+            metadata: _musicTrackMetadataDtoFixture.Create(title: "Somebody to Love"),
+            moods: [],
+            isrcs: [],
+            contributors: [],
+            ratings: [],
+            includeDiscNumber: false,
+            includeScript: false,
+            includeKey: false,
+            includeBpm: false,
+            includeWork: false,
+            includeMusicBrainzRecordingId: false,
+            includeMusicBrainzTrackId: false);
+        JsonSerializerOptions serializationOptions = new(JsonSerializerDefaults.Web)
+        {
+            Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+        };
+        JsonObject body = JsonSerializer.SerializeToNode(request, serializationOptions)!.AsObject();
+        body["path"] = attemptedPath;
+        using StringContent jsonContent = new(body.ToJsonString(serializationOptions), Encoding.UTF8, "application/json");
+
+        // Act
+        HttpResponseMessage response = await _client.PutAsync($"/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}", jsonContent);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        TrackResponse? trackResponse = JsonSerializer.Deserialize<TrackResponse>(content, _jsonOptions);
+        Assert.NotNull(trackResponse);
+        // the posted file system path is ignored, because a track path is set only when the track is created by the scanner
+        Assert.Equal(originalPath, trackResponse!.Path);
+        Assert.NotEqual(attemptedPath, trackResponse.Path);
+        Assert.Equal("Somebody to Love", trackResponse.Metadata!.Title);
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        TrackEntity storedTrack = dbContext.Tracks.Single(track => track.Id == trackId);
+        Assert.Equal(originalPath, storedTrack.Path);
+        Assert.NotEqual(attemptedPath, storedTrack.Path);
     }
 
     [Fact]

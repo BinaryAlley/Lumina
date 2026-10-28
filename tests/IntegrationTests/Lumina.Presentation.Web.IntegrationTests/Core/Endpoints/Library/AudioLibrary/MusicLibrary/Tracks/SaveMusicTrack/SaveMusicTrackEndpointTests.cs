@@ -8,11 +8,15 @@ using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 #endregion
 
@@ -24,6 +28,11 @@ namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.AudioL
 [ExcludeFromCodeCoverage]
 public class SaveMusicTrackEndpointTests : IClassFixture<LuminaWebFactory>
 {
+    private static readonly JsonSerializerOptions s_jsonOptions = new(JsonSerializerDefaults.Web)
+    {
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+    };
+
     private readonly LuminaWebFactory _apiFactory;
     private readonly UpdateMusicTrackRequestFixture _updateMusicTrackRequestFixture = new();
     private readonly MusicTrackDtoFixture _musicTrackDtoFixture = new();
@@ -64,6 +73,41 @@ public class SaveMusicTrackEndpointTests : IClassFixture<LuminaWebFactory>
         Assert.True(json.RootElement.GetProperty("success").GetBoolean());
         Assert.Equal(trackId, json.RootElement.GetProperty("data").GetProperty("id").GetGuid());
         Assert.Contains(_apiFactory.ApiClientStub.PutRequests, putRequest => putRequest.Endpoint == $"libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}" && putRequest.Data is UpdateMusicTrackRequest forwarded && forwarded.Metadata!.Title == request.Metadata!.Title);
+    }
+
+    [Fact]
+    public async Task SaveMusicTrack_WhenPostedBodyCarriesAFilePath_ShouldNotForwardAFilePathToTheApi()
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        Guid libraryId = Guid.NewGuid();
+        Guid artistId = Guid.NewGuid();
+        Guid albumId = Guid.NewGuid();
+        Guid trackId = Guid.NewGuid();
+        string attemptedPath = Path.Combine(Path.GetTempPath(), "lumina-outside-content-root", "etc", "hosts");
+        UpdateMusicTrackRequest request = _updateMusicTrackRequestFixture.Create();
+        MusicTrackDto expectedTrack = _musicTrackDtoFixture.Create(id: trackId, albumId: albumId, libraryId: libraryId);
+        _apiFactory.ApiClientStub.RegisterPutResponse($"libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}", expectedTrack);
+        AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
+        HttpRequestMessage saveRequest = CreateSaveRequest(artistId, albumId, trackId, libraryId, request, attemptedPath);
+        saveRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);
+
+        // Act
+        HttpResponseMessage response = await webClient.Client.SendAsync(saveRequest);
+        string content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        using JsonDocument json = JsonDocument.Parse(content);
+        Assert.True(json.RootElement.GetProperty("success").GetBoolean());
+        (string Endpoint, object? Data) forwardedRequest = Assert.Single(
+            _apiFactory.ApiClientStub.PutRequests,
+            putRequest => putRequest.Endpoint == $"libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}");
+        UpdateMusicTrackRequest forwarded = Assert.IsType<UpdateMusicTrackRequest>(forwardedRequest.Data);
+        Assert.Equal(request.Metadata!.Title, forwarded.Metadata!.Title);
+        // The Web request type has no file system path, so the posted path is dropped before the API call.
+        using JsonDocument forwardedJson = JsonDocument.Parse(JsonSerializer.Serialize(forwarded, s_jsonOptions));
+        Assert.False(forwardedJson.RootElement.TryGetProperty("path", out _));
     }
 
     [Fact]
@@ -118,6 +162,30 @@ public class SaveMusicTrackEndpointTests : IClassFixture<LuminaWebFactory>
         HttpRequestMessage saveRequest = new(HttpMethod.Put, $"/en-us/library/audio-library/music-library/artists/{artistId}/albums/{albumId}/tracks/{trackId}/api-save-track?libraryId={libraryId}")
         {
             Content = JsonContent.Create(request)
+        };
+        saveRequest.Content!.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+        saveRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        return saveRequest;
+    }
+
+    /// <summary>
+    /// Builds the save request that PUTs the given <paramref name="request"/>, carrying an extra file system path property,
+    /// to the track identified by the route, with the owning library passed through the query string.
+    /// </summary>
+    /// <param name="artistId">The route Id of the artist the track belongs to.</param>
+    /// <param name="albumId">The route Id of the album the track belongs to.</param>
+    /// <param name="trackId">The route Id of the track to save.</param>
+    /// <param name="libraryId">The Id of the media library the track belongs to.</param>
+    /// <param name="request">The track data to send.</param>
+    /// <param name="attemptedPath">The file system path to inject into the posted body.</param>
+    /// <returns>The configured save request.</returns>
+    private static HttpRequestMessage CreateSaveRequest(Guid artistId, Guid albumId, Guid trackId, Guid libraryId, UpdateMusicTrackRequest request, string attemptedPath)
+    {
+        JsonObject body = JsonSerializer.SerializeToNode(request, s_jsonOptions)!.AsObject();
+        body["path"] = attemptedPath;
+        HttpRequestMessage saveRequest = new(HttpMethod.Put, $"/en-us/library/audio-library/music-library/artists/{artistId}/albums/{albumId}/tracks/{trackId}/api-save-track?libraryId={libraryId}")
+        {
+            Content = new StringContent(body.ToJsonString(s_jsonOptions), Encoding.UTF8, "application/json")
         };
         saveRequest.Content!.Headers.ContentType = new MediaTypeHeaderValue("application/json");
         saveRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

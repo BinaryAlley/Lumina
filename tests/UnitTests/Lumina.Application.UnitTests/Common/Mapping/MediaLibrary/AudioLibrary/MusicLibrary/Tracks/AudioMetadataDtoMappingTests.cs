@@ -157,6 +157,22 @@ public class AudioMetadataDtoMappingTests
         Assert.Equal(trackDisambiguation, track.Disambiguation.Value);
     }
 
+    [Fact]
+    public void ApplyTo_WhenApplyingAudioMetadata_ShouldPreserveTheTrackFilePath()
+    {
+        // Arrange
+        (Artist artist, Album album, Track track) = CreateDomainArtist();
+        string originalPath = track.Path;
+        AudioMetadataDto dto = _audioMetadataDtoFixture.Create();
+
+        // Act
+        Result<Updated> result = dto.ApplyTo(artist, album, track, []);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(originalPath, track.Path);
+    }
+
     /// <summary>
     /// Creates a domain artist that owns a single album, which in turn owns a single track.
     /// </summary>
