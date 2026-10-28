@@ -14,6 +14,7 @@ using Lumina.Domain.Core.BoundedContexts.MediaConsumptionBoundedContext.Common.V
 using Lumina.Domain.SharedKernel.Common.Enums.MediaConsumption;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
+using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -78,10 +79,13 @@ public class GetAllUsersConsumptionStatisticsQueryHandler : IQueryHandler<GetAll
             return ApplicationErrors.Authorization.NotAuthorized;
 
         Guid? libraryId = query.LibraryId is null ? null : Guid.Parse(query.LibraryId);
+        MediaKind? mediaKind = query.MediaKind is null ? null : Enum.Parse<MediaKind>(query.MediaKind, ignoreCase: true);
+        DateTime? fromUtc = query.FromUtc is null ? null : DateTime.Parse(query.FromUtc, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
+        DateTime? toUtc = query.ToUtc is null ? null : DateTime.Parse(query.ToUtc, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
 
         // This is the only statistics query that loads the records of every user, and it is reachable only through the admin check above.
         Result<IReadOnlyList<MediaConsumptionRecordEntity>> getRecordsResult = await _unitOfWork.ConsumptionStatisticsRepository
-            .GetForAllUsersAsync(libraryId, query.MediaKind, query.FromUtc, query.ToUtc, cancellationToken).ConfigureAwait(false);
+            .GetForAllUsersAsync(libraryId, mediaKind, fromUtc, toUtc, cancellationToken).ConfigureAwait(false);
         if (getRecordsResult.IsFailure)
             return getRecordsResult.Errors;
 

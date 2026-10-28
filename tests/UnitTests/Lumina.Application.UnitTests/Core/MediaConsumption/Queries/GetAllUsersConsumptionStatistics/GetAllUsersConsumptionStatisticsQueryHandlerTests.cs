@@ -125,9 +125,9 @@ public class GetAllUsersConsumptionStatisticsQueryHandlerTests
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
-        MediaKind mediaKind = MediaKind.MusicTrack;
-        DateTime fromUtc = DateTime.UtcNow.AddDays(-10);
-        DateTime toUtc = DateTime.UtcNow.AddDays(-1);
+        string mediaKind = nameof(MediaKind.MusicTrack);
+        string fromUtc = "2026-03-01T00:00:00Z";
+        string toUtc = "2026-03-02T00:00:00Z";
         GetAllUsersConsumptionStatisticsQuery query = _getAllUsersConsumptionStatisticsQueryFixture.Create(
             libraryId: libraryId.ToString(),
             mediaKind: mediaKind,
@@ -140,7 +140,11 @@ public class GetAllUsersConsumptionStatisticsQueryHandlerTests
         // Assert
         Assert.False(result.IsFailure);
         await _mockConsumptionStatisticsRepository.Received(1).GetForAllUsersAsync(
-            libraryId, mediaKind, fromUtc, toUtc, Arg.Any<CancellationToken>());
+            libraryId,
+            MediaKind.MusicTrack,
+            Arg.Is<DateTime?>(value => value == new DateTime(2026, 3, 1, 0, 0, 0, DateTimeKind.Utc)),
+            Arg.Is<DateTime?>(value => value == new DateTime(2026, 3, 2, 0, 0, 0, DateTimeKind.Utc)),
+            Arg.Any<CancellationToken>());
     }
 
     [Fact]

@@ -81,7 +81,7 @@ public class GetAllUsersConsumptionStatisticsQueryValidatorTests
     public void Validate_WhenMediaKindIsNone_ShouldHaveValidationError()
     {
         // Arrange
-        GetAllUsersConsumptionStatisticsQuery query = _getAllUsersConsumptionStatisticsQueryFixture.Create(mediaKind: MediaKind.None);
+        GetAllUsersConsumptionStatisticsQuery query = _getAllUsersConsumptionStatisticsQueryFixture.Create(mediaKind: nameof(MediaKind.None));
 
         // Act
         List<Error> result = _validator.TestValidate(query);
@@ -94,7 +94,7 @@ public class GetAllUsersConsumptionStatisticsQueryValidatorTests
     public void Validate_WhenMediaKindIsUndefined_ShouldHaveValidationError()
     {
         // Arrange
-        GetAllUsersConsumptionStatisticsQuery query = _getAllUsersConsumptionStatisticsQueryFixture.Create(mediaKind: (MediaKind)99);
+        GetAllUsersConsumptionStatisticsQuery query = _getAllUsersConsumptionStatisticsQueryFixture.Create(mediaKind: "999");
 
         // Act
         List<Error> result = _validator.TestValidate(query);
@@ -104,11 +104,11 @@ public class GetAllUsersConsumptionStatisticsQueryValidatorTests
     }
 
     [Theory]
-    [InlineData(MediaKind.MusicTrack)] // a kind supported by the current catalogues
-    [InlineData(MediaKind.Book)] // another kind supported by the current catalogues
-    [InlineData(MediaKind.Movie)] // a kind without a catalogue, still a defined kind
-    [InlineData(MediaKind.Photo)] // a kind that every session counts for, still a defined kind
-    public void Validate_WhenMediaKindIsDefined_ShouldNotHaveValidationError(MediaKind mediaKind)
+    [InlineData(nameof(MediaKind.MusicTrack))] // a kind supported by the current catalogues
+    [InlineData(nameof(MediaKind.Book))] // another kind supported by the current catalogues
+    [InlineData(nameof(MediaKind.Movie))] // a kind without a catalogue, still a defined kind
+    [InlineData(nameof(MediaKind.Photo))] // a kind that every session counts for, still a defined kind
+    public void Validate_WhenMediaKindIsDefined_ShouldNotHaveValidationError(string mediaKind)
     {
         // Arrange
         GetAllUsersConsumptionStatisticsQuery query = _getAllUsersConsumptionStatisticsQueryFixture.Create(mediaKind: mediaKind);
@@ -125,7 +125,7 @@ public class GetAllUsersConsumptionStatisticsQueryValidatorTests
     {
         // Arrange
         GetAllUsersConsumptionStatisticsQuery query = _getAllUsersConsumptionStatisticsQueryFixture.Create(
-            fromUtc: DateTime.UtcNow.AddDays(-7),
+            fromUtc: "2026-03-01T00:00:00Z",
             includeToUtc: false);
 
         // Act
@@ -140,7 +140,7 @@ public class GetAllUsersConsumptionStatisticsQueryValidatorTests
     {
         // Arrange
         GetAllUsersConsumptionStatisticsQuery query = _getAllUsersConsumptionStatisticsQueryFixture.Create(
-            toUtc: DateTime.UtcNow,
+            toUtc: "2026-03-02T00:00:00Z",
             includeFromUtc: false);
 
         // Act
@@ -154,7 +154,7 @@ public class GetAllUsersConsumptionStatisticsQueryValidatorTests
     public void Validate_WhenBothDateRangeBoundsAreEqual_ShouldNotHaveValidationError()
     {
         // Arrange
-        DateTime bound = DateTime.UtcNow;
+        string bound = "2026-03-02T00:00:00Z";
         GetAllUsersConsumptionStatisticsQuery query = _getAllUsersConsumptionStatisticsQueryFixture.Create(fromUtc: bound, toUtc: bound);
 
         // Act
@@ -169,8 +169,24 @@ public class GetAllUsersConsumptionStatisticsQueryValidatorTests
     {
         // Arrange
         GetAllUsersConsumptionStatisticsQuery query = _getAllUsersConsumptionStatisticsQueryFixture.Create(
-            fromUtc: DateTime.UtcNow,
-            toUtc: DateTime.UtcNow.AddDays(-1));
+            fromUtc: "2026-03-02T00:00:00Z",
+            toUtc: "2026-03-01T00:00:00Z");
+
+        // Act
+        List<Error> result = _validator.TestValidate(query);
+
+        // Assert
+        result.ShouldHaveValidationError(Errors.MediaConsumption.ConsumptionDateRangeIsInvalid);
+    }
+
+    [Theory]
+    [InlineData("")] // an empty bound
+    [InlineData("not-a-date")] // a textual value that is not a date
+    [InlineData("2026-13-45T99:99:99")] // a value with out of range components
+    public void Validate_WhenADateRangeBoundIsNotAValidDate_ShouldHaveValidationError(string invalidBound)
+    {
+        // Arrange
+        GetAllUsersConsumptionStatisticsQuery query = _getAllUsersConsumptionStatisticsQueryFixture.Create(fromUtc: invalidBound);
 
         // Act
         List<Error> result = _validator.TestValidate(query);

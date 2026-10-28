@@ -81,11 +81,11 @@ Authorization: Bearer <token>
 | Query parameter | Meaning |
 | --- | --- |
 | `libraryId` | Optional. The Id of a library to restrict the history to. It must be a non-empty Guid. |
-| `mediaKind` | Optional. A media kind to restrict the history to. `None` is rejected. |
+| `mediaKind` | Optional. The name of a media kind to restrict the history to, matched case insensitively. Only member names are accepted, so a numeric value is rejected even when it is a defined enumeration value. `None` is rejected. |
 | `currentPage` | Optional. The one based page of distinct media items to return. |
 | `perPage` | Optional. The number of distinct media items per page. |
-| `fromUtc` | Optional. The inclusive start of the history date range. |
-| `toUtc` | Optional. The inclusive end of the history date range. It must not be before `fromUtc`. |
+| `fromUtc` | Optional. The inclusive start of the history date range, in UTC. A trailing zone designator is honored and converted to UTC, while a value without one is interpreted as UTC. |
+| `toUtc` | Optional. The inclusive end of the history date range, in UTC. A trailing zone designator is honored and converted to UTC, while a value without one is interpreted as UTC. It must not be before `fromUtc`. |
 
 The same query parameters apply to the per-user route. The route user is the target, and the access policy decides whether the caller may read it.
 
@@ -198,9 +198,9 @@ Authorization: Bearer <token>
 | Query parameter | Meaning |
 | --- | --- |
 | `libraryId` | Optional. The Id of a library to restrict the statistics to. It must be a non-empty Guid. |
-| `mediaKind` | Optional. A media kind to restrict the statistics to. `None` is rejected. |
-| `fromUtc` | Optional. The inclusive start of the date range. |
-| `toUtc` | Optional. The inclusive end of the date range. It must not be before `fromUtc`. |
+| `mediaKind` | Optional. The name of a media kind to restrict the statistics to, matched case insensitively. Only member names are accepted, so a numeric value is rejected even when it is a defined enumeration value. `None` is rejected. |
+| `fromUtc` | Optional. The inclusive start of the date range, in UTC. A trailing zone designator is honored and converted to UTC, while a value without one is interpreted as UTC. |
+| `toUtc` | Optional. The inclusive end of the date range, in UTC. A trailing zone designator is honored and converted to UTC, while a value without one is interpreted as UTC. It must not be before `fromUtc`. |
 
 #### Get Consumption Statistics Response
 
@@ -585,9 +585,9 @@ A request that fails validation is rejected with `422 Unprocessable Entity` and 
 | `MediaItemIdCannotBeEmpty` | Delete item history | The `mediaItemId` route value is the empty Guid. |
 | `LibraryIdCannotBeEmpty` | Statistics filters, delete item history, clear resume points | A supplied library Id is not a non-empty Guid. |
 | `UnsupportedMediaKind` | Statistics filters, delete item history | The supplied kind is `None` or is not a defined media kind. Omitting `mediaKind` is valid on the statistics filters. |
-| `ConsumptionDateRangeIsInvalid` | Statistics filters | `fromUtc` is after `toUtc`. |
+| `ConsumptionDateRangeIsInvalid` | Statistics filters | A date bound is not a valid date, or `fromUtc` is after `toUtc`. |
 
-A value that cannot be bound to the request type, such as a malformed route Id on delete item history or an unknown media kind name on a query filter, is rejected by the framework before these validators run.
+A value that cannot be bound to the request type, such as a malformed route Id on delete item history, is rejected by the framework before these validators run. Media kind query filters are carried as text, so an unknown name reaches the validator and is reported as `UnsupportedMediaKind`.
 
 ### Concurrency
 

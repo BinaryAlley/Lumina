@@ -6,6 +6,7 @@ using Lumina.Application.Fixtures.Common.DTO.Pagination;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
@@ -37,9 +38,9 @@ public class GetMostConsumedQueryFixture
     /// </summary>
     /// <param name="targetUserId">Optional. The Id of the user whose history is retrieved. Defaults to a random Id.</param>
     /// <param name="libraryId">Optional. The Id of the media library to restrict the history to. Defaults to a random Id.</param>
-    /// <param name="mediaKind">Optional. The kind of media to restrict the history to. Defaults to a random supported kind.</param>
-    /// <param name="fromUtc">Optional. The inclusive start of the date range. Defaults to a bounded moment in the past.</param>
-    /// <param name="toUtc">Optional. The inclusive end of the date range. Defaults to a bounded moment after the start.</param>
+    /// <param name="mediaKind">Optional. The name of the kind of media to restrict the history to. Defaults to the name of a random supported kind.</param>
+    /// <param name="fromUtc">Optional. The inclusive start of the date range. Defaults to a bounded UTC moment in the past, as a text value.</param>
+    /// <param name="toUtc">Optional. The inclusive end of the date range. Defaults to a bounded UTC moment, as a text value.</param>
     /// <param name="paginationData">Optional. The requested pagination data. Defaults to a random page when it is included.</param>
     /// <param name="includeTargetUserId">Whether the target user Id should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeLibraryId">Whether the library Id should be included, or forced to <see langword="null"/>.</param>
@@ -51,9 +52,9 @@ public class GetMostConsumedQueryFixture
     public GetMostConsumedQuery Create(
         string? targetUserId = null,
         string? libraryId = null,
-        MediaKind? mediaKind = null,
-        DateTime? fromUtc = null,
-        DateTime? toUtc = null,
+        string? mediaKind = null,
+        string? fromUtc = null,
+        string? toUtc = null,
         PaginationDataDto? paginationData = null,
         bool includeTargetUserId = true,
         bool includeLibraryId = true,
@@ -62,15 +63,13 @@ public class GetMostConsumedQueryFixture
         bool includeToUtc = true,
         bool includePaginationData = false)
     {
-        DateTime resolvedFromUtc = fromUtc ?? (toUtc.HasValue
-            ? toUtc.Value.AddDays(-_faker.Random.Int(1, 30))
-            : DateTime.UtcNow.AddDays(-_faker.Random.Int(1, 30)));
-        DateTime resolvedToUtc = toUtc ?? resolvedFromUtc.AddDays(_faker.Random.Int(1, 30));
+        string resolvedFromUtc = fromUtc ?? DateTime.UtcNow.AddDays(-_faker.Random.Int(1, 30)).ToString("o", CultureInfo.InvariantCulture);
+        string resolvedToUtc = toUtc ?? DateTime.UtcNow.AddDays(_faker.Random.Int(1, 30)).ToString("o", CultureInfo.InvariantCulture);
 
         return new GetMostConsumedQuery(
             includeTargetUserId ? targetUserId ?? _faker.Random.Guid().ToString() : null,
             includeLibraryId ? libraryId ?? _faker.Random.Guid().ToString() : null,
-            includeMediaKind ? mediaKind ?? _faker.Random.ArrayElement(_supportedMediaKinds) : null,
+            includeMediaKind ? mediaKind ?? _faker.Random.ArrayElement(_supportedMediaKinds).ToString() : null,
             includeFromUtc ? resolvedFromUtc : null,
             includeToUtc ? resolvedToUtc : null,
             includePaginationData ? paginationData ?? _paginationDataDtoFixture.Create() : null);

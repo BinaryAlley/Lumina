@@ -2,6 +2,7 @@
 using Lumina.Application.Common.Infrastructure.Validation;
 using System;
 using System.Collections;
+using System.Linq;
 using System.Text.RegularExpressions;
 #endregion
 
@@ -256,6 +257,23 @@ public static class ValidatorUtilities
     public static IRuleBuilder<TRequest, TEnum?> IsInEnum<TRequest, TEnum>(this IRuleBuilder<TRequest, TEnum?> ruleBuilder) where TEnum : struct, Enum
     {
         return ruleBuilder.Must(value => value.HasValue && Enum.IsDefined(value.Value));
+    }
+
+    /// <summary>
+    /// Defines a validation rule that ensures a textual enum value is either <see langword="null"/> or the name of a defined member of the specified
+    /// enumeration type.
+    /// </summary>
+    /// <remarks>
+    /// Only the member names of the enumeration are accepted, so a numeric value is rejected even when it is a defined member. A
+    /// <see langword="null"/> value represents an omitted optional filter and passes.
+    /// </remarks>
+    /// <typeparam name="TRequest">The type of the request being validated.</typeparam>
+    /// <typeparam name="TEnum">The type of the enumeration.</typeparam>
+    /// <param name="ruleBuilder">The rule builder instance.</param>
+    /// <returns>The current <see cref="IRuleBuilder{TRequest, TProperty}"/> instance for method chaining.</returns>
+    public static IRuleBuilder<TRequest, string?> IsInEnum<TRequest, TEnum>(this IRuleBuilder<TRequest, string?> ruleBuilder) where TEnum : struct, Enum
+    {
+        return ruleBuilder.Must(value => value is null || Enum.GetNames<TEnum>().Contains(value, StringComparer.OrdinalIgnoreCase));
     }
 
     /// <summary>

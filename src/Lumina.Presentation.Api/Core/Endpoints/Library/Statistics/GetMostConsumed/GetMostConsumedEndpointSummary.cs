@@ -27,15 +27,15 @@ public class GetMostConsumedEndpointSummary : Summary<GetMostConsumedEndpoint, G
 
         ExampleRequest = new GetMostConsumedRequest(
             LibraryId: null,
-            MediaKind: MediaKind.MusicTrack,
+            MediaKind: nameof(MediaKind.MusicTrack),
             CurrentPage: 1,
             PerPage: 50,
-            FromUtc: new DateTime(2026, 10, 1, 0, 0, 0, DateTimeKind.Utc),
-            ToUtc: new DateTime(2026, 10, 31, 23, 59, 59, DateTimeKind.Utc)
+            FromUtc: "2026-10-01T00:00:00Z",
+            ToUtc: "2026-10-31T23:59:59Z"
         );
 
         RequestParam(request => request.LibraryId, "The Id of the media library to restrict the history to. Optional.");
-        RequestParam(request => request.MediaKind, "The kind of media to restrict the history to. Optional.");
+        RequestParam(request => request.MediaKind, "The name of the kind of media to restrict the history to. Optional. Only the member names of the media kind enumeration are accepted.");
         RequestParam(request => request.CurrentPage, "The one based page of media items to return. Optional.");
         RequestParam(request => request.PerPage, "The number of media items per page. Optional.");
         RequestParam(request => request.FromUtc, "The inclusive start of the date range. Optional.");

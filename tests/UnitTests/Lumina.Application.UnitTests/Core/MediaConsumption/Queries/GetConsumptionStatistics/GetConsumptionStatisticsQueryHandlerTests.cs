@@ -198,9 +198,9 @@ public class GetConsumptionStatisticsQueryHandlerTests
     public async Task HandleAsync_WhenFiltersAreSupplied_ShouldForwardThemUnchanged()
     {
         // Arrange
-        MediaKind mediaKind = MediaKind.Book;
-        DateTime fromUtc = DateTime.UtcNow.AddDays(-10);
-        DateTime toUtc = DateTime.UtcNow.AddDays(-1);
+        string mediaKind = nameof(MediaKind.Book);
+        string fromUtc = "2026-03-01T00:00:00Z";
+        string toUtc = "2026-03-02T00:00:00Z";
         GetConsumptionStatisticsQuery query = _getConsumptionStatisticsQueryFixture.Create(
             includeLibraryId: false,
             mediaKind: mediaKind,
@@ -213,7 +213,12 @@ public class GetConsumptionStatisticsQueryHandlerTests
         // Assert
         Assert.False(result.IsFailure);
         await _mockConsumptionStatisticsRepository.Received(1).GetForUserAsync(
-            Arg.Any<Guid>(), null, mediaKind, fromUtc, toUtc, Arg.Any<CancellationToken>());
+            Arg.Any<Guid>(),
+            null,
+            MediaKind.Book,
+            Arg.Is<DateTime?>(value => value == new DateTime(2026, 3, 1, 0, 0, 0, DateTimeKind.Utc)),
+            Arg.Is<DateTime?>(value => value == new DateTime(2026, 3, 2, 0, 0, 0, DateTimeKind.Utc)),
+            Arg.Any<CancellationToken>());
     }
 
     [Fact]

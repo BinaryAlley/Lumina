@@ -27,6 +27,13 @@ public static class GetRecentlyConsumedRequestMapping
                 PerPage = request.PerPage ?? 50
             };
 
-        return new GetRecentlyConsumedQuery(targetUserId, request.LibraryId, request.MediaKind, request.FromUtc, request.ToUtc, paginationData);
+        return new GetRecentlyConsumedQuery(
+            targetUserId,
+            request.LibraryId,
+            request.MediaKind,
+            request.FromUtc,
+            request.ToUtc,
+            paginationData
+        );
     }
 }

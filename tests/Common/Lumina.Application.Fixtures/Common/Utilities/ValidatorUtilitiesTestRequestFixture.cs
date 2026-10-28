@@ -44,6 +44,7 @@ public class ValidatorUtilitiesTestRequestFixture
     /// <param name="inclusiveNullableIntValue">Optional. The nullable integer value that must be between 1 and 10.</param>
     /// <param name="equalValue">Optional. The value that must equal the comparison value.</param>
     /// <param name="equalComparisonValue">Optional. The comparison value.</param>
+    /// <param name="textualEnumValue">Optional. The textual enum value that must be a member name of the test enumeration.</param>
     /// <returns>A configured <see cref="ValidatorUtilitiesTestRequest"/> instance.</returns>
     public ValidatorUtilitiesTestRequest Create(
         int? intValue = null,
@@ -70,7 +71,8 @@ public class ValidatorUtilitiesTestRequestFixture
         int? inclusiveIntValue = null,
         int? inclusiveNullableIntValue = null,
         string? equalValue = null,
-        string? equalComparisonValue = null)
+        string? equalComparisonValue = null,
+        string? textualEnumValue = null)
     {
         string resolvedPattern = patternValue ?? ValidPattern;
         return new Faker<ValidatorUtilitiesTestRequest>()
@@ -99,7 +101,8 @@ public class ValidatorUtilitiesTestRequestFixture
                 InclusiveIntValue: inclusiveIntValue ?? f.Random.Int(1, 10),
                 InclusiveNullableIntValue: inclusiveNullableIntValue ?? f.Random.Int(1, 10),
                 EqualValue: equalValue ?? "same",
-                EqualComparisonValue: equalComparisonValue ?? "same"))
+                EqualComparisonValue: equalComparisonValue ?? "same",
+                TextualEnumValue: textualEnumValue ?? f.PickRandom<ValidatorUtilitiesTestEnum>().ToString()))
             .Generate();
     }
 
