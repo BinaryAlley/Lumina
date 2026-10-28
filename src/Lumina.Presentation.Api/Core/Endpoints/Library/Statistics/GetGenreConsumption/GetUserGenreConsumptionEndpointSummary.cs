@@ -26,8 +26,8 @@ public class GetUserGenreConsumptionEndpointSummary : Summary<GetUserGenreConsum
         ExampleRequest = new GetGenreConsumptionRequest(
             LibraryId: null,
             MediaKind: null,
-            FromUtc: new DateTime(2026, 10, 1, 0, 0, 0, DateTimeKind.Utc),
-            ToUtc: new DateTime(2026, 10, 31, 23, 59, 59, DateTimeKind.Utc)
+            FromUtc: "2026-10-01T00:00:00.0000000Z",
+            ToUtc: "2026-10-31T23:59:59.0000000Z"
         );
 
         Params["userId"] = "The Id of the user whose statistics are retrieved. An Admin can name any user; a regular user can only name themselves.";

@@ -192,6 +192,35 @@ public class GetRecentlyConsumedQueryHandlerTests
     }
 
     [Fact]
+    public async Task HandleAsync_WhenTheQueryIsFiltered_ShouldForwardTheParsedFiltersToTheRecordsRepository()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        string fromUtc = "2025-01-02T03:04:05Z";
+        string toUtc = "2025-02-03T04:05:06Z";
+        DateTime expectedFromUtc = new(2025, 1, 2, 3, 4, 5, DateTimeKind.Utc);
+        DateTime expectedToUtc = new(2025, 2, 3, 4, 5, 6, DateTimeKind.Utc);
+        GetRecentlyConsumedQuery query = _getRecentlyConsumedQueryFixture.Create(
+            includeTargetUserId: false,
+            libraryId: libraryId.ToString(),
+            mediaKind: nameof(MediaKind.Book),
+            fromUtc: fromUtc,
+            toUtc: toUtc);
+
+        // Act
+        await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        await _mockConsumptionStatisticsRepository.Received(1).GetForUserAsync(
+            _userId,
+            Arg.Is<Guid?>(value => value == libraryId),
+            Arg.Is<MediaKind?>(value => value == MediaKind.Book),
+            Arg.Is<DateTime?>(value => value == expectedFromUtc),
+            Arg.Is<DateTime?>(value => value == expectedToUtc),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task HandleAsync_WhenAnItemHasSeveralSessions_ShouldAggregateThemIntoOneRow()
     {
         // Arrange

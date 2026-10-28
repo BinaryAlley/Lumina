@@ -6,6 +6,7 @@ using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.ConsumptionActivity;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -69,10 +70,15 @@ public class DeleteConsumptionItemHistoryCommandHandler : ICommandHandler<Delete
         if (!canAccessTarget)
             return ApplicationErrors.Authorization.NotAuthorized;
 
+        // The validator guarantees that the route values are well formed before this point.
+        MediaKind mediaKind = Enum.Parse<MediaKind>(command.MediaKind!, ignoreCase: true);
+        Guid mediaItemId = Guid.Parse(command.MediaItemId!);
+        Guid libraryId = Guid.Parse(command.LibraryId!);
+
         // The deletion covers every recorded session of the item in its library, not only the sessions of a date range, so the row
         // disappears from the history consistently with clearing the whole history.
         Result<Deleted> deleteResult = await _unitOfWork.MediaConsumptionRecordRepository
-            .DeleteAllByMediaItemIdForUserAsync(targetUserId, command.MediaKind, command.MediaItemId, command.LibraryId, cancellationToken).ConfigureAwait(false);
+            .DeleteAllByMediaItemIdForUserAsync(targetUserId, mediaKind, mediaItemId, libraryId, cancellationToken).ConfigureAwait(false);
         if (deleteResult.IsFailure)
             return deleteResult.Errors;
 

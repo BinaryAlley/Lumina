@@ -24,20 +24,36 @@ public class DeleteConsumptionItemHistoryCommandValidator : AbstractValidator<De
                 (Guid.TryParse(targetUserId, out Guid parsedTargetUserId) && parsedTargetUserId != Guid.Empty))
             .WithError(Errors.MediaConsumption.TargetUserIdIsInvalid);
 
+        // Only the member names of the media kind enumeration are accepted, so a numeric value that happens to parse as a kind is rejected.
         RuleFor(command => command.MediaKind)
-            .IsInEnum()
+            .NotEmpty()
             .WithError(Errors.MediaConsumption.UnsupportedMediaKind);
 
         RuleFor(command => command.MediaKind)
-            .Must(mediaKind => mediaKind != MediaKind.None)
+            .IsInEnum<DeleteConsumptionItemHistoryCommand, MediaKind>()
+            .WithError(Errors.MediaConsumption.UnsupportedMediaKind);
+
+        RuleFor(command => command.MediaKind)
+            .Must(mediaKind => mediaKind is null ||
+                !string.Equals(mediaKind, nameof(MediaKind.None), StringComparison.OrdinalIgnoreCase))
             .WithError(Errors.MediaConsumption.UnsupportedMediaKind);
 
         RuleFor(command => command.MediaItemId)
-            .Must(mediaItemId => mediaItemId != Guid.Empty)
+            .NotEmpty()
+            .WithError(Errors.MediaConsumption.MediaItemIdCannotBeEmpty);
+
+        RuleFor(command => command.MediaItemId)
+            .Must(mediaItemId => Guid.TryParse(mediaItemId, out Guid parsedMediaItemId) && parsedMediaItemId != Guid.Empty)
+            .When(command => command.MediaItemId is not null && command.MediaItemId.Length > 0)
             .WithError(Errors.MediaConsumption.MediaItemIdCannotBeEmpty);
 
         RuleFor(command => command.LibraryId)
-            .Must(libraryId => libraryId != Guid.Empty)
+            .NotEmpty()
+            .WithError(Errors.Library.LibraryIdCannotBeEmpty);
+
+        RuleFor(command => command.LibraryId)
+            .Must(libraryId => Guid.TryParse(libraryId, out Guid parsedLibraryId) && parsedLibraryId != Guid.Empty)
+            .When(command => command.LibraryId is not null && command.LibraryId.Length > 0)
             .WithError(Errors.Library.LibraryIdCannotBeEmpty);
     }
 }

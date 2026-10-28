@@ -26,8 +26,8 @@ public class GetGenreConsumptionEndpointSummary : Summary<GetGenreConsumptionEnd
         ExampleRequest = new GetGenreConsumptionRequest(
             LibraryId: null,
             MediaKind: null,
-            FromUtc: new DateTime(2026, 10, 1, 0, 0, 0, DateTimeKind.Utc),
-            ToUtc: new DateTime(2026, 10, 31, 23, 59, 59, DateTimeKind.Utc)
+            FromUtc: "2026-10-01T00:00:00.0000000Z",
+            ToUtc: "2026-10-31T23:59:59.0000000Z"
         );
 
         RequestParam(request => request.LibraryId, "The Id of the media library to restrict the statistics to. Optional.");
