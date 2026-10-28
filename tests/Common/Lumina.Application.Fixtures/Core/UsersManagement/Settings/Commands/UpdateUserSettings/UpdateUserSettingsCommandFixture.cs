@@ -41,6 +41,15 @@ public class UpdateUserSettingsCommandFixture
     /// <param name="vuMeterPeakHoldDurationInMilliseconds">Optional. The time a peak of the VU meter is held before it starts falling.</param>
     /// <param name="vuMeterReleasePerSecond">Optional. The number of level units the display of the VU meter falls per second when the input level drops.</param>
     /// <param name="vuMeterPeakReleasePerSecond">Optional. The number of level units the peak of the VU meter falls per second after its hold time elapsed.</param>
+    /// <param name="includeVuMeterOrientation">Whether to generate the VU meter orientation, or leave it <see langword="null"/>.</param>
+    /// <param name="includeVuMeterSegmentCount">Whether to generate the VU meter segment count, or leave it <see langword="null"/>.</param>
+    /// <param name="includeVuMeterSegmentGap">Whether to generate the VU meter segment gap, or leave it <see langword="null"/>.</param>
+    /// <param name="includeVuMeterMediumThreshold">Whether to generate the VU meter medium threshold, or leave it <see langword="null"/>.</param>
+    /// <param name="includeVuMeterHighThreshold">Whether to generate the VU meter high threshold, or leave it <see langword="null"/>.</param>
+    /// <param name="includeVuMeterShowPeak">Whether to generate the VU meter peak marker setting, or leave it <see langword="null"/>.</param>
+    /// <param name="includeVuMeterPeakHoldDurationInMilliseconds">Whether to generate the VU meter peak hold duration, or leave it <see langword="null"/>.</param>
+    /// <param name="includeVuMeterReleasePerSecond">Whether to generate the VU meter release rate, or leave it <see langword="null"/>.</param>
+    /// <param name="includeVuMeterPeakReleasePerSecond">Whether to generate the VU meter peak release rate, or leave it <see langword="null"/>.</param>
     /// <returns>The created command.</returns>
     public UpdateUserSettingsCommand Create(
         bool? isPaginationEnabled = null,
@@ -64,11 +73,24 @@ public class UpdateUserSettingsCommandFixture
         bool? vuMeterShowPeak = null,
         int? vuMeterPeakHoldDurationInMilliseconds = null,
         double? vuMeterReleasePerSecond = null,
-        double? vuMeterPeakReleasePerSecond = null)
+        double? vuMeterPeakReleasePerSecond = null,
+        bool includeVuMeterOrientation = true,
+        bool includeVuMeterSegmentCount = true,
+        bool includeVuMeterSegmentGap = true,
+        bool includeVuMeterMediumThreshold = true,
+        bool includeVuMeterHighThreshold = true,
+        bool includeVuMeterShowPeak = true,
+        bool includeVuMeterPeakHoldDurationInMilliseconds = true,
+        bool includeVuMeterReleasePerSecond = true,
+        bool includeVuMeterPeakReleasePerSecond = true)
     {
         // The high threshold is generated from the medium one, so a randomized command always describes a valid meter.
-        double mediumThreshold = vuMeterMediumThreshold ?? Random.Shared.NextDouble();
-        double highThreshold = vuMeterHighThreshold ?? (mediumThreshold + Random.Shared.NextDouble() * (1 - mediumThreshold));
+        double? mediumThreshold = includeVuMeterMediumThreshold
+            ? vuMeterMediumThreshold ?? Random.Shared.NextDouble()
+            : null;
+        double? highThreshold = includeVuMeterHighThreshold
+            ? vuMeterHighThreshold ?? (mediumThreshold is null ? Random.Shared.NextDouble() : mediumThreshold.Value + Random.Shared.NextDouble() * (1 - mediumThreshold.Value))
+            : null;
         return new Faker<UpdateUserSettingsCommand>()
             .CustomInstantiator(f => new UpdateUserSettingsCommand(default, default, default, default, default, default, default, default, default, default, default, default, default, default, default, default, default, default, default, default, default, default))
             .RuleFor(x => x.IsPaginationEnabled, f => isPaginationEnabled ?? f.Random.Bool())
@@ -84,15 +106,15 @@ public class UpdateUserSettingsCommandFixture
             .RuleFor(x => x.IsGaplessPlaybackEnabled, f => isGaplessPlaybackEnabled ?? f.Random.Bool())
             .RuleFor(x => x.ReplayGainMode, f => replayGainMode ?? f.PickRandom<ReplayGainMode>())
             .RuleFor(x => x.StreamingQuality, f => streamingQuality ?? f.PickRandom<PlaybackStreamingQuality>())
-            .RuleFor(x => x.VuMeterOrientation, f => vuMeterOrientation ?? f.PickRandom<VuMeterOrientation>())
-            .RuleFor(x => x.VuMeterSegmentCount, f => vuMeterSegmentCount ?? f.Random.Int(1, 128))
-            .RuleFor(x => x.VuMeterSegmentGap, f => vuMeterSegmentGap ?? f.Random.Int(0, 32))
+            .RuleFor(x => x.VuMeterOrientation, f => includeVuMeterOrientation ? vuMeterOrientation ?? f.PickRandom<VuMeterOrientation>() : null)
+            .RuleFor(x => x.VuMeterSegmentCount, f => includeVuMeterSegmentCount ? vuMeterSegmentCount ?? f.Random.Int(1, 128) : null)
+            .RuleFor(x => x.VuMeterSegmentGap, f => includeVuMeterSegmentGap ? vuMeterSegmentGap ?? f.Random.Int(0, 32) : null)
             .RuleFor(x => x.VuMeterMediumThreshold, f => mediumThreshold)
             .RuleFor(x => x.VuMeterHighThreshold, f => highThreshold)
-            .RuleFor(x => x.VuMeterShowPeak, f => vuMeterShowPeak ?? f.Random.Bool())
-            .RuleFor(x => x.VuMeterPeakHoldDurationInMilliseconds, f => vuMeterPeakHoldDurationInMilliseconds ?? f.Random.Int(0, 10000))
-            .RuleFor(x => x.VuMeterReleasePerSecond, f => vuMeterReleasePerSecond ?? f.Random.Double(0, 100))
-            .RuleFor(x => x.VuMeterPeakReleasePerSecond, f => vuMeterPeakReleasePerSecond ?? f.Random.Double(0, 100))
+            .RuleFor(x => x.VuMeterShowPeak, f => includeVuMeterShowPeak ? vuMeterShowPeak ?? f.Random.Bool() : null)
+            .RuleFor(x => x.VuMeterPeakHoldDurationInMilliseconds, f => includeVuMeterPeakHoldDurationInMilliseconds ? vuMeterPeakHoldDurationInMilliseconds ?? f.Random.Int(0, 10000) : null)
+            .RuleFor(x => x.VuMeterReleasePerSecond, f => includeVuMeterReleasePerSecond ? vuMeterReleasePerSecond ?? f.Random.Double(0, 100) : null)
+            .RuleFor(x => x.VuMeterPeakReleasePerSecond, f => includeVuMeterPeakReleasePerSecond ? vuMeterPeakReleasePerSecond ?? f.Random.Double(0, 100) : null)
             .Generate();
     }
 

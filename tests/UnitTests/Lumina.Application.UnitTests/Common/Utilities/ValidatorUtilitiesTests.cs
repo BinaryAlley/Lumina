@@ -801,6 +801,123 @@ public class ValidatorUtilitiesTests
         result.ShouldNotHaveValidationError(s_equalValueError);
     }
 
+    [Fact]
+    public void Validate_WhenNullableDoubleValueIsNull_ShouldNotHaveValidationError()
+    {
+        // Arrange
+        ValidatorUtilitiesTestRequest request = _validatorUtilitiesTestRequestFixture.Create(includeNullableDoubleValue: false);
+
+        // Act
+        List<Error> result = _validator.TestValidate(request);
+
+        // Assert
+        result.ShouldNotHaveValidationError(s_nullableDoubleValueError);
+    }
+
+    [Fact]
+    public void Validate_WhenNullableDoubleComparisonValueIsNull_ShouldNotHaveValidationError()
+    {
+        // Arrange
+        ValidatorUtilitiesTestRequest request = _validatorUtilitiesTestRequestFixture.Create(includeNullableDoubleComparisonValue: false);
+
+        // Act
+        List<Error> result = _validator.TestValidate(request);
+
+        // Assert
+        result.ShouldNotHaveValidationError(s_nullableDoubleValueError);
+    }
+
+    [Fact]
+    public void Validate_WhenNullableDoubleValueIsGreaterThanComparison_ShouldNotHaveValidationError()
+    {
+        // Arrange
+        ValidatorUtilitiesTestRequest request = _validatorUtilitiesTestRequestFixture.Create(
+            nullableDoubleValue: 6.0,
+            nullableDoubleComparisonValue: 5.0);
+
+        // Act
+        List<Error> result = _validator.TestValidate(request);
+
+        // Assert
+        result.ShouldNotHaveValidationError(s_nullableDoubleValueError);
+    }
+
+    [Fact]
+    public void Validate_WhenNullableDoubleValueEqualsComparison_ShouldNotHaveValidationError()
+    {
+        // Arrange
+        ValidatorUtilitiesTestRequest request = _validatorUtilitiesTestRequestFixture.Create(
+            nullableDoubleValue: 5.0,
+            nullableDoubleComparisonValue: 5.0);
+
+        // Act
+        List<Error> result = _validator.TestValidate(request);
+
+        // Assert
+        result.ShouldNotHaveValidationError(s_nullableDoubleValueError);
+    }
+
+    [Fact]
+    public void Validate_WhenNullableDoubleValueIsSmallerThanComparison_ShouldHaveValidationError()
+    {
+        // Arrange
+        ValidatorUtilitiesTestRequest request = _validatorUtilitiesTestRequestFixture.Create(
+            nullableDoubleValue: 4.0,
+            nullableDoubleComparisonValue: 5.0);
+
+        // Act
+        List<Error> result = _validator.TestValidate(request);
+
+        // Assert
+        result.ShouldHaveValidationError(s_nullableDoubleValueError);
+    }
+
+    [Fact]
+    public void Validate_WhenInclusiveNullableDoubleValueIsNull_ShouldNotHaveValidationError()
+    {
+        // Arrange
+        ValidatorUtilitiesTestRequest request = _validatorUtilitiesTestRequestFixture.Create(includeInclusiveNullableDoubleValue: false);
+
+        // Act
+        List<Error> result = _validator.TestValidate(request);
+
+        // Assert
+        result.ShouldNotHaveValidationError(s_inclusiveNullableDoubleValueError);
+    }
+
+    [Theory]
+    [InlineData(0.99)] // just below the minimum
+    [InlineData(10.01)] // just above the maximum
+    public void Validate_WhenInclusiveNullableDoubleValueIsOutsideRange_ShouldHaveValidationError(double inclusiveNullableDoubleValue)
+    {
+        // Arrange
+        ValidatorUtilitiesTestRequest request = _validatorUtilitiesTestRequestFixture.Create(
+            inclusiveNullableDoubleValue: inclusiveNullableDoubleValue);
+
+        // Act
+        List<Error> result = _validator.TestValidate(request);
+
+        // Assert
+        result.ShouldHaveValidationError(s_inclusiveNullableDoubleValueError);
+    }
+
+    [Theory]
+    [InlineData(1.0)] // the minimum
+    [InlineData(5.0)] // a middle value
+    [InlineData(10.0)] // the maximum
+    public void Validate_WhenInclusiveNullableDoubleValueIsWithinRange_ShouldNotHaveValidationError(double inclusiveNullableDoubleValue)
+    {
+        // Arrange
+        ValidatorUtilitiesTestRequest request = _validatorUtilitiesTestRequestFixture.Create(
+            inclusiveNullableDoubleValue: inclusiveNullableDoubleValue);
+
+        // Act
+        List<Error> result = _validator.TestValidate(request);
+
+        // Assert
+        result.ShouldNotHaveValidationError(s_inclusiveNullableDoubleValueError);
+    }
+
     [ExcludeFromCodeCoverage]
     private sealed class ValidatorUtilitiesTestValidator : AbstractValidator<ValidatorUtilitiesTestRequest>
     {
@@ -829,6 +946,8 @@ public class ValidatorUtilitiesTests
             RuleFor(request => request.SelectorMatchValue).Matches(instance => instance.PatternValue).WithError(s_selectorMatchValueError);
             RuleFor(request => request.InclusiveIntValue).InclusiveBetween(1, 10).WithError(s_inclusiveIntValueError);
             RuleFor(request => request.InclusiveNullableIntValue).InclusiveBetween(1, 10).WithError(s_inclusiveNullableIntValueError);
+            RuleFor(request => request.NullableDoubleValue).GreaterThanOrEqualTo(instance => instance.NullableDoubleComparisonValue).WithError(s_nullableDoubleValueError);
+            RuleFor(request => request.InclusiveNullableDoubleValue).InclusiveBetween(1d, 10d).WithError(s_inclusiveNullableDoubleValueError);
             RuleFor(request => request.EqualValue).Equal(instance => instance.EqualComparisonValue).WithError(s_equalValueError);
         }
     }
@@ -856,5 +975,7 @@ public class ValidatorUtilitiesTests
     private static readonly Error s_selectorMatchValueError = Error.Validation(description: "SelectorMatchValueError");
     private static readonly Error s_inclusiveIntValueError = Error.Validation(description: "InclusiveIntValueError");
     private static readonly Error s_inclusiveNullableIntValueError = Error.Validation(description: "InclusiveNullableIntValueError");
+    private static readonly Error s_nullableDoubleValueError = Error.Validation(description: "NullableDoubleValueError");
+    private static readonly Error s_inclusiveNullableDoubleValueError = Error.Validation(description: "InclusiveNullableDoubleValueError");
     private static readonly Error s_equalValueError = Error.Validation(description: "EqualValueError");
 }

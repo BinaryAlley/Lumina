@@ -42,6 +42,15 @@ public class UpdateUserSettingsRequestFixture
     /// <param name="vuMeterPeakHoldDurationInMilliseconds">The time a peak of the VU meter is held before it starts falling.</param>
     /// <param name="vuMeterReleasePerSecond">The number of level units the display of the VU meter falls per second when the input level drops.</param>
     /// <param name="vuMeterPeakReleasePerSecond">The number of level units the peak of the VU meter falls per second after its hold time elapsed.</param>
+    /// <param name="includeVuMeterOrientation">Whether to generate the VU meter orientation, or leave it <see langword="null"/>.</param>
+    /// <param name="includeVuMeterSegmentCount">Whether to generate the VU meter segment count, or leave it <see langword="null"/>.</param>
+    /// <param name="includeVuMeterSegmentGap">Whether to generate the VU meter segment gap, or leave it <see langword="null"/>.</param>
+    /// <param name="includeVuMeterMediumThreshold">Whether to generate the VU meter medium threshold, or leave it <see langword="null"/>.</param>
+    /// <param name="includeVuMeterHighThreshold">Whether to generate the VU meter high threshold, or leave it <see langword="null"/>.</param>
+    /// <param name="includeVuMeterShowPeak">Whether to generate the VU meter peak marker setting, or leave it <see langword="null"/>.</param>
+    /// <param name="includeVuMeterPeakHoldDurationInMilliseconds">Whether to generate the VU meter peak hold duration, or leave it <see langword="null"/>.</param>
+    /// <param name="includeVuMeterReleasePerSecond">Whether to generate the VU meter release rate, or leave it <see langword="null"/>.</param>
+    /// <param name="includeVuMeterPeakReleasePerSecond">Whether to generate the VU meter peak release rate, or leave it <see langword="null"/>.</param>
     /// <returns>The created <see cref="UpdateUserSettingsRequest"/>.</returns>
     public UpdateUserSettingsRequest Create(
         bool? isPaginationEnabled = null,
@@ -65,11 +74,24 @@ public class UpdateUserSettingsRequestFixture
         bool? vuMeterShowPeak = null,
         int? vuMeterPeakHoldDurationInMilliseconds = null,
         double? vuMeterReleasePerSecond = null,
-        double? vuMeterPeakReleasePerSecond = null)
+        double? vuMeterPeakReleasePerSecond = null,
+        bool includeVuMeterOrientation = true,
+        bool includeVuMeterSegmentCount = true,
+        bool includeVuMeterSegmentGap = true,
+        bool includeVuMeterMediumThreshold = true,
+        bool includeVuMeterHighThreshold = true,
+        bool includeVuMeterShowPeak = true,
+        bool includeVuMeterPeakHoldDurationInMilliseconds = true,
+        bool includeVuMeterReleasePerSecond = true,
+        bool includeVuMeterPeakReleasePerSecond = true)
     {
         // The high threshold is generated from the medium one, so a randomized request always describes a valid meter.
-        double mediumThreshold = vuMeterMediumThreshold ?? _faker.Random.Double(0, 1);
-        double highThreshold = vuMeterHighThreshold ?? _faker.Random.Double(mediumThreshold, 1);
+        double? mediumThreshold = includeVuMeterMediumThreshold
+            ? vuMeterMediumThreshold ?? _faker.Random.Double(0, 1)
+            : null;
+        double? highThreshold = includeVuMeterHighThreshold
+            ? vuMeterHighThreshold ?? (mediumThreshold is null ? _faker.Random.Double(0, 1) : _faker.Random.Double(mediumThreshold.Value, 1))
+            : null;
         return new UpdateUserSettingsRequest(
             isPaginationEnabled ?? _faker.Random.Bool(),
             itemsPerPage ?? _faker.Random.Int(1, 100),
@@ -84,15 +106,15 @@ public class UpdateUserSettingsRequestFixture
             isGaplessPlaybackEnabled ?? _faker.Random.Bool(),
             replayGainMode ?? _faker.PickRandom<ReplayGainMode>(),
             streamingQuality ?? _faker.PickRandom<PlaybackStreamingQuality>(),
-            vuMeterOrientation ?? _faker.PickRandom<VuMeterOrientation>(),
-            vuMeterSegmentCount ?? _faker.Random.Int(1, 128),
-            vuMeterSegmentGap ?? _faker.Random.Int(0, 32),
+            includeVuMeterOrientation ? vuMeterOrientation ?? _faker.PickRandom<VuMeterOrientation>() : null,
+            includeVuMeterSegmentCount ? vuMeterSegmentCount ?? _faker.Random.Int(1, 128) : null,
+            includeVuMeterSegmentGap ? vuMeterSegmentGap ?? _faker.Random.Int(0, 32) : null,
             mediumThreshold,
             highThreshold,
-            vuMeterShowPeak ?? _faker.Random.Bool(),
-            vuMeterPeakHoldDurationInMilliseconds ?? _faker.Random.Int(0, 10000),
-            vuMeterReleasePerSecond ?? _faker.Random.Double(0, 100),
-            vuMeterPeakReleasePerSecond ?? _faker.Random.Double(0, 100));
+            includeVuMeterShowPeak ? vuMeterShowPeak ?? _faker.Random.Bool() : null,
+            includeVuMeterPeakHoldDurationInMilliseconds ? vuMeterPeakHoldDurationInMilliseconds ?? _faker.Random.Int(0, 10000) : null,
+            includeVuMeterReleasePerSecond ? vuMeterReleasePerSecond ?? _faker.Random.Double(0, 100) : null,
+            includeVuMeterPeakReleasePerSecond ? vuMeterPeakReleasePerSecond ?? _faker.Random.Double(0, 100) : null);
     }
 
     /// <summary>

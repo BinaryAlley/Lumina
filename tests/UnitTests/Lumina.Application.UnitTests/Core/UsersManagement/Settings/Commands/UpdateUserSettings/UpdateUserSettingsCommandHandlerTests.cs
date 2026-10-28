@@ -77,7 +77,16 @@ public class UpdateUserSettingsCommandHandlerTests
                 settings.ItemsPerPage == command.ItemsPerPage &&
                 settings.ShouldIgnoreThePrefixForAlphaPicker == command.ShouldIgnoreThePrefixForAlphaPicker &&
                 settings.ShouldRenderPdfAsImages == command.ShouldRenderPdfAsImages &&
-                settings.ShouldPreserveBookStyles == command.ShouldPreserveBookStyles),
+                settings.ShouldPreserveBookStyles == command.ShouldPreserveBookStyles &&
+                settings.VuMeterOrientation == command.VuMeterOrientation &&
+                settings.VuMeterSegmentCount == command.VuMeterSegmentCount &&
+                settings.VuMeterSegmentGap == command.VuMeterSegmentGap &&
+                settings.VuMeterMediumThreshold == command.VuMeterMediumThreshold &&
+                settings.VuMeterHighThreshold == command.VuMeterHighThreshold &&
+                settings.VuMeterShowPeak == command.VuMeterShowPeak &&
+                settings.VuMeterPeakHoldDurationInMilliseconds == command.VuMeterPeakHoldDurationInMilliseconds &&
+                settings.VuMeterReleasePerSecond == command.VuMeterReleasePerSecond &&
+                settings.VuMeterPeakReleasePerSecond == command.VuMeterPeakReleasePerSecond),
             Arg.Any<CancellationToken>());
         await _mockUserSettingsRepository.DidNotReceive().UpdateAsync(Arg.Any<UserSettingsEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
@@ -107,7 +116,16 @@ public class UpdateUserSettingsCommandHandlerTests
                 settings.ItemsPerPage == command.ItemsPerPage &&
                 settings.ShouldIgnoreThePrefixForAlphaPicker == command.ShouldIgnoreThePrefixForAlphaPicker &&
                 settings.ShouldRenderPdfAsImages == command.ShouldRenderPdfAsImages &&
-                settings.ShouldPreserveBookStyles == command.ShouldPreserveBookStyles),
+                settings.ShouldPreserveBookStyles == command.ShouldPreserveBookStyles &&
+                settings.VuMeterOrientation == command.VuMeterOrientation &&
+                settings.VuMeterSegmentCount == command.VuMeterSegmentCount &&
+                settings.VuMeterSegmentGap == command.VuMeterSegmentGap &&
+                settings.VuMeterMediumThreshold == command.VuMeterMediumThreshold &&
+                settings.VuMeterHighThreshold == command.VuMeterHighThreshold &&
+                settings.VuMeterShowPeak == command.VuMeterShowPeak &&
+                settings.VuMeterPeakHoldDurationInMilliseconds == command.VuMeterPeakHoldDurationInMilliseconds &&
+                settings.VuMeterReleasePerSecond == command.VuMeterReleasePerSecond &&
+                settings.VuMeterPeakReleasePerSecond == command.VuMeterPeakReleasePerSecond),
             Arg.Any<CancellationToken>());
         await _mockUserSettingsRepository.DidNotReceive().InsertAsync(Arg.Any<UserSettingsEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());

@@ -15,6 +15,9 @@ namespace Lumina.Application.Fixtures.Common.Utilities;
 public class ValidatorUtilitiesTestRequestFixture
 {
     private const string ValidPattern = "^[a-z]{3}-\\d{3}$";
+    private const double VALID_NULLABLE_DOUBLE_VALUE = 7.5;
+    private const double VALID_NULLABLE_DOUBLE_COMPARISON_VALUE = 5.0;
+    private const double VALID_INCLUSIVE_NULLABLE_DOUBLE_VALUE = 5.0;
 
     /// <summary>
     /// Creates a new <see cref="ValidatorUtilitiesTestRequest"/> instance with randomized test data that satisfies all validation rules.
@@ -45,6 +48,12 @@ public class ValidatorUtilitiesTestRequestFixture
     /// <param name="equalValue">Optional. The value that must equal the comparison value.</param>
     /// <param name="equalComparisonValue">Optional. The comparison value.</param>
     /// <param name="textualEnumValue">Optional. The textual enum value that must be a member name of the test enumeration.</param>
+    /// <param name="nullableDoubleValue">Optional. The nullable double value that must be greater than or equal to the selected comparison value.</param>
+    /// <param name="nullableDoubleComparisonValue">Optional. The nullable double comparison value selected from the request.</param>
+    /// <param name="inclusiveNullableDoubleValue">Optional. The nullable double value that must be between 1 and 10.</param>
+    /// <param name="includeNullableDoubleValue">Whether to generate the nullable double value, or leave it <see langword="null"/>.</param>
+    /// <param name="includeNullableDoubleComparisonValue">Whether to generate the nullable double comparison value, or leave it <see langword="null"/>.</param>
+    /// <param name="includeInclusiveNullableDoubleValue">Whether to generate the inclusive nullable double value, or leave it <see langword="null"/>.</param>
     /// <returns>A configured <see cref="ValidatorUtilitiesTestRequest"/> instance.</returns>
     public ValidatorUtilitiesTestRequest Create(
         int? intValue = null,
@@ -72,7 +81,13 @@ public class ValidatorUtilitiesTestRequestFixture
         int? inclusiveNullableIntValue = null,
         string? equalValue = null,
         string? equalComparisonValue = null,
-        string? textualEnumValue = null)
+        string? textualEnumValue = null,
+        double? nullableDoubleValue = null,
+        double? nullableDoubleComparisonValue = null,
+        double? inclusiveNullableDoubleValue = null,
+        bool includeNullableDoubleValue = true,
+        bool includeNullableDoubleComparisonValue = true,
+        bool includeInclusiveNullableDoubleValue = true)
     {
         string resolvedPattern = patternValue ?? ValidPattern;
         return new Faker<ValidatorUtilitiesTestRequest>()
@@ -102,7 +117,10 @@ public class ValidatorUtilitiesTestRequestFixture
                 InclusiveNullableIntValue: inclusiveNullableIntValue ?? f.Random.Int(1, 10),
                 EqualValue: equalValue ?? "same",
                 EqualComparisonValue: equalComparisonValue ?? "same",
-                TextualEnumValue: textualEnumValue ?? f.PickRandom<ValidatorUtilitiesTestEnum>().ToString()))
+                TextualEnumValue: textualEnumValue ?? f.PickRandom<ValidatorUtilitiesTestEnum>().ToString(),
+                NullableDoubleValue: includeNullableDoubleValue ? nullableDoubleValue ?? VALID_NULLABLE_DOUBLE_VALUE : null,
+                NullableDoubleComparisonValue: includeNullableDoubleComparisonValue ? nullableDoubleComparisonValue ?? VALID_NULLABLE_DOUBLE_COMPARISON_VALUE : null,
+                InclusiveNullableDoubleValue: includeInclusiveNullableDoubleValue ? inclusiveNullableDoubleValue ?? VALID_INCLUSIVE_NULLABLE_DOUBLE_VALUE : null))
             .Generate();
     }
 
