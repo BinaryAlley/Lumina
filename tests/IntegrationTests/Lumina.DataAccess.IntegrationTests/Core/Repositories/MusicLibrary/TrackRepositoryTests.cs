@@ -17,6 +17,7 @@ using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
@@ -46,6 +47,7 @@ public class TrackRepositoryTests
     private readonly MediaContributorEntityFixture _mediaContributorEntityFixture = new();
     private readonly AlbumEntityFixture _albumEntityFixture = new();
     private readonly ArtistEntityFixture _artistEntityFixture = new();
+    private readonly MusicArtworkEntityFixture _musicArtworkEntityFixture = new();
     private readonly PaginationDataDtoFixture _paginationDataDtoFixture = new();
 
     [Fact]
@@ -932,6 +934,348 @@ public class TrackRepositoryTests
             result.Value.Select(track => track.Id).OrderBy(id => id));
     }
 
+    [Fact]
+    public async Task GetShuffleTracksLiteAsync_WhenCalled_ShouldReturnOnlyTracksOfTheRequestedLibrary()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-library-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = new(context);
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
+        AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
+        List<TrackEntity> libraryTracks = await SeedShuffleTracksAsync(context, album, libraryId, 3);
+        Guid otherLibraryId = Guid.NewGuid();
+        ArtistEntity otherArtist = await SeedArtistAsync(context, otherLibraryId, "ABBA");
+        AlbumEntity otherAlbum = await SeedAlbumForArtistAsync(context, otherLibraryId, otherArtist.Id, "Arrival");
+        List<TrackEntity> otherLibraryTracks = await SeedShuffleTracksAsync(context, otherAlbum, otherLibraryId, 3);
+
+        // Act
+        Result<IReadOnlyList<ShuffleTrackRowDto>> result = await sut.GetShuffleTracksLiteAsync(
+            libraryId, null, null, [], 10, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(libraryTracks.Count, result.Value.Count);
+        Assert.All(result.Value, row => Assert.Contains(libraryTracks, track => track.Id == row.TrackId));
+        Assert.DoesNotContain(result.Value, row => otherLibraryTracks.Exists(track => track.Id == row.TrackId));
+        Assert.Equal(result.Value.Count, result.Value.Select(row => row.TrackId).Distinct().Count());
+    }
+
+    [Fact]
+    public async Task GetShuffleTracksLiteAsync_WhenArtistIdIsProvided_ShouldReturnOnlyTracksOfThatArtist()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-artist-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = new(context);
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
+        AlbumEntity artistAlbum = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
+        List<TrackEntity> artistTracks = await SeedShuffleTracksAsync(context, artistAlbum, libraryId, 2);
+        ArtistEntity otherArtist = await SeedArtistAsync(context, libraryId, "David Bowie");
+        AlbumEntity otherArtistAlbum = await SeedAlbumForArtistAsync(context, libraryId, otherArtist.Id, "Heroes");
+        List<TrackEntity> otherArtistTracks = await SeedShuffleTracksAsync(context, otherArtistAlbum, libraryId, 2);
+
+        // Act
+        Result<IReadOnlyList<ShuffleTrackRowDto>> result = await sut.GetShuffleTracksLiteAsync(
+            libraryId, artist.Id, null, [], 10, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(artistTracks.Count, result.Value.Count);
+        Assert.All(result.Value, row => Assert.Contains(artistTracks, track => track.Id == row.TrackId));
+        Assert.All(result.Value, row => Assert.Equal(artist.Id, row.ArtistId));
+        Assert.DoesNotContain(result.Value, row => otherArtistTracks.Exists(track => track.Id == row.TrackId));
+    }
+
+    [Fact]
+    public async Task GetShuffleTracksLiteAsync_WhenAlbumIdIsProvided_ShouldReturnOnlyTracksOfThatAlbum()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-album-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = new(context);
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
+        AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
+        List<TrackEntity> albumTracks = await SeedShuffleTracksAsync(context, album, libraryId, 2);
+        AlbumEntity otherAlbum = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "News of the World");
+        List<TrackEntity> otherAlbumTracks = await SeedShuffleTracksAsync(context, otherAlbum, libraryId, 2);
+
+        // Act
+        Result<IReadOnlyList<ShuffleTrackRowDto>> result = await sut.GetShuffleTracksLiteAsync(
+            libraryId, null, album.Id, [], 10, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(albumTracks.Count, result.Value.Count);
+        Assert.All(result.Value, row => Assert.Contains(albumTracks, track => track.Id == row.TrackId));
+        Assert.All(result.Value, row => Assert.Equal(album.Id, row.AlbumId));
+        Assert.DoesNotContain(result.Value, row => otherAlbumTracks.Exists(track => track.Id == row.TrackId));
+    }
+
+    [Fact]
+    public async Task GetShuffleTracksLiteAsync_WhenArtistIdAndAlbumIdAreProvided_ShouldApplyBothFilters()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-bothfilters-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = new(context);
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
+        AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
+        List<TrackEntity> albumTracks = await SeedShuffleTracksAsync(context, album, libraryId, 2);
+        AlbumEntity otherAlbumOfArtist = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "News of the World");
+        List<TrackEntity> otherAlbumOfArtistTracks = await SeedShuffleTracksAsync(context, otherAlbumOfArtist, libraryId, 2);
+        ArtistEntity otherArtist = await SeedArtistAsync(context, libraryId, "David Bowie");
+        AlbumEntity otherArtistAlbum = await SeedAlbumForArtistAsync(context, libraryId, otherArtist.Id, "Heroes");
+        List<TrackEntity> otherArtistAlbumTracks = await SeedShuffleTracksAsync(context, otherArtistAlbum, libraryId, 2);
+
+        // Act
+        Result<IReadOnlyList<ShuffleTrackRowDto>> result = await sut.GetShuffleTracksLiteAsync(
+            libraryId, artist.Id, album.Id, [], 10, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(albumTracks.Count, result.Value.Count);
+        Assert.All(result.Value, row => Assert.Contains(albumTracks, track => track.Id == row.TrackId));
+        Assert.DoesNotContain(result.Value, row => otherAlbumOfArtistTracks.Exists(track => track.Id == row.TrackId));
+        Assert.DoesNotContain(result.Value, row => otherArtistAlbumTracks.Exists(track => track.Id == row.TrackId));
+    }
+
+    [Fact]
+    public async Task GetShuffleTracksLiteAsync_WhenExcludedTrackIdsAreProvided_ShouldExcludeEveryOneOfThem()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-excluded-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = new(context);
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
+        AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
+        List<TrackEntity> tracks = await SeedShuffleTracksAsync(context, album, libraryId, 4);
+        Guid[] excludedTrackIds = [.. tracks.Take(3).Select(track => track.Id)];
+        TrackEntity expectedTrack = tracks[3];
+
+        // Act
+        Result<IReadOnlyList<ShuffleTrackRowDto>> result = await sut.GetShuffleTracksLiteAsync(
+            libraryId, null, null, excludedTrackIds, 10, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        ShuffleTrackRowDto row = Assert.Single(result.Value);
+        Assert.Equal(expectedTrack.Id, row.TrackId);
+        Assert.DoesNotContain(result.Value, candidate => excludedTrackIds.Contains(candidate.TrackId));
+    }
+
+    [Fact]
+    public async Task GetShuffleTracksLiteAsync_WhenCountIsLowerThanTheAvailableTracks_ShouldReturnAtMostCount()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-count-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = new(context);
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
+        AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
+        await SeedShuffleTracksAsync(context, album, libraryId, 5);
+
+        // Act
+        Result<IReadOnlyList<ShuffleTrackRowDto>> result = await sut.GetShuffleTracksLiteAsync(
+            libraryId, null, null, [], 2, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(2, result.Value.Count);
+        Assert.Equal(result.Value.Count, result.Value.Select(row => row.TrackId).Distinct().Count());
+    }
+
+    [Fact]
+    public async Task GetShuffleTracksLiteAsync_WhenTheLibraryHasFewerTracksThanCount_ShouldReturnEveryAvailableTrack()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-fewertracks-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = new(context);
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
+        AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
+        List<TrackEntity> tracks = await SeedShuffleTracksAsync(context, album, libraryId, 2);
+
+        // Act
+        Result<IReadOnlyList<ShuffleTrackRowDto>> result = await sut.GetShuffleTracksLiteAsync(
+            libraryId, null, null, [], 50, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(tracks.Count, result.Value.Count);
+        Assert.All(result.Value, row => Assert.Contains(tracks, track => track.Id == row.TrackId));
+    }
+
+    [Fact]
+    public async Task GetShuffleTracksLiteAsync_WhenNothingMatches_ShouldReturnAnEmptyList()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-nomatch-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = new(context);
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
+        AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
+        await SeedShuffleTracksAsync(context, album, libraryId, 2);
+
+        // Act
+        Result<IReadOnlyList<ShuffleTrackRowDto>> result = await sut.GetShuffleTracksLiteAsync(
+            libraryId, null, Guid.NewGuid(), [], 10, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Empty(result.Value);
+    }
+
+    [Fact]
+    public async Task GetShuffleTracksLiteAsync_WhenCalled_ShouldProjectEveryField()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-projection-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = new(context);
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
+        AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
+        TrackEntity track = _trackEntityFixture.Create(
+            albumId: album.Id,
+            libraryId: libraryId,
+            path: "/music/queen/bohemian-rhapsody.flac",
+            title: "Bohemian Rhapsody",
+            includeMetadata: false);
+        track.DurationInSeconds = 355;
+        context.Tracks.Add(track);
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<ShuffleTrackRowDto>> result = await sut.GetShuffleTracksLiteAsync(
+            libraryId, null, null, [], 10, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        ShuffleTrackRowDto row = Assert.Single(result.Value);
+        Assert.Equal(track.Id, row.TrackId);
+        Assert.Equal("Bohemian Rhapsody", row.Title);
+        Assert.Equal(355, row.DurationInSeconds);
+        Assert.Equal(album.Id, row.AlbumId);
+        Assert.Equal("A Night at the Opera", row.AlbumTitle);
+        Assert.Equal(artist.Id, row.ArtistId);
+    }
+
+    [Fact]
+    public async Task GetShuffleTracksLiteAsync_WhenTheAlbumHasACoverArtwork_ShouldProjectItsFileName()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-cover-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = new(context);
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
+        AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
+        TrackEntity track = (await SeedShuffleTracksAsync(context, album, libraryId, 1))[0];
+        await AddArtworkAsync(context, album.Id, ArtworkType.Cover, "a-night-at-the-opera-cover.jpg");
+
+        // Act
+        Result<IReadOnlyList<ShuffleTrackRowDto>> result = await sut.GetShuffleTracksLiteAsync(
+            libraryId, null, album.Id, [], 10, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        ShuffleTrackRowDto row = Assert.Single(result.Value);
+        Assert.Equal(track.Id, row.TrackId);
+        Assert.Equal("a-night-at-the-opera-cover.jpg", row.CoverPath);
+    }
+
+    [Fact]
+    public async Task GetShuffleTracksLiteAsync_WhenTheAlbumHasNoArtwork_ShouldProjectANullCoverPath()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-nocover-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = new(context);
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
+        AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
+        await SeedShuffleTracksAsync(context, album, libraryId, 1);
+
+        // Act
+        Result<IReadOnlyList<ShuffleTrackRowDto>> result = await sut.GetShuffleTracksLiteAsync(
+            libraryId, null, album.Id, [], 10, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        ShuffleTrackRowDto row = Assert.Single(result.Value);
+        Assert.Null(row.CoverPath);
+    }
+
+    [Fact]
+    public async Task GetShuffleTracksLiteAsync_WhenTheAlbumOnlyHasANonCoverArtwork_ShouldNotUseItAsTheCover()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-noncover-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = new(context);
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
+        AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
+        await SeedShuffleTracksAsync(context, album, libraryId, 1);
+        await AddArtworkAsync(context, album.Id, ArtworkType.Booklet, "booklet-page.jpg");
+
+        // Act
+        Result<IReadOnlyList<ShuffleTrackRowDto>> result = await sut.GetShuffleTracksLiteAsync(
+            libraryId, null, album.Id, [], 10, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        ShuffleTrackRowDto row = Assert.Single(result.Value);
+        Assert.Null(row.CoverPath);
+    }
+
+    [Fact]
+    public async Task GetShuffleTracksLiteAsync_WhenOnlyAnotherAlbumHasACover_ShouldNotUseThatCover()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-othercover-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = new(context);
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
+        AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
+        await SeedShuffleTracksAsync(context, album, libraryId, 1);
+        AlbumEntity otherAlbum = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "News of the World");
+        await AddArtworkAsync(context, otherAlbum.Id, ArtworkType.Cover, "news-of-the-world-cover.jpg");
+
+        // Act
+        Result<IReadOnlyList<ShuffleTrackRowDto>> result = await sut.GetShuffleTracksLiteAsync(
+            libraryId, null, album.Id, [], 10, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        ShuffleTrackRowDto row = Assert.Single(result.Value);
+        Assert.Null(row.CoverPath);
+    }
+
     /// <summary>
     /// Creates a list of tracks with distinct paths and empty metadata collections, so that the chunked lookup can be exercised without extra graph data.
     /// </summary>
@@ -1031,5 +1375,77 @@ public class TrackRepositoryTests
             .Include(track => track.Moods)
             .Include(track => track.Isrcs)
             .FirstAsync(track => track.Id == trackId);
+    }
+
+    /// <summary>
+    /// Seeds an artist of the library identified by <paramref name="libraryId"/>.
+    /// </summary>
+    /// <param name="context">The context the artist is persisted through.</param>
+    /// <param name="libraryId">The Id of the library the artist belongs to.</param>
+    /// <param name="name">The name of the artist.</param>
+    /// <returns>The persisted artist.</returns>
+    private async Task<ArtistEntity> SeedArtistAsync(LuminaDbContext context, Guid libraryId, string name)
+    {
+        ArtistEntity artist = _artistEntityFixture.Create(libraryId: libraryId, name: name, includeAlbums: false, includeContributors: false);
+        context.Artists.Add(artist);
+        await context.SaveChangesAsync();
+        return artist;
+    }
+
+    /// <summary>
+    /// Seeds an album of the artist identified by <paramref name="artistId"/>.
+    /// </summary>
+    /// <param name="context">The context the album is persisted through.</param>
+    /// <param name="libraryId">The Id of the library the album belongs to.</param>
+    /// <param name="artistId">The Id of the artist the album belongs to.</param>
+    /// <param name="title">The title of the album.</param>
+    /// <returns>The persisted album.</returns>
+    private async Task<AlbumEntity> SeedAlbumForArtistAsync(LuminaDbContext context, Guid libraryId, Guid artistId, string title)
+    {
+        AlbumEntity album = _albumEntityFixture.Create(
+            artistId: artistId, libraryId: libraryId, title: title, includeTracks: false, includeMetadata: false);
+        context.Albums.Add(album);
+        await context.SaveChangesAsync();
+        return album;
+    }
+
+    /// <summary>
+    /// Seeds a number of tracks of the album identified by <paramref name="album"/>, with distinct paths and no metadata collections.
+    /// </summary>
+    /// <param name="context">The context the tracks are persisted through.</param>
+    /// <param name="album">The album that owns the tracks.</param>
+    /// <param name="libraryId">The Id of the library that owns the tracks.</param>
+    /// <param name="count">The number of tracks to seed.</param>
+    /// <returns>The persisted tracks.</returns>
+    private async Task<List<TrackEntity>> SeedShuffleTracksAsync(LuminaDbContext context, AlbumEntity album, Guid libraryId, int count)
+    {
+        List<TrackEntity> tracks = [.. Enumerable.Range(0, count).Select(index => _trackEntityFixture.Create(
+            albumId: album.Id,
+            libraryId: libraryId,
+            path: $"/music/shuffle-{Guid.NewGuid():N}.flac",
+            title: $"Shuffle Track {index}",
+            includeMetadata: false))];
+        context.Tracks.AddRange(tracks);
+        await context.SaveChangesAsync();
+        return tracks;
+    }
+
+    /// <summary>
+    /// Seeds a piece of artwork of the album identified by <paramref name="albumId"/>.
+    /// </summary>
+    /// <param name="context">The context the artwork is persisted through.</param>
+    /// <param name="albumId">The Id of the album that owns the artwork.</param>
+    /// <param name="artworkType">The type of the artwork.</param>
+    /// <param name="fileName">The relative file name of the stored artwork.</param>
+    private async Task AddArtworkAsync(LuminaDbContext context, Guid albumId, ArtworkType artworkType, string fileName)
+    {
+        context.MusicArtwork.Add(_musicArtworkEntityFixture.Create(
+            ownerType: MusicArtworkOwnerType.Album,
+            ownerId: albumId,
+            artworkType: artworkType,
+            ordinal: 0,
+            fileName: fileName,
+            status: ArtworkStatus.Enriched));
+        await context.SaveChangesAsync();
     }
 }

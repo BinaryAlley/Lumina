@@ -27,6 +27,7 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.AudioLibrary.
 public class AlbumEntityMappingTests
 {
     private readonly AlbumEntityFixture _albumEntityFixture = new();
+    private readonly ArtistEntityFixture _artistEntityFixture = new();
     private readonly TrackEntityFixture _trackEntityFixture = new();
     private readonly GenreEntityFixture _genreEntityFixture = new();
     private readonly TagEntityFixture _tagEntityFixture = new();
@@ -252,6 +253,7 @@ public class AlbumEntityMappingTests
     {
         // Arrange
         AlbumEntity entity = _albumEntityFixture.Create();
+        entity.Artist = _artistEntityFixture.Create(name: "Queen");
 
         // Act
         AlbumResponse result = entity.ToResponse();
@@ -260,6 +262,7 @@ public class AlbumEntityMappingTests
         Assert.NotNull(result);
         Assert.Equal(entity.Id, result.Id);
         Assert.Equal(entity.ArtistId, result.ArtistId);
+        Assert.Equal("Queen", result.ArtistName);
         Assert.Equal(entity.LibraryId, result.LibraryId);
         // No cover path is supplied by default, so the response exposes none.
         Assert.Null(result.CoverPath);
@@ -300,6 +303,21 @@ public class AlbumEntityMappingTests
     }
 
     [Fact]
+    public void ToResponse_WhenAlbumHasNoArtist_ShouldMapAnEmptyArtistName()
+    {
+        // Arrange
+        AlbumEntity entity = _albumEntityFixture.Create();
+        entity.Artist = null;
+
+        // Act
+        AlbumResponse result = entity.ToResponse();
+
+        // Assert
+        // The response contract always carries an artist name, so an album loaded without its artist exposes an empty one instead of null.
+        Assert.Equal(string.Empty, result.ArtistName);
+    }
+
+    [Fact]
     public void ToResponse_WhenLanguageSubpropertiesAreBlank_ShouldMapLanguagesToNull()
     {
         // Arrange
@@ -335,6 +353,8 @@ public class AlbumEntityMappingTests
     {
         // Arrange
         List<AlbumEntity> entities = _albumEntityFixture.CreateMany(2);
+        for (int i = 0; i < entities.Count; i++)
+            entities[i].Artist = _artistEntityFixture.Create(name: $"Artist {i}");
 
         // Act
         IReadOnlyList<AlbumResponse> results = entities.ToResponses();
@@ -346,6 +366,7 @@ public class AlbumEntityMappingTests
         {
             Assert.Equal(entities[i].Id, results[i].Id);
             Assert.Equal(entities[i].Title, results[i].Metadata.Title);
+            Assert.Equal($"Artist {i}", results[i].ArtistName);
         }
     }
 
