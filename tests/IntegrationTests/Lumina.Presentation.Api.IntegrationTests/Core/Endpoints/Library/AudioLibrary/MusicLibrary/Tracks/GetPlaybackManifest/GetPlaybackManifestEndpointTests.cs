@@ -7,6 +7,7 @@ using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Playback
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.Playback;
+using Lumina.Presentation.Api.Common.Routes.Library.AudioLibrary.MusicLibrary;
 using Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetPlaybackManifest;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.Extensions.DependencyInjection;
@@ -96,6 +97,8 @@ public class GetPlaybackManifestEndpointTests : IClassFixture<AuthenticatedLumin
         Assert.True(manifest.IsSeekable);
         Assert.Equal($"/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}/stream", manifest.StreamPath);
         Assert.DoesNotContain("http", manifest.StreamPath, StringComparison.OrdinalIgnoreCase);
+        Assert.Null(manifest.DeliveryId);
+        Assert.Null(manifest.SegmentStreamPathTemplate);
     }
 
     [Fact]
@@ -119,6 +122,59 @@ public class GetPlaybackManifestEndpointTests : IClassFixture<AuthenticatedLumin
         Assert.Equal(PlaybackDeliveryShape.TimeAddressedSegments, manifest.DeliveryShape);
         Assert.Equal(6, manifest.SegmentDurationSeconds);
         Assert.True(manifest.IsSeekable);
+        Assert.NotNull(manifest.DeliveryId);
+        Assert.Matches("^[0-9a-f]{32}$", manifest.DeliveryId);
+        Assert.Equal(BuildExpectedSegmentStreamPathTemplate(libraryId, artistId, albumId, trackId), manifest.SegmentStreamPathTemplate);
+        Assert.DoesNotContain("http", manifest.SegmentStreamPathTemplate, StringComparison.OrdinalIgnoreCase);
+        string cacheControl = string.Join(", ", response.Headers.GetValues("Cache-Control"));
+        Assert.Contains("private", cacheControl);
+        Assert.Contains("no-store", cacheControl);
+        Assert.Contains("Authorization", response.Headers.Vary);
+    }
+
+    [Fact]
+    public async Task GetPlaybackManifest_WhenTheSameTrackIsRequestedTwice_ShouldReuseTheSameDeliveryId()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        (Guid libraryId, Guid artistId, Guid albumId, Guid trackId) = await SeedLibraryArtistAlbumAndTrackAsync(userId, container: "OGG", audioCodec: "OPUS");
+        string requestPath = $"/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}/playback-manifest?capabilities=mp3/mp3";
+
+        // Act
+        HttpResponseMessage firstResponse = await _client.GetAsync(requestPath);
+        HttpResponseMessage secondResponse = await _client.GetAsync(requestPath);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, firstResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, secondResponse.StatusCode);
+        PlaybackManifestResponse? firstManifest = await ReadManifestAsync(firstResponse);
+        PlaybackManifestResponse? secondManifest = await ReadManifestAsync(secondResponse);
+        Assert.NotNull(firstManifest);
+        Assert.NotNull(secondManifest);
+        Assert.NotNull(firstManifest!.DeliveryId);
+        Assert.Equal(firstManifest.DeliveryId, secondManifest!.DeliveryId);
+    }
+
+    [Fact]
+    public async Task GetPlaybackManifest_WhenTheTranscodedResponseIsReread_ShouldKeepAWellFormedDeliveryId()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        (Guid libraryId, Guid artistId, Guid albumId, Guid trackId) = await SeedLibraryArtistAlbumAndTrackAsync(userId, container: "OGG", audioCodec: "OPUS");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}/playback-manifest?capabilities=mp3/mp3");
+        string content = await response.Content.ReadAsStringAsync();
+
+        // Act
+        using JsonDocument firstRead = JsonDocument.Parse(content);
+        string? deliveryIdFromFirstRead = firstRead.RootElement.GetProperty("deliveryId").GetString();
+        PlaybackManifestResponse? secondRead = JsonSerializer.Deserialize<PlaybackManifestResponse>(content, _jsonOptions);
+
+        // Assert
+        Assert.NotNull(deliveryIdFromFirstRead);
+        Assert.Matches("^[0-9a-f]{32}$", deliveryIdFromFirstRead);
+        Assert.NotNull(secondRead);
+        Assert.Equal(deliveryIdFromFirstRead, secondRead!.DeliveryId);
+        Assert.Matches("^[0-9a-f]{32}$", secondRead.DeliveryId);
     }
 
     [Fact]
@@ -228,6 +284,23 @@ public class GetPlaybackManifestEndpointTests : IClassFixture<AuthenticatedLumin
         dbContext.Users.Add(_userEntityFixture.Create(id: userId, username: username, password: "TestPass123!"));
         await dbContext.SaveChangesAsync();
         return (userId, username);
+    }
+
+    /// <summary>
+    /// Builds the segment stream path template the manifest is expected to report for a track.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library the track belongs to.</param>
+    /// <param name="artistId">The Id of the artist the album belongs to.</param>
+    /// <param name="albumId">The Id of the album the track belongs to.</param>
+    /// <param name="trackId">The Id of the track.</param>
+    /// <returns>The expected segment stream path template, with its placeholders preserved.</returns>
+    private static string BuildExpectedSegmentStreamPathTemplate(Guid libraryId, Guid artistId, Guid albumId, Guid trackId)
+    {
+        return ApiRoutes.Tracks.STREAM_TRACK_SEGMENT
+            .Replace("{libraryId}", libraryId.ToString())
+            .Replace("{artistId}", artistId.ToString())
+            .Replace("{albumId}", albumId.ToString())
+            .Replace("{trackId}", trackId.ToString());
     }
 
     /// <summary>

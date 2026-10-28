@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web;
 using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.HealthChecks;
 using Lumina.Presentation.Web.Fixtures.Common.Api;
@@ -30,6 +29,11 @@ public class LuminaWebFactory : WebApplicationFactory<Program>, IDisposable
     public StubApiHttpClient ApiClientStub { get; } = new();
 
     /// <summary>
+    /// Gets the stub used in place of the remote streaming API client.
+    /// </summary>
+    public StubStreamingApiHttpClient StreamingApiClientStub { get; } = new();
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="LuminaWebFactory"/> class.
     /// </summary>
     public LuminaWebFactory()
@@ -44,7 +48,7 @@ public class LuminaWebFactory : WebApplicationFactory<Program>, IDisposable
     {
         builder.ConfigureAppConfiguration((context, config) =>
         {
-            // provide the application configuration values that the Web app validates on startup
+            // Provide the application configuration values that the Web app validates on startup.
             config.AddInMemoryCollection(initialData: new Dictionary<string, string?>
             {
                 ["EncryptionSettings:SecretKey"] = TEST_ENCRYPTION_KEY,
@@ -55,14 +59,19 @@ public class LuminaWebFactory : WebApplicationFactory<Program>, IDisposable
         });
         builder.ConfigureServices(services =>
         {
-            // remove the typed HTTP client registration, so that the stub can take its place
-            ServiceDescriptor[] apiClientDescriptors = services.Where(serviceDescriptor => serviceDescriptor.ServiceType == typeof(IApiHttpClient)).ToArray();
+            // Remove the typed HTTP client registration, so that the stub can take its place.
+            ServiceDescriptor[] apiClientDescriptors = [.. services.Where(serviceDescriptor => serviceDescriptor.ServiceType == typeof(IApiHttpClient))];
             foreach (ServiceDescriptor descriptor in apiClientDescriptors)
                 services.Remove(descriptor);
             services.AddSingleton<IApiHttpClient>(ApiClientStub);
 
-            // the API reachability health check resolves ApiReachabilityHealthCheck from DI when it runs; replace its
-            // registration with a healthy subclass, since no real API exists during these tests
+            // Remove the typed streaming HTTP client registration, so that the streaming stub can take its place.
+            ServiceDescriptor[] streamingApiClientDescriptors = [.. services.Where(serviceDescriptor => serviceDescriptor.ServiceType == typeof(IStreamingApiHttpClient))];
+            foreach (ServiceDescriptor descriptor in streamingApiClientDescriptors)
+                services.Remove(descriptor);
+            services.AddSingleton<IStreamingApiHttpClient>(StreamingApiClientStub);
+
+            // The API reachability health check resolves ApiReachabilityHealthCheck from DI when it runs; replace its registration with a healthy subclass, since no real API exists during these tests.
             services.RemoveAll<ApiReachabilityHealthCheck>();
             services.AddScoped<ApiReachabilityHealthCheck, HealthyApiReachabilityHealthCheck>();
         });

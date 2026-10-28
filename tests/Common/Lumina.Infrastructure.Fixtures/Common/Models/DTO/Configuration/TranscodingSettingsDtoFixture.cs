@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
 using Lumina.Infrastructure.Common.Models.DTO.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -31,6 +32,7 @@ public class TranscodingSettingsDtoFixture
     /// default temporary directory.
     /// </param>
     /// <param name="includeCacheDirectory">Whether to generate the optional cache directory, defaulting to <see langword="true"/>.</param>
+    /// <param name="includeFfmpegPath">Whether the ffmpeg path should be included, or forced to <see langword="null"/>, defaulting to <see langword="true"/>.</param>
     /// <returns>A configured <see cref="TranscodingSettingsDto"/> instance.</returns>
     public TranscodingSettingsDto Create(
         string? ffmpegPath = null,
@@ -40,16 +42,19 @@ public class TranscodingSettingsDtoFixture
         int? jobTimeoutSeconds = null,
         int? evictionGraceSeconds = null,
         string? cacheDirectory = null,
-        bool includeCacheDirectory = true)
+        bool includeCacheDirectory = true,
+        bool includeFfmpegPath = true)
     {
+        int resolvedMaxConcurrentJobs = maxConcurrentJobs ?? _faker.Random.Int(1, 16);
         return new TranscodingSettingsDto
         {
-            FfmpegPath = ffmpegPath ?? _faker.System.FileName("exe"),
-            MaxConcurrentJobs = maxConcurrentJobs ?? _faker.Random.Int(1, 16),
-            MaxConcurrentJobsPerUser = maxConcurrentJobsPerUser ?? _faker.Random.Int(1, 8),
+            FfmpegPath = includeFfmpegPath ? (ffmpegPath ?? _faker.System.FileName("exe")) : null!,
+            MaxConcurrentJobs = resolvedMaxConcurrentJobs,
+            // A per-user limit above the global one is rejected by the validator, so the generated value never exceeds the global limit.
+            MaxConcurrentJobsPerUser = maxConcurrentJobsPerUser ?? _faker.Random.Int(1, Math.Max(1, resolvedMaxConcurrentJobs)),
             MaxCacheBytes = maxCacheBytes ?? _faker.Random.Long(1_000_000_000, 8_589_934_592),
             JobTimeoutSeconds = jobTimeoutSeconds ?? _faker.Random.Int(60, 3600),
-            EvictionGraceSeconds = evictionGraceSeconds ?? _faker.Random.Int(0, 600),
+            EvictionGraceSeconds = evictionGraceSeconds ?? _faker.Random.Int(1, 600),
             CacheDirectory = includeCacheDirectory ? cacheDirectory ?? _faker.System.DirectoryPath() : null
         };
     }
