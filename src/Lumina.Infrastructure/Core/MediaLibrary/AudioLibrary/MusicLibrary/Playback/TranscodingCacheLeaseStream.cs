@@ -96,7 +96,8 @@ internal sealed class TranscodingCacheLeaseStream : Stream
     /// <returns>The number of bytes read.</returns>
     public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
     {
-        return _innerStream.ReadAsync(buffer, offset, count, cancellationToken);
+        // The memory based overload is the one the inner stream should implement, so the array overload only adapts to it.
+        return _innerStream.ReadAsync(buffer.AsMemory(offset, count), cancellationToken).AsTask();
     }
 
     /// <summary>
@@ -160,7 +161,8 @@ internal sealed class TranscodingCacheLeaseStream : Stream
     /// <returns>A task that represents the asynchronous write operation.</returns>
     public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
     {
-        return _innerStream.WriteAsync(buffer, offset, count, cancellationToken);
+        // The memory based overload is the one the inner stream should implement, so the array overload only adapts to it.
+        return _innerStream.WriteAsync(buffer.AsMemory(offset, count), cancellationToken).AsTask();
     }
 
     /// <summary>
