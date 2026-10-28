@@ -36,11 +36,13 @@ public class MusicMimeTypesTests
         Assert.Equal(expectedMimeType, result);
     }
 
-    [Fact]
-    public void GetMimeType_WhenFormatIsNone_ShouldReturnOpaqueBinaryMimeType()
+    [Theory]
+    [InlineData(AudioFileFormat.None)] // the none audio format has no mime mapping
+    [InlineData((AudioFileFormat)999)] // an unknown audio format has no mime mapping
+    public void GetMimeType_WhenFormatIsUnknown_ShouldReturnOpaqueBinaryMimeType(AudioFileFormat format)
     {
         // Act
-        string result = MusicMimeTypes.GetMimeType(AudioFileFormat.None);
+        string result = MusicMimeTypes.GetMimeType(format);
 
         // Assert
         Assert.Equal("application/octet-stream", result);

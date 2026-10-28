@@ -22,4 +22,14 @@ public class AudioFileFormatTests
         // Assert
         Assert.Equal(values.Length, values.Distinct().Count());
     }
+
+    [Fact]
+    public void None_WhenCastingToInteger_ShouldBeZero()
+    {
+        // Act
+        int value = (int)AudioFileFormat.None;
+
+        // Assert
+        Assert.Equal(0, value);
+    }
 }

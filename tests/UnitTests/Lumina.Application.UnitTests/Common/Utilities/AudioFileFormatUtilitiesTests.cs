@@ -75,4 +75,17 @@ public class AudioFileFormatUtilitiesTests
         // Assert
         Assert.Equal(AudioFileFormat.MP3, result);
     }
+
+    [Fact]
+    public void ToAudioFileFormat_WhenFilePathContainsDirectoriesAndMixedCaseExtension_ShouldReturnMappedFormat()
+    {
+        // Arrange
+        string filePath = "library/music/Queen/A Night at the Opera (1975).Remastered/01 - Bohemian Rhapsody.FLAC";
+
+        // Act
+        AudioFileFormat result = filePath.ToAudioFileFormat();
+
+        // Assert
+        Assert.Equal(AudioFileFormat.FLAC, result);
+    }
 }
