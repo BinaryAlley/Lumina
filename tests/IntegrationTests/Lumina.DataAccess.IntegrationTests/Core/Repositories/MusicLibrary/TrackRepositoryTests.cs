@@ -869,7 +869,7 @@ public class TrackRepositoryTests
         using LuminaDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = new(context);
         Guid libraryId = Guid.NewGuid();
-        AlbumEntity album = await SeedAlbumAsync(context, libraryId);
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId, includeMetadata: true);
         ArtistEntity artist = await context.Artists.AsNoTracking().FirstAsync(candidate => candidate.Id == album.ArtistId);
         TrackEntity track = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, path: "/music/queen/loaded.flac", includeMetadata: false);
         track.Tags = [_tagEntityFixture.Create(name: "LoadedTag"), _tagEntityFixture.Create(name: "SecondLoadedTag")];
@@ -892,6 +892,10 @@ public class TrackRepositoryTests
         Assert.Equal(album.Id, returnedTrack.Album!.Id);
         Assert.NotNull(returnedTrack.Album.Artist);
         Assert.Equal(artist.Id, returnedTrack.Album.Artist!.Id);
+        Assert.Single(returnedTrack.Album.Tags);
+        Assert.Single(returnedTrack.Album.Genres);
+        Assert.Single(returnedTrack.Album.Artist.Tags);
+        Assert.Single(returnedTrack.Album.Artist.Genres);
         Assert.Equal(2, returnedTrack.Tags.Count);
         Assert.Single(returnedTrack.Genres);
         Assert.Single(returnedTrack.Moods);
@@ -910,8 +914,8 @@ public class TrackRepositoryTests
         TrackRepository sut = new(context);
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
-        const int trackCount = 501;
-        List<TrackEntity> tracks = CreateTracks(trackCount, album.Id, libraryId);
+        const int TRACK_COUNT = 501;
+        List<TrackEntity> tracks = CreateTracks(TRACK_COUNT, album.Id, libraryId);
         context.Tracks.AddRange(tracks);
         await context.SaveChangesAsync();
         context.ChangeTracker.Clear();
@@ -922,7 +926,7 @@ public class TrackRepositoryTests
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Equal(trackCount, result.Value.Count);
+        Assert.Equal(TRACK_COUNT, result.Value.Count);
         Assert.Equal(
             tracks.Select(track => track.Id).OrderBy(id => id),
             result.Value.Select(track => track.Id).OrderBy(id => id));
@@ -960,19 +964,30 @@ public class TrackRepositoryTests
     /// </summary>
     /// <param name="context">The context the artist and album are persisted through.</param>
     /// <param name="libraryId">The Id of the library the album belongs to.</param>
+    /// <param name="includeMetadata">Whether the album and its artist should carry tags and genres, or empty collections.</param>
     /// <returns>The persisted album.</returns>
-    private async Task<AlbumEntity> SeedAlbumAsync(LuminaDbContext context, Guid libraryId)
+    private async Task<AlbumEntity> SeedAlbumAsync(LuminaDbContext context, Guid libraryId, bool includeMetadata = false)
     {
         ArtistEntity? artist = await context.Artists.FirstOrDefaultAsync(existing => existing.LibraryId == libraryId);
         if (artist is null)
         {
             artist = _artistEntityFixture.Create(
                 libraryId: libraryId, name: "Queen", includeAlbums: false, includeContributors: false);
+            if (includeMetadata)
+            {
+                artist.Tags = [_tagEntityFixture.Create(name: $"ArtistTag-{Guid.NewGuid():N}")];
+                artist.Genres = [_genreEntityFixture.Create(name: $"ArtistGenre-{Guid.NewGuid():N}")];
+            }
             context.Artists.Add(artist);
             await context.SaveChangesAsync();
         }
         AlbumEntity album = _albumEntityFixture.Create(
             artistId: artist.Id, libraryId: libraryId, includeTracks: false, includeMetadata: false);
+        if (includeMetadata)
+        {
+            album.Tags = [_tagEntityFixture.Create(name: $"AlbumTag-{Guid.NewGuid():N}")];
+            album.Genres = [_genreEntityFixture.Create(name: $"AlbumGenre-{Guid.NewGuid():N}")];
+        }
         context.Albums.Add(album);
         await context.SaveChangesAsync();
         return album;

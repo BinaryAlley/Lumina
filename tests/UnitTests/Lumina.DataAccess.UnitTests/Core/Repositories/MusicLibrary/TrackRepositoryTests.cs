@@ -941,7 +941,11 @@ public class TrackRepositoryTests
         // Arrange
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = _artistEntityFixture.Create(libraryId: libraryId, includeAlbums: false, includeContributors: false);
+        artist.Tags = [_tagEntityFixture.Create(name: "ArtistTag1")];
+        artist.Genres = [_genreEntityFixture.Create(name: "ArtistGenre1")];
         AlbumEntity album = _albumEntityFixture.Create(artistId: artist.Id, libraryId: libraryId, includeTracks: false, includeMetadata: false);
+        album.Tags = [_tagEntityFixture.Create(name: "AlbumTag1"), _tagEntityFixture.Create(name: "AlbumTag2")];
+        album.Genres = [_genreEntityFixture.Create(name: "AlbumGenre1")];
         TrackEntity track = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, includeMetadata: false);
         track.Tags = [_tagEntityFixture.Create(name: "Tag1"), _tagEntityFixture.Create(name: "Tag2")];
         track.Genres = [_genreEntityFixture.Create(name: "Genre1")];
@@ -964,6 +968,10 @@ public class TrackRepositoryTests
         Assert.Equal(album.Id, returnedTrack.Album!.Id);
         Assert.NotNull(returnedTrack.Album.Artist);
         Assert.Equal(artist.Id, returnedTrack.Album.Artist!.Id);
+        Assert.Equal(2, returnedTrack.Album.Tags.Count);
+        Assert.Single(returnedTrack.Album.Genres);
+        Assert.Single(returnedTrack.Album.Artist.Tags);
+        Assert.Single(returnedTrack.Album.Artist.Genres);
         Assert.Equal(2, returnedTrack.Tags.Count);
         Assert.Single(returnedTrack.Genres);
         Assert.Single(returnedTrack.Moods);
@@ -976,8 +984,8 @@ public class TrackRepositoryTests
     public async Task GetByIdsAsync_WhenMoreThanFiveHundredIdsAreRequested_ShouldReturnEveryTrack()
     {
         // Arrange
-        const int trackCount = 501;
-        List<TrackEntity> tracks = CreateTracks(trackCount);
+        const int TRACK_COUNT = 501;
+        List<TrackEntity> tracks = CreateTracks(TRACK_COUNT);
         _mockContext.Tracks.AddRange(tracks);
         await _mockContext.SaveChangesAsync();
 
@@ -987,7 +995,7 @@ public class TrackRepositoryTests
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Equal(trackCount, result.Value.Count);
+        Assert.Equal(TRACK_COUNT, result.Value.Count);
         Assert.Equal(
             tracks.Select(track => track.Id).OrderBy(id => id),
             result.Value.Select(track => track.Id).OrderBy(id => id));

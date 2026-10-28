@@ -308,6 +308,40 @@ public class GetTagConsumptionQueryHandlerTests
     }
 
     [Fact]
+    public async Task HandleAsync_WhenATrackHasTags_ShouldUseTheTrackTagsInsteadOfTheAlbumAndArtistTags()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid trackId = Guid.NewGuid();
+        ArtistEntity artist = _artistEntityFixture.Create(libraryId: libraryId, includeAlbums: false, includeContributors: false);
+        artist.Tags = [_tagEntityFixture.Create(name: "artisttag")];
+        AlbumEntity album = _albumEntityFixture.Create(libraryId: libraryId, includeTracks: false, includeMetadata: false);
+        album.Artist = artist;
+        album.Tags = [_tagEntityFixture.Create(name: "albumtag")];
+        TrackEntity track = _trackEntityFixture.Create(id: trackId, albumId: album.Id, libraryId: libraryId, includeMetadata: false);
+        track.Album = album;
+        track.Tags = [_tagEntityFixture.Create(name: "tracktag")];
+        StubRecords(_mediaConsumptionRecordEntityFixture.Create(
+            userId: _userId,
+            mediaKind: MediaKind.MusicTrack,
+            mediaItemId: trackId,
+            libraryId: libraryId,
+            status: ConsumptionStatus.Completed,
+            consumedDurationMilliseconds: 1_000,
+            consecutivePagesRead: 0));
+        StubTracks(track);
+        GetTagConsumptionQuery query = _getTagConsumptionQueryFixture.Create();
+
+        // Act
+        Result<IReadOnlyList<TagConsumptionResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        TagConsumptionResponse tag = Assert.Single(result.Value);
+        Assert.Equal("tracktag", tag.Name);
+    }
+
+    [Fact]
     public async Task HandleAsync_WhenATrackHasNoTagsOfItsOwn_ShouldFallBackToItsAlbumTags()
     {
         // Arrange
