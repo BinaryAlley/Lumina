@@ -2,6 +2,7 @@
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Utilities;
 using Lumina.Domain.Common.Errors;
+using Lumina.Domain.SharedKernel.Common.Enums.Favorites;
 using System;
 #endregion
 
@@ -23,6 +24,11 @@ public class AddFavoriteCommandValidator : AbstractValidator<AddFavoriteCommand>
 
         RuleFor(command => command.MediaKind)
             .IsInEnum()
+            .WithError(Errors.Favorites.FavoriteMediaKindIsInvalid)
+            .When(command => command.MediaKind is not null);
+
+        RuleFor(command => command.MediaKind)
+            .Must(mediaKind => mediaKind != FavoriteMediaKind.None)
             .WithError(Errors.Favorites.FavoriteMediaKindIsInvalid)
             .When(command => command.MediaKind is not null);
 

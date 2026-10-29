@@ -32,6 +32,20 @@ public abstract class BaseEndpoint<TRequest, TResponse> : Endpoint<TRequest, TRe
     }
 
     /// <summary>
+    /// Sets the <c>Cache-Control</c> header, and remembers the chosen value so that it can be restored after later components overwrite it.
+    /// </summary>
+    /// <remarks>
+    /// The antiforgery token generation and the session middleware both force their own <c>Cache-Control</c> value, and they can run after the
+    /// endpoint has chosen one. The remembered value is restored when the response starts by the <c>CacheControlHeaderMiddleware</c>.
+    /// </remarks>
+    /// <param name="cacheControl">The <c>Cache-Control</c> value chosen by the endpoint.</param>
+    protected void SetCacheControl(string cacheControl)
+    {
+        HttpContext.Response.Headers.CacheControl = cacheControl;
+        HttpContext.Items[HttpContextItemKeys.CACHE_CONTROL] = cacheControl;
+    }
+
+    /// <summary>
     /// Renders a Razor view to the response.
     /// </summary>
     /// <param name="viewName">The name or path of the view to render.</param>
@@ -40,6 +54,13 @@ public abstract class BaseEndpoint<TRequest, TResponse> : Endpoint<TRequest, TRe
     /// <returns>An <see cref="IResult"/> that renders the view.</returns>
     protected IResult View(string viewName, object? model = null, IReadOnlyDictionary<string, object?>? viewData = null)
     {
+        // A view endpoint that set the Cache-Control header directly, instead of through SetCacheControl, still has its value remembered.
+        if (!HttpContext.Items.ContainsKey(HttpContextItemKeys.CACHE_CONTROL))
+        {
+            string cacheControl = HttpContext.Response.Headers.CacheControl.ToString();
+            if (!string.IsNullOrEmpty(cacheControl))
+                HttpContext.Items[HttpContextItemKeys.CACHE_CONTROL] = cacheControl;
+        }
         // Store the path of the displayed view in the session, so that the login redirect after the JWT token expires points to it; ignore the login endpoint,
         // because it is incorrect to be redirected to the login URL, with the login URL as the return URL.
         if (HttpContext.Request.Path != "/en-us/auth/login")

@@ -2,6 +2,7 @@
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Utilities;
 using Lumina.Domain.Common.Errors;
+using Lumina.Domain.SharedKernel.Common.Enums.Favorites;
 using System;
 using System.Linq;
 #endregion
@@ -26,6 +27,11 @@ public class GetFavoriteStatusQueryValidator : AbstractValidator<GetFavoriteStat
 
         RuleFor(query => query.MediaKind)
             .IsInEnum()
+            .WithError(Errors.Favorites.FavoriteMediaKindIsInvalid)
+            .When(query => query.MediaKind is not null);
+
+        RuleFor(query => query.MediaKind)
+            .Must(mediaKind => mediaKind != FavoriteMediaKind.None)
             .WithError(Errors.Favorites.FavoriteMediaKindIsInvalid)
             .When(query => query.MediaKind is not null);
 

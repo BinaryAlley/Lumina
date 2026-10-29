@@ -11,6 +11,11 @@ namespace Lumina.Domain.SharedKernel.Common.Enums.Favorites;
 public enum FavoriteMediaKind
 {
     /// <summary>
+    /// No media kind. Used as the default value; it is not a kind that can be marked as a favorite.
+    /// </summary>
+    None = 0,
+
+    /// <summary>
     /// A favorite that references an artist of a music library.
     /// </summary>
     MusicArtist,

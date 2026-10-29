@@ -70,7 +70,7 @@ public class StatisticsIndexViewEndpoint : BaseEndpoint<EmptyRequest, IResult>
     public override async Task<IResult> ExecuteAsync(EmptyRequest request, CancellationToken cancellationToken)
     {
         // The page shows the statistics of the authenticated user, so no intermediary may store it, and the response varies by the sign in cookie.
-        HttpContext.Response.Headers["Cache-Control"] = "private, no-store";
+        SetCacheControl("private, no-store");
         HttpContext.Response.Headers["Vary"] = "Cookie";
         string title = _localizer["Title"].Value;
         bool isAdmin = await _authorizationService.IsInRoleAsync("Admin", cancellationToken).ConfigureAwait(false);

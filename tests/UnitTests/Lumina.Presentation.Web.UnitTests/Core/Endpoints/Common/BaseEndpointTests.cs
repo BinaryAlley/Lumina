@@ -84,6 +84,63 @@ public class BaseEndpointTests
     }
 
     [Fact]
+    public void TestSetCacheControl_WhenCalled_ShouldSetTheHeaderAndRememberTheValue()
+    {
+        // Act
+        _sut.TestSetCacheControl("private, no-store");
+
+        // Assert
+        Assert.Equal("private, no-store", _sut.HttpContext.Response.Headers.CacheControl.ToString());
+        Assert.Equal("private, no-store", _sut.HttpContext.Items[HttpContextItemKeys.CACHE_CONTROL]);
+    }
+
+    [Fact]
+    public void TestView_WhenACacheControlValueWasRemembered_ShouldKeepItAfterALaterHeaderOverwrite()
+    {
+        // Arrange
+        TestHttpContextFactory.ConfigureSession(_sut.HttpContext, TestHttpContextFactory.CreateSession());
+        _sut.HttpContext.Request.Path = "/en-us/favorites";
+        _sut.TestSetCacheControl("private, no-store");
+        // The antiforgery token generation overwrites the header after the endpoint chose its value.
+        _sut.HttpContext.Response.Headers.CacheControl = "no-cache, no-store";
+
+        // Act
+        _sut.TestView("/Core/Views/Favorites/Index.cshtml");
+
+        // Assert
+        Assert.Equal("private, no-store", _sut.HttpContext.Items[HttpContextItemKeys.CACHE_CONTROL]);
+    }
+
+    [Fact]
+    public void TestView_WhenCacheControlIsSetDirectly_ShouldStoreItForTheResponseStartRestoration()
+    {
+        // Arrange
+        TestHttpContextFactory.ConfigureSession(_sut.HttpContext, TestHttpContextFactory.CreateSession());
+        _sut.HttpContext.Request.Path = "/en-us/favorites";
+        _sut.HttpContext.Response.Headers.CacheControl = "private, no-store";
+
+        // Act
+        _sut.TestView("/Core/Views/Favorites/Index.cshtml");
+
+        // Assert
+        Assert.Equal("private, no-store", _sut.HttpContext.Items[HttpContextItemKeys.CACHE_CONTROL]);
+    }
+
+    [Fact]
+    public void TestView_WhenCacheControlIsNotSet_ShouldNotStoreACacheControlValue()
+    {
+        // Arrange
+        TestHttpContextFactory.ConfigureSession(_sut.HttpContext, TestHttpContextFactory.CreateSession());
+        _sut.HttpContext.Request.Path = "/en-us/favorites";
+
+        // Act
+        _sut.TestView("/Core/Views/Favorites/Index.cshtml");
+
+        // Assert
+        Assert.False(_sut.HttpContext.Items.ContainsKey(HttpContextItemKeys.CACHE_CONTROL));
+    }
+
+    [Fact]
     public void TestCulture_WhenCultureRouteValuePresent_ShouldReturnCulture()
     {
         // Arrange

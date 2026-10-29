@@ -23,9 +23,12 @@ public class RemoveFavoriteCommandValidator : AbstractValidator<RemoveFavoriteCo
             .NotEmpty()
             .WithError(Errors.Favorites.FavoriteMediaKindIsInvalid);
 
-        // Only the member names are accepted, so a numeric route value that happens to parse as an enumeration value is rejected.
+        // Only the member names other than the default None are accepted, so a numeric route value that happens to parse as an
+        // enumeration value, or the explicit default value, is rejected.
         RuleFor(command => command.MediaKind)
-            .Must(mediaKind => Enum.GetNames<FavoriteMediaKind>().Contains(mediaKind, StringComparer.OrdinalIgnoreCase))
+            .Must(mediaKind => Enum.GetNames<FavoriteMediaKind>()
+                .Where(mediaKindName => !string.Equals(mediaKindName, nameof(FavoriteMediaKind.None), StringComparison.Ordinal))
+                .Contains(mediaKind, StringComparer.OrdinalIgnoreCase))
             .When(command => command.MediaKind is not null && command.MediaKind.Length > 0)
             .WithError(Errors.Favorites.FavoriteMediaKindIsInvalid);
 

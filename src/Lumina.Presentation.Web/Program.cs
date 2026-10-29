@@ -97,6 +97,8 @@ public class Program
         app.UseApiExceptionHandling(); // handle any problem details returned by the API
         app.UseRouting();
         app.UseRequestLocalization(); // set the culture from the localized routes
+        // restore the Cache-Control chosen by the endpoint after the antiforgery and session middlewares overwrite it
+        app.UseCacheControlHeader();
         app.UseSession();
         app.UseAuthentication();
         app.UseAuthorization();

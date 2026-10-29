@@ -69,7 +69,7 @@ public class FavoritesIndexViewEndpoint : BaseEndpoint<EmptyRequest, IResult>
     public override async Task<IResult> ExecuteAsync(EmptyRequest request, CancellationToken cancellationToken)
     {
         // The page shows the favorites of the authenticated user, so no intermediary may store it, and the response varies by the sign in cookie.
-        HttpContext.Response.Headers["Cache-Control"] = "private, no-store";
+        SetCacheControl("private, no-store");
         HttpContext.Response.Headers["Vary"] = "Cookie";
         // The page removes favorites, which submit through the form anti-forgery token, so a fresh token is issued for it.
         AntiforgeryTokenSet antiforgeryTokens = _antiforgery.GetAndStoreTokens(HttpContext);

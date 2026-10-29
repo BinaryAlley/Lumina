@@ -102,3 +102,7 @@ Report `FavoriteAlreadyExists` instead of returning the existing favorite.
 
 **Rejected**: a toggle rendered on several pages, and several open tabs, make a repeated add a normal event rather than an error. An idempotent add keeps the client simple, since it does not have to distinguish a created favorite from an existing one. `FavoriteAlreadyExists` remains defined in the favorites error set, but no operation produces it.
 
+## Amendment: Explicit Default Media Kind (2026-10-29)
+
+`FavoriteMediaKind` now declares `None = 0` as its first member and default value, so an unset kind is never mistaken for `MusicArtist`. The other members keep their order and now occupy values 1 to 6. `None` is not a favoritable kind: the application validators reject it with `FavoriteMediaKindIsInvalid`, `Favorite.IsSupported` reports it as unsupported, and no operation creates a favorite of it. A stored favorite whose kind was recorded as `None` is still rehydrated without failure, so the read paths remain tolerant of legacy or malformed rows. Because the kind is stored by name, no data migration is required.
+

@@ -13,6 +13,8 @@ using Lumina.DataAccess.Common.Interceptors;
 using Lumina.DataAccess.Core.Repositories.Playlists;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.Playlists;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -41,6 +43,7 @@ public class PlaylistRepositoryTests
     private readonly ArtistEntityFixture _artistEntityFixture = new();
     private readonly AlbumEntityFixture _albumEntityFixture = new();
     private readonly TrackEntityFixture _trackEntityFixture = new();
+    private readonly MusicArtworkEntityFixture _musicArtworkEntityFixture = new();
 
     [Fact]
     public async Task UpdateAsync_WhenNoEditableValueChanged_ShouldNotModifyTheStoredPlaylist()
@@ -420,6 +423,388 @@ public class PlaylistRepositoryTests
         Assert.Equal(1, storedPlaylist.EntryCount);
         Assert.Equal(1L, storedPlaylist.Version);
         Assert.False(await context.PlaylistEntries.AsNoTracking().AnyAsync(entry => entry.Id == firstEntry.Id));
+    }
+
+    [Fact]
+    public async Task GetDetailsForUserAsync_WhenThePlaylistDoesNotExist_ShouldReturnSuccessWithNull()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-details-missing-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        PlaylistRepository sut = new(context);
+
+        // Act
+        Result<PlaylistDetailsDto?> result = await sut.GetDetailsForUserAsync(Guid.NewGuid(), Guid.NewGuid(), paginationData: null, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Null(result.Value);
+    }
+
+    [Fact]
+    public async Task GetDetailsForUserAsync_WhenThePlaylistBelongsToAnotherUser_ShouldReturnSuccessWithNull()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-details-other-user-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        PlaylistRepository sut = new(context);
+        Guid ownerUserId = Guid.NewGuid();
+        context.Users.Add(_userEntityFixture.Create(id: ownerUserId));
+        (PlaylistEntity playlist, _) = await SeedOrderedPlaylistAsync(context, ownerUserId, entryCount: 2);
+
+        // Act
+        Result<PlaylistDetailsDto?> result = await sut.GetDetailsForUserAsync(playlist.Id, Guid.NewGuid(), paginationData: null, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Null(result.Value);
+    }
+
+    [Fact]
+    public async Task GetDetailsForUserAsync_WhenNoPaginationIsRequested_ShouldReturnEveryEntryWithDenseDisplayPositions()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-details-all-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        PlaylistRepository sut = new(context);
+        Guid userId = Guid.NewGuid();
+        context.Users.Add(_userEntityFixture.Create(id: userId));
+        (PlaylistEntity playlist, List<PlaylistEntryEntity> entries) = await SeedOrderedPlaylistAsync(context, userId, entryCount: 3);
+
+        // Act
+        Result<PlaylistDetailsDto?> result = await sut.GetDetailsForUserAsync(playlist.Id, userId, paginationData: null, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Equal([0, 1, 2], result.Value!.Entries.Data.Select(entry => entry.DisplayPosition));
+        Assert.Equal(entries.Select(entry => entry.Id), result.Value.Entries.Data.Select(entry => entry.Entry.Id));
+        Assert.Equal(1, result.Value.Entries.CurrentPage);
+        Assert.Equal(3, result.Value.Entries.PerPage);
+        Assert.Equal(3, result.Value.Entries.Count);
+        Assert.Equal(1, result.Value.Entries.NumberOfPages);
+    }
+
+    [Fact]
+    public async Task GetDetailsForUserAsync_WhenAPageIsRequested_ShouldReturnOnlyThatPageWithDenseDisplayPositions()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-details-page-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        PlaylistRepository sut = new(context);
+        Guid userId = Guid.NewGuid();
+        context.Users.Add(_userEntityFixture.Create(id: userId));
+        (PlaylistEntity playlist, List<PlaylistEntryEntity> entries) = await SeedOrderedPlaylistAsync(context, userId, entryCount: 5);
+        PaginationDataDto firstPage = new() { CurrentPage = 1, PerPage = 2 };
+        PaginationDataDto secondPage = new() { CurrentPage = 2, PerPage = 2 };
+
+        // Act
+        Result<PlaylistDetailsDto?> firstPageResult = await sut.GetDetailsForUserAsync(playlist.Id, userId, firstPage, CancellationToken.None);
+        Result<PlaylistDetailsDto?> secondPageResult = await sut.GetDetailsForUserAsync(playlist.Id, userId, secondPage, CancellationToken.None);
+
+        // Assert
+        Assert.False(firstPageResult.IsFailure);
+        Assert.NotNull(firstPageResult.Value);
+        Assert.Equal([0, 1], firstPageResult.Value!.Entries.Data.Select(entry => entry.DisplayPosition));
+        Assert.Equal([entries[0].Id, entries[1].Id], firstPageResult.Value.Entries.Data.Select(entry => entry.Entry.Id));
+        Assert.Equal(1, firstPageResult.Value.Entries.CurrentPage);
+        Assert.Equal(2, firstPageResult.Value.Entries.PerPage);
+        Assert.Equal(5, firstPageResult.Value.Entries.Count);
+        Assert.Equal(3, firstPageResult.Value.Entries.NumberOfPages);
+
+        Assert.False(secondPageResult.IsFailure);
+        Assert.NotNull(secondPageResult.Value);
+        // The display positions continue from the offset of the page, so the second page starts at 2 and not at 0.
+        Assert.Equal([2, 3], secondPageResult.Value!.Entries.Data.Select(entry => entry.DisplayPosition));
+        Assert.Equal([entries[2].Id, entries[3].Id], secondPageResult.Value.Entries.Data.Select(entry => entry.Entry.Id));
+        Assert.Equal(2, secondPageResult.Value.Entries.CurrentPage);
+        Assert.Equal(5, secondPageResult.Value.Entries.Count);
+        Assert.Equal(3, secondPageResult.Value.Entries.NumberOfPages);
+    }
+
+    [Fact]
+    public async Task GetDetailsForUserAsync_WhenTheRequestedPageExceedsTheLastPage_ShouldClampToTheLastPage()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-details-clamp-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        PlaylistRepository sut = new(context);
+        Guid userId = Guid.NewGuid();
+        context.Users.Add(_userEntityFixture.Create(id: userId));
+        (PlaylistEntity playlist, List<PlaylistEntryEntity> entries) = await SeedOrderedPlaylistAsync(context, userId, entryCount: 5);
+        PaginationDataDto beyondLastPage = new() { CurrentPage = 99, PerPage = 2 };
+
+        // Act
+        Result<PlaylistDetailsDto?> result = await sut.GetDetailsForUserAsync(playlist.Id, userId, beyondLastPage, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Equal(3, result.Value!.Entries.CurrentPage);
+        PlaylistEntryDto lastEntry = Assert.Single(result.Value.Entries.Data);
+        Assert.Equal(entries[4].Id, lastEntry.Entry.Id);
+        Assert.Equal(4, lastEntry.DisplayPosition);
+    }
+
+    [Fact]
+    public async Task GetDetailsForUserAsync_WhenThePlaylistIsEmptyAndAPageIsRequested_ShouldReturnAnEmptyPage()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-details-empty-page-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        PlaylistRepository sut = new(context);
+        Guid userId = Guid.NewGuid();
+        context.Users.Add(_userEntityFixture.Create(id: userId));
+        (PlaylistEntity playlist, _) = await SeedOrderedPlaylistAsync(context, userId, entryCount: 0);
+        PaginationDataDto paginationData = new() { CurrentPage = 2, PerPage = 3 };
+
+        // Act
+        Result<PlaylistDetailsDto?> result = await sut.GetDetailsForUserAsync(playlist.Id, userId, paginationData, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Empty(result.Value!.Entries.Data);
+        Assert.Equal(0, result.Value.Entries.Count);
+        Assert.Equal(0, result.Value.Entries.NumberOfPages);
+        Assert.Equal(1, result.Value.Entries.CurrentPage);
+        Assert.Equal(3, result.Value.Entries.PerPage);
+    }
+
+    [Fact]
+    public async Task GetDetailsForUserAsync_WhenThePlaylistIsEmptyAndNoPaginationIsRequested_ShouldReturnAnEmptyResultWithOnePage()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-details-empty-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        PlaylistRepository sut = new(context);
+        Guid userId = Guid.NewGuid();
+        context.Users.Add(_userEntityFixture.Create(id: userId));
+        (PlaylistEntity playlist, _) = await SeedOrderedPlaylistAsync(context, userId, entryCount: 0);
+
+        // Act
+        Result<PlaylistDetailsDto?> result = await sut.GetDetailsForUserAsync(playlist.Id, userId, paginationData: null, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Empty(result.Value!.Entries.Data);
+        Assert.Equal(0, result.Value.Entries.PerPage);
+        Assert.Equal(0, result.Value.Entries.Count);
+        Assert.Equal(1, result.Value.Entries.NumberOfPages);
+        Assert.Equal(1, result.Value.Entries.CurrentPage);
+    }
+
+    [Fact]
+    public async Task GetDetailsForUserAsync_WhenAnEntryReferencesAMissingTrack_ShouldKeepTheEntryWithoutDisplayData()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-details-missing-track-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        PlaylistRepository sut = new(context);
+        Guid userId = Guid.NewGuid();
+        Guid libraryId = Guid.NewGuid();
+        context.Users.Add(_userEntityFixture.Create(id: userId));
+        (_, _, TrackEntity track) = await SeedTrackAsync(context, libraryId, artistName: "Existing Artist", albumTitle: "Existing Album", trackTitle: "Existing Track", coverFileName: "existing-cover.jpg");
+        Guid playlistId = Guid.NewGuid();
+        PlaylistEntryEntity existingEntry = _playlistEntryEntityFixture.Create(
+            playlistId: playlistId,
+            mediaItemId: track.Id,
+            mediaItemType: PlaylistMediaItemType.MusicTrack,
+            position: 1_000_000_000L);
+        PlaylistEntryEntity missingEntry = _playlistEntryEntityFixture.Create(
+            playlistId: playlistId,
+            mediaItemId: Guid.NewGuid(),
+            mediaItemType: PlaylistMediaItemType.MusicTrack,
+            position: 2_000_000_000L);
+        PlaylistEntity playlist = _playlistEntityFixture.Create(
+            id: playlistId,
+            userId: userId,
+            type: PlaylistType.Music,
+            entries: [existingEntry, missingEntry],
+            entryCount: 2,
+            version: 0);
+        context.Playlists.Add(playlist);
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<PlaylistDetailsDto?> result = await sut.GetDetailsForUserAsync(playlistId, userId, paginationData: null, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Equal(2, result.Value!.Entries.Data.Count);
+        PlaylistEntryDto missingItem = Assert.Single(result.Value.Entries.Data, entry => entry.Entry.Id == missingEntry.Id);
+        Assert.Null(missingItem.Display);
+        PlaylistEntryDto existingItem = Assert.Single(result.Value.Entries.Data, entry => entry.Entry.Id == existingEntry.Id);
+        Assert.NotNull(existingItem.Display);
+    }
+
+    [Fact]
+    public async Task GetDetailsForUserAsync_WhenTheEntriesReferenceMusicTracks_ShouldMapTheirDisplayData()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-details-display-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        PlaylistRepository sut = new(context);
+        Guid userId = Guid.NewGuid();
+        Guid libraryId = Guid.NewGuid();
+        context.Users.Add(_userEntityFixture.Create(id: userId));
+        string coverFileName = "album-cover.jpg";
+        (ArtistEntity artist, AlbumEntity album, TrackEntity track) = await SeedTrackAsync(
+            context,
+            libraryId,
+            artistName: "Display Artist",
+            albumTitle: "Display Album",
+            trackTitle: "Display Track",
+            coverFileName: coverFileName);
+        Guid playlistId = Guid.NewGuid();
+        PlaylistEntryEntity entry = _playlistEntryEntityFixture.Create(
+            playlistId: playlistId,
+            mediaItemId: track.Id,
+            mediaItemType: PlaylistMediaItemType.MusicTrack,
+            position: 1_000_000_000L);
+        PlaylistEntity playlist = _playlistEntityFixture.Create(
+            id: playlistId,
+            userId: userId,
+            type: PlaylistType.Music,
+            entries: [entry],
+            entryCount: 1,
+            version: 0);
+        context.Playlists.Add(playlist);
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<PlaylistDetailsDto?> result = await sut.GetDetailsForUserAsync(playlistId, userId, paginationData: null, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        PlaylistEntryDto item = Assert.Single(result.Value!.Entries.Data);
+        Assert.NotNull(item.Display);
+        Assert.Equal(track.Id, item.Display!.TrackId);
+        Assert.Equal("Display Track", item.Display.TrackTitle);
+        Assert.Equal(track.DurationInSeconds, item.Display.DurationInSeconds);
+        Assert.Equal(libraryId, item.Display.LibraryId);
+        Assert.Equal(album.Id, item.Display.AlbumId);
+        Assert.Equal("Display Album", item.Display.AlbumTitle);
+        Assert.Equal(artist.Id, item.Display.ArtistId);
+        Assert.Equal("Display Artist", item.Display.ArtistName);
+        Assert.Equal(coverFileName, item.Display.CoverPath);
+    }
+
+    [Fact]
+    public async Task GetDetailsForUserAsync_WhenAnEntryReferencesANonMusicMediaItem_ShouldReturnNoDisplayData()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-details-video-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        PlaylistRepository sut = new(context);
+        Guid userId = Guid.NewGuid();
+        Guid libraryId = Guid.NewGuid();
+        context.Users.Add(_userEntityFixture.Create(id: userId));
+        (_, _, TrackEntity track) = await SeedTrackAsync(context, libraryId, artistName: "Video Artist", albumTitle: "Video Album", trackTitle: "Video Track", coverFileName: "video-cover.jpg");
+        Guid playlistId = Guid.NewGuid();
+        // The media item Id belongs to a real track, so a null display proves the entry type is what excludes it, not a missing row.
+        PlaylistEntryEntity entry = _playlistEntryEntityFixture.Create(
+            playlistId: playlistId,
+            mediaItemId: track.Id,
+            mediaItemType: PlaylistMediaItemType.VideoFile,
+            position: 1_000_000_000L);
+        PlaylistEntity playlist = _playlistEntityFixture.Create(
+            id: playlistId,
+            userId: userId,
+            type: PlaylistType.Music,
+            entries: [entry],
+            entryCount: 1,
+            version: 0);
+        context.Playlists.Add(playlist);
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<PlaylistDetailsDto?> result = await sut.GetDetailsForUserAsync(playlistId, userId, paginationData: null, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        PlaylistEntryDto item = Assert.Single(result.Value!.Entries.Data);
+        Assert.Null(item.Display);
+    }
+
+    /// <summary>
+    /// Seeds a playlist of the given user with the requested number of entries, each referencing a different generated media item.
+    /// </summary>
+    /// <param name="context">The context to seed.</param>
+    /// <param name="userId">The Id of the user that owns the playlist.</param>
+    /// <param name="entryCount">The number of entries the playlist receives.</param>
+    /// <returns>The seeded playlist and its entries, in position order.</returns>
+    private async Task<(PlaylistEntity Playlist, List<PlaylistEntryEntity> Entries)> SeedOrderedPlaylistAsync(LuminaDbContext context, Guid userId, int entryCount)
+    {
+        Guid playlistId = Guid.NewGuid();
+        List<PlaylistEntryEntity> entries = [.. Enumerable.Range(0, entryCount).Select(index => _playlistEntryEntityFixture.Create(
+            playlistId: playlistId,
+            mediaItemId: Guid.NewGuid(),
+            mediaItemType: PlaylistMediaItemType.MusicTrack,
+            position: (index + 1) * 1_000_000_000L))];
+        PlaylistEntity playlist = _playlistEntityFixture.Create(
+            id: playlistId,
+            userId: userId,
+            type: PlaylistType.Music,
+            entries: entries,
+            entryCount: entries.Count,
+            version: 0);
+        context.Playlists.Add(playlist);
+        await context.SaveChangesAsync();
+        return (playlist, entries);
+    }
+
+    /// <summary>
+    /// Seeds one artist, one album of that artist and one track of that album, together with the cover artwork of the album.
+    /// </summary>
+    /// <param name="context">The context to seed.</param>
+    /// <param name="libraryId">The Id of the library the catalogue belongs to.</param>
+    /// <param name="artistName">The name of the artist.</param>
+    /// <param name="albumTitle">The title of the album.</param>
+    /// <param name="trackTitle">The title of the track.</param>
+    /// <param name="coverFileName">The file name of the cover artwork of the album.</param>
+    /// <returns>The seeded artist, album and track.</returns>
+    private async Task<(ArtistEntity Artist, AlbumEntity Album, TrackEntity Track)> SeedTrackAsync(
+        LuminaDbContext context,
+        Guid libraryId,
+        string artistName,
+        string albumTitle,
+        string trackTitle,
+        string coverFileName)
+    {
+        ArtistEntity artist = _artistEntityFixture.Create(libraryId: libraryId, name: artistName, includeAlbums: false, includeContributors: false);
+        context.Artists.Add(artist);
+        await context.SaveChangesAsync();
+
+        AlbumEntity album = _albumEntityFixture.Create(artistId: artist.Id, libraryId: libraryId, title: albumTitle, includeTracks: false, includeMetadata: false);
+        context.Albums.Add(album);
+        await context.SaveChangesAsync();
+
+        TrackEntity track = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, title: trackTitle, includeMetadata: false);
+        context.Tracks.Add(track);
+        context.MusicArtwork.Add(_musicArtworkEntityFixture.Create(
+            ownerType: MusicArtworkOwnerType.Album,
+            ownerId: album.Id,
+            artworkType: ArtworkType.Cover,
+            ordinal: 0,
+            fileName: coverFileName));
+        await context.SaveChangesAsync();
+
+        return (artist, album, track);
     }
 
     /// <summary>

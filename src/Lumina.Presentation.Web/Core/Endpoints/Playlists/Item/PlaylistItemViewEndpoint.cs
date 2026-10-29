@@ -83,7 +83,7 @@ public class PlaylistItemViewEndpoint : BaseEndpoint<EmptyRequest, IResult>
     public override async Task<IResult> ExecuteAsync(EmptyRequest request, CancellationToken cancellationToken)
     {
         // The page shows a playlist of the authenticated user, so no intermediary may store it, and the response varies by the sign in cookie.
-        HttpContext.Response.Headers["Cache-Control"] = "private, no-store";
+        SetCacheControl("private, no-store");
         HttpContext.Response.Headers["Vary"] = "Cookie";
         // The route value is normalized to a Guid before it is substituted into the upstream URL, so that a crafted value can never escape
         // its URL segment, and an unparseable id is reported by the API as a missing playlist id.

@@ -313,7 +313,7 @@ The validation errors of each operation are:
 
 | Error | Operation | When |
 | --- | --- | --- |
-| `FavoriteMediaKindIsInvalid` | Add, Remove, Get Favorites, Get Favorite Status | The kind is missing where it is required, or it is a number that is not a member of the media kind enumeration. In the Remove route, the segment is not a member name of the enumeration, and numbers are not accepted. |
+| `FavoriteMediaKindIsInvalid` | Add, Remove, Get Favorites, Get Favorite Status | The kind is missing where it is required, the kind is `None`, or it is a number that is not a member of the media kind enumeration. In the Remove route, the segment is not a member name of the enumeration, and numbers are not accepted. |
 | `FavoriteMediaKindIsNotSupported` | Add | The kind is `Video` or `Photo`, which are planned and cannot be favorited yet. |
 | `FavoriteMediaItemIdCannotBeEmpty` | Add, Remove, Get Favorite Status | The item Id is missing or is the empty Guid. In the Remove route it is also reported when the segment is not a Guid. For the status request, any of the Ids is the empty Guid. |
 | `FavoriteMediaItemIdsCannotBeEmpty` | Get Favorite Status | No `mediaItemIds` were given. |

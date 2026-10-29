@@ -81,7 +81,7 @@ public class AddPlaylistViewEndpoint : BaseEndpoint<EmptyRequest, IResult>
     public override async Task<IResult> ExecuteAsync(EmptyRequest request, CancellationToken cancellationToken)
     {
         // The page creates a playlist of the authenticated user, so no intermediary may store it, and the response varies by the sign in cookie.
-        HttpContext.Response.Headers["Cache-Control"] = "private, no-store";
+        SetCacheControl("private, no-store");
         HttpContext.Response.Headers["Vary"] = "Cookie";
 
         // The page submits through the form anti-forgery token, so a fresh token is issued for it.

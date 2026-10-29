@@ -129,6 +129,38 @@ public class ThemeNavBuilderTests
     }
 
     [Fact]
+    public async Task BuildAsync_WhenUserIsAuthenticated_ShouldIncludeFavoritesEntryInTheLibrarySection()
+    {
+        // Arrange
+        _mockHttpContextAccessor.HttpContext.Returns(TestHttpContextFactory.Create(user: TestHttpContextFactory.CreateAuthenticatedUser()));
+
+        // Act
+        ThemeNavMenuDto result = await _sut.BuildAsync(CancellationToken.None);
+
+        // Assert
+        ThemeNavSectionDto mobileLibrarySection = FindSection(result, "Localized-Library")!;
+        Assert.Contains(mobileLibrarySection.Items, entry => entry.Label == "Localized-Favorites" && entry.Url == "http://localhost/en-us/favorites");
+        ThemeNavSectionDto menubarLibrarySection = FindSection(result, "Localized-Library", isMobile: false)!;
+        Assert.Contains(menubarLibrarySection.Items, entry => entry.Label == "Localized-Favorites" && entry.Url == "http://localhost/en-us/favorites");
+    }
+
+    [Fact]
+    public async Task BuildAsync_WhenUserIsAnonymous_ShouldNotIncludeAnyFavoritesEntry()
+    {
+        // Arrange
+        _mockHttpContextAccessor.HttpContext.Returns(TestHttpContextFactory.Create(user: null));
+
+        // Act
+        ThemeNavMenuDto result = await _sut.BuildAsync(CancellationToken.None);
+
+        // Assert
+        Assert.DoesNotContain(FlattenEntries(result.MobileSections), entry => entry.Label == "Localized-Favorites");
+        Assert.DoesNotContain(FlattenEntries(result.MenubarSections), entry => entry.Label == "Localized-Favorites");
+        Assert.DoesNotContain(FlattenEntries(result.MobileSections), entry => entry.Url == "http://localhost/en-us/favorites");
+        Assert.DoesNotContain(FlattenEntries(result.MenubarSections), entry => entry.Url == "http://localhost/en-us/favorites");
+    }
+
+    [Fact]
     public async Task BuildAsync_WhenUserIsAdmin_ShouldIncludeAdministratorSection()
     {
         // Arrange
@@ -260,8 +292,36 @@ public class ThemeNavBuilderTests
         _mockUrlService.GetAbsoluteUrl(WebRoutes.Admin.MANAGE_THEMES).Returns("http://localhost/en-us/admin/manage-themes");
         _mockUrlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.INDEX).Returns("http://localhost/en-us/libraries/manage");
         _mockUrlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.ADD_LIBRARY).Returns("http://localhost/en-us/libraries/manage/item");
+        _mockUrlService.GetAbsoluteUrl(WebRoutes.Favorites.INDEX).Returns("http://localhost/en-us/favorites");
         _mockUrlService.GetAbsoluteUrl(WebRoutes.Settings.INDEX).Returns("http://localhost/en-us/tools/settings");
         _mockUrlService.GetAbsoluteUrl(WebRoutes.Language.SET_LANGUAGE).Returns("http://localhost/en-us/tools/language/set-language");
+    }
+
+    /// <summary>
+    /// Flattens the entries of the given sections, including the nested children of every submenu.
+    /// </summary>
+    /// <param name="sections">The sections whose entries are flattened.</param>
+    /// <returns>The entries of the sections, depth first.</returns>
+    private static IEnumerable<ThemeNavEntryDto> FlattenEntries(IEnumerable<ThemeNavSectionDto> sections)
+    {
+        foreach (ThemeNavSectionDto section in sections)
+            foreach (ThemeNavEntryDto entry in FlattenEntries(section.Items))
+                yield return entry;
+    }
+
+    /// <summary>
+    /// Flattens the given entries, including the nested children of every submenu.
+    /// </summary>
+    /// <param name="entries">The entries to flatten.</param>
+    /// <returns>The entries, depth first.</returns>
+    private static IEnumerable<ThemeNavEntryDto> FlattenEntries(IEnumerable<ThemeNavEntryDto> entries)
+    {
+        foreach (ThemeNavEntryDto entry in entries)
+        {
+            yield return entry;
+            foreach (ThemeNavEntryDto child in FlattenEntries(entry.Children))
+                yield return child;
+        }
     }
 
     private static ThemeNavSectionDto? FindSection(ThemeNavMenuDto menu, string label, bool isMobile = true)

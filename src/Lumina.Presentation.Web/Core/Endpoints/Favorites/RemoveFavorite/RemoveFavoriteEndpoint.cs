@@ -57,7 +57,7 @@ public class RemoveFavoriteEndpoint : BaseEndpoint<FastEndpoints.EmptyRequest, I
         string routeMediaKind = HttpContext.Request.RouteValues["mediaKind"]?.ToString() ?? string.Empty;
         string mediaKind = INVALID_MEDIA_KIND_PLACEHOLDER;
         foreach (string mediaKindName in Enum.GetNames<FavoriteMediaKind>())
-            if (string.Equals(mediaKindName, routeMediaKind, StringComparison.OrdinalIgnoreCase))
+            if (mediaKindName != nameof(FavoriteMediaKind.None) && string.Equals(mediaKindName, routeMediaKind, StringComparison.OrdinalIgnoreCase))
                 mediaKind = mediaKindName;
         string routeMediaItemId = HttpContext.Request.RouteValues["mediaItemId"]?.ToString() ?? string.Empty;
         string mediaItemId = Guid.TryParse(routeMediaItemId, out Guid parsedMediaItemId) ? parsedMediaItemId.ToString() : Guid.Empty.ToString();

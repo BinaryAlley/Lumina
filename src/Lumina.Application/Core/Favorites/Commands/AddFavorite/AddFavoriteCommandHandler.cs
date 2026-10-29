@@ -136,10 +136,6 @@ public class AddFavoriteCommandHandler : ICommandHandler<AddFavoriteCommand, Res
             return getConcurrentFavoriteResult.Value.ToResponse();
         }
 
-        // Queue any domain events, to be published after the request has completed successfully.
-        foreach (IDomainEvent domainEvent in favorite.GetDomainEvents())
-            _domainEventsQueue.Enqueue(domainEvent);
-
         // The persisted row is read back, so the response carries the timestamps the auditing interceptor actually stored.
         Result<FavoriteEntity?> getFavoriteResult = await _unitOfWork.FavoriteRepository
             .GetByMediaItemIdForUserAsync(userId, mediaKind, mediaItemId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -147,6 +143,11 @@ public class AddFavoriteCommandHandler : ICommandHandler<AddFavoriteCommand, Res
             return getFavoriteResult.Errors;
         if (getFavoriteResult.Value is null)
             return DomainErrors.Favorites.FavoriteNotFound;
+
+        // Queue any domain events, to be published after the request has completed successfully. The events are queued only after the persisted
+        // row has been read back, so a failed read cannot announce a favorite that the request reports as failed.
+        foreach (IDomainEvent domainEvent in favorite.GetDomainEvents())
+            _domainEventsQueue.Enqueue(domainEvent);
 
         return getFavoriteResult.Value.ToResponse();
     }
