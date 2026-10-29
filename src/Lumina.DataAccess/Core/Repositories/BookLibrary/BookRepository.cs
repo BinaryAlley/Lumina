@@ -320,10 +320,15 @@ internal sealed class BookRepository : IBookRepository
 
         // The stored paths are compared ordinally, matching the case sensitive comparison used by the unique index of the storage medium.
         List<string> distinctPaths = [.. paths.Distinct(StringComparer.Ordinal)];
-        List<string> existingPaths = await _luminaDbContext.Books
-            .Where(repositoryBook => repositoryBook.LibraryId == libraryId && distinctPaths.Contains(repositoryBook.Path))
-            .Select(repositoryBook => repositoryBook.Path)
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
+        // A large library stages far more paths than the storage medium accepts as the parameters of a single statement, so the lookup is split into
+        // bounded chunks and the matches of every chunk are accumulated, which keeps a scan of any size within the parameter limit.
+        const int LOOKUP_CHUNK_SIZE = 20_000;
+        List<string> existingPaths = [];
+        foreach (string[] chunk in distinctPaths.Chunk(LOOKUP_CHUNK_SIZE))
+            existingPaths.AddRange(await _luminaDbContext.Books
+                .Where(repositoryBook => repositoryBook.LibraryId == libraryId && chunk.Contains(repositoryBook.Path))
+                .Select(repositoryBook => repositoryBook.Path)
+                .ToListAsync(cancellationToken).ConfigureAwait(false));
         return Result.From<IReadOnlyCollection<string>>(existingPaths);
     }
 
@@ -413,15 +418,25 @@ internal sealed class BookRepository : IBookRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Updated>> ResetEnrichmentStateForPathsAsync(Guid libraryId, IReadOnlyCollection<string> paths, CancellationToken cancellationToken)
     {
-        await _luminaDbContext.Books
-            .Where(book => book.LibraryId == libraryId && paths.Contains(book.Path))
-            .ExecuteUpdateAsync(setters => setters.SetProperty(book => book.MetadataStatus, MetadataStatus.Pending), cancellationToken)
-            .ConfigureAwait(false);
+        List<string> pathList = [.. paths.Distinct(StringComparer.Ordinal)];
+        if (pathList.Count == 0)
+            return Result.Updated;
 
-        await _luminaDbContext.Set<BookArtworkEntity>()
-            .Where(artwork => _luminaDbContext.Books.Any(book => book.Id == artwork.BookId && book.LibraryId == libraryId && paths.Contains(book.Path)))
-            .ExecuteUpdateAsync(setters => setters.SetProperty(artwork => artwork.Status, ArtworkStatus.Pending), cancellationToken)
-            .ConfigureAwait(false);
+        // A scan can change more paths than the storage medium accepts as the parameters of a single statement, so the reset is split into bounded
+        // chunks, keeping the operation within the parameter limit regardless of the library size.
+        const int LOOKUP_CHUNK_SIZE = 20_000;
+        foreach (string[] chunk in pathList.Chunk(LOOKUP_CHUNK_SIZE))
+        {
+            await _luminaDbContext.Books
+                .Where(book => book.LibraryId == libraryId && chunk.Contains(book.Path))
+                .ExecuteUpdateAsync(setters => setters.SetProperty(book => book.MetadataStatus, MetadataStatus.Pending), cancellationToken)
+                .ConfigureAwait(false);
+
+            await _luminaDbContext.Set<BookArtworkEntity>()
+                .Where(artwork => _luminaDbContext.Books.Any(book => book.Id == artwork.BookId && book.LibraryId == libraryId && chunk.Contains(book.Path)))
+                .ExecuteUpdateAsync(setters => setters.SetProperty(artwork => artwork.Status, ArtworkStatus.Pending), cancellationToken)
+                .ConfigureAwait(false);
+        }
 
         return Result.Updated;
     }

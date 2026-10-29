@@ -30,7 +30,7 @@ public interface ILibraryScanSnapshotRepository : IRepository<LibraryScanSnapsho
     /// <param name="libraryId">The unique identifier of the library whose media library scan snapshot item paths are retrieved.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of media library scan snapshot item paths, or an error.</returns>
-    Task<Result<IReadOnlyList<string>>> GetPathsAsync(Guid libraryId, CancellationToken cancellationToken);
+    Task<Result<IReadOnlySet<string>>> GetPathsAsync(Guid libraryId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Atomically applies the results of the current scan to the storage medium, by replacing the media library scan snapshot of the previous scan with the snapshot of the current scan.
@@ -43,4 +43,14 @@ public interface ILibraryScanSnapshotRepository : IRepository<LibraryScanSnapsho
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     Task<Result<Updated>> ApplySnapshotSwapAsync(Guid libraryId, Guid scanId, Guid userId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Removes the media library scan snapshot entries that the scan identified by <paramref name="scanId"/> added or modified, restoring the snapshot to
+    /// the state it had before the scan was applied.
+    /// </summary>
+    /// <param name="libraryId">The unique identifier of the library whose scan snapshot is rolled back.</param>
+    /// <param name="scanId">The unique identifier of the media library scan whose snapshot entries are removed.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Deleted>> RollbackSnapshotForScanAsync(Guid libraryId, Guid scanId, CancellationToken cancellationToken);
 }

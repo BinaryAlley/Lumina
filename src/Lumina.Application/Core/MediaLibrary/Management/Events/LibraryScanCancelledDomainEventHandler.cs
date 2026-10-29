@@ -77,7 +77,14 @@ public class LibraryScanCancelledDomainEventHandler : IDomainEventHandler<Librar
         MediaLibraryScanCompositeId compositeId = MediaLibraryScanCompositeId.Create(domainEvent.ScanId, UserId.Create(getLibraryScansResult.Value.UserId));
         _mediaLibrariesScanCancellationTracker.RemoveScan(compositeId);
         _mediaLibrariesScanProgressTracker.RemoveScanProgress(compositeId);
-        Result<Success> clearStagingResult = await _unitOfWork.LibraryScanStagingResultsRepository.ClearForScanAsync(domainEvent.ScanId.Value, cancellationToken).ConfigureAwait(false);
+        // Cancelling the scan cancels its own token, so the cleanup must not observe it, otherwise the staged results of the cancelled scan would survive the cancellation.
+        // A scan that was cancelled after its snapshot was applied has not materialized its items yet, so its snapshot entries are rolled back, allowing the next
+        // scan to treat the files as new and extract their metadata again instead of skipping them as unchanged.
+        Result<Deleted> rollbackSnapshotResult = await _unitOfWork.LibraryScanSnapshotRepository.RollbackSnapshotForScanAsync(
+            domainEvent.LibraryId.Value, domainEvent.ScanId.Value, CancellationToken.None).ConfigureAwait(false);
+        if (rollbackSnapshotResult.IsFailure)
+            throw new EventualConsistencyException(rollbackSnapshotResult.FirstError, rollbackSnapshotResult.Errors);
+        Result<Success> clearStagingResult = await _unitOfWork.LibraryScanStagingResultsRepository.ClearForScanAsync(domainEvent.ScanId.Value, CancellationToken.None).ConfigureAwait(false);
         if (clearStagingResult.IsFailure)
             throw new EventualConsistencyException(clearStagingResult.FirstError, clearStagingResult.Errors);
     }

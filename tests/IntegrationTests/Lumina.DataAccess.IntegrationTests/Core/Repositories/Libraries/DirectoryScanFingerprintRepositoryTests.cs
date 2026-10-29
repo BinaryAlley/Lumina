@@ -102,8 +102,8 @@ public class DirectoryScanFingerprintRepositoryTests : IDisposable
         (Guid libraryId, _) = await SeedLibraryGraphAsync();
         List<DirectoryScanFingerprintEntity> fingerprints =
         [
-            _directoryScanFingerprintEntityFixture.Create(libraryId: libraryId),
-            _directoryScanFingerprintEntityFixture.Create(libraryId: libraryId)
+            _directoryScanFingerprintEntityFixture.Create(libraryId: libraryId, path: "/dir1"),
+            _directoryScanFingerprintEntityFixture.Create(libraryId: libraryId, path: "/dir2")
         ];
 
         // Act

@@ -62,8 +62,10 @@ public class MusicMediaLibraryScanItemMaterializerTests
             .Returns(Result.From(new Created()));
         _mockTrackRepository.GetExistingPathsAsync(Arg.Any<Guid>(), Arg.Any<IReadOnlyCollection<string>>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyCollection<string>>([]));
-        _mockStagedMetadataRepository.DeleteByScanIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From(new Deleted()));
+        _mockStagedMetadataRepository.DeleteByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Deleted);
+        _mockStagedMetadataRepository.GetByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<MusicLibraryScanItemMetadataEntity>>([]));
 
         _mockPathService = Substitute.For<IPathService>();
         _mockPathService.PathSeparator.Returns('/');
@@ -99,11 +101,11 @@ public class MusicMediaLibraryScanItemMaterializerTests
             musicBrainzReleaseArtistId: releaseArtistId,
             musicBrainzReleaseId: secondReleaseId,
             musicBrainzRecordingId: secondRecordingId);
-        _mockStagedMetadataRepository.GetByScanIdAsync(_scanId, Arg.Any<CancellationToken>())
+        _mockStagedMetadataRepository.GetByLibraryIdAsync(_libraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<MusicLibraryScanItemMetadataEntity>>([firstStagedItem, secondStagedItem]));
 
         // Act
-        Result<Success> result = await _sut.MaterializeItemsAsync(_mockUnitOfWork, _libraryId, _scanId, [firstStagedItem.Path, secondStagedItem.Path], CancellationToken.None);
+        Result<Success> result = await _sut.MaterializeItemsAsync(_mockUnitOfWork, _libraryId, _scanId, CreatePathSet(firstStagedItem.Path, secondStagedItem.Path), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -131,11 +133,11 @@ public class MusicMediaLibraryScanItemMaterializerTests
             path: "/music/some-artist/some-release/track.mp3",
             includeMusicBrainzTags: false,
             includeContainer: false);
-        _mockStagedMetadataRepository.GetByScanIdAsync(_scanId, Arg.Any<CancellationToken>())
+        _mockStagedMetadataRepository.GetByLibraryIdAsync(_libraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<MusicLibraryScanItemMetadataEntity>>([stagedItem]));
 
         // Act
-        Result<Success> result = await _sut.MaterializeItemsAsync(_mockUnitOfWork, _libraryId, _scanId, [stagedItem.Path], CancellationToken.None);
+        Result<Success> result = await _sut.MaterializeItemsAsync(_mockUnitOfWork, _libraryId, _scanId, CreatePathSet(stagedItem.Path), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -167,11 +169,11 @@ public class MusicMediaLibraryScanItemMaterializerTests
             musicBrainzArtistId: Guid.NewGuid(),
             musicBrainzReleaseArtistId: variousArtistsId,
             musicBrainzReleaseId: compilationReleaseId);
-        _mockStagedMetadataRepository.GetByScanIdAsync(_scanId, Arg.Any<CancellationToken>())
+        _mockStagedMetadataRepository.GetByLibraryIdAsync(_libraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<MusicLibraryScanItemMetadataEntity>>([firstStagedItem, secondStagedItem]));
 
         // Act
-        Result<Success> result = await _sut.MaterializeItemsAsync(_mockUnitOfWork, _libraryId, _scanId, [firstStagedItem.Path, secondStagedItem.Path], CancellationToken.None);
+        Result<Success> result = await _sut.MaterializeItemsAsync(_mockUnitOfWork, _libraryId, _scanId, CreatePathSet(firstStagedItem.Path, secondStagedItem.Path), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -199,11 +201,11 @@ public class MusicMediaLibraryScanItemMaterializerTests
             releaseName: "Shared Release Title",
             path: "/music/shared-artist/shared-release/second.mp3",
             includeMusicBrainzTags: false);
-        _mockStagedMetadataRepository.GetByScanIdAsync(_scanId, Arg.Any<CancellationToken>())
+        _mockStagedMetadataRepository.GetByLibraryIdAsync(_libraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<MusicLibraryScanItemMetadataEntity>>([firstStagedItem, secondStagedItem]));
 
         // Act
-        Result<Success> result = await _sut.MaterializeItemsAsync(_mockUnitOfWork, _libraryId, _scanId, [firstStagedItem.Path, secondStagedItem.Path], CancellationToken.None);
+        Result<Success> result = await _sut.MaterializeItemsAsync(_mockUnitOfWork, _libraryId, _scanId, CreatePathSet(firstStagedItem.Path, secondStagedItem.Path), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -213,5 +215,58 @@ public class MusicMediaLibraryScanItemMaterializerTests
         Assert.Null(artist.MusicBrainzArtistId);
         Assert.Null(album.MusicBrainzReleaseId);
         Assert.Equal(2, album.Tracks.Count);
+    }
+
+    [Fact]
+    public async Task MaterializeItemsAsync_WhenTheCurrentScanStagedNothing_ShouldMaterializeTheMetadataLeftBehindByAnEarlierScanForTheCurrentSnapshotPaths()
+    {
+        // Arrange
+        MusicLibraryScanItemMetadataEntity stagedItemInSnapshot = _musicLibraryScanItemMetadataEntityFixture.Create(
+            libraryId: _libraryId,
+            artistName: "Recovered Artist",
+            releaseName: "Recovered Release",
+            path: "/music/recovered-artist/recovered-release/first.mp3",
+            includeMusicBrainzTags: false);
+        MusicLibraryScanItemMetadataEntity stagedItemNoLongerInSnapshot = _musicLibraryScanItemMetadataEntityFixture.Create(
+            libraryId: _libraryId,
+            artistName: "Deleted Artist",
+            releaseName: "Deleted Release",
+            path: "/music/deleted-artist/deleted-release/deleted.mp3",
+            includeMusicBrainzTags: false);
+        _mockStagedMetadataRepository.GetByLibraryIdAsync(_libraryId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<MusicLibraryScanItemMetadataEntity>>([stagedItemInSnapshot, stagedItemNoLongerInSnapshot]));
+
+        // Act
+        Result<Success> result = await _sut.MaterializeItemsAsync(_mockUnitOfWork, _libraryId, _scanId, CreatePathSet(stagedItemInSnapshot.Path), CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        // The metadata left behind by the earlier scan is reused only for the files that are still in the current snapshot.
+        ArtistEntity artist = Assert.Single(_insertedArtists);
+        Assert.Equal("Recovered Artist", artist.Name);
+        AlbumEntity album = Assert.Single(artist.Albums);
+        Assert.Equal(stagedItemInSnapshot.Path, Assert.Single(album.Tracks).Path);
+    }
+
+    [Fact]
+    public async Task ClearStagedDataAsync_WhenCalled_ShouldDeleteTheStagedMetadataOfTheWholeLibrary()
+    {
+        // Act
+        Result<Deleted> result = await _sut.ClearStagedDataAsync(_mockUnitOfWork, _libraryId, _scanId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Deleted, result.Value);
+        await _mockStagedMetadataRepository.Received(1).DeleteByLibraryIdAsync(_libraryId, CancellationToken.None);
+    }
+
+    /// <summary>
+    /// Creates the set of media library scan snapshot paths that the media library scan produces.
+    /// </summary>
+    /// <param name="paths">The paths of the set.</param>
+    /// <returns>The set of paths.</returns>
+    private static IReadOnlySet<string> CreatePathSet(params string[] paths)
+    {
+        return new HashSet<string>(paths, StringComparer.Ordinal);
     }
 }

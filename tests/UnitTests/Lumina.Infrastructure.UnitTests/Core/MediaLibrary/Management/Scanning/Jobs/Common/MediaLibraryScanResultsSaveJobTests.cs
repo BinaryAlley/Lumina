@@ -128,7 +128,7 @@ public class MediaLibraryScanResultsSaveJobTests
         _mockSnapshotRepository.ApplySnapshotSwapAsync(_libraryId.Value, _scanId.Value, _userId.Value, Arg.Any<CancellationToken>())
             .Returns(Result.From(Result.Updated));
         _mockSnapshotRepository.GetPathsAsync(_libraryId.Value, Arg.Any<CancellationToken>())
-            .Returns(Result.From<IReadOnlyList<string>>(["book1.pdf", "book2.pdf"]));
+            .Returns(Result.From(CreatePathSet("book1.pdf", "book2.pdf")));
         _mockBookRepository.GetExistingPathsAsync(_libraryId.Value, Arg.Any<IReadOnlyCollection<string>>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyCollection<string>>([]));
         _mockBookRepository.InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>())
@@ -159,7 +159,7 @@ public class MediaLibraryScanResultsSaveJobTests
         _mockSnapshotRepository.ApplySnapshotSwapAsync(_libraryId.Value, _scanId.Value, _userId.Value, Arg.Any<CancellationToken>())
             .Returns(Result.From(Result.Updated));
         _mockSnapshotRepository.GetPathsAsync(_libraryId.Value, Arg.Any<CancellationToken>())
-            .Returns(Result.From<IReadOnlyList<string>>([]));
+            .Returns(Result.From(CreatePathSet()));
         _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
 
         // Act
@@ -184,7 +184,7 @@ public class MediaLibraryScanResultsSaveJobTests
         _mockSnapshotRepository.ApplySnapshotSwapAsync(_libraryId.Value, _scanId.Value, _userId.Value, Arg.Any<CancellationToken>())
             .Returns(Result.From(Result.Updated));
         _mockSnapshotRepository.GetPathsAsync(_libraryId.Value, Arg.Any<CancellationToken>())
-            .Returns(Result.From<IReadOnlyList<string>>([]));
+            .Returns(Result.From(CreatePathSet()));
         _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
 
         // Act
@@ -207,7 +207,7 @@ public class MediaLibraryScanResultsSaveJobTests
         _mockSnapshotRepository.ApplySnapshotSwapAsync(_libraryId.Value, _scanId.Value, _userId.Value, Arg.Any<CancellationToken>())
             .Returns(Result.From(Result.Updated));
         _mockSnapshotRepository.GetPathsAsync(_libraryId.Value, Arg.Any<CancellationToken>())
-            .Returns(Result.From<IReadOnlyList<string>>(["existing.pdf"]));
+            .Returns(Result.From(CreatePathSet("existing.pdf")));
         _mockBookRepository.GetExistingPathsAsync(_libraryId.Value, Arg.Any<IReadOnlyCollection<string>>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyCollection<string>>(["existing.pdf"]));
         _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
@@ -354,7 +354,7 @@ public class MediaLibraryScanResultsSaveJobTests
         _mockSnapshotRepository.ApplySnapshotSwapAsync(_libraryId.Value, _scanId.Value, _userId.Value, Arg.Any<CancellationToken>())
             .Returns(Result.From(Result.Updated));
         _mockSnapshotRepository.GetPathsAsync(_libraryId.Value, Arg.Any<CancellationToken>())
-            .Returns(Result.From<IReadOnlyList<string>>(["book1.pdf"]));
+            .Returns(Result.From(CreatePathSet("book1.pdf")));
         _mockBookRepository.GetExistingPathsAsync(_libraryId.Value, Arg.Any<IReadOnlyCollection<string>>(), Arg.Any<CancellationToken>())
             .Returns(Error.Failure("Database.Error", "Failed to get the existing paths"));
 
@@ -380,7 +380,7 @@ public class MediaLibraryScanResultsSaveJobTests
         _mockSnapshotRepository.ApplySnapshotSwapAsync(_libraryId.Value, _scanId.Value, _userId.Value, Arg.Any<CancellationToken>())
             .Returns(Result.From(Result.Updated));
         _mockSnapshotRepository.GetPathsAsync(_libraryId.Value, Arg.Any<CancellationToken>())
-            .Returns(Result.From<IReadOnlyList<string>>(["book1.pdf"]));
+            .Returns(Result.From(CreatePathSet("book1.pdf")));
         _mockBookRepository.GetExistingPathsAsync(_libraryId.Value, Arg.Any<IReadOnlyCollection<string>>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyCollection<string>>([]));
         _mockBookRepository.InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>())
@@ -407,7 +407,7 @@ public class MediaLibraryScanResultsSaveJobTests
         _mockSnapshotRepository.ApplySnapshotSwapAsync(_libraryId.Value, _scanId.Value, _userId.Value, Arg.Any<CancellationToken>())
             .Returns(Result.From(Result.Updated));
         _mockSnapshotRepository.GetPathsAsync(_libraryId.Value, Arg.Any<CancellationToken>())
-            .Returns(Result.From<IReadOnlyList<string>>([]));
+            .Returns(Result.From(CreatePathSet()));
         _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
 
         IMediaLibraryScanJob mockChild = Substitute.For<IMediaLibraryScanJob>();
@@ -436,7 +436,7 @@ public class MediaLibraryScanResultsSaveJobTests
         _mockSnapshotRepository.ApplySnapshotSwapAsync(_libraryId.Value, _scanId.Value, _userId.Value, Arg.Any<CancellationToken>())
             .Returns(Result.From(Result.Updated));
         _mockSnapshotRepository.GetPathsAsync(_libraryId.Value, Arg.Any<CancellationToken>())
-            .Returns(Result.From<IReadOnlyList<string>>(["_.pdf"]));
+            .Returns(Result.From(CreatePathSet("_.pdf")));
         _mockBookRepository.GetExistingPathsAsync(_libraryId.Value, Arg.Any<IReadOnlyCollection<string>>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyCollection<string>>([]));
         _mockBookRepository.InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>())
@@ -450,5 +450,15 @@ public class MediaLibraryScanResultsSaveJobTests
         // The file name is made only of separators, so the derived title is empty and the raw file name is used as a fallback.
         await _mockBookRepository.Received(1).InsertAsync(Arg.Is<BookEntity>(book => book.Path == "_.pdf" && book.Title == "_"), Arg.Any<CancellationToken>());
         Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+    }
+
+    /// <summary>
+    /// Creates the set of media library scan snapshot paths that the snapshot repository returns.
+    /// </summary>
+    /// <param name="paths">The paths of the set.</param>
+    /// <returns>The set of paths.</returns>
+    private static IReadOnlySet<string> CreatePathSet(params string[] paths)
+    {
+        return new HashSet<string>(paths, StringComparer.Ordinal);
     }
 }

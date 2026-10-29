@@ -79,7 +79,7 @@ public class BooksMediaLibraryScanItemMaterializerTests
         _mockPathService.GetFileName("C:\\MusicBackup\\track.epub").Returns("track.epub");
 
         // Act
-        Result<Success> result = await _sut.MaterializeItemsAsync(_mockUnitOfWork, _libraryId, _scanId, ["C:\\MusicBackup\\track.epub"], CancellationToken.None);
+        Result<Success> result = await _sut.MaterializeItemsAsync(_mockUnitOfWork, _libraryId, _scanId, CreatePathSet("C:\\MusicBackup\\track.epub"), CancellationToken.None);
 
         // Assert
         // A sibling directory whose name only starts with the content location name is not inside the library, so the item is not parsed against
@@ -99,11 +99,21 @@ public class BooksMediaLibraryScanItemMaterializerTests
         _mockPathService.IsPathWithin("C:\\Music\\Artist\\track.epub", "C:\\Music").Returns(true);
 
         // Act
-        Result<Success> result = await _sut.MaterializeItemsAsync(_mockUnitOfWork, _libraryId, _scanId, ["C:\\Music\\Artist\\track.epub"], CancellationToken.None);
+        Result<Success> result = await _sut.MaterializeItemsAsync(_mockUnitOfWork, _libraryId, _scanId, CreatePathSet("C:\\Music\\Artist\\track.epub"), CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
         _mockPathService.Received(1).IsPathWithin("C:\\Music\\Artist\\track.epub", "C:\\Music");
         _mockPathTemplateService.Received(1).Parse(Arg.Any<LibraryType>(), Arg.Any<LibraryPathTemplate>(), "Artist\\track.epub", '\\');
+    }
+
+    /// <summary>
+    /// Creates the set of media library scan snapshot paths that the media library scan produces.
+    /// </summary>
+    /// <param name="paths">The paths of the set.</param>
+    /// <returns>The set of paths.</returns>
+    private static IReadOnlySet<string> CreatePathSet(params string[] paths)
+    {
+        return new HashSet<string>(paths, StringComparer.Ordinal);
     }
 }

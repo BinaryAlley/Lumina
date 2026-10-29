@@ -100,6 +100,39 @@ public class MusicLibraryScanItemMetadataRepositoryTests : IDisposable
     }
 
     [Fact]
+    public async Task GetByLibraryIdAsync_WhenCalled_ShouldReturnAllTheItemsOfTheLibraryOrderedByPath()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        MusicLibraryScanItemMetadataEntity itemOfFirstScan = _musicLibraryScanItemMetadataEntityFixture.Create(
+            libraryId: libraryId, libraryScanId: Guid.NewGuid(), path: "/music/queen/bohemian-rhapsody.flac");
+        MusicLibraryScanItemMetadataEntity itemOfSecondScan = _musicLibraryScanItemMetadataEntityFixture.Create(
+            libraryId: libraryId, libraryScanId: Guid.NewGuid(), path: "/music/queen/bicycle-race.flac");
+        MusicLibraryScanItemMetadataEntity itemOfAnotherLibrary = _musicLibraryScanItemMetadataEntityFixture.Create(
+            libraryId: Guid.NewGuid(), path: "/music/queen/love-of-my-life.flac");
+        _context.MusicLibraryScanItemMetadata.AddRange(itemOfFirstScan, itemOfSecondScan, itemOfAnotherLibrary);
+        await _context.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<MusicLibraryScanItemMetadataEntity>> result = await _sut.GetByLibraryIdAsync(libraryId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal([itemOfSecondScan.Id, itemOfFirstScan.Id], result.Value.Select(item => item.Id));
+    }
+
+    [Fact]
+    public async Task GetByLibraryIdAsync_WhenNoItemsExistForTheLibrary_ShouldReturnAnEmptyCollection()
+    {
+        // Act
+        Result<IReadOnlyList<MusicLibraryScanItemMetadataEntity>> result = await _sut.GetByLibraryIdAsync(Guid.NewGuid(), CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Empty(result.Value);
+    }
+
+    [Fact]
     public async Task DeleteByScanIdAsync_WhenCalled_ShouldDeleteOnlyTheItemsOfTheScan()
     {
         // Arrange

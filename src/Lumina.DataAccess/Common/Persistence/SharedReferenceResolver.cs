@@ -73,10 +73,15 @@ internal static class SharedReferenceResolver
         List<string> unresolvedNames = [.. resolvedByName.Keys.Where(name => !namesResolvedFromTrackedEntities.Contains(name))];
         if (unresolvedNames.Count > 0)
         {
-            // Stored names are normalized when they are written, so the normalized incoming names are matched directly against the primary key.
-            List<TEntity> storedEntities = await context.Set<TEntity>()
-                .Where(entity => unresolvedNames.Contains(EF.Property<string>(entity, nameof(ISharedReferenceEntity.Name))))
-                .ToListAsync(cancellationToken).ConfigureAwait(false);
+            // A large request can reference more shared names than the storage medium accepts as the parameters of a single statement, so the lookup
+            // is split into bounded chunks and the stored rows of every chunk are accumulated.
+            const int LOOKUP_CHUNK_SIZE = 20_000;
+            List<TEntity> storedEntities = [];
+            foreach (string[] chunk in unresolvedNames.Chunk(LOOKUP_CHUNK_SIZE))
+                // Stored names are normalized when they are written, so the normalized incoming names are matched directly against the primary key.
+                storedEntities.AddRange(await context.Set<TEntity>()
+                    .Where(entity => chunk.Contains(EF.Property<string>(entity, nameof(ISharedReferenceEntity.Name))))
+                    .ToListAsync(cancellationToken).ConfigureAwait(false));
 
             foreach (TEntity storedEntity in storedEntities)
                 resolvedByName[NormalizeName(storedEntity.Name!)] = storedEntity;

@@ -113,7 +113,7 @@ internal sealed class MediaLibraryScanResultsSaveJob : MediaLibraryScanJob, IMed
                     }
 
                     // Materialize the media library items from the scan snapshot, so that they are browsable even without web metadata.
-                    Result<IReadOnlyList<string>> getPathsResult = await unitOfWork.LibraryScanSnapshotRepository.GetPathsAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                    Result<IReadOnlySet<string>> getPathsResult = await unitOfWork.LibraryScanSnapshotRepository.GetPathsAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
                     if (getPathsResult.IsFailure)
                         throw new InvalidOperationException(getPathsResult.FirstError.Description);
 
@@ -124,6 +124,11 @@ internal sealed class MediaLibraryScanResultsSaveJob : MediaLibraryScanJob, IMed
                     Result<Success> saveChangesResult = await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
                     if (saveChangesResult.IsFailure)
                         throw new InvalidOperationException(saveChangesResult.FirstError.Description);
+
+                    // The staged data is only cleared once the materialized items are safely stored, so a failed save can be retried from the same staged data.
+                    Result<Deleted> clearStagedDataResult = await materializer.ClearStagedDataAsync(unitOfWork, LibraryId.Value, ScanId.Value, cancellationToken).ConfigureAwait(false);
+                    if (clearStagedDataResult.IsFailure)
+                        throw new InvalidOperationException(clearStagedDataResult.FirstError.Description);
 
                     // Increment the number of processed elements progress.
                     publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 1, 1, cancellationToken).ConfigureAwait(false);

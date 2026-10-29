@@ -190,6 +190,34 @@ public class TrackRepositoryTests
     }
 
     [Fact]
+    public async Task GetExistingPathsAsync_WhenMorePathsAreRequestedThanTheStorageAccepts_ShouldReturnTheExistingPaths()
+    {
+        // Arrange
+        // A scan of a very large library stages more paths than SQLite accepts as the parameters of one statement, which used to fail the whole scan.
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-existingpaths-large-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        TrackRepository sut = new(context);
+
+        Guid libraryId = Guid.NewGuid();
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId);
+        TrackEntity track = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, path: "/music/queen/bohemian-rhapsody.flac", includeMetadata: false);
+        context.Tracks.Add(track);
+        await context.SaveChangesAsync();
+        List<string> requestedPaths = [.. Enumerable.Range(0, 120_000).Select(index => $"/music/queen/track-{index}.flac")];
+        requestedPaths.Add("/music/queen/bohemian-rhapsody.flac");
+
+        // Act
+        Result<IReadOnlyCollection<string>> result = await sut.GetExistingPathsAsync(libraryId, requestedPaths, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        string existingPath = Assert.Single(result.Value);
+        Assert.Equal("/music/queen/bohemian-rhapsody.flac", existingPath);
+    }
+
+    [Fact]
     public async Task UpdateAsync_WhenNothingChanged_ShouldNotChangeAnyAuditColumn()
     {
         // Arrange
