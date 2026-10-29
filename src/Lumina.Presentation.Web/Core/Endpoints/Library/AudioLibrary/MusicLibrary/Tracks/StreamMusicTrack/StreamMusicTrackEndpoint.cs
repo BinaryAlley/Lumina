@@ -2,6 +2,7 @@
 using FastEndpoints;
 using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.DependencyInjection;
+using Lumina.Presentation.Web.Common.Exceptions;
 using Lumina.Presentation.Web.Common.Http;
 using Lumina.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Presentation.Web.Common.Routes;
@@ -11,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -75,10 +77,21 @@ public class StreamMusicTrackEndpoint : BaseEndpoint<StreamMusicTrackRequest, IR
         AddHeader(forwardHeaders, "If-Modified-Since", HttpContext.Request.Headers.IfModifiedSince);
 
         // The API response is disposed once the copy ends, so that the underlying connection is released as soon as the client stops reading.
-        await using (ApiStreamResult streamResult = await _streamingApiHttpClient.GetStreamAsync(endpoint, forwardHeaders, cancellationToken).ConfigureAwait(false))
-        { // The proxy owns the status, header, caching and body rules shared with the normalized segment proxy.
-            await ApiStreamProxy.WriteAsync(HttpContext.Response, streamResult, cancellationToken).ConfigureAwait(false);
+        ApiStreamResult streamResult;
+        try
+        {
+            streamResult = await _streamingApiHttpClient.GetStreamAsync(endpoint, forwardHeaders, cancellationToken).ConfigureAwait(false);
         }
+        catch (ApiException apiException) when (apiException.HttpStatusCode is HttpStatusCode.ServiceUnavailable or HttpStatusCode.TooManyRequests)
+        {
+            // A busy normalization pipeline or the stream concurrency limit is an expected, transient condition that the player retries. It is
+            // answered with a bare status instead of being logged as an unexpected API failure with a stack trace.
+            HttpContext.Response.StatusCode = (int)apiException.HttpStatusCode;
+            HttpContext.Response.ContentLength = 0;
+            return Results.Empty;
+        }
+        await using (streamResult) // The proxy owns the status, header, caching and body rules shared with the normalized segment proxy.
+            await ApiStreamProxy.WriteAsync(HttpContext.Response, streamResult, cancellationToken).ConfigureAwait(false);
         return Results.Empty;
     }
 

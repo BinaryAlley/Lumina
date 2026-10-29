@@ -28,6 +28,7 @@ public class StubApiHttpClient : IApiHttpClient
     private readonly Dictionary<string, Func<object, object>> _postResponseFactories = [];
     private readonly Dictionary<string, Func<object, object>> _putResponseFactories = [];
     private readonly HashSet<string> _deleteSuccessEndpoints = [];
+    private readonly Dictionary<string, ApiException> _deleteExceptions = [];
     private BlobDataDto? _blobResponse;
 
     /// <summary>
@@ -168,6 +169,16 @@ public class StubApiHttpClient : IApiHttpClient
     }
 
     /// <summary>
+    /// Registers the exception thrown when the specified DELETE endpoint is called.
+    /// </summary>
+    /// <param name="endpoint">The API endpoint for which to register the exception.</param>
+    /// <param name="exception">The exception to throw.</param>
+    public void RegisterDeleteException(string endpoint, ApiException exception)
+    {
+        _deleteExceptions[endpoint] = exception;
+    }
+
+    /// <summary>
     /// Registers the blob response returned when a blob endpoint is called.
     /// </summary>
     /// <param name="blob">The blob response to return.</param>
@@ -185,6 +196,7 @@ public class StubApiHttpClient : IApiHttpClient
         _postResponseFactories.Clear();
         _putResponseFactories.Clear();
         _deleteSuccessEndpoints.Clear();
+        _deleteExceptions.Clear();
         _blobResponse = null;
         GetEndpointsCalled.Clear();
         PostRequests.Clear();
@@ -245,6 +257,8 @@ public class StubApiHttpClient : IApiHttpClient
     public Task DeleteAsync(string endpoint, CancellationToken cancellationToken = default)
     {
         DeleteEndpointsCalled.Add(endpoint);
+        if (_deleteExceptions.TryGetValue(endpoint, out ApiException? exception))
+            throw exception;
         if (_deleteSuccessEndpoints.Contains(endpoint))
             return Task.CompletedTask;
         throw new ApiException(null, System.Net.HttpStatusCode.InternalServerError, endpoint);

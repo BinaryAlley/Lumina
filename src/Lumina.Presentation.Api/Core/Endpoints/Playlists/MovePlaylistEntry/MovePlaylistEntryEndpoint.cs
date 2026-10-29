@@ -51,6 +51,10 @@ public class MovePlaylistEntryEndpoint : BaseEndpoint<MovePlaylistEntryRequest, 
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(MovePlaylistEntryRequest request, CancellationToken cancellationToken)
     {
+        // The playlists belong to the authenticated user, so no intermediary may store any response of this route, including its problem
+        // responses, and every response varies by the bearer token that authorized it.
+        HttpContext.Response.Headers["Cache-Control"] = "private, no-store";
+        HttpContext.Response.Headers["Vary"] = "Authorization";
         // The playlist and the entry are identified by the route values, not by any id posted in the body.
         string? playlistId = HttpContext.Request.RouteValues["playlistId"]?.ToString();
         string? playlistEntryId = HttpContext.Request.RouteValues["playlistEntryId"]?.ToString();

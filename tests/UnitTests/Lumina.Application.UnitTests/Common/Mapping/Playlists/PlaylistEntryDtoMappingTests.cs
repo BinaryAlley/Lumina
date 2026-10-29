@@ -112,10 +112,10 @@ public class PlaylistEntryDtoMappingTests
 
         // Assert
         Assert.Equal(3, response.Data.Count);
-        Assert.Equal<Guid>(
+        Assert.Equal(
             entries.Select(entry => entry.Entry.Id),
             response.Data.Select(entry => entry.Id));
-        Assert.Equal<int>([0, 1, 2], response.Data.Select(entry => entry.Position));
+        Assert.Equal([0, 1, 2], response.Data.Select(entry => entry.Position));
         Assert.Equal(2, response.CurrentPage);
         Assert.Equal(3, response.PerPage);
         Assert.Equal(7, response.Count);

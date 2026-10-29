@@ -48,6 +48,10 @@ public class DeletePlaylistEndpoint : BaseEndpoint<FastEndpoints.EmptyRequest, I
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(FastEndpoints.EmptyRequest request, CancellationToken cancellationToken)
     {
+        // The playlists belong to the authenticated user, so no intermediary may store any response of this route, including its problem
+        // responses, and every response varies by the bearer token that authorized it.
+        HttpContext.Response.Headers["Cache-Control"] = "private, no-store";
+        HttpContext.Response.Headers["Vary"] = "Authorization";
         // Take the unique identifier from the route.
         string? playlistId = HttpContext.Request.RouteValues["playlistId"]?.ToString();
         Result<Deleted> result = await _deletePlaylistCommandHandler.HandleAsync(new DeletePlaylistCommand(playlistId), cancellationToken).ConfigureAwait(false);

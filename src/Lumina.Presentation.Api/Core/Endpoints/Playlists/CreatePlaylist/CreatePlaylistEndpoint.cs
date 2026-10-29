@@ -51,6 +51,10 @@ public class CreatePlaylistEndpoint : BaseEndpoint<CreatePlaylistRequest, IResul
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(CreatePlaylistRequest request, CancellationToken cancellationToken)
     {
+        // The playlists belong to the authenticated user, so no intermediary may store any response of this route, including its problem
+        // responses, and every response varies by the bearer token that authorized it.
+        HttpContext.Response.Headers["Cache-Control"] = "private, no-store";
+        HttpContext.Response.Headers["Vary"] = "Authorization";
         Result<PlaylistResponse> result = await _createPlaylistCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }

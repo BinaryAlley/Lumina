@@ -220,7 +220,7 @@ public class RemoveFavoriteEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     /// </summary>
     /// <param name="response">The HTTP response to assert on.</param>
     /// <param name="expectedInstance">The expected request instance path.</param>
-    private async Task AssertUnauthorizedAsync(HttpResponseMessage response, string expectedInstance)
+    private static async Task AssertUnauthorizedAsync(HttpResponseMessage response, string expectedInstance)
     {
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
         Assert.Equal("application/json", response.Content.Headers.ContentType?.MediaType);

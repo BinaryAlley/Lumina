@@ -39,6 +39,7 @@ public class TrackEntityFixture
     /// <param name="title">Optional. The title of the track.</param>
     /// <param name="container">Optional. The container of the audio file of the track.</param>
     /// <param name="trackNumber">Optional. The number of the track on its disc.</param>
+    /// <param name="discNumber">Optional. The number of the disc the track belongs to.</param>
     /// <param name="originalReleaseDate">Optional. The original release date of the track.</param>
     /// <param name="originalReleaseYear">Optional. The original release year of the track.</param>
     /// <param name="reReleaseDate">Optional. The re-release date of the track.</param>
@@ -66,6 +67,7 @@ public class TrackEntityFixture
         string? title = null,
         string? container = null,
         int? trackNumber = null,
+        int? discNumber = null,
         DateOnly? originalReleaseDate = null,
         int? originalReleaseYear = null,
         DateOnly? reReleaseDate = null,
@@ -136,7 +138,7 @@ public class TrackEntityFixture
             .RuleFor(x => x.ReplayGainAlbumPeak, f => includeReplayGain ? (replayGainAlbumPeak ?? f.Random.Decimal(0m, 1.5m)) : null)
             .RuleFor(x => x.Bitrate, Random.Shared.Next(96, 1411))
             .RuleFor(x => x.TrackNumber, f => trackNumber ?? f.Random.Int(1, 20))
-            .RuleFor(x => x.DiscNumber, Random.Shared.Next(1, 3))
+            .RuleFor(x => x.DiscNumber, discNumber ?? Random.Shared.Next(1, 3))
             .RuleFor(x => x.Script, f => f.Random.String2(f.Random.Number(1, 50)))
             .RuleFor(x => x.Key, f => f.PickRandom<MusicKey>())
             .RuleFor(x => x.Bpm, Random.Shared.Next(40, 240))

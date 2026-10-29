@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Presentation.Web.Common.Api;
+using Lumina.Presentation.Web.Common.DTO.Common;
+using Lumina.Presentation.Web.Common.Exceptions;
 using Lumina.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.StreamMusicTrack;
@@ -137,6 +139,49 @@ public class StreamMusicTrackEndpointTests
             Arg.Is<string>(endpoint => endpoint == expectedEndpoint),
             Arg.Any<IReadOnlyDictionary<string, string>>(),
             Arg.Any<CancellationToken>());
+    }
+
+    [Theory]
+    [InlineData(HttpStatusCode.ServiceUnavailable)] // a busy normalization pipeline is a transient condition
+    [InlineData(HttpStatusCode.TooManyRequests)] // the stream concurrency limit was reached
+    public async Task ExecuteAsync_WhenApiReportsATransientCondition_ShouldReturnABareStatusWithoutThrowing(HttpStatusCode statusCode)
+    {
+        // Arrange
+        StreamMusicTrackRequest request = _streamMusicTrackRequestFixture.Create();
+        ApiException apiException = new(
+            new ProblemDetailsDto { Title = "General.Failure", Detail = "InternalServerError", Status = (int)statusCode },
+            statusCode,
+            BuildExpectedEndpoint(request));
+        _mockStreamingApiHttpClient.GetStreamAsync(Arg.Any<string>(), Arg.Any<IReadOnlyDictionary<string, string>>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromException<ApiStreamResult>(apiException));
+
+        // Act
+        IResult result = await _sut.ExecuteAsync(request, CancellationToken.None);
+
+        // Assert
+        Assert.IsType<EmptyHttpResult>(result);
+        Assert.Equal((int)statusCode, _sut.HttpContext.Response.StatusCode);
+        Assert.Equal(0, _sut.HttpContext.Response.ContentLength);
+        Assert.Equal(0, _sut.HttpContext.Response.Body.Length);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenApiReportsAnUnexpectedFailure_ShouldPropagateTheApiException()
+    {
+        // Arrange
+        StreamMusicTrackRequest request = _streamMusicTrackRequestFixture.Create();
+        ApiException apiException = new(
+            new ProblemDetailsDto { Title = "General.Failure", Detail = "InternalServerError", Status = StatusCodes.Status500InternalServerError },
+            HttpStatusCode.InternalServerError,
+            BuildExpectedEndpoint(request));
+        _mockStreamingApiHttpClient.GetStreamAsync(Arg.Any<string>(), Arg.Any<IReadOnlyDictionary<string, string>>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromException<ApiStreamResult>(apiException));
+
+        // Act
+        Task<IResult> operationTask = _sut.ExecuteAsync(request, CancellationToken.None);
+
+        // Assert
+        await Assert.ThrowsAsync<ApiException>(() => operationTask);
     }
 
     [Fact]

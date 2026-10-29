@@ -51,6 +51,10 @@ public class AddPlaylistScopeEntriesEndpoint : BaseEndpoint<AddPlaylistScopeEntr
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(AddPlaylistScopeEntriesRequest request, CancellationToken cancellationToken)
     {
+        // The playlists belong to the authenticated user, so no intermediary may store any response of this route, including its problem
+        // responses, and every response varies by the bearer token that authorized it.
+        HttpContext.Response.Headers["Cache-Control"] = "private, no-store";
+        HttpContext.Response.Headers["Vary"] = "Authorization";
         // The playlist is identified by the route value, not by any id posted in the body.
         string? playlistId = HttpContext.Request.RouteValues["playlistId"]?.ToString();
         Result<PlaylistEntriesAddedResponse> result = await _addPlaylistScopeEntriesCommandHandler.HandleAsync(request.ToCommand(playlistId), cancellationToken).ConfigureAwait(false);

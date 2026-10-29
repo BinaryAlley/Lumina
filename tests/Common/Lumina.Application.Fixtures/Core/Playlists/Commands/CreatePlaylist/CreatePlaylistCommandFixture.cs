@@ -25,16 +25,18 @@ public class CreatePlaylistCommandFixture
     /// <param name="type">Optional. The kind of media the playlist holds. Defaults to the only supported kind.</param>
     /// <param name="includeDescription">Whether the description should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeType">Whether the media type should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeName">Whether the name should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="CreatePlaylistCommand"/>.</returns>
     public CreatePlaylistCommand Create(
         string? name = null,
         string? description = null,
         PlaylistType? type = null,
         bool includeDescription = true,
-        bool includeType = true)
+        bool includeType = true,
+        bool includeName = true)
     {
         return new CreatePlaylistCommand(
-            name ?? _faker.Lorem.Sentence(3),
+            includeName ? (name ?? _faker.Lorem.Sentence(3)) : null,
             includeDescription ? (description ?? _faker.Lorem.Sentence()) : null,
             includeType ? (type ?? PlaylistType.Music) : null);
     }
