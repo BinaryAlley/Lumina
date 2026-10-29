@@ -26,6 +26,14 @@ public interface IMusicLibraryScanItemMetadataRepository : IRepository<MusicLibr
     Task<Result<IReadOnlyList<MusicLibraryScanItemMetadataEntity>>> GetByScanIdAsync(Guid scanId, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Gets all the staged music metadata items of the media library identified by <paramref name="libraryId"/>, regardless of the scan that staged them.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose staged music metadata is retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="MusicLibraryScanItemMetadataEntity"/>, or an error.</returns>
+    Task<Result<IReadOnlyList<MusicLibraryScanItemMetadataEntity>>> GetByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Deletes all the staged music metadata items of the media library scan identified by <paramref name="scanId"/>.
     /// </summary>
     /// <param name="scanId">The Id of the media library scan whose staged music metadata is deleted.</param>

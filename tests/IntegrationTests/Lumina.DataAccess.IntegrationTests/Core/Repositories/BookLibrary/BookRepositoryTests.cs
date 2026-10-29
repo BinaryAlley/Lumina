@@ -83,6 +83,35 @@ public class BookRepositoryTests
     }
 
     [Fact]
+    public async Task GetExistingPathsAsync_WhenMorePathsAreRequestedThanTheStorageAccepts_ShouldReturnTheExistingPaths()
+    {
+        // Arrange
+        // A scan of a very large library stages more paths than SQLite accepts as the parameters of one statement, which used to fail the whole scan.
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-existingpaths-large-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        BookRepository sut = new(context);
+
+        Guid libraryId = Guid.NewGuid();
+        BookEntity book = _bookEntityFixture.Create();
+        book.LibraryId = libraryId;
+        book.Path = "/books/tolkien/the-hobbit.epub";
+        context.Books.Add(book);
+        await context.SaveChangesAsync();
+        List<string> requestedPaths = [.. Enumerable.Range(0, 120_000).Select(index => $"/books/tolkien/book-{index}.epub")];
+        requestedPaths.Add("/books/tolkien/the-hobbit.epub");
+
+        // Act
+        Result<IReadOnlyCollection<string>> result = await sut.GetExistingPathsAsync(libraryId, requestedPaths, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        string existingPath = Assert.Single(result.Value);
+        Assert.Equal("/books/tolkien/the-hobbit.epub", existingPath);
+    }
+
+    [Fact]
     public async Task ResetMetadataStatusForLibraryAsync_WhenCalled_ShouldResetTheMetadataStatusOfAllBooksOfTheLibrary()
     {
         // Arrange

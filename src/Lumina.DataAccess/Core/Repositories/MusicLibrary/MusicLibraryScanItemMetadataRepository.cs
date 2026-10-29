@@ -59,6 +59,22 @@ internal sealed class MusicLibraryScanItemMetadataRepository : IMusicLibraryScan
     }
 
     /// <summary>
+    /// Gets all the staged music metadata items of the media library identified by <paramref name="libraryId"/>, regardless of the scan that staged them.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose staged music metadata is retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="MusicLibraryScanItemMetadataEntity"/>, or an error.</returns>
+    public async Task<Result<IReadOnlyList<MusicLibraryScanItemMetadataEntity>>> GetByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken)
+    {
+        IReadOnlyList<MusicLibraryScanItemMetadataEntity> items = await _luminaDbContext.MusicLibraryScanItemMetadata
+            .AsNoTracking()
+            .Where(musicMetadata => musicMetadata.LibraryId == libraryId)
+            .OrderBy(musicMetadata => musicMetadata.Path)
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+        return Result.From(items);
+    }
+
+    /// <summary>
     /// Deletes all the staged music metadata items of the media library scan identified by <paramref name="scanId"/>.
     /// </summary>
     /// <param name="scanId">The Id of the media library scan whose staged music metadata is deleted.</param>

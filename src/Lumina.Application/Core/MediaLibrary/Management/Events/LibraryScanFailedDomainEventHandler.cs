@@ -86,11 +86,19 @@ public class LibraryScanFailedDomainEventHandler : IDomainEventHandler<LibrarySc
         // Release the scan processing resources, regardless of whether the scan was already marked as failed by a concurrent job.
         _mediaLibrariesScanCancellationTracker.RemoveScan(domainEvent.MediaLibraryScanCompositeId);
         _mediaLibrariesScanProgressTracker.RemoveScanProgress(domainEvent.MediaLibraryScanCompositeId);
-        Result<Success> clearStagingResult = await _unitOfWork.LibraryScanStagingResultsRepository.ClearForScanAsync(domainEvent.MediaLibraryScanCompositeId.ScanId.Value, cancellationToken).ConfigureAwait(false);
+        // Releasing the resources cancels the scan's own token, so the cleanup that follows must not observe it, otherwise the staged results of a failed scan
+        // would survive the failure and leak into the storage medium.
+        // A scan that failed after its snapshot was applied has not materialized its items yet, so its snapshot entries are rolled back, allowing the next
+        // scan to treat the files as new and extract their metadata again instead of skipping them as unchanged.
+        Result<Deleted> rollbackSnapshotResult = await _unitOfWork.LibraryScanSnapshotRepository.RollbackSnapshotForScanAsync(
+            domainEvent.LibraryId.Value, domainEvent.MediaLibraryScanCompositeId.ScanId.Value, CancellationToken.None).ConfigureAwait(false);
+        if (rollbackSnapshotResult.IsFailure)
+            throw new EventualConsistencyException(rollbackSnapshotResult.FirstError, rollbackSnapshotResult.Errors);
+        Result<Success> clearStagingResult = await _unitOfWork.LibraryScanStagingResultsRepository.ClearForScanAsync(domainEvent.MediaLibraryScanCompositeId.ScanId.Value, CancellationToken.None).ConfigureAwait(false);
         if (clearStagingResult.IsFailure)
             throw new EventualConsistencyException(clearStagingResult.FirstError, clearStagingResult.Errors);
 
         // Notify SignalR clients that the library scan failed.
-        await _debouncedLibraryScanProgressNotifier.SendLibraryScanFailedEventAsync(domainEvent.MediaLibraryScanCompositeId, cancellationToken).ConfigureAwait(false);
+        await _debouncedLibraryScanProgressNotifier.SendLibraryScanFailedEventAsync(domainEvent.MediaLibraryScanCompositeId, CancellationToken.None).ConfigureAwait(false);
     }
 }

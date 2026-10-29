@@ -84,10 +84,15 @@ internal sealed class TrackRepository : ITrackRepository
 
         // The stored paths are compared ordinally, matching the case sensitive comparison used by the unique index of the storage medium.
         List<string> distinctPaths = [.. paths.Distinct(StringComparer.Ordinal)];
-        List<string> existingPaths = await _luminaDbContext.Tracks
-            .Where(repositoryTrack => repositoryTrack.LibraryId == libraryId && distinctPaths.Contains(repositoryTrack.Path))
-            .Select(repositoryTrack => repositoryTrack.Path)
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
+        // A large library stages far more paths than the storage medium accepts as the parameters of a single statement, so the lookup is split into
+        // bounded chunks and the matches of every chunk are accumulated, which keeps a scan of any size within the parameter limit.
+        const int LOOKUP_CHUNK_SIZE = 20_000;
+        List<string> existingPaths = [];
+        foreach (string[] chunk in distinctPaths.Chunk(LOOKUP_CHUNK_SIZE))
+            existingPaths.AddRange(await _luminaDbContext.Tracks
+                .Where(repositoryTrack => repositoryTrack.LibraryId == libraryId && chunk.Contains(repositoryTrack.Path))
+                .Select(repositoryTrack => repositoryTrack.Path)
+                .ToListAsync(cancellationToken).ConfigureAwait(false));
         return Result.From<IReadOnlyCollection<string>>(existingPaths);
     }
 
@@ -463,38 +468,54 @@ internal sealed class TrackRepository : ITrackRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Updated>> ResetEnrichmentStateForPathsAsync(Guid libraryId, IReadOnlyCollection<string> paths, CancellationToken cancellationToken)
     {
-        List<string> pathList = [.. paths];
+        List<string> pathList = [.. paths.Distinct(StringComparer.Ordinal)];
         if (pathList.Count == 0)
             return Result.Updated;
 
+        // A scan can change more paths and reach more tracks than the storage medium accepts as the parameters of a single statement, so every lookup
+        // and every update is split into bounded chunks, keeping the whole operation within the parameter limit regardless of the library size.
+        const int LOOKUP_CHUNK_SIZE = 20_000;
+
         // The tracks stored at the changed paths are reset, together with the albums and the artists they belong to, because the metadata of the whole release is re-evaluated.
-        List<Guid> trackIds = await _luminaDbContext.Tracks
-            .Where(track => track.LibraryId == libraryId && pathList.Contains(track.Path))
-            .Select(track => track.Id)
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
+        List<Guid> trackIds = [];
+        foreach (string[] chunk in pathList.Chunk(LOOKUP_CHUNK_SIZE))
+            trackIds.AddRange(await _luminaDbContext.Tracks
+                .Where(track => track.LibraryId == libraryId && chunk.Contains(track.Path))
+                .Select(track => track.Id)
+                .ToListAsync(cancellationToken).ConfigureAwait(false));
         if (trackIds.Count == 0)
             return Result.Updated;
 
-        List<Guid> albumIds = await _luminaDbContext.Tracks
-            .Where(track => trackIds.Contains(track.Id))
-            .Select(track => track.AlbumId)
-            .Distinct()
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
-        List<Guid> artistIds = await _luminaDbContext.Albums
-            .Where(album => albumIds.Contains(album.Id))
-            .Select(album => album.ArtistId)
-            .Distinct()
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
+        HashSet<Guid> albumIdSet = [];
+        foreach (Guid[] chunk in trackIds.Chunk(LOOKUP_CHUNK_SIZE))
+            albumIdSet.UnionWith(await _luminaDbContext.Tracks
+                .Where(track => chunk.Contains(track.Id))
+                .Select(track => track.AlbumId)
+                .Distinct()
+                .ToListAsync(cancellationToken).ConfigureAwait(false));
+        List<Guid> albumIds = [.. albumIdSet];
 
-        await _luminaDbContext.Tracks
-            .Where(track => trackIds.Contains(track.Id))
-            .ExecuteUpdateAsync(setters => setters.SetProperty(track => track.MetadataStatus, MetadataStatus.Pending), cancellationToken).ConfigureAwait(false);
-        await _luminaDbContext.Albums
-            .Where(album => albumIds.Contains(album.Id))
-            .ExecuteUpdateAsync(setters => setters.SetProperty(album => album.MetadataStatus, MetadataStatus.Pending), cancellationToken).ConfigureAwait(false);
-        await _luminaDbContext.Artists
-            .Where(artist => artistIds.Contains(artist.Id))
-            .ExecuteUpdateAsync(setters => setters.SetProperty(artist => artist.MetadataStatus, MetadataStatus.Pending), cancellationToken).ConfigureAwait(false);
+        HashSet<Guid> artistIdSet = [];
+        foreach (Guid[] chunk in albumIds.Chunk(LOOKUP_CHUNK_SIZE))
+            artistIdSet.UnionWith(await _luminaDbContext.Albums
+                .Where(album => chunk.Contains(album.Id))
+                .Select(album => album.ArtistId)
+                .Distinct()
+                .ToListAsync(cancellationToken).ConfigureAwait(false));
+        List<Guid> artistIds = [.. artistIdSet];
+
+        foreach (Guid[] chunk in trackIds.Chunk(LOOKUP_CHUNK_SIZE))
+            await _luminaDbContext.Tracks
+                .Where(track => chunk.Contains(track.Id))
+                .ExecuteUpdateAsync(setters => setters.SetProperty(track => track.MetadataStatus, MetadataStatus.Pending), cancellationToken).ConfigureAwait(false);
+        foreach (Guid[] chunk in albumIds.Chunk(LOOKUP_CHUNK_SIZE))
+            await _luminaDbContext.Albums
+                .Where(album => chunk.Contains(album.Id))
+                .ExecuteUpdateAsync(setters => setters.SetProperty(album => album.MetadataStatus, MetadataStatus.Pending), cancellationToken).ConfigureAwait(false);
+        foreach (Guid[] chunk in artistIds.Chunk(LOOKUP_CHUNK_SIZE))
+            await _luminaDbContext.Artists
+                .Where(artist => chunk.Contains(artist.Id))
+                .ExecuteUpdateAsync(setters => setters.SetProperty(artist => artist.MetadataStatus, MetadataStatus.Pending), cancellationToken).ConfigureAwait(false);
 
         return Result.Updated;
     }

@@ -36,6 +36,7 @@ public class LibraryScanSnapshotRepositoryTests : IDisposable
     private readonly LibraryScanSnapshotRepository _sut;
     private readonly LibraryScanSnapshotEntityFixture _libraryScanSnapshotEntityFixture = new();
     private readonly LibraryScanStagingResultsEntityFixture _libraryScanStagingResultsEntityFixture = new();
+    private readonly LibraryScanResultEntityFixture _libraryScanResultEntityFixture = new();
     private readonly UserEntityFixture _userEntityFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly LibraryScanEntityFixture _libraryScanEntityFixture = new();
@@ -128,7 +129,7 @@ public class LibraryScanSnapshotRepositoryTests : IDisposable
         await _context.SaveChangesAsync();
 
         // Act
-        Result<IReadOnlyList<string>> result = await _sut.GetPathsAsync(library.Id, CancellationToken.None);
+        Result<IReadOnlySet<string>> result = await _sut.GetPathsAsync(library.Id, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -144,7 +145,7 @@ public class LibraryScanSnapshotRepositoryTests : IDisposable
         (_, LibraryEntity library, _) = await SeedScanGraphAsync();
 
         // Act
-        Result<IReadOnlyList<string>> result = await _sut.GetPathsAsync(library.Id, CancellationToken.None);
+        Result<IReadOnlySet<string>> result = await _sut.GetPathsAsync(library.Id, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -222,6 +223,36 @@ public class LibraryScanSnapshotRepositoryTests : IDisposable
         Assert.Equal(Result.Updated, result.Value);
         Assert.False(await _context.LibraryScanResults.AsNoTracking().AnyAsync());
         Assert.False(await _context.LibraryScanStagingResults.AsNoTracking().AnyAsync(staging => staging.LibraryScanId == scanId));
+    }
+
+    [Fact]
+    public async Task RollbackSnapshotForScanAsync_WhenCalled_ShouldRemoveOnlyTheSnapshotEntriesTheScanAddedOrModified()
+    {
+        // Arrange
+        (_, LibraryEntity library, Guid scanId) = await SeedScanGraphAsync();
+        LibraryScanSnapshotEntity untouchedSnapshot = _libraryScanSnapshotEntityFixture.Create(libraryId: library.Id, path: "/books/untouched.epub");
+        LibraryScanSnapshotEntity newSnapshot = _libraryScanSnapshotEntityFixture.Create(libraryId: library.Id, path: "/books/new.epub");
+        LibraryScanSnapshotEntity modifiedSnapshot = _libraryScanSnapshotEntityFixture.Create(libraryId: library.Id, path: "/books/modified.epub");
+        _context.LibraryScanSnapshots.AddRange(untouchedSnapshot, newSnapshot, modifiedSnapshot);
+        LibraryScanResultEntity newResult = _libraryScanResultEntityFixture.Create(libraryScanId: scanId, status: LibraryScanFileStatus.New, path: "/books/new.epub");
+        LibraryScanResultEntity modifiedResult = _libraryScanResultEntityFixture.Create(libraryScanId: scanId, status: LibraryScanFileStatus.Modified, path: "/books/modified.epub");
+        LibraryScanResultEntity deletedResult = _libraryScanResultEntityFixture.Create(libraryScanId: scanId, status: LibraryScanFileStatus.Deleted, path: "/books/deleted.epub");
+        _context.LibraryScanResults.AddRange(newResult, modifiedResult, deletedResult);
+        await _context.SaveChangesAsync();
+
+        // Act
+        Result<Deleted> result = await _sut.RollbackSnapshotForScanAsync(library.Id, scanId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Deleted, result.Value);
+        List<LibraryScanSnapshotEntity> snapshots = await _context.LibraryScanSnapshots.AsNoTracking()
+            .Where(snapshot => snapshot.LibraryId == library.Id)
+            .ToListAsync();
+        LibraryScanSnapshotEntity remainingSnapshot = Assert.Single(snapshots);
+        Assert.Equal("/books/untouched.epub", remainingSnapshot.Path);
+        // The audit results are kept: they describe what the failed scan found, and only the snapshot is rolled back.
+        Assert.Equal(3, await _context.LibraryScanResults.AsNoTracking().CountAsync(scanResult => scanResult.LibraryScanId == scanId));
     }
 
     /// <summary>

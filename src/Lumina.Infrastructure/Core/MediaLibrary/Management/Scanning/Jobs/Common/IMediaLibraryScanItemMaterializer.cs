@@ -36,10 +36,20 @@ internal interface IMediaLibraryScanItemMaterializer
     /// <param name="unitOfWork">The unit of work used to interact with the data access layer.</param>
     /// <param name="libraryId">The Id of the media library whose items are materialized.</param>
     /// <param name="scanId">The Id of the media library scan whose results are materialized.</param>
-    /// <param name="paths">The file system paths of the media library scan snapshot.</param>
+    /// <param name="paths">The set of file system paths of the media library scan snapshot.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
-    Task<Result<Success>> MaterializeItemsAsync(IUnitOfWork unitOfWork, Guid libraryId, Guid scanId, IReadOnlyList<string> paths, CancellationToken cancellationToken);
+    Task<Result<Success>> MaterializeItemsAsync(IUnitOfWork unitOfWork, Guid libraryId, Guid scanId, IReadOnlySet<string> paths, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Clears the data that the media library scan staged for the media library, after its items were successfully saved.
+    /// </summary>
+    /// <param name="unitOfWork">The unit of work used to interact with the data access layer.</param>
+    /// <param name="libraryId">The Id of the media library whose staged data is cleared.</param>
+    /// <param name="scanId">The Id of the media library scan whose staged data is cleared.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Deleted>> ClearStagedDataAsync(IUnitOfWork unitOfWork, Guid libraryId, Guid scanId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Resets the metadata enrichment status of all the media library items of the media library identified by <paramref name="libraryId"/>.

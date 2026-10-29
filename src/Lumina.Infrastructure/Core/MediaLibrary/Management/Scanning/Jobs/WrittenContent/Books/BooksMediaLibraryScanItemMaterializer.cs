@@ -68,7 +68,7 @@ internal sealed class BooksMediaLibraryScanItemMaterializer : IMediaLibraryScanI
     /// <param name="paths">The file system paths of the media library scan snapshot.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<Result<Success>> MaterializeItemsAsync(IUnitOfWork unitOfWork, Guid libraryId, Guid scanId, IReadOnlyList<string> paths, CancellationToken cancellationToken)
+    public async Task<Result<Success>> MaterializeItemsAsync(IUnitOfWork unitOfWork, Guid libraryId, Guid scanId, IReadOnlySet<string> paths, CancellationToken cancellationToken)
     {
         // The library holds the path template that describes the structure of the library on disk, used to derive the metadata of each book from its path.
         Result<LibraryEntity?> getLibraryResult = await unitOfWork.LibraryRepository.GetByIdAsync(libraryId, cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -87,8 +87,7 @@ internal sealed class BooksMediaLibraryScanItemMaterializer : IMediaLibraryScanI
 
         // Books that are already stored are never inserted again, so a re-scan of an unchanged file does not duplicate its book. The existing paths are
         // loaded in a single query, instead of one existence check per path, so that the number of round trips does not scale with the size of the library.
-        List<string> stagedPaths = [.. paths];
-        Result<IReadOnlyCollection<string>> getExistingPathsResult = await unitOfWork.BookRepository.GetExistingPathsAsync(libraryId, stagedPaths, cancellationToken).ConfigureAwait(false);
+        Result<IReadOnlyCollection<string>> getExistingPathsResult = await unitOfWork.BookRepository.GetExistingPathsAsync(libraryId, paths, cancellationToken).ConfigureAwait(false);
         if (getExistingPathsResult.IsFailure)
             return getExistingPathsResult.Errors;
         HashSet<string> existingPaths = [.. getExistingPathsResult.Value];
@@ -105,6 +104,20 @@ internal sealed class BooksMediaLibraryScanItemMaterializer : IMediaLibraryScanI
                 return insertBookResult.Errors;
         }
         return Result.Success;
+    }
+
+    /// <summary>
+    /// Clears the data that the media library scan staged for the media library, after its items were successfully saved.
+    /// </summary>
+    /// <param name="unitOfWork">The unit of work used to interact with the data access layer.</param>
+    /// <param name="libraryId">The Id of the media library whose staged data is cleared.</param>
+    /// <param name="scanId">The Id of the media library scan whose staged data is cleared.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public Task<Result<Deleted>> ClearStagedDataAsync(IUnitOfWork unitOfWork, Guid libraryId, Guid scanId, CancellationToken cancellationToken)
+    {
+        // The books materialize directly from the paths of the snapshot, so they do not stage any data of their own to clear.
+        return Task.FromResult<Result<Deleted>>(Result.Deleted);
     }
 
     /// <summary>

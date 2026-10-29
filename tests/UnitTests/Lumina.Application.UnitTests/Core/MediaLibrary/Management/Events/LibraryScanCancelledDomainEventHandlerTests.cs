@@ -33,6 +33,7 @@ public class LibraryScanCancelledDomainEventHandlerTests
     private readonly IUnitOfWork _mockUnitOfWork;
     private readonly ILibraryScanRepository _mockLibraryScanRepository;
     private readonly ILibraryScanStagingResultsRepository _mockLibraryScanStagingResultsRepository;
+    private readonly ILibraryScanSnapshotRepository _mockLibraryScanSnapshotRepository;
     private readonly IMediaLibraryScanningService _mockMediaLibraryScanningService;
     private readonly IMediaLibrariesScanProgressTracker _mockMediaLibrariesScanProgressTracker;
     private readonly IMediaLibrariesScanCancellationTracker _mockMediaLibrariesScanCancellationTracker;
@@ -49,14 +50,18 @@ public class LibraryScanCancelledDomainEventHandlerTests
         _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockLibraryScanRepository = Substitute.For<ILibraryScanRepository>();
         _mockLibraryScanStagingResultsRepository = Substitute.For<ILibraryScanStagingResultsRepository>();
+        _mockLibraryScanSnapshotRepository = Substitute.For<ILibraryScanSnapshotRepository>();
         _mockUnitOfWork.LibraryScanRepository.Returns(_mockLibraryScanRepository);
         _mockUnitOfWork.LibraryScanStagingResultsRepository.Returns(_mockLibraryScanStagingResultsRepository);
+        _mockUnitOfWork.LibraryScanSnapshotRepository.Returns(_mockLibraryScanSnapshotRepository);
         _mockMediaLibraryScanningService = Substitute.For<IMediaLibraryScanningService>();
         _mockMediaLibrariesScanProgressTracker = Substitute.For<IMediaLibrariesScanProgressTracker>();
         _mockMediaLibrariesScanCancellationTracker = Substitute.For<IMediaLibrariesScanCancellationTracker>();
 
-        // default stubs: the cancellation service and the staging results clearing succeed
+        // default stubs: the cancellation service, the snapshot rollback and the staging results clearing succeed
         _mockMediaLibraryScanningService.CancelScan(Arg.Any<LibraryScan>()).Returns(Result.Success);
+        _mockLibraryScanSnapshotRepository.RollbackSnapshotForScanAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Deleted);
         _mockLibraryScanStagingResultsRepository.ClearForScanAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
             .Returns(Result.Success);
 
@@ -81,7 +86,8 @@ public class LibraryScanCancelledDomainEventHandlerTests
         _mockMediaLibraryScanningService.Received(1).CancelScan(Arg.Is<LibraryScan>(libraryScan => libraryScan.Id.Value == scan.Id));
         _mockMediaLibrariesScanCancellationTracker.Received(1).RemoveScan(Arg.Any<MediaLibraryScanCompositeId>());
         _mockMediaLibrariesScanProgressTracker.Received(1).RemoveScanProgress(Arg.Any<MediaLibraryScanCompositeId>());
-        await _mockLibraryScanStagingResultsRepository.Received(1).ClearForScanAsync(scan.Id, Arg.Any<CancellationToken>());
+        await _mockLibraryScanSnapshotRepository.Received(1).RollbackSnapshotForScanAsync(domainEvent.LibraryId.Value, domainEvent.ScanId.Value, CancellationToken.None);
+        await _mockLibraryScanStagingResultsRepository.Received(1).ClearForScanAsync(scan.Id, CancellationToken.None);
     }
 
     [Fact]
@@ -99,6 +105,7 @@ public class LibraryScanCancelledDomainEventHandlerTests
 
         // Assert
         Assert.Equal(error, exception.EventualConsistencyError);
+        await _mockLibraryScanSnapshotRepository.DidNotReceive().RollbackSnapshotForScanAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockLibraryScanStagingResultsRepository.DidNotReceive().ClearForScanAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
     }
 
@@ -139,6 +146,7 @@ public class LibraryScanCancelledDomainEventHandlerTests
         // Assert
         Assert.Equal(error, exception.EventualConsistencyError);
         _mockMediaLibrariesScanCancellationTracker.DidNotReceive().RemoveScan(Arg.Any<MediaLibraryScanCompositeId>());
+        await _mockLibraryScanSnapshotRepository.DidNotReceive().RollbackSnapshotForScanAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockLibraryScanStagingResultsRepository.DidNotReceive().ClearForScanAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
     }
 
@@ -162,5 +170,27 @@ public class LibraryScanCancelledDomainEventHandlerTests
 
         // Assert
         Assert.Equal(error, exception.EventualConsistencyError);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenTheScanTokenIsCanceled_ShouldStillClearTheStagingResults()
+    {
+        // Arrange
+        // Cancelling the scan cancels its own token, so the cleanup must not be skipped because of it.
+        LibraryScanCancelledDomainEvent domainEvent = _libraryScanCancelledDomainEventFixture.Create();
+        LibraryScanEntity scan = _libraryScanEntityFixture.Create(
+            id: domainEvent.ScanId.Value,
+            libraryId: domainEvent.LibraryId.Value);
+        _mockLibraryScanRepository.GetByIdAsync(scan.Id, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryScanEntity?>(scan));
+        using CancellationTokenSource canceledTokenSource = new();
+        canceledTokenSource.Cancel();
+
+        // Act
+        await _sut.HandleAsync(domainEvent, canceledTokenSource.Token);
+
+        // Assert
+        await _mockLibraryScanSnapshotRepository.Received(1).RollbackSnapshotForScanAsync(domainEvent.LibraryId.Value, domainEvent.ScanId.Value, CancellationToken.None);
+        await _mockLibraryScanStagingResultsRepository.Received(1).ClearForScanAsync(scan.Id, CancellationToken.None);
     }
 }

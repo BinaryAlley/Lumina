@@ -70,7 +70,7 @@ internal sealed class LibraryScanSnapshotRepository : ILibraryScanSnapshotReposi
     /// <param name="libraryId">The unique identifier of the library whose media library scan snapshot item paths are retrieved.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of media library scan snapshot item paths, or an error.</returns>
-    public async Task<Result<IReadOnlyList<string>>> GetPathsAsync(Guid libraryId, CancellationToken cancellationToken)
+    public async Task<Result<IReadOnlySet<string>>> GetPathsAsync(Guid libraryId, CancellationToken cancellationToken)
     {
         await using SqliteConnection connection = await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
         const string GET_PATHS_SQL = """
@@ -82,7 +82,8 @@ internal sealed class LibraryScanSnapshotRepository : ILibraryScanSnapshotReposi
         CommandDefinition command = new(GET_PATHS_SQL, new { libraryId }, cancellationToken: cancellationToken);
 
         IEnumerable<string> paths = await connection.QueryAsync<string>(command).ConfigureAwait(false);
-        return paths.ToList();
+        // The snapshot is keyed by path, so the paths are unique, and a set answers the membership checks of the materializers without another copy.
+        return Result.From<IReadOnlySet<string>>(paths.ToHashSet(StringComparer.Ordinal));
     }
 
     /// <summary>
@@ -180,6 +181,36 @@ internal sealed class LibraryScanSnapshotRepository : ILibraryScanSnapshotReposi
 
         await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
         return Result.Updated;
+    }
+
+    /// <summary>
+    /// Removes the media library scan snapshot entries that the scan identified by <paramref name="scanId"/> added or modified, restoring the snapshot to
+    /// the state it had before the scan was applied.
+    /// </summary>
+    /// <param name="libraryId">The unique identifier of the library whose scan snapshot is rolled back.</param>
+    /// <param name="scanId">The unique identifier of the media library scan whose snapshot entries are removed.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Deleted>> RollbackSnapshotForScanAsync(Guid libraryId, Guid scanId, CancellationToken cancellationToken)
+    {
+        await using SqliteConnection connection = await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
+        // The audit rows of the scan identify the paths that its snapshot swap added or updated, so removing those snapshot rows makes the next scan
+        // treat the files as new again, instead of skipping the re-extraction of the metadata that never made it into materialized items.
+        const string ROLLBACK_SQL = """
+            DELETE FROM LibraryScanSnapshots
+            WHERE LibraryId = @libraryId
+              AND Path IN (
+                  SELECT Path
+                  FROM LibraryScanResults
+                  WHERE LibraryScanId = @scanId
+                    AND Status IN ('New', 'Modified')
+              );
+            """;
+
+        CommandDefinition command = new(ROLLBACK_SQL, new { libraryId, scanId }, cancellationToken: cancellationToken);
+
+        await connection.ExecuteAsync(command).ConfigureAwait(false);
+        return Result.Deleted;
     }
 
     /// <summary>

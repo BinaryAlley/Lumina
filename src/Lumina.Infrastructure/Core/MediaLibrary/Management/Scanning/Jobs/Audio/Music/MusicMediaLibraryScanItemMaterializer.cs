@@ -63,13 +63,21 @@ internal sealed class MusicMediaLibraryScanItemMaterializer : IMediaLibraryScanI
     /// <param name="paths">The file system paths of the media library scan snapshot.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<Result<Success>> MaterializeItemsAsync(IUnitOfWork unitOfWork, Guid libraryId, Guid scanId, IReadOnlyList<string> paths, CancellationToken cancellationToken)
+    public async Task<Result<Success>> MaterializeItemsAsync(IUnitOfWork unitOfWork, Guid libraryId, Guid scanId, IReadOnlySet<string> paths, CancellationToken cancellationToken)
     {
-        // The staged metadata of the scan holds everything needed to materialize the music library items, grouped by artist and by release.
-        Result<IReadOnlyList<MusicLibraryScanItemMetadataEntity>> getStagedMetadataResult = await unitOfWork.MusicLibraryScanItemMetadataRepository.GetByScanIdAsync(scanId, cancellationToken).ConfigureAwait(false);
+        // The staged metadata of the media library holds everything needed to materialize the music library items, grouped by artist and by release.
+        // It is read for the whole library, so the metadata that a failed earlier scan left behind is reused for the files that are still in the current
+        // snapshot, allowing a retried scan to complete without extracting the metadata of the whole library again. The metadata of the current scan wins
+        // over the metadata of an earlier scan for the same path, and the snapshot filters out the files that were deleted in the meantime.
+        Result<IReadOnlyList<MusicLibraryScanItemMetadataEntity>> getStagedMetadataResult = await unitOfWork.MusicLibraryScanItemMetadataRepository.GetByLibraryIdAsync(libraryId, cancellationToken).ConfigureAwait(false);
         if (getStagedMetadataResult.IsFailure)
             return getStagedMetadataResult.Errors;
-        IReadOnlyList<MusicLibraryScanItemMetadataEntity> stagedMetadata = getStagedMetadataResult.Value;
+        Dictionary<string, MusicLibraryScanItemMetadataEntity> stagedMetadataByPath = new(StringComparer.Ordinal);
+        foreach (MusicLibraryScanItemMetadataEntity stagedItem in getStagedMetadataResult.Value)
+            if (!stagedMetadataByPath.TryGetValue(stagedItem.Path, out _) || stagedItem.LibraryScanId == scanId)
+                stagedMetadataByPath[stagedItem.Path] = stagedItem;
+        List<MusicLibraryScanItemMetadataEntity> stagedMetadata = [.. stagedMetadataByPath.Values.Where(stagedItem => paths.Contains(stagedItem.Path))];
+
         if (stagedMetadata.Count == 0)
             return Result.Success;
 
@@ -171,12 +179,21 @@ internal sealed class MusicMediaLibraryScanItemMaterializer : IMediaLibraryScanI
             }
         }
 
-        // The staged metadata of the scan was consumed, so it is removed, keeping the storage medium bounded across scans.
-        Result<Deleted> deleteStagedMetadataResult = await unitOfWork.MusicLibraryScanItemMetadataRepository.DeleteByScanIdAsync(scanId, cancellationToken).ConfigureAwait(false);
-        if (deleteStagedMetadataResult.IsFailure)
-            return deleteStagedMetadataResult.Errors;
-
         return Result.Success;
+    }
+
+    /// <summary>
+    /// Clears the data that the media library scan staged for the media library, after its items were successfully saved.
+    /// </summary>
+    /// <param name="unitOfWork">The unit of work used to interact with the data access layer.</param>
+    /// <param name="libraryId">The Id of the media library whose staged data is cleared.</param>
+    /// <param name="scanId">The Id of the media library scan whose staged data is cleared.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Deleted>> ClearStagedDataAsync(IUnitOfWork unitOfWork, Guid libraryId, Guid scanId, CancellationToken cancellationToken)
+    {
+        // The delete covers the whole library, so the staged metadata that an earlier failed scan of the same library left behind is discarded as well.
+        return await unitOfWork.MusicLibraryScanItemMetadataRepository.DeleteByLibraryIdAsync(libraryId, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
