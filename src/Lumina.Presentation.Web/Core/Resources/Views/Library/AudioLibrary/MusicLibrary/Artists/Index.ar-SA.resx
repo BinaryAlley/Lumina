@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -56,5 +56,17 @@
   </data>
   <data name="DeleteFailed" xml:space="preserve">
     <value>تعذر حذف العنصر.</value>
+  </data>
+  <data name="Shuffle" xml:space="preserve">
+    <value>تشغيل عشوائي</value>
+  </data>
+  <data name="Play" xml:space="preserve">
+    <value>تشغيل</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>الإجراءات</value>
+  </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>إضافة إلى قائمة التشغيل</value>
   </data>
 </root>

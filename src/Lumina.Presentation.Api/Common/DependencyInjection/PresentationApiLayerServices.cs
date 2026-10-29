@@ -17,6 +17,7 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
@@ -31,6 +32,9 @@ namespace Lumina.Presentation.Api.Common.DependencyInjection;
 [ExcludeFromCodeCoverage]
 public static class PresentationApiLayerServices
 {
+    public const string AUTHENTICATION_RATE_LIMIT_POLICY = "authenticationPolicy";
+    public const string TRACK_STREAM_RATE_LIMIT_POLICY = "trackStreamPolicy";
+
     /// <summary>
     /// Registers the services of the Presentation Api layer into the Dependency Injection container.
     /// </summary>
@@ -94,7 +98,7 @@ public static class PresentationApiLayerServices
 
                 await onRejectedContext.HttpContext.Response.WriteAsJsonAsync(problem, cancellationToken);
             };
-            rateLimiterOptions.AddPolicy("authenticationPolicy", httpContext =>
+            rateLimiterOptions.AddPolicy(AUTHENTICATION_RATE_LIMIT_POLICY, httpContext =>
             {
                 string clientIp = httpContext.Request.Headers["X-Forwarded-For"] // First check forwarded headers, in case this is behind a reverse proxy.
                     .FirstOrDefault()?.Split(',')[0].Trim() // Take first IP, if multiple available, to avoid IP spoofing attempts,
@@ -108,6 +112,20 @@ public static class PresentationApiLayerServices
                         Window = TimeSpan.FromMinutes(15), // within 15 minute window.
                         QueueLimit = 0,  // Don't queue requests.
                         AutoReplenishment = true  // Automatically reset rate limiter tokens.
+                    });
+            });
+            rateLimiterOptions.AddPolicy(TRACK_STREAM_RATE_LIMIT_POLICY, httpContext =>
+            {
+                // The track stream is limited per user, so that a single user cannot hold an unbounded number of long lived audio streams open at once.
+                // This is deliberately not the login policy: it is a concurrency limit, partitioned per authenticated user, not a per IP attempt window.
+                string userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "anonymous";
+                return RateLimitPartition.GetConcurrencyLimiter(
+                    partitionKey: $"trackStream_{userId}",
+                    factory: _ => new ConcurrencyLimiterOptions
+                    {
+                        PermitLimit = 4, // Allow 4 concurrent audio streams per user.
+                        QueueLimit = 0, // Don't queue requests, a request beyond the limit is rejected instead of waiting.
+                        QueueProcessingOrder = QueueProcessingOrder.OldestFirst
                     });
             });
         });

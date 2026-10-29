@@ -24,9 +24,13 @@ public static partial class WebRoutes
         public const string UPDATE_ALBUM_COVER = "{culture}/library/audio-library/music-library/artists/{artistId}/albums/{albumId}/api-update-cover";
         public const string DELETE_ALBUM = "{culture}/library/audio-library/music-library/artists/{artistId}/albums/{albumId}/api-delete-album";
         public const string GET_ALBUM_TRACKS = "{culture}/library/audio-library/music-library/artists/{artistId}/albums/{albumId}/tracks/api-get-tracks";
+        public const string SHUFFLE_TRACKS = "{culture}/library/audio-library/music-library/tracks/api-shuffle-tracks";
         public const string TRACK = "{culture}/library/audio-library/music-library/artists/{artistId}/albums/{albumId}/tracks/{trackId}";
         public const string GET_TRACK = "{culture}/library/audio-library/music-library/artists/{artistId}/albums/{albumId}/tracks/{trackId}/api-get-track";
         public const string SAVE_TRACK = "{culture}/library/audio-library/music-library/artists/{artistId}/albums/{albumId}/tracks/{trackId}/api-save-track";
         public const string DELETE_TRACK = "{culture}/library/audio-library/music-library/artists/{artistId}/albums/{albumId}/tracks/{trackId}/api-delete-track";
+        public const string STREAM_TRACK = "{culture}/library/audio-library/music-library/artists/{artistId}/albums/{albumId}/tracks/{trackId}/api-stream-track";
+        public const string STREAM_TRACK_SEGMENT = "{culture}/library/audio-library/music-library/artists/{artistId}/albums/{albumId}/tracks/{trackId}/api-stream-track-segment/{deliveryId}/{segmentIndex}";
+        public const string GET_PLAYBACK_MANIFEST = "{culture}/library/audio-library/music-library/artists/{artistId}/albums/{albumId}/tracks/{trackId}/api-get-playback-manifest";
     }
 }

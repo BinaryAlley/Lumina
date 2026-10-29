@@ -14,7 +14,6 @@ namespace Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Track
 /// <summary>
 /// Represents a request to update an existing track.
 /// </summary>
-/// <param name="Path">The file system path of the track. Required.</param>
 /// <param name="Metadata">The audio metadata of the track. Required.</param>
 /// <param name="TrackNumber">The number of the track on its disc. Required.</param>
 /// <param name="DiscNumber">The number of the disc the track belongs to. Optional.</param>
@@ -30,7 +29,6 @@ namespace Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Track
 /// <param name="Ratings">The list of ratings for this track. Required.</param>
 [DebuggerDisplay("Title: {Metadata.Title}")]
 public record UpdateTrackRequest(
-    string? Path,
     MusicTrackMetadataDto? Metadata,
     int? TrackNumber,
     int? DiscNumber,

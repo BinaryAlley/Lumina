@@ -2,6 +2,7 @@
 using FastEndpoints;
 using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
+using Lumina.Presentation.Web.Common.DTO.Common;
 using Lumina.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Common;
@@ -50,7 +51,7 @@ public class GetAlbumTracksEndpoint : BaseEndpoint<GetAlbumTracksLiteRequest, IR
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(GetAlbumTracksLiteRequest request, CancellationToken cancellationToken)
     {
-        PaginatedMusicTrackLiteDto response = await _apiHttpClient.GetAsync<PaginatedMusicTrackLiteDto>(BuildItemsEndpoint(request), cancellationToken).ConfigureAwait(false);
+        PaginatedDto<MusicTrackLiteDto> response = await _apiHttpClient.GetAsync<PaginatedDto<MusicTrackLiteDto>>(BuildItemsEndpoint(request), cancellationToken).ConfigureAwait(false);
         return JsonSuccess(response);
     }
 

@@ -1202,6 +1202,197 @@ body {
         width: 64px;
     }
 
+    .tracks-table .track-play-column,
+    .tracks-table .track-favorite-column,
+    .tracks-table .track-actions-column {
+        width: 40px;
+    }
+
+    .tracks-table .track-play-cell,
+    .tracks-table .track-favorite-cell,
+    .tracks-table .track-actions-cell {
+        width: 40px;
+        padding-left: 0;
+        padding-right: 0;
+        text-align: center;
+    }
+
+/* The play control of an album track row stays a small square, so its column cannot widen the table. */
+.track-play-button {
+    width: 24px;
+    min-width: 24px;
+    height: 24px;
+    padding: 0;
+    line-height: 1;
+}
+
+/* The card actions menu, reused by the actions menu of an album track row. */
+.card-actions-trigger {
+    position: absolute;
+    right: 2px;
+    bottom: 28px;
+    width: 22px;
+    height: 22px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #6DCBFE;
+    border: 1px solid #777777;
+    border-bottom-color: #000000;
+    border-right-color: #000000;
+    background: linear-gradient(to bottom, #505050 0%, #464646 35%, #404040 55%, #363636 100%);
+    font-size: 16px;
+    line-height: 1;
+}
+
+.card-actions-trigger::after {
+    content: '\22EE';
+}
+
+.media-card:hover .card-actions-trigger,
+.media-card.open .card-actions-trigger {
+    display: flex;
+}
+
+.card-actions-trigger:hover {
+    color: #FFFFFF;
+}
+
+/* The track row places the same trigger inline and always visible, instead of on a media card. */
+.track-actions-cell .card-actions-trigger {
+    position: static;
+    display: flex;
+    margin: 0 auto;
+}
+
+/* The favorite heart of a media card: the box of the actions trigger, placed immediately on its left. The global favorites script writes the state attributes. */
+.card-favorite-toggle {
+    position: absolute;
+    right: 28px;
+    bottom: 28px;
+    width: 22px;
+    height: 22px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #6DCBFE;
+    border: 1px solid #777777;
+    border-bottom-color: #000000;
+    border-right-color: #000000;
+    background: linear-gradient(to bottom, #505050 0%, #464646 35%, #404040 55%, #363636 100%);
+    font-size: 16px;
+    line-height: 1;
+}
+
+.card-favorite-toggle::after {
+    content: '\2665';
+}
+
+.media-card:hover .card-favorite-toggle,
+.media-card.open .card-favorite-toggle,
+.media-card:focus-within .card-favorite-toggle {
+    display: flex;
+}
+
+.card-favorite-toggle:hover {
+    color: #FFFFFF;
+}
+
+.card-favorite-toggle[aria-pressed="true"],
+.card-favorite-toggle.is-favorite {
+    color: #FF5D5D;
+}
+
+.card-favorite-toggle[data-favorite-state="loading"] {
+    opacity: 0.5;
+    cursor: progress;
+}
+
+.card-favorite-toggle[data-favorite-state="failed"] {
+    border-color: #FF5D5D;
+}
+
+/* A card without an actions trigger, like the cards of the favorites page, gives its place to the heart. The heart is the
+   only action of such a card, so it is always visible: a touch screen has no hover to reveal it, and a display: none control cannot be reached with the keyboard. */
+.media-card:not(:has(.card-actions-trigger)) > .card-favorite-toggle {
+    right: 2px;
+    display: flex;
+}
+
+/* The track row places the same heart inline and always visible, instead of on a media card. */
+.track-favorite-cell .card-favorite-toggle {
+    position: static;
+    display: flex;
+    margin: 0 auto;
+}
+
+/* The hearts of a playlist row and of a player queue item are inline actions, so they are always visible and never take the position of a card heart. */
+.playlist-entry-favorite.card-favorite-toggle,
+.audio-player-queue-item-actions .card-favorite-toggle {
+    position: static;
+    display: flex;
+    flex: 0 0 auto;
+    margin: 0;
+}
+
+/* The add-to-playlist action of a playlist row is compact, because it sits in a row that already carries the playback, reordering and removal controls. */
+.playlist-entry-add-to-playlist {
+    width: 22px;
+    min-width: 22px;
+    height: 22px;
+    padding: 0;
+    line-height: 1;
+}
+
+.card-actions-menu {
+    display: none;
+    position: fixed;
+    z-index: 901;
+    min-width: 150px;
+    background: #4F4F4F;
+    border: 1px solid #777777;
+    border-bottom-color: #000000;
+    border-right-color: #000000;
+    padding: 4px;
+    margin: 0;
+    list-style-type: none;
+}
+
+.media-card.open .card-actions-menu,
+.card-actions-menu.open {
+    display: block;
+}
+
+.card-actions-menu a {
+    display: block;
+    padding: 3px 10px;
+    text-decoration: none;
+    cursor: default;
+    color: #6DCBFE;
+    background: #232323;
+    border-left: 1px solid #000000;
+    border-right: 1px solid #777777;
+    user-select: none;
+}
+
+.card-actions-menu a:first-child {
+    border-top: 1px solid #000000;
+}
+
+.card-actions-menu a:last-child {
+    border-bottom: 1px solid #777777;
+}
+
+.card-actions-menu a:hover {
+    background: linear-gradient(to bottom, #505050 0%, #464646 35%, #404040 55%, #363636 100%);
+    border: 1px solid #777777;
+    border-right-color: #000000;
+    border-bottom-color: #000000;
+    color: #FFFFFF;
+}
+
 .track-name-link {
     text-decoration: none;
     color: #E6E6E6;
@@ -1249,4 +1440,1033 @@ body {
 
 .artwork-carousel-item:hover {
     border-color: #FFFFFF;
+}
+
+/* Audio player bar. This is the application fallback styling: the themes own the final look and layout, and the
+   audio player script owns the state. The container carries 'not-shown' and 'expanded'; main carries the matching
+   'audio-player-not-shown' and 'audio-player-bar-expanded' classes. A theme is free to replace every rule below. */
+.audio-player-container {
+    position: fixed;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    z-index: 997;
+    display: flex;
+    flex-direction: column;
+    /* The bar stays anchored to the bottom of the viewport while the expanded area above it grows and shrinks. */
+    justify-content: flex-end;
+    height: 50px;
+    overflow: hidden;
+    background-color: #1C1C1C;
+    border-top: 1px solid #444444;
+    /* The expand and collapse duration is one value, so a theme can keep the height, fade and padding transitions in step by overriding this property on the container. */
+    --audio-player-expanded-duration: 0.4s;
+    transition: height var(--audio-player-expanded-duration) ease;
+    /* The VU meter palette is declared on the container so a theme overrides it on the
+       container or on the meter root, and every channel, segment and peak marker inherits the override. */
+    --audio-player-vu-normal-color: #0099FF;
+    --audio-player-vu-medium-color: #FFD166;
+    --audio-player-vu-high-color: #FF5D5D;
+    --audio-player-vu-inactive-color: transparent;
+    --audio-player-vu-peak-color: #F4F7FA;
+    --audio-player-vu-background-color: transparent;
+}
+
+.audio-player-container.not-shown {
+    height: 0px;
+    border-top-width: 0px;
+}
+
+/* The 'hidden' attribute keeps the bar unrendered until the audio player script takes over, so that a page load
+   never shows it, not even for a frame while the stylesheets settle. The script removes it once the bar is already
+   in its hidden state, so the removal is never visible. */
+.audio-player-container[hidden] {
+    display: none !important;
+}
+
+/* While the audio player applies its initial hidden state, its transitions, and the offset transition of the content
+   area, are suppressed, so that a page load never slides the bar or the content into place. The player removes the
+   marker once it is initialized, and later show, hide and expand transitions work normally. */
+html.audio-player-initializing main,
+html.audio-player-initializing .audio-player-container {
+    transition: none !important;
+}
+
+/* The fallback layout has no theme to position the content area, so it reserves room for the bar itself, consuming the
+   same classes a theme consumes on main. A themed layout positions main itself and does not carry this class. */
+.application-fallback-layout main {
+    padding-bottom: 50px;
+    transition: padding-bottom 0.4s ease;
+}
+
+.application-fallback-layout main.audio-player-not-shown {
+    padding-bottom: 0px;
+}
+
+.audio-player-container.expanded {
+    height: calc(100% - 22px); /* expanded height, less the height of the menu bar */
+}
+
+.audio-player-bar {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 8px;
+    height: 50px;
+    padding: 0px 10px;
+    color: #E6E6E6;
+}
+
+.audio-player-cover-thumbnail {
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+}
+
+.audio-player-track-labels {
+    display: flex;
+    flex: 1 1 20%;
+    min-width: 0px;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.audio-player-track-name,
+.audio-player-album-name {
+    min-width: 0px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.audio-player-album-name {
+    font-size: 11px;
+    color: #9AA7B0;
+}
+
+.audio-player-album-name:empty {
+    display: none;
+}
+
+/* VU meter. The player renders one channel per band and one segment per channel, and writes only the state and zone of
+   each segment and the position of each peak, so a theme restyles the whole meter from these rules or replaces them. The
+   colors are custom properties declared on the container, so overriding them on the container or on a theme selector is
+   enough to recolor every segment. The meter publishes the configured segment gap as '--audio-player-vu-segment-gap', the
+   segment count as '--audio-player-vu-segment-count', the channel count as '--audio-player-vu-band-count' and the peak position as '--audio-player-vu-peak-position'. */
+.audio-player-vu-meter {
+    --audio-player-vu-cell: 3px;
+    --audio-player-vu-extent: 48px;
+    --audio-player-vu-max-cell: 4px;
+    --audio-player-vu-row: 1px;
+    --audio-player-vu-run: 8px;
+    flex: 0 0 auto;
+    display: flex;
+    gap: var(--audio-player-vu-segment-gap, 1px);
+    overflow: hidden;
+    background-color: var(--audio-player-vu-background-color, transparent);
+}
+
+@supports (width: round(down, 5px, 1px)) {
+    .audio-player-vu-meter {
+        --audio-player-vu-cell: max(1px, round(down, min(var(--audio-player-vu-max-cell), calc((var(--audio-player-vu-extent) - (var(--audio-player-vu-segment-count, 12) - 1) * var(--audio-player-vu-segment-gap, 1px)) / var(--audio-player-vu-segment-count, 12))), 1px));
+        --audio-player-vu-row: max(1px, round(down, calc((var(--audio-player-vu-extent) - (var(--audio-player-vu-band-count, 24) - 1) * var(--audio-player-vu-segment-gap, 1px)) / var(--audio-player-vu-band-count, 24)), 1px));
+    }
+}
+
+.audio-player-vu-meter[data-audio-player-vu-meter-orientation="vertical"] {
+    flex-direction: row;
+    width: calc(var(--audio-player-vu-band-count, 24) * var(--audio-player-vu-cell) + (var(--audio-player-vu-band-count, 24) - 1) * var(--audio-player-vu-segment-gap, 1px));
+    height: calc(var(--audio-player-vu-segment-count, 12) * var(--audio-player-vu-cell) + (var(--audio-player-vu-segment-count, 12) - 1) * var(--audio-player-vu-segment-gap, 1px));
+}
+
+.audio-player-vu-meter[data-audio-player-vu-meter-orientation="horizontal"] {
+    flex-direction: column;
+    width: calc(var(--audio-player-vu-segment-count, 12) * var(--audio-player-vu-run) + (var(--audio-player-vu-segment-count, 12) - 1) * var(--audio-player-vu-segment-gap, 1px));
+    height: calc(var(--audio-player-vu-band-count, 24) * var(--audio-player-vu-row) + (var(--audio-player-vu-band-count, 24) - 1) * var(--audio-player-vu-segment-gap, 1px));
+}
+
+.audio-player-vu-channel {
+    position: relative;
+    display: flex;
+    flex: 0 0 auto;
+    gap: var(--audio-player-vu-segment-gap, 1px);
+}
+
+.audio-player-vu-meter[data-audio-player-vu-meter-orientation="vertical"] .audio-player-vu-channel {
+    flex-direction: column-reverse;
+    width: var(--audio-player-vu-cell);
+}
+
+.audio-player-vu-meter[data-audio-player-vu-meter-orientation="horizontal"] .audio-player-vu-channel {
+    flex-direction: row;
+    height: var(--audio-player-vu-row);
+}
+
+/* A segment is inactive until the level reaches it, and it takes its zone color only while it is active. The zone is
+   part of the markup, so a theme can give each of the three independently. */
+.audio-player-vu-segment {
+    flex: 0 0 auto;
+    background-color: var(--audio-player-vu-inactive-color, transparent);
+}
+
+.audio-player-vu-meter[data-audio-player-vu-meter-orientation="vertical"] .audio-player-vu-segment {
+    width: var(--audio-player-vu-cell);
+    height: var(--audio-player-vu-cell);
+}
+
+.audio-player-vu-meter[data-audio-player-vu-meter-orientation="horizontal"] .audio-player-vu-segment {
+    width: var(--audio-player-vu-run);
+    height: var(--audio-player-vu-row);
+}
+
+.audio-player-vu-segment[data-audio-player-vu-segment-state="active"][data-audio-player-vu-segment-zone="normal"] {
+    background-color: var(--audio-player-vu-normal-color, #0099FF);
+}
+
+.audio-player-vu-segment[data-audio-player-vu-segment-state="active"][data-audio-player-vu-segment-zone="medium"] {
+    background-color: var(--audio-player-vu-medium-color, #FFD166);
+}
+
+.audio-player-vu-segment[data-audio-player-vu-segment-state="active"][data-audio-player-vu-segment-zone="high"] {
+    background-color: var(--audio-player-vu-high-color, #FF5D5D);
+}
+
+/* The peak marker spans the short axis of its channel and is placed on the long axis from the custom property, so the
+   same markup serves both orientations: a theme only maps the property to whichever edge its own layout grows from. */
+.audio-player-vu-peak {
+    position: absolute;
+    background-color: var(--audio-player-vu-peak-color, #F4F7FA);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.audio-player-vu-peak[data-audio-player-vu-peak-state="active"] {
+    opacity: 1;
+}
+
+.audio-player-vu-meter[data-audio-player-vu-meter-orientation="vertical"] .audio-player-vu-peak {
+    left: 0px;
+    right: 0px;
+    bottom: var(--audio-player-vu-peak-position, 0%);
+    height: 2px;
+    transform: translateY(50%);
+}
+
+.audio-player-vu-meter[data-audio-player-vu-meter-orientation="horizontal"] .audio-player-vu-peak {
+    top: 0px;
+    bottom: 0px;
+    left: var(--audio-player-vu-peak-position, 0%);
+    width: 2px;
+    transform: translateX(-50%);
+}
+
+.audio-player-time {
+    flex: 0 0 auto;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+}
+
+.audio-player-progress {
+    position: relative;
+    flex: 2 1 40%;
+    min-width: 40px;
+    height: 6px;
+    background-color: transparent;
+    cursor: pointer;
+    /* A touch drag is claimed by the control instead of the browser, which would otherwise cancel the gesture. */
+    touch-action: none;
+}
+
+/* The bar exposes three distinct states a theme can style independently: the not yet downloaded track
+   ('audio-player-progress-undownloaded'), the downloaded but not played part ('audio-player-progress-downloaded'),
+   and the played part ('audio-player-progress-played'). The player publishes the start and the width of each state as
+   the custom properties below, and this stylesheet consumes them; a theme overrides these rules, or consumes the same
+   properties itself, to give each state its own look and the bar its own shape or orientation. */
+.audio-player-progress-played,
+.audio-player-progress-downloaded,
+.audio-player-progress-undownloaded {
+    position: absolute;
+    top: 0px;
+    height: 100%;
+}
+
+.audio-player-progress-played {
+    left: var(--audio-player-progress-played-start, 0%);
+    width: var(--audio-player-progress-played-width, 0%);
+    background-color: #6DCBFE;
+}
+
+.audio-player-progress-downloaded {
+    left: var(--audio-player-progress-downloaded-start, 0%);
+    width: var(--audio-player-progress-downloaded-width, 0%);
+    background-color: #5A6B78;
+}
+
+.audio-player-progress-undownloaded {
+    left: var(--audio-player-progress-undownloaded-start, 0%);
+    width: var(--audio-player-progress-undownloaded-width, 100%);
+    background-color: #333333;
+}
+
+/* While a seek waits for the range of its target position the bar pulses, so the loading state is visible without a
+   separate element. A theme restyles it through the 'is-buffering' class. The pulse is a decoration, so it is dropped
+   when the visitor asked for reduced motion; the 'is-buffering' class and the state attribute still mark the state. */
+.audio-player-progress.is-buffering {
+    animation: audio-player-progress-buffering 1s ease-in-out infinite;
+}
+
+@keyframes audio-player-progress-buffering {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.45;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .audio-player-progress.is-buffering {
+        animation: none;
+    }
+}
+
+.audio-player-progress.is-scrubbing {
+    cursor: grabbing;
+}
+
+.audio-player-volume.is-scrubbing {
+    cursor: grabbing;
+}
+
+/* The queue controls hold the skip controls and the repeat toggle. They sit next to the play control, so the bar reads as one transport row. */
+.audio-player-queue-controls {
+    position: relative;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+/* The button class is the current hook; the play-pause and mute class names are kept as aliases so a theme that targets
+   those older hooks directly still gets the same box. */
+.audio-player-button,
+.audio-player-play-pause,
+.audio-player-mute {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0px;
+    background-color: transparent;
+    border: 0px;
+    color: inherit;
+    cursor: pointer;
+}
+
+.audio-player-button:disabled,
+.audio-player-button.is-disabled,
+.audio-player-play-pause:disabled,
+.audio-player-play-pause.is-disabled,
+.audio-player-mute:disabled,
+.audio-player-mute.is-disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+/* The favorite toggle of the condensed bar is icon only, with no rectangle of its own: it reuses the transparent box of a transport button, and the stylesheet draws the heart. */
+.audio-player-favorite[hidden] {
+    display: none;
+}
+
+.audio-player-favorite-icon {
+    display: block;
+    font-size: 16px;
+    line-height: 1;
+    color: #E6E6E6;
+}
+
+.audio-player-favorite-icon::after {
+    content: '\2665';
+}
+
+.audio-player-favorite:hover .audio-player-favorite-icon {
+    color: #FFFFFF;
+}
+
+.audio-player-favorite.is-favorite .audio-player-favorite-icon {
+    color: #FF5D5D;
+}
+
+.audio-player-favorite[data-favorite-state="loading"] {
+    opacity: 0.5;
+    cursor: progress;
+}
+
+/* The skip icons are drawn with CSS, so a theme restyles them without an image. */
+.audio-player-previous-icon,
+.audio-player-next-icon {
+    display: block;
+    width: 0px;
+    height: 0px;
+    border-style: solid;
+    border-width: 5px 8px 5px 0px;
+    border-color: transparent #E6E6E6 transparent transparent;
+}
+
+.audio-player-previous-icon {
+    box-shadow: -3px 0px 0px #E6E6E6;
+}
+
+.audio-player-next-icon {
+    border-width: 5px 0px 5px 8px;
+    border-color: transparent transparent transparent #E6E6E6;
+    box-shadow: 3px 0px 0px #E6E6E6;
+}
+
+/* The repeat glyph is text, so a theme can replace it with its own imagery while keeping the hook. */
+.audio-player-repeat-icon {
+    display: block;
+    font-size: 17px;
+    line-height: 1;
+    color: #E6E6E6;
+}
+
+.audio-player-repeat.is-active .audio-player-repeat-icon {
+    color: #6DCBFE;
+}
+
+.audio-player-repeat {
+    position: relative;
+}
+
+.audio-player-repeat-one-badge {
+    display: none;
+    position: absolute;
+    right: 3px;
+    bottom: 2px;
+    font-size: 9px;
+    line-height: 1;
+    color: #6DCBFE;
+}
+
+.audio-player-repeat.is-one .audio-player-repeat-one-badge {
+    display: block;
+}
+
+/* The play affordance is a right pointing triangle, and the pause affordance two bars, both drawn with CSS
+   so that a theme can restyle them without an image. */
+.audio-player-play-pause-icon {
+    display: block;
+    width: 0px;
+    height: 0px;
+    border-style: solid;
+    border-width: 6px 0px 6px 10px;
+    border-color: transparent transparent transparent #E6E6E6;
+}
+
+.audio-player-play-pause.is-playing .audio-player-play-pause-icon {
+    width: 10px;
+    height: 12px;
+    border-width: 0px;
+    border-right: 3px solid #E6E6E6;
+    border-left: 3px solid #E6E6E6;
+}
+
+/* The stop affordance is a filled square, drawn with CSS so a theme can restyle it without an image. */
+.audio-player-stop-icon {
+    display: block;
+    width: 10px;
+    height: 10px;
+    background-color: #E6E6E6;
+}
+
+.audio-player-volume-control {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* The speaker cone of the mute toggle is drawn with CSS, so that a theme restyles it without an image. */
+.audio-player-mute-icon {
+    display: block;
+    width: 0px;
+    height: 0px;
+    border-style: solid;
+    border-width: 5px 8px 5px 0px;
+    border-color: transparent #E6E6E6 transparent transparent;
+}
+
+.audio-player-mute.is-muted .audio-player-mute-icon {
+    border-right-color: #8A8A8A;
+}
+
+/* The volume fill is positioned from the custom properties the player publishes, exactly like the progress bar, so a
+   theme restyles or reorients it without any inline geometry. touch-action is disabled on both sliders so a touch drag
+   is claimed by the control instead of the browser, which would otherwise cancel the gesture mid-drag. */
+.audio-player-volume {
+    position: relative;
+    width: 80px;
+    height: 6px;
+    background-color: #333333;
+    cursor: pointer;
+    touch-action: none;
+}
+
+.audio-player-volume-level {
+    position: absolute;
+    top: 0px;
+    left: var(--audio-player-volume-start, 0%);
+    width: var(--audio-player-volume-width, 100%);
+    height: 100%;
+    background-color: #6DCBFE;
+}
+
+.audio-player-volume.is-muted .audio-player-volume-level {
+    background-color: #5A6B78;
+}
+
+.audio-player-controls {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.audio-player-controls button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0px;
+    background: none;
+    border: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
+/* The expand control is a pair of chevrons: they point up while the bar is collapsed, because activating the
+   control expands the bar, and down while it is expanded, because activating it collapses the bar again. */
+.audio-player-expand-icon {
+    position: relative;
+    display: block;
+    width: 12px;
+    height: 14px;
+}
+
+.audio-player-expand-icon::before,
+.audio-player-expand-icon::after {
+    content: "";
+    position: absolute;
+    left: 1px;
+    width: 8px;
+    height: 8px;
+    border-top: 2px solid #E6E6E6;
+    border-left: 2px solid #E6E6E6;
+    transform: rotate(45deg);
+}
+
+.audio-player-expand-icon::before {
+    top: 0px;
+}
+
+.audio-player-expand-icon::after {
+    top: 5px;
+}
+
+.audio-player-container.expanded .audio-player-expand-icon::before,
+.audio-player-container.expanded .audio-player-expand-icon::after {
+    transform: rotate(225deg);
+}
+
+/* Fallback layout only. The expanded area stays in the flex column so the condensed bar remains anchored to the bottom
+   while this area grows and shrinks above it. A theme can replace this with a vertical bar, a horizontal queue, an
+   overlay, or any other layout; the player only toggles the state classes. Its vertical padding is zero while collapsed,
+   because padding cannot shrink with the flex item and would otherwise push the bar out of the viewport during the
+   fallback collapse transition. */
+.audio-player-expanded {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: row;
+    min-height: 0px;
+    gap: 16px;
+    padding: 0px 16px;
+    overflow-y: auto;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+        opacity var(--audio-player-expanded-duration) ease,
+        visibility 0s linear var(--audio-player-expanded-duration),
+        padding-top var(--audio-player-expanded-duration) ease,
+        padding-bottom var(--audio-player-expanded-duration) ease;
+}
+
+.audio-player-container.expanded .audio-player-expanded {
+    padding-top: 16px;
+    padding-bottom: 16px;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition-delay: 0s, 0s, 0s, 0s;
+}
+
+/* The expanded player presents the current track's cover, labels and stored album artwork in one column beside the queue. */
+.audio-player-now-playing {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 240px;
+    min-width: 0px;
+}
+
+.audio-player-cover-image {
+    display: block;
+    flex: 0 0 auto;
+    width: 240px;
+    height: 240px;
+    object-fit: cover;
+}
+
+.audio-player-now-playing .audio-player-cover-image {
+    width: 100%;
+}
+
+.audio-player-now-playing-labels {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0px;
+}
+
+.audio-player-now-playing-title {
+    min-width: 0px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 14px;
+    font-weight: 700;
+    color: #E6E6E6;
+}
+
+.audio-player-now-playing-release-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    min-width: 0px;
+}
+
+.audio-player-now-playing-release,
+.audio-player-now-playing-year,
+.audio-player-now-playing-artist {
+    min-width: 0px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+    color: #9AA7B0;
+}
+
+.audio-player-now-playing-release-type {
+    flex: 0 0 auto;
+    align-self: center;
+    padding: 1px 5px;
+    border: 1px solid #555555;
+    border-radius: 3px;
+    background-color: #2A2A2A;
+    color: #E6E6E6;
+    font-size: 10px;
+    line-height: 1.3;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.audio-player-now-playing-release-type:empty {
+    display: none;
+}
+
+.audio-player-now-playing-release {
+    flex: 1 1 auto;
+}
+
+.audio-player-now-playing-year {
+    flex: 0 0 auto;
+}
+
+.audio-player-now-playing-release:empty,
+.audio-player-now-playing-year:empty,
+.audio-player-now-playing-artist:empty {
+    display: none;
+}
+
+.audio-player-artwork-carousel {
+    max-width: 100%;
+    margin-top: 2px;
+}
+
+.audio-player-artwork-carousel[hidden] {
+    display: none;
+}
+
+/* The queue area takes the flex slot of the queue itself, so the queue action row above the list never becomes a new
+   sibling column of the expanded layout. The queue keeps filling the remaining height inside the area. */
+.audio-player-queue-area {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-width: 0px;
+    min-height: 0px;
+}
+
+.audio-player-queue-actions {
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 8px;
+}
+
+.audio-player-queue-actions .enlightenment-combobox {
+    flex: 1 1 200px;
+    min-width: 160px;
+}
+
+.audio-player-queue-actions .enlightenment-combobox.is-disabled {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.audio-player-queue {
+    flex: 1 1 auto;
+    min-height: 0px;
+    margin: 0px;
+    padding: 0px;
+    overflow-y: auto;
+    list-style: none;
+}
+
+/* A queue item carries its album cover, so a queue built from a whole library shuffle stays readable when consecutive
+   entries come from different artists and releases. The row is slightly taller than the plain text rows it replaced. */
+.audio-player-queue-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 52px;
+    padding: 8px;
+    box-sizing: border-box;
+    border-bottom: 1px solid #333333;
+    cursor: pointer;
+}
+
+.audio-player-queue-item-cover {
+    display: block;
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+    background-color: #333333;
+}
+
+.audio-player-queue-item.is-played .audio-player-queue-item-title {
+    color: #8A8A8A;
+}
+
+.audio-player-queue-item.is-current .audio-player-queue-item-title {
+    color: #6DCBFE;
+    font-weight: 700;
+}
+
+.audio-player-queue-item:focus {
+    outline: 1px solid #6DCBFE;
+}
+
+.audio-player-queue-item-title {
+    flex: 1 1 auto;
+    min-width: 0px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.audio-player-queue-item-duration {
+    flex: 0 0 auto;
+    font-size: 12px;
+    color: #9AA7B0;
+    font-variant-numeric: tabular-nums;
+}
+
+/* The favorite and add-to-playlist actions of a queue item sit after its duration, so a queued track can be saved without starting it. A queue item without a track renders the container empty. */
+.audio-player-queue-item-actions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 4px;
+}
+
+.audio-player-queue-item-actions:empty {
+    display: none;
+}
+
+/* The shared playlist picker of the add-to-playlist card actions. It reuses the application dialog surface on its own
+   overlay, so it never takes part in the queue of the global dialog service. */
+.playlist-picker-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.playlist-picker-overlay .dialog {
+    width: 400px;
+    max-width: 100%;
+}
+
+.playlist-picker-body {
+    padding-top: 4px;
+}
+
+.playlist-picker-scope {
+    margin: 0px 0px 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #9AA7B0;
+    font-size: 12px;
+}
+
+.playlist-picker-empty {
+    margin: 10px 0px 0px;
+    color: #9AA7B0;
+    font-size: 12px;
+}
+
+/* The statistics page: filters, summary tiles, breakdown tables, tag and genre bars, and the history rows. */
+.statistics-page {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    min-height: 100%;
+    padding: 0 2.5rem 2.5rem;
+}
+
+.statistics-user-selector {
+    display: flex;
+    align-items: flex-end;
+    margin-top: 1rem;
+}
+
+.statistics-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.statistics-filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.statistics-filter-buttons {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
+.statistics-state {
+    color: #9AA7B0;
+    text-align: center;
+    margin: 1rem 0;
+}
+
+.statistics-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.statistics-summary-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px;
+    border: 1px solid #777777;
+    border-bottom-color: #000000;
+    border-right-color: #000000;
+    background: linear-gradient(to bottom, #505050 0%, #464646 35%, #404040 55%, #363636 100%);
+}
+
+.statistics-table-wrapper {
+    overflow-x: auto;
+    margin-bottom: 1.5rem;
+}
+
+.statistics-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.statistics-table th,
+.statistics-table td {
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    white-space: nowrap;
+}
+
+.statistics-table th {
+    color: #9AA7B0;
+    font-weight: normal;
+}
+
+.statistics-media-kind-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border: 1px solid #777777;
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.15);
+    color: #d8d8d8;
+    font-size: 12px;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+
+.statistics-terms {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.statistics-terms-column {
+    min-width: 0;
+}
+
+.statistics-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.statistics-bar-row {
+    display: grid;
+    grid-template-columns: minmax(90px, 1fr) minmax(80px, 2fr) auto;
+    align-items: center;
+    gap: 10px;
+}
+
+.statistics-term-name {
+    color: #d8d8d8;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.statistics-bar-track {
+    height: 10px;
+    border: 1px solid #777777;
+    background: rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+}
+
+.statistics-bar-fill {
+    height: 100%;
+    background: #8fb5c9;
+}
+
+.statistics-term-meta {
+    color: #9AA7B0;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.statistics-history-section {
+    margin-top: 1.5rem;
+}
+
+.statistics-history-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.statistics-item-list {
+    margin-bottom: 1.5rem;
+}
+
+.statistics-item-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.statistics-item-cover {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.statistics-item-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.statistics-item-title {
+    color: #d8d8d8;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.statistics-item-meta {
+    color: #9AA7B0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.statistics-item-metrics {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.statistics-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex-shrink: 0;
+}
+
+.statistics-delete-button {
+    white-space: nowrap;
 }

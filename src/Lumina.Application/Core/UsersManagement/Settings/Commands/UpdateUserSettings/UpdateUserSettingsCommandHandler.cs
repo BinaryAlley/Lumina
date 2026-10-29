@@ -66,19 +66,15 @@ public class UpdateUserSettingsCommandHandler : ICommandHandler<UpdateUserSettin
 
         if (getSettingsResult.Value is null)
         {
-            // Create the settings of the current user, since they are not stored yet.
-            Result<UserSettings> createSettingsResult = UserSettings.Create(
-                UserId.Create(userId),
-                command.IsPaginationEnabled,
-                command.ItemsPerPage,
-                command.ShouldIgnoreThePrefixForAlphaPicker,
-                command.IsThemeCachingEnabled,
-                command.ShouldAggregateMetadataWhenMissing,
-                command.ShouldAggregateArtworkWhenMissing,
-                command.ShouldRenderPdfAsImages,
-                command.ShouldPreserveBookStyles);
+            // Create the settings of the current user, since they are not stored yet. The playback state the player reports automatically is left
+            // at its default, because this command only carries the settings the user edits by hand.
+            Result<UserSettings> createSettingsResult = UserSettings.Create(UserId.Create(userId));
             if (createSettingsResult.IsFailure)
                 return createSettingsResult.Errors;
+
+            Result<Updated> applySettingsResult = ApplySettings(createSettingsResult.Value, command);
+            if (applySettingsResult.IsFailure)
+                return applySettingsResult.Errors;
 
             Result<Created> insertResult = await _unitOfWork.UserSettingsRepository.InsertAsync(createSettingsResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
             if (insertResult.IsFailure)
@@ -91,15 +87,7 @@ public class UpdateUserSettingsCommandHandler : ICommandHandler<UpdateUserSettin
             if (toDomainEntityResult.IsFailure)
                 return toDomainEntityResult.Errors;
 
-            Result<Updated> updateSettingsResult = toDomainEntityResult.Value.UpdateSettings(
-                command.IsPaginationEnabled,
-                command.ItemsPerPage,
-                command.ShouldIgnoreThePrefixForAlphaPicker,
-                command.IsThemeCachingEnabled,
-                command.ShouldAggregateMetadataWhenMissing,
-                command.ShouldAggregateArtworkWhenMissing,
-                command.ShouldRenderPdfAsImages,
-                command.ShouldPreserveBookStyles);
+            Result<Updated> updateSettingsResult = ApplySettings(toDomainEntityResult.Value, command);
             if (updateSettingsResult.IsFailure)
                 return updateSettingsResult.Errors;
 
@@ -113,5 +101,38 @@ public class UpdateUserSettingsCommandHandler : ICommandHandler<UpdateUserSettin
             return saveChangesResult.Errors;
 
         return Result.Updated;
+    }
+
+    /// <summary>
+    /// Applies the values carried by <paramref name="command"/> to the settings of the current user.
+    /// </summary>
+    /// <param name="settings">The settings of the current user to update.</param>
+    /// <param name="command">The command carrying the new values of the settings.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful update, or an error.</returns>
+    private static Result<Updated> ApplySettings(UserSettings settings, UpdateUserSettingsCommand command)
+    {
+        return settings.UpdateSettings(
+            command.IsPaginationEnabled,
+            command.ItemsPerPage,
+            command.ShouldIgnoreThePrefixForAlphaPicker,
+            command.IsThemeCachingEnabled,
+            command.ShouldAggregateMetadataWhenMissing,
+            command.ShouldAggregateArtworkWhenMissing,
+            command.ShouldRenderPdfAsImages,
+            command.ShouldPreserveBookStyles,
+            command.ShouldKeepDownloadingWhilePaused!.Value,
+            command.ShouldAutoplay!.Value,
+            command.IsGaplessPlaybackEnabled!.Value,
+            command.ReplayGainMode!.Value,
+            command.StreamingQuality!.Value,
+            command.VuMeterOrientation!.Value,
+            command.VuMeterSegmentCount!.Value,
+            command.VuMeterSegmentGap!.Value,
+            command.VuMeterMediumThreshold!.Value,
+            command.VuMeterHighThreshold!.Value,
+            command.VuMeterShowPeak!.Value,
+            command.VuMeterPeakHoldDurationInMilliseconds!.Value,
+            command.VuMeterReleasePerSecond!.Value,
+            command.VuMeterPeakReleasePerSecond!.Value);
     }
 }

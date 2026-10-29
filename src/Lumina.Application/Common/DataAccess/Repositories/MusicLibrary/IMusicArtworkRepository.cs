@@ -28,6 +28,15 @@ public interface IMusicArtworkRepository : IRepository<MusicArtworkEntity>,
     Task<Result<IReadOnlyList<MusicArtworkEntity>>> GetByOwnerAsync(MusicArtworkOwnerType ownerType, Guid ownerId, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Gets the pieces of artwork owned by the music library items of the provided <paramref name="ownerType"/> identified by any of <paramref name="ownerIds"/>.
+    /// </summary>
+    /// <param name="ownerType">The type of the music library items that own the artwork.</param>
+    /// <param name="ownerIds">The Ids of the music library items that own the artwork.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the artwork of the existing owners, or an error.</returns>
+    Task<Result<IReadOnlyList<MusicArtworkEntity>>> GetByOwnersAsync(MusicArtworkOwnerType ownerType, IReadOnlyCollection<Guid> ownerIds, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Deletes all the pieces of artwork owned by the music library item of the provided <paramref name="ownerType"/> identified by <paramref name="ownerId"/>.
     /// </summary>
     /// <param name="ownerType">The type of the music library item that owns the artwork.</param>

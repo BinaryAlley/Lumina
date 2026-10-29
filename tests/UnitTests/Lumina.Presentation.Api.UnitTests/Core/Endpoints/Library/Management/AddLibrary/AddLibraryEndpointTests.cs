@@ -86,7 +86,9 @@ public class AddLibraryEndpointTests
     public async Task ExecuteAsync_WhenCalled_ShouldSendAddLibraryCommandToSender()
     {
         // Arrange
-        AddLibraryRequest request = _addLibraryRequestFixture.Create();
+        AddLibraryRequest request = _addLibraryRequestFixture.Create(
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: 65);
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<AddLibraryCommand>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(_libraryResponseFixture.Create()));
@@ -105,7 +107,31 @@ public class AddLibraryEndpointTests
                 command.IsLocked == request.IsLocked &&
                 command.CanDownloadMetadataFromWeb == request.CanDownloadMetadataFromWeb &&
                 command.ShouldSaveMetadataInMediaDirectories == request.ShouldSaveMetadataInMediaDirectories &&
-                command.ShouldSkipUnchangedDirectoriesDuringScan == request.ShouldSkipUnchangedDirectoriesDuringScan),
+                command.ShouldSkipUnchangedDirectoriesDuringScan == request.ShouldSkipUnchangedDirectoriesDuringScan &&
+                command.ShouldTrackConsumptionProgress == request.ShouldTrackConsumptionProgress &&
+                command.CompletionThresholdPercentage == request.CompletionThresholdPercentage),
+            Arg.Is(cancellationToken));
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenConsumptionSettingsAreAbsent_ShouldSendNullConsumptionSettings()
+    {
+        // Arrange
+        AddLibraryRequest request = _addLibraryRequestFixture.Create(
+            shouldTrackConsumptionProgress: null,
+            completionThresholdPercentage: null);
+        CancellationToken cancellationToken = CancellationToken.None;
+        _mockHandler.HandleAsync(Arg.Any<AddLibraryCommand>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(_libraryResponseFixture.Create()));
+
+        // Act
+        await _sut.ExecuteAsync(request, cancellationToken);
+
+        // Assert
+        await _mockHandler.Received(1).HandleAsync(
+            Arg.Is<AddLibraryCommand>(command =>
+                command.ShouldTrackConsumptionProgress == null &&
+                command.CompletionThresholdPercentage == null),
             Arg.Is(cancellationToken));
     }
 

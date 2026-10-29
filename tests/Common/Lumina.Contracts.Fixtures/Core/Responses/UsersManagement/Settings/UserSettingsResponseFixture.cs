@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
 using Lumina.Contracts.Responses.UsersManagement.Settings;
+using Lumina.Domain.SharedKernel.Common.Enums.Playback;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -29,6 +30,20 @@ public class UserSettingsResponseFixture
     /// <param name="shouldAggregateArtworkWhenMissing">Optional. Whether the artwork of the media library items is aggregated from multiple providers, when it is missing.</param>
     /// <param name="shouldRenderPdfAsImages">Optional. Whether PDF books are rendered as page images for the user.</param>
     /// <param name="shouldPreserveBookStyles">Optional. Whether the styles of the book content are preserved when it is rendered for the user.</param>
+    /// <param name="shouldKeepDownloadingWhilePaused">Optional. Whether the player keeps downloading a track while playback is paused.</param>
+    /// <param name="shouldAutoplay">Optional. Whether the player continues playback at the end of an album or artist.</param>
+    /// <param name="isGaplessPlaybackEnabled">Optional. Whether the player transitions between consecutive tracks without a gap.</param>
+    /// <param name="replayGainMode">Optional. The way ReplayGain normalization is applied to the tracks the user plays.</param>
+    /// <param name="streamingQuality">Optional. The quality cap applied to the audio the server normalizes for the user.</param>
+    /// <param name="vuMeterOrientation">Optional. The direction in which each channel of the VU meter of the audio player grows.</param>
+    /// <param name="vuMeterSegmentCount">Optional. The number of segments each channel of the VU meter is divided into.</param>
+    /// <param name="vuMeterSegmentGap">Optional. The gap, in pixels, between the segments and the channels of the VU meter.</param>
+    /// <param name="vuMeterMediumThreshold">Optional. The level above which a segment of the VU meter is drawn with its medium state.</param>
+    /// <param name="vuMeterHighThreshold">Optional. The level above which a segment of the VU meter is drawn with its high state.</param>
+    /// <param name="vuMeterShowPeak">Optional. Whether the VU meter holds the peak level of each channel after it falls.</param>
+    /// <param name="vuMeterPeakHoldDurationInMilliseconds">Optional. The time a peak of the VU meter is held before it starts falling.</param>
+    /// <param name="vuMeterReleasePerSecond">Optional. The number of level units the display of the VU meter falls per second when the input level drops.</param>
+    /// <param name="vuMeterPeakReleasePerSecond">Optional. The number of level units the peak of the VU meter falls per second after its hold time elapsed.</param>
     /// <returns>The created <see cref="UserSettingsResponse"/>.</returns>
     public UserSettingsResponse Create(
         Guid? userId = null,
@@ -39,8 +54,25 @@ public class UserSettingsResponseFixture
         bool? shouldAggregateMetadataWhenMissing = null,
         bool? shouldAggregateArtworkWhenMissing = null,
         bool? shouldRenderPdfAsImages = null,
-        bool? shouldPreserveBookStyles = null)
+        bool? shouldPreserveBookStyles = null,
+        bool? shouldKeepDownloadingWhilePaused = null,
+        bool? shouldAutoplay = null,
+        bool? isGaplessPlaybackEnabled = null,
+        ReplayGainMode? replayGainMode = null,
+        PlaybackStreamingQuality? streamingQuality = null,
+        VuMeterOrientation? vuMeterOrientation = null,
+        int? vuMeterSegmentCount = null,
+        int? vuMeterSegmentGap = null,
+        double? vuMeterMediumThreshold = null,
+        double? vuMeterHighThreshold = null,
+        bool? vuMeterShowPeak = null,
+        int? vuMeterPeakHoldDurationInMilliseconds = null,
+        double? vuMeterReleasePerSecond = null,
+        double? vuMeterPeakReleasePerSecond = null)
     {
+        // The high threshold is generated from the medium one, so a randomized response always describes a valid meter.
+        double mediumThreshold = vuMeterMediumThreshold ?? _faker.Random.Double(0, 1);
+        double highThreshold = vuMeterHighThreshold ?? _faker.Random.Double(mediumThreshold, 1);
         return new UserSettingsResponse(
             userId ?? Guid.NewGuid(),
             isPaginationEnabled ?? _faker.Random.Bool(),
@@ -50,7 +82,21 @@ public class UserSettingsResponseFixture
             shouldAggregateMetadataWhenMissing ?? _faker.Random.Bool(),
             shouldAggregateArtworkWhenMissing ?? _faker.Random.Bool(),
             shouldRenderPdfAsImages ?? _faker.Random.Bool(),
-            shouldPreserveBookStyles ?? _faker.Random.Bool());
+            shouldPreserveBookStyles ?? _faker.Random.Bool(),
+            shouldKeepDownloadingWhilePaused ?? _faker.Random.Bool(),
+            shouldAutoplay ?? _faker.Random.Bool(),
+            isGaplessPlaybackEnabled ?? _faker.Random.Bool(),
+            replayGainMode ?? _faker.PickRandom<ReplayGainMode>(),
+            streamingQuality ?? _faker.PickRandom<PlaybackStreamingQuality>(),
+            vuMeterOrientation ?? _faker.PickRandom<VuMeterOrientation>(),
+            vuMeterSegmentCount ?? _faker.Random.Int(1, 128),
+            vuMeterSegmentGap ?? _faker.Random.Int(0, 32),
+            mediumThreshold,
+            highThreshold,
+            vuMeterShowPeak ?? _faker.Random.Bool(),
+            vuMeterPeakHoldDurationInMilliseconds ?? _faker.Random.Int(0, 10000),
+            vuMeterReleasePerSecond ?? _faker.Random.Double(0, 100),
+            vuMeterPeakReleasePerSecond ?? _faker.Random.Double(0, 100));
     }
 
     /// <summary>

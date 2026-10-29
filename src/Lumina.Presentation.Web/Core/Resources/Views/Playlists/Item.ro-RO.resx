@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Play" xml:space="preserve">
+    <value>Redă</value>
+  </data>
+  <data name="PlayPlaylist" xml:space="preserve">
+    <value>Redă lista de redare</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Salvează</value>
+  </data>
+  <data name="Saved" xml:space="preserve">
+    <value>Lista de redare a fost salvată.</value>
+  </data>
+  <data name="SaveFailed" xml:space="preserve">
+    <value>Lista de redare nu a putut fi salvată.</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Șterge</value>
+  </data>
+  <data name="DeleteConfirm" xml:space="preserve">
+    <value>Ștergi această listă de redare? Această acțiune nu poate fi anulată.</value>
+  </data>
+  <data name="DeleteFailed" xml:space="preserve">
+    <value>Lista de redare nu a putut fi ștearsă.</value>
+  </data>
+  <data name="BackToPlaylists" xml:space="preserve">
+    <value>Înapoi la liste de redare</value>
+  </data>
+  <data name="Tracks" xml:space="preserve">
+    <value>Piese</value>
+  </data>
+  <data name="NoTracks" xml:space="preserve">
+    <value>Această listă de redare nu are încă piese.</value>
+  </data>
+  <data name="AddTrack" xml:space="preserve">
+    <value>Adaugă o piesă</value>
+  </data>
+  <data name="Library" xml:space="preserve">
+    <value>Bibliotecă</value>
+  </data>
+  <data name="Artist" xml:space="preserve">
+    <value>Artist</value>
+  </data>
+  <data name="Album" xml:space="preserve">
+    <value>Album</value>
+  </data>
+  <data name="Track" xml:space="preserve">
+    <value>Piesă</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Adaugă</value>
+  </data>
+  <data name="AddFailed" xml:space="preserve">
+    <value>Piesa nu a putut fi adăugată.</value>
+  </data>
+  <data name="RefreshFailed" xml:space="preserve">
+    <value>Lista de redare a fost actualizată, dar lista nu a putut fi reîmprospătată. Reîncarcă pagina pentru a vedea modificarea.</value>
+  </data>
+  <data name="SelectLibrary" xml:space="preserve">
+    <value>Selectează o bibliotecă</value>
+  </data>
+  <data name="SelectArtist" xml:space="preserve">
+    <value>Selectează un artist</value>
+  </data>
+  <data name="SelectAlbum" xml:space="preserve">
+    <value>Selectează un album</value>
+  </data>
+  <data name="SelectTrack" xml:space="preserve">
+    <value>Selectează o piesă</value>
+  </data>
+  <data name="MoveUp" xml:space="preserve">
+    <value>Mută în sus</value>
+  </data>
+  <data name="MoveDown" xml:space="preserve">
+    <value>Mută în jos</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Elimină</value>
+  </data>
+  <data name="RemoveConfirm" xml:space="preserve">
+    <value>Elimini această piesă din lista de redare?</value>
+  </data>
+  <data name="RemoveFailed" xml:space="preserve">
+    <value>Piesa nu a putut fi eliminată.</value>
+  </data>
+  <data name="ReorderFailed" xml:space="preserve">
+    <value>Lista de redare nu a putut fi reordonată.</value>
+  </data>
+  <data name="UnavailableTrack" xml:space="preserve">
+    <value>Piesă indisponibilă</value>
+  </data>
+  <data name="PlaylistNameRequired" xml:space="preserve">
+    <value>O listă de redare are nevoie de un nume.</value>
+  </data>
+  <data name="NothingToPlay" xml:space="preserve">
+    <value>Această listă de redare nu conține piese care pot fi redate.</value>
+  </data>
+  <data name="PlayerUnavailable" xml:space="preserve">
+    <value>Playerul audio nu este disponibil.</value>
+  </data>
+  <data name="EditDetails" xml:space="preserve">
+    <value>Detalii listă de redare</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Nume</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Descriere</value>
+  </data>
+  <data name="NoMusicLibraries" xml:space="preserve">
+    <value>Nu ai încă biblioteci muzicale.</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Se încarcă...</value>
+  </data>
+  <data name="DragToReorder" xml:space="preserve">
+    <value>Trage pentru a reordona</value>
+  </data>
+  <data name="CreatePlaylist" xml:space="preserve">
+    <value>Creează listă de redare</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Anulează</value>
+  </data>
+  <data name="LoadMore" xml:space="preserve">
+    <value>Încarcă mai multe</value>
+  </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>Adaugă în listă de redare</value>
+  </data>
+</root>

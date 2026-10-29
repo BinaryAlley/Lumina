@@ -92,6 +92,34 @@ public class MusicMetadataAggregatorTests
     }
 
     [Fact]
+    public void Merge_WhenTheFirstAudioMetadataHasAContainer_ShouldKeepTheFirstContainer()
+    {
+        // Arrange
+        AudioMetadataDto first = _audioMetadataDtoFixture.Create(container: "MP3");
+        AudioMetadataDto second = _audioMetadataDtoFixture.Create(container: "FLAC");
+
+        // Act
+        AudioMetadataDto merged = MusicMetadataAggregator.Merge(first, second);
+
+        // Assert
+        Assert.Equal("MP3", merged.Container);
+    }
+
+    [Fact]
+    public void Merge_WhenTheFirstAudioMetadataHasNoContainer_ShouldTakeTheSecondContainer()
+    {
+        // Arrange
+        AudioMetadataDto first = _audioMetadataDtoFixture.Create(includeContainer: false);
+        AudioMetadataDto second = _audioMetadataDtoFixture.Create(container: "FLAC");
+
+        // Act
+        AudioMetadataDto merged = MusicMetadataAggregator.Merge(first, second);
+
+        // Assert
+        Assert.Equal("FLAC", merged.Container);
+    }
+
+    [Fact]
     public void Merge_WhenTheFirstMetadataHasOnlyAReleaseYearAndTheSecondHasAReleaseDate_ShouldDeriveTheYearFromTheDate()
     {
         // Arrange

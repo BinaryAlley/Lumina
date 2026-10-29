@@ -565,17 +565,15 @@ internal sealed class ArtistRepository : IArtistRepository
         if (filterSpecification is not null)
             artistsQuery = artistsQuery.Where(filterSpecification.ToExpression());
 
+        // The cover of the artist is the cover artwork stored for it, if any, and it is exposed so that the clients can display it without loading the whole artist.
         IQueryable<ArtistLiteRow> liteRowsQuery = ApplySorting(artistsQuery, sortBy, sortOrder ?? SortOrder.Ascending, libraryFilter.ShouldIgnoreThePrefixForAlphaPicker)
-            .Select(artist => new ArtistLiteRow
-            {
-                Id = artist.Id,
-                Name = artist.Name,
-                // The cover of the artist is the cover artwork stored for it, if any, and it is exposed so that the clients can display it without loading the whole artist.
-                CoverPath = _luminaDbContext.MusicArtwork
+            .Select(artist => new ArtistLiteRow(
+                artist.Id,
+                artist.Name,
+                _luminaDbContext.MusicArtwork
                     .Where(artwork => artwork.OwnerType == MusicArtworkOwnerType.Artist && artwork.OwnerId == artist.Id && artwork.ArtworkType == ArtworkType.Cover)
                     .Select(artwork => artwork.FileName)
-                    .FirstOrDefault()
-            });
+                    .FirstOrDefault()));
 
         // If no pagination was requested, return all the artists of the library.
         if (paginationData is null)

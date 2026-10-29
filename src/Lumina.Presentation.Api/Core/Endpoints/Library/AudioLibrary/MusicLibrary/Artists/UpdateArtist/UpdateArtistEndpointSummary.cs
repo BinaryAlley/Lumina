@@ -546,6 +546,7 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                     new AlbumResponse(
                         Id: albumId,
                         ArtistId: artistId,
+                        ArtistName: "Queen",
                         LibraryId: libraryId,
                         Metadata: new MusicAlbumMetadataDto(
                             Title: "A Night at the Opera",
@@ -630,6 +631,7 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                                 AlbumId: albumId,
                                 LibraryId: libraryId,
                                 Path: "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
+                                Container: "FLAC",
                                 Metadata: new MusicTrackMetadataDto(
                                     Title: "Bohemian Rhapsody",
                                     OriginalTitle: "Bohemian Rhapsody",
@@ -728,6 +730,7 @@ public class UpdateArtistEndpointSummary : Summary<UpdateArtistEndpoint, UpdateA
                                 AlbumId: albumId,
                                 LibraryId: libraryId,
                                 Path: "/music/queen/a-night-at-the-opera/07-youre-my-best-friend.flac",
+                                Container: "FLAC",
                                 Metadata: new MusicTrackMetadataDto(
                                     Title: "You're My Best Friend",
                                     OriginalTitle: "You're My Best Friend",

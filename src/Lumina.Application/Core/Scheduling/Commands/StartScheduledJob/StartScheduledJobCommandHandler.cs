@@ -11,7 +11,6 @@ using Lumina.Contracts.Responses.Scheduling;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
-using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -76,7 +75,7 @@ public class StartScheduledJobCommandHandler : ICommandHandler<StartScheduledJob
         Guid userId = currentUserId.Value;
 
         // Only administrators can start scheduled jobs.
-        if (!await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false))
+        if (!await _authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false))
             return ApplicationErrors.Authorization.NotAuthorized;
 
         // Get the scheduled job from the storage medium.

@@ -518,6 +518,7 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists
           "albumId": "e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f",
           "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
           "path": "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
+          "container": "FLAC",
           "metadata": {
             "title": "Bohemian Rhapsody",
             "originalTitle": "Bohemian Rhapsody",
@@ -596,6 +597,7 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists
           "albumId": "e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f",
           "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
           "path": "/music/queen/a-night-at-the-opera/07-youre-my-best-friend.flac",
+          "container": "FLAC",
           "metadata": {
             "title": "You're My Best Friend",
             "originalTitle": "You're My Best Friend",
@@ -865,6 +867,7 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists?currentPage=1&
               "albumId": "e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f",
               "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
               "path": "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
+              "container": "FLAC",
               "metadata": {
                 "title": "Bohemian Rhapsody",
                 "originalTitle": "Bohemian Rhapsody",
@@ -943,6 +946,7 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists?currentPage=1&
               "albumId": "e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f",
               "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
               "path": "/music/queen/a-night-at-the-opera/07-youre-my-best-friend.flac",
+              "container": "FLAC",
               "metadata": {
                 "title": "You're My Best Friend",
                 "originalTitle": "You're My Best Friend",
@@ -1252,6 +1256,7 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
           "albumId": "e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f",
           "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
           "path": "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
+          "container": "FLAC",
           "metadata": {
             "title": "Bohemian Rhapsody",
             "originalTitle": "Bohemian Rhapsody",
@@ -1330,6 +1335,7 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
           "albumId": "e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f",
           "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
           "path": "/music/queen/a-night-at-the-opera/07-youre-my-best-friend.flac",
+          "container": "FLAC",
           "metadata": {
             "title": "You're My Best Friend",
             "originalTitle": "You're My Best Friend",
@@ -1916,6 +1922,7 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
           "albumId": "e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f",
           "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
           "path": "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
+          "container": "FLAC",
           "metadata": {
             "title": "Bohemian Rhapsody",
             "originalTitle": "Bohemian Rhapsody",
@@ -1994,6 +2001,7 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
           "albumId": "e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f",
           "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
           "path": "/music/queen/a-night-at-the-opera/07-youre-my-best-friend.flac",
+          "container": "FLAC",
           "metadata": {
             "title": "You're My Best Friend",
             "originalTitle": "You're My Best Friend",

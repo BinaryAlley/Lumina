@@ -1,9 +1,12 @@
 @using Lumina.Presentation.Web.Common.DTO.Configuration
+@using Lumina.Presentation.Web.Common.Routes
+@using Lumina.Presentation.Web.Common.Services
 @using Microsoft.Extensions.Localization
 @using Microsoft.Extensions.Options
 
 @inject IStringLocalizerFactory _stringLocalizerFactory
 @inject IOptions<ServerConfigurationDto> _serverConfigurationModel
+@inject IUrlService _urlService
 
 @{
     IStringLocalizer localizer = _stringLocalizerFactory.Create("Lumina.Presentation.Web.Views.Shared._Layout", "Lumina.Presentation.Web");
@@ -30,9 +33,133 @@
         error: '@localizer["Error"]',
         information: '@localizer["Information"]'
     };
+    // The endpoints the audio player reads the stored playback preferences of the user from, writes the volume and mute
+    // state it changes back to, and fetches the playback manifest of a track from, together with the stream route
+    // template the manifest path must match. The routes are the culture aware web routes, so the player never hardcodes
+    // a path, and it never reaches the API server directly. The consumption route templates carry their named identifiers
+    // unreplaced, so the player fills in the library, the kind, the item, or the record of the session it reports.
+    var audioPlayerConfiguration = {
+        getUserSettingsUrl: '@_urlService.GetRelativeUrl(WebRoutes.Settings.GET_USER_SETTINGS)',
+        getPlaybackStateUrl: '@_urlService.GetRelativeUrl(WebRoutes.Settings.GET_PLAYBACK_STATE)',
+        updatePlaybackStateUrl: '@_urlService.GetRelativeUrl(WebRoutes.Settings.UPDATE_PLAYBACK_STATE)',
+        getPlaybackManifestUrl: '@_urlService.GetRelativeUrl(WebRoutes.Music.GET_PLAYBACK_MANIFEST)',
+        streamTrackRouteTemplate: '@_urlService.GetRelativeUrl(WebRoutes.Music.STREAM_TRACK)',
+        streamTrackSegmentRouteTemplate: '@_urlService.GetRelativeUrl(WebRoutes.Music.STREAM_TRACK_SEGMENT)',
+        startConsumptionRouteTemplate: '@_urlService.GetRelativeUrl(WebRoutes.MediaConsumption.START_CONSUMPTION)',
+        reportConsumptionProgressRouteTemplate: '@_urlService.GetRelativeUrl(WebRoutes.MediaConsumption.REPORT_CONSUMPTION_PROGRESS)',
+        completeConsumptionRouteTemplate: '@_urlService.GetRelativeUrl(WebRoutes.MediaConsumption.COMPLETE_CONSUMPTION)',
+        stopConsumptionRouteTemplate: '@_urlService.GetRelativeUrl(WebRoutes.MediaConsumption.STOP_CONSUMPTION)',
+        // The endpoints the queue of the player is built from: the releases of an artist, the tracks of a release, and the
+        // artists of a library, which are also the endpoints the autoplay continuation and the library shuffle use. The
+        // queue script documents which context uses which endpoint, and appends the library and pagination query parameters.
+        getArtistsUrl: '@_urlService.GetRelativeUrl(WebRoutes.Music.GET_ARTISTS)',
+        getArtistAlbumsUrl: '@_urlService.GetRelativeUrl(WebRoutes.Music.GET_ARTIST_ALBUMS)',
+        getAlbumTracksUrl: '@_urlService.GetRelativeUrl(WebRoutes.Music.GET_ALBUM_TRACKS)',
+        // The full album details, used by the expanded player for the release labels and the artwork carousel of the
+        // current track's album. The route carries the artist and album Ids, and the library Id is a query parameter.
+        getAlbumUrl: '@_urlService.GetRelativeUrl(WebRoutes.Music.GET_ALBUM)',
+        // The endpoint that draws a uniformly random batch of tracks of a library, artist or album. The server samples the
+        // database, so a shuffle of a large library never has to enumerate its albums and tracks in the browser.
+        shuffleTracksUrl: '@_urlService.GetRelativeUrl(WebRoutes.Music.SHUFFLE_TRACKS)',
+        // The playlists of the user, and the route that appends the current queue to one of them. The queue action in the
+        // expanded bar uses the first to fill its select and the second to send the ordered track Ids in one request.
+        getPlaylistsUrl: '@_urlService.GetRelativeUrl(WebRoutes.Playlists.GET_PLAYLISTS)',
+        addPlaylistEntriesRouteTemplate: '@_urlService.GetRelativeUrl(WebRoutes.Playlists.ADD_PLAYLIST_ENTRIES, new { playlistId = default(Guid) })',
+        strings: {
+            play: '@localizer["AudioPlayerPlay"]',
+            pause: '@localizer["AudioPlayerPause"]',
+            mute: '@localizer["AudioPlayerMute"]',
+            unmute: '@localizer["AudioPlayerUnmute"]',
+            volume: '@localizer["AudioPlayerVolume"]',
+            seek: '@localizer["AudioPlayerSeek"]',
+            buffering: '@localizer["AudioPlayerBuffering"]',
+            previous: '@localizer["AudioPlayerPrevious"]',
+            next: '@localizer["AudioPlayerNext"]',
+            repeat: '@localizer["AudioPlayerRepeat"]',
+            repeatOff: '@localizer["AudioPlayerRepeatOff"]',
+            repeatAll: '@localizer["AudioPlayerRepeatAll"]',
+            repeatOne: '@localizer["AudioPlayerRepeatOne"]',
+            queue: '@localizer["AudioPlayerQueue"]',
+            albumArtwork: '@localizer["AudioPlayerAlbumArtwork"]',
+            addQueueToPlaylist: '@localizer["AudioPlayerAddQueueToPlaylist"]',
+            selectPlaylist: '@localizer["AudioPlayerSelectPlaylist"]',
+            playlistQueueAdded: '@localizer["AudioPlayerPlaylistQueueAdded"]',
+            playlistQueueAddFailed: '@localizer["AudioPlayerPlaylistQueueAddFailed"]',
+            noPlaylists: '@localizer["AudioPlayerNoPlaylists"]',
+            add: '@localizer["AudioPlayerAdd"]',
+            addToPlaylist: '@localizer["PlaylistAddToPlaylist"]'
+        }
+    };
+    // The endpoints and dialog labels of the add-to-playlist actions that the music library, artist and album cards share. The route
+    // that returns the track Ids of a scope lets a whole library, artist or album be added in one batch request, and the batch
+    // route is the same one the player uses for its queue. The routes are culture aware web routes, so the pages never hardcode
+    // a path, and the dialog labels come from the global resources.
+    var playlistConfiguration = {
+        getPlaylistsUrl: '@_urlService.GetRelativeUrl(WebRoutes.Playlists.GET_PLAYLISTS)',
+        addPlaylistEntryUrl: '@_urlService.GetRelativeUrl(WebRoutes.Playlists.ADD_PLAYLIST_ENTRY, new { playlistId = default(Guid) })',
+        addScopeEntriesUrl: '@_urlService.GetRelativeUrl(WebRoutes.Playlists.ADD_PLAYLIST_SCOPE_ENTRIES, new { playlistId = default(Guid) })',
+        createPlaylistUrl: '@_urlService.GetRelativeUrl(WebRoutes.Playlists.ADD)',
+        strings: {
+            selectPlaylist: '@localizer["AudioPlayerSelectPlaylist"]',
+            noPlaylists: '@localizer["AudioPlayerNoPlaylists"]',
+            createPlaylist: '@localizer["PlaylistCreate"]',
+            tracksAdded: '@localizer["PlaylistTracksAdded"]',
+            tracksAddFailed: '@localizer["PlaylistTracksAddFailed"]',
+            noTracksToAdd: '@localizer["PlaylistNoTracksToAdd"]',
+            add: '@localizer["AudioPlayerAdd"]',
+            addToPlaylist: '@localizer["PlaylistAddToPlaylist"]'
+        }
+    };
+    // The endpoints and labels of the favorite toggles that every media page and theme template can render. The script reads which
+    // items of a kind are favorites of the current user, adds a favorite, and removes one through the culture aware web routes, so
+    // the pages never hardcode a path. The remove route is rendered with its named mediaKind and mediaItemId placeholders intact, which
+    // the script fills in, so the two values keep their meaning even if the route segment order changes. The labels are serialized as
+    // script literals, because a localized text can contain characters that would end a quoted literal.
+    var favoritesConfiguration = {
+        getFavoriteStatusUrl: '@_urlService.GetRelativeUrl(WebRoutes.Favorites.GET_FAVORITE_STATUS)',
+        addFavoriteUrl: '@_urlService.GetRelativeUrl(WebRoutes.Favorites.ADD_FAVORITE)',
+        removeFavoriteUrlTemplate: '@_urlService.GetRelativeUrl(WebRoutes.Favorites.REMOVE_FAVORITE)',
+        strings: {
+            add: @Json.Serialize(localizer["FavoritesAdd"].Value),
+            remove: @Json.Serialize(localizer["FavoritesRemove"].Value)
+        }
+    };
 </script>
+@if (User?.Identity?.IsAuthenticated == true)
+{
+    <!-- The audio player writes the volume and mute state it changes to the playback state endpoint, which validates an
+         anti-forgery token. The player is rendered only for an authenticated visitor, so the token is rendered here too,
+         once, with the global configuration, whatever the active theme is. -->
+    @Html.AntiForgeryToken()
+}
 <script src="~/libs/microsoft-signalr/signalr.min.js" asp-append-version="true"></script>
 <script defer src="~/js/notifications.js" asp-append-version="true"></script>
 <script defer src="~/js/dialogs.js" asp-append-version="true"></script>
 <script defer src="~/js/image-viewer.js" asp-append-version="true"></script>
 <script defer src="~/js/site.js" asp-append-version="true"></script>
+<script defer src="~/js/playlists.js" asp-append-version="true"></script>
+<script defer src="~/js/favorites.js" asp-append-version="true"></script>
+<script defer src="~/js/theme-client-template-engine.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-utils.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-errors.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-events.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-vu-meter.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-queue.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-download.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-render.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-decode.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-capabilities.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-demux/audio-player-demux-common.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-demux/audio-player-demux-mp3.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-demux/audio-player-demux-aac.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-demux/audio-player-demux-flac.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-demux/audio-player-demux-ogg.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-demux/audio-player-demux-wav.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-demux/audio-player-demux-capabilities.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-engine.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-manifest.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-pipeline/audio-player-pipeline-byte-source.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-pipeline/audio-player-pipeline-normalized.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-pipeline/audio-player-pipeline-schedulers.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-pipeline/audio-player-pipeline-engine.js" asp-append-version="true"></script>

@@ -275,25 +275,23 @@ internal sealed class AlbumRepository : IAlbumRepository
     public async Task<Result<PaginatedResultDto<AlbumLiteRow>>> GetAlbumsLiteByArtistIdAsync(Guid artistId, PaginationDataDto? paginationData, CancellationToken cancellationToken)
     {
         // The lightweight read models are always retrieved without tracking, because they are never modified by the caller.
+        // The release year and the release types are exposed so that the clients can group and order the releases of an artist.
+        // The cover of the album is the cover artwork stored for it, if any, and it is exposed so that the clients can display it without loading the whole album.
         IQueryable<AlbumLiteRow> liteRowsQuery = _luminaDbContext.Albums
             .AsNoTracking()
             .Where(album => album.ArtistId == artistId)
             .OrderBy(album => album.Title)
             .ThenBy(album => album.Id)
-            .Select(album => new AlbumLiteRow
-            {
-                Id = album.Id,
-                Title = album.Title,
-                TotalTracks = album.TotalTracks,
-                // The release year and the release types are exposed so that the clients can group and order the releases of an artist.
-                ReleaseYear = album.ReReleaseYear ?? album.OriginalReleaseYear,
-                ReleaseTypes = album.ReleaseTypes.Select(releaseType => releaseType.ReleaseType).ToList(),
-                // The cover of the album is the cover artwork stored for it, if any, and it is exposed so that the clients can display it without loading the whole album.
-                CoverPath = _luminaDbContext.MusicArtwork
+            .Select(album => new AlbumLiteRow(
+                album.Id,
+                album.Title,
+                album.TotalTracks,
+                _luminaDbContext.MusicArtwork
                     .Where(artwork => artwork.OwnerType == MusicArtworkOwnerType.Album && artwork.OwnerId == album.Id && artwork.ArtworkType == ArtworkType.Cover)
                     .Select(artwork => artwork.FileName)
-                    .FirstOrDefault()
-            });
+                    .FirstOrDefault(),
+                album.ReReleaseYear ?? album.OriginalReleaseYear,
+                album.ReleaseTypes.Select(releaseType => releaseType.ReleaseType).ToList()));
 
         if (paginationData is null)
         {

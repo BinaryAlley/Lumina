@@ -343,9 +343,13 @@ public sealed class Track : Entity<TrackId>
     }
 
     /// <summary>
-    /// Updates the details of the track, without touching the moods, the ISRCs, the media contributors, and the ratings.
+    /// Updates the details of the track, without touching the file system path, the moods, the ISRCs, the media contributors, and the ratings.
     /// </summary>
-    /// <param name="path">The file system path of the track.</param>
+    /// <remarks>
+    /// The file system path is intentionally not editable here: it is set only when the track is created by the scanner, so that a client
+    /// can never point an existing track at an arbitrary file of the host. The container is captured from the file itself and is not part of
+    /// an edit either, so an update that does not carry one keeps the container already stored for the track.
+    /// </remarks>
     /// <param name="metadata">The audio metadata of the track.</param>
     /// <param name="disambiguation">The optional disambiguation comment of the track.</param>
     /// <param name="trackNumber">The number of the track on its disc.</param>
@@ -359,7 +363,6 @@ public sealed class Track : Entity<TrackId>
     /// <param name="musicBrainzTrackId">The optional MusicBrainz identifier of the track.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     internal Result<Updated> UpdateDetails(
-        string path,
         AudioMetadata metadata,
         Optional<string> disambiguation,
         int trackNumber,
@@ -372,8 +375,16 @@ public sealed class Track : Entity<TrackId>
         Optional<MusicBrainzId> musicBrainzRecordingId,
         Optional<MusicBrainzId> musicBrainzTrackId)
     {
-        Path = path;
-        Metadata = metadata;
+        // The container is captured from the file itself and is never part of an edit, so an update that does not carry one keeps the stored container.
+        if (metadata.Container.HasValue)
+            Metadata = metadata;
+        else
+        {
+            Result<AudioMetadata> metadataWithStoredContainerResult = metadata.WithContainer(Metadata.Container);
+            if (metadataWithStoredContainerResult.IsFailure)
+                return metadataWithStoredContainerResult.Errors;
+            Metadata = metadataWithStoredContainerResult.Value;
+        }
         Disambiguation = disambiguation;
         TrackNumber = trackNumber;
         DiscNumber = discNumber;

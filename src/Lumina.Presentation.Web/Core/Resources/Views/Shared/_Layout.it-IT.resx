@@ -120,6 +120,27 @@
   <data name="Abort" xml:space="preserve">
     <value>Interrompi</value>
   </data>
+  <data name="AudioPlayerBuffering" xml:space="preserve">
+    <value>Caricamento in corso</value>
+  </data>
+  <data name="AudioPlayerMute" xml:space="preserve">
+    <value>Disattiva audio</value>
+  </data>
+  <data name="AudioPlayerPause" xml:space="preserve">
+    <value>Pausa</value>
+  </data>
+  <data name="AudioPlayerPlay" xml:space="preserve">
+    <value>Riproduci</value>
+  </data>
+  <data name="AudioPlayerSeek" xml:space="preserve">
+    <value>Posizione di riproduzione</value>
+  </data>
+  <data name="AudioPlayerUnmute" xml:space="preserve">
+    <value>Riattiva audio</value>
+  </data>
+  <data name="AudioPlayerVolume" xml:space="preserve">
+    <value>Volume</value>
+  </data>
   <data name="Cancel" xml:space="preserve">
     <value>Annulla</value>
   </data>
@@ -147,8 +168,8 @@
   <data name="Retry" xml:space="preserve">
     <value>Riprova</value>
   </data>
-  <data name="ToggleFullHeight" xml:space="preserve">
-    <value>Attiva/Disattiva Altezza Piena</value>
+  <data name="ToggleExpanded" xml:space="preserve">
+    <value>Espandi o comprimi il lettore</value>
   </data>
   <data name="ToggleVisibility" xml:space="preserve">
     <value>Attiva/Disattiva Visibilità</value>
@@ -158,5 +179,86 @@
   </data>
   <data name="Yes" xml:space="preserve">
     <value>Sì</value>
+  </data>
+  <data name="AudioPlayerPrevious" xml:space="preserve">
+    <value>Brano precedente</value>
+  </data>
+  <data name="AudioPlayerNext" xml:space="preserve">
+    <value>Brano successivo</value>
+  </data>
+  <data name="AudioPlayerShuffle" xml:space="preserve">
+    <value>Riproduzione casuale</value>
+  </data>
+  <data name="AudioPlayerShuffleRelease" xml:space="preserve">
+    <value>Casuale per album</value>
+  </data>
+  <data name="AudioPlayerShuffleArtist" xml:space="preserve">
+    <value>Casuale per artista</value>
+  </data>
+  <data name="AudioPlayerShuffleLibrary" xml:space="preserve">
+    <value>Casuale per libreria</value>
+  </data>
+  <data name="AudioPlayerRepeat" xml:space="preserve">
+    <value>Ripeti</value>
+  </data>
+  <data name="AudioPlayerRepeatOff" xml:space="preserve">
+    <value>Ripetizione disattivata</value>
+  </data>
+  <data name="AudioPlayerRepeatAll" xml:space="preserve">
+    <value>Ripeti tutto</value>
+  </data>
+  <data name="AudioPlayerRepeatOne" xml:space="preserve">
+    <value>Ripeti brano</value>
+  </data>
+  <data name="AudioPlayerQueue" xml:space="preserve">
+    <value>Coda di riproduzione</value>
+  </data>
+  <data name="AudioPlayerShuffleOff" xml:space="preserve">
+    <value>Riproduzione casuale disattivata</value>
+  </data>
+  <data name="AudioPlayerStop" xml:space="preserve">
+    <value>Ferma</value>
+  </data>
+  <data name="AudioPlayerAlbumArtwork" xml:space="preserve">
+    <value>Illustrazioni dell'album</value>
+  </data>
+  <data name="AudioPlayerAddQueueToPlaylist" xml:space="preserve">
+    <value>Aggiungi la coda a una playlist</value>
+  </data>
+  <data name="AudioPlayerPlaylistQueueAddFailed" xml:space="preserve">
+    <value>Non è stato possibile aggiungere la coda alla playlist.</value>
+  </data>
+  <data name="AudioPlayerSelectPlaylist" xml:space="preserve">
+    <value>Seleziona una playlist</value>
+  </data>
+  <data name="AudioPlayerAdd" xml:space="preserve">
+    <value>Aggiungi</value>
+  </data>
+  <data name="AudioPlayerPlaylistQueueAdded" xml:space="preserve">
+    <value>La coda è stata aggiunta alla playlist.</value>
+  </data>
+  <data name="AudioPlayerNoPlaylists" xml:space="preserve">
+    <value>Non hai ancora playlist.</value>
+  </data>
+  <data name="PlaylistAddToPlaylist" xml:space="preserve">
+    <value>Aggiungi alla playlist</value>
+  </data>
+  <data name="PlaylistCreate" xml:space="preserve">
+    <value>Crea playlist</value>
+  </data>
+  <data name="PlaylistTracksAdded" xml:space="preserve">
+    <value>Le tracce sono state aggiunte alla playlist.</value>
+  </data>
+  <data name="PlaylistTracksAddFailed" xml:space="preserve">
+    <value>Non è stato possibile aggiungere le tracce alla playlist.</value>
+  </data>
+  <data name="PlaylistNoTracksToAdd" xml:space="preserve">
+    <value>Non ci sono tracce da aggiungere.</value>
+  </data>
+  <data name="FavoritesAdd" xml:space="preserve">
+    <value>Aggiungi ai preferiti</value>
+  </data>
+  <data name="FavoritesRemove" xml:space="preserve">
+    <value>Rimuovi dai preferiti</value>
   </data>
 </root>

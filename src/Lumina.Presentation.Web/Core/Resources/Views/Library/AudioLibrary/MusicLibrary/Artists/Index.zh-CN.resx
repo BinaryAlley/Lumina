@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -56,5 +56,17 @@
   </data>
   <data name="DeleteFailed" xml:space="preserve">
     <value>无法删除该项目。</value>
+  </data>
+  <data name="Shuffle" xml:space="preserve">
+    <value>随机播放</value>
+  </data>
+  <data name="Play" xml:space="preserve">
+    <value>播放</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>操作</value>
+  </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>添加到播放列表</value>
   </data>
 </root>

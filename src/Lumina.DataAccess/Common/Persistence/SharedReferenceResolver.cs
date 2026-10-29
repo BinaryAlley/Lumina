@@ -17,25 +17,26 @@ namespace Lumina.DataAccess.Common.Persistence;
 /// </summary>
 /// <remarks>
 /// This is the toolkit's only concern expressed over a family of entity shapes, through the <see cref="ISharedReferenceEntity"/> marker interface:
-/// a shared reference is resolved by its name, the stored row wins over the incoming instance, and within-request duplicates are collapsed to one instance.
+/// a shared reference is resolved by its normalized name, trimmed and lowercased with the invariant culture, the stored row wins over the incoming instance,
+/// and within-request duplicates are collapsed to one instance. Differently cased spellings of the same name therefore resolve to the same row.
 /// No per-entity method is ever needed, so a new shared reference type adds no new persistence type. A shared reference whose name is null or whitespace
 /// cannot be keyed and would be lost silently, so it fails the resolution with the caller-provided error instead of being dropped.
 /// </remarks>
 internal static class SharedReferenceResolver
 {
     /// <summary>
-    /// Resolves the single <typeparamref name="TEntity"/> instance that represents each distinct name carried by <paramref name="incomingEntities"/>.
+    /// Resolves the single <typeparamref name="TEntity"/> instance that represents each distinct normalized name carried by <paramref name="incomingEntities"/>.
     /// </summary>
     /// <remarks>
     /// The stored row wins over the incoming instance, so that a shared reference that is already persisted is reused instead of inserted again. The
-    /// instances are also collapsed by name, so that a name shared by several parents of the same request is only ever tracked once.
+    /// instances are also collapsed by normalized name, so that a name shared by several parents of the same request is only ever tracked once.
     /// </remarks>
     /// <typeparam name="TEntity">The type of the shared reference entity.</typeparam>
     /// <param name="context">The Entity Framework context the stored rows are read through.</param>
     /// <param name="incomingEntities">The shared references carried by the entity that is about to be persisted.</param>
     /// <param name="invalidNameError">The error returned when a shared reference carries a name that is null or whitespace.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>A result containing either a dictionary that maps each distinct name to the single instance that represents it, or an error.</returns>
+    /// <returns>A result containing either a dictionary that maps each distinct normalized name to the single instance that represents it, or an error.</returns>
     internal static async Task<Result<IReadOnlyDictionary<string, TEntity>>> ResolveAsync<TEntity>(LuminaDbContext context, IEnumerable<TEntity> incomingEntities, Error invalidNameError, CancellationToken cancellationToken)
         where TEntity : class, ISharedReferenceEntity
     {
@@ -47,7 +48,7 @@ internal static class SharedReferenceResolver
             string? name = incomingEntity.Name;
             if (string.IsNullOrWhiteSpace(name))
                 return invalidNameError;
-            resolvedByName.TryAdd(name, incomingEntity);
+            resolvedByName.TryAdd(NormalizeName(name), incomingEntity);
         }
 
         if (resolvedByName.Count == 0)
@@ -58,10 +59,13 @@ internal static class SharedReferenceResolver
         foreach (TEntity trackedEntity in context.Set<TEntity>().Local)
         {
             string? trackedName = trackedEntity.Name;
-            if (!string.IsNullOrWhiteSpace(trackedName) && resolvedByName.ContainsKey(trackedName))
+            if (string.IsNullOrWhiteSpace(trackedName))
+                continue;
+            string normalizedTrackedName = NormalizeName(trackedName);
+            if (resolvedByName.ContainsKey(normalizedTrackedName))
             {
-                resolvedByName[trackedName] = trackedEntity;
-                namesResolvedFromTrackedEntities.Add(trackedName);
+                resolvedByName[normalizedTrackedName] = trackedEntity;
+                namesResolvedFromTrackedEntities.Add(normalizedTrackedName);
             }
         }
 
@@ -69,12 +73,13 @@ internal static class SharedReferenceResolver
         List<string> unresolvedNames = [.. resolvedByName.Keys.Where(name => !namesResolvedFromTrackedEntities.Contains(name))];
         if (unresolvedNames.Count > 0)
         {
+            // Stored names are normalized when they are written, so the normalized incoming names are matched directly against the primary key.
             List<TEntity> storedEntities = await context.Set<TEntity>()
                 .Where(entity => unresolvedNames.Contains(EF.Property<string>(entity, nameof(ISharedReferenceEntity.Name))))
                 .ToListAsync(cancellationToken).ConfigureAwait(false);
 
             foreach (TEntity storedEntity in storedEntities)
-                resolvedByName[storedEntity.Name!] = storedEntity;
+                resolvedByName[NormalizeName(storedEntity.Name!)] = storedEntity;
         }
 
         return resolvedByName;
@@ -96,10 +101,20 @@ internal static class SharedReferenceResolver
             string? name = incomingEntity.Name;
             if (string.IsNullOrWhiteSpace(name))
                 continue;
-            if (resolvedEntities.TryGetValue(name, out TEntity? resolvedEntity) && resolvedEntity is not null)
+            if (resolvedEntities.TryGetValue(NormalizeName(name), out TEntity? resolvedEntity) && resolvedEntity is not null)
                 normalizedEntities.Add(resolvedEntity);
         }
         return normalizedEntities;
+    }
+
+    /// <summary>
+    /// Normalizes a shared reference name to the form that identifies it: trimmed and lowercased with the invariant culture.
+    /// </summary>
+    /// <param name="name">The name to normalize, which must not be null or whitespace.</param>
+    /// <returns>The normalized name.</returns>
+    private static string NormalizeName(string name)
+    {
+        return name.Trim().ToLowerInvariant();
     }
 
     /// <summary>

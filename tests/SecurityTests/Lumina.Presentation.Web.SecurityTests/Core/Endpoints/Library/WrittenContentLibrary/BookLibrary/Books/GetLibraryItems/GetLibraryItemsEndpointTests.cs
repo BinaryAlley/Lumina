@@ -1,5 +1,7 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Presentation.Web.Common.DTO.Libraries;
 using Lumina.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetLibraryItems;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
 using Lumina.Presentation.Web.Fixtures.Common.DTO.Libraries;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.SecurityTests.Common.Setup;
@@ -17,7 +19,7 @@ namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.WrittenCo
 public class GetLibraryItemsEndpointTests : IClassFixture<LuminaWebFactory>
 {
     private readonly LuminaWebFactory _apiFactory;
-    private readonly PaginatedBookLiteDtoFixture _paginatedBookLiteDtoFixture = new();
+    private readonly PaginatedDtoFixture<BookLiteDto> _paginatedBookLiteDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetLibraryItemsEndpointTests"/> class.

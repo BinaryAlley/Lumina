@@ -1,7 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
+using Lumina.Presentation.Web.Common.DTO.Common;
 using Lumina.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Albums.GetArtistAlbums;
 using Lumina.Presentation.Web.Fixtures.Common.DTO.AudioLibrary.MusicLibrary;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
@@ -22,7 +24,7 @@ namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.AudioL
 public class GetArtistAlbumsEndpointTests : IClassFixture<LuminaWebFactory>
 {
     private readonly LuminaWebFactory _apiFactory;
-    private readonly PaginatedMusicAlbumLiteDtoFixture _paginatedMusicAlbumLiteDtoFixture = new();
+    private readonly PaginatedDtoFixture<MusicAlbumLiteDto> _paginatedMusicAlbumLiteDtoFixture = new();
     private readonly MusicAlbumLiteDtoFixture _musicAlbumLiteDtoFixture = new();
 
     /// <summary>
@@ -41,7 +43,7 @@ public class GetArtistAlbumsEndpointTests : IClassFixture<LuminaWebFactory>
         _apiFactory.ApiClientStub.Reset();
         Guid libraryId = Guid.NewGuid();
         Guid artistId = Guid.NewGuid();
-        PaginatedMusicAlbumLiteDto expectedResponse = _paginatedMusicAlbumLiteDtoFixture.Create(data: [_musicAlbumLiteDtoFixture.Create(title: "Test Album")]);
+        PaginatedDto<MusicAlbumLiteDto> expectedResponse = _paginatedMusicAlbumLiteDtoFixture.Create(data: [_musicAlbumLiteDtoFixture.Create(title: "Test Album")]);
         string expectedEndpoint = $"libraries/{libraryId}/artists/{artistId}/albums/lite?currentPage=1&perPage=20";
         _apiFactory.ApiClientStub.RegisterGetResponse(expectedEndpoint, expectedResponse);
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);

@@ -1506,4 +1506,22 @@
   <data name="Identifiers" xml:space="preserve">
     <value>Identifiants</value>
   </data>
+  <data name="PlayAlbum" xml:space="preserve">
+    <value>Lire l'album</value>
+  </data>
+  <data name="PlayTrack" xml:space="preserve">
+    <value>Lire la piste</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>Ajouter à la liste de lecture</value>
+  </data>
+  <data name="AddToPlayQueue" xml:space="preserve">
+    <value>Ajouter à la file d&#x27;attente</value>
+  </data>
+  <data name="PlayAllFromHere" xml:space="preserve">
+    <value>Lire tout à partir d&#x27;ici</value>
+  </data>
 </root>

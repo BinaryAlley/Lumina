@@ -69,4 +69,121 @@
   <data name="DescriptionShouldAggregateArtworkWhenMissing" xml:space="preserve">
     <value>启用后，首个图片提供程序未提供的媒体库项目图片将由后续提供程序补齐。</value>
   </data>
+  <data name="Playback" xml:space="preserve">
+    <value>播放</value>
+  </data>
+  <data name="ShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>暂停时继续下载</value>
+  </data>
+  <data name="DescriptionShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>播放暂停时播放器是否继续下载曲目直到整个文件，这样恢复播放时无需等待数据。</value>
+  </data>
+  <data name="ShouldAutoplay" xml:space="preserve">
+    <value>自动播放</value>
+  </data>
+  <data name="DescriptionShouldAutoplay" xml:space="preserve">
+    <value>专辑或艺术家播放结束后是否自动继续播放后续曲目。</value>
+  </data>
+  <data name="IsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>无缝播放</value>
+  </data>
+  <data name="DescriptionIsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>连续曲目之间是否无静默间隔地播放。</value>
+  </data>
+  <data name="ReplayGainMode" xml:space="preserve">
+    <value>ReplayGain</value>
+  </data>
+  <data name="DescriptionReplayGainMode" xml:space="preserve">
+    <value>如何对您播放的曲目应用 ReplayGain 音量标准化。</value>
+  </data>
+  <data name="ReplayGainModeOff" xml:space="preserve">
+    <value>关闭</value>
+  </data>
+  <data name="ReplayGainModeTrack" xml:space="preserve">
+    <value>按曲目</value>
+  </data>
+  <data name="ReplayGainModeAlbum" xml:space="preserve">
+    <value>按专辑</value>
+  </data>
+  <data name="StreamingQuality" xml:space="preserve">
+    <value>流媒体质量</value>
+  </data>
+  <data name="DescriptionStreamingQuality" xml:space="preserve">
+    <value>当服务器需要为播放对曲目进行标准化时应用的质量上限。直接播放永远不会被更改。</value>
+  </data>
+  <data name="StreamingQualityAuto" xml:space="preserve">
+    <value>自动</value>
+  </data>
+  <data name="StreamingQualityLow" xml:space="preserve">
+    <value>低 (96 kbps)</value>
+  </data>
+  <data name="StreamingQualityMedium" xml:space="preserve">
+    <value>中 (160 kbps)</value>
+  </data>
+  <data name="StreamingQualityHigh" xml:space="preserve">
+    <value>高 (320 kbps)</value>
+  </data>
+  <data name="DescriptionVuMeterSegmentCount" xml:space="preserve">
+    <value>VU 表的每个通道分为多少段，介于 1 到 128 之间。</value>
+  </data>
+  <data name="VuMeterPeakReleasePerSecond" xml:space="preserve">
+    <value>峰值衰落</value>
+  </data>
+  <data name="DescriptionVuMeterHighThreshold" xml:space="preserve">
+    <value>以高状态绘制段时所超过的电平，介于 0 到 1 之间。它必须大于或等于中等阈值。</value>
+  </data>
+  <data name="DescriptionVuMeterOrientation" xml:space="preserve">
+    <value>VU 表的通道是从下向上增长，还是从左向右增长。</value>
+  </data>
+  <data name="DescriptionVuMeterMediumThreshold" xml:space="preserve">
+    <value>以中等状态绘制段时所超过的电平，介于 0 到 1 之间。</value>
+  </data>
+  <data name="VuMeterOrientationVertical" xml:space="preserve">
+    <value>垂直</value>
+  </data>
+  <data name="VuMeterReleasePerSecond" xml:space="preserve">
+    <value>电平衰落</value>
+  </data>
+  <data name="VuMeterOrientationHorizontal" xml:space="preserve">
+    <value>水平</value>
+  </data>
+  <data name="VuMeterOrientation" xml:space="preserve">
+    <value>方向</value>
+  </data>
+  <data name="VuMeterHighThreshold" xml:space="preserve">
+    <value>高阈值</value>
+  </data>
+  <data name="VuMeterSegmentCount" xml:space="preserve">
+    <value>每通道段数</value>
+  </data>
+  <data name="VuMeterMediumThreshold" xml:space="preserve">
+    <value>中等阈值</value>
+  </data>
+  <data name="VuMeter" xml:space="preserve">
+    <value>VU 表</value>
+  </data>
+  <data name="VuMeterPeakHoldDuration" xml:space="preserve">
+    <value>峰值保持（毫秒）</value>
+  </data>
+  <data name="DescriptionVuMeterShowPeak" xml:space="preserve">
+    <value>每个通道是否在其最近的最大电平处保留标记。</value>
+  </data>
+  <data name="DescriptionVuMeterPeakReleasePerSecond" xml:space="preserve">
+    <value>峰值标记在保持时间过后每秒下降的电平单位数，介于 0 到 100 之间。数值越大下降越快。</value>
+  </data>
+  <data name="DescriptionVuMeterPeakHoldDuration" xml:space="preserve">
+    <value>峰值标记在开始下降之前保持的时间（以毫秒为单位），介于 0 到 10000 之间。</value>
+  </data>
+  <data name="VuMeterShowPeak" xml:space="preserve">
+    <value>显示峰值</value>
+  </data>
+  <data name="DescriptionVuMeterSegmentGap" xml:space="preserve">
+    <value>VU 表的段与通道之间的间距（以像素为单位），介于 0 到 32 之间。</value>
+  </data>
+  <data name="VuMeterSegmentGap" xml:space="preserve">
+    <value>段间距</value>
+  </data>
+  <data name="DescriptionVuMeterReleasePerSecond" xml:space="preserve">
+    <value>声音下降后通道每秒下降的电平单位数，介于 0 到 100 之间。数值越大下降越快。</value>
+  </data>
 </root>

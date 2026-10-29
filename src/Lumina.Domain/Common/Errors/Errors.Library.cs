@@ -29,5 +29,7 @@ public static partial class Errors
         public static Error PathTemplateValuePartMustContainSinglePlaceholder => Error.Validation(description: nameof(PathTemplateValuePartMustContainSinglePlaceholder));
         public static Error PathTemplatePartKindNotSupportedForLibraryType => Error.Validation(description: nameof(PathTemplatePartKindNotSupportedForLibraryType));
         public static Error PathTemplateIsNotSupportedForLibraryType => Error.Validation(description: nameof(PathTemplateIsNotSupportedForLibraryType));
+        public static Error CompletionThresholdPercentageMustBeNullWhenProgressTrackingIsOff => Error.Validation(description: nameof(CompletionThresholdPercentageMustBeNullWhenProgressTrackingIsOff));
+        public static Error CompletionThresholdPercentageMustBeBetweenZeroAndOneHundred => Error.Validation(description: nameof(CompletionThresholdPercentageMustBeBetweenZeroAndOneHundred));
     }
 }

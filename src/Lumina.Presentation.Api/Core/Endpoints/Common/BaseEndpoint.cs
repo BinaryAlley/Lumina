@@ -45,16 +45,20 @@ public abstract class BaseEndpoint<TRequest, TResponse> : Endpoint<TRequest, TRe
     protected IResult Problem(Error error)
     {
         Dictionary<string, object?> extensionsDictionary = [];
-        int statusCode = error.Type switch
-        {
-            ErrorType.Validation => StatusCodes.Status400BadRequest,
-            ErrorType.Unauthorized => StatusCodes.Status403Forbidden, // DO NOT return Status401Unauthorized, that actually means lack of valid authentication credentials (not logged in)
-            ErrorType.Failure => StatusCodes.Status403Forbidden,
-            ErrorType.Forbidden => StatusCodes.Status403Forbidden,
-            ErrorType.NotFound => StatusCodes.Status404NotFound,
-            ErrorType.Conflict => StatusCodes.Status409Conflict,
-            _ => StatusCodes.Status500InternalServerError,
-        };
+        // A resource that is temporarily unavailable is a transient condition of the server, not an unexpected failure, so it is reported as
+        // unavailable rather than as an internal error. A client can retry it, and the playback player does.
+        int statusCode = error is ResourceUnavailableError
+            ? StatusCodes.Status503ServiceUnavailable
+            : error.Type switch
+            {
+                ErrorType.Validation => StatusCodes.Status400BadRequest,
+                ErrorType.Unauthorized => StatusCodes.Status403Forbidden, // DO NOT return Status401Unauthorized, that actually means lack of valid authentication credentials (not logged in)
+                ErrorType.Failure => StatusCodes.Status403Forbidden,
+                ErrorType.Forbidden => StatusCodes.Status403Forbidden,
+                ErrorType.NotFound => StatusCodes.Status404NotFound,
+                ErrorType.Conflict => StatusCodes.Status409Conflict,
+                _ => StatusCodes.Status500InternalServerError,
+            };
 
         extensionsDictionary["traceId"] = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
 
@@ -79,15 +83,11 @@ public abstract class BaseEndpoint<TRequest, TResponse> : Endpoint<TRequest, TRe
 
         // populate the errors dictionary with error codes and their descriptions
         foreach (Error error in errors)
-        {
             if (!errorsDictionary.TryGetValue(error.Code, out string[]? value))
                 errorsDictionary.Add(error.Code, [error.Description]);
             else
-            {
                 if (!errorsDictionary[error.Code].Contains(error.Description))
                     errorsDictionary[error.Code] = [.. value, error.Description];
-            }
-        }
 
         // add trace identifier to the extensions dictionary for tracing purposes
         extensionsDictionary["traceId"] = Activity.Current?.Id ?? HttpContext.TraceIdentifier;

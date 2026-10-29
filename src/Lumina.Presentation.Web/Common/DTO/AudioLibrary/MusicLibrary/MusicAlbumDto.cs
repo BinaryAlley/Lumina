@@ -27,6 +27,11 @@ public class MusicAlbumDto
     public Guid ArtistId { get; set; }
 
     /// <summary>
+    /// Gets or sets the name of the artist the album belongs to.
+    /// </summary>
+    public string ArtistName { get; set; } = string.Empty;
+
+    /// <summary>
     /// Gets or sets the Id of the media library this album belongs to.
     /// </summary>
     public Guid LibraryId { get; set; }

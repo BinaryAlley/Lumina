@@ -33,7 +33,23 @@ public static class UserSettingsEntityMapping
             repositoryEntity.ShouldAggregateMetadataWhenMissing,
             repositoryEntity.ShouldAggregateArtworkWhenMissing,
             repositoryEntity.ShouldRenderPdfAsImages,
-            repositoryEntity.ShouldPreserveBookStyles
+            repositoryEntity.ShouldPreserveBookStyles,
+            repositoryEntity.ShouldKeepDownloadingWhilePaused,
+            repositoryEntity.ShouldAutoplay,
+            repositoryEntity.IsGaplessPlaybackEnabled,
+            repositoryEntity.ReplayGainMode,
+            repositoryEntity.StreamingQuality,
+            repositoryEntity.VuMeterOrientation,
+            repositoryEntity.VuMeterSegmentCount,
+            repositoryEntity.VuMeterSegmentGap,
+            repositoryEntity.VuMeterMediumThreshold,
+            repositoryEntity.VuMeterHighThreshold,
+            repositoryEntity.VuMeterShowPeak,
+            repositoryEntity.VuMeterPeakHoldDurationInMilliseconds,
+            repositoryEntity.VuMeterReleasePerSecond,
+            repositoryEntity.VuMeterPeakReleasePerSecond,
+            repositoryEntity.Volume,
+            repositoryEntity.IsMuted
         );
     }
 
@@ -53,7 +69,21 @@ public static class UserSettingsEntityMapping
             repositoryEntity.ShouldAggregateMetadataWhenMissing,
             repositoryEntity.ShouldAggregateArtworkWhenMissing,
             repositoryEntity.ShouldRenderPdfAsImages,
-            repositoryEntity.ShouldPreserveBookStyles
+            repositoryEntity.ShouldPreserveBookStyles,
+            repositoryEntity.ShouldKeepDownloadingWhilePaused,
+            repositoryEntity.ShouldAutoplay,
+            repositoryEntity.IsGaplessPlaybackEnabled,
+            repositoryEntity.ReplayGainMode,
+            repositoryEntity.StreamingQuality,
+            repositoryEntity.VuMeterOrientation,
+            repositoryEntity.VuMeterSegmentCount,
+            repositoryEntity.VuMeterSegmentGap,
+            repositoryEntity.VuMeterMediumThreshold,
+            repositoryEntity.VuMeterHighThreshold,
+            repositoryEntity.VuMeterShowPeak,
+            repositoryEntity.VuMeterPeakHoldDurationInMilliseconds,
+            repositoryEntity.VuMeterReleasePerSecond,
+            repositoryEntity.VuMeterPeakReleasePerSecond
         );
     }
 }

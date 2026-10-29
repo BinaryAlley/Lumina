@@ -71,6 +71,14 @@ public class LibraryConfiguration : IEntityTypeConfiguration<LibraryEntity>
             .HasDefaultValue(null)
             .HasColumnOrder(11);
 
+        builder.Property(library => library.ShouldTrackConsumptionProgress)
+            .HasDefaultValue(false)
+            .HasColumnOrder(16);
+
+        builder.Property(library => library.CompletionThresholdPercentage)
+            .HasDefaultValue(null)
+            .HasColumnOrder(17);
+
         // one user with many libraries
         builder.HasOne(library => library.User)
             .WithMany(user => user.Libraries)

@@ -61,6 +61,7 @@ public class AudioMetadataDtoFixture
     /// <param name="channels">Optional. The number of audio channels.</param>
     /// <param name="bitDepth">Optional. The bit depth of the audio.</param>
     /// <param name="audioCodec">Optional. The audio codec used.</param>
+    /// <param name="container">Optional. The container of the audio file.</param>
     /// <param name="bitrate">Optional. The bitrate of the audio, in kbps.</param>
     /// <param name="musicBrainzRecordingId">Optional. The MusicBrainz identifier of the recording.</param>
     /// <param name="musicBrainzTrackId">Optional. The MusicBrainz identifier of the track.</param>
@@ -86,6 +87,7 @@ public class AudioMetadataDtoFixture
     /// <param name="includeChannels">Whether the channels should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeBitDepth">Whether the bit depth should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeAudioCodec">Whether the audio codec should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeContainer">Whether the container should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeBitrate">Whether the bitrate should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeMusicBrainzRecordingId">Whether the MusicBrainz recording Id should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeMusicBrainzTrackId">Whether the MusicBrainz track Id should be included, or forced to <see langword="null"/>.</param>
@@ -114,6 +116,7 @@ public class AudioMetadataDtoFixture
         int? channels = null,
         int? bitDepth = null,
         string? audioCodec = null,
+        string? container = null,
         int? bitrate = null,
         Guid? musicBrainzRecordingId = null,
         Guid? musicBrainzTrackId = null,
@@ -139,6 +142,7 @@ public class AudioMetadataDtoFixture
         bool includeChannels = true,
         bool includeBitDepth = true,
         bool includeAudioCodec = true,
+        bool includeContainer = true,
         bool includeBitrate = true,
         bool includeMusicBrainzRecordingId = true,
         bool includeMusicBrainzTrackId = true,
@@ -167,6 +171,7 @@ public class AudioMetadataDtoFixture
             includeChannels ? (channels ?? _faker.Random.Int(1, 8)) : null,
             includeBitDepth ? (bitDepth ?? _faker.Random.Int(8, 32)) : null,
             includeAudioCodec ? (audioCodec ?? _faker.Random.ArrayElement(["FLAC", "MP3", "AAC", "ALAC"])) : null,
+            includeContainer ? (container ?? _faker.Random.ArrayElement(["MP3", "FLAC", "OGG", "MP4", "AAC", "WAV"])) : null,
             includeBitrate ? (bitrate ?? _faker.Random.Int(96, 1411)) : null,
             includeMusicBrainzRecordingId ? (musicBrainzRecordingId ?? _faker.Random.Guid()) : null,
             includeMusicBrainzTrackId ? (musicBrainzTrackId ?? _faker.Random.Guid()) : null,

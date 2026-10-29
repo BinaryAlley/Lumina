@@ -1506,4 +1506,22 @@
   <data name="Identifiers" xml:space="preserve">
     <value>Ідентифікатори</value>
   </data>
+  <data name="PlayAlbum" xml:space="preserve">
+    <value>Відтворити альбом</value>
+  </data>
+  <data name="PlayTrack" xml:space="preserve">
+    <value>Відтворити трек</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Дії</value>
+  </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>Додати до списку відтворення</value>
+  </data>
+  <data name="AddToPlayQueue" xml:space="preserve">
+    <value>Додати до черги відтворення</value>
+  </data>
+  <data name="PlayAllFromHere" xml:space="preserve">
+    <value>Відтворити все звідси</value>
+  </data>
 </root>

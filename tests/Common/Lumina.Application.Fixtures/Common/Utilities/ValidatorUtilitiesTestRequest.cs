@@ -35,4 +35,8 @@ public sealed record ValidatorUtilitiesTestRequest(
     int InclusiveIntValue,
     int? InclusiveNullableIntValue,
     string? EqualValue,
-    string? EqualComparisonValue);
+    string? EqualComparisonValue,
+    string? TextualEnumValue,
+    double? NullableDoubleValue,
+    double? NullableDoubleComparisonValue,
+    double? InclusiveNullableDoubleValue);

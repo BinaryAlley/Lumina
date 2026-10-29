@@ -69,4 +69,121 @@
   <data name="DescriptionShouldAggregateArtworkWhenMissing" xml:space="preserve">
     <value>عند التفعيل، تُستكمل الأعمال الفنية لعناصر المكتبة التي لا يوفرها مزود الأعمال الفنية الأول من المزودين التاليين.</value>
   </data>
+  <data name="Playback" xml:space="preserve">
+    <value>التشغيل</value>
+  </data>
+  <data name="ShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>متابعة التنزيل أثناء الإيقاف المؤقت</value>
+  </data>
+  <data name="DescriptionShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>ما إذا كان المشغل يواصل تنزيل المقطع أثناء إيقاف التشغيل مؤقتًا، حتى الملف كاملاً، بحيث لا ينتظر الاستئناف البيانات أبدًا.</value>
+  </data>
+  <data name="ShouldAutoplay" xml:space="preserve">
+    <value>التشغيل التلقائي</value>
+  </data>
+  <data name="DescriptionShouldAutoplay" xml:space="preserve">
+    <value>ما إذا كان التشغيل يستمر تلقائيًا بالمقاطع التالية عند انتهاء الألبوم أو الفنان.</value>
+  </data>
+  <data name="IsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>تشغيل دون فواصل</value>
+  </data>
+  <data name="DescriptionIsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>ما إذا كانت المقاطع المتتالية تُشغَّل دون صمت بينها.</value>
+  </data>
+  <data name="ReplayGainMode" xml:space="preserve">
+    <value>ReplayGain</value>
+  </data>
+  <data name="DescriptionReplayGainMode" xml:space="preserve">
+    <value>كيفية تطبيق تسوية ReplayGain على المقاطع التي تشغّلها.</value>
+  </data>
+  <data name="ReplayGainModeOff" xml:space="preserve">
+    <value>إيقاف</value>
+  </data>
+  <data name="ReplayGainModeTrack" xml:space="preserve">
+    <value>لكل مقطع</value>
+  </data>
+  <data name="ReplayGainModeAlbum" xml:space="preserve">
+    <value>لكل ألبوم</value>
+  </data>
+  <data name="StreamingQuality" xml:space="preserve">
+    <value>جودة البث</value>
+  </data>
+  <data name="DescriptionStreamingQuality" xml:space="preserve">
+    <value>حد الجودة الذي يُطبَّق عندما يضطر الخادم إلى تسوية مقطع للتشغيل. لا يتغير التشغيل المباشر أبدًا.</value>
+  </data>
+  <data name="StreamingQualityAuto" xml:space="preserve">
+    <value>تلقائي</value>
+  </data>
+  <data name="StreamingQualityLow" xml:space="preserve">
+    <value>منخفضة (96 kbps)</value>
+  </data>
+  <data name="StreamingQualityMedium" xml:space="preserve">
+    <value>متوسطة (160 kbps)</value>
+  </data>
+  <data name="StreamingQualityHigh" xml:space="preserve">
+    <value>عالية (320 kbps)</value>
+  </data>
+  <data name="DescriptionVuMeterSegmentCount" xml:space="preserve">
+    <value>عدد المقاطع التي تنقسم إليها كل قناة من مقياس VU، بين 1 و128.</value>
+  </data>
+  <data name="VuMeterPeakReleasePerSecond" xml:space="preserve">
+    <value>انخفاض القمم</value>
+  </data>
+  <data name="DescriptionVuMeterHighThreshold" xml:space="preserve">
+    <value>المستوى بين 0 و1 الذي يُرسم فوقه المقطع بالحالة العالية. يجب أن يكون على الأقل مساويًا للعتبة المتوسطة.</value>
+  </data>
+  <data name="DescriptionVuMeterOrientation" xml:space="preserve">
+    <value>ما إذا كانت قنوات مقياس VU تنمو من الأسفل إلى الأعلى أو من اليسار إلى اليمين.</value>
+  </data>
+  <data name="DescriptionVuMeterMediumThreshold" xml:space="preserve">
+    <value>المستوى بين 0 و1 الذي يُرسم فوقه المقطع بالحالة المتوسطة.</value>
+  </data>
+  <data name="VuMeterOrientationVertical" xml:space="preserve">
+    <value>عمودي</value>
+  </data>
+  <data name="VuMeterReleasePerSecond" xml:space="preserve">
+    <value>انخفاض المستوى</value>
+  </data>
+  <data name="VuMeterOrientationHorizontal" xml:space="preserve">
+    <value>أفقي</value>
+  </data>
+  <data name="VuMeterOrientation" xml:space="preserve">
+    <value>الاتجاه</value>
+  </data>
+  <data name="VuMeterHighThreshold" xml:space="preserve">
+    <value>العتبة العالية</value>
+  </data>
+  <data name="VuMeterSegmentCount" xml:space="preserve">
+    <value>المقاطع لكل قناة</value>
+  </data>
+  <data name="VuMeterMediumThreshold" xml:space="preserve">
+    <value>العتبة المتوسطة</value>
+  </data>
+  <data name="VuMeter" xml:space="preserve">
+    <value>مقياس VU</value>
+  </data>
+  <data name="VuMeterPeakHoldDuration" xml:space="preserve">
+    <value>تثبيت القمم (مللي ثانية)</value>
+  </data>
+  <data name="DescriptionVuMeterShowPeak" xml:space="preserve">
+    <value>ما إذا كانت كل قناة تحتفظ بعلامة عند أعلى مستوى حديث لها.</value>
+  </data>
+  <data name="DescriptionVuMeterPeakReleasePerSecond" xml:space="preserve">
+    <value>عدد وحدات المستوى التي تنخفضها علامة القمة في الثانية بعد مدة تثبيتها، بين 0 و100. القيم الأعلى تنخفض أسرع.</value>
+  </data>
+  <data name="DescriptionVuMeterPeakHoldDuration" xml:space="preserve">
+    <value>مدة تثبيت علامة القمة بالمللي ثانية قبل أن تبدأ في الانخفاض، بين 0 و10000.</value>
+  </data>
+  <data name="VuMeterShowPeak" xml:space="preserve">
+    <value>إظهار القمم</value>
+  </data>
+  <data name="DescriptionVuMeterSegmentGap" xml:space="preserve">
+    <value>المسافة بالبكسل بين مقاطع مقياس VU وقنواته، بين 0 و32.</value>
+  </data>
+  <data name="VuMeterSegmentGap" xml:space="preserve">
+    <value>المسافة بين المقاطع</value>
+  </data>
+  <data name="DescriptionVuMeterReleasePerSecond" xml:space="preserve">
+    <value>عدد وحدات المستوى التي تنخفضها القناة في الثانية بعد انخفاض الصوت، بين 0 و100. القيم الأعلى تنخفض أسرع.</value>
+  </data>
 </root>

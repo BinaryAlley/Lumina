@@ -638,11 +638,11 @@ public sealed class Artist : AggregateRoot<ArtistId>
     /// <remarks>
     /// A track is a child entity of the artist aggregate, not an aggregate root, so it is mutated through its owning artist,
     /// which is the consistency boundary. Book is itself an aggregate root, so its update flow reconstitutes it directly
-    /// with its own Create method instead. This difference is intentional.
+    /// with its own Create method instead. This difference is intentional. The file system path of the track is never updated
+    /// here: a track path is set only when the track is created by the scanner.
     /// </remarks>
     /// <param name="album">The album the track belongs to.</param>
     /// <param name="track">The track to update.</param>
-    /// <param name="path">The file system path of the track.</param>
     /// <param name="metadata">The audio metadata of the track.</param>
     /// <param name="disambiguation">The optional disambiguation comment of the track.</param>
     /// <param name="trackNumber">The number of the track on its disc.</param>
@@ -662,7 +662,6 @@ public sealed class Artist : AggregateRoot<ArtistId>
     public Result<Updated> UpdateTrackInAlbum(
         Album album,
         Track track,
-        string path,
         AudioMetadata metadata,
         Optional<string> disambiguation,
         int trackNumber,
@@ -686,7 +685,6 @@ public sealed class Artist : AggregateRoot<ArtistId>
             return Errors.Music.TrackNotFound;
 
         track.UpdateDetails(
-            path,
             metadata,
             disambiguation,
             trackNumber,

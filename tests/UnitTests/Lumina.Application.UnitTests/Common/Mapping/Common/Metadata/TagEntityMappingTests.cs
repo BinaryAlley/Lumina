@@ -81,7 +81,22 @@ public class TagEntityMappingTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
-        Assert.Equal(entity.Name, result.Value.Name);
+        Assert.Equal("fantasy", result.Value.Name);
+    }
+
+    [Fact]
+    public void ToDomainValueObject_WhenTagNameHasSurroundingWhitespaceAndMixedCase_ShouldStoreTheTrimmedLowercaseInvariantName()
+    {
+        // Arrange
+        TagEntity entity = _tagEntityFixture.Create(name: "  InDiE  ");
+
+        // Act
+        Result<Tag> result = entity.ToDomainValueObject();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Equal("indie", result.Value.Name);
     }
 
     [Theory]
@@ -124,7 +139,7 @@ public class TagEntityMappingTests
         for (int i = 0; i < entities.Count; i++)
         {
             Assert.False(resultList[i].IsFailure);
-            Assert.Equal(entities[i].Name, resultList[i].Value.Name);
+            Assert.Equal(entities[i].Name!.ToLowerInvariant(), resultList[i].Value.Name);
         }
     }
 

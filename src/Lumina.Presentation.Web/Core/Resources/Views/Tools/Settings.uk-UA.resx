@@ -69,4 +69,121 @@
   <data name="DescriptionShouldAggregateArtworkWhenMissing" xml:space="preserve">
     <value>Коли ввімкнено, ілюстрації елементів бібліотеки, які не надає перший постачальник ілюстрацій, доповнюються від наступних постачальників.</value>
   </data>
+  <data name="Playback" xml:space="preserve">
+    <value>Відтворення</value>
+  </data>
+  <data name="ShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>Продовжувати завантаження на паузі</value>
+  </data>
+  <data name="DescriptionShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>Чи продовжує програвач завантажувати трек, поки відтворення призупинено, аж до всього файлу, щоб відновлення ніколи не чекало на дані.</value>
+  </data>
+  <data name="ShouldAutoplay" xml:space="preserve">
+    <value>Автовідтворення</value>
+  </data>
+  <data name="DescriptionShouldAutoplay" xml:space="preserve">
+    <value>Чи продовжується відтворення автоматично наступними треками після завершення альбому або виконавця.</value>
+  </data>
+  <data name="IsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>Відтворення без пауз</value>
+  </data>
+  <data name="DescriptionIsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>Чи відтворюються послідовні треки без тихої паузи між ними.</value>
+  </data>
+  <data name="ReplayGainMode" xml:space="preserve">
+    <value>ReplayGain</value>
+  </data>
+  <data name="DescriptionReplayGainMode" xml:space="preserve">
+    <value>Як нормалізація ReplayGain застосовується до треків, які ви відтворюєте.</value>
+  </data>
+  <data name="ReplayGainModeOff" xml:space="preserve">
+    <value>Вимкнено</value>
+  </data>
+  <data name="ReplayGainModeTrack" xml:space="preserve">
+    <value>Для кожного треку</value>
+  </data>
+  <data name="ReplayGainModeAlbum" xml:space="preserve">
+    <value>Для кожного альбому</value>
+  </data>
+  <data name="StreamingQuality" xml:space="preserve">
+    <value>Якість потокового передавання</value>
+  </data>
+  <data name="DescriptionStreamingQuality" xml:space="preserve">
+    <value>Обмеження якості, що застосовується, коли сервер має нормалізувати трек для відтворення. Пряме відтворення ніколи не змінюється.</value>
+  </data>
+  <data name="StreamingQualityAuto" xml:space="preserve">
+    <value>Автоматично</value>
+  </data>
+  <data name="StreamingQualityLow" xml:space="preserve">
+    <value>Низька (96 kbps)</value>
+  </data>
+  <data name="StreamingQualityMedium" xml:space="preserve">
+    <value>Середня (160 kbps)</value>
+  </data>
+  <data name="StreamingQualityHigh" xml:space="preserve">
+    <value>Висока (320 kbps)</value>
+  </data>
+  <data name="DescriptionVuMeterSegmentCount" xml:space="preserve">
+    <value>На скільки сегментів поділено кожен канал VU-метра, від 1 до 128.</value>
+  </data>
+  <data name="VuMeterPeakReleasePerSecond" xml:space="preserve">
+    <value>Спад піків</value>
+  </data>
+  <data name="DescriptionVuMeterHighThreshold" xml:space="preserve">
+    <value>Рівень від 0 до 1, вище якого сегмент малюється у високому стані. Він має бути не меншим за середній поріг.</value>
+  </data>
+  <data name="DescriptionVuMeterOrientation" xml:space="preserve">
+    <value>Чи ростуть канали VU-метра знизу вгору або зліва направо.</value>
+  </data>
+  <data name="DescriptionVuMeterMediumThreshold" xml:space="preserve">
+    <value>Рівень від 0 до 1, вище якого сегмент малюється в середньому стані.</value>
+  </data>
+  <data name="VuMeterOrientationVertical" xml:space="preserve">
+    <value>Вертикальна</value>
+  </data>
+  <data name="VuMeterReleasePerSecond" xml:space="preserve">
+    <value>Спад рівня</value>
+  </data>
+  <data name="VuMeterOrientationHorizontal" xml:space="preserve">
+    <value>Горизонтальна</value>
+  </data>
+  <data name="VuMeterOrientation" xml:space="preserve">
+    <value>Орієнтація</value>
+  </data>
+  <data name="VuMeterHighThreshold" xml:space="preserve">
+    <value>Високий поріг</value>
+  </data>
+  <data name="VuMeterSegmentCount" xml:space="preserve">
+    <value>Сегментів на канал</value>
+  </data>
+  <data name="VuMeterMediumThreshold" xml:space="preserve">
+    <value>Середній поріг</value>
+  </data>
+  <data name="VuMeter" xml:space="preserve">
+    <value>VU-метр</value>
+  </data>
+  <data name="VuMeterPeakHoldDuration" xml:space="preserve">
+    <value>Утримання піків (мс)</value>
+  </data>
+  <data name="DescriptionVuMeterShowPeak" xml:space="preserve">
+    <value>Чи залишає кожен канал позначку на своєму найгучнішому недавньому рівні.</value>
+  </data>
+  <data name="DescriptionVuMeterPeakReleasePerSecond" xml:space="preserve">
+    <value>Скільки одиниць рівня позначка піку спадає за секунду після часу утримання, від 0 до 100. Більші значення спадають швидше.</value>
+  </data>
+  <data name="DescriptionVuMeterPeakHoldDuration" xml:space="preserve">
+    <value>Скільки мілісекунд позначка піку утримується перед тим, як почати спадати, від 0 до 10000.</value>
+  </data>
+  <data name="VuMeterShowPeak" xml:space="preserve">
+    <value>Показувати піки</value>
+  </data>
+  <data name="DescriptionVuMeterSegmentGap" xml:space="preserve">
+    <value>Проміжок у пікселях між сегментами та каналами VU-метра, від 0 до 32.</value>
+  </data>
+  <data name="VuMeterSegmentGap" xml:space="preserve">
+    <value>Проміжок між сегментами</value>
+  </data>
+  <data name="DescriptionVuMeterReleasePerSecond" xml:space="preserve">
+    <value>Скільки одиниць рівня канал спадає за секунду після зниження звуку, від 0 до 100. Більші значення спадають швидше.</value>
+  </data>
 </root>

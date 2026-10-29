@@ -1,7 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
+using Lumina.Presentation.Web.Common.DTO.Common;
 using Lumina.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetAlbumTracks;
 using Lumina.Presentation.Web.Fixtures.Common.DTO.AudioLibrary.MusicLibrary;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
@@ -22,7 +24,7 @@ namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.AudioL
 public class GetAlbumTracksEndpointTests : IClassFixture<LuminaWebFactory>
 {
     private readonly LuminaWebFactory _apiFactory;
-    private readonly PaginatedMusicTrackLiteDtoFixture _paginatedMusicTrackLiteDtoFixture = new();
+    private readonly PaginatedDtoFixture<MusicTrackLiteDto> _paginatedMusicTrackLiteDtoFixture = new();
     private readonly MusicTrackLiteDtoFixture _musicTrackLiteDtoFixture = new();
 
     /// <summary>
@@ -42,7 +44,7 @@ public class GetAlbumTracksEndpointTests : IClassFixture<LuminaWebFactory>
         Guid libraryId = Guid.NewGuid();
         Guid artistId = Guid.NewGuid();
         Guid albumId = Guid.NewGuid();
-        PaginatedMusicTrackLiteDto expectedResponse = _paginatedMusicTrackLiteDtoFixture.Create(data: [_musicTrackLiteDtoFixture.Create(title: "Test Track")]);
+        PaginatedDto<MusicTrackLiteDto> expectedResponse = _paginatedMusicTrackLiteDtoFixture.Create(data: [_musicTrackLiteDtoFixture.Create(title: "Test Track")]);
         string expectedEndpoint = $"libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/lite?currentPage=1&perPage=20";
         _apiFactory.ApiClientStub.RegisterGetResponse(expectedEndpoint, expectedResponse);
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);

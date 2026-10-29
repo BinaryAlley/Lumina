@@ -120,4 +120,16 @@
   <data name="NoLibraries" xml:space="preserve">
     <value>Aucune bibliothèque</value>
   </data>
+  <data name="Shuffle" xml:space="preserve">
+    <value>Lecture aléatoire</value>
+  </data>
+  <data name="Play" xml:space="preserve">
+    <value>Lecture</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>Ajouter à la liste de lecture</value>
+  </data>
 </root>

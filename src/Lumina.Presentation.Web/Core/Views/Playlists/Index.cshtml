@@ -1,0 +1,207 @@
+@*
+    FALLBACK PLAYLISTS PAGE - READ BEFORE EDITING
+
+    This view is the application fallback of the playlists page, rendered only when the theme template of the page cannot be
+    loaded. On a healthy site the page comes from the theme's playlists/index template. It keeps the DOM contract and the client
+    script the theme template mirrors, so that listing and deleting playlists keep working even without the theme.
+
+    The page only lists the playlists. Creating and editing a playlist happen on the dedicated playlist page, reached through
+    the create button or through a playlist card, the same way every other manageable resource of the application is split between a list page and an add/edit page.
+
+    To restyle the page, edit the theme files. This fallback is intentionally plain, so that a broken theme is obvious to the user while the page still functions.
+
+    /playlists
+*@
+
+@using Lumina.Presentation.Web.Common.Services
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System
+@using System.Collections.Generic
+@using System.Text.Json
+@using System.Text.Json.Serialization
+
+@inject IViewLocalizer _localizer
+@inject IUrlService _urlService
+
+@{
+    // Generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler.
+    var scriptId = ScriptIdentifierHelper.GenerateScriptId();
+    var strings = new Dictionary<string, string>
+    {
+        ["title"] = _localizer["Title"].Value,
+        ["noPlaylists"] = _localizer["NoPlaylists"].Value,
+        ["tracks"] = _localizer["Tracks"].Value,
+        ["delete"] = _localizer["Delete"].Value,
+        ["deleteConfirm"] = _localizer["DeleteConfirm"].Value,
+        ["deleteFailed"] = _localizer["DeleteFailed"].Value,
+        ["items"] = _localizer["Items"].Value
+    };
+    var jsonOptions = new JsonSerializerOptions
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        Converters = { new JsonStringEnumConverter() }
+    };
+}
+
+@Html.AntiForgeryToken()
+
+<div class="cotton-candy">
+    <div style="display: grid; grid-template-rows: auto 1fr;">
+        <div style="min-height: 1rem;"></div>
+        <div class="pl-10 pr-10 pb-10">
+            <div class="text-center">
+                <h1 class="text-light-two engraved-title">@_localizer["Title"]</h1>
+            </div>
+            <div class="form-row">
+                <span id="playlist-count" class="text-light-two"></span>
+                <button id="create-playlist-button" type="button" class="confirm-button h-22px">@_localizer["Create"]</button>
+            </div>
+            <div id="playlists-container" class="cards-container justify-start h-100"></div>
+            <p id="no-playlists" class="hidden text-light-two text-center">@_localizer["NoPlaylists"]</p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- The "text/plain" type is a design choice, not a mistake: it keeps the browser from executing this view script during HTML parsing, before site.js defines the API helpers it calls. site.js (which loads deferred) executes these scripts once it is loaded, both on the initial page load and during AJAX navigation. -->
+    <script type="text/plain" data-form="@scriptId">
+        const strings = @Html.Raw(JsonSerializer.Serialize(strings, jsonOptions));
+        const getPlaylistsUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Playlists.GET_PLAYLISTS)';
+        const addUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Playlists.ADD)';
+        const itemUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Playlists.ITEM, new { playlistId = default(Guid) })';
+        const deleteUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Playlists.DELETE_PLAYLIST, new { playlistId = default(Guid) })';
+        const EMPTY_GUID = '00000000-0000-0000-0000-000000000000';
+        const playlistsContainer = document.getElementById('playlists-container');
+        const noPlaylistsMessage = document.getElementById('no-playlists');
+        const playlistCount = document.getElementById('playlist-count');
+        const createPlaylistButton = document.getElementById('create-playlist-button');
+        let isInitialized = false;
+        let requestSequence = 0;
+
+        function buildItemUrl(playlistId) {
+            return itemUrlTemplate.replace(`/${EMPTY_GUID}`, `/${playlistId}`);
+        }
+
+        function buildDeleteUrl(playlistId) {
+            return deleteUrlTemplate.replace(`/${EMPTY_GUID}`, `/${playlistId}`);
+        }
+
+        function renderPlaylists(playlists) {
+            playlistsContainer.querySelectorAll('.media-card').forEach(card => card.remove());
+            if (!Array.isArray(playlists) || playlists.length === 0) {
+                noPlaylistsMessage.classList.remove('hidden');
+                playlistCount.textContent = '';
+                return;
+            }
+            noPlaylistsMessage.classList.add('hidden');
+            playlistCount.textContent = `${playlists.length} ${strings.items}`;
+            playlists.forEach(playlist => playlistsContainer.appendChild(createPlaylistCard(playlist)));
+        }
+
+        function createPlaylistCard(playlist) {
+            const card = document.createElement('div');
+            card.className = 'media-card';
+            card.dataset.playlistId = playlist.id;
+
+            const link = document.createElement('a');
+            link.className = 'media-panel nav-link no-underline';
+            link.href = buildItemUrl(playlist.id);
+            link.style.width = '240px';
+            link.style.height = 'auto';
+            link.style.padding = '10px';
+
+            const title = document.createElement('strong');
+            title.className = 'text-light-two';
+            title.textContent = playlist.name || strings.title;
+            title.style.display = 'block';
+            title.style.whiteSpace = 'nowrap';
+            title.style.overflow = 'hidden';
+            title.style.textOverflow = 'ellipsis';
+            link.appendChild(title);
+
+            if (playlist.description) {
+                const description = document.createElement('span');
+                description.className = 'text-light-two';
+                description.style.display = 'block';
+                description.style.opacity = '0.8';
+                description.style.marginTop = '4px';
+                description.style.whiteSpace = 'nowrap';
+                description.style.overflow = 'hidden';
+                description.style.textOverflow = 'ellipsis';
+                description.textContent = playlist.description;
+                link.appendChild(description);
+            }
+
+            const count = document.createElement('span');
+            count.className = 'text-light-two';
+            count.style.display = 'block';
+            count.style.marginTop = '8px';
+            count.textContent = `${playlist.entryCount} ${strings.tracks}`;
+            link.appendChild(count);
+
+            const deleteButton = document.createElement('button');
+            deleteButton.type = 'button';
+            deleteButton.className = 'abort-button h-22px';
+            deleteButton.style.marginTop = '8px';
+            deleteButton.textContent = strings.delete;
+            deleteButton.addEventListener('click', async event => {
+                event.preventDefault();
+                event.stopPropagation();
+                await deletePlaylistAsync(playlist.id);
+            });
+
+            card.appendChild(link);
+            card.appendChild(deleteButton);
+            return card;
+        }
+
+        async function loadPlaylistsAsync() {
+            const requestId = ++requestSequence;
+            const playlists = await callApiGetAsync(getPlaylistsUrl);
+            if (requestId !== requestSequence)
+                return;
+            if (playlists)
+                renderPlaylists(playlists);
+        }
+
+        function handlePlaylistUpdated() {
+            loadPlaylistsAsync();
+        }
+
+        async function openCreatePlaylistAsync() {
+            await updateContentAsync(addUrl, true);
+        }
+
+        async function deletePlaylistAsync(playlistId) {
+            if (await dialogService.show(strings.deleteConfirm, jsLocalizedDialogs.confirmation, DialogButtons.YES_NO, DialogIcon.QUESTION) !== DialogButton.YES)
+                return;
+            const deleted = await callApiDeleteAsync(buildDeleteUrl(playlistId));
+            if (deleted)
+                await loadPlaylistsAsync();
+            else
+                notificationService.show(strings.deleteFailed, NotificationType.ERROR);
+        }
+
+        document.addEventListener('lumina:playlist-updated', handlePlaylistUpdated);
+        if (createPlaylistButton)
+            createPlaylistButton.addEventListener('click', openCreatePlaylistAsync);
+
+        async function InitializeAsync() {
+            if (isInitialized)
+                return;
+            if (!playlistsContainer)
+                return;
+            isInitialized = true;
+            await loadPlaylistsAsync();
+        }
+
+        window.viewCleanups = window.viewCleanups || {};
+        window.viewCleanups['@scriptId'] = () => {
+            document.removeEventListener('lumina:playlist-updated', handlePlaylistUpdated);
+            if (createPlaylistButton)
+                createPlaylistButton.removeEventListener('click', openCreatePlaylistAsync);
+            console.log(`Unloaded @scriptId`);
+        };
+        console.log(`Loaded @scriptId`);
+    </script>
+}

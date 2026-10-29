@@ -36,6 +36,8 @@ public static class LibraryEntityMapping
             repositoryEntity.CanDownloadMetadataFromWeb,
             repositoryEntity.ShouldSaveMetadataInMediaDirectories,
             repositoryEntity.ShouldSkipUnchangedDirectoriesDuringScan,
+            repositoryEntity.ShouldTrackConsumptionProgress,
+            repositoryEntity.CompletionThresholdPercentage,
             [.. repositoryEntity.PathTemplateParts
                 .OrderBy(part => part.Position)
                 .Select(part => new LibraryPathTemplatePartResponse(part.Kind.ToString(), part.Representation, part.IsOptional))],
@@ -57,6 +59,8 @@ public static class LibraryEntityMapping
         if (pathTemplateResult.IsFailure)
             return pathTemplateResult.Errors;
 
+        LibraryConsumptionSettings consumptionSettings = repositoryEntity.ToDomainValueObject();
+
         return Library.Create(
             LibraryId.Create(repositoryEntity.Id),
             UserId.Create(repositoryEntity.UserId),
@@ -69,9 +73,22 @@ public static class LibraryEntityMapping
             repositoryEntity.CanDownloadMetadataFromWeb,
             repositoryEntity.ShouldSaveMetadataInMediaDirectories,
             repositoryEntity.ShouldSkipUnchangedDirectoriesDuringScan,
+            consumptionSettings,
             pathTemplateResult.Value,
             [.. repositoryEntity.LibraryScans.Select(libraryScan => ScanId.Create(libraryScan.Id))]
         );
+    }
+
+    /// <summary>
+    /// Converts the consumption settings stored on <paramref name="repositoryEntity"/> to <see cref="LibraryConsumptionSettings"/>.
+    /// </summary>
+    /// <param name="repositoryEntity">The repository entity whose consumption settings are converted.</param>
+    /// <returns>The converted consumption settings.</returns>
+    public static LibraryConsumptionSettings ToDomainValueObject(this LibraryEntity repositoryEntity)
+    {
+        return LibraryConsumptionSettings.Create(
+            repositoryEntity.ShouldTrackConsumptionProgress,
+            Optional<int>.FromNullable(repositoryEntity.CompletionThresholdPercentage));
     }
 
     /// <summary>

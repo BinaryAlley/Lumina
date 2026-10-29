@@ -1,16 +1,19 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DomainEvents;
+using Lumina.Application.Common.Infrastructure.Authorization.Policies.ConsumptionActivity;
 using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
 using Lumina.Application.Common.Infrastructure.Plugins;
 using Lumina.Application.Common.Infrastructure.Security;
 using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Application.Common.Infrastructure.Validation;
+using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
 using Lumina.Application.Core.MediaLibrary.Management.Progress;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Queue;
 using Lumina.Infrastructure.Common.DependencyInjection;
-using Lumina.Infrastructure.Core.Plugins;
+using Lumina.Infrastructure.Core.Authorization.Policies.ConsumptionActivity;
+using Lumina.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
 using Lumina.Infrastructure.Core.Security;
 using Lumina.Infrastructure.Core.Time;
 using Lumina.Plugins.Contracts.Core.Plugins;
@@ -19,7 +22,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 #endregion
 
 namespace Lumina.Infrastructure.UnitTests.Common.DependencyInjection;
@@ -43,6 +45,7 @@ public class InfrastructureLayerServicesTests
         // Assert
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IFileHashService) && descriptor.ImplementationType == typeof(FileHashService));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IDateTimeProvider) && descriptor.ImplementationType == typeof(DateTimeProvider));
+        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IPlaybackFormatService) && descriptor.ImplementationType == typeof(PlaybackFormatService));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IPluginManager));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IPluginSettingsStore));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IDomainEventsQueue));
@@ -51,6 +54,7 @@ public class InfrastructureLayerServicesTests
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IMediaLibrariesScanCancellationTracker));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IMediaLibraryScanProgressNotifier));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IHostedService));
+        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IConsumptionActivityAccessPolicy) && descriptor.ImplementationType == typeof(ConsumptionActivityAccessPolicy));
     }
 
     [Fact]

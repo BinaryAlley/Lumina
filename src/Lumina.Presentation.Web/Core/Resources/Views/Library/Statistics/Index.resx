@@ -1,0 +1,201 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Title" xml:space="preserve">
+    <value>Statistics</value>
+  </data>
+  <data name="TotalConsumedDuration" xml:space="preserve">
+    <value>Total consumed time</value>
+  </data>
+  <data name="CountedSessions" xml:space="preserve">
+    <value>Counted sessions</value>
+  </data>
+  <data name="CompletedSessions" xml:space="preserve">
+    <value>Completed sessions</value>
+  </data>
+  <data name="CompletionRate" xml:space="preserve">
+    <value>Completion rate</value>
+  </data>
+  <data name="ByMediaKind" xml:space="preserve">
+    <value>By media kind</value>
+  </data>
+  <data name="MediaKind" xml:space="preserve">
+    <value>Media kind</value>
+  </data>
+  <data name="Duration" xml:space="preserve">
+    <value>Time</value>
+  </data>
+  <data name="Stopped" xml:space="preserve">
+    <value>Stopped</value>
+  </data>
+  <data name="Counted" xml:space="preserve">
+    <value>Counted</value>
+  </data>
+  <data name="Completed" xml:space="preserve">
+    <value>Completed</value>
+  </data>
+  <data name="Genres" xml:space="preserve">
+    <value>Genres</value>
+  </data>
+  <data name="Tags" xml:space="preserve">
+    <value>Tags</value>
+  </data>
+  <data name="NoGenres" xml:space="preserve">
+    <value>No genre data for these filters.</value>
+  </data>
+  <data name="NoTags" xml:space="preserve">
+    <value>No tag data for these filters.</value>
+  </data>
+  <data name="Items" xml:space="preserve">
+    <value>items</value>
+  </data>
+  <data name="RecentlyConsumed" xml:space="preserve">
+    <value>Recently consumed</value>
+  </data>
+  <data name="MostConsumed" xml:space="preserve">
+    <value>Most consumed</value>
+  </data>
+  <data name="NoRecentlyConsumed" xml:space="preserve">
+    <value>No recently consumed items.</value>
+  </data>
+  <data name="NoMostConsumed" xml:space="preserve">
+    <value>No most consumed items.</value>
+  </data>
+  <data name="LastConsumed" xml:space="preserve">
+    <value>Last consumed</value>
+  </data>
+  <data name="Unavailable" xml:space="preserve">
+    <value>This item is no longer available.</value>
+  </data>
+  <data name="DeleteFromHistory" xml:space="preserve">
+    <value>Delete from history</value>
+  </data>
+  <data name="DeleteFromHistoryConfirm" xml:space="preserve">
+    <value>Delete every recorded session of this item from the history?</value>
+  </data>
+  <data name="HistoryEntryDeleted" xml:space="preserve">
+    <value>The history entry was deleted.</value>
+  </data>
+  <data name="ClearHistory" xml:space="preserve">
+    <value>Clear history</value>
+  </data>
+  <data name="ClearHistoryConfirm" xml:space="preserve">
+    <value>Delete the entire consumption history of the selected user?</value>
+  </data>
+  <data name="HistoryCleared" xml:space="preserve">
+    <value>The consumption history was cleared.</value>
+  </data>
+  <data name="ClearResumePoints" xml:space="preserve">
+    <value>Remove from continue watching</value>
+  </data>
+  <data name="ClearResumePointsConfirm" xml:space="preserve">
+    <value>Remove every resume point of the selected user? The history is kept.</value>
+  </data>
+  <data name="ResumePointsCleared" xml:space="preserve">
+    <value>The resume points were removed.</value>
+  </data>
+  <data name="Filters" xml:space="preserve">
+    <value>Filters</value>
+  </data>
+  <data name="Library" xml:space="preserve">
+    <value>Library</value>
+  </data>
+  <data name="AllLibraries" xml:space="preserve">
+    <value>All libraries</value>
+  </data>
+  <data name="AllMediaKinds" xml:space="preserve">
+    <value>All media kinds</value>
+  </data>
+  <data name="From" xml:space="preserve">
+    <value>From</value>
+  </data>
+  <data name="To" xml:space="preserve">
+    <value>To</value>
+  </data>
+  <data name="Apply" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="Reset" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="InvalidDateRange" xml:space="preserve">
+    <value>The start date must not be after the end date.</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>User</value>
+  </data>
+  <data name="AllUsers" xml:space="preserve">
+    <value>All users</value>
+  </data>
+  <data name="Me" xml:space="preserve">
+    <value>Me</value>
+  </data>
+  <data name="AllUsersHistoryUnavailable" xml:space="preserve">
+    <value>The history and the tag breakdown are available per user. Select a user to see them.</value>
+  </data>
+  <data name="PerUser" xml:space="preserve">
+    <value>Per user</value>
+  </data>
+  <data name="NoUsers" xml:space="preserve">
+    <value>No users have consumption statistics for these filters.</value>
+  </data>
+  <data name="NoMediaKindData" xml:space="preserve">
+    <value>No media kind data for these filters.</value>
+  </data>
+  <data name="NoConsumption" xml:space="preserve">
+    <value>There is no consumption history for these filters.</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Loading...</value>
+  </data>
+  <data name="LoadFailed" xml:space="preserve">
+    <value>The statistics could not be loaded.</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>Retry</value>
+  </data>
+  <data name="KindMusicTrack" xml:space="preserve">
+    <value>Track</value>
+  </data>
+  <data name="KindPodcastEpisode" xml:space="preserve">
+    <value>Podcast episode</value>
+  </data>
+  <data name="KindAudiobook" xml:space="preserve">
+    <value>Audiobook</value>
+  </data>
+  <data name="KindMovie" xml:space="preserve">
+    <value>Movie</value>
+  </data>
+  <data name="KindTvEpisode" xml:space="preserve">
+    <value>TV episode</value>
+  </data>
+  <data name="KindBook" xml:space="preserve">
+    <value>Book</value>
+  </data>
+  <data name="KindPhoto" xml:space="preserve">
+    <value>Photo</value>
+  </data>
+  <data name="KindVideo" xml:space="preserve">
+    <value>Video</value>
+  </data>
+  <data name="HoursShort" xml:space="preserve">
+    <value>h</value>
+  </data>
+  <data name="MinutesShort" xml:space="preserve">
+    <value>m</value>
+  </data>
+  <data name="SecondsShort" xml:space="preserve">
+    <value>s</value>
+  </data>
+</root>

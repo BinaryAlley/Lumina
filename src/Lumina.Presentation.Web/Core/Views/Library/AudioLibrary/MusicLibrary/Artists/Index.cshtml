@@ -110,9 +110,13 @@
             sortAscending: '@_localizer["SortAscending"]',
             sortDescending: '@_localizer["SortDescending"]',
             viewDetails: '@_localizer["ViewDetails"]',
+            actions: '@_localizer["Actions"]',
+            play: '@_localizer["Play"]',
+            shuffle: '@_localizer["Shuffle"]',
             deleteItem: '@_localizer["Delete"]',
             deleteConfirm: '@_localizer["DeleteConfirm"]',
-            deleteFailed: '@_localizer["DeleteFailed"]'
+            deleteFailed: '@_localizer["DeleteFailed"]',
+            addToPlaylist: '@_localizer["AddToPlaylist"]'
         };
 
         function buildItemsUrl() {
@@ -208,7 +212,7 @@
             trigger.type = 'button';
             trigger.className = 'card-actions-trigger';
             trigger.setAttribute('aria-haspopup', 'menu');
-            trigger.setAttribute('aria-label', jsLocalizedStrings.viewDetails);
+            trigger.setAttribute('aria-label', jsLocalizedStrings.actions);
             trigger.addEventListener('click', event => {
                 event.preventDefault();
                 event.stopImmediatePropagation();
@@ -218,11 +222,68 @@
             const menu = document.createElement('nav');
             menu.className = 'card-actions-menu';
             menu.setAttribute('role', 'menu');
-            menu.innerHTML = `
-                <a role="menuitem" href="${artistUrl}">${jsLocalizedStrings.viewDetails}</a>
-                <a role="menuitem" href="#" class="card-action-delete">${jsLocalizedStrings.deleteItem}</a>`;
+
+            const detailsAction = document.createElement('a');
+            detailsAction.setAttribute('role', 'menuitem');
+            detailsAction.href = artistUrl;
+            detailsAction.textContent = jsLocalizedStrings.viewDetails;
+
+            const playAction = document.createElement('a');
+            playAction.setAttribute('role', 'menuitem');
+            playAction.href = '#';
+            playAction.className = 'card-action-play';
+            playAction.textContent = jsLocalizedStrings.play;
+            playAction.setAttribute('data-audio-player-play', '');
+            playAction.dataset.libraryId = libraryId;
+            playAction.dataset.artistId = artist.id;
+            playAction.dataset.title = artist.name || '';
+            if (artist.coverPath)
+                playAction.dataset.coverArtPath = artist.coverPath;
+
+            const shuffleAction = document.createElement('a');
+            shuffleAction.setAttribute('role', 'menuitem');
+            shuffleAction.href = '#';
+            shuffleAction.className = 'card-action-shuffle';
+            shuffleAction.textContent = jsLocalizedStrings.shuffle;
+            shuffleAction.setAttribute('data-audio-player-play-shuffled', '');
+            shuffleAction.setAttribute('data-audio-player-shuffle-scope', 'artist');
+            shuffleAction.dataset.libraryId = libraryId;
+            shuffleAction.dataset.artistId = artist.id;
+            shuffleAction.dataset.title = artist.name || '';
+            if (artist.coverPath)
+                shuffleAction.dataset.coverArtPath = artist.coverPath;
+
+            const addToPlaylistAction = document.createElement('a');
+            addToPlaylistAction.setAttribute('role', 'menuitem');
+            addToPlaylistAction.href = '#';
+            addToPlaylistAction.className = 'card-action-add-to-playlist';
+            addToPlaylistAction.textContent = jsLocalizedStrings.addToPlaylist;
+            addToPlaylistAction.addEventListener('click', async event => {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                closeCardMenus();
+                if (window.LuminaPlaylists)
+                    await window.LuminaPlaylists.showAddScopeDialogAsync({ libraryId: libraryId, artistId: artist.id, title: artist.name || '', addToPlaylistLabel: jsLocalizedStrings.addToPlaylist, returnFocus: trigger });
+            });
+
+            const deleteAction = document.createElement('a');
+            deleteAction.setAttribute('role', 'menuitem');
+            deleteAction.href = '#';
+            deleteAction.className = 'card-action-delete';
+            deleteAction.textContent = jsLocalizedStrings.deleteItem;
+
+            menu.appendChild(detailsAction);
+            menu.appendChild(playAction);
+            menu.appendChild(shuffleAction);
+            menu.appendChild(addToPlaylistAction);
+            menu.appendChild(deleteAction);
 
             menu.addEventListener('click', async event => {
+                // The global audio player delegation handles the play and shuffle actions; the menu only closes here.
+                if (event.target.closest('.card-action-play, .card-action-shuffle')) {
+                    closeCardMenus();
+                    return;
+                }
                 const deleteItem = event.target.closest('.card-action-delete');
                 const menuItem = event.target.closest('a[role="menuitem"]');
                 if (!menuItem)
@@ -237,7 +298,16 @@
                 await updateContentAsync(menuItem.href, true);
             });
 
+            // The favorite heart is a plain button: the global favorites script finds it by its data attributes, hydrates its state and handles its click.
+            const favoriteToggle = document.createElement('button');
+            favoriteToggle.type = 'button';
+            favoriteToggle.className = 'card-favorite-toggle';
+            favoriteToggle.setAttribute('data-favorite-toggle', '');
+            favoriteToggle.setAttribute('data-favorite-media-kind', 'MusicArtist');
+            favoriteToggle.setAttribute('data-favorite-media-item-id', artist.id);
+
             card.appendChild(cardLink);
+            card.appendChild(favoriteToggle);
             card.appendChild(trigger);
             card.appendChild(menu);
 

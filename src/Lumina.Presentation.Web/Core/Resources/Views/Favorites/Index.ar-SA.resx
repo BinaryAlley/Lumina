@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Title" xml:space="preserve">
+    <value>المفضلة</value>
+  </data>
+  <data name="NoFavorites" xml:space="preserve">
+    <value>ليست لديك أي عناصر مفضلة بعد.</value>
+  </data>
+  <data name="NoFavoritesInKind" xml:space="preserve">
+    <value>ليست لديك أي عناصر مفضلة من هذا النوع بعد.</value>
+  </data>
+  <data name="Unavailable" xml:space="preserve">
+    <value>هذا العنصر لم يعد متاحًا.</value>
+  </data>
+  <data name="FilterAll" xml:space="preserve">
+    <value>الكل</value>
+  </data>
+  <data name="FilterArtists" xml:space="preserve">
+    <value>الفنانون</value>
+  </data>
+  <data name="FilterAlbums" xml:space="preserve">
+    <value>الألبومات</value>
+  </data>
+  <data name="FilterTracks" xml:space="preserve">
+    <value>المقاطع</value>
+  </data>
+  <data name="FilterBooks" xml:space="preserve">
+    <value>الكتب</value>
+  </data>
+  <data name="KindArtist" xml:space="preserve">
+    <value>فنان</value>
+  </data>
+  <data name="KindAlbum" xml:space="preserve">
+    <value>ألبوم</value>
+  </data>
+  <data name="KindTrack" xml:space="preserve">
+    <value>مقطع</value>
+  </data>
+  <data name="KindBook" xml:space="preserve">
+    <value>كتاب</value>
+  </data>
+  <data name="LoadMore" xml:space="preserve">
+    <value>تحميل المزيد</value>
+  </data>
+  <data name="ItemsCount" xml:space="preserve">
+    <value>عناصر</value>
+  </data>
+  <data name="LoadFailed" xml:space="preserve">
+    <value>تعذر تحميل المفضلة.</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>إعادة المحاولة</value>
+  </data>
+</root>

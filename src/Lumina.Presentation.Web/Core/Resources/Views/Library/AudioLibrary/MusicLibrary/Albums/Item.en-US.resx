@@ -703,7 +703,7 @@
     <value>Costa Rica</value>
   </data>
   <data name="Country.CI" xml:space="preserve">
-    <value>CÃ´te dâ€™Ivoire</value>
+    <value>Côte d’Ivoire</value>
   </data>
   <data name="Country.HR" xml:space="preserve">
     <value>Croatia</value>
@@ -1030,7 +1030,7 @@
     <value>San Marino</value>
   </data>
   <data name="Country.ST" xml:space="preserve">
-    <value>SÃ£o TomÃ© &amp; PrÃ­ncipe</value>
+    <value>São Tomé &amp; Príncipe</value>
   </data>
   <data name="Country.SA" xml:space="preserve">
     <value>Saudi Arabia</value>
@@ -1117,7 +1117,7 @@
     <value>Tunisia</value>
   </data>
   <data name="Country.TR" xml:space="preserve">
-    <value>TÃ¼rkiye</value>
+    <value>Türkiye</value>
   </data>
   <data name="Country.TM" xml:space="preserve">
     <value>Turkmenistan</value>
@@ -1505,5 +1505,23 @@
   </data>
   <data name="Identifiers" xml:space="preserve">
     <value>Identifiers</value>
+  </data>
+  <data name="PlayAlbum" xml:space="preserve">
+    <value>Play album</value>
+  </data>
+  <data name="PlayTrack" xml:space="preserve">
+    <value>Play track</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>Add to playlist</value>
+  </data>
+  <data name="AddToPlayQueue" xml:space="preserve">
+    <value>Add to play queue</value>
+  </data>
+  <data name="PlayAllFromHere" xml:space="preserve">
+    <value>Play all from here</value>
   </data>
 </root>

@@ -217,22 +217,22 @@
     <value>已完成扫描任务数量必须为正数！</value>
   </data>
   <data name="ContributorDisplayNameCannotBeEmpty" xml:space="preserve">
-    <value>参与者显示名称不能为空！</value>
+    <value>贡献者显示名称不能为空！</value>
   </data>
   <data name="ContributorDisplayNameMustBeMaximum100CharactersLong" xml:space="preserve">
-    <value>参与者显示名称最多只能有100个字符！</value>
+    <value>贡献者显示名称最多只能有100个字符！</value>
   </data>
   <data name="ContributorLegalNameMustBeMaximum100CharactersLong" xml:space="preserve">
-    <value>参与者法定姓名最多只能有100个字符！</value>
+    <value>贡献者法定姓名最多只能有100个字符！</value>
   </data>
   <data name="ContributorNameCannotBeEmpty" xml:space="preserve">
-    <value>参与者姓名不能为空！</value>
+    <value>贡献者姓名不能为空！</value>
   </data>
   <data name="ContributorRoleCannotBeNull" xml:space="preserve">
-    <value>参与者角色不能为空！</value>
+    <value>贡献者角色不能为空！</value>
   </data>
   <data name="ContributorsListCannotBeNull" xml:space="preserve">
-    <value>参与者列表不能为空！</value>
+    <value>贡献者列表不能为空！</value>
   </data>
   <data name="CorsOriginIsInvalid" xml:space="preserve">
     <value>CORS来源无效！</value>
@@ -812,5 +812,497 @@
   </data>
   <data name="InvalidScheduleType" xml:space="preserve">
     <value>调度类型无效！</value>
+  </data>
+  <data name="InvalidReplayGainMode" xml:space="preserve">
+    <value>无效的 ReplayGain 模式！</value>
+  </data>
+  <data name="InvalidStreamingQuality" xml:space="preserve">
+    <value>无效的流媒体质量！</value>
+  </data>
+  <data name="IsMutedCannotBeNull" xml:space="preserve">
+    <value>静音状态不能为空！</value>
+  </data>
+  <data name="VolumeCannotBeNull" xml:space="preserve">
+    <value>音量不能为空！</value>
+  </data>
+  <data name="VolumeMustBeBetweenZeroAndOne" xml:space="preserve">
+    <value>音量必须介于 0 和 1 之间！</value>
+  </data>
+  <data name="ShouldKeepDownloadingWhilePausedCannotBeNull" xml:space="preserve">
+    <value>暂停时继续下载的偏好设置不能为空！</value>
+  </data>
+  <data name="ShouldAutoplayCannotBeNull" xml:space="preserve">
+    <value>自动播放的偏好设置不能为空！</value>
+  </data>
+  <data name="IsGaplessPlaybackEnabledCannotBeNull" xml:space="preserve">
+    <value>无缝播放的偏好设置不能为空！</value>
+  </data>
+  <data name="ReplayGainModeCannotBeNull" xml:space="preserve">
+    <value>ReplayGain 模式不能为空！</value>
+  </data>
+  <data name="StreamingQualityCannotBeNull" xml:space="preserve">
+    <value>流媒体质量不能为空！</value>
+  </data>
+  <data name="ShuffleTrackCountMustBeGreaterThanZero" xml:space="preserve">
+    <value>随机播放曲目数必须大于零！</value>
+  </data>
+  <data name="ShuffleTrackCountMustBeAtMost500" xml:space="preserve">
+    <value>随机播放曲目数不能超过 500！</value>
+  </data>
+  <data name="VuMeterReleasePerSecondCannotBeNull" xml:space="preserve">
+    <value>VU 表的衰落速度不能为空！</value>
+  </data>
+  <data name="VuMeterSegmentCountCannotBeNull" xml:space="preserve">
+    <value>VU 表的段数不能为空！</value>
+  </data>
+  <data name="VuMeterReleasePerSecondMustBeBetweenZeroAndOneHundred" xml:space="preserve">
+    <value>VU 表的衰落速度必须介于每秒 0 到 100 之间！</value>
+  </data>
+  <data name="VuMeterPeakHoldDurationMustBeBetweenZeroAndTenThousandMilliseconds" xml:space="preserve">
+    <value>VU 表的峰值保持时间必须在 0 到 10000 毫秒之间！</value>
+  </data>
+  <data name="InvalidVuMeterOrientation" xml:space="preserve">
+    <value>VU 表的方向无效！</value>
+  </data>
+  <data name="VuMeterSegmentCountMustBeBetweenOneAndOneHundredTwentyEight" xml:space="preserve">
+    <value>VU 表的段数必须在 1 到 128 之间！</value>
+  </data>
+  <data name="VuMeterShowPeakCannotBeNull" xml:space="preserve">
+    <value>VU 表的峰值显示首选项不能为空！</value>
+  </data>
+  <data name="VuMeterMediumThresholdMustBeBetweenZeroAndOne" xml:space="preserve">
+    <value>VU 表的中等阈值必须在 0 到 1 之间！</value>
+  </data>
+  <data name="VuMeterPeakReleasePerSecondMustBeBetweenZeroAndOneHundred" xml:space="preserve">
+    <value>VU 表的峰值衰落速度必须介于每秒 0 到 100 之间！</value>
+  </data>
+  <data name="VuMeterSegmentGapCannotBeNull" xml:space="preserve">
+    <value>VU 表的段间距不能为空！</value>
+  </data>
+  <data name="VuMeterSegmentGapMustBeBetweenZeroAndThirtyTwo" xml:space="preserve">
+    <value>VU 表的段间距必须在 0 到 32 之间！</value>
+  </data>
+  <data name="VuMeterPeakHoldDurationCannotBeNull" xml:space="preserve">
+    <value>VU 表的峰值保持时间不能为空！</value>
+  </data>
+  <data name="VuMeterOrientationCannotBeNull" xml:space="preserve">
+    <value>VU 表的方向不能为空！</value>
+  </data>
+  <data name="VuMeterMediumThresholdCannotBeNull" xml:space="preserve">
+    <value>VU 表的中等阈值不能为空！</value>
+  </data>
+  <data name="VuMeterHighThresholdMustBeBetweenZeroAndOne" xml:space="preserve">
+    <value>VU 表的高阈值必须在 0 到 1 之间！</value>
+  </data>
+  <data name="VuMeterPeakReleasePerSecondCannotBeNull" xml:space="preserve">
+    <value>VU 表的峰值衰落速度不能为空！</value>
+  </data>
+  <data name="VuMeterHighThresholdMustBeGreaterThanOrEqualToMediumThreshold" xml:space="preserve">
+    <value>VU 表的高阈值必须大于或等于中等阈值！</value>
+  </data>
+  <data name="VuMeterHighThresholdCannotBeNull" xml:space="preserve">
+    <value>VU 表的高阈值不能为空！</value>
+  </data>
+  <data name="AlbumAlreadyExists" xml:space="preserve">
+    <value>该专辑已经存在！</value>
+  </data>
+  <data name="AlbumIdCannotBeEmpty" xml:space="preserve">
+    <value>专辑ID不能为空！</value>
+  </data>
+  <data name="AlbumNotFound" xml:space="preserve">
+    <value>找不到专辑！</value>
+  </data>
+  <data name="AlbumTitleCannotBeEmpty" xml:space="preserve">
+    <value>专辑名称不能为空！</value>
+  </data>
+  <data name="AlbumTitleMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>专辑名称的长度不得超过 255 个字符！</value>
+  </data>
+  <data name="AlbumsListCannotBeNull" xml:space="preserve">
+    <value>专辑列表不能为空！</value>
+  </data>
+  <data name="AreaNameCannotBeEmpty" xml:space="preserve">
+    <value>区域名称不能为空！</value>
+  </data>
+  <data name="AreaNameMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>区域名称的长度不得超过 255 个字符！</value>
+  </data>
+  <data name="ArtistAliasNameCannotBeEmpty" xml:space="preserve">
+    <value>艺人别名不能为空！</value>
+  </data>
+  <data name="ArtistAliasNameMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>艺术家别名的长度不得超过 255 个字符！</value>
+  </data>
+  <data name="ArtistAlreadyExists" xml:space="preserve">
+    <value>这位艺术家已经存在了！</value>
+  </data>
+  <data name="ArtistIdCannotBeEmpty" xml:space="preserve">
+    <value>艺人ID不能为空！</value>
+  </data>
+  <data name="ArtistMustHaveAtLeastOneAlbum" xml:space="preserve">
+    <value>艺术家必须至少拥有一张专辑！</value>
+  </data>
+  <data name="ArtistNameCannotBeEmpty" xml:space="preserve">
+    <value>艺人姓名不能为空！</value>
+  </data>
+  <data name="ArtistNameMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>艺术家姓名的长度不得超过 255 个字符！</value>
+  </data>
+  <data name="ArtistNotFound" xml:space="preserve">
+    <value>未找到该艺术家！</value>
+  </data>
+  <data name="ArtistWebsiteMustBeMaximum2048CharactersLong" xml:space="preserve">
+    <value>艺术家网站的长度不得超过 2048 个字符！</value>
+  </data>
+  <data name="BarcodeValueCannotBeEmpty" xml:space="preserve">
+    <value>条形码值不能为空！</value>
+  </data>
+  <data name="BpmMustBeGreaterThanZero" xml:space="preserve">
+    <value>BPM 必须大于零！</value>
+  </data>
+  <data name="CatalogNumberMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>目录号的长度不得超过 50 个字符！</value>
+  </data>
+  <data name="CompletionThresholdPercentageMustBeBetweenZeroAndOneHundred" xml:space="preserve">
+    <value>完成阈值必须在0到100之间！</value>
+  </data>
+  <data name="CompletionThresholdPercentageMustBeNullWhenProgressTrackingIsOff" xml:space="preserve">
+    <value>关闭进度跟踪时，完成阈值必须为 null！</value>
+  </data>
+  <data name="ConcurrencyConflict" xml:space="preserve">
+    <value>保存更改时发生并发冲突！</value>
+  </data>
+  <data name="ConsecutivePagesReadIsOnlySupportedForPageBasedMedia" xml:space="preserve">
+    <value>连续阅读页数仅支持基于页面的媒体！</value>
+  </data>
+  <data name="ConsecutivePagesReadMustBeNonNegative" xml:space="preserve">
+    <value>连续阅读页数不能为负数！</value>
+  </data>
+  <data name="ConsumedDurationCannotDecrease" xml:space="preserve">
+    <value>消费时长不能减少！</value>
+  </data>
+  <data name="ConsumedDurationIsOutOfRange" xml:space="preserve">
+    <value>消费时长超出范围！</value>
+  </data>
+  <data name="ConsumedDurationMustBeNonNegative" xml:space="preserve">
+    <value>消费时长不能为负数！</value>
+  </data>
+  <data name="ConsumptionDateRangeIsInvalid" xml:space="preserve">
+    <value>消费日期范围无效！</value>
+  </data>
+  <data name="ConsumptionIsAlreadyTerminal" xml:space="preserve">
+    <value>消费已结束！</value>
+  </data>
+  <data name="ConsumptionIsNotInProgress" xml:space="preserve">
+    <value>消费不在进行中！</value>
+  </data>
+  <data name="ConsumptionRecordIdCannotBeEmpty" xml:space="preserve">
+    <value>消费记录 Id不能为空！</value>
+  </data>
+  <data name="ConsumptionRecordNotFound" xml:space="preserve">
+    <value>找不到消费记录！</value>
+  </data>
+  <data name="CountryMustBeMaximum2CharactersLong" xml:space="preserve">
+    <value>国家/地区的长度不得超过 2 个字符！</value>
+  </data>
+  <data name="CoverCannotBeNull" xml:space="preserve">
+    <value>封面不能为空！</value>
+  </data>
+  <data name="DeliveryIdCannotBeEmpty" xml:space="preserve">
+    <value>发货ID不能为空！</value>
+  </data>
+  <data name="DeliveryIdIsInvalid" xml:space="preserve">
+    <value>送货ID无效！</value>
+  </data>
+  <data name="DiscNumberMustBeGreaterThanZero" xml:space="preserve">
+    <value>光盘编号必须大于零！</value>
+  </data>
+  <data name="EndedConsumptionCannotPrecedeLastActivity" xml:space="preserve">
+    <value>结束时间不能早于最后活动时间！</value>
+  </data>
+  <data name="EndedConsumptionMustHaveEndTime" xml:space="preserve">
+    <value>已结束的消费必须有结束时间！</value>
+  </data>
+  <data name="FavoriteAlreadyExists" xml:space="preserve">
+    <value>收藏已存在！</value>
+  </data>
+  <data name="FavoriteMediaItemIdCannotBeEmpty" xml:space="preserve">
+    <value>收藏的媒体项 ID 不能为空！</value>
+  </data>
+  <data name="FavoriteMediaItemIdsCannotBeEmpty" xml:space="preserve">
+    <value>收藏的媒体项 ID 列表不能为空！</value>
+  </data>
+  <data name="FavoriteMediaItemIdsExceedMaximumCount" xml:space="preserve">
+    <value>收藏的媒体项 ID 列表超出最大数量！</value>
+  </data>
+  <data name="FavoriteMediaKindIsInvalid" xml:space="preserve">
+    <value>收藏的媒体类型无效！</value>
+  </data>
+  <data name="FavoriteMediaKindIsNotSupported" xml:space="preserve">
+    <value>不支持收藏的媒体类型！</value>
+  </data>
+  <data name="FavoriteNotFound" xml:space="preserve">
+    <value>找不到收藏！</value>
+  </data>
+  <data name="FileTooLarge" xml:space="preserve">
+    <value>文件太大！</value>
+  </data>
+  <data name="InProgressConsumptionCannotHaveEndTime" xml:space="preserve">
+    <value>进行中的消费不能有结束时间！</value>
+  </data>
+  <data name="InvalidFormatForBarcode" xml:space="preserve">
+    <value>条形码格式无效！</value>
+  </data>
+  <data name="InvalidMediaPosition" xml:space="preserve">
+    <value>媒体位置无效！</value>
+  </data>
+  <data name="InvalidProgressFraction" xml:space="preserve">
+    <value>进度比例无效！</value>
+  </data>
+  <data name="IpiValueCannotBeEmpty" xml:space="preserve">
+    <value>IPI值不能为空！</value>
+  </data>
+  <data name="IpiValueMustBeMaximum20CharactersLong" xml:space="preserve">
+    <value>IPI 值的长度不得超过 20 个字符！</value>
+  </data>
+  <data name="IsniValueCannotBeEmpty" xml:space="preserve">
+    <value>ISNI 值不能为空！</value>
+  </data>
+  <data name="IsniValueMustBeMaximum20CharactersLong" xml:space="preserve">
+    <value>ISNI 值的长度不得超过 20 个字符！</value>
+  </data>
+  <data name="IsrcInvalidFormat" xml:space="preserve">
+    <value>ISRC 格式无效！</value>
+  </data>
+  <data name="IsrcValueCannotBeEmpty" xml:space="preserve">
+    <value>ISRC 值不能为空！</value>
+  </data>
+  <data name="LastActivityCannotPrecedeStart" xml:space="preserve">
+    <value>最后活动时间不能早于开始时间！</value>
+  </data>
+  <data name="LocationRefCannotBeEmpty" xml:space="preserve">
+    <value>位置参考不能为空！</value>
+  </data>
+  <data name="MediaContributorAlreadyExists" xml:space="preserve">
+    <value>媒体贡献者已存在！</value>
+  </data>
+  <data name="MediaContributorNameCannotBeEmpty" xml:space="preserve">
+    <value>媒体贡献者名称不能为空！</value>
+  </data>
+  <data name="MediaContributorRoleNameCannotBeEmpty" xml:space="preserve">
+    <value>媒体贡献者角色名称不能为空！</value>
+  </data>
+  <data name="MediaItemIdCannotBeEmpty" xml:space="preserve">
+    <value>媒体项 Id不能为空！</value>
+  </data>
+  <data name="MediaKindCannotResume" xml:space="preserve">
+    <value>此类媒体无法继续！</value>
+  </data>
+  <data name="MediaKindCannotStartCompleted" xml:space="preserve">
+    <value>此类媒体不能以已完成状态开始！</value>
+  </data>
+  <data name="MediaResumePointNotFound" xml:space="preserve">
+    <value>找不到媒体继续点！</value>
+  </data>
+  <data name="MoodNameCannotBeEmpty" xml:space="preserve">
+    <value>心情名称不能为空！</value>
+  </data>
+  <data name="MusicBrainzIdInvalidFormat" xml:space="preserve">
+    <value>MusicBrainz Id 格式无效！</value>
+  </data>
+  <data name="NoReaderAvailable" xml:space="preserve">
+    <value>没有可用的图书阅读器能够打开此图书。</value>
+  </data>
+  <data name="NoSupportedPlaybackFormat" xml:space="preserve">
+    <value>未找到支持的播放格式！</value>
+  </data>
+  <data name="NormalizationCacheLimitExceeded" xml:space="preserve">
+    <value>超出规范化缓存限制！</value>
+  </data>
+  <data name="NormalizationFailed" xml:space="preserve">
+    <value>曲目规范化失败！</value>
+  </data>
+  <data name="NormalizationIsNotRequiredForDirectPlay" xml:space="preserve">
+    <value>直接播放不需要规范化！</value>
+  </data>
+  <data name="NormalizationTimedOut" xml:space="preserve">
+    <value>曲目规范化超时！</value>
+  </data>
+  <data name="NormalizationUnavailable" xml:space="preserve">
+    <value>曲目规范化目前不可用！</value>
+  </data>
+  <data name="NormalizedTrackCacheEntryNotFound" xml:space="preserve">
+    <value>找不到规范化曲目缓存项！</value>
+  </data>
+  <data name="NormalizedTrackSegmentNotFound" xml:space="preserve">
+    <value>找不到规范化曲目片段！</value>
+  </data>
+  <data name="PathTemplateIsNotSupportedForLibraryType" xml:space="preserve">
+    <value>此库类型不支持路径模板！</value>
+  </data>
+  <data name="PathTemplateLiteralCannotBeEmpty" xml:space="preserve">
+    <value>路径模板的文字部分不能为空！</value>
+  </data>
+  <data name="PathTemplatePartKindNotSupportedForLibraryType" xml:space="preserve">
+    <value>此库类型不支持路径模板部分类型！</value>
+  </data>
+  <data name="PathTemplateValuePartMustContainSinglePlaceholder" xml:space="preserve">
+    <value>路径模板的值部分必须恰好包含一个占位符！</value>
+  </data>
+  <data name="PermissionNotFound" xml:space="preserve">
+    <value>没有找到权限！</value>
+  </data>
+  <data name="PlaybackDeliveryChanged" xml:space="preserve">
+    <value>播放交付方式发生变化！</value>
+  </data>
+  <data name="PlaybackDeliveryNotFound" xml:space="preserve">
+    <value>找不到播放传送！</value>
+  </data>
+  <data name="PlaybackFormatNotImplemented" xml:space="preserve">
+    <value>播放格式未实现！</value>
+  </data>
+  <data name="PlaylistAlreadyExists" xml:space="preserve">
+    <value>播放列表已经存在！</value>
+  </data>
+  <data name="PlaylistDescriptionMustBeMaximum2000CharactersLong" xml:space="preserve">
+    <value>播放列表描述的长度不得超过 2000 个字符！</value>
+  </data>
+  <data name="PlaylistDoesNotAcceptMediaItems" xml:space="preserve">
+    <value>该播放列表不接受媒体项目！</value>
+  </data>
+  <data name="PlaylistEntryIdCannotBeEmpty" xml:space="preserve">
+    <value>播放列表条目 ID 不能为空！</value>
+  </data>
+  <data name="PlaylistEntryNotFound" xml:space="preserve">
+    <value>找不到播放列表条目！</value>
+  </data>
+  <data name="PlaylistEntryPositionsAreInvalid" xml:space="preserve">
+    <value>播放列表条目位置无效！</value>
+  </data>
+  <data name="PlaylistIdCannotBeEmpty" xml:space="preserve">
+    <value>播放列表ID不能为空！</value>
+  </data>
+  <data name="PlaylistMoveTargetPositionIsInvalid" xml:space="preserve">
+    <value>播放列表移动目标位置无效！</value>
+  </data>
+  <data name="PlaylistNameCannotBeEmpty" xml:space="preserve">
+    <value>播放列表名称不能为空！</value>
+  </data>
+  <data name="PlaylistNameMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>播放列表名称的长度不得超过 255 个字符！</value>
+  </data>
+  <data name="PlaylistNotFound" xml:space="preserve">
+    <value>找不到播放列表！</value>
+  </data>
+  <data name="PlaylistTypeIsInvalid" xml:space="preserve">
+    <value>播放列表类型无效！</value>
+  </data>
+  <data name="ReaderDisabled" xml:space="preserve">
+    <value>打开此图书的图书阅读器已在此媒体库中禁用。在媒体库设置中启用它即可阅读该图书。</value>
+  </data>
+  <data name="ResourceKeyCannotBeEmpty" xml:space="preserve">
+    <value>资源键不能为空！</value>
+  </data>
+  <data name="ResourceNotFound" xml:space="preserve">
+    <value>没有找到资源！</value>
+  </data>
+  <data name="ScriptMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>脚本长度不得超过 50 个字符！</value>
+  </data>
+  <data name="SectionNotFound" xml:space="preserve">
+    <value>未找到该部分！</value>
+  </data>
+  <data name="SegmentDurationMustBePositive" xml:space="preserve">
+    <value>分段持续时间必须为正！</value>
+  </data>
+  <data name="SegmentIndexCannotBeEmpty" xml:space="preserve">
+    <value>段索引不能为空！</value>
+  </data>
+  <data name="SegmentIndexMustBeValid" xml:space="preserve">
+    <value>段索引无效！</value>
+  </data>
+  <data name="TargetUserIdIsInvalid" xml:space="preserve">
+    <value>目标用户 Id无效！</value>
+  </data>
+  <data name="TheArtistAlreadyHasTheAlbum" xml:space="preserve">
+    <value>艺术家已经拥有专辑了！</value>
+  </data>
+  <data name="TheArtistDoesNotHaveTheAlbum" xml:space="preserve">
+    <value>该艺术家没有专辑！</value>
+  </data>
+  <data name="TheTrackIsAlreadyInTheAlbum" xml:space="preserve">
+    <value>曲目已在专辑中！</value>
+  </data>
+  <data name="TheTrackIsNotInTheAlbum" xml:space="preserve">
+    <value>该曲目不在专辑中！</value>
+  </data>
+  <data name="ThemeTemplateNotFound" xml:space="preserve">
+    <value>找不到主题模板！</value>
+  </data>
+  <data name="TotalDiscsMustBeGreaterThanZero" xml:space="preserve">
+    <value>光盘总数必须大于零！</value>
+  </data>
+  <data name="TotalTracksMustBeGreaterThanZero" xml:space="preserve">
+    <value>曲目总数必须大于零！</value>
+  </data>
+  <data name="TrackAlreadyExists" xml:space="preserve">
+    <value>该曲目已经存在！</value>
+  </data>
+  <data name="TrackDurationMustBePositive" xml:space="preserve">
+    <value>曲目时长必须为正数！</value>
+  </data>
+  <data name="TrackFileNotFound" xml:space="preserve">
+    <value>未找到曲目文件！</value>
+  </data>
+  <data name="TrackIdCannotBeEmpty" xml:space="preserve">
+    <value>曲目 ID 不能为空！</value>
+  </data>
+  <data name="TrackNotFound" xml:space="preserve">
+    <value>未找到曲目！</value>
+  </data>
+  <data name="TrackNumberMustBeGreaterThanZero" xml:space="preserve">
+    <value>曲目编号必须大于零！</value>
+  </data>
+  <data name="TrackPathCannotBeEmpty" xml:space="preserve">
+    <value>曲目路径不能为空！</value>
+  </data>
+  <data name="TrackPathMustBeMaximum2048CharactersLong" xml:space="preserve">
+    <value>曲目路径最多只能有 2048 个字符！</value>
+  </data>
+  <data name="TrackPathMustBeWithinLibraryContentLocations" xml:space="preserve">
+    <value>曲目路径必须在库内容位置之一内！</value>
+  </data>
+  <data name="TracksListCannotBeNull" xml:space="preserve">
+    <value>曲目列表不能为空！</value>
+  </data>
+  <data name="UnknownMusicArtistGender" xml:space="preserve">
+    <value>音乐人性别未知！</value>
+  </data>
+  <data name="UnknownMusicArtistType" xml:space="preserve">
+    <value>音乐艺术家类型未知！</value>
+  </data>
+  <data name="UnknownMusicKey" xml:space="preserve">
+    <value>音乐调未知！</value>
+  </data>
+  <data name="UnknownMusicMediaFormat" xml:space="preserve">
+    <value>音乐媒体格式未知！</value>
+  </data>
+  <data name="UnknownMusicReleasePackaging" xml:space="preserve">
+    <value>音乐发行包装未知！</value>
+  </data>
+  <data name="UnknownMusicReleaseStatus" xml:space="preserve">
+    <value>音乐发行状态未知！</value>
+  </data>
+  <data name="UnknownMusicReleaseType" xml:space="preserve">
+    <value>音乐发行类型未知！</value>
+  </data>
+  <data name="UnsupportedMediaKind" xml:space="preserve">
+    <value>媒体类型不受支持！</value>
+  </data>
+  <data name="WorkMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>作品长度不得超过 255 个字符！</value>
+  </data>
+  <data name="WorkTitleCannotBeEmpty" xml:space="preserve">
+    <value>作品名称不能为空！</value>
   </data>
 </root>

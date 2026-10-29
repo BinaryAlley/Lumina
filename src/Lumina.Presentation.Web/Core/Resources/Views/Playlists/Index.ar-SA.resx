@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Title" xml:space="preserve">
+    <value>قوائم التشغيل</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>الاسم</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>الوصف</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>إنشاء</value>
+  </data>
+  <data name="NoPlaylists" xml:space="preserve">
+    <value>ليست لديك أي قوائم تشغيل بعد.</value>
+  </data>
+  <data name="Tracks" xml:space="preserve">
+    <value>مقاطع</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>حذف</value>
+  </data>
+  <data name="DeleteConfirm" xml:space="preserve">
+    <value>هل تريد حذف قائمة التشغيل هذه؟ لا يمكن التراجع عن هذا الإجراء.</value>
+  </data>
+  <data name="DeleteFailed" xml:space="preserve">
+    <value>تعذر حذف قائمة التشغيل.</value>
+  </data>
+  <data name="CreateFailed" xml:space="preserve">
+    <value>تعذر إنشاء قائمة التشغيل.</value>
+  </data>
+  <data name="PlaylistNameRequired" xml:space="preserve">
+    <value>تحتاج قائمة التشغيل إلى اسم.</value>
+  </data>
+  <data name="Items" xml:space="preserve">
+    <value>عناصر</value>
+  </data>
+</root>

@@ -46,18 +46,18 @@ public class GetUserSettingsQueryHandler : IQueryHandler<GetUserSettingsQuery, R
     /// </returns>
     public async Task<Result<UserSettingsResponse>> HandleAsync(GetUserSettingsQuery query, CancellationToken cancellationToken)
     {
-        // an authenticated request must always carry a user identity
+        // An authenticated request must always carry a user identity.
         Guid? currentUserId = _currentUserService.UserId;
         if (currentUserId is null)
             return Errors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // get the settings of the current user from the repository
+        // Get the settings of the current user from the repository.
         Result<UserSettingsEntity?> getSettingsResult = await _unitOfWork.UserSettingsRepository.GetByUserIdAsync(userId, cancellationToken).ConfigureAwait(false);
         if (getSettingsResult.IsFailure)
             return getSettingsResult.Errors;
 
-        // when no settings are stored for the current user yet, return the default settings
+        // When no settings are stored for the current user yet, return the default settings.
         if (getSettingsResult.Value is null)
         {
             Result<UserSettings> defaultSettingsResult = UserSettings.Create();

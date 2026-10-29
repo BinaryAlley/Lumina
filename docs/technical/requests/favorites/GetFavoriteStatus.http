@@ -1,0 +1,2 @@
+GET {{host}}/api/v1/users/me/favorites/status?mediaKind=MusicTrack&mediaItemIds=9f0e1d2c-3b4a-4c6d-8e7f-9a0b1c2d3e4f&mediaItemIds=8e9f0a1b-2c3d-4e5f-9a6b-7c8d9e0f1a2b
+Authorization: Bearer {{ACCESS_TOKEN}}

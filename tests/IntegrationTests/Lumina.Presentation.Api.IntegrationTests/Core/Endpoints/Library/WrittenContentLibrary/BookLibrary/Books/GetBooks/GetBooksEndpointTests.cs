@@ -461,8 +461,8 @@ public class GetBooksEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         BookEntity book = _bookEntityFixture.Create(libraryId: libraryId, title: title, path: $"/books/{Guid.NewGuid()}.epub", includeMetadata: false);
-        book.Tags = [_tagEntityFixture.Create(name: $"Tag-{Guid.NewGuid()}")];
-        book.Genres = [_genreEntityFixture.Create(name: $"Genre-{Guid.NewGuid()}")];
+        book.Tags = [_tagEntityFixture.Create(name: $"tag-{Guid.NewGuid()}")];
+        book.Genres = [_genreEntityFixture.Create(name: $"genre-{Guid.NewGuid()}")];
         book.ISBNs = [_isbnEntityFixture.Create(value: "9780395272237", format: IsbnFormat.Isbn13)];
         book.Ratings = [_bookRatingEntityFixture.Create(value: 4.5M, maxValue: 5, source: BookRatingSource.Goodreads, voteCount: 100)];
         dbContext.Books.Add(book);

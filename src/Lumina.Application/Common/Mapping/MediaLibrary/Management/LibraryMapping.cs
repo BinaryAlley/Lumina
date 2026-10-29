@@ -39,6 +39,10 @@ public static class LibraryMapping
             CanDownloadMetadataFromWeb = domainEntity.CanDownloadMetadataFromWeb,
             ShouldSaveMetadataInMediaDirectories = domainEntity.ShouldSaveMetadataInMediaDirectories,
             ShouldSkipUnchangedDirectoriesDuringScan = domainEntity.ShouldSkipUnchangedDirectoriesDuringScan,
+            ShouldTrackConsumptionProgress = domainEntity.ConsumptionSettings.ShouldTrackConsumptionProgress,
+            CompletionThresholdPercentage = domainEntity.ConsumptionSettings.CompletionThresholdPercentage.HasValue
+                ? domainEntity.ConsumptionSettings.CompletionThresholdPercentage.Value
+                : null,
             LibraryScans = [.. domainEntity.ScanIds.Select(scanId => new LibraryScanEntity()
             {
                 Id = scanId.Value,

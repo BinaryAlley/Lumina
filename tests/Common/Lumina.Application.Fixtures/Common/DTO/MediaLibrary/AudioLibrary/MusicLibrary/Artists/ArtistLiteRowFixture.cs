@@ -31,12 +31,10 @@ public class ArtistLiteRowFixture
         string? coverPath = null,
         bool includeCoverPath = true)
     {
-        return new ArtistLiteRow
-        {
-            Id = id ?? _faker.Random.Guid(),
-            Name = name ?? _faker.Name.FullName(),
-            CoverPath = includeCoverPath ? (coverPath ?? _faker.System.FilePath()) : null
-        };
+        return new ArtistLiteRow(
+            id ?? _faker.Random.Guid(),
+            name ?? _faker.Name.FullName(),
+            includeCoverPath ? (coverPath ?? _faker.System.FilePath()) : null);
     }
 
     /// <summary>

@@ -1,0 +1,201 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Title" xml:space="preserve">
+    <value>Statistici</value>
+  </data>
+  <data name="TotalConsumedDuration" xml:space="preserve">
+    <value>Timp total consumat</value>
+  </data>
+  <data name="CountedSessions" xml:space="preserve">
+    <value>Sesiuni contorizate</value>
+  </data>
+  <data name="CompletedSessions" xml:space="preserve">
+    <value>Sesiuni finalizate</value>
+  </data>
+  <data name="CompletionRate" xml:space="preserve">
+    <value>Rată de finalizare</value>
+  </data>
+  <data name="ByMediaKind" xml:space="preserve">
+    <value>După tipul de conținut</value>
+  </data>
+  <data name="MediaKind" xml:space="preserve">
+    <value>Tip de conținut</value>
+  </data>
+  <data name="Duration" xml:space="preserve">
+    <value>Timp</value>
+  </data>
+  <data name="Stopped" xml:space="preserve">
+    <value>Oprite</value>
+  </data>
+  <data name="Counted" xml:space="preserve">
+    <value>Contorizate</value>
+  </data>
+  <data name="Completed" xml:space="preserve">
+    <value>Finalizate</value>
+  </data>
+  <data name="Genres" xml:space="preserve">
+    <value>Genuri</value>
+  </data>
+  <data name="Tags" xml:space="preserve">
+    <value>Etichete</value>
+  </data>
+  <data name="NoGenres" xml:space="preserve">
+    <value>Nu există date despre genuri pentru aceste filtre.</value>
+  </data>
+  <data name="NoTags" xml:space="preserve">
+    <value>Nu există date despre etichete pentru aceste filtre.</value>
+  </data>
+  <data name="Items" xml:space="preserve">
+    <value>elemente</value>
+  </data>
+  <data name="RecentlyConsumed" xml:space="preserve">
+    <value>Consumate recent</value>
+  </data>
+  <data name="MostConsumed" xml:space="preserve">
+    <value>Cele mai consumate</value>
+  </data>
+  <data name="NoRecentlyConsumed" xml:space="preserve">
+    <value>Nu există elemente consumate recent.</value>
+  </data>
+  <data name="NoMostConsumed" xml:space="preserve">
+    <value>Nu există elemente cele mai consumate.</value>
+  </data>
+  <data name="LastConsumed" xml:space="preserve">
+    <value>Ultima consumare</value>
+  </data>
+  <data name="Unavailable" xml:space="preserve">
+    <value>Acest element nu mai este disponibil.</value>
+  </data>
+  <data name="DeleteFromHistory" xml:space="preserve">
+    <value>Șterge din istoric</value>
+  </data>
+  <data name="DeleteFromHistoryConfirm" xml:space="preserve">
+    <value>Ștergi toate sesiunile înregistrate ale acestui element din istoric?</value>
+  </data>
+  <data name="HistoryEntryDeleted" xml:space="preserve">
+    <value>Intrarea din istoric a fost ștearsă.</value>
+  </data>
+  <data name="ClearHistory" xml:space="preserve">
+    <value>Golește istoricul</value>
+  </data>
+  <data name="ClearHistoryConfirm" xml:space="preserve">
+    <value>Ștergi întregul istoric de consum al utilizatorului selectat?</value>
+  </data>
+  <data name="HistoryCleared" xml:space="preserve">
+    <value>Istoricul de consum a fost golit.</value>
+  </data>
+  <data name="ClearResumePoints" xml:space="preserve">
+    <value>Elimină din continuă vizionarea</value>
+  </data>
+  <data name="ClearResumePointsConfirm" xml:space="preserve">
+    <value>Elimini toate punctele de reluare ale utilizatorului selectat? Istoricul este păstrat.</value>
+  </data>
+  <data name="ResumePointsCleared" xml:space="preserve">
+    <value>Punctele de reluare au fost eliminate.</value>
+  </data>
+  <data name="Filters" xml:space="preserve">
+    <value>Filtre</value>
+  </data>
+  <data name="Library" xml:space="preserve">
+    <value>Bibliotecă</value>
+  </data>
+  <data name="AllLibraries" xml:space="preserve">
+    <value>Toate bibliotecile</value>
+  </data>
+  <data name="AllMediaKinds" xml:space="preserve">
+    <value>Toate tipurile de conținut</value>
+  </data>
+  <data name="From" xml:space="preserve">
+    <value>De la</value>
+  </data>
+  <data name="To" xml:space="preserve">
+    <value>Până la</value>
+  </data>
+  <data name="Apply" xml:space="preserve">
+    <value>Aplică</value>
+  </data>
+  <data name="Reset" xml:space="preserve">
+    <value>Resetează</value>
+  </data>
+  <data name="InvalidDateRange" xml:space="preserve">
+    <value>Data de început nu trebuie să fie după data de sfârșit.</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>Utilizator</value>
+  </data>
+  <data name="AllUsers" xml:space="preserve">
+    <value>Toți utilizatorii</value>
+  </data>
+  <data name="Me" xml:space="preserve">
+    <value>Eu</value>
+  </data>
+  <data name="AllUsersHistoryUnavailable" xml:space="preserve">
+    <value>Istoricul și defalcarea etichetelor sunt disponibile pentru fiecare utilizator. Selectează un utilizator pentru a le vedea.</value>
+  </data>
+  <data name="PerUser" xml:space="preserve">
+    <value>Per utilizator</value>
+  </data>
+  <data name="NoUsers" xml:space="preserve">
+    <value>Niciun utilizator nu are statistici de consum pentru aceste filtre.</value>
+  </data>
+  <data name="NoMediaKindData" xml:space="preserve">
+    <value>Nu există date despre tipul de conținut pentru aceste filtre.</value>
+  </data>
+  <data name="NoConsumption" xml:space="preserve">
+    <value>Nu există istoric de consum pentru aceste filtre.</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Se încarcă...</value>
+  </data>
+  <data name="LoadFailed" xml:space="preserve">
+    <value>Statisticile nu au putut fi încărcate.</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>Reîncearcă</value>
+  </data>
+  <data name="KindMusicTrack" xml:space="preserve">
+    <value>Pistă</value>
+  </data>
+  <data name="KindPodcastEpisode" xml:space="preserve">
+    <value>Episod de podcast</value>
+  </data>
+  <data name="KindAudiobook" xml:space="preserve">
+    <value>Carte audio</value>
+  </data>
+  <data name="KindMovie" xml:space="preserve">
+    <value>Film</value>
+  </data>
+  <data name="KindTvEpisode" xml:space="preserve">
+    <value>Episod TV</value>
+  </data>
+  <data name="KindBook" xml:space="preserve">
+    <value>Carte</value>
+  </data>
+  <data name="KindPhoto" xml:space="preserve">
+    <value>Fotografie</value>
+  </data>
+  <data name="KindVideo" xml:space="preserve">
+    <value>Videoclip</value>
+  </data>
+  <data name="HoursShort" xml:space="preserve">
+    <value>h</value>
+  </data>
+  <data name="MinutesShort" xml:space="preserve">
+    <value>min</value>
+  </data>
+  <data name="SecondsShort" xml:space="preserve">
+    <value>s</value>
+  </data>
+</root>

@@ -813,4 +813,496 @@
   <data name="InvalidScheduleType" xml:space="preserve">
     <value>The schedule type is invalid!</value>
   </data>
+  <data name="InvalidReplayGainMode" xml:space="preserve">
+    <value>Invalid ReplayGain mode!</value>
+  </data>
+  <data name="InvalidStreamingQuality" xml:space="preserve">
+    <value>Invalid streaming quality!</value>
+  </data>
+  <data name="IsMutedCannotBeNull" xml:space="preserve">
+    <value>The mute state cannot be null!</value>
+  </data>
+  <data name="VolumeCannotBeNull" xml:space="preserve">
+    <value>The volume cannot be null!</value>
+  </data>
+  <data name="VolumeMustBeBetweenZeroAndOne" xml:space="preserve">
+    <value>The volume must be between 0 and 1!</value>
+  </data>
+  <data name="ShouldKeepDownloadingWhilePausedCannotBeNull" xml:space="preserve">
+    <value>The keep-downloading-while-paused preference cannot be null!</value>
+  </data>
+  <data name="ShouldAutoplayCannotBeNull" xml:space="preserve">
+    <value>The autoplay preference cannot be null!</value>
+  </data>
+  <data name="IsGaplessPlaybackEnabledCannotBeNull" xml:space="preserve">
+    <value>The gapless playback preference cannot be null!</value>
+  </data>
+  <data name="ReplayGainModeCannotBeNull" xml:space="preserve">
+    <value>The ReplayGain mode cannot be null!</value>
+  </data>
+  <data name="StreamingQualityCannotBeNull" xml:space="preserve">
+    <value>The streaming quality cannot be null!</value>
+  </data>
+  <data name="ShuffleTrackCountMustBeGreaterThanZero" xml:space="preserve">
+    <value>The shuffle track count must be greater than zero!</value>
+  </data>
+  <data name="ShuffleTrackCountMustBeAtMost500" xml:space="preserve">
+    <value>The shuffle track count must be at most 500!</value>
+  </data>
+  <data name="VuMeterReleasePerSecondCannotBeNull" xml:space="preserve">
+    <value>The VU meter release cannot be null!</value>
+  </data>
+  <data name="VuMeterSegmentCountCannotBeNull" xml:space="preserve">
+    <value>The VU meter segment count cannot be null!</value>
+  </data>
+  <data name="VuMeterReleasePerSecondMustBeBetweenZeroAndOneHundred" xml:space="preserve">
+    <value>The VU meter release must be between 0 and 100 per second!</value>
+  </data>
+  <data name="VuMeterPeakHoldDurationMustBeBetweenZeroAndTenThousandMilliseconds" xml:space="preserve">
+    <value>The VU meter peak hold duration must be between 0 and 10000 milliseconds!</value>
+  </data>
+  <data name="InvalidVuMeterOrientation" xml:space="preserve">
+    <value>Invalid VU meter orientation!</value>
+  </data>
+  <data name="VuMeterSegmentCountMustBeBetweenOneAndOneHundredTwentyEight" xml:space="preserve">
+    <value>The VU meter segment count must be between 1 and 128!</value>
+  </data>
+  <data name="VuMeterShowPeakCannotBeNull" xml:space="preserve">
+    <value>The VU meter show peak preference cannot be null!</value>
+  </data>
+  <data name="VuMeterMediumThresholdMustBeBetweenZeroAndOne" xml:space="preserve">
+    <value>The VU meter medium threshold must be between 0 and 1!</value>
+  </data>
+  <data name="VuMeterPeakReleasePerSecondMustBeBetweenZeroAndOneHundred" xml:space="preserve">
+    <value>The VU meter peak release must be between 0 and 100 per second!</value>
+  </data>
+  <data name="VuMeterSegmentGapCannotBeNull" xml:space="preserve">
+    <value>The VU meter segment gap cannot be null!</value>
+  </data>
+  <data name="VuMeterSegmentGapMustBeBetweenZeroAndThirtyTwo" xml:space="preserve">
+    <value>The VU meter segment gap must be between 0 and 32!</value>
+  </data>
+  <data name="VuMeterPeakHoldDurationCannotBeNull" xml:space="preserve">
+    <value>The VU meter peak hold duration cannot be null!</value>
+  </data>
+  <data name="VuMeterOrientationCannotBeNull" xml:space="preserve">
+    <value>The VU meter orientation cannot be null!</value>
+  </data>
+  <data name="VuMeterMediumThresholdCannotBeNull" xml:space="preserve">
+    <value>The VU meter medium threshold cannot be null!</value>
+  </data>
+  <data name="VuMeterHighThresholdMustBeBetweenZeroAndOne" xml:space="preserve">
+    <value>The VU meter high threshold must be between 0 and 1!</value>
+  </data>
+  <data name="VuMeterPeakReleasePerSecondCannotBeNull" xml:space="preserve">
+    <value>The VU meter peak release cannot be null!</value>
+  </data>
+  <data name="VuMeterHighThresholdMustBeGreaterThanOrEqualToMediumThreshold" xml:space="preserve">
+    <value>The VU meter high threshold must be greater than or equal to the medium threshold!</value>
+  </data>
+  <data name="VuMeterHighThresholdCannotBeNull" xml:space="preserve">
+    <value>The VU meter high threshold cannot be null!</value>
+  </data>
+  <data name="AlbumAlreadyExists" xml:space="preserve">
+    <value>The album already exists!</value>
+  </data>
+  <data name="AlbumIdCannotBeEmpty" xml:space="preserve">
+    <value>The album Id cannot be empty!</value>
+  </data>
+  <data name="AlbumNotFound" xml:space="preserve">
+    <value>The album was not found!</value>
+  </data>
+  <data name="AlbumTitleCannotBeEmpty" xml:space="preserve">
+    <value>The album title cannot be empty!</value>
+  </data>
+  <data name="AlbumTitleMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>The album title must be maximum 255 characters long!</value>
+  </data>
+  <data name="AlbumsListCannotBeNull" xml:space="preserve">
+    <value>The albums list cannot be null!</value>
+  </data>
+  <data name="AreaNameCannotBeEmpty" xml:space="preserve">
+    <value>The area name cannot be empty!</value>
+  </data>
+  <data name="AreaNameMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>The area name must be maximum 255 characters long!</value>
+  </data>
+  <data name="ArtistAliasNameCannotBeEmpty" xml:space="preserve">
+    <value>The artist alias name cannot be empty!</value>
+  </data>
+  <data name="ArtistAliasNameMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>The artist alias name must be maximum 255 characters long!</value>
+  </data>
+  <data name="ArtistAlreadyExists" xml:space="preserve">
+    <value>The artist already exists!</value>
+  </data>
+  <data name="ArtistIdCannotBeEmpty" xml:space="preserve">
+    <value>The artist Id cannot be empty!</value>
+  </data>
+  <data name="ArtistMustHaveAtLeastOneAlbum" xml:space="preserve">
+    <value>The artist must have at least one album!</value>
+  </data>
+  <data name="ArtistNameCannotBeEmpty" xml:space="preserve">
+    <value>The artist name cannot be empty!</value>
+  </data>
+  <data name="ArtistNameMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>The artist name must be maximum 255 characters long!</value>
+  </data>
+  <data name="ArtistNotFound" xml:space="preserve">
+    <value>The artist was not found!</value>
+  </data>
+  <data name="ArtistWebsiteMustBeMaximum2048CharactersLong" xml:space="preserve">
+    <value>The artist website must be maximum 2048 characters long!</value>
+  </data>
+  <data name="BarcodeValueCannotBeEmpty" xml:space="preserve">
+    <value>The barcode value cannot be empty!</value>
+  </data>
+  <data name="BpmMustBeGreaterThanZero" xml:space="preserve">
+    <value>The BPM must be greater than zero!</value>
+  </data>
+  <data name="CatalogNumberMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>The catalog number must be maximum 50 characters long!</value>
+  </data>
+  <data name="CompletionThresholdPercentageMustBeBetweenZeroAndOneHundred" xml:space="preserve">
+    <value>The completion threshold must be between 0 and 100!</value>
+  </data>
+  <data name="CompletionThresholdPercentageMustBeNullWhenProgressTrackingIsOff" xml:space="preserve">
+    <value>The completion threshold must be null when progress tracking is off!</value>
+  </data>
+  <data name="ConcurrencyConflict" xml:space="preserve">
+    <value>A concurrency conflict occurred while saving the changes!</value>
+  </data>
+  <data name="ConsecutivePagesReadIsOnlySupportedForPageBasedMedia" xml:space="preserve">
+    <value>The number of consecutive pages read is only supported for page based media!</value>
+  </data>
+  <data name="ConsecutivePagesReadMustBeNonNegative" xml:space="preserve">
+    <value>The number of consecutive pages read cannot be negative!</value>
+  </data>
+  <data name="ConsumedDurationCannotDecrease" xml:space="preserve">
+    <value>The consumed duration cannot decrease!</value>
+  </data>
+  <data name="ConsumedDurationIsOutOfRange" xml:space="preserve">
+    <value>The consumed duration is out of range!</value>
+  </data>
+  <data name="ConsumedDurationMustBeNonNegative" xml:space="preserve">
+    <value>The consumed duration cannot be negative!</value>
+  </data>
+  <data name="ConsumptionDateRangeIsInvalid" xml:space="preserve">
+    <value>The consumption date range is invalid!</value>
+  </data>
+  <data name="ConsumptionIsAlreadyTerminal" xml:space="preserve">
+    <value>The consumption has already ended!</value>
+  </data>
+  <data name="ConsumptionIsNotInProgress" xml:space="preserve">
+    <value>The consumption is not in progress!</value>
+  </data>
+  <data name="ConsumptionRecordIdCannotBeEmpty" xml:space="preserve">
+    <value>The consumption record Id cannot be empty!</value>
+  </data>
+  <data name="ConsumptionRecordNotFound" xml:space="preserve">
+    <value>The consumption record was not found!</value>
+  </data>
+  <data name="CountryMustBeMaximum2CharactersLong" xml:space="preserve">
+    <value>The country must be maximum 2 characters long!</value>
+  </data>
+  <data name="CoverCannotBeNull" xml:space="preserve">
+    <value>The cover cannot be null!</value>
+  </data>
+  <data name="DeliveryIdCannotBeEmpty" xml:space="preserve">
+    <value>The delivery Id cannot be empty!</value>
+  </data>
+  <data name="DeliveryIdIsInvalid" xml:space="preserve">
+    <value>The delivery Id is invalid!</value>
+  </data>
+  <data name="DiscNumberMustBeGreaterThanZero" xml:space="preserve">
+    <value>The disc number must be greater than zero!</value>
+  </data>
+  <data name="EndedConsumptionCannotPrecedeLastActivity" xml:space="preserve">
+    <value>The end time cannot precede the last activity!</value>
+  </data>
+  <data name="EndedConsumptionMustHaveEndTime" xml:space="preserve">
+    <value>An ended consumption must have an end time!</value>
+  </data>
+  <data name="FavoriteAlreadyExists" xml:space="preserve">
+    <value>The favorite already exists!</value>
+  </data>
+  <data name="FavoriteMediaItemIdCannotBeEmpty" xml:space="preserve">
+    <value>The favorite media item Id cannot be empty!</value>
+  </data>
+  <data name="FavoriteMediaItemIdsCannotBeEmpty" xml:space="preserve">
+    <value>The favorite media item Ids list cannot be empty!</value>
+  </data>
+  <data name="FavoriteMediaItemIdsExceedMaximumCount" xml:space="preserve">
+    <value>The favorite media item Ids list exceeds the maximum count!</value>
+  </data>
+  <data name="FavoriteMediaKindIsInvalid" xml:space="preserve">
+    <value>The favorite media kind is invalid!</value>
+  </data>
+  <data name="FavoriteMediaKindIsNotSupported" xml:space="preserve">
+    <value>The favorite media kind is not supported!</value>
+  </data>
+  <data name="FavoriteNotFound" xml:space="preserve">
+    <value>The favorite was not found!</value>
+  </data>
+  <data name="FileTooLarge" xml:space="preserve">
+    <value>The file is too large!</value>
+  </data>
+  <data name="InProgressConsumptionCannotHaveEndTime" xml:space="preserve">
+    <value>A consumption that is in progress cannot have an end time!</value>
+  </data>
+  <data name="InvalidFormatForBarcode" xml:space="preserve">
+    <value>The barcode format is invalid!</value>
+  </data>
+  <data name="InvalidMediaPosition" xml:space="preserve">
+    <value>The media position is invalid!</value>
+  </data>
+  <data name="InvalidProgressFraction" xml:space="preserve">
+    <value>The progress fraction is invalid!</value>
+  </data>
+  <data name="IpiValueCannotBeEmpty" xml:space="preserve">
+    <value>The IPI value cannot be empty!</value>
+  </data>
+  <data name="IpiValueMustBeMaximum20CharactersLong" xml:space="preserve">
+    <value>The IPI value must be maximum 20 characters long!</value>
+  </data>
+  <data name="IsniValueCannotBeEmpty" xml:space="preserve">
+    <value>The ISNI value cannot be empty!</value>
+  </data>
+  <data name="IsniValueMustBeMaximum20CharactersLong" xml:space="preserve">
+    <value>The ISNI value must be maximum 20 characters long!</value>
+  </data>
+  <data name="IsrcInvalidFormat" xml:space="preserve">
+    <value>The ISRC format is invalid!</value>
+  </data>
+  <data name="IsrcValueCannotBeEmpty" xml:space="preserve">
+    <value>The ISRC value cannot be empty!</value>
+  </data>
+  <data name="LastActivityCannotPrecedeStart" xml:space="preserve">
+    <value>The last activity cannot precede the start!</value>
+  </data>
+  <data name="LocationRefCannotBeEmpty" xml:space="preserve">
+    <value>The location reference cannot be empty!</value>
+  </data>
+  <data name="MediaContributorAlreadyExists" xml:space="preserve">
+    <value>The media contributor already exists!</value>
+  </data>
+  <data name="MediaContributorNameCannotBeEmpty" xml:space="preserve">
+    <value>The media contributor name cannot be empty!</value>
+  </data>
+  <data name="MediaContributorRoleNameCannotBeEmpty" xml:space="preserve">
+    <value>The media contributor role name cannot be empty!</value>
+  </data>
+  <data name="MediaItemIdCannotBeEmpty" xml:space="preserve">
+    <value>The media item Id cannot be empty!</value>
+  </data>
+  <data name="MediaKindCannotResume" xml:space="preserve">
+    <value>Media of this kind cannot be resumed!</value>
+  </data>
+  <data name="MediaKindCannotStartCompleted" xml:space="preserve">
+    <value>Media of this kind cannot be started as completed!</value>
+  </data>
+  <data name="MediaResumePointNotFound" xml:space="preserve">
+    <value>The media resume point was not found!</value>
+  </data>
+  <data name="MoodNameCannotBeEmpty" xml:space="preserve">
+    <value>The mood name cannot be empty!</value>
+  </data>
+  <data name="MusicBrainzIdInvalidFormat" xml:space="preserve">
+    <value>The MusicBrainz Id format is invalid!</value>
+  </data>
+  <data name="NoReaderAvailable" xml:space="preserve">
+    <value>No reader is available for this book!</value>
+  </data>
+  <data name="NoSupportedPlaybackFormat" xml:space="preserve">
+    <value>No supported playback format was found!</value>
+  </data>
+  <data name="NormalizationCacheLimitExceeded" xml:space="preserve">
+    <value>The normalization cache limit was exceeded!</value>
+  </data>
+  <data name="NormalizationFailed" xml:space="preserve">
+    <value>The track normalization failed!</value>
+  </data>
+  <data name="NormalizationIsNotRequiredForDirectPlay" xml:space="preserve">
+    <value>Normalization is not required for direct playback!</value>
+  </data>
+  <data name="NormalizationTimedOut" xml:space="preserve">
+    <value>The track normalization timed out!</value>
+  </data>
+  <data name="NormalizationUnavailable" xml:space="preserve">
+    <value>Track normalization is currently unavailable!</value>
+  </data>
+  <data name="NormalizedTrackCacheEntryNotFound" xml:space="preserve">
+    <value>The normalized track cache entry was not found!</value>
+  </data>
+  <data name="NormalizedTrackSegmentNotFound" xml:space="preserve">
+    <value>The normalized track segment was not found!</value>
+  </data>
+  <data name="PathTemplateIsNotSupportedForLibraryType" xml:space="preserve">
+    <value>The path template is not supported for this library type!</value>
+  </data>
+  <data name="PathTemplateLiteralCannotBeEmpty" xml:space="preserve">
+    <value>A literal part of the path template cannot be empty!</value>
+  </data>
+  <data name="PathTemplatePartKindNotSupportedForLibraryType" xml:space="preserve">
+    <value>The path template part kind is not supported for this library type!</value>
+  </data>
+  <data name="PathTemplateValuePartMustContainSinglePlaceholder" xml:space="preserve">
+    <value>A value part of the path template must contain exactly one placeholder!</value>
+  </data>
+  <data name="PermissionNotFound" xml:space="preserve">
+    <value>The permission was not found!</value>
+  </data>
+  <data name="PlaybackDeliveryChanged" xml:space="preserve">
+    <value>The playback delivery changed!</value>
+  </data>
+  <data name="PlaybackDeliveryNotFound" xml:space="preserve">
+    <value>The playback delivery was not found!</value>
+  </data>
+  <data name="PlaybackFormatNotImplemented" xml:space="preserve">
+    <value>The playback format is not implemented!</value>
+  </data>
+  <data name="PlaylistAlreadyExists" xml:space="preserve">
+    <value>The playlist already exists!</value>
+  </data>
+  <data name="PlaylistDescriptionMustBeMaximum2000CharactersLong" xml:space="preserve">
+    <value>The playlist description must be maximum 2000 characters long!</value>
+  </data>
+  <data name="PlaylistDoesNotAcceptMediaItems" xml:space="preserve">
+    <value>The playlist does not accept media items!</value>
+  </data>
+  <data name="PlaylistEntryIdCannotBeEmpty" xml:space="preserve">
+    <value>The playlist entry Id cannot be empty!</value>
+  </data>
+  <data name="PlaylistEntryNotFound" xml:space="preserve">
+    <value>The playlist entry was not found!</value>
+  </data>
+  <data name="PlaylistEntryPositionsAreInvalid" xml:space="preserve">
+    <value>The playlist entry positions are invalid!</value>
+  </data>
+  <data name="PlaylistIdCannotBeEmpty" xml:space="preserve">
+    <value>The playlist Id cannot be empty!</value>
+  </data>
+  <data name="PlaylistMoveTargetPositionIsInvalid" xml:space="preserve">
+    <value>The playlist move target position is invalid!</value>
+  </data>
+  <data name="PlaylistNameCannotBeEmpty" xml:space="preserve">
+    <value>The playlist name cannot be empty!</value>
+  </data>
+  <data name="PlaylistNameMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>The playlist name must be maximum 255 characters long!</value>
+  </data>
+  <data name="PlaylistNotFound" xml:space="preserve">
+    <value>The playlist was not found!</value>
+  </data>
+  <data name="PlaylistTypeIsInvalid" xml:space="preserve">
+    <value>The playlist type is invalid!</value>
+  </data>
+  <data name="ReaderDisabled" xml:space="preserve">
+    <value>The reader is disabled for this library!</value>
+  </data>
+  <data name="ResourceKeyCannotBeEmpty" xml:space="preserve">
+    <value>The resource key cannot be empty!</value>
+  </data>
+  <data name="ResourceNotFound" xml:space="preserve">
+    <value>The resource was not found!</value>
+  </data>
+  <data name="ScriptMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>The script must be maximum 50 characters long!</value>
+  </data>
+  <data name="SectionNotFound" xml:space="preserve">
+    <value>The section was not found!</value>
+  </data>
+  <data name="SegmentDurationMustBePositive" xml:space="preserve">
+    <value>The segment duration must be positive!</value>
+  </data>
+  <data name="SegmentIndexCannotBeEmpty" xml:space="preserve">
+    <value>The segment index cannot be empty!</value>
+  </data>
+  <data name="SegmentIndexMustBeValid" xml:space="preserve">
+    <value>The segment index is invalid!</value>
+  </data>
+  <data name="TargetUserIdIsInvalid" xml:space="preserve">
+    <value>The target user Id is invalid!</value>
+  </data>
+  <data name="TheArtistAlreadyHasTheAlbum" xml:space="preserve">
+    <value>The artist already has the album!</value>
+  </data>
+  <data name="TheArtistDoesNotHaveTheAlbum" xml:space="preserve">
+    <value>The artist does not have the album!</value>
+  </data>
+  <data name="TheTrackIsAlreadyInTheAlbum" xml:space="preserve">
+    <value>The track is already in the album!</value>
+  </data>
+  <data name="TheTrackIsNotInTheAlbum" xml:space="preserve">
+    <value>The track is not in the album!</value>
+  </data>
+  <data name="ThemeTemplateNotFound" xml:space="preserve">
+    <value>The theme template was not found!</value>
+  </data>
+  <data name="TotalDiscsMustBeGreaterThanZero" xml:space="preserve">
+    <value>The total number of discs must be greater than zero!</value>
+  </data>
+  <data name="TotalTracksMustBeGreaterThanZero" xml:space="preserve">
+    <value>The total number of tracks must be greater than zero!</value>
+  </data>
+  <data name="TrackAlreadyExists" xml:space="preserve">
+    <value>The track already exists!</value>
+  </data>
+  <data name="TrackDurationMustBePositive" xml:space="preserve">
+    <value>The track duration must be positive!</value>
+  </data>
+  <data name="TrackFileNotFound" xml:space="preserve">
+    <value>The track file was not found!</value>
+  </data>
+  <data name="TrackIdCannotBeEmpty" xml:space="preserve">
+    <value>The track Id cannot be empty!</value>
+  </data>
+  <data name="TrackNotFound" xml:space="preserve">
+    <value>The track was not found!</value>
+  </data>
+  <data name="TrackNumberMustBeGreaterThanZero" xml:space="preserve">
+    <value>The track number must be greater than zero!</value>
+  </data>
+  <data name="TrackPathCannotBeEmpty" xml:space="preserve">
+    <value>The track path cannot be empty!</value>
+  </data>
+  <data name="TrackPathMustBeMaximum2048CharactersLong" xml:space="preserve">
+    <value>The track path must be maximum 2048 characters long!</value>
+  </data>
+  <data name="TrackPathMustBeWithinLibraryContentLocations" xml:space="preserve">
+    <value>The track path must be inside one of the library content locations!</value>
+  </data>
+  <data name="TracksListCannotBeNull" xml:space="preserve">
+    <value>The tracks list cannot be null!</value>
+  </data>
+  <data name="UnknownMusicArtistGender" xml:space="preserve">
+    <value>The music artist gender is unknown!</value>
+  </data>
+  <data name="UnknownMusicArtistType" xml:space="preserve">
+    <value>The music artist type is unknown!</value>
+  </data>
+  <data name="UnknownMusicKey" xml:space="preserve">
+    <value>The music key is unknown!</value>
+  </data>
+  <data name="UnknownMusicMediaFormat" xml:space="preserve">
+    <value>The music media format is unknown!</value>
+  </data>
+  <data name="UnknownMusicReleasePackaging" xml:space="preserve">
+    <value>The music release packaging is unknown!</value>
+  </data>
+  <data name="UnknownMusicReleaseStatus" xml:space="preserve">
+    <value>The music release status is unknown!</value>
+  </data>
+  <data name="UnknownMusicReleaseType" xml:space="preserve">
+    <value>The music release type is unknown!</value>
+  </data>
+  <data name="UnsupportedMediaKind" xml:space="preserve">
+    <value>The media kind is not supported!</value>
+  </data>
+  <data name="WorkMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>The work must be maximum 255 characters long!</value>
+  </data>
+  <data name="WorkTitleCannotBeEmpty" xml:space="preserve">
+    <value>The work title cannot be empty!</value>
+  </data>
 </root>

@@ -219,4 +219,13 @@
   <data name="ScheduledJobs" xml:space="preserve">
     <value>スケジュール済みジョブ</value>
   </data>
+  <data name="Playlists" xml:space="preserve">
+    <value>プレイリスト</value>
+  </data>
+  <data name="Favorites" xml:space="preserve">
+    <value>お気に入り</value>
+  </data>
+  <data name="Statistics" xml:space="preserve">
+    <value>統計</value>
+  </data>
 </root>

@@ -1,0 +1,534 @@
+@*
+    FALLBACK FAVORITES PAGE - READ BEFORE EDITING
+
+    This view is the application fallback of the favorites page, rendered only when the theme template of the page cannot be
+    loaded. The bundled themes ship no template for it, so this view is what the user sees on a healthy site as well. It keeps
+    the DOM contract and the client script a theme template would mirror, so that listing, filtering and removing favorites
+    keep working with any theme.
+
+    The page lists the favorites of the current user across every media kind, from the most recently favorited, in pages of
+    50 items, and the kind filter restricts the list to one kind. Every card links to the page of its item, and carries a
+    favorite heart (a card-favorite-toggle button, always visible, in the place the actions trigger has on the library cards)
+    that the global favorites script drives, so a favorite is removed from the card itself. The page listens to
+    the lumina:favorite-changed event the script dispatches and removes the card of an item that is no longer a favorite, so
+    the counter and the empty state follow without another request. A favorite whose item was deleted, or whose library the
+    user can no longer access, is kept as an unavailable card without a link, so the owner can still remove it.
+
+    The element hooks the script needs are favorites-container, no-favorites, favorite-count, favorites-kind-filter,
+    load-more-favorites-button and retry-favorites-button, and the classes of the cards are media-card, media-panel and
+    card-favorite-toggle. A failed reload clears the rendered window and shows the retry button, so the page never keeps the cards
+    of a filter the combo no longer shows.
+
+    To restyle the page, edit the theme files. This fallback is intentionally plain, so that a broken theme is obvious to the user while the page still functions.
+
+    /favorites
+*@
+
+@using Lumina.Presentation.Web.Common.Services
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System
+@using System.Collections.Generic
+@using System.Text.Json
+@using System.Text.Json.Serialization
+
+@inject IViewLocalizer _localizer
+@inject IUrlService _urlService
+
+@{
+    // Generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler.
+    var scriptId = ScriptIdentifierHelper.GenerateScriptId();
+    var strings = new Dictionary<string, string>
+    {
+        ["title"] = _localizer["Title"].Value,
+        ["noFavorites"] = _localizer["NoFavorites"].Value,
+        ["noFavoritesInKind"] = _localizer["NoFavoritesInKind"].Value,
+        ["unavailable"] = _localizer["Unavailable"].Value,
+        ["itemsCount"] = _localizer["ItemsCount"].Value,
+        ["loadFailed"] = _localizer["LoadFailed"].Value,
+        ["kindMusicArtist"] = _localizer["KindArtist"].Value,
+        ["kindMusicAlbum"] = _localizer["KindAlbum"].Value,
+        ["kindMusicTrack"] = _localizer["KindTrack"].Value,
+        ["kindBook"] = _localizer["KindBook"].Value
+    };
+    var jsonOptions = new JsonSerializerOptions
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        Converters = { new JsonStringEnumConverter() }
+    };
+}
+
+@Html.AntiForgeryToken()
+
+<div class="cotton-candy">
+    <div style="display: grid; grid-template-rows: auto 1fr;">
+        <div style="min-height: 1rem;"></div>
+        <div class="pl-10 pr-10 pb-10">
+            <div class="text-center">
+                <h1 class="text-light-two engraved-title">@_localizer["Title"]</h1>
+            </div>
+            <!-- Kind filter. -->
+            <div class="form-row">
+                <div class="enlightenment-combobox inline-block w-200px" id="favorites-kind-filter">
+                    <div class="shine-effect" style="top: 1px;"></div>
+                    <input type="checkbox" class="enlightenment-toggle-checkbox" id="favorites-kind-filter-toggle" />
+                    <label class="enlightenment-toggle" for="favorites-kind-filter-toggle">
+                        <span class="enlightenment-selected-text" data-value="">@_localizer["FilterAll"]</span>
+                    </label>
+                    <div class="enlightenment-dropdown">
+                        <div class="shine-effect" style="top: -4px;"></div>
+                        <div class="enlightenment-option" data-value="">@_localizer["FilterAll"]</div>
+                        <div class="enlightenment-option" data-value="MusicArtist">@_localizer["FilterArtists"]</div>
+                        <div class="enlightenment-option" data-value="MusicAlbum">@_localizer["FilterAlbums"]</div>
+                        <div class="enlightenment-option" data-value="MusicTrack">@_localizer["FilterTracks"]</div>
+                        <div class="enlightenment-option last-option" data-value="Book">@_localizer["FilterBooks"]</div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <span id="favorite-count" class="text-light-two" aria-live="polite"></span>
+            </div>
+            <div id="favorites-container" class="cards-container justify-start h-100"></div>
+            <p id="no-favorites" class="hidden text-light-two text-center" aria-live="polite" aria-atomic="true" tabindex="-1">@_localizer["NoFavorites"]</p>
+            <div class="form-row">
+                <button id="load-more-favorites-button" type="button" class="confirm-button hidden">@_localizer["LoadMore"]</button>
+                <button id="retry-favorites-button" type="button" class="confirm-button hidden">@_localizer["Retry"]</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- The "text/plain" type is a design choice, not a mistake: it keeps the browser from executing this view script during HTML parsing, before site.js defines the API helpers it calls. site.js (which loads deferred) executes these scripts once it is loaded, both on the initial page load and during AJAX navigation. -->
+    <script type="text/plain" data-form="@scriptId">
+        const strings = @Html.Raw(JsonSerializer.Serialize(strings, jsonOptions));
+        const getFavoritesUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Favorites.GET_FAVORITES)';
+        const artistUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Music.ARTIST, new { artistId = default(Guid) })';
+        const albumUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Music.ALBUM, new { artistId = default(Guid), albumId = default(Guid) })';
+        const trackUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Music.TRACK, new { artistId = default(Guid), albumId = default(Guid), trackId = default(Guid) })';
+        const bookUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.EDIT_BOOK, new { bookId = default(Guid) })';
+        const EMPTY_GUID = '00000000-0000-0000-0000-000000000000';
+        const PAGE_SIZE = 50;
+        const favoritesContainer = document.getElementById('favorites-container');
+        const noFavoritesMessage = document.getElementById('no-favorites');
+        const favoriteCount = document.getElementById('favorite-count');
+        const kindFilter = document.getElementById('favorites-kind-filter');
+        const loadMoreButton = document.getElementById('load-more-favorites-button');
+        const retryButton = document.getElementById('retry-favorites-button');
+        let isInitialized = false;
+        let isLoading = false;
+        let requestSequence = 0;
+        let currentKind = '';
+        let hasLoadedWindow = false;
+        let hasLoadFailed = false;
+        let isRetrying = false;
+        // The page of the last loaded window, the page size, the total number of pages, the number of cards that are rendered and
+        // the total the server reported for the current filter.
+        let currentPage = 1;
+        let perPage = PAGE_SIZE;
+        let numberOfPages = 0;
+        let loadedCount = 0;
+        let totalCount = 0;
+        // A removal shifts one item of the next page into the last loaded page, so the next load more reads that page again.
+        let isWindowStale = false;
+
+        function isKnownId(id) {
+            return typeof id === 'string' && id !== '' && id !== EMPTY_GUID;
+        }
+
+        // Builds the page route of the item of a favorite. Returns an empty string when the page of the item cannot be addressed,
+        // for example a track whose album is not known, so the card is rendered without a link instead of with a broken one.
+        function buildItemUrl(item) {
+            if (!isKnownId(item.libraryId))
+                return '';
+            const libraryQuery = `?libraryId=${encodeURIComponent(item.libraryId)}`;
+            switch (item.mediaKind) {
+                case 'MusicArtist':
+                    return artistUrlTemplate.replace(`/${EMPTY_GUID}`, `/${item.mediaItemId}`) + libraryQuery;
+                case 'MusicAlbum':
+                    if (!isKnownId(item.creatorId))
+                        return '';
+                    return albumUrlTemplate.replace(`/${EMPTY_GUID}`, `/${item.creatorId}`).replace(`/${EMPTY_GUID}`, `/${item.mediaItemId}`) + libraryQuery;
+                case 'MusicTrack':
+                    if (!isKnownId(item.creatorId) || !isKnownId(item.collectionId))
+                        return '';
+                    return trackUrlTemplate.replace(`/${EMPTY_GUID}`, `/${item.creatorId}`).replace(`/${EMPTY_GUID}`, `/${item.collectionId}`).replace(`/${EMPTY_GUID}`, `/${item.mediaItemId}`) + libraryQuery;
+                case 'Book':
+                    return bookUrlTemplate.replace(`/${EMPTY_GUID}`, `/${item.mediaItemId}`) + libraryQuery;
+                default:
+                    return '';
+            }
+        }
+
+        // The creator and the collection of the item, for example the artist and the album of a track, on one line.
+        function buildSubtitle(item) {
+            return [item.creatorName, item.collectionTitle].filter(value => value).join(' - ');
+        }
+
+        function createTextLine(text, isKindLine) {
+            const line = document.createElement('span');
+            line.className = 'text-light-two';
+            line.textContent = text;
+            line.style.display = 'block';
+            line.style.width = '200px';
+            line.style.height = 'auto';
+            line.style.boxSizing = 'border-box';
+            line.style.textAlign = 'center';
+            if (isKindLine) {
+                line.style.padding = '0 4px 4px';
+                line.style.fontSize = '12px';
+                line.style.opacity = '0.6';
+            } else {
+                line.style.padding = '0 4px';
+                line.style.whiteSpace = 'nowrap';
+                line.style.overflow = 'hidden';
+                line.style.textOverflow = 'ellipsis';
+                line.style.opacity = '0.8';
+            }
+            return line;
+        }
+
+        function findCard(mediaKind, mediaItemId) {
+            const itemId = String(mediaItemId).toLowerCase();
+            return Array.from(favoritesContainer.querySelectorAll('.media-card'))
+                .find(card => card.dataset.mediaKind === mediaKind && card.dataset.mediaItemId.toLowerCase() === itemId) || null;
+        }
+
+        // The heart of a card, drawn by the application style sheet like the actions trigger of the library cards, which the cards
+        // of this page do not have. It is a plain button: the global favorites script finds it by its data attributes, hydrates its state and handles its click.
+        function createFavoriteToggle(item) {
+            const toggle = document.createElement('button');
+            toggle.type = 'button';
+            toggle.className = 'card-favorite-toggle';
+            toggle.setAttribute('data-favorite-toggle', '');
+            toggle.setAttribute('data-favorite-media-kind', item.mediaKind);
+            toggle.setAttribute('data-favorite-media-item-id', item.mediaItemId);
+            // Every card of this page is a favorite, so the toggle starts in that state and does not flash while the global favorites
+            // script checks it. The script confirms the state and keeps the accessible name and the hover text in its language.
+            toggle.setAttribute('aria-pressed', 'true');
+            toggle.setAttribute('data-favorite-state', 'favorited');
+            return toggle;
+        }
+
+        function createFavoriteCard(item) {
+            const isAvailable = item.isAvailable === true;
+            const itemUrl = isAvailable ? buildItemUrl(item) : '';
+
+            const card = document.createElement('div');
+            card.className = 'media-card';
+            card.dataset.mediaKind = item.mediaKind;
+            card.dataset.mediaItemId = item.mediaItemId;
+
+            // A card without a page to open is not a link: the unavailable items have nothing to open, and a link to nowhere
+            // would only mislead the keyboard and the screen reader users.
+            const panel = document.createElement(itemUrl ? 'a' : 'div');
+            panel.className = itemUrl ? 'media-panel nav-link no-underline' : 'media-panel no-underline';
+            panel.style.width = '200px';
+            panel.style.height = 'auto';
+            if (itemUrl)
+                panel.href = itemUrl;
+            else
+                panel.style.cursor = 'default';
+
+            // The cover is shown as a square, cropped from its center (never stretched), like the cards of the library pages.
+            const image = document.createElement('img');
+            image.src = isAvailable && item.coverPath
+                ? `${globalConfiguration.serverBasePath}${item.coverPath}`
+                : (item.mediaKind === 'Book' ? '/images/ui/book-placeholder.svg' : '/images/ui/music-placeholder.svg');
+            image.alt = '';
+            image.style.width = '200px';
+            image.style.height = '200px';
+            image.style.flexGrow = '0';
+            image.style.objectFit = 'cover';
+            image.style.objectPosition = 'center';
+            panel.appendChild(image);
+
+            // The title of an available item is kept on a single line, truncated with an ellipsis when it does not fit, so that all the cards share
+            // the same height. The unavailable message is a whole sentence and wraps on its own lines instead.
+            const titleSpan = document.createElement('span');
+            titleSpan.className = 'text-light-two';
+            titleSpan.style.display = 'block';
+            titleSpan.style.width = '200px';
+            titleSpan.style.boxSizing = 'border-box';
+            titleSpan.style.height = 'auto';
+            titleSpan.style.padding = '4px';
+            titleSpan.style.textAlign = 'center';
+            titleSpan.style.whiteSpace = 'nowrap';
+            titleSpan.style.overflow = 'hidden';
+            titleSpan.style.textOverflow = 'ellipsis';
+            const title = document.createElement('strong');
+            title.textContent = isAvailable ? item.title : strings.unavailable;
+            titleSpan.appendChild(title);
+            titleSpan.title = title.textContent;
+            // The unavailable message is a whole sentence, so it wraps instead of being cut to fit the single title line of an item.
+            if (!isAvailable) {
+                titleSpan.style.whiteSpace = 'normal';
+                titleSpan.style.overflow = 'visible';
+                titleSpan.style.textOverflow = 'clip';
+            }
+            panel.appendChild(titleSpan);
+
+            // The subtitle line is always rendered, with a non-breaking space when there is nothing to show, so that every card has the same
+            // number of lines and therefore the same height, whatever the kind of the favorite.
+            const subtitle = isAvailable ? buildSubtitle(item) : '';
+            const subtitleLine = createTextLine(subtitle || '\u00A0', false);
+            if (subtitle)
+                subtitleLine.title = subtitle;
+            panel.appendChild(subtitleLine);
+            panel.appendChild(createTextLine(strings[`kind${item.mediaKind}`] || item.mediaKind, true));
+
+            card.appendChild(panel);
+            card.appendChild(createFavoriteToggle(item));
+            return card;
+        }
+
+        function updateState() {
+            const hasCards = loadedCount > 0;
+            // A removal shifts one item of the next page into the last loaded page even when it was the last page, so the rendered
+            // count, not the page number alone, decides whether that shifted item still has to be fetched.
+            const hasMore = hasLoadedWindow && (currentPage < numberOfPages || (isWindowStale && loadedCount < totalCount));
+            // The empty state appears only after a window of the current filter was received, so it never flashes while the first
+            // window is loading, and the failure message replaces it when that window or a later reload failed.
+            const showEmptyState = hasLoadedWindow && !hasCards && !hasMore;
+            // Clearing the message while a retry is in flight lets the live region announce the failure again when the message returns.
+            noFavoritesMessage.textContent = isRetrying
+                ? ''
+                : (hasLoadFailed ? strings.loadFailed : (currentKind === '' ? strings.noFavorites : strings.noFavoritesInKind));
+            noFavoritesMessage.classList.toggle('hidden', !hasLoadFailed && !showEmptyState);
+            favoriteCount.textContent = totalCount > 0 ? `${totalCount} ${strings.itemsCount}` : '';
+            loadMoreButton.classList.toggle('hidden', hasLoadFailed || isRetrying || !hasMore);
+            loadMoreButton.disabled = isLoading;
+            if (retryButton) {
+                retryButton.classList.toggle('hidden', !hasLoadFailed && !isRetrying);
+                retryButton.disabled = isLoading;
+                retryButton.setAttribute('aria-busy', isRetrying ? 'true' : 'false');
+            }
+        }
+
+        function buildFavoritesUrl(page) {
+            const parameters = new URLSearchParams();
+            if (currentKind !== '')
+                parameters.set('mediaKind', currentKind);
+            parameters.set('currentPage', page);
+            parameters.set('perPage', perPage);
+            return `${getFavoritesUrl}?${parameters.toString()}`;
+        }
+
+        // Loads a page of the favorites and renders it. A reload replaces the cards, which is what changing the filter does, and a
+        // load more appends the next page. An answer that was overtaken by a newer request is dropped.
+        async function loadFavoritesAsync(isAppend, isRetry = false, shouldRestartFromFirstPage = true) {
+            const requestId = ++requestSequence;
+            // A reload starts again from the first page of the filter. A load more asks for the page after the last one, or asks for
+            // the last one again when a removal shifted an item of the next page into it.
+            const requestedPage = isAppend ? (isWindowStale ? currentPage : currentPage + 1) : 1;
+            // A reload starts a new page chain for the filter, so the empty state stays hidden until its first answer arrives. A retry keeps
+            // the failure message and the retry button visible, with the button disabled and marked busy, until the answer arrives.
+            isRetrying = isRetry;
+            if (!isAppend) {
+                hasLoadedWindow = false;
+                if (!isRetry)
+                    hasLoadFailed = false;
+            }
+            isLoading = true;
+            updateState();
+            const page = await callApiGetAsync(buildFavoritesUrl(requestedPage));
+            if (requestId !== requestSequence)
+                return;
+            isLoading = false;
+            isRetrying = false;
+            if (!page || !Array.isArray(page.data)) {
+                // The API helper already reported the failure. A reload has nothing left to show, so it clears the cards of the
+                // previous page and leaves a retry instead of hiding the only way to continue. A failed load more keeps its
+                // button, because the rendered page is still valid.
+                if (!isAppend) {
+                    favoritesContainer.querySelectorAll('.media-card').forEach(card => card.remove());
+                    loadedCount = 0;
+                    currentPage = 1;
+                    perPage = PAGE_SIZE;
+                    numberOfPages = 0;
+                    totalCount = 0;
+                    hasLoadedWindow = false;
+                    hasLoadFailed = true;
+                    isWindowStale = false;
+                }
+                updateState();
+                if (isRetry)
+                    focusAfterReload('', '');
+                return;
+            }
+            const wasWindowStale = isWindowStale;
+            if (!isAppend) {
+                favoritesContainer.querySelectorAll('.media-card').forEach(card => card.remove());
+                loadedCount = 0;
+            }
+            let pageHasRenderedItems = false;
+            page.data.forEach(item => {
+                // An item favorited since an earlier page shifts the list, so the same favorite could come twice. The card that is
+                // already rendered is kept, but the duplicate means the page chain no longer matches the rendered rows.
+                if (findCard(item.mediaKind, item.mediaItemId)) {
+                    pageHasRenderedItems = true;
+                    return;
+                }
+                favoritesContainer.appendChild(createFavoriteCard(item));
+                loadedCount++;
+            });
+            isWindowStale = false;
+            currentPage = Number.isInteger(page.currentPage) && page.currentPage > 0 ? page.currentPage : requestedPage;
+            perPage = Number.isInteger(page.perPage) && page.perPage > 0 ? page.perPage : PAGE_SIZE;
+            totalCount = Number.isInteger(page.count) ? page.count : loadedCount;
+            numberOfPages = Number.isInteger(page.numberOfPages) ? page.numberOfPages : (perPage > 0 ? Math.ceil(totalCount / perPage) : 0);
+            // An empty page means there is nothing more to read, even when a stale total still claims otherwise.
+            if (page.data.length === 0) {
+                totalCount = Math.min(totalCount, loadedCount);
+                numberOfPages = Math.min(numberOfPages, currentPage);
+            }
+            // An item favorited in another tab or on another device shifts every server page after it. The page then contains cards that
+            // are already rendered, and the last page can be reached while cards are still missing. Both mean the page chain no longer
+            // covers the rendered rows, so the only consistent window is a fresh read from the first page. The stale re-read after a
+            // removal is excluded, because that overlap is expected there and it keeps the card of the shifted item.
+            if (shouldRestartFromFirstPage && ((!wasWindowStale && pageHasRenderedItems) || (currentPage >= numberOfPages && loadedCount < totalCount))) {
+                await loadFavoritesAsync(false, false, false);
+                // The restart is a fresh read, so it does not carry the retry flag. The outer retry still owns the focus, and the inner
+                // call replaced the cards and hid the retry button, so the focus has to move after it completes.
+                if (isRetry)
+                    focusAfterReload('', '');
+                return;
+            }
+            hasLoadedWindow = true;
+            hasLoadFailed = false;
+            bindNavigationLinks();
+            updateState();
+            if (isRetry)
+                focusAfterReload('', '');
+        }
+
+        async function loadMoreAsync() {
+            if (isLoading)
+                return;
+            await loadFavoritesAsync(true);
+        }
+
+        async function retryLoadAsync() {
+            if (isLoading)
+                return;
+            await loadFavoritesAsync(false, true);
+        }
+
+        // Moves focus into the window a removal or a retry loaded: the neighboring card when it is still there, the first card otherwise,
+        // the load more button or the retry button, and finally the visible message when the window is empty.
+        function focusAfterReload(neighborKind, neighborId) {
+            const refreshedNeighbor = neighborKind ? findCard(neighborKind, neighborId) : null;
+            const firstCard = favoritesContainer.querySelector('.media-card');
+            const focusTarget = refreshedNeighbor || firstCard;
+            const focusToggle = focusTarget ? focusTarget.querySelector('[data-favorite-toggle]') : null;
+            if (focusToggle)
+                focusToggle.focus();
+            else if (!loadMoreButton.classList.contains('hidden'))
+                loadMoreButton.focus();
+            else if (retryButton && !retryButton.classList.contains('hidden'))
+                retryButton.focus();
+            else if (!noFavoritesMessage.classList.contains('hidden'))
+                noFavoritesMessage.focus();
+        }
+
+        // Removes the card of an item that is no longer a favorite, and moves the keyboard focus to the neighboring card, so a keyboard user is not dropped to the top of the page.
+        async function handleFavoriteChanged(event) {
+            const detail = event.detail;
+            if (!detail || detail.isFavorite)
+                return;
+            const card = findCard(detail.mediaKind, detail.mediaItemId);
+            if (!card)
+                return;
+            const neighbor = card.nextElementSibling || card.previousElementSibling;
+            const neighborKind = neighbor ? neighbor.dataset.mediaKind : '';
+            const neighborId = neighbor ? neighbor.dataset.mediaItemId : '';
+            const hadFocus = card.contains(document.activeElement);
+            card.remove();
+            loadedCount--;
+            totalCount = Math.max(0, totalCount - 1);
+            numberOfPages = perPage > 0 ? Math.ceil(totalCount / perPage) : 0;
+            // A page that was requested before this removal describes the list that still contained the item, so neither its
+            // cards nor its total can be applied. Drop it and load the first page again.
+            const mustReload = isLoading;
+            if (mustReload) {
+                requestSequence++;
+                isLoading = false;
+                hasLoadedWindow = false;
+                isWindowStale = false;
+                updateState();
+                await loadFavoritesAsync(false);
+                if (hadFocus)
+                    focusAfterReload(neighborKind, neighborId);
+                return;
+            }
+            // The list lost one item, so one item of the next page shifted into the last loaded page. The next load more reads
+            // that page again, so the shifted item is not skipped.
+            isWindowStale = true;
+            updateState();
+            // Every rendered card was removed but the user has more favorites, so the first page is loaded again instead of
+            // starting from a page that no longer matches the empty screen. Focus moves after that reload, because it
+            // replaces the cards and hides the load more button the old focus fallback would have chosen.
+            if (loadedCount === 0 && totalCount > 0) {
+                await loadFavoritesAsync(false);
+                if (hadFocus)
+                    focusAfterReload(neighborKind, neighborId);
+                return;
+            }
+            if (hadFocus) {
+                const neighborToggle = neighbor ? neighbor.querySelector('[data-favorite-toggle]') : null;
+                if (neighborToggle)
+                    neighborToggle.focus();
+                else if (!loadMoreButton.classList.contains('hidden'))
+                    loadMoreButton.focus();
+            }
+        }
+
+        function handleKindFilterClick(event) {
+            const option = event.target.closest('.enlightenment-option');
+            if (!option || option.classList.contains('disabled'))
+                return;
+            const selected = kindFilter.querySelector('.enlightenment-selected-text');
+            if (selected) {
+                selected.textContent = option.textContent;
+                selected.setAttribute('data-value', option.getAttribute('data-value') || '');
+            }
+            const toggle = kindFilter.querySelector('.enlightenment-toggle-checkbox');
+            if (toggle)
+                toggle.checked = false;
+            const kind = option.getAttribute('data-value') || '';
+            if (kind === currentKind)
+                return;
+            currentKind = kind;
+            loadFavoritesAsync(false);
+        }
+
+        document.addEventListener('lumina:favorite-changed', handleFavoriteChanged);
+        if (kindFilter)
+            kindFilter.addEventListener('click', handleKindFilterClick);
+        if (loadMoreButton)
+            loadMoreButton.addEventListener('click', loadMoreAsync);
+        if (retryButton)
+            retryButton.addEventListener('click', retryLoadAsync);
+
+        async function InitializeAsync() {
+            if (isInitialized)
+                return;
+            if (!favoritesContainer)
+                return;
+            isInitialized = true;
+            await loadFavoritesAsync(false);
+        }
+
+        window.viewCleanups = window.viewCleanups || {};
+        window.viewCleanups['@scriptId'] = () => {
+            document.removeEventListener('lumina:favorite-changed', handleFavoriteChanged);
+            if (kindFilter)
+                kindFilter.removeEventListener('click', handleKindFilterClick);
+            if (loadMoreButton)
+                loadMoreButton.removeEventListener('click', loadMoreAsync);
+            if (retryButton)
+                retryButton.removeEventListener('click', retryLoadAsync);
+            console.log(`Unloaded @scriptId`);
+        };
+        console.log(`Loaded @scriptId`);
+    </script>
+}

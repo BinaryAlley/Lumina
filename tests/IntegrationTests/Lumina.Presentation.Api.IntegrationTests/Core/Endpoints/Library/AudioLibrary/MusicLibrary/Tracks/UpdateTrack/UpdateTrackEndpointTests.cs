@@ -41,7 +41,9 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -56,7 +58,6 @@ namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Library.AudioL
 public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
 {
     private static readonly string s_contentRootPath = Path.Combine(Path.GetTempPath(), "lumina-update-track-tests");
-    private static readonly string s_outsideContentRootPath = Path.Combine(Path.GetTempPath(), "lumina-update-track-outside");
 
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
@@ -115,10 +116,9 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         // Arrange
         Guid userId = GetCurrentUserId();
         Guid libraryId = await SeedLibraryAsync(userId);
-        (Guid artistId, Guid albumId, Guid trackId) = await SeedArtistGraphAsync(libraryId, Path.Combine(s_contentRootPath, "bohemian-rhapsody.flac"));
-        string updatedPath = Path.Combine(s_contentRootPath, $"love-of-my-life-{Guid.NewGuid():N}.flac");
+        string originalPath = Path.Combine(s_contentRootPath, "bohemian-rhapsody.flac");
+        (Guid artistId, Guid albumId, Guid trackId) = await SeedArtistGraphAsync(libraryId, originalPath);
         UpdateTrackRequest request = _updateTrackRequestFixture.Create(
-            path: updatedPath,
             metadata: _musicTrackMetadataDtoFixture.Create(title: "Somebody to Love"),
             moods: [],
             isrcs: [],
@@ -142,14 +142,65 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         Assert.NotNull(trackResponse);
         Assert.Equal(trackId, trackResponse!.Id);
         Assert.Equal(libraryId, trackResponse.LibraryId);
-        Assert.Equal(updatedPath, trackResponse.Path);
+        // the file system path is preserved by the update, it is set only when the track is created
+        Assert.Equal(originalPath, trackResponse.Path);
         Assert.Equal("Somebody to Love", trackResponse.Metadata!.Title);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         TrackEntity storedTrack = dbContext.Tracks.Single(track => track.Id == trackId);
         Assert.Equal("Somebody to Love", storedTrack.Title);
-        Assert.Equal(updatedPath, storedTrack.Path);
+        Assert.Equal(originalPath, storedTrack.Path);
+    }
+
+    [Fact]
+    public async Task UpdateTrack_WhenRequestBodyCarriesAFilePath_ShouldIgnoreItAndPreserveTheStoredPath()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = await SeedLibraryAsync(userId);
+        string originalPath = Path.Combine(s_contentRootPath, "bohemian-rhapsody.flac");
+        string attemptedPath = Path.Combine(Path.GetTempPath(), "lumina-outside-content-root", "etc", "hosts");
+        (Guid artistId, Guid albumId, Guid trackId) = await SeedArtistGraphAsync(libraryId, originalPath);
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create(
+            metadata: _musicTrackMetadataDtoFixture.Create(title: "Somebody to Love"),
+            moods: [],
+            isrcs: [],
+            contributors: [],
+            ratings: [],
+            includeDiscNumber: false,
+            includeScript: false,
+            includeKey: false,
+            includeBpm: false,
+            includeWork: false,
+            includeMusicBrainzRecordingId: false,
+            includeMusicBrainzTrackId: false);
+        JsonSerializerOptions serializationOptions = new(JsonSerializerDefaults.Web)
+        {
+            Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+        };
+        JsonObject body = JsonSerializer.SerializeToNode(request, serializationOptions)!.AsObject();
+        body["path"] = attemptedPath;
+        using StringContent jsonContent = new(body.ToJsonString(serializationOptions), Encoding.UTF8, "application/json");
+
+        // Act
+        HttpResponseMessage response = await _client.PutAsync($"/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}", jsonContent);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        TrackResponse? trackResponse = JsonSerializer.Deserialize<TrackResponse>(content, _jsonOptions);
+        Assert.NotNull(trackResponse);
+        // the posted file system path is ignored, because a track path is set only when the track is created by the scanner
+        Assert.Equal(originalPath, trackResponse!.Path);
+        Assert.NotEqual(attemptedPath, trackResponse.Path);
+        Assert.Equal("Somebody to Love", trackResponse.Metadata!.Title);
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        TrackEntity storedTrack = dbContext.Tracks.Single(track => track.Id == trackId);
+        Assert.Equal(originalPath, storedTrack.Path);
+        Assert.NotEqual(attemptedPath, storedTrack.Path);
     }
 
     [Fact]
@@ -160,7 +211,6 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         Guid libraryId = await SeedLibraryAsync(otherUserId);
         (Guid artistId, Guid albumId, Guid trackId) = await SeedArtistGraphAsync(libraryId, Path.Combine(s_contentRootPath, "bohemian-rhapsody.flac"));
         UpdateTrackRequest request = _updateTrackRequestFixture.Create(
-            path: Path.Combine(s_contentRootPath, "dont-stop-me-now.flac"),
             metadata: _musicTrackMetadataDtoFixture.Create(title: "Don't Stop Me Now"),
             moods: [],
             isrcs: [],
@@ -302,22 +352,6 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     }
 
     [Fact]
-    public async Task UpdateTrack_WhenPathIsOutsideLibraryContentLocations_ShouldReturnPathError()
-    {
-        // Arrange
-        Guid userId = GetCurrentUserId();
-        Guid libraryId = await SeedLibraryAsync(userId);
-        (Guid artistId, Guid albumId, Guid trackId) = await SeedArtistGraphAsync(libraryId, Path.Combine(s_contentRootPath, "bohemian-rhapsody.flac"));
-        UpdateTrackRequest request = _updateTrackRequestFixture.Create(path: Path.Combine(s_outsideContentRootPath, "under-pressure.flac"));
-
-        // Act
-        HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}", request);
-
-        // Assert
-        await AssertUnprocessableEntityWithValidationErrors(response, "TrackPathMustBeWithinLibraryContentLocations");
-    }
-
-    [Fact]
     public async Task UpdateTrack_WhenAReferencedContributorDoesNotExist_ShouldReturnMediaContributorNotFoundProblem()
     {
         // Arrange
@@ -325,7 +359,6 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         Guid libraryId = await SeedLibraryAsync(userId);
         (Guid artistId, Guid albumId, Guid trackId) = await SeedArtistGraphAsync(libraryId, Path.Combine(s_contentRootPath, "bohemian-rhapsody.flac"));
         UpdateTrackRequest request = _updateTrackRequestFixture.Create(
-            path: Path.Combine(s_contentRootPath, "somebody-to-love.flac"),
             contributors: [_mediaContributorReferenceDtoFixture.Create(contributorId: Guid.NewGuid(), role: MediaContributorRole.Vocals)]);
 
         // Act
@@ -350,7 +383,6 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         ];
         await SeedContributorsAsync(duplicatedContributors);
         UpdateTrackRequest request = _updateTrackRequestFixture.Create(
-            path: Path.Combine(s_contentRootPath, "another-one-bites-the-dust.flac"),
             moods: [],
             isrcs: [],
             contributors: duplicatedContributors,
@@ -371,32 +403,6 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         Assert.All(links, link => Assert.Equal(contributorId, link.MediaContributorId));
         Assert.Contains(links, link => link.Role == MediaContributorRole.Vocals);
         Assert.Contains(links, link => link.Role == MediaContributorRole.Guitar);
-    }
-
-    [Fact]
-    public async Task UpdateTrack_WhenPathIsNull_ShouldReturnUnprocessableEntity()
-    {
-        // Arrange
-        UpdateTrackRequest request = _updateTrackRequestFixture.Create(includePath: false);
-
-        // Act
-        HttpResponseMessage response = await PutTrackAsync(request);
-
-        // Assert
-        await AssertUnprocessableEntityWithValidationErrors(response, "TrackPathCannotBeEmpty");
-    }
-
-    [Fact]
-    public async Task UpdateTrack_WhenPathExceeds2048Characters_ShouldReturnUnprocessableEntity()
-    {
-        // Arrange
-        UpdateTrackRequest request = _updateTrackRequestFixture.Create(path: new Faker().Random.String2(2049));
-
-        // Act
-        HttpResponseMessage response = await PutTrackAsync(request);
-
-        // Assert
-        await AssertUnprocessableEntityWithValidationErrors(response, "TrackPathMustBeMaximum2048CharactersLong");
     }
 
     [Fact]
@@ -1004,7 +1010,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         Guid userId = GetCurrentUserId();
         Guid libraryId = await SeedLibraryAsync(userId);
         (Guid artistId, Guid albumId, Guid trackId) = await SeedArtistGraphAsync(libraryId, Path.Combine(s_contentRootPath, "bohemian-rhapsody.flac"));
-        UpdateTrackRequest request = _updateTrackRequestFixture.Create(path: Path.Combine(s_contentRootPath, "the-show-must-go-on.flac"));
+        UpdateTrackRequest request = _updateTrackRequestFixture.Create();
         using CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
 
         // Act & Assert

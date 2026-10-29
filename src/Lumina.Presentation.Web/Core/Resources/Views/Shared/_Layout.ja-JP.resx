@@ -120,6 +120,27 @@
   <data name="Abort" xml:space="preserve">
     <value>中止する</value>
   </data>
+  <data name="AudioPlayerBuffering" xml:space="preserve">
+    <value>バッファリング中</value>
+  </data>
+  <data name="AudioPlayerMute" xml:space="preserve">
+    <value>ミュート</value>
+  </data>
+  <data name="AudioPlayerPause" xml:space="preserve">
+    <value>一時停止</value>
+  </data>
+  <data name="AudioPlayerPlay" xml:space="preserve">
+    <value>再生</value>
+  </data>
+  <data name="AudioPlayerSeek" xml:space="preserve">
+    <value>再生位置</value>
+  </data>
+  <data name="AudioPlayerUnmute" xml:space="preserve">
+    <value>ミュート解除</value>
+  </data>
+  <data name="AudioPlayerVolume" xml:space="preserve">
+    <value>音量</value>
+  </data>
   <data name="Cancel" xml:space="preserve">
     <value>キャンセル</value>
   </data>
@@ -147,8 +168,8 @@
   <data name="Retry" xml:space="preserve">
     <value>再試行</value>
   </data>
-  <data name="ToggleFullHeight" xml:space="preserve">
-    <value>全高表示切替</value>
+  <data name="ToggleExpanded" xml:space="preserve">
+    <value>プレーヤーを展開または折りたたむ</value>
   </data>
   <data name="ToggleVisibility" xml:space="preserve">
     <value>表示切替</value>
@@ -158,5 +179,86 @@
   </data>
   <data name="Yes" xml:space="preserve">
     <value>はい</value>
+  </data>
+  <data name="AudioPlayerPrevious" xml:space="preserve">
+    <value>前の曲</value>
+  </data>
+  <data name="AudioPlayerNext" xml:space="preserve">
+    <value>次の曲</value>
+  </data>
+  <data name="AudioPlayerShuffle" xml:space="preserve">
+    <value>シャッフル</value>
+  </data>
+  <data name="AudioPlayerShuffleRelease" xml:space="preserve">
+    <value>アルバムをシャッフル</value>
+  </data>
+  <data name="AudioPlayerShuffleArtist" xml:space="preserve">
+    <value>アーティストをシャッフル</value>
+  </data>
+  <data name="AudioPlayerShuffleLibrary" xml:space="preserve">
+    <value>ライブラリをシャッフル</value>
+  </data>
+  <data name="AudioPlayerRepeat" xml:space="preserve">
+    <value>リピート</value>
+  </data>
+  <data name="AudioPlayerRepeatOff" xml:space="preserve">
+    <value>リピートなし</value>
+  </data>
+  <data name="AudioPlayerRepeatAll" xml:space="preserve">
+    <value>すべてリピート</value>
+  </data>
+  <data name="AudioPlayerRepeatOne" xml:space="preserve">
+    <value>1曲リピート</value>
+  </data>
+  <data name="AudioPlayerQueue" xml:space="preserve">
+    <value>再生キュー</value>
+  </data>
+  <data name="AudioPlayerShuffleOff" xml:space="preserve">
+    <value>シャッフルなし</value>
+  </data>
+  <data name="AudioPlayerStop" xml:space="preserve">
+    <value>停止</value>
+  </data>
+  <data name="AudioPlayerAlbumArtwork" xml:space="preserve">
+    <value>アルバムアートワーク</value>
+  </data>
+  <data name="AudioPlayerAddQueueToPlaylist" xml:space="preserve">
+    <value>キューをプレイリストに追加</value>
+  </data>
+  <data name="AudioPlayerPlaylistQueueAddFailed" xml:space="preserve">
+    <value>キューをプレイリストに追加できませんでした。</value>
+  </data>
+  <data name="AudioPlayerSelectPlaylist" xml:space="preserve">
+    <value>プレイリストを選択</value>
+  </data>
+  <data name="AudioPlayerAdd" xml:space="preserve">
+    <value>追加</value>
+  </data>
+  <data name="AudioPlayerPlaylistQueueAdded" xml:space="preserve">
+    <value>キューをプレイリストに追加しました。</value>
+  </data>
+  <data name="AudioPlayerNoPlaylists" xml:space="preserve">
+    <value>プレイリストはまだありません。</value>
+  </data>
+  <data name="PlaylistAddToPlaylist" xml:space="preserve">
+    <value>プレイリストに追加</value>
+  </data>
+  <data name="PlaylistCreate" xml:space="preserve">
+    <value>プレイリストを作成</value>
+  </data>
+  <data name="PlaylistTracksAdded" xml:space="preserve">
+    <value>トラックをプレイリストに追加しました。</value>
+  </data>
+  <data name="PlaylistTracksAddFailed" xml:space="preserve">
+    <value>トラックをプレイリストに追加できませんでした。</value>
+  </data>
+  <data name="PlaylistNoTracksToAdd" xml:space="preserve">
+    <value>追加するトラックがありません。</value>
+  </data>
+  <data name="FavoritesAdd" xml:space="preserve">
+    <value>お気に入りに追加</value>
+  </data>
+  <data name="FavoritesRemove" xml:space="preserve">
+    <value>お気に入りから削除</value>
   </data>
 </root>

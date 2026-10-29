@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Play" xml:space="preserve">
+    <value>تشغيل</value>
+  </data>
+  <data name="PlayPlaylist" xml:space="preserve">
+    <value>تشغيل قائمة التشغيل</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>حفظ</value>
+  </data>
+  <data name="Saved" xml:space="preserve">
+    <value>تم حفظ قائمة التشغيل.</value>
+  </data>
+  <data name="SaveFailed" xml:space="preserve">
+    <value>تعذر حفظ قائمة التشغيل.</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>حذف</value>
+  </data>
+  <data name="DeleteConfirm" xml:space="preserve">
+    <value>هل تريد حذف قائمة التشغيل هذه؟ لا يمكن التراجع عن هذا الإجراء.</value>
+  </data>
+  <data name="DeleteFailed" xml:space="preserve">
+    <value>تعذر حذف قائمة التشغيل.</value>
+  </data>
+  <data name="BackToPlaylists" xml:space="preserve">
+    <value>العودة إلى قوائم التشغيل</value>
+  </data>
+  <data name="Tracks" xml:space="preserve">
+    <value>المقاطع</value>
+  </data>
+  <data name="NoTracks" xml:space="preserve">
+    <value>لا تحتوي قائمة التشغيل هذه على مقاطع بعد.</value>
+  </data>
+  <data name="AddTrack" xml:space="preserve">
+    <value>إضافة مقطع</value>
+  </data>
+  <data name="Library" xml:space="preserve">
+    <value>المكتبة</value>
+  </data>
+  <data name="Artist" xml:space="preserve">
+    <value>الفنان</value>
+  </data>
+  <data name="Album" xml:space="preserve">
+    <value>الألبوم</value>
+  </data>
+  <data name="Track" xml:space="preserve">
+    <value>المقطع</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>إضافة</value>
+  </data>
+  <data name="AddFailed" xml:space="preserve">
+    <value>تعذر إضافة المقطع.</value>
+  </data>
+  <data name="RefreshFailed" xml:space="preserve">
+    <value>تم تحديث قائمة التشغيل، لكن تعذر تحديث القائمة. أعد تحميل الصفحة لرؤية التغيير.</value>
+  </data>
+  <data name="SelectLibrary" xml:space="preserve">
+    <value>اختر مكتبة</value>
+  </data>
+  <data name="SelectArtist" xml:space="preserve">
+    <value>اختر فنانًا</value>
+  </data>
+  <data name="SelectAlbum" xml:space="preserve">
+    <value>اختر ألبومًا</value>
+  </data>
+  <data name="SelectTrack" xml:space="preserve">
+    <value>اختر مقطعًا</value>
+  </data>
+  <data name="MoveUp" xml:space="preserve">
+    <value>نقل لأعلى</value>
+  </data>
+  <data name="MoveDown" xml:space="preserve">
+    <value>نقل لأسفل</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>إزالة</value>
+  </data>
+  <data name="RemoveConfirm" xml:space="preserve">
+    <value>هل تريد إزالة هذا المقطع من قائمة التشغيل؟</value>
+  </data>
+  <data name="RemoveFailed" xml:space="preserve">
+    <value>تعذرت إزالة المقطع.</value>
+  </data>
+  <data name="ReorderFailed" xml:space="preserve">
+    <value>تعذر إعادة ترتيب قائمة التشغيل.</value>
+  </data>
+  <data name="UnavailableTrack" xml:space="preserve">
+    <value>مقطع غير متاح</value>
+  </data>
+  <data name="PlaylistNameRequired" xml:space="preserve">
+    <value>تحتاج قائمة التشغيل إلى اسم.</value>
+  </data>
+  <data name="NothingToPlay" xml:space="preserve">
+    <value>لا تحتوي قائمة التشغيل هذه على مقاطع قابلة للتشغيل.</value>
+  </data>
+  <data name="PlayerUnavailable" xml:space="preserve">
+    <value>مشغل الصوت غير متاح.</value>
+  </data>
+  <data name="EditDetails" xml:space="preserve">
+    <value>تفاصيل قائمة التشغيل</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>الاسم</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>الوصف</value>
+  </data>
+  <data name="NoMusicLibraries" xml:space="preserve">
+    <value>ليست لديك مكتبات موسيقى بعد.</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>جارٍ التحميل...</value>
+  </data>
+  <data name="DragToReorder" xml:space="preserve">
+    <value>اسحب لإعادة الترتيب</value>
+  </data>
+  <data name="CreatePlaylist" xml:space="preserve">
+    <value>إنشاء قائمة تشغيل</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>إلغاء</value>
+  </data>
+  <data name="LoadMore" xml:space="preserve">
+    <value>تحميل المزيد</value>
+  </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>إضافة إلى قائمة التشغيل</value>
+  </data>
+</root>

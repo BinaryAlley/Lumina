@@ -15,7 +15,7 @@ public interface IDomainEventHandler<TDomainEvent> where TDomainEvent : IDomainE
     /// Handles the specified <paramref name="domainEvent"/>.
     /// </summary>
     /// <param name="domainEvent">The domain event to handle.</param>
-    /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
     ValueTask HandleAsync(TDomainEvent domainEvent, CancellationToken cancellationToken);
 }

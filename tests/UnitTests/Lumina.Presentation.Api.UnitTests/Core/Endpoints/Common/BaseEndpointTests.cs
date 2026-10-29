@@ -207,6 +207,25 @@ public class BaseEndpointTests
     }
 
     [Fact]
+    public void Problem_WhenCalledWithResourceUnavailableError_ShouldReturnServiceUnavailableStatusCode()
+    {
+        // Arrange
+        List<Error> errors = [Error.ResourceUnavailable("ErrorCode", "ErrorDescription")];
+
+        // Act
+        IResult result = _sut.TestProblem(errors);
+
+        // Assert
+        ProblemHttpResult problemResult = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(StatusCodes.Status503ServiceUnavailable, problemResult.StatusCode);
+        Assert.Equal(StatusCodes.Status503ServiceUnavailable, problemResult.ProblemDetails.Status);
+        Assert.Equal("ErrorCode", problemResult.ProblemDetails.Title);
+        Assert.Equal("ErrorDescription", problemResult.ProblemDetails.Detail);
+        Assert.NotNull(problemResult.ProblemDetails.Instance);
+        Assert.Contains("traceId", problemResult.ProblemDetails.Extensions.Keys);
+    }
+
+    [Fact]
     public void Problem_WhenCalledWithMixedErrorsStartingWithValidation_ShouldReturnTheValidationStatusCode()
     {
         // Arrange

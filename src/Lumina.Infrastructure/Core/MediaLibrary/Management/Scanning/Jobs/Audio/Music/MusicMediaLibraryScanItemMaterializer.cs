@@ -306,6 +306,7 @@ internal sealed class MusicMediaLibraryScanItemMaterializer : IMediaLibraryScanI
             Channels = stagedItem.Channels,
             BitDepth = stagedItem.BitDepth,
             AudioCodec = stagedItem.AudioCodec,
+            Container = stagedItem.Container,
             Bitrate = stagedItem.Bitrate,
             AcoustId = stagedItem.AcoustId,
             ReplayGainTrackGain = stagedItem.ReplayGainTrackGain,

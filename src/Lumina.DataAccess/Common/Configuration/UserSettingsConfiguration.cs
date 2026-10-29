@@ -66,6 +66,70 @@ public class UserSettingsConfiguration : IEntityTypeConfiguration<UserSettingsEn
             .IsRequired()
             .HasColumnOrder(9);
 
+        builder.Property(settings => settings.ShouldKeepDownloadingWhilePaused)
+            .IsRequired()
+            .HasColumnOrder(14);
+
+        builder.Property(settings => settings.ShouldAutoplay)
+            .IsRequired()
+            .HasColumnOrder(15);
+
+        builder.Property(settings => settings.IsGaplessPlaybackEnabled)
+            .IsRequired()
+            .HasColumnOrder(16);
+
+        builder.Property(settings => settings.ReplayGainMode)
+            .IsRequired()
+            .HasColumnOrder(17);
+
+        builder.Property(settings => settings.StreamingQuality)
+            .IsRequired()
+            .HasColumnOrder(18);
+
+        builder.Property(settings => settings.VuMeterOrientation)
+            .IsRequired()
+            .HasColumnOrder(19);
+
+        builder.Property(settings => settings.VuMeterSegmentCount)
+            .IsRequired()
+            .HasColumnOrder(20);
+
+        builder.Property(settings => settings.VuMeterSegmentGap)
+            .IsRequired()
+            .HasColumnOrder(21);
+
+        builder.Property(settings => settings.VuMeterMediumThreshold)
+            .IsRequired()
+            .HasColumnOrder(22);
+
+        builder.Property(settings => settings.VuMeterHighThreshold)
+            .IsRequired()
+            .HasColumnOrder(23);
+
+        builder.Property(settings => settings.VuMeterShowPeak)
+            .IsRequired()
+            .HasColumnOrder(24);
+
+        builder.Property(settings => settings.VuMeterPeakHoldDurationInMilliseconds)
+            .IsRequired()
+            .HasColumnOrder(25);
+
+        builder.Property(settings => settings.VuMeterReleasePerSecond)
+            .IsRequired()
+            .HasColumnOrder(26);
+
+        builder.Property(settings => settings.VuMeterPeakReleasePerSecond)
+            .IsRequired()
+            .HasColumnOrder(27);
+
+        builder.Property(settings => settings.Volume)
+            .IsRequired()
+            .HasColumnOrder(28);
+
+        builder.Property(settings => settings.IsMuted)
+            .IsRequired()
+            .HasColumnOrder(29);
+
         // audit
         builder.Property(settings => settings.CreatedOnUtc)
             .IsRequired()

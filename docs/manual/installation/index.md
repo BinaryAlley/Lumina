@@ -21,16 +21,17 @@ Lumina ships as two applications that talk to each other over the network: the *
 
 > **Not production ready yet.** Lumina is pre-alpha software. Updates are one way and can lose Lumina's data, so read [Updating](#updating) before you install or upgrade.
 
-There are **two ways to install Lumina**. Pick one:
+There are **two ways to run Lumina**. Pick one:
 
 - **[Option A: run with Docker Compose](#option-a-run-with-docker-compose)**, the recommended route, where a single command brings up the whole system.
-- **[Option B: build and run manually](#option-b-build-and-run-manually)**, if you would rather run the applications directly, without containers.
+- **[Option B: run the applications directly](#option-b-run-the-applications-directly)**, whether you install a release package or build from source, if you would rather run them without containers.
 
 Everything from Configuration onward applies to whichever route you chose.
 
 ## Before you start
 
-- **Docker**, if you want the container route, or the **.NET 10 SDK** if you want to build and run from source.
+- **Docker**, if you want the container route. For a non-container install, you need the Lumina application files, from a release package or installer, or from your own build, plus the **.NET 10 runtime** unless that package is self-contained. The **.NET 10 SDK** is only needed if you build from source.
+- **ffmpeg**, for any non-container install, however you obtained the application files. The API server uses it to remux or transcode audio that the browser cannot play as stored. The Docker API container image already includes it.
 - By default the **web client listens on port `5012`** and the **API on port `5214`**. You can change either, as long as the two agree on where the API is (see [Configuration](#configuration)).
 - For anything reachable beyond your own machine, put a **reverse proxy** in front to terminate TLS and forward to the web client.
 - Lumina needs **no external database server**. It keeps its data in a local SQLite file that is created automatically.
@@ -77,21 +78,23 @@ The development configuration embeds throwaway keys so the container route works
 
 Set them as environment variables on the `lumina-api` and `lumina-web` services in your own compose file or orchestration.
 
-## Option B: build and run manually
+## Option B: run the applications directly
 
-With the .NET 10 SDK installed, build the solution from the `src` directory:
+Use a release package or installer when one is available, or, with the .NET 10 SDK installed, build the solution from the `src` directory:
 
 ```bash
 dotnet build Lumina.sln
 ```
 
-Run the API and the web client. In development, their addresses come from each project's `launchSettings.json` (`http://localhost:5214` and `http://localhost:5012`). When you run a published build directly on a host, set the addresses yourself, either with `ASPNETCORE_URLS` or with `ASPNETCORE_HTTP_PORTS`:
+Run the API and the web client from the installed release package or from the published build. In development, their addresses come from each project's `launchSettings.json` (`http://localhost:5214` and `http://localhost:5012`). When you run a published build directly on a host, set the addresses yourself, either with `ASPNETCORE_URLS` or with `ASPNETCORE_HTTP_PORTS`:
 
 ```bash
 ASPNETCORE_HTTP_PORTS=5012 dotnet Lumina.Presentation.Web.dll
 ```
 
 The API creates its SQLite database (`Lumina.db`) next to its own binary and applies any pending migrations at startup, so the first launch sets up the schema on its own.
+
+The API server needs **ffmpeg** on its `PATH` to normalize audio that a player cannot play as stored. Install it with your platform's package manager, or point `TranscodingSettings:FfmpegPath` at the binary if it is somewhere else.
 
 ## Configuration
 
@@ -112,9 +115,14 @@ The settings that matter most when installing:
 | `PluginsSettings:Directory` | API server | Folder holding installed plugin assemblies, `plugins` by default. |
 | `ThemeEngine:StoragePath`, `ThemeEngine:BundledThemesPath`, `ThemeEngine:DefaultThemeId` | API server | Where installed and bundled themes live, and which theme is activated by default. |
 | `ThemeEngine:MaxArchiveBytes`, `MaxExpandedBytes`, `MaxSingleFileBytes`, `MaxEntries` | API server | Limits enforced on uploaded theme packs. |
+| `TranscodingSettings:FfmpegPath`, `MaxConcurrentJobs`, `MaxConcurrentJobsPerUser`, `MaxCacheBytes`, `JobTimeoutSeconds`, `EvictionGraceSeconds`, `CacheDirectory` | API server | Where the ffmpeg binary is, how many audio normalization jobs may run at once in total and per user, the maximum size of the normalized audio cache in bytes, how long a single job may take in seconds, how long a freshly produced or served cache entry is protected from eviction, and where the cache is stored. When `CacheDirectory` is absent, a private directory under the API account's temporary directory is used. |
 | `Telemetry:Enabled`, `Telemetry:Otlp:Endpoint`, `Telemetry:TraceSampleRatio`, `Telemetry:ConsoleExporterEnabled` | API server and web client | Telemetry behavior. The OTLP endpoint also falls back to the `OTEL_EXPORTER_OTLP_ENDPOINT` environment variable. Again, while telemetry is enabled as a feature, nothing is sent anywhere. |
 
 The `LOG_PATH` environment variable selects where the rolling log files are written.
+
+The normalized audio cache must not be placed inside `MediaSettings:RootDirectory`, because that directory is served at the `/media` route, and it must not contain that directory either, because cleaning the cache would remove the media. The startup configuration also rejects a cache directory that is a filesystem root, the application directory or one of its parents, or that overlaps the logs or plugins directories. The default uses a private directory under the API account's temporary directory and avoids all of these. The cache holds transcoded or remuxed audio only while it is useful: at API startup only the entries the cache itself owns are removed, and a directory is cleaned only when it carries Lumina's cache marker file (`.lumina-transcoding-cache`) or is empty, so a directory that belongs to something else is left untouched. Its total footprint is capped by `TranscodingSettings:MaxCacheBytes`, but an entry that is still being read, or that was just produced when the cache was already at the limit, is kept until it can be removed, so the cache can exceed the cap temporarily. The cache is not part of the media library.
+
+The default cache directory is scoped to the API account, but the coordinator, the running jobs and the startup cleanup are per process. Run a single API process per account and host, or configure a distinct `CacheDirectory` for each instance. Playback delivery handles are also process local: in a load balanced multi-instance deployment, a track's manifest and its subsequent segment requests must reach the same API instance, so configure sticky routing for them as described for SignalR below. On a multi-user Unix host the directory is created with private permissions, and a pre-existing directory owned by another account is treated as unavailable rather than reused or deleted.
 
 ### Keeping the two applications in step
 

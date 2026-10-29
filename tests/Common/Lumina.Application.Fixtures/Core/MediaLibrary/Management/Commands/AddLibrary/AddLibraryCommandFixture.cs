@@ -28,6 +28,8 @@ public class AddLibraryCommandFixture
     /// <param name="canDownloadMetadataFromWeb">Whether the media library should download metadata from the web or not.</param>
     /// <param name="shouldSaveMetadataInMediaDirectories">Whether the metadata should be saved in the media directories or not.</param>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether unchanged directories should be skipped during a scan or not.</param>
+    /// <param name="shouldTrackConsumptionProgress">Optional. Whether the consumption progress of the media library items should be tracked, or not.</param>
+    /// <param name="completionThresholdPercentage">Optional. The percentage of a media library item that must be consumed for its session to be considered completed.</param>
     /// <param name="pathTemplateParts">Optional. The ordered parts of the path template of the media library.</param>
     /// <returns>The created command.</returns>
     public AddLibraryCommand Create(
@@ -40,6 +42,8 @@ public class AddLibraryCommandFixture
         bool canDownloadMetadataFromWeb = true,
         bool shouldSaveMetadataInMediaDirectories = true,
         bool shouldSkipUnchangedDirectoriesDuringScan = false,
+        bool? shouldTrackConsumptionProgress = null,
+        int? completionThresholdPercentage = null,
         LibraryPathTemplatePartDto[]? pathTemplateParts = null)
     {
         return new Faker<AddLibraryCommand>()
@@ -53,6 +57,8 @@ public class AddLibraryCommandFixture
                 true,
                 true,
                 false,
+                shouldTrackConsumptionProgress,
+                completionThresholdPercentage,
                 null
             ))
             .RuleFor(x => x.Title, f => title ?? f.Lorem.Word())

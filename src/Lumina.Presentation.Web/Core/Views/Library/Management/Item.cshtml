@@ -8,6 +8,7 @@
 
 @{
     var id = Context.Request.RouteValues["id"] as string;
+    var shouldTrackConsumptionProgress = Model.ShouldTrackConsumptionProgress ?? false;
     // Generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler.
     var scriptId = ScriptIdentifierHelper.GenerateScriptId();
 }
@@ -23,7 +24,7 @@
     <div style="min-height: 1rem;"></div><!-- The first row is a dummy row for "margin", because setting a margin on the next row would offset the parent's position. -->
     <div class="enlightenment-panel shadow-effect mx-auto panel w-50 mb-10" style="min-width: 320px;">
         <div class="shine-effect"></div>
-        <form method="post" id="add-media-library-form" class="inline">
+        <form method="post" id="add-media-library-form" class="inline" novalidate>
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="Id" value="@id" />
             <input type="hidden" asp-for="UserId" value="@Model.UserId"/>
@@ -204,6 +205,28 @@
                     </div>
                     <small class="form-label text-disabled form-description">@_localizer["DescriptionShouldSkipUnchangedDirectoriesDuringScan"]</small>
                 </div>
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="should-track-consumption-progress">@_localizer["ShouldTrackConsumptionProgress"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <label class="enlightenment-checkbox-label">
+                            <input type="checkbox" id="should-track-consumption-progress" name="ShouldTrackConsumptionProgress" class="enlightenment-checkbox-hidden" checked="@(shouldTrackConsumptionProgress ? "checked" : null)" />
+                            <span class="enlightenment-checkbox"></span>
+                        </label>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionShouldTrackConsumptionProgress"]</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-label">
+                        <label asp-for="CompletionThresholdPercentage">@_localizer["CompletionThresholdPercentage"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <input asp-for="CompletionThresholdPercentage" type="number" min="0" max="100" step="1" class="enlightenment-input" disabled="@(!shouldTrackConsumptionProgress ? "disabled" : null)" aria-describedby="completion-threshold-validation" />
+                        <span id="completion-threshold-validation" class="invalid-feedback hidden">@_localizer["CompletionThresholdPercentageValidation"]</span>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionCompletionThresholdPercentage"]</small>
+                </div>
                 <!-- Path template. -->
                 <style>
                     .path-template-palette { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
@@ -320,9 +343,22 @@
         const chkCanDownloadMetadataFromWeb = form.querySelector('[name="CanDownloadMetadataFromWeb"]');
         const chkShouldSaveMetadataInMediaDirectories = form.querySelector('[name="ShouldSaveMetadataInMediaDirectories"]');
         const chkShouldSkipUnchangedDirectoriesDuringScan = form.querySelector('[name="ShouldSkipUnchangedDirectoriesDuringScan"]');
+        const chkShouldTrackConsumptionProgress = form.querySelector('[name="ShouldTrackConsumptionProgress"]');
+        const inputCompletionThresholdPercentage = form.querySelector('[name="CompletionThresholdPercentage"]');
+        const completionThresholdValidation = document.getElementById('completion-threshold-validation');
+        // The threshold loaded with an existing library, so turning tracking off does not replace a custom stored value with the type default.
+        const initialCompletionThresholdPercentage = inputCompletionThresholdPercentage.value.trim();
 
         // Create new or update existing media library.
         async function handleAddMediaLibraryAsync() {
+            // A threshold outside the allowed range is a client side validation failure, so no request is sent.
+            if (!isCompletionThresholdValid()) {
+                setCompletionThresholdValidationMessage(true);
+                inputCompletionThresholdPercentage.focus();
+                return;
+            }
+            const shouldTrackConsumptionProgress = chkShouldTrackConsumptionProgress.checked;
+            const completionThresholdPercentage = inputCompletionThresholdPercentage.value.trim();
             const formData = {
                 Id: form.querySelector('[name="Id"]').value || null,
                 UserId: form.querySelector('[name="UserId"]').value || null,
@@ -340,6 +376,13 @@
                 CanDownloadMetadataFromWeb: chkCanDownloadMetadataFromWeb.checked,
                 ShouldSaveMetadataInMediaDirectories: chkShouldSaveMetadataInMediaDirectories.checked,
                 ShouldSkipUnchangedDirectoriesDuringScan: chkShouldSkipUnchangedDirectoriesDuringScan.checked,
+                ShouldTrackConsumptionProgress: shouldTrackConsumptionProgress,
+                // An empty threshold is sent as null: creating a library or enabling progress tracking uses the type default,
+                // editing a library that already tracks progress keeps the stored threshold, and types without a default
+                // threshold record completion only when it is reported explicitly. It is always null while tracking is off.
+                CompletionThresholdPercentage: shouldTrackConsumptionProgress && completionThresholdPercentage !== ''
+                    ? Number(completionThresholdPercentage)
+                    : null,
                 PathTemplateParts: Array.from(pathTemplateDropzone.querySelectorAll('.path-template-pill')).map(pill => {
                     const optional = pill.querySelector('.path-template-optional');
                     return {
@@ -620,6 +663,81 @@
                     e.target.checked = !isEnabled;
                 }
             }
+        };
+
+        // The default completion threshold of each library type that tracks consumption progress by default. It mirrors
+        // LibraryConsumptionSettings.CreateDefault(LibraryType) in the domain, so the two must be kept in sync.
+        const defaultCompletionThresholds = {
+            Book: 100, EBook: 100, ComicBook: 100, Magazine: 100, Newspaper: 100, Manga: 100, GraphicNovel: 100, AcademicPaper: 100, SheetMusic: 100,
+            TvShow: 90, Movie: 90, Documentary: 90, Anime: 90, ConcertVideo: 90, TutorialVideo: 90, HomeVideo: 90, YouTubeVideo: 90, MusicVideo: 90,
+            LiveRecordingVideo: 90, InterviewVideo: 90, CoverSongVideo: 90,
+            Audiobook: 95, PodcastAudio: 95, PodcastVideo: 95
+        };
+
+        // Gets the default consumption settings of a library type. Types that are not listed track nothing and have no threshold.
+        function getDefaultConsumptionSettings(libraryType) {
+            if (Object.prototype.hasOwnProperty.call(defaultCompletionThresholds, libraryType))
+                return { shouldTrackConsumptionProgress: true, completionThresholdPercentage: defaultCompletionThresholds[libraryType] };
+            return { shouldTrackConsumptionProgress: false, completionThresholdPercentage: null };
+        }
+
+        // Gets the library type currently selected in the combobox.
+        function getSelectedLibraryType() {
+            return libraryTypeSelectedItem ? libraryTypeSelectedItem.getAttribute('data-value') : null;
+        }
+
+        // A threshold is valid when it is empty, or a whole number between 0 and 100.
+        function isCompletionThresholdValid() {
+            if (!chkShouldTrackConsumptionProgress.checked)
+                return true;
+            const value = inputCompletionThresholdPercentage.value.trim();
+            if (value === '')
+                return true;
+            const threshold = Number(value);
+            return Number.isInteger(threshold) && threshold >= 0 && threshold <= 100;
+        }
+
+        // Shows or hides the localized validation message of the completion threshold.
+        function setCompletionThresholdValidationMessage(isVisible) {
+            completionThresholdValidation.classList.toggle('hidden', !isVisible);
+            inputCompletionThresholdPercentage.setAttribute('aria-invalid', isVisible ? 'true' : 'false');
+        }
+
+        // Keeps the threshold input state in sync with the progress tracking checkbox, so the threshold can only be edited
+        // while tracking is on, and it is never sent while tracking is off.
+        function syncCompletionThresholdInputState() {
+            inputCompletionThresholdPercentage.disabled = !chkShouldTrackConsumptionProgress.checked;
+            if (!chkShouldTrackConsumptionProgress.checked)
+                inputCompletionThresholdPercentage.value = '';
+            setCompletionThresholdValidationMessage(false);
+        }
+
+        // Applies the default consumption settings of the selected library type, for a new library.
+        function applyDefaultConsumptionSettings() {
+            const settings = getDefaultConsumptionSettings(getSelectedLibraryType());
+            chkShouldTrackConsumptionProgress.checked = settings.shouldTrackConsumptionProgress;
+            inputCompletionThresholdPercentage.value = settings.completionThresholdPercentage ?? '';
+            syncCompletionThresholdInputState();
+        }
+
+        // On progress tracking checkbox change, enables the threshold input and restores the threshold that was loaded with the library
+        // when it had a stored value, or prefills the default of the library type when it did not. Turning tracking off clears the threshold.
+        const handleShouldTrackConsumptionProgressChange = function() {
+            if (chkShouldTrackConsumptionProgress.checked && inputCompletionThresholdPercentage.value.trim() === '') {
+                if (id && initialCompletionThresholdPercentage !== '')
+                    inputCompletionThresholdPercentage.value = initialCompletionThresholdPercentage;
+                else {
+                    const settings = getDefaultConsumptionSettings(getSelectedLibraryType());
+                    if (settings.shouldTrackConsumptionProgress && settings.completionThresholdPercentage !== null)
+                        inputCompletionThresholdPercentage.value = settings.completionThresholdPercentage;
+                }
+            }
+            syncCompletionThresholdInputState();
+        };
+
+        // On completion threshold input, updates the validation message.
+        const handleCompletionThresholdInput = function() {
+            setCompletionThresholdValidationMessage(!isCompletionThresholdValid());
         };
 
         // Path template editor.
@@ -953,7 +1071,12 @@
         const handleLibraryTypeChange = function(e) {
             const option = e.target.closest('.enlightenment-option');
             if (!option || option.classList.contains('disabled') || !option.getAttribute('data-value')) return;
-            setTimeout(() => { loadPathTemplateAsync(); }, 0);
+            setTimeout(() => {
+                loadPathTemplateAsync();
+                // A new library starts from the default consumption settings of its type. An existing library keeps the settings it was loaded with.
+                if (!id)
+                    applyDefaultConsumptionSettings();
+            }, 0);
         };
 
         // Add listeners.
@@ -965,6 +1088,9 @@
         imgAddCover.addEventListener('click', handleImgAddCoverClick);
         mediaCoverFormTable.addEventListener('click', handleRowRemoval);
         mediaDirectoriesFormTable.addEventListener('click', handleRowRemoval);
+        chkShouldTrackConsumptionProgress.addEventListener('change', handleShouldTrackConsumptionProgressChange);
+        inputCompletionThresholdPercentage.addEventListener('input', handleCompletionThresholdInput);
+        inputCompletionThresholdPercentage.addEventListener('change', handleCompletionThresholdInput);
         pathTemplateDropzone.addEventListener('dragover', handlePathTemplateDragOver);
         pathTemplateDropzone.addEventListener('drop', handlePathTemplateDrop);
         pathTemplateDropzone.addEventListener('dragleave', handlePathTemplateDragLeave);
@@ -991,6 +1117,9 @@
             imgAddCover.removeEventListener('click', handleImgAddCoverClick);
             mediaCoverFormTable.removeEventListener('click', handleRowRemoval);
             mediaDirectoriesFormTable.removeEventListener('click', handleRowRemoval);
+            chkShouldTrackConsumptionProgress.removeEventListener('change', handleShouldTrackConsumptionProgressChange);
+            inputCompletionThresholdPercentage.removeEventListener('input', handleCompletionThresholdInput);
+            inputCompletionThresholdPercentage.removeEventListener('change', handleCompletionThresholdInput);
             pathTemplateDropzone.removeEventListener('dragover', handlePathTemplateDragOver);
             pathTemplateDropzone.removeEventListener('drop', handlePathTemplateDrop);
             pathTemplateDropzone.removeEventListener('dragleave', handlePathTemplateDragLeave);
@@ -1017,6 +1146,13 @@
 
         // Load the path template of the selected library type, and its default, for both new and existing libraries.
         loadPathTemplateAsync();
+
+        // A new library starts from the default consumption settings of the selected library type. An existing library
+        // renders the stored values, but its threshold input state is still reconciled with the tracking checkbox.
+        if (!id)
+            applyDefaultConsumptionSettings();
+        else
+            syncCompletionThresholdInputState();
 
         // Store all cleanups for this view on window object using the scriptId.
         window.viewCleanups = window.viewCleanups || {};

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -56,5 +56,17 @@
   </data>
   <data name="DeleteFailed" xml:space="preserve">
     <value>Elementul nu a putut fi șters.</value>
+  </data>
+  <data name="Shuffle" xml:space="preserve">
+    <value>Aleatoriu</value>
+  </data>
+  <data name="Play" xml:space="preserve">
+    <value>Redare</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Acțiuni</value>
+  </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>Adaugă în listă de redare</value>
   </data>
 </root>

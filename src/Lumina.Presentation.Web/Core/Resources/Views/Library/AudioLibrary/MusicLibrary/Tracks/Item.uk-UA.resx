@@ -1179,4 +1179,7 @@
   <data name="AddWorkIswc" xml:space="preserve">
     <value>Додати ISWC</value>
   </data>
+  <data name="PlayTrack" xml:space="preserve">
+    <value>Відтворити трек</value>
+  </data>
 </root>

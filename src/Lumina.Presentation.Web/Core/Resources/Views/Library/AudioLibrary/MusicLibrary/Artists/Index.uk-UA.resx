@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -56,5 +56,17 @@
   </data>
   <data name="DeleteFailed" xml:space="preserve">
     <value>Не вдалося видалити елемент.</value>
+  </data>
+  <data name="Shuffle" xml:space="preserve">
+    <value>Перемішати</value>
+  </data>
+  <data name="Play" xml:space="preserve">
+    <value>Відтворити</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Дії</value>
+  </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>Додати до списку відтворення</value>
   </data>
 </root>

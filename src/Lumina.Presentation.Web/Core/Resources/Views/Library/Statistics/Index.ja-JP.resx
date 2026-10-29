@@ -1,0 +1,201 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Title" xml:space="preserve">
+    <value>統計</value>
+  </data>
+  <data name="TotalConsumedDuration" xml:space="preserve">
+    <value>総消費時間</value>
+  </data>
+  <data name="CountedSessions" xml:space="preserve">
+    <value>集計対象セッション</value>
+  </data>
+  <data name="CompletedSessions" xml:space="preserve">
+    <value>完了セッション</value>
+  </data>
+  <data name="CompletionRate" xml:space="preserve">
+    <value>完了率</value>
+  </data>
+  <data name="ByMediaKind" xml:space="preserve">
+    <value>メディア種別ごと</value>
+  </data>
+  <data name="MediaKind" xml:space="preserve">
+    <value>メディア種別</value>
+  </data>
+  <data name="Duration" xml:space="preserve">
+    <value>時間</value>
+  </data>
+  <data name="Stopped" xml:space="preserve">
+    <value>停止</value>
+  </data>
+  <data name="Counted" xml:space="preserve">
+    <value>集計対象</value>
+  </data>
+  <data name="Completed" xml:space="preserve">
+    <value>完了</value>
+  </data>
+  <data name="Genres" xml:space="preserve">
+    <value>ジャンル</value>
+  </data>
+  <data name="Tags" xml:space="preserve">
+    <value>タグ</value>
+  </data>
+  <data name="NoGenres" xml:space="preserve">
+    <value>このフィルターのジャンルデータはありません。</value>
+  </data>
+  <data name="NoTags" xml:space="preserve">
+    <value>このフィルターのタグデータはありません。</value>
+  </data>
+  <data name="Items" xml:space="preserve">
+    <value>件</value>
+  </data>
+  <data name="RecentlyConsumed" xml:space="preserve">
+    <value>最近消費したもの</value>
+  </data>
+  <data name="MostConsumed" xml:space="preserve">
+    <value>最も消費したもの</value>
+  </data>
+  <data name="NoRecentlyConsumed" xml:space="preserve">
+    <value>最近消費したものはありません。</value>
+  </data>
+  <data name="NoMostConsumed" xml:space="preserve">
+    <value>最も消費したものはありません。</value>
+  </data>
+  <data name="LastConsumed" xml:space="preserve">
+    <value>最終消費</value>
+  </data>
+  <data name="Unavailable" xml:space="preserve">
+    <value>このアイテムはもう利用できません。</value>
+  </data>
+  <data name="DeleteFromHistory" xml:space="preserve">
+    <value>履歴から削除</value>
+  </data>
+  <data name="DeleteFromHistoryConfirm" xml:space="preserve">
+    <value>このアイテムの記録されたすべてのセッションを履歴から削除しますか?</value>
+  </data>
+  <data name="HistoryEntryDeleted" xml:space="preserve">
+    <value>履歴の項目を削除しました。</value>
+  </data>
+  <data name="ClearHistory" xml:space="preserve">
+    <value>履歴を消去</value>
+  </data>
+  <data name="ClearHistoryConfirm" xml:space="preserve">
+    <value>選択したユーザーの消費履歴をすべて削除しますか?</value>
+  </data>
+  <data name="HistoryCleared" xml:space="preserve">
+    <value>消費履歴を消去しました。</value>
+  </data>
+  <data name="ClearResumePoints" xml:space="preserve">
+    <value>続きを見るから削除</value>
+  </data>
+  <data name="ClearResumePointsConfirm" xml:space="preserve">
+    <value>選択したユーザーの再開ポイントをすべて削除しますか? 履歴は保持されます。</value>
+  </data>
+  <data name="ResumePointsCleared" xml:space="preserve">
+    <value>再開ポイントを削除しました。</value>
+  </data>
+  <data name="Filters" xml:space="preserve">
+    <value>フィルター</value>
+  </data>
+  <data name="Library" xml:space="preserve">
+    <value>ライブラリ</value>
+  </data>
+  <data name="AllLibraries" xml:space="preserve">
+    <value>すべてのライブラリ</value>
+  </data>
+  <data name="AllMediaKinds" xml:space="preserve">
+    <value>すべてのメディア種別</value>
+  </data>
+  <data name="From" xml:space="preserve">
+    <value>開始</value>
+  </data>
+  <data name="To" xml:space="preserve">
+    <value>終了</value>
+  </data>
+  <data name="Apply" xml:space="preserve">
+    <value>適用</value>
+  </data>
+  <data name="Reset" xml:space="preserve">
+    <value>リセット</value>
+  </data>
+  <data name="InvalidDateRange" xml:space="preserve">
+    <value>開始日は終了日より後にできません。</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>ユーザー</value>
+  </data>
+  <data name="AllUsers" xml:space="preserve">
+    <value>すべてのユーザー</value>
+  </data>
+  <data name="Me" xml:space="preserve">
+    <value>自分</value>
+  </data>
+  <data name="AllUsersHistoryUnavailable" xml:space="preserve">
+    <value>履歴とタグの内訳はユーザーごとに表示されます。表示するユーザーを選択してください。</value>
+  </data>
+  <data name="PerUser" xml:space="preserve">
+    <value>ユーザーごと</value>
+  </data>
+  <data name="NoUsers" xml:space="preserve">
+    <value>このフィルターの消費統計を持つユーザーはいません。</value>
+  </data>
+  <data name="NoMediaKindData" xml:space="preserve">
+    <value>このフィルターのメディア種別データはありません。</value>
+  </data>
+  <data name="NoConsumption" xml:space="preserve">
+    <value>このフィルターの消費履歴はありません。</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>読み込み中...</value>
+  </data>
+  <data name="LoadFailed" xml:space="preserve">
+    <value>統計を読み込めませんでした。</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>再試行</value>
+  </data>
+  <data name="KindMusicTrack" xml:space="preserve">
+    <value>トラック</value>
+  </data>
+  <data name="KindPodcastEpisode" xml:space="preserve">
+    <value>ポッドキャストエピソード</value>
+  </data>
+  <data name="KindAudiobook" xml:space="preserve">
+    <value>オーディオブック</value>
+  </data>
+  <data name="KindMovie" xml:space="preserve">
+    <value>映画</value>
+  </data>
+  <data name="KindTvEpisode" xml:space="preserve">
+    <value>TVエピソード</value>
+  </data>
+  <data name="KindBook" xml:space="preserve">
+    <value>本</value>
+  </data>
+  <data name="KindPhoto" xml:space="preserve">
+    <value>写真</value>
+  </data>
+  <data name="KindVideo" xml:space="preserve">
+    <value>動画</value>
+  </data>
+  <data name="HoursShort" xml:space="preserve">
+    <value>時間</value>
+  </data>
+  <data name="MinutesShort" xml:space="preserve">
+    <value>分</value>
+  </data>
+  <data name="SecondsShort" xml:space="preserve">
+    <value>秒</value>
+  </data>
+</root>

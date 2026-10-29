@@ -27,7 +27,7 @@ public class MusicTrackMetadataDtoMappingTests
     private readonly LanguageInfoDtoFixture _languageInfoDtoFixture = new();
 
     [Fact]
-    public void ToDomainEntity_WhenMappingCompleteDto_ShouldMapAllPropertiesCorrectly()
+    public void ToDomainValueObject_WhenMappingCompleteDto_ShouldMapAllPropertiesCorrectly()
     {
         // Arrange
         MusicTrackMetadataDto dto = _musicTrackMetadataDtoFixture.Create();
@@ -70,6 +70,8 @@ public class MusicTrackMetadataDtoMappingTests
         Assert.Equal(dto.BitDepth, metadata.BitDepth.Value);
         Assert.True(metadata.AudioCodec.HasValue);
         Assert.Equal(dto.AudioCodec, metadata.AudioCodec.Value);
+        // The container is captured locally from the file itself, so it can never be set through the metadata of a request.
+        Assert.False(metadata.Container.HasValue);
         Assert.True(metadata.Bitrate.HasValue);
         Assert.Equal(dto.Bitrate, metadata.Bitrate.Value);
         Assert.Equal(dto.Genres!.Select(genre => genre.Name), metadata.Genres.Select(genre => genre.Name));
@@ -77,7 +79,7 @@ public class MusicTrackMetadataDtoMappingTests
     }
 
     [Fact]
-    public void ToDomainEntity_WhenOptionalPropertiesAreMissing_ShouldMapTheRequiredValuesAndDefaults()
+    public void ToDomainValueObject_WhenOptionalPropertiesAreMissing_ShouldMapTheRequiredValuesAndDefaults()
     {
         // Arrange
         MusicTrackMetadataDto dto = _musicTrackMetadataDtoFixture.Create(
@@ -123,7 +125,7 @@ public class MusicTrackMetadataDtoMappingTests
     }
 
     [Fact]
-    public void ToDomainEntity_WhenLanguageIsMissingRequiredSubproperties_ShouldMapLanguageToNone()
+    public void ToDomainValueObject_WhenLanguageIsMissingRequiredSubproperties_ShouldMapLanguageToNone()
     {
         // Arrange
         LanguageInfoDto incompleteLanguage = _languageInfoDtoFixture.Create(includeLanguageCode: false);
@@ -141,7 +143,7 @@ public class MusicTrackMetadataDtoMappingTests
     }
 
     [Fact]
-    public void ToDomainEntity_WhenReleaseInfoIsInvalid_ShouldReturnError()
+    public void ToDomainValueObject_WhenReleaseInfoIsInvalid_ShouldReturnError()
     {
         // Arrange
         ReleaseInfoDto releaseInfo = _releaseInfoDtoFixture.Create(
@@ -158,7 +160,7 @@ public class MusicTrackMetadataDtoMappingTests
     }
 
     [Fact]
-    public void ToDomainEntity_WhenGenreIsInvalid_ShouldReturnError()
+    public void ToDomainValueObject_WhenGenreIsInvalid_ShouldReturnError()
     {
         // Arrange
         MusicTrackMetadataDto dto = _musicTrackMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]);
@@ -172,7 +174,7 @@ public class MusicTrackMetadataDtoMappingTests
     }
 
     [Fact]
-    public void ToDomainEntity_WhenTagIsInvalid_ShouldReturnError()
+    public void ToDomainValueObject_WhenTagIsInvalid_ShouldReturnError()
     {
         // Arrange
         MusicTrackMetadataDto dto = _musicTrackMetadataDtoFixture.Create(tags: [_tagDtoFixture.Create(name: "   ")]);

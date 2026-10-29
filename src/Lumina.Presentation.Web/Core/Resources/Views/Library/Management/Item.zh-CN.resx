@@ -312,9 +312,6 @@
   <data name="WrittenContent" xml:space="preserve">
     <value>文字内容</value>
   </data>
-  <data name="YouTube" xml:space="preserve">
-    <value>油管</value>
-  </data>
   <data name="Name" xml:space="preserve">
     <value>名称</value>
   </data>
@@ -413,5 +410,23 @@
   </data>
   <data name="PathPartBookId" xml:space="preserve">
     <value>书籍编号</value>
+  </data>
+  <data name="ShouldTrackConsumptionProgress" xml:space="preserve">
+    <value>跟踪消费进度</value>
+  </data>
+  <data name="DescriptionShouldTrackConsumptionProgress" xml:space="preserve">
+    <value>是否记住此媒体库项目的播放或阅读位置，以便用户可以从上次停止的地方继续。</value>
+  </data>
+  <data name="CompletionThresholdPercentage" xml:space="preserve">
+    <value>完成阈值 (%)</value>
+  </data>
+  <data name="DescriptionCompletionThresholdPercentage" xml:space="preserve">
+    <value>为了使某个项目的会话被视为已完成，必须消费的百分比。留空时，创建媒体库或启用进度跟踪会使用该类型的默认值，而编辑已在跟踪进度的媒体库时会保留已存储的阈值。没有默认阈值的类型仅在明确报告时记录完成。</value>
+  </data>
+  <data name="CompletionThresholdPercentageValidation" xml:space="preserve">
+    <value>完成阈值必须是介于 0 和 100 之间的整数。</value>
+  </data>
+  <data name="Youtube" xml:space="preserve">
+    <value>YouTube</value>
   </data>
 </root>

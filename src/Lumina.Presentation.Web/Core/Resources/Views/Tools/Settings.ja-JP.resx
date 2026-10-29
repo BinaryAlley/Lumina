@@ -69,4 +69,121 @@
   <data name="DescriptionShouldAggregateArtworkWhenMissing" xml:space="preserve">
     <value>有効にすると、最初のアートワークプロバイダーが提供しないライブラリ項目のアートワークが、後続のプロバイダーから補完されます。</value>
   </data>
+  <data name="Playback" xml:space="preserve">
+    <value>再生</value>
+  </data>
+  <data name="ShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>一時停止中もダウンロードを続ける</value>
+  </data>
+  <data name="DescriptionShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>再生を一時停止している間もプレーヤーがトラックのダウンロードをファイル全体まで続けるかどうか。再開時にデータを待たずに済みます。</value>
+  </data>
+  <data name="ShouldAutoplay" xml:space="preserve">
+    <value>自動再生</value>
+  </data>
+  <data name="DescriptionShouldAutoplay" xml:space="preserve">
+    <value>アルバムまたはアーティストの再生が終わったときに、続くトラックを自動的に再生するかどうか。</value>
+  </data>
+  <data name="IsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>ギャップレス再生</value>
+  </data>
+  <data name="DescriptionIsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>連続するトラックを間に無音を挟まずに再生するかどうか。</value>
+  </data>
+  <data name="ReplayGainMode" xml:space="preserve">
+    <value>ReplayGain</value>
+  </data>
+  <data name="DescriptionReplayGainMode" xml:space="preserve">
+    <value>再生するトラックに ReplayGain の正規化をどのように適用するか。</value>
+  </data>
+  <data name="ReplayGainModeOff" xml:space="preserve">
+    <value>オフ</value>
+  </data>
+  <data name="ReplayGainModeTrack" xml:space="preserve">
+    <value>トラックごと</value>
+  </data>
+  <data name="ReplayGainModeAlbum" xml:space="preserve">
+    <value>アルバムごと</value>
+  </data>
+  <data name="StreamingQuality" xml:space="preserve">
+    <value>ストリーミング品質</value>
+  </data>
+  <data name="DescriptionStreamingQuality" xml:space="preserve">
+    <value>サーバーが再生のためにトラックを正規化する必要がある場合に適用される品質の上限。直接再生は決して変更されません。</value>
+  </data>
+  <data name="StreamingQualityAuto" xml:space="preserve">
+    <value>自動</value>
+  </data>
+  <data name="StreamingQualityLow" xml:space="preserve">
+    <value>低 (96 kbps)</value>
+  </data>
+  <data name="StreamingQualityMedium" xml:space="preserve">
+    <value>中 (160 kbps)</value>
+  </data>
+  <data name="StreamingQualityHigh" xml:space="preserve">
+    <value>高 (320 kbps)</value>
+  </data>
+  <data name="DescriptionVuMeterSegmentCount" xml:space="preserve">
+    <value>VUメーターの各チャンネルを分割するセグメント数です。1から128の間で指定します。</value>
+  </data>
+  <data name="VuMeterPeakReleasePerSecond" xml:space="preserve">
+    <value>ピークの減衰</value>
+  </data>
+  <data name="DescriptionVuMeterHighThreshold" xml:space="preserve">
+    <value>セグメントを高い状態で描画するレベルです。0から1の間で指定し、中間しきい値以上である必要があります。</value>
+  </data>
+  <data name="DescriptionVuMeterOrientation" xml:space="preserve">
+    <value>VUメーターの各チャンネルが下から上へ伸びるか、左から右へ伸びるかを指定します。</value>
+  </data>
+  <data name="DescriptionVuMeterMediumThreshold" xml:space="preserve">
+    <value>セグメントを中間状態で描画するレベルです。0から1の間で指定します。</value>
+  </data>
+  <data name="VuMeterOrientationVertical" xml:space="preserve">
+    <value>垂直</value>
+  </data>
+  <data name="VuMeterReleasePerSecond" xml:space="preserve">
+    <value>レベルの減衰</value>
+  </data>
+  <data name="VuMeterOrientationHorizontal" xml:space="preserve">
+    <value>水平</value>
+  </data>
+  <data name="VuMeterOrientation" xml:space="preserve">
+    <value>向き</value>
+  </data>
+  <data name="VuMeterHighThreshold" xml:space="preserve">
+    <value>高いしきい値</value>
+  </data>
+  <data name="VuMeterSegmentCount" xml:space="preserve">
+    <value>チャンネルあたりのセグメント数</value>
+  </data>
+  <data name="VuMeterMediumThreshold" xml:space="preserve">
+    <value>中間しきい値</value>
+  </data>
+  <data name="VuMeter" xml:space="preserve">
+    <value>VUメーター</value>
+  </data>
+  <data name="VuMeterPeakHoldDuration" xml:space="preserve">
+    <value>ピーク保持 (ms)</value>
+  </data>
+  <data name="DescriptionVuMeterShowPeak" xml:space="preserve">
+    <value>各チャンネルに直近の最大レベルの印を残すかどうかを指定します。</value>
+  </data>
+  <data name="DescriptionVuMeterPeakReleasePerSecond" xml:space="preserve">
+    <value>保持時間の後、ピークの印が1秒あたりに下がるレベルの量です。0から100の間で指定します。値が大きいほど速く下がります。</value>
+  </data>
+  <data name="DescriptionVuMeterPeakHoldDuration" xml:space="preserve">
+    <value>ピークの印が下がり始めるまで保持される時間をミリ秒単位で指定します。0から10000の間です。</value>
+  </data>
+  <data name="VuMeterShowPeak" xml:space="preserve">
+    <value>ピークを表示</value>
+  </data>
+  <data name="DescriptionVuMeterSegmentGap" xml:space="preserve">
+    <value>VUメーターのセグメントとチャンネルの間隔をピクセル単位で指定します。0から32の間です。</value>
+  </data>
+  <data name="VuMeterSegmentGap" xml:space="preserve">
+    <value>セグメント間隔</value>
+  </data>
+  <data name="DescriptionVuMeterReleasePerSecond" xml:space="preserve">
+    <value>音が下がった後にチャンネルが1秒あたりに下がるレベルの量です。0から100の間で指定します。値が大きいほど速く下がります。</value>
+  </data>
 </root>

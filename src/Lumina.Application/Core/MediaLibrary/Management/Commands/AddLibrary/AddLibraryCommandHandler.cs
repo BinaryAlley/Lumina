@@ -96,7 +96,7 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Resul
         Guid userId = currentUserId.Value;
 
         // Only admins or users with the permission to manage media libraries can create them.
-        if (!await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false) &&
+        if (!await _authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false) &&
             !await _authorizationService.HasPermissionAsync(userId, AuthorizationPermission.CanCreateLibraries, cancellationToken).ConfigureAwait(false))
             return ApplicationErrors.Authorization.NotAuthorized;
 
@@ -115,6 +115,17 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Resul
         }
 
         LibraryType libraryType = Enum.Parse<LibraryType>(command.LibraryType!);
+
+        // A library created without explicit consumption settings uses the defaults of its type. When progress tracking is on and no threshold is
+        // supplied, the default threshold of the type is used; a type without one keeps no threshold, which means completion is recorded explicitly.
+        LibraryConsumptionSettings defaultConsumptionSettings = LibraryConsumptionSettings.CreateDefault(libraryType);
+        bool shouldTrackConsumptionProgress = command.ShouldTrackConsumptionProgress ?? defaultConsumptionSettings.ShouldTrackConsumptionProgress;
+        Optional<int> completionThresholdPercentage = Optional<int>.FromNullable(command.CompletionThresholdPercentage);
+        if (completionThresholdPercentage.HasValue && !shouldTrackConsumptionProgress)
+            return DomainErrors.Library.CompletionThresholdPercentageMustBeNullWhenProgressTrackingIsOff;
+        if (!completionThresholdPercentage.HasValue && shouldTrackConsumptionProgress)
+            completionThresholdPercentage = defaultConsumptionSettings.CompletionThresholdPercentage;
+        LibraryConsumptionSettings consumptionSettings = LibraryConsumptionSettings.Create(shouldTrackConsumptionProgress, completionThresholdPercentage);
 
         // A library always carries a path template: the one provided by the user, or the ideal structure of the library type as its default.
         Result<IReadOnlyList<LibraryPathPart>> pathTemplatePartsResult = command.PathTemplateParts.ToDomainParts();
@@ -136,6 +147,7 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Resul
             command.CanDownloadMetadataFromWeb,
             command.ShouldSaveMetadataInMediaDirectories,
             command.ShouldSkipUnchangedDirectoriesDuringScan,
+            consumptionSettings,
             pathTemplateResult.Value,
             []
         );

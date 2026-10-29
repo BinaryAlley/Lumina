@@ -35,14 +35,12 @@ public class TrackLiteRowFixture
         bool includeDiscNumber = true,
         int? durationInSeconds = null)
     {
-        return new TrackLiteRow
-        {
-            Id = id ?? _faker.Random.Guid(),
-            Title = title ?? _faker.Lorem.Sentence(),
-            TrackNumber = trackNumber ?? _faker.Random.Int(1, 30),
-            DiscNumber = includeDiscNumber ? (discNumber ?? _faker.Random.Int(1, 3)) : null,
-            DurationInSeconds = durationInSeconds ?? _faker.Random.Int(1, 600)
-        };
+        return new TrackLiteRow(
+            id ?? _faker.Random.Guid(),
+            title ?? _faker.Lorem.Sentence(),
+            trackNumber ?? _faker.Random.Int(1, 30),
+            includeDiscNumber ? (discNumber ?? _faker.Random.Int(1, 3)) : null,
+            durationInSeconds ?? _faker.Random.Int(1, 600));
     }
 
     /// <summary>

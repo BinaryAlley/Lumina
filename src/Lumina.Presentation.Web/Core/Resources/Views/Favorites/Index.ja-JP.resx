@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Title" xml:space="preserve">
+    <value>お気に入り</value>
+  </data>
+  <data name="NoFavorites" xml:space="preserve">
+    <value>お気に入りはまだありません。</value>
+  </data>
+  <data name="NoFavoritesInKind" xml:space="preserve">
+    <value>この種類のお気に入りはまだありません。</value>
+  </data>
+  <data name="Unavailable" xml:space="preserve">
+    <value>この項目は利用できなくなりました。</value>
+  </data>
+  <data name="FilterAll" xml:space="preserve">
+    <value>すべて</value>
+  </data>
+  <data name="FilterArtists" xml:space="preserve">
+    <value>アーティスト</value>
+  </data>
+  <data name="FilterAlbums" xml:space="preserve">
+    <value>アルバム</value>
+  </data>
+  <data name="FilterTracks" xml:space="preserve">
+    <value>曲</value>
+  </data>
+  <data name="FilterBooks" xml:space="preserve">
+    <value>書籍</value>
+  </data>
+  <data name="KindArtist" xml:space="preserve">
+    <value>アーティスト</value>
+  </data>
+  <data name="KindAlbum" xml:space="preserve">
+    <value>アルバム</value>
+  </data>
+  <data name="KindTrack" xml:space="preserve">
+    <value>曲</value>
+  </data>
+  <data name="KindBook" xml:space="preserve">
+    <value>書籍</value>
+  </data>
+  <data name="LoadMore" xml:space="preserve">
+    <value>さらに読み込む</value>
+  </data>
+  <data name="ItemsCount" xml:space="preserve">
+    <value>件</value>
+  </data>
+  <data name="LoadFailed" xml:space="preserve">
+    <value>お気に入りを読み込めませんでした。</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>再試行</value>
+  </data>
+</root>

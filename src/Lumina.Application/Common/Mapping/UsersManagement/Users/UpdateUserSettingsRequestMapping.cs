@@ -25,7 +25,21 @@ public static class UpdateUserSettingsRequestMapping
             request.ShouldAggregateMetadataWhenMissing,
             request.ShouldAggregateArtworkWhenMissing,
             request.ShouldRenderPdfAsImages,
-            request.ShouldPreserveBookStyles
+            request.ShouldPreserveBookStyles,
+            request.ShouldKeepDownloadingWhilePaused,
+            request.ShouldAutoplay,
+            request.IsGaplessPlaybackEnabled,
+            request.ReplayGainMode,
+            request.StreamingQuality,
+            request.VuMeterOrientation,
+            request.VuMeterSegmentCount,
+            request.VuMeterSegmentGap,
+            request.VuMeterMediumThreshold,
+            request.VuMeterHighThreshold,
+            request.VuMeterShowPeak,
+            request.VuMeterPeakHoldDurationInMilliseconds,
+            request.VuMeterReleasePerSecond,
+            request.VuMeterPeakReleasePerSecond
         );
     }
 }

@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.Errors;
@@ -8,9 +7,9 @@ using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Contracts.Responses.Authorization;
+using Lumina.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -53,21 +52,21 @@ public class GetAuthorizationQueryHandler : IQueryHandler<GetAuthorizationQuery,
         if (validationResult.Count > 0)
             return validationResult;
 
-        // an authenticated request must always carry a user identity
+        // An authenticated request must always carry a user identity.
         Guid? currentUserId = _currentUserService.UserId;
         if (currentUserId is null)
             return Errors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // first, check if the Id of the user for whom to get the permission list is different from the Id currently making the request
+        // First, check if the Id of the user for whom to get the permission list is different from the Id currently making the request.
         if (userId != query.UserId)
         {
-            // if it is, get the role of the current user, and see if they are Admin
+            // If it is, get the role of the current user, and see if they are Admin.
             Result<UserAuthorizationEntity> getCurrentUserPermissionResult = await _authorizationService.GetUserAuthorizationAsync(userId, cancellationToken).ConfigureAwait(false);
             if (getCurrentUserPermissionResult.IsFailure)
                 return getCurrentUserPermissionResult.Errors;
-            // if the current user is not an Admin, and the account for whom they request the permissions list is not theirs, deny the request
-            if (getCurrentUserPermissionResult.Value.Role != "Admin")
+            // If the current user is not an Admin, and the account for whom they request the permissions list is not theirs, deny the request.
+            if (getCurrentUserPermissionResult.Value.Role != AuthorizationRoles.ADMIN)
                 return Errors.Authorization.NotAuthorized;
         }
         Result<UserAuthorizationEntity> getUserPermissionResult = await _authorizationService.GetUserAuthorizationAsync(query.UserId!.Value, cancellationToken).ConfigureAwait(false);

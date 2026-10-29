@@ -39,7 +39,6 @@ public class UpdateTrackCommandFixture
     /// <param name="artistId">Optional. The Id of the artist the track belongs to.</param>
     /// <param name="albumId">Optional. The Id of the album the track belongs to.</param>
     /// <param name="trackId">Optional. The Id of the track to update.</param>
-    /// <param name="path">Optional. The file system path of the track.</param>
     /// <param name="metadata">Optional. The audio metadata of the track.</param>
     /// <param name="trackNumber">Optional. The number of the track on its disc.</param>
     /// <param name="discNumber">Optional. The number of the disc the track belongs to.</param>
@@ -69,7 +68,6 @@ public class UpdateTrackCommandFixture
     /// <param name="includeArtistId">Whether the artist Id should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeAlbumId">Whether the album Id should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeTrackId">Whether the track Id should be included, or forced to <see langword="null"/>.</param>
-    /// <param name="includePath">Whether the path should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeTrackNumber">Whether the track number should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created command to update a track.</returns>
     public UpdateTrackCommand Create(
@@ -77,7 +75,6 @@ public class UpdateTrackCommandFixture
         string? artistId = null,
         string? albumId = null,
         string? trackId = null,
-        string? path = null,
         MusicTrackMetadataDto? metadata = null,
         int? trackNumber = null,
         int? discNumber = null,
@@ -107,7 +104,6 @@ public class UpdateTrackCommandFixture
         bool includeArtistId = true,
         bool includeAlbumId = true,
         bool includeTrackId = true,
-        bool includePath = true,
         bool includeTrackNumber = true)
     {
         return new UpdateTrackCommand(
@@ -115,7 +111,6 @@ public class UpdateTrackCommandFixture
             includeArtistId ? (artistId ?? _faker.Random.Guid().ToString()) : null,
             includeAlbumId ? (albumId ?? _faker.Random.Guid().ToString()) : null,
             includeTrackId ? (trackId ?? _faker.Random.Guid().ToString()) : null,
-            includePath ? (path ?? _faker.System.FilePath()) : null,
             includeMetadata ? (metadata ?? _musicTrackMetadataDtoFixture.Create()) : null,
             includeTrackNumber ? (trackNumber ?? _faker.Random.Int(1, 20)) : null,
             includeDiscNumber ? (discNumber ?? _faker.Random.Int(1, 3)) : null,

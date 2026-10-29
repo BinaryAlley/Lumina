@@ -45,6 +45,8 @@ public class LibraryEntityMappingTests
         Assert.Equal(entity.LibraryType, result.LibraryType);
         Assert.Equal(entity.ContentLocations.Select(l => l.Path), result.ContentLocations);
         Assert.Equal(entity.CoverImage, result.CoverImage);
+        Assert.Equal(entity.ShouldTrackConsumptionProgress, result.ShouldTrackConsumptionProgress);
+        Assert.Equal(entity.CompletionThresholdPercentage, result.CompletionThresholdPercentage);
         Assert.Equal(entity.CreatedOnUtc, result.CreatedOnUtc);
         Assert.Equal(entity.UpdatedOnUtc, result.UpdatedOnUtc);
     }
@@ -198,6 +200,8 @@ public class LibraryEntityMappingTests
         Assert.Equal(entity.Title, result.Value.Title);
         Assert.Equal(entity.LibraryType, result.Value.LibraryType);
         Assert.Equal("D:/cover.jpg", result.Value.CoverImage.Value);
+        Assert.Equal(entity.ShouldTrackConsumptionProgress, result.Value.ConsumptionSettings.ShouldTrackConsumptionProgress);
+        Assert.Equal(entity.CompletionThresholdPercentage, result.Value.ConsumptionSettings.CompletionThresholdPercentage.HasValue ? result.Value.ConsumptionSettings.CompletionThresholdPercentage.Value : null);
         Assert.Equal(2, result.Value.PathTemplate.Parts.Count);
         Assert.Equal(LibraryPathPartKind.Literal, result.Value.PathTemplate.Parts[0].Kind);
         Assert.Equal("Various Artists", result.Value.PathTemplate.Parts[0].Representation);
@@ -249,5 +253,146 @@ public class LibraryEntityMappingTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(DomainErrors.Library.PathTemplateValuePartMustContainSinglePlaceholder, result.FirstError);
+    }
+
+    [Fact]
+    public void ToResponse_WhenProgressTrackingIsEnabled_ShouldMapTrackingAndThreshold()
+    {
+        // Arrange
+        LibraryEntity entity = _libraryEntityFixture.Create(
+            libraryType: LibraryType.Book,
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: 65);
+
+        // Act
+        LibraryResponse result = entity.ToResponse();
+
+        // Assert
+        Assert.True(result.ShouldTrackConsumptionProgress);
+        Assert.Equal(65, result.CompletionThresholdPercentage);
+    }
+
+    [Fact]
+    public void ToResponse_WhenProgressTrackingIsDisabled_ShouldMapTrackingOffWithoutThreshold()
+    {
+        // Arrange
+        LibraryEntity entity = _libraryEntityFixture.Create(
+            libraryType: LibraryType.Book,
+            shouldTrackConsumptionProgress: false,
+            completionThresholdPercentage: null);
+
+        // Act
+        LibraryResponse result = entity.ToResponse();
+
+        // Assert
+        Assert.False(result.ShouldTrackConsumptionProgress);
+        Assert.Null(result.CompletionThresholdPercentage);
+    }
+
+    [Fact]
+    public void ToDomainEntity_WhenProgressTrackingIsEnabled_ShouldMapConsumptionSettings()
+    {
+        // Arrange
+        LibraryEntity entity = _libraryEntityFixture.Create(
+            libraryType: LibraryType.Book,
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: 65);
+
+        // Act
+        Result<Library> result = entity.ToDomainEntity();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.True(result.Value.ConsumptionSettings.ShouldTrackConsumptionProgress);
+        Assert.True(result.Value.ConsumptionSettings.CompletionThresholdPercentage.HasValue);
+        Assert.Equal(65, result.Value.ConsumptionSettings.CompletionThresholdPercentage.Value);
+    }
+
+    [Fact]
+    public void ToDomainEntity_WhenProgressTrackingIsEnabledWithoutThreshold_ShouldMapNoThreshold()
+    {
+        // Arrange
+        LibraryEntity entity = _libraryEntityFixture.Create(
+            libraryType: LibraryType.Book,
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: null);
+
+        // Act
+        Result<Library> result = entity.ToDomainEntity();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.True(result.Value.ConsumptionSettings.ShouldTrackConsumptionProgress);
+        Assert.False(result.Value.ConsumptionSettings.CompletionThresholdPercentage.HasValue);
+    }
+
+    [Fact]
+    public void ToDomainEntity_WhenProgressTrackingIsDisabledButStoredThresholdExists_ShouldNotRetainThreshold()
+    {
+        // Arrange
+        LibraryEntity entity = _libraryEntityFixture.Create(
+            libraryType: LibraryType.Book,
+            shouldTrackConsumptionProgress: false,
+            completionThresholdPercentage: 65);
+
+        // Act
+        Result<Library> result = entity.ToDomainEntity();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.False(result.Value.ConsumptionSettings.ShouldTrackConsumptionProgress);
+        Assert.False(result.Value.ConsumptionSettings.CompletionThresholdPercentage.HasValue);
+    }
+
+    [Fact]
+    public void ToDomainValueObject_WhenProgressTrackingIsEnabled_ShouldMapTrackingAndThreshold()
+    {
+        // Arrange
+        LibraryEntity entity = _libraryEntityFixture.Create(
+            libraryType: LibraryType.Book,
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: 65);
+
+        // Act
+        LibraryConsumptionSettings result = entity.ToDomainValueObject();
+
+        // Assert
+        Assert.True(result.ShouldTrackConsumptionProgress);
+        Assert.True(result.CompletionThresholdPercentage.HasValue);
+        Assert.Equal(65, result.CompletionThresholdPercentage.Value);
+    }
+
+    [Fact]
+    public void ToDomainValueObject_WhenProgressTrackingIsDisabled_ShouldNotRetainThreshold()
+    {
+        // Arrange
+        LibraryEntity entity = _libraryEntityFixture.Create(
+            libraryType: LibraryType.Book,
+            shouldTrackConsumptionProgress: false,
+            completionThresholdPercentage: 65);
+
+        // Act
+        LibraryConsumptionSettings result = entity.ToDomainValueObject();
+
+        // Assert
+        Assert.False(result.ShouldTrackConsumptionProgress);
+        Assert.False(result.CompletionThresholdPercentage.HasValue);
+    }
+
+    [Fact]
+    public void ToDomainValueObject_WhenProgressTrackingIsEnabledWithoutThreshold_ShouldMapNoThreshold()
+    {
+        // Arrange
+        LibraryEntity entity = _libraryEntityFixture.Create(
+            libraryType: LibraryType.Book,
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: null);
+
+        // Act
+        LibraryConsumptionSettings result = entity.ToDomainValueObject();
+
+        // Assert
+        Assert.True(result.ShouldTrackConsumptionProgress);
+        Assert.False(result.CompletionThresholdPercentage.HasValue);
     }
 }

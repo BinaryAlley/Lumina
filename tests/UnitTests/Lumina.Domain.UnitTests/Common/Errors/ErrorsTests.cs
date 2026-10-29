@@ -42,7 +42,7 @@ public class ErrorsTests
     {
         // Assert
         // The count assertion fails when an error is added or removed, reminding to update the assertions below.
-        Assert.Equal(18, typeof(DomainErrors.Library).GetProperties().Length);
+        Assert.Equal(20, typeof(DomainErrors.Library).GetProperties().Length);
         AssertError(DomainErrors.Library.CannotScanLockedLibrary, ErrorType.Forbidden);
         AssertError(DomainErrors.Library.CannotScanDisabledLibrary, ErrorType.Forbidden);
         AssertError(DomainErrors.Library.LibraryIdCannotBeEmpty, ErrorType.Validation);
@@ -61,6 +61,8 @@ public class ErrorsTests
         AssertError(DomainErrors.Library.PathTemplateValuePartMustContainSinglePlaceholder, ErrorType.Validation);
         AssertError(DomainErrors.Library.PathTemplatePartKindNotSupportedForLibraryType, ErrorType.Validation);
         AssertError(DomainErrors.Library.PathTemplateIsNotSupportedForLibraryType, ErrorType.Validation);
+        AssertError(DomainErrors.Library.CompletionThresholdPercentageMustBeNullWhenProgressTrackingIsOff, ErrorType.Validation);
+        AssertError(DomainErrors.Library.CompletionThresholdPercentageMustBeBetweenZeroAndOneHundred, ErrorType.Validation);
     }
 
     [Fact]
@@ -79,10 +81,38 @@ public class ErrorsTests
     {
         // Assert
         // The count assertion fails when an error is added or removed, reminding to update the assertions below.
-        Assert.Equal(3, typeof(DomainErrors.UserSettings).GetProperties().Length);
+        Assert.Equal(31, typeof(DomainErrors.UserSettings).GetProperties().Length);
         AssertError(DomainErrors.UserSettings.UserSettingsAlreadyExists, ErrorType.Conflict);
         AssertError(DomainErrors.UserSettings.UserSettingsNotFound, ErrorType.NotFound);
         AssertError(DomainErrors.UserSettings.ItemsPerPageMustBeGreaterThanZero, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VolumeCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VolumeMustBeBetweenZeroAndOne, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.IsMutedCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.ShouldKeepDownloadingWhilePausedCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.ShouldAutoplayCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.IsGaplessPlaybackEnabledCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.ReplayGainModeCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.StreamingQualityCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.InvalidReplayGainMode, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.InvalidStreamingQuality, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterOrientationCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.InvalidVuMeterOrientation, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterSegmentCountCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterSegmentCountMustBeBetweenOneAndOneHundredTwentyEight, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterSegmentGapCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterSegmentGapMustBeBetweenZeroAndThirtyTwo, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterMediumThresholdCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterMediumThresholdMustBeBetweenZeroAndOne, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterHighThresholdCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterHighThresholdMustBeBetweenZeroAndOne, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterHighThresholdMustBeGreaterThanOrEqualToMediumThreshold, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterShowPeakCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterPeakHoldDurationCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterPeakHoldDurationMustBeBetweenZeroAndTenThousandMilliseconds, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterReleasePerSecondCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterReleasePerSecondMustBeBetweenZeroAndOneHundred, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterPeakReleasePerSecondCannotBeNull, ErrorType.Validation);
+        AssertError(DomainErrors.UserSettings.VuMeterPeakReleasePerSecondMustBeBetweenZeroAndOneHundred, ErrorType.Validation);
     }
 
     [Fact]
@@ -192,6 +222,36 @@ public class ErrorsTests
         Assert.Equal(2, typeof(DomainErrors.MediaContributors).GetProperties().Length);
         AssertError(DomainErrors.MediaContributors.MediaContributorNameCannotBeEmpty, ErrorType.Validation);
         AssertError(DomainErrors.MediaContributors.MediaContributorRoleNameCannotBeEmpty, ErrorType.Validation);
+    }
+
+    [Fact]
+    public void MediaConsumption_WhenAccessed_ShouldExposeErrorsWithExpectedTypes()
+    {
+        // Assert
+        // The count assertion fails when an error is added or removed, reminding to update the assertions below.
+        Assert.Equal(22, typeof(DomainErrors.MediaConsumption).GetProperties().Length);
+        AssertError(DomainErrors.MediaConsumption.UnsupportedMediaKind, ErrorType.Validation);
+        AssertError(DomainErrors.MediaConsumption.MediaKindCannotStartCompleted, ErrorType.Forbidden);
+        AssertError(DomainErrors.MediaConsumption.MediaKindCannotResume, ErrorType.Forbidden);
+        AssertError(DomainErrors.MediaConsumption.ConsumptionRecordNotFound, ErrorType.NotFound);
+        AssertError(DomainErrors.MediaConsumption.MediaResumePointNotFound, ErrorType.NotFound);
+        AssertError(DomainErrors.MediaConsumption.ConsumptionRecordIdCannotBeEmpty, ErrorType.Validation);
+        AssertError(DomainErrors.MediaConsumption.MediaItemIdCannotBeEmpty, ErrorType.Validation);
+        AssertError(DomainErrors.MediaConsumption.TargetUserIdIsInvalid, ErrorType.Validation);
+        AssertError(DomainErrors.MediaConsumption.ConsumptionDateRangeIsInvalid, ErrorType.Validation);
+        AssertError(DomainErrors.MediaConsumption.InvalidMediaPosition, ErrorType.Validation);
+        AssertError(DomainErrors.MediaConsumption.InvalidProgressFraction, ErrorType.Validation);
+        AssertError(DomainErrors.MediaConsumption.ConsumedDurationMustBeNonNegative, ErrorType.Validation);
+        AssertError(DomainErrors.MediaConsumption.ConsumedDurationIsOutOfRange, ErrorType.Validation);
+        AssertError(DomainErrors.MediaConsumption.ConsumedDurationCannotDecrease, ErrorType.Forbidden);
+        AssertError(DomainErrors.MediaConsumption.ConsecutivePagesReadMustBeNonNegative, ErrorType.Validation);
+        AssertError(DomainErrors.MediaConsumption.ConsecutivePagesReadIsOnlySupportedForPageBasedMedia, ErrorType.Forbidden);
+        AssertError(DomainErrors.MediaConsumption.ConsumptionIsNotInProgress, ErrorType.Conflict);
+        AssertError(DomainErrors.MediaConsumption.ConsumptionIsAlreadyTerminal, ErrorType.Conflict);
+        AssertError(DomainErrors.MediaConsumption.InProgressConsumptionCannotHaveEndTime, ErrorType.Validation);
+        AssertError(DomainErrors.MediaConsumption.EndedConsumptionMustHaveEndTime, ErrorType.Validation);
+        AssertError(DomainErrors.MediaConsumption.LastActivityCannotPrecedeStart, ErrorType.Forbidden);
+        AssertError(DomainErrors.MediaConsumption.EndedConsumptionCannotPrecedeLastActivity, ErrorType.Forbidden);
     }
 
     [Fact]

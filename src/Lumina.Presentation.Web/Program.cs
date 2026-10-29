@@ -97,9 +97,13 @@ public class Program
         app.UseApiExceptionHandling(); // handle any problem details returned by the API
         app.UseRouting();
         app.UseRequestLocalization(); // set the culture from the localized routes
+        // restore the Cache-Control chosen by the endpoint after the antiforgery and session middlewares overwrite it
+        app.UseCacheControlHeader();
         app.UseSession();
         app.UseAuthentication();
         app.UseAuthorization();
+        // The rate limiting policies are evaluated after authentication, because the track stream limit is partitioned per authenticated user.
+        app.UseRateLimiter();
         // validate the antiforgery token after authentication, because the token is bound to the authenticated user and
         // validating it before the user is known would reject every request made by a logged-in user
         app.UseAntiforgeryFE(additionalContentTypes: ["application/json"]);

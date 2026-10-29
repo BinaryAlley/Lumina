@@ -158,7 +158,6 @@ public class UpdateTrackEndpointTests
                 command.ArtistId == artistId.ToString() &&
                 command.AlbumId == albumId.ToString() &&
                 command.TrackId == trackId.ToString() &&
-                command.Path == request.Path &&
                 command.Metadata == request.Metadata &&
                 command.TrackNumber == request.TrackNumber &&
                 command.DiscNumber == request.DiscNumber &&

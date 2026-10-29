@@ -25,7 +25,7 @@ public class SqliteGuidTypeHandlerTests
     }
 
     [Fact]
-    public void SetValue_WhenCalled_ShouldStoreTheGuidAsItsTextRepresentation()
+    public void SetValue_WhenCalled_ShouldStoreTheGuidAsItsUpperCaseTextRepresentation()
     {
         // Arrange
         IDbDataParameter parameter = Substitute.For<IDbDataParameter>();
@@ -35,7 +35,7 @@ public class SqliteGuidTypeHandlerTests
         _sut.SetValue(parameter, guid);
 
         // Assert
-        Assert.Equal(guid.ToString(), (string?)parameter.Value);
+        Assert.Equal(guid.ToString().ToUpperInvariant(), (string?)parameter.Value);
     }
 
     [Fact]

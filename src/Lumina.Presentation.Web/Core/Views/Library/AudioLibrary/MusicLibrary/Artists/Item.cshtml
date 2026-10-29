@@ -9,6 +9,9 @@
     The albums of the artist are NOT edited inline: they are listed as cards that navigate to their own pages,
     and the update request only round-trips the albums unchanged, so that updating the artist never drops them.
 
+    The artist header exposes a play all trigger for the global audio player. The player handles the trigger by event
+    delegation, so this view binds no playback listener; the trigger attribute contract lives in docs/technical/theming/Theming.md.
+
     To change the behavior of the page, edit this script (and the theme template, when present). To restyle
     the page, edit the theme files. This fallback keeps every feature working without styling, so that a
     broken theme is obvious to the user while the page still functions.
@@ -36,6 +39,9 @@
     var aliases = metadata?.Aliases ?? [];
     var contributors = Model.Contributors ?? [];
     var ratings = Model.Ratings ?? [];
+    // The play all trigger starts disabled when the artist is already known to hold no releases, so an empty discography
+    // cannot be clicked before the release list request resolves. A failed request never changes this state.
+    var hasReleases = (Model.Albums?.Count ?? 0) > 0;
     var genres = metadata?.Genres ?? [];
     var tags = metadata?.Tags ?? [];
     var area = metadata?.Area;
@@ -110,6 +116,15 @@
         <div class="shine-effect"></div>
         <div class="form-row">
             <button id="btn-back-to-artists" type="button" class="abort-button">@_localizer["BackToArtists"]</button>
+            <!-- The play all trigger is handled by the global audio player script through event delegation, so this page binds no click handler of its own. -->
+            <button id="btn-play-artist" type="button" class="confirm-button" @(hasReleases ? string.Empty : "disabled")
+                    data-audio-player-play
+                    data-library-id="@libraryId"
+                    data-artist-id="@artistId"
+                    data-title="@(metadata?.Name ?? string.Empty)"
+                    data-cover-art-path="@(Model.CoverPath ?? string.Empty)">
+                @_localizer["PlayAll"]
+            </button>
         </div>
         <div class="form-row">
             <h1 class="text-light-two w-100 text-center pt-0 pb-0 engraved-title">@_localizer["EditArtist"]</h1>
@@ -624,6 +639,7 @@
         const btnBackToArtists = document.getElementById('btn-back-to-artists');
         const btnSaveArtist = document.getElementById('btn-save-artist');
         const btnDeleteArtist = document.getElementById('btn-delete-artist');
+        const btnPlayArtist = document.getElementById('btn-play-artist');
         const btnAddAlias = document.getElementById('btn-add-alias');
         const btnAddIpi = document.getElementById('btn-add-ipi');
         const btnAddIsni = document.getElementById('btn-add-isni');
@@ -656,7 +672,10 @@
             noCover: @Json.Serialize(_localizer["NoCover"].Value),
             coverSaved: @Json.Serialize(_localizer["CoverSaved"].Value),
             coverUploadFailed: @Json.Serialize(_localizer["CoverUploadFailed"].Value),
-            remove: @Json.Serialize(_localizer["Remove"].Value)
+            play: @Json.Serialize(_localizer["Play"].Value),
+            shuffle: @Json.Serialize(_localizer["Shuffle"].Value),
+            remove: @Json.Serialize(_localizer["Remove"].Value),
+            addToPlaylist: @Json.Serialize(_localizer["AddToPlaylist"].Value)
         };
 
         // Reads the trimmed value of the element with the provided id.
@@ -932,6 +951,28 @@
             return deleteAlbumUrlTemplate.replace('/@(default(Guid))', `/${artistId}`).replace('/@(default(Guid))', `/${albumId}`) + `?libraryId=${libraryId}`;
         }
 
+        // Writes the play descriptor of an album onto an album card menu action.
+        function applyAlbumPlayDescriptor(trigger, album) {
+            trigger.dataset.libraryId = libraryId;
+            trigger.dataset.artistId = artistId;
+            trigger.dataset.albumId = album.id;
+            trigger.dataset.title = album.title || '';
+            if (album.coverPath)
+                trigger.dataset.coverArtPath = album.coverPath;
+            else
+                delete trigger.dataset.coverArtPath;
+        }
+
+        // Creates an action of the album card actions menu.
+        function createAlbumMenuAction(label, className) {
+            const action = document.createElement('a');
+            action.setAttribute('role', 'menuitem');
+            action.href = '#';
+            action.className = className;
+            action.textContent = label;
+            return action;
+        }
+
         // The localized labels of the release types, keyed by their canonical enum name.
         const releaseTypeLabels = {
             'Album': '@_localizer["Album"].Value',
@@ -962,11 +1003,16 @@
             renderReleases(response);
         }
 
-        // Renders the releases of the artist, grouped by their primary release type, each group ordered by release year.
+        // Renders the releases of the artist, grouped by their primary release type, each group ordered by release year. A
+        // failed request returns undefined, which is not an empty discography: it leaves the existing list and play state intact.
         function renderReleases(response) {
+            if (!response || !Array.isArray(response.data))
+                return;
             albumsContainer.querySelectorAll('.release-group').forEach(group => group.remove());
-            const releases = response && response.data ? response.data : [];
+            const releases = response.data;
             noAlbumsMessage.classList.toggle('hidden', releases.length !== 0);
+            // Only a successful empty list disables the play all trigger. The player can still build the queue itself when the release list could not be loaded.
+            btnPlayArtist.disabled = releases.length === 0;
 
             // The releases are grouped by their first release type, falling back to "Other" when the type is not known.
             const groups = new Map();
@@ -1072,8 +1118,38 @@
             const menu = document.createElement('nav');
             menu.className = 'card-actions-menu';
             menu.setAttribute('role', 'menu');
-            menu.innerHTML = `<a role="menuitem" href="#" class="card-action-delete">${jsLocalizedStrings.remove}</a>`;
+
+            const playAction = createAlbumMenuAction(jsLocalizedStrings.play, 'card-action-play');
+            playAction.setAttribute('data-audio-player-play', '');
+            applyAlbumPlayDescriptor(playAction, album);
+
+            const shuffleAction = createAlbumMenuAction(jsLocalizedStrings.shuffle, 'card-action-shuffle');
+            shuffleAction.setAttribute('data-audio-player-play-shuffled', '');
+            shuffleAction.setAttribute('data-audio-player-shuffle-scope', 'release');
+            applyAlbumPlayDescriptor(shuffleAction, album);
+
+            const addToPlaylistAction = createAlbumMenuAction(jsLocalizedStrings.addToPlaylist, 'card-action-add-to-playlist');
+            addToPlaylistAction.addEventListener('click', async event => {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                closeCardMenus();
+                if (window.LuminaPlaylists)
+                    await window.LuminaPlaylists.showAddScopeDialogAsync({ libraryId: libraryId, artistId: artistId, albumId: album.id, title: album.title || '', addToPlaylistLabel: jsLocalizedStrings.addToPlaylist, returnFocus: trigger });
+            });
+
+            const deleteAction = createAlbumMenuAction(jsLocalizedStrings.remove, 'card-action-delete');
+
+            menu.appendChild(playAction);
+            menu.appendChild(shuffleAction);
+            menu.appendChild(addToPlaylistAction);
+            menu.appendChild(deleteAction);
+
             menu.addEventListener('click', async event => {
+                // Play and shuffle are handled by the global audio player delegation, so the menu only closes here.
+                if (event.target.closest('.card-action-play, .card-action-shuffle')) {
+                    closeCardMenus();
+                    return;
+                }
                 const deleteItem = event.target.closest('.card-action-delete');
                 if (!deleteItem)
                     return;
@@ -1083,7 +1159,16 @@
                 await deleteAlbumAsync(card.dataset.albumId);
             });
 
+            // The favorite heart is a plain button: the global favorites script finds it by its data attributes, hydrates its state and handles its click.
+            const favoriteToggle = document.createElement('button');
+            favoriteToggle.type = 'button';
+            favoriteToggle.className = 'card-favorite-toggle';
+            favoriteToggle.setAttribute('data-favorite-toggle', '');
+            favoriteToggle.setAttribute('data-favorite-media-kind', 'MusicAlbum');
+            favoriteToggle.setAttribute('data-favorite-media-item-id', album.id);
+
             card.appendChild(cardLink);
+            card.appendChild(favoriteToggle);
             card.appendChild(trigger);
             card.appendChild(menu);
 
@@ -1237,6 +1322,11 @@
                     coverImage.dataset.coverPath = storedPath;
                     coverPathLabel.textContent = storedPath ? storedPath : jsLocalizedStrings.noCover;
                     coverPathLabel.title = storedPath;
+                    // The player shows the cover the page displays, so the uploaded cover is handed to the play trigger too.
+                    if (storedPath)
+                        btnPlayArtist.dataset.coverArtPath = storedPath;
+                    else
+                        delete btnPlayArtist.dataset.coverArtPath;
                 };
                 reader.readAsDataURL(file);
                 notificationService.show(jsLocalizedStrings.coverSaved, NotificationType.SUCCESS);

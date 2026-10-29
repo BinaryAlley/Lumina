@@ -31,7 +31,6 @@ public class UpdateTrackEndpointSummary : Summary<UpdateTrackEndpoint, UpdateTra
         Description = "Updates the details of the track identified by the route, returning the full details of the updated track. The track is updated by an Admin, who can update the tracks of all libraries, or by the owner of the library of the track.";
 
         ExampleRequest = new UpdateTrackRequest(
-            Path: "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
             Metadata: new MusicTrackMetadataDto(
                 Title: "Bohemian Rhapsody",
                 OriginalTitle: "Bohemian Rhapsody",
@@ -124,7 +123,6 @@ public class UpdateTrackEndpointSummary : Summary<UpdateTrackEndpoint, UpdateTra
             DiscNumber: 1
         );
 
-        RequestParam(r => r.Path, "The file system path of the track. Required.");
         RequestParam(r => r.Metadata, "The audio metadata of the track. Required.");
         RequestParam(r => r.Metadata!.Title, "The title of the track. Required.");
         RequestParam(r => r.Metadata!.OriginalTitle, "The original title of the track. Optional.");
@@ -170,6 +168,7 @@ public class UpdateTrackEndpointSummary : Summary<UpdateTrackEndpoint, UpdateTra
         ResponseParam<TrackResponse>(r => r.AlbumId, "The Id of the album the track belongs to.");
         ResponseParam<TrackResponse>(r => r.LibraryId, "The Id of the media library the track belongs to.");
         ResponseParam<TrackResponse>(r => r.Path, "The file system path of the track.");
+        ResponseParam<TrackResponse>(r => r.Container, "The container of the audio file of the track, if applicable.");
         ResponseParam<TrackResponse>(r => r.Metadata!.Title, "The title of the track.");
         ResponseParam<TrackResponse>(r => r.Metadata!.OriginalTitle, "The original title of the track, if applicable.");
         ResponseParam<TrackResponse>(r => r.Metadata!.Description, "The description of the track, if applicable.");
@@ -215,6 +214,7 @@ public class UpdateTrackEndpointSummary : Summary<UpdateTrackEndpoint, UpdateTra
                 AlbumId: Guid.NewGuid(),
                 LibraryId: Guid.NewGuid(),
                 Path: "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
+                Container: "FLAC",
                 Metadata: new MusicTrackMetadataDto(
                     Title: "Bohemian Rhapsody",
                     OriginalTitle: "Bohemian Rhapsody",
@@ -397,7 +397,7 @@ public class UpdateTrackEndpointSummary : Summary<UpdateTrackEndpoint, UpdateTra
             }
         );
 
-        Response(409, "The request failed because the new file system path already belongs to another track in the library, or because a unique constraint was violated.", "application/problem+json",
+        Response(409, "The request failed because a unique constraint was violated.", "application/problem+json",
             example: new
             {
                 type = "https://tools.ietf.org/html/rfc9110#section-15.5.10",
@@ -426,8 +426,6 @@ public class UpdateTrackEndpointSummary : Summary<UpdateTrackEndpoint, UpdateTra
                             "ArtistIdCannotBeEmpty",
                             "AlbumIdCannotBeEmpty",
                             "TrackIdCannotBeEmpty",
-                            "TrackPathCannotBeEmpty",
-                            "TrackPathMustBeMaximum2048CharactersLong",
                             "MetadataCannotBeNull",
                             "TitleCannotBeEmpty",
                             "TitleMustBeMaximum255CharactersLong",
@@ -468,8 +466,7 @@ public class UpdateTrackEndpointSummary : Summary<UpdateTrackEndpoint, UpdateTra
                             "RatingValueMustBePositive",
                             "RatingValueCannotBeGreaterThanMaxValue",
                             "RatingMaxValueMustBePositive",
-                            "RatingVoteCountMustBePositive",
-                            "TrackPathMustBeWithinLibraryContentLocations"
+                            "RatingVoteCountMustBePositive"
                         }
                     }
                 },

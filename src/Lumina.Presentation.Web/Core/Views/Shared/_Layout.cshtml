@@ -46,12 +46,12 @@ else
         <title>@ViewData["Title"] - Lumina</title>
         @await Html.PartialAsync("_ThemeLayoutHead")
     </head>
-    <body>
+    <body class="application-fallback-layout">
         <div id="page">
             <header>
                 @await Html.PartialAsync("_NavMenu")
             </header>
-            <main role="main" style="@(User?.Identity?.IsAuthenticated == false ? "bottom: 0px;" : string.Empty)">
+            <main role="main" class="audio-player-not-shown" style="@(User?.Identity?.IsAuthenticated == false ? "bottom: 0px;" : string.Empty)">
                 <article class="h-100">
                     @Html.Raw(bodyHtml)
                     <div id="modal-background-article"></div>

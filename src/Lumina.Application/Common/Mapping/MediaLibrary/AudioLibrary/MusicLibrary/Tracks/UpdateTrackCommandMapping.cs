@@ -85,7 +85,6 @@ public static class UpdateTrackCommandMapping
         Result<Updated> updateResult = artist.UpdateTrackInAlbum(
             album,
             track,
-            command.Path!,
             metadataResult.Value,
             Optional<string>.FromNullable(metadata.Disambiguation),
             command.TrackNumber!.Value,

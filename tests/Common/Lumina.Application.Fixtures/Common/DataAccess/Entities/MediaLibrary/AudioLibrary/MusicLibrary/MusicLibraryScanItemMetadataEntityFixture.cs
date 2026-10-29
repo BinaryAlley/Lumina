@@ -39,6 +39,7 @@ public class MusicLibraryScanItemMetadataEntityFixture
     /// <param name="musicBrainzWorkId">Optional. The MusicBrainz identifier of the work.</param>
     /// <param name="workTitle">Optional. The title of the work.</param>
     /// <param name="includeMusicBrainzTags">Whether the MusicBrainz identifiers and the work title should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeContainer">Whether the container should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="MusicLibraryScanItemMetadataEntity"/>.</returns>
     public MusicLibraryScanItemMetadataEntity Create(
         Guid? id = null,
@@ -58,7 +59,8 @@ public class MusicLibraryScanItemMetadataEntityFixture
         Guid? musicBrainzTrackId = null,
         Guid? musicBrainzWorkId = null,
         string? workTitle = null,
-        bool includeMusicBrainzTags = true)
+        bool includeMusicBrainzTags = true,
+        bool includeContainer = true)
     {
         return new MusicLibraryScanItemMetadataEntity
         {
@@ -78,6 +80,7 @@ public class MusicLibraryScanItemMetadataEntityFixture
             Channels = _faker.PickRandom(1, 2, 6),
             BitDepth = Random.Shared.Next(8, 32),
             AudioCodec = _faker.PickRandom("FLAC", "MP3", "AAC", "ALAC"),
+            Container = includeContainer ? _faker.PickRandom("FLAC", "MP3", "OGG", "MP4", "AAC", "WAV") : null,
             Bitrate = Random.Shared.Next(96, 1411),
             MusicBrainzArtistId = includeMusicBrainzTags ? musicBrainzArtistId ?? Guid.NewGuid() : null,
             MusicBrainzReleaseArtistId = includeMusicBrainzTags ? musicBrainzReleaseArtistId ?? Guid.NewGuid() : null,

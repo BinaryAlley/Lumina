@@ -59,6 +59,138 @@
         const librariesContainer = document.getElementById('libraries-container');
         const noLibrariesMessage = document.getElementById('no-libraries');
 
+        const jsLocalizedStrings = {
+            actions: @Json.Serialize(_localizer["Actions"].Value),
+            play: @Json.Serialize(_localizer["Play"].Value),
+            shuffle: @Json.Serialize(_localizer["Shuffle"].Value),
+            addToPlaylist: @Json.Serialize(_localizer["AddToPlaylist"].Value)
+        };
+
+        // Closes the actions menus of all the music library cards.
+        function closeCardMenus() {
+            librariesContainer.querySelectorAll('.media-card.open').forEach(card => {
+                card.classList.remove('open');
+                const menu = card.querySelector('.card-actions-menu');
+                if (menu)
+                    menu.classList.remove('open');
+            });
+        }
+
+        // Toggles the actions menu of a music library card, opening it with its top left corner at the given viewport position.
+        function toggleCardMenu(card, anchor) {
+            const wasOpen = card.classList.contains('open');
+            closeCardMenus();
+            if (wasOpen)
+                return;
+            card.classList.add('open');
+            const menu = card.querySelector('.card-actions-menu');
+            if (menu) {
+                menu.classList.add('open');
+                positionActionsMenu(menu, anchor);
+            }
+        }
+
+        // Resolves the viewport point where the card actions menu opens.
+        function resolveMenuAnchor(event) {
+            if (event.clientX !== 0 || event.clientY !== 0)
+                return { x: event.clientX, y: event.clientY };
+            const triggerRect = event.currentTarget.getBoundingClientRect();
+            return { x: triggerRect.left, y: triggerRect.bottom };
+        }
+
+        // Places the card actions menu with its top left corner at the requested viewport point.
+        function positionActionsMenu(menu, anchor) {
+            const margin = 4;
+            const maxLeft = Math.max(margin, window.innerWidth - menu.offsetWidth - margin);
+            const maxTop = Math.max(margin, window.innerHeight - menu.offsetHeight - margin);
+            menu.style.position = 'fixed';
+            menu.style.left = `${Math.min(Math.max(margin, anchor.x), maxLeft)}px`;
+            menu.style.top = `${Math.min(Math.max(margin, anchor.y), maxTop)}px`;
+        }
+
+        // Closes the actions menus when clicking or pressing a key outside them.
+        function handleCardMenuDismiss(event) {
+            if (event.type === 'keydown' && event.key !== 'Escape')
+                return;
+            if (event.type === 'click' && event.target.closest('.card-actions-menu, .card-actions-trigger'))
+                return;
+            closeCardMenus();
+        }
+
+        // Adds the actions menu of a music library card, with the play and shuffle actions that start the whole library.
+        function createMusicLibraryMenu(card, library) {
+            const libraryCoverPath = library.coverImage
+                ? `/media/libraries/${library.id}/${library.coverImage.substring(library.coverImage.lastIndexOf('cover.'))}`
+                : '';
+            const trigger = document.createElement('button');
+            trigger.type = 'button';
+            trigger.className = 'card-actions-trigger';
+            trigger.setAttribute('aria-haspopup', 'menu');
+            trigger.setAttribute('aria-label', jsLocalizedStrings.actions);
+            trigger.addEventListener('click', event => {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                toggleCardMenu(card, resolveMenuAnchor(event));
+            });
+
+            const menu = document.createElement('nav');
+            menu.className = 'card-actions-menu';
+            menu.setAttribute('role', 'menu');
+
+            const playAction = document.createElement('a');
+            playAction.setAttribute('role', 'menuitem');
+            playAction.href = '#';
+            playAction.className = 'card-action-play';
+            playAction.textContent = jsLocalizedStrings.play;
+            playAction.setAttribute('data-audio-player-play-library', '');
+            playAction.dataset.libraryId = library.id;
+            playAction.dataset.title = library.title || '';
+            if (libraryCoverPath)
+                playAction.dataset.coverArtPath = libraryCoverPath;
+            menu.appendChild(playAction);
+
+            const shuffleAction = document.createElement('a');
+            shuffleAction.setAttribute('role', 'menuitem');
+            shuffleAction.href = '#';
+            shuffleAction.className = 'card-action-shuffle';
+            shuffleAction.textContent = jsLocalizedStrings.shuffle;
+            shuffleAction.setAttribute('data-audio-player-play-library-shuffled', '');
+            shuffleAction.dataset.libraryId = library.id;
+            menu.appendChild(shuffleAction);
+
+            const addToPlaylistAction = document.createElement('a');
+            addToPlaylistAction.setAttribute('role', 'menuitem');
+            addToPlaylistAction.href = '#';
+            addToPlaylistAction.className = 'card-action-add-to-playlist';
+            addToPlaylistAction.textContent = jsLocalizedStrings.addToPlaylist;
+            addToPlaylistAction.addEventListener('click', async event => {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                closeCardMenus();
+                if (window.LuminaPlaylists)
+                    await window.LuminaPlaylists.showAddScopeDialogAsync({ libraryId: library.id, title: library.title || '', addToPlaylistLabel: jsLocalizedStrings.addToPlaylist, returnFocus: trigger });
+            });
+            menu.appendChild(addToPlaylistAction);
+
+            menu.addEventListener('click', event => {
+                // The global audio player delegation handles the play and shuffle actions; the menu only closes here.
+                if (event.target.closest('.card-action-play, .card-action-shuffle'))
+                    closeCardMenus();
+            });
+
+            card.appendChild(trigger);
+            card.appendChild(menu);
+            card.addEventListener('contextmenu', event => {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                toggleCardMenu(card, resolveMenuAnchor(event));
+            });
+            card.addEventListener('click', event => {
+                if (card.classList.contains('open') && !event.target.closest('.card-actions-menu'))
+                    closeCardMenus();
+            });
+        }
+
         async function InitializeAsync() {
             if (isInitialized)
                 return;
@@ -95,7 +227,15 @@
                         <span class="text-light-two"><strong>${library.title}</strong></span>
                     `;
 
-                    librariesContainer.appendChild(libraryElement);
+                    // A music library gets a card actions menu with the play and shuffle actions for the whole library.
+                    if (library.libraryType === 'Music') {
+                        const card = document.createElement('div');
+                        card.className = 'media-card';
+                        card.appendChild(libraryElement);
+                        createMusicLibraryMenu(card, library);
+                        librariesContainer.appendChild(card);
+                    } else
+                        librariesContainer.appendChild(libraryElement);
                 });
                 // Bind the AJAX navigation behavior to the library links, which were created after the initial navigation binding.
                 bindNavigationLinks();
@@ -107,10 +247,14 @@
         }
 
         // Add listeners.
+        document.addEventListener('click', handleCardMenuDismiss);
+        document.addEventListener('keydown', handleCardMenuDismiss);
         document.addEventListener('DOMContentLoaded', InitializeAsync);
 
         // Register cleanup for these listeners.
         cleanupFunctions.push(() => {
+            document.removeEventListener('click', handleCardMenuDismiss);
+            document.removeEventListener('keydown', handleCardMenuDismiss);
             document.removeEventListener('DOMContentLoaded', InitializeAsync);
         });
 

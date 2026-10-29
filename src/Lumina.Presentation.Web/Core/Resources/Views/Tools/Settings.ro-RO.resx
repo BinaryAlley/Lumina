@@ -69,4 +69,121 @@
   <data name="DescriptionShouldAggregateArtworkWhenMissing" xml:space="preserve">
     <value>Când este activat, ilustrațiile elementelor din bibliotecă pe care primul furnizor de ilustrații nu le oferă sunt completate de la furnizorii următori.</value>
   </data>
+  <data name="Playback" xml:space="preserve">
+    <value>Redare</value>
+  </data>
+  <data name="ShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>Continuă descărcarea în pauză</value>
+  </data>
+  <data name="DescriptionShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>Dacă playerul continuă să descarce piesa în timp ce redarea este în pauză, până la întregul fișier, astfel încât reluarea să nu aștepte niciodată datele.</value>
+  </data>
+  <data name="ShouldAutoplay" xml:space="preserve">
+    <value>Redare automată</value>
+  </data>
+  <data name="DescriptionShouldAutoplay" xml:space="preserve">
+    <value>Dacă redarea continuă automat cu piesele următoare la sfârșitul unui album sau al unui artist.</value>
+  </data>
+  <data name="IsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>Redare fără întreruperi</value>
+  </data>
+  <data name="DescriptionIsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>Dacă piesele consecutive sunt redate fără o pauză de sunet între ele.</value>
+  </data>
+  <data name="ReplayGainMode" xml:space="preserve">
+    <value>ReplayGain</value>
+  </data>
+  <data name="DescriptionReplayGainMode" xml:space="preserve">
+    <value>Modul în care normalizarea ReplayGain este aplicată pieselor pe care le redai.</value>
+  </data>
+  <data name="ReplayGainModeOff" xml:space="preserve">
+    <value>Dezactivat</value>
+  </data>
+  <data name="ReplayGainModeTrack" xml:space="preserve">
+    <value>Per piesă</value>
+  </data>
+  <data name="ReplayGainModeAlbum" xml:space="preserve">
+    <value>Per album</value>
+  </data>
+  <data name="StreamingQuality" xml:space="preserve">
+    <value>Calitatea fluxului</value>
+  </data>
+  <data name="DescriptionStreamingQuality" xml:space="preserve">
+    <value>Limita de calitate aplicată atunci când serverul trebuie să normalizeze o piesă pentru redare. Redarea directă nu este niciodată modificată.</value>
+  </data>
+  <data name="StreamingQualityAuto" xml:space="preserve">
+    <value>Automată</value>
+  </data>
+  <data name="StreamingQualityLow" xml:space="preserve">
+    <value>Redusă (96 kbps)</value>
+  </data>
+  <data name="StreamingQualityMedium" xml:space="preserve">
+    <value>Medie (160 kbps)</value>
+  </data>
+  <data name="StreamingQualityHigh" xml:space="preserve">
+    <value>Ridicată (320 kbps)</value>
+  </data>
+  <data name="DescriptionVuMeterSegmentCount" xml:space="preserve">
+    <value>În câte segmente este împărțit fiecare canal al vumetrului, între 1 și 128.</value>
+  </data>
+  <data name="VuMeterPeakReleasePerSecond" xml:space="preserve">
+    <value>Scăderea vârfurilor</value>
+  </data>
+  <data name="DescriptionVuMeterHighThreshold" xml:space="preserve">
+    <value>Nivelul, între 0 și 1, peste care un segment este desenat cu starea ridicată. Trebuie să fie cel puțin pragul mediu.</value>
+  </data>
+  <data name="DescriptionVuMeterOrientation" xml:space="preserve">
+    <value>Dacă canalele vumetrului cresc de jos în sus sau de la stânga la dreapta.</value>
+  </data>
+  <data name="DescriptionVuMeterMediumThreshold" xml:space="preserve">
+    <value>Nivelul, între 0 și 1, peste care un segment este desenat cu starea medie.</value>
+  </data>
+  <data name="VuMeterOrientationVertical" xml:space="preserve">
+    <value>Verticală</value>
+  </data>
+  <data name="VuMeterReleasePerSecond" xml:space="preserve">
+    <value>Scăderea nivelului</value>
+  </data>
+  <data name="VuMeterOrientationHorizontal" xml:space="preserve">
+    <value>Orizontală</value>
+  </data>
+  <data name="VuMeterOrientation" xml:space="preserve">
+    <value>Orientare</value>
+  </data>
+  <data name="VuMeterHighThreshold" xml:space="preserve">
+    <value>Prag ridicat</value>
+  </data>
+  <data name="VuMeterSegmentCount" xml:space="preserve">
+    <value>Segmente pe canal</value>
+  </data>
+  <data name="VuMeterMediumThreshold" xml:space="preserve">
+    <value>Prag mediu</value>
+  </data>
+  <data name="VuMeter" xml:space="preserve">
+    <value>Vumetru</value>
+  </data>
+  <data name="VuMeterPeakHoldDuration" xml:space="preserve">
+    <value>Menținerea vârfurilor (ms)</value>
+  </data>
+  <data name="DescriptionVuMeterShowPeak" xml:space="preserve">
+    <value>Dacă fiecare canal păstrează un marcaj la cel mai puternic nivel recent.</value>
+  </data>
+  <data name="DescriptionVuMeterPeakReleasePerSecond" xml:space="preserve">
+    <value>Câte unități de nivel scade un marcaj de vârf pe secundă după durata de menținere, între 0 și 100. Valorile mai mari scad mai repede.</value>
+  </data>
+  <data name="DescriptionVuMeterPeakHoldDuration" xml:space="preserve">
+    <value>Cât timp, în milisecunde, este menținut un marcaj de vârf înainte de a începe să scadă, între 0 și 10000.</value>
+  </data>
+  <data name="VuMeterShowPeak" xml:space="preserve">
+    <value>Afișează vârfurile</value>
+  </data>
+  <data name="DescriptionVuMeterSegmentGap" xml:space="preserve">
+    <value>Spațiul, în pixeli, dintre segmente și canalele vumetrului, între 0 și 32.</value>
+  </data>
+  <data name="VuMeterSegmentGap" xml:space="preserve">
+    <value>Spațiu între segmente</value>
+  </data>
+  <data name="DescriptionVuMeterReleasePerSecond" xml:space="preserve">
+    <value>Câte unități de nivel scade un canal pe secundă după ce sunetul scade, între 0 și 100. Valorile mai mari scad mai repede.</value>
+  </data>
 </root>

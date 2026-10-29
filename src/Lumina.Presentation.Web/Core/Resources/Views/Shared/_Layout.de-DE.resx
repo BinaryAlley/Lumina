@@ -120,6 +120,27 @@
   <data name="Abort" xml:space="preserve">
     <value>Abbrechen</value>
   </data>
+  <data name="AudioPlayerBuffering" xml:space="preserve">
+    <value>Wird gepuffert</value>
+  </data>
+  <data name="AudioPlayerMute" xml:space="preserve">
+    <value>Stummschalten</value>
+  </data>
+  <data name="AudioPlayerPause" xml:space="preserve">
+    <value>Pause</value>
+  </data>
+  <data name="AudioPlayerPlay" xml:space="preserve">
+    <value>Abspielen</value>
+  </data>
+  <data name="AudioPlayerSeek" xml:space="preserve">
+    <value>Wiedergabeposition</value>
+  </data>
+  <data name="AudioPlayerUnmute" xml:space="preserve">
+    <value>Stummschaltung aufheben</value>
+  </data>
+  <data name="AudioPlayerVolume" xml:space="preserve">
+    <value>Lautstärke</value>
+  </data>
   <data name="Cancel" xml:space="preserve">
     <value>Abbrechen</value>
   </data>
@@ -147,8 +168,8 @@
   <data name="Retry" xml:space="preserve">
     <value>Wiederholen</value>
   </data>
-  <data name="ToggleFullHeight" xml:space="preserve">
-    <value>Vollhöhe Umschalten</value>
+  <data name="ToggleExpanded" xml:space="preserve">
+    <value>Player ein- oder ausklappen</value>
   </data>
   <data name="ToggleVisibility" xml:space="preserve">
     <value>Sichtbarkeit Umschalten</value>
@@ -158,5 +179,86 @@
   </data>
   <data name="Yes" xml:space="preserve">
     <value>Ja</value>
+  </data>
+  <data name="AudioPlayerPrevious" xml:space="preserve">
+    <value>Vorheriger Titel</value>
+  </data>
+  <data name="AudioPlayerNext" xml:space="preserve">
+    <value>Nächster Titel</value>
+  </data>
+  <data name="AudioPlayerShuffle" xml:space="preserve">
+    <value>Zufallswiedergabe</value>
+  </data>
+  <data name="AudioPlayerShuffleRelease" xml:space="preserve">
+    <value>Release zufällig abspielen</value>
+  </data>
+  <data name="AudioPlayerShuffleArtist" xml:space="preserve">
+    <value>Interpret zufällig abspielen</value>
+  </data>
+  <data name="AudioPlayerShuffleLibrary" xml:space="preserve">
+    <value>Bibliothek zufällig abspielen</value>
+  </data>
+  <data name="AudioPlayerRepeat" xml:space="preserve">
+    <value>Wiederholen</value>
+  </data>
+  <data name="AudioPlayerRepeatOff" xml:space="preserve">
+    <value>Wiederholung aus</value>
+  </data>
+  <data name="AudioPlayerRepeatAll" xml:space="preserve">
+    <value>Alle wiederholen</value>
+  </data>
+  <data name="AudioPlayerRepeatOne" xml:space="preserve">
+    <value>Titel wiederholen</value>
+  </data>
+  <data name="AudioPlayerQueue" xml:space="preserve">
+    <value>Warteschlange</value>
+  </data>
+  <data name="AudioPlayerShuffleOff" xml:space="preserve">
+    <value>Zufallswiedergabe aus</value>
+  </data>
+  <data name="AudioPlayerStop" xml:space="preserve">
+    <value>Stopp</value>
+  </data>
+  <data name="AudioPlayerAlbumArtwork" xml:space="preserve">
+    <value>Albumcover</value>
+  </data>
+  <data name="AudioPlayerAddQueueToPlaylist" xml:space="preserve">
+    <value>Warteschlange zu Wiedergabeliste hinzufügen</value>
+  </data>
+  <data name="AudioPlayerPlaylistQueueAddFailed" xml:space="preserve">
+    <value>Die Warteschlange konnte nicht zur Wiedergabeliste hinzugefügt werden.</value>
+  </data>
+  <data name="AudioPlayerSelectPlaylist" xml:space="preserve">
+    <value>Wiedergabeliste auswählen</value>
+  </data>
+  <data name="AudioPlayerAdd" xml:space="preserve">
+    <value>Hinzufügen</value>
+  </data>
+  <data name="AudioPlayerPlaylistQueueAdded" xml:space="preserve">
+    <value>Die Warteschlange wurde der Wiedergabeliste hinzugefügt.</value>
+  </data>
+  <data name="AudioPlayerNoPlaylists" xml:space="preserve">
+    <value>Du hast noch keine Wiedergabelisten.</value>
+  </data>
+  <data name="PlaylistAddToPlaylist" xml:space="preserve">
+    <value>Zur Wiedergabeliste hinzufügen</value>
+  </data>
+  <data name="PlaylistCreate" xml:space="preserve">
+    <value>Wiedergabeliste erstellen</value>
+  </data>
+  <data name="PlaylistTracksAdded" xml:space="preserve">
+    <value>Die Titel wurden zur Wiedergabeliste hinzugefügt.</value>
+  </data>
+  <data name="PlaylistTracksAddFailed" xml:space="preserve">
+    <value>Die Titel konnten nicht zur Wiedergabeliste hinzugefügt werden.</value>
+  </data>
+  <data name="PlaylistNoTracksToAdd" xml:space="preserve">
+    <value>Es gibt keine Titel zum Hinzufügen.</value>
+  </data>
+  <data name="FavoritesAdd" xml:space="preserve">
+    <value>Zu Favoriten hinzufügen</value>
+  </data>
+  <data name="FavoritesRemove" xml:space="preserve">
+    <value>Aus Favoriten entfernen</value>
   </data>
 </root>

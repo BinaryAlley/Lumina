@@ -62,8 +62,8 @@ public class InstallPluginCommandHandler : ICommandHandler<InstallPluginCommand,
             return ApplicationErrors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // only admins can install plugins
-        if (!await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false))
+        // Only admins can install plugins.
+        if (!await _authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false))
             return ApplicationErrors.Authorization.NotAuthorized;
 
         Result<Success> installResult = await _pluginInstaller.InstallAsync(command.Archive!, command.FileName!, cancellationToken).ConfigureAwait(false);

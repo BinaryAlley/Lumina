@@ -26,7 +26,6 @@ public static class UpdateTrackRequestMapping
             artistId,
             albumId,
             trackId,
-            request.Path,
             request.Metadata,
             request.TrackNumber,
             request.DiscNumber,

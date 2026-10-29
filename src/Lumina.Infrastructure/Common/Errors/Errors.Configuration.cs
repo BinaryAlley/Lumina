@@ -33,5 +33,21 @@ public static partial class Errors
         public static Error ThemeMaxExpandedBytesMustBePositive => Error.Validation(description: nameof(ThemeMaxExpandedBytesMustBePositive));
         public static Error ThemeMaxSingleFileBytesMustBePositive => Error.Validation(description: nameof(ThemeMaxSingleFileBytesMustBePositive));
         public static Error ThemeMaxEntriesMustBePositive => Error.Validation(description: nameof(ThemeMaxEntriesMustBePositive));
+        public static Error TranscodingFfmpegPathCannotBeEmpty => Error.Validation(description: nameof(TranscodingFfmpegPathCannotBeEmpty));
+        public static Error TranscodingMaxConcurrentJobsMustBePositive => Error.Validation(description: nameof(TranscodingMaxConcurrentJobsMustBePositive));
+        public static Error TranscodingMaxConcurrentJobsIsTooLarge => Error.Validation(description: nameof(TranscodingMaxConcurrentJobsIsTooLarge));
+        public static Error TranscodingMaxConcurrentJobsPerUserMustBePositive => Error.Validation(description: nameof(TranscodingMaxConcurrentJobsPerUserMustBePositive));
+        public static Error TranscodingMaxConcurrentJobsPerUserIsTooLarge => Error.Validation(description: nameof(TranscodingMaxConcurrentJobsPerUserIsTooLarge));
+        public static Error TranscodingMaxConcurrentJobsPerUserExceedsGlobal => Error.Validation(description: nameof(TranscodingMaxConcurrentJobsPerUserExceedsGlobal));
+        public static Error TranscodingMaxCacheBytesMustBePositive => Error.Validation(description: nameof(TranscodingMaxCacheBytesMustBePositive));
+        public static Error TranscodingJobTimeoutMustBePositive => Error.Validation(description: nameof(TranscodingJobTimeoutMustBePositive));
+        public static Error TranscodingJobTimeoutIsTooLong => Error.Validation(description: nameof(TranscodingJobTimeoutIsTooLong));
+        public static Error TranscodingEvictionGraceSecondsMustBePositive => Error.Validation(description: nameof(TranscodingEvictionGraceSecondsMustBePositive));
+        public static Error TranscodingEvictionGraceSecondsIsTooLong => Error.Validation(description: nameof(TranscodingEvictionGraceSecondsIsTooLong));
+        public static Error TranscodingCacheDirectoryIsInvalid => Error.Validation(description: nameof(TranscodingCacheDirectoryIsInvalid));
+        public static Error TranscodingCacheDirectoryIsInsideMediaRoot => Error.Validation(description: nameof(TranscodingCacheDirectoryIsInsideMediaRoot));
+        public static Error TranscodingCacheDirectoryContainsMediaRoot => Error.Validation(description: nameof(TranscodingCacheDirectoryContainsMediaRoot));
+        public static Error TranscodingCacheDirectoryIsUnsafeLocation => Error.Validation(description: nameof(TranscodingCacheDirectoryIsUnsafeLocation));
+        public static Error TranscodingDefaultCacheDirectoryIsInsideMediaRoot => Error.Validation(description: nameof(TranscodingDefaultCacheDirectoryIsInsideMediaRoot));
     }
 }

@@ -2,6 +2,7 @@
 using FastEndpoints;
 using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.DTO.UsersManagement;
+using Lumina.Presentation.Web.Common.Enums.AudioLibrary;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Common.Services;
 using Lumina.Presentation.Web.Core.Endpoints.Tools.Settings.UpdateUserSettings;
@@ -69,5 +70,42 @@ public class UpdateUserSettingsEndpointTests
         using JsonDocument jsonDocument = JsonDocument.Parse(body);
         Assert.True(jsonDocument.RootElement.GetProperty("success").GetBoolean());
         Assert.True(jsonDocument.RootElement.GetProperty("data").GetProperty("isUpdated").GetBoolean());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenCalled_ShouldForwardVuMeterSettingsToApi()
+    {
+        // Arrange
+        UserSettingsDto request = _userSettingsDtoFixture.Create(
+            vuMeterOrientation: VuMeterOrientation.Horizontal,
+            vuMeterSegmentCount: 20,
+            vuMeterSegmentGap: 4,
+            vuMeterMediumThreshold: 0.35,
+            vuMeterHighThreshold: 0.9,
+            vuMeterShowPeak: false,
+            vuMeterPeakHoldDurationInMilliseconds: 1200,
+            vuMeterReleasePerSecond: 7.5,
+            vuMeterPeakReleasePerSecond: 0.25);
+        _mockApiHttpClient.PutAsync<Web.Common.Requests.Common.EmptyRequest, UserSettingsDto>(Arg.Any<string>(), Arg.Any<UserSettingsDto>(), Arg.Any<CancellationToken>())
+            .Returns(new Web.Common.Requests.Common.EmptyRequest());
+
+        // Act
+        IResult result = await _sut.ExecuteAsync(request, CancellationToken.None);
+
+        // Assert
+        Assert.NotNull(result);
+        await _mockApiHttpClient.Received(1).PutAsync<Web.Common.Requests.Common.EmptyRequest, UserSettingsDto>(
+            ApiRoutes.Users.UPDATE_USER_SETTINGS,
+            Arg.Is<UserSettingsDto>(settings =>
+                settings.VuMeterOrientation == VuMeterOrientation.Horizontal &&
+                settings.VuMeterSegmentCount == 20 &&
+                settings.VuMeterSegmentGap == 4 &&
+                settings.VuMeterMediumThreshold == 0.35 &&
+                settings.VuMeterHighThreshold == 0.9 &&
+                settings.VuMeterShowPeak == false &&
+                settings.VuMeterPeakHoldDurationInMilliseconds == 1200 &&
+                settings.VuMeterReleasePerSecond == 7.5 &&
+                settings.VuMeterPeakReleasePerSecond == 0.25),
+            Arg.Any<CancellationToken>());
     }
 }

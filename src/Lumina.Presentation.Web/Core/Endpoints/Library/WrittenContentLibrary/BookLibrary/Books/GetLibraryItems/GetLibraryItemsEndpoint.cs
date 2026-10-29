@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Presentation.Web.Common.Api;
+using Lumina.Presentation.Web.Common.DTO.Common;
 using Lumina.Presentation.Web.Common.DTO.Libraries;
 using Lumina.Presentation.Web.Common.Requests.Libraries;
 using Lumina.Presentation.Web.Common.Routes;
@@ -50,7 +51,7 @@ public class GetLibraryItemsEndpoint : BaseEndpoint<GetBooksLiteRequest, IResult
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(GetBooksLiteRequest request, CancellationToken cancellationToken)
     {
-        PaginatedBookLiteDto response = await _apiHttpClient.GetAsync<PaginatedBookLiteDto>(BuildItemsEndpoint(request), cancellationToken).ConfigureAwait(false);
+        PaginatedDto<BookLiteDto> response = await _apiHttpClient.GetAsync<PaginatedDto<BookLiteDto>>(BuildItemsEndpoint(request), cancellationToken).ConfigureAwait(false);
         return JsonSuccess(response);
     }
 

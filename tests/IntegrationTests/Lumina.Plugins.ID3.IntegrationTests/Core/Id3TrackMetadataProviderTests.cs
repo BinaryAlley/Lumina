@@ -56,6 +56,7 @@ public class Id3TrackMetadataProviderTests : IDisposable
         Assert.Equal("The Track", result.Title);
         Assert.Equal(MusicKey.CSharpMinor, result.Key);
         Assert.Equal(128, result.Bpm);
+        Assert.Equal("WAV", result.Container);
         Assert.NotNull(result.Contributors);
         Assert.Contains(result.Contributors, contributor => contributor.Name!.DisplayName == "The Artist");
     }

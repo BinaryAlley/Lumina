@@ -1,0 +1,1238 @@
+@*
+    FALLBACK PLAYLIST PAGE - READ BEFORE EDITING
+
+    This view is the application fallback of a playlist page, rendered only when the theme template of the page cannot be
+    loaded. On a healthy site the page comes from the theme's playlists/item template. It keeps the DOM contract and the client
+    script the theme template mirrors, so that creating, editing, reordering, playing and deleting a playlist keep working
+    even without the theme. The same page serves the add route ({culture}/playlists/item) and the edit route
+    ({culture}/playlists/item/{playlistId}); the page data and the hidden 'isNew' flag tell the script which mode it is in.
+
+    The rows render play triggers for the global audio player. The player handles those triggers by event delegation, so this
+    view binds no playback listener; the trigger attribute contract lives in docs/technical/theming/Theming.md.
+
+    To restyle the page, edit the theme files. This fallback is intentionally plain, so that a broken theme is obvious to the user while the page still functions.
+
+    /playlists/item
+    /playlists/item/{playlistId}
+*@
+
+@using Lumina.Presentation.Web.Common.DTO.Playlists
+@using Lumina.Presentation.Web.Common.Services
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System
+@using System.Collections.Generic
+@using System.Text.Json
+@using System.Text.Json.Serialization
+
+@model PlaylistDto
+
+@inject IViewLocalizer _localizer
+@inject IUrlService _urlService
+
+@{
+    // Generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler.
+    var scriptId = ScriptIdentifierHelper.GenerateScriptId();
+    var isNew = ViewData["IsNew"] as bool? ?? false;
+    var pageTitle = isNew ? _localizer["CreatePlaylist"].Value : Model.Name;
+    var strings = new Dictionary<string, string>
+    {
+        ["play"] = _localizer["Play"].Value,
+        ["playPlaylist"] = _localizer["PlayPlaylist"].Value,
+        ["save"] = _localizer["Save"].Value,
+        ["saved"] = _localizer["Saved"].Value,
+        ["saveFailed"] = _localizer["SaveFailed"].Value,
+        ["delete"] = _localizer["Delete"].Value,
+        ["deleteConfirm"] = _localizer["DeleteConfirm"].Value,
+        ["deleteFailed"] = _localizer["DeleteFailed"].Value,
+        ["backToPlaylists"] = _localizer["BackToPlaylists"].Value,
+        ["tracks"] = _localizer["Tracks"].Value,
+        ["noTracks"] = _localizer["NoTracks"].Value,
+        ["addTrack"] = _localizer["AddTrack"].Value,
+        ["library"] = _localizer["Library"].Value,
+        ["artist"] = _localizer["Artist"].Value,
+        ["album"] = _localizer["Album"].Value,
+        ["track"] = _localizer["Track"].Value,
+        ["add"] = _localizer["Add"].Value,
+        ["addToPlaylist"] = _localizer["AddToPlaylist"].Value,
+        ["addFailed"] = _localizer["AddFailed"].Value,
+        ["refreshFailed"] = _localizer["RefreshFailed"].Value,
+        ["selectLibrary"] = _localizer["SelectLibrary"].Value,
+        ["selectArtist"] = _localizer["SelectArtist"].Value,
+        ["selectAlbum"] = _localizer["SelectAlbum"].Value,
+        ["selectTrack"] = _localizer["SelectTrack"].Value,
+        ["moveUp"] = _localizer["MoveUp"].Value,
+        ["moveDown"] = _localizer["MoveDown"].Value,
+        ["dragToReorder"] = _localizer["DragToReorder"].Value,
+        ["remove"] = _localizer["Remove"].Value,
+        ["removeConfirm"] = _localizer["RemoveConfirm"].Value,
+        ["removeFailed"] = _localizer["RemoveFailed"].Value,
+        ["reorderFailed"] = _localizer["ReorderFailed"].Value,
+        ["unavailableTrack"] = _localizer["UnavailableTrack"].Value,
+        ["playlistNameRequired"] = _localizer["PlaylistNameRequired"].Value,
+        ["nothingToPlay"] = _localizer["NothingToPlay"].Value,
+        ["playerUnavailable"] = _localizer["PlayerUnavailable"].Value,
+        ["editDetails"] = _localizer["EditDetails"].Value,
+        ["name"] = _localizer["Name"].Value,
+        ["description"] = _localizer["Description"].Value,
+        ["createPlaylist"] = _localizer["CreatePlaylist"].Value,
+        ["noMusicLibraries"] = _localizer["NoMusicLibraries"].Value,
+        ["loading"] = _localizer["Loading"].Value
+    };
+    var jsonOptions = new JsonSerializerOptions
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        Converters = { new JsonStringEnumConverter() }
+    };
+}
+
+@Html.AntiForgeryToken()
+
+<div class="cotton-candy">
+    <div style="display: grid; grid-template-rows: auto 1fr;">
+        <div style="min-height: 1rem;"></div>
+        <div class="pl-10 pr-10 pb-10">
+            <div class="form-row">
+                <a id="back-to-playlists" class="nav-link text-light-two" href="@_urlService.GetAbsoluteUrl(WebRoutes.Playlists.INDEX)">@_localizer["BackToPlaylists"]</a>
+            </div>
+
+            <!-- The dedicated add/edit page. It only holds the playlist details; the track management lives below it and only exists for an existing playlist. -->
+            <div class="enlightenment-panel shadow-effect mx-auto panel w-100 mb-10" style="max-width: 1000px;">
+                <div class="shine-effect"></div>
+                <form id="playlist-details-form" class="inline" autocomplete="off">
+                    <div class="form-row">
+                        <h1 id="playlist-title" class="text-light-two w-100 text-center pt-0 pb-0 engraved-title">@pageTitle</h1>
+                    </div>
+                    <div class="form-container">
+                        <h3 class="text-light-two">@_localizer["EditDetails"]</h3>
+                        <!-- Name. -->
+                        <div class="form-row">
+                            <div class="form-label">
+                                <label for="playlist-name-input">@_localizer["Name"]</label>
+                                <span class="mandatory-field">*</span>:
+                            </div>
+                            <div class="form-field">
+                                <input id="playlist-name-input" type="text" class="enlightenment-input" maxlength="255" value="@Model.Name" />
+                            </div>
+                        </div>
+                        <!-- Description. -->
+                        <div class="form-row">
+                            <div class="form-label">
+                                <label for="playlist-description-input">@_localizer["Description"]</label>:
+                            </div>
+                            <div class="form-field">
+                                <textarea id="playlist-description-input" class="enlightenment-input" maxlength="2000">@Model.Description</textarea>
+                            </div>
+                        </div>
+                        <!-- Actions. -->
+                        <div class="form-row">
+                            <button id="save-playlist-button" type="submit" class="confirm-button w-100px">@_localizer["Save"]</button>
+                            @if (!isNew)
+                            {
+                                <button id="play-playlist-button" type="button" class="confirm-button">@_localizer["PlayPlaylist"]</button>
+                                <button id="delete-playlist-button" type="button" class="abort-button">@_localizer["Delete"]</button>
+                            }
+                            <button id="cancel-playlist-button" type="button" class="abort-button w-100px">@_localizer["Cancel"]</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            @if (!isNew)
+            {
+                <!-- The content of an existing playlist: ordered entries, drag and drop, keyboard reordering, and the track picker. -->
+                <div class="enlightenment-panel shadow-effect mx-auto panel w-100 mb-10" style="max-width: 1200px;">
+                    <div class="shine-effect"></div>
+                    <div class="form-container">
+                        <h3 class="text-light-two">@_localizer["Tracks"]</h3>
+                        <div id="playlist-entries"></div>
+                        <p id="no-tracks" class="hidden text-light-two">@_localizer["NoTracks"]</p>
+                        <button id="load-more-entries-button" type="button" class="confirm-button hidden">@_localizer["LoadMore"]</button>
+
+                        <h3 class="text-light-two">@_localizer["AddTrack"]</h3>
+                        <!-- Library. -->
+                        <div class="form-row">
+                            <div class="form-label">
+                                <label for="playlist-library-combobox-toggle">@_localizer["Library"]</label>:
+                            </div>
+                            <div class="form-field">
+                                <div class="enlightenment-combobox inline-block w-100" id="playlist-library-combobox">
+                                    <div class="shine-effect" style="top: 1px;"></div>
+                                    <input type="checkbox" class="enlightenment-toggle-checkbox" id="playlist-library-combobox-toggle" />
+                                    <label class="enlightenment-toggle" for="playlist-library-combobox-toggle">
+                                        <span class="enlightenment-selected-text" data-value="">@_localizer["SelectLibrary"]</span>
+                                    </label>
+                                    <div class="enlightenment-dropdown">
+                                        <div class="shine-effect" style="top: -4px;"></div>
+                                        <div class="enlightenment-option first-option disabled" data-value="">@_localizer["SelectLibrary"]</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Artist. -->
+                        <div class="form-row">
+                            <div class="form-label">
+                                <label for="playlist-artist-combobox-toggle">@_localizer["Artist"]</label>:
+                            </div>
+                            <div class="form-field">
+                                <div class="enlightenment-combobox inline-block w-100" id="playlist-artist-combobox">
+                                    <div class="shine-effect" style="top: 1px;"></div>
+                                    <input type="checkbox" class="enlightenment-toggle-checkbox" id="playlist-artist-combobox-toggle" />
+                                    <label class="enlightenment-toggle" for="playlist-artist-combobox-toggle">
+                                        <span class="enlightenment-selected-text" data-value="">@_localizer["SelectArtist"]</span>
+                                    </label>
+                                    <div class="enlightenment-dropdown">
+                                        <div class="shine-effect" style="top: -4px;"></div>
+                                        <div class="enlightenment-option first-option disabled" data-value="">@_localizer["SelectArtist"]</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Album. -->
+                        <div class="form-row">
+                            <div class="form-label">
+                                <label for="playlist-album-combobox-toggle">@_localizer["Album"]</label>:
+                            </div>
+                            <div class="form-field">
+                                <div class="enlightenment-combobox inline-block w-100" id="playlist-album-combobox">
+                                    <div class="shine-effect" style="top: 1px;"></div>
+                                    <input type="checkbox" class="enlightenment-toggle-checkbox" id="playlist-album-combobox-toggle" />
+                                    <label class="enlightenment-toggle" for="playlist-album-combobox-toggle">
+                                        <span class="enlightenment-selected-text" data-value="">@_localizer["SelectAlbum"]</span>
+                                    </label>
+                                    <div class="enlightenment-dropdown">
+                                        <div class="shine-effect" style="top: -4px;"></div>
+                                        <div class="enlightenment-option first-option disabled" data-value="">@_localizer["SelectAlbum"]</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Track. -->
+                        <div class="form-row">
+                            <div class="form-label">
+                                <label for="playlist-track-combobox-toggle">@_localizer["Track"]</label>:
+                            </div>
+                            <div class="form-field">
+                                <div class="enlightenment-combobox inline-block w-100" id="playlist-track-combobox">
+                                    <div class="shine-effect" style="top: 1px;"></div>
+                                    <input type="checkbox" class="enlightenment-toggle-checkbox" id="playlist-track-combobox-toggle" />
+                                    <label class="enlightenment-toggle" for="playlist-track-combobox-toggle">
+                                        <span class="enlightenment-selected-text" data-value="">@_localizer["SelectTrack"]</span>
+                                    </label>
+                                    <div class="enlightenment-dropdown">
+                                        <div class="shine-effect" style="top: -4px;"></div>
+                                        <div class="enlightenment-option first-option disabled" data-value="">@_localizer["SelectTrack"]</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Add action and the empty library notice. -->
+                        <div class="form-row">
+                            <div class="form-label"></div>
+                            <div class="form-field">
+                                <button id="add-track-button" type="button" class="confirm-button">@_localizer["Add"]</button>
+                                <p id="no-music-libraries" class="hidden text-light-two">@_localizer["NoMusicLibraries"]</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- The "text/plain" type is a design choice, not a mistake: it keeps the browser from executing this view script during HTML parsing, before site.js defines the API helpers it calls. site.js (which loads deferred) executes these scripts once it is loaded, both on the initial page load and during AJAX navigation. -->
+    <script type="text/plain" data-form="@scriptId">
+        const strings = @Html.Raw(JsonSerializer.Serialize(strings, jsonOptions));
+        let playlist = @Html.Raw(JsonSerializer.Serialize(Model, jsonOptions));
+        const isNew = @(isNew ? "true" : "false");
+        const EMPTY_GUID = '00000000-0000-0000-0000-000000000000';
+        const createPlaylistUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Playlists.CREATE_PLAYLIST)';
+        const itemUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Playlists.ITEM, new { playlistId = default(Guid) })';
+        const getPlaylistUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Playlists.GET_PLAYLIST, new { playlistId = Model.Id })';
+        const updatePlaylistUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Playlists.UPDATE_PLAYLIST, new { playlistId = Model.Id })';
+        const deletePlaylistUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Playlists.DELETE_PLAYLIST, new { playlistId = Model.Id })';
+        const addEntryUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Playlists.ADD_PLAYLIST_ENTRY, new { playlistId = Model.Id })';
+        const removeEntryUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Playlists.REMOVE_PLAYLIST_ENTRY, new { playlistId = Model.Id, playlistEntryId = default(Guid) })';
+        const moveEntryUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Playlists.MOVE_PLAYLIST_ENTRY, new { playlistId = Model.Id, playlistEntryId = default(Guid) })';
+        const getEnabledLibrariesUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.GET_ENABLED_LIBRARIES)';
+        const getArtistsUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Music.GET_ARTISTS)';
+        const getArtistAlbumsUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Music.GET_ARTIST_ALBUMS, new { artistId = default(Guid) })';
+        const getAlbumTracksUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Music.GET_ALBUM_TRACKS, new { artistId = default(Guid), albumId = default(Guid) })';
+        const indexUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Playlists.INDEX)';
+
+        const playlistDetailsForm = document.getElementById('playlist-details-form');
+        const playlistTitle = document.getElementById('playlist-title');
+        const playlistNameInput = document.getElementById('playlist-name-input');
+        const playlistDescriptionInput = document.getElementById('playlist-description-input');
+        const entriesContainer = document.getElementById('playlist-entries');
+        const noTracksMessage = document.getElementById('no-tracks');
+        const savePlaylistButton = document.getElementById('save-playlist-button');
+        const cancelPlaylistButton = document.getElementById('cancel-playlist-button');
+        const playPlaylistButton = document.getElementById('play-playlist-button');
+        const deletePlaylistButton = document.getElementById('delete-playlist-button');
+        const libraryCombobox = document.getElementById('playlist-library-combobox');
+        const artistCombobox = document.getElementById('playlist-artist-combobox');
+        const albumCombobox = document.getElementById('playlist-album-combobox');
+        const trackCombobox = document.getElementById('playlist-track-combobox');
+        const addTrackButton = document.getElementById('add-track-button');
+        const noMusicLibrariesMessage = document.getElementById('no-music-libraries');
+        const loadMoreEntriesButton = document.getElementById('load-more-entries-button');
+        const DEFAULT_PAGE_SIZE = 200;
+        // The page the first rendered row belongs to, the size of each page and the total number of pages. The global position of the
+        // first row currently on screen is derived from the page, and local row indexes are only meaningful after adding this offset,
+        // which is why the move and Load more logic use it for every comparison against the whole playlist.
+        let currentPage = 1;
+        let perPage = DEFAULT_PAGE_SIZE;
+        let numberOfPages = 0;
+        let entriesOffset = 0;
+        if (playlist && playlist.entries) {
+            if (Number.isInteger(playlist.entries.currentPage) && playlist.entries.currentPage > 0)
+                currentPage = playlist.entries.currentPage;
+            if (Number.isInteger(playlist.entries.perPage) && playlist.entries.perPage > 0)
+                perPage = playlist.entries.perPage;
+            if (Number.isInteger(playlist.entries.numberOfPages))
+                numberOfPages = playlist.entries.numberOfPages;
+            entriesOffset = (currentPage - 1) * perPage;
+        }
+        let isInitialized = false;
+        let draggedEntryId = null;
+        let dragWasDropped = false;
+        let isEntryMutationInFlight = false;
+
+        function buildItemUrl(playlistId) {
+            return itemUrlTemplate.replace(`/${EMPTY_GUID}`, `/${playlistId}`);
+        }
+
+        // The entries of the page currently rendered, and the total the server reported for the whole playlist.
+        function getPlaylistEntries() {
+            return playlist && playlist.entries && Array.isArray(playlist.entries.data) ? playlist.entries.data : [];
+        }
+
+        function getPlaylistEntryCount() {
+            return playlist && playlist.entries && Number.isFinite(playlist.entries.count) ? playlist.entries.count : getPlaylistEntries().length;
+        }
+
+        function findEntryRow(entryId) {
+            if (!entriesContainer)
+                return null;
+            return Array.from(entriesContainer.querySelectorAll('.playlist-entry'))
+                .find(row => row.dataset.entryId === entryId) || null;
+        }
+
+        // Applies a playlist read back from the server and derives the global position of its first row.
+        function applyPlaylistPage(page) {
+            playlist = page;
+            const entries = page && page.entries ? page.entries : null;
+            currentPage = entries && Number.isInteger(entries.currentPage) && entries.currentPage > 0 ? entries.currentPage : 1;
+            perPage = entries && Number.isInteger(entries.perPage) && entries.perPage > 0 ? entries.perPage : DEFAULT_PAGE_SIZE;
+            numberOfPages = entries && Number.isInteger(entries.numberOfPages) ? entries.numberOfPages : 0;
+            entriesOffset = (currentPage - 1) * perPage;
+        }
+
+        function formatDuration(totalSeconds) {
+            const seconds = Number.isFinite(Number(totalSeconds)) ? Math.max(0, Math.floor(Number(totalSeconds))) : 0;
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${minutes}:${String(remainingSeconds).padStart(2, '0')}`;
+        }
+
+        function isPlayable(entry) {
+            return entry.mediaItemType === 'MusicTrack'
+                && entry.libraryId !== EMPTY_GUID
+                && entry.collectionId !== EMPTY_GUID
+                && entry.creatorId !== EMPTY_GUID
+                && entry.mediaItemId !== EMPTY_GUID;
+        }
+
+        function buildRemoveEntryUrl(entryId) {
+            return removeEntryUrlTemplate.replace(`/${EMPTY_GUID}`, `/${entryId}`);
+        }
+
+        function buildMoveEntryUrl(entryId) {
+            return moveEntryUrlTemplate.replace(`/${EMPTY_GUID}`, `/${encodeURIComponent(entryId)}`);
+        }
+
+        function getComboboxValue(combobox) {
+            if (!combobox)
+                return '';
+            const selected = combobox.querySelector('.enlightenment-selected-text');
+            return selected ? (selected.getAttribute('data-value') || '') : '';
+        }
+
+        function resetCombobox(combobox, placeholder) {
+            if (!combobox)
+                return;
+            const selected = combobox.querySelector('.enlightenment-selected-text');
+            const dropdown = combobox.querySelector('.enlightenment-dropdown');
+            if (!selected || !dropdown)
+                return;
+            selected.textContent = placeholder;
+            selected.setAttribute('data-value', '');
+            dropdown.querySelectorAll('.enlightenment-option:not(.first-option)').forEach(option => option.remove());
+            const firstOption = dropdown.querySelector('.first-option');
+            if (firstOption) {
+                firstOption.textContent = placeholder;
+                firstOption.setAttribute('data-value', '');
+            }
+        }
+
+        function fillCombobox(combobox, items, valueSelector, labelSelector, placeholder) {
+            resetCombobox(combobox, placeholder);
+            if (!combobox)
+                return;
+            const dropdown = combobox.querySelector('.enlightenment-dropdown');
+            if (!dropdown)
+                return;
+            items.forEach(item => {
+                const option = document.createElement('div');
+                option.className = 'enlightenment-option';
+                option.setAttribute('data-value', String(valueSelector(item)));
+                option.textContent = String(labelSelector(item) || '');
+                dropdown.appendChild(option);
+            });
+            const options = dropdown.querySelectorAll('.enlightenment-option:not(.first-option)');
+            options.forEach((option, index) => option.classList.toggle('last-option', index === options.length - 1));
+        }
+
+        function bindComboboxChange(combobox, callback) {
+            if (!combobox)
+                return null;
+            const handler = event => {
+                const option = event.target.closest('.enlightenment-option');
+                if (!option || option.classList.contains('disabled') || option.classList.contains('first-option'))
+                    return;
+                const selected = combobox.querySelector('.enlightenment-selected-text');
+                if (selected) {
+                    selected.textContent = option.textContent;
+                    selected.setAttribute('data-value', option.getAttribute('data-value') || '');
+                }
+                const toggle = combobox.querySelector('.enlightenment-toggle-checkbox');
+                if (toggle)
+                    toggle.checked = false;
+                callback();
+            };
+            combobox.addEventListener('click', handler);
+            return handler;
+        }
+
+        function renderPlaylist() {
+            playlistTitle.textContent = isNew ? strings.createPlaylist : (playlist.name || '');
+            if (document.activeElement !== playlistNameInput)
+                playlistNameInput.value = playlist.name || '';
+            if (document.activeElement !== playlistDescriptionInput)
+                playlistDescriptionInput.value = playlist.description || '';
+            if (!isNew) {
+                renderEntries();
+                updateLoadMoreButton();
+            }
+        }
+
+        // Shows the load more control only while the page has entry pages left to fetch.
+        function updateLoadMoreButton() {
+            if (!loadMoreEntriesButton)
+                return;
+            const loaded = getPlaylistEntries().length;
+            const total = getPlaylistEntryCount();
+            // The rows on screen start at entriesOffset, not at the beginning of the playlist, so the loaded count alone cannot tell
+            // whether the whole playlist is on screen.
+            const hasMore = entriesOffset + loaded < total;
+            loadMoreEntriesButton.classList.toggle('hidden', !hasMore);
+            loadMoreEntriesButton.disabled = !hasMore || isEntryMutationInFlight;
+        }
+
+        // Serializes entry mutations, so a move, a removal or an add cannot reach the server out of order with another one.
+        function setEntryMutationInFlight(value) {
+            isEntryMutationInFlight = value;
+            if (addTrackButton)
+                addTrackButton.disabled = value;
+            refreshEntryRows();
+            updateLoadMoreButton();
+        }
+
+        function renderEntries() {
+            if (!entriesContainer)
+                return;
+            entriesContainer.querySelectorAll('.playlist-entry').forEach(row => row.remove());
+            const entries = getPlaylistEntries();
+            const total = getPlaylistEntryCount();
+            if (total === 0) {
+                noTracksMessage.classList.remove('hidden');
+                return;
+            }
+            noTracksMessage.classList.add('hidden');
+            entries.forEach((entry, index) => entriesContainer.appendChild(createEntryRow(entry, index)));
+            updateLoadMoreButton();
+        }
+
+        // Whether the fetched page proves that the rendered window no longer matches the server. A page behind the requested one means
+        // the server clamped it because the playlist shrank, and a total smaller than the rendered rows means the rows themselves are
+        // stale. Neither can be fixed by appending, so the caller reloads the first page instead.
+        function pageShrankBeforeWindow(page, requestedPage) {
+            if (!page || !page.entries)
+                return false;
+            const resolvedPage = Number.isInteger(page.entries.currentPage) && page.entries.currentPage > 0
+                ? page.entries.currentPage
+                : requestedPage;
+            return resolvedPage < requestedPage
+                || (Number.isInteger(page.entries.count) && page.entries.count < entriesOffset + getPlaylistEntries().length);
+        }
+
+        // Replaces the rendered rows with the first page, which is the only window that is valid after the playlist shrank.
+        async function reloadFirstPageAsync() {
+            const page = await callApiGetAsync(`${getPlaylistUrl}?currentPage=1&perPage=${perPage}`);
+            if (!page || !page.entries || !Array.isArray(page.entries.data))
+                return false;
+            applyPlaylistPage(page);
+            renderPlaylist();
+            return true;
+        }
+
+        // Merges the entries of one fetched page into the rows already on screen, without replacing them. A page that starts after the
+        // first entry that is not on screen would leave a hole in the rendered rows, so it is not merged and the Load more state stays
+        // responsible for reaching it. The rows are numbered from entriesOffset, which is only valid while the rendered entries are
+        // contiguous, so a page that overlaps the rendered rows is merged by Id and a page after a gap is left for Load more.
+        function mergeEntriesPage(page, pageNumber) {
+            if (!entriesContainer || !page || !page.entries || !Array.isArray(page.entries.data))
+                return false;
+            // The server can clamp the requested page to the last one, so its answer is the page that actually arrived.
+            const resolvedPage = Number.isInteger(page.entries.currentPage) && page.entries.currentPage > 0 ? page.entries.currentPage : pageNumber;
+            const pageStart = (resolvedPage - 1) * perPage;
+            const entries = getPlaylistEntries();
+            if (pageStart < entriesOffset || pageStart > entriesOffset + entries.length)
+                return false;
+            page.entries.data.forEach(entry => {
+                if (findEntryRow(entry.id))
+                    return;
+                entries.push(entry);
+                entriesContainer.appendChild(createEntryRow(entry, entries.length - 1));
+            });
+            playlist.entries.count = page.entries.count;
+            playlist.entries.numberOfPages = page.entries.numberOfPages;
+            numberOfPages = Number.isInteger(page.entries.numberOfPages) ? page.entries.numberOfPages : numberOfPages;
+            refreshEntryRows();
+            return true;
+        }
+
+        // Fetches the next page of entries and appends it to the rows already on screen.
+        async function loadMoreEntriesAsync() {
+            if (!entriesContainer || !loadMoreEntriesButton || isEntryMutationInFlight)
+                return;
+            const loaded = getPlaylistEntries().length;
+            const total = getPlaylistEntryCount();
+            // The loaded rows begin at entriesOffset, so they cover the playlist only when offset plus loaded reaches the total.
+            if (entriesOffset + loaded >= total)
+                return;
+            // The next page is the one that contains the first entry that is not on screen yet. A removal shifts the entries by one,
+            // so this page can overlap the rows already rendered; rows are appended by Id, so the overlap is skipped and the shifted entry is not lost.
+            const nextPage = Math.floor((entriesOffset + loaded) / perPage) + 1;
+            if (numberOfPages > 0 && nextPage > numberOfPages)
+                return;
+            setEntryMutationInFlight(true);
+            try {
+                const page = await callApiGetAsync(`${getPlaylistUrl}?currentPage=${nextPage}&perPage=${perPage}`);
+                if (pageShrankBeforeWindow(page, nextPage)) {
+                    if (!await reloadFirstPageAsync())
+                        notificationService.show(strings.refreshFailed, NotificationType.ERROR);
+                    return;
+                }
+                mergeEntriesPage(page, nextPage);
+            } finally {
+                setEntryMutationInFlight(false);
+            }
+        }
+
+        // Renumbers the existing rows and updates their move controls, without recreating the rows or their listeners.
+        function refreshEntryRows() {
+            if (!entriesContainer)
+                return;
+            const rows = Array.from(entriesContainer.querySelectorAll('.playlist-entry'));
+            const total = getPlaylistEntryCount();
+            rows.forEach((row, index) => {
+                // The move controls are guarded by the global position of the row, not by its index inside the loaded window.
+                const globalIndex = entriesOffset + index;
+                const position = row.querySelector('.playlist-entry-position');
+                if (position)
+                    position.textContent = String(globalIndex + 1);
+                const moveUp = row.querySelector('.playlist-entry-move-up');
+                if (moveUp)
+                    moveUp.disabled = isEntryMutationInFlight || globalIndex === 0;
+                const moveDown = row.querySelector('.playlist-entry-move-down');
+                if (moveDown)
+                    moveDown.disabled = isEntryMutationInFlight || globalIndex >= total - 1;
+                const remove = row.querySelector('.playlist-entry-remove');
+                if (remove)
+                    remove.disabled = isEntryMutationInFlight;
+                const dragHandle = row.querySelector('.playlist-entry-drag-handle');
+                if (dragHandle)
+                    dragHandle.draggable = !isEntryMutationInFlight;
+            });
+            noTracksMessage.classList.toggle('hidden', total > 0);
+        }
+
+        // Appends one row for an entry the server appended, without replacing the rows that are already on screen.
+        function appendEntryRow(entry) {
+            if (!entriesContainer)
+                return;
+            // Use the rows already on screen, not the post-push entries length, so the new row is numbered correctly before refreshEntryRows.
+            const index = entriesContainer.querySelectorAll('.playlist-entry').length;
+            entriesContainer.appendChild(createEntryRow(entry, index));
+            refreshEntryRows();
+        }
+
+        // Removes one row by its entry Id, without reading the whole playlist back.
+        function removeEntryRow(entryId) {
+            if (!entriesContainer)
+                return;
+            const row = Array.from(entriesContainer.querySelectorAll('.playlist-entry'))
+                .find(candidate => candidate.dataset.entryId === entryId);
+            if (row)
+                row.remove();
+            refreshEntryRows();
+        }
+
+        // Applies an order of entry Ids by moving the existing rows, then renumbering them.
+        function applyEntryOrderByIds(orderedEntryIds) {
+            if (!entriesContainer || !Array.isArray(orderedEntryIds))
+                return;
+            const rowsById = new Map(Array.from(entriesContainer.querySelectorAll('.playlist-entry'))
+                .map(row => [row.dataset.entryId, row]));
+            for (const entryId of orderedEntryIds) {
+                const row = rowsById.get(entryId);
+                if (row)
+                    entriesContainer.appendChild(row);
+            }
+            refreshEntryRows();
+        }
+
+        // Keeps the in-memory entries in the same order as the rows, so playback and later moves use the order on screen.
+        function syncPlaylistEntriesFromOrder(orderedEntryIds) {
+            const entriesById = new Map(getPlaylistEntries().map(entry => [entry.id, entry]));
+            playlist.entries.data = orderedEntryIds
+                .map(entryId => entriesById.get(entryId))
+                .filter(entry => !!entry);
+            playlist.entries.data.forEach((entry, index) => entry.position = entriesOffset + index);
+        }
+
+        // Applies a details update without touching the rows of the playlist.
+        function applyPlaylistDetails(details) {
+            playlist.name = details.name || '';
+            playlist.description = details.description || '';
+            playlist.type = details.type;
+            playlist.updatedOnUtc = details.updatedOnUtc;
+            playlistTitle.textContent = playlist.name;
+            if (document.activeElement !== playlistNameInput)
+                playlistNameInput.value = playlist.name;
+            if (document.activeElement !== playlistDescriptionInput)
+                playlistDescriptionInput.value = playlist.description;
+        }
+
+        function createEntryRow(entry, index) {
+            const row = document.createElement('div');
+            row.className = 'playlist-entry form-row';
+            row.dataset.entryId = entry.id;
+            row.style.alignItems = 'center';
+            row.style.gap = '8px';
+            row.style.padding = '6px 0';
+            row.style.borderBottom = '1px solid rgba(255, 255, 255, 0.08)';
+
+            const dragHandle = document.createElement('span');
+            dragHandle.className = 'playlist-entry-drag-handle';
+            dragHandle.textContent = '\u2630';
+            dragHandle.title = strings.dragToReorder;
+            dragHandle.setAttribute('aria-hidden', 'true');
+            dragHandle.draggable = true;
+            dragHandle.style.cursor = 'grab';
+            dragHandle.style.padding = '0 6px';
+            dragHandle.style.userSelect = 'none';
+            dragHandle.addEventListener('dragstart', event => {
+                if (isEntryMutationInFlight) {
+                    event.preventDefault();
+                    return;
+                }
+                draggedEntryId = row.dataset.entryId;
+                dragWasDropped = false;
+                row.classList.add('is-dragging');
+                row.style.opacity = '0.5';
+                event.dataTransfer.effectAllowed = 'move';
+                event.dataTransfer.setData('text/plain', row.dataset.entryId);
+            });
+            dragHandle.addEventListener('dragend', () => {
+                const entryId = row.dataset.entryId;
+                const wasDropped = dragWasDropped;
+                row.classList.remove('is-dragging');
+                row.style.opacity = '';
+                draggedEntryId = null;
+                dragWasDropped = false;
+                if (wasDropped && entryId)
+                    commitDragOrderAsync(entryId);
+                else
+                    // Escape, or a drop outside the list, cancels the drag. The DOM was already reordered while dragging, so it is
+                    // restored to the last order the server accepted instead of persisting the cancelled order.
+                    applyEntryOrderByIds(getPlaylistEntries().map(entry => entry.id));
+            });
+            row.appendChild(dragHandle);
+
+            row.addEventListener('dragover', event => {
+                if (!draggedEntryId || draggedEntryId === row.dataset.entryId)
+                    return;
+                event.preventDefault();
+                const rows = Array.from(entriesContainer.querySelectorAll('.playlist-entry'));
+                const draggedRow = rows.find(candidate => candidate.dataset.entryId === draggedEntryId);
+                if (!draggedRow)
+                    return;
+                const bounds = row.getBoundingClientRect();
+                const isAfter = event.clientY > bounds.top + (bounds.height / 2);
+                entriesContainer.insertBefore(draggedRow, isAfter ? row.nextSibling : row);
+            });
+            row.addEventListener('drop', event => {
+                if (draggedEntryId) {
+                    event.preventDefault();
+                    dragWasDropped = true;
+                }
+            });
+
+            const position = document.createElement('span');
+            position.className = 'playlist-entry-position text-light-two';
+            position.style.minWidth = '2em';
+            position.style.textAlign = 'right';
+            position.textContent = String(entriesOffset + index + 1);
+            row.appendChild(position);
+
+            const cover = document.createElement('img');
+            cover.src = entry.coverPath
+                ? `${globalConfiguration.serverBasePath}${entry.coverPath}`
+                : '/images/ui/music-placeholder.svg';
+            cover.alt = '';
+            cover.style.width = '40px';
+            cover.style.height = '40px';
+            cover.style.objectFit = 'cover';
+            cover.style.flexGrow = '0';
+            row.appendChild(cover);
+
+            const details = document.createElement('span');
+            details.className = 'text-light-two';
+            details.style.flex = '1';
+            details.style.minWidth = '0';
+            const title = document.createElement('strong');
+            title.style.display = 'block';
+            title.style.whiteSpace = 'nowrap';
+            title.style.overflow = 'hidden';
+            title.style.textOverflow = 'ellipsis';
+            title.textContent = isPlayable(entry) ? (entry.mediaItemTitle || '') : strings.unavailableTrack;
+            details.appendChild(title);
+            const subtitle = document.createElement('span');
+            subtitle.style.display = 'block';
+            subtitle.style.opacity = '0.8';
+            subtitle.style.whiteSpace = 'nowrap';
+            subtitle.style.overflow = 'hidden';
+            subtitle.style.textOverflow = 'ellipsis';
+            subtitle.textContent = [entry.creatorName, entry.collectionTitle].filter(value => !!value).join(' - ');
+            details.appendChild(subtitle);
+            row.appendChild(details);
+
+            const duration = document.createElement('span');
+            duration.className = 'text-light-two';
+            duration.textContent = formatDuration(entry.durationInSeconds);
+            row.appendChild(duration);
+
+            if (isPlayable(entry)) {
+                const playButton = document.createElement('button');
+                playButton.type = 'button';
+                playButton.className = 'confirm-button';
+                playButton.textContent = strings.play;
+                playButton.setAttribute('data-audio-player-play', '');
+                playButton.dataset.trackId = entry.mediaItemId;
+                playButton.dataset.libraryId = entry.libraryId;
+                playButton.dataset.albumId = entry.collectionId;
+                playButton.dataset.artistId = entry.creatorId;
+                playButton.dataset.title = entry.mediaItemTitle || '';
+                playButton.dataset.albumTitle = entry.collectionTitle || '';
+                playButton.dataset.duration = String(entry.durationInSeconds ?? 0);
+                if (entry.coverPath)
+                    playButton.dataset.coverArtPath = entry.coverPath;
+                row.appendChild(playButton);
+
+                // The favorite heart and the add-to-playlist action of the row work through the global favorites and playlist
+                // scripts, so the row binds no listener of its own and a themed row only has to render the same attributes.
+                const favoriteToggle = document.createElement('button');
+                favoriteToggle.type = 'button';
+                favoriteToggle.className = 'card-favorite-toggle playlist-entry-favorite';
+                favoriteToggle.setAttribute('data-favorite-toggle', '');
+                favoriteToggle.setAttribute('data-favorite-media-kind', 'MusicTrack');
+                favoriteToggle.setAttribute('data-favorite-media-item-id', entry.mediaItemId);
+                row.appendChild(favoriteToggle);
+
+                const addToPlaylistButton = document.createElement('button');
+                addToPlaylistButton.type = 'button';
+                addToPlaylistButton.className = 'confirm-button playlist-entry-add-to-playlist';
+                addToPlaylistButton.textContent = '+';
+                // An empty localized string must not replace the accessible name and the hover text with empty values.
+                if (strings.addToPlaylist) {
+                    addToPlaylistButton.setAttribute('aria-label', strings.addToPlaylist);
+                    addToPlaylistButton.title = strings.addToPlaylist;
+                }
+                addToPlaylistButton.dataset.playlistAdd = '';
+                addToPlaylistButton.dataset.playlistLibraryId = entry.libraryId;
+                addToPlaylistButton.dataset.playlistTrackId = entry.mediaItemId;
+                addToPlaylistButton.dataset.playlistAlbumId = entry.collectionId;
+                addToPlaylistButton.dataset.playlistArtistId = entry.creatorId;
+                addToPlaylistButton.dataset.playlistTitle = entry.mediaItemTitle || '';
+                row.appendChild(addToPlaylistButton);
+            }
+
+            // The index passed to this function is local to the rendered rows. Disabling the move controls requires the global position,
+            // otherwise the first row of a window that does not start at zero looks like the first row of the whole playlist.
+            const total = getPlaylistEntryCount();
+            const globalIndex = entriesOffset + index;
+
+            const moveUpButton = document.createElement('button');
+            moveUpButton.type = 'button';
+            moveUpButton.className = 'playlist-entry-move-up confirm-button';
+            moveUpButton.textContent = '\u25B2';
+            moveUpButton.title = strings.moveUp;
+            moveUpButton.setAttribute('aria-label', strings.moveUp);
+            moveUpButton.disabled = globalIndex === 0;
+            moveUpButton.addEventListener('click', async () => await moveEntryAsync(entry.id, -1));
+            row.appendChild(moveUpButton);
+
+            const moveDownButton = document.createElement('button');
+            moveDownButton.type = 'button';
+            moveDownButton.className = 'playlist-entry-move-down confirm-button';
+            moveDownButton.textContent = '\u25BC';
+            moveDownButton.title = strings.moveDown;
+            moveDownButton.setAttribute('aria-label', strings.moveDown);
+            moveDownButton.disabled = globalIndex >= total - 1;
+            moveDownButton.addEventListener('click', async () => await moveEntryAsync(entry.id, 1));
+            row.appendChild(moveDownButton);
+
+            const removeButton = document.createElement('button');
+            removeButton.type = 'button';
+            removeButton.className = 'abort-button playlist-entry-remove';
+            removeButton.textContent = strings.remove;
+            removeButton.addEventListener('click', async () => await removeEntryAsync(entry.id));
+            row.appendChild(removeButton);
+
+            return row;
+        }
+
+        async function commitDragOrderAsync(entryId) {
+            if (!entriesContainer || !entryId)
+                return;
+            const orderedEntryIds = Array.from(entriesContainer.querySelectorAll('.playlist-entry'))
+                .map(row => row.dataset.entryId);
+            const currentEntryIds = getPlaylistEntries().map(entry => entry.id);
+            if (orderedEntryIds.length !== currentEntryIds.length) {
+                applyEntryOrderByIds(currentEntryIds);
+                return;
+            }
+            if (orderedEntryIds.every((candidate, index) => candidate === currentEntryIds[index]))
+                return;
+            // A drag can only reorder rows that are on screen, so its target is a local index. The server works with global positions, so
+            // the window offset has to be added before the move request is sent.
+            const targetPosition = orderedEntryIds.indexOf(entryId);
+            if (targetPosition < 0) {
+                applyEntryOrderByIds(currentEntryIds);
+                return;
+            }
+            if (isEntryMutationInFlight) {
+                // A mutation started between the drag start and the drop. The local order is restored instead of sending a second, out-of-order move.
+                applyEntryOrderByIds(currentEntryIds);
+                return;
+            }
+            setEntryMutationInFlight(true);
+            try {
+                const result = await callApiPutAsync(buildMoveEntryUrl(entryId), { targetPosition: entriesOffset + targetPosition });
+                if (result.success && result.data) {
+                    playlist.updatedOnUtc = result.data.updatedOnUtc;
+                    applyEntryOrderByIds(orderedEntryIds);
+                    syncPlaylistEntriesFromOrder(orderedEntryIds);
+                } else {
+                    if (!result.success)
+                        notificationService.show(strings.reorderFailed, NotificationType.ERROR);
+                    // A failed drag is rolled back to the last order the server accepted, instead of leaving the screen out of sync.
+                    applyEntryOrderByIds(currentEntryIds);
+                }
+            } finally {
+                setEntryMutationInFlight(false);
+            }
+        }
+
+        async function handlePlaylistUpdated(event) {
+            if (isNew)
+                return;
+            const detail = event && event.detail ? event.detail : null;
+            if (!detail)
+                return;
+            if (detail.playlistId && detail.playlistId !== playlist.id)
+                return;
+            if (detail.playlist && detail.playlist.id && detail.playlist.id !== playlist.id)
+                return;
+            // A local mutation already refreshes the view, so an external event that arrives while one is running must not read a
+            // playlist that the mutation is still changing. Dropping it avoids replacing the rows with an answer taken mid-write.
+            if (isEntryMutationInFlight)
+                return;
+            setEntryMutationInFlight(true);
+            try {
+                // An append made elsewhere announces either a batch result with addedCount, or a single entry result with entry.
+                // The rows on screen start at currentPage, which is the first rendered page and never advances when more pages are
+                // loaded. The page to read is therefore the first page that is not fully rendered, not currentPage. Reading it merges
+                // the appended entries into the rows already on screen instead of replacing pages 2 and later with page 1.
+                const addedCount = Number.isInteger(detail.addedCount) ? detail.addedCount : (detail.entry ? 1 : 0);
+                if (addedCount > 0) {
+                    playlist.entries.count = getPlaylistEntryCount() + addedCount;
+                    playlist.entries.numberOfPages = perPage > 0 ? Math.ceil(playlist.entries.count / perPage) : 0;
+                    numberOfPages = playlist.entries.numberOfPages;
+                }
+                if (detail.updatedOnUtc)
+                    playlist.updatedOnUtc = detail.updatedOnUtc;
+                const loaded = getPlaylistEntries().length;
+                const nextPage = Math.floor((entriesOffset + loaded) / perPage) + 1;
+                if (nextPage > numberOfPages)
+                    return;
+                const page = await callApiGetAsync(`${getPlaylistUrl}?currentPage=${nextPage}&perPage=${perPage}`);
+                if (!page || !page.entries || !Array.isArray(page.entries.data))
+                    return;
+                if (pageShrankBeforeWindow(page, nextPage)) {
+                    if (!await reloadFirstPageAsync())
+                        notificationService.show(strings.refreshFailed, NotificationType.ERROR);
+                    return;
+                }
+                mergeEntriesPage(page, nextPage);
+            } finally {
+                setEntryMutationInFlight(false);
+            }
+        }
+
+        async function saveDetailsAsync(event) {
+            if (event)
+                event.preventDefault();
+            const name = playlistNameInput.value.trim();
+            const description = playlistDescriptionInput.value.trim();
+            if (name === '') {
+                notificationService.show(strings.playlistNameRequired, NotificationType.ERROR);
+                return;
+            }
+            if (isNew) {
+                const createdPlaylist = await callApiPostAsync(createPlaylistUrl, { name, description: description === '' ? null : description, type: 'Music' });
+                if (createdPlaylist && createdPlaylist.id)
+                    await updateContentAsync(buildItemUrl(createdPlaylist.id), true);
+                else
+                    notificationService.show(strings.saveFailed, NotificationType.ERROR);
+                return;
+            }
+            const result = await callApiPutAsync(updatePlaylistUrl, { name, description: description === '' ? null : description });
+            if (result.success && result.data) {
+                applyPlaylistDetails(result.data);
+                notificationService.show(strings.saved, NotificationType.SUCCESS);
+            } else if (!result.success) {
+                notificationService.show(strings.saveFailed, NotificationType.ERROR);
+            }
+        }
+
+        async function deletePlaylistAsync() {
+            if (isNew)
+                return;
+            if (await dialogService.show(strings.deleteConfirm, jsLocalizedDialogs.confirmation, DialogButtons.YES_NO, DialogIcon.QUESTION) !== DialogButton.YES)
+                return;
+            const deleted = await callApiDeleteAsync(deletePlaylistUrl);
+            if (deleted)
+                await updateContentAsync(indexUrl, true);
+            else
+                notificationService.show(strings.deleteFailed, NotificationType.ERROR);
+        }
+
+        async function cancelPlaylistAsync() {
+            await updateContentAsync(indexUrl, true);
+        }
+
+        async function moveEntryAsync(entryId, offset) {
+            if (!entriesContainer || isEntryMutationInFlight)
+                return;
+            const orderedEntryIds = Array.from(entriesContainer.querySelectorAll('.playlist-entry'))
+                .map(row => row.dataset.entryId);
+            const index = orderedEntryIds.indexOf(entryId);
+            if (index < 0)
+                return;
+            // The server accepts a target position anywhere in the whole playlist. The target is therefore compared with the global
+            // position of the row, so the first row of a shifted window can still move up and the last loaded row can still move down into
+            // the entries that are not loaded yet.
+            const total = getPlaylistEntryCount();
+            const targetGlobalIndex = entriesOffset + index + offset;
+            if (targetGlobalIndex < 0 || targetGlobalIndex >= total)
+                return;
+            setEntryMutationInFlight(true);
+            try {
+                const result = await callApiPutAsync(buildMoveEntryUrl(entryId), { targetPosition: targetGlobalIndex });
+                if (result.success && result.data) {
+                    playlist.updatedOnUtc = result.data.updatedOnUtc;
+                    const isOutsideLoadedWindow = targetGlobalIndex < entriesOffset || targetGlobalIndex >= entriesOffset + orderedEntryIds.length;
+                    if (isOutsideLoadedWindow) {
+                        // The row moved into a page that is not loaded, so another entry moved into its place. Re-read the current page
+                        // instead of leaving an order on screen that the next Load more would duplicate.
+                        const refreshedWindow = await callApiGetAsync(`${getPlaylistUrl}?currentPage=${currentPage}&perPage=${perPage}`);
+                        if (refreshedWindow && refreshedWindow.entries && Array.isArray(refreshedWindow.entries.data)) {
+                            applyPlaylistPage(refreshedWindow);
+                            renderPlaylist();
+                        } else 
+                            notificationService.show(strings.reorderFailed, NotificationType.ERROR);
+                    } else {
+                        const targetIndex = index + offset;
+                        orderedEntryIds.splice(index, 1);
+                        orderedEntryIds.splice(targetIndex, 0, entryId);
+                        applyEntryOrderByIds(orderedEntryIds);
+                        syncPlaylistEntriesFromOrder(orderedEntryIds);
+                    }
+                } else if (!result.success) 
+                    notificationService.show(strings.reorderFailed, NotificationType.ERROR);
+            } finally {
+                setEntryMutationInFlight(false);
+            }
+        }
+
+        async function removeEntryAsync(entryId) {
+            if (isEntryMutationInFlight)
+                return;
+            if (await dialogService.show(strings.removeConfirm, jsLocalizedDialogs.confirmation, DialogButtons.YES_NO, DialogIcon.QUESTION) !== DialogButton.YES)
+                return;
+            if (isEntryMutationInFlight)
+                return;
+            setEntryMutationInFlight(true);
+            try {
+                const removed = await callApiDeleteAsync(buildRemoveEntryUrl(entryId));
+                if (removed) {
+                    // The row is removed from the existing DOM and the remaining rows are renumbered, so the page does not read the whole playlist back for a single removed entry.
+                    const totalBefore = getPlaylistEntryCount();
+                    playlist.entries.data = getPlaylistEntries().filter(entry => entry.id !== entryId);
+                    playlist.entries.data.forEach((entry, index) => entry.position = entriesOffset + index);
+                    playlist.entries.count = Math.max(0, totalBefore - 1);
+                    playlist.entries.numberOfPages = perPage > 0 ? Math.ceil(playlist.entries.count / perPage) : 0;
+                    numberOfPages = playlist.entries.numberOfPages;
+                    removeEntryRow(entryId);
+                } else 
+                    notificationService.show(strings.removeFailed, NotificationType.ERROR);
+            } finally {
+                setEntryMutationInFlight(false);
+            }
+        }
+
+        // Fetches every entry of the playlist page by page, for the explicit play action. A large playlist is never loaded for the page itself.
+        async function fetchAllPlaylistEntriesAsync() {
+            const allEntries = [];
+            let pageNumber = 1;
+            while (true) {
+                const page = await callApiGetAsync(`${getPlaylistUrl}?currentPage=${pageNumber}&perPage=1000`);
+                if (!page || !page.entries || !Array.isArray(page.entries.data) || page.entries.data.length === 0)
+                    break;
+                allEntries.push(...page.entries.data);
+                const totalPages = Number.isInteger(page.entries.numberOfPages) && page.entries.numberOfPages > 0
+                    ? page.entries.numberOfPages
+                    : Math.max(1, Math.ceil(page.entries.count / 1000));
+                if (allEntries.length >= page.entries.count || pageNumber >= totalPages)
+                    break;
+                pageNumber++;
+            }
+            return allEntries;
+        }
+
+        async function playPlaylistAsync() {
+            const entries = (await fetchAllPlaylistEntriesAsync()).filter(isPlayable);
+            if (entries.length === 0) {
+                notificationService.show(strings.nothingToPlay, NotificationType.ERROR);
+                return;
+            }
+            const player = window.LuminaAudioPlayer && window.LuminaAudioPlayer.instance;
+            if (!player) {
+                notificationService.show(strings.playerUnavailable, NotificationType.ERROR);
+                return;
+            }
+            const queue = entries.map(entry => ({
+                trackId: entry.mediaItemId,
+                libraryId: entry.libraryId,
+                albumId: entry.collectionId,
+                artistId: entry.creatorId,
+                title: entry.mediaItemTitle || '',
+                albumTitle: entry.collectionTitle || '',
+                durationInSeconds: entry.durationInSeconds,
+                coverArtPath: entry.coverPath || ''
+            }));
+            try {
+                await player.playAsync({ libraryId: queue[0].libraryId, queue });
+            } catch (error) {
+                console.error('Error:', error);
+                notificationService.show(strings.nothingToPlay, NotificationType.ERROR);
+            }
+        }
+
+        async function loadLibrariesAsync() {
+            const libraries = await callApiGetAsync(getEnabledLibrariesUrl);
+            const musicLibraries = Array.isArray(libraries)
+                ? libraries.filter(library => String(library.libraryType || '').toLowerCase() === 'music')
+                : [];
+            fillCombobox(libraryCombobox, musicLibraries, library => library.id, library => library.title, strings.selectLibrary);
+            noMusicLibrariesMessage.classList.toggle('hidden', musicLibraries.length > 0);
+        }
+
+        async function loadArtistsAsync() {
+            resetCombobox(artistCombobox, strings.selectArtist);
+            resetCombobox(albumCombobox, strings.selectAlbum);
+            resetCombobox(trackCombobox, strings.selectTrack);
+            const libraryId = getComboboxValue(libraryCombobox);
+            if (!libraryId)
+                return;
+            const artists = await callApiGetAsync(`${getArtistsUrl}?libraryId=${encodeURIComponent(libraryId)}&shouldIgnoreThePrefixForAlphaPicker=false`);
+            if (artists && Array.isArray(artists.data))
+                fillCombobox(artistCombobox, artists.data, artist => artist.id, artist => artist.name, strings.selectArtist);
+        }
+
+        async function loadAlbumsAsync() {
+            resetCombobox(albumCombobox, strings.selectAlbum);
+            resetCombobox(trackCombobox, strings.selectTrack);
+            const libraryId = getComboboxValue(libraryCombobox);
+            const artistId = getComboboxValue(artistCombobox);
+            if (!libraryId || !artistId)
+                return;
+            const url = getArtistAlbumsUrlTemplate.replace(`/${EMPTY_GUID}`, `/${artistId}`) + `?libraryId=${encodeURIComponent(libraryId)}`;
+            const albums = await callApiGetAsync(url);
+            if (albums && Array.isArray(albums.data))
+                fillCombobox(albumCombobox, albums.data, album => album.id, album => album.title, strings.selectAlbum);
+        }
+
+        async function loadTracksAsync() {
+            resetCombobox(trackCombobox, strings.selectTrack);
+            const libraryId = getComboboxValue(libraryCombobox);
+            const artistId = getComboboxValue(artistCombobox);
+            const albumId = getComboboxValue(albumCombobox);
+            if (!libraryId || !artistId || !albumId)
+                return;
+            const url = getAlbumTracksUrlTemplate
+                .replace(`/${EMPTY_GUID}`, `/${artistId}`)
+                .replace(`/${EMPTY_GUID}`, `/${albumId}`) + `?libraryId=${encodeURIComponent(libraryId)}`;
+            const tracks = await callApiGetAsync(url);
+            if (tracks && Array.isArray(tracks.data))
+                fillCombobox(trackCombobox, tracks.data, track => track.id, track => track.title, strings.selectTrack);
+        }
+
+        async function addTrackAsync() {
+            if (isEntryMutationInFlight)
+                return;
+            const trackId = getComboboxValue(trackCombobox);
+            if (!trackId)
+                return;
+            setEntryMutationInFlight(true);
+            try {
+                const added = await callApiPostAsync(addEntryUrl, { trackId });
+                if (added && added.entry) {
+                    const entries = getPlaylistEntries();
+                    const totalBefore = getPlaylistEntryCount();
+                    if (entries.length >= totalBefore) {
+                        entries.push(added.entry);
+                        playlist.entries.count = totalBefore + 1;
+                        playlist.entries.numberOfPages = perPage > 0 ? Math.ceil(playlist.entries.count / perPage) : 0;
+                        numberOfPages = playlist.entries.numberOfPages;
+                        playlist.updatedOnUtc = added.updatedOnUtc;
+                        appendEntryRow(added.entry);
+                    } else {
+                        // The new entry is at the global end, beyond the rendered rows. The count and the number of pages change even
+                        // when the page that contains the new entry cannot be merged, because that page may start after the first entry
+                        // that is not on screen. Keeping the optimistic values means Load more still leads to it.
+                        const newCount = totalBefore + 1;
+                        const newNumberOfPages = perPage > 0 ? Math.ceil(newCount / perPage) : 0;
+                        playlist.entries.count = newCount;
+                        playlist.entries.numberOfPages = newNumberOfPages;
+                        numberOfPages = newNumberOfPages;
+                        playlist.updatedOnUtc = added.updatedOnUtc;
+                        // The last page is fetched to show the new entry, and merged only when it is the page that directly follows the
+                        // rendered rows. When several pages are not on screen, replacing the rows with only the last page would hide the
+                        // entries that were already rendered, so the page is left to Load more instead.
+                        const lastPage = Math.max(1, Math.ceil(newCount / perPage));
+                        const page = await callApiGetAsync(`${getPlaylistUrl}?currentPage=${lastPage}&perPage=${perPage}`);
+                        if (!page || !page.entries || !Array.isArray(page.entries.data)) {
+                            // The add is committed and the counts above already include it, but the rows could not be read back. Saying so
+                            // is what keeps the user from adding the same track again because the list still looks unchanged.
+                            notificationService.show(strings.refreshFailed, NotificationType.ERROR);
+                        } else if (pageShrankBeforeWindow(page, lastPage)) {
+                            // Another client shrank the playlist while the rows were on screen, and the server clamped the requested page
+                            // behind them. Appending would keep rows that no longer exist, so the whole window is read again.
+                            if (!await reloadFirstPageAsync())
+                                notificationService.show(strings.refreshFailed, NotificationType.ERROR);
+                        } else {
+                            // The fetched page is authoritative for the totals, which can differ from the optimistic values when another request changed the playlist in the meantime.
+                            playlist.entries.count = page.entries.count;
+                            playlist.entries.numberOfPages = page.entries.numberOfPages;
+                            numberOfPages = Number.isInteger(page.entries.numberOfPages) ? page.entries.numberOfPages : numberOfPages;
+                            mergeEntriesPage(page, lastPage);
+                        }
+                    }
+                    resetCombobox(trackCombobox, strings.selectTrack);
+                } else 
+                    notificationService.show(strings.addFailed, NotificationType.ERROR);
+            } finally {
+                setEntryMutationInFlight(false);
+            }
+        }
+
+        document.addEventListener('lumina:playlist-updated', handlePlaylistUpdated);
+        if (entriesContainer) {
+            entriesContainer.addEventListener('dragover', event => {
+                if (draggedEntryId)
+                    event.preventDefault();
+            });
+            entriesContainer.addEventListener('drop', event => {
+                if (draggedEntryId) {
+                    event.preventDefault();
+                    dragWasDropped = true;
+                }
+            });
+        }
+        playlistDetailsForm.addEventListener('submit', saveDetailsAsync);
+        if (cancelPlaylistButton)
+            cancelPlaylistButton.addEventListener('click', cancelPlaylistAsync);
+        if (deletePlaylistButton)
+            deletePlaylistButton.addEventListener('click', deletePlaylistAsync);
+        if (playPlaylistButton)
+            playPlaylistButton.addEventListener('click', playPlaylistAsync);
+        if (addTrackButton)
+            addTrackButton.addEventListener('click', addTrackAsync);
+        if (loadMoreEntriesButton)
+            loadMoreEntriesButton.addEventListener('click', loadMoreEntriesAsync);
+        const libraryComboboxHandler = bindComboboxChange(libraryCombobox, loadArtistsAsync);
+        const artistComboboxHandler = bindComboboxChange(artistCombobox, loadAlbumsAsync);
+        const albumComboboxHandler = bindComboboxChange(albumCombobox, loadTracksAsync);
+
+        async function InitializeAsync() {
+            if (isInitialized)
+                return;
+            if (!playlistDetailsForm)
+                return;
+            isInitialized = true;
+            renderPlaylist();
+            if (!isNew)
+                await loadLibrariesAsync();
+        }
+
+        window.viewCleanups = window.viewCleanups || {};
+        window.viewCleanups['@scriptId'] = () => {
+            playlistDetailsForm.removeEventListener('submit', saveDetailsAsync);
+            if (cancelPlaylistButton)
+                cancelPlaylistButton.removeEventListener('click', cancelPlaylistAsync);
+            if (deletePlaylistButton)
+                deletePlaylistButton.removeEventListener('click', deletePlaylistAsync);
+            if (playPlaylistButton)
+                playPlaylistButton.removeEventListener('click', playPlaylistAsync);
+            if (addTrackButton)
+                addTrackButton.removeEventListener('click', addTrackAsync);
+            if (loadMoreEntriesButton)
+                loadMoreEntriesButton.removeEventListener('click', loadMoreEntriesAsync);
+            if (libraryCombobox && libraryComboboxHandler)
+                libraryCombobox.removeEventListener('click', libraryComboboxHandler);
+            if (artistCombobox && artistComboboxHandler)
+                artistCombobox.removeEventListener('click', artistComboboxHandler);
+            if (albumCombobox && albumComboboxHandler)
+                albumCombobox.removeEventListener('click', albumComboboxHandler);
+            document.removeEventListener('lumina:playlist-updated', handlePlaylistUpdated);
+            console.log(`Unloaded @scriptId`);
+        };
+        console.log(`Loaded @scriptId`);
+    </script>
+}

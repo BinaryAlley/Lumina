@@ -5,9 +5,23 @@ Content-Type: application/json
 {
   "isPaginationEnabled": true,
   "itemsPerPage": 50,
-  "ignoreThePrefixForAlphaPicker": true,
+  "shouldIgnoreThePrefixForAlphaPicker": true,
   "isThemeCachingEnabled": true,
   "shouldAggregateMetadataWhenMissing": true,
   "shouldRenderPdfAsImages": false,
-  "shouldPreserveBookStyles": true
+  "shouldPreserveBookStyles": true,
+  "shouldKeepDownloadingWhilePaused": true,
+  "shouldAutoplay": true,
+  "isGaplessPlaybackEnabled": true,
+  "replayGainMode": "Off",
+  "streamingQuality": "Auto",
+  "vuMeterOrientation": "Vertical",
+  "vuMeterSegmentCount": 12,
+  "vuMeterSegmentGap": 1,
+  "vuMeterMediumThreshold": 0.6,
+  "vuMeterHighThreshold": 0.8,
+  "vuMeterShowPeak": true,
+  "vuMeterPeakHoldDurationInMilliseconds": 650,
+  "vuMeterReleasePerSecond": 3,
+  "vuMeterPeakReleasePerSecond": 0.65
 }

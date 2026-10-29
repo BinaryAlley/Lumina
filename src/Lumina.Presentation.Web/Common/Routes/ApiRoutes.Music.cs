@@ -21,8 +21,12 @@ public static partial class ApiRoutes
         public const string UPDATE_ALBUM_COVER = "libraries/{libraryId}/artists/{artistId}/albums/{albumId}/cover";
         public const string DELETE_ALBUM = "libraries/{libraryId}/artists/{artistId}/albums/{albumId}";
         public const string GET_ALBUM_TRACKS_LITE = "libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/lite";
+        public const string SHUFFLE_TRACKS = "libraries/{libraryId}/tracks/shuffle";
         public const string GET_TRACK = "libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}";
         public const string UPDATE_TRACK = "libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}";
         public const string DELETE_TRACK = "libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}";
+        public const string STREAM_TRACK = "libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}/stream";
+        public const string STREAM_TRACK_SEGMENT = "libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}/stream/deliveries/{deliveryId}/segments/{segmentIndex}";
+        public const string GET_PLAYBACK_MANIFEST = "libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}/playback-manifest";
     }
 }

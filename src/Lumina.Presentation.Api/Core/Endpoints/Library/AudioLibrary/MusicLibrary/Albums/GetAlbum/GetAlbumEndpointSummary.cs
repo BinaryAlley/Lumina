@@ -32,6 +32,7 @@ public class GetAlbumEndpointSummary : Summary<GetAlbumEndpoint, EmptyRequest>
 
         ResponseParam<AlbumResponse>(r => r.Id, "The Id of the album.");
         ResponseParam<AlbumResponse>(r => r.ArtistId, "The Id of the artist the album belongs to.");
+        ResponseParam<AlbumResponse>(r => r.ArtistName, "The name of the artist the album belongs to.");
         ResponseParam<AlbumResponse>(r => r.LibraryId, "The Id of the media library the album belongs to.");
         ResponseParam<AlbumResponse>(r => r.Metadata!.Title, "The title of the album.");
         ResponseParam<AlbumResponse>(r => r.Metadata!.OriginalTitle, "The original title of the album, if applicable.");
@@ -72,6 +73,7 @@ public class GetAlbumEndpointSummary : Summary<GetAlbumEndpoint, EmptyRequest>
             example: new AlbumResponse(
                 Id: Guid.NewGuid(),
                 ArtistId: Guid.NewGuid(),
+                ArtistName: "Queen",
                 LibraryId: Guid.NewGuid(),
                 Metadata: new MusicAlbumMetadataDto(
                     Title: "A Night at the Opera",
@@ -152,6 +154,7 @@ public class GetAlbumEndpointSummary : Summary<GetAlbumEndpoint, EmptyRequest>
                         AlbumId: Guid.NewGuid(),
                         LibraryId: Guid.NewGuid(),
                         Path: "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
+                        Container: "FLAC",
                         Metadata: new(
                             Title: "Bohemian Rhapsody",
                             OriginalTitle: "Bohemian Rhapsody",
@@ -244,6 +247,7 @@ public class GetAlbumEndpointSummary : Summary<GetAlbumEndpoint, EmptyRequest>
                         AlbumId: Guid.NewGuid(),
                         LibraryId: Guid.NewGuid(),
                         Path: "/music/queen/a-night-at-the-opera/07-youre-my-best-friend.flac",
+                        Container: "FLAC",
                         Metadata: new(
                             Title: "You're My Best Friend",
                             OriginalTitle: "You're My Best Friend",

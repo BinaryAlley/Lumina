@@ -33,6 +33,7 @@ namespace Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Trac
 /// <param name="Isrcs">The list of ISRC (International Standard Recording Code) of the track.</param>
 /// <param name="Contributors">The list of references to the media contributors that performed on the track, each with the role they played.</param>
 /// <param name="Ratings">The list of ratings for this track.</param>
+/// <param name="Container">The container of the audio file of the track, for example MP3, FLAC, OGG, AAC, MP4 or WAV, captured from the file itself. Read only, and not settable through a request. Optional.</param>
 [DebuggerDisplay("Title: {Metadata.Title}")]
 public record TrackResponse(
     Guid Id,
@@ -53,5 +54,6 @@ public record TrackResponse(
     List<MoodDto>? Moods,
     List<IsrcDto>? Isrcs,
     List<MediaContributorReferenceDto>? Contributors,
-    List<AudioRatingDto>? Ratings
+    List<AudioRatingDto>? Ratings,
+    string? Container = null
 );

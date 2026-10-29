@@ -79,6 +79,7 @@ public class GetArtistEndpointSummary : Summary<GetArtistEndpoint, EmptyRequest>
                     new(
                         Id: Guid.NewGuid(),
                         ArtistId: Guid.NewGuid(),
+                        ArtistName: "Queen",
                         LibraryId: Guid.NewGuid(),
                         Metadata: new(
                             Title: "A Night at the Opera",
@@ -123,6 +124,7 @@ public class GetArtistEndpointSummary : Summary<GetArtistEndpoint, EmptyRequest>
                                 AlbumId: Guid.NewGuid(),
                                 LibraryId: Guid.NewGuid(),
                                 Path: "/music/queen/a-night-at-the-opera/01-bohemian-rhapsody.flac",
+                                Container: "FLAC",
                                 Metadata: new(
                                     Title: "Bohemian Rhapsody",
                                     OriginalTitle: "Bohemian Rhapsody",

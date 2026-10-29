@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -95,6 +96,12 @@ public class EditMusicTrackViewEndpoint : BaseEndpoint<GetMusicTrackViewRequest,
         // The cover shown on the left of the track page is the cover of the album that holds the track, so the album is fetched alongside the track.
         MusicAlbumDto album = await _apiHttpClient.GetAsync<MusicAlbumDto>(
             ApiRoutes.Music.GET_ALBUM.Replace("{libraryId}", request.LibraryId.ToString()).Replace("{artistId}", normalizedArtistId).Replace("{albumId}", normalizedAlbumId), cancellationToken).ConfigureAwait(false);
+        // The track page and its play trigger show the same cover the album page shows: the stored cover, or the first stored
+        // artwork when the album has no cover. It is resolved once and used for both the themed page data and the fallback view.
+        string albumCoverPath = album.CoverPath ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(albumCoverPath))
+            albumCoverPath = (album.Artwork ?? []).FirstOrDefault(artwork => !string.IsNullOrWhiteSpace(artwork.Path))?.Path ?? string.Empty;
+        string albumTitle = album.Metadata?.Title ?? string.Empty;
 
         // The themed view is a regular page that submits its own requests, so a fresh anti-forgery token must be issued for it.
         AntiforgeryTokenSet antiforgeryTokens = _antiforgery.GetAndStoreTokens(HttpContext);
@@ -114,7 +121,10 @@ public class EditMusicTrackViewEndpoint : BaseEndpoint<GetMusicTrackViewRequest,
                 ["saveUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Music.SAVE_TRACK, new { artistId = default(Guid), albumId = default(Guid), trackId = default(Guid) }) ?? string.Empty,
                 ["deleteUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Music.DELETE_TRACK, new { artistId = default(Guid), albumId = default(Guid), trackId = default(Guid) }) ?? string.Empty,
                 ["backUrl"] = (_urlService.GetAbsoluteUrl(WebRoutes.Music.ALBUM, new { artistId = normalizedArtistId, albumId = track.AlbumId }) ?? string.Empty) + "?libraryId=" + track.LibraryId,
-                ["albumCoverPath"] = album.CoverPath ?? string.Empty,
+                ["albumCoverPath"] = albumCoverPath,
+                ["albumTitle"] = albumTitle,
+                ["trackTitle"] = title,
+                ["trackDurationInSeconds"] = track.Metadata?.DurationInSeconds,
                 ["trackJson"] = JsonSerializer.Serialize(track, s_camelCaseJsonOptions),
                 ["strings"] = ThemePageDataFactory.CreateLocalizedStrings(_localizer),
                 ["stringsJson"] = JsonSerializer.Serialize(ThemePageDataFactory.CreateLocalizedStrings(_localizer), s_camelCaseJsonOptions)
@@ -127,7 +137,9 @@ public class EditMusicTrackViewEndpoint : BaseEndpoint<GetMusicTrackViewRequest,
             Dictionary<string, object?> viewData = new()
             {
                 ["Title"] = title,
-                ["AlbumCoverPath"] = album.CoverPath ?? string.Empty
+                ["ArtistId"] = normalizedArtistId,
+                ["AlbumCoverPath"] = albumCoverPath,
+                ["AlbumTitle"] = albumTitle
             };
             return View("/Core/Views/Library/AudioLibrary/MusicLibrary/Tracks/Item.cshtml", track, viewData);
         }

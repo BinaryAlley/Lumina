@@ -1506,4 +1506,22 @@
   <data name="Identifiers" xml:space="preserve">
     <value>識別子</value>
   </data>
+  <data name="PlayAlbum" xml:space="preserve">
+    <value>アルバムを再生</value>
+  </data>
+  <data name="PlayTrack" xml:space="preserve">
+    <value>トラックを再生</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>操作</value>
+  </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>プレイリストに追加</value>
+  </data>
+  <data name="AddToPlayQueue" xml:space="preserve">
+    <value>再生キューに追加</value>
+  </data>
+  <data name="PlayAllFromHere" xml:space="preserve">
+    <value>ここからすべて再生</value>
+  </data>
 </root>

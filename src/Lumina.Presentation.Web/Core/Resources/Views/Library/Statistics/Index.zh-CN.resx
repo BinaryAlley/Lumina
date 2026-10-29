@@ -1,0 +1,201 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Title" xml:space="preserve">
+    <value>统计</value>
+  </data>
+  <data name="TotalConsumedDuration" xml:space="preserve">
+    <value>总消费时长</value>
+  </data>
+  <data name="CountedSessions" xml:space="preserve">
+    <value>计入的会话</value>
+  </data>
+  <data name="CompletedSessions" xml:space="preserve">
+    <value>已完成的会话</value>
+  </data>
+  <data name="CompletionRate" xml:space="preserve">
+    <value>完成率</value>
+  </data>
+  <data name="ByMediaKind" xml:space="preserve">
+    <value>按媒体类型</value>
+  </data>
+  <data name="MediaKind" xml:space="preserve">
+    <value>媒体类型</value>
+  </data>
+  <data name="Duration" xml:space="preserve">
+    <value>时长</value>
+  </data>
+  <data name="Stopped" xml:space="preserve">
+    <value>已停止</value>
+  </data>
+  <data name="Counted" xml:space="preserve">
+    <value>已计入</value>
+  </data>
+  <data name="Completed" xml:space="preserve">
+    <value>已完成</value>
+  </data>
+  <data name="Genres" xml:space="preserve">
+    <value>类型</value>
+  </data>
+  <data name="Tags" xml:space="preserve">
+    <value>标签</value>
+  </data>
+  <data name="NoGenres" xml:space="preserve">
+    <value>这些筛选条件下没有类型数据。</value>
+  </data>
+  <data name="NoTags" xml:space="preserve">
+    <value>这些筛选条件下没有标签数据。</value>
+  </data>
+  <data name="Items" xml:space="preserve">
+    <value>项</value>
+  </data>
+  <data name="RecentlyConsumed" xml:space="preserve">
+    <value>最近消费</value>
+  </data>
+  <data name="MostConsumed" xml:space="preserve">
+    <value>最常消费</value>
+  </data>
+  <data name="NoRecentlyConsumed" xml:space="preserve">
+    <value>没有最近消费的项目。</value>
+  </data>
+  <data name="NoMostConsumed" xml:space="preserve">
+    <value>没有最常消费的项目。</value>
+  </data>
+  <data name="LastConsumed" xml:space="preserve">
+    <value>最近消费时间</value>
+  </data>
+  <data name="Unavailable" xml:space="preserve">
+    <value>此项目已不可用。</value>
+  </data>
+  <data name="DeleteFromHistory" xml:space="preserve">
+    <value>从历史记录中删除</value>
+  </data>
+  <data name="DeleteFromHistoryConfirm" xml:space="preserve">
+    <value>要从历史记录中删除此项目的所有已记录会话吗？</value>
+  </data>
+  <data name="HistoryEntryDeleted" xml:space="preserve">
+    <value>历史记录项已删除。</value>
+  </data>
+  <data name="ClearHistory" xml:space="preserve">
+    <value>清除历史记录</value>
+  </data>
+  <data name="ClearHistoryConfirm" xml:space="preserve">
+    <value>要删除所选用户的全部消费历史记录吗？</value>
+  </data>
+  <data name="HistoryCleared" xml:space="preserve">
+    <value>消费历史记录已清除。</value>
+  </data>
+  <data name="ClearResumePoints" xml:space="preserve">
+    <value>从继续观看中移除</value>
+  </data>
+  <data name="ClearResumePointsConfirm" xml:space="preserve">
+    <value>要移除所选用户的全部继续播放点吗？历史记录会保留。</value>
+  </data>
+  <data name="ResumePointsCleared" xml:space="preserve">
+    <value>继续播放点已移除。</value>
+  </data>
+  <data name="Filters" xml:space="preserve">
+    <value>筛选</value>
+  </data>
+  <data name="Library" xml:space="preserve">
+    <value>媒体库</value>
+  </data>
+  <data name="AllLibraries" xml:space="preserve">
+    <value>所有媒体库</value>
+  </data>
+  <data name="AllMediaKinds" xml:space="preserve">
+    <value>所有媒体类型</value>
+  </data>
+  <data name="From" xml:space="preserve">
+    <value>从</value>
+  </data>
+  <data name="To" xml:space="preserve">
+    <value>到</value>
+  </data>
+  <data name="Apply" xml:space="preserve">
+    <value>应用</value>
+  </data>
+  <data name="Reset" xml:space="preserve">
+    <value>重置</value>
+  </data>
+  <data name="InvalidDateRange" xml:space="preserve">
+    <value>开始日期不能晚于结束日期。</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>用户</value>
+  </data>
+  <data name="AllUsers" xml:space="preserve">
+    <value>所有用户</value>
+  </data>
+  <data name="Me" xml:space="preserve">
+    <value>我</value>
+  </data>
+  <data name="AllUsersHistoryUnavailable" xml:space="preserve">
+    <value>历史记录和标签明细按用户提供。请选择用户以查看。</value>
+  </data>
+  <data name="PerUser" xml:space="preserve">
+    <value>按用户</value>
+  </data>
+  <data name="NoUsers" xml:space="preserve">
+    <value>没有用户在这些筛选条件下有消费统计。</value>
+  </data>
+  <data name="NoMediaKindData" xml:space="preserve">
+    <value>这些筛选条件下没有媒体类型数据。</value>
+  </data>
+  <data name="NoConsumption" xml:space="preserve">
+    <value>这些筛选条件下没有消费历史记录。</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>正在加载...</value>
+  </data>
+  <data name="LoadFailed" xml:space="preserve">
+    <value>无法加载统计。</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>重试</value>
+  </data>
+  <data name="KindMusicTrack" xml:space="preserve">
+    <value>曲目</value>
+  </data>
+  <data name="KindPodcastEpisode" xml:space="preserve">
+    <value>播客单集</value>
+  </data>
+  <data name="KindAudiobook" xml:space="preserve">
+    <value>有声书</value>
+  </data>
+  <data name="KindMovie" xml:space="preserve">
+    <value>电影</value>
+  </data>
+  <data name="KindTvEpisode" xml:space="preserve">
+    <value>电视单集</value>
+  </data>
+  <data name="KindBook" xml:space="preserve">
+    <value>书籍</value>
+  </data>
+  <data name="KindPhoto" xml:space="preserve">
+    <value>照片</value>
+  </data>
+  <data name="KindVideo" xml:space="preserve">
+    <value>视频</value>
+  </data>
+  <data name="HoursShort" xml:space="preserve">
+    <value>小时</value>
+  </data>
+  <data name="MinutesShort" xml:space="preserve">
+    <value>分</value>
+  </data>
+  <data name="SecondsShort" xml:space="preserve">
+    <value>秒</value>
+  </data>
+</root>

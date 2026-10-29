@@ -1,9 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
+using Lumina.Application.Common.DataAccess.Entities.Favorites;
+using Lumina.Application.Common.DataAccess.Entities.MediaConsumption;
 using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Application.Common.DataAccess.Entities.Playlists;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Entities.Scheduling;
 using Lumina.Application.Common.DataAccess.Entities.Themes;
@@ -49,6 +52,11 @@ public class LuminaDbContext : DbContext
     public virtual DbSet<ScheduledJobEntity> ScheduledJobs { get; set; } = null!;
     public virtual DbSet<ScheduledJobExecutionEntity> ScheduledJobExecutions { get; set; } = null!;
     public virtual DbSet<SchedulerDisplayPreferencesEntity> SchedulerDisplayPreferences { get; set; } = null!;
+    public virtual DbSet<PlaylistEntity> Playlists { get; set; } = null!;
+    public virtual DbSet<PlaylistEntryEntity> PlaylistEntries { get; set; } = null!;
+    public virtual DbSet<FavoriteEntity> Favorites { get; set; } = null!;
+    public virtual DbSet<MediaConsumptionRecordEntity> MediaConsumptionRecords { get; set; } = null!;
+    public virtual DbSet<MediaResumePointEntity> MediaResumePoints { get; set; } = null!;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LuminaDbContext"/> class.

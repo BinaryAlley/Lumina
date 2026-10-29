@@ -22,14 +22,16 @@ public class ThemeTemplateResponseDtoFixture
     /// </summary>
     /// <param name="theme">Optional theme the template belongs to.</param>
     /// <param name="template">Optional sanitized template content.</param>
+    /// <param name="includeTemplate">Whether the template content should be included, or forced to <see langword="null"/>.</param>
     /// <returns>A configured <see cref="ThemeTemplateResponseDto"/> instance.</returns>
     public ThemeTemplateResponseDto Create(
         ThemeResponseDto? theme = null, 
-        string? template = null)
+        string? template = null,
+        bool includeTemplate = true)
     {
         return new ThemeTemplateResponseDto(
             Theme: theme ?? _themeResponseDtoFixture.Create(),
-            Template: template ?? _faker.Lorem.Paragraph()
+            Template: includeTemplate ? (template ?? _faker.Lorem.Paragraph()) : null!
         );
     }
 

@@ -64,7 +64,7 @@ public class UpdateRoleCommandHandler : ICommandHandler<UpdateRoleCommand, Resul
         Guid userId = currentUserId.Value;
 
         // Only admins can update authorization roles.
-        bool isAdmin = await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false);
+        bool isAdmin = await _authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false);
         if (!isAdmin)
             return Errors.Authorization.NotAuthorized;
 

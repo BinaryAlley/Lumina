@@ -14,6 +14,8 @@ Content-Type: application/json
   "canDownloadMetadataFromWeb": true,
   "shouldSaveMetadataInMediaDirectories": true,
   "shouldSkipUnchangedDirectoriesDuringScan": true,
+  "shouldTrackConsumptionProgress": true,
+  "completionThresholdPercentage": 100,
   "pathTemplateParts": [
     { "kind": "Artist", "representation": "{0}", "isOptional": false },
     { "kind": "Separator", "representation": "", "isOptional": false }

@@ -120,6 +120,27 @@
   <data name="Abort" xml:space="preserve">
     <value>Abort</value>
   </data>
+  <data name="AudioPlayerBuffering" xml:space="preserve">
+    <value>Buffering</value>
+  </data>
+  <data name="AudioPlayerMute" xml:space="preserve">
+    <value>Mute</value>
+  </data>
+  <data name="AudioPlayerPause" xml:space="preserve">
+    <value>Pause</value>
+  </data>
+  <data name="AudioPlayerPlay" xml:space="preserve">
+    <value>Play</value>
+  </data>
+  <data name="AudioPlayerSeek" xml:space="preserve">
+    <value>Playback position</value>
+  </data>
+  <data name="AudioPlayerUnmute" xml:space="preserve">
+    <value>Unmute</value>
+  </data>
+  <data name="AudioPlayerVolume" xml:space="preserve">
+    <value>Volume</value>
+  </data>
   <data name="Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
@@ -147,8 +168,8 @@
   <data name="Retry" xml:space="preserve">
     <value>Retry</value>
   </data>
-  <data name="ToggleFullHeight" xml:space="preserve">
-    <value>Toggle Full Height</value>
+  <data name="ToggleExpanded" xml:space="preserve">
+    <value>Expand or collapse player</value>
   </data>
   <data name="ToggleVisibility" xml:space="preserve">
     <value>Toggle Visibility</value>
@@ -158,5 +179,86 @@
   </data>
   <data name="Yes" xml:space="preserve">
     <value>Yes</value>
+  </data>
+  <data name="AudioPlayerPrevious" xml:space="preserve">
+    <value>Previous track</value>
+  </data>
+  <data name="AudioPlayerNext" xml:space="preserve">
+    <value>Next track</value>
+  </data>
+  <data name="AudioPlayerShuffle" xml:space="preserve">
+    <value>Shuffle</value>
+  </data>
+  <data name="AudioPlayerShuffleRelease" xml:space="preserve">
+    <value>Shuffle release</value>
+  </data>
+  <data name="AudioPlayerShuffleArtist" xml:space="preserve">
+    <value>Shuffle artist</value>
+  </data>
+  <data name="AudioPlayerShuffleLibrary" xml:space="preserve">
+    <value>Shuffle library</value>
+  </data>
+  <data name="AudioPlayerRepeat" xml:space="preserve">
+    <value>Repeat</value>
+  </data>
+  <data name="AudioPlayerRepeatOff" xml:space="preserve">
+    <value>Repeat off</value>
+  </data>
+  <data name="AudioPlayerRepeatAll" xml:space="preserve">
+    <value>Repeat all</value>
+  </data>
+  <data name="AudioPlayerRepeatOne" xml:space="preserve">
+    <value>Repeat one</value>
+  </data>
+  <data name="AudioPlayerQueue" xml:space="preserve">
+    <value>Play queue</value>
+  </data>
+  <data name="AudioPlayerShuffleOff" xml:space="preserve">
+    <value>Shuffle off</value>
+  </data>
+  <data name="AudioPlayerStop" xml:space="preserve">
+    <value>Stop</value>
+  </data>
+  <data name="AudioPlayerAlbumArtwork" xml:space="preserve">
+    <value>Album artwork</value>
+  </data>
+  <data name="AudioPlayerAddQueueToPlaylist" xml:space="preserve">
+    <value>Add queue to playlist</value>
+  </data>
+  <data name="AudioPlayerPlaylistQueueAddFailed" xml:space="preserve">
+    <value>The queue could not be added to the playlist.</value>
+  </data>
+  <data name="AudioPlayerSelectPlaylist" xml:space="preserve">
+    <value>Select a playlist</value>
+  </data>
+  <data name="AudioPlayerAdd" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="AudioPlayerPlaylistQueueAdded" xml:space="preserve">
+    <value>The queue was added to the playlist.</value>
+  </data>
+  <data name="AudioPlayerNoPlaylists" xml:space="preserve">
+    <value>You have no playlists yet.</value>
+  </data>
+  <data name="PlaylistAddToPlaylist" xml:space="preserve">
+    <value>Add to playlist</value>
+  </data>
+  <data name="PlaylistCreate" xml:space="preserve">
+    <value>Create playlist</value>
+  </data>
+  <data name="PlaylistTracksAdded" xml:space="preserve">
+    <value>The tracks were added to the playlist.</value>
+  </data>
+  <data name="PlaylistTracksAddFailed" xml:space="preserve">
+    <value>The tracks could not be added to the playlist.</value>
+  </data>
+  <data name="PlaylistNoTracksToAdd" xml:space="preserve">
+    <value>There are no tracks to add.</value>
+  </data>
+  <data name="FavoritesAdd" xml:space="preserve">
+    <value>Add to favorites</value>
+  </data>
+  <data name="FavoritesRemove" xml:space="preserve">
+    <value>Remove from favorites</value>
   </data>
 </root>

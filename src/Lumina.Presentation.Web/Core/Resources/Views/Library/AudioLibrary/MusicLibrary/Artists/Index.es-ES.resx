@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -56,5 +56,17 @@
   </data>
   <data name="DeleteFailed" xml:space="preserve">
     <value>No se ha podido eliminar el elemento.</value>
+  </data>
+  <data name="Shuffle" xml:space="preserve">
+    <value>Aleatorio</value>
+  </data>
+  <data name="Play" xml:space="preserve">
+    <value>Reproducir</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Acciones</value>
+  </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>Añadir a la lista de reproducción</value>
   </data>
 </root>

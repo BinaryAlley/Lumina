@@ -63,6 +63,7 @@ public static class MusicTrackMetadataDtoMapping
         if (dto.OriginalLanguage is not null && dto.OriginalLanguage.LanguageCode is not null && dto.OriginalLanguage.LanguageName is not null)
             originalLanguage = LanguageInfo.Create(dto.OriginalLanguage.LanguageCode, dto.OriginalLanguage.LanguageName, Optional<string>.FromNullable(dto.OriginalLanguage.NativeName));
 
+        // The container is captured from the file itself and is never settable through a request; on an edit the track keeps the container it already has.
         return AudioMetadata.Create(
             dto.Title!,
             Optional<string>.FromNullable(dto.OriginalTitle),
@@ -77,6 +78,7 @@ public static class MusicTrackMetadataDtoMapping
             originalLanguage,
             Optional<int>.FromNullable(dto.BitDepth),
             Optional<string>.FromNullable(dto.AudioCodec),
+            Optional<string>.None(),
             Optional<int>.FromNullable(dto.Bitrate),
             Optional<string>.FromNullable(dto.AcoustId),
             Optional<decimal>.FromNullable(dto.ReplayGainTrackGain),

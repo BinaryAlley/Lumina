@@ -1,11 +1,10 @@
-const scrollbarHeight = getScrollbarHeight();
+﻿const scrollbarHeight = getScrollbarHeight();
 const scrollbarWidth = getScrollbarWidth();
 const progressIndicator = document.getElementById('progress-indicator');
 const progressIndicatorValue = document.getElementById('progress-indicator-value');
 const progressIndicatorValueShadow = document.getElementById('progress-indicator-value-shadow');
 const progressIndicatorValueText = document.getElementById('progress-indicator-value-text');
-const audioPlayerFullHeightToggle = document.getElementById('audio-player-full-height-toggle');
-const audioPlayerClose = document.getElementById('audio-player-close');
+const audioPlayerExpandToggle = document.getElementById('audio-player-expand-toggle');
 
 let enableConsoleDebugMessages = false; // whether to display debug messages at the developer console, or not
 
@@ -366,7 +365,14 @@ async function updateContentAsync(url, addToHistory) {
             window.viewCleanups = {};
         }
 
-        const response = await fetch(url);
+        // The in-place navigation is a page load performed through fetch, so it declares that it expects HTML. Without this header, the
+        // server cannot tell it apart from a media request, since both send Accept: */*, and a failed navigation (an expired session, for
+        // example) would be answered with a bare status code instead of the redirect to the login page this code follows.
+        const response = await fetch(url, {
+            headers: {
+                'Accept': 'text/html'
+            }
+        });
         if (response.redirected) // if a redirect is requested, perform it
             window.location.href = response.url;
         else {
@@ -641,29 +647,16 @@ function getElementOffset(id) {
 }
 
 /**
- * Toggles the visibility of the audio player.
+ * Expands the audio player, or collapses it back, by routing to the audio player that owns the bar.
  */
-function toggleAudioPlayerVisibility() {
-    const playerContainer = document.querySelector('.audio-player-container');
-    const contentContainer = document.querySelector('main');
-    playerContainer.classList.toggle('not-shown');
-    contentContainer.classList.toggle('audio-player-not-shown');
+function toggleAudioPlayerExpanded() {
+    const player = window.LuminaAudioPlayer && window.LuminaAudioPlayer.instance;
+    if (player && typeof player.toggleExpanded === 'function')
+        player.toggleExpanded();
 }
 
-/**
- * Toggles the display of the audio player as collapsed player, or full height player.
- */
-function toggleAudioPlayerFullHeight() {
-    const playerContainer = document.querySelector('.audio-player-container');
-    const contentContainer = document.querySelector('main');
-    playerContainer.classList.toggle('full-height');
-    contentContainer.classList.toggle('audio-player-full-height');
-}
-
-if (audioPlayerFullHeightToggle)
-    audioPlayerFullHeightToggle.addEventListener('click', toggleAudioPlayerFullHeight);
-if (audioPlayerClose)
-    audioPlayerClose.addEventListener('click', toggleAudioPlayerVisibility);
+if (audioPlayerExpandToggle)
+    audioPlayerExpandToggle.addEventListener('click', toggleAudioPlayerExpanded);
 
 
 /**

@@ -1,10 +1,14 @@
 # This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 # curl is used by the container healthcheck to probe the /health endpoints
+# ffmpeg is used by the API server to remux or transcode audio the browser cannot play directly.
+# The package comes from the base image distribution and is not version-pinned, so the encoder set can change with a base image rebuild.
+# The API startup probe verifies the encoders the normalization catalog uses and reports a missing one at startup. Pin the base image digest
+# or the package version when a fully reproducible toolchain is required.
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl \
+    && apt-get install -y --no-install-recommends curl ffmpeg \
     && rm -rf /var/lib/apt/lists/* \
-    && mkdir /logs && chown -R app:app /logs
+    && mkdir -p /app /logs && chown -R app:app /app /logs
 USER app
 WORKDIR /app
 EXPOSE 5214

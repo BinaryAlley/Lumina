@@ -1,9 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Common;
+using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Common;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaContributors;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.DataAccess.Common.Interceptors;
 using Lumina.DataAccess.Core.Repositories.BookLibrary;
@@ -11,6 +12,7 @@ using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -38,6 +40,7 @@ public class BookRepositoryTests
     private readonly IsbnEntityFixture _isbnEntityFixture = new();
     private readonly TagEntityFixture _tagEntityFixture = new();
     private readonly GenreEntityFixture _genreEntityFixture = new();
+    private readonly MediaContributorEntityFixture _mediaContributorEntityFixture = new();
 
     [Fact]
     public async Task ResetEnrichmentStateForPathsAsync_WhenCalled_ShouldResetTheMetadataAndArtworkStatusesForThePaths()
@@ -472,6 +475,320 @@ public class BookRepositoryTests
         context.ChangeTracker.Clear();
         BookEntity survivor = Assert.Single(await context.Books.AsNoTracking().ToListAsync());
         Assert.Equal(bookOfAnotherLibrary.Id, survivor.Id);
+    }
+
+    [Fact]
+    public async Task GetByIdsAsync_WhenIdsIsEmpty_ShouldReturnAnEmptyList()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-getbyids-empty-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        BookRepository sut = new(context);
+        context.Books.Add(_bookEntityFixture.Create(includeMetadata: false));
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<BookEntity>> result = await sut.GetByIdsAsync([], false, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Empty(result.Value);
+    }
+
+    [Fact]
+    public async Task GetByIdsAsync_WhenCalled_ShouldReturnOnlyTheRequestedBooks()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-getbyids-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        BookRepository sut = new(context);
+        BookEntity firstBook = _bookEntityFixture.Create(includeMetadata: false);
+        BookEntity secondBook = _bookEntityFixture.Create(includeMetadata: false);
+        BookEntity thirdBook = _bookEntityFixture.Create(includeMetadata: false);
+        context.Books.AddRange(firstBook, secondBook, thirdBook);
+        await context.SaveChangesAsync();
+        context.ChangeTracker.Clear();
+
+        // Act
+        Result<IReadOnlyList<BookEntity>> result = await sut.GetByIdsAsync([firstBook.Id, thirdBook.Id], false, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(2, result.Value.Count);
+        Assert.Contains(result.Value, book => book.Id == firstBook.Id);
+        Assert.Contains(result.Value, book => book.Id == thirdBook.Id);
+        Assert.DoesNotContain(result.Value, book => book.Id == secondBook.Id);
+    }
+
+    [Fact]
+    public async Task GetByIdsAsync_WhenNavigationPropertiesShouldNotBeIncluded_ShouldNotLoadTheRelatedCollections()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-getbyids-notracking-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        BookRepository sut = new(context);
+        MediaContributorEntity author = _mediaContributorEntityFixture.Create(displayName: "Frank Herbert");
+        BookEntity book = _bookEntityFixture.Create(includeMetadata: false);
+        book.Tags = [_tagEntityFixture.Create(name: "HiddenTag")];
+        book.Genres = [_genreEntityFixture.Create(name: "HiddenGenre")];
+        book.ISBNs = [_isbnEntityFixture.Create(value: "9783161484100", format: IsbnFormat.Isbn13)];
+        book.Ratings = [_bookRatingEntityFixture.Create(value: 4.5M, maxValue: 5, source: BookRatingSource.Goodreads, voteCount: 100)];
+        book.Contributors = [_bookContributorEntityFixture.Create(bookId: book.Id, mediaContributorId: author.Id, role: MediaContributorRole.Author)];
+        book.Artwork = [_bookArtworkEntityFixture.Create(bookId: book.Id, artworkType: ArtworkType.Cover, ordinal: 0, status: ArtworkStatus.Enriched)];
+        context.Books.Add(book);
+        context.MediaContributors.Add(author);
+        await context.SaveChangesAsync();
+        context.ChangeTracker.Clear();
+
+        // Act
+        Result<IReadOnlyList<BookEntity>> result = await sut.GetByIdsAsync([book.Id], false, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        BookEntity returnedBook = Assert.Single(result.Value);
+        Assert.Equal(book.Id, returnedBook.Id);
+        Assert.Empty(returnedBook.Tags);
+        Assert.Empty(returnedBook.Genres);
+        Assert.Empty(returnedBook.Contributors);
+        Assert.Empty(returnedBook.Artwork);
+        // ISBNs and Ratings are owned collections, so EF Core materializes them together with the book even when the optional graph is not
+        // included. The flag only controls the non-owned navigation properties, which is why those are asserted empty above.
+        Assert.Single(returnedBook.ISBNs);
+        Assert.Single(returnedBook.Ratings);
+        // The rows are read without tracking, so the read statistics never leak into the unit of work.
+        Assert.Empty(context.ChangeTracker.Entries<BookEntity>());
+        Assert.Equal(EntityState.Detached, context.Entry(returnedBook).State);
+    }
+
+    [Fact]
+    public async Task GetByIdsAsync_WhenNavigationPropertiesShouldBeIncluded_ShouldLoadTheRelatedCollections()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-getbyids-include-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        BookRepository sut = new(context);
+        MediaContributorEntity author = _mediaContributorEntityFixture.Create(displayName: "Frank Herbert");
+        BookEntity book = _bookEntityFixture.Create(includeMetadata: false);
+        book.Tags = [_tagEntityFixture.Create(name: "LoadedTag"), _tagEntityFixture.Create(name: "SecondLoadedTag")];
+        book.Genres = [_genreEntityFixture.Create(name: "LoadedGenre")];
+        book.ISBNs = [_isbnEntityFixture.Create(value: "9783161484100", format: IsbnFormat.Isbn13)];
+        book.Ratings = [_bookRatingEntityFixture.Create(value: 4.5M, maxValue: 5, source: BookRatingSource.Goodreads, voteCount: 100)];
+        book.Contributors = [_bookContributorEntityFixture.Create(bookId: book.Id, mediaContributorId: author.Id, role: MediaContributorRole.Author)];
+        book.Artwork = [_bookArtworkEntityFixture.Create(bookId: book.Id, artworkType: ArtworkType.Cover, ordinal: 0, status: ArtworkStatus.Enriched, fileName: "cover.jpg")];
+        context.Books.Add(book);
+        context.MediaContributors.Add(author);
+        await context.SaveChangesAsync();
+        context.ChangeTracker.Clear();
+
+        // Act
+        Result<IReadOnlyList<BookEntity>> result = await sut.GetByIdsAsync([book.Id], true, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        BookEntity returnedBook = Assert.Single(result.Value);
+        Assert.Equal(2, returnedBook.Tags.Count);
+        Assert.Single(returnedBook.Genres);
+        Assert.Equal("9783161484100", Assert.Single(returnedBook.ISBNs).Value);
+        Assert.Equal(4.5M, Assert.Single(returnedBook.Ratings).Value);
+        Assert.Equal(author.Id, Assert.Single(returnedBook.Contributors).MediaContributorId);
+        Assert.Equal("cover.jpg", Assert.Single(returnedBook.Artwork).FileName);
+    }
+
+    [Fact]
+    public async Task GetByIdsAsync_WhenExactlyFiveHundredIdsAreRequested_ShouldReturnEveryBook()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-getbyids-boundary-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        BookRepository sut = new(context);
+        const int BOOK_COUNT = 500;
+        List<BookEntity> books = CreateBooks(BOOK_COUNT);
+        context.Books.AddRange(books);
+        await context.SaveChangesAsync();
+        context.ChangeTracker.Clear();
+
+        // Act
+        // A single full chunk proves the boundary does not drop the last chunk.
+        Result<IReadOnlyList<BookEntity>> result = await sut.GetByIdsAsync([.. books.Select(book => book.Id)], false, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(BOOK_COUNT, result.Value.Count);
+        Assert.Equal(
+            books.Select(book => book.Id).OrderBy(id => id),
+            result.Value.Select(book => book.Id).OrderBy(id => id));
+    }
+
+    [Fact]
+    public async Task GetByIdsAsync_WhenMoreThanFiveHundredIdsAreRequested_ShouldReturnEveryBook()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-getbyids-chunks-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        BookRepository sut = new(context);
+        const int BOOK_COUNT = 501;
+        List<BookEntity> books = CreateBooks(BOOK_COUNT);
+        context.Books.AddRange(books);
+        await context.SaveChangesAsync();
+        context.ChangeTracker.Clear();
+
+        // Act
+        // The lookup is chunked in batches of 500, so the 501st Id proves the second chunk is queried as well.
+        Result<IReadOnlyList<BookEntity>> result = await sut.GetByIdsAsync([.. books.Select(book => book.Id)], false, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(BOOK_COUNT, result.Value.Count);
+        Assert.Equal(
+            books.Select(book => book.Id).OrderBy(id => id),
+            result.Value.Select(book => book.Id).OrderBy(id => id));
+    }
+
+    [Fact]
+    public async Task GetAuthorsDisplayNamesByBookIdsAsync_WhenBookHasMultipleAuthors_ShouldReturnTheMinimumAuthorDisplayName()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-authors-min-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        BookRepository sut = new(context);
+        BookEntity book = _bookEntityFixture.Create(includeMetadata: false);
+        MediaContributorEntity firstAuthor = _mediaContributorEntityFixture.Create(displayName: "Zoe Author");
+        MediaContributorEntity secondAuthor = _mediaContributorEntityFixture.Create(displayName: "Alice Author");
+        MediaContributorEntity translator = _mediaContributorEntityFixture.Create(displayName: "Aaron Translator");
+        context.Books.Add(book);
+        context.MediaContributors.AddRange(firstAuthor, secondAuthor, translator);
+        await context.SaveChangesAsync();
+        context.BookContributors.AddRange(
+            _bookContributorEntityFixture.Create(bookId: book.Id, mediaContributorId: firstAuthor.Id, role: MediaContributorRole.Author),
+            _bookContributorEntityFixture.Create(bookId: book.Id, mediaContributorId: secondAuthor.Id, role: MediaContributorRole.Author),
+            // The translator sorts before every author, so the result would change if a non-Author role were included.
+            _bookContributorEntityFixture.Create(bookId: book.Id, mediaContributorId: translator.Id, role: MediaContributorRole.Translator));
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyDictionary<Guid, string?>> result = await sut.GetAuthorsDisplayNamesByBookIdsAsync([book.Id], CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal("Alice Author", result.Value[book.Id]);
+    }
+
+    [Fact]
+    public async Task GetAuthorsDisplayNamesByBookIdsAsync_WhenABookIsNotRequested_ShouldNotReturnIt()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-authors-requested-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        BookRepository sut = new(context);
+        BookEntity requestedBook = _bookEntityFixture.Create(includeMetadata: false);
+        BookEntity bookNotRequested = _bookEntityFixture.Create(includeMetadata: false);
+        MediaContributorEntity requestedAuthor = _mediaContributorEntityFixture.Create(displayName: "Requested Author");
+        MediaContributorEntity otherAuthor = _mediaContributorEntityFixture.Create(displayName: "Other Author");
+        context.Books.AddRange(requestedBook, bookNotRequested);
+        context.MediaContributors.AddRange(requestedAuthor, otherAuthor);
+        await context.SaveChangesAsync();
+        context.BookContributors.AddRange(
+            _bookContributorEntityFixture.Create(bookId: requestedBook.Id, mediaContributorId: requestedAuthor.Id, role: MediaContributorRole.Author),
+            _bookContributorEntityFixture.Create(bookId: bookNotRequested.Id, mediaContributorId: otherAuthor.Id, role: MediaContributorRole.Author));
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyDictionary<Guid, string?>> result = await sut.GetAuthorsDisplayNamesByBookIdsAsync([requestedBook.Id], CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal("Requested Author", result.Value[requestedBook.Id]);
+        Assert.DoesNotContain(bookNotRequested.Id, result.Value.Keys);
+    }
+
+    [Fact]
+    public async Task GetAuthorsDisplayNamesByBookIdsAsync_WhenBookIdsIsEmpty_ShouldReturnAnEmptyDictionary()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-authors-empty-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        BookRepository sut = new(context);
+        BookEntity book = _bookEntityFixture.Create(includeMetadata: false);
+        MediaContributorEntity author = _mediaContributorEntityFixture.Create();
+        context.Books.Add(book);
+        context.MediaContributors.Add(author);
+        await context.SaveChangesAsync();
+        context.BookContributors.Add(
+            _bookContributorEntityFixture.Create(bookId: book.Id, mediaContributorId: author.Id, role: MediaContributorRole.Author));
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyDictionary<Guid, string?>> result = await sut.GetAuthorsDisplayNamesByBookIdsAsync([], CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Empty(result.Value);
+    }
+
+    [Fact]
+    public async Task GetAuthorsDisplayNamesByBookIdsAsync_WhenMoreThanFiveHundredIdsAreRequested_ShouldReturnTheAuthorOfEveryRequestedBook()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-authors-chunks-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        BookRepository sut = new(context);
+        const int BOOK_COUNT = 501;
+        List<BookEntity> books = CreateBooks(BOOK_COUNT);
+        MediaContributorEntity author = _mediaContributorEntityFixture.Create(displayName: "Shared Author");
+        context.Books.AddRange(books);
+        context.MediaContributors.Add(author);
+        await context.SaveChangesAsync();
+        context.BookContributors.AddRange([.. books.Select(book =>
+            _bookContributorEntityFixture.Create(bookId: book.Id, mediaContributorId: author.Id, role: MediaContributorRole.Author))]);
+        await context.SaveChangesAsync();
+        context.ChangeTracker.Clear();
+
+        // Act
+        // The lookup is chunked in batches of 500, so the 501st book proves the second chunk is queried as well.
+        Result<IReadOnlyDictionary<Guid, string?>> result = await sut.GetAuthorsDisplayNamesByBookIdsAsync(
+            [.. books.Select(book => book.Id)], CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(BOOK_COUNT, result.Value.Count);
+        Assert.All(result.Value.Keys, bookId => Assert.Equal("Shared Author", result.Value[bookId]));
+    }
+
+    /// <summary>
+    /// Creates a list of books with distinct paths and empty metadata collections, so that the chunked lookups can be exercised without extra graph data.
+    /// </summary>
+    /// <param name="count">The number of books to create.</param>
+    /// <returns>The created books.</returns>
+    private List<BookEntity> CreateBooks(int count)
+    {
+        return [.. Enumerable.Range(0, count).Select(_ => _bookEntityFixture.Create(
+            path: $"/books/generated-{Guid.NewGuid():N}.epub", includeMetadata: false))];
+    }
+
+    /// <summary>
+    /// Creates a real SQLite backed context, so that the stored values are read exactly as they were written.
+    /// </summary>
+    /// <param name="anchorConnection">The open in-memory SQLite connection that keeps the database alive for the duration of the test.</param>
+    /// <returns>The created context.</returns>
+    private static LuminaDbContext CreateContext(SqliteConnection anchorConnection)
+    {
+        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>()
+            .UseSqlite(anchorConnection.ConnectionString)
+            .Options);
+        context.Database.EnsureCreated();
+        return context;
     }
 
     /// <summary>

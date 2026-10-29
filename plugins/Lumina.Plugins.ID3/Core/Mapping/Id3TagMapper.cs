@@ -164,6 +164,7 @@ internal static class Id3TagMapper
             Channels: data.Channels,
             BitDepth: data.BitDepth,
             AudioCodec: NullIfWhiteSpace(data.AudioCodec),
+            Container: NullIfWhiteSpace(data.Container),
             Bitrate: data.Bitrate,
             MusicBrainzRecordingId: ParseGuid(data.MusicBrainzRecordingId),
             MusicBrainzTrackId: ParseGuid(data.MusicBrainzReleaseTrackId),

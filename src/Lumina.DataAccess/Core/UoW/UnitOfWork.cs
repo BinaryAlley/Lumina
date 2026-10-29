@@ -1,9 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.BookLibrary;
+using Lumina.Application.Common.DataAccess.Repositories.Favorites;
+using Lumina.Application.Common.DataAccess.Repositories.MediaConsumption;
 using Lumina.Application.Common.DataAccess.Repositories.MediaContributors;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
+using Lumina.Application.Common.DataAccess.Repositories.Playlists;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Scheduling;
 using Lumina.Application.Common.DataAccess.Repositories.Themes;
@@ -12,9 +15,12 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Errors;
 using Lumina.DataAccess.Core.Repositories.Authorization;
 using Lumina.DataAccess.Core.Repositories.BookLibrary;
+using Lumina.DataAccess.Core.Repositories.Favorites;
 using Lumina.DataAccess.Core.Repositories.Libraries;
+using Lumina.DataAccess.Core.Repositories.MediaConsumption;
 using Lumina.DataAccess.Core.Repositories.MediaContributors;
 using Lumina.DataAccess.Core.Repositories.MusicLibrary;
+using Lumina.DataAccess.Core.Repositories.Playlists;
 using Lumina.DataAccess.Core.Repositories.Plugins;
 using Lumina.DataAccess.Core.Repositories.Scheduling;
 using Lumina.DataAccess.Core.Repositories.Themes;
@@ -64,6 +70,11 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     private IThemeRepository? _themeRepository;
     private IUserRepository? _userRepository;
     private IUserSettingsRepository? _userSettingsRepository;
+    private IPlaylistRepository? _playlistRepository;
+    private IFavoriteRepository? _favoriteRepository;
+    private IMediaConsumptionRecordRepository? _mediaConsumptionRecordRepository;
+    private IMediaResumePointRepository? _mediaResumePointRepository;
+    private IConsumptionStatisticsRepository? _consumptionStatisticsRepository;
 
     /// <summary>
     /// Gets the permission repository.
@@ -375,6 +386,66 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     }
 
     /// <summary>
+    /// Gets the playlist repository.
+    /// </summary>
+    public IPlaylistRepository PlaylistRepository
+    {
+        get
+        {
+            _playlistRepository ??= new PlaylistRepository(_luminaDbContext);
+            return _playlistRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the favorite repository.
+    /// </summary>
+    public IFavoriteRepository FavoriteRepository
+    {
+        get
+        {
+            _favoriteRepository ??= new FavoriteRepository(_luminaDbContext);
+            return _favoriteRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the media consumption record repository.
+    /// </summary>
+    public IMediaConsumptionRecordRepository MediaConsumptionRecordRepository
+    {
+        get
+        {
+            _mediaConsumptionRecordRepository ??= new MediaConsumptionRecordRepository(_luminaDbContext);
+            return _mediaConsumptionRecordRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the media resume point repository.
+    /// </summary>
+    public IMediaResumePointRepository MediaResumePointRepository
+    {
+        get
+        {
+            _mediaResumePointRepository ??= new MediaResumePointRepository(_luminaDbContext);
+            return _mediaResumePointRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the repository for the consumption records used to build consumption statistics.
+    /// </summary>
+    public IConsumptionStatisticsRepository ConsumptionStatisticsRepository
+    {
+        get
+        {
+            _consumptionStatisticsRepository ??= new ConsumptionStatisticsRepository(_luminaDbContext);
+            return _consumptionStatisticsRepository;
+        }
+    }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="UnitOfWork"/> class.
     /// </summary>
     /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
@@ -395,12 +466,27 @@ public class UnitOfWork : IUnitOfWork, IDisposable
             await _luminaDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return Result.Success;
         }
+        // A concurrency conflict means that another request changed the same row after this request read it. It is an expected persistence
+        // conflict, so it is reported as a failure result instead of bubbling up as an unhandled exception.
+        catch (DbUpdateConcurrencyException)
+        {
+            return Errors.Persistence.ConcurrencyConflict;
+        }
         // A unique constraint violation is an expected persistence conflict, so it is reported as a failure result instead of bubbling up
-        // as an unhandled exception and being turned into a generic internal server error. Any other exception is unexpected and is left
-        // to propagate to the centralized exception handling middleware.
+        // as an unhandled exception and being turned into a generic internal server error.
         catch (DbUpdateException exception) when (IsUniqueConstraintViolation(exception))
         {
             return Errors.Persistence.UniqueConstraintViolation;
+        }
+        // SQLite reports a busy or locked database when another writer holds the lock. It is a concurrent write conflict, not an unexpected
+        // server failure, so it is reported the same way as an optimistic concurrency conflict.
+        catch (DbUpdateException exception) when (IsSqliteConcurrencyConflict(exception))
+        {
+            return Errors.Persistence.ConcurrencyConflict;
+        }
+        catch (SqliteException exception) when (IsSqliteBusyOrLocked(exception))
+        {
+            return Errors.Persistence.ConcurrencyConflict;
         }
     }
 
@@ -414,6 +500,26 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         // SQLite reports a generic constraint failure code for several constraints, so the extended code is used to tell a unique violation apart.
         return exception.InnerException is SqliteException sqliteException
             && sqliteException.SqliteExtendedErrorCode == 2067; // SQLITE_CONSTRAINT_UNIQUE
+    }
+
+    /// <summary>
+    /// Determines whether the provided <paramref name="exception"/> was caused by a SQLite write conflict.
+    /// </summary>
+    /// <param name="exception">The exception to inspect.</param>
+    /// <returns><see langword="true"/> if the exception was caused by a busy or locked database, <see langword="false"/> otherwise.</returns>
+    private static bool IsSqliteConcurrencyConflict(DbUpdateException exception)
+    {
+        return exception.InnerException is SqliteException sqliteException && IsSqliteBusyOrLocked(sqliteException);
+    }
+
+    /// <summary>
+    /// Determines whether the provided <paramref name="exception"/> reports a busy or locked SQLite database.
+    /// </summary>
+    /// <param name="exception">The exception to inspect.</param>
+    /// <returns><see langword="true"/> if the database is busy or locked, <see langword="false"/> otherwise.</returns>
+    private static bool IsSqliteBusyOrLocked(SqliteException exception)
+    {
+        return exception.SqliteErrorCode is 5 or 6; // SQLITE_BUSY, SQLITE_LOCKED
     }
 
     /// <summary>

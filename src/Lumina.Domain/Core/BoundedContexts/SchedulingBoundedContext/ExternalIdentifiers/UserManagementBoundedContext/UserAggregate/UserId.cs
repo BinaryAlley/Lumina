@@ -8,7 +8,7 @@ using System.Diagnostics;
 namespace Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ExternalIdentifiers.UserManagementBoundedContext.UserAggregate;
 
 /// <summary>
-/// Value object for the Id of a user, duplicated from the UserManagement bounded context to keep the cross bounded context references decoupled.
+/// Value Object for the Id of a user, duplicated from the UserManagement bounded context to keep the cross bounded context references decoupled.
 /// </summary>
 [DebuggerDisplay("{Value}")]
 public sealed class UserId : EntityId<Guid>

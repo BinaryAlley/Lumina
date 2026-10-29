@@ -23,6 +23,15 @@ public class BaseEndpointFixture : BaseEndpoint<EmptyRequest, IResult>
     public string TestCulture => Culture;
 
     /// <summary>
+    /// Sets the <c>Cache-Control</c> header through the <see cref="BaseEndpoint.SetCacheControl(string)"/> helper.
+    /// </summary>
+    /// <param name="cacheControl">The <c>Cache-Control</c> value chosen by the endpoint.</param>
+    public void TestSetCacheControl(string cacheControl)
+    {
+        SetCacheControl(cacheControl);
+    }
+
+    /// <summary>
     /// Renders a Razor view through the <see cref="BaseEndpoint.View(string, object?, IReadOnlyDictionary{string, object?})"/> helper.
     /// </summary>
     /// <param name="viewName">The name or path of the view to render.</param>

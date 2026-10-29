@@ -1506,4 +1506,22 @@
   <data name="Identifiers" xml:space="preserve">
     <value>المعرّفات</value>
   </data>
+  <data name="PlayAlbum" xml:space="preserve">
+    <value>تشغيل الألبوم</value>
+  </data>
+  <data name="PlayTrack" xml:space="preserve">
+    <value>تشغيل المقطع</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>الإجراءات</value>
+  </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>إضافة إلى قائمة التشغيل</value>
+  </data>
+  <data name="AddToPlayQueue" xml:space="preserve">
+    <value>إضافة إلى قائمة الانتظار</value>
+  </data>
+  <data name="PlayAllFromHere" xml:space="preserve">
+    <value>تشغيل الكل من هنا</value>
+  </data>
 </root>

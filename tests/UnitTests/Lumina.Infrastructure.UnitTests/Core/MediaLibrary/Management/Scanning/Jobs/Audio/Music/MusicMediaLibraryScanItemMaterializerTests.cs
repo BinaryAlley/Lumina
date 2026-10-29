@@ -116,6 +116,33 @@ public class MusicMediaLibraryScanItemMaterializerTests
         AlbumEntity secondAlbum = artist.Albums.Single(album => album.MusicBrainzReleaseId == secondReleaseId);
         Assert.Equal(firstRecordingId, Assert.Single(firstAlbum.Tracks).MusicBrainzRecordingId);
         Assert.Equal(secondRecordingId, Assert.Single(secondAlbum.Tracks).MusicBrainzRecordingId);
+        // The container read from the file itself is carried from the staged metadata to the materialized track.
+        Assert.Equal(firstStagedItem.Container, Assert.Single(firstAlbum.Tracks).Container);
+    }
+
+    [Fact]
+    public async Task MaterializeItemsAsync_WhenTheStagedItemHasNoContainer_ShouldMaterializeTheTrackWithoutAContainer()
+    {
+        // Arrange
+        MusicLibraryScanItemMetadataEntity stagedItem = _musicLibraryScanItemMetadataEntityFixture.Create(
+            libraryId: _libraryId,
+            artistName: "Some Artist",
+            releaseName: "Some Release",
+            path: "/music/some-artist/some-release/track.mp3",
+            includeMusicBrainzTags: false,
+            includeContainer: false);
+        _mockStagedMetadataRepository.GetByScanIdAsync(_scanId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<MusicLibraryScanItemMetadataEntity>>([stagedItem]));
+
+        // Act
+        Result<Success> result = await _sut.MaterializeItemsAsync(_mockUnitOfWork, _libraryId, _scanId, [stagedItem.Path], CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        ArtistEntity artist = Assert.Single(_insertedArtists);
+        AlbumEntity album = Assert.Single(artist.Albums);
+        // A file whose container the scan could not recognize materializes its track without a container, rather than failing the scan.
+        Assert.Null(Assert.Single(album.Tracks).Container);
     }
 
     [Fact]

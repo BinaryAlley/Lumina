@@ -1,0 +1,7 @@
+### Music track
+GET {{host}}/api/v1/users/me/media-resume-points/MusicTrack/9f0e1d2c-3b4a-4c6d-8e7f-9a0b1c2d3e4f
+Authorization: Bearer {{ACCESS_TOKEN}}
+
+### Book
+GET {{host}}/api/v1/users/me/media-resume-points/Book/7a6b5c4d-3e2f-4a1b-8c9d-0e1f2a3b4c5d
+Authorization: Bearer {{ACCESS_TOKEN}}

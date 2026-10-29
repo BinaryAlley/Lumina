@@ -13,5 +13,7 @@ public static partial class ApiRoutes
         public const string GET_USER_BY_ID = "/users/{id}";
         public const string GET_USER_SETTINGS = "/users/me/settings"; // uses "me" because it is always for the currently authenticated user
         public const string UPDATE_USER_SETTINGS = "/users/me/settings";
+        public const string GET_PLAYBACK_STATE = "/users/me/settings/playback-state";
+        public const string UPDATE_PLAYBACK_STATE = "/users/me/settings/playback-state";
     }
 }

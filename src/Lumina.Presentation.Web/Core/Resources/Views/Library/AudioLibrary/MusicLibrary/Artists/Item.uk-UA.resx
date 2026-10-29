@@ -1083,4 +1083,16 @@
   <data name="AddIsni" xml:space="preserve">
     <value>Додати ISNI</value>
   </data>
+  <data name="PlayAll" xml:space="preserve">
+    <value>Відтворити все</value>
+  </data>
+  <data name="Play" xml:space="preserve">
+    <value>Відтворити</value>
+  </data>
+  <data name="Shuffle" xml:space="preserve">
+    <value>Перемішати</value>
+  </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>Додати до списку відтворення</value>
+  </data>
 </root>

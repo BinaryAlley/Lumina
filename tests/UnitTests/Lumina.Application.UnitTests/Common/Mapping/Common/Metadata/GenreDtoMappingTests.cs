@@ -31,7 +31,7 @@ public class GenreDtoMappingTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
-        Assert.Equal(genreDto.Name, result.Value.Name);
+        Assert.Equal("rock", result.Value.Name);
     }
 
     [Theory]
@@ -50,7 +50,22 @@ public class GenreDtoMappingTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
-        Assert.Equal(genreDto.Name, result.Value.Name);
+        Assert.Equal(name.ToLowerInvariant(), result.Value.Name);
+    }
+
+    [Fact]
+    public void ToDomainValueObject_WhenGenreNameHasSurroundingWhitespaceAndMixedCase_ShouldStoreTheTrimmedLowercaseInvariantName()
+    {
+        // Arrange
+        GenreDto genreDto = _genreDtoFixture.Create(name: "  ÉLECTRO  ");
+
+        // Act
+        Result<Genre> result = genreDto.ToDomainValueObject();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Equal("électro", result.Value.Name);
     }
 
     [Theory]
@@ -92,7 +107,7 @@ public class GenreDtoMappingTests
         for (int i = 0; i < genreDtos.Count; i++)
         {
             Assert.False(resultList[i].IsFailure);
-            Assert.Equal(genreDtos[i].Name, resultList[i].Value.Name);
+            Assert.Equal(genreDtos[i].Name!.ToLowerInvariant(), resultList[i].Value.Name);
         }
     }
 
@@ -117,12 +132,12 @@ public class GenreDtoMappingTests
 
         List<Result<Genre>> resultList = results.ToList();
         Assert.False(resultList[0].IsFailure);
-        Assert.Equal("Rock", resultList[0].Value.Name);
+        Assert.Equal("rock", resultList[0].Value.Name);
 
         Assert.True(resultList[1].IsFailure);
 
         Assert.False(resultList[2].IsFailure);
-        Assert.Equal("Jazz", resultList[2].Value.Name);
+        Assert.Equal("jazz", resultList[2].Value.Name);
 
         Assert.True(resultList[3].IsFailure);
     }

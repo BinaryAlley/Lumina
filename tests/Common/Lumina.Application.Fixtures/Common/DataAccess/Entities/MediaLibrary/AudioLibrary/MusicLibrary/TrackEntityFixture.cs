@@ -37,7 +37,9 @@ public class TrackEntityFixture
     /// <param name="libraryId">Optional. The Id of the media library that owns the track.</param>
     /// <param name="path">Optional. The file system path of the track.</param>
     /// <param name="title">Optional. The title of the track.</param>
+    /// <param name="container">Optional. The container of the audio file of the track.</param>
     /// <param name="trackNumber">Optional. The number of the track on its disc.</param>
+    /// <param name="discNumber">Optional. The number of the disc the track belongs to.</param>
     /// <param name="originalReleaseDate">Optional. The original release date of the track.</param>
     /// <param name="originalReleaseYear">Optional. The original release year of the track.</param>
     /// <param name="reReleaseDate">Optional. The re-release date of the track.</param>
@@ -47,7 +49,15 @@ public class TrackEntityFixture
     /// <param name="includeOriginalReleaseYear">Whether the original release year should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeReReleaseDate">Whether the re-release date should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeReReleaseYear">Whether the re-release year should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeContainer">Whether the container should be included, or forced to <see langword="null"/>.</param>
     /// <param name="metadataStatus">Optional. The metadata enrichment status of the track.</param>
+    /// <param name="audioCodec">Optional. The audio codec of the track.</param>
+    /// <param name="includeAudioCodec">Whether the audio codec should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="replayGainTrackGain">Optional. The ReplayGain track gain of the track, in decibels.</param>
+    /// <param name="replayGainTrackPeak">Optional. The ReplayGain track peak of the track.</param>
+    /// <param name="replayGainAlbumGain">Optional. The ReplayGain album gain of the track, in decibels.</param>
+    /// <param name="replayGainAlbumPeak">Optional. The ReplayGain album peak of the track.</param>
+    /// <param name="includeReplayGain">Whether the ReplayGain values should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="TrackEntity"/>.</returns>
     public TrackEntity Create(
         Guid? id = null,
@@ -55,7 +65,9 @@ public class TrackEntityFixture
         Guid? libraryId = null,
         string? path = null,
         string? title = null,
+        string? container = null,
         int? trackNumber = null,
+        int? discNumber = null,
         DateOnly? originalReleaseDate = null,
         int? originalReleaseYear = null,
         DateOnly? reReleaseDate = null,
@@ -65,7 +77,15 @@ public class TrackEntityFixture
         bool includeOriginalReleaseYear = true,
         bool includeReReleaseDate = true,
         bool includeReReleaseYear = true,
-        MetadataStatus? metadataStatus = null)
+        bool includeContainer = true,
+        MetadataStatus? metadataStatus = null,
+        string? audioCodec = null,
+        bool includeAudioCodec = true,
+        decimal? replayGainTrackGain = null,
+        decimal? replayGainTrackPeak = null,
+        decimal? replayGainAlbumGain = null,
+        decimal? replayGainAlbumPeak = null,
+        bool includeReplayGain = true)
     {
         Guid resolvedId = id ?? Guid.NewGuid();
         Guid resolvedAlbumId = albumId ?? Guid.NewGuid();
@@ -110,10 +130,15 @@ public class TrackEntityFixture
             .RuleFor(x => x.SampleRate, f => f.PickRandom(44100, 48000, 96000))
             .RuleFor(x => x.Channels, f => f.PickRandom(1, 2, 6))
             .RuleFor(x => x.BitDepth, Random.Shared.Next(8, 32))
-            .RuleFor(x => x.AudioCodec, f => f.PickRandom("FLAC", "MP3", "AAC", "ALAC"))
+            .RuleFor(x => x.AudioCodec, f => includeAudioCodec ? (audioCodec ?? f.PickRandom("FLAC", "MP3", "AAC", "ALAC")) : null)
+            .RuleFor(x => x.Container, f => includeContainer ? (container ?? f.PickRandom("FLAC", "MP3", "OGG", "MP4", "AAC", "WAV")) : null)
+            .RuleFor(x => x.ReplayGainTrackGain, f => includeReplayGain ? (replayGainTrackGain ?? f.Random.Decimal(-20m, 0m)) : null)
+            .RuleFor(x => x.ReplayGainTrackPeak, f => includeReplayGain ? (replayGainTrackPeak ?? f.Random.Decimal(0m, 1.5m)) : null)
+            .RuleFor(x => x.ReplayGainAlbumGain, f => includeReplayGain ? (replayGainAlbumGain ?? f.Random.Decimal(-20m, 0m)) : null)
+            .RuleFor(x => x.ReplayGainAlbumPeak, f => includeReplayGain ? (replayGainAlbumPeak ?? f.Random.Decimal(0m, 1.5m)) : null)
             .RuleFor(x => x.Bitrate, Random.Shared.Next(96, 1411))
             .RuleFor(x => x.TrackNumber, f => trackNumber ?? f.Random.Int(1, 20))
-            .RuleFor(x => x.DiscNumber, Random.Shared.Next(1, 3))
+            .RuleFor(x => x.DiscNumber, discNumber ?? Random.Shared.Next(1, 3))
             .RuleFor(x => x.Script, f => f.Random.String2(f.Random.Number(1, 50)))
             .RuleFor(x => x.Key, f => f.PickRandom<MusicKey>())
             .RuleFor(x => x.Bpm, Random.Shared.Next(40, 240))

@@ -312,9 +312,6 @@
   <data name="WrittenContent" xml:space="preserve">
     <value>文字コンテンツ</value>
   </data>
-  <data name="YouTube" xml:space="preserve">
-    <value>ユーチューブ</value>
-  </data>
   <data name="Name" xml:space="preserve">
     <value>名前</value>
   </data>
@@ -413,5 +410,23 @@
   </data>
   <data name="PathPartBookId" xml:space="preserve">
     <value>書籍ID</value>
+  </data>
+  <data name="ShouldTrackConsumptionProgress" xml:space="preserve">
+    <value>進行状況を記録</value>
+  </data>
+  <data name="DescriptionShouldTrackConsumptionProgress" xml:space="preserve">
+    <value>このライブラリの項目の再生位置または閲覧位置を記憶し、ユーザーが中断した場所から再開できるようにするかどうか。</value>
+  </data>
+  <data name="CompletionThresholdPercentage" xml:space="preserve">
+    <value>完了しきい値 (%)</value>
+  </data>
+  <data name="DescriptionCompletionThresholdPercentage" xml:space="preserve">
+    <value>項目のセッションを完了とみなすために消費する必要がある割合。空欄の場合、ライブラリの作成時または進行状況の追跡を有効にするときはライブラリの種類の既定値が使用され、すでに進行状況を追跡しているライブラリの編集時は保存されているしきい値が維持されます。既定のしきい値がない種類では、明示的に報告された場合にのみ完了を記録します。</value>
+  </data>
+  <data name="CompletionThresholdPercentageValidation" xml:space="preserve">
+    <value>完了しきい値は 0 から 100 の間の整数である必要があります。</value>
+  </data>
+  <data name="Youtube" xml:space="preserve">
+    <value>YouTube</value>
   </data>
 </root>

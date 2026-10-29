@@ -52,6 +52,7 @@ public static class TrackMapping
             Channels = domainEntity.Metadata.Channels,
             BitDepth = domainEntity.Metadata.BitDepth.HasValue ? domainEntity.Metadata.BitDepth.Value : null,
             AudioCodec = domainEntity.Metadata.AudioCodec.HasValue ? domainEntity.Metadata.AudioCodec.Value : null,
+            Container = domainEntity.Metadata.Container.HasValue ? domainEntity.Metadata.Container.Value : null,
             Bitrate = domainEntity.Metadata.Bitrate.HasValue ? domainEntity.Metadata.Bitrate.Value : null,
             AcoustId = domainEntity.Metadata.AcoustId.HasValue ? domainEntity.Metadata.AcoustId.Value : null,
             ReplayGainTrackGain = domainEntity.Metadata.ReplayGainTrackGain.HasValue ? domainEntity.Metadata.ReplayGainTrackGain.Value : null,

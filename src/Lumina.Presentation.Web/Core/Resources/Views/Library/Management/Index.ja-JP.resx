@@ -294,7 +294,7 @@
   <data name="Yes" xml:space="preserve">
     <value>はい</value>
   </data>
-  <data name="YouTube" xml:space="preserve">
-    <value>ユーチューブ</value>
+  <data name="Youtube" xml:space="preserve">
+    <value>YouTube</value>
   </data>
 </root>

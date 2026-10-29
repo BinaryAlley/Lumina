@@ -68,6 +68,7 @@ public class TrackMappingTests
         Assert.Equal(track.Metadata.Channels, result.Channels);
         Assert.Equal(track.Metadata.BitDepth.HasValue ? track.Metadata.BitDepth.Value : null, result.BitDepth);
         Assert.Equal(track.Metadata.AudioCodec.HasValue ? track.Metadata.AudioCodec.Value : null, result.AudioCodec);
+        Assert.Equal(track.Metadata.Container.HasValue ? track.Metadata.Container.Value : null, result.Container);
         Assert.Equal(track.Metadata.Bitrate.HasValue ? track.Metadata.Bitrate.Value : null, result.Bitrate);
         Assert.Equal(track.TrackNumber, result.TrackNumber);
         Assert.Equal(track.DiscNumber.HasValue ? track.DiscNumber.Value : null, result.DiscNumber);
@@ -134,6 +135,7 @@ public class TrackMappingTests
             originalLanguage: Optional<LanguageInfo>.None(),
             bitDepth: Optional<int>.None(),
             audioCodec: Optional<string>.None(),
+            container: Optional<string>.None(),
             bitrate: Optional<int>.None());
         Track track = _trackFixture.Create(
             metadata: metadata,
@@ -169,6 +171,7 @@ public class TrackMappingTests
         Assert.Null(result.OriginalLanguageNativeName);
         Assert.Null(result.BitDepth);
         Assert.Null(result.AudioCodec);
+        Assert.Null(result.Container);
         Assert.Null(result.Bitrate);
         Assert.Null(result.DiscNumber);
         Assert.Null(result.Script);

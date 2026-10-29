@@ -152,6 +152,8 @@ public sealed class ThemeNavBuilder
         ];
         if (canCreateLibraries)
             items.Add(new ThemeNavEntryDto(Localize("AddNewLibrary"), _urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.ADD_LIBRARY), "nav-link", []));
+        items.Add(new ThemeNavEntryDto(Localize("Favorites"), _urlService.GetAbsoluteUrl(WebRoutes.Favorites.INDEX), "nav-link", []));
+        items.Add(new ThemeNavEntryDto(Localize("Statistics"), _urlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.INDEX), "nav-link", []));
         // The written content and audio entries open the home page filtered to the libraries of their category, so that browsing starts
         // from the libraries the user owns (or from every library, for administrators), instead of from a single library picked upfront.
         string librariesCatalogUrl = _urlService.GetAbsoluteUrl(WebRoutes.Home.INDEX_CULTURED) ?? string.Empty;
@@ -163,6 +165,7 @@ public sealed class ThemeNavBuilder
         items.Add(new ThemeNavEntryDto(Localize("Audio"), Url: null, CssClass: null,
         [
             new ThemeNavEntryDto(Localize("Music"), $"{librariesCatalogUrl}?category=music", "nav-link", []),
+            new ThemeNavEntryDto(Localize("Playlists"), _urlService.GetAbsoluteUrl(WebRoutes.Playlists.INDEX), "nav-link", []),
             new ThemeNavEntryDto(Localize("Interviews"), "library/audio/interviews", "nav-link", [])
         ]));
         items.Add(new ThemeNavEntryDto(Localize("Video"), Url: null, CssClass: null,

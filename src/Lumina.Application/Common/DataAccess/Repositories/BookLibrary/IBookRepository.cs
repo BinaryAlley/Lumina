@@ -125,6 +125,15 @@ public interface IBookRepository : IRepository<BookEntity>,
     Task<Result<IReadOnlyDictionary<Guid, string?>>> GetAuthorsDisplayNamesByBookIdsAsync(IReadOnlyCollection<Guid> bookIds, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Gets the books identified by <paramref name="bookIds"/>, optionally together with their navigation properties.
+    /// </summary>
+    /// <param name="bookIds">The Ids of the books to get.</param>
+    /// <param name="shouldIncludeNavigationProperties">Whether the navigation properties of the books should be loaded together with the books themselves.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the existing books, or an error.</returns>
+    Task<Result<IReadOnlyList<BookEntity>>> GetByIdsAsync(IReadOnlyCollection<Guid> bookIds, bool shouldIncludeNavigationProperties, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Deletes all the books of the media library identified by <paramref name="libraryId"/>, together with their artwork and their related data.
     /// </summary>
     /// <param name="libraryId">The Id of the media library whose books are deleted.</param>

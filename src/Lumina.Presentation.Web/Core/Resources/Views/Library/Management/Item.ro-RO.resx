@@ -312,9 +312,6 @@
   <data name="WrittenContent" xml:space="preserve">
     <value>Conținut Scris</value>
   </data>
-  <data name="YouTube" xml:space="preserve">
-    <value>YouTube</value>
-  </data>
   <data name="Name" xml:space="preserve">
     <value>Nume</value>
   </data>
@@ -413,5 +410,23 @@
   </data>
   <data name="PathPartBookId" xml:space="preserve">
     <value>Id-ul cărții</value>
+  </data>
+  <data name="ShouldTrackConsumptionProgress" xml:space="preserve">
+    <value>Urmărește Progresul Consumului</value>
+  </data>
+  <data name="DescriptionShouldTrackConsumptionProgress" xml:space="preserve">
+    <value>Dacă poziția de redare sau de citire a elementelor acestei biblioteci este reținută, astfel încât utilizatorul să poată relua de unde a rămas.</value>
+  </data>
+  <data name="CompletionThresholdPercentage" xml:space="preserve">
+    <value>Prag De Finalizare (%)</value>
+  </data>
+  <data name="DescriptionCompletionThresholdPercentage" xml:space="preserve">
+    <value>Procentul unui element care trebuie consumat pentru ca sesiunea sa să fie considerată finalizată. Dacă este lăsat gol, se folosește valoarea implicită a tipului de bibliotecă la crearea unei biblioteci sau la activarea urmăririi progresului, iar valoarea salvată este păstrată la editarea unei biblioteci care urmărește deja progresul. Tipurile fără un prag implicit înregistrează finalizarea doar când este raportată explicit.</value>
+  </data>
+  <data name="CompletionThresholdPercentageValidation" xml:space="preserve">
+    <value>Pragul de finalizare trebuie să fie un număr întreg între 0 și 100.</value>
+  </data>
+  <data name="Youtube" xml:space="preserve">
+    <value>YouTube</value>
   </data>
 </root>

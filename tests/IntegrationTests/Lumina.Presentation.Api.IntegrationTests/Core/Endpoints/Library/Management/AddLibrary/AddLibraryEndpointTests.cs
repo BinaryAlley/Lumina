@@ -124,6 +124,269 @@ public class AddLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         Assert.NotEmpty(problemDetails["traceId"].GetString()!);
     }
 
+    [Fact]
+    public async Task AddLibrary_WhenConsumptionSettingsAreSupplied_ShouldPersistAndReturnThem()
+    {
+        // Arrange
+        AddLibraryRequest request = _addLibraryRequestFixture.Create(
+            title: "Tracked Library",
+            libraryType: "EBook",
+            contentLocations: ["C:/Media"],
+            coverImage: null,
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: true,
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: 90
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/libraries", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        LibraryResponse? library = await response.Content.ReadFromJsonAsync<LibraryResponse>(_jsonOptions);
+        Assert.NotNull(library);
+        Assert.True(library!.ShouldTrackConsumptionProgress);
+        Assert.Equal(90, library.CompletionThresholdPercentage);
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(candidate => candidate.Id == library.Id);
+        Assert.NotNull(storedLibrary);
+        Assert.True(storedLibrary!.ShouldTrackConsumptionProgress);
+        Assert.Equal(90, storedLibrary.CompletionThresholdPercentage);
+    }
+
+    [Fact]
+    public async Task AddLibrary_WhenConsumptionSettingsAreOmitted_ShouldUseTheLibraryTypeDefaults()
+    {
+        // Arrange
+        AddLibraryRequest request = _addLibraryRequestFixture.Create(
+            title: "Default Consumption Library",
+            libraryType: "EBook",
+            contentLocations: ["C:/Media"],
+            coverImage: null,
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: true,
+            shouldTrackConsumptionProgress: null,
+            completionThresholdPercentage: null
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/libraries", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        LibraryResponse? library = await response.Content.ReadFromJsonAsync<LibraryResponse>(_jsonOptions);
+        Assert.NotNull(library);
+        Assert.True(library!.ShouldTrackConsumptionProgress);
+        Assert.Equal(100, library.CompletionThresholdPercentage);
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(candidate => candidate.Id == library.Id);
+        Assert.NotNull(storedLibrary);
+        Assert.True(storedLibrary!.ShouldTrackConsumptionProgress);
+        Assert.Equal(100, storedLibrary.CompletionThresholdPercentage);
+    }
+
+    [Fact]
+    public async Task AddLibrary_WhenLibraryTypeDoesNotTrackConsumptionByDefault_ShouldStoreTrackingOffWithoutThreshold()
+    {
+        // Arrange
+        AddLibraryRequest request = _addLibraryRequestFixture.Create(
+            title: "Music Library",
+            libraryType: "Music",
+            contentLocations: ["C:/Media"],
+            coverImage: null,
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: true,
+            shouldTrackConsumptionProgress: null,
+            completionThresholdPercentage: null
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/libraries", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        LibraryResponse? library = await response.Content.ReadFromJsonAsync<LibraryResponse>(_jsonOptions);
+        Assert.NotNull(library);
+        Assert.Equal(LibraryType.Music, library!.LibraryType);
+        Assert.False(library.ShouldTrackConsumptionProgress);
+        Assert.Null(library.CompletionThresholdPercentage);
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(candidate => candidate.Id == library.Id);
+        Assert.NotNull(storedLibrary);
+        Assert.False(storedLibrary!.ShouldTrackConsumptionProgress);
+        Assert.Null(storedLibrary.CompletionThresholdPercentage);
+    }
+
+    [Fact]
+    public async Task AddLibrary_WhenProgressTrackingIsExplicitlyDisabled_ShouldStoreTrackingOffWithoutThreshold()
+    {
+        // Arrange
+        AddLibraryRequest request = _addLibraryRequestFixture.Create(
+            title: "Untracked Library",
+            libraryType: "EBook",
+            contentLocations: ["C:/Media"],
+            coverImage: null,
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: true,
+            shouldTrackConsumptionProgress: false,
+            completionThresholdPercentage: null
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/libraries", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        LibraryResponse? library = await response.Content.ReadFromJsonAsync<LibraryResponse>(_jsonOptions);
+        Assert.NotNull(library);
+        Assert.False(library!.ShouldTrackConsumptionProgress);
+        Assert.Null(library.CompletionThresholdPercentage);
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(candidate => candidate.Id == library.Id);
+        Assert.NotNull(storedLibrary);
+        Assert.False(storedLibrary!.ShouldTrackConsumptionProgress);
+        Assert.Null(storedLibrary.CompletionThresholdPercentage);
+    }
+
+    [Fact]
+    public async Task AddLibrary_WhenThresholdIsAboveOneHundred_ShouldReturnValidationProblemAndNotPersist()
+    {
+        // Arrange
+        string title = "Above Range Library";
+        AddLibraryRequest request = _addLibraryRequestFixture.Create(
+            title: title,
+            libraryType: "EBook",
+            contentLocations: ["C:/Media"],
+            coverImage: null,
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: true,
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: 101
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/libraries", request);
+
+        // Assert
+        await AssertValidationProblemAsync(response, "CompletionThresholdPercentageMustBeBetweenZeroAndOneHundred");
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        Assert.False(await dbContext.Libraries.AnyAsync(candidate => candidate.Title == title));
+    }
+
+    [Fact]
+    public async Task AddLibrary_WhenThresholdIsBelowZero_ShouldReturnValidationProblemAndNotPersist()
+    {
+        // Arrange
+        string title = "Below Range Library";
+        AddLibraryRequest request = _addLibraryRequestFixture.Create(
+            title: title,
+            libraryType: "EBook",
+            contentLocations: ["C:/Media"],
+            coverImage: null,
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: true,
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: -1
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/libraries", request);
+
+        // Assert
+        await AssertValidationProblemAsync(response, "CompletionThresholdPercentageMustBeBetweenZeroAndOneHundred");
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        Assert.False(await dbContext.Libraries.AnyAsync(candidate => candidate.Title == title));
+    }
+
+    [Fact]
+    public async Task AddLibrary_WhenThresholdIsSuppliedWhileProgressTrackingIsDisabled_ShouldReturnValidationProblemAndNotPersist()
+    {
+        // Arrange
+        string title = "Disabled Tracking Library";
+        AddLibraryRequest request = _addLibraryRequestFixture.Create(
+            title: title,
+            libraryType: "EBook",
+            contentLocations: ["C:/Media"],
+            coverImage: null,
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: true,
+            shouldTrackConsumptionProgress: false,
+            completionThresholdPercentage: 50
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/libraries", request);
+
+        // Assert
+        await AssertValidationProblemAsync(response, "CompletionThresholdPercentageMustBeNullWhenProgressTrackingIsOff");
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        Assert.False(await dbContext.Libraries.AnyAsync(candidate => candidate.Title == title));
+    }
+
+    /// <summary>
+    /// Asserts that <paramref name="response"/> carries the standard validation problem of the add library route.
+    /// </summary>
+    /// <param name="response">The response to assert.</param>
+    /// <param name="expectedErrorDescription">The error description expected under the validation errors.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    private async Task AssertValidationProblemAsync(HttpResponseMessage response, string expectedErrorDescription)
+    {
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+
+        string content = await response.Content.ReadAsStringAsync();
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", problemDetails["type"].GetString());
+        Assert.Equal("General.Validation", problemDetails["title"].GetString());
+        Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
+        Assert.Equal("/api/v1/libraries", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
+
+        Dictionary<string, string[]>? errors = problemDetails["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
+        Assert.NotNull(errors);
+        Assert.Contains("General.Validation", errors!.Keys);
+        Assert.Contains(expectedErrorDescription, errors["General.Validation"]);
+    }
+
     /// <summary>
     /// Disposes API factory resources.
     /// </summary>

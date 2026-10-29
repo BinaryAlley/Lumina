@@ -2,6 +2,7 @@
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.DataAccess.Core.UoW;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using System;
 using System.Collections.Generic;
@@ -26,6 +27,11 @@ public class UserSettingsConfigurationTests
     {
         _context = new LuminaDbContext(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite("Data Source=:memory:").Options);
     }
+
+    /// <summary>
+    /// Gets the design-time model, which retains configuration such as column order that the read-optimized runtime model omits.
+    /// </summary>
+    private IModel DesignTimeModel => _context.GetService<IDesignTimeModel>().Model;
 
     [Fact]
     public void Configure_WhenApplied_ShouldSetTableNameAndKey()
@@ -53,12 +59,30 @@ public class UserSettingsConfigurationTests
         IProperty isPaginationEnabledProperty = entityType.GetProperty(nameof(UserSettingsEntity.IsPaginationEnabled));
         IProperty itemsPerPageProperty = entityType.GetProperty(nameof(UserSettingsEntity.ItemsPerPage));
         IProperty ignoreThePrefixProperty = entityType.GetProperty(nameof(UserSettingsEntity.ShouldIgnoreThePrefixForAlphaPicker));
+        IProperty vuMeterOrientationProperty = entityType.GetProperty(nameof(UserSettingsEntity.VuMeterOrientation));
+        IProperty vuMeterSegmentCountProperty = entityType.GetProperty(nameof(UserSettingsEntity.VuMeterSegmentCount));
+        IProperty vuMeterSegmentGapProperty = entityType.GetProperty(nameof(UserSettingsEntity.VuMeterSegmentGap));
+        IProperty vuMeterMediumThresholdProperty = entityType.GetProperty(nameof(UserSettingsEntity.VuMeterMediumThreshold));
+        IProperty vuMeterHighThresholdProperty = entityType.GetProperty(nameof(UserSettingsEntity.VuMeterHighThreshold));
+        IProperty vuMeterShowPeakProperty = entityType.GetProperty(nameof(UserSettingsEntity.VuMeterShowPeak));
+        IProperty vuMeterPeakHoldDurationProperty = entityType.GetProperty(nameof(UserSettingsEntity.VuMeterPeakHoldDurationInMilliseconds));
+        IProperty vuMeterReleasePerSecondProperty = entityType.GetProperty(nameof(UserSettingsEntity.VuMeterReleasePerSecond));
+        IProperty vuMeterPeakReleasePerSecondProperty = entityType.GetProperty(nameof(UserSettingsEntity.VuMeterPeakReleasePerSecond));
 
         // Assert
         Assert.False(userIdProperty.IsNullable);
         Assert.False(isPaginationEnabledProperty.IsNullable);
         Assert.False(itemsPerPageProperty.IsNullable);
         Assert.False(ignoreThePrefixProperty.IsNullable);
+        Assert.False(vuMeterOrientationProperty.IsNullable);
+        Assert.False(vuMeterSegmentCountProperty.IsNullable);
+        Assert.False(vuMeterSegmentGapProperty.IsNullable);
+        Assert.False(vuMeterMediumThresholdProperty.IsNullable);
+        Assert.False(vuMeterHighThresholdProperty.IsNullable);
+        Assert.False(vuMeterShowPeakProperty.IsNullable);
+        Assert.False(vuMeterPeakHoldDurationProperty.IsNullable);
+        Assert.False(vuMeterReleasePerSecondProperty.IsNullable);
+        Assert.False(vuMeterPeakReleasePerSecondProperty.IsNullable);
     }
 
     [Fact]
@@ -103,5 +127,38 @@ public class UserSettingsConfigurationTests
         // Assert
         Assert.False(createdOnUtcProperty.IsNullable);
         Assert.Null(updatedOnUtcProperty.GetDefaultValue());
+    }
+
+    [Fact]
+    public void Configure_WhenApplied_ShouldConfigureVuMeterAndPlaybackStateColumnOrders()
+    {
+        // Arrange
+        IEntityType entityType = DesignTimeModel.FindEntityType(typeof(UserSettingsEntity))!;
+
+        // Act
+        IProperty vuMeterOrientationProperty = entityType.GetProperty(nameof(UserSettingsEntity.VuMeterOrientation));
+        IProperty vuMeterSegmentCountProperty = entityType.GetProperty(nameof(UserSettingsEntity.VuMeterSegmentCount));
+        IProperty vuMeterSegmentGapProperty = entityType.GetProperty(nameof(UserSettingsEntity.VuMeterSegmentGap));
+        IProperty vuMeterMediumThresholdProperty = entityType.GetProperty(nameof(UserSettingsEntity.VuMeterMediumThreshold));
+        IProperty vuMeterHighThresholdProperty = entityType.GetProperty(nameof(UserSettingsEntity.VuMeterHighThreshold));
+        IProperty vuMeterShowPeakProperty = entityType.GetProperty(nameof(UserSettingsEntity.VuMeterShowPeak));
+        IProperty vuMeterPeakHoldDurationProperty = entityType.GetProperty(nameof(UserSettingsEntity.VuMeterPeakHoldDurationInMilliseconds));
+        IProperty vuMeterReleasePerSecondProperty = entityType.GetProperty(nameof(UserSettingsEntity.VuMeterReleasePerSecond));
+        IProperty vuMeterPeakReleasePerSecondProperty = entityType.GetProperty(nameof(UserSettingsEntity.VuMeterPeakReleasePerSecond));
+        IProperty volumeProperty = entityType.GetProperty(nameof(UserSettingsEntity.Volume));
+        IProperty isMutedProperty = entityType.GetProperty(nameof(UserSettingsEntity.IsMuted));
+
+        // Assert
+        Assert.Equal(19, vuMeterOrientationProperty.GetColumnOrder());
+        Assert.Equal(20, vuMeterSegmentCountProperty.GetColumnOrder());
+        Assert.Equal(21, vuMeterSegmentGapProperty.GetColumnOrder());
+        Assert.Equal(22, vuMeterMediumThresholdProperty.GetColumnOrder());
+        Assert.Equal(23, vuMeterHighThresholdProperty.GetColumnOrder());
+        Assert.Equal(24, vuMeterShowPeakProperty.GetColumnOrder());
+        Assert.Equal(25, vuMeterPeakHoldDurationProperty.GetColumnOrder());
+        Assert.Equal(26, vuMeterReleasePerSecondProperty.GetColumnOrder());
+        Assert.Equal(27, vuMeterPeakReleasePerSecondProperty.GetColumnOrder());
+        Assert.Equal(28, volumeProperty.GetColumnOrder());
+        Assert.Equal(29, isMutedProperty.GetColumnOrder());
     }
 }

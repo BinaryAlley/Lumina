@@ -1,7 +1,10 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Common;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Lumina.Contracts.Fixtures.Core.DTO.Common;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
@@ -34,9 +37,13 @@ public class AddTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     private readonly HttpClient _client;
     private readonly AddTrackRequestFixture _addTrackRequestFixture = new();
     private readonly MusicTrackMetadataDtoFixture _musicTrackMetadataDtoFixture = new();
+    private readonly GenreDtoFixture _genreDtoFixture = new();
+    private readonly TagDtoFixture _tagDtoFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly ArtistEntityFixture _artistEntityFixture = new();
     private readonly AlbumEntityFixture _albumEntityFixture = new();
+    private readonly TagEntityFixture _tagEntityFixture = new();
+    private readonly GenreEntityFixture _genreEntityFixture = new();
     private readonly List<string> _seededUsernames = [];
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -218,6 +225,57 @@ public class AddTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         TrackEntity storedTrack = await dbContext.Tracks.SingleAsync(track => track.LibraryId == libraryId);
         Assert.Equal(maliciousTitle, storedTrack.Title);
 
+    }
+
+    [Theory]
+    [InlineData("'; DROP TABLE Tags; --")] // destructive injection in a tag and genre name
+    [InlineData("' OR '1'='1")] // boolean-based injection in a tag and genre name
+    public async Task AddTrack_WithSQLInjectionInTagAndGenreNames_ShouldNotCorruptOrLeakData(string maliciousName)
+    {
+        // Arrange
+        (Guid userId, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(_client);
+        _seededUsernames.Add(username);
+        (Guid libraryId, Guid artistId, Guid albumId) = await SeedLibraryArtistAndAlbumAsync(userId);
+        string suffix = Guid.NewGuid().ToString("N")[..8];
+        string seededTagName = $"seeded-tag-{suffix}";
+        string seededGenreName = $"seeded-genre-{suffix}";
+        using (IServiceScope seedScope = _apiFactory.Services.CreateScope())
+        {
+            LuminaDbContext seedDbContext = seedScope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            seedDbContext.Set<TagEntity>().Add(_tagEntityFixture.Create(name: seededTagName));
+            seedDbContext.Set<GenreEntity>().Add(_genreEntityFixture.Create(name: seededGenreName));
+            await seedDbContext.SaveChangesAsync();
+        }
+        string injectedTagName = $"{maliciousName} {suffix}";
+        string injectedGenreName = $"{maliciousName} genre {suffix}";
+        AddTrackRequest request = _addTrackRequestFixture.Create(
+            path: Path.Combine(_libraryContentLocation, $"{Guid.NewGuid():N}.flac"),
+            metadata: _musicTrackMetadataDtoFixture.Create(
+                genres: [_genreDtoFixture.Create(name: injectedGenreName)],
+                tags: [_tagDtoFixture.Create(name: injectedTagName)]),
+            contributors: []);
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync($"/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks", request);
+        string content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        // The malicious names are user data, not SQL: they must be stored verbatim (normalized) without breaking the request or the schema.
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        Assert.DoesNotContain("SQL", content, StringComparison.Ordinal);
+        Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("StackTrace", content, StringComparison.OrdinalIgnoreCase);
+
+        using (IServiceScope scope = _apiFactory.Services.CreateScope())
+        {
+            LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            Assert.Equal(1, await dbContext.Libraries.CountAsync(library => library.Id == libraryId));
+            Assert.Equal(1, await dbContext.Tracks.CountAsync(track => track.LibraryId == libraryId));
+            Assert.True(await dbContext.Set<TagEntity>().AnyAsync(tag => tag.Name == seededTagName));
+            Assert.True(await dbContext.Set<GenreEntity>().AnyAsync(genre => genre.Name == seededGenreName));
+            Assert.True(await dbContext.Set<TagEntity>().AnyAsync(tag => tag.Name == injectedTagName.ToLowerInvariant()));
+            Assert.True(await dbContext.Set<GenreEntity>().AnyAsync(genre => genre.Name == injectedGenreName.ToLowerInvariant()));
+        }
     }
 
     [Theory]

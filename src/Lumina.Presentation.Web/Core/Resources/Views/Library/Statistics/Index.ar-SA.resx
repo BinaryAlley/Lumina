@@ -1,0 +1,201 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Title" xml:space="preserve">
+    <value>الإحصائيات</value>
+  </data>
+  <data name="TotalConsumedDuration" xml:space="preserve">
+    <value>إجمالي وقت الاستهلاك</value>
+  </data>
+  <data name="CountedSessions" xml:space="preserve">
+    <value>الجلسات المحتسبة</value>
+  </data>
+  <data name="CompletedSessions" xml:space="preserve">
+    <value>الجلسات المكتملة</value>
+  </data>
+  <data name="CompletionRate" xml:space="preserve">
+    <value>معدل الإكمال</value>
+  </data>
+  <data name="ByMediaKind" xml:space="preserve">
+    <value>حسب نوع الوسائط</value>
+  </data>
+  <data name="MediaKind" xml:space="preserve">
+    <value>نوع الوسائط</value>
+  </data>
+  <data name="Duration" xml:space="preserve">
+    <value>الوقت</value>
+  </data>
+  <data name="Stopped" xml:space="preserve">
+    <value>متوقفة</value>
+  </data>
+  <data name="Counted" xml:space="preserve">
+    <value>محتسبة</value>
+  </data>
+  <data name="Completed" xml:space="preserve">
+    <value>مكتملة</value>
+  </data>
+  <data name="Genres" xml:space="preserve">
+    <value>الأنواع</value>
+  </data>
+  <data name="Tags" xml:space="preserve">
+    <value>العلامات</value>
+  </data>
+  <data name="NoGenres" xml:space="preserve">
+    <value>لا توجد بيانات أنواع لهذه عوامل التصفية.</value>
+  </data>
+  <data name="NoTags" xml:space="preserve">
+    <value>لا توجد بيانات علامات لهذه عوامل التصفية.</value>
+  </data>
+  <data name="Items" xml:space="preserve">
+    <value>عناصر</value>
+  </data>
+  <data name="RecentlyConsumed" xml:space="preserve">
+    <value>المستهلك مؤخراً</value>
+  </data>
+  <data name="MostConsumed" xml:space="preserve">
+    <value>الأكثر استهلاكاً</value>
+  </data>
+  <data name="NoRecentlyConsumed" xml:space="preserve">
+    <value>لا توجد عناصر مستهلكة مؤخراً.</value>
+  </data>
+  <data name="NoMostConsumed" xml:space="preserve">
+    <value>لا توجد عناصر أكثر استهلاكاً.</value>
+  </data>
+  <data name="LastConsumed" xml:space="preserve">
+    <value>آخر استهلاك</value>
+  </data>
+  <data name="Unavailable" xml:space="preserve">
+    <value>هذا العنصر لم يعد متاحاً.</value>
+  </data>
+  <data name="DeleteFromHistory" xml:space="preserve">
+    <value>حذف من السجل</value>
+  </data>
+  <data name="DeleteFromHistoryConfirm" xml:space="preserve">
+    <value>هل تريد حذف كل الجلسات المسجلة لهذا العنصر من السجل؟</value>
+  </data>
+  <data name="HistoryEntryDeleted" xml:space="preserve">
+    <value>تم حذف إدخال السجل.</value>
+  </data>
+  <data name="ClearHistory" xml:space="preserve">
+    <value>مسح السجل</value>
+  </data>
+  <data name="ClearHistoryConfirm" xml:space="preserve">
+    <value>هل تريد حذف سجل الاستهلاك بالكامل للمستخدم المحدد؟</value>
+  </data>
+  <data name="HistoryCleared" xml:space="preserve">
+    <value>تم مسح سجل الاستهلاك.</value>
+  </data>
+  <data name="ClearResumePoints" xml:space="preserve">
+    <value>إزالة من متابعة المشاهدة</value>
+  </data>
+  <data name="ClearResumePointsConfirm" xml:space="preserve">
+    <value>هل تريد إزالة كل نقاط الاستئناف للمستخدم المحدد؟ يتم الاحتفاظ بالسجل.</value>
+  </data>
+  <data name="ResumePointsCleared" xml:space="preserve">
+    <value>تمت إزالة نقاط الاستئناف.</value>
+  </data>
+  <data name="Filters" xml:space="preserve">
+    <value>عوامل التصفية</value>
+  </data>
+  <data name="Library" xml:space="preserve">
+    <value>المكتبة</value>
+  </data>
+  <data name="AllLibraries" xml:space="preserve">
+    <value>كل المكتبات</value>
+  </data>
+  <data name="AllMediaKinds" xml:space="preserve">
+    <value>كل أنواع الوسائط</value>
+  </data>
+  <data name="From" xml:space="preserve">
+    <value>من</value>
+  </data>
+  <data name="To" xml:space="preserve">
+    <value>إلى</value>
+  </data>
+  <data name="Apply" xml:space="preserve">
+    <value>تطبيق</value>
+  </data>
+  <data name="Reset" xml:space="preserve">
+    <value>إعادة تعيين</value>
+  </data>
+  <data name="InvalidDateRange" xml:space="preserve">
+    <value>يجب ألا يكون تاريخ البداية بعد تاريخ النهاية.</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>المستخدم</value>
+  </data>
+  <data name="AllUsers" xml:space="preserve">
+    <value>كل المستخدمين</value>
+  </data>
+  <data name="Me" xml:space="preserve">
+    <value>أنا</value>
+  </data>
+  <data name="AllUsersHistoryUnavailable" xml:space="preserve">
+    <value>السجل وتفصيل العلامات متاحان لكل مستخدم. اختر مستخدماً لعرضهما.</value>
+  </data>
+  <data name="PerUser" xml:space="preserve">
+    <value>لكل مستخدم</value>
+  </data>
+  <data name="NoUsers" xml:space="preserve">
+    <value>لا يوجد مستخدمون لديهم إحصائيات استهلاك لهذه عوامل التصفية.</value>
+  </data>
+  <data name="NoMediaKindData" xml:space="preserve">
+    <value>لا توجد بيانات نوع وسائط لهذه عوامل التصفية.</value>
+  </data>
+  <data name="NoConsumption" xml:space="preserve">
+    <value>لا يوجد سجل استهلاك لهذه عوامل التصفية.</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>جارٍ التحميل...</value>
+  </data>
+  <data name="LoadFailed" xml:space="preserve">
+    <value>تعذر تحميل الإحصائيات.</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>إعادة المحاولة</value>
+  </data>
+  <data name="KindMusicTrack" xml:space="preserve">
+    <value>مقطع</value>
+  </data>
+  <data name="KindPodcastEpisode" xml:space="preserve">
+    <value>حلقة بودكاست</value>
+  </data>
+  <data name="KindAudiobook" xml:space="preserve">
+    <value>كتاب صوتي</value>
+  </data>
+  <data name="KindMovie" xml:space="preserve">
+    <value>فيلم</value>
+  </data>
+  <data name="KindTvEpisode" xml:space="preserve">
+    <value>حلقة تلفزيونية</value>
+  </data>
+  <data name="KindBook" xml:space="preserve">
+    <value>كتاب</value>
+  </data>
+  <data name="KindPhoto" xml:space="preserve">
+    <value>صورة</value>
+  </data>
+  <data name="KindVideo" xml:space="preserve">
+    <value>فيديو</value>
+  </data>
+  <data name="HoursShort" xml:space="preserve">
+    <value>س</value>
+  </data>
+  <data name="MinutesShort" xml:space="preserve">
+    <value>د</value>
+  </data>
+  <data name="SecondsShort" xml:space="preserve">
+    <value>ث</value>
+  </data>
+</root>

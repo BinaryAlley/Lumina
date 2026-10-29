@@ -312,9 +312,6 @@
   <data name="WrittenContent" xml:space="preserve">
     <value>Письмовий контент</value>
   </data>
-  <data name="YouTube" xml:space="preserve">
-    <value>Ютуб</value>
-  </data>
   <data name="Name" xml:space="preserve">
     <value>Ім'я</value>
   </data>
@@ -413,5 +410,23 @@
   </data>
   <data name="PathPartBookId" xml:space="preserve">
     <value>Ідентифікатор книги</value>
+  </data>
+  <data name="ShouldTrackConsumptionProgress" xml:space="preserve">
+    <value>Відстежувати прогрес споживання</value>
+  </data>
+  <data name="DescriptionShouldTrackConsumptionProgress" xml:space="preserve">
+    <value>Чи запам'ятовується позиція відтворення або читання елементів цієї бібліотеки, щоб користувач міг продовжити з того місця, де зупинився.</value>
+  </data>
+  <data name="CompletionThresholdPercentage" xml:space="preserve">
+    <value>Поріг завершення (%)</value>
+  </data>
+  <data name="DescriptionCompletionThresholdPercentage" xml:space="preserve">
+    <value>Відсоток елемента, який потрібно спожити, щоб його сеанс вважався завершеним. Якщо залишити порожнім, типове значення типу бібліотеки використовується під час створення бібліотеки або ввімкнення відстеження прогресу, а збережене значення зберігається під час редагування бібліотеки, яка вже відстежує прогрес. Типи без типового порогу фіксують завершення лише тоді, коли його явно повідомлено.</value>
+  </data>
+  <data name="CompletionThresholdPercentageValidation" xml:space="preserve">
+    <value>Поріг завершення має бути цілим числом від 0 до 100.</value>
+  </data>
+  <data name="Youtube" xml:space="preserve">
+    <value>YouTube</value>
   </data>
 </root>

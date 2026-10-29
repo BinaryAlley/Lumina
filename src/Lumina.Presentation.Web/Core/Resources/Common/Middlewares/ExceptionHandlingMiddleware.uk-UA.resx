@@ -813,4 +813,496 @@
   <data name="InvalidScheduleType" xml:space="preserve">
     <value>Тип розкладу недійсний!</value>
   </data>
+  <data name="InvalidReplayGainMode" xml:space="preserve">
+    <value>Неприпустимий режим ReplayGain!</value>
+  </data>
+  <data name="InvalidStreamingQuality" xml:space="preserve">
+    <value>Неприпустима якість потокового передавання!</value>
+  </data>
+  <data name="IsMutedCannotBeNull" xml:space="preserve">
+    <value>Стан без звуку не може бути порожнім!</value>
+  </data>
+  <data name="VolumeCannotBeNull" xml:space="preserve">
+    <value>Гучність не може бути порожньою!</value>
+  </data>
+  <data name="VolumeMustBeBetweenZeroAndOne" xml:space="preserve">
+    <value>Гучність має бути між 0 і 1!</value>
+  </data>
+  <data name="ShouldKeepDownloadingWhilePausedCannotBeNull" xml:space="preserve">
+    <value>Налаштування продовження завантаження на паузі не може бути порожнім!</value>
+  </data>
+  <data name="ShouldAutoplayCannotBeNull" xml:space="preserve">
+    <value>Налаштування автовідтворення не може бути порожнім!</value>
+  </data>
+  <data name="IsGaplessPlaybackEnabledCannotBeNull" xml:space="preserve">
+    <value>Налаштування відтворення без пауз не може бути порожнім!</value>
+  </data>
+  <data name="ReplayGainModeCannotBeNull" xml:space="preserve">
+    <value>Режим ReplayGain не може бути порожнім!</value>
+  </data>
+  <data name="StreamingQualityCannotBeNull" xml:space="preserve">
+    <value>Якість потокового передавання не може бути порожньою!</value>
+  </data>
+  <data name="ShuffleTrackCountMustBeGreaterThanZero" xml:space="preserve">
+    <value>Кількість треків для перемішування має бути більшою за нуль!</value>
+  </data>
+  <data name="ShuffleTrackCountMustBeAtMost500" xml:space="preserve">
+    <value>Кількість треків для перемішування не може перевищувати 500!</value>
+  </data>
+  <data name="VuMeterReleasePerSecondCannotBeNull" xml:space="preserve">
+    <value>Спад VU-метра не може бути порожнім!</value>
+  </data>
+  <data name="VuMeterSegmentCountCannotBeNull" xml:space="preserve">
+    <value>Кількість сегментів VU-метра не може бути порожньою!</value>
+  </data>
+  <data name="VuMeterReleasePerSecondMustBeBetweenZeroAndOneHundred" xml:space="preserve">
+    <value>Спад VU-метра має бути від 0 до 100 за секунду!</value>
+  </data>
+  <data name="VuMeterPeakHoldDurationMustBeBetweenZeroAndTenThousandMilliseconds" xml:space="preserve">
+    <value>Тривалість утримання піків VU-метра має бути від 0 до 10000 мілісекунд!</value>
+  </data>
+  <data name="InvalidVuMeterOrientation" xml:space="preserve">
+    <value>Недійсна орієнтація VU-метра!</value>
+  </data>
+  <data name="VuMeterSegmentCountMustBeBetweenOneAndOneHundredTwentyEight" xml:space="preserve">
+    <value>Кількість сегментів VU-метра має бути від 1 до 128!</value>
+  </data>
+  <data name="VuMeterShowPeakCannotBeNull" xml:space="preserve">
+    <value>Налаштування показу піків VU-метра не може бути порожнім!</value>
+  </data>
+  <data name="VuMeterMediumThresholdMustBeBetweenZeroAndOne" xml:space="preserve">
+    <value>Середній поріг VU-метра має бути від 0 до 1!</value>
+  </data>
+  <data name="VuMeterPeakReleasePerSecondMustBeBetweenZeroAndOneHundred" xml:space="preserve">
+    <value>Спад піків VU-метра має бути від 0 до 100 за секунду!</value>
+  </data>
+  <data name="VuMeterSegmentGapCannotBeNull" xml:space="preserve">
+    <value>Проміжок між сегментами VU-метра не може бути порожнім!</value>
+  </data>
+  <data name="VuMeterSegmentGapMustBeBetweenZeroAndThirtyTwo" xml:space="preserve">
+    <value>Проміжок між сегментами VU-метра має бути від 0 до 32!</value>
+  </data>
+  <data name="VuMeterPeakHoldDurationCannotBeNull" xml:space="preserve">
+    <value>Тривалість утримання піків VU-метра не може бути порожньою!</value>
+  </data>
+  <data name="VuMeterOrientationCannotBeNull" xml:space="preserve">
+    <value>Орієнтація VU-метра не може бути порожньою!</value>
+  </data>
+  <data name="VuMeterMediumThresholdCannotBeNull" xml:space="preserve">
+    <value>Середній поріг VU-метра не може бути порожнім!</value>
+  </data>
+  <data name="VuMeterHighThresholdMustBeBetweenZeroAndOne" xml:space="preserve">
+    <value>Високий поріг VU-метра має бути від 0 до 1!</value>
+  </data>
+  <data name="VuMeterPeakReleasePerSecondCannotBeNull" xml:space="preserve">
+    <value>Спад піків VU-метра не може бути порожнім!</value>
+  </data>
+  <data name="VuMeterHighThresholdMustBeGreaterThanOrEqualToMediumThreshold" xml:space="preserve">
+    <value>Високий поріг VU-метра має бути більшим або дорівнювати середньому порогу!</value>
+  </data>
+  <data name="VuMeterHighThresholdCannotBeNull" xml:space="preserve">
+    <value>Високий поріг VU-метра не може бути порожнім!</value>
+  </data>
+  <data name="AlbumAlreadyExists" xml:space="preserve">
+    <value>Альбом вже є!</value>
+  </data>
+  <data name="AlbumIdCannotBeEmpty" xml:space="preserve">
+    <value>Ідентифікатор альбому не може бути порожнім!</value>
+  </data>
+  <data name="AlbumNotFound" xml:space="preserve">
+    <value>Альбом не знайдено!</value>
+  </data>
+  <data name="AlbumTitleCannotBeEmpty" xml:space="preserve">
+    <value>Назва альбому не може бути пустою!</value>
+  </data>
+  <data name="AlbumTitleMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>Назва альбому має містити максимум 255 символів!</value>
+  </data>
+  <data name="AlbumsListCannotBeNull" xml:space="preserve">
+    <value>Список альбомів не може бути нульовим!</value>
+  </data>
+  <data name="AreaNameCannotBeEmpty" xml:space="preserve">
+    <value>Назва області не може бути пустою!</value>
+  </data>
+  <data name="AreaNameMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>Назва області має містити максимум 255 символів!</value>
+  </data>
+  <data name="ArtistAliasNameCannotBeEmpty" xml:space="preserve">
+    <value>Псевдонім виконавця не може бути пустим!</value>
+  </data>
+  <data name="ArtistAliasNameMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>Псевдонім виконавця має містити максимум 255 символів!</value>
+  </data>
+  <data name="ArtistAlreadyExists" xml:space="preserve">
+    <value>Виконавець уже існує!</value>
+  </data>
+  <data name="ArtistIdCannotBeEmpty" xml:space="preserve">
+    <value>Ідентифікатор виконавця не може бути порожнім!</value>
+  </data>
+  <data name="ArtistMustHaveAtLeastOneAlbum" xml:space="preserve">
+    <value>Виконавець повинен мати хоча б один альбом!</value>
+  </data>
+  <data name="ArtistNameCannotBeEmpty" xml:space="preserve">
+    <value>Ім'я виконавця не може бути пустим!</value>
+  </data>
+  <data name="ArtistNameMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>Ім'я виконавця має містити максимум 255 символів!</value>
+  </data>
+  <data name="ArtistNotFound" xml:space="preserve">
+    <value>Виконавця не знайдено!</value>
+  </data>
+  <data name="ArtistWebsiteMustBeMaximum2048CharactersLong" xml:space="preserve">
+    <value>Веб-сайт виконавця має містити максимум 2048 символів!</value>
+  </data>
+  <data name="BarcodeValueCannotBeEmpty" xml:space="preserve">
+    <value>Значення штрих-коду не може бути порожнім!</value>
+  </data>
+  <data name="BpmMustBeGreaterThanZero" xml:space="preserve">
+    <value>BPM має бути більше нуля!</value>
+  </data>
+  <data name="CatalogNumberMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>Каталожний номер має містити максимум 50 символів!</value>
+  </data>
+  <data name="CompletionThresholdPercentageMustBeBetweenZeroAndOneHundred" xml:space="preserve">
+    <value>Поріг завершення має бути між 0 і 100!</value>
+  </data>
+  <data name="CompletionThresholdPercentageMustBeNullWhenProgressTrackingIsOff" xml:space="preserve">
+    <value>Поріг завершення має бути null, коли відстеження прогресу вимкнено!</value>
+  </data>
+  <data name="ConcurrencyConflict" xml:space="preserve">
+    <value>Під час збереження змін стався конфлікт паралельного доступу!</value>
+  </data>
+  <data name="ConsecutivePagesReadIsOnlySupportedForPageBasedMedia" xml:space="preserve">
+    <value>Кількість послідовно прочитаних сторінок підтримується лише для сторінкових медіа!</value>
+  </data>
+  <data name="ConsecutivePagesReadMustBeNonNegative" xml:space="preserve">
+    <value>Кількість послідовно прочитаних сторінок не може бути від'ємною!</value>
+  </data>
+  <data name="ConsumedDurationCannotDecrease" xml:space="preserve">
+    <value>Спожита тривалість не може зменшуватися!</value>
+  </data>
+  <data name="ConsumedDurationIsOutOfRange" xml:space="preserve">
+    <value>Спожита тривалість виходить за межі діапазону!</value>
+  </data>
+  <data name="ConsumedDurationMustBeNonNegative" xml:space="preserve">
+    <value>Спожита тривалість не може бути від'ємною!</value>
+  </data>
+  <data name="ConsumptionDateRangeIsInvalid" xml:space="preserve">
+    <value>Діапазон дат споживання недійсний!</value>
+  </data>
+  <data name="ConsumptionIsAlreadyTerminal" xml:space="preserve">
+    <value>Споживання вже завершено!</value>
+  </data>
+  <data name="ConsumptionIsNotInProgress" xml:space="preserve">
+    <value>Споживання не в процесі!</value>
+  </data>
+  <data name="ConsumptionRecordIdCannotBeEmpty" xml:space="preserve">
+    <value>Ідентифікатор запису споживання не може бути порожнім!</value>
+  </data>
+  <data name="ConsumptionRecordNotFound" xml:space="preserve">
+    <value>Запис споживання не знайдено!</value>
+  </data>
+  <data name="CountryMustBeMaximum2CharactersLong" xml:space="preserve">
+    <value>Країна має містити максимум 2 символи!</value>
+  </data>
+  <data name="CoverCannotBeNull" xml:space="preserve">
+    <value>Обкладинка не може бути null!</value>
+  </data>
+  <data name="DeliveryIdCannotBeEmpty" xml:space="preserve">
+    <value>Ідентифікатор доставки не може бути порожнім!</value>
+  </data>
+  <data name="DeliveryIdIsInvalid" xml:space="preserve">
+    <value>Ідентифікатор доставки недійсний!</value>
+  </data>
+  <data name="DiscNumberMustBeGreaterThanZero" xml:space="preserve">
+    <value>Номер диска має бути більше нуля!</value>
+  </data>
+  <data name="EndedConsumptionCannotPrecedeLastActivity" xml:space="preserve">
+    <value>Час завершення не може передувати останній активності!</value>
+  </data>
+  <data name="EndedConsumptionMustHaveEndTime" xml:space="preserve">
+    <value>Завершене споживання повинно мати час завершення!</value>
+  </data>
+  <data name="FavoriteAlreadyExists" xml:space="preserve">
+    <value>Фаворит вже існує!</value>
+  </data>
+  <data name="FavoriteMediaItemIdCannotBeEmpty" xml:space="preserve">
+    <value>Ідентифікатор улюбленого мультимедійного елемента не може бути порожнім!</value>
+  </data>
+  <data name="FavoriteMediaItemIdsCannotBeEmpty" xml:space="preserve">
+    <value>Список ідентифікаторів улюблених медіа-елементів не може бути порожнім!</value>
+  </data>
+  <data name="FavoriteMediaItemIdsExceedMaximumCount" xml:space="preserve">
+    <value>Список ідентифікаторів улюблених медіа-елементів перевищує максимальну кількість!</value>
+  </data>
+  <data name="FavoriteMediaKindIsInvalid" xml:space="preserve">
+    <value>Улюблений тип медіа недійсний!</value>
+  </data>
+  <data name="FavoriteMediaKindIsNotSupported" xml:space="preserve">
+    <value>Улюблений тип медіа не підтримується!</value>
+  </data>
+  <data name="FavoriteNotFound" xml:space="preserve">
+    <value>Фаворит не знайдено!</value>
+  </data>
+  <data name="FileTooLarge" xml:space="preserve">
+    <value>Файл завеликий!</value>
+  </data>
+  <data name="InProgressConsumptionCannotHaveEndTime" xml:space="preserve">
+    <value>Споживання в процесі не може мати час завершення!</value>
+  </data>
+  <data name="InvalidFormatForBarcode" xml:space="preserve">
+    <value>Формат штрих-коду недійсний!</value>
+  </data>
+  <data name="InvalidMediaPosition" xml:space="preserve">
+    <value>Медіапозиція недійсна!</value>
+  </data>
+  <data name="InvalidProgressFraction" xml:space="preserve">
+    <value>Частка прогресу недійсна!</value>
+  </data>
+  <data name="IpiValueCannotBeEmpty" xml:space="preserve">
+    <value>Значення IPI не може бути порожнім!</value>
+  </data>
+  <data name="IpiValueMustBeMaximum20CharactersLong" xml:space="preserve">
+    <value>Значення IPI має містити максимум 20 символів!</value>
+  </data>
+  <data name="IsniValueCannotBeEmpty" xml:space="preserve">
+    <value>Значення ISNI не може бути порожнім!</value>
+  </data>
+  <data name="IsniValueMustBeMaximum20CharactersLong" xml:space="preserve">
+    <value>Значення ISNI має містити максимум 20 символів!</value>
+  </data>
+  <data name="IsrcInvalidFormat" xml:space="preserve">
+    <value>Формат ISRC недійсний!</value>
+  </data>
+  <data name="IsrcValueCannotBeEmpty" xml:space="preserve">
+    <value>Значення ISRC не може бути порожнім!</value>
+  </data>
+  <data name="LastActivityCannotPrecedeStart" xml:space="preserve">
+    <value>Остання активність не може передувати початку!</value>
+  </data>
+  <data name="LocationRefCannotBeEmpty" xml:space="preserve">
+    <value>Посилання на місцезнаходження не може бути порожнім!</value>
+  </data>
+  <data name="MediaContributorAlreadyExists" xml:space="preserve">
+    <value>Медіадописувач уже існує!</value>
+  </data>
+  <data name="MediaContributorNameCannotBeEmpty" xml:space="preserve">
+    <value>Ім’я медіа-учасника не може бути пустим!</value>
+  </data>
+  <data name="MediaContributorRoleNameCannotBeEmpty" xml:space="preserve">
+    <value>Назва ролі учасника медіа не може бути пустою!</value>
+  </data>
+  <data name="MediaItemIdCannotBeEmpty" xml:space="preserve">
+    <value>Ідентифікатор медіаелемента не може бути порожнім!</value>
+  </data>
+  <data name="MediaKindCannotResume" xml:space="preserve">
+    <value>Медіа цього типу не можна продовжити!</value>
+  </data>
+  <data name="MediaKindCannotStartCompleted" xml:space="preserve">
+    <value>Медіа цього типу не можна запустити як завершені!</value>
+  </data>
+  <data name="MediaResumePointNotFound" xml:space="preserve">
+    <value>Точку продовження медіа не знайдено!</value>
+  </data>
+  <data name="MoodNameCannotBeEmpty" xml:space="preserve">
+    <value>Назва настрою не може бути пустою!</value>
+  </data>
+  <data name="MusicBrainzIdInvalidFormat" xml:space="preserve">
+    <value>Формат ідентифікатора MusicBrainz недійсний!</value>
+  </data>
+  <data name="NoReaderAvailable" xml:space="preserve">
+    <value>Немає читача книг для цієї книги!</value>
+  </data>
+  <data name="NoSupportedPlaybackFormat" xml:space="preserve">
+    <value>Не знайдено жодного підтримуваного формату відтворення!</value>
+  </data>
+  <data name="NormalizationCacheLimitExceeded" xml:space="preserve">
+    <value>Ліміт кешу нормалізації перевищено!</value>
+  </data>
+  <data name="NormalizationFailed" xml:space="preserve">
+    <value>Не вдалося нормалізувати трек!</value>
+  </data>
+  <data name="NormalizationIsNotRequiredForDirectPlay" xml:space="preserve">
+    <value>Для прямого відтворення нормалізація не потрібна!</value>
+  </data>
+  <data name="NormalizationTimedOut" xml:space="preserve">
+    <value>Час очікування нормалізації треку минув!</value>
+  </data>
+  <data name="NormalizationUnavailable" xml:space="preserve">
+    <value>Нормалізація треку наразі недоступна!</value>
+  </data>
+  <data name="NormalizedTrackCacheEntryNotFound" xml:space="preserve">
+    <value>Запис кешу нормалізованого треку не знайдено!</value>
+  </data>
+  <data name="NormalizedTrackSegmentNotFound" xml:space="preserve">
+    <value>Сегмент нормалізованого треку не знайдено!</value>
+  </data>
+  <data name="PathTemplateIsNotSupportedForLibraryType" xml:space="preserve">
+    <value>Шаблон шляху не підтримується для цього типу бібліотеки!</value>
+  </data>
+  <data name="PathTemplateLiteralCannotBeEmpty" xml:space="preserve">
+    <value>Літеральна частина шаблону шляху не може бути порожньою!</value>
+  </data>
+  <data name="PathTemplatePartKindNotSupportedForLibraryType" xml:space="preserve">
+    <value>Тип частини шаблону шляху не підтримується для цього типу бібліотеки!</value>
+  </data>
+  <data name="PathTemplateValuePartMustContainSinglePlaceholder" xml:space="preserve">
+    <value>Частина значення шаблону шляху повинна містити рівно один заповнювач!</value>
+  </data>
+  <data name="PermissionNotFound" xml:space="preserve">
+    <value>Дозвіл не знайдено!</value>
+  </data>
+  <data name="PlaybackDeliveryChanged" xml:space="preserve">
+    <value>Подача відтворення змінена!</value>
+  </data>
+  <data name="PlaybackDeliveryNotFound" xml:space="preserve">
+    <value>Доставка відтворення не знайдена!</value>
+  </data>
+  <data name="PlaybackFormatNotImplemented" xml:space="preserve">
+    <value>Формат відтворення не реалізовано!</value>
+  </data>
+  <data name="PlaylistAlreadyExists" xml:space="preserve">
+    <value>Список відтворення вже існує!</value>
+  </data>
+  <data name="PlaylistDescriptionMustBeMaximum2000CharactersLong" xml:space="preserve">
+    <value>Опис списку відтворення має містити максимум 2000 символів!</value>
+  </data>
+  <data name="PlaylistDoesNotAcceptMediaItems" xml:space="preserve">
+    <value>Список відтворення не приймає медіаелементи!</value>
+  </data>
+  <data name="PlaylistEntryIdCannotBeEmpty" xml:space="preserve">
+    <value>Ідентифікатор запису списку відтворення не може бути порожнім!</value>
+  </data>
+  <data name="PlaylistEntryNotFound" xml:space="preserve">
+    <value>Запис у списку відтворення не знайдено!</value>
+  </data>
+  <data name="PlaylistEntryPositionsAreInvalid" xml:space="preserve">
+    <value>Позиції в списку відтворення недійсні!</value>
+  </data>
+  <data name="PlaylistIdCannotBeEmpty" xml:space="preserve">
+    <value>Ідентифікатор списку відтворення не може бути порожнім!</value>
+  </data>
+  <data name="PlaylistMoveTargetPositionIsInvalid" xml:space="preserve">
+    <value>Цільова позиція переміщення списку відтворення недійсна!</value>
+  </data>
+  <data name="PlaylistNameCannotBeEmpty" xml:space="preserve">
+    <value>Назва списку відтворення не може бути пустою!</value>
+  </data>
+  <data name="PlaylistNameMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>Назва списку відтворення має містити максимум 255 символів!</value>
+  </data>
+  <data name="PlaylistNotFound" xml:space="preserve">
+    <value>Список відтворення не знайдено!</value>
+  </data>
+  <data name="PlaylistTypeIsInvalid" xml:space="preserve">
+    <value>Тип списку відтворення недійсний!</value>
+  </data>
+  <data name="ReaderDisabled" xml:space="preserve">
+    <value>Читач книг вимкнено для цієї бібліотеки!</value>
+  </data>
+  <data name="ResourceKeyCannotBeEmpty" xml:space="preserve">
+    <value>Ключ ресурсу не може бути порожнім!</value>
+  </data>
+  <data name="ResourceNotFound" xml:space="preserve">
+    <value>Ресурс не знайдено!</value>
+  </data>
+  <data name="ScriptMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>Довжина сценарію не повинна перевищувати 50 символів!</value>
+  </data>
+  <data name="SectionNotFound" xml:space="preserve">
+    <value>Розділ не знайдено!</value>
+  </data>
+  <data name="SegmentDurationMustBePositive" xml:space="preserve">
+    <value>Тривалість сегмента має бути позитивною!</value>
+  </data>
+  <data name="SegmentIndexCannotBeEmpty" xml:space="preserve">
+    <value>Індекс сегмента не може бути порожнім!</value>
+  </data>
+  <data name="SegmentIndexMustBeValid" xml:space="preserve">
+    <value>Індекс сегмента недійсний!</value>
+  </data>
+  <data name="TargetUserIdIsInvalid" xml:space="preserve">
+    <value>Ідентифікатор цільового користувача недійсний!</value>
+  </data>
+  <data name="TheArtistAlreadyHasTheAlbum" xml:space="preserve">
+    <value>У виконавця вже є альбом!</value>
+  </data>
+  <data name="TheArtistDoesNotHaveTheAlbum" xml:space="preserve">
+    <value>У виконавця немає альбому!</value>
+  </data>
+  <data name="TheTrackIsAlreadyInTheAlbum" xml:space="preserve">
+    <value>Трек уже є в альбомі!</value>
+  </data>
+  <data name="TheTrackIsNotInTheAlbum" xml:space="preserve">
+    <value>Треку немає в альбомі!</value>
+  </data>
+  <data name="ThemeTemplateNotFound" xml:space="preserve">
+    <value>Шаблон теми не знайдено!</value>
+  </data>
+  <data name="TotalDiscsMustBeGreaterThanZero" xml:space="preserve">
+    <value>Загальна кількість дисків має бути більше нуля!</value>
+  </data>
+  <data name="TotalTracksMustBeGreaterThanZero" xml:space="preserve">
+    <value>Загальна кількість треків має бути більшою за нуль!</value>
+  </data>
+  <data name="TrackAlreadyExists" xml:space="preserve">
+    <value>Трек уже існує!</value>
+  </data>
+  <data name="TrackDurationMustBePositive" xml:space="preserve">
+    <value>Тривалість треку має бути додатною!</value>
+  </data>
+  <data name="TrackFileNotFound" xml:space="preserve">
+    <value>Файл треку не знайдено!</value>
+  </data>
+  <data name="TrackIdCannotBeEmpty" xml:space="preserve">
+    <value>Ідентифікатор треку не може бути порожнім!</value>
+  </data>
+  <data name="TrackNotFound" xml:space="preserve">
+    <value>Трек не знайдено!</value>
+  </data>
+  <data name="TrackNumberMustBeGreaterThanZero" xml:space="preserve">
+    <value>Номер треку має бути більшим за нуль!</value>
+  </data>
+  <data name="TrackPathCannotBeEmpty" xml:space="preserve">
+    <value>Шлях треку не може бути порожнім!</value>
+  </data>
+  <data name="TrackPathMustBeMaximum2048CharactersLong" xml:space="preserve">
+    <value>Шлях треку не має перевищувати 2048 символів!</value>
+  </data>
+  <data name="TrackPathMustBeWithinLibraryContentLocations" xml:space="preserve">
+    <value>Шлях треку має бути всередині одного з розташувань вмісту бібліотеки!</value>
+  </data>
+  <data name="TracksListCannotBeNull" xml:space="preserve">
+    <value>Список треків не може бути порожнім!</value>
+  </data>
+  <data name="UnknownMusicArtistGender" xml:space="preserve">
+    <value>Стать виконавця невідома!</value>
+  </data>
+  <data name="UnknownMusicArtistType" xml:space="preserve">
+    <value>Тип музичного виконавця невідомий!</value>
+  </data>
+  <data name="UnknownMusicKey" xml:space="preserve">
+    <value>Музичний ключ невідомий!</value>
+  </data>
+  <data name="UnknownMusicMediaFormat" xml:space="preserve">
+    <value>Формат музичного носія невідомий!</value>
+  </data>
+  <data name="UnknownMusicReleasePackaging" xml:space="preserve">
+    <value>Упаковка музичного випуску невідома!</value>
+  </data>
+  <data name="UnknownMusicReleaseStatus" xml:space="preserve">
+    <value>Статус випуску музики невідомий!</value>
+  </data>
+  <data name="UnknownMusicReleaseType" xml:space="preserve">
+    <value>Тип випуску музики невідомий!</value>
+  </data>
+  <data name="UnsupportedMediaKind" xml:space="preserve">
+    <value>Тип медіа не підтримується!</value>
+  </data>
+  <data name="WorkMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>Робота має бути не більше 255 символів!</value>
+  </data>
+  <data name="WorkTitleCannotBeEmpty" xml:space="preserve">
+    <value>Назва роботи не може бути пустою!</value>
+  </data>
 </root>

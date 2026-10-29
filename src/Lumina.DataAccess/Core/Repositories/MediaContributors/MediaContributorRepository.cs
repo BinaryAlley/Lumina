@@ -106,9 +106,16 @@ internal sealed class MediaContributorRepository : IMediaContributorRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either the retrieved <see cref="MediaContributorEntity"/>s, or an error.</returns>
     public async Task<Result<IReadOnlyList<MediaContributorEntity>>> GetByIdsAsync(IReadOnlyCollection<Guid> ids, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.MediaContributors
-            .Where(contributor => ids.Contains(contributor.Id))
-            .ToListAsync(cancellationToken)
-            .ConfigureAwait(false);
+        List<MediaContributorEntity> contributors = [];
+        // The lookup is split into bounded chunks, so an unpaginated history never exceeds the storage parameter limit.
+        const int LOOKUP_CHUNK_SIZE = 500;
+        foreach (Guid[] chunk in ids.Chunk(LOOKUP_CHUNK_SIZE))
+        {
+            contributors.AddRange(await _luminaDbContext.MediaContributors
+                .Where(contributor => chunk.Contains(contributor.Id))
+                .ToListAsync(cancellationToken)
+                .ConfigureAwait(false));
+        }
+        return Result.From<IReadOnlyList<MediaContributorEntity>>(contributors);
     }
 }

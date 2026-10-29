@@ -1,8 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.DTO.Filtering;
 using Lumina.Application.Common.DTO.Pagination;
@@ -12,6 +10,7 @@ using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Application.Common.Mapping.UsersManagement.Users;
 using Lumina.Contracts.Responses.UsersManagement.Users;
+using Lumina.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -59,7 +58,7 @@ public class GetUsersQueryHandler : IQueryHandler<GetUsersQuery, Result<IEnumera
         Guid userId = currentUserId.Value;
 
         // Only admins can see the list of users.
-        bool isAdmin = await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false);
+        bool isAdmin = await _authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false);
         if (!isAdmin)
             return Errors.Authorization.NotAuthorized;
         Result<PaginatedResultDto<UserEntity>> getRolesResult = await _unitOfWork.UserRepository.GetAllAsync<BaseFilterDto>(cancellationToken: cancellationToken).ConfigureAwait(false);

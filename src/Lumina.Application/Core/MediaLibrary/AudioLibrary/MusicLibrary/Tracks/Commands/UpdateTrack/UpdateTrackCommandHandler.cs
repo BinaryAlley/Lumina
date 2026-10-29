@@ -26,7 +26,6 @@ using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.ExternalIden
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.ValueObjects;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using System;
@@ -48,7 +47,6 @@ public class UpdateTrackCommandHandler : ICommandHandler<UpdateTrackCommand, Res
     private readonly IAuthorizationService _authorizationService;
     private readonly ICurrentUserService _currentUserService;
     private readonly IValidator<UpdateTrackCommand> _validator;
-    private readonly IPathService _pathService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdateTrackCommandHandler"/> class.
@@ -57,14 +55,12 @@ public class UpdateTrackCommandHandler : ICommandHandler<UpdateTrackCommand, Res
     /// <param name="authorizationService">Injected service for authorization related functionality.</param>
     /// <param name="currentUserService">Injected service to retrieve the current user information.</param>
     /// <param name="validator">Injected validator for application validation rules.</param>
-    /// <param name="pathService">Injected service for file system path related functionality.</param>
-    public UpdateTrackCommandHandler(IUnitOfWork unitOfWork, IAuthorizationService authorizationService, ICurrentUserService currentUserService, IValidator<UpdateTrackCommand> validator, IPathService pathService)
+    public UpdateTrackCommandHandler(IUnitOfWork unitOfWork, IAuthorizationService authorizationService, ICurrentUserService currentUserService, IValidator<UpdateTrackCommand> validator)
     {
         _unitOfWork = unitOfWork;
         _authorizationService = authorizationService;
         _currentUserService = currentUserService;
         _validator = validator;
-        _pathService = pathService;
     }
 
     /// <summary>
@@ -127,11 +123,6 @@ public class UpdateTrackCommandHandler : ICommandHandler<UpdateTrackCommand, Res
         if (getLibraryResult.Value is null)
             return Errors.Library.LibraryNotFound;
 
-        // A track is only readable if it is stored inside one of the content locations of its library, so a client can never edit an entry
-        // that points the reading pipeline at an arbitrary file of the host.
-        if (!AreTrackPathsWithinLibraryContentLocations(getLibraryResult.Value, command))
-            return Errors.Music.TrackPathMustBeWithinLibraryContentLocations;
-
         // Media contributors are referenced by Id and are never created implicitly by editing a track, so each one must already exist.
         Result<IReadOnlyList<MediaContributorEntity>> getContributorsResult = await GetExistingContributorsAsync(command, cancellationToken).ConfigureAwait(false);
         if (getContributorsResult.IsFailure)
@@ -162,17 +153,6 @@ public class UpdateTrackCommandHandler : ICommandHandler<UpdateTrackCommand, Res
             return Errors.Music.TrackNotFound;
 
         return getPersistedTrackResult.Value.ToResponse();
-    }
-
-    /// <summary>
-    /// Determines whether the track path referenced by <paramref name="command"/> is stored inside one of the content locations of <paramref name="library"/>.
-    /// </summary>
-    /// <param name="library">The media library that owns the track.</param>
-    /// <param name="command">The command carrying the referenced track.</param>
-    /// <returns><see langword="true"/> when the referenced track path is within a content location of the library; otherwise, <see langword="false"/>.</returns>
-    private bool AreTrackPathsWithinLibraryContentLocations(LibraryEntity library, UpdateTrackCommand command)
-    {
-        return library.ContentLocations.Any(contentLocation => _pathService.IsPathWithin(command.Path!, contentLocation.Path));
     }
 
     /// <summary>

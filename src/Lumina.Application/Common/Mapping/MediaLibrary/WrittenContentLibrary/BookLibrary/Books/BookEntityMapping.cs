@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Application.Common.DTO.MediaConsumption;
 using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
@@ -31,6 +32,33 @@ namespace Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.B
 /// </summary>
 public static class BookEntityMapping
 {
+    /// <summary>
+    /// Converts <paramref name="repositoryEntity"/> to the consumption history row of a book.
+    /// </summary>
+    /// <param name="repositoryEntity">The repository entity to be converted.</param>
+    /// <param name="lastConsumedOnUtc">The date and time when the book was last consumed.</param>
+    /// <param name="countedSessionCount">The number of sessions of the book that count towards statistics.</param>
+    /// <param name="completedSessionCount">The number of sessions of the book that completed.</param>
+    /// <param name="consumedDurationMilliseconds">The active duration consumed in the book, over all of its sessions, in milliseconds.</param>
+    /// <param name="creatorName">The name of the author of the book, or an empty string when there is none.</param>
+    /// <returns>The converted consumption history row.</returns>
+    public static ConsumedItemDto ToDto(this BookEntity repositoryEntity, DateTime lastConsumedOnUtc, int countedSessionCount, int completedSessionCount, long consumedDurationMilliseconds, string creatorName)
+    {
+        return new ConsumedItemDto(
+            MediaKind.Book,
+            repositoryEntity.Id,
+            repositoryEntity.LibraryId,
+            true,
+            repositoryEntity.Title,
+            string.Empty,
+            creatorName,
+            repositoryEntity.Artwork.FirstOrDefault(artwork => artwork.ArtworkType == ArtworkType.Cover)?.FileName,
+            lastConsumedOnUtc,
+            countedSessionCount,
+            completedSessionCount,
+            consumedDurationMilliseconds);
+    }
+
     /// <summary>
     /// Converts <paramref name="repositoryEntity"/> to <see cref="Book"/>.
     /// </summary>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Title" xml:space="preserve">
+    <value>Liste de redare</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Nume</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Descriere</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Creează</value>
+  </data>
+  <data name="NoPlaylists" xml:space="preserve">
+    <value>Nu ai încă liste de redare.</value>
+  </data>
+  <data name="Tracks" xml:space="preserve">
+    <value>piese</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Șterge</value>
+  </data>
+  <data name="DeleteConfirm" xml:space="preserve">
+    <value>Ștergi această listă de redare? Această acțiune nu poate fi anulată.</value>
+  </data>
+  <data name="DeleteFailed" xml:space="preserve">
+    <value>Lista de redare nu a putut fi ștearsă.</value>
+  </data>
+  <data name="CreateFailed" xml:space="preserve">
+    <value>Lista de redare nu a putut fi creată.</value>
+  </data>
+  <data name="PlaylistNameRequired" xml:space="preserve">
+    <value>O listă de redare are nevoie de un nume.</value>
+  </data>
+  <data name="Items" xml:space="preserve">
+    <value>elemente</value>
+  </data>
+</root>

@@ -190,8 +190,8 @@ public class TrackTests
     {
         // Arrange
         Track track = _trackFixture.Create();
+        string originalPath = track.Path;
         List<Mood> originalMoods = [.. track.Moods];
-        string path = "C:\\Music\\queen\\bohemian-rhapsody.flac";
         AudioMetadata metadata = _audioMetadataFixture.Create();
         Optional<string> disambiguation = Optional<string>.Some("remastered");
         Optional<int> discNumber = Optional<int>.Some(2);
@@ -206,7 +206,6 @@ public class TrackTests
 
         // Act
         Result<Updated> result = track.UpdateDetails(
-            path,
             metadata,
             disambiguation,
             7,
@@ -221,7 +220,6 @@ public class TrackTests
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Equal(path, track.Path);
         Assert.Equal(metadata, track.Metadata);
         Assert.Equal(disambiguation, track.Disambiguation);
         Assert.Equal(7, track.TrackNumber);
@@ -235,8 +233,66 @@ public class TrackTests
         Assert.Equal(trackId, track.MusicBrainzTrackId);
         Assert.True(track.UpdatedOnUtc.HasValue);
         Assert.True(track.UpdatedOnUtc.Value >= beforeUpdate);
-        // the collections are not part of the details update
+        // The file system path is not part of the details update, it is set only when the track is created.
+        Assert.Equal(originalPath, track.Path);
+        // The collections are not part of the details update.
         Assert.Equal(originalMoods, track.Moods);
+    }
+
+    [Fact]
+    public void UpdateDetails_WhenTheMetadataCarriesNoContainer_ShouldKeepTheStoredContainer()
+    {
+        // Arrange
+        Track track = _trackFixture.Create();
+        Optional<string> storedContainer = track.Metadata.Container;
+        AudioMetadata metadata = _audioMetadataFixture.Create(container: Optional<string>.None());
+
+        // Act
+        Result<Updated> result = track.UpdateDetails(
+            metadata,
+            track.Disambiguation,
+            track.TrackNumber,
+            track.DiscNumber,
+            track.Script,
+            track.Key,
+            track.Bpm,
+            track.IsVideo,
+            track.Work,
+            track.MusicBrainzRecordingId,
+            track.MusicBrainzTrackId);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        // The container is captured from the file itself and is never part of an edit, so an update that does not carry one keeps the stored container.
+        Assert.Equal(storedContainer, track.Metadata.Container);
+        // The rest of the metadata still comes from the update.
+        Assert.Equal(metadata.Title, track.Metadata.Title);
+    }
+
+    [Fact]
+    public void UpdateDetails_WhenTheMetadataCarriesAContainer_ShouldReplaceTheStoredContainer()
+    {
+        // Arrange
+        Track track = _trackFixture.Create();
+        AudioMetadata metadata = _audioMetadataFixture.Create(container: Optional<string>.Some("OGG"));
+
+        // Act
+        Result<Updated> result = track.UpdateDetails(
+            metadata,
+            track.Disambiguation,
+            track.TrackNumber,
+            track.DiscNumber,
+            track.Script,
+            track.Key,
+            track.Bpm,
+            track.IsVideo,
+            track.Work,
+            track.MusicBrainzRecordingId,
+            track.MusicBrainzTrackId);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal("OGG", track.Metadata.Container.Value);
     }
 
     [Fact]
@@ -376,7 +432,6 @@ public class TrackTests
 
         // Act
         Result<Updated> result = track.UpdateDetails(
-            "C:\\Music\\queen\\bohemian-rhapsody.flac",
             _audioMetadataFixture.Create(),
             Optional<string>.None(),
             11,

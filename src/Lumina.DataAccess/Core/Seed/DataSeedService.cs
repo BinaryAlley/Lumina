@@ -7,12 +7,12 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.DTO.Filtering;
 using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Errors;
+using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -77,7 +77,7 @@ public class DataSeedService : IDataSeedService
         // Create the default authorization roles and add them to the repository.
         RoleEntity[] defaultRoles =
         [
-            new() { RoleName = "Admin", CreatedBy = userId, CreatedOnUtc = _dateTimeProvider.UtcNow }
+            new() { RoleName = AuthorizationRoles.ADMIN, CreatedBy = userId, CreatedOnUtc = _dateTimeProvider.UtcNow }
         ];
         foreach (RoleEntity role in defaultRoles)
         {
@@ -100,7 +100,7 @@ public class DataSeedService : IDataSeedService
     public async Task<Result<Created>> SetAdminRolePermissionsAsync(Guid userId, CancellationToken cancellationToken)
     {
         // Get the admin role.
-        Result<RoleEntity?> getAdminRoleResult = await _unitOfWork.RoleRepository.GetByNameAsync("Admin", cancellationToken).ConfigureAwait(false);
+        Result<RoleEntity?> getAdminRoleResult = await _unitOfWork.RoleRepository.GetByNameAsync(AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false);
         if (getAdminRoleResult.IsFailure)
             return getAdminRoleResult.Errors;
 
@@ -143,7 +143,7 @@ public class DataSeedService : IDataSeedService
     public async Task<Result<Created>> SetAdminRoleToAdministratorAccount(Guid userId, CancellationToken cancellationToken)
     {
         // Get the admin role.
-        Result<RoleEntity?> getAdminRoleResult = await _unitOfWork.RoleRepository.GetByNameAsync("Admin", cancellationToken).ConfigureAwait(false);
+        Result<RoleEntity?> getAdminRoleResult = await _unitOfWork.RoleRepository.GetByNameAsync(AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false);
         if (getAdminRoleResult.IsFailure)
             return getAdminRoleResult.Errors;
 

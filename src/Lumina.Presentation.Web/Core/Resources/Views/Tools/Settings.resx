@@ -69,4 +69,121 @@
   <data name="DescriptionShouldAggregateArtworkWhenMissing" xml:space="preserve">
     <value>When enabled, the artwork of library items that the first artwork provider does not supply is filled in from the following providers.</value>
   </data>
+  <data name="Playback" xml:space="preserve">
+    <value>Playback</value>
+  </data>
+  <data name="ShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>Keep downloading while paused</value>
+  </data>
+  <data name="DescriptionShouldKeepDownloadingWhilePaused" xml:space="preserve">
+    <value>Whether the player keeps downloading the track while playback is paused, up to the entire file, so resuming never waits for data.</value>
+  </data>
+  <data name="ShouldAutoplay" xml:space="preserve">
+    <value>Autoplay</value>
+  </data>
+  <data name="DescriptionShouldAutoplay" xml:space="preserve">
+    <value>Whether playback continues automatically with the following tracks when an album or artist finishes.</value>
+  </data>
+  <data name="IsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>Gapless playback</value>
+  </data>
+  <data name="DescriptionIsGaplessPlaybackEnabled" xml:space="preserve">
+    <value>Whether consecutive tracks play without a silent gap between them.</value>
+  </data>
+  <data name="ReplayGainMode" xml:space="preserve">
+    <value>ReplayGain</value>
+  </data>
+  <data name="DescriptionReplayGainMode" xml:space="preserve">
+    <value>How ReplayGain normalization is applied to the tracks you play.</value>
+  </data>
+  <data name="ReplayGainModeOff" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="ReplayGainModeTrack" xml:space="preserve">
+    <value>Per track</value>
+  </data>
+  <data name="ReplayGainModeAlbum" xml:space="preserve">
+    <value>Per album</value>
+  </data>
+  <data name="StreamingQuality" xml:space="preserve">
+    <value>Streaming quality</value>
+  </data>
+  <data name="DescriptionStreamingQuality" xml:space="preserve">
+    <value>The quality cap applied when the server has to normalize a track for playback. Direct playback is never changed.</value>
+  </data>
+  <data name="StreamingQualityAuto" xml:space="preserve">
+    <value>Automatic</value>
+  </data>
+  <data name="StreamingQualityLow" xml:space="preserve">
+    <value>Low (96 kbps)</value>
+  </data>
+  <data name="StreamingQualityMedium" xml:space="preserve">
+    <value>Medium (160 kbps)</value>
+  </data>
+  <data name="StreamingQualityHigh" xml:space="preserve">
+    <value>High (320 kbps)</value>
+  </data>
+  <data name="DescriptionVuMeterSegmentCount" xml:space="preserve">
+    <value>How many segments each channel of the VU meter is divided into, between 1 and 128.</value>
+  </data>
+  <data name="VuMeterPeakReleasePerSecond" xml:space="preserve">
+    <value>Peak falloff</value>
+  </data>
+  <data name="DescriptionVuMeterHighThreshold" xml:space="preserve">
+    <value>The level, between 0 and 1, above which a segment is drawn with the high state. It must be at least the medium threshold.</value>
+  </data>
+  <data name="DescriptionVuMeterOrientation" xml:space="preserve">
+    <value>Whether the channels of the VU meter grow upwards from the bottom, or rightwards from the left.</value>
+  </data>
+  <data name="DescriptionVuMeterMediumThreshold" xml:space="preserve">
+    <value>The level, between 0 and 1, above which a segment is drawn with the medium state.</value>
+  </data>
+  <data name="VuMeterOrientationVertical" xml:space="preserve">
+    <value>Vertical</value>
+  </data>
+  <data name="VuMeterReleasePerSecond" xml:space="preserve">
+    <value>Level falloff</value>
+  </data>
+  <data name="VuMeterOrientationHorizontal" xml:space="preserve">
+    <value>Horizontal</value>
+  </data>
+  <data name="VuMeterOrientation" xml:space="preserve">
+    <value>Orientation</value>
+  </data>
+  <data name="VuMeterHighThreshold" xml:space="preserve">
+    <value>High threshold</value>
+  </data>
+  <data name="VuMeterSegmentCount" xml:space="preserve">
+    <value>Segments per channel</value>
+  </data>
+  <data name="VuMeterMediumThreshold" xml:space="preserve">
+    <value>Medium threshold</value>
+  </data>
+  <data name="VuMeter" xml:space="preserve">
+    <value>VU meter</value>
+  </data>
+  <data name="VuMeterPeakHoldDuration" xml:space="preserve">
+    <value>Peak hold (ms)</value>
+  </data>
+  <data name="DescriptionVuMeterShowPeak" xml:space="preserve">
+    <value>Whether each channel holds a mark at its loudest recent level.</value>
+  </data>
+  <data name="DescriptionVuMeterPeakReleasePerSecond" xml:space="preserve">
+    <value>How many level units a peak mark falls per second after its hold time, between 0 and 100. Higher values fall faster.</value>
+  </data>
+  <data name="DescriptionVuMeterPeakHoldDuration" xml:space="preserve">
+    <value>How long, in milliseconds, a peak mark is held before it starts falling, between 0 and 10000.</value>
+  </data>
+  <data name="VuMeterShowPeak" xml:space="preserve">
+    <value>Show peak</value>
+  </data>
+  <data name="DescriptionVuMeterSegmentGap" xml:space="preserve">
+    <value>The gap, in pixels, between the segments and the channels of the VU meter, between 0 and 32.</value>
+  </data>
+  <data name="VuMeterSegmentGap" xml:space="preserve">
+    <value>Segment gap</value>
+  </data>
+  <data name="DescriptionVuMeterReleasePerSecond" xml:space="preserve">
+    <value>How many level units a channel falls per second after the sound drops, between 0 and 100. Higher values fall faster.</value>
+  </data>
 </root>

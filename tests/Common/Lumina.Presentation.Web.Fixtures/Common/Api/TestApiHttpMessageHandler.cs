@@ -15,7 +15,7 @@ namespace Lumina.Presentation.Web.Fixtures.Common.Api;
 [ExcludeFromCodeCoverage]
 public class TestApiHttpMessageHandler : HttpMessageHandler
 {
-    private readonly Func<HttpRequestMessage, HttpResponseMessage> _responseFactory;
+    private readonly Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> _responseFactory;
 
     /// <summary>
     /// Gets the list of requests that were sent through this handler.
@@ -28,10 +28,24 @@ public class TestApiHttpMessageHandler : HttpMessageHandler
     public List<string?> RequestBodies { get; } = [];
 
     /// <summary>
+    /// Gets the cancellation tokens the requests were sent with.
+    /// </summary>
+    public List<CancellationToken> CancellationTokens { get; } = [];
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="TestApiHttpMessageHandler"/> class.
     /// </summary>
     /// <param name="responseFactory">The factory that produces the response for a given request.</param>
     public TestApiHttpMessageHandler(Func<HttpRequestMessage, HttpResponseMessage> responseFactory)
+    {
+        _responseFactory = (request, cancellationToken) => Task.FromResult(responseFactory(request));
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TestApiHttpMessageHandler"/> class.
+    /// </summary>
+    /// <param name="responseFactory">The asynchronous factory that produces the response for a given request and cancellation token.</param>
+    public TestApiHttpMessageHandler(Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> responseFactory)
     {
         _responseFactory = responseFactory;
     }
@@ -45,7 +59,8 @@ public class TestApiHttpMessageHandler : HttpMessageHandler
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         Requests.Add(request);
+        CancellationTokens.Add(cancellationToken);
         RequestBodies.Add(request.Content is null ? null : await request.Content.ReadAsStringAsync(cancellationToken));
-        return await Task.FromResult(_responseFactory(request));
+        return await _responseFactory(request, cancellationToken);
     }
 }

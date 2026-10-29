@@ -8,8 +8,8 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Infrastructure.Common.DependencyInjection;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Progress;
-using Lumina.Infrastructure.Core.Scheduling.Notifications;
 using Lumina.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
+using Lumina.Infrastructure.Core.Scheduling.Notifications;
 using Lumina.Presentation.Api.Common.DependencyInjection;
 using Lumina.Presentation.Api.Common.Middlewares;
 using Lumina.Presentation.Api.Common.Utilities;
@@ -94,7 +94,19 @@ public class Program
             try
             {
                 LuminaDbContext context = services.GetRequiredService<LuminaDbContext>();
-                await context.Database.MigrateAsync();
+                // Migrations can need a temporary store for an update or a table rebuild. The process can run in an environment whose
+                // temporary directory is missing or read-only, so the migration connection keeps the temporary store in memory instead
+                // of failing with SQLite error 14 while it tries to create a temporary file.
+                await context.Database.OpenConnectionAsync();
+                try
+                {
+                    await context.Database.ExecuteSqlRawAsync("PRAGMA temp_store = MEMORY;");
+                    await context.Database.MigrateAsync();
+                }
+                finally
+                {
+                    await context.Database.CloseConnectionAsync();
+                }
 
                 // Enable the Write-Ahead Logging journal mode and a busy timeout, so that the Entity Framework connection and the dedicated connections
                 // used by the bulk data access operations of Dapper can access the database concurrently, without database locking errors.

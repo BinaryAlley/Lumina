@@ -120,6 +120,27 @@
   <data name="Abort" xml:space="preserve">
     <value>Перервати</value>
   </data>
+  <data name="AudioPlayerBuffering" xml:space="preserve">
+    <value>Буферизація</value>
+  </data>
+  <data name="AudioPlayerMute" xml:space="preserve">
+    <value>Вимкнути звук</value>
+  </data>
+  <data name="AudioPlayerPause" xml:space="preserve">
+    <value>Пауза</value>
+  </data>
+  <data name="AudioPlayerPlay" xml:space="preserve">
+    <value>Відтворити</value>
+  </data>
+  <data name="AudioPlayerSeek" xml:space="preserve">
+    <value>Позиція відтворення</value>
+  </data>
+  <data name="AudioPlayerUnmute" xml:space="preserve">
+    <value>Увімкнути звук</value>
+  </data>
+  <data name="AudioPlayerVolume" xml:space="preserve">
+    <value>Гучність</value>
+  </data>
   <data name="Cancel" xml:space="preserve">
     <value>Скасувати</value>
   </data>
@@ -147,8 +168,8 @@
   <data name="Retry" xml:space="preserve">
     <value>Повторити</value>
   </data>
-  <data name="ToggleFullHeight" xml:space="preserve">
-    <value>Перемкнути Повну Висоту</value>
+  <data name="ToggleExpanded" xml:space="preserve">
+    <value>Розгорнути або згорнути плеєр</value>
   </data>
   <data name="ToggleVisibility" xml:space="preserve">
     <value>Перемкнути Видимість</value>
@@ -158,5 +179,86 @@
   </data>
   <data name="Yes" xml:space="preserve">
     <value>Так</value>
+  </data>
+  <data name="AudioPlayerPrevious" xml:space="preserve">
+    <value>Попередній трек</value>
+  </data>
+  <data name="AudioPlayerNext" xml:space="preserve">
+    <value>Наступний трек</value>
+  </data>
+  <data name="AudioPlayerShuffle" xml:space="preserve">
+    <value>Перемішати</value>
+  </data>
+  <data name="AudioPlayerShuffleRelease" xml:space="preserve">
+    <value>Перемішати альбом</value>
+  </data>
+  <data name="AudioPlayerShuffleArtist" xml:space="preserve">
+    <value>Перемішати виконавця</value>
+  </data>
+  <data name="AudioPlayerShuffleLibrary" xml:space="preserve">
+    <value>Перемішати бібліотеку</value>
+  </data>
+  <data name="AudioPlayerRepeat" xml:space="preserve">
+    <value>Повтор</value>
+  </data>
+  <data name="AudioPlayerRepeatOff" xml:space="preserve">
+    <value>Повтор вимкнено</value>
+  </data>
+  <data name="AudioPlayerRepeatAll" xml:space="preserve">
+    <value>Повторити все</value>
+  </data>
+  <data name="AudioPlayerRepeatOne" xml:space="preserve">
+    <value>Повторити трек</value>
+  </data>
+  <data name="AudioPlayerQueue" xml:space="preserve">
+    <value>Черга відтворення</value>
+  </data>
+  <data name="AudioPlayerShuffleOff" xml:space="preserve">
+    <value>Перемішування вимкнено</value>
+  </data>
+  <data name="AudioPlayerStop" xml:space="preserve">
+    <value>Зупинити</value>
+  </data>
+  <data name="AudioPlayerAlbumArtwork" xml:space="preserve">
+    <value>Обкладинки альбому</value>
+  </data>
+  <data name="AudioPlayerAddQueueToPlaylist" xml:space="preserve">
+    <value>Додати чергу до списку відтворення</value>
+  </data>
+  <data name="AudioPlayerPlaylistQueueAddFailed" xml:space="preserve">
+    <value>Не вдалося додати чергу до списку відтворення.</value>
+  </data>
+  <data name="AudioPlayerSelectPlaylist" xml:space="preserve">
+    <value>Виберіть список відтворення</value>
+  </data>
+  <data name="AudioPlayerAdd" xml:space="preserve">
+    <value>Додати</value>
+  </data>
+  <data name="AudioPlayerPlaylistQueueAdded" xml:space="preserve">
+    <value>Чергу додано до списку відтворення.</value>
+  </data>
+  <data name="AudioPlayerNoPlaylists" xml:space="preserve">
+    <value>У вас ще немає списків відтворення.</value>
+  </data>
+  <data name="PlaylistAddToPlaylist" xml:space="preserve">
+    <value>Додати до списку відтворення</value>
+  </data>
+  <data name="PlaylistCreate" xml:space="preserve">
+    <value>Створити список відтворення</value>
+  </data>
+  <data name="PlaylistTracksAdded" xml:space="preserve">
+    <value>Треки додано до списку відтворення.</value>
+  </data>
+  <data name="PlaylistTracksAddFailed" xml:space="preserve">
+    <value>Не вдалося додати треки до списку відтворення.</value>
+  </data>
+  <data name="PlaylistNoTracksToAdd" xml:space="preserve">
+    <value>Немає треків для додавання.</value>
+  </data>
+  <data name="FavoritesAdd" xml:space="preserve">
+    <value>Додати до улюбленого</value>
+  </data>
+  <data name="FavoritesRemove" xml:space="preserve">
+    <value>Видалити з улюбленого</value>
   </data>
 </root>

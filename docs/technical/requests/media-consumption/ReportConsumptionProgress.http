@@ -1,0 +1,31 @@
+### Music track
+PUT {{host}}/api/v1/users/me/consumption-records/2c1b0a9f-8e7d-4c6b-5a4f-3e2d1c0b9a8f/progress
+Authorization: Bearer {{ACCESS_TOKEN}}
+Content-Type: application/json
+
+{
+  "position": {
+    "kind": "TimeOffset",
+    "timeOffsetSeconds": 92.5,
+    "location": null
+  },
+  "progressFraction": 0.31,
+  "consumedDurationInSeconds": 92.5,
+  "consecutivePagesRead": 0
+}
+
+### Book
+PUT {{host}}/api/v1/users/me/consumption-records/8f7e6d5c-4b3a-4928-8170-6f5e4d3c2b1a/progress
+Authorization: Bearer {{ACCESS_TOKEN}}
+Content-Type: application/json
+
+{
+  "position": {
+    "kind": "Location",
+    "timeOffsetSeconds": null,
+    "location": "epubcfi(/6/6[chapter-2]!/4/2/2)"
+  },
+  "progressFraction": 0.18,
+  "consumedDurationInSeconds": 300,
+  "consecutivePagesRead": 2
+}

@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
+using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaContributors;
@@ -133,14 +134,14 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
         // genres checks
         Assert.Equal(bookRequest.Metadata.Genres!.Count, bookResponse.Metadata.Genres!.Count);
         Assert.Equal(
-            bookRequest.Metadata.Genres.Select(genre => genre.Name).OrderBy(x => x),
-            bookResponse.Metadata.Genres.Select(genre => genre.Name).OrderBy(x => x));
+            bookRequest.Metadata.Genres.Select(genre => genre.Name!.ToLowerInvariant()).OrderBy(name => name),
+            bookResponse.Metadata.Genres.Select(genre => genre.Name).OrderBy(name => name));
 
         // tags checks
         Assert.Equal(bookRequest.Metadata.Tags!.Count, bookResponse.Metadata.Tags!.Count);
         Assert.Equal(
-            bookRequest.Metadata.Tags.Select(tag => tag.Name).OrderBy(x => x),
-            bookResponse.Metadata.Tags.Select(tag => tag.Name).OrderBy(x => x));
+            bookRequest.Metadata.Tags.Select(tag => tag.Name!.ToLowerInvariant()).OrderBy(name => name),
+            bookResponse.Metadata.Tags.Select(tag => tag.Name).OrderBy(name => name));
 
         // book specific properties
         Assert.Equal(bookRequest.Format, bookResponse.Format);
@@ -1749,6 +1750,55 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
         Assert.NotNull(problemDetails);
         Assert.Equal("General.Validation", problemDetails!["title"].GetString());
         Assert.Contains("LibraryIdCannotBeEmpty", content, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task AddBook_WhenTwoBooksShareTagAndGenreNamesWithDifferentCasingAndWhitespace_ShouldStoreOneNormalizedRowPerName()
+    {
+        // Arrange
+        string suffix = Guid.NewGuid().ToString("N")[..8];
+        string tagName = $"horror-{suffix}";
+        string genreName = $"fiction-{suffix}";
+        AddBookRequest firstRequest = _addBookRequestFixture.Create(
+            path: Path.Combine(_libraryContentLocation, $"{Guid.NewGuid():N}.epub"),
+            metadata: _writtenContentMetadataDtoFixture.Create(
+                genres: [_genreDtoFixture.Create(name: $"  {genreName.ToUpperInvariant()}  ")],
+                tags: [_tagDtoFixture.Create(name: $"  {tagName.ToUpperInvariant()}  ")]),
+            contributors: []);
+        AddBookRequest secondRequest = _addBookRequestFixture.Create(
+            path: Path.Combine(_libraryContentLocation, $"{Guid.NewGuid():N}.epub"),
+            metadata: _writtenContentMetadataDtoFixture.Create(
+                genres: [_genreDtoFixture.Create(name: genreName)],
+                tags: [_tagDtoFixture.Create(name: tagName)]),
+            contributors: []);
+
+        // Act
+        HttpResponseMessage firstResponse = await PostBookAsync(firstRequest);
+        HttpResponseMessage secondResponse = await PostBookAsync(secondRequest);
+
+        // Assert
+        firstResponse.EnsureSuccessStatusCode();
+        secondResponse.EnsureSuccessStatusCode();
+        BookResponse? firstBook = await firstResponse.Content.ReadFromJsonAsync<BookResponse>(_jsonOptions);
+        BookResponse? secondBook = await secondResponse.Content.ReadFromJsonAsync<BookResponse>(_jsonOptions);
+        Assert.NotNull(firstBook);
+        Assert.NotNull(secondBook);
+        Assert.Equal(new[] { tagName }, firstBook!.Metadata.Tags!.Select(tag => tag.Name));
+        Assert.Equal(new[] { genreName }, firstBook.Metadata.Genres!.Select(genre => genre.Name));
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        // Both spellings must collapse into a single row each, keyed by the normalized name.
+        Assert.Equal(1, await dbContext.Set<TagEntity>().CountAsync(tag => tag.Name == tagName));
+        Assert.Equal(1, await dbContext.Set<GenreEntity>().CountAsync(genre => genre.Name == genreName));
+
+        List<BookEntity> books = [.. dbContext.Books
+            .Include(book => book.Tags)
+            .Include(book => book.Genres)
+            .Where(book => book.Id == firstBook.Id || book.Id == secondBook!.Id)];
+        Assert.Equal(2, books.Count);
+        Assert.All(books, book => Assert.Contains(book.Tags, tag => tag.Name == tagName));
+        Assert.All(books, book => Assert.Contains(book.Genres, genre => genre.Name == genreName));
     }
 
     [Fact]

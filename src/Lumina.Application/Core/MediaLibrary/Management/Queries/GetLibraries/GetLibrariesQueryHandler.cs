@@ -67,7 +67,7 @@ public class GetLibrariesQueryHandler : IQueryHandler<GetLibrariesQuery, Result<
             return getLibrariesResult.Errors;
 
         // Admins can see all libraries.
-        if (await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false))
+        if (await _authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false))
             return Result.From(getLibrariesResult.Value.Data.Select(library => library.ToResponse()).ToArray());
         else
         {

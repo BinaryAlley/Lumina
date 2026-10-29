@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Localization.Routing;
 using Microsoft.AspNetCore.Mvc.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Polly.CircuitBreaker;
@@ -31,7 +32,9 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 using System.Threading.Tasks;
 #endregion
 
@@ -43,6 +46,11 @@ namespace Lumina.Presentation.Web.Common.DependencyInjection;
 [ExcludeFromCodeCoverage]
 public static class PresentationWebLayerServices
 {
+    /// <summary>
+    /// The name of the rate limiting policy that bounds the number of concurrent track streams held by a single user.
+    /// </summary>
+    public const string TRACK_STREAM_RATE_LIMIT_POLICY = "trackStreamPolicy";
+
     /// <summary>
     /// Registers the services of the Presentation Web layer into the Dependency Injection container.
     /// </summary>
@@ -288,12 +296,44 @@ public static class PresentationWebLayerServices
 
         AsyncPolicyWrap<HttpResponseMessage> policy = Policy.WrapAsync(retryPolicy, circuitBreakerPolicy);
 
+        // Bound the number of long lived streams a single user can hold open at once, mirroring the concurrency limit the API server applies to
+        // its own stream route. Without it, an authenticated user could make this application open an unbounded number of parallel streams, each
+        // pinning a connection towards the API for the whole duration of a track, turning this application into an exhaustion amplifier.
+        services.AddRateLimiter(rateLimiterOptions =>
+        {
+            rateLimiterOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            rateLimiterOptions.AddPolicy(TRACK_STREAM_RATE_LIMIT_POLICY, httpContext =>
+            {
+                // The limit is partitioned per authenticated user, and it is a concurrency limit, not a per IP attempt window, so it is deliberately separate from any login throttling.
+                string userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "anonymous";
+                return RateLimitPartition.GetConcurrencyLimiter(
+                    partitionKey: $"trackStream_{userId}",
+                    factory: _ => new ConcurrencyLimiterOptions
+                    {
+                        PermitLimit = 4, // Allow 4 concurrent audio streams per user, matching the API server.
+                        QueueLimit = 0 // Don't queue requests, a request beyond the limit is rejected instead of waiting.
+                    });
+            });
+        });
+
         // Register the HTTP typed client used for the API interaction.
         services.AddHttpClient<IApiHttpClient, ApiHttpClient>()
             .AddHttpMessageHandler<CachedAuthorizationHandler>()
             .AddHttpMessageHandler<CachedThemeHandler>()
             .AddPolicyHandler(retryPolicy)
             .AddPolicyHandler(circuitBreakerPolicy);
+
+        // Register the HTTP typed client used for streaming responses from the API. It deliberately has no retry and no circuit breaker policy,
+        // because a stream cannot be transparently retried once its content has started reaching the client. It configures a bounded, generous
+        // timeout itself, because a stream stays open for as long as the client keeps reading it, yet a stalled one must never be held forever.
+        services.AddHttpClient<IStreamingApiHttpClient, StreamingApiHttpClient>()
+            // Cap the connections a stream can pin towards the API, as a backstop on top of the per user concurrency limit of the stream route.
+            .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
+            {
+                // A blackholed connection attempt must fail on its own, well before the request timeout, instead of holding a stream permit.
+                ConnectTimeout = TimeSpan.FromSeconds(30),
+                MaxConnectionsPerServer = 64
+            });
 
         services.AddScoped<CachedAuthorizationHandler>();
         services.AddScoped<CachedThemeHandler>();
@@ -311,6 +351,8 @@ public static class PresentationWebLayerServices
         services.AddScoped<ThemeLayoutRenderer>();
         services.AddScoped<ThemeFileSystemBrowserBuilder>();
         services.AddScoped<ThemeFileSystemBrowserRenderer>();
+        services.AddScoped<ThemeAudioPlayerBuilder>();
+        services.AddScoped<ThemeAudioPlayerRenderer>();
 
         services.AddScoped<IAuthorizationHandler, InitializationHandler>();
         services.AddScoped<IAuthorizationHandler, RoleAuthorizationHandler>();

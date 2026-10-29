@@ -59,7 +59,7 @@ public class GetScheduledJobHistoryQueryHandler : IQueryHandler<GetScheduledJobH
         Guid userId = currentUserId.Value;
 
         // Only administrators can get the history of scheduled jobs.
-        if (!await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false))
+        if (!await _authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false))
             return ApplicationErrors.Authorization.NotAuthorized;
 
         // The lower bound defaults to one day before the upper bound, which defaults to now.

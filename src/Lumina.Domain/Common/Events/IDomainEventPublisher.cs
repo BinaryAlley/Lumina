@@ -14,7 +14,7 @@ public interface IDomainEventPublisher
     /// Publishes the specified <paramref name="domainEvent"/> to all its registered handlers, in registration order.
     /// </summary>
     /// <param name="domainEvent">The domain event to publish.</param>
-    /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
     ValueTask PublishAsync(IDomainEvent domainEvent, CancellationToken cancellationToken = default);
 }

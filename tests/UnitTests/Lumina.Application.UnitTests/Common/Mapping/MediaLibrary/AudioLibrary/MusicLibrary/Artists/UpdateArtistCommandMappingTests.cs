@@ -44,8 +44,9 @@ public class UpdateArtistCommandMappingTests
         // Arrange
         Guid libraryId = Guid.NewGuid();
         (Artist artist, Guid albumId, Guid trackId) = CreateDomainArtist(libraryId);
-        string updatedPath = "/music/queen/a-night-at-the-opera/03-you-re-my-best-friend.flac";
-        AddTrackCommand trackCommand = _addTrackCommandFixture.Create(trackId: trackId, path: updatedPath, trackNumber: 7);
+        string originalPath = artist.Albums.SelectMany(album => album.Tracks).First(track => track.Id.Value == trackId).Path;
+        string attemptedPath = "/music/queen/a-night-at-the-opera/03-you-re-my-best-friend.flac";
+        AddTrackCommand trackCommand = _addTrackCommandFixture.Create(trackId: trackId, path: attemptedPath, trackNumber: 7);
         AddAlbumCommand albumCommand = _addAlbumCommandFixture.Create(albumId: albumId, tracks: [trackCommand]);
         UpdateArtistCommand command = _updateArtistCommandFixture.Create(
             libraryId: libraryId.ToString(),
@@ -67,7 +68,9 @@ public class UpdateArtistCommandMappingTests
         Album updatedAlbum = result.Value.Albums.First(album => album.Id.Value == albumId);
         Assert.Equal(albumCommand.Metadata!.Title, updatedAlbum.Metadata.Title);
         Track updatedTrack = updatedAlbum.Tracks.First(track => track.Id.Value == trackId);
-        Assert.Equal(updatedPath, updatedTrack.Path);
+        // the file system path of an existing track is never changed by the update, it is set only when the track is created
+        Assert.Equal(originalPath, updatedTrack.Path);
+        Assert.NotEqual(attemptedPath, updatedTrack.Path);
         Assert.Equal(7, updatedTrack.TrackNumber);
         Assert.True(updatedTrack.DiscNumber.HasValue);
         Assert.Equal(trackCommand.DiscNumber, updatedTrack.DiscNumber.Value);
@@ -281,6 +284,30 @@ public class UpdateArtistCommandMappingTests
         Assert.Equal(disambiguation, updatedTrack.Disambiguation.Value);
     }
 
+    [Fact]
+    public void ToDomainEntity_WhenTheTrackMetadataCarriesNoContainer_ShouldKeepTheTrackContainer()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        (Artist artist, Guid albumId, Guid trackId) = CreateDomainArtist(libraryId);
+        AddTrackCommand trackCommand = _addTrackCommandFixture.Create(trackId: trackId);
+        AddAlbumCommand albumCommand = _addAlbumCommandFixture.Create(albumId: albumId, tracks: [trackCommand]);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(
+            libraryId: libraryId.ToString(),
+            artistId: artist.Id.Value.ToString(),
+            albums: [albumCommand]);
+
+        // Act
+        Result<Artist> result = command.ToDomainEntity(artist);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Track updatedTrack = result.Value.Albums.First(album => album.Id.Value == albumId).Tracks.First(track => track.Id.Value == trackId);
+        // The stored container is pinned to a known value, so the assertion cannot pass by coincidence.
+        // The container is captured from the file itself, so reconciling a track during an artist edit keeps the stored container.
+        Assert.Equal("FLAC", updatedTrack.Metadata.Container.Value);
+    }
+
     /// <summary>
     /// Creates a domain artist that owns a single album, which in turn owns a single track, all belonging to <paramref name="libraryId"/>.
     /// </summary>
@@ -293,7 +320,7 @@ public class UpdateArtistCommandMappingTests
         AlbumEntity albumEntity = _albumEntityFixture.Create(
             id: albumId,
             libraryId: libraryId,
-            tracks: [_trackEntityFixture.Create(id: trackId, albumId: albumId, libraryId: libraryId)]);
+            tracks: [_trackEntityFixture.Create(id: trackId, albumId: albumId, libraryId: libraryId, container: "FLAC")]);
         ArtistEntity artistEntity = _artistEntityFixture.Create(libraryId: libraryId, albums: [albumEntity]);
         Result<Artist> artistResult = artistEntity.ToDomainEntity();
         return (artistResult.Value, albumId, trackId);

@@ -1,0 +1,7 @@
+### Current user
+GET {{host}}/api/v1/users/me/consumption-statistics/tags?mediaKind=MusicTrack
+Authorization: Bearer {{ACCESS_TOKEN}}
+
+### Another user (admin)
+GET {{host}}/api/v1/users/2cff0c0f-3a67-4e30-b94f-f4e948a3b64f/consumption-statistics/tags
+Authorization: Bearer {{ACCESS_TOKEN}}

@@ -1083,4 +1083,16 @@
   <data name="AddIsni" xml:space="preserve">
     <value>Aggiungi ISNI</value>
   </data>
+  <data name="PlayAll" xml:space="preserve">
+    <value>Riproduci tutto</value>
+  </data>
+  <data name="Play" xml:space="preserve">
+    <value>Riproduci</value>
+  </data>
+  <data name="Shuffle" xml:space="preserve">
+    <value>Riproduzione casuale</value>
+  </data>
+  <data name="AddToPlaylist" xml:space="preserve">
+    <value>Aggiungi alla playlist</value>
+  </data>
 </root>

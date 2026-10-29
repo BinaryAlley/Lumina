@@ -43,7 +43,7 @@ internal sealed class StubHttpMessageHandler : HttpMessageHandler
     /// Returns a response with the configured status code and body.
     /// </summary>
     /// <param name="request">The request, which is ignored.</param>
-    /// <param name="cancellationToken">Cancellation token that can be used to cancel the operation.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>The configured response.</returns>
     protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {

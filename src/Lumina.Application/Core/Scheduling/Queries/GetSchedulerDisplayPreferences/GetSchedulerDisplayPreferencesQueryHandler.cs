@@ -55,7 +55,7 @@ public class GetSchedulerDisplayPreferencesQueryHandler : IQueryHandler<GetSched
         Guid userId = currentUserId.Value;
 
         // Only administrators can view the scheduler page.
-        if (!await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false))
+        if (!await _authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false))
             return ApplicationErrors.Authorization.NotAuthorized;
 
         // Get the display preferences of the scheduler page of the current user from the repository.

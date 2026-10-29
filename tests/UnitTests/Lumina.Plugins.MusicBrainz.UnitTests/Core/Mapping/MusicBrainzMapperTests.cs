@@ -1051,6 +1051,7 @@ public class MusicBrainzMapperTests
         Assert.Null(result.Channels);
         Assert.Null(result.BitDepth);
         Assert.Null(result.AudioCodec);
+        Assert.Null(result.Container); // a metadata provider never supplies the container, which is captured locally from the file
         Assert.Null(result.Bitrate);
         Assert.Equal(recordingId, result.MusicBrainzRecordingId);
         Assert.Null(result.MusicBrainzTrackId);

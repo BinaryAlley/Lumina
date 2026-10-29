@@ -2,6 +2,7 @@
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate;
+using Lumina.Domain.SharedKernel.Common.Enums.Playback;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -28,6 +29,22 @@ public class UserSettingsFixture
     /// <param name="shouldAggregateArtworkWhenMissing">Whether the artwork of the media library items is aggregated from multiple providers, when it is missing.</param>
     /// <param name="shouldRenderPdfAsImages">Whether PDF books are rendered as page images for the user.</param>
     /// <param name="shouldPreserveBookStyles">Whether the styles of the book content are preserved when it is rendered for the user.</param>
+    /// <param name="shouldKeepDownloadingWhilePaused">Whether the player keeps downloading a track while playback is paused.</param>
+    /// <param name="shouldAutoplay">Whether the player continues playback at the end of an album or artist.</param>
+    /// <param name="isGaplessPlaybackEnabled">Whether the player transitions between consecutive tracks without a gap.</param>
+    /// <param name="replayGainMode">The way ReplayGain normalization is applied to the tracks the user plays.</param>
+    /// <param name="streamingQuality">The quality cap applied to the audio the server normalizes for the user.</param>
+    /// <param name="vuMeterOrientation">The direction in which each channel of the VU meter of the audio player grows.</param>
+    /// <param name="vuMeterSegmentCount">The number of segments each channel of the VU meter is divided into.</param>
+    /// <param name="vuMeterSegmentGap">The gap, in pixels, between the segments and the channels of the VU meter.</param>
+    /// <param name="vuMeterMediumThreshold">The level above which a segment of the VU meter is drawn with its medium state.</param>
+    /// <param name="vuMeterHighThreshold">The level above which a segment of the VU meter is drawn with its high state.</param>
+    /// <param name="vuMeterShowPeak">Whether the VU meter holds the peak level of each channel after it falls.</param>
+    /// <param name="vuMeterPeakHoldDurationInMilliseconds">The time a peak of the VU meter is held before it starts falling.</param>
+    /// <param name="vuMeterReleasePerSecond">The number of level units the display of the VU meter falls per second when the input level drops.</param>
+    /// <param name="vuMeterPeakReleasePerSecond">The number of level units the peak of the VU meter falls per second after its hold time elapsed.</param>
+    /// <param name="volume">The last volume the player reported for the user.</param>
+    /// <param name="isMuted">The last mute state the player reported for the user.</param>
     /// <returns>The created <see cref="UserSettings"/>.</returns>
     public UserSettings Create(
         Guid? userId = null,
@@ -38,7 +55,23 @@ public class UserSettingsFixture
         bool shouldAggregateMetadataWhenMissing = false,
         bool shouldAggregateArtworkWhenMissing = false,
         bool shouldRenderPdfAsImages = false,
-        bool shouldPreserveBookStyles = true)
+        bool shouldPreserveBookStyles = true,
+        bool shouldKeepDownloadingWhilePaused = true,
+        bool shouldAutoplay = true,
+        bool isGaplessPlaybackEnabled = true,
+        ReplayGainMode replayGainMode = ReplayGainMode.Off,
+        PlaybackStreamingQuality streamingQuality = PlaybackStreamingQuality.Auto,
+        VuMeterOrientation vuMeterOrientation = VuMeterOrientation.Vertical,
+        int vuMeterSegmentCount = 12,
+        int vuMeterSegmentGap = 1,
+        double vuMeterMediumThreshold = 0.6,
+        double vuMeterHighThreshold = 0.8,
+        bool vuMeterShowPeak = true,
+        int vuMeterPeakHoldDurationInMilliseconds = 650,
+        double vuMeterReleasePerSecond = 3.0,
+        double vuMeterPeakReleasePerSecond = 0.65,
+        double volume = 1.0,
+        bool isMuted = false)
     {
         Result<UserSettings> settings = UserSettings.Create(
             userId is null ? UserId.CreateUnique() : UserId.Create(userId.Value),
@@ -49,7 +82,23 @@ public class UserSettingsFixture
             shouldAggregateMetadataWhenMissing,
             shouldAggregateArtworkWhenMissing,
             shouldRenderPdfAsImages,
-            shouldPreserveBookStyles);
+            shouldPreserveBookStyles,
+            shouldKeepDownloadingWhilePaused,
+            shouldAutoplay,
+            isGaplessPlaybackEnabled,
+            replayGainMode,
+            streamingQuality,
+            vuMeterOrientation,
+            vuMeterSegmentCount,
+            vuMeterSegmentGap,
+            vuMeterMediumThreshold,
+            vuMeterHighThreshold,
+            vuMeterShowPeak,
+            vuMeterPeakHoldDurationInMilliseconds,
+            vuMeterReleasePerSecond,
+            vuMeterPeakReleasePerSecond,
+            volume,
+            isMuted);
         return settings.Value;
     }
 

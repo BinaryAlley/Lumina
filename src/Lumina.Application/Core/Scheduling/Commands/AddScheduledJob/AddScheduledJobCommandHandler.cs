@@ -78,7 +78,7 @@ public class AddScheduledJobCommandHandler : ICommandHandler<AddScheduledJobComm
         Guid userId = currentUserId.Value;
 
         // Only administrators can schedule jobs.
-        if (!await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false))
+        if (!await _authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false))
             return ApplicationErrors.Authorization.NotAuthorized;
 
         // Create the schedule of the scheduled job, based on its type.

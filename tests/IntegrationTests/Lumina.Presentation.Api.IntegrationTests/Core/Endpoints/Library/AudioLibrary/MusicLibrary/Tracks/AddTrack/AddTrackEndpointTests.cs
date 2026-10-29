@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
+using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaContributors;
@@ -212,10 +214,10 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
 
         // Genres and tags checks.
         Assert.Equal(
-            metadata.Genres!.Select(genre => genre.Name).OrderBy(name => name),
+            metadata.Genres!.Select(genre => genre.Name!.ToLowerInvariant()).OrderBy(name => name),
             trackResponse.Metadata.Genres!.Select(genre => genre.Name).OrderBy(name => name));
         Assert.Equal(
-            metadata.Tags!.Select(tag => tag.Name).OrderBy(name => name),
+            metadata.Tags!.Select(tag => tag.Name!.ToLowerInvariant()).OrderBy(name => name),
             trackResponse.Metadata.Tags!.Select(tag => tag.Name).OrderBy(name => name));
 
         // Moods, ISRCs, contributors and ratings checks.
@@ -236,6 +238,56 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         Assert.NotNull(response.Headers.Location);
         string locationUri = response.Headers.Location!.ToString();
         Assert.EndsWith($"/api/v1/libraries/{_libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackResponse.Id}", locationUri);
+    }
+
+    [Fact]
+    public async Task AddTrack_WhenTwoTracksShareTagAndGenreNamesWithDifferentCasingAndWhitespace_ShouldStoreOneNormalizedRowPerName()
+    {
+        // Arrange
+        (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
+        string suffix = Guid.NewGuid().ToString("N")[..8];
+        string tagName = $"tag-{suffix}";
+        string genreName = $"genre-{suffix}";
+        AddTrackRequest firstRequest = _addTrackRequestFixture.Create(
+            path: Path.Combine(_libraryContentLocation, $"{Guid.NewGuid():N}.flac"),
+            metadata: _musicTrackMetadataDtoFixture.Create(
+                genres: [_genreDtoFixture.Create(name: $"  {genreName.ToUpperInvariant()}  ")],
+                tags: [_tagDtoFixture.Create(name: $"  {tagName.ToUpperInvariant()}  ")]),
+            contributors: []);
+        AddTrackRequest secondRequest = _addTrackRequestFixture.Create(
+            path: Path.Combine(_libraryContentLocation, $"{Guid.NewGuid():N}.flac"),
+            metadata: _musicTrackMetadataDtoFixture.Create(
+                genres: [_genreDtoFixture.Create(name: genreName)],
+                tags: [_tagDtoFixture.Create(name: tagName)]),
+            contributors: []);
+
+        // Act
+        HttpResponseMessage firstResponse = await PostTrackAsync(artistId, albumId, firstRequest);
+        HttpResponseMessage secondResponse = await PostTrackAsync(artistId, albumId, secondRequest);
+
+        // Assert
+        firstResponse.EnsureSuccessStatusCode();
+        secondResponse.EnsureSuccessStatusCode();
+        TrackResponse? firstTrack = await firstResponse.Content.ReadFromJsonAsync<TrackResponse>(_jsonOptions);
+        TrackResponse? secondTrack = await secondResponse.Content.ReadFromJsonAsync<TrackResponse>(_jsonOptions);
+        Assert.NotNull(firstTrack);
+        Assert.NotNull(secondTrack);
+        Assert.Equal(new[] { tagName }, firstTrack!.Metadata.Tags!.Select(tag => tag.Name));
+        Assert.Equal(new[] { genreName }, firstTrack.Metadata.Genres!.Select(genre => genre.Name));
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        // Both spellings must collapse into a single row each, keyed by the normalized name.
+        Assert.Equal(1, await dbContext.Set<TagEntity>().CountAsync(tag => tag.Name == tagName));
+        Assert.Equal(1, await dbContext.Set<GenreEntity>().CountAsync(genre => genre.Name == genreName));
+
+        List<TrackEntity> tracks = [.. dbContext.Tracks
+            .Include(track => track.Tags)
+            .Include(track => track.Genres)
+            .Where(track => track.Id == firstTrack.Id || track.Id == secondTrack!.Id)];
+        Assert.Equal(2, tracks.Count);
+        Assert.All(tracks, track => Assert.Contains(track.Tags, tag => tag.Name == tagName));
+        Assert.All(tracks, track => Assert.Contains(track.Genres, genre => genre.Name == genreName));
     }
 
     [Fact]

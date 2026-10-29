@@ -158,7 +158,6 @@ public static class UpdateArtistCommandMapping
                 Result<Updated> updateTrackResult = artist.UpdateTrackInAlbum(
                     existingAlbum,
                     existingTrack,
-                    domainTrack.Path,
                     domainTrack.Metadata,
                     domainTrack.Disambiguation,
                     domainTrack.TrackNumber,

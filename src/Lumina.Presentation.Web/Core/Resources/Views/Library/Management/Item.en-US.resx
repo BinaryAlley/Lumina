@@ -312,9 +312,6 @@
   <data name="WrittenContent" xml:space="preserve">
     <value>Written Content</value>
   </data>
-  <data name="YouTube" xml:space="preserve">
-    <value>YouTube</value>
-  </data>
   <data name="Name" xml:space="preserve">
     <value>Name</value>
   </data>
@@ -413,5 +410,23 @@
   </data>
   <data name="PathPartBookId" xml:space="preserve">
     <value>Book id</value>
+  </data>
+  <data name="ShouldTrackConsumptionProgress" xml:space="preserve">
+    <value>Track Consumption Progress</value>
+  </data>
+  <data name="DescriptionShouldTrackConsumptionProgress" xml:space="preserve">
+    <value>Whether the playback or reading position of this library's items is remembered, so the user can resume where they left off.</value>
+  </data>
+  <data name="CompletionThresholdPercentage" xml:space="preserve">
+    <value>Completion Threshold (%)</value>
+  </data>
+  <data name="DescriptionCompletionThresholdPercentage" xml:space="preserve">
+    <value>The percentage of an item that must be consumed for its session to be considered completed. When empty, the default of the library type is used when creating a library or enabling progress tracking, and the stored threshold is kept when editing a library that already tracks progress. Types without a default threshold record completion only when it is reported explicitly.</value>
+  </data>
+  <data name="CompletionThresholdPercentageValidation" xml:space="preserve">
+    <value>The completion threshold must be a whole number between 0 and 100.</value>
+  </data>
+  <data name="Youtube" xml:space="preserve">
+    <value>YouTube</value>
   </data>
 </root>

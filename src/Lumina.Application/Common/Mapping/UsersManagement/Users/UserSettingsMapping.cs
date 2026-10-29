@@ -29,7 +29,23 @@ public static class UserSettingsMapping
             ShouldAggregateMetadataWhenMissing = domainEntity.ShouldAggregateMetadataWhenMissing,
             ShouldAggregateArtworkWhenMissing = domainEntity.ShouldAggregateArtworkWhenMissing,
             ShouldRenderPdfAsImages = domainEntity.ShouldRenderPdfAsImages,
-            ShouldPreserveBookStyles = domainEntity.ShouldPreserveBookStyles
+            ShouldPreserveBookStyles = domainEntity.ShouldPreserveBookStyles,
+            ShouldKeepDownloadingWhilePaused = domainEntity.ShouldKeepDownloadingWhilePaused,
+            ShouldAutoplay = domainEntity.ShouldAutoplay,
+            IsGaplessPlaybackEnabled = domainEntity.IsGaplessPlaybackEnabled,
+            ReplayGainMode = domainEntity.ReplayGainMode,
+            StreamingQuality = domainEntity.StreamingQuality,
+            VuMeterOrientation = domainEntity.VuMeterOrientation,
+            VuMeterSegmentCount = domainEntity.VuMeterSegmentCount,
+            VuMeterSegmentGap = domainEntity.VuMeterSegmentGap,
+            VuMeterMediumThreshold = domainEntity.VuMeterMediumThreshold,
+            VuMeterHighThreshold = domainEntity.VuMeterHighThreshold,
+            VuMeterShowPeak = domainEntity.VuMeterShowPeak,
+            VuMeterPeakHoldDurationInMilliseconds = domainEntity.VuMeterPeakHoldDurationInMilliseconds,
+            VuMeterReleasePerSecond = domainEntity.VuMeterReleasePerSecond,
+            VuMeterPeakReleasePerSecond = domainEntity.VuMeterPeakReleasePerSecond,
+            Volume = domainEntity.Volume,
+            IsMuted = domainEntity.IsMuted
         };
     }
 
@@ -49,7 +65,21 @@ public static class UserSettingsMapping
             domainEntity.ShouldAggregateMetadataWhenMissing,
             domainEntity.ShouldAggregateArtworkWhenMissing,
             domainEntity.ShouldRenderPdfAsImages,
-            domainEntity.ShouldPreserveBookStyles
+            domainEntity.ShouldPreserveBookStyles,
+            domainEntity.ShouldKeepDownloadingWhilePaused,
+            domainEntity.ShouldAutoplay,
+            domainEntity.IsGaplessPlaybackEnabled,
+            domainEntity.ReplayGainMode,
+            domainEntity.StreamingQuality,
+            domainEntity.VuMeterOrientation,
+            domainEntity.VuMeterSegmentCount,
+            domainEntity.VuMeterSegmentGap,
+            domainEntity.VuMeterMediumThreshold,
+            domainEntity.VuMeterHighThreshold,
+            domainEntity.VuMeterShowPeak,
+            domainEntity.VuMeterPeakHoldDurationInMilliseconds,
+            domainEntity.VuMeterReleasePerSecond,
+            domainEntity.VuMeterPeakReleasePerSecond
         );
     }
 }

@@ -1,9 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.BookLibrary;
+using Lumina.Application.Common.DataAccess.Repositories.Favorites;
+using Lumina.Application.Common.DataAccess.Repositories.MediaConsumption;
 using Lumina.Application.Common.DataAccess.Repositories.MediaContributors;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
+using Lumina.Application.Common.DataAccess.Repositories.Playlists;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Scheduling;
 using Lumina.Application.Common.DataAccess.Repositories.Themes;
@@ -149,6 +152,31 @@ public interface IUnitOfWork
     /// Gets the user settings repository.
     /// </summary>
     IUserSettingsRepository UserSettingsRepository { get; }
+
+    /// <summary>
+    /// Gets the playlist repository.
+    /// </summary>
+    IPlaylistRepository PlaylistRepository { get; }
+
+    /// <summary>
+    /// Gets the favorite repository.
+    /// </summary>
+    IFavoriteRepository FavoriteRepository { get; }
+
+    /// <summary>
+    /// Gets the media consumption record repository.
+    /// </summary>
+    IMediaConsumptionRecordRepository MediaConsumptionRecordRepository { get; }
+
+    /// <summary>
+    /// Gets the media resume point repository.
+    /// </summary>
+    IMediaResumePointRepository MediaResumePointRepository { get; }
+
+    /// <summary>
+    /// Gets the repository for the consumption records used to build consumption statistics.
+    /// </summary>
+    IConsumptionStatisticsRepository ConsumptionStatisticsRepository { get; }
 
     /// <summary>
     /// Saves the changes made to the database.

@@ -1,0 +1,7 @@
+### Current user
+GET {{host}}/api/v1/users/me/consumption-history/recently-consumed?currentPage=1&perPage=50
+Authorization: Bearer {{ACCESS_TOKEN}}
+
+### Another user (admin)
+GET {{host}}/api/v1/users/2cff0c0f-3a67-4e30-b94f-f4e948a3b64f/consumption-history/recently-consumed?libraryId=3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a&mediaKind=MusicTrack&currentPage=1&perPage=50&fromUtc=2026-10-01T00:00:00Z&toUtc=2026-10-31T23:59:59Z
+Authorization: Bearer {{ACCESS_TOKEN}}

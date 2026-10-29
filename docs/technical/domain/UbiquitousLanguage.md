@@ -5,12 +5,26 @@
 - _**Metadata**_: Information describing a media item
 - _**User**_: A person who interacts with the media library
 - _**Playlist**_: A curated list of media items, potentially cross-media-type
+- _**Favorite**_: The marker a user places on a media item of any media kind, private to that user. It references the item only by its kind and its Id, so one concept serves music, books and the media kinds that are planned
+- _**FavoriteMediaKind**_: The set of media item kinds that can be marked as a favorite
 - _**Tag**_: A label for categorizing and organizing media items
 - _**Collection**_: A user-defined group of any media items
 - _**File**_: The actual digital file of a media item
 - _**Stream**_: A media item accessed via streaming rather than local storage
 - _**Language Track**_: An audio or text track in a specific language
 - _**Media Contributor**_: A person, group, or organization that contributed to a media item, together with the role they played
+- _**Direct Play**_: Delivery of a track's audio as stored, because the player can demux its container and decode its codec
+- _**Remux**_: Delivery of a track's audio with its codec repackaged into a container the player can demux, without re-encoding it
+- _**Transcode**_: Delivery of a track's audio re-encoded into a codec the player can decode
+- _**Playback Capabilities**_: The container and codec combinations a player advertises it can demux and decode directly
+- _**Delivery Shape**_: The way delivered audio is addressed and seeked, by byte range or as fixed duration, time addressed segments
+- _**Media Consumption**_: The recording of what a user consumed, how far they reached and how long they consumed it, across every media kind
+- _**Media Consumption Record**_: The record of one consumption session of a media item by a user, from its start to its progress, completion or stop, private to that user. It stores no queue, current index, repeat or shuffle state
+- _**Media Resume Point**_: The latest position of one media item for one user, stored separately from the consumption history so the user can resume the item. There is at most one per user, media kind and media item
+- _**Consumption Statistics**_: The read model derived from the consumption records on every request. It is not an aggregate, it is not stored, and it has no counter or rollup table
+- _**Counted Session**_: A consumption record that counts towards the statistics, because it completed or because its media kind's counting rule was reached
+- _**ShouldTrackConsumptionProgress**_: The per-library setting that decides whether the latest position of an item is remembered, so the user can resume it
+- _**CompletionThresholdPercentage**_: The optional per-library percentage of an item that must be consumed for a session to count as completed when it stops. When it is absent and tracking is on, completion is recorded only when it is reported explicitly
 
 ## Video Content
 - _**TV Show**_: A series of episodes typically organized into seasons
@@ -88,8 +102,11 @@
 - SheetMusic
 - Photo
 - PhotoAlbum
+- MediaConsumptionRecord
+- MediaResumePoint
 - User
 - Playlist
+- Favorite
 - Collection
 - SubtitleFile
 - Lyrics
@@ -107,7 +124,10 @@
 - PodcastLibrary (root: PodcastLibrary, entities: Podcast, PodcastEpisode)
 - WrittenContentLibrary (root: WrittenContentLibrary, entities: Book, EBook, BookSeries, ComicBook, ComicSeries, Magazine, MagazineIssue, Newspaper, Manga, GraphicNovel, AcademicPaper, SheetMusic, Screenplay)
 - PhotoLibrary (root: PhotoLibrary, entities: Photo, PhotoAlbum, AlbumArtwork, MoviePoster)
-- UserProfile (root: User, entities: Playlist, Collection)
+- UserProfile (root: User, entities: Collection)
+- PlaylistManagement (root: Playlist, entities: PlaylistEntry)
+- Favorites (root: Favorite, no entities)
+- MediaConsumption (roots: MediaConsumptionRecord, MediaResumePoint, no entities)
 - SupplementaryContentLibrary (root: SupplementaryContentLibrary, entities: SubtitleFile, Lyrics, LanguageTrack)
 - FileSystemManagement (root: File, entities: Stream)
 
@@ -160,6 +180,14 @@
 - StreamInfo
 - StreamingQuality
 - UserPreferences
+- LibraryConsumptionSettings
+- MediaConsumptionRecordId
+- MediaResumePointId
+- MediaPosition
+- MediaConsumptionRule (abstract)
+- DurationThresholdConsumptionRule (abstract)
+- PageThresholdConsumptionRule (abstract)
+- EverySessionConsumptionRule (abstract)
 - Rating (abstract)
 - AudioRating
 - Genre
@@ -203,6 +231,16 @@
 - MediaItemRemoved
 - PlaylistCreated
 - PlaylistUpdated
+- PlaylistEntryAdded
+- PlaylistEntryRemoved
+- PlaylistEntriesReordered
+- PlaylistDeleted
+- FavoriteAdded
+- FavoriteRemoved
+- MediaConsumptionStarted
+- MediaConsumptionProgressed
+- MediaConsumptionCompleted
+- MediaConsumptionStopped
 - UserPreferencesChanged
 - MetadataUpdated
 - FileTranscoded
@@ -217,6 +255,13 @@
 - UserExperience
   - Aggregates: UserProfile
   - Services: RecommendationEngine, ContentCurationService, UserActivityTrackingService
+- PlaylistManagement
+  - Aggregates: Playlist
+- Favorites
+  - Aggregates: Favorite
+- MediaConsumption
+  - Aggregates: MediaConsumptionRecord, MediaResumePoint
+  - Read models: ConsumptionStatistics
 - ContentDelivery
   - Aggregates: FileSystemManagement
   - Services: StreamingService, ContentSynchronizationService
@@ -232,6 +277,10 @@
 - PhotoRepository
 - UserRepository
 - PlaylistRepository
+- FavoriteRepository
+- MediaConsumptionRecordRepository
+- MediaResumePointRepository
+- ConsumptionStatisticsRepository
 - CollectionRepository
 - FileRepository
 - StreamRepository

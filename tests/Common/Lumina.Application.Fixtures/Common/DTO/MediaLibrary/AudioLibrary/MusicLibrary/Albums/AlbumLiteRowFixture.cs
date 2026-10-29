@@ -45,15 +45,13 @@ public class AlbumLiteRowFixture
         bool includeReleaseYear = true,
         bool includeReleaseTypes = true)
     {
-        return new AlbumLiteRow
-        {
-            Id = id ?? _faker.Random.Guid(),
-            Title = title ?? _faker.Music.Genre(),
-            TotalTracks = totalTracks ?? _faker.Random.Int(1, 30),
-            CoverPath = includeCoverPath ? (coverPath ?? _faker.System.FilePath()) : null,
-            ReleaseYear = includeReleaseYear ? (releaseYear ?? _faker.Random.Int(MINIMUM_RELEASE_YEAR, MAXIMUM_RELEASE_YEAR)) : null,
-            ReleaseTypes = includeReleaseTypes ? (releaseTypes ?? [.. Enumerable.Range(0, _faker.Random.Int(1, 3)).Select(index => _faker.PickRandom<MusicReleaseType>())]) : null
-        };
+        return new AlbumLiteRow(
+            id ?? _faker.Random.Guid(),
+            title ?? _faker.Music.Genre(),
+            totalTracks ?? _faker.Random.Int(1, 30),
+            includeCoverPath ? (coverPath ?? _faker.System.FilePath()) : null,
+            includeReleaseYear ? (releaseYear ?? _faker.Random.Int(MINIMUM_RELEASE_YEAR, MAXIMUM_RELEASE_YEAR)) : null,
+            includeReleaseTypes ? (releaseTypes ?? [.. Enumerable.Range(0, _faker.Random.Int(1, 3)).Select(index => _faker.PickRandom<MusicReleaseType>())]) : null);
     }
 
     /// <summary>

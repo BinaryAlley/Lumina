@@ -31,7 +31,9 @@ public class AddMediaLibraryRequestMappingTests
             isLocked: false,
             canDownloadMetadataFromWeb: true,
             shouldSaveMetadataInMediaDirectories: false,
-            shouldSkipUnchangedDirectoriesDuringScan: false
+            shouldSkipUnchangedDirectoriesDuringScan: false,
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: 90
         );
 
         // Act
@@ -47,6 +49,8 @@ public class AddMediaLibraryRequestMappingTests
         Assert.Equal(request.IsLocked, result.IsLocked);
         Assert.Equal(request.CanDownloadMetadataFromWeb, result.CanDownloadMetadataFromWeb);
         Assert.Equal(request.ShouldSaveMetadataInMediaDirectories, result.ShouldSaveMetadataInMediaDirectories);
+        Assert.Equal(request.ShouldTrackConsumptionProgress, result.ShouldTrackConsumptionProgress);
+        Assert.Equal(request.CompletionThresholdPercentage, result.CompletionThresholdPercentage);
     }
 
     [Theory]
@@ -185,5 +189,58 @@ public class AddMediaLibraryRequestMappingTests
 
         // Assert
         Assert.Null(result.PathTemplateParts);
+    }
+
+    [Fact]
+    public void ToCommand_WhenConsumptionSettingsAreSupplied_ShouldMapThem()
+    {
+        // Arrange
+        AddLibraryRequest request = _addLibraryRequestFixture.Create(
+            libraryType: "Book",
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: 75);
+
+        // Act
+        AddLibraryCommand result = request.ToCommand();
+
+        // Assert
+        Assert.NotNull(result.ShouldTrackConsumptionProgress);
+        Assert.True(result.ShouldTrackConsumptionProgress.Value);
+        Assert.Equal(75, result.CompletionThresholdPercentage);
+    }
+
+    [Fact]
+    public void ToCommand_WhenConsumptionSettingsAreAbsent_ShouldPreserveThemAsNull()
+    {
+        // Arrange
+        AddLibraryRequest request = _addLibraryRequestFixture.Create(
+            libraryType: "Book",
+            shouldTrackConsumptionProgress: null,
+            completionThresholdPercentage: null);
+
+        // Act
+        AddLibraryCommand result = request.ToCommand();
+
+        // Assert
+        Assert.Null(result.ShouldTrackConsumptionProgress);
+        Assert.Null(result.CompletionThresholdPercentage);
+    }
+
+    [Fact]
+    public void ToCommand_WhenProgressTrackingIsExplicitlyDisabled_ShouldPreserveTheDisabledFlagWithoutThreshold()
+    {
+        // Arrange
+        AddLibraryRequest request = _addLibraryRequestFixture.Create(
+            libraryType: "Book",
+            shouldTrackConsumptionProgress: false,
+            completionThresholdPercentage: null);
+
+        // Act
+        AddLibraryCommand result = request.ToCommand();
+
+        // Assert
+        Assert.NotNull(result.ShouldTrackConsumptionProgress);
+        Assert.False(result.ShouldTrackConsumptionProgress.Value);
+        Assert.Null(result.CompletionThresholdPercentage);
     }
 }

@@ -8,6 +8,7 @@ using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -181,5 +182,61 @@ public class MediaContributorRepositoryTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.MediaContributor.MediaContributorAlreadyExists, result.FirstError);
+    }
+
+    [Fact]
+    public async Task GetByIdsAsync_WhenIdsIsEmpty_ShouldReturnAnEmptyList()
+    {
+        // Arrange
+        MediaContributorEntity contributor = _mediaContributorEntityFixture.Create();
+        _mockContext.MediaContributors.Add(contributor);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<MediaContributorEntity>> result = await _sut.GetByIdsAsync([], CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Empty(result.Value);
+    }
+
+    [Fact]
+    public async Task GetByIdsAsync_WhenAnIdDoesNotExist_ShouldIgnoreIt()
+    {
+        // Arrange
+        MediaContributorEntity contributor = _mediaContributorEntityFixture.Create();
+        _mockContext.MediaContributors.Add(contributor);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<MediaContributorEntity>> result = await _sut.GetByIdsAsync([contributor.Id, Guid.NewGuid()], CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        MediaContributorEntity returnedContributor = Assert.Single(result.Value);
+        Assert.Equal(contributor.Id, returnedContributor.Id);
+    }
+
+    [Fact]
+    public async Task GetByIdsAsync_WhenMoreThanFiveHundredIdsAreRequested_ShouldReturnEveryContributor()
+    {
+        // Arrange
+        const int CONTRIBUTOR_COUNT = 501;
+        List<MediaContributorEntity> contributors = _mediaContributorEntityFixture.CreateMany(CONTRIBUTOR_COUNT);
+        _mockContext.MediaContributors.AddRange(contributors);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        // The lookup is chunked in batches of 500, so the 501st Id proves the second chunk is queried as well.
+        Result<IReadOnlyList<MediaContributorEntity>> result = await _sut.GetByIdsAsync(
+            [.. contributors.Select(contributor => contributor.Id)], CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(CONTRIBUTOR_COUNT, result.Value.Count);
+        Assert.Equal(
+            contributors.Select(contributor => contributor.Id).OrderBy(id => id),
+            result.Value.Select(contributor => contributor.Id).OrderBy(id => id));
     }
 }

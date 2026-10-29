@@ -38,7 +38,6 @@ public class UpdateTrackRequestMappingTests
         Assert.Equal(artistId.ToString(), result.ArtistId);
         Assert.Equal(albumId.ToString(), result.AlbumId);
         Assert.Equal(trackId.ToString(), result.TrackId);
-        Assert.Equal(request.Path, result.Path);
         Assert.Equal(request.Metadata, result.Metadata);
         Assert.Equal(request.TrackNumber, result.TrackNumber);
         Assert.Equal(request.DiscNumber, result.DiscNumber);

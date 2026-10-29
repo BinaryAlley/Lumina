@@ -39,6 +39,7 @@ public class TrackResponseFixture
     /// <param name="albumId">Optional. The Id of the album the track belongs to.</param>
     /// <param name="libraryId">Optional. The Id of the media library this track belongs to.</param>
     /// <param name="path">Optional. The file system path of the track.</param>
+    /// <param name="container">Optional. The container of the audio file of the track.</param>
     /// <param name="metadata">Optional. The audio metadata of the track.</param>
     /// <param name="trackNumber">Optional. The number of the track on its disc.</param>
     /// <param name="discNumber">Optional. The number of the disc the track belongs to.</param>
@@ -56,6 +57,7 @@ public class TrackResponseFixture
     /// <param name="ratings">Optional. The list of ratings of the track.</param>
     /// <param name="includeMusicBrainzRecordingId">Whether the MusicBrainz recording Id should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeMusicBrainzTrackId">Whether the MusicBrainz track Id should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeContainer">Whether the container should be included, or forced to <see langword="null"/>.</param>
     /// <returns>The created <see cref="TrackResponse"/>.</returns>
     public TrackResponse Create(
         Guid? id = null,
@@ -78,7 +80,9 @@ public class TrackResponseFixture
         List<MediaContributorReferenceDto>? contributors = null,
         List<AudioRatingDto>? ratings = null,
         bool includeMusicBrainzRecordingId = true,
-        bool includeMusicBrainzTrackId = true)
+        bool includeMusicBrainzTrackId = true,
+        bool includeContainer = true,
+        string? container = null)
     {
         return new TrackResponse(
             id ?? Guid.NewGuid(),
@@ -99,7 +103,8 @@ public class TrackResponseFixture
             moods ?? _moodDtoFixture.CreateMany(1),
             isrcs ?? _isrcDtoFixture.CreateMany(1),
             contributors ?? _mediaContributorReferenceDtoFixture.CreateMany(1),
-            ratings ?? _audioRatingDtoFixture.CreateMany(1));
+            ratings ?? _audioRatingDtoFixture.CreateMany(1),
+            includeContainer ? (container ?? _faker.Random.ArrayElement(["MP3", "FLAC", "OGG", "MP4", "AAC", "WAV"])) : null);
     }
 
     /// <summary>

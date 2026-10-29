@@ -130,6 +130,178 @@
                     </div>
                     <small class="form-label text-disabled form-description">@_localizer["DescriptionShouldAggregateArtworkWhenMissing"]</small>
                 </div>
+                <!-- Playback. -->
+                <div class="form-row">
+                    <h4 class="text-light-two w-100">@_localizer["Playback"]</h4>
+                </div>
+                <!-- Keep downloading while paused. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="ShouldKeepDownloadingWhilePaused">@_localizer["ShouldKeepDownloadingWhilePaused"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <label class="enlightenment-checkbox-label">
+                            <input type="checkbox" id="ShouldKeepDownloadingWhilePaused" class="enlightenment-checkbox-hidden" />
+                            <span class="enlightenment-checkbox"></span>
+                        </label>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionShouldKeepDownloadingWhilePaused"]</small>
+                </div>
+                <!-- Autoplay. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="ShouldAutoplay">@_localizer["ShouldAutoplay"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <label class="enlightenment-checkbox-label">
+                            <input type="checkbox" id="ShouldAutoplay" class="enlightenment-checkbox-hidden" />
+                            <span class="enlightenment-checkbox"></span>
+                        </label>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionShouldAutoplay"]</small>
+                </div>
+                <!-- Gapless playback. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="IsGaplessPlaybackEnabled">@_localizer["IsGaplessPlaybackEnabled"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <label class="enlightenment-checkbox-label">
+                            <input type="checkbox" id="IsGaplessPlaybackEnabled" class="enlightenment-checkbox-hidden" />
+                            <span class="enlightenment-checkbox"></span>
+                        </label>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionIsGaplessPlaybackEnabled"]</small>
+                </div>
+                <!-- ReplayGain mode. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label asp-for="ReplayGainMode">@_localizer["ReplayGainMode"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <select asp-for="ReplayGainMode" class="enlightenment-input">
+                            <option value="Off">@_localizer["ReplayGainModeOff"]</option>
+                            <option value="Track">@_localizer["ReplayGainModeTrack"]</option>
+                            <option value="Album">@_localizer["ReplayGainModeAlbum"]</option>
+                        </select>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionReplayGainMode"]</small>
+                </div>
+                <!-- Streaming quality. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label asp-for="StreamingQuality">@_localizer["StreamingQuality"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <select asp-for="StreamingQuality" class="enlightenment-input">
+                            <option value="Auto">@_localizer["StreamingQualityAuto"]</option>
+                            <option value="Low">@_localizer["StreamingQualityLow"]</option>
+                            <option value="Medium">@_localizer["StreamingQualityMedium"]</option>
+                            <option value="High">@_localizer["StreamingQualityHigh"]</option>
+                        </select>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionStreamingQuality"]</small>
+                </div>
+                <!-- VU meter. -->
+                <div class="form-row">
+                    <h4 class="text-light-two w-100">@_localizer["VuMeter"]</h4>
+                </div>
+                <!-- Orientation. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="VuMeterOrientation">@_localizer["VuMeterOrientation"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <select id="VuMeterOrientation" class="enlightenment-input">
+                            <option value="Vertical">@_localizer["VuMeterOrientationVertical"]</option>
+                            <option value="Horizontal">@_localizer["VuMeterOrientationHorizontal"]</option>
+                        </select>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionVuMeterOrientation"]</small>
+                </div>
+                <!-- Segment count. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="VuMeterSegmentCount">@_localizer["VuMeterSegmentCount"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <input type="number" id="VuMeterSegmentCount" min="1" max="128" step="1" class="enlightenment-input" />
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionVuMeterSegmentCount"]</small>
+                </div>
+                <!-- Segment gap. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="VuMeterSegmentGap">@_localizer["VuMeterSegmentGap"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <input type="number" id="VuMeterSegmentGap" min="0" max="32" step="1" class="enlightenment-input" />
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionVuMeterSegmentGap"]</small>
+                </div>
+                <!-- Medium threshold. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="VuMeterMediumThreshold">@_localizer["VuMeterMediumThreshold"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <input type="number" id="VuMeterMediumThreshold" min="0" max="1" step="0.05" class="enlightenment-input" />
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionVuMeterMediumThreshold"]</small>
+                </div>
+                <!-- High threshold. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="VuMeterHighThreshold">@_localizer["VuMeterHighThreshold"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <input type="number" id="VuMeterHighThreshold" min="0" max="1" step="0.05" class="enlightenment-input" />
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionVuMeterHighThreshold"]</small>
+                </div>
+                <!-- Show peak. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="VuMeterShowPeak">@_localizer["VuMeterShowPeak"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <label class="enlightenment-checkbox-label">
+                            <input type="checkbox" id="VuMeterShowPeak" class="enlightenment-checkbox-hidden" />
+                            <span class="enlightenment-checkbox"></span>
+                        </label>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionVuMeterShowPeak"]</small>
+                </div>
+                <!-- Peak hold duration. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="VuMeterPeakHoldDurationInMilliseconds">@_localizer["VuMeterPeakHoldDuration"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <input type="number" id="VuMeterPeakHoldDurationInMilliseconds" min="0" max="10000" step="50" class="enlightenment-input" />
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionVuMeterPeakHoldDuration"]</small>
+                </div>
+                <!-- Display release. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="VuMeterReleasePerSecond">@_localizer["VuMeterReleasePerSecond"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <input type="number" id="VuMeterReleasePerSecond" min="0" max="100" step="0.05" class="enlightenment-input" />
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionVuMeterReleasePerSecond"]</small>
+                </div>
+                <!-- Peak release. -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label for="VuMeterPeakReleasePerSecond">@_localizer["VuMeterPeakReleasePerSecond"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <input type="number" id="VuMeterPeakReleasePerSecond" min="0" max="100" step="0.05" class="enlightenment-input" />
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionVuMeterPeakReleasePerSecond"]</small>
+                </div>
                 <div class="form-row" style="justify-content: center;">
                     <button type="submit" class="confirm-button h-22px">@_localizer["Save"]</button>
                 </div>
@@ -154,6 +326,20 @@
         const checkboxShouldPreserveBookStyles = document.getElementById('ShouldPreserveBookStyles');
         const checkboxShouldAggregateMetadataWhenMissing = document.getElementById('ShouldAggregateMetadataWhenMissing');
         const checkboxShouldAggregateArtworkWhenMissing = document.getElementById('ShouldAggregateArtworkWhenMissing');
+        const checkboxShouldKeepDownloadingWhilePaused = document.getElementById('ShouldKeepDownloadingWhilePaused');
+        const checkboxShouldAutoplay = document.getElementById('ShouldAutoplay');
+        const checkboxIsGaplessPlaybackEnabled = document.getElementById('IsGaplessPlaybackEnabled');
+        const selectReplayGainMode = document.getElementById('ReplayGainMode');
+        const selectStreamingQuality = document.getElementById('StreamingQuality');
+        const selectVuMeterOrientation = document.getElementById('VuMeterOrientation');
+        const inputVuMeterSegmentCount = document.getElementById('VuMeterSegmentCount');
+        const inputVuMeterSegmentGap = document.getElementById('VuMeterSegmentGap');
+        const inputVuMeterMediumThreshold = document.getElementById('VuMeterMediumThreshold');
+        const inputVuMeterHighThreshold = document.getElementById('VuMeterHighThreshold');
+        const checkboxVuMeterShowPeak = document.getElementById('VuMeterShowPeak');
+        const inputVuMeterPeakHoldDurationInMilliseconds = document.getElementById('VuMeterPeakHoldDurationInMilliseconds');
+        const inputVuMeterReleasePerSecond = document.getElementById('VuMeterReleasePerSecond');
+        const inputVuMeterPeakReleasePerSecond = document.getElementById('VuMeterPeakReleasePerSecond');
 
         // Toggle the enabled state of the items per page input based on the pagination checkbox.
         function updateItemsPerPageEnabledState() {
@@ -172,11 +358,30 @@
                 checkboxShouldPreserveBookStyles.checked = data.shouldPreserveBookStyles === true;
                 checkboxShouldAggregateMetadataWhenMissing.checked = data.shouldAggregateMetadataWhenMissing === true;
                 checkboxShouldAggregateArtworkWhenMissing.checked = data.shouldAggregateArtworkWhenMissing === true;
+                checkboxShouldKeepDownloadingWhilePaused.checked = data.shouldKeepDownloadingWhilePaused === true;
+                checkboxShouldAutoplay.checked = data.shouldAutoplay === true;
+                checkboxIsGaplessPlaybackEnabled.checked = data.isGaplessPlaybackEnabled === true;
+                selectReplayGainMode.value = data.replayGainMode ?? 'Off';
+                selectStreamingQuality.value = data.streamingQuality ?? 'Auto';
+                selectVuMeterOrientation.value = data.vuMeterOrientation ?? 'Vertical';
+                inputVuMeterSegmentCount.value = data.vuMeterSegmentCount ?? 12;
+                inputVuMeterSegmentGap.value = data.vuMeterSegmentGap ?? 1;
+                inputVuMeterMediumThreshold.value = data.vuMeterMediumThreshold ?? 0.6;
+                inputVuMeterHighThreshold.value = data.vuMeterHighThreshold ?? 0.8;
+                checkboxVuMeterShowPeak.checked = data.vuMeterShowPeak !== false;
+                inputVuMeterPeakHoldDurationInMilliseconds.value = data.vuMeterPeakHoldDurationInMilliseconds ?? 650;
+                inputVuMeterReleasePerSecond.value = data.vuMeterReleasePerSecond ?? 3;
+                inputVuMeterPeakReleasePerSecond.value = data.vuMeterPeakReleasePerSecond ?? 0.65;
                 updateItemsPerPageEnabledState();
             }
         }
 
         // Save the settings of the current user.
+        // An empty numeric field is sent as null, so the server reports it as missing instead of reading it as zero.
+        function readOptionalNumber(input) {
+            return input.value.trim() === '' ? null : Number(input.value);
+        }
+
         async function handleSaveUserSettingsAsync() {
             const formData = {
                 IsPaginationEnabled: checkboxIsPaginationEnabled.checked,
@@ -186,11 +391,30 @@
                 ShouldAggregateMetadataWhenMissing: checkboxShouldAggregateMetadataWhenMissing.checked,
                 ShouldAggregateArtworkWhenMissing: checkboxShouldAggregateArtworkWhenMissing.checked,
                 ShouldRenderPdfAsImages: checkboxShouldRenderPdfAsImages.checked,
-                ShouldPreserveBookStyles: checkboxShouldPreserveBookStyles.checked
+                ShouldPreserveBookStyles: checkboxShouldPreserveBookStyles.checked,
+                ShouldKeepDownloadingWhilePaused: checkboxShouldKeepDownloadingWhilePaused.checked,
+                ShouldAutoplay: checkboxShouldAutoplay.checked,
+                IsGaplessPlaybackEnabled: checkboxIsGaplessPlaybackEnabled.checked,
+                ReplayGainMode: selectReplayGainMode.value,
+                StreamingQuality: selectStreamingQuality.value,
+                VuMeterOrientation: selectVuMeterOrientation.value,
+                VuMeterSegmentCount: readOptionalNumber(inputVuMeterSegmentCount),
+                VuMeterSegmentGap: readOptionalNumber(inputVuMeterSegmentGap),
+                VuMeterMediumThreshold: readOptionalNumber(inputVuMeterMediumThreshold),
+                VuMeterHighThreshold: readOptionalNumber(inputVuMeterHighThreshold),
+                VuMeterShowPeak: checkboxVuMeterShowPeak.checked,
+                VuMeterPeakHoldDurationInMilliseconds: readOptionalNumber(inputVuMeterPeakHoldDurationInMilliseconds),
+                VuMeterReleasePerSecond: readOptionalNumber(inputVuMeterReleasePerSecond),
+                VuMeterPeakReleasePerSecond: readOptionalNumber(inputVuMeterPeakReleasePerSecond)
             };
             const data = await callApiPostAsync('@_urlService.GetAbsoluteUrl(WebRoutes.Settings.UPDATE_USER_SETTINGS)', formData);
-            if (data && data.isUpdated === true)
+            if (data && data.isUpdated === true) {
                 notificationService.show('@_localizer["SettingsSaved"]', NotificationType.SUCCESS);
+                // The player lives in the layout and is not recreated by the navigation manager, so the saved playback and
+                // VU meter settings are handed to it directly instead of waiting for a full page reload.
+                if (window.LuminaAudioPlayer && window.LuminaAudioPlayer.instance && typeof window.LuminaAudioPlayer.instance.reloadPreferencesAsync === 'function')
+                    await window.LuminaAudioPlayer.instance.reloadPreferencesAsync();
+            }
         }
 
         // On form submit event.

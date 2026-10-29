@@ -1,6 +1,9 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Common;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Lumina.Contracts.Fixtures.Core.DTO.Common;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
@@ -33,7 +36,11 @@ public class AddBookEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
     private readonly HttpClient _client;
     private readonly AddBookRequestFixture _addBookRequestFixture = new();
     private readonly WrittenContentMetadataDtoFixture _writtenContentMetadataDtoFixture = new();
+    private readonly GenreDtoFixture _genreDtoFixture = new();
+    private readonly TagDtoFixture _tagDtoFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
+    private readonly TagEntityFixture _tagEntityFixture = new();
+    private readonly GenreEntityFixture _genreEntityFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
@@ -172,6 +179,68 @@ public class AddBookEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         BookEntity storedBook = await dbContext.Books.SingleAsync(book => book.LibraryId == libraryId);
         Assert.Equal(maliciousTitle, storedBook.Title);
+
+        await _apiFactory.RemoveTestUserAsync(username);
+    }
+
+    [Theory]
+    [InlineData("'; DROP TABLE Tags; --")] // destructive injection in a tag and genre name
+    [InlineData("' OR '1'='1")] // boolean-based injection in a tag and genre name
+    public async Task AddBook_WithSQLInjectionInTagAndGenreNames_ShouldNotCorruptOrLeakData(string maliciousName)
+    {
+        // Arrange
+        HttpClient client = _apiFactory.CreateClient();
+        (Guid userId, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(client);
+        Guid libraryId = Guid.NewGuid();
+        string contentLocation = Path.GetTempPath();
+        string suffix = Guid.NewGuid().ToString("N")[..8];
+        string seededTagName = $"seeded-tag-{suffix}";
+        string seededGenreName = $"seeded-genre-{suffix}";
+        using (IServiceScope seedScope = _apiFactory.Services.CreateScope())
+        {
+            LuminaDbContext seedDbContext = seedScope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            seedDbContext.Libraries.Add(_libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Test Library", libraryType: LibraryType.EBook, contentLocations: [contentLocation]));
+            seedDbContext.Set<TagEntity>().Add(_tagEntityFixture.Create(name: seededTagName));
+            seedDbContext.Set<GenreEntity>().Add(_genreEntityFixture.Create(name: seededGenreName));
+            await seedDbContext.SaveChangesAsync();
+        }
+        string injectedTagName = $"{maliciousName} {suffix}";
+        string injectedGenreName = $"{maliciousName} genre {suffix}";
+        AddBookRequest request = _addBookRequestFixture.Create(
+            path: Path.Combine(contentLocation, $"{Guid.NewGuid()}.epub"),
+            metadata: _writtenContentMetadataDtoFixture.Create(
+                genres: [_genreDtoFixture.Create(name: injectedGenreName)],
+                tags: [_tagDtoFixture.Create(name: injectedTagName)]),
+            contributors: []);
+
+        // Act
+        HttpResponseMessage response = await client.PostAsJsonAsync($"/api/v1/libraries/{libraryId}/books", request);
+        string content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        // The malicious names are user data, not SQL: they must be stored verbatim (normalized) without breaking the request or the schema.
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        Assert.DoesNotContain("SQL", content, StringComparison.Ordinal);
+        Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("StackTrace", content, StringComparison.OrdinalIgnoreCase);
+
+        using (IServiceScope scope = _apiFactory.Services.CreateScope())
+        {
+            LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            Assert.Equal(1, await dbContext.Libraries.CountAsync(library => library.Id == libraryId));
+            Assert.Equal(1, await dbContext.Books.CountAsync(book => book.LibraryId == libraryId));
+            // The join rows must still exist and point at the normalized tag and genre that the request supplied.
+            BookEntity storedBook = await dbContext.Books
+                .Include(book => book.Tags)
+                .Include(book => book.Genres)
+                .SingleAsync(book => book.LibraryId == libraryId);
+            Assert.Equal(injectedTagName.ToLowerInvariant(), Assert.Single(storedBook.Tags).Name);
+            Assert.Equal(injectedGenreName.ToLowerInvariant(), Assert.Single(storedBook.Genres).Name);
+            Assert.True(await dbContext.Set<TagEntity>().AnyAsync(tag => tag.Name == seededTagName));
+            Assert.True(await dbContext.Set<GenreEntity>().AnyAsync(genre => genre.Name == seededGenreName));
+            Assert.True(await dbContext.Set<TagEntity>().AnyAsync(tag => tag.Name == injectedTagName.ToLowerInvariant()));
+            Assert.True(await dbContext.Set<GenreEntity>().AnyAsync(genre => genre.Name == injectedGenreName.ToLowerInvariant()));
+        }
 
         await _apiFactory.RemoveTestUserAsync(username);
     }

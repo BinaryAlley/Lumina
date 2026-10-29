@@ -1,0 +1,2 @@
+GET {{host}}/api/v1/users/me/favorites?mediaKind=MusicTrack&currentPage=1&perPage=200
+Authorization: Bearer {{ACCESS_TOKEN}}

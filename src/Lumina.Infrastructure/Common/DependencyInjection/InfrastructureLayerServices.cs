@@ -2,6 +2,7 @@
 using Lumina.Application.Common.DomainEvents;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
+using Lumina.Application.Common.Infrastructure.Authorization.Policies.ConsumptionActivity;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.Over18;
 using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
@@ -13,6 +14,7 @@ using Lumina.Application.Common.Infrastructure.Themes;
 using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artwork;
+using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
 using Lumina.Application.Core.MediaLibrary.Management.Progress;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Artwork;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
@@ -29,6 +31,7 @@ using Lumina.Infrastructure.Common.Networking;
 using Lumina.Infrastructure.Core.Authentication;
 using Lumina.Infrastructure.Core.Authorization;
 using Lumina.Infrastructure.Core.Authorization.Policies.Common.Factory;
+using Lumina.Infrastructure.Core.Authorization.Policies.ConsumptionActivity;
 using Lumina.Infrastructure.Core.Authorization.Policies.LibraryOwnership;
 using Lumina.Infrastructure.Core.Authorization.Policies.Over18;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Cancellation;
@@ -38,6 +41,7 @@ using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.WrittenCo
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Progress;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Queue;
 using Lumina.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artwork;
+using Lumina.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
 using Lumina.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Artwork;
 using Lumina.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
 using Lumina.Infrastructure.Core.Plugins;
@@ -101,6 +105,7 @@ public static class InfrastructureLayerServices
         // Authorization.
         services.AddScoped<IOver18Policy, Over18Policy>();
         services.AddScoped<ILibraryOwnershipPolicy, LibraryOwnershipPolicy>();
+        services.AddScoped<IConsumptionActivityAccessPolicy, ConsumptionActivityAccessPolicy>();
         services.AddScoped<IAuthorizationPolicyFactory, AuthorizationPolicyFactory>();
         services.AddScoped<IAuthorizationService, AuthorizationService>();
 
@@ -145,6 +150,26 @@ public static class InfrastructureLayerServices
 
         // Music artwork: stores the artwork of the albums into the internal media directory.
         services.AddScoped<IMusicArtworkService, MusicArtworkService>();
+
+        // Music playback: decides, for a track and the capabilities a player advertises, whether the track is played as stored,
+        // repackaged into another container, or re-encoded into another codec.
+        services.AddSingleton<IPlaybackFormatService, PlaybackFormatService>();
+
+        // Music playback: issues and resolves the opaque delivery handles reported by a playback manifest, so the segment route never has to
+        // recompute the delivery decision, the quality cap or the source file identity from values that can change while the track plays.
+        services.AddSingleton<IPlaybackDeliveryHandleService, PlaybackDeliveryHandleService>();
+
+        // Music playback: records the outcome of the ffmpeg probe, so a missing binary or encoder is reported as unavailable for the affected formats.
+        services.AddSingleton<TranscodingToolchainStatus>();
+
+        // Music playback: produces the normalized (remuxed or transcoded) audio of a track with ffmpeg, caches it as fixed duration
+        // segments and serves it from the cache, bounded in concurrency, cancellable and capped in disk usage. The segment route of the
+        // playback stream surface is its consumer.
+        services.AddSingleton<ITrackNormalizationService, TrackNormalizationService>();
+
+        // Music playback: owns the normalized audio cache lifecycle and verifies the ffmpeg encoders at startup, so a missing or changed toolchain
+        // is recorded and reported as unavailable for the affected formats instead of surfacing as a per track playback failure.
+        services.AddHostedService<TranscodingStartupInitializer>();
 
         // Book reading: resolves the book reader plugins, extracts the books into a temporary directory, and serves their contents.
         // The enablement cache lets the reading service skip the per-request database read of the reader configurations.

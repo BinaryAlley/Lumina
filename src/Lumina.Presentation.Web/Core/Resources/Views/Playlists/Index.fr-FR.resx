@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Title" xml:space="preserve">
+    <value>Listes de lecture</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Nom</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Créer</value>
+  </data>
+  <data name="NoPlaylists" xml:space="preserve">
+    <value>Vous n&apos;avez encore aucune liste de lecture.</value>
+  </data>
+  <data name="Tracks" xml:space="preserve">
+    <value>pistes</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+  <data name="DeleteConfirm" xml:space="preserve">
+    <value>Supprimer cette liste de lecture ? Cette action est irréversible.</value>
+  </data>
+  <data name="DeleteFailed" xml:space="preserve">
+    <value>La liste de lecture n&apos;a pas pu être supprimée.</value>
+  </data>
+  <data name="CreateFailed" xml:space="preserve">
+    <value>La liste de lecture n&apos;a pas pu être créée.</value>
+  </data>
+  <data name="PlaylistNameRequired" xml:space="preserve">
+    <value>Une liste de lecture doit avoir un nom.</value>
+  </data>
+  <data name="Items" xml:space="preserve">
+    <value>éléments</value>
+  </data>
+</root>

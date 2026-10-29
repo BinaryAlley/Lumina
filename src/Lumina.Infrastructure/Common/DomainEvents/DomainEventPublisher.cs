@@ -32,7 +32,7 @@ public class DomainEventPublisher : IDomainEventPublisher
     /// Publishes the specified <paramref name="domainEvent"/> to all its registered handlers, in registration order.
     /// </summary>
     /// <param name="domainEvent">The domain event to publish.</param>
-    /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
     public ValueTask PublishAsync(IDomainEvent domainEvent, CancellationToken cancellationToken = default)
     {
@@ -54,7 +54,7 @@ public class DomainEventPublisher : IDomainEventPublisher
     /// <typeparam name="TDomainEvent">The type of the domain event being dispatched.</typeparam>
     /// <param name="domainEvent">The domain event to dispatch.</param>
     /// <param name="serviceProvider">The provider used to resolve the domain event handlers.</param>
-    /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
     private static async Task DispatchAsync<TDomainEvent>(IDomainEvent domainEvent, IServiceProvider serviceProvider, CancellationToken cancellationToken)
         where TDomainEvent : IDomainEvent

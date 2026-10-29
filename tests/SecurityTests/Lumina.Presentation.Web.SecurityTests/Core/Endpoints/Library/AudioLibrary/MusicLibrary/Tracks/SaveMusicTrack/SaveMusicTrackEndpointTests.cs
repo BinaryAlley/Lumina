@@ -6,13 +6,14 @@ using Lumina.Presentation.Web.Fixtures.Common.DTO.AudioLibrary.MusicLibrary;
 using Lumina.Presentation.Web.Fixtures.Common.Requests.Library.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.SecurityTests.Common.Setup;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Threading.Tasks;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 #endregion
 
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.SaveMusicTrack;
@@ -23,6 +24,11 @@ namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.AudioLibr
 [ExcludeFromCodeCoverage]
 public class SaveMusicTrackEndpointTests : IClassFixture<LuminaWebFactory>
 {
+    private static readonly JsonSerializerOptions s_jsonOptions = new(JsonSerializerDefaults.Web)
+    {
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+    };
+
     private readonly LuminaWebFactory _apiFactory;
     private readonly UpdateMusicTrackRequestFixture _updateMusicTrackRequestFixture = new();
     private readonly MusicTrackDtoFixture _musicTrackDtoFixture = new();
@@ -123,6 +129,44 @@ public class SaveMusicTrackEndpointTests : IClassFixture<LuminaWebFactory>
         Assert.Contains(_apiFactory.ApiClientStub.PutRequests, putRequest => putRequest.Endpoint == $"libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}" && putRequest.Data is UpdateMusicTrackRequest forwarded && forwarded.Metadata!.Title == maliciousTitle);
     }
 
+    [Theory]
+    [InlineData("C:\\Windows\\System32\\drivers\\etc\\hosts")] // Windows sensitive file
+    [InlineData("/etc/passwd")] // Unix sensitive file
+    public async Task SaveMusicTrack_WhenPostedBodyAttemptsToSetTheFilePath_ShouldNotForwardAFilePathToTheApi(string attemptedPath)
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        Guid libraryId = Guid.NewGuid();
+        Guid artistId = Guid.NewGuid();
+        Guid albumId = Guid.NewGuid();
+        Guid trackId = Guid.NewGuid();
+        UpdateMusicTrackRequest request = _updateMusicTrackRequestFixture.Create();
+        MusicTrackDto expectedTrack = _musicTrackDtoFixture.Create(id: trackId);
+        _apiFactory.ApiClientStub.RegisterPutResponse($"libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}", expectedTrack);
+        AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
+        HttpRequestMessage saveRequest = CreateSaveRequest(artistId.ToString(), albumId.ToString(), trackId.ToString(), libraryId.ToString(), request, attemptedPath);
+        saveRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);
+
+        // Act
+        HttpResponseMessage response = await webClient.Client.SendAsync(saveRequest);
+        string content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        // The Web request type has no file system path, so a posted path can never reach the API, and the response must not echo it
+        // nor leak stack traces or database details.
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.DoesNotContain(attemptedPath, content, StringComparison.Ordinal);
+        Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
+        (string Endpoint, object? Data) forwardedRequest = Assert.Single(
+            _apiFactory.ApiClientStub.PutRequests,
+            putRequest => putRequest.Endpoint == $"libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}");
+        UpdateMusicTrackRequest forwarded = Assert.IsType<UpdateMusicTrackRequest>(forwardedRequest.Data);
+        Assert.Equal(request.Metadata!.Title, forwarded.Metadata!.Title);
+        using JsonDocument forwardedJson = JsonDocument.Parse(JsonSerializer.Serialize(forwarded, s_jsonOptions));
+        Assert.False(forwardedJson.RootElement.TryGetProperty("path", out _));
+    }
+
     [Fact]
     public async Task SaveMusicTrack_WhenCalledWithoutAntiforgeryToken_ShouldRejectRequestAndNotCallApi()
     {
@@ -174,6 +218,29 @@ public class SaveMusicTrackEndpointTests : IClassFixture<LuminaWebFactory>
         HttpRequestMessage saveRequest = new(HttpMethod.Put, $"/en-us/library/audio-library/music-library/artists/{Uri.EscapeDataString(artistId)}/albums/{Uri.EscapeDataString(albumId)}/tracks/{Uri.EscapeDataString(trackId)}/api-save-track?libraryId={Uri.EscapeDataString(libraryId)}")
         {
             Content = JsonContent.Create(request)
+        };
+        saveRequest.Content!.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+        saveRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        return saveRequest;
+    }
+
+    /// <summary>
+    /// Builds the save request that PUTs the given <paramref name="request"/>, carrying an extra file system path property, to the track identified by the route, with the owning library passed through the query string.
+    /// </summary>
+    /// <param name="artistId">The raw route value of the artist Id.</param>
+    /// <param name="albumId">The raw route value of the album Id.</param>
+    /// <param name="trackId">The raw route value of the track Id.</param>
+    /// <param name="libraryId">The raw query value of the library Id.</param>
+    /// <param name="request">The track data to send.</param>
+    /// <param name="attemptedPath">The file system path to inject into the posted body.</param>
+    /// <returns>The configured save request.</returns>
+    private static HttpRequestMessage CreateSaveRequest(string artistId, string albumId, string trackId, string libraryId, UpdateMusicTrackRequest request, string attemptedPath)
+    {
+        JsonObject body = JsonSerializer.SerializeToNode(request, s_jsonOptions)!.AsObject();
+        body["path"] = attemptedPath;
+        HttpRequestMessage saveRequest = new(HttpMethod.Put, $"/en-us/library/audio-library/music-library/artists/{Uri.EscapeDataString(artistId)}/albums/{Uri.EscapeDataString(albumId)}/tracks/{Uri.EscapeDataString(trackId)}/api-save-track?libraryId={Uri.EscapeDataString(libraryId)}")
+        {
+            Content = new StringContent(body.ToJsonString(s_jsonOptions), Encoding.UTF8, "application/json")
         };
         saveRequest.Content!.Headers.ContentType = new MediaTypeHeaderValue("application/json");
         saveRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

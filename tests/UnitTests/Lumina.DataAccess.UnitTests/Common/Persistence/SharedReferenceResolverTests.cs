@@ -96,6 +96,175 @@ public class SharedReferenceResolverTests
     }
 
     [Fact]
+    public async Task ResolveAsync_WhenIncomingNamesDifferOnlyByCasing_ShouldCollapseThemToASingleInstance()
+    {
+        // Arrange
+        TagEntity firstTag = _tagEntityFixture.Create(name: "Horror");
+        TagEntity secondTag = _tagEntityFixture.Create(name: "horror");
+
+        // Act
+        Result<IReadOnlyDictionary<string, TagEntity>> resolveResult = await SharedReferenceResolver.ResolveAsync(_mockContext, [firstTag, secondTag], Errors.Metadata.TagNameCannotBeEmpty, CancellationToken.None);
+
+        // Assert
+        Assert.False(resolveResult.IsFailure);
+        Assert.Single(resolveResult.Value);
+        Assert.Same(firstTag, resolveResult.Value["horror"]);
+    }
+
+    [Fact]
+    public async Task ResolveAsync_WhenAStoredNameDiffersOnlyByCasing_ShouldReturnTheStoredInstance()
+    {
+        // Arrange
+        TagEntity storedTag = _tagEntityFixture.Create(name: "horror");
+        _mockContext.Set<TagEntity>().Add(storedTag);
+        await _mockContext.SaveChangesAsync();
+
+        // Detach the stored row, so that the resolution cannot take the tracked shortcut and must read it from the storage medium.
+        _mockContext.ChangeTracker.Clear();
+        TagEntity incomingTag = _tagEntityFixture.Create(name: "Horror");
+
+        // Act
+        Result<IReadOnlyDictionary<string, TagEntity>> resolveResult = await SharedReferenceResolver.ResolveAsync(_mockContext, [incomingTag], Errors.Metadata.TagNameCannotBeEmpty, CancellationToken.None);
+
+        // Assert
+        Assert.False(resolveResult.IsFailure);
+        TagEntity resolvedTag = resolveResult.Value["horror"];
+        // A different instance than the incoming one proves the stored row was reused instead of the incoming one being inserted.
+        Assert.NotSame(incomingTag, resolvedTag);
+        Assert.Equal("horror", resolvedTag.Name);
+    }
+
+    [Fact]
+    public async Task ResolveAsync_WhenIncomingNamesDifferOnlyByWhitespaceAndCasing_ShouldCollapseThemToTheNormalizedName()
+    {
+        // Arrange
+        TagEntity firstTag = _tagEntityFixture.Create(name: "  Horror  ");
+        TagEntity secondTag = _tagEntityFixture.Create(name: "HORROR");
+        TagEntity thirdTag = _tagEntityFixture.Create(name: "horror");
+
+        // Act
+        Result<IReadOnlyDictionary<string, TagEntity>> resolveResult = await SharedReferenceResolver.ResolveAsync(_mockContext, [firstTag, secondTag, thirdTag], Errors.Metadata.TagNameCannotBeEmpty, CancellationToken.None);
+
+        // Assert
+        Assert.False(resolveResult.IsFailure);
+        Assert.Single(resolveResult.Value);
+        Assert.Same(firstTag, resolveResult.Value["horror"]);
+    }
+
+    [Fact]
+    public async Task ResolveAsync_WhenAStoredNormalizedNameExistsAndTheIncomingNameIsPaddedAndMixedCase_ShouldReturnTheStoredInstance()
+    {
+        // Arrange
+        TagEntity storedTag = _tagEntityFixture.Create(name: "horror");
+        _mockContext.Set<TagEntity>().Add(storedTag);
+        await _mockContext.SaveChangesAsync();
+
+        // Detach the stored row, so that the resolution cannot take the tracked shortcut and must read it from the storage medium.
+        _mockContext.ChangeTracker.Clear();
+        TagEntity incomingTag = _tagEntityFixture.Create(name: "  HoRRoR  ");
+
+        // Act
+        Result<IReadOnlyDictionary<string, TagEntity>> resolveResult = await SharedReferenceResolver.ResolveAsync(_mockContext, [incomingTag], Errors.Metadata.TagNameCannotBeEmpty, CancellationToken.None);
+
+        // Assert
+        Assert.False(resolveResult.IsFailure);
+        Assert.Single(resolveResult.Value);
+        TagEntity resolvedTag = resolveResult.Value["horror"];
+        Assert.NotSame(incomingTag, resolvedTag);
+        Assert.Equal("horror", resolvedTag.Name);
+    }
+
+    [Fact]
+    public async Task ResolveAsync_WhenATrackedLegacyMixedCaseRowExistsAndTheIncomingNameIsNormalized_ShouldReturnTheTrackedInstance()
+    {
+        // Arrange
+        TagEntity trackedTag = _tagEntityFixture.Create(name: "Horror");
+        _mockContext.Set<TagEntity>().Add(trackedTag);
+        TagEntity incomingTag = _tagEntityFixture.Create(name: "horror");
+
+        // Act
+        Result<IReadOnlyDictionary<string, TagEntity>> resolveResult = await SharedReferenceResolver.ResolveAsync(_mockContext, [incomingTag], Errors.Metadata.TagNameCannotBeEmpty, CancellationToken.None);
+
+        // Assert
+        Assert.False(resolveResult.IsFailure);
+        Assert.Same(trackedTag, resolveResult.Value["horror"]);
+    }
+
+    [Fact]
+    public async Task ResolveAsync_WhenANonAsciiUppercaseNameMatchesAStoredLowercaseName_ShouldReturnTheStoredInstance()
+    {
+        // Arrange
+        GenreEntity storedGenre = _genreEntityFixture.Create(name: "électro");
+        _mockContext.Set<GenreEntity>().Add(storedGenre);
+        await _mockContext.SaveChangesAsync();
+
+        // Detach the stored row, so that the resolution cannot take the tracked shortcut and must read it from the storage medium.
+        _mockContext.ChangeTracker.Clear();
+        GenreEntity incomingGenre = _genreEntityFixture.Create(name: "ÉLECTRO");
+
+        // Act
+        Result<IReadOnlyDictionary<string, GenreEntity>> resolveResult = await SharedReferenceResolver.ResolveAsync(_mockContext, [incomingGenre], Errors.Metadata.GenreNameCannotBeEmpty, CancellationToken.None);
+
+        // Assert
+        Assert.False(resolveResult.IsFailure);
+        Assert.Single(resolveResult.Value);
+        GenreEntity resolvedGenre = resolveResult.Value["électro"];
+        Assert.NotSame(incomingGenre, resolvedGenre);
+        Assert.Equal("électro", resolvedGenre.Name);
+    }
+
+    [Fact]
+    public async Task Normalize_WhenANameIsPaddedAndMixedCase_ShouldMapToTheResolvedInstance()
+    {
+        // Arrange
+        TagEntity resolvedTag = _tagEntityFixture.Create(name: "horror");
+        TagEntity incomingTag = _tagEntityFixture.Create(name: "  HoRRoR  ");
+        Result<IReadOnlyDictionary<string, TagEntity>> resolveResult = await SharedReferenceResolver.ResolveAsync(_mockContext, [resolvedTag], Errors.Metadata.TagNameCannotBeEmpty, CancellationToken.None);
+
+        // Act
+        IReadOnlyCollection<TagEntity> normalizedTags = SharedReferenceResolver.Normalize([incomingTag], resolveResult.Value);
+
+        // Assert
+        Assert.Same(resolvedTag, Assert.Single(normalizedTags));
+    }
+
+    [Fact]
+    public async Task ReconcileAsync_WhenAStoredNormalizedNameExistsAndTheIncomingNameIsPaddedAndMixedCase_ShouldReuseTheStoredInstance()
+    {
+        // Arrange
+        TagEntity storedTag = _tagEntityFixture.Create(name: "horror");
+        _mockContext.Set<TagEntity>().Add(storedTag);
+        await _mockContext.SaveChangesAsync();
+
+        List<TagEntity> trackedTags = [];
+        TagEntity incomingTag = _tagEntityFixture.Create(name: "  HoRRoR  ");
+
+        // Act
+        Result<Updated> result = await SharedReferenceResolver.ReconcileAsync(_mockContext, trackedTags, [incomingTag], Errors.Metadata.TagNameCannotBeEmpty, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Same(storedTag, Assert.Single(trackedTags));
+    }
+
+    [Fact]
+    public async Task ReconcileAsync_WhenANewNameIsRepeatedWithDifferentCasingAndWhitespace_ShouldAddASingleInstance()
+    {
+        // Arrange
+        List<TagEntity> trackedTags = [];
+        TagEntity firstTag = _tagEntityFixture.Create(name: "  Horror  ");
+        TagEntity secondTag = _tagEntityFixture.Create(name: "HORROR");
+        TagEntity thirdTag = _tagEntityFixture.Create(name: "horror");
+
+        // Act
+        Result<Updated> result = await SharedReferenceResolver.ReconcileAsync(_mockContext, trackedTags, [firstTag, secondTag, thirdTag], Errors.Metadata.TagNameCannotBeEmpty, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Same(firstTag, Assert.Single(trackedTags));
+    }
+
+    [Fact]
     public async Task ResolveAsync_WhenThereAreNoIncomingEntities_ShouldReturnAnEmptyDictionary()
     {
         // Act
@@ -135,6 +304,21 @@ public class SharedReferenceResolverTests
         // Assert
         TagEntity normalizedTag = Assert.Single(normalizedTags);
         Assert.Same(firstTag, normalizedTag);
+    }
+
+    [Fact]
+    public async Task Normalize_WhenANameDiffersOnlyByCasingFromTheResolvedName_ShouldMapToTheResolvedInstance()
+    {
+        // Arrange
+        TagEntity resolvedTag = _tagEntityFixture.Create(name: "horror");
+        TagEntity incomingTag = _tagEntityFixture.Create(name: "Horror");
+        Result<IReadOnlyDictionary<string, TagEntity>> resolveResult = await SharedReferenceResolver.ResolveAsync(_mockContext, [resolvedTag], Errors.Metadata.TagNameCannotBeEmpty, CancellationToken.None);
+
+        // Act
+        IReadOnlyCollection<TagEntity> normalizedTags = SharedReferenceResolver.Normalize([incomingTag], resolveResult.Value);
+
+        // Assert
+        Assert.Same(resolvedTag, Assert.Single(normalizedTags));
     }
 
     [Fact]

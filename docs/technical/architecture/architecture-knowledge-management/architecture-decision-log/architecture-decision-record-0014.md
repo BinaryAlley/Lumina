@@ -82,3 +82,17 @@ Introduce a generic persistence engine driven by a per-aggregate profile describ
 Stop modeling shared references as a shared table keyed by name, and store them per aggregate, removing the duplicate-key-in-graph class of bug at the source.
 
 **Rejected**: it requires a database schema change and changes query behavior for shared references, which is out of scope. The shared tables are kept, and the concern is handled where it belongs, in the persistence toolkit.
+
+## Amendment: Set-Based Playlist Entry Operations (2026-10-20)
+
+The playlist entries are mutated by set-based storage operations because a playlist can hold a whole library. The batched raw append and the `ExecuteUpdateAsync` and `ExecuteDeleteAsync` move and removal statements bypass the change tracker and therefore also bypass the auditing interceptor.
+
+Those operations stamp `UpdatedOnUtc` and `UpdatedBy` on the playlist row themselves, stamp the creation or update audit columns of the entry rows they write, and increment the playlist concurrency token, in the same transaction. This is the only exception to the rule that the auditing interceptor is the only writer of the audit columns. Details edits still go through `EditableValuesCopier` and leave the audit columns to the interceptor. The exception is confined to `PlaylistRepository` and is documented in the class remarks.
+
+Ordering is storage owned as well. The unique index on `(PlaylistId, Position)` is the enforced invariant, and the positions are sparse order keys rather than dense indices. A move normally changes one key to the midpoint between its new neighbors, and a removal deletes one row, so neither rewrites the following range. If repeated midpoint moves exhaust the numeric gap between two neighbors, a rare rebalance respaces the keys with a temporary table and two passes so the unique index is never violated. The domain only rejects duplicate positions on reconstitution, so a storage gap is readable instead of making the playlist impossible to load.
+
+## Amendment: Playlist Entry Count and Change Detection (2026-10-21)
+
+The playlist row now carries a denormalized `EntryCount`, maintained by the set-based append and removal operations in the same statement that updates the playlist activity time and concurrency token. Window reads, moves and the single-add read-back use that column instead of counting the entries of the playlist, so none of them scan an index proportional to the playlist size.
+
+Details edits still go through `EditableValuesCopier`, but the copier now compares the incoming value with the tracked value before assigning it and marks only an actual change as modified. `PlaylistRepository.UpdateAsync` also compares the tracked original values explicitly before it decides to increment the concurrency token, so a no-op save neither restamps the row nor bumps its version.

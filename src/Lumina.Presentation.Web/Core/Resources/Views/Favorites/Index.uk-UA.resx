@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Title" xml:space="preserve">
+    <value>Улюблене</value>
+  </data>
+  <data name="NoFavorites" xml:space="preserve">
+    <value>У вас ще немає улюбленого.</value>
+  </data>
+  <data name="NoFavoritesInKind" xml:space="preserve">
+    <value>У вас ще немає улюбленого цього типу.</value>
+  </data>
+  <data name="Unavailable" xml:space="preserve">
+    <value>Цей елемент більше недоступний.</value>
+  </data>
+  <data name="FilterAll" xml:space="preserve">
+    <value>Усе</value>
+  </data>
+  <data name="FilterArtists" xml:space="preserve">
+    <value>Виконавці</value>
+  </data>
+  <data name="FilterAlbums" xml:space="preserve">
+    <value>Альбоми</value>
+  </data>
+  <data name="FilterTracks" xml:space="preserve">
+    <value>Треки</value>
+  </data>
+  <data name="FilterBooks" xml:space="preserve">
+    <value>Книги</value>
+  </data>
+  <data name="KindArtist" xml:space="preserve">
+    <value>Виконавець</value>
+  </data>
+  <data name="KindAlbum" xml:space="preserve">
+    <value>Альбом</value>
+  </data>
+  <data name="KindTrack" xml:space="preserve">
+    <value>Трек</value>
+  </data>
+  <data name="KindBook" xml:space="preserve">
+    <value>Книга</value>
+  </data>
+  <data name="LoadMore" xml:space="preserve">
+    <value>Завантажити ще</value>
+  </data>
+  <data name="ItemsCount" xml:space="preserve">
+    <value>елементів</value>
+  </data>
+  <data name="LoadFailed" xml:space="preserve">
+    <value>Не вдалося завантажити улюблене.</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>Повторити</value>
+  </data>
+</root>

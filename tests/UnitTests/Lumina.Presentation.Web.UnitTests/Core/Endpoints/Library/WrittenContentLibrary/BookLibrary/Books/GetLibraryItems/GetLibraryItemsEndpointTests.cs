@@ -1,11 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Presentation.Web.Common.Api;
+using Lumina.Presentation.Web.Common.DTO.Common;
 using Lumina.Presentation.Web.Common.DTO.Libraries;
 using Lumina.Presentation.Web.Common.Enums.Common;
 using Lumina.Presentation.Web.Common.Requests.Libraries;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetLibraryItems;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
 using Lumina.Presentation.Web.Fixtures.Common.DTO.Libraries;
 using Lumina.Presentation.Web.Fixtures.Common.Requests.Libraries;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
@@ -30,7 +32,7 @@ public class GetLibraryItemsEndpointTests
     private readonly IApiHttpClient _mockApiHttpClient;
     private readonly GetLibraryItemsEndpoint _sut;
     private readonly GetBooksLiteRequestFixture _getBooksLiteRequestFixture = new();
-    private readonly PaginatedBookLiteDtoFixture _paginatedBookLiteDtoFixture = new();
+    private readonly PaginatedDtoFixture<BookLiteDto> _paginatedBookLiteDtoFixture = new();
     private readonly BookLiteDtoFixture _bookLiteDtoFixture = new();
 
     /// <summary>
@@ -54,14 +56,14 @@ public class GetLibraryItemsEndpointTests
             shouldIgnoreThePrefixForAlphaPicker: true,
             sortBy: "title",
             sortOrder: SortOrder.Ascending);
-        _mockApiHttpClient.GetAsync<PaginatedBookLiteDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.GetAsync<PaginatedDto<BookLiteDto>>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(_paginatedBookLiteDtoFixture.Create());
 
         // Act
         await _sut.ExecuteAsync(request, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).GetAsync<PaginatedBookLiteDto>(
+        await _mockApiHttpClient.Received(1).GetAsync<PaginatedDto<BookLiteDto>>(
             Arg.Is<string>(endpoint =>
                 endpoint.StartsWith(ApiRoutes.Books.GET_BOOKS_LITE.Replace("{libraryId}", request.LibraryId.ToString()), StringComparison.OrdinalIgnoreCase) &&
                 endpoint.Contains("currentPage=2") &&
@@ -79,14 +81,14 @@ public class GetLibraryItemsEndpointTests
     {
         // Arrange
         GetBooksLiteRequest request = _getBooksLiteRequestFixture.Create();
-        _mockApiHttpClient.GetAsync<PaginatedBookLiteDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.GetAsync<PaginatedDto<BookLiteDto>>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(_paginatedBookLiteDtoFixture.Create());
 
         // Act
         await _sut.ExecuteAsync(request, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).GetAsync<PaginatedBookLiteDto>(
+        await _mockApiHttpClient.Received(1).GetAsync<PaginatedDto<BookLiteDto>>(
             Arg.Is<string>(endpoint =>
                 endpoint.StartsWith(ApiRoutes.Books.GET_BOOKS_LITE.Replace("{libraryId}", request.LibraryId.ToString()), StringComparison.OrdinalIgnoreCase) &&
                 endpoint.EndsWith("?shouldIgnoreThePrefixForAlphaPicker=False", StringComparison.OrdinalIgnoreCase) &&
@@ -101,13 +103,13 @@ public class GetLibraryItemsEndpointTests
     {
         // Arrange
         GetBooksLiteRequest request = _getBooksLiteRequestFixture.Create();
-        PaginatedBookLiteDto expectedResponse = _paginatedBookLiteDtoFixture.Create(
+        PaginatedDto<BookLiteDto> expectedResponse = _paginatedBookLiteDtoFixture.Create(
             data: [_bookLiteDtoFixture.Create(title: "Test Book")],
             currentPage: 1,
             perPage: 48,
             count: 1,
             numberOfPages: 1);
-        _mockApiHttpClient.GetAsync<PaginatedBookLiteDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.GetAsync<PaginatedDto<BookLiteDto>>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(expectedResponse);
 
         // Act

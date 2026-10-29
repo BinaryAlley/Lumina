@@ -77,6 +77,11 @@ public class Library : AggregateRoot<LibraryId>
     public bool ShouldSkipUnchangedDirectoriesDuringScan { get; private set; }
 
     /// <summary>
+    /// Gets the consumption settings of the media library.
+    /// </summary>
+    public LibraryConsumptionSettings ConsumptionSettings { get; private set; }
+
+    /// <summary>
     /// Gets the template describing the structure of the media library on disk, always populated with the effective template: the one specified by the
     /// user, or the ideal structure of the library type when none was provided.
     /// </summary>
@@ -106,6 +111,7 @@ public class Library : AggregateRoot<LibraryId>
     /// <param name="canDownloadMetadataFromWeb">Whether this media library should update the metadata of its elements from the web, or not.</param>
     /// <param name="shouldSaveMetadataInMediaDirectories">Whether this media library should copy the downloaded metadata into the media library content locations, or not.</param>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether this media library should skip the directories whose contents have not changed since the last scan, during the scan, or not.</param>
+    /// <param name="consumptionSettings">The consumption settings of the media library.</param>
     /// <param name="pathTemplate">The template describing the structure of the media library on disk.</param>
     /// <param name="scanIds">The list of objects representing the unique identifier of scans of the media library.</param>
     private Library(
@@ -120,6 +126,7 @@ public class Library : AggregateRoot<LibraryId>
         bool canDownloadMetadataFromWeb,
         bool shouldSaveMetadataInMediaDirectories,
         bool shouldSkipUnchangedDirectoriesDuringScan,
+        LibraryConsumptionSettings consumptionSettings,
         LibraryPathTemplate pathTemplate,
         List<ScanId> scanIds) : base(id)
     {
@@ -133,6 +140,7 @@ public class Library : AggregateRoot<LibraryId>
         CanDownloadMetadataFromWeb = canDownloadMetadataFromWeb;
         ShouldSaveMetadataInMediaDirectories = shouldSaveMetadataInMediaDirectories;
         ShouldSkipUnchangedDirectoriesDuringScan = shouldSkipUnchangedDirectoriesDuringScan;
+        ConsumptionSettings = consumptionSettings;
         PathTemplate = pathTemplate;
         _scanIds = scanIds;
     }
@@ -150,6 +158,7 @@ public class Library : AggregateRoot<LibraryId>
     /// <param name="canDownloadMetadataFromWeb">Whether this media library should update the metadata of its elements from the web, or not.</param>
     /// <param name="shouldSaveMetadataInMediaDirectories">Whether this media library should copy the downloaded metadata into the media library content locations, or not.</param>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether this media library should skip the directories whose contents have not changed since the last scan, during the scan, or not.</param>
+    /// <param name="consumptionSettings">The consumption settings of the media library.</param>
     /// <param name="pathTemplate">The template describing the structure of the media library on disk.</param>
     /// <param name="scanIds">The list of objects representing the unique identifier of scans of the media library.</param>
     /// <returns>
@@ -166,6 +175,7 @@ public class Library : AggregateRoot<LibraryId>
         bool canDownloadMetadataFromWeb,
         bool shouldSaveMetadataInMediaDirectories,
         bool shouldSkipUnchangedDirectoriesDuringScan,
+        LibraryConsumptionSettings consumptionSettings,
         LibraryPathTemplate pathTemplate,
         List<ScanId> scanIds)
     {
@@ -190,6 +200,7 @@ public class Library : AggregateRoot<LibraryId>
             canDownloadMetadataFromWeb,
             shouldSaveMetadataInMediaDirectories,
             shouldSkipUnchangedDirectoriesDuringScan,
+            consumptionSettings,
             pathTemplate,
             scanIds
         );
@@ -209,6 +220,7 @@ public class Library : AggregateRoot<LibraryId>
     /// <param name="canDownloadMetadataFromWeb">Whether this media library should update the metadata of its elements from the web, or not.</param>
     /// <param name="shouldSaveMetadataInMediaDirectories">Whether this media library should copy the downloaded metadata into the media library content locations, or not.</param>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether this media library should skip the directories whose contents have not changed since the last scan, during the scan, or not.</param>
+    /// <param name="consumptionSettings">The consumption settings of the media library.</param>
     /// <param name="pathTemplate">The template describing the structure of the media library on disk.</param>
     /// <param name="scanIds">The list of objects representing the unique identifier of scans of the media library.</param>
     /// <returns>
@@ -226,6 +238,7 @@ public class Library : AggregateRoot<LibraryId>
         bool canDownloadMetadataFromWeb,
         bool shouldSaveMetadataInMediaDirectories,
         bool shouldSkipUnchangedDirectoriesDuringScan,
+        LibraryConsumptionSettings consumptionSettings,
         LibraryPathTemplate pathTemplate,
         List<ScanId> scanIds)
     {
@@ -250,6 +263,7 @@ public class Library : AggregateRoot<LibraryId>
             canDownloadMetadataFromWeb,
             shouldSaveMetadataInMediaDirectories,
             shouldSkipUnchangedDirectoriesDuringScan,
+            consumptionSettings,
             pathTemplate,
             scanIds
         );

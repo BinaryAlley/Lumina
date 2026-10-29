@@ -219,4 +219,13 @@
   <data name="ScheduledJobs" xml:space="preserve">
     <value>Заплановані завдання</value>
   </data>
+  <data name="Playlists" xml:space="preserve">
+    <value>Списки відтворення</value>
+  </data>
+  <data name="Favorites" xml:space="preserve">
+    <value>Улюблене</value>
+  </data>
+  <data name="Statistics" xml:space="preserve">
+    <value>Статистика</value>
+  </data>
 </root>

@@ -661,7 +661,7 @@ public class ArtistTests
         Track track = _trackFixture.Create();
         Album album = _albumFixture.Create(tracks: [track]);
         Artist artist = _artistFixture.Create(albums: [album]);
-        string path = "C:\\Music\\queen\\bohemian-rhapsody.flac";
+        string originalPath = track.Path;
         AudioMetadata metadata = _audioMetadataFixture.Create();
         Optional<string> disambiguation = Optional<string>.Some("remastered");
         Optional<int> discNumber = Optional<int>.Some(1);
@@ -681,7 +681,6 @@ public class ArtistTests
         Result<Updated> result = artist.UpdateTrackInAlbum(
             album,
             track,
-            path,
             metadata,
             disambiguation,
             11,
@@ -700,7 +699,8 @@ public class ArtistTests
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Equal(path, track.Path);
+        // The file system path is not part of the track update, it is set only when the track is created.
+        Assert.Equal(originalPath, track.Path);
         Assert.Equal(metadata, track.Metadata);
         Assert.Equal(disambiguation, track.Disambiguation);
         Assert.Equal(11, track.TrackNumber);
@@ -735,7 +735,6 @@ public class ArtistTests
         Result<Updated> result = artist.UpdateTrackInAlbum(
             foreignAlbum,
             track,
-            "C:\\Music\\queen\\bohemian-rhapsody.flac",
             _audioMetadataFixture.Create(),
             Optional<string>.None(),
             11,
@@ -773,7 +772,6 @@ public class ArtistTests
         Result<Updated> result = artist.UpdateTrackInAlbum(
             album,
             track,
-            "C:\\Music\\queen\\bohemian-rhapsody.flac",
             _audioMetadataFixture.Create(),
             Optional<string>.None(),
             11,
