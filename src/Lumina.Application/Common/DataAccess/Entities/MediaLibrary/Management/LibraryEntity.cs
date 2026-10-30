@@ -81,6 +81,11 @@ public class LibraryEntity : IStorageEntity, IAuditableEntity
     public bool ShouldSkipUnchangedDirectoriesDuringScan { get; init; }
 
     /// <summary>
+    /// Gets whether the content of this media library is stored on a solid state drive, in which case the file discovery and content hashing stages read the files in parallel.
+    /// </summary>
+    public bool IsContentOnSsd { get; init; }
+
+    /// <summary>
     /// Gets a value indicating whether the consumption progress of the media library items is tracked.
     /// </summary>
     public bool ShouldTrackConsumptionProgress { get; init; }
