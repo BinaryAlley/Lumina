@@ -177,6 +177,9 @@
   <data name="DescriptionEnabled" xml:space="preserve">
     <value>Se questa libreria multimediale è disabilitata o meno. Una libreria disabilitata non viene mostrata agli utenti, scansionata, aggiornata, ecc.</value>
   </data>
+  <data name="DescriptionIsContentOnSsd" xml:space="preserve">
+    <value>Indica se il contenuto della libreria multimediale è archiviato su un'unità a stato solido. Quando è attiva, le fasi di individuazione dei file e di calcolo dell'hash del contenuto leggono i file in parallelo, sfruttando la bassa latenza delle unità a stato solido. Lasciarla disattivata per i dischi rigidi meccanici, dove le letture parallele possono ridurre le prestazioni.</value>
+  </data>
   <data name="DescriptionLibraryType" xml:space="preserve">
     <value>Seleziona il tipo di contenuti multimediali che questa biblioteca conterrà</value>
   </data>
@@ -224,6 +227,9 @@
   </data>
   <data name="Interview" xml:space="preserve">
     <value>Intervista</value>
+  </data>
+  <data name="IsContentOnSsd" xml:space="preserve">
+    <value>Contenuto su SSD</value>
   </data>
   <data name="LibrarySaved" xml:space="preserve">
     <value>Biblioteca Salvata</value>

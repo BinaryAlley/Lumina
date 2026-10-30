@@ -15,11 +15,13 @@ using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Library
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -41,6 +43,7 @@ internal sealed class MusicFileSystemDiscoveryJob : MediaLibraryScanJob, IMusicF
         StringComparer.OrdinalIgnoreCase
     );
     private readonly IServiceScopeFactory _serviceScopeFactory;
+    private readonly ILogger<MusicFileSystemDiscoveryJob> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MusicFileSystemDiscoveryJob"/> class.
@@ -49,9 +52,11 @@ internal sealed class MusicFileSystemDiscoveryJob : MediaLibraryScanJob, IMusicF
     /// Injected factory for creating scopes in which services are requested.
     /// See docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details.
     /// </param>
-    public MusicFileSystemDiscoveryJob(IServiceScopeFactory serviceScopeFactory)
+    /// <param name="logger">Injected logger for the media library scan job.</param>
+    public MusicFileSystemDiscoveryJob(IServiceScopeFactory serviceScopeFactory, ILogger<MusicFileSystemDiscoveryJob> logger)
     {
         _serviceScopeFactory = serviceScopeFactory;
+        _logger = logger;
     }
 
     /// <summary>
@@ -116,6 +121,11 @@ internal sealed class MusicFileSystemDiscoveryJob : MediaLibraryScanJob, IMusicF
                     List<LibraryScanStagingResultsEntity> stagingBatch = [];
                     List<DirectoryScanFingerprintEntity> fingerprintBatch = [];
 
+                    // When the library content is stored on a solid state drive, the file system reads of the scan run in parallel.
+                    bool shouldParallelizeReads = domainLibraryResult.Value.IsContentOnSsd;
+                    if (shouldParallelizeReads)
+                        _logger.LogDebug("The content of the media library with Id '{LibraryId}' is stored on a solid state drive, so its file system reads will run in parallel.", LibraryId.Value);
+
                     // Get the files for each of the media library content locations.
                     foreach (FileSystemPathId contentLocation in domainLibraryResult.Value.ContentLocations)
                     {
@@ -126,6 +136,7 @@ internal sealed class MusicFileSystemDiscoveryJob : MediaLibraryScanJob, IMusicF
                             fileProviderService,
                             directoryProviderService,
                             fingerprintsByPath is not null,
+                            shouldParallelizeReads,
                             fingerprintsByPath,
                             stagingBatch,
                             fingerprintBatch,
@@ -189,6 +200,7 @@ internal sealed class MusicFileSystemDiscoveryJob : MediaLibraryScanJob, IMusicF
     /// <param name="fileProviderService">The service used to enumerate the files of a directory.</param>
     /// <param name="directoryProviderService">The service used to enumerate the subdirectories of a directory.</param>
     /// <param name="shouldSkipUnchangedDirectories">Whether to skip the directories whose last write time has not changed since the last scan, or not.</param>
+    /// <param name="shouldParallelizeReads">Whether the file system reads should run in parallel, which benefits solid state drives.</param>
     /// <param name="fingerprintsByPath">The directory scan fingerprints of the library, mapped by the directory path. Can be <see langword="null"/> when the fast skip is disabled.</param>
     /// <param name="stagingBatch">The batch of discovered files that is written to the staging results when it reaches the batch size.</param>
     /// <param name="fingerprintBatch">The batch of directory scan fingerprints that is written to the storage medium when it reaches the batch size.</param>
@@ -204,6 +216,7 @@ internal sealed class MusicFileSystemDiscoveryJob : MediaLibraryScanJob, IMusicF
         IFileProviderService fileProviderService,
         IDirectoryProviderService directoryProviderService,
         bool shouldSkipUnchangedDirectories,
+        bool shouldParallelizeReads,
         Dictionary<string, DirectoryScanFingerprintEntity>? fingerprintsByPath,
         List<LibraryScanStagingResultsEntity> stagingBatch,
         List<DirectoryScanFingerprintEntity> fingerprintBatch,
@@ -258,40 +271,24 @@ internal sealed class MusicFileSystemDiscoveryJob : MediaLibraryScanJob, IMusicF
             Result<IEnumerable<FileSystemPathId>> getFilesResult = fileProviderService.GetFilePaths(currentDirectory, true);
             if (getFilesResult.IsSuccess)
             {
-                foreach (FileSystemPathId filePath in getFilesResult.Value)
+                if (shouldParallelizeReads)
+                    await StageFilesInParallelAsync(getFilesResult.Value, fileProviderService, stagingBatch, stagingResultsRepository, cancellationToken).ConfigureAwait(false);
+                else
                 {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    if (!s_audioExtensions.Contains(Path.GetExtension(filePath.Path)))
-                        continue;
-
-                    long size = 0;
-                    Result<long?> getSizeResult = fileProviderService.GetSize(filePath);
-                    if (getSizeResult.IsSuccess && getSizeResult.Value.HasValue)
-                        size = getSizeResult.Value.Value;
-
-                    long ticks = 0;
-                    Result<Optional<DateTime>> getFileLastWriteTimeResult = fileProviderService.GetLastWriteTime(filePath);
-                    if (getFileLastWriteTimeResult.IsSuccess && getFileLastWriteTimeResult.Value.HasValue)
-                        ticks = getFileLastWriteTimeResult.Value.Value.Ticks;
-
-                    stagingBatch.Add(new LibraryScanStagingResultsEntity()
+                    foreach (FileSystemPathId filePath in getFilesResult.Value)
                     {
-                        Id = Guid.NewGuid(),
-                        LibraryScanId = ScanId.Value,
-                        Path = filePath.Path,
-                        Size = size,
-                        Ticks = ticks,
-                        ContentHash = 0,
-                        PreviousContentHash = 0,
-                        NeedsRehash = true,
-                        IsNew = true
-                    });
-                    if (stagingBatch.Count >= STAGING_BATCH_SIZE)
-                    {
-                        Result<Created> insertBatchResult = await stagingResultsRepository.InsertRangeAsync(stagingBatch, cancellationToken).ConfigureAwait(false);
-                        if (insertBatchResult.IsFailure)
-                            throw new InvalidOperationException(insertBatchResult.FirstError.Description);
-                        stagingBatch.Clear();
+                        cancellationToken.ThrowIfCancellationRequested();
+                        if (!s_audioExtensions.Contains(Path.GetExtension(filePath.Path)))
+                            continue;
+
+                        stagingBatch.Add(CreateStagingResult(filePath, fileProviderService));
+                        if (stagingBatch.Count >= STAGING_BATCH_SIZE)
+                        {
+                            Result<Created> insertBatchResult = await stagingResultsRepository.InsertRangeAsync(stagingBatch, cancellationToken).ConfigureAwait(false);
+                            if (insertBatchResult.IsFailure)
+                                throw new InvalidOperationException(insertBatchResult.FirstError.Description);
+                            stagingBatch.Clear();
+                        }
                     }
                 }
             }
@@ -307,6 +304,102 @@ internal sealed class MusicFileSystemDiscoveryJob : MediaLibraryScanJob, IMusicF
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Reads the metadata of <paramref name="filePaths"/> in parallel and writes the discovered music files in batches to the staging results.
+    /// </summary>
+    /// <param name="filePaths">The file paths of the current directory.</param>
+    /// <param name="fileProviderService">The service used to read the metadata of a file.</param>
+    /// <param name="stagingBatch">The batch of discovered files that is written to the staging results when it reaches the batch size.</param>
+    /// <param name="stagingResultsRepository">The repository used to write the discovered files to the staging results.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    private async Task StageFilesInParallelAsync(
+        IEnumerable<FileSystemPathId> filePaths,
+        IFileProviderService fileProviderService,
+        List<LibraryScanStagingResultsEntity> stagingBatch,
+        ILibraryScanStagingResultsRepository stagingResultsRepository,
+        CancellationToken cancellationToken)
+    {
+        List<FileSystemPathId> filesToProcess = [.. filePaths.Where(filePath => s_audioExtensions.Contains(Path.GetExtension(filePath.Path)))];
+        LibraryScanStagingResultsEntity?[] discoveredFiles = new LibraryScanStagingResultsEntity?[filesToProcess.Count];
+        ParallelOptions parallelOptions = new()
+        {
+            CancellationToken = cancellationToken,
+            MaxDegreeOfParallelism = Environment.ProcessorCount
+        };
+
+        try
+        {
+            Parallel.For(0, filesToProcess.Count, parallelOptions, index =>
+            {
+                try
+                {
+                    discoveredFiles[index] = CreateStagingResult(filesToProcess[index], fileProviderService);
+                }
+                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+                {
+                    // A file might become inaccessible between enumeration and processing, so it is skipped.
+                    _logger.LogWarning(ex, "Failed to read the metadata of the music file '{Path}', so it is skipped for this scan.", filesToProcess[index].Path);
+                }
+            });
+        }
+        catch (AggregateException aggregateException)
+        {
+            // Parallel.For wraps the exceptions thrown by its body, so the real cause is rethrown here, to keep the reported scan failure meaningful.
+            AggregateException flattenedException = aggregateException.Flatten();
+            if (flattenedException.InnerExceptions.Count == 1)
+                ExceptionDispatchInfo.Capture(flattenedException.InnerExceptions[0]).Throw();
+            throw new AggregateException(string.Join("; ", flattenedException.InnerExceptions.Select(exception => exception.Message)), flattenedException.InnerExceptions);
+        }
+
+        // The repository is not thread-safe, so the discovered files are written sequentially, in bounded batches.
+        foreach (LibraryScanStagingResultsEntity? discoveredFile in discoveredFiles)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (discoveredFile is null)
+                continue;
+            stagingBatch.Add(discoveredFile);
+            if (stagingBatch.Count >= STAGING_BATCH_SIZE)
+            {
+                Result<Created> insertBatchResult = await stagingResultsRepository.InsertRangeAsync(stagingBatch, cancellationToken).ConfigureAwait(false);
+                if (insertBatchResult.IsFailure)
+                    throw new InvalidOperationException(insertBatchResult.FirstError.Description);
+                stagingBatch.Clear();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Creates a staging result entity from a discovered music file.
+    /// </summary>
+    /// <param name="filePath">The discovered music file.</param>
+    /// <param name="fileProviderService">The service used to read the metadata of a file.</param>
+    /// <returns>The staging result entity of the file.</returns>
+    private LibraryScanStagingResultsEntity CreateStagingResult(FileSystemPathId filePath, IFileProviderService fileProviderService)
+    {
+        long size = 0;
+        Result<long?> getSizeResult = fileProviderService.GetSize(filePath);
+        if (getSizeResult.IsSuccess && getSizeResult.Value.HasValue)
+            size = getSizeResult.Value.Value;
+
+        long ticks = 0;
+        Result<Optional<DateTime>> getFileLastWriteTimeResult = fileProviderService.GetLastWriteTime(filePath);
+        if (getFileLastWriteTimeResult.IsSuccess && getFileLastWriteTimeResult.Value.HasValue)
+            ticks = getFileLastWriteTimeResult.Value.Value.Ticks;
+
+        return new LibraryScanStagingResultsEntity()
+        {
+            Id = Guid.NewGuid(),
+            LibraryScanId = ScanId.Value,
+            Path = filePath.Path,
+            Size = size,
+            Ticks = ticks,
+            ContentHash = 0,
+            PreviousContentHash = 0,
+            NeedsRehash = true,
+            IsNew = true
+        };
     }
 
     /// <summary>

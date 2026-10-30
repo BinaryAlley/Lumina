@@ -19,10 +19,12 @@ using Lumina.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.U
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Audio.Music;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,6 +40,7 @@ public class MusicFileSystemDiscoveryJobTests
 {
     private const string ROOT_PATH = @"C:\Music";
     private const string AUDIO_FILE_PATH = @"C:\Music\song.mp3";
+    private const string SECOND_AUDIO_FILE_PATH = @"C:\Music\other.mp3";
     private const string IMAGE_FILE_PATH = @"C:\Music\cover.jpg";
 
     private readonly IServiceScopeFactory _mockServiceScopeFactory;
@@ -50,6 +53,7 @@ public class MusicFileSystemDiscoveryJobTests
     private readonly IFileProviderService _mockFileProviderService;
     private readonly IDirectoryProviderService _mockDirectoryProviderService;
     private readonly IDomainEventPublisher _mockDomainEventPublisher;
+    private readonly ILogger<MusicFileSystemDiscoveryJob> _mockLogger;
     private readonly MusicFileSystemDiscoveryJob _sut;
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly DirectoryScanFingerprintEntityFixture _directoryScanFingerprintEntityFixture = new();
@@ -101,7 +105,9 @@ public class MusicFileSystemDiscoveryJobTests
         _libraryId = _libraryIdFixture.Create();
         _scanId = _scanIdFixture.Create();
         _userId = _userIdFixture.Create();
-        _sut = new MusicFileSystemDiscoveryJob(_mockServiceScopeFactory)
+        _mockLogger = Substitute.For<ILogger<MusicFileSystemDiscoveryJob>>();
+        _mockLogger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
+        _sut = new MusicFileSystemDiscoveryJob(_mockServiceScopeFactory, _mockLogger)
         {
             ScanId = _scanId,
             UserId = _userId,
@@ -180,6 +186,45 @@ public class MusicFileSystemDiscoveryJobTests
                 && entities.First().LibraryScanId == _scanId.Value
                 && entities.First().NeedsRehash),
             Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenTheLibraryIsOnSsd_ShouldReadInParallelAndSkipFilesThatBecomeInaccessible()
+    {
+        // Arrange
+        SetupLibrary(isContentOnSsd: true);
+        SetupDirectory(ROOT_PATH, files: [AUDIO_FILE_PATH, SECOND_AUDIO_FILE_PATH, IMAGE_FILE_PATH], subdirectories: []);
+        _mockFileProviderService.GetSize(Arg.Is<FileSystemPathId>(path => path.Path == AUDIO_FILE_PATH))
+            .Returns(_ => throw new IOException("The file vanished between enumeration and processing"));
+        _mockFileProviderService.GetSize(Arg.Is<FileSystemPathId>(path => path.Path == SECOND_AUDIO_FILE_PATH)).Returns(Result.From<long?>(1234L));
+        _mockFileProviderService.GetLastWriteTime(Arg.Is<FileSystemPathId>(path => path.Path == SECOND_AUDIO_FILE_PATH))
+            .Returns(Result.From(Optional<DateTime>.Some(new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc))));
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        // The sequential path does not catch per-file IO exceptions, so completing here proves the parallel path was taken.
+        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+        await _mockStagingResultsRepository.Received(1).InsertRangeAsync(
+            Arg.Is<IReadOnlyCollection<LibraryScanStagingResultsEntity>>(entities => entities.Count == 1
+                && entities.First().Path == SECOND_AUDIO_FILE_PATH
+                && entities.First().Size == 1234
+                && entities.First().LibraryScanId == _scanId.Value
+                && entities.First().NeedsRehash),
+            Arg.Any<CancellationToken>());
+        _mockLogger.Received(1).Log(
+            LogLevel.Debug,
+            Arg.Any<EventId>(),
+            Arg.Is<object>(state => state.ToString()!.Contains("solid state drive", StringComparison.Ordinal)),
+            Arg.Any<Exception?>(),
+            Arg.Any<Func<object, Exception?, string>>());
+        _mockLogger.Received(1).Log(
+            LogLevel.Warning,
+            Arg.Any<EventId>(),
+            Arg.Is<object>(state => state.ToString()!.Contains(AUDIO_FILE_PATH, StringComparison.Ordinal)),
+            Arg.Any<IOException>(),
+            Arg.Any<Func<object, Exception?, string>>());
     }
 
     [Fact]
@@ -302,6 +347,22 @@ public class MusicFileSystemDiscoveryJobTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_WhenAFileMetadataReadThrowsAnUnexpectedException_ShouldMarkJobAsFailed()
+    {
+        // Arrange
+        SetupLibrary(isContentOnSsd: true);
+        SetupDirectory(ROOT_PATH, files: [AUDIO_FILE_PATH], subdirectories: []);
+        _mockFileProviderService.GetSize(Arg.Any<FileSystemPathId>()).Returns(_ => throw new InvalidOperationException("Unexpected defect"));
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(LibraryScanJobStatus.Failed, _sut.Status);
+        await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Is<LibraryScanFailedDomainEvent>(domainEvent => domainEvent.LibraryId == _libraryId), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task ExecuteAsync_WhenTheFingerprintUpsertFails_ShouldMarkJobAsFailed()
     {
         // Arrange
@@ -342,13 +403,15 @@ public class MusicFileSystemDiscoveryJobTests
     /// Stubs the media library reader with a library whose single content location is the test root path.
     /// </summary>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether the library skips the directories that have not changed since the last scan.</param>
-    private void SetupLibrary(bool shouldSkipUnchangedDirectoriesDuringScan = false)
+    /// <param name="isContentOnSsd">Whether the content of the library is stored on a solid state drive.</param>
+    private void SetupLibrary(bool shouldSkipUnchangedDirectoriesDuringScan = false, bool isContentOnSsd = false)
     {
         LibraryEntity library = _libraryEntityFixture.Create(
             id: _libraryId.Value,
             libraryType: LibraryType.Music,
             contentLocations: [ROOT_PATH],
-            shouldSkipUnchangedDirectoriesDuringScan: shouldSkipUnchangedDirectoriesDuringScan);
+            shouldSkipUnchangedDirectoriesDuringScan: shouldSkipUnchangedDirectoriesDuringScan,
+            isContentOnSsd: isContentOnSsd);
         _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
     }

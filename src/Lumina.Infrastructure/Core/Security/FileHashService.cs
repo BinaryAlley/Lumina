@@ -27,36 +27,37 @@ internal class FileHashService : IFileHashService
     /// Hashes <paramref name="inputFiles"/> by sampling chunks from them.
     /// </summary>
     /// <param name="inputFiles">The collection of files to hash.</param>
+    /// <param name="shouldParallelizeReads">Whether the files should be read in parallel. Parallel reads benefit solid state drives, while mechanical hard drives are faster with sequential reads.</param>
     /// <param name="callback">Callback to invoke during processing of elements.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>A collection of the hashed files, along with their hashes.</returns>
-    public async Task<List<HashedFileSystemFileDto>> HashFilesAsync(IReadOnlyCollection<HashedFileSystemFileDto> inputFiles, Func<Task> callback, CancellationToken cancellationToken)
+    public async Task<List<HashedFileSystemFileDto>> HashFilesAsync(IReadOnlyCollection<HashedFileSystemFileDto> inputFiles, bool shouldParallelizeReads, Func<Task> callback, CancellationToken cancellationToken)
     {
         List<HashedFileSystemFileDto> outputFiles = [];
         object listLock = new();
 
-        // make use of all available processors
+        // Solid state drives benefit from reading multiple files at once, while mechanical hard drives are faster with sequential reads because of their seek time.
         ParallelOptions parallelOptions = new()
         {
             CancellationToken = cancellationToken,
-            MaxDegreeOfParallelism = Environment.ProcessorCount // TODO: make this configurable, such that parallelism can be turned off for mechanical hard drives
+            MaxDegreeOfParallelism = shouldParallelizeReads ? Environment.ProcessorCount : 1
         };
         await Parallel.ForEachAsync(inputFiles, parallelOptions, async (file, cancellationToken) =>
         {
             cancellationToken.ThrowIfCancellationRequested();
             try
             {
-                // invoke the method that triggers progress reporting
+                // Invoke the method that triggers progress reporting.
                 await callback().ConfigureAwait(false);
 
                 ushort bufferSize = (ushort)Math.Min(DEFAULT_BUFFER_SIZE, file.Size);
 
-                // get the file hash and check if it differs from the one stored on previous scan
+                // Get the file hash and check if it differs from the one stored on previous scan.
                 ulong currentHash = file.Size == 0
-                    ? s_emptyFileHash // precomputed constant: XxHash64 hash of zero-length input
+                    ? s_emptyFileHash // Precomputed constant: XxHash64 hash of zero-length input.
                     : ComputeFileHash(file.Path, file.Size, bufferSize);
 
-                // the decision of whether a file changed is already made before hashing, so all files that reach this point get their hash stored
+                // The decision of whether a file changed is already made before hashing, so all files that reach this point get their hash stored.
                 lock (listLock)
                     outputFiles.Add(file with { CurrentHash = currentHash });
             }
@@ -78,7 +79,7 @@ internal class FileHashService : IFileHashService
     {
         long fileSize = new FileInfo(filePath).Length;
         if (fileSize == 0)
-            return s_emptyFileHash; // precomputed constant: XxHash64 hash of zero-length input
+            return s_emptyFileHash; // Precomputed constant: XxHash64 hash of zero-length input.
 
         ushort bufferSize = (ushort)Math.Min(DEFAULT_BUFFER_SIZE, fileSize);
         return ComputeFileHash(filePath, fileSize, bufferSize);
@@ -92,46 +93,46 @@ internal class FileHashService : IFileHashService
     /// <param name="bufferSize">Sample window size (automatically clamped to file size).</param>
     private static unsafe ulong ComputeFileHash(string filePath, long fileSize, ushort bufferSize)
     {
-        // create a memory-mapped file for efficient access to large files
+        // Create a memory-mapped file for efficient access to large files.
         using MemoryMappedFile memoryMappedFile = MemoryMappedFile.CreateFromFile(filePath, FileMode.Open, null, 0, MemoryMappedFileAccess.Read);
-        // create a view accessor to read from the memory-mapped file
+        // Create a view accessor to read from the memory-mapped file.
         using MemoryMappedViewAccessor memoryMappedViewAccessor = memoryMappedFile.CreateViewAccessor(0, fileSize, MemoryMappedFileAccess.Read);
 
         byte* memoryPointer = null;
 
         try
         {
-            // get a direct pointer to the memory-mapped file, for faster access
+            // Get a direct pointer to the memory-mapped file, for faster access.
             memoryMappedViewAccessor.SafeMemoryMappedViewHandle.AcquirePointer(ref memoryPointer);
 
-            // get the thread-local hasher and reset it before use; resetting at entry (rather than at exit) ensures
-            // the hasher is always in a clean state even if a previous call on this thread threw mid-computation
+            // Get the thread-local hasher and reset it before use; resetting at entry (rather than at exit) ensures
+            // the hasher is always in a clean state even if a previous call on this thread threw mid-computation.
             XxHash64 hasher = s_threadLocalHasher.Value!;
             hasher.Reset();
 
-            // allocate hash result buffer on the stack, to avoid heap allocation
+            // Allocate hash result buffer on the stack, to avoid heap allocation.
             Span<byte> hashSpan = stackalloc byte[sizeof(ulong)];
 
-            // process only predefined sampled segments of the file, instead of the entire file
+            // Process only predefined sampled segments of the file, instead of the entire file.
             foreach (long offset in GetByteBufferSampleOffsets(fileSize, bufferSize))
             {
-                // calculate how many bytes to read (handle edge case at end of file, or when the file size is smaller than the buffer)
+                // Calculate how many bytes to read (handle edge case at end of file, or when the file size is smaller than the buffer).
                 ushort readSize = (ushort)Math.Min(bufferSize, fileSize - offset);
-                // create a span directly over the memory-mapped region
+                // Create a span directly over the memory-mapped region.
                 ReadOnlySpan<byte> dataSpan = new(memoryPointer + offset, readSize);
-                // update the hash with this chunk of data
+                // Update the hash with this chunk of data.
                 hasher.Append(dataSpan);
             }
 
-            // get the final hash value
+            // Get the final hash value.
             if (!hasher.TryGetCurrentHash(hashSpan, out int bytesWritten) || bytesWritten != sizeof(ulong))
                 throw new InvalidOperationException("Hash computation failed");
-            // convert the hash byte span to a long, and return it
+            // Convert the hash byte span to a long, and return it.
             return BitConverter.ToUInt64(hashSpan);
         }
         finally
         {
-            if (memoryPointer is not null) // always release the pointer, to prevent memory leaks
+            if (memoryPointer is not null) // Always release the pointer, to prevent memory leaks.
                 memoryMappedViewAccessor.SafeMemoryMappedViewHandle.ReleasePointer();
         }
     }
@@ -144,20 +145,20 @@ internal class FileHashService : IFileHashService
     /// <returns>An enumerable of byte offsets to sample from the file.</returns>
     private static IEnumerable<long> GetByteBufferSampleOffsets(long fileSize, ushort bufferSize)
     {
-        // for small files, just read from the beginning
+        // For small files, just read from the beginning.
         if (fileSize <= bufferSize * SAMPLE_COUNT)
         {
             yield return 0;
             yield break;
         }
-        // for larger files, sample at strategic points:
-        yield return 0; // beginning of the file
-        yield return fileSize / 4; // quarter of the file
-        yield return fileSize / 2; // half of the file
-        yield return 3 * fileSize / 4; // three quarters of the file
-        yield return Math.Max(0, fileSize - bufferSize); // end of the file (ensure we don't go past the end)
+        // For larger files, sample at strategic points:
+        yield return 0; // Beginning of the file.
+        yield return fileSize / 4; // Quarter of the file.
+        yield return fileSize / 2; // Half of the file.
+        yield return 3 * fileSize / 4; // Three quarters of the file.
+        yield return Math.Max(0, fileSize - bufferSize); // End of the file (ensure we don't go past the end).
 
-        // additional evenly spaced samples, if needed
+        // Additional evenly spaced samples, if needed.
         long interval = fileSize / (SAMPLE_COUNT + 1);
         for (int i = 1; i <= SAMPLE_COUNT - 4; i++)
             yield return interval * i;

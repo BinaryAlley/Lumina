@@ -31,6 +31,10 @@ public class SaveLibraryEndpointSummary : Summary<SaveLibraryEndpoint, LibraryDt
         RequestParam(r => r.CanDownloadMetadataFromWeb, "Whether the metadata of the media library items should be downloaded from the web, or not. Optional.");
         RequestParam(r => r.ShouldSaveMetadataInMediaDirectories, "Whether the downloaded metadata should be copied into the media library content locations, or not. Optional.");
         RequestParam(r => r.ShouldSkipUnchangedDirectoriesDuringScan, "Whether the directories whose contents have not changed since the last scan should be skipped during the scan, or not. Optional.");
+        RequestParam(r => r.IsContentOnSsd, "Whether the content of the media library is stored on a solid state drive, in which case the file discovery and content hashing stages read the files in parallel. Optional.");
+        RequestParam(r => r.ShouldTrackConsumptionProgress, "Whether the consumption progress of the media library items should be tracked, or not. Optional, the default of the library type is used on create, and the stored value is kept on update.");
+        RequestParam(r => r.CompletionThresholdPercentage, "The percentage of a media library item that must be consumed for its session to be considered completed. Optional, the default of the library type is used on create, and the stored value is kept on update.");
+        RequestParam(r => r.PathTemplateParts, "The ordered parts of the template describing the structure of the media library on disk. Optional, the ideal structure of the library type is used when absent.");
 
         ExampleRequest = new LibraryDto();
 

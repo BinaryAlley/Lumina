@@ -177,6 +177,9 @@
   <data name="DescriptionEnabled" xml:space="preserve">
     <value>Whether this media library is disabled or not. A disabled library is not displayed to the users, scanned, updated, etc.</value>
   </data>
+  <data name="DescriptionIsContentOnSsd" xml:space="preserve">
+    <value>Whether the media library content is stored on a solid state drive. When enabled, the file discovery and content hashing stages read files in parallel, which takes advantage of the low latency of solid state drives. Leave it off for mechanical hard drives, where parallel reads can reduce performance.</value>
+  </data>
   <data name="DescriptionLibraryType" xml:space="preserve">
     <value>Select the type of media content this library will contain</value>
   </data>
@@ -224,6 +227,9 @@
   </data>
   <data name="Interview" xml:space="preserve">
     <value>Interview</value>
+  </data>
+  <data name="IsContentOnSsd" xml:space="preserve">
+    <value>Content Is On SSD</value>
   </data>
   <data name="LibrarySaved" xml:space="preserve">
     <value>Library Saved</value>

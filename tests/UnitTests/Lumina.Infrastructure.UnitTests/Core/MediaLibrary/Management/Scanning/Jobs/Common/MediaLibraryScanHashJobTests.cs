@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
@@ -13,6 +14,7 @@ using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggreg
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Fixtures.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
@@ -38,6 +40,7 @@ public class MediaLibraryScanHashJobTests
     private readonly IServiceScope _mockServiceScope;
     private readonly IServiceProvider _mockServiceProvider;
     private readonly IUnitOfWork _mockUnitOfWork;
+    private readonly ILibraryRepository _mockLibraryRepository;
     private readonly ILibraryScanStagingResultsRepository _mockStagingResultsRepository;
     private readonly IDomainEventPublisher _mockDomainEventPublisher;
     private readonly IFileHashService _mockFileHashService;
@@ -46,6 +49,7 @@ public class MediaLibraryScanHashJobTests
     private readonly UserIdFixture _userIdFixture = new();
     private readonly LibraryIdFixture _libraryIdFixture = new();
     private readonly HashedFileSystemFileDtoFixture _hashedFileSystemFileDtoFixture = new();
+    private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly ScanId _scanId;
     private readonly UserId _userId;
     private readonly LibraryId _libraryId;
@@ -63,7 +67,9 @@ public class MediaLibraryScanHashJobTests
 
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
         _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
+        _mockLibraryRepository = Substitute.For<ILibraryRepository>();
         _mockStagingResultsRepository = Substitute.For<ILibraryScanStagingResultsRepository>();
+        _mockUnitOfWork.LibraryRepository.Returns(_mockLibraryRepository);
         _mockUnitOfWork.LibraryScanStagingResultsRepository.Returns(_mockStagingResultsRepository);
         _mockServiceProvider.GetService(typeof(IUnitOfWork)).Returns(_mockUnitOfWork);
 
@@ -84,6 +90,9 @@ public class MediaLibraryScanHashJobTests
             UserId = _userId,
             LibraryId = _libraryId
         };
+
+        _mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(_libraryEntityFixture.Create(id: _libraryId.Value, userId: _userId.Value, isContentOnSsd: true)));
     }
 
     [Fact]
@@ -97,7 +106,7 @@ public class MediaLibraryScanHashJobTests
             .Returns(
                 Result.From<IReadOnlyList<HashedFileSystemFileDto>>(filesToHash),
                 Result.From<IReadOnlyList<HashedFileSystemFileDto>>([]));
-        _mockFileHashService.HashFilesAsync(Arg.Any<IReadOnlyCollection<HashedFileSystemFileDto>>(), Arg.Any<Func<Task>>(), Arg.Any<CancellationToken>())
+        _mockFileHashService.HashFilesAsync(Arg.Any<IReadOnlyCollection<HashedFileSystemFileDto>>(), Arg.Any<bool>(), Arg.Any<Func<Task>>(), Arg.Any<CancellationToken>())
             .Returns(callInfo => Task.FromResult(callInfo.Arg<IReadOnlyCollection<HashedFileSystemFileDto>>()
                 .Select(file => file with { CurrentHash = 42UL })
                 .ToList()));
@@ -111,6 +120,7 @@ public class MediaLibraryScanHashJobTests
         Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
         await _mockFileHashService.Received(1).HashFilesAsync(
             Arg.Any<IReadOnlyCollection<HashedFileSystemFileDto>>(),
+            Arg.Is<bool>(shouldParallelizeReads => shouldParallelizeReads),
             Arg.Any<Func<Task>>(),
             Arg.Any<CancellationToken>());
         await _mockStagingResultsRepository.Received(1).UpdateFileHashesAsync(
@@ -118,6 +128,59 @@ public class MediaLibraryScanHashJobTests
             Arg.Is<IReadOnlyCollection<HashedFileSystemFileDto>>(files => files.Count == 2 && files.All(file => file.CurrentHash == 42UL)),
             Arg.Any<CancellationToken>());
         await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Is<LibraryScanProgressChangedDomainEvent>(domainEvent => domainEvent.LibraryId == _libraryId), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenLibraryIsNotOnSsd_ShouldHashTheFilesSequentially()
+    {
+        // Arrange
+        _mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(_libraryEntityFixture.Create(id: _libraryId.Value, userId: _userId.Value, isContentOnSsd: false)));
+        List<HashedFileSystemFileDto> filesToHash = [_hashedFileSystemFileDtoFixture.Create(path: "/books/book1.pdf")];
+        _mockStagingResultsRepository.GetFilesToHashCountAsync(_scanId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From(1));
+        _mockStagingResultsRepository.GetFilesToHashPageAsync(_scanId.Value, Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(
+                Result.From<IReadOnlyList<HashedFileSystemFileDto>>(filesToHash),
+                Result.From<IReadOnlyList<HashedFileSystemFileDto>>([]));
+        _mockFileHashService.HashFilesAsync(Arg.Any<IReadOnlyCollection<HashedFileSystemFileDto>>(), Arg.Any<bool>(), Arg.Any<Func<Task>>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => Task.FromResult(callInfo.Arg<IReadOnlyCollection<HashedFileSystemFileDto>>()
+                .Select(file => file with { CurrentHash = 42UL })
+                .ToList()));
+        _mockStagingResultsRepository.UpdateFileHashesAsync(_scanId.Value, Arg.Any<IReadOnlyCollection<HashedFileSystemFileDto>>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(Result.Updated));
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+        await _mockFileHashService.Received(1).HashFilesAsync(
+            Arg.Any<IReadOnlyCollection<HashedFileSystemFileDto>>(),
+            Arg.Is<bool>(shouldParallelizeReads => !shouldParallelizeReads),
+            Arg.Any<Func<Task>>(),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenGettingTheLibraryFails_ShouldMarkJobAsFailedAndPublishFailureEvent()
+    {
+        // Arrange
+        _mockStagingResultsRepository.GetFilesToHashCountAsync(_scanId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From(1));
+        _mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(Error.Failure("Database.Error", "Failed to retrieve the library"));
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(LibraryScanJobStatus.Failed, _sut.Status);
+        await _mockFileHashService.DidNotReceive().HashFilesAsync(Arg.Any<IReadOnlyCollection<HashedFileSystemFileDto>>(), Arg.Any<bool>(), Arg.Any<Func<Task>>(), Arg.Any<CancellationToken>());
+        await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Is<LibraryScanFailedDomainEvent>(domainEvent =>
+            domainEvent.LibraryId == _libraryId
+            && domainEvent.MediaLibraryScanCompositeId.ScanId == _scanId
+            && domainEvent.MediaLibraryScanCompositeId.UserId == _userId), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -134,7 +197,8 @@ public class MediaLibraryScanHashJobTests
 
         // Assert
         Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
-        await _mockFileHashService.DidNotReceive().HashFilesAsync(Arg.Any<IReadOnlyCollection<HashedFileSystemFileDto>>(), Arg.Any<Func<Task>>(), Arg.Any<CancellationToken>());
+        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
+        await _mockFileHashService.DidNotReceive().HashFilesAsync(Arg.Any<IReadOnlyCollection<HashedFileSystemFileDto>>(), Arg.Any<bool>(), Arg.Any<Func<Task>>(), Arg.Any<CancellationToken>());
         await _mockStagingResultsRepository.DidNotReceive().UpdateFileHashesAsync(Arg.Any<Guid>(), Arg.Any<IReadOnlyCollection<HashedFileSystemFileDto>>(), Arg.Any<CancellationToken>());
         await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Is<LibraryScanProgressChangedDomainEvent>(domainEvent => domainEvent.LibraryId == _libraryId), Arg.Any<CancellationToken>());
     }
@@ -151,7 +215,7 @@ public class MediaLibraryScanHashJobTests
 
         // Assert
         Assert.Equal(LibraryScanJobStatus.Failed, _sut.Status);
-        await _mockFileHashService.DidNotReceive().HashFilesAsync(Arg.Any<IReadOnlyCollection<HashedFileSystemFileDto>>(), Arg.Any<Func<Task>>(), Arg.Any<CancellationToken>());
+        await _mockFileHashService.DidNotReceive().HashFilesAsync(Arg.Any<IReadOnlyCollection<HashedFileSystemFileDto>>(), Arg.Any<bool>(), Arg.Any<Func<Task>>(), Arg.Any<CancellationToken>());
         await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Is<LibraryScanFailedDomainEvent>(domainEvent =>
             domainEvent.LibraryId == _libraryId
             && domainEvent.MediaLibraryScanCompositeId.ScanId == _scanId
@@ -187,7 +251,7 @@ public class MediaLibraryScanHashJobTests
 
         // Assert
         Assert.Equal(LibraryScanJobStatus.Failed, _sut.Status);
-        await _mockFileHashService.DidNotReceive().HashFilesAsync(Arg.Any<IReadOnlyCollection<HashedFileSystemFileDto>>(), Arg.Any<Func<Task>>(), Arg.Any<CancellationToken>());
+        await _mockFileHashService.DidNotReceive().HashFilesAsync(Arg.Any<IReadOnlyCollection<HashedFileSystemFileDto>>(), Arg.Any<bool>(), Arg.Any<Func<Task>>(), Arg.Any<CancellationToken>());
         await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Is<LibraryScanFailedDomainEvent>(domainEvent =>
             domainEvent.LibraryId == _libraryId
             && domainEvent.MediaLibraryScanCompositeId.ScanId == _scanId
@@ -205,7 +269,7 @@ public class MediaLibraryScanHashJobTests
             .Returns(
                 Result.From<IReadOnlyList<HashedFileSystemFileDto>>(filesToHash),
                 Result.From<IReadOnlyList<HashedFileSystemFileDto>>([]));
-        _mockFileHashService.HashFilesAsync(Arg.Any<IReadOnlyCollection<HashedFileSystemFileDto>>(), Arg.Any<Func<Task>>(), Arg.Any<CancellationToken>())
+        _mockFileHashService.HashFilesAsync(Arg.Any<IReadOnlyCollection<HashedFileSystemFileDto>>(), Arg.Any<bool>(), Arg.Any<Func<Task>>(), Arg.Any<CancellationToken>())
             .Returns(callInfo => Task.FromResult(callInfo.Arg<IReadOnlyCollection<HashedFileSystemFileDto>>()
                 .Select(file => file with { CurrentHash = 42UL })
                 .ToList()));
@@ -217,7 +281,7 @@ public class MediaLibraryScanHashJobTests
 
         // Assert
         Assert.Equal(LibraryScanJobStatus.Failed, _sut.Status);
-        await _mockFileHashService.Received(1).HashFilesAsync(Arg.Any<IReadOnlyCollection<HashedFileSystemFileDto>>(), Arg.Any<Func<Task>>(), Arg.Any<CancellationToken>());
+        await _mockFileHashService.Received(1).HashFilesAsync(Arg.Any<IReadOnlyCollection<HashedFileSystemFileDto>>(), Arg.Any<bool>(), Arg.Any<Func<Task>>(), Arg.Any<CancellationToken>());
         await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Is<LibraryScanFailedDomainEvent>(domainEvent =>
             domainEvent.LibraryId == _libraryId
             && domainEvent.MediaLibraryScanCompositeId.ScanId == _scanId
@@ -235,7 +299,7 @@ public class MediaLibraryScanHashJobTests
             .Returns(
                 Result.From<IReadOnlyList<HashedFileSystemFileDto>>(filesToHash),
                 Result.From<IReadOnlyList<HashedFileSystemFileDto>>([]));
-        _mockFileHashService.HashFilesAsync(Arg.Any<IReadOnlyCollection<HashedFileSystemFileDto>>(), Arg.Any<Func<Task>>(), Arg.Any<CancellationToken>())
+        _mockFileHashService.HashFilesAsync(Arg.Any<IReadOnlyCollection<HashedFileSystemFileDto>>(), Arg.Any<bool>(), Arg.Any<Func<Task>>(), Arg.Any<CancellationToken>())
             .Returns(async callInfo =>
             {
                 await callInfo.Arg<Func<Task>>()();
@@ -268,7 +332,7 @@ public class MediaLibraryScanHashJobTests
             .Returns(
                 Result.From<IReadOnlyList<HashedFileSystemFileDto>>(filesToHash),
                 Result.From<IReadOnlyList<HashedFileSystemFileDto>>([]));
-        _mockFileHashService.HashFilesAsync(Arg.Any<IReadOnlyCollection<HashedFileSystemFileDto>>(), Arg.Any<Func<Task>>(), Arg.Any<CancellationToken>())
+        _mockFileHashService.HashFilesAsync(Arg.Any<IReadOnlyCollection<HashedFileSystemFileDto>>(), Arg.Any<bool>(), Arg.Any<Func<Task>>(), Arg.Any<CancellationToken>())
             .Returns(async callInfo =>
             {
                 await Task.Delay(150);

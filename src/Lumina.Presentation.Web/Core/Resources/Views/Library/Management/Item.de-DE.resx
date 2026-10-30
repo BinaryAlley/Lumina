@@ -177,6 +177,9 @@
   <data name="DescriptionEnabled" xml:space="preserve">
     <value>Ob diese Medienbibliothek deaktiviert ist oder nicht. Eine deaktivierte Bibliothek wird den Benutzern nicht angezeigt, nicht gescannt, nicht aktualisiert, usw.</value>
   </data>
+  <data name="DescriptionIsContentOnSsd" xml:space="preserve">
+    <value>Ob der Inhalt der Medienbibliothek auf einer Solid State Drive gespeichert ist. Wenn aktiviert, lesen die Dateierkennung und das Hashen der Inhalte Dateien parallel, was die geringe Latenz von Solid State Drives nutzt. Für mechanische Festplatten deaktiviert lassen, da parallele Lesezugriffe die Leistung verringern können.</value>
+  </data>
   <data name="DescriptionLibraryType" xml:space="preserve">
     <value>Wählen Sie die Art der Medieninhalte aus, die diese Bibliothek enthalten soll</value>
   </data>
@@ -224,6 +227,9 @@
   </data>
   <data name="Interview" xml:space="preserve">
     <value>Interview</value>
+  </data>
+  <data name="IsContentOnSsd" xml:space="preserve">
+    <value>Inhalt liegt auf SSD</value>
   </data>
   <data name="LibrarySaved" xml:space="preserve">
     <value>Bibliothek Gespeichert</value>

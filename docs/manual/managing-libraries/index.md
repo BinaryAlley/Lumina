@@ -51,6 +51,7 @@ Open the Libraries management page, choose to add a library, and fill in the for
 | Download metadata from the web | on | Whether Lumina may look up the metadata of the items online. This only has an effect when a metadata provider is enabled for the library (see [Plugins](../plugins/index.md)). |
 | Save metadata in media directories | off | Whether the metadata Lumina fetches is also written next to your media files, so other tools can read it. This is the one option that writes into your media folders. |
 | Skip unchanged directories during scan | off | An opt-in speedup that skips folders whose own last-modified time has not changed since the last scan. Editing the contents of an existing file in place, without adding, removing or renaming anything in that folder, leaves the folder's time untouched, so that edit can be missed while it is on. |
+| Content is on SSD | off | Whether the folders of this library are stored on a solid state drive. When on, the file discovery and content hashing stages read several files at the same time, which is faster on solid state drives. Leave it off for mechanical hard drives, where reading files in parallel can slow the scan down. |
 | Track consumption progress | the type default | Whether the latest playback or reading position of the library's items is remembered, so a user can resume where they left off. |
 | Completion threshold | the type default | The percentage of an item that must be consumed for a stopped session to be recorded as completed. Empty means completion is recorded only when it is reported explicitly. |
 | Path template | the type's ideal structure | Tells Lumina how your folders are arranged on disk. Unless you customize it, it holds the default template of the library type, which is exactly the structure Lumina expects. Optional, and explained in full below. |
@@ -118,6 +119,8 @@ The template is read on every scan, so changing it changes how your folders are 
 Creating a library only records where the media lives. To actually read it, you scan it. You can scan a single library, or all of them at once, from the Libraries page.
 
 Lumina is designed to be efficient and performant. The first scan of a library reads and indexes everything it finds, so it is the slowest one. Every scan after that compares what is on disk against the previous scan and only processes what is new or changed, so it is normally much faster. How long any scan takes also depends on what is enabled for the library: metadata and artwork providers that fetch data from the web add network time on top of reading the files, and they do it only for the items that need it.
+
+How the scan reads the files depends on the hardware that stores them. A library whose content is on a solid state drive can discover and hash several files at the same time, so turn on **Content is on SSD** for it. A library on a mechanical hard drive should keep that setting off, because parallel reads make the drive seek back and forth and can make the scan slower. Metadata extraction and artwork resolution still read the files one at a time; this setting only changes file discovery and content hashing.
 
 Scans run on the server in the background, so once one starts you can close the browser and come back later.
 
@@ -190,6 +193,7 @@ These are per user settings, each user changes their own from the settings page 
 
 - **`Save metadata in media directories` writes into your media folders.** It is off by default; turn it on only if you want metadata files to accompany your media.
 - **`Skip unchanged directories during scan` can miss in-place edits.** It trusts each folder's own last-modified time, so editing the contents of an existing file without adding, removing or renaming anything in its folder leaves the folder unchanged and it gets skipped. Adding, removing or renaming a file does change the folder, and is still seen.
+- **`Content is on SSD` changes how file discovery and content hashing read files.** Turn it on only when the folders of the library really are on a solid state drive. On a mechanical hard drive, parallel reads can make those stages slower than sequential ones.
 - **`Locked` blocks everything.** A locked library is not scanned and not updated, including by the scheduler.
 - **`Disabled` hides the library.** A disabled library is neither shown on the dashboard nor touched.
 - **Deleting a library removes Lumina's catalogue for it.** The files remain, but the metadata and artwork Lumina held for that library do not. Consumption history and resume points are kept as records of what was consumed. The history shows the items as unavailable until you delete it. **Remove from continue watching** removes every resume point of the selected user, not only the ones from the deleted library.

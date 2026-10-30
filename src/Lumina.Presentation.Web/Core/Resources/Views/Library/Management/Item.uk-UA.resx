@@ -177,6 +177,9 @@
   <data name="DescriptionEnabled" xml:space="preserve">
     <value>Чи вимкнена ця медіатека чи ні. Вимкнена бібліотека не відображається користувачам, не сканується, не оновлюється тощо.</value>
   </data>
+  <data name="DescriptionIsContentOnSsd" xml:space="preserve">
+    <value>Вказує, чи зберігається вміст медіатеки на твердотільному накопичувачі. Якщо ввімкнено, етапи виявлення файлів і обчислення хешу вмісту читають файли паралельно, використовуючи низьку затримку твердотільних накопичувачів. Залиште вимкненим для механічних жорстких дисків, де паралельне читання може знизити продуктивність.</value>
+  </data>
   <data name="DescriptionLibraryType" xml:space="preserve">
     <value>Виберіть тип медіаконтенту, який міститиме ця бібліотека</value>
   </data>
@@ -224,6 +227,9 @@
   </data>
   <data name="Interview" xml:space="preserve">
     <value>Інтерв'ю</value>
+  </data>
+  <data name="IsContentOnSsd" xml:space="preserve">
+    <value>Вміст на SSD</value>
   </data>
   <data name="LibrarySaved" xml:space="preserve">
     <value>Бібліотеку збережено</value>

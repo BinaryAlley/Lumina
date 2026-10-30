@@ -1,19 +1,19 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
 using Lumina.Application.Common.Infrastructure.Security;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Domain.Common.Events;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Lumina.Application.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
 #endregion
 
 namespace Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
@@ -23,7 +23,7 @@ namespace Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Commo
 /// </summary>
 internal sealed class MediaLibraryScanHashJob : MediaLibraryScanJob, IMediaLibraryScanHashJob
 {
-    private const int HASHING_PAGE_SIZE = 1000; // the number of files that are hashed and written back in a single batch, keeping the peak memory bounded regardless of the library size
+    private const int HASHING_PAGE_SIZE = 1000; // The number of files that are hashed and written back in a single batch, keeping the peak memory bounded regardless of the library size.
     private readonly IServiceScopeFactory _serviceScopeFactory;
 
     /// <summary>
@@ -49,9 +49,9 @@ internal sealed class MediaLibraryScanHashJob : MediaLibraryScanJob, IMediaLibra
     {
         try
         {
-            // increment the number of parents that finished their execution and called this job (beware race conditions, jobs run in parallel)
+            // Increment the number of parents that finished their execution and called this job (beware race conditions, jobs run in parallel).
             int parentsCompleted = Interlocked.Increment(ref parentsPayloadsExecuted);
-            // only execute this job's payload when it has no parents, or when all the parents finished their execution
+            // Only execute this job's payload when it has no parents, or when all the parents finished their execution.
             if (Parents.Count == 0 || parentsCompleted == Parents.Count)
             {
                 // this needs to be wrapped in a task because even though this job is processed in a "fire and forget" async manner, it still does synchronous
@@ -59,7 +59,7 @@ internal sealed class MediaLibraryScanHashJob : MediaLibraryScanJob, IMediaLibra
                 await Task.Run(async () =>
                 {
                     Status = LibraryScanJobStatus.Running;
-                    // see docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details:
+                    // See docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details:
                     await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
                     IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
                     IDomainEventPublisher domainEventPublisher = asyncServiceScope.ServiceProvider.GetService<IDomainEventPublisher>()!;
@@ -74,7 +74,22 @@ internal sealed class MediaLibraryScanHashJob : MediaLibraryScanJob, IMediaLibra
                         throw new InvalidOperationException(getFilesToHashCountResult.FirstError.Description);
                     int totalFilesToHash = getFilesToHashCountResult.Value;
 
-                    // set the initial progress of the scan job
+                    // Get the library only when there are files to hash, and only the scalar values needed to know whether its content is stored on a solid state drive,.
+                    // in which case the file reads run in parallel.
+                    bool shouldParallelizeReads = false;
+                    if (totalFilesToHash > 0)
+                    {
+                        Result<LibraryEntity?> getLibraryResult = await unitOfWork.LibraryRepository.GetByIdAsync(
+                            LibraryId.Value,
+                            shouldIncludeNavigationProperties: false,
+                            shouldTrackEntities: false,
+                            cancellationToken: cancellationToken).ConfigureAwait(false);
+                        if (getLibraryResult.IsFailure || getLibraryResult.Value is null)
+                            throw new InvalidOperationException(getLibraryResult.IsFailure ? getLibraryResult.FirstError.Description : "The media library was not found.");
+                        shouldParallelizeReads = getLibraryResult.Value.IsContentOnSsd;
+                    }
+
+                    // Set the initial progress of the scan job.
                     Result<Success> publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 0, totalFilesToHash, cancellationToken).ConfigureAwait(false);
                     if (publishJobProgressResult.IsFailure)
                         throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
@@ -84,7 +99,7 @@ internal sealed class MediaLibraryScanHashJob : MediaLibraryScanJob, IMediaLibra
                     int processedFilesCount = 0;
                     string? lastPath = null;
 
-                    // process the files that need hashing in pages, keeping the peak memory bounded regardless of the library size
+                    // Process the files that need hashing in pages, keeping the peak memory bounded regardless of the library size.
                     while (true)
                     {
                         cancellationToken.ThrowIfCancellationRequested();
@@ -96,14 +111,14 @@ internal sealed class MediaLibraryScanHashJob : MediaLibraryScanJob, IMediaLibra
                         if (filesToHashPage.Count == 0)
                             break;
 
-                        // hash the files of the current page in parallel, invoking the progress callback before each file
-                        List<HashedFileSystemFileDto> hashedFiles = await fileHashService.HashFilesAsync(filesToHashPage, async () =>
+                        // Hash the files of the current page in parallel, invoking the progress callback before each file.
+                        List<HashedFileSystemFileDto> hashedFiles = await fileHashService.HashFilesAsync(filesToHashPage, shouldParallelizeReads, async () =>
                         {
-                            // check if enough time has passed since last update
+                            // Check if enough time has passed since last update.
                             DateTime now = DateTime.UtcNow;
                             if ((now - lastUpdateTime).TotalMilliseconds >= minUpdateIntervalMs)
                             {
-                                // increment the number of processed elements progress
+                                // Increment the number of processed elements progress.
                                 publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, Interlocked.Increment(ref processedFilesCount), totalFilesToHash, cancellationToken).ConfigureAwait(false);
                                 if (publishJobProgressResult.IsFailure)
                                     throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
@@ -111,7 +126,7 @@ internal sealed class MediaLibraryScanHashJob : MediaLibraryScanJob, IMediaLibra
                             }
                         }, cancellationToken).ConfigureAwait(false);
 
-                        // write the computed hashes back to the staging results
+                        // Write the computed hashes back to the staging results.
                         Result<Updated> updateHashesResult = await unitOfWork.LibraryScanStagingResultsRepository.UpdateFileHashesAsync(ScanId.Value, hashedFiles, cancellationToken).ConfigureAwait(false);
                         if (updateHashesResult.IsFailure)
                             throw new InvalidOperationException(updateHashesResult.FirstError.Description);
@@ -119,11 +134,11 @@ internal sealed class MediaLibraryScanHashJob : MediaLibraryScanJob, IMediaLibra
                         lastPath = filesToHashPage[^1].Path;
                     }
 
-                    // this job finished, increment the number of processed jobs progress
+                    // This job finished, increment the number of processed jobs progress.
                     await domainEventPublisher.PublishAsync(new LibraryScanProgressChangedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                     Status = LibraryScanJobStatus.Completed;
 
-                    // call each linked child with the obtained payload
+                    // Call each linked child with the obtained payload.
                     foreach (IMediaLibraryScanJob child in Children)
                         await child.ExecuteAsync(id, input, cancellationToken).ConfigureAwait(false);
                 }, cancellationToken).ConfigureAwait(false);

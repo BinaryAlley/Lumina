@@ -79,6 +79,10 @@ public class LibraryConfiguration : IEntityTypeConfiguration<LibraryEntity>
             .HasDefaultValue(null)
             .HasColumnOrder(17);
 
+        builder.Property(library => library.IsContentOnSsd)
+            .HasDefaultValue(false)
+            .HasColumnOrder(18);
+
         // one user with many libraries
         builder.HasOne(library => library.User)
             .WithMany(user => user.Libraries)

@@ -39,6 +39,7 @@ public static class LibraryMapping
             CanDownloadMetadataFromWeb = domainEntity.CanDownloadMetadataFromWeb,
             ShouldSaveMetadataInMediaDirectories = domainEntity.ShouldSaveMetadataInMediaDirectories,
             ShouldSkipUnchangedDirectoriesDuringScan = domainEntity.ShouldSkipUnchangedDirectoriesDuringScan,
+            IsContentOnSsd = domainEntity.IsContentOnSsd,
             ShouldTrackConsumptionProgress = domainEntity.ConsumptionSettings.ShouldTrackConsumptionProgress,
             CompletionThresholdPercentage = domainEntity.ConsumptionSettings.CompletionThresholdPercentage.HasValue
                 ? domainEntity.ConsumptionSettings.CompletionThresholdPercentage.Value

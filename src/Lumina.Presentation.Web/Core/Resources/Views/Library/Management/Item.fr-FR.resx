@@ -177,6 +177,9 @@
   <data name="DescriptionEnabled" xml:space="preserve">
     <value>Si cette médiathèque est désactivée ou non. Une bibliothèque désactivée n'est pas affichée aux utilisateurs, ni analysée, ni mise à jour, etc.</value>
   </data>
+  <data name="DescriptionIsContentOnSsd" xml:space="preserve">
+    <value>Indique si le contenu de la médiathèque est stocké sur un disque SSD. Lorsque cette option est activée, les étapes de découverte des fichiers et de calcul des empreintes du contenu lisent les fichiers en parallèle, ce qui tire parti de la faible latence des disques SSD. Laissez-la désactivée pour les disques durs mécaniques, où les lectures parallèles peuvent réduire les performances.</value>
+  </data>
   <data name="DescriptionLibraryType" xml:space="preserve">
     <value>Choisissez le type de contenu multimédia que contiendra cette bibliothèque</value>
   </data>
@@ -224,6 +227,9 @@
   </data>
   <data name="Interview" xml:space="preserve">
     <value>Entretien</value>
+  </data>
+  <data name="IsContentOnSsd" xml:space="preserve">
+    <value>Contenu sur SSD</value>
   </data>
   <data name="LibrarySaved" xml:space="preserve">
     <value>Bibliothèque Enregistrée</value>

@@ -177,6 +177,9 @@
   <data name="DescriptionEnabled" xml:space="preserve">
     <value>Dacă această bibliotecă media este dezactivată sau nu. O bibliotecă dezactivată nu este afișată utilizatorilor, scanată, actualizată, etc.</value>
   </data>
+  <data name="DescriptionIsContentOnSsd" xml:space="preserve">
+    <value>Stabilește dacă fișierele bibliotecii media se află pe un SSD. Când este activată, etapele de descoperire a fișierelor și de calculare a amprentelor conținutului citesc fișierele în paralel, valorificând latența redusă a unităților SSD. Lăsați-o dezactivată pentru hard disk-urile mecanice, unde citirile în paralel pot reduce performanța.</value>
+  </data>
   <data name="DescriptionLibraryType" xml:space="preserve">
     <value>Selectează tipul de conținut media pe care îl va conține această bibliotecă</value>
   </data>
@@ -224,6 +227,9 @@
   </data>
   <data name="Interview" xml:space="preserve">
     <value>Interviu</value>
+  </data>
+  <data name="IsContentOnSsd" xml:space="preserve">
+    <value>Conținutul este pe SSD</value>
   </data>
   <data name="LibrarySaved" xml:space="preserve">
     <value>Biblioteca A Fost Salvată</value>

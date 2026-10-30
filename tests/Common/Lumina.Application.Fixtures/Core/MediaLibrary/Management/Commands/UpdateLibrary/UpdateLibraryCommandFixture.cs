@@ -31,6 +31,7 @@ public class UpdateLibraryCommandFixture
     /// <param name="canDownloadMetadataFromWeb">Whether the media library should download metadata from the web or not.</param>
     /// <param name="shouldSaveMetadataInMediaDirectories">Whether the metadata should be saved in the media directories or not.</param>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether unchanged directories should be skipped during a scan or not.</param>
+    /// <param name="isContentOnSsd">Whether the content of the media library is stored on a solid state drive.</param>
     /// <param name="shouldTrackConsumptionProgress">Optional. Whether the consumption progress of the media library items should be tracked, or not.</param>
     /// <param name="completionThresholdPercentage">Optional. The percentage of a media library item that must be consumed for its session to be considered completed.</param>
     /// <param name="pathTemplateParts">Optional. The ordered parts of the path template of the media library.</param>
@@ -47,6 +48,7 @@ public class UpdateLibraryCommandFixture
         bool canDownloadMetadataFromWeb = true,
         bool shouldSaveMetadataInMediaDirectories = true,
         bool shouldSkipUnchangedDirectoriesDuringScan = false,
+        bool isContentOnSsd = false,
         bool? shouldTrackConsumptionProgress = null,
         int? completionThresholdPercentage = null,
         LibraryPathTemplatePartDto[]? pathTemplateParts = null)
@@ -64,6 +66,7 @@ public class UpdateLibraryCommandFixture
                 true,
                 true,
                 false,
+                false,
                 shouldTrackConsumptionProgress,
                 completionThresholdPercentage,
                 null
@@ -79,6 +82,7 @@ public class UpdateLibraryCommandFixture
             .RuleFor(x => x.CanDownloadMetadataFromWeb, canDownloadMetadataFromWeb)
             .RuleFor(x => x.ShouldSaveMetadataInMediaDirectories, shouldSaveMetadataInMediaDirectories)
             .RuleFor(x => x.ShouldSkipUnchangedDirectoriesDuringScan, shouldSkipUnchangedDirectoriesDuringScan)
+            .RuleFor(x => x.IsContentOnSsd, isContentOnSsd)
             .RuleFor(x => x.PathTemplateParts, pathTemplateParts)
             .Generate();
     }

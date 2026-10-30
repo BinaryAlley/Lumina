@@ -169,6 +169,7 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
             command.CanDownloadMetadataFromWeb,
             command.ShouldSaveMetadataInMediaDirectories,
             command.ShouldSkipUnchangedDirectoriesDuringScan,
+            command.IsContentOnSsd,
             consumptionSettings,
             pathTemplateResult.Value,
             [.. getLibraryResult.Value.LibraryScans.Select(libraryScan => ScanId.Create(libraryScan.Id))]

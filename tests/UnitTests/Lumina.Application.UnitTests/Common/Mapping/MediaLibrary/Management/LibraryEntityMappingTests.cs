@@ -32,7 +32,8 @@ public class LibraryEntityMappingTests
             title: "My Library",
             libraryType: LibraryType.Book,
             contentLocations: ["C:/Books", "D:/Media/Books"],
-            coverImage: "D:/myPoster.jpg");
+            coverImage: "D:/myPoster.jpg",
+            isContentOnSsd: true);
 
         // Act
         LibraryResponse result = entity.ToResponse();
@@ -45,6 +46,7 @@ public class LibraryEntityMappingTests
         Assert.Equal(entity.LibraryType, result.LibraryType);
         Assert.Equal(entity.ContentLocations.Select(l => l.Path), result.ContentLocations);
         Assert.Equal(entity.CoverImage, result.CoverImage);
+        Assert.Equal(entity.IsContentOnSsd, result.IsContentOnSsd);
         Assert.Equal(entity.ShouldTrackConsumptionProgress, result.ShouldTrackConsumptionProgress);
         Assert.Equal(entity.CompletionThresholdPercentage, result.CompletionThresholdPercentage);
         Assert.Equal(entity.CreatedOnUtc, result.CreatedOnUtc);
@@ -188,6 +190,7 @@ public class LibraryEntityMappingTests
             libraryType: LibraryType.Book,
             contentLocations: ["C:/Books"],
             coverImage: "D:/cover.jpg",
+            isContentOnSsd: true,
             pathTemplateParts: [firstPart, secondPart]);
 
         // Act
@@ -200,6 +203,7 @@ public class LibraryEntityMappingTests
         Assert.Equal(entity.Title, result.Value.Title);
         Assert.Equal(entity.LibraryType, result.Value.LibraryType);
         Assert.Equal("D:/cover.jpg", result.Value.CoverImage.Value);
+        Assert.Equal(entity.IsContentOnSsd, result.Value.IsContentOnSsd);
         Assert.Equal(entity.ShouldTrackConsumptionProgress, result.Value.ConsumptionSettings.ShouldTrackConsumptionProgress);
         Assert.Equal(entity.CompletionThresholdPercentage, result.Value.ConsumptionSettings.CompletionThresholdPercentage.HasValue ? result.Value.ConsumptionSettings.CompletionThresholdPercentage.Value : null);
         Assert.Equal(2, result.Value.PathTemplate.Parts.Count);
