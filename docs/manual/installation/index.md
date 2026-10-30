@@ -83,7 +83,7 @@ Set them as environment variables on the `lumina-api` and `lumina-web` services 
 Use a release package or installer when one is available, or, with the .NET 10 SDK installed, build the solution from the `src` directory:
 
 ```bash
-dotnet build Lumina.sln
+dotnet build Lumina.slnx
 ```
 
 Run the API and the web client from the installed release package or from the published build. In development, their addresses come from each project's `launchSettings.json` (`http://localhost:5214` and `http://localhost:5012`). When you run a published build directly on a host, set the addresses yourself, either with `ASPNETCORE_URLS` or with `ASPNETCORE_HTTP_PORTS`:

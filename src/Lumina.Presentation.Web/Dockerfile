@@ -50,5 +50,5 @@ ENV ASPNETCORE_HTTP_PORTS=5012
 EXPOSE 5012
 ENTRYPOINT ["dotnet", "Lumina.Presentation.Web.dll"]
 
-# to build this Docker image, run the following command from the root of the project (location of the .sln file):
+# to build this Docker image, run the following command from the root of the project (location of the .slnx solution file):
 # docker build --no-cache -t lumina-web -f Lumina.Presentation.Web/Dockerfile .

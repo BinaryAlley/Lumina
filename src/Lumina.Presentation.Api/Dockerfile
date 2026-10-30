@@ -65,5 +65,5 @@ ENV ASPNETCORE_HTTP_PORTS=5214
 EXPOSE 5214
 ENTRYPOINT ["dotnet", "Lumina.Presentation.Api.dll"]
 
-# to build this Docker image, run the following command from the root of the project (location of the .sln file):
+# to build this Docker image, run the following command from the root of the project (location of the .slnx solution file):
 # docker build --no-cache -t lumina-api -f Lumina.Presentation.Api/Dockerfile .

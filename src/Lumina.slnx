@@ -1,0 +1,422 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/docs/">
+    <File Path="../docs/CONTRIBUTING.md" />
+    <File Path="../docs/SOURCES.md" />
+    <File Path="../LICENSE.md" />
+    <File Path="../README.md" />
+  </Folder>
+  <Folder Name="/docs/manual/">
+    <File Path="../docs/manual/index.md" />
+  </Folder>
+  <Folder Name="/docs/manual/installation/">
+    <File Path="../docs/manual/installation/index.md" />
+  </Folder>
+  <Folder Name="/docs/manual/managing-libraries/">
+    <File Path="../docs/manual/managing-libraries/index.md" />
+  </Folder>
+  <Folder Name="/docs/manual/plugins/">
+    <File Path="../docs/manual/plugins/index.md" />
+  </Folder>
+  <Folder Name="/docs/manual/themes/">
+    <File Path="../docs/manual/themes/index.md" />
+  </Folder>
+  <Folder Name="/docs/manual/using-lumina/">
+    <File Path="../docs/manual/using-lumina/index.md" />
+  </Folder>
+  <Folder Name="/docs/technical/" />
+  <Folder Name="/docs/technical/api/" />
+  <Folder Name="/docs/technical/api/admin/" />
+  <Folder Name="/docs/technical/api/admin/authorization/">
+    <File Path="../docs/technical/api/admin/authorization/Api.Permissions.md" />
+    <File Path="../docs/technical/api/admin/authorization/Api.Roles.md" />
+  </Folder>
+  <Folder Name="/docs/technical/api/favorites/">
+    <File Path="../docs/technical/api/favorites/Api.Favorites.md" />
+  </Folder>
+  <Folder Name="/docs/technical/api/file-system-management/">
+    <File Path="../docs/technical/api/file-system-management/Api.Directories.md" />
+    <File Path="../docs/technical/api/file-system-management/Api.Drives.md" />
+    <File Path="../docs/technical/api/file-system-management/Api.Files.md" />
+    <File Path="../docs/technical/api/file-system-management/Api.FileSystem.md" />
+    <File Path="../docs/technical/api/file-system-management/Api.Path.md" />
+    <File Path="../docs/technical/api/file-system-management/Api.Thumbnails.md" />
+  </Folder>
+  <Folder Name="/docs/technical/api/library/" />
+  <Folder Name="/docs/technical/api/library/audio-library/" />
+  <Folder Name="/docs/technical/api/library/audio-library/music-library/">
+    <File Path="../docs/technical/api/library/audio-library/music-library/Api.Albums.md" />
+    <File Path="../docs/technical/api/library/audio-library/music-library/Api.Artists.md" />
+    <File Path="../docs/technical/api/library/audio-library/music-library/Api.Tracks.md" />
+  </Folder>
+  <Folder Name="/docs/technical/api/library/management/">
+    <File Path="../docs/technical/api/library/management/Api.Libraries.md" />
+  </Folder>
+  <Folder Name="/docs/technical/api/library/statistics/">
+    <File Path="../docs/technical/api/library/statistics/Api.LibraryStatistics.md" />
+  </Folder>
+  <Folder Name="/docs/technical/api/library/written-content-library/" />
+  <Folder Name="/docs/technical/api/library/written-content-library/book-library/">
+    <File Path="../docs/technical/api/library/written-content-library/book-library/Api.Books.md" />
+  </Folder>
+  <Folder Name="/docs/technical/api/maintenance/">
+    <File Path="../docs/technical/api/maintenance/Api.Health.md" />
+    <File Path="../docs/technical/api/maintenance/Api.Initialization.md" />
+  </Folder>
+  <Folder Name="/docs/technical/api/media-consumption/">
+    <File Path="../docs/technical/api/media-consumption/Api.MediaConsumption.md" />
+  </Folder>
+  <Folder Name="/docs/technical/api/plugins/">
+    <File Path="../docs/technical/api/plugins/Api.Plugins.md" />
+  </Folder>
+  <Folder Name="/docs/technical/api/scheduling/">
+    <File Path="../docs/technical/api/scheduling/Api.Scheduling.md" />
+  </Folder>
+  <Folder Name="/docs/technical/api/themes/">
+    <File Path="../docs/technical/api/themes/Api.Themes.md" />
+  </Folder>
+  <Folder Name="/docs/technical/api/users-management/">
+    <File Path="../docs/technical/api/users-management/Api.Authentication.md" />
+    <File Path="../docs/technical/api/users-management/Api.Authorization.md" />
+    <File Path="../docs/technical/api/users-management/Api.Settings.md" />
+  </Folder>
+  <Folder Name="/docs/technical/architecture/">
+    <File Path="../docs/technical/architecture/1 system-context-diagram.puml" />
+    <File Path="../docs/technical/architecture/1 system-context-diagram.svg" />
+    <File Path="../docs/technical/architecture/2 container-diagram.puml" />
+    <File Path="../docs/technical/architecture/2 container-diagram.svg" />
+    <File Path="../docs/technical/architecture/3.1 component-web-client-diagram.puml" />
+    <File Path="../docs/technical/architecture/3.1 component-web-client-diagram.svg" />
+    <File Path="../docs/technical/architecture/3.2 component-api-server-diagram.puml" />
+    <File Path="../docs/technical/architecture/3.2 component-api-server-diagram.svg" />
+    <File Path="../docs/technical/architecture/4.1 code-media-library-scanning-diagram.puml" />
+    <File Path="../docs/technical/architecture/4.1 code-media-library-scanning-diagram.svg" />
+    <File Path="../docs/technical/architecture/4.2 code-book-reading-diagram.puml" />
+    <File Path="../docs/technical/architecture/4.2 code-book-reading-diagram.svg" />
+    <File Path="../docs/technical/architecture/4.3 code-scheduler-diagram.puml" />
+    <File Path="../docs/technical/architecture/4.3 code-scheduler-diagram.svg" />
+  </Folder>
+  <Folder Name="/docs/technical/architecture/architecture-knowledge-management/" />
+  <Folder Name="/docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/">
+    <File Path="../docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md" />
+    <File Path="../docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0002.md" />
+    <File Path="../docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0003.md" />
+    <File Path="../docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0004.md" />
+    <File Path="../docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0005.md" />
+    <File Path="../docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0006.md" />
+    <File Path="../docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0007.md" />
+    <File Path="../docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0008.md" />
+    <File Path="../docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0009.md" />
+    <File Path="../docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0010.md" />
+    <File Path="../docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0011.md" />
+    <File Path="../docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0012.md" />
+    <File Path="../docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0013.md" />
+    <File Path="../docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0014.md" />
+    <File Path="../docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0015.md" />
+    <File Path="../docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0016.md" />
+    <File Path="../docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0017.md" />
+    <File Path="../docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0018.md" />
+    <File Path="../docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0019.md" />
+  </Folder>
+  <Folder Name="/docs/technical/domain/">
+    <File Path="../docs/technical/domain/Aggregates.AudioLibrary.md" />
+    <File Path="../docs/technical/domain/Aggregates.FileSystemManagement.md" />
+    <File Path="../docs/technical/domain/Aggregates.VideoLibrary.md" />
+    <File Path="../docs/technical/domain/Aggregates.WrittenContentLibrary.md" />
+    <File Path="../docs/technical/domain/Common.Metadata.md" />
+    <File Path="../docs/technical/domain/Domain.md" />
+    <File Path="../docs/technical/domain/UbiquitousLanguage.md" />
+  </Folder>
+  <Folder Name="/docs/technical/requests/">
+    <File Path="../docs/technical/requests/http-client.env.json" />
+  </Folder>
+  <Folder Name="/docs/technical/requests/admin/" />
+  <Folder Name="/docs/technical/requests/admin/authorization/" />
+  <Folder Name="/docs/technical/requests/admin/authorization/permissions/">
+    <File Path="../docs/technical/requests/admin/authorization/permissions/GetPermissions.http" />
+  </Folder>
+  <Folder Name="/docs/technical/requests/admin/authorization/roles/">
+    <File Path="../docs/technical/requests/admin/authorization/roles/AddRole.http" />
+    <File Path="../docs/technical/requests/admin/authorization/roles/DeleteRole.http" />
+    <File Path="../docs/technical/requests/admin/authorization/roles/GetRolePermissions.http" />
+    <File Path="../docs/technical/requests/admin/authorization/roles/GetRoles.http" />
+    <File Path="../docs/technical/requests/admin/authorization/roles/UpdateRole.http" />
+  </Folder>
+  <Folder Name="/docs/technical/requests/favorites/">
+    <File Path="../docs/technical/requests/favorites/AddFavorite.http" />
+    <File Path="../docs/technical/requests/favorites/GetFavorites.http" />
+    <File Path="../docs/technical/requests/favorites/GetFavoriteStatus.http" />
+    <File Path="../docs/technical/requests/favorites/RemoveFavorite.http" />
+  </Folder>
+  <Folder Name="/docs/technical/requests/file-system-management/" />
+  <Folder Name="/docs/technical/requests/file-system-management/directories/">
+    <File Path="../docs/technical/requests/file-system-management/directories/GetDirectories.http" />
+  </Folder>
+  <Folder Name="/docs/technical/requests/file-system-management/drives/">
+    <File Path="../docs/technical/requests/file-system-management/drives/GetDrives.http" />
+  </Folder>
+  <Folder Name="/docs/technical/requests/file-system-management/file-system/">
+    <File Path="../docs/technical/requests/file-system-management/file-system/GetType.http" />
+  </Folder>
+  <Folder Name="/docs/technical/requests/file-system-management/files/">
+    <File Path="../docs/technical/requests/file-system-management/files/GetFiles.http" />
+    <File Path="../docs/technical/requests/file-system-management/files/GetTreeFiles.http" />
+  </Folder>
+  <Folder Name="/docs/technical/requests/file-system-management/path/">
+    <File Path="../docs/technical/requests/file-system-management/path/CheckPathExists.http" />
+    <File Path="../docs/technical/requests/file-system-management/path/CombinePath.http" />
+    <File Path="../docs/technical/requests/file-system-management/path/GetPathParent.http" />
+    <File Path="../docs/technical/requests/file-system-management/path/GetPathRoot.http" />
+    <File Path="../docs/technical/requests/file-system-management/path/GetPathSeparator.http" />
+    <File Path="../docs/technical/requests/file-system-management/path/SplitPath.http" />
+    <File Path="../docs/technical/requests/file-system-management/path/ValidatePath.http" />
+  </Folder>
+  <Folder Name="/docs/technical/requests/file-system-management/thumbnails/">
+    <File Path="../docs/technical/requests/file-system-management/thumbnails/GetThumbnail.http" />
+  </Folder>
+  <Folder Name="/docs/technical/requests/library/" />
+  <Folder Name="/docs/technical/requests/library/audio-library/" />
+  <Folder Name="/docs/technical/requests/library/audio-library/music-library/" />
+  <Folder Name="/docs/technical/requests/library/audio-library/music-library/albums/">
+    <File Path="../docs/technical/requests/library/audio-library/music-library/albums/AddAlbum.http" />
+    <File Path="../docs/technical/requests/library/audio-library/music-library/albums/DeleteAlbum.http" />
+    <File Path="../docs/technical/requests/library/audio-library/music-library/albums/GetAlbum.http" />
+    <File Path="../docs/technical/requests/library/audio-library/music-library/albums/GetAlbumTracks.http" />
+    <File Path="../docs/technical/requests/library/audio-library/music-library/albums/GetAlbumTracksLite.http" />
+    <File Path="../docs/technical/requests/library/audio-library/music-library/albums/UpdateAlbum.http" />
+    <File Path="../docs/technical/requests/library/audio-library/music-library/albums/UpdateAlbumCover.http" />
+  </Folder>
+  <Folder Name="/docs/technical/requests/library/audio-library/music-library/artists/">
+    <File Path="../docs/technical/requests/library/audio-library/music-library/artists/AddArtist.http" />
+    <File Path="../docs/technical/requests/library/audio-library/music-library/artists/DeleteArtist.http" />
+    <File Path="../docs/technical/requests/library/audio-library/music-library/artists/GetArtist.http" />
+    <File Path="../docs/technical/requests/library/audio-library/music-library/artists/GetArtistAlbums.http" />
+    <File Path="../docs/technical/requests/library/audio-library/music-library/artists/GetArtistAlbumsLite.http" />
+    <File Path="../docs/technical/requests/library/audio-library/music-library/artists/GetArtists.http" />
+    <File Path="../docs/technical/requests/library/audio-library/music-library/artists/GetArtistsLite.http" />
+    <File Path="../docs/technical/requests/library/audio-library/music-library/artists/UpdateArtist.http" />
+    <File Path="../docs/technical/requests/library/audio-library/music-library/artists/UpdateArtistCover.http" />
+  </Folder>
+  <Folder Name="/docs/technical/requests/library/audio-library/music-library/tracks/">
+    <File Path="../docs/technical/requests/library/audio-library/music-library/tracks/AddTrack.http" />
+    <File Path="../docs/technical/requests/library/audio-library/music-library/tracks/DeleteTrack.http" />
+    <File Path="../docs/technical/requests/library/audio-library/music-library/tracks/GetPlaybackManifest.http" />
+    <File Path="../docs/technical/requests/library/audio-library/music-library/tracks/GetTrack.http" />
+    <File Path="../docs/technical/requests/library/audio-library/music-library/tracks/ShuffleTracks.http" />
+    <File Path="../docs/technical/requests/library/audio-library/music-library/tracks/StreamTrack.http" />
+    <File Path="../docs/technical/requests/library/audio-library/music-library/tracks/StreamTrackSegment.http" />
+    <File Path="../docs/technical/requests/library/audio-library/music-library/tracks/UpdateTrack.http" />
+  </Folder>
+  <Folder Name="/docs/technical/requests/library/management/">
+    <File Path="../docs/technical/requests/library/management/AddLibrary.http" />
+    <File Path="../docs/technical/requests/library/management/CancelLibrariesScan.http" />
+    <File Path="../docs/technical/requests/library/management/CancelLibraryScan.http" />
+    <File Path="../docs/technical/requests/library/management/DeleteLibrary.http" />
+    <File Path="../docs/technical/requests/library/management/GetEnabledLibraries.http" />
+    <File Path="../docs/technical/requests/library/management/GetLibraries.http" />
+    <File Path="../docs/technical/requests/library/management/GetLibrary.http" />
+    <File Path="../docs/technical/requests/library/management/GetLibraryPathTemplateParts.http" />
+    <File Path="../docs/technical/requests/library/management/GetLibraryScanProgress.http" />
+    <File Path="../docs/technical/requests/library/management/GetRunningLibraryScans.http" />
+    <File Path="../docs/technical/requests/library/management/ScanLibraries.http" />
+    <File Path="../docs/technical/requests/library/management/ScanLibrary.http" />
+    <File Path="../docs/technical/requests/library/management/UpdateLibrary.http" />
+  </Folder>
+  <Folder Name="/docs/technical/requests/library/statistics/">
+    <File Path="../docs/technical/requests/library/statistics/ClearConsumptionHistory.http" />
+    <File Path="../docs/technical/requests/library/statistics/ClearResumePoints.http" />
+    <File Path="../docs/technical/requests/library/statistics/DeleteConsumptionItemHistory.http" />
+    <File Path="../docs/technical/requests/library/statistics/DeleteConsumptionRecord.http" />
+    <File Path="../docs/technical/requests/library/statistics/GetAllUsersConsumptionStatistics.http" />
+    <File Path="../docs/technical/requests/library/statistics/GetConsumptionStatistics.http" />
+    <File Path="../docs/technical/requests/library/statistics/GetGenreConsumption.http" />
+    <File Path="../docs/technical/requests/library/statistics/GetMostConsumed.http" />
+    <File Path="../docs/technical/requests/library/statistics/GetRecentlyConsumed.http" />
+    <File Path="../docs/technical/requests/library/statistics/GetTagConsumption.http" />
+  </Folder>
+  <Folder Name="/docs/technical/requests/library/written-content-library/" />
+  <Folder Name="/docs/technical/requests/library/written-content-library/book-library/" />
+  <Folder Name="/docs/technical/requests/library/written-content-library/book-library/books/">
+    <File Path="../docs/technical/requests/library/written-content-library/book-library/books/AddBook.http" />
+    <File Path="../docs/technical/requests/library/written-content-library/book-library/books/GetBook.http" />
+    <File Path="../docs/technical/requests/library/written-content-library/book-library/books/GetBooks.http" />
+    <File Path="../docs/technical/requests/library/written-content-library/book-library/books/GetBooksLite.http" />
+    <File Path="../docs/technical/requests/library/written-content-library/book-library/books/UpdateBook.http" />
+    <File Path="../docs/technical/requests/library/written-content-library/book-library/books/UpdateBookCover.http" />
+  </Folder>
+  <Folder Name="/docs/technical/requests/library/written-content-library/book-library/books/reading/">
+    <File Path="../docs/technical/requests/library/written-content-library/book-library/books/reading/GetReadingAvailability.http" />
+    <File Path="../docs/technical/requests/library/written-content-library/book-library/books/reading/GetReadingManifest.http" />
+    <File Path="../docs/technical/requests/library/written-content-library/book-library/books/reading/GetReadingResource.http" />
+    <File Path="../docs/technical/requests/library/written-content-library/book-library/books/reading/GetReadingSection.http" />
+  </Folder>
+  <Folder Name="/docs/technical/requests/maintenance/">
+    <File Path="../docs/technical/requests/maintenance/CheckHealth.http" />
+  </Folder>
+  <Folder Name="/docs/technical/requests/maintenance/application-setup/">
+    <File Path="../docs/technical/requests/maintenance/application-setup/CheckInitialization.http" />
+    <File Path="../docs/technical/requests/maintenance/application-setup/SetupApplication.http" />
+  </Folder>
+  <Folder Name="/docs/technical/requests/media-consumption/">
+    <File Path="../docs/technical/requests/media-consumption/CompleteConsumption.http" />
+    <File Path="../docs/technical/requests/media-consumption/GetConsumptionRecord.http" />
+    <File Path="../docs/technical/requests/media-consumption/GetResumePoint.http" />
+    <File Path="../docs/technical/requests/media-consumption/ReportConsumptionProgress.http" />
+    <File Path="../docs/technical/requests/media-consumption/StartConsumption.http" />
+    <File Path="../docs/technical/requests/media-consumption/StopConsumption.http" />
+  </Folder>
+  <Folder Name="/docs/technical/requests/plugins/">
+    <File Path="../docs/technical/requests/plugins/GetLibraryArtworkProviders.http" />
+    <File Path="../docs/technical/requests/plugins/GetLibraryBookReaders.http" />
+    <File Path="../docs/technical/requests/plugins/GetLibraryMetadataProviders.http" />
+    <File Path="../docs/technical/requests/plugins/GetPlugins.http" />
+    <File Path="../docs/technical/requests/plugins/GetPluginSettings.http" />
+    <File Path="../docs/technical/requests/plugins/InstallPlugin.http" />
+    <File Path="../docs/technical/requests/plugins/ReorderLibraryArtworkProviders.http" />
+    <File Path="../docs/technical/requests/plugins/ReorderLibraryMetadataProviders.http" />
+    <File Path="../docs/technical/requests/plugins/SetLibraryArtworkProviderEnabled.http" />
+    <File Path="../docs/technical/requests/plugins/SetLibraryBookReaderEnabled.http" />
+    <File Path="../docs/technical/requests/plugins/SetLibraryMetadataProviderEnabled.http" />
+    <File Path="../docs/technical/requests/plugins/UpdatePluginSettings.http" />
+  </Folder>
+  <Folder Name="/docs/technical/requests/scheduling/">
+    <File Path="../docs/technical/requests/scheduling/AddScheduledJob.http" />
+    <File Path="../docs/technical/requests/scheduling/FireScheduledJob.http" />
+    <File Path="../docs/technical/requests/scheduling/GetScheduledJobHistory.http" />
+    <File Path="../docs/technical/requests/scheduling/GetScheduledJobs.http" />
+    <File Path="../docs/technical/requests/scheduling/GetSchedulerDisplayPreferences.http" />
+    <File Path="../docs/technical/requests/scheduling/RemoveScheduledJob.http" />
+    <File Path="../docs/technical/requests/scheduling/StartScheduledJob.http" />
+    <File Path="../docs/technical/requests/scheduling/StopScheduledJob.http" />
+    <File Path="../docs/technical/requests/scheduling/UpdateSchedulerDisplayPreferences.http" />
+  </Folder>
+  <Folder Name="/docs/technical/requests/themes/" />
+  <Folder Name="/docs/technical/requests/themes/management/">
+    <File Path="../docs/technical/requests/themes/management/DeleteTheme.http" />
+    <File Path="../docs/technical/requests/themes/management/InstallTheme.http" />
+    <File Path="../docs/technical/requests/themes/management/RestoreTheme.http" />
+    <File Path="../docs/technical/requests/themes/management/SetCurrentTheme.http" />
+  </Folder>
+  <Folder Name="/docs/technical/requests/themes/queries/">
+    <File Path="../docs/technical/requests/themes/queries/GetCurrentTheme.http" />
+    <File Path="../docs/technical/requests/themes/queries/GetThemeArchive.http" />
+    <File Path="../docs/technical/requests/themes/queries/GetThemeAsset.http" />
+    <File Path="../docs/technical/requests/themes/queries/GetThemes.http" />
+    <File Path="../docs/technical/requests/themes/queries/GetThemeSettings.http" />
+    <File Path="../docs/technical/requests/themes/queries/GetThemeTemplate.http" />
+  </Folder>
+  <Folder Name="/docs/technical/requests/users-management/" />
+  <Folder Name="/docs/technical/requests/users-management/authentication/">
+    <File Path="../docs/technical/requests/users-management/authentication/ChangePassword.http" />
+    <File Path="../docs/technical/requests/users-management/authentication/GetUsers.http" />
+    <File Path="../docs/technical/requests/users-management/authentication/Login.http" />
+    <File Path="../docs/technical/requests/users-management/authentication/RecoverPassword.http" />
+    <File Path="../docs/technical/requests/users-management/authentication/Register.http" />
+  </Folder>
+  <Folder Name="/docs/technical/requests/users-management/authorization/">
+    <File Path="../docs/technical/requests/users-management/authorization/GetAuthorization.http" />
+    <File Path="../docs/technical/requests/users-management/authorization/GetUserPermissions.http" />
+    <File Path="../docs/technical/requests/users-management/authorization/GetUserRole.http" />
+    <File Path="../docs/technical/requests/users-management/authorization/UpdateUserRoleAndPermissions.http" />
+  </Folder>
+  <Folder Name="/docs/technical/requests/users-management/settings/">
+    <File Path="../docs/technical/requests/users-management/settings/GetPlaybackState.http" />
+    <File Path="../docs/technical/requests/users-management/settings/GetUserSettings.http" />
+    <File Path="../docs/technical/requests/users-management/settings/UpdatePlaybackState.http" />
+    <File Path="../docs/technical/requests/users-management/settings/UpdateUserSettings.http" />
+  </Folder>
+  <Folder Name="/docs/technical/templates/">
+    <File Path="../docs/technical/templates/PULL_REQUEST_TEMPLATE.md" />
+  </Folder>
+  <Folder Name="/docs/technical/theming/">
+    <File Path="../docs/technical/theming/Theming.md" />
+  </Folder>
+  <Folder Name="/plugins/">
+    <Project Path="../plugins/Lumina.Plugins.Calibre/Lumina.Plugins.Calibre.csproj" />
+    <Project Path="../plugins/Lumina.Plugins.CoverArtArchive/Lumina.Plugins.CoverArtArchive.csproj" />
+    <Project Path="../plugins/Lumina.Plugins.Epub/Lumina.Plugins.Epub.csproj" />
+    <Project Path="../plugins/Lumina.Plugins.ID3/Lumina.Plugins.ID3.csproj" />
+    <Project Path="../plugins/Lumina.Plugins.LocalMusicArtwork/Lumina.Plugins.LocalMusicArtwork.csproj" />
+    <Project Path="../plugins/Lumina.Plugins.MusicBrainz/Lumina.Plugins.MusicBrainz.csproj" />
+    <Project Path="../plugins/Lumina.Plugins.OpenLibrary/Lumina.Plugins.OpenLibrary.csproj" />
+    <Project Path="../plugins/Lumina.Plugins.Pdf/Lumina.Plugins.Pdf.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="../.editorconfig" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="Lumina.Application/Lumina.Application.csproj" />
+    <Project Path="Lumina.Contracts/Lumina.Contracts.csproj" />
+    <Project Path="Lumina.DataAccess/Lumina.DataAccess.csproj" />
+    <Project Path="Lumina.Domain.SharedKernel/Lumina.Domain.SharedKernel.csproj" />
+    <Project Path="Lumina.Domain/Lumina.Domain.csproj" />
+    <Project Path="Lumina.Infrastructure/Lumina.Infrastructure.csproj" />
+    <Project Path="Lumina.Plugins.Contracts/Lumina.Plugins.Contracts.csproj" />
+    <Project Path="Lumina.Presentation.Api/Lumina.Presentation.Api.csproj" />
+    <Project Path="Lumina.Presentation.Web/Lumina.Presentation.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+  <Folder Name="/tests/Common/">
+    <Project Path="../tests/Common/Lumina.Application.Fixtures/Lumina.Application.Fixtures.csproj" />
+    <Project Path="../tests/Common/Lumina.Contracts.Fixtures/Lumina.Contracts.Fixtures.csproj" />
+    <Project Path="../tests/Common/Lumina.Domain.Fixtures/Lumina.Domain.Fixtures.csproj" />
+    <Project Path="../tests/Common/Lumina.Domain.SharedKernel.Fixtures/Lumina.Domain.SharedKernel.Fixtures.csproj" />
+    <Project Path="../tests/Common/Lumina.Infrastructure.Fixtures/Lumina.Infrastructure.Fixtures.csproj" />
+    <Project Path="../tests/Common/Lumina.Plugins.Calibre.Fixtures/Lumina.Plugins.Calibre.Fixtures.csproj" />
+    <Project Path="../tests/Common/Lumina.Plugins.Contracts.Fixtures/Lumina.Plugins.Contracts.Fixtures.csproj" />
+    <Project Path="../tests/Common/Lumina.Plugins.CoverArtArchive.Fixtures/Lumina.Plugins.CoverArtArchive.Fixtures.csproj" />
+    <Project Path="../tests/Common/Lumina.Plugins.Epub.Fixtures/Lumina.Plugins.Epub.Fixtures.csproj" />
+    <Project Path="../tests/Common/Lumina.Plugins.ID3.Fixtures/Lumina.Plugins.ID3.Fixtures.csproj" />
+    <Project Path="../tests/Common/Lumina.Plugins.LocalMusicArtwork.Fixtures/Lumina.Plugins.LocalMusicArtwork.Fixtures.csproj" />
+    <Project Path="../tests/Common/Lumina.Plugins.MusicBrainz.Fixtures/Lumina.Plugins.MusicBrainz.Fixtures.csproj" />
+    <Project Path="../tests/Common/Lumina.Plugins.OpenLibrary.Fixtures/Lumina.Plugins.OpenLibrary.Fixtures.csproj" />
+    <Project Path="../tests/Common/Lumina.Plugins.Pdf.Fixtures/Lumina.Plugins.Pdf.Fixtures.csproj" />
+    <Project Path="../tests/Common/Lumina.Presentation.Api.Fixtures/Lumina.Presentation.Api.Fixtures.csproj" />
+    <Project Path="../tests/Common/Lumina.Presentation.Web.Fixtures/Lumina.Presentation.Web.Fixtures.csproj" />
+    <Project Path="../tests/Common/Lumina.TestPlugin/Lumina.TestPlugin.csproj" />
+  </Folder>
+  <Folder Name="/tests/IntegrationTests/">
+    <Project Path="../tests/IntegrationTests/Lumina.DataAccess.IntegrationTests/Lumina.DataAccess.IntegrationTests.csproj" />
+    <Project Path="../tests/IntegrationTests/Lumina.Infrastructure.IntegrationTests/Lumina.Infrastructure.IntegrationTests.csproj" />
+    <Project Path="../tests/IntegrationTests/Lumina.Plugins.Calibre.IntegrationTests/Lumina.Plugins.Calibre.IntegrationTests.csproj" />
+    <Project Path="../tests/IntegrationTests/Lumina.Plugins.Epub.IntegrationTests/Lumina.Plugins.Epub.IntegrationTests.csproj" />
+    <Project Path="../tests/IntegrationTests/Lumina.Plugins.ID3.IntegrationTests/Lumina.Plugins.ID3.IntegrationTests.csproj" />
+    <Project Path="../tests/IntegrationTests/Lumina.Plugins.LocalMusicArtwork.IntegrationTests/Lumina.Plugins.LocalMusicArtwork.IntegrationTests.csproj" />
+    <Project Path="../tests/IntegrationTests/Lumina.Plugins.Pdf.IntegrationTests/Lumina.Plugins.Pdf.IntegrationTests.csproj" />
+    <Project Path="../tests/IntegrationTests/Lumina.Presentation.Api.IntegrationTests/Lumina.Presentation.Api.IntegrationTests.csproj" />
+    <Project Path="../tests/IntegrationTests/Lumina.Presentation.Web.IntegrationTests/Lumina.Presentation.Web.IntegrationTests.csproj" />
+  </Folder>
+  <Folder Name="/tests/SecurityTests/">
+    <Project Path="../tests/SecurityTests/Lumina.Plugins.Calibre.SecurityTests/Lumina.Plugins.Calibre.SecurityTests.csproj" />
+    <Project Path="../tests/SecurityTests/Lumina.Plugins.CoverArtArchive.SecurityTests/Lumina.Plugins.CoverArtArchive.SecurityTests.csproj" />
+    <Project Path="../tests/SecurityTests/Lumina.Plugins.MusicBrainz.SecurityTests/Lumina.Plugins.MusicBrainz.SecurityTests.csproj" />
+    <Project Path="../tests/SecurityTests/Lumina.Presentation.Api.SecurityTests/Lumina.Presentation.Api.SecurityTests.csproj" />
+    <Project Path="../tests/SecurityTests/Lumina.Presentation.Web.SecurityTests/Lumina.Presentation.Web.SecurityTests.csproj" />
+  </Folder>
+  <Folder Name="/tests/UnitTests/">
+    <Project Path="../tests/UnitTests/Lumina.Application.UnitTests/Lumina.Application.UnitTests.csproj" />
+    <Project Path="../tests/UnitTests/Lumina.Contracts.UnitTests/Lumina.Contracts.UnitTests.csproj" />
+    <Project Path="../tests/UnitTests/Lumina.DataAccess.UnitTests/Lumina.DataAccess.UnitTests.csproj" />
+    <Project Path="../tests/UnitTests/Lumina.Domain.SharedKernel.UnitTests/Lumina.Domain.SharedKernel.UnitTests.csproj" />
+    <Project Path="../tests/UnitTests/Lumina.Domain.UnitTests/Lumina.Domain.UnitTests.csproj" />
+    <Project Path="../tests/UnitTests/Lumina.Infrastructure.UnitTests/Lumina.Infrastructure.UnitTests.csproj" />
+    <Project Path="../tests/UnitTests/Lumina.Plugins.Calibre.UnitTests/Lumina.Plugins.Calibre.UnitTests.csproj" />
+    <Project Path="../tests/UnitTests/Lumina.Plugins.Contracts.UnitTests/Lumina.Plugins.Contracts.UnitTests.csproj" />
+    <Project Path="../tests/UnitTests/Lumina.Plugins.CoverArtArchive.UnitTests/Lumina.Plugins.CoverArtArchive.UnitTests.csproj" />
+    <Project Path="../tests/UnitTests/Lumina.Plugins.Epub.UnitTests/Lumina.Plugins.Epub.UnitTests.csproj" />
+    <Project Path="../tests/UnitTests/Lumina.Plugins.ID3.UnitTests/Lumina.Plugins.ID3.UnitTests.csproj" />
+    <Project Path="../tests/UnitTests/Lumina.Plugins.LocalMusicArtwork.UnitTests/Lumina.Plugins.LocalMusicArtwork.UnitTests.csproj" />
+    <Project Path="../tests/UnitTests/Lumina.Plugins.MusicBrainz.UnitTests/Lumina.Plugins.MusicBrainz.UnitTests.csproj" />
+    <Project Path="../tests/UnitTests/Lumina.Plugins.OpenLibrary.UnitTests/Lumina.Plugins.OpenLibrary.UnitTests.csproj" />
+    <Project Path="../tests/UnitTests/Lumina.Plugins.Pdf.UnitTests/Lumina.Plugins.Pdf.UnitTests.csproj" />
+    <Project Path="../tests/UnitTests/Lumina.Presentation.Api.UnitTests/Lumina.Presentation.Api.UnitTests.csproj" />
+    <Project Path="../tests/UnitTests/Lumina.Presentation.Web.UnitTests/Lumina.Presentation.Web.UnitTests.csproj" />
+  </Folder>
+  <Project Path="docker-compose.dcproj">
+    <Build Solution="*|Any CPU" />
+  </Project>
+</Solution>
