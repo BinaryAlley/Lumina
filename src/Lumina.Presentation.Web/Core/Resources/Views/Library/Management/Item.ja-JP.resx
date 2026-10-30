@@ -177,6 +177,9 @@
   <data name="DescriptionEnabled" xml:space="preserve">
     <value>このメディアライブラリが無効になっているかどうか。無効化されたライブラリはユーザーに表示されず、スキャンされず、更新もされません。</value>
   </data>
+  <data name="DescriptionIsContentOnSsd" xml:space="preserve">
+    <value>メディアライブラリのコンテンツがソリッドステートドライブに保存されているかどうか。有効にすると、ファイル検出とコンテンツのハッシュ計算の段階で複数のファイルを並列で読み取り、ソリッドステートドライブの低遅延を活用します。並列読み取りがパフォーマンスを低下させる可能性があるメカニカルハードディスクでは無効のままにしてください。</value>
+  </data>
   <data name="DescriptionLibraryType" xml:space="preserve">
     <value>この図書館に含める媒体コンテンツの種類を選択してください</value>
   </data>
@@ -224,6 +227,9 @@
   </data>
   <data name="Interview" xml:space="preserve">
     <value>インタビュー</value>
+  </data>
+  <data name="IsContentOnSsd" xml:space="preserve">
+    <value>コンテンツはSSD上にあります</value>
   </data>
   <data name="LibrarySaved" xml:space="preserve">
     <value>ライブラリを保存しました</value>

@@ -177,6 +177,9 @@
   <data name="DescriptionEnabled" xml:space="preserve">
     <value>此媒体库是否已禁用。禁用的库不会显示给用户，不会被扫描、更新等。</value>
   </data>
+  <data name="DescriptionIsContentOnSsd" xml:space="preserve">
+    <value>媒体库内容是否存储在固态硬盘上。启用后，文件发现和内容哈希计算阶段会并行读取文件，从而利用固态硬盘的低延迟。对于机械硬盘，请保持关闭，因为并行读取可能会降低性能。</value>
+  </data>
   <data name="DescriptionLibraryType" xml:space="preserve">
     <value>选择这个图书馆将包含的媒体内容类型</value>
   </data>
@@ -224,6 +227,9 @@
   </data>
   <data name="Interview" xml:space="preserve">
     <value>访谈</value>
+  </data>
+  <data name="IsContentOnSsd" xml:space="preserve">
+    <value>内容位于固态硬盘</value>
   </data>
   <data name="LibrarySaved" xml:space="preserve">
     <value>图书馆已保存</value>

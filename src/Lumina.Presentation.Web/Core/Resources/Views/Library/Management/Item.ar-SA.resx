@@ -177,6 +177,9 @@
   <data name="DescriptionEnabled" xml:space="preserve">
     <value>ما إذا كانت مكتبة الوسائط هذه معطّلة أم لا. المكتبة المعطّلة لا تُعرض على المستخدمين ولا تُفحص ولا تُحدَّث وما إلى ذلك.</value>
   </data>
+  <data name="DescriptionIsContentOnSsd" xml:space="preserve">
+    <value>يشير إلى ما إذا كان محتوى مكتبة الوسائط مخزناً على قرص حالة صلبة. عند التفعيل، تقرأ مرحلتا اكتشاف الملفات وحساب تجزئة المحتوى الملفات بالتوازي، مما يستفيد من زمن الاستجابة المنخفض لأقراص الحالة الصلبة. اتركه معطلاً لأقراص القرص الصلب الميكانيكية، حيث قد تقلل القراءات المتوازية من الأداء.</value>
+  </data>
   <data name="DescriptionLibraryType" xml:space="preserve">
     <value>حدد نوع محتوى الوسائط الذي ستحتويه هذه المكتبة</value>
   </data>
@@ -224,6 +227,9 @@
   </data>
   <data name="Interview" xml:space="preserve">
     <value>مقابلة</value>
+  </data>
+  <data name="IsContentOnSsd" xml:space="preserve">
+    <value>المحتوى على قرص SSD</value>
   </data>
   <data name="LibrarySaved" xml:space="preserve">
     <value>تم حفظ المكتبة</value>

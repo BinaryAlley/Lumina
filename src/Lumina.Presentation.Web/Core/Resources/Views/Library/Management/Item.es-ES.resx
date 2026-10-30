@@ -177,6 +177,9 @@
   <data name="DescriptionEnabled" xml:space="preserve">
     <value>Si esta biblioteca multimedia está desactivada o no. Una biblioteca desactivada no se muestra a los usuarios, no se escanea, no se actualiza, etc.</value>
   </data>
+  <data name="DescriptionIsContentOnSsd" xml:space="preserve">
+    <value>Indica si el contenido de la biblioteca multimedia está almacenado en una unidad de estado sólido. Cuando se activa, las etapas de descubrimiento de archivos y de cálculo de hash del contenido leen archivos en paralelo, aprovechando la baja latencia de las unidades de estado sólido. Déjalo desactivado para discos duros mecánicos, donde las lecturas en paralelo pueden reducir el rendimiento.</value>
+  </data>
   <data name="DescriptionLibraryType" xml:space="preserve">
     <value>Selecciona el tipo de contenido multimedia que contendrá esta biblioteca</value>
   </data>
@@ -224,6 +227,9 @@
   </data>
   <data name="Interview" xml:space="preserve">
     <value>Entrevista</value>
+  </data>
+  <data name="IsContentOnSsd" xml:space="preserve">
+    <value>El contenido está en SSD</value>
   </data>
   <data name="LibrarySaved" xml:space="preserve">
     <value>Biblioteca Guardada</value>
