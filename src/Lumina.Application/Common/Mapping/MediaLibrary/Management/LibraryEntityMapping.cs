@@ -36,6 +36,7 @@ public static class LibraryEntityMapping
             repositoryEntity.CanDownloadMetadataFromWeb,
             repositoryEntity.ShouldSaveMetadataInMediaDirectories,
             repositoryEntity.ShouldSkipUnchangedDirectoriesDuringScan,
+            repositoryEntity.IsContentOnSsd,
             repositoryEntity.ShouldTrackConsumptionProgress,
             repositoryEntity.CompletionThresholdPercentage,
             [.. repositoryEntity.PathTemplateParts
@@ -73,6 +74,7 @@ public static class LibraryEntityMapping
             repositoryEntity.CanDownloadMetadataFromWeb,
             repositoryEntity.ShouldSaveMetadataInMediaDirectories,
             repositoryEntity.ShouldSkipUnchangedDirectoriesDuringScan,
+            repositoryEntity.IsContentOnSsd,
             consumptionSettings,
             pathTemplateResult.Value,
             [.. repositoryEntity.LibraryScans.Select(libraryScan => ScanId.Create(libraryScan.Id))]

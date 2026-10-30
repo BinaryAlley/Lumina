@@ -147,6 +147,7 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Resul
             command.CanDownloadMetadataFromWeb,
             command.ShouldSaveMetadataInMediaDirectories,
             command.ShouldSkipUnchangedDirectoriesDuringScan,
+            command.IsContentOnSsd,
             consumptionSettings,
             pathTemplateResult.Value,
             []

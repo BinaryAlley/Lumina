@@ -31,6 +31,7 @@ public static class UpdateLibraryRequestMapping
             request.CanDownloadMetadataFromWeb,
             request.ShouldSaveMetadataInMediaDirectories,
             request.ShouldSkipUnchangedDirectoriesDuringScan,
+            request.IsContentOnSsd,
             request.ShouldTrackConsumptionProgress,
             request.CompletionThresholdPercentage,
             request.PathTemplateParts?.Select(part => new LibraryPathTemplatePartDto(part.Kind, part.Representation, part.IsOptional)).ToArray()
