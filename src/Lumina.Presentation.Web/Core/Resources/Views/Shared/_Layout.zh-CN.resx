@@ -240,6 +240,9 @@
   <data name="AudioPlayerNoPlaylists" xml:space="preserve">
     <value>你还没有播放列表。</value>
   </data>
+  <data name="AudioPlayerFallbackNotification" xml:space="preserve">
+    <value>您的浏览器不提供完整播放器所需的音频功能。Lumina 已切换到简化版 HTML 音频播放器，因此部分功能不可用。详情请参阅手册中的音乐播放兼容性部分。</value>
+  </data>
   <data name="PlaylistAddToPlaylist" xml:space="preserve">
     <value>添加到播放列表</value>
   </data>

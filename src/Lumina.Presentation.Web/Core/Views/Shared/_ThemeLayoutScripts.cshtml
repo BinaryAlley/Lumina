@@ -87,7 +87,10 @@
             playlistQueueAddFailed: '@localizer["AudioPlayerPlaylistQueueAddFailed"]',
             noPlaylists: '@localizer["AudioPlayerNoPlaylists"]',
             add: '@localizer["AudioPlayerAdd"]',
-            addToPlaylist: '@localizer["PlaylistAddToPlaylist"]'
+            addToPlaylist: '@localizer["PlaylistAddToPlaylist"]',
+            // The one time notice of the degraded HTML audio fallback. It points at the manual section that explains the
+            // browser setting which restores the full player, and it is serialized so a translation can carry an apostrophe.
+            fallbackNotification: @Json.Serialize(localizer["AudioPlayerFallbackNotification"].Value)
         }
     };
     // The endpoints and dialog labels of the add-to-playlist actions that the music library, artist and album cards share. The route
@@ -159,6 +162,7 @@
 <script defer src="~/js/audio-player/audio-player-engine.js" asp-append-version="true"></script>
 <script defer src="~/js/audio-player/audio-player.js" asp-append-version="true"></script>
 <script defer src="~/js/audio-player/audio-player-manifest.js" asp-append-version="true"></script>
+<script defer src="~/js/audio-player/audio-player-html-audio-engine.js" asp-append-version="true"></script>
 <script defer src="~/js/audio-player/audio-player-pipeline/audio-player-pipeline-byte-source.js" asp-append-version="true"></script>
 <script defer src="~/js/audio-player/audio-player-pipeline/audio-player-pipeline-normalized.js" asp-append-version="true"></script>
 <script defer src="~/js/audio-player/audio-player-pipeline/audio-player-pipeline-schedulers.js" asp-append-version="true"></script>

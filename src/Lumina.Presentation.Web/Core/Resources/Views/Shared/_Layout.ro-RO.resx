@@ -240,6 +240,9 @@
   <data name="AudioPlayerNoPlaylists" xml:space="preserve">
     <value>Nu ai încă liste de redare.</value>
   </data>
+  <data name="AudioPlayerFallbackNotification" xml:space="preserve">
+    <value>Browserul nu oferă capacitățile audio de care are nevoie playerul complet. Lumina a trecut la un player audio HTML redus, astfel încât unele funcții nu sunt disponibile. Consultați secțiunea despre compatibilitatea redării muzicii din manual pentru detalii.</value>
+  </data>
   <data name="PlaylistAddToPlaylist" xml:space="preserve">
     <value>Adaugă în listă de redare</value>
   </data>

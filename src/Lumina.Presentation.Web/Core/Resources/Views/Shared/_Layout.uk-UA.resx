@@ -240,6 +240,9 @@
   <data name="AudioPlayerNoPlaylists" xml:space="preserve">
     <value>У вас ще немає списків відтворення.</value>
   </data>
+  <data name="AudioPlayerFallbackNotification" xml:space="preserve">
+    <value>Ваш браузер не надає аудіоможливостей, потрібних повному програвачу. Lumina перейшла на спрощений HTML-аудіопрогравач, тому деякі функції недоступні. Докладніше дивіться в розділі про сумісність відтворення музики в посібнику.</value>
+  </data>
   <data name="PlaylistAddToPlaylist" xml:space="preserve">
     <value>Додати до списку відтворення</value>
   </data>
