@@ -23,13 +23,13 @@ jobs:
         shell: bash
         run: printf '%s\n' "${{ secrets.SIXLABORS_LICENSE_KEY }}" > src/Lumina.Domain/sixlabors.lic
       - name: Restore dependencies
-        run: dotnet restore src/Lumina.sln
+        run: dotnet restore src/Lumina.slnx
       - name: Build
-        run: dotnet build src/Lumina.sln --no-restore -p:SixLaborsLicenseEnforceBuild=true
+        run: dotnet build src/Lumina.slnx --no-restore -p:SixLaborsLicenseEnforceBuild=true
       - name: Run tests
         # blame-hang terminates a test that blocks for 10 minutes and dumps the hang stack,
         # turning the recurring 'stuck job' into a failing job that names the culprit test
-        run: dotnet test src/Lumina.sln --no-build --verbosity normal --blame-hang --blame-hang-timeout 10m
+        run: dotnet test src/Lumina.slnx --no-build --verbosity normal --blame-hang --blame-hang-timeout 10m
       - name: Upload hang diagnostics
         if: failure()
         uses: actions/upload-artifact@v4
