@@ -69,6 +69,11 @@ public class LibraryDto
     public bool ShouldSkipUnchangedDirectoriesDuringScan { get; set; } = false;
 
     /// <summary>
+    /// Gets or sets whether the content of this media library is stored on a solid state drive, in which case the file discovery and content hashing stages read the files in parallel.
+    /// </summary>
+    public bool IsContentOnSsd { get; set; } = false;
+
+    /// <summary>
     /// Gets or sets whether the consumption progress of the media library items is tracked, or not. When absent, the default of the library type is used on create, and the stored value is kept on update.
     /// </summary>
     public bool? ShouldTrackConsumptionProgress { get; set; }
