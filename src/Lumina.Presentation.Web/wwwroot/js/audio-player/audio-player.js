@@ -705,6 +705,14 @@
             this.capabilities = options.capabilities || new LuminaAudioPlayer.PlayerCapabilities();
             this.engineRegistry = options.engineRegistry || LuminaAudioPlayer.createDefaultEngineRegistry();
             this.engineName = options.engineName || LuminaAudioPlayer.NULL_ENGINE_NAME;
+            // The fallback is a second registered engine the player selects instead of the primary one when the browser
+            // misses a capability the primary engine requires. It is null for a bare composition that provides no fallback.
+            this.fallbackEngineName = null;
+            // True once a play request was accepted under the fallback because the capability report of the browser was not
+            // satisfied. It decides which engine the first load creates, and whether the fallback notice is shown.
+            this.isUsingFallbackEngine = false;
+            // The one time notice about the degraded fallback is shown only when the bar becomes visible for the first time.
+            this.hasShownFallbackNotification = false;
 
             this.state = LuminaAudioPlayer.PlayerState.IDLE;
             this.descriptor = null;
@@ -1296,7 +1304,7 @@
             const report = await this.capabilitiesReady;
             if (requestToken !== this.playRequestToken)
                 return false;
-            if (report && !report.isSupported) {
+            if (report && !report.isSupported && !this.enableFallbackPlayback(report)) {
                 this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING, 'The browser is missing a capability the player requires.',
                     { missing: report.missing }));
                 return false;
@@ -1471,7 +1479,7 @@
             const report = await this.capabilitiesReady;
             if (requestToken !== this.playRequestToken)
                 return false;
-            if (report && !report.isSupported) {
+            if (report && !report.isSupported && !this.enableFallbackPlayback(report)) {
                 this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING, 'The browser is missing a capability the player requires.',
                     { missing: report.missing }));
                 return false;
@@ -1815,7 +1823,7 @@
             const report = await this.capabilitiesReady;
             if (this.state !== LuminaAudioPlayer.PlayerState.PLAYING)
                 return false;
-            if (report && !report.isSupported) {
+            if (report && !report.isSupported && !this.enableFallbackPlayback(report)) {
                 this.fail(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING, 'The browser is missing a capability the player requires.',
                     { missing: report.missing }), LuminaAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING);
                 return true;
@@ -1874,7 +1882,7 @@
             const report = await this.capabilitiesReady;
             if (requestToken !== this.playRequestToken)
                 return false;
-            if (report && !report.isSupported) {
+            if (report && !report.isSupported && !this.enableFallbackPlayback(report)) {
                 const capabilityError = new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING,
                     'The browser is missing a capability the player requires.', { missing: report.missing });
                 // A missing capability rejects this transition, not the track that is still playing. Its playback and its
@@ -2321,6 +2329,10 @@
             if (!this.container)
                 return;
             const wasHidden = this.container.classList.contains('not-shown');
+            // The degraded fallback is explained once, right before playback first brings the bar into view, instead of on
+            // every track or on every page load of a browser whose capabilities may never be used.
+            if (wasHidden && this.isUsingFallbackEngine)
+                this.showFallbackNotification();
             this.container.removeAttribute('hidden');
             this.container.classList.remove('not-shown');
             // A shown bar is interactive again, so its controls return to the tab order and to assistive technology.
@@ -3261,6 +3273,63 @@
         }
 
         /**
+         * Registers the engine the player falls back to when the browser misses a capability the primary engine requires.
+         *
+         * The fallback is selected per play request, after the capability report is known, so the primary engine stays the
+         * default of a fully capable browser. It is registered separately instead of replacing the primary engine so that a
+         * consumer can inspect both names and a test can compose either one.
+         * @param {string} name - The name of an engine that is already registered on this player.
+         * @returns {LuminaAudioPlayer.AudioPlayer} This player, for chaining.
+         * @throws {LuminaAudioPlayer.PlayerError} When no engine with that name is registered.
+         */
+        registerFallbackEngine(name) {
+            if (typeof name !== 'string' || !this.engineRegistry.hasEngine(name))
+                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, `No player engine named '${name}' is registered.`);
+            this.fallbackEngineName = name;
+            return this;
+        }
+
+        /**
+         * Gets the name of the engine the player falls back to, or null when no fallback is registered.
+         * @returns {string|null} The fallback engine name.
+         */
+        getFallbackEngineName() {
+            return this.fallbackEngineName;
+        }
+
+        /**
+         * Checks whether the player has a registered fallback that can take over a track the primary engine cannot play.
+         * @returns {boolean} True when a fallback engine is registered.
+         */
+        isFallbackPlaybackAvailable() {
+            return typeof this.fallbackEngineName === 'string'
+                && this.fallbackEngineName.length > 0
+                && this.engineRegistry.hasEngine(this.fallbackEngineName);
+        }
+
+        /**
+         * Accepts a play request under the fallback when the capability report is not satisfied.
+         * @param {Object} report - The capability report that rejected the primary engine.
+         * @returns {boolean} True when the fallback can take over, false when the play request must fail.
+         */
+        enableFallbackPlayback(report) {
+            if (!report || report.isSupported || !this.isFallbackPlaybackAvailable())
+                return false;
+            this.isUsingFallbackEngine = true;
+            return true;
+        }
+
+        /**
+         * Gets the name of the engine the next load must create, which is the fallback once a play was accepted under it.
+         * @returns {string} The engine name to create.
+         */
+        getEffectiveEngineName() {
+            return this.isUsingFallbackEngine && this.isFallbackPlaybackAvailable()
+                ? this.fallbackEngineName
+                : this.engineName;
+        }
+
+        /**
          * Selects the registered engine the player runs with. The selection takes effect on the next load.
          *
          * When an engine instance is already created, it is destroyed and dropped, so that the next load builds the
@@ -3310,9 +3379,10 @@
         async ensureEngineAsync() {
             if (this.engine)
                 return this.engine;
-            this.engine = this.engineRegistry.create(this.engineName, this.createEngineHost());
+            const engineName = this.getEffectiveEngineName();
+            this.engine = this.engineRegistry.create(engineName, this.createEngineHost());
             if (!this.engine)
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, `No player engine named '${this.engineName}' is registered.`);
+                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, `No player engine named '${engineName}' is registered.`);
             // The stored volume is applied at creation, so the very first track starts at the volume the user last chose.
             await this.applyVolumeAsync();
             return this.engine;
@@ -3699,17 +3769,19 @@
         }
 
         /**
-         * Detects the browser capabilities and publishes a typed error when one is missing.
+         * Detects the browser capabilities and publishes the report.
+         *
+         * A missing capability is not an error at detection time: the play path decides whether the registered fallback can
+         * take the track over, and only a play request without a usable engine raises the typed capability error. Raising it
+         * here would report a failure on every page load of a browser the fallback can still serve.
          * @returns {Promise<Object>} The capability report.
          */
         async detectCapabilitiesAsync() {
             const report = await this.capabilities.detectAsync();
             this.capabilityReport = report;
             this.events.emit(LuminaAudioPlayer.PlayerEvent.CAPABILITIES_CHANGED, report);
-            if (!report.isSupported) {
-                this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING, 'The browser is missing a capability the player requires.',
-                    { missing: report.missing }));
-            }
+            if (!report.isSupported)
+                console.warn('Audio player: the browser is missing a capability the player requires.', { missing: report.missing });
             return report;
         }
 
@@ -5862,6 +5934,28 @@
                 console.error(`Audio player: ${message}`);
             else
                 console.info(`Audio player: ${message}`);
+        }
+
+        /**
+         * Shows the one time notice that explains why the player runs with its degraded fallback engine.
+         *
+         * The notice is emitted as a warning through the global notification service when the page provides it, and falls
+         * back to the console on a minimal page or in a test. The manual reference is part of the localized message, so the
+         * notice points the listener at the section that explains the browser setting that restores the full player.
+         */
+        showFallbackNotification() {
+            if (this.hasShownFallbackNotification)
+                return;
+            this.hasShownFallbackNotification = true;
+            const configuration = this.getConfiguration();
+            const strings = configuration && configuration.strings ? configuration.strings : {};
+            const message = strings.fallbackNotification
+                || 'Your browser does not provide the audio capabilities the full player needs, so Lumina switched to a degraded HTML audio player. Some features are unavailable. See the manual for details.';
+            if (typeof notificationService !== 'undefined' && typeof NotificationType !== 'undefined') {
+                notificationService.show(message, NotificationType.WARNING);
+                return;
+            }
+            console.warn(`Audio player: ${message}`);
         }
 
         /**

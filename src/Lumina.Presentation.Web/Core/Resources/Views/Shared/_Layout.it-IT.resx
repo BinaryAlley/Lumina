@@ -240,6 +240,9 @@
   <data name="AudioPlayerNoPlaylists" xml:space="preserve">
     <value>Non hai ancora playlist.</value>
   </data>
+  <data name="AudioPlayerFallbackNotification" xml:space="preserve">
+    <value>Il browser non fornisce le capacità audio richieste dal lettore completo. Lumina usa quindi un lettore audio HTML ridotto, per cui alcune funzioni non sono disponibili. Consulta la sezione sulla compatibilità di riproduzione musicale del manuale per i dettagli.</value>
+  </data>
   <data name="PlaylistAddToPlaylist" xml:space="preserve">
     <value>Aggiungi alla playlist</value>
   </data>

@@ -240,6 +240,9 @@
   <data name="AudioPlayerNoPlaylists" xml:space="preserve">
     <value>You have no playlists yet.</value>
   </data>
+  <data name="AudioPlayerFallbackNotification" xml:space="preserve">
+    <value>Your browser does not provide the audio capabilities the full player needs. Lumina switched to a degraded HTML audio player, so some features are unavailable. See the Music playback compatibility section of the manual for details.</value>
+  </data>
   <data name="PlaylistAddToPlaylist" xml:space="preserve">
     <value>Add to playlist</value>
   </data>

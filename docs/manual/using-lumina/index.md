@@ -79,6 +79,20 @@ The music pages also play what they show. The artist page has a **Play all** con
 
 Music libraries do not remember positions by default. When progress tracking is turned on for a music library, starting a track resumes it from the last reported position, and stopping it at or above the library's completion threshold, when one is set, completes the session instead of saving a position.
 
+## Music playback compatibility
+
+The full music player decodes audio with the WebCodecs API and outputs it through the Web Audio API. A privacy hardened browser can hide WebCodecs even though its own native audio player still works. LibreWolf does this by default: `privacy.resistFingerprinting` is turned on, and the browser then hides the WebCodecs constructors. When Lumina detects that, it switches to a fallback player built on the browser's HTML audio element and shows a notice when the player opens for the first time.
+
+The fallback is a degraded experience in two ways. It plays only the formats the browser itself can decode, without the server changing the container or the codec first, so a track that needs a server remux or transcode cannot use the fallback. It also has no true gapless playback, because an HTML audio element cannot append the next track sample accurately; the next track starts after the current one ends, with a small gap.
+
+ReplayGain normalization and the VU meter still work in the fallback when the browser also provides the Web Audio API, which is the usual case. The fallback routes the audio element through the same kind of ReplayGain gain and output analyzer the full player uses. If the Web Audio API is missing too, the fallback plays through the element's own output without ReplayGain or a VU meter.
+
+To restore the full player in LibreWolf, exempt the address of your Lumina server from Resist Fingerprinting:
+
+1. Open `about:config`.
+2. Set `privacy.resistFingerprinting.exemptedDomains` to include the host you use. For a server on the same machine, `localhost,127.0.0.1` covers both common addresses.
+3. Reload Lumina.
+
 ## Playlists
 
 The **Playlists** entry under Audio opens your playlists. A playlist survives signing out and back in, but the player queue itself does not. A full page reload still starts with an empty queue and a hidden player.

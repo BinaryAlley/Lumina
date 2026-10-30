@@ -240,6 +240,9 @@
   <data name="AudioPlayerNoPlaylists" xml:space="preserve">
     <value>プレイリストはまだありません。</value>
   </data>
+  <data name="AudioPlayerFallbackNotification" xml:space="preserve">
+    <value>お使いのブラウザには完全なプレーヤーに必要なオーディオ機能がありません。Lumina は簡易な HTML オーディオプレーヤーに切り替えたため、一部の機能を利用できません。詳細はマニュアルの音楽再生の互換性の節を参照してください。</value>
+  </data>
   <data name="PlaylistAddToPlaylist" xml:space="preserve">
     <value>プレイリストに追加</value>
   </data>

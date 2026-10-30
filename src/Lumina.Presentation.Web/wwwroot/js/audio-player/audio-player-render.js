@@ -356,6 +356,18 @@
     }
 
     /**
+     * Computes the linear ReplayGain value a manifest and a mode select, through the same resolver and clipping rule the
+     * renderer uses, so an engine that applies ReplayGain itself never drifts from the full player.
+     * @param {Object|null} manifest - The playback manifest of the track.
+     * @param {string} mode - One of the {@link LuminaAudioPlayer.PlayerReplayGainMode} values.
+     * @returns {number} The linear gain, one when nothing is selected.
+     */
+    function computeReplayGainTrackGain(manifest, mode) {
+        const values = resolveReplayGain(manifest, normalizeReplayGainMode(mode));
+        return computeReplayGainLinearGain(values.gainDb, values.peak);
+    }
+
+    /**
      * Creates an AudioContext through the browser constructors.
      * @returns {AudioContext|null} The created context, or null when the browser exposes no constructor.
      */
@@ -1292,8 +1304,7 @@
          * @returns {number} The linear gain, one when nothing is selected.
          */
         computeTrackGain(manifest) {
-            const values = resolveReplayGain(manifest, this.replayGainMode);
-            return computeReplayGainLinearGain(values.gainDb, values.peak);
+            return computeReplayGainTrackGain(manifest, this.replayGainMode);
         }
 
         /**
@@ -1844,6 +1855,7 @@
     }
 
     LuminaAudioPlayer.TrackRenderer = TrackRenderer;
+    LuminaAudioPlayer.computeReplayGainTrackGain = computeReplayGainTrackGain;
 
     /**
      * Creates a track renderer. See {@link LuminaAudioPlayer.TrackRenderer} for the options.
