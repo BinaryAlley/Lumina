@@ -2,6 +2,7 @@
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Primitives;
@@ -15,10 +16,13 @@ using Lumina.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.U
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.WrittenContent.Books;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -38,7 +42,9 @@ public class BooksFileSystemDiscoveryJobTests
     private readonly ILibraryRepository _mockLibraryRepository;
     private readonly ILibraryScanStagingResultsRepository _mockStagingResultsRepository;
     private readonly IDomainEventPublisher _mockDomainEventPublisher;
+    private readonly ILogger<BooksFileSystemDiscoveryJob> _mockLogger;
     private readonly BooksFileSystemDiscoveryJob _sut;
+    private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly ScanIdFixture _scanIdFixture = new();
     private readonly UserIdFixture _userIdFixture = new();
     private readonly LibraryIdFixture _libraryIdFixture = new();
@@ -73,7 +79,9 @@ public class BooksFileSystemDiscoveryJobTests
         _scanId = _scanIdFixture.Create();
         _userId = _userIdFixture.Create();
         _libraryId = _libraryIdFixture.Create();
-        _sut = new BooksFileSystemDiscoveryJob(_mockServiceScopeFactory)
+        _mockLogger = Substitute.For<ILogger<BooksFileSystemDiscoveryJob>>();
+        _mockLogger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
+        _sut = new BooksFileSystemDiscoveryJob(_mockServiceScopeFactory, _mockLogger)
         {
             ScanId = _scanId,
             UserId = _userId,
@@ -129,5 +137,83 @@ public class BooksFileSystemDiscoveryJobTests
         // Assert
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => operation);
         Assert.Equal(LibraryScanJobStatus.Canceled, _sut.Status);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenTheLibraryIsOnSsd_ShouldLogThatTheFileSystemReadsRunInParallel()
+    {
+        // Arrange
+        string temporaryDirectoryPath = Path.Combine(Path.GetTempPath(), $"lumina-books-ssd-{Guid.NewGuid()}");
+        Directory.CreateDirectory(temporaryDirectoryPath);
+        File.WriteAllText(Path.Combine(temporaryDirectoryPath, "book.pdf"), "book content");
+        try
+        {
+            LibraryEntity libraryEntity = _libraryEntityFixture.Create(
+                id: _libraryId.Value,
+                userId: _userId.Value,
+                libraryType: LibraryType.Book,
+                contentLocations: [temporaryDirectoryPath],
+                isContentOnSsd: true);
+            _mockLibraryRepository.GetByIdAsync(_libraryId.Value, cancellationToken: Arg.Any<CancellationToken>())
+                .Returns(Result.From<LibraryEntity?>(libraryEntity));
+            _mockStagingResultsRepository.InsertRangeAsync(Arg.Any<IReadOnlyCollection<LibraryScanStagingResultsEntity>>(), Arg.Any<CancellationToken>())
+                .Returns(Result.From(Result.Created));
+
+            // Act
+            await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+            // Assert
+            Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+            await _mockStagingResultsRepository.Received(1).InsertRangeAsync(
+                Arg.Is<IReadOnlyCollection<LibraryScanStagingResultsEntity>>(entities => entities.Count == 1 && Path.GetFileName(entities.First().Path) == "book.pdf"),
+                Arg.Any<CancellationToken>());
+            _mockLogger.Received(1).Log(
+                LogLevel.Debug,
+                Arg.Any<EventId>(),
+                Arg.Is<object>(state => state.ToString()!.Contains("solid state drive", StringComparison.Ordinal)),
+                Arg.Any<Exception?>(),
+                Arg.Any<Func<object, Exception?, string>>());
+        }
+        finally
+        {
+            Directory.Delete(temporaryDirectoryPath, recursive: true);
+        }
+    }
+
+    [Fact]
+    public async Task StageFilesInParallelAsync_WhenAFileVanishesBeforeItsMetadataIsRead_ShouldSkipItAndLogAWarning()
+    {
+        // Arrange
+        FileInfo vanishedFile = new(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString(), "vanished.pdf"));
+        List<LibraryScanStagingResultsEntity> stagingBatch = [];
+
+        // Act
+        await _sut.StageFilesInParallelAsync([vanishedFile], stagingBatch, _mockStagingResultsRepository, CancellationToken.None);
+
+        // Assert
+        Assert.Empty(stagingBatch);
+        await _mockStagingResultsRepository.DidNotReceive().InsertRangeAsync(Arg.Any<IReadOnlyCollection<LibraryScanStagingResultsEntity>>(), Arg.Any<CancellationToken>());
+        _mockLogger.Received(1).Log(
+            LogLevel.Warning,
+            Arg.Any<EventId>(),
+            Arg.Is<object>(state => state.ToString()!.Contains("vanished.pdf", StringComparison.Ordinal)),
+            Arg.Any<IOException>(),
+            Arg.Any<Func<object, Exception?, string>>());
+    }
+
+    [Fact]
+    public async Task StageFilesInParallelAsync_WhenAFileReadThrowsAnUnexpectedException_ShouldRethrowTheRealCause()
+    {
+        // Arrange
+        List<LibraryScanStagingResultsEntity> stagingBatch = [];
+        List<FileInfo> files = [null!];
+
+        // Act
+        Exception exception = await Assert.ThrowsAsync<NullReferenceException>(() =>
+            _sut.StageFilesInParallelAsync(files, stagingBatch, _mockStagingResultsRepository, CancellationToken.None));
+
+        // Assert
+        // Parallel.For wraps the body exception in an AggregateException, which would otherwise be reported as "One or more errors occurred.".
+        Assert.IsType<NullReferenceException>(exception);
     }
 }

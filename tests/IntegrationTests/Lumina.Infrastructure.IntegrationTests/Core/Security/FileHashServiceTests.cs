@@ -40,6 +40,7 @@ public class FileHashServiceTests
         // Act
         List<HashedFileSystemFileDto> result = await _sut.HashFilesAsync(
             inputFiles,
+            shouldParallelizeReads: true,
             () =>
             {
                 callbackInvocationCount++;
@@ -66,7 +67,7 @@ public class FileHashServiceTests
         List<HashedFileSystemFileDto> inputFiles = [_hashedFileSystemFileDtoFixture.Create(path: filePath, size: new FileInfo(filePath).Length, currentHash: 0, oldHash: 0, ticks: 0)];
 
         // Act
-        List<HashedFileSystemFileDto> result = await _sut.HashFilesAsync(inputFiles, () => Task.CompletedTask, CancellationToken.None);
+        List<HashedFileSystemFileDto> result = await _sut.HashFilesAsync(inputFiles, shouldParallelizeReads: true, () => Task.CompletedTask, CancellationToken.None);
 
         // Assert
         HashedFileSystemFileDto hashedFile = Assert.Single(result);
@@ -83,10 +84,10 @@ public class FileHashServiceTests
         List<HashedFileSystemFileDto> firstInputFiles = [_hashedFileSystemFileDtoFixture.Create(path: filePath, size: new FileInfo(filePath).Length, currentHash: 0, oldHash: 0, ticks: 0)];
 
         // Act
-        List<HashedFileSystemFileDto> firstResult = await _sut.HashFilesAsync(firstInputFiles, () => Task.CompletedTask, CancellationToken.None);
+        List<HashedFileSystemFileDto> firstResult = await _sut.HashFilesAsync(firstInputFiles, shouldParallelizeReads: true, () => Task.CompletedTask, CancellationToken.None);
         await File.WriteAllTextAsync(filePath, "changed content");
         List<HashedFileSystemFileDto> secondInputFiles = [_hashedFileSystemFileDtoFixture.Create(path: filePath, size: new FileInfo(filePath).Length, currentHash: 0, oldHash: 0, ticks: 0)];
-        List<HashedFileSystemFileDto> secondResult = await _sut.HashFilesAsync(secondInputFiles, () => Task.CompletedTask, CancellationToken.None);
+        List<HashedFileSystemFileDto> secondResult = await _sut.HashFilesAsync(secondInputFiles, shouldParallelizeReads: true, () => Task.CompletedTask, CancellationToken.None);
 
         // Assert
         Assert.NotEqual(firstResult[0].CurrentHash, secondResult[0].CurrentHash);
@@ -100,7 +101,7 @@ public class FileHashServiceTests
         List<HashedFileSystemFileDto> inputFiles = [_hashedFileSystemFileDtoFixture.Create(path: nonExistentFilePath, size: 100, currentHash: 0, oldHash: 0, ticks: 0)];
 
         // Act
-        List<HashedFileSystemFileDto> result = await _sut.HashFilesAsync(inputFiles, () => Task.CompletedTask, CancellationToken.None);
+        List<HashedFileSystemFileDto> result = await _sut.HashFilesAsync(inputFiles, shouldParallelizeReads: true, () => Task.CompletedTask, CancellationToken.None);
 
         // Assert
         Assert.Empty(result);
@@ -119,12 +120,43 @@ public class FileHashServiceTests
         ];
 
         // Act
-        List<HashedFileSystemFileDto> result = await _sut.HashFilesAsync(inputFiles, () => Task.CompletedTask, CancellationToken.None);
+        List<HashedFileSystemFileDto> result = await _sut.HashFilesAsync(inputFiles, shouldParallelizeReads: true, () => Task.CompletedTask, CancellationToken.None);
 
         // Assert
         HashedFileSystemFileDto hashedFile = Assert.Single(result);
         Assert.Equal(existingFilePath, hashedFile.Path);
         Assert.NotEqual(0UL, hashedFile.CurrentHash);
+    }
+
+    [Fact]
+    public async Task HashFilesAsync_WhenReadsAreNotParallelized_ShouldHashAllFilesSequentially()
+    {
+        // Arrange
+        using TemporaryTestDirectory temporaryTestDirectory = new();
+        string filePath1 = temporaryTestDirectory.CreateFile("book1.pdf", "content of the first book");
+        string filePath2 = temporaryTestDirectory.CreateFile("book2.pdf", "content of the second book");
+        List<HashedFileSystemFileDto> inputFiles =
+        [
+            _hashedFileSystemFileDtoFixture.Create(path: filePath1, size: new FileInfo(filePath1).Length, currentHash: 0, oldHash: 0, ticks: 0),
+            _hashedFileSystemFileDtoFixture.Create(path: filePath2, size: new FileInfo(filePath2).Length, currentHash: 0, oldHash: 0, ticks: 0)
+        ];
+        int callbackInvocationCount = 0;
+
+        // Act
+        List<HashedFileSystemFileDto> result = await _sut.HashFilesAsync(
+            inputFiles,
+            shouldParallelizeReads: false,
+            () =>
+            {
+                callbackInvocationCount++;
+                return Task.CompletedTask;
+            },
+            CancellationToken.None);
+
+        // Assert
+        Assert.Equal(2, result.Count);
+        Assert.Equal(2, callbackInvocationCount);
+        Assert.All(result, file => Assert.NotEqual(0UL, file.CurrentHash));
     }
 
     [Fact]
@@ -138,7 +170,7 @@ public class FileHashServiceTests
         cancellationTokenSource.Cancel();
 
         // Act
-        Task<List<HashedFileSystemFileDto>> operation = _sut.HashFilesAsync(inputFiles, () => Task.CompletedTask, cancellationTokenSource.Token);
+        Task<List<HashedFileSystemFileDto>> operation = _sut.HashFilesAsync(inputFiles, shouldParallelizeReads: true, () => Task.CompletedTask, cancellationTokenSource.Token);
 
         // Assert
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => operation);
@@ -182,7 +214,7 @@ public class FileHashServiceTests
         List<HashedFileSystemFileDto> inputFiles = [_hashedFileSystemFileDtoFixture.Create(path: filePath, size: new FileInfo(filePath).Length, currentHash: 0, oldHash: 0, ticks: 0)];
 
         // Act
-        List<HashedFileSystemFileDto> result = await _sut.HashFilesAsync(inputFiles, () => Task.CompletedTask, CancellationToken.None);
+        List<HashedFileSystemFileDto> result = await _sut.HashFilesAsync(inputFiles, shouldParallelizeReads: true, () => Task.CompletedTask, CancellationToken.None);
 
         // Assert
         HashedFileSystemFileDto hashedFile = Assert.Single(result);

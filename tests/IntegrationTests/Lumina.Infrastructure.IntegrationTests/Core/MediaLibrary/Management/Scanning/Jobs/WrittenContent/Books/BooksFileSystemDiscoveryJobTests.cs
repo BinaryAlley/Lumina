@@ -81,7 +81,7 @@ public class BooksFileSystemDiscoveryJobTests
         _scanId = _scanIdFixture.Create();
         _userId = _userIdFixture.Create();
         _libraryId = _libraryIdFixture.Create();
-        _sut = new BooksFileSystemDiscoveryJob(_mockServiceScopeFactory)
+        _sut = new BooksFileSystemDiscoveryJob(_mockServiceScopeFactory, Substitute.For<Microsoft.Extensions.Logging.ILogger<BooksFileSystemDiscoveryJob>>())
         {
             ScanId = _scanId,
             UserId = _userId,
@@ -105,7 +105,8 @@ public class BooksFileSystemDiscoveryJobTests
             title: "Test Library",
             libraryType: LibraryType.Book,
             contentLocations: [temporaryLibraryDirectory.Path],
-            shouldSkipUnchangedDirectoriesDuringScan: false);
+            shouldSkipUnchangedDirectoriesDuringScan: false,
+            isContentOnSsd: true);
         _mockLibraryRepository.GetByIdAsync(_libraryId.Value, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(libraryEntity));
         _mockStagingResultsRepository.InsertRangeAsync(Arg.Any<IReadOnlyCollection<LibraryScanStagingResultsEntity>>(), Arg.Any<CancellationToken>())

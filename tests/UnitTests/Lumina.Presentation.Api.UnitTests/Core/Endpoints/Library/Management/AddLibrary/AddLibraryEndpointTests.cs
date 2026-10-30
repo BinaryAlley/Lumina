@@ -87,6 +87,7 @@ public class AddLibraryEndpointTests
     {
         // Arrange
         AddLibraryRequest request = _addLibraryRequestFixture.Create(
+            isContentOnSsd: true,
             shouldTrackConsumptionProgress: true,
             completionThresholdPercentage: 65);
         CancellationToken cancellationToken = CancellationToken.None;
@@ -108,6 +109,7 @@ public class AddLibraryEndpointTests
                 command.CanDownloadMetadataFromWeb == request.CanDownloadMetadataFromWeb &&
                 command.ShouldSaveMetadataInMediaDirectories == request.ShouldSaveMetadataInMediaDirectories &&
                 command.ShouldSkipUnchangedDirectoriesDuringScan == request.ShouldSkipUnchangedDirectoriesDuringScan &&
+                command.IsContentOnSsd == request.IsContentOnSsd &&
                 command.ShouldTrackConsumptionProgress == request.ShouldTrackConsumptionProgress &&
                 command.CompletionThresholdPercentage == request.CompletionThresholdPercentage),
             Arg.Is(cancellationToken));

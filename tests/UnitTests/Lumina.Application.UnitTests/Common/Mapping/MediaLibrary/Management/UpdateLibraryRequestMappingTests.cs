@@ -32,6 +32,7 @@ public class UpdateLibraryRequestMappingTests
             canDownloadMetadataFromWeb: true,
             shouldSaveMetadataInMediaDirectories: false,
             shouldSkipUnchangedDirectoriesDuringScan: false,
+            isContentOnSsd: true,
             shouldTrackConsumptionProgress: true,
             completionThresholdPercentage: 90);
 
@@ -49,6 +50,7 @@ public class UpdateLibraryRequestMappingTests
         Assert.Equal(request.CanDownloadMetadataFromWeb, result.CanDownloadMetadataFromWeb);
         Assert.Equal(request.ShouldSaveMetadataInMediaDirectories, result.ShouldSaveMetadataInMediaDirectories);
         Assert.Equal(request.ShouldSkipUnchangedDirectoriesDuringScan, result.ShouldSkipUnchangedDirectoriesDuringScan);
+        Assert.Equal(request.IsContentOnSsd, result.IsContentOnSsd);
         Assert.Equal(request.ShouldTrackConsumptionProgress, result.ShouldTrackConsumptionProgress);
         Assert.Equal(request.CompletionThresholdPercentage, result.CompletionThresholdPercentage);
     }

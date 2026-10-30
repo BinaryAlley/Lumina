@@ -62,6 +62,7 @@ public class LibraryConfigurationTests
         IProperty downloadMetadataProperty = entityType.GetProperty(nameof(LibraryEntity.CanDownloadMetadataFromWeb));
         IProperty shouldTrackConsumptionProgressProperty = entityType.GetProperty(nameof(LibraryEntity.ShouldTrackConsumptionProgress));
         IProperty completionThresholdPercentageProperty = entityType.GetProperty(nameof(LibraryEntity.CompletionThresholdPercentage));
+        IProperty isContentOnSsdProperty = entityType.GetProperty(nameof(LibraryEntity.IsContentOnSsd));
 
         // Assert
         Assert.False(titleProperty.IsNullable);
@@ -76,6 +77,23 @@ public class LibraryConfigurationTests
         Assert.Equal(typeof(int?), completionThresholdPercentageProperty.ClrType);
         Assert.True(completionThresholdPercentageProperty.IsNullable);
         Assert.Null(completionThresholdPercentageProperty.GetDefaultValue());
+        Assert.Equal(typeof(bool), isContentOnSsdProperty.ClrType);
+        Assert.False(isContentOnSsdProperty.IsNullable);
+        Assert.Equal(false, isContentOnSsdProperty.GetDefaultValue());
+    }
+
+    [Fact]
+    public void Configure_WhenApplied_ShouldConfigureSsdContentColumnOrder()
+    {
+        // Arrange
+        IEntityType entityType = DesignTimeModel.FindEntityType(typeof(LibraryEntity))!;
+
+        // Act
+        IProperty isContentOnSsdProperty = entityType.GetProperty(nameof(LibraryEntity.IsContentOnSsd));
+
+        // Assert
+        Assert.Equal(18, isContentOnSsdProperty.GetColumnOrder());
+        Assert.Equal(nameof(LibraryEntity.IsContentOnSsd), isContentOnSsdProperty.GetColumnName());
     }
 
     [Fact]

@@ -43,6 +43,7 @@ public class LibraryFixture
     /// <param name="canDownloadMetadataFromWeb">Whether metadata download from the web is enabled.</param>
     /// <param name="shouldSaveMetadataInMediaDirectories">Whether metadata should be saved in the media directories.</param>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether unchanged directories should be skipped during scan.</param>
+    /// <param name="isContentOnSsd">Whether the content of the library is stored on a solid state drive.</param>
     /// <param name="consumptionSettings">Optional. The consumption settings of the library.</param>
     /// <param name="scanIds">Optional. The scan Ids associated with the library.</param>
     /// <param name="pathTemplate">Optional. The path template of the library.</param>
@@ -60,6 +61,7 @@ public class LibraryFixture
         bool canDownloadMetadataFromWeb = true,
         bool shouldSaveMetadataInMediaDirectories = false,
         bool shouldSkipUnchangedDirectoriesDuringScan = false,
+        bool isContentOnSsd = false,
         LibraryConsumptionSettings? consumptionSettings = null,
         IEnumerable<Guid>? scanIds = null,
         LibraryPathTemplate? pathTemplate = null,
@@ -91,6 +93,7 @@ public class LibraryFixture
                 canDownloadMetadataFromWeb,
                 shouldSaveMetadataInMediaDirectories,
                 shouldSkipUnchangedDirectoriesDuringScan,
+                isContentOnSsd,
                 resolvedConsumptionSettings,
                 pathTemplate ?? LibraryPathTemplate.Empty(),
                 resolvedScanIds
@@ -107,6 +110,7 @@ public class LibraryFixture
                 canDownloadMetadataFromWeb,
                 shouldSaveMetadataInMediaDirectories,
                 shouldSkipUnchangedDirectoriesDuringScan,
+                isContentOnSsd,
                 resolvedConsumptionSettings,
                 pathTemplate ?? LibraryPathTemplate.Empty(),
                 resolvedScanIds

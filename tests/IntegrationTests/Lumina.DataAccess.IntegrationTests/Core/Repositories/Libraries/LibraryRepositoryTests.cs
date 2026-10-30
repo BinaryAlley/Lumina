@@ -149,6 +149,31 @@ public class LibraryRepositoryTests
     }
 
     [Fact]
+    public async Task InsertAsync_WhenLibraryContentIsOnSsd_ShouldPersistTheSetting()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-libraryrepo-insert-ssd-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        Guid userId = Guid.NewGuid();
+        DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
+        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        LibraryRepository sut = new(context);
+        context.Users.Add(_userEntityFixture.Create(id: userId));
+        LibraryEntity library = _libraryEntityFixture.Create(userId: userId, isContentOnSsd: true, contentLocations: []);
+
+        // Act
+        Result<Created> result = await sut.InsertAsync(library, CancellationToken.None);
+        await context.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Created, result.Value);
+        LibraryEntity? storedLibrary = await context.Libraries.AsNoTracking().FirstOrDefaultAsync(candidate => candidate.Id == library.Id);
+        Assert.NotNull(storedLibrary);
+        Assert.True(storedLibrary!.IsContentOnSsd);
+    }
+
+    [Fact]
     public async Task UpdateAsync_WhenConsumptionSettingsAreEnabled_ShouldPersistTheTrackingAndThreshold()
     {
         // Arrange

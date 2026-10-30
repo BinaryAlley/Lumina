@@ -33,6 +33,7 @@ public class LibraryEntityFixture
     /// <param name="canDownloadMetadataFromWeb">Whether the media library should download metadata from the web or not.</param>
     /// <param name="shouldSaveMetadataInMediaDirectories">Whether the metadata should be saved in the media directories or not.</param>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether unchanged directories should be skipped during a scan or not.</param>
+    /// <param name="isContentOnSsd">Whether the content of the media library is stored on a solid state drive.</param>
     /// <param name="shouldTrackConsumptionProgress">Whether the consumption progress of the media library items is tracked.</param>
     /// <param name="completionThresholdPercentage">The percentage of a media library item that must be consumed for its session to be considered completed.</param>
     /// <param name="metadataProvidersConfigurationFingerprint">Optional. The fingerprint of the metadata provider configuration of the media library.</param>
@@ -52,6 +53,7 @@ public class LibraryEntityFixture
         bool canDownloadMetadataFromWeb = true,
         bool shouldSaveMetadataInMediaDirectories = true,
         bool shouldSkipUnchangedDirectoriesDuringScan = false,
+        bool isContentOnSsd = false,
         bool shouldTrackConsumptionProgress = false,
         int? completionThresholdPercentage = null,
         string? metadataProvidersConfigurationFingerprint = null,
@@ -75,6 +77,7 @@ public class LibraryEntityFixture
                 CanDownloadMetadataFromWeb = canDownloadMetadataFromWeb,
                 ShouldSaveMetadataInMediaDirectories = shouldSaveMetadataInMediaDirectories,
                 ShouldSkipUnchangedDirectoriesDuringScan = shouldSkipUnchangedDirectoriesDuringScan,
+                IsContentOnSsd = isContentOnSsd,
                 ShouldTrackConsumptionProgress = shouldTrackConsumptionProgress,
                 CompletionThresholdPercentage = completionThresholdPercentage,
                 MetadataProvidersConfigurationFingerprint = metadataProvidersConfigurationFingerprint,
