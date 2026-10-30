@@ -47,31 +47,6 @@
         <AutoGen>True</AutoGen>
         <DependentUpon>Plugins.resx</DependentUpon>
       </Compile>
-      <Compile Update="Core\Resources\Views\Auth\ChangePassword.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>ChangePassword.resx</DependentUpon>
-      </Compile>
-      <Compile Update="Core\Resources\Views\Auth\Login.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Login.resx</DependentUpon>
-      </Compile>
-      <Compile Update="Core\Resources\Views\Auth\RecoverPassword.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>RecoverPassword.resx</DependentUpon>
-      </Compile>
-      <Compile Update="Core\Resources\Views\Auth\Register.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Register.resx</DependentUpon>
-      </Compile>
-      <Compile Update="Core\Resources\Views\Library\Management\Item.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Item.resx</DependentUpon>
-      </Compile>
     </ItemGroup>
 
     <ItemGroup>
@@ -239,40 +214,6 @@
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Core\Resources\Views\Auth\Register.zh-CN.resx">
-        <Generator>PublicResXFileCodeGenerator</Generator>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Library\Management\Item.ar-SA.resx">
-        <Generator>PublicResXFileCodeGenerator</Generator>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Library\Management\Item.de-DE.resx">
-        <Generator>PublicResXFileCodeGenerator</Generator>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Library\Management\Item.en-US.resx">
-        <Generator>PublicResXFileCodeGenerator</Generator>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Library\Management\Item.es-ES.resx">
-        <Generator>PublicResXFileCodeGenerator</Generator>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Library\Management\Item.fr-FR.resx">
-        <Generator>PublicResXFileCodeGenerator</Generator>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Library\Management\Item.it-IT.resx">
-        <Generator>PublicResXFileCodeGenerator</Generator>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Library\Management\Item.ja-JP.resx">
-        <Generator>PublicResXFileCodeGenerator</Generator>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Library\Management\Item.resx">
-        <Generator>PublicResXFileCodeGenerator</Generator>
-        <LastGenOutput>Item.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Library\Management\Item.ro-RO.resx">
-        <Generator>PublicResXFileCodeGenerator</Generator>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Library\Management\Item.uk-UA.resx">
-        <Generator>PublicResXFileCodeGenerator</Generator>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Library\Management\Item.zh-CN.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Core\Resources\Views\Shared\Components\FileSystemBrowser\Default.ar-SA.resx">
