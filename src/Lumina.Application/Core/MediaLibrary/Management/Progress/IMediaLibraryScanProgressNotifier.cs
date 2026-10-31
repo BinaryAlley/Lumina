@@ -31,4 +31,11 @@ public interface IMediaLibraryScanProgressNotifier
     /// <param name="mediaLibraryScanCompositeId">The object representing the unique identifier for the media library scan that failed.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     Task SendLibraryScanFailedEventAsync(MediaLibraryScanCompositeId mediaLibraryScanCompositeId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Notifies the SignalR clients about the cancellation of a media library scan.
+    /// </summary>
+    /// <param name="mediaLibraryScanCompositeId">The object representing the unique identifier for the media library scan that was cancelled.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    Task SendLibraryScanCancelledEventAsync(MediaLibraryScanCompositeId mediaLibraryScanCompositeId, CancellationToken cancellationToken);
 }

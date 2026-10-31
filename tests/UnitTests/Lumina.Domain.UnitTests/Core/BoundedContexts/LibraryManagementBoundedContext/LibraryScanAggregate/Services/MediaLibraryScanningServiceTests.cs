@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
@@ -8,20 +9,19 @@ using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Library
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Progress;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Queue;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Scanners;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using NSubstitute;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
-using System.Threading.Channels;
 using System.Threading.Tasks;
 #endregion
 
@@ -33,7 +33,6 @@ namespace Lumina.Domain.UnitTests.Core.BoundedContexts.LibraryManagementBoundedC
 [ExcludeFromCodeCoverage]
 public class MediaLibraryScanningServiceTests
 {
-    private readonly IMediaLibrariesScanQueue _mockScanQueue;
     private readonly IMediaLibraryScannerFactory _mockScannerFactory;
     private readonly IMediaLibrariesScanCancellationTracker _mockCancellationTracker;
     private readonly IMediaLibrariesScanProgressTracker _mockProgressTracker;
@@ -42,85 +41,168 @@ public class MediaLibraryScanningServiceTests
     private readonly LibraryScanFixture _libraryScanFixture = new();
     private readonly ScanIdFixture _scanIdFixture = new();
     private readonly UserIdFixture _userIdFixture = new();
-    private readonly Channel<IMediaLibraryScanJob> _channel;
+    private readonly LibraryIdFixture _libraryIdFixture = new();
+    private readonly MediaLibraryScanDiscoveryJobFixture _mediaLibraryScanDiscoveryJobFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MediaLibraryScanningServiceTests"/> class.
     /// </summary>
     public MediaLibraryScanningServiceTests()
     {
-        _channel = Channel.CreateUnbounded<IMediaLibraryScanJob>();
-        _mockScanQueue = Substitute.For<IMediaLibrariesScanQueue>();
-        _mockScanQueue.Writer.Returns(_channel.Writer);
-        _mockScanQueue.Reader.Returns(_channel.Reader);
         _mockScannerFactory = Substitute.For<IMediaLibraryScannerFactory>();
         _mockCancellationTracker = Substitute.For<IMediaLibrariesScanCancellationTracker>();
-        _mockCancellationTracker.GetTokenForScan(Arg.Any<MediaLibraryScanCompositeId>()).Returns(CancellationToken.None);
         _mockProgressTracker = Substitute.For<IMediaLibrariesScanProgressTracker>();
-        _mockProgressTracker.InitializeScanProgress(Arg.Any<LibraryId>(), Arg.Any<MediaLibraryScanCompositeId>(), Arg.Any<int>()).Returns(Result.Created);
+        _mockProgressTracker.InitializeScanProgress(Arg.Any<LibraryId>(), Arg.Any<MediaLibraryScanCompositeId>(), Arg.Any<int>())
+            .Returns(Result.Created);
         _mockDomainEventPublisher = Substitute.For<IDomainEventPublisher>();
-        _sut = new MediaLibraryScanningService(_mockScanQueue, _mockScannerFactory, _mockCancellationTracker, _mockProgressTracker, _mockDomainEventPublisher);
+        _sut = new MediaLibraryScanningService(_mockScannerFactory, _mockCancellationTracker, _mockProgressTracker, _mockDomainEventPublisher);
     }
 
     [Fact]
-    public async Task StartScanAsync_WhenScanStartsSuccessfully_ShouldPublishEventsAndEnqueueJobs()
+    public async Task StartScanAsync_WhenScanStartsSuccessfully_ShouldReturnTheDiscoveryRootJob()
     {
         // Arrange
         LibraryScan scan = _libraryScanFixture.Create();
-        IMediaLibraryScanJob job = CreateJob(children: []);
-        IMediaTypeScanner scanner = CreateScanner([job]);
+        FakeMediaLibraryScanDiscoveryJob rootJob = _mediaLibraryScanDiscoveryJobFixture.Create();
+        RegisterScanner(LibraryType.Book, rootJob);
 
         // Act
-        Result<Success> result = await _sut.StartScanAsync(scan, LibraryType.Book, CancellationToken.None);
+        Result<IMediaLibraryScanDiscoveryJob> result = await _sut.StartScanAsync(scan, LibraryType.Book, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Equal(Result.Success, result.Value);
+        Assert.Same(rootJob, result.Value);
         Assert.Equal(LibraryScanJobStatus.Running, scan.Status);
-        await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Any<LibraryScanStartedDomainEvent>(), Arg.Any<CancellationToken>());
-        _mockCancellationTracker.Received(1).RegisterScan(Arg.Is<MediaLibraryScanCompositeId>(compositeId => compositeId.ScanId == scan.Id && compositeId.UserId == scan.UserId));
-        _mockProgressTracker.Received(1).InitializeScanProgress(scan.LibraryId, Arg.Any<MediaLibraryScanCompositeId>(), totalJobs: 1);
-        Assert.Equal(scan.Id, job.ScanId);
-        Assert.Equal(scan.UserId, job.UserId);
-        Assert.True(_channel.Reader.TryRead(out IMediaLibraryScanJob? enqueuedJob));
-        Assert.Same(job, enqueuedJob);
-        Assert.False(_channel.Reader.TryRead(out _));
     }
 
     [Fact]
-    public async Task StartScanAsync_WhenScanCannotStart_ShouldReturnErrorAndNotEnqueueJobs()
+    public async Task StartScanAsync_WhenScanStartsSuccessfully_ShouldPublishTheStartedEvent()
     {
         // Arrange
-        LibraryScan scan = _libraryScanFixture.Create(status: LibraryScanJobStatus.Running);
+        LibraryScan scan = _libraryScanFixture.Create();
+        RegisterScanner(LibraryType.Book, _mediaLibraryScanDiscoveryJobFixture.Create());
 
         // Act
-        Result<Success> result = await _sut.StartScanAsync(scan, LibraryType.Book, CancellationToken.None);
+        await _sut.StartScanAsync(scan, LibraryType.Book, CancellationToken.None);
+
+        // Assert
+        await _mockDomainEventPublisher.Received(1).PublishAsync(
+            Arg.Is<IDomainEvent>(domainEvent => domainEvent.GetType() == typeof(LibraryScanStartedDomainEvent)
+                && ((LibraryScanStartedDomainEvent)domainEvent).LibraryScan == scan),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task StartScanAsync_WhenScanStartsSuccessfully_ShouldRegisterTheScanForCancellation()
+    {
+        // Arrange
+        LibraryScan scan = _libraryScanFixture.Create();
+        RegisterScanner(LibraryType.Book, _mediaLibraryScanDiscoveryJobFixture.Create());
+
+        // Act
+        await _sut.StartScanAsync(scan, LibraryType.Book, CancellationToken.None);
+
+        // Assert
+        _mockCancellationTracker.Received(1).RegisterScan(
+            Arg.Is<MediaLibraryScanCompositeId>(compositeId => compositeId.ScanId == scan.Id && compositeId.UserId == scan.UserId));
+    }
+
+    [Fact]
+    public async Task StartScanAsync_WhenScanStartsSuccessfully_ShouldInitializeProgressWithTheRealJobCount()
+    {
+        // Arrange
+        LibraryScan scan = _libraryScanFixture.Create();
+        FakeMediaLibraryScanDiscoveryJob leafJob = _mediaLibraryScanDiscoveryJobFixture.Create();
+        FakeMediaLibraryScanDiscoveryJob middleJob = _mediaLibraryScanDiscoveryJobFixture.Create(children: [leafJob]);
+        FakeMediaLibraryScanDiscoveryJob rootJob = _mediaLibraryScanDiscoveryJobFixture.Create(children: [middleJob]);
+        RegisterScanner(LibraryType.Book, rootJob);
+
+        // Act
+        await _sut.StartScanAsync(scan, LibraryType.Book, CancellationToken.None);
+
+        // Assert
+        _mockProgressTracker.Received(1).InitializeScanProgress(
+            scan.LibraryId,
+            Arg.Is<MediaLibraryScanCompositeId>(compositeId => compositeId.ScanId == scan.Id && compositeId.UserId == scan.UserId),
+            totalJobs: 3);
+    }
+
+    [Fact]
+    public async Task StartScanAsync_WhenScanStartsSuccessfully_ShouldSetScanPropertiesOnTheWholeJobChain()
+    {
+        // Arrange
+        LibraryScan scan = _libraryScanFixture.Create();
+        FakeMediaLibraryScanDiscoveryJob leafJob = _mediaLibraryScanDiscoveryJobFixture.Create();
+        FakeMediaLibraryScanDiscoveryJob middleJob = _mediaLibraryScanDiscoveryJobFixture.Create(children: [leafJob]);
+        FakeMediaLibraryScanDiscoveryJob rootJob = _mediaLibraryScanDiscoveryJobFixture.Create(children: [middleJob]);
+        RegisterScanner(LibraryType.Book, rootJob);
+
+        // Act
+        await _sut.StartScanAsync(scan, LibraryType.Book, CancellationToken.None);
+
+        // Assert
+        AssertScanProperties(rootJob, scan);
+        AssertScanProperties(middleJob, scan);
+        AssertScanProperties(leafJob, scan);
+    }
+
+    [Fact]
+    public async Task StartScanAsync_WhenScannerIsUnavailable_ShouldReturnErrorAndChangeNothing()
+    {
+        // Arrange
+        LibraryScan scan = _libraryScanFixture.Create();
+        _mockScannerFactory.CreateLibraryScanner(LibraryType.Movie).Returns(Errors.LibraryScanning.NoScannerForLibraryType);
+
+        // Act
+        Result<IMediaLibraryScanDiscoveryJob> result = await _sut.StartScanAsync(scan, LibraryType.Movie, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
-        Assert.Equal(Lumina.Domain.Common.Errors.Errors.LibraryScanning.CanOnlyStartPendingScans, result.FirstError);
-        await _mockDomainEventPublisher.DidNotReceive().PublishAsync(Arg.Any<IDomainEvent>(), Arg.Any<CancellationToken>());
+        Assert.Equal(Errors.LibraryScanning.NoScannerForLibraryType, result.FirstError);
+        Assert.Equal(LibraryScanJobStatus.Pending, scan.Status);
+        Assert.Empty(scan.GetDomainEvents());
+        _mockCancellationTracker.DidNotReceive().RegisterScan(Arg.Any<MediaLibraryScanCompositeId>());
         _mockProgressTracker.DidNotReceive().InitializeScanProgress(Arg.Any<LibraryId>(), Arg.Any<MediaLibraryScanCompositeId>(), Arg.Any<int>());
-        Assert.False(_channel.Reader.TryRead(out _));
+        await _mockDomainEventPublisher.DidNotReceive().PublishAsync(Arg.Any<IDomainEvent>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
-    public async Task StartScanAsync_WhenScannerThrowsNotImplementedException_ShouldSucceedWithoutEnqueuingJobs()
+    public async Task StartScanAsync_WhenScanIsNotPending_ShouldReturnErrorWithoutRegisteringOrPublishing()
+    {
+        // Arrange
+        LibraryScan scan = _libraryScanFixture.Create(status: LibraryScanJobStatus.Running);
+        RegisterScanner(LibraryType.Book, _mediaLibraryScanDiscoveryJobFixture.Create());
+
+        // Act
+        Result<IMediaLibraryScanDiscoveryJob> result = await _sut.StartScanAsync(scan, LibraryType.Book, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.LibraryScanning.CanOnlyStartPendingScans, result.FirstError);
+        Assert.Equal(LibraryScanJobStatus.Running, scan.Status);
+        Assert.Empty(scan.GetDomainEvents());
+        _mockCancellationTracker.DidNotReceive().RegisterScan(Arg.Any<MediaLibraryScanCompositeId>());
+        _mockProgressTracker.DidNotReceive().InitializeScanProgress(Arg.Any<LibraryId>(), Arg.Any<MediaLibraryScanCompositeId>(), Arg.Any<int>());
+        await _mockDomainEventPublisher.DidNotReceive().PublishAsync(Arg.Any<IDomainEvent>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task StartScanAsync_WhenProgressInitializationFails_ShouldReturnErrorWithoutPublishingEvents()
     {
         // Arrange
         LibraryScan scan = _libraryScanFixture.Create();
-        IMediaTypeScanner scanner = Substitute.For<IMediaTypeScanner>();
-        scanner.CreateScanJobsForLibrary(Arg.Any<LibraryId>()).Returns(_ => throw new NotImplementedException());
-        _mockScannerFactory.CreateLibraryScanner(LibraryType.Book).Returns(scanner);
+        RegisterScanner(LibraryType.Book, _mediaLibraryScanDiscoveryJobFixture.Create());
+        Error error = Error.Failure(description: "Failed to initialize the media library scan progress");
+        _mockProgressTracker.InitializeScanProgress(Arg.Any<LibraryId>(), Arg.Any<MediaLibraryScanCompositeId>(), Arg.Any<int>())
+            .Returns(error);
 
         // Act
-        Result<Success> result = await _sut.StartScanAsync(scan, LibraryType.Book, CancellationToken.None);
+        Result<IMediaLibraryScanDiscoveryJob> result = await _sut.StartScanAsync(scan, LibraryType.Book, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsFailure);
-        Assert.Equal(Result.Success, result.Value);
-        _mockProgressTracker.DidNotReceive().InitializeScanProgress(Arg.Any<LibraryId>(), Arg.Any<MediaLibraryScanCompositeId>(), Arg.Any<int>());
-        Assert.False(_channel.Reader.TryRead(out _));
+        Assert.True(result.IsFailure);
+        Assert.Equal(error, result.FirstError);
+        await _mockDomainEventPublisher.DidNotReceive().PublishAsync(Arg.Any<IDomainEvent>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -129,17 +211,16 @@ public class MediaLibraryScanningServiceTests
         // Arrange
         LibraryScan scan = _libraryScanFixture.Create();
         IMediaLibraryScanJob sharedChild = CreateJob(children: []);
-        IMediaLibraryScanJob firstRoot = CreateJob(children: [sharedChild]);
-        IMediaLibraryScanJob secondRoot = CreateJob(children: [sharedChild]);
-        IMediaTypeScanner scanner = CreateScanner([firstRoot, secondRoot]);
+        IMediaLibraryScanJob firstChild = CreateJob(children: [sharedChild]);
+        IMediaLibraryScanJob secondChild = CreateJob(children: [sharedChild]);
+        FakeMediaLibraryScanDiscoveryJob rootJob = _mediaLibraryScanDiscoveryJobFixture.Create(children: [firstChild, secondChild]);
+        RegisterScanner(LibraryType.Book, rootJob);
 
         // Act
-        Result<Success> result = await _sut.StartScanAsync(scan, LibraryType.Book, CancellationToken.None);
+        await _sut.StartScanAsync(scan, LibraryType.Book, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsFailure);
-        _mockProgressTracker.Received(1).InitializeScanProgress(scan.LibraryId, Arg.Any<MediaLibraryScanCompositeId>(), totalJobs: 3);
-        Assert.Equal(2, CountEnqueuedJobs());
+        _mockProgressTracker.Received(1).InitializeScanProgress(scan.LibraryId, Arg.Any<MediaLibraryScanCompositeId>(), totalJobs: 4);
     }
 
     [Fact]
@@ -180,15 +261,16 @@ public class MediaLibraryScanningServiceTests
     }
 
     /// <summary>
-    /// Creates a mocked <see cref="IMediaTypeScanner"/> and registers it with the mocked scanner factory.
+    /// Registers a mocked media library scanner that returns <paramref name="rootJob"/> with the mocked scanner factory.
     /// </summary>
-    /// <param name="jobs">The scan jobs the scanner returns when asked to create scan jobs for a library.</param>
+    /// <param name="libraryType">The media library type that the scanner is registered for.</param>
+    /// <param name="rootJob">The file system discovery job returned by the scanner.</param>
     /// <returns>The created mocked scanner.</returns>
-    private IMediaTypeScanner CreateScanner(List<IMediaLibraryScanJob> jobs)
+    private IMediaTypeScanner RegisterScanner(LibraryType libraryType, IMediaLibraryScanDiscoveryJob rootJob)
     {
         IMediaTypeScanner scanner = Substitute.For<IMediaTypeScanner>();
-        scanner.CreateScanJobsForLibrary(Arg.Any<LibraryId>()).Returns(jobs);
-        _mockScannerFactory.CreateLibraryScanner(LibraryType.Book).Returns(scanner);
+        scanner.CreateScanJobsForLibrary(Arg.Any<LibraryId>()).Returns(rootJob);
+        _mockScannerFactory.CreateLibraryScanner(libraryType).Returns(Result.From(scanner));
         return scanner;
     }
 
@@ -205,14 +287,13 @@ public class MediaLibraryScanningServiceTests
     }
 
     /// <summary>
-    /// Counts and drains the scan jobs currently enqueued on the scan queue channel.
+    /// Asserts that the scan identity of the scan was propagated to <paramref name="job"/>.
     /// </summary>
-    /// <returns>The number of enqueued scan jobs.</returns>
-    private int CountEnqueuedJobs()
+    /// <param name="job">The job whose scan properties are asserted.</param>
+    /// <param name="scan">The media library scan that owns the job.</param>
+    private static void AssertScanProperties(IMediaLibraryScanJob job, LibraryScan scan)
     {
-        int count = 0;
-        while (_channel.Reader.TryRead(out _))
-            count++;
-        return count;
+        Assert.Equal(scan.Id, job.ScanId);
+        Assert.Equal(scan.UserId, job.UserId);
     }
 }

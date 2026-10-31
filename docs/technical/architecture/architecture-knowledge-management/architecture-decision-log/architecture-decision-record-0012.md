@@ -1,7 +1,6 @@
 # Architecture Decision Record (ADR): 0012 - Replace FluentValidation with Custom Validation Abstractions
 
 ## Status
-
 **Accepted** (2026-08-13)
 
 ## Context
@@ -171,8 +170,7 @@ internal sealed class CreateSensorCommandValidator : AbstractValidator<CreateSen
 | Familiar Surface | `RuleFor` / `Must` / `When` / `WithError` pattern is intentionally close to FluentValidation, minimising cognitive load during migration |
 | Encapsulation | `IValidationRule` and `ValidationRule` are `internal`; consumers only interact with `IValidator` and `IRuleBuilder` |
 
-### Risks and Mitigations
-
+### Risks and Tradeoffs
 | Risk | Mitigation Strategy |
 |---|---|
 | Missing built-in rules surfacing post-migration | Audit all existing FluentValidation rule usages before removal; add corresponding `ValidatorUtilities` extensions as needed |

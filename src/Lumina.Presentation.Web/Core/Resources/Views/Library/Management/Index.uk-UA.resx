@@ -141,6 +141,9 @@
   <data name="CancelScan" xml:space="preserve">
     <value>Скасувати Сканування</value>
   </data>
+  <data name="Cancelling" xml:space="preserve">
+    <value>Скасування</value>
+  </data>
   <data name="ComicBook" xml:space="preserve">
     <value>Комікс</value>
   </data>
@@ -248,6 +251,9 @@
   </data>
   <data name="RadioShow" xml:space="preserve">
     <value>Радіопередача</value>
+  </data>
+  <data name="Queued" xml:space="preserve">
+    <value>У черзі</value>
   </data>
   <data name="Remix" xml:space="preserve">
     <value>Ремікс</value>

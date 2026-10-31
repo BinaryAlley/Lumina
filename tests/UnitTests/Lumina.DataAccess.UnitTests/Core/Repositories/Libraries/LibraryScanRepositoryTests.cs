@@ -123,22 +123,25 @@ public class LibraryScanRepositoryTests
     }
 
     [Fact]
-    public async Task GetRunningScansAsync_WhenCalled_ShouldReturnOnlyRunningScans()
+    public async Task GetActiveScansAsync_WhenCalled_ShouldReturnPendingAndRunningScansOnly()
     {
         // Arrange
         LibraryScanEntity runningScan = _libraryScanEntityFixture.Create(status: LibraryScanJobStatus.Running);
-        LibraryScanEntity completedScan = _libraryScanEntityFixture.Create(status: LibraryScanJobStatus.Completed);
         LibraryScanEntity pendingScan = _libraryScanEntityFixture.Create(status: LibraryScanJobStatus.Pending);
-        _mockContext.LibraryScans.AddRange(runningScan, completedScan, pendingScan);
+        LibraryScanEntity completedScan = _libraryScanEntityFixture.Create(status: LibraryScanJobStatus.Completed);
+        LibraryScanEntity canceledScan = _libraryScanEntityFixture.Create(status: LibraryScanJobStatus.Canceled);
+        LibraryScanEntity failedScan = _libraryScanEntityFixture.Create(status: LibraryScanJobStatus.Failed);
+        _mockContext.LibraryScans.AddRange(runningScan, pendingScan, completedScan, canceledScan, failedScan);
         await _mockContext.SaveChangesAsync();
 
         // Act
-        Result<IEnumerable<LibraryScanEntity>> result = await _sut.GetRunningScansAsync(CancellationToken.None);
+        Result<IEnumerable<LibraryScanEntity>> result = await _sut.GetActiveScansAsync(CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
-        LibraryScanEntity retrievedScan = Assert.Single(result.Value);
-        Assert.Equal(runningScan.Id, retrievedScan.Id);
+        Assert.Equal(2, result.Value.Count());
+        Assert.Contains(result.Value, libraryScan => libraryScan.Id == runningScan.Id);
+        Assert.Contains(result.Value, libraryScan => libraryScan.Id == pendingScan.Id);
     }
 
     [Fact]

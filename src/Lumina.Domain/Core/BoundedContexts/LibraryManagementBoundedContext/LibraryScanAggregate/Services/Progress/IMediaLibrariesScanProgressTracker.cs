@@ -12,6 +12,14 @@ namespace Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Lib
 public interface IMediaLibrariesScanProgressTracker
 {
     /// <summary>
+    /// Initializes the progress tracking of a media library scan that is waiting in the scan queue, before its jobs are prepared.
+    /// </summary>
+    /// <param name="libraryId">The object representing the unique identifier of the media library being scanned.</param>
+    /// <param name="mediaLibraryScanCompositeId">Model for tracking media library scans.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Result<Created> InitializeQueuedScanProgress(LibraryId libraryId, MediaLibraryScanCompositeId mediaLibraryScanCompositeId);
+
+    /// <summary>
     /// Initializes the the progress tracking of a media library scan.
     /// </summary>
     /// <param name="libraryId">The object representing the unique identifier of the media library being scanned.</param>

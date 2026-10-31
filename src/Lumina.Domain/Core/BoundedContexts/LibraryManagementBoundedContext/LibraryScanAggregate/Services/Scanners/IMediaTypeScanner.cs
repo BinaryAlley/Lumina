@@ -2,7 +2,6 @@
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
-using System.Collections.Generic;
 #endregion
 
 namespace Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Scanners;
@@ -18,9 +17,9 @@ public interface IMediaTypeScanner
     LibraryType SupportedLibraryType { get; }
 
     /// <summary>
-    /// Creates the media library scan jobs for the provided media library.
+    /// Creates the media library scan job graph for the provided media library.
     /// </summary>
     /// <param name="libraryId">The unique identifier of the media library for which to create the media library scan jobs.</param>
-    /// <returns>A collection of media library scan jobs.</returns>
-    IEnumerable<IMediaLibraryScanJob> CreateScanJobsForLibrary(LibraryId libraryId);
+    /// <returns>The file system discovery job, which is the only top level job of the media library scan job graph.</returns>
+    IMediaLibraryScanDiscoveryJob CreateScanJobsForLibrary(LibraryId libraryId);
 }

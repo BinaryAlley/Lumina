@@ -3,7 +3,6 @@ using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibrary
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using System.Collections.Generic;
 #endregion
 
 namespace Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Services.Scanners;
@@ -30,11 +29,11 @@ internal class MusicLibraryTypeScanner : IMusicLibraryTypeScanner
     }
 
     /// <summary>
-    /// Creates the media library scan jobs for the provided media library.
+    /// Creates the media library scan job graph for the provided media library.
     /// </summary>
     /// <param name="libraryId">The unique identifier of the media library for which to create the media library scan jobs.</param>
-    /// <returns>A collection of media library scan jobs.</returns>
-    public IEnumerable<IMediaLibraryScanJob> CreateScanJobsForLibrary(LibraryId libraryId)
+    /// <returns>The file system discovery job, which is the only top level job of the media library scan job graph.</returns>
+    public IMediaLibraryScanDiscoveryJob CreateScanJobsForLibrary(LibraryId libraryId)
     {
         // Declare the list of jobs that this scanner requires.
         IMusicFileSystemDiscoveryJob fileSystemDiscoveryJob = _mediaScanJobFactory.CreateJob<IMusicFileSystemDiscoveryJob>(libraryId);
@@ -75,7 +74,7 @@ internal class MusicLibraryTypeScanner : IMusicLibraryTypeScanner
         mediaLibraryScanMetadataEnrichmentJob.AddChild(mediaLibraryScanArtworkEnrichmentJob);
         mediaLibraryScanArtworkEnrichmentJob.AddParent(mediaLibraryScanMetadataEnrichmentJob);
 
-        // Return the top level jobs that will be triggered when the scan will be started.
-        yield return fileSystemDiscoveryJob;
+        // The file system discovery job is the only top level job: no scanning can happen before the files are discovered.
+        return fileSystemDiscoveryJob;
     }
 }

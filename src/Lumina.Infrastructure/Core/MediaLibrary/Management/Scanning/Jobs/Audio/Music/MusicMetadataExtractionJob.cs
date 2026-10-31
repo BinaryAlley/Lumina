@@ -67,86 +67,58 @@ internal sealed class MusicMetadataExtractionJob : MediaLibraryScanJob, IMusicMe
     {
         try
         {
+            cancellationToken.ThrowIfCancellationRequested();
             // Increment the number of parents that finished their execution and called this job (beware race conditions, jobs run in parallel).
             int parentsCompleted = Interlocked.Increment(ref parentsPayloadsExecuted);
             // Only execute this job's payload when it has no parents, or when all the parents finished their execution.
             if (Parents.Count == 0 || parentsCompleted == Parents.Count)
             {
-                // This needs to be wrapped in a task because even though this job is processed in a "fire and forget" async manner, it still does synchronous
-                // file system processing that takes time, and would block the processing of scan jobs in the in-memory queue.
-                await Task.Run(async () =>
+                Status = LibraryScanJobStatus.Running;
+                // See docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details.
+                await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
+                IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
+                IDomainEventPublisher domainEventPublisher = asyncServiceScope.ServiceProvider.GetService<IDomainEventPublisher>()!;
+
+                MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
+
+                // Get the library from the repository, both to verify that it exists and to know its content locations.
+                Result<LibraryEntity?> getLibraryResult = await unitOfWork.LibraryRepository.GetByIdAsync(LibraryId.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
+                if (getLibraryResult.IsFailure || getLibraryResult.Value is null)
+                    throw new InvalidOperationException(getLibraryResult.IsFailure ? getLibraryResult.FirstError.Description : "The media library was not found.");
+                Result<Library> domainLibraryResult = getLibraryResult.Value.ToDomainEntity();
+                if (domainLibraryResult.IsFailure)
+                    throw new InvalidOperationException(domainLibraryResult.FirstError.Description);
+
+                // The library always carries a path template: the one configured by the user, or the ideal structure of the library type as its default.
+                ILibraryPathTemplateService pathTemplateService = asyncServiceScope.ServiceProvider.GetService<ILibraryPathTemplateService>()!;
+                IPathService pathService = asyncServiceScope.ServiceProvider.GetService<IPathService>()!;
+                Result<LibraryPathTemplate> pathTemplateResult = pathTemplateService.ResolveTemplate(domainLibraryResult.Value.LibraryType, domainLibraryResult.Value.PathTemplate.Parts);
+                if (pathTemplateResult.IsFailure)
+                    throw new InvalidOperationException(pathTemplateResult.FirstError.Description);
+                LibraryPathTemplate pathTemplate = pathTemplateResult.Value;
+
+                // The metadata is extracted only for the files that are new or changed, since the unchanged ones already have their materialized items.
+                Result<IReadOnlyList<string>> getPathsResult = await unitOfWork.LibraryScanStagingResultsRepository.GetPathsNeedingRehashAsync(ScanId.Value, cancellationToken).ConfigureAwait(false);
+                if (getPathsResult.IsFailure)
+                    throw new InvalidOperationException(getPathsResult.FirstError.Description);
+                IReadOnlyList<string> paths = getPathsResult.Value;
+
+                // Set the initial progress of the scan job.
+                Result<Success> publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 0, paths.Count, cancellationToken).ConfigureAwait(false);
+                if (publishJobProgressResult.IsFailure)
+                    throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
+
+                TimeSpan heartbeatInterval = TimeSpan.FromSeconds(1);
+                DateTime lastHeartbeat = DateTime.UtcNow;
+                int processedItems = 0;
+
+                List<MusicLibraryScanItemMetadataEntity> metadataBatch = [];
+                foreach (string path in paths)
                 {
-                    Status = LibraryScanJobStatus.Running;
-                    // See docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details.
-                    await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
-                    IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
-                    IDomainEventPublisher domainEventPublisher = asyncServiceScope.ServiceProvider.GetService<IDomainEventPublisher>()!;
+                    cancellationToken.ThrowIfCancellationRequested();
 
-                    MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
-
-                    // Get the library from the repository, both to verify that it exists and to know its content locations.
-                    Result<LibraryEntity?> getLibraryResult = await unitOfWork.LibraryRepository.GetByIdAsync(LibraryId.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
-                    if (getLibraryResult.IsFailure || getLibraryResult.Value is null)
-                        throw new InvalidOperationException(getLibraryResult.IsFailure ? getLibraryResult.FirstError.Description : "The media library was not found.");
-                    Result<Library> domainLibraryResult = getLibraryResult.Value.ToDomainEntity();
-                    if (domainLibraryResult.IsFailure)
-                        throw new InvalidOperationException(domainLibraryResult.FirstError.Description);
-
-                    // The library always carries a path template: the one configured by the user, or the ideal structure of the library type as its default.
-                    ILibraryPathTemplateService pathTemplateService = asyncServiceScope.ServiceProvider.GetService<ILibraryPathTemplateService>()!;
-                    IPathService pathService = asyncServiceScope.ServiceProvider.GetService<IPathService>()!;
-                    Result<LibraryPathTemplate> pathTemplateResult = pathTemplateService.ResolveTemplate(domainLibraryResult.Value.LibraryType, domainLibraryResult.Value.PathTemplate.Parts);
-                    if (pathTemplateResult.IsFailure)
-                        throw new InvalidOperationException(pathTemplateResult.FirstError.Description);
-                    LibraryPathTemplate pathTemplate = pathTemplateResult.Value;
-
-                    // The metadata is extracted only for the files that are new or changed, since the unchanged ones already have their materialized items.
-                    Result<IReadOnlyList<string>> getPathsResult = await unitOfWork.LibraryScanStagingResultsRepository.GetPathsNeedingRehashAsync(ScanId.Value, cancellationToken).ConfigureAwait(false);
-                    if (getPathsResult.IsFailure)
-                        throw new InvalidOperationException(getPathsResult.FirstError.Description);
-                    IReadOnlyList<string> paths = getPathsResult.Value;
-
-                    // Set the initial progress of the scan job.
-                    Result<Success> publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 0, paths.Count, cancellationToken).ConfigureAwait(false);
-                    if (publishJobProgressResult.IsFailure)
-                        throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
-
-                    TimeSpan heartbeatInterval = TimeSpan.FromSeconds(1);
-                    DateTime lastHeartbeat = DateTime.UtcNow;
-                    int processedItems = 0;
-
-                    List<MusicLibraryScanItemMetadataEntity> metadataBatch = [];
-                    foreach (string path in paths)
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
-
-                        metadataBatch.Add(ExtractMetadata(path, domainLibraryResult.Value.ContentLocations, domainLibraryResult.Value.LibraryType, pathTemplate, pathTemplateService, pathService));
-                        if (metadataBatch.Count >= EXTRACTION_BATCH_SIZE)
-                        {
-                            Result<Created> insertBatchResult = await unitOfWork.MusicLibraryScanItemMetadataRepository.InsertRangeAsync(metadataBatch, cancellationToken).ConfigureAwait(false);
-                            if (insertBatchResult.IsFailure)
-                                throw new InvalidOperationException(insertBatchResult.FirstError.Description);
-                            Result<Success> saveBatchResult = await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-                            if (saveBatchResult.IsFailure)
-                                throw new InvalidOperationException(saveBatchResult.FirstError.Description);
-                            metadataBatch.Clear();
-                            unitOfWork.ClearTrackedEntities();
-                        }
-                        processedItems++;
-
-                        // Increment the number of processed elements progress in a high-frequency counter with low overhead check.
-                        DateTime now = DateTime.UtcNow;
-                        if (now - lastHeartbeat >= heartbeatInterval)
-                        {
-                            publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, processedItems, paths.Count, cancellationToken).ConfigureAwait(false);
-                            if (publishJobProgressResult.IsFailure)
-                                throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
-                            lastHeartbeat = now;
-                        }
-                    }
-
-                    // Flush any remaining extracted metadata items that did not reach the batch size.
-                    if (metadataBatch.Count > 0)
+                    metadataBatch.Add(ExtractMetadata(path, domainLibraryResult.Value.ContentLocations, domainLibraryResult.Value.LibraryType, pathTemplate, pathTemplateService, pathService));
+                    if (metadataBatch.Count >= EXTRACTION_BATCH_SIZE)
                     {
                         Result<Created> insertBatchResult = await unitOfWork.MusicLibraryScanItemMetadataRepository.InsertRangeAsync(metadataBatch, cancellationToken).ConfigureAwait(false);
                         if (insertBatchResult.IsFailure)
@@ -154,16 +126,40 @@ internal sealed class MusicMetadataExtractionJob : MediaLibraryScanJob, IMusicMe
                         Result<Success> saveBatchResult = await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
                         if (saveBatchResult.IsFailure)
                             throw new InvalidOperationException(saveBatchResult.FirstError.Description);
+                        metadataBatch.Clear();
+                        unitOfWork.ClearTrackedEntities();
                     }
+                    processedItems++;
 
-                    // This job finished, increment the number of processed jobs progress.
-                    await domainEventPublisher.PublishAsync(new LibraryScanProgressChangedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
-                    Status = LibraryScanJobStatus.Completed;
+                    // Increment the number of processed elements progress in a high-frequency counter with low overhead check.
+                    DateTime now = DateTime.UtcNow;
+                    if (now - lastHeartbeat >= heartbeatInterval)
+                    {
+                        publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, processedItems, paths.Count, cancellationToken).ConfigureAwait(false);
+                        if (publishJobProgressResult.IsFailure)
+                            throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
+                        lastHeartbeat = now;
+                    }
+                }
 
-                    // Call each linked child with the obtained payload.
-                    foreach (IMediaLibraryScanJob child in Children)
-                        await child.ExecuteAsync(id, input, cancellationToken).ConfigureAwait(false);
-                }, cancellationToken).ConfigureAwait(false);
+                // Flush any remaining extracted metadata items that did not reach the batch size.
+                if (metadataBatch.Count > 0)
+                {
+                    Result<Created> insertBatchResult = await unitOfWork.MusicLibraryScanItemMetadataRepository.InsertRangeAsync(metadataBatch, cancellationToken).ConfigureAwait(false);
+                    if (insertBatchResult.IsFailure)
+                        throw new InvalidOperationException(insertBatchResult.FirstError.Description);
+                    Result<Success> saveBatchResult = await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                    if (saveBatchResult.IsFailure)
+                        throw new InvalidOperationException(saveBatchResult.FirstError.Description);
+                }
+
+                // This job finished, increment the number of processed jobs progress.
+                await domainEventPublisher.PublishAsync(new LibraryScanProgressChangedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                Status = LibraryScanJobStatus.Completed;
+
+                // Call each linked child with the obtained payload.
+                foreach (IMediaLibraryScanJob child in Children)
+                    await child.ExecuteAsync(id, input, cancellationToken).ConfigureAwait(false);
             }
         }
         catch (OperationCanceledException)

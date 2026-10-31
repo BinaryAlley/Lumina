@@ -11,7 +11,6 @@ using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -54,11 +53,11 @@ public class BookLibraryTypeScannerTests
         BookLibraryTypeScanner sut = new(_mockJobFactory);
 
         // Act
-        List<IMediaLibraryScanJob> rootJobs = [.. sut.CreateScanJobsForLibrary(libraryId)];
+        IMediaLibraryScanDiscoveryJob rootJob = sut.CreateScanJobsForLibrary(libraryId);
 
         // Assert
-        IMediaLibraryScanJob rootJob = Assert.Single(rootJobs);
         Assert.Same(discoveryJob, rootJob);
+        Assert.IsAssignableFrom<IBooksFileSystemDiscoveryJob>(rootJob);
         Assert.Contains(diffJob, discoveryJob.Children);
         Assert.Contains(discoveryJob, diffJob.Parents);
         Assert.Contains(hashJob, diffJob.Children);
@@ -76,6 +75,58 @@ public class BookLibraryTypeScannerTests
     }
 
     [Fact]
+    public void CreateScanJobsForLibrary_WhenCalled_ShouldReturnTheFileSystemDiscoveryJobAsTheOnlyRoot()
+    {
+        // Arrange
+        LibraryId libraryId = _libraryIdFixture.Create();
+        TestScanJob discoveryJob = CreateJob<IBooksFileSystemDiscoveryJob>();
+        CreateJob<IMediaLibraryScanDiffJob>();
+        CreateJob<IMediaLibraryScanHashJob>();
+        CreateJob<IMediaLibraryScanResultsSaveJob>();
+        CreateJob<IMediaLibraryScanProviderConfigurationInvalidationJob>();
+        CreateJob<IMediaLibraryScanMetadataEnrichmentJob>();
+        CreateJob<IMediaLibraryScanArtworkEnrichmentJob>();
+        BookLibraryTypeScanner sut = new(_mockJobFactory);
+
+        // Act
+        IMediaLibraryScanDiscoveryJob rootJob = sut.CreateScanJobsForLibrary(libraryId);
+
+        // Assert
+        Assert.Same(discoveryJob, rootJob);
+        // The file system discovery job is the only top level job, so nothing else is reachable without it.
+        Assert.Empty(discoveryJob.Parents);
+    }
+
+    [Fact]
+    public void CreateScanJobsForLibrary_WhenCalled_ShouldMakeTheWholeChainReachableFromTheRoot()
+    {
+        // Arrange
+        LibraryId libraryId = _libraryIdFixture.Create();
+        TestScanJob discoveryJob = CreateJob<IBooksFileSystemDiscoveryJob>();
+        TestScanJob diffJob = CreateJob<IMediaLibraryScanDiffJob>();
+        TestScanJob hashJob = CreateJob<IMediaLibraryScanHashJob>();
+        TestScanJob saveJob = CreateJob<IMediaLibraryScanResultsSaveJob>();
+        TestScanJob invalidationJob = CreateJob<IMediaLibraryScanProviderConfigurationInvalidationJob>();
+        TestScanJob enrichmentJob = CreateJob<IMediaLibraryScanMetadataEnrichmentJob>();
+        TestScanJob artworkEnrichmentJob = CreateJob<IMediaLibraryScanArtworkEnrichmentJob>();
+        BookLibraryTypeScanner sut = new(_mockJobFactory);
+
+        // Act
+        IMediaLibraryScanDiscoveryJob rootJob = sut.CreateScanJobsForLibrary(libraryId);
+        HashSet<IMediaLibraryScanJob> reachableJobs = GetReachableJobs(rootJob);
+
+        // Assert
+        Assert.Equal(7, reachableJobs.Count);
+        Assert.Contains(discoveryJob, reachableJobs);
+        Assert.Contains(diffJob, reachableJobs);
+        Assert.Contains(hashJob, reachableJobs);
+        Assert.Contains(saveJob, reachableJobs);
+        Assert.Contains(invalidationJob, reachableJobs);
+        Assert.Contains(enrichmentJob, reachableJobs);
+        Assert.Contains(artworkEnrichmentJob, reachableJobs);
+    }
+
+    [Fact]
     public void CreateScanJobsForLibrary_WhenCalled_ShouldCreateJobsForTheLibrary()
     {
         // Arrange
@@ -90,7 +141,7 @@ public class BookLibraryTypeScannerTests
         BookLibraryTypeScanner sut = new(_mockJobFactory);
 
         // Act
-        _ = sut.CreateScanJobsForLibrary(libraryId).ToList();
+        _ = sut.CreateScanJobsForLibrary(libraryId);
 
         // Assert
         _mockJobFactory.Received(1).CreateJob<IBooksFileSystemDiscoveryJob>(libraryId);
@@ -100,6 +151,27 @@ public class BookLibraryTypeScannerTests
         _mockJobFactory.Received(1).CreateJob<IMediaLibraryScanProviderConfigurationInvalidationJob>(libraryId);
         _mockJobFactory.Received(1).CreateJob<IMediaLibraryScanMetadataEnrichmentJob>(libraryId);
         _mockJobFactory.Received(1).CreateJob<IMediaLibraryScanArtworkEnrichmentJob>(libraryId);
+    }
+
+    /// <summary>
+    /// Collects every job that is reachable from <paramref name="rootJob"/> through the child relationships.
+    /// </summary>
+    /// <param name="rootJob">The root job of the job graph.</param>
+    /// <returns>The set of reachable jobs.</returns>
+    private static HashSet<IMediaLibraryScanJob> GetReachableJobs(IMediaLibraryScanJob rootJob)
+    {
+        HashSet<IMediaLibraryScanJob> reachableJobs = [];
+        Queue<IMediaLibraryScanJob> jobsToVisit = new();
+        jobsToVisit.Enqueue(rootJob);
+        while (jobsToVisit.Count > 0)
+        {
+            IMediaLibraryScanJob currentJob = jobsToVisit.Dequeue();
+            if (!reachableJobs.Add(currentJob))
+                continue;
+            foreach (IMediaLibraryScanJob childJob in currentJob.Children)
+                jobsToVisit.Enqueue(childJob);
+        }
+        return reachableJobs;
     }
 
     private TestScanJob CreateJob<TJob>() where TJob : class, IMediaLibraryScanJob

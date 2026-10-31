@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Queue;
-using NSubstitute;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,37 +16,58 @@ namespace Lumina.Infrastructure.UnitTests.Core.MediaLibrary.Management.Scanning.
 public class MediaLibrariesScanQueueTests
 {
     private readonly MediaLibrariesScanQueue _sut = new();
+    private readonly MediaLibraryScanCompositeIdFixture _mediaLibraryScanCompositeIdFixture = new();
 
     [Fact]
-    public async Task Writer_WhenJobIsWritten_ShouldAllowReadingItFromReader()
+    public async Task Writer_WhenScanIsWritten_ShouldAllowReadingItFromReader()
     {
         // Arrange
-        IMediaLibraryScanJob job = Substitute.For<IMediaLibraryScanJob>();
+        MediaLibraryScanCompositeId scanId = _mediaLibraryScanCompositeIdFixture.Create();
 
         // Act
-        bool writeResult = _sut.Writer.TryWrite(job);
-        IMediaLibraryScanJob readJob = await _sut.Reader.ReadAsync(CancellationToken.None);
+        bool writeResult = _sut.Writer.TryWrite(scanId);
+        MediaLibraryScanCompositeId readScanId = await _sut.Reader.ReadAsync(CancellationToken.None);
 
         // Assert
         Assert.True(writeResult);
-        Assert.Same(job, readJob);
+        Assert.Equal(scanId, readScanId);
     }
 
     [Fact]
-    public async Task Writer_WhenMultipleJobsAreWritten_ShouldReadThemInFifoOrder()
+    public async Task Writer_WhenMultipleScansAreWritten_ShouldReadThemInFifoOrder()
     {
         // Arrange
-        IMediaLibraryScanJob firstJob = Substitute.For<IMediaLibraryScanJob>();
-        IMediaLibraryScanJob secondJob = Substitute.For<IMediaLibraryScanJob>();
+        MediaLibraryScanCompositeId firstScanId = _mediaLibraryScanCompositeIdFixture.Create();
+        MediaLibraryScanCompositeId secondScanId = _mediaLibraryScanCompositeIdFixture.Create();
+        MediaLibraryScanCompositeId thirdScanId = _mediaLibraryScanCompositeIdFixture.Create();
 
         // Act
-        _sut.Writer.TryWrite(firstJob);
-        _sut.Writer.TryWrite(secondJob);
-        IMediaLibraryScanJob firstReadJob = await _sut.Reader.ReadAsync(CancellationToken.None);
-        IMediaLibraryScanJob secondReadJob = await _sut.Reader.ReadAsync(CancellationToken.None);
+        _sut.Writer.TryWrite(firstScanId);
+        _sut.Writer.TryWrite(secondScanId);
+        _sut.Writer.TryWrite(thirdScanId);
+        MediaLibraryScanCompositeId firstReadScanId = await _sut.Reader.ReadAsync(CancellationToken.None);
+        MediaLibraryScanCompositeId secondReadScanId = await _sut.Reader.ReadAsync(CancellationToken.None);
+        MediaLibraryScanCompositeId thirdReadScanId = await _sut.Reader.ReadAsync(CancellationToken.None);
 
         // Assert
-        Assert.Same(firstJob, firstReadJob);
-        Assert.Same(secondJob, secondReadJob);
+        // The scan processor relies on the queue order: scans must run in the order in which they were queued.
+        Assert.Equal(firstScanId, firstReadScanId);
+        Assert.Equal(secondScanId, secondReadScanId);
+        Assert.Equal(thirdScanId, thirdReadScanId);
+    }
+
+    [Fact]
+    public async Task Reader_WhenQueueIsEmpty_ShouldNotCompleteUntilAScanIsWritten()
+    {
+        // Arrange
+        MediaLibraryScanCompositeId scanId = _mediaLibraryScanCompositeIdFixture.Create();
+
+        // Act
+        Task<MediaLibraryScanCompositeId> readTask = _sut.Reader.ReadAsync(CancellationToken.None).AsTask();
+        _sut.Writer.TryWrite(scanId);
+
+        // Assert
+        MediaLibraryScanCompositeId readScanId = await readTask;
+        Assert.Equal(scanId, readScanId);
     }
 }

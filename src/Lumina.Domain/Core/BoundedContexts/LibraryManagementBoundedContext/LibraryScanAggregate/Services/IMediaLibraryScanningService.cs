@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,13 +14,16 @@ namespace Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Lib
 public interface IMediaLibraryScanningService
 {
     /// <summary>
-    /// Starts <paramref name="scan"/>.
+    /// Starts <paramref name="scan"/> and prepares its job graph.
     /// </summary>
     /// <param name="scan">The media library scan to start.</param>
     /// <param name="libraryType">The type of the media library to be scanned.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
-    Task<Result<Success>> StartScanAsync(LibraryScan scan, LibraryType libraryType, CancellationToken cancellationToken);
+    /// <returns>
+    /// An <see cref="Result{TValue}"/> containing either the file system discovery job, which is the only top level job of the
+    /// media library scan job graph and whose execution completes the entire scan, or an error.
+    /// </returns>
+    Task<Result<IMediaLibraryScanDiscoveryJob>> StartScanAsync(LibraryScan scan, LibraryType libraryType, CancellationToken cancellationToken);
 
     /// <summary>
     /// Cancels <paramref name="scan"/>.

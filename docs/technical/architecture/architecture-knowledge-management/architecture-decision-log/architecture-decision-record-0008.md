@@ -17,10 +17,6 @@ Define the `IScanJobRegistry` interface, which maps a hook name to the plugin jo
 
 The payload passing between jobs keeps the generic `ExecuteAsync<TInput>` contract. The core scan jobs are database-centric and ignore the payload, because they exchange the scan state through the staging and snapshot tables ([ADR-0004](architecture-decision-record-0004.md), [ADR-0005](architecture-decision-record-0005.md)). Payload passing remains available for plugin jobs that need to exchange data in memory, and the runtime type switching that was used in the previous `HashComparerJob` is eliminated.
 
-## Amendments
-
-- **2026-10-09**: Superseded by [ADR-0015](architecture-decision-record-0015.md). The `ScanJobHooks` hook points and the `IScanJobRegistry` / `ScanJobRegistry` were removed, and plugins now contribute capability providers (`IMetadataProvider`, `IArtworkProvider`, `IBookReader`) instead of scan jobs. This ADR is marked superseded rather than amended because its decision is replaced in full by [ADR-0015](architecture-decision-record-0015.md); [ADR-0001](architecture-decision-record-0001.md), [ADR-0003](architecture-decision-record-0003.md) and [ADR-0010](architecture-decision-record-0010.md) stay accepted because only part of their decisions changed.
-
 ## Consequences
 
 > The rows struck through reflect the superseded hook point and scan job registry model. They no longer hold, see [ADR-0015](architecture-decision-record-0015.md).
@@ -51,3 +47,7 @@ Allow plugins to attach anywhere in the graph without restriction.
 Rework the jobs into a generic pipeline engine where edges carry strongly typed channels.
 
 **Rejected**: The database-centric jobs exchange state through the database, so a full in-memory typed dataflow engine would add complexity without benefit. The generic payload contract is retained for the plugin jobs that need it.
+
+## Amendment: Superseded by Plugin Capability Providers (2026-10-09)
+
+Superseded by [ADR-0015](architecture-decision-record-0015.md). The `ScanJobHooks` hook points and the `IScanJobRegistry` / `ScanJobRegistry` were removed, and plugins now contribute capability providers (`IMetadataProvider`, `IArtworkProvider`, `IBookReader`) instead of scan jobs. This ADR is marked superseded rather than amended because its decision is replaced in full by [ADR-0015](architecture-decision-record-0015.md); [ADR-0001](architecture-decision-record-0001.md), [ADR-0003](architecture-decision-record-0003.md) and [ADR-0010](architecture-decision-record-0010.md) stay accepted because only part of their decisions changed.

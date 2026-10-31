@@ -1,7 +1,6 @@
 # Architecture Decision Record (ADR): 0013 - Replace Mediator Domain Event Publishing with a Custom Implementation
 
 ## Status
-
 **Accepted** (2026-08-13)
 
 ## Context
@@ -53,8 +52,7 @@ The existing assembly scan that registers `ICommandHandler<>`, `IQueryHandler<>`
 | Consistency | Domain event handlers join the same explicit registration scan as the CQRS handlers |
 | Single event contract | `IDomainEvent` remains the sole contract until a real cross-bounded-context consumer exists |
 
-### Risks and Mitigations
-
+### Risks and Tradeoffs
 | Risk | Mitigation Strategy |
 |---|---|
 | Handler resolution failures surface at runtime | Existing integration test suite exercises the DI container on startup |

@@ -41,7 +41,7 @@ public class CancelLibrariesScanEndpoint : BaseEndpoint<EmptyRequest, IResult>
     }
 
     /// <summary>
-    /// Cancels the running scans of all the media libraries.
+    /// Cancels the running and queued scans of all the media libraries.
     /// </summary>
     /// <param name="request">The request object.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>

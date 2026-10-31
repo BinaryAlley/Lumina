@@ -1,7 +1,6 @@
 # Architecture Decision Record (ADR): 0016 - Playback Delivery Decision and Player Capability Negotiation
 
 ## Status
-
 **Accepted** (2026-10-14)
 
 ## Context
@@ -70,8 +69,7 @@ The segments are exposed through a dedicated segment route, `.../stream/deliveri
 | Seekability | Time addressed segments make a normalized delivery seekable without a byte to time index |
 | Testability | The decision is a pure function of the stored container and codec and the advertised capabilities |
 
-### Risks and Mitigations
-
+### Risks and Tradeoffs
 | Risk | Mitigation Strategy |
 |---|---|
 | The probe reports a codec as a free form description that does not name the codec the player advertises | The stored description is canonicalized to the advertised codec names before comparison, and the MPEG layer is matched by its layer number, so a description that names no decodable codec is left unmatched and forces a transcode |

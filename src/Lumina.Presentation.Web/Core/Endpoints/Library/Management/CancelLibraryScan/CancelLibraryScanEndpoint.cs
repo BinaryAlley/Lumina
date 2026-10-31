@@ -42,7 +42,7 @@ public class CancelLibraryScanEndpoint : BaseEndpoint<CancelLibraryScanRequest, 
     }
 
     /// <summary>
-    /// Cancels a running scan of a media library.
+    /// Cancels a running or queued scan of a media library.
     /// </summary>
     /// <param name="request">The request containing the Ids of the media library and of the scan to cancel.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>

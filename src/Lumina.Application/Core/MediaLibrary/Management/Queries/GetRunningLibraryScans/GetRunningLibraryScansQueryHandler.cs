@@ -65,33 +65,33 @@ public class GetRunningLibraryScansQueryHandler : IQueryHandler<GetRunningLibrar
             return Errors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // Get the ongoing library scans from the repository.
-        Result<IEnumerable<LibraryScanEntity>> getRunningScansResult = await _unitOfWork.LibraryScanRepository.GetRunningScansAsync(cancellationToken).ConfigureAwait(false);
-        if (getRunningScansResult.IsFailure)
-            return getRunningScansResult.Errors;
+        // Get the library scans that are executing or still waiting in the scan queue, from the repository.
+        Result<IEnumerable<LibraryScanEntity>> getActiveScansResult = await _unitOfWork.LibraryScanRepository.GetActiveScansAsync(cancellationToken).ConfigureAwait(false);
+        if (getActiveScansResult.IsFailure)
+            return getActiveScansResult.Errors;
 
         // Filter the library scans by what the user is allowed to see: admins see all libraries, regular users only their own.
-        LibraryScanEntity[] userRunningRepositoryLibraryScans = [];
+        LibraryScanEntity[] userActiveRepositoryLibraryScans = [];
         if (await _authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false))
-            userRunningRepositoryLibraryScans = [.. getRunningScansResult.Value];
+            userActiveRepositoryLibraryScans = [.. getActiveScansResult.Value];
         else
-            userRunningRepositoryLibraryScans = [.. getRunningScansResult.Value.Where(libraryScan => libraryScan.UserId == userId)];
+            userActiveRepositoryLibraryScans = [.. getActiveScansResult.Value.Where(libraryScan => libraryScan.UserId == userId)];
 
         // For each of the filtered library scans, get their progress.
         List<MediaLibraryScanProgressResponse> libraryScanProgresses = [];
-        IEnumerable<Result<LibraryScan>> userRunningDomainLibraryScans = userRunningRepositoryLibraryScans.ToDomainEntities();
-        foreach (Result<LibraryScan> userRunningDomainLibraryScan in userRunningDomainLibraryScans)
+        IEnumerable<Result<LibraryScan>> userActiveDomainLibraryScans = userActiveRepositoryLibraryScans.ToDomainEntities();
+        foreach (Result<LibraryScan> userActiveDomainLibraryScan in userActiveDomainLibraryScans)
         {
-            if (userRunningDomainLibraryScan.IsFailure)
-                return userRunningDomainLibraryScan.Errors;
-            else
-            {
-                Result<MediaLibraryScanProgress> getLibraryScanProgressResult = _mediaLibrariesScanProgressTracker.GetScanProgress(
-                    MediaLibraryScanCompositeId.Create(userRunningDomainLibraryScan.Value.Id, userRunningDomainLibraryScan.Value.UserId));
-                if (getLibraryScanProgressResult.IsFailure)
-                    return getLibraryScanProgressResult.Errors;
-                libraryScanProgresses.Add(getLibraryScanProgressResult.Value.ToResponse());
-            }
+            if (userActiveDomainLibraryScan.IsFailure)
+                return userActiveDomainLibraryScan.Errors;
+
+            Result<MediaLibraryScanProgress> getLibraryScanProgressResult = _mediaLibrariesScanProgressTracker.GetScanProgress(
+                MediaLibraryScanCompositeId.Create(userActiveDomainLibraryScan.Value.Id, userActiveDomainLibraryScan.Value.UserId));
+            // A scan whose progress was already released has ended, so it is not reported as active any more.
+            if (getLibraryScanProgressResult.IsFailure)
+                continue;
+
+            libraryScanProgresses.Add(getLibraryScanProgressResult.Value.ToResponse());
         }
 
         return Result.From(libraryScanProgresses.AsEnumerable());

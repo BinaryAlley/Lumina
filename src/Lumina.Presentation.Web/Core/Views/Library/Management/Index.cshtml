@@ -168,7 +168,8 @@
         const jsLocalizedLibraryScanStatuses = {
             Completed: '@_localizer["Completed"]',
             Failed: '@_localizer["Failed"]',
-            Canceled: '@_localizer["Canceled"]'
+            Canceled: '@_localizer["Canceled"]',
+            Cancelling: '@_localizer["Cancelling"]'
         };
         const jsLocalizedLibraryScanJobsStatuses = {
             DiscoveringFiles: '@_localizer["DiscoveringFiles"]',
@@ -178,7 +179,8 @@
             SavingScanData: '@_localizer["SavingScanData"]',
             InvalidatingStaleEnrichment: '@_localizer["InvalidatingStaleEnrichment"]',
             EnrichingMetadata: '@_localizer["EnrichingMetadata"]',
-            ResolvingArtwork: '@_localizer["ResolvingArtwork"]'
+            ResolvingArtwork: '@_localizer["ResolvingArtwork"]',
+            Queued: '@_localizer["Queued"]'
         };
         const jsLocalizedLibraryTypes = {
             Book: '@_localizer["Book"]',
@@ -307,12 +309,17 @@
 
                         row.setAttribute('data-scan-id', scan.scanId);
 
-                        statusSpan.textContent = jsLocalizedLibraryScanJobsStatuses[scan.currentJobProgress.currentOperation];
+                        // A queued scan has no progress to show yet, so only its waiting state is displayed.
+                        const currentOperation = scan.currentJobProgress.currentOperation;
+                        const isQueued = currentOperation === 'Queued';
+                        statusSpan.textContent = jsLocalizedLibraryScanJobsStatuses[currentOperation] ?? currentOperation;
                         statusSpan.classList.remove('hidden');
 
-                        scanProgress.classList.remove('hidden');
-                        totalProgressDiv.style.width = `${scan.overallProgressPercentage}%`;
-                        jobProgressDiv.style.width = `${scan.currentJobProgress.progressPercentage}%`;
+                        scanProgress.classList.toggle('hidden', isQueued);
+                        if (!isQueued) {
+                            totalProgressDiv.style.width = `${scan.overallProgressPercentage}%`;
+                            jobProgressDiv.style.width = `${scan.currentJobProgress.progressPercentage}%`;
+                        }
 
                         scanIcon.classList.add('hidden');
                         cancelScanIcon.classList.remove('hidden');
@@ -369,6 +376,12 @@
                         scanIcon.classList.add('hidden');
                         cancelScanIcon.classList.remove('hidden');
 
+                        // The scan is queued until its turn comes, so it has no progress to show yet.
+                        const statusSpan = row.querySelector('.scan-job-status');
+                        statusSpan.textContent = jsLocalizedLibraryScanJobsStatuses['Queued'];
+                        statusSpan.classList.remove('hidden');
+                        row.querySelector('.scan-progress').classList.add('hidden');
+
                         const scanId = scan.scanId;
                         await signalRConnection.invoke('SubscribeToScan', scanId);
                     }
@@ -401,6 +414,12 @@
                     scanIcon.classList.add('hidden');
                     cancelScanIcon.classList.remove('hidden');
 
+                    // The scan is queued until its turn comes, so it has no progress to show yet.
+                    const statusSpan = row.querySelector('.scan-job-status');
+                    statusSpan.textContent = jsLocalizedLibraryScanJobsStatuses['Queued'];
+                    statusSpan.classList.remove('hidden');
+                    row.querySelector('.scan-progress').classList.add('hidden');
+
                     const scanId = success.scanId;
                     await signalRConnection.invoke('SubscribeToScan', scanId);
                 }
@@ -410,29 +429,20 @@
         // On cancel all libraries scan button click.
         const handleCancelLibrariesScanClick = async function(e) {
             await callApiPostAsync('@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.CANCEL_LIBRARIES_SCAN)', {});
-            btnCancelLibrariesScan.style.display = 'none';
-            btnScanAllLibraries.style.display = 'block';
 
-            // Toggle icons for all active scan rows.
+            // The cancellations are only applied once the server confirms each one, so the cancel button stays hidden meanwhile.
+            btnCancelLibrariesScan.style.display = 'none';
+
+            // Ask all active scan rows to show that their cancellation is in progress.
             const rows = document.querySelectorAll('tr[data-scan-id]');
 
             rows.forEach(row => {
-                // Remove the scan Id, its no longer being scanned.
-                row.removeAttribute('data-scan-id');
-
                 const statusSpan = row.querySelector('.scan-job-status');
-                statusSpan.textContent = `${jsLocalizedLibraryScanStatuses['Canceled']}.`;
-                const scanProgress = row.querySelector('.scan-progress');
-                scanProgress.classList.add('hidden');
-
-                // Show scan status icon.
-                const completedIdon = row.querySelector('img[src*="yellow.png"]');
-                completedIdon.classList.remove('hidden');
+                statusSpan.textContent = `${jsLocalizedLibraryScanStatuses['Cancelling']}.`;
+                statusSpan.classList.remove('hidden');
 
                 // Toggle scan action icons.
-                const scanIcon = row.querySelector('img[src*="trigger.svg"]');
                 const cancelScanIcon = row.querySelector('img[src*="stop.svg"]');
-                scanIcon.classList.remove('hidden');
                 cancelScanIcon.classList.add('hidden');
             });
         };
@@ -441,6 +451,7 @@
         const handleCancelLibraryScanClick = async function(e) {
             if (e.target.matches('img[src*="stop.svg"]')) {
                 const row = e.target.closest('tr');
+                const scanId = row.getAttribute('data-scan-id');
 
                 const url = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.CANCEL_LIBRARY_SCAN, new { libraryId = default(Guid), scanId = default(Guid) })';
 
@@ -460,29 +471,18 @@
                 ).join('/');
 
                 await callApiPostAsync(finalUrl);
-                
-                // Remove the scan Id, its no longer being scanned.
-                row.removeAttribute('data-scan-id');
 
-                const statusSpan = row.querySelector('.scan-job-status');
-                statusSpan.textContent = `${jsLocalizedLibraryScanStatuses['Canceled']}.`;
-                const scanProgress = row.querySelector('.scan-progress');
-                scanProgress.classList.add('hidden');
+                // The cancellation is only applied once the server confirms it, so the scan keeps its Id and is shown as being cancelled meanwhile.
+                // The server might have confirmed it already, in which case the row no longer carries the Id and is left as it is.
+                if (row.getAttribute('data-scan-id') === scanId) {
+                    const statusSpan = row.querySelector('.scan-job-status');
+                    statusSpan.textContent = `${jsLocalizedLibraryScanStatuses['Cancelling']}.`;
+                    statusSpan.classList.remove('hidden');
 
-                // Show scan status icon.
-                const completedIdon = row.querySelector('img[src*="yellow.png"]');
-                completedIdon.classList.remove('hidden');
-
-                // Toggle scan action icons.
-                const scanIcon = row.querySelector('img[src*="trigger.svg"]');
-                const cancelScanIcon = row.querySelector('img[src*="stop.svg"]');
-                scanIcon.classList.remove('hidden');
-                cancelScanIcon.classList.add('hidden');
-
-                // Toggle scan action buttons.
-                const hasActiveScans = document.querySelectorAll('tr[data-scan-id]').length > 0;
-                btnCancelLibrariesScan.style.display = hasActiveScans ? 'block' : 'none';
-                btnScanAllLibraries.style.display = hasActiveScans ? 'none' : 'block';
+                    // Toggle scan action icons.
+                    const cancelScanIcon = row.querySelector('img[src*="stop.svg"]');
+                    cancelScanIcon.classList.add('hidden');
+                }
             }
         };
 
@@ -502,17 +502,21 @@
                 const rows = document.querySelectorAll(`tr[data-scan-id="${progress.scanId}"]`);
                 rows.forEach(row => {
                     // Update status text.
+                    const currentOperation = progress.currentJobProgress.currentOperation;
+                    const isQueued = currentOperation === 'Queued';
                     const statusSpan = row.querySelector('.scan-job-status');
-                    statusSpan.textContent = jsLocalizedLibraryScanJobsStatuses[progress.currentJobProgress.currentOperation];
+                    statusSpan.textContent = jsLocalizedLibraryScanJobsStatuses[currentOperation] ?? currentOperation;
                     statusSpan.classList.remove('hidden');
 
-                    // Update progress bars.
+                    // Update progress bars. A queued scan has no progress to show yet.
                     const scanProgress = row.querySelector('.scan-progress');
                     const totalProgressDiv = row.querySelector('.scan-progress-total > div');
                     const jobProgressDiv = row.querySelector('.scan-progress-job > div');
-                    scanProgress.classList.remove('hidden');
-                    totalProgressDiv.style.width = `${progress.overallProgressPercentage}%`;
-                    jobProgressDiv.style.width = `${progress.currentJobProgress.progressPercentage}%`;
+                    scanProgress.classList.toggle('hidden', isQueued);
+                    if (!isQueued) {
+                        totalProgressDiv.style.width = `${progress.overallProgressPercentage}%`;
+                        jobProgressDiv.style.width = `${progress.currentJobProgress.progressPercentage}%`;
+                    }
 
                     // Toggle scan action icons.
                     const scanIcon = row.querySelector('img[src*="trigger.svg"]');
@@ -576,10 +580,38 @@
                 btnScanAllLibraries.style.display = hasActiveScans ? 'none' : 'block';
             };
 
+            // Scan cancellation handler.
+            const cancelledHandler = (progress) => {
+                const rows = document.querySelectorAll(`tr[data-scan-id="${progress.scanId}"]`);
+                rows.forEach(row => {
+                    // Remove the scan Id, its no longer being scanned.
+                    row.removeAttribute('data-scan-id');
+
+                    const statusSpan = row.querySelector('.scan-job-status');
+                    statusSpan.textContent = `${jsLocalizedLibraryScanStatuses[progress.status]}.`;
+                    const scanProgress = row.querySelector('.scan-progress');
+                    scanProgress.classList.add('hidden');
+
+                    // Show scan status icon.
+                    const canceledIdon = row.querySelector('img[src*="yellow.png"]');
+                    canceledIdon.classList.remove('hidden');
+
+                    // Toggle scan action icons.
+                    const scanIcon = row.querySelector('img[src*="trigger.svg"]');
+                    const cancelScanIcon = row.querySelector('img[src*="stop.svg"]');
+                    scanIcon.classList.remove('hidden');
+                    cancelScanIcon.classList.add('hidden');
+                });
+                const hasActiveScans = document.querySelectorAll('tr[data-scan-id]').length > 0;
+                btnCancelLibrariesScan.style.display = hasActiveScans ? 'block' : 'none';
+                btnScanAllLibraries.style.display = hasActiveScans ? 'none' : 'block';
+            };
+
             // Subscribe to events.
             signalRConnection.on("libraryScanProgressUpdateEvent", progressHandler);
             signalRConnection.on("libraryScanFinishedEvent", completionHandler);
             signalRConnection.on("libraryScanFailedEvent", failureHandler);
+            signalRConnection.on("libraryScanCancelledEvent", cancelledHandler);
             signalRConnection.onclose(onClose);
             signalRConnection.onreconnecting(onReconnecting);
             signalRConnection.onreconnected(onReconnected);
@@ -588,6 +620,7 @@
                 signalRConnection.off("libraryScanProgressUpdateEvent", progressHandler);
                 signalRConnection.off("libraryScanFinishedEvent", completionHandler);
                 signalRConnection.off("libraryScanFailedEvent", failureHandler);
+                signalRConnection.off("libraryScanCancelledEvent", cancelledHandler);
                 signalRConnection.off("close", onClose);
                 signalRConnection.off("reconnecting", onReconnecting);
                 signalRConnection.off("reconnected", onReconnected);

@@ -83,16 +83,17 @@ internal sealed class LibraryScanRepository : ILibraryScanRepository
     }
 
     /// <summary>
-    /// Gets the media library scans that have a <see cref="LibraryScanJobStatus.Running"/> status, from the storage medium.
+    /// Gets the media library scans that have a <see cref="LibraryScanJobStatus.Pending"/> or a
+    /// <see cref="LibraryScanJobStatus.Running"/> status, from the storage medium.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="LibraryScanEntity"/>, or an error.</returns>
-    public async Task<Result<IEnumerable<LibraryScanEntity>>> GetRunningScansAsync(CancellationToken cancellationToken)
+    public async Task<Result<IEnumerable<LibraryScanEntity>>> GetActiveScansAsync(CancellationToken cancellationToken)
     {
         return await _luminaDbContext.LibraryScans
             .Include(library => library.Library)
             .AsSplitQuery()
-            .Where(library => library.Status == LibraryScanJobStatus.Running)
+            .Where(library => library.Status == LibraryScanJobStatus.Pending || library.Status == LibraryScanJobStatus.Running)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
     }
 

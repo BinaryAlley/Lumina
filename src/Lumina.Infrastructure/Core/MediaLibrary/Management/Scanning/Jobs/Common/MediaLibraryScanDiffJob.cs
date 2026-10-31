@@ -45,47 +45,43 @@ internal sealed class MediaLibraryScanDiffJob : MediaLibraryScanJob, IMediaLibra
     {
         try
         {
-            // increment the number of parents that finished their execution and called this job (beware race conditions, jobs run in parallel)
+            cancellationToken.ThrowIfCancellationRequested();
+            // Increment the number of parents that finished their execution and called this job (beware race conditions, jobs run in parallel).
             int parentsCompleted = Interlocked.Increment(ref parentsPayloadsExecuted);
-            // only execute this job's payload when it has no parents, or when all the parents finished their execution
+            // Only execute this job's payload when it has no parents, or when all the parents finished their execution.
             if (Parents.Count == 0 || parentsCompleted == Parents.Count)
             {
-                // this needs to be wrapped in a task because even though this job is processed in a "fire and forget" async manner, it still does synchronous
-                // processing that takes time, and would block the processing of scan jobs in the in-memory queue
-                await Task.Run(async () =>
-                {
-                    Status = LibraryScanJobStatus.Running;
-                    // see docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details:
-                    await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
-                    IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
-                    IDomainEventPublisher domainEventPublisher = asyncServiceScope.ServiceProvider.GetService<IDomainEventPublisher>()!;
+                Status = LibraryScanJobStatus.Running;
+                // See docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details:
+                await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
+                IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
+                IDomainEventPublisher domainEventPublisher = asyncServiceScope.ServiceProvider.GetService<IDomainEventPublisher>()!;
 
 
-                    MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
+                MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
 
-                    // set the initial progress of the scan job, it's a 1 step job - comparing the discovered files against the media library scan snapshot
-                    Result<Success> publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 0, 1, cancellationToken).ConfigureAwait(false);
-                    if (publishJobProgressResult.IsFailure)
-                        throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
+                // Set the initial progress of the scan job, it's a 1 step job - comparing the discovered files against the media library scan snapshot.
+                Result<Success> publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 0, 1, cancellationToken).ConfigureAwait(false);
+                if (publishJobProgressResult.IsFailure)
+                    throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
 
-                    // mark the staging results against the media library scan snapshot of the previous scan
-                    Result<Updated> markChangesResult = await unitOfWork.LibraryScanStagingResultsRepository.MarkChangesAgainstSnapshotAsync(ScanId.Value, LibraryId.Value, cancellationToken).ConfigureAwait(false);
-                    if (markChangesResult.IsFailure)
-                        throw new InvalidOperationException(markChangesResult.FirstError.Description);
+                // Mark the staging results against the media library scan snapshot of the previous scan.
+                Result<Updated> markChangesResult = await unitOfWork.LibraryScanStagingResultsRepository.MarkChangesAgainstSnapshotAsync(ScanId.Value, LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                if (markChangesResult.IsFailure)
+                    throw new InvalidOperationException(markChangesResult.FirstError.Description);
 
-                    // increment the number of processed elements progress
-                    publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 1, 1, cancellationToken).ConfigureAwait(false);
-                    if (publishJobProgressResult.IsFailure)
-                        throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
+                // Increment the number of processed elements progress.
+                publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 1, 1, cancellationToken).ConfigureAwait(false);
+                if (publishJobProgressResult.IsFailure)
+                    throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
 
-                    // this job finished, increment the number of processed jobs progress
-                    await domainEventPublisher.PublishAsync(new LibraryScanProgressChangedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
-                    Status = LibraryScanJobStatus.Completed;
+                // This job finished, increment the number of processed jobs progress.
+                await domainEventPublisher.PublishAsync(new LibraryScanProgressChangedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                Status = LibraryScanJobStatus.Completed;
 
-                    // call each linked child with the obtained payload
-                    foreach (IMediaLibraryScanJob child in Children)
-                        await child.ExecuteAsync(id, input, cancellationToken).ConfigureAwait(false);
-                }, cancellationToken).ConfigureAwait(false);
+                // Call each linked child with the obtained payload.
+                foreach (IMediaLibraryScanJob child in Children)
+                    await child.ExecuteAsync(id, input, cancellationToken).ConfigureAwait(false);
             }
         }
         catch (OperationCanceledException)

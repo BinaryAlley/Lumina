@@ -18,9 +18,9 @@ namespace Lumina.Infrastructure.Core.Security;
 /// </summary>
 internal class FileHashService : IFileHashService
 {
-    private const int SAMPLE_COUNT = 6; // number of sample points for hash computation
-    private const ushort DEFAULT_BUFFER_SIZE = 65535; // buffer size (64KB - 1) for reading file chunks
-    private static readonly ThreadLocal<XxHash64> s_threadLocalHasher = new(() => new XxHash64()); // thread-local hasher to avoid contention and pool management overhead during parallel processing
+    private const int SAMPLE_COUNT = 6; // Number of sample points for hash computation.
+    private const ushort DEFAULT_BUFFER_SIZE = 65535; // Buffer size (64KB - 1) for reading file chunks.
+    private static readonly ThreadLocal<XxHash64> s_threadLocalHasher = new(() => new XxHash64()); // Thread-local hasher to avoid contention and pool management overhead during parallel processing.
     private static readonly ulong s_emptyFileHash = ComputeEmptyHash();
 
     /// <summary>
@@ -37,10 +37,11 @@ internal class FileHashService : IFileHashService
         object listLock = new();
 
         // Solid state drives benefit from reading multiple files at once, while mechanical hard drives are faster with sequential reads because of their seek time.
+        // One logical processor is deliberately left out of the scan, so that the rest of the process, the web server included, keeps a processor available to it.
         ParallelOptions parallelOptions = new()
         {
             CancellationToken = cancellationToken,
-            MaxDegreeOfParallelism = shouldParallelizeReads ? Environment.ProcessorCount : 1
+            MaxDegreeOfParallelism = shouldParallelizeReads ? Math.Max(1, Environment.ProcessorCount - 1) : 1
         };
         await Parallel.ForEachAsync(inputFiles, parallelOptions, async (file, cancellationToken) =>
         {

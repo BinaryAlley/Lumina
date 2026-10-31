@@ -141,6 +141,9 @@
   <data name="CancelScan" xml:space="preserve">
     <value>Cancel Scan</value>
   </data>
+  <data name="Cancelling" xml:space="preserve">
+    <value>Cancelling</value>
+  </data>
   <data name="ComicBook" xml:space="preserve">
     <value>Comic Book</value>
   </data>
@@ -248,6 +251,9 @@
   </data>
   <data name="RadioShow" xml:space="preserve">
     <value>Radio Show</value>
+  </data>
+  <data name="Queued" xml:space="preserve">
+    <value>Queued</value>
   </data>
   <data name="Remix" xml:space="preserve">
     <value>Remix</value>

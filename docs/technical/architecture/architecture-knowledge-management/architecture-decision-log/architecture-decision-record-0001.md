@@ -36,9 +36,6 @@ internal sealed class FileSystemDiscoveryJob : MediaLibraryScanJob, IFileSystemD
     }
 }
 ```
-## Amendments
-
-- **2026-10-09**: The generic `FileSystemDiscoveryJob` / `IFileSystemDiscoveryJob` was split into per-type discovery jobs (`BooksFileSystemDiscoveryJob`, `MusicFileSystemDiscoveryJob`), and the job execution contract is now `ExecuteAsync<TInput>(Guid id, TInput input, CancellationToken token)` on `IMediaLibraryScanJob`. The `IServiceScopeFactory` decision itself is unchanged.
 
 ## Consequences
 
@@ -105,3 +102,15 @@ services.AddDbContextFactory<LuminaDbContext>(options =>
 ```
 
 **Rejected**: Would require a dependency on EF Core in the Application layer, and even when using an abstraction, would completely defeat the purpose of using the Repository + Unit of Work patterns used everywhere else in the Application layer.
+
+## Amendment: Per-Type File System Discovery Jobs (2026-10-09)
+
+The generic `FileSystemDiscoveryJob` / `IFileSystemDiscoveryJob` was split into per-type discovery jobs (`BooksFileSystemDiscoveryJob`, `MusicFileSystemDiscoveryJob`), and the job execution contract is now `ExecuteAsync<TInput>(Guid id, TInput input, CancellationToken token)` on `IMediaLibraryScanJob`. The `IServiceScopeFactory` decision itself is unchanged.
+
+## Amendment: Serialized Media Library Scans (2026-10-31)
+
+The execution model described above changed in a way that directly affects how scoped services are obtained. Until this amendment, the unit placed on the in-memory queue was the root job of a scan job graph, and the processor launched each root job in a fire-and-forget manner. Scanning several media libraries at once, which is the normal outcome of a "scan all libraries" action or of a scheduled run, therefore started one complete job chain per library at the same time. Each chain fans out to `Environment.ProcessorCount` parallel file reads for file system discovery and content hashing, and every job performed its work on the same shared thread pool that the web server uses to handle requests, so above a certain number of libraries the thread pool was starved and the API could stop answering requests for as long as the scans were running. The queue therefore carries the media library scans themselves now, and `MediaLibraryScanProcessorJob` awaits a scan completely before it dequeues the next one.
+
+Waiting for a complete scan means the processor owns the execution for its whole duration, which can be hours. That is why the scope lifetime at this level matters, and why the processor does not keep a scope open around a scan: a unit of work and its `DbContext` resolved there would stay alive, and hold a database connection, for the entire scan. The processor uses one short lived scope to read the scan and a second short lived scope to prepare its job graph through `IMediaLibraryScanningService`, disposes both before the job graph starts, and executes the graph outside any scope. The jobs themselves keep creating their own scopes exactly as decided above, so the `IServiceScopeFactory` decision and the sample above are unchanged.
+
+The scan's job graph still has exactly one top level job, and the scanner contract now makes that structural: `IMediaTypeScanner.CreateScanJobsForLibrary` returns `IMediaLibraryScanDiscoveryJob`, implemented by the file system discovery jobs, instead of a collection of jobs. Because every job awaits its children, awaiting that discovery job is what tells the processor that the scan, and with it the execution it took over from the queue, is over. Without that invariant, the processor could move on to the next scan while work of the previous one was still running and its scopes were already disposed.

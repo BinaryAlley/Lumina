@@ -1,9 +1,9 @@
 # Architecture Decision Record (ADR): 0003 - Pragmatic `System.IO` Usage for File System Discovery in Library Scan Job
 
-## Status  
+## Status
 **Accepted** (2025-03-01)
 
-## Context  
+## Context
 The media library scanning subsystem requires:  
 1. **Performance at scale**: enumeration of files needs to run fast, because file discovery is the first job in the chain of media library scan jobs. If this is slow, the entire scan will be slow, no matter how optimized subsequent jobs are.
 2. **Domain model limitations**:  
@@ -13,7 +13,7 @@ The media library scanning subsystem requires:
    - Users potentially having tens of millions of files and hundreds of terrabytes of data, in some cases.
    - Limited value from domain semantics during raw discovery.
 
-## Decision  
+## Decision
 Use `System.IO` directly in `FileSystemDiscoveryJob` with:  
 
 ```csharp
@@ -25,33 +25,28 @@ private static List<FileInfo> GetFiles(...)
 }
 ```
 
-
-## Amendments
-
-- **2026-10-09**: The single generic `FileSystemDiscoveryJob` was split into per-type discovery jobs (`BooksFileSystemDiscoveryJob`, `MusicFileSystemDiscoveryJob`). The `System.IO` guidance of this ADR applies to the books discovery job, which still traverses the file system directly. The music discovery job uses the domain file system provider services (`IFileProviderService`, `IDirectoryProviderService`) instead.
-
 ## Consequences
 
-### Performance vs Purity Tradeoff  
+### Positive Outcomes
 | Metric               | Before (Domain) | After (System.IO) | Delta    |  
 |----------------------|-----------------|-------------------|----------|  
 | 100k File Enumeration| 65s             | 4s                | -94%     |
 
-### Risks and Mitigations  
+### Risks and Tradeoffs
 | Risk                          | Mitigation Strategy                                        |  
 |-------------------------------|------------------------------------------------------------|  
 | Hidden Platform Dependencies  | Regular integration tests on Linux/Windows                 |  
 | Loss of Domain Abstraction    | Strictly limit usage to library scan discovery phase only  |  
 
-## Alternatives Considered  
+## Alternatives Considered
 
-### 1. Optimized Domain Aggregate  
+### 1. Optimized Domain Aggregate
 
 Domain entities like `File` or `Directory` could be modified to bypass invariants checks in their initialization, leading to a noticeable latency drop.
 
 **Rejected**: Invariants checks are one of the most important domain aspects, and the performance gain was still insufficient for the target scale.
 
-### 2. Hybrid Approach  
+### 2. Hybrid Approach
 
 ```csharp
 if (fileCount > 10_000) 
@@ -84,7 +79,7 @@ static extern IntPtr OpenDir(string name);
 | Memory Leaks                  | Manual handle management required finalizers and safe handles                |
 | Testing Complexity            | Physical VM requirements for platform validation                             |
 
-### 5. Native C Library with Managed Interop
+### 4. Native C Library with Managed Interop
 
 ```c
 // file_discovery.c
@@ -114,3 +109,7 @@ void lin_enumerate(const char* path, void (callback)(const char))
 | Cross-Compilation Complexity  | Required CI pipeline support for Windows/macOS/Linux binaries |
 | ABI Breakage                  | High risk of crashes during .NET runtime updates              |
 | Debugging Difficulty          | Specialized tools (WinDbg/gdb) needed for crash analysis      |
+
+## Amendment: Per-Type File System Discovery Jobs (2026-10-09)
+
+The single generic `FileSystemDiscoveryJob` was split into per-type discovery jobs (`BooksFileSystemDiscoveryJob`, `MusicFileSystemDiscoveryJob`). The `System.IO` guidance of this ADR applies to the books discovery job, which still traverses the file system directly. The music discovery job uses the domain file system provider services (`IFileProviderService`, `IDirectoryProviderService`) instead.

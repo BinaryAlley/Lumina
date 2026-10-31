@@ -141,6 +141,9 @@
   <data name="CancelScan" xml:space="preserve">
     <value>取消扫描</value>
   </data>
+  <data name="Cancelling" xml:space="preserve">
+    <value>正在取消</value>
+  </data>
   <data name="ComicBook" xml:space="preserve">
     <value>漫画</value>
   </data>
@@ -248,6 +251,9 @@
   </data>
   <data name="RadioShow" xml:space="preserve">
     <value>广播节目</value>
+  </data>
+  <data name="Queued" xml:space="preserve">
+    <value>排队中</value>
   </data>
   <data name="Remix" xml:space="preserve">
     <value>混音版</value>

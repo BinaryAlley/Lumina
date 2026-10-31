@@ -1,15 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.DomainEvents;
-using Lumina.Application.Common.Mapping.MediaLibrary.Management;
-using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Events;
-using Lumina.Domain.Common.Exceptions;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Progress;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Queue;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -21,22 +16,24 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Events;
 /// </summary>
 public class LibraryScanQueuedDomainEventHandler : IDomainEventHandler<LibraryScanQueuedDomainEvent>
 {
-    private readonly IMediaLibraryScanningService _mediaLibraryScanningService;
-    private readonly IDomainEventsQueue _domainEventsQueue;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMediaLibrariesScanQueue _mediaLibrariesScanQueue;
+    private readonly IMediaLibrariesScanCancellationTracker _mediaLibrariesScanCancellationTracker;
+    private readonly IMediaLibrariesScanProgressTracker _mediaLibrariesScanProgressTracker;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LibraryScanQueuedDomainEventHandler"/> class.
     /// </summary>
-    /// <param name="mediaLibraryScanningService">Injected service for scanning media libraries.</param>
-    /// <param name="domainEventsQueue">Injected unit of work for interacting with the data access layer repositories.</param>
-    /// <param name="domainEventsQueue">Injected service for the queue of domain events.</param>
-    /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
-    public LibraryScanQueuedDomainEventHandler(IMediaLibraryScanningService mediaLibraryScanningService, IDomainEventsQueue domainEventsQueue, IUnitOfWork unitOfWork)
+    /// <param name="mediaLibrariesScanQueue">Injected queue used for processing the media library scans that are waiting to execute.</param>
+    /// <param name="mediaLibrariesScanCancellationTracker">Injected tracker used for canceling media library scans.</param>
+    /// <param name="mediaLibrariesScanProgressTracker">Injected tracker used for media library scans progress.</param>
+    public LibraryScanQueuedDomainEventHandler(
+        IMediaLibrariesScanQueue mediaLibrariesScanQueue,
+        IMediaLibrariesScanCancellationTracker mediaLibrariesScanCancellationTracker,
+        IMediaLibrariesScanProgressTracker mediaLibrariesScanProgressTracker)
     {
-        _mediaLibraryScanningService = mediaLibraryScanningService;
-        _domainEventsQueue = domainEventsQueue;
-        _unitOfWork = unitOfWork;
+        _mediaLibrariesScanQueue = mediaLibrariesScanQueue;
+        _mediaLibrariesScanCancellationTracker = mediaLibrariesScanCancellationTracker;
+        _mediaLibrariesScanProgressTracker = mediaLibrariesScanProgressTracker;
     }
 
     /// <summary>
@@ -46,26 +43,18 @@ public class LibraryScanQueuedDomainEventHandler : IDomainEventHandler<LibrarySc
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public async ValueTask HandleAsync(LibraryScanQueuedDomainEvent domainEvent, CancellationToken cancellationToken)
     {
-        // Get the library scan that was queued, from the repository.
-        Result<LibraryScanEntity?> getLibraryScanResult = await _unitOfWork.LibraryScanRepository.GetByIdAsync(domainEvent.ScanId.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
-        if (getLibraryScanResult.IsFailure)
-            throw new EventualConsistencyException(getLibraryScanResult.FirstError, getLibraryScanResult.Errors);
-        if (getLibraryScanResult.Value is null)
-            throw new EventualConsistencyException(Errors.LibraryScanning.LibraryScanNotFound);
+        MediaLibraryScanCompositeId compositeId = MediaLibraryScanCompositeId.Create(domainEvent.ScanId, domainEvent.UserId);
 
-        // Convert the repository entity to a domain entity.
-        Result<LibraryScan> libraryScanDomainResult = getLibraryScanResult.Value.ToDomainEntity();
-        if (libraryScanDomainResult.IsFailure)
-            throw new EventualConsistencyException(libraryScanDomainResult.FirstError, libraryScanDomainResult.Errors);
+        // Register the scan for cancellation before it is queued, so that a cancellation that arrives while the scan is still
+        // waiting for its turn is honored when the scan processor finally picks it up.
+        _mediaLibrariesScanCancellationTracker.RegisterScan(compositeId);
 
-        // Start the media library scan.
-        Result<Success> startScanResult = await _mediaLibraryScanningService.StartScanAsync(
-            libraryScanDomainResult.Value, getLibraryScanResult.Value.Library.LibraryType, cancellationToken).ConfigureAwait(false);
-        if (startScanResult.IsFailure)
-            throw new EventualConsistencyException(startScanResult.FirstError, startScanResult.Errors);
+        // Report the scan as queued, so clients can show it while it waits for the scans ahead of it to finish.
+        // This is only a display concern, so it must never prevent the scan from being queued.
+        _ = _mediaLibrariesScanProgressTracker.InitializeQueuedScanProgress(domainEvent.LibraryId, compositeId);
 
-        // Queue any domain events.
-        foreach (IDomainEvent queuedDomainEvent in libraryScanDomainResult.Value.GetDomainEvents())
-            _domainEventsQueue.Enqueue(queuedDomainEvent);
+        // Only the scan itself is queued, not its jobs. The scan processor prepares and executes the jobs of one scan at a time,
+        // so the scans run consecutively, in the order in which they were queued.
+        await _mediaLibrariesScanQueue.Writer.WriteAsync(compositeId, cancellationToken).ConfigureAwait(false);
     }
 }

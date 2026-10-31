@@ -69,10 +69,8 @@ public class MediaLibraryScanProgressTests
         Assert.False(result.Value.CurrentJobProgress.HasValue);
     }
 
-    [Theory]
-    [InlineData(0)] // total jobs must be positive
-    [InlineData(-1)] // total jobs must be positive
-    public void Create_WhenTotalJobsIsNotPositive_ShouldReturnError(int totalJobs)
+    [Fact]
+    public void Create_WhenTotalJobsIsZeroAndStatusIsPending_ShouldCreateQueuedProgress()
     {
         // Act
         Result<MediaLibraryScanProgress> result = MediaLibraryScanProgress.Create(
@@ -80,8 +78,50 @@ public class MediaLibraryScanProgressTests
             _userIdFixture.Create(),
             _libraryIdFixture.Create(),
             completedJobs: 0,
-            totalJobs: totalJobs,
+            totalJobs: 0,
             LibraryScanJobStatus.Pending,
+            Optional<MediaLibraryScanJobProgress>.None());
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(0, result.Value.TotalJobs);
+        Assert.Equal(LibraryScanJobStatus.Pending, result.Value.Status);
+        Assert.Equal(0, result.Value.OverallProgressPercentage);
+    }
+
+    [Fact]
+    public void Create_WhenTotalJobsIsNegative_ShouldReturnError()
+    {
+        // Act
+        Result<MediaLibraryScanProgress> result = MediaLibraryScanProgress.Create(
+            _scanIdFixture.Create(),
+            _userIdFixture.Create(),
+            _libraryIdFixture.Create(),
+            completedJobs: 0,
+            totalJobs: -1,
+            LibraryScanJobStatus.Pending,
+            Optional<MediaLibraryScanJobProgress>.None());
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.LibraryScanning.TotalScanJobsCountMustBePositive, result.FirstError);
+    }
+
+    [Theory]
+    [InlineData(LibraryScanJobStatus.Running)] // Only a scan that is still queued may have no jobs yet.
+    [InlineData(LibraryScanJobStatus.Completed)] // A completed scan must have had at least one job.
+    [InlineData(LibraryScanJobStatus.Canceled)] // A canceled scan must have had at least one job.
+    [InlineData(LibraryScanJobStatus.Failed)] // A failed scan must have had at least one job.
+    public void Create_WhenTotalJobsIsZeroAndStatusIsNotPending_ShouldReturnError(LibraryScanJobStatus status)
+    {
+        // Act
+        Result<MediaLibraryScanProgress> result = MediaLibraryScanProgress.Create(
+            _scanIdFixture.Create(),
+            _userIdFixture.Create(),
+            _libraryIdFixture.Create(),
+            completedJobs: 0,
+            totalJobs: 0,
+            status,
             Optional<MediaLibraryScanJobProgress>.None());
 
         // Assert

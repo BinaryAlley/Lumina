@@ -19,7 +19,7 @@ public class CancelLibrariesScanEndpointSummary : Summary<CancelLibrariesScanEnd
     public CancelLibrariesScanEndpointSummary()
     {
         Summary = "Cancels the scan of all the media libraries.";
-        Description = "Cancels the running scans of all the media libraries.";
+        Description = "Cancels the running and queued scans of all the media libraries.";
 
         Response(200, "The scan of all media libraries is cancelled.", example: new SuccessResponse(true));
     }

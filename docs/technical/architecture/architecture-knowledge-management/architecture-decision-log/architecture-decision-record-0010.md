@@ -18,14 +18,6 @@ The metadata enrichment job (`MediaLibraryScanMetadataEnrichmentJob`) is a best-
 
 The `MediaLibraryScanResultsSaveJob` no longer publishes `LibraryScanFinishedDomainEvent`. The event is published by the last job of the directed acyclic job graph: the save job when the library does not permit downloading data from the web (no enrichment phase), or the metadata enrichment job otherwise.
 
-## Amendments
-
-- **2026-10-09**: The enrichment phase is now three sequential jobs, and the last job of the graph is the artwork enrichment job.
-  - `MediaLibraryScanProviderConfigurationInvalidationJob` invalidates the enrichment state of the items whose metadata or artwork providers changed since the last scan, and the metadata derived from the paths when the path template changed.
-  - `MediaLibraryScanMetadataEnrichmentJob` enriches the metadata and links the media contributors.
-  - `MediaLibraryScanArtworkEnrichmentJob` resolves the artwork and is always the last job, publishing `LibraryScanFinishedDomainEvent` (see `MediaLibraryScanArtworkEnrichmentJob`).
-- **2026-10-09**: The `MediaLibraryScanResultsSaveJob` no longer publishes `LibraryScanFinishedDomainEvent`; it triggers the provider configuration invalidation job. The metadata enrichment semantics described below apply to both the metadata and the artwork enrichment jobs, and across every media library type with enrichers, including music (`MusicMediaLibraryScanMetadataEnricher`, `MusicMediaLibraryScanArtworkEnricher`), not only books.
-
 ## Consequences
 
 ### Positive Outcomes
@@ -53,3 +45,15 @@ Keep [ADR-0009](architecture-decision-record-0009.md) semantics for the enrichme
 Enrich the books asynchronously after the scan, decoupled from the scan progress and cancellation.
 
 **Rejected**: This contradicts the decision that the metadata enrichment phase is part of the scan lifetime, covered by the scan progress reporting and cancellation machinery, so that the scan progress reaches completion only when the metadata is downloaded.
+
+## Amendment: Sequential Enrichment Jobs and Artwork Enrichment Last (2026-10-09)
+
+The enrichment phase is now three sequential jobs, and the last job of the graph is the artwork enrichment job.
+
+- `MediaLibraryScanProviderConfigurationInvalidationJob` invalidates the enrichment state of the items whose metadata or artwork providers changed since the last scan, and the metadata derived from the paths when the path template changed.
+- `MediaLibraryScanMetadataEnrichmentJob` enriches the metadata and links the media contributors.
+- `MediaLibraryScanArtworkEnrichmentJob` resolves the artwork and is always the last job, publishing `LibraryScanFinishedDomainEvent` (see `MediaLibraryScanArtworkEnrichmentJob`).
+
+## Amendment: Enrichment Semantics Across Media Library Types (2026-10-09)
+
+The `MediaLibraryScanResultsSaveJob` no longer publishes `LibraryScanFinishedDomainEvent`; it triggers the provider configuration invalidation job. The metadata enrichment semantics described above apply to both the metadata and the artwork enrichment jobs, and across every media library type with enrichers, including music (`MusicMediaLibraryScanMetadataEnricher`, `MusicMediaLibraryScanArtworkEnricher`), not only books.

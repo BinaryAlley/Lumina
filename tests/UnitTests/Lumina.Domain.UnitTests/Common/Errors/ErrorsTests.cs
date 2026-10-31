@@ -18,12 +18,12 @@ public class ErrorsTests
     {
         // Assert
         // The count assertion fails when an error is added or removed, reminding to update the assertions below.
-        Assert.Equal(16, typeof(DomainErrors.LibraryScanning).GetProperties().Length);
+        Assert.Equal(17, typeof(DomainErrors.LibraryScanning).GetProperties().Length);
         AssertError(DomainErrors.LibraryScanning.LibraryScanIdCannotBeEmpty, ErrorType.Validation);
         AssertError(DomainErrors.LibraryScanning.CanOnlyStartPendingScans, ErrorType.Forbidden);
         AssertError(DomainErrors.LibraryScanning.CanOnlyCompleteRunningScans, ErrorType.Forbidden);
-        AssertError(DomainErrors.LibraryScanning.CanOnlyCancelRunningScans, ErrorType.Forbidden);
-        AssertError(DomainErrors.LibraryScanning.CanOnlyFailRunningScans, ErrorType.Forbidden);
+        AssertError(DomainErrors.LibraryScanning.CanOnlyCancelPendingOrRunningScans, ErrorType.Forbidden);
+        AssertError(DomainErrors.LibraryScanning.CanOnlyFailPendingOrRunningScans, ErrorType.Forbidden);
         AssertError(DomainErrors.LibraryScanning.ScanIdCannotBeEmpty, ErrorType.Validation);
         AssertError(DomainErrors.LibraryScanning.LibraryScanAlreadyExists, ErrorType.Conflict);
         AssertError(DomainErrors.LibraryScanning.LibraryAlreadyBeingScanned, ErrorType.Forbidden);
@@ -35,6 +35,7 @@ public class ErrorsTests
         AssertError(DomainErrors.LibraryScanning.CompletedScanJobItemsCountCantExceedTotalScanJobItemsCount, ErrorType.Validation);
         AssertError(DomainErrors.LibraryScanning.CompletedScanJobsCountCantExceedTotalScanJobsCount, ErrorType.Validation);
         AssertError(DomainErrors.LibraryScanning.ScanJobCurrentOperationCannotBeEmpty, ErrorType.Validation);
+        AssertError(DomainErrors.LibraryScanning.NoScannerForLibraryType, ErrorType.Unexpected);
     }
 
     [Fact]

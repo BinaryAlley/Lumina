@@ -64,18 +64,18 @@ public class CancelLibrariesScanCommandHandler : ICommandHandler<CancelLibraries
             return Errors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // Get the running library scans of the current user from the repository.
-        Result<IEnumerable<LibraryScanEntity>> getRunningLibraryScansResult = await _unitOfWork.LibraryScanRepository.GetRunningScansAsync(cancellationToken).ConfigureAwait(false);
-        if (getRunningLibraryScansResult.IsFailure)
-            return getRunningLibraryScansResult.Errors;
+        // Get the scans of the current user that are either executing or still waiting in the scan queue, from the repository.
+        Result<IEnumerable<LibraryScanEntity>> getActiveLibraryScansResult = await _unitOfWork.LibraryScanRepository.GetActiveScansAsync(cancellationToken).ConfigureAwait(false);
+        if (getActiveLibraryScansResult.IsFailure)
+            return getActiveLibraryScansResult.Errors;
 
         // Filter the library scans to process.
         List<LibraryScanEntity> authorizedLibraryScans = [];
         // Admins can see all library scans.
         if (await _authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false))
-            authorizedLibraryScans.AddRange(getRunningLibraryScansResult.Value);
+            authorizedLibraryScans.AddRange(getActiveLibraryScansResult.Value);
         else // For regular users, only take the library scans that belong to them.
-            authorizedLibraryScans.AddRange(getRunningLibraryScansResult.Value.Where(libraryScan => libraryScan.UserId == userId));
+            authorizedLibraryScans.AddRange(getActiveLibraryScansResult.Value.Where(libraryScan => libraryScan.UserId == userId));
 
         // Convert persistence library scans to domain entities.
         IEnumerable<Result<LibraryScan>> libraryScansDomainResult = authorizedLibraryScans.ToDomainEntities();

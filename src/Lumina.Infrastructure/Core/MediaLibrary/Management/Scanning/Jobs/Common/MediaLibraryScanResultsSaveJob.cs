@@ -48,104 +48,100 @@ internal sealed class MediaLibraryScanResultsSaveJob : MediaLibraryScanJob, IMed
     {
         try
         {
+            cancellationToken.ThrowIfCancellationRequested();
             // Increment the number of parents that finished their execution and called this job (beware race conditions, jobs run in parallel).
             int parentsCompleted = Interlocked.Increment(ref parentsPayloadsExecuted);
             // Only execute this job's payload when it has no parents, or when all the parents finished their execution.
             if (Parents.Count == 0 || parentsCompleted == Parents.Count)
             {
-                // This needs to be wrapped in a task because even though this job is processed in a "fire and forget" async manner, it still does synchronous
-                // processing that takes time, and would block the processing of scan jobs in the in-memory queue.
-                await Task.Run(async () =>
+                Status = LibraryScanJobStatus.Running;
+                // See docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details.
+                await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
+                IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
+                IDomainEventPublisher domainEventPublisher = asyncServiceScope.ServiceProvider.GetService<IDomainEventPublisher>()!;
+
+                MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
+
+                // Load the media library, whose type determines the materializer used to create the media library items.
+                Result<LibraryEntity?> getLibraryResult = await unitOfWork.LibraryRepository.GetByIdAsync(LibraryId.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
+                if (getLibraryResult.IsFailure || getLibraryResult.Value is null)
+                    throw new InvalidOperationException(getLibraryResult.IsFailure ? getLibraryResult.FirstError.Description : "The media library was not found.");
+                LibraryType libraryType = getLibraryResult.Value.LibraryType;
+
+                IMediaLibraryScanItemMaterializer? materializer = asyncServiceScope.ServiceProvider
+                    .GetServices<IMediaLibraryScanItemMaterializer>()
+                    .FirstOrDefault(candidate => candidate.SupportedLibraryType == libraryType);
+                if (materializer is null)
+                    throw new InvalidOperationException($"No media library item materializer exists for media library type '{libraryType}'.");
+
+                // Set the initial progress of the scan job; it is a single step job, applying the scan results to the storage medium.
+                Result<Success> publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 0, 1, cancellationToken).ConfigureAwait(false);
+                if (publishJobProgressResult.IsFailure)
+                    throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
+
+                // Get the paths of the media library scan snapshot items that are no longer present in the current scan, so that deletion events can be raised for them.
+                Result<IReadOnlyList<string>> getDeletedPathsResult = await unitOfWork.LibraryScanSnapshotRepository.GetDeletedPathsAsync(LibraryId.Value, ScanId.Value, cancellationToken).ConfigureAwait(false);
+                if (getDeletedPathsResult.IsFailure)
+                    throw new InvalidOperationException(getDeletedPathsResult.FirstError.Description);
+
+                // Get the paths of the media library scan staging results that changed since the previous scan, so that the items stored at those paths are re-enriched.
+                Result<IReadOnlyList<string>> getChangedPathsResult = await unitOfWork.LibraryScanStagingResultsRepository.GetChangedPathsAsync(ScanId.Value, cancellationToken).ConfigureAwait(false);
+                if (getChangedPathsResult.IsFailure)
+                    throw new InvalidOperationException(getChangedPathsResult.FirstError.Description);
+
+                // Apply the results of the current scan to the storage medium, atomically replacing the media library scan snapshot of the previous scan.
+                Result<Updated> applySnapshotSwapResult = await unitOfWork.LibraryScanSnapshotRepository.ApplySnapshotSwapAsync(LibraryId.Value, ScanId.Value, UserId.Value, cancellationToken).ConfigureAwait(false);
+                if (applySnapshotSwapResult.IsFailure)
+                    throw new InvalidOperationException(applySnapshotSwapResult.FirstError.Description);
+
+                // Reset the enrichment state of the media library items whose content changed, so that they are re-enriched by the enrichment jobs that follow.
+                if (getChangedPathsResult.Value.Count > 0)
                 {
-                    Status = LibraryScanJobStatus.Running;
-                    // See docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details.
-                    await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
-                    IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
-                    IDomainEventPublisher domainEventPublisher = asyncServiceScope.ServiceProvider.GetService<IDomainEventPublisher>()!;
+                    Result<Updated> resetEnrichmentStateResult = await materializer.ResetEnrichmentStateForChangedPathsAsync(unitOfWork, LibraryId.Value, getChangedPathsResult.Value, cancellationToken).ConfigureAwait(false);
+                    if (resetEnrichmentStateResult.IsFailure)
+                        throw new InvalidOperationException(resetEnrichmentStateResult.FirstError.Description);
+                }
 
-                    MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
+                // Raise a deletion event for every media library scan snapshot item that is no longer present on disk.
+                foreach (string deletedPath in getDeletedPathsResult.Value)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    await domainEventPublisher.PublishAsync(new LibraryMediaItemDeletedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, deletedPath, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                }
 
-                    // Load the media library, whose type determines the materializer used to create the media library items.
-                    Result<LibraryEntity?> getLibraryResult = await unitOfWork.LibraryRepository.GetByIdAsync(LibraryId.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
-                    if (getLibraryResult.IsFailure || getLibraryResult.Value is null)
-                        throw new InvalidOperationException(getLibraryResult.IsFailure ? getLibraryResult.FirstError.Description : "The media library was not found.");
-                    LibraryType libraryType = getLibraryResult.Value.LibraryType;
+                // Materialize the media library items from the scan snapshot, so that they are browsable even without web metadata.
+                Result<IReadOnlySet<string>> getPathsResult = await unitOfWork.LibraryScanSnapshotRepository.GetPathsAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                if (getPathsResult.IsFailure)
+                    throw new InvalidOperationException(getPathsResult.FirstError.Description);
 
-                    IMediaLibraryScanItemMaterializer? materializer = asyncServiceScope.ServiceProvider
-                        .GetServices<IMediaLibraryScanItemMaterializer>()
-                        .FirstOrDefault(candidate => candidate.SupportedLibraryType == libraryType);
-                    if (materializer is null)
-                        throw new InvalidOperationException($"No media library item materializer exists for media library type '{libraryType}'.");
+                Result<Success> materializeItemsResult = await materializer.MaterializeItemsAsync(unitOfWork, LibraryId.Value, ScanId.Value, getPathsResult.Value, cancellationToken).ConfigureAwait(false);
+                if (materializeItemsResult.IsFailure)
+                    throw new InvalidOperationException(materializeItemsResult.FirstError.Description);
 
-                    // Set the initial progress of the scan job; it is a single step job, applying the scan results to the storage medium.
-                    Result<Success> publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 0, 1, cancellationToken).ConfigureAwait(false);
-                    if (publishJobProgressResult.IsFailure)
-                        throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
+                Result<Success> saveChangesResult = await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                if (saveChangesResult.IsFailure)
+                    throw new InvalidOperationException(saveChangesResult.FirstError.Description);
 
-                    // Get the paths of the media library scan snapshot items that are no longer present in the current scan, so that deletion events can be raised for them.
-                    Result<IReadOnlyList<string>> getDeletedPathsResult = await unitOfWork.LibraryScanSnapshotRepository.GetDeletedPathsAsync(LibraryId.Value, ScanId.Value, cancellationToken).ConfigureAwait(false);
-                    if (getDeletedPathsResult.IsFailure)
-                        throw new InvalidOperationException(getDeletedPathsResult.FirstError.Description);
+                // The staged data is only cleared once the materialized items are safely stored, so a failed save can be retried from the same staged data.
+                Result<Deleted> clearStagedDataResult = await materializer.ClearStagedDataAsync(unitOfWork, LibraryId.Value, ScanId.Value, cancellationToken).ConfigureAwait(false);
+                if (clearStagedDataResult.IsFailure)
+                    throw new InvalidOperationException(clearStagedDataResult.FirstError.Description);
 
-                    // Get the paths of the media library scan staging results that changed since the previous scan, so that the items stored at those paths are re-enriched.
-                    Result<IReadOnlyList<string>> getChangedPathsResult = await unitOfWork.LibraryScanStagingResultsRepository.GetChangedPathsAsync(ScanId.Value, cancellationToken).ConfigureAwait(false);
-                    if (getChangedPathsResult.IsFailure)
-                        throw new InvalidOperationException(getChangedPathsResult.FirstError.Description);
+                // Increment the number of processed elements progress.
+                publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 1, 1, cancellationToken).ConfigureAwait(false);
+                if (publishJobProgressResult.IsFailure)
+                    throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
 
-                    // Apply the results of the current scan to the storage medium, atomically replacing the media library scan snapshot of the previous scan.
-                    Result<Updated> applySnapshotSwapResult = await unitOfWork.LibraryScanSnapshotRepository.ApplySnapshotSwapAsync(LibraryId.Value, ScanId.Value, UserId.Value, cancellationToken).ConfigureAwait(false);
-                    if (applySnapshotSwapResult.IsFailure)
-                        throw new InvalidOperationException(applySnapshotSwapResult.FirstError.Description);
+                // Increment the number of completed jobs progress.
+                await domainEventPublisher.PublishAsync(new LibraryScanProgressChangedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                Status = LibraryScanJobStatus.Completed;
+                // When this job has no linked children, it is the last job in the directed acyclic job graph, and the scan is completed.
+                if (Children.Count == 0)
+                    await domainEventPublisher.PublishAsync(new LibraryScanFinishedDomainEvent(Guid.NewGuid(), compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
 
-                    // Reset the enrichment state of the media library items whose content changed, so that they are re-enriched by the enrichment jobs that follow.
-                    if (getChangedPathsResult.Value.Count > 0)
-                    {
-                        Result<Updated> resetEnrichmentStateResult = await materializer.ResetEnrichmentStateForChangedPathsAsync(unitOfWork, LibraryId.Value, getChangedPathsResult.Value, cancellationToken).ConfigureAwait(false);
-                        if (resetEnrichmentStateResult.IsFailure)
-                            throw new InvalidOperationException(resetEnrichmentStateResult.FirstError.Description);
-                    }
-
-                    // Raise a deletion event for every media library scan snapshot item that is no longer present on disk.
-                    foreach (string deletedPath in getDeletedPathsResult.Value)
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
-                        await domainEventPublisher.PublishAsync(new LibraryMediaItemDeletedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, deletedPath, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
-                    }
-
-                    // Materialize the media library items from the scan snapshot, so that they are browsable even without web metadata.
-                    Result<IReadOnlySet<string>> getPathsResult = await unitOfWork.LibraryScanSnapshotRepository.GetPathsAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
-                    if (getPathsResult.IsFailure)
-                        throw new InvalidOperationException(getPathsResult.FirstError.Description);
-
-                    Result<Success> materializeItemsResult = await materializer.MaterializeItemsAsync(unitOfWork, LibraryId.Value, ScanId.Value, getPathsResult.Value, cancellationToken).ConfigureAwait(false);
-                    if (materializeItemsResult.IsFailure)
-                        throw new InvalidOperationException(materializeItemsResult.FirstError.Description);
-
-                    Result<Success> saveChangesResult = await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-                    if (saveChangesResult.IsFailure)
-                        throw new InvalidOperationException(saveChangesResult.FirstError.Description);
-
-                    // The staged data is only cleared once the materialized items are safely stored, so a failed save can be retried from the same staged data.
-                    Result<Deleted> clearStagedDataResult = await materializer.ClearStagedDataAsync(unitOfWork, LibraryId.Value, ScanId.Value, cancellationToken).ConfigureAwait(false);
-                    if (clearStagedDataResult.IsFailure)
-                        throw new InvalidOperationException(clearStagedDataResult.FirstError.Description);
-
-                    // Increment the number of processed elements progress.
-                    publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 1, 1, cancellationToken).ConfigureAwait(false);
-                    if (publishJobProgressResult.IsFailure)
-                        throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
-
-                    // Increment the number of completed jobs progress.
-                    await domainEventPublisher.PublishAsync(new LibraryScanProgressChangedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
-                    Status = LibraryScanJobStatus.Completed;
-                    // When this job has no linked children, it is the last job in the directed acyclic job graph, and the scan is completed.
-                    if (Children.Count == 0)
-                        await domainEventPublisher.PublishAsync(new LibraryScanFinishedDomainEvent(Guid.NewGuid(), compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
-
-                    // Call each linked child with the obtained payload.
-                    foreach (IMediaLibraryScanJob child in Children)
-                        await child.ExecuteAsync(id, input, cancellationToken).ConfigureAwait(false);
-                }, cancellationToken).ConfigureAwait(false);
+                // Call each linked child with the obtained payload.
+                foreach (IMediaLibraryScanJob child in Children)
+                    await child.ExecuteAsync(id, input, cancellationToken).ConfigureAwait(false);
             }
         }
         catch (OperationCanceledException)

@@ -47,48 +47,44 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
     {
         try
         {
+            cancellationToken.ThrowIfCancellationRequested();
             // Increment the number of parents that finished their execution and called this job (beware race conditions, jobs run in parallel).
             int parentsCompleted = Interlocked.Increment(ref parentsPayloadsExecuted);
             // Only execute this job's payload when it has no parents, or when all the parents finished their execution.
             if (Parents.Count == 0 || parentsCompleted == Parents.Count)
             {
-                // This needs to be wrapped in a task because even though this job is processed in a "fire and forget" async manner, it still does synchronous
-                // processing that takes time, and would block the processing of scan jobs in the in-memory queue.
-                await Task.Run(async () =>
-                {
-                    Status = LibraryScanJobStatus.Running;
-                    // See docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details.
-                    await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
-                    IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
-                    IDomainEventPublisher domainEventPublisher = asyncServiceScope.ServiceProvider.GetService<IDomainEventPublisher>()!;
+                Status = LibraryScanJobStatus.Running;
+                // See docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details.
+                await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
+                IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
+                IDomainEventPublisher domainEventPublisher = asyncServiceScope.ServiceProvider.GetService<IDomainEventPublisher>()!;
 
-                    MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
+                MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
 
-                    // Load the media library, whose type determines the metadata enricher to use.
-                    Result<LibraryEntity?> getLibraryResult = await unitOfWork.LibraryRepository.GetByIdAsync(LibraryId.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
-                    if (getLibraryResult.IsFailure || getLibraryResult.Value is null)
-                        throw new InvalidOperationException(getLibraryResult.IsFailure ? getLibraryResult.FirstError.Description : "The media library was not found.");
-                    LibraryType libraryType = getLibraryResult.Value.LibraryType;
+                // Load the media library, whose type determines the metadata enricher to use.
+                Result<LibraryEntity?> getLibraryResult = await unitOfWork.LibraryRepository.GetByIdAsync(LibraryId.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
+                if (getLibraryResult.IsFailure || getLibraryResult.Value is null)
+                    throw new InvalidOperationException(getLibraryResult.IsFailure ? getLibraryResult.FirstError.Description : "The media library was not found.");
+                LibraryType libraryType = getLibraryResult.Value.LibraryType;
 
-                    IMediaLibraryScanMetadataEnricher? metadataEnricher = asyncServiceScope.ServiceProvider
-                        .GetServices<IMediaLibraryScanMetadataEnricher>()
-                        .FirstOrDefault(candidate => candidate.SupportedLibraryType == libraryType);
-                    if (metadataEnricher is null)
-                        throw new InvalidOperationException($"No metadata enricher exists for media library type '{libraryType}'.");
+                IMediaLibraryScanMetadataEnricher? metadataEnricher = asyncServiceScope.ServiceProvider
+                    .GetServices<IMediaLibraryScanMetadataEnricher>()
+                    .FirstOrDefault(candidate => candidate.SupportedLibraryType == libraryType);
+                if (metadataEnricher is null)
+                    throw new InvalidOperationException($"No metadata enricher exists for media library type '{libraryType}'.");
 
-                    await metadataEnricher.EnrichAsync(LibraryId, ScanId, UserId, cancellationToken).ConfigureAwait(false);
+                await metadataEnricher.EnrichAsync(LibraryId, ScanId, UserId, cancellationToken).ConfigureAwait(false);
 
-                    // Increment the number of completed jobs progress.
-                    await domainEventPublisher.PublishAsync(new LibraryScanProgressChangedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
-                    Status = LibraryScanJobStatus.Completed;
-                    // When this job has no linked children, it is the last job in the directed acyclic job graph, and the scan is completed.
-                    if (Children.Count == 0)
-                        await domainEventPublisher.PublishAsync(new LibraryScanFinishedDomainEvent(Guid.NewGuid(), compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                // Increment the number of completed jobs progress.
+                await domainEventPublisher.PublishAsync(new LibraryScanProgressChangedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                Status = LibraryScanJobStatus.Completed;
+                // When this job has no linked children, it is the last job in the directed acyclic job graph, and the scan is completed.
+                if (Children.Count == 0)
+                    await domainEventPublisher.PublishAsync(new LibraryScanFinishedDomainEvent(Guid.NewGuid(), compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
 
-                    // Call each linked child with the obtained payload.
-                    foreach (IMediaLibraryScanJob child in Children)
-                        await child.ExecuteAsync(id, input, cancellationToken).ConfigureAwait(false);
-                }, cancellationToken).ConfigureAwait(false);
+                // Call each linked child with the obtained payload.
+                foreach (IMediaLibraryScanJob child in Children)
+                    await child.ExecuteAsync(id, input, cancellationToken).ConfigureAwait(false);
             }
         }
         catch (OperationCanceledException)

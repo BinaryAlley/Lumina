@@ -8,6 +8,6 @@ namespace Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLib
 /// <summary>
 /// Interface for the media library scan job for discovering music file system items.
 /// </summary>
-public interface IMusicFileSystemDiscoveryJob : IMediaLibraryScanJob
+public interface IMusicFileSystemDiscoveryJob : IMediaLibraryScanDiscoveryJob
 {
 }
