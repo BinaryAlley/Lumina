@@ -1,7 +1,6 @@
 # Architecture Decision Record (ADR): 0017 - One Generic Favorites Aggregate Keyed by Media Kind and Item Id
 
 ## Status
-
 **Accepted** (2026-10-21)
 
 ## Context
@@ -61,8 +60,7 @@ The decision includes these rules:
 | No existence oracle | An inaccessible item and a missing item are indistinguishable when adding, and inaccessible display data is never listed |
 | No schema change for new kinds | The kind is stored by name, so a planned kind only needs its restriction lifted and its two resolutions written |
 
-### Risks and Mitigations
-
+### Risks and Tradeoffs
 | Risk | Mitigation Strategy |
 |---|---|
 | Without a foreign key, rows can point at items that no longer exist | This is intended: the listing returns such rows as unavailable and removal never needs the item. Nothing relies on the item being present |

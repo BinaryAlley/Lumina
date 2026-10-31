@@ -1,7 +1,6 @@
 # Architecture Decision Record (ADR): 0014 - Closed Generic Persistence Toolkit for Aggregate Graph Persistence
 
 ## Status
-
 **Accepted** (2026-09-26)
 
 ## Context
@@ -54,8 +53,7 @@ Treat `Lumina.DataAccess\Common\Persistence` as a closed set of generic, entity-
 | Testability | The primitives are covered directly by unit tests, independently of any repository |
 | Ownership | No new external dependency and no declarative engine; the toolkit depends only on the internal `ISharedReferenceEntity` marker, and the logic stays explicit and inspectable |
 
-### Risks and Mitigations
-
+### Risks and Tradeoffs
 | Risk | Mitigation Strategy |
 |---|---|
 | The generic resolver depends on an entity keyed by `Name` and translated by EF Core | `SharedReferenceResolver` is generic over `ISharedReferenceEntity` and is exercised by both unit and integration tests, which prove the EF translation |

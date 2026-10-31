@@ -1,7 +1,6 @@
 # Architecture Decision Record (ADR): 0011 - Replace MediatR with Custom CQRS Abstractions
 
 ## Status
-
 **Accepted** (2026-08-13)
 
 ## Context
@@ -121,8 +120,7 @@ internal sealed class GetConfiguredNismsEndpoint : IGetConfiguredNismsEndpoint
 | DI Alignment | Leverages the existing .NET DI container idioms already present in the solution |
 | Performance | No runtime reflection, other than the startup registration of application use case handlers |
 
-### Risks and Mitigations
-
+### Risks and Tradeoffs
 | Risk | Mitigation Strategy |
 |---|---|
 | Loss of pipeline behavior support | Application validation will be performed manually, as an orchestration step |

@@ -1,7 +1,6 @@
 # Architecture Decision Record (ADR): 0018 - Media Neutral Consumption History, Resume Points, and Derived Statistics
 
 ## Status
-
 **Accepted** (2026-10-26)
 
 ## Context
@@ -88,8 +87,7 @@ The statistics count a session when the rule of its media kind says so. Duration
 | Per-library policy | Progress tracking and completion thresholds are chosen per library instead of being hardcoded for a media kind |
 | Privacy by default | A regular user cannot read or delete another user's data, and a wrong user id is reported as not authorized rather than revealing existence |
 
-### Risks and Mitigations
-
+### Risks and Tradeoffs
 | Risk | Mitigation Strategy |
 |---|---|
 | Without a foreign key, a record can point at an item that no longer exists | This is intended: the history keeps its counts and duration, and the list returns the item as unavailable with blank display data so the user can delete it |

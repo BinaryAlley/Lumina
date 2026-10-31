@@ -1,7 +1,6 @@
 # Architecture Decision Record (ADR): 0019 - SSD Aware Read Parallelism During Media Library Scans
 
 ## Status
-
 **Accepted** (2026-10-30)
 
 ## Context

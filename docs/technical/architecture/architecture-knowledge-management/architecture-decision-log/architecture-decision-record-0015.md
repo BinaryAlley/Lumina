@@ -1,7 +1,6 @@
 # Architecture Decision Record (ADR): 0015 - Plugin Capability Providers for Media Library Enrichment
 
 ## Status
-
 **Accepted** (2026-10-09)
 
 Supersedes [ADR-0008](architecture-decision-record-0008.md).
@@ -56,8 +55,7 @@ The host defines the capability contracts, and a plugin implements the ones it s
 | Per-library control | Providers are enabled and ranked per media library, independent of plugin installation |
 | Simplicity | No hook registry, no graph splicing across the plugin boundary, and no runtime payload type switching |
 
-### Risks and Mitigations
-
+### Risks and Tradeoffs
 | Risk | Mitigation Strategy |
 |---|---|
 | A plugin registers a capability a library type does not support | Providers declare `SupportedLibraryTypes`, and the host only offers and invokes providers that support the library being processed |
