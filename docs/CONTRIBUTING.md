@@ -14,6 +14,8 @@
 - Follow [this template](./technical/templates/PULL_REQUEST_TEMPLATE.md) for your pull request.
 - Write clear and descriptive commit messages in third person singular (e.g., "fixes xx").
 - Keep your pull requests focused on a single issue or feature.
+- Read the [AI policy](./other/AI_POLICY.md) before using AI tools to help with a contribution.
+- If you use an AI agent on your changes, point it at the [C# conventions](./technical/templates/CSharpConventions.md) and [test conventions](./technical/templates/CSharpTestConventions.md) skill files, so it follows the same rules as everyone else. They are written for agents: they describe the rules below to a machine and do not replace this document.
 - Contributors are expected to add themselves to the list at the end of this file.
 
 ## Documentation Standards
@@ -94,6 +96,9 @@ public interface IUserService
 ```
 
 ## Code style
+
+Many of the rules in this section are also encoded in the root [`.editorconfig`](../.editorconfig), which your IDE reads automatically: indentation, line endings (LF), encoding (UTF-8 with a final newline), naming, `var` usage, expression-bodied members, braces and namespace declarations. Anything it marks as `error` is not a suggestion: fix it before you push, even though a plain `dotnet build` can still succeed with style violations, because the style analyzers do not run as part of the build by default and only compiler warnings are promoted to errors. `dotnet format` applies the same rules if your editor does not.
+
 ### General
 - Use 4 spaces for indentation.
 
@@ -163,7 +168,7 @@ namespace MyNamespace // Not allowed
     }
 }
 ```
-- Avoid using primary constructors unless they will be re-designed to be assigned to readonly fields. For example:
+- Do not use primary constructors. They do not assign into readonly fields, and immutability matters more than conciseness here. For example:
 ```csharp
 public class User(IUserRepository userRepository) // Not Allowed
 {
@@ -176,7 +181,7 @@ public class User
 
     public User(IUserRepository userRepository) // Correct
     {
-        _userRepository = userRepository
+        _userRepository = userRepository;
     }
 }
 ```
@@ -398,9 +403,7 @@ public class ExampleClass
 public void ProcessValue(object? value)
 {
     if (value is null) // Correct
-    {
-        // Handle null case
-    }
+        return;
 }
 
 public Expression<Func<MyClass, bool>> CreateExpression()
@@ -411,9 +414,7 @@ public Expression<Func<MyClass, bool>> CreateExpression()
 public void ProcessValue(object? value)
 {
     if (value == null) // Not Allowed
-    {
-        // Handle null case
-    }
+        return;
 }
 ```
 
@@ -446,36 +447,28 @@ namespace MyNamespace // Not Allowed
 - Use a single space after keywords in control flow statements. For example:
 ```csharp
 if (condition) // Correct
-{
-    // Do something
-}
+    DoSomething();
 
 for (int i = 0; i < 10; i++) // Correct
-{
-    // Iterate
-}
+    DoSomething();
 
 if(condition)// Not Allowed
-{
-    // Do something
-}
+    DoSomething();
 
 for(int i = 0; i < 10; i++)// Not Allowed
-{
-    // Iterate
-}
+    DoSomething();
 ```
 - Do not use spaces inside parentheses or square brackets. For example:
 ```csharp
 if (condition) // Correct
-{
-    var items = new List<int> { 1, 2, 3 }; // Correct
-}
+    DoSomething();
+
+List<int> items = [1, 2, 3]; // Correct
 
 if ( condition ) // Not Allowed
-{
-    var items = new List<int> {1, 2, 3}; // Not Allowed
-}
+    DoSomething();
+
+List<int> items = [ 1, 2, 3 ]; // Not Allowed
 ```
 - Use a single space before and after binary operators. For example:
 ```csharp
@@ -491,14 +484,10 @@ bool isActive=true&&false; // Not Allowed
 
 ```csharp
 if (myObject is null) // Correct
-{
-    // Handle null case
-}
+    DoSomething();
 
 if (object.ReferenceEquals(myObject, null)) // Not Allowed
-{
-    // Handle null case
-}
+    DoSomething();
 ```
 - Use readonly fields *where possible*. For example:
 ```csharp
@@ -593,13 +582,13 @@ All contributors are expected to write and maintain tests for their code, to ens
 public void Add_WhenCalledWithTwoNumbers_ShouldReturnTheirSum()
 {
     // Arrange
-    var calculator = new Calculator();
+    Calculator calculator = new();
     
     // Act
     int result = calculator.Add(2, 3);
     
     // Assert
-    result.Should().Be(5);
+    Assert.Equal(5, result);
 }
 ```
 - Only the following libraries are permited (proposals for additional libraries will be reviewed first):
@@ -649,10 +638,10 @@ public void CreateRepository_WhenUnregisteredTypeRequested_ShouldThrowException(
 public void Add_WhenCalledWithVariousInputs_ShouldReturnExpectedSum(int a, int b, int expected)
 {
     // Arrange
-    var calculator = new Calculator();
+    Calculator calculator = new();
     
     // Act & Assert
-    calculator.Add(a, b).Should().Be(expected);
+    Assert.Equal(expected, calculator.Add(a, b));
 }
 ```
 
