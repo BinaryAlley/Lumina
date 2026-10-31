@@ -10,6 +10,9 @@
     <File Path="../LICENSE.md" />
     <File Path="../README.md" />
   </Folder>
+  <Folder Name="/docs/other/">
+    <File Path="../docs/other/AI_POLICY.md" />
+  </Folder>
   <Folder Name="/docs/manual/">
     <File Path="../docs/manual/index.md" />
   </Folder>
@@ -330,6 +333,8 @@
     <File Path="../docs/technical/requests/users-management/settings/UpdateUserSettings.http" />
   </Folder>
   <Folder Name="/docs/technical/templates/">
+    <File Path="../docs/technical/templates/CSharpConventions.md" />
+    <File Path="../docs/technical/templates/CSharpTestConventions.md" />
     <File Path="../docs/technical/templates/PULL_REQUEST_TEMPLATE.md" />
   </Folder>
   <Folder Name="/docs/technical/theming/">

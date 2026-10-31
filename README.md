@@ -79,7 +79,7 @@ The development setup ships convenience defaults that must never be used in a re
 
 ## Contributing
 
-Lumina welcomes community contributions. All forms of input, be it code, bug reports, or feature suggestions, are appreciated. Be sure to read the [guidelines](./docs/CONTRIBUTING.md) for contributing first!
+Lumina welcomes community contributions. All forms of input, be it code, bug reports, or feature suggestions, are appreciated. Be sure to read the [guidelines](./docs/CONTRIBUTING.md) for contributing first, and if you use AI when contributing, read the [AI policy](./docs/other/AI_POLICY.md) as well. It is short, and it is enforced.
 
 ## Acknowledgments and Credits
 

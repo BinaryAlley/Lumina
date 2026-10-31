@@ -68,8 +68,6 @@ $RECYCLE.BIN/
 *.sqlite
 
 # AI
-AGENTS.[Mm][Dd]
-agents.[Mm][Dd]
 SKILL.[Mm][Dd]
 skill.[Mm][Dd]
 
