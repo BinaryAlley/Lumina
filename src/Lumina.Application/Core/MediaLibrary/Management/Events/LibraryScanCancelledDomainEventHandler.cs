@@ -4,6 +4,7 @@ using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
+using Lumina.Application.Core.MediaLibrary.Management.Progress;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Exceptions;
@@ -11,7 +12,6 @@ using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Library
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Progress;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using System.Threading;
@@ -27,7 +27,7 @@ public class LibraryScanCancelledDomainEventHandler : IDomainEventHandler<Librar
 {
     private readonly IMediaLibraryScanningService _mediaLibraryScanningService;
     private readonly IMediaLibrariesScanCancellationTracker _mediaLibrariesScanCancellationTracker;
-    private readonly IMediaLibrariesScanProgressTracker _mediaLibrariesScanProgressTracker;
+    private readonly IMediaLibraryScanProgressNotifier _mediaLibraryScanProgressNotifier;
     private readonly IUnitOfWork _unitOfWork;
 
     /// <summary>
@@ -35,17 +35,17 @@ public class LibraryScanCancelledDomainEventHandler : IDomainEventHandler<Librar
     /// </summary>
     /// <param name="mediaLibraryScanningService">Injected service for scanning media libraries.</param>
     /// <param name="mediaLibrariesScanCancellationTracker">Injected tracker used for canceling media library scans.</param>
-    /// <param name="mediaLibrariesScanProgressTracker">Injected tracker used for media library scans progress.</param>
+    /// <param name="mediaLibraryScanProgressNotifier">Injected service for notifying media libraries scan progress changes to third parties.</param>
     /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
     public LibraryScanCancelledDomainEventHandler(
         IMediaLibraryScanningService mediaLibraryScanningService,
         IMediaLibrariesScanCancellationTracker mediaLibrariesScanCancellationTracker,
-        IMediaLibrariesScanProgressTracker mediaLibrariesScanProgressTracker,
+        IMediaLibraryScanProgressNotifier mediaLibraryScanProgressNotifier,
         IUnitOfWork unitOfWork)
     {
         _mediaLibraryScanningService = mediaLibraryScanningService;
         _mediaLibrariesScanCancellationTracker = mediaLibrariesScanCancellationTracker;
-        _mediaLibrariesScanProgressTracker = mediaLibrariesScanProgressTracker;
+        _mediaLibraryScanProgressNotifier = mediaLibraryScanProgressNotifier;
         _unitOfWork = unitOfWork;
     }
 
@@ -73,10 +73,13 @@ public class LibraryScanCancelledDomainEventHandler : IDomainEventHandler<Librar
         if (cancelScanResult.IsFailure)
             throw new EventualConsistencyException(cancelScanResult.FirstError, cancelScanResult.Errors);
 
-        // Release the scan processing resources.
         MediaLibraryScanCompositeId compositeId = MediaLibraryScanCompositeId.Create(domainEvent.ScanId, UserId.Create(getLibraryScansResult.Value.UserId));
+
+        // Report the cancellation to the clients and release the progress entry of the scan, so that they stop showing it as active.
+        await _mediaLibraryScanProgressNotifier.SendLibraryScanCancelledEventAsync(compositeId, cancellationToken).ConfigureAwait(false);
+
+        // Release the scan processing resources.
         _mediaLibrariesScanCancellationTracker.RemoveScan(compositeId);
-        _mediaLibrariesScanProgressTracker.RemoveScanProgress(compositeId);
         // Cancelling the scan cancels its own token, so the cleanup must not observe it, otherwise the staged results of the cancelled scan would survive the cancellation.
         // A scan that was cancelled after its snapshot was applied has not materialized its items yet, so its snapshot entries are rolled back, allowing the next
         // scan to treat the files as new and extract their metadata again instead of skipping them as unchanged.

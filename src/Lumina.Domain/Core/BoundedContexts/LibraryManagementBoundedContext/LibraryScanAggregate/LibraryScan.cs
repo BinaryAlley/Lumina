@@ -90,11 +90,11 @@ public class LibraryScan : AggregateRoot<ScanId>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public Result<Success> QueueScan()
     {        
-        // there must be no active scan for this library in the past 30 days
+        // There must be no active scan for this library in the past 30 days.
         if (_pastScans.Any(libraryScan => libraryScan.Status == LibraryScanJobStatus.Running || libraryScan.Status == LibraryScanJobStatus.Pending))
             return Errors.LibraryScanning.LibraryAlreadyBeingScanned;
 
-        _domainEvents.Add(new LibraryScanQueuedDomainEvent(Guid.NewGuid(), Id, LibraryId, DateTime.UtcNow));
+        _domainEvents.Add(new LibraryScanQueuedDomainEvent(Guid.NewGuid(), Id, UserId, LibraryId, DateTime.UtcNow));
 
         return Result.Success;
     }
@@ -110,7 +110,7 @@ public class LibraryScan : AggregateRoot<ScanId>
         else
             return Errors.LibraryScanning.CanOnlyStartPendingScans;
 
-        // there must be no active scan for this library in the past 30 days
+        // There must be no active scan for this library in the past 30 days.
         if (_pastScans.Any(libraryScan => libraryScan.Status == LibraryScanJobStatus.Running || libraryScan.Status == LibraryScanJobStatus.Pending))
             return Errors.LibraryScanning.LibraryAlreadyBeingScanned;
 
@@ -139,10 +139,11 @@ public class LibraryScan : AggregateRoot<ScanId>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public Result<Success> CancelScan()
     {
-        if (Status == LibraryScanJobStatus.Running)
+        // A scan that is waiting in the scan queue can be cancelled just as well as one that is already executing.
+        if (Status == LibraryScanJobStatus.Pending || Status == LibraryScanJobStatus.Running)
             Status = LibraryScanJobStatus.Canceled;
         else
-            return Errors.LibraryScanning.CanOnlyCancelRunningScans;
+            return Errors.LibraryScanning.CanOnlyCancelPendingOrRunningScans;
         
         _domainEvents.Add(new LibraryScanCancelledDomainEvent(Guid.NewGuid(), Id, LibraryId, DateTime.UtcNow));
  
@@ -155,10 +156,11 @@ public class LibraryScan : AggregateRoot<ScanId>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public Result<Success> FailScan()
     {
-        if (Status == LibraryScanJobStatus.Running)
+        // A scan can fail before it starts executing, for example when its media library type has no scanner yet.
+        if (Status == LibraryScanJobStatus.Pending || Status == LibraryScanJobStatus.Running)
             Status = LibraryScanJobStatus.Failed;
         else
-            return Errors.LibraryScanning.CanOnlyFailRunningScans;
+            return Errors.LibraryScanning.CanOnlyFailPendingOrRunningScans;
 
         return Result.Success;
     }

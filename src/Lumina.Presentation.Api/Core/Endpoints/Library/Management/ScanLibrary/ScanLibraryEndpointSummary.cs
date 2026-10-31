@@ -21,7 +21,7 @@ public class ScanLibraryEndpointSummary : Summary<ScanLibraryEndpoint, ScanLibra
     public ScanLibraryEndpointSummary()
     {
         Summary = "Triggers the scan of a media library.";
-        Description = "Starts the scanning process of a media library of a user.";
+        Description = "Queues the scanning process of a media library of a user. Queued scans run one at a time.";
 
         ExampleRequest = new ScanLibraryRequest(
             Id: Guid.NewGuid()

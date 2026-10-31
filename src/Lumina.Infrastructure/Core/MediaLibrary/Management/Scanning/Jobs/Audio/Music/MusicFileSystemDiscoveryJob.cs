@@ -70,115 +70,111 @@ internal sealed class MusicFileSystemDiscoveryJob : MediaLibraryScanJob, IMusicF
     {
         try
         {
+            cancellationToken.ThrowIfCancellationRequested();
             // Increment the number of parents that finished their execution and called this job (beware race conditions, jobs run in parallel).
             int parentsCompleted = Interlocked.Increment(ref parentsPayloadsExecuted);
             // Only execute this job's payload when it has no parents, or when all the parents finished their execution.
             if (Parents.Count == 0 || parentsCompleted == Parents.Count)
             {
-                // This needs to be wrapped in a task because even though this job is processed in a "fire and forget" async manner, it still does synchronous
-                // file system processing that takes time, and would block the processing of scan jobs in the in-memory queue.
-                await Task.Run(async () =>
+                Status = LibraryScanJobStatus.Running;
+                // See docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details.
+                await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
+                IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
+                IDomainEventPublisher domainEventPublisher = asyncServiceScope.ServiceProvider.GetService<IDomainEventPublisher>()!;
+                IFileProviderService fileProviderService = asyncServiceScope.ServiceProvider.GetService<IFileProviderService>()!;
+                IDirectoryProviderService directoryProviderService = asyncServiceScope.ServiceProvider.GetService<IDirectoryProviderService>()!;
+
+                MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
+
+                // Get the library from the repository.
+                Result<LibraryEntity?> getLibraryResult = await unitOfWork.LibraryRepository.GetByIdAsync(LibraryId.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
+                if (getLibraryResult.IsFailure || getLibraryResult.Value is null)
+                    throw new InvalidOperationException(getLibraryResult.IsFailure ? getLibraryResult.FirstError.Description : "The media library was not found.");
+
+                // Convert it to a domain object.
+                Result<Library> domainLibraryResult = getLibraryResult.Value.ToDomainEntity();
+                if (domainLibraryResult.IsFailure)
+                    throw new InvalidOperationException(domainLibraryResult.FirstError.Description);
+
+                // When the fast skip is enabled, load the directory scan fingerprints of the library, used to skip the directories that have not changed since the last scan.
+                Dictionary<string, DirectoryScanFingerprintEntity>? fingerprintsByPath = null;
+                if (domainLibraryResult.Value.ShouldSkipUnchangedDirectoriesDuringScan)
                 {
-                    Status = LibraryScanJobStatus.Running;
-                    // See docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details.
-                    await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
-                    IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
-                    IDomainEventPublisher domainEventPublisher = asyncServiceScope.ServiceProvider.GetService<IDomainEventPublisher>()!;
-                    IFileProviderService fileProviderService = asyncServiceScope.ServiceProvider.GetService<IFileProviderService>()!;
-                    IDirectoryProviderService directoryProviderService = asyncServiceScope.ServiceProvider.GetService<IDirectoryProviderService>()!;
+                    Result<Dictionary<string, DirectoryScanFingerprintEntity>> getFingerprintsResult = await unitOfWork.DirectoryScanFingerprintRepository.GetMappedByLibraryIdAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                    if (getFingerprintsResult.IsFailure)
+                        throw new InvalidOperationException(getFingerprintsResult.FirstError.Description);
+                    fingerprintsByPath = getFingerprintsResult.Value;
+                }
 
-                    MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
+                // Set the initial progress of the scan job.
+                Result<Success> publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 0, domainLibraryResult.Value.ContentLocations.Count, cancellationToken).ConfigureAwait(false);
+                if (publishJobProgressResult.IsFailure)
+                    throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
 
-                    // Get the library from the repository.
-                    Result<LibraryEntity?> getLibraryResult = await unitOfWork.LibraryRepository.GetByIdAsync(LibraryId.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
-                    if (getLibraryResult.IsFailure || getLibraryResult.Value is null)
-                        throw new InvalidOperationException(getLibraryResult.IsFailure ? getLibraryResult.FirstError.Description : "The media library was not found.");
+                TimeSpan heartbeatInterval = TimeSpan.FromSeconds(1);
+                DateTime lastHeartbeat = DateTime.UtcNow;
+                int processedContentLocations = 0;
 
-                    // Convert it to a domain object.
-                    Result<Library> domainLibraryResult = getLibraryResult.Value.ToDomainEntity();
-                    if (domainLibraryResult.IsFailure)
-                        throw new InvalidOperationException(domainLibraryResult.FirstError.Description);
+                List<LibraryScanStagingResultsEntity> stagingBatch = [];
+                List<DirectoryScanFingerprintEntity> fingerprintBatch = [];
 
-                    // When the fast skip is enabled, load the directory scan fingerprints of the library, used to skip the directories that have not changed since the last scan.
-                    Dictionary<string, DirectoryScanFingerprintEntity>? fingerprintsByPath = null;
-                    if (domainLibraryResult.Value.ShouldSkipUnchangedDirectoriesDuringScan)
+                // When the library content is stored on a solid state drive, the file system reads of the scan run in parallel.
+                bool shouldParallelizeReads = domainLibraryResult.Value.IsContentOnSsd;
+                if (shouldParallelizeReads)
+                    _logger.LogDebug("The content of the media library with Id '{LibraryId}' is stored on a solid state drive, so its file system reads will run in parallel.", LibraryId.Value);
+
+                // Get the files for each of the media library content locations.
+                foreach (FileSystemPathId contentLocation in domainLibraryResult.Value.ContentLocations)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    await DiscoverContentLocationAsync(
+                        contentLocation.Path,
+                        fileProviderService,
+                        directoryProviderService,
+                        fingerprintsByPath is not null,
+                        shouldParallelizeReads,
+                        fingerprintsByPath,
+                        stagingBatch,
+                        fingerprintBatch,
+                        unitOfWork.LibraryScanStagingResultsRepository,
+                        unitOfWork.DirectoryScanFingerprintRepository,
+                        cancellationToken).ConfigureAwait(false);
+                    processedContentLocations++;
+
+                    // Increment the number of processed elements progress in a high-frequency counter with low overhead check.
+                    DateTime now = DateTime.UtcNow;
+                    if (now - lastHeartbeat >= heartbeatInterval)
                     {
-                        Result<Dictionary<string, DirectoryScanFingerprintEntity>> getFingerprintsResult = await unitOfWork.DirectoryScanFingerprintRepository.GetMappedByLibraryIdAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
-                        if (getFingerprintsResult.IsFailure)
-                            throw new InvalidOperationException(getFingerprintsResult.FirstError.Description);
-                        fingerprintsByPath = getFingerprintsResult.Value;
+                        publishJobProgressResult = await PublishJobProgressAsync(
+                            domainEventPublisher, compositeKey, processedContentLocations, domainLibraryResult.Value.ContentLocations.Count, cancellationToken).ConfigureAwait(false);
+                        if (publishJobProgressResult.IsFailure)
+                            throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
+                        lastHeartbeat = now;
                     }
+                }
 
-                    // Set the initial progress of the scan job.
-                    Result<Success> publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 0, domainLibraryResult.Value.ContentLocations.Count, cancellationToken).ConfigureAwait(false);
-                    if (publishJobProgressResult.IsFailure)
-                        throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
+                // Flush any remaining discovered files and directory scan fingerprints that did not reach the batch size.
+                if (stagingBatch.Count > 0)
+                {
+                    Result<Created> insertResult = await unitOfWork.LibraryScanStagingResultsRepository.InsertRangeAsync(stagingBatch, cancellationToken).ConfigureAwait(false);
+                    if (insertResult.IsFailure)
+                        throw new InvalidOperationException(insertResult.FirstError.Description);
+                }
+                if (fingerprintBatch.Count > 0)
+                {
+                    Result<Updated> upsertResult = await unitOfWork.DirectoryScanFingerprintRepository.UpsertRangeAsync(fingerprintBatch, cancellationToken).ConfigureAwait(false);
+                    if (upsertResult.IsFailure)
+                        throw new InvalidOperationException(upsertResult.FirstError.Description);
+                }
 
-                    TimeSpan heartbeatInterval = TimeSpan.FromSeconds(1);
-                    DateTime lastHeartbeat = DateTime.UtcNow;
-                    int processedContentLocations = 0;
+                // This job finished, increment the number of processed jobs progress.
+                await domainEventPublisher.PublishAsync(new LibraryScanProgressChangedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                Status = LibraryScanJobStatus.Completed;
 
-                    List<LibraryScanStagingResultsEntity> stagingBatch = [];
-                    List<DirectoryScanFingerprintEntity> fingerprintBatch = [];
-
-                    // When the library content is stored on a solid state drive, the file system reads of the scan run in parallel.
-                    bool shouldParallelizeReads = domainLibraryResult.Value.IsContentOnSsd;
-                    if (shouldParallelizeReads)
-                        _logger.LogDebug("The content of the media library with Id '{LibraryId}' is stored on a solid state drive, so its file system reads will run in parallel.", LibraryId.Value);
-
-                    // Get the files for each of the media library content locations.
-                    foreach (FileSystemPathId contentLocation in domainLibraryResult.Value.ContentLocations)
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
-
-                        await DiscoverContentLocationAsync(
-                            contentLocation.Path,
-                            fileProviderService,
-                            directoryProviderService,
-                            fingerprintsByPath is not null,
-                            shouldParallelizeReads,
-                            fingerprintsByPath,
-                            stagingBatch,
-                            fingerprintBatch,
-                            unitOfWork.LibraryScanStagingResultsRepository,
-                            unitOfWork.DirectoryScanFingerprintRepository,
-                            cancellationToken).ConfigureAwait(false);
-                        processedContentLocations++;
-
-                        // Increment the number of processed elements progress in a high-frequency counter with low overhead check.
-                        DateTime now = DateTime.UtcNow;
-                        if (now - lastHeartbeat >= heartbeatInterval)
-                        {
-                            publishJobProgressResult = await PublishJobProgressAsync(
-                                domainEventPublisher, compositeKey, processedContentLocations, domainLibraryResult.Value.ContentLocations.Count, cancellationToken).ConfigureAwait(false);
-                            if (publishJobProgressResult.IsFailure)
-                                throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
-                            lastHeartbeat = now;
-                        }
-                    }
-
-                    // Flush any remaining discovered files and directory scan fingerprints that did not reach the batch size.
-                    if (stagingBatch.Count > 0)
-                    {
-                        Result<Created> insertResult = await unitOfWork.LibraryScanStagingResultsRepository.InsertRangeAsync(stagingBatch, cancellationToken).ConfigureAwait(false);
-                        if (insertResult.IsFailure)
-                            throw new InvalidOperationException(insertResult.FirstError.Description);
-                    }
-                    if (fingerprintBatch.Count > 0)
-                    {
-                        Result<Updated> upsertResult = await unitOfWork.DirectoryScanFingerprintRepository.UpsertRangeAsync(fingerprintBatch, cancellationToken).ConfigureAwait(false);
-                        if (upsertResult.IsFailure)
-                            throw new InvalidOperationException(upsertResult.FirstError.Description);
-                    }
-
-                    // This job finished, increment the number of processed jobs progress.
-                    await domainEventPublisher.PublishAsync(new LibraryScanProgressChangedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
-                    Status = LibraryScanJobStatus.Completed;
-
-                    // Call each linked child with the obtained payload.
-                    foreach (IMediaLibraryScanJob child in Children)
-                        await child.ExecuteAsync(id, input, cancellationToken).ConfigureAwait(false);
-                }, cancellationToken).ConfigureAwait(false);
+                // Call each linked child with the obtained payload.
+                foreach (IMediaLibraryScanJob child in Children)
+                    await child.ExecuteAsync(id, input, cancellationToken).ConfigureAwait(false);
             }
         }
         catch (OperationCanceledException)

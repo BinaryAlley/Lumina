@@ -96,6 +96,9 @@ internal sealed class LibraryRepository : ILibraryRepository
             .Include(library => library.PathTemplateParts)
             .AsSplitQuery()
             .Where(library => library.IsEnabled && !library.IsLocked)
+            // The scan queue executes the scans in this order, so it must be deterministic and match the order shown to the user.
+            .OrderBy(library => library.Title)
+            .ThenBy(library => library.Id)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
     }
 

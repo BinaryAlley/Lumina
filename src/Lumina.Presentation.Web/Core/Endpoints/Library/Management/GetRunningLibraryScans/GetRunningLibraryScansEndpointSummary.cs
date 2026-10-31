@@ -20,7 +20,7 @@ public class GetRunningLibraryScansEndpointSummary : Summary<GetRunningLibrarySc
     public GetRunningLibraryScansEndpointSummary()
     {
         Summary = "Retrieves the running media library scans.";
-        Description = "Retrieves the collection of ongoing media library scans.";
+        Description = "Retrieves the collection of ongoing media library scans, including the scans waiting in the scan queue.";
 
         Response(200, "The collection of ongoing media library scans is returned.", example: new SuccessResponse<LibraryScanProgressDto[]>(true, default));
     }

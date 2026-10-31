@@ -17,6 +17,36 @@ internal class MediaLibrariesScanProgressTracker : IMediaLibrariesScanProgressTr
     private readonly ConcurrentDictionary<MediaLibraryScanCompositeId, MediaLibraryScanProgress> _scanProgresses = new();
 
     /// <summary>
+    /// Initializes the progress tracking of a media library scan that is waiting in the scan queue, before its jobs are prepared.
+    /// </summary>
+    /// <param name="libraryId">The object representing the unique identifier of the media library being scanned.</param>
+    /// <param name="mediaLibraryScanCompositeId">Model for tracking media library scans.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public Result<Created> InitializeQueuedScanProgress(LibraryId libraryId, MediaLibraryScanCompositeId mediaLibraryScanCompositeId)
+    {
+        // The total number of jobs is only known once the scan starts, because the job graph is prepared at that point.
+        Result<MediaLibraryScanJobProgress> createLibraryScanJobProgressResult = MediaLibraryScanJobProgress.Create(0, 0, "Queued");
+        if (createLibraryScanJobProgressResult.IsFailure)
+            return createLibraryScanJobProgressResult.Errors;
+
+        Result<MediaLibraryScanProgress> createScanProgressResult = MediaLibraryScanProgress.Create(
+            mediaLibraryScanCompositeId.ScanId,
+            mediaLibraryScanCompositeId.UserId,
+            libraryId,
+            completedJobs: 0,
+            totalJobs: 0,
+            LibraryScanJobStatus.Pending,
+            Optional<MediaLibraryScanJobProgress>.Some(createLibraryScanJobProgressResult.Value)
+        );
+        if (createScanProgressResult.IsFailure)
+            return createScanProgressResult.Errors;
+
+        _scanProgresses[mediaLibraryScanCompositeId] = createScanProgressResult.Value;
+
+        return Result.Created;
+    }
+
+    /// <summary>
     /// Initializes the the progress tracking of a media library scan.
     /// </summary>
     /// <param name="libraryId">The object representing the unique identifier of the media library being scanned.</param>

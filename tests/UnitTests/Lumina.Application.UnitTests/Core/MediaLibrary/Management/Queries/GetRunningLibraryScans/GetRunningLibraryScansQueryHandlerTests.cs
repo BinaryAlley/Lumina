@@ -10,6 +10,7 @@ using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Manage
 using Lumina.Application.Fixtures.Core.MediaLibrary.Management.Queries.GetRunningLibraryScans;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Progress;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
@@ -58,7 +59,7 @@ public class GetRunningLibraryScansQueryHandlerTests
         _mockMediaLibrariesScanProgressTracker = Substitute.For<IMediaLibrariesScanProgressTracker>();
         _userId = Guid.NewGuid();
 
-        // default stubs: the current user is authenticated, is an admin, and every scan has progress
+        // Default stubs: the current user is authenticated, is an admin, and every scan has progress.
         _mockCurrentUserService.UserId.Returns(_userId);
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>()).Returns(true);
         _mockMediaLibrariesScanProgressTracker.GetScanProgress(Arg.Any<MediaLibraryScanCompositeId>())
@@ -72,15 +73,15 @@ public class GetRunningLibraryScansQueryHandlerTests
     }
 
     [Fact]
-    public async Task HandleAsync_WhenUserIsAdmin_ShouldReturnProgressForAllRunningScans()
+    public async Task HandleAsync_WhenUserIsAdmin_ShouldReturnProgressForAllActiveScans()
     {
         // Arrange
-        List<LibraryScanEntity> runningScans =
+        List<LibraryScanEntity> activeScans =
         [
             _libraryScanEntityFixture.Create(userId: _userId),
             _libraryScanEntityFixture.Create(userId: Guid.NewGuid())
         ];
-        _mockLibraryScanRepository.GetRunningScansAsync(Arg.Any<CancellationToken>()).Returns(Result.From<IEnumerable<LibraryScanEntity>>(runningScans));
+        _mockLibraryScanRepository.GetActiveScansAsync(Arg.Any<CancellationToken>()).Returns(Result.From<IEnumerable<LibraryScanEntity>>(activeScans));
 
         // Act
         Result<IEnumerable<MediaLibraryScanProgressResponse>> result = await _sut.HandleAsync(_getRunningLibraryScansQueryFixture.Create(), CancellationToken.None);
@@ -94,12 +95,12 @@ public class GetRunningLibraryScansQueryHandlerTests
     public async Task HandleAsync_WhenUserIsNotAdmin_ShouldReturnProgressOnlyForScansOwnedByTheUser()
     {
         // Arrange
-        List<LibraryScanEntity> runningScans =
+        List<LibraryScanEntity> activeScans =
         [
             _libraryScanEntityFixture.Create(userId: _userId),
             _libraryScanEntityFixture.Create(userId: Guid.NewGuid())
         ];
-        _mockLibraryScanRepository.GetRunningScansAsync(Arg.Any<CancellationToken>()).Returns(Result.From<IEnumerable<LibraryScanEntity>>(runningScans));
+        _mockLibraryScanRepository.GetActiveScansAsync(Arg.Any<CancellationToken>()).Returns(Result.From<IEnumerable<LibraryScanEntity>>(activeScans));
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>()).Returns(false);
 
         // Act
@@ -108,6 +109,32 @@ public class GetRunningLibraryScansQueryHandlerTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.Single(result.Value);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenActiveScanIsPending_ShouldReturnItsQueuedProgress()
+    {
+        // Arrange
+        LibraryScanEntity pendingScan = _libraryScanEntityFixture.Create(userId: _userId, status: LibraryScanJobStatus.Pending);
+        _mockLibraryScanRepository.GetActiveScansAsync(Arg.Any<CancellationToken>())
+            .Returns(Result.From<IEnumerable<LibraryScanEntity>>([pendingScan]));
+        _mockMediaLibrariesScanProgressTracker.GetScanProgress(Arg.Any<MediaLibraryScanCompositeId>())
+            .Returns(Result.From(_mediaLibraryScanProgressFixture.Create(
+                scanId: ScanId.Create(pendingScan.Id),
+                userId: _userIdFixture.Create(value: _userId),
+                libraryId: LibraryId.Create(pendingScan.LibraryId),
+                completedJobs: 0,
+                totalJobs: 0,
+                status: LibraryScanJobStatus.Pending)));
+
+        // Act
+        Result<IEnumerable<MediaLibraryScanProgressResponse>> result = await _sut.HandleAsync(_getRunningLibraryScansQueryFixture.Create(), CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        MediaLibraryScanProgressResponse response = Assert.Single(result.Value);
+        Assert.Equal(pendingScan.Id, response.ScanId);
+        Assert.Equal(LibraryScanJobStatus.Pending.ToString(), response.Status);
     }
 
     [Fact]
@@ -122,15 +149,15 @@ public class GetRunningLibraryScansQueryHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authorization.NotAuthorized, result.FirstError);
-        await _mockLibraryScanRepository.DidNotReceive().GetRunningScansAsync(Arg.Any<CancellationToken>());
+        await _mockLibraryScanRepository.DidNotReceive().GetActiveScansAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
-    public async Task HandleAsync_WhenGetRunningScansFails_ShouldReturnError()
+    public async Task HandleAsync_WhenGetActiveScansFails_ShouldReturnError()
     {
         // Arrange
-        _mockLibraryScanRepository.GetRunningScansAsync(Arg.Any<CancellationToken>())
-            .Returns(Error.Failure(description: "Failed to get running scans"));
+        _mockLibraryScanRepository.GetActiveScansAsync(Arg.Any<CancellationToken>())
+            .Returns(Error.Failure(description: "Failed to get active scans"));
 
         // Act
         Result<IEnumerable<MediaLibraryScanProgressResponse>> result = await _sut.HandleAsync(_getRunningLibraryScansQueryFixture.Create(), CancellationToken.None);
@@ -140,18 +167,29 @@ public class GetRunningLibraryScansQueryHandlerTests
     }
 
     [Fact]
-    public async Task HandleAsync_WhenGettingScanProgressFails_ShouldReturnError()
+    public async Task HandleAsync_WhenAnActiveScanHasNoProgress_ShouldSkipThatScan()
     {
         // Arrange
-        List<LibraryScanEntity> runningScans = [_libraryScanEntityFixture.Create(userId: _userId)];
-        _mockLibraryScanRepository.GetRunningScansAsync(Arg.Any<CancellationToken>()).Returns(Result.From<IEnumerable<LibraryScanEntity>>(runningScans));
+        List<LibraryScanEntity> activeScans =
+        [
+            _libraryScanEntityFixture.Create(userId: _userId),
+            _libraryScanEntityFixture.Create(userId: _userId)
+        ];
+        _mockLibraryScanRepository.GetActiveScansAsync(Arg.Any<CancellationToken>()).Returns(Result.From<IEnumerable<LibraryScanEntity>>(activeScans));
+        // A scan whose progress was already released has ended, so it is not reported as active any more, without failing the whole query.
+        MediaLibraryScanProgress releasedProgress = _mediaLibraryScanProgressFixture.Create(
+            userId: _userIdFixture.Create(value: _userId),
+            completedJobs: 1,
+            totalJobs: 2,
+            status: LibraryScanJobStatus.Running);
         _mockMediaLibrariesScanProgressTracker.GetScanProgress(Arg.Any<MediaLibraryScanCompositeId>())
-            .Returns(Error.Failure(description: "Failed to get scan progress"));
+            .Returns(Result.From(releasedProgress), Error.Failure(description: "The scan progress was already released"));
 
         // Act
         Result<IEnumerable<MediaLibraryScanProgressResponse>> result = await _sut.HandleAsync(_getRunningLibraryScansQueryFixture.Create(), CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsFailure);
+        Assert.False(result.IsFailure);
+        Assert.Single(result.Value);
     }
 }

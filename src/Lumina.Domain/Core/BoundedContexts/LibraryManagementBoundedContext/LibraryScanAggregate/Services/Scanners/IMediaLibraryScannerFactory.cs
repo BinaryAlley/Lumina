@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 #endregion
 
@@ -13,6 +14,8 @@ internal interface IMediaLibraryScannerFactory
     /// Creates a media library scanner based on the provided library type.
     /// </summary>
     /// <param name="libraryType">The type of the library that determines the type of the created media library scanner.</param>
-    /// <returns>A media library scanner for the specified media library type.</returns>
-    IMediaTypeScanner CreateLibraryScanner(LibraryType libraryType);
+    /// <returns>
+    /// An <see cref="Result{TValue}"/> containing either a media library scanner for the specified media library type, or an error.
+    /// </returns>
+    Result<IMediaTypeScanner> CreateLibraryScanner(LibraryType libraryType);
 }

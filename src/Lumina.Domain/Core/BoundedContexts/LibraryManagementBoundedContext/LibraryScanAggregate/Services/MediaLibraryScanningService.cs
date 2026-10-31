@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Progress;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Queue;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Scanners;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
@@ -22,7 +22,6 @@ namespace Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Lib
 /// </summary>
 internal class MediaLibraryScanningService : IMediaLibraryScanningService
 {
-    private readonly IMediaLibrariesScanQueue _mediaLibrariesScanQueue;
     private readonly IMediaLibraryScannerFactory _mediaLibraryScannerFactory;
     private readonly IMediaLibrariesScanCancellationTracker _mediaLibrariesScanCancellationTracker;
     private readonly IMediaLibrariesScanProgressTracker _mediaLibrariesScanProgressTracker;
@@ -31,19 +30,16 @@ internal class MediaLibraryScanningService : IMediaLibraryScanningService
     /// <summary>
     /// Initializes a new instance of the <see cref="MediaLibraryScanningService"/> class.
     /// </summary>
-    /// <param name="mediaLibrariesScanQueue">Injected queue used for processing media libraries scan jobs.</param>
     /// <param name="mediaLibraryScannerFactory">Injected factory for creating media library scanners.</param>
     /// <param name="mediaLibrariesScanCancellationTracker">Injected tracker used for canceling media library scans.</param>
     /// <param name="mediaLibrariesScanProgressTracker">Injected tracker used for media library scans progress.</param>
     /// <param name="domainEventPublisher">The domain event publisher used to publish events.</param>
     public MediaLibraryScanningService(
-        IMediaLibrariesScanQueue mediaLibrariesScanQueue,
         IMediaLibraryScannerFactory mediaLibraryScannerFactory,
         IMediaLibrariesScanCancellationTracker mediaLibrariesScanCancellationTracker,
         IMediaLibrariesScanProgressTracker mediaLibrariesScanProgressTracker,
         IDomainEventPublisher domainEventPublisher)
     {
-        _mediaLibrariesScanQueue = mediaLibrariesScanQueue;
         _mediaLibraryScannerFactory = mediaLibraryScannerFactory;
         _mediaLibrariesScanCancellationTracker = mediaLibrariesScanCancellationTracker;
         _mediaLibrariesScanProgressTracker = mediaLibrariesScanProgressTracker;
@@ -51,51 +47,48 @@ internal class MediaLibraryScanningService : IMediaLibraryScanningService
     }
 
     /// <summary>
-    /// Starts <paramref name="scan"/>.
+    /// Starts <paramref name="scan"/> and prepares its job graph.
     /// </summary>
     /// <param name="scan">The media library scan to start.</param>
     /// <param name="libraryType">The type of the media library to be scanned.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<Result<Success>> StartScanAsync(LibraryScan scan, LibraryType libraryType, CancellationToken cancellationToken)
+    /// <returns>
+    /// An <see cref="Result{TValue}"/> containing either the file system discovery job, which is the only top level job of the
+    /// media library scan job graph and whose execution completes the entire scan, or an error.
+    /// </returns>
+    public async Task<Result<IMediaLibraryScanDiscoveryJob>> StartScanAsync(LibraryScan scan, LibraryType libraryType, CancellationToken cancellationToken)
     {
-        // mark the scan itself as started
+        // Resolve the scanner before changing any state, so that a media library type without a scanner fails its own scan,
+        // without leaving it started and without affecting the other scans that are queued behind it.
+        Result<IMediaTypeScanner> getScannerResult = _mediaLibraryScannerFactory.CreateLibraryScanner(libraryType);
+        if (getScannerResult.IsFailure)
+            return getScannerResult.Errors;
+
+        // Build the job graph before the scan starts, so that its jobs already carry the scan identity when they report their progress,
+        // and so that the total number of jobs is known for the progress tracking.
+        IMediaLibraryScanDiscoveryJob rootJob = getScannerResult.Value.CreateScanJobsForLibrary(scan.LibraryId);
+        SetScanPropertiesForJobChain(rootJob, scan.Id, scan.UserId);
+        int totalJobs = CountTotalJobs(rootJob);
+
+        // Mark the scan itself as started.
         Result<Success> startScanResult = scan.StartScan();
         if (startScanResult.IsFailure)
             return startScanResult.Errors;
 
+        MediaLibraryScanCompositeId compositeId = MediaLibraryScanCompositeId.Create(scan.Id, scan.UserId);
+
+        // Register the scan in the tracker for cancellation tokens.
+        _mediaLibrariesScanCancellationTracker.RegisterScan(compositeId);
+
+        // Initialize the progress of the scan before publishing its events, so that the handlers of the started event can already report it.
+        Result<Created> initializeScanProgressResult = _mediaLibrariesScanProgressTracker.InitializeScanProgress(scan.LibraryId, compositeId, totalJobs);
+        if (initializeScanProgressResult.IsFailure)
+            return initializeScanProgressResult.Errors;
+
         foreach (IDomainEvent domainEvent in scan.GetDomainEvents())
             await _domainEventPublisher.PublishAsync(domainEvent, cancellationToken).ConfigureAwait(false);
-        
-        // register the scan in the tracker for cancellation tokens
-        _mediaLibrariesScanCancellationTracker.RegisterScan(MediaLibraryScanCompositeId.Create(scan.Id, scan.UserId));
 
-        try
-        {
-            // link the user's cancellation token with the scan's token
-            using CancellationTokenSource linkedSource = CancellationTokenSource
-               .CreateLinkedTokenSource(cancellationToken, _mediaLibrariesScanCancellationTracker.GetTokenForScan(MediaLibraryScanCompositeId.Create(scan.Id, scan.UserId)));
-
-            // get a media library scanner for the provided media library type
-            IMediaTypeScanner scanner = _mediaLibraryScannerFactory.CreateLibraryScanner(libraryType);
-            // get the list of scan jobs for the retrieved scanner. It is impotant to enumerate them here, because deferred execuction would destroy any graph relationships
-            // and properties we might set before putting the jobs on the in-memory queue.
-            List<IMediaLibraryScanJob> jobs = [.. scanner.CreateScanJobsForLibrary(scan.LibraryId)];
-
-            // count total jobs in the chain by traversing the job graph
-            int totalJobs = CountTotalJobs(jobs);
-            _mediaLibrariesScanProgressTracker.InitializeScanProgress(scan.LibraryId, MediaLibraryScanCompositeId.Create(scan.Id, scan.UserId), totalJobs);
-
-            // enqueue the jobs on the channel from where they will be processed
-            foreach (IMediaLibraryScanJob job in jobs)
-            {
-                // set the Id of the scan and of the user initiating the scan to all jobs in the scan job graph
-                SetScanPropertiesForJobChain(job, scan.Id, scan.UserId);
-                await _mediaLibrariesScanQueue.Writer.WriteAsync(job, linkedSource.Token).ConfigureAwait(false);
-            }
-        }
-        catch (NotImplementedException) { }
-        return Result.Success;
+        return Result.From<IMediaLibraryScanDiscoveryJob>(rootJob);
     }
 
     /// <summary>
@@ -105,7 +98,7 @@ internal class MediaLibraryScanningService : IMediaLibraryScanningService
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public Result<Success> CancelScan(LibraryScan scan)
     {
-        // trigger the process that cancels the jobs of the scan
+        // Trigger the process that cancels the jobs of the scan.
         _mediaLibrariesScanCancellationTracker.CancelScan(MediaLibraryScanCompositeId.Create(scan.Id, scan.UserId));
         return Result.Success;
     }
@@ -120,21 +113,20 @@ internal class MediaLibraryScanningService : IMediaLibraryScanningService
     {
         job.ScanId = scanId;
         job.UserId = userId;
-        // recursively set properties for all children
+        // Recursively set properties for all children.
         foreach (IMediaLibraryScanJob childJob in job.Children)
             SetScanPropertiesForJobChain(childJob, scanId, userId);
     }
 
     /// <summary>
-    /// Counts the total number of unique media library scan jobs in a list of root jobs.
+    /// Counts the total number of unique media library scan jobs in the job graph that starts at <paramref name="rootJob"/>.
     /// </summary>
-    /// <param name="rootJobs">A list of root media library scan jobs to traverse.</param>
+    /// <param name="rootJob">The file system discovery job, which is the only top level job of the scan job graph.</param>
     /// <returns>The total count of unique media library scan jobs.</returns>
-    private static int CountTotalJobs(List<IMediaLibraryScanJob> rootJobs)
+    private static int CountTotalJobs(IMediaLibraryScanDiscoveryJob rootJob)
     {
         HashSet<IMediaLibraryScanJob> uniqueJobs = [];
-        foreach (IMediaLibraryScanJob job in rootJobs)
-            TraverseJobGraph(job, uniqueJobs);
+        TraverseJobGraph(rootJob, uniqueJobs);
         return uniqueJobs.Count;
     }
 

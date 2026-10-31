@@ -5,6 +5,6 @@ namespace Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext
 /// <summary>
 /// Interface for the media library scan job for discovering books file system items.
 /// </summary>
-public interface IBooksFileSystemDiscoveryJob : IMediaLibraryScanJob
+public interface IBooksFileSystemDiscoveryJob : IMediaLibraryScanDiscoveryJob
 {
 }

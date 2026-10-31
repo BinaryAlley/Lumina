@@ -112,7 +112,7 @@ public static class InfrastructureLayerServices
         // Media library scanning.
         services.AddSingleton<IMediaLibrariesScanQueue, MediaLibrariesScanQueue>();
         services.AddSingleton<IMediaLibrariesScanCancellationTracker, MediaLibrariesScanCancellationTracker>();
-        services.AddHostedService<MediaLibraryScanJobProcessorJob>();
+        services.AddHostedService<MediaLibraryScanProcessorJob>();
 
         services.AddTransient<IBooksFileSystemDiscoveryJob, BooksFileSystemDiscoveryJob>();
         services.AddTransient<IMusicFileSystemDiscoveryJob, MusicFileSystemDiscoveryJob>();

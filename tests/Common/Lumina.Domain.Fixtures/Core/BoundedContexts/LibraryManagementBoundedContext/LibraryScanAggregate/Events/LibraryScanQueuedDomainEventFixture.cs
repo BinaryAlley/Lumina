@@ -2,8 +2,10 @@
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -17,6 +19,7 @@ namespace Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedCo
 public class LibraryScanQueuedDomainEventFixture
 {
     private readonly ScanIdFixture _scanIdFixture = new();
+    private readonly UserIdFixture _userIdFixture = new();
     private readonly LibraryIdFixture _libraryIdFixture = new();
 
     /// <summary>
@@ -24,18 +27,21 @@ public class LibraryScanQueuedDomainEventFixture
     /// </summary>
     /// <param name="id">Optional. The Id of the domain event.</param>
     /// <param name="scanId">Optional. The unique identifier of the queued media library scan.</param>
+    /// <param name="userId">Optional. The unique identifier of the user that initiated the queued media library scan.</param>
     /// <param name="libraryId">Optional. The unique identifier of the library whose scan was queued.</param>
     /// <param name="occurredOnUtc">Optional. The date and time when the domain event occurred.</param>
     /// <returns>The created <see cref="LibraryScanQueuedDomainEvent"/>.</returns>
     public LibraryScanQueuedDomainEvent Create(
         Guid? id = null,
         ScanId? scanId = null,
+        UserId? userId = null,
         LibraryId? libraryId = null,
         DateTime? occurredOnUtc = null)
     {
         return new LibraryScanQueuedDomainEvent(
             id ?? Guid.NewGuid(),
             scanId ?? _scanIdFixture.Create(),
+            userId ?? _userIdFixture.Create(),
             libraryId ?? _libraryIdFixture.Create(),
             occurredOnUtc ?? DateTime.UtcNow);
     }

@@ -28,11 +28,11 @@ public interface ILibraryScanRepository : IRepository<LibraryScanEntity>,
     Task<Result<IEnumerable<LibraryScanEntity>>> GetPastMonthScansByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Gets the media library scans have a <see cref="LibraryScanJobStatus.Running"/> status, from the storage medium.
+    /// Gets the media library scans that have a <see cref="LibraryScanJobStatus.Pending"/> or a <see cref="LibraryScanJobStatus.Running"/> status, from the storage medium.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="LibraryScanEntity"/>, or an error.</returns>
-    Task<Result<IEnumerable<LibraryScanEntity>>> GetRunningScansAsync(CancellationToken cancellationToken);
+    Task<Result<IEnumerable<LibraryScanEntity>>> GetActiveScansAsync(CancellationToken cancellationToken);
 
     /// <summary>
     /// Marks the media library scans that were interrupted by an application restart, meaning the ones that are still

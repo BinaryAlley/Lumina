@@ -96,6 +96,7 @@ public class LibraryScanTests
         Assert.Equal(LibraryScanJobStatus.Pending, scan.Status);
         LibraryScanQueuedDomainEvent queuedEvent = Assert.IsType<LibraryScanQueuedDomainEvent>(Assert.Single(scan.GetDomainEvents()));
         Assert.Equal(scan.Id, queuedEvent.ScanId);
+        Assert.Equal(scan.UserId, queuedEvent.UserId);
         Assert.Equal(scan.LibraryId, queuedEvent.LibraryId);
     }
 
@@ -149,10 +150,10 @@ public class LibraryScanTests
     }
 
     [Theory]
-    [InlineData(LibraryScanJobStatus.Running)] // cannot start an already running scan
-    [InlineData(LibraryScanJobStatus.Completed)] // cannot start a completed scan
-    [InlineData(LibraryScanJobStatus.Canceled)] // cannot start a canceled scan
-    [InlineData(LibraryScanJobStatus.Failed)] // cannot start a failed scan
+    [InlineData(LibraryScanJobStatus.Running)] // Cannot start an already running scan.
+    [InlineData(LibraryScanJobStatus.Completed)] // Cannot start a completed scan.
+    [InlineData(LibraryScanJobStatus.Canceled)] // Cannot start a canceled scan.
+    [InlineData(LibraryScanJobStatus.Failed)] // Cannot start a failed scan.
     public void StartScan_WhenNotPending_ShouldReturnError(LibraryScanJobStatus status)
     {
         // Arrange
@@ -200,10 +201,10 @@ public class LibraryScanTests
     }
 
     [Theory]
-    [InlineData(LibraryScanJobStatus.Pending)] // cannot complete a pending scan
-    [InlineData(LibraryScanJobStatus.Completed)] // cannot complete an already completed scan
-    [InlineData(LibraryScanJobStatus.Canceled)] // cannot complete a canceled scan
-    [InlineData(LibraryScanJobStatus.Failed)] // cannot complete a failed scan
+    [InlineData(LibraryScanJobStatus.Pending)] // Cannot complete a pending scan.
+    [InlineData(LibraryScanJobStatus.Completed)] // Cannot complete an already completed scan.
+    [InlineData(LibraryScanJobStatus.Canceled)] // Cannot complete a canceled scan.
+    [InlineData(LibraryScanJobStatus.Failed)] // Cannot complete a failed scan.
     public void FinishScan_WhenNotRunning_ShouldReturnError(LibraryScanJobStatus status)
     {
         // Arrange
@@ -218,11 +219,13 @@ public class LibraryScanTests
         Assert.Equal(status, scan.Status);
     }
 
-    [Fact]
-    public void CancelScan_WhenRunning_ShouldTransitionToCanceledAndRaiseCancelledEvent()
+    [Theory]
+    [InlineData(LibraryScanJobStatus.Pending)] // A scan waiting in the scan queue can be canceled too.
+    [InlineData(LibraryScanJobStatus.Running)] // A scan that is already executing can be canceled.
+    public void CancelScan_WhenPendingOrRunning_ShouldTransitionToCanceledAndRaiseCancelledEvent(LibraryScanJobStatus status)
     {
         // Arrange
-        LibraryScan scan = _libraryScanFixture.Create(status: LibraryScanJobStatus.Running);
+        LibraryScan scan = _libraryScanFixture.Create(status: status);
 
         // Act
         Result<Success> result = scan.CancelScan();
@@ -237,11 +240,10 @@ public class LibraryScanTests
     }
 
     [Theory]
-    [InlineData(LibraryScanJobStatus.Pending)] // cannot cancel a pending scan
-    [InlineData(LibraryScanJobStatus.Completed)] // cannot cancel a completed scan
-    [InlineData(LibraryScanJobStatus.Canceled)] // cannot cancel an already canceled scan
-    [InlineData(LibraryScanJobStatus.Failed)] // cannot cancel a failed scan
-    public void CancelScan_WhenNotRunning_ShouldReturnError(LibraryScanJobStatus status)
+    [InlineData(LibraryScanJobStatus.Completed)] // Cannot cancel a completed scan.
+    [InlineData(LibraryScanJobStatus.Canceled)] // Cannot cancel an already canceled scan.
+    [InlineData(LibraryScanJobStatus.Failed)] // Cannot cancel a failed scan.
+    public void CancelScan_WhenInATerminalState_ShouldReturnError(LibraryScanJobStatus status)
     {
         // Arrange
         LibraryScan scan = _libraryScanFixture.Create(status: status);
@@ -251,16 +253,18 @@ public class LibraryScanTests
 
         // Assert
         Assert.True(result.IsFailure);
-        Assert.Equal(Errors.LibraryScanning.CanOnlyCancelRunningScans, result.FirstError);
+        Assert.Equal(Errors.LibraryScanning.CanOnlyCancelPendingOrRunningScans, result.FirstError);
         Assert.Equal(status, scan.Status);
         Assert.Empty(scan.GetDomainEvents());
     }
 
-    [Fact]
-    public void FailScan_WhenRunning_ShouldTransitionToFailed()
+    [Theory]
+    [InlineData(LibraryScanJobStatus.Pending)] // A scan that has no scanner yet fails before it starts executing.
+    [InlineData(LibraryScanJobStatus.Running)] // A scan that is executing can fail too.
+    public void FailScan_WhenPendingOrRunning_ShouldTransitionToFailed(LibraryScanJobStatus status)
     {
         // Arrange
-        LibraryScan scan = _libraryScanFixture.Create(status: LibraryScanJobStatus.Running);
+        LibraryScan scan = _libraryScanFixture.Create(status: status);
 
         // Act
         Result<Success> result = scan.FailScan();
@@ -272,11 +276,10 @@ public class LibraryScanTests
     }
 
     [Theory]
-    [InlineData(LibraryScanJobStatus.Pending)] // cannot fail a pending scan
-    [InlineData(LibraryScanJobStatus.Completed)] // cannot fail a completed scan
-    [InlineData(LibraryScanJobStatus.Canceled)] // cannot fail a canceled scan
-    [InlineData(LibraryScanJobStatus.Failed)] // cannot fail an already failed scan
-    public void FailScan_WhenNotRunning_ShouldReturnError(LibraryScanJobStatus status)
+    [InlineData(LibraryScanJobStatus.Completed)] // Cannot fail a completed scan.
+    [InlineData(LibraryScanJobStatus.Canceled)] // Cannot fail a canceled scan.
+    [InlineData(LibraryScanJobStatus.Failed)] // Cannot fail an already failed scan.
+    public void FailScan_WhenInATerminalState_ShouldReturnError(LibraryScanJobStatus status)
     {
         // Arrange
         LibraryScan scan = _libraryScanFixture.Create(status: status);
@@ -286,7 +289,7 @@ public class LibraryScanTests
 
         // Assert
         Assert.True(result.IsFailure);
-        Assert.Equal(Errors.LibraryScanning.CanOnlyFailRunningScans, result.FirstError);
+        Assert.Equal(Errors.LibraryScanning.CanOnlyFailPendingOrRunningScans, result.FirstError);
         Assert.Equal(status, scan.Status);
     }
 }

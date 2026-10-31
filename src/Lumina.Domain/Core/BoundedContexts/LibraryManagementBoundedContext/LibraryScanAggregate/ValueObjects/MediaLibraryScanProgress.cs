@@ -107,7 +107,8 @@ public sealed class MediaLibraryScanProgress : ValueObject
         LibraryScanJobStatus status, 
         Optional<MediaLibraryScanJobProgress> currentJobProgress)
     {
-        if (totalJobs <= 0)
+        // A scan waiting in the scan queue has no jobs prepared yet, so its total number of jobs is only known once it starts.
+        if (totalJobs < 0 || (totalJobs == 0 && status != LibraryScanJobStatus.Pending))
             return Errors.LibraryScanning.TotalScanJobsCountMustBePositive;
         if (completedJobs < 0)
             return Errors.LibraryScanning.CompletedScanJobsCountMustBePositive;

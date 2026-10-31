@@ -3,7 +3,6 @@ using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Library
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Services.Jobs;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using System.Collections.Generic;
 #endregion
 
 namespace Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Services.Scanners;
@@ -30,19 +29,19 @@ internal class BookLibraryTypeScanner : IBookLibraryTypeScanner
     }
 
     /// <summary>
-    /// Creates the media library scan jobs for the provided media library.
+    /// Creates the media library scan job graph for the provided media library.
     /// </summary>
     /// <param name="libraryId">The unique identifier of the media library for which to create the media library scan jobs.</param>
-    /// <returns>A collection of media library scan jobs.</returns>
-    public IEnumerable<IMediaLibraryScanJob> CreateScanJobsForLibrary(LibraryId libraryId)
+    /// <returns>The file system discovery job, which is the only top level job of the media library scan job graph.</returns>
+    public IMediaLibraryScanDiscoveryJob CreateScanJobsForLibrary(LibraryId libraryId)
     {
-        // declare the list of jobs that this scanner requires
+        // Declare the list of jobs that this scanner requires.
         IBooksFileSystemDiscoveryJob fileSystemDiscoveryJob = _mediaScanJobFactory.CreateJob<IBooksFileSystemDiscoveryJob>(libraryId);
         IMediaLibraryScanDiffJob mediaLibraryScanDiffJob = _mediaScanJobFactory.CreateJob<IMediaLibraryScanDiffJob>(libraryId);
         IMediaLibraryScanHashJob mediaLibraryScanHashJob = _mediaScanJobFactory.CreateJob<IMediaLibraryScanHashJob>(libraryId);
         IMediaLibraryScanResultsSaveJob mediaLibraryScanResultsSaveJob = _mediaScanJobFactory.CreateJob<IMediaLibraryScanResultsSaveJob>(libraryId);
 
-        // establish the hierarchical relationships between jobs
+        // Establish the hierarchical relationships between jobs.
         fileSystemDiscoveryJob.AddChild(mediaLibraryScanDiffJob);
         mediaLibraryScanDiffJob.AddParent(fileSystemDiscoveryJob);
 
@@ -52,7 +51,7 @@ internal class BookLibraryTypeScanner : IBookLibraryTypeScanner
         mediaLibraryScanHashJob.AddChild(mediaLibraryScanResultsSaveJob);
         mediaLibraryScanResultsSaveJob.AddParent(mediaLibraryScanHashJob);
 
-        // the enrichment of the media library items is split into independent, modular jobs that run sequentially: the provider configuration
+        // The enrichment of the media library items is split into independent, modular jobs that run sequentially: the provider configuration
         // invalidation job invalidates the enrichment state of the items whose metadata or artwork providers changed since the last scan, the
         // metadata enrichment job enriches the metadata and links the media contributors, and the artwork enrichment job resolves the artwork.
         // The artwork enrichment job is always the last job in the directed acyclic job graph, running after the metadata enrichment job, so that
@@ -70,7 +69,7 @@ internal class BookLibraryTypeScanner : IBookLibraryTypeScanner
         mediaLibraryScanMetadataEnrichmentJob.AddChild(mediaLibraryScanArtworkEnrichmentJob);
         mediaLibraryScanArtworkEnrichmentJob.AddParent(mediaLibraryScanMetadataEnrichmentJob);
 
-        // return the top level jobs that will be triggered when the scan will be started
-        yield return fileSystemDiscoveryJob;
+        // The file system discovery job is the only top level job: no scanning can happen before the files are discovered.
+        return fileSystemDiscoveryJob;
     }
 }

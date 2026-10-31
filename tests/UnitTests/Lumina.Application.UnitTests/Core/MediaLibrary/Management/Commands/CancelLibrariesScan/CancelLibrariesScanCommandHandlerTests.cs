@@ -52,7 +52,7 @@ public class CancelLibrariesScanCommandHandlerTests
         _mockDomainEventsQueue = Substitute.For<IDomainEventsQueue>();
         _userId = Guid.NewGuid();
 
-        // default stubs: the current user is authenticated and is an admin
+        // Default stubs: the current user is authenticated and is an admin.
         _mockCurrentUserService.UserId.Returns(_userId);
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>()).Returns(true);
         _mockLibraryScanRepository.UpdateAsync(Arg.Any<LibraryScanEntity>(), Arg.Any<CancellationToken>())
@@ -62,15 +62,15 @@ public class CancelLibrariesScanCommandHandlerTests
     }
 
     [Fact]
-    public async Task HandleAsync_WhenUserIsAdmin_ShouldCancelAllRunningScans()
+    public async Task HandleAsync_WhenUserIsAdmin_ShouldCancelAllActiveScans()
     {
         // Arrange
-        List<LibraryScanEntity> runningScans =
+        List<LibraryScanEntity> activeScans =
         [
             _libraryScanEntityFixture.Create(userId: _userId),
             _libraryScanEntityFixture.Create(userId: _userId)
         ];
-        _mockLibraryScanRepository.GetRunningScansAsync(Arg.Any<CancellationToken>()).Returns(Result.From<IEnumerable<LibraryScanEntity>>(runningScans));
+        _mockLibraryScanRepository.GetActiveScansAsync(Arg.Any<CancellationToken>()).Returns(Result.From<IEnumerable<LibraryScanEntity>>(activeScans));
 
         // Act
         Result<Success> result = await _sut.HandleAsync(_cancelLibrariesScanCommandFixture.Create(), CancellationToken.None);
@@ -84,16 +84,35 @@ public class CancelLibrariesScanCommandHandlerTests
     }
 
     [Fact]
+    public async Task HandleAsync_WhenAnActiveScanIsPending_ShouldCancelItToo()
+    {
+        // Arrange
+        // A scan that is still waiting in the scan queue is an active scan, so cancelling all scans must cancel it as well.
+        List<LibraryScanEntity> activeScans = [_libraryScanEntityFixture.Create(userId: _userId, status: LibraryScanJobStatus.Pending)];
+        _mockLibraryScanRepository.GetActiveScansAsync(Arg.Any<CancellationToken>()).Returns(Result.From<IEnumerable<LibraryScanEntity>>(activeScans));
+
+        // Act
+        Result<Success> result = await _sut.HandleAsync(_cancelLibrariesScanCommandFixture.Create(), CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockLibraryScanRepository.Received(1).UpdateAsync(
+            Arg.Is<LibraryScanEntity>(libraryScan => libraryScan.Status == LibraryScanJobStatus.Canceled),
+            Arg.Any<CancellationToken>());
+        _mockDomainEventsQueue.Received(1).Enqueue(Arg.Is<LibraryScanCancelledDomainEvent>(domainEvent => domainEvent.ScanId.Value == activeScans[0].Id));
+    }
+
+    [Fact]
     public async Task HandleAsync_WhenUserIsNotAdmin_ShouldOnlyCancelScansOwnedByTheUser()
     {
         // Arrange
         Guid otherUserId = Guid.NewGuid();
-        List<LibraryScanEntity> runningScans =
+        List<LibraryScanEntity> activeScans =
         [
             _libraryScanEntityFixture.Create(userId: _userId),
             _libraryScanEntityFixture.Create(userId: otherUserId)
         ];
-        _mockLibraryScanRepository.GetRunningScansAsync(Arg.Any<CancellationToken>()).Returns(Result.From<IEnumerable<LibraryScanEntity>>(runningScans));
+        _mockLibraryScanRepository.GetActiveScansAsync(Arg.Any<CancellationToken>()).Returns(Result.From<IEnumerable<LibraryScanEntity>>(activeScans));
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>()).Returns(false);
 
         // Act
@@ -117,16 +136,16 @@ public class CancelLibrariesScanCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
-        await _mockLibraryScanRepository.DidNotReceive().GetRunningScansAsync(Arg.Any<CancellationToken>());
+        await _mockLibraryScanRepository.DidNotReceive().GetActiveScansAsync(Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
-    public async Task HandleAsync_WhenGetRunningScansFails_ShouldReturnError()
+    public async Task HandleAsync_WhenGetActiveScansFails_ShouldReturnError()
     {
         // Arrange
-        _mockLibraryScanRepository.GetRunningScansAsync(Arg.Any<CancellationToken>())
-            .Returns(Error.Failure(description: "Failed to get running scans"));
+        _mockLibraryScanRepository.GetActiveScansAsync(Arg.Any<CancellationToken>())
+            .Returns(Error.Failure(description: "Failed to get active scans"));
 
         // Act
         Result<Success> result = await _sut.HandleAsync(_cancelLibrariesScanCommandFixture.Create(), CancellationToken.None);
@@ -141,8 +160,8 @@ public class CancelLibrariesScanCommandHandlerTests
     public async Task HandleAsync_WhenUpdateFails_ShouldReturnError()
     {
         // Arrange
-        List<LibraryScanEntity> runningScans = [_libraryScanEntityFixture.Create(userId: _userId)];
-        _mockLibraryScanRepository.GetRunningScansAsync(Arg.Any<CancellationToken>()).Returns(Result.From<IEnumerable<LibraryScanEntity>>(runningScans));
+        List<LibraryScanEntity> activeScans = [_libraryScanEntityFixture.Create(userId: _userId)];
+        _mockLibraryScanRepository.GetActiveScansAsync(Arg.Any<CancellationToken>()).Returns(Result.From<IEnumerable<LibraryScanEntity>>(activeScans));
         _mockLibraryScanRepository.UpdateAsync(Arg.Any<LibraryScanEntity>(), Arg.Any<CancellationToken>())
             .Returns(Error.Failure(description: "Failed to update library scan"));
 
@@ -155,18 +174,18 @@ public class CancelLibrariesScanCommandHandlerTests
     }
 
     [Fact]
-    public async Task HandleAsync_WhenScanIsNotRunning_ShouldReturnError()
+    public async Task HandleAsync_WhenScanIsInATerminalState_ShouldReturnError()
     {
         // Arrange
-        List<LibraryScanEntity> runningScans = [_libraryScanEntityFixture.Create(userId: _userId, status: LibraryScanJobStatus.Completed)];
-        _mockLibraryScanRepository.GetRunningScansAsync(Arg.Any<CancellationToken>()).Returns(Result.From<IEnumerable<LibraryScanEntity>>(runningScans));
+        List<LibraryScanEntity> activeScans = [_libraryScanEntityFixture.Create(userId: _userId, status: LibraryScanJobStatus.Completed)];
+        _mockLibraryScanRepository.GetActiveScansAsync(Arg.Any<CancellationToken>()).Returns(Result.From<IEnumerable<LibraryScanEntity>>(activeScans));
 
         // Act
         Result<Success> result = await _sut.HandleAsync(_cancelLibrariesScanCommandFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
-        Assert.Equal(Lumina.Domain.Common.Errors.Errors.LibraryScanning.CanOnlyCancelRunningScans, result.FirstError);
+        Assert.Equal(Lumina.Domain.Common.Errors.Errors.LibraryScanning.CanOnlyCancelPendingOrRunningScans, result.FirstError);
         await _mockLibraryScanRepository.DidNotReceive().UpdateAsync(Arg.Any<LibraryScanEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }

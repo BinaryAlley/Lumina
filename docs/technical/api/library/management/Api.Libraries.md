@@ -368,9 +368,26 @@ GET api/v1/libraries/scans/running
     },
     "status": "Running",
     "overallProgressPercentage": 40.0
+  },
+  {
+    "scanId": "0b5f8d21-9c3e-4a7b-8f6d-1e2a3b4c5d6e",
+    "userId": "2cff0c0f-3a67-4e30-b94f-f4e948a3b64f",
+    "libraryId": "5d4c3b2a-1f0e-4d9c-8b7a-6f5e4d3c2b1a",
+    "totalJobs": 0,
+    "completedJobs": 0,
+    "currentJobProgress": {
+      "completedItems": 0,
+      "totalItems": 0,
+      "currentOperation": "Queued",
+      "progressPercentage": 0.0
+    },
+    "status": "Pending",
+    "overallProgressPercentage": 0.0
   }
 ]
 ```
+
+Queued scans are reported here too, with no jobs prepared yet, because media library scans are executed one at a time and a scan that was queued can wait for the scans ahead of it to finish before it starts.
 
 ### Get Library Scan Progress
 

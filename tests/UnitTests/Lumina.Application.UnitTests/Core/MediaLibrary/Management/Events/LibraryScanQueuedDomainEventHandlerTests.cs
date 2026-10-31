@@ -1,24 +1,18 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.DomainEvents;
 using Lumina.Application.Core.MediaLibrary.Management.Events;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Domain.Common.Events;
-using Lumina.Domain.Common.Exceptions;
 using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Progress;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Queue;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using NSubstitute;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.UnitTests.Core.MediaLibrary.Management.Events;
@@ -29,109 +23,90 @@ namespace Lumina.Application.UnitTests.Core.MediaLibrary.Management.Events;
 [ExcludeFromCodeCoverage]
 public class LibraryScanQueuedDomainEventHandlerTests
 {
-    private readonly IUnitOfWork _mockUnitOfWork;
-    private readonly ILibraryScanRepository _mockLibraryScanRepository;
-    private readonly IMediaLibraryScanningService _mockMediaLibraryScanningService;
-    private readonly IDomainEventsQueue _mockDomainEventsQueue;
+    private readonly IMediaLibrariesScanQueue _mockScanQueue;
+    private readonly IMediaLibrariesScanCancellationTracker _mockCancellationTracker;
+    private readonly IMediaLibrariesScanProgressTracker _mockProgressTracker;
     private readonly LibraryScanQueuedDomainEventHandler _sut;
-    private readonly LibraryScanEntityFixture _libraryScanEntityFixture = new();
     private readonly LibraryScanQueuedDomainEventFixture _libraryScanQueuedDomainEventFixture = new();
+    private readonly Channel<MediaLibraryScanCompositeId> _channel;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LibraryScanQueuedDomainEventHandlerTests"/> class.
     /// </summary>
     public LibraryScanQueuedDomainEventHandlerTests()
     {
-        _mockUnitOfWork = Substitute.For<IUnitOfWork>();
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
-        _mockLibraryScanRepository = Substitute.For<ILibraryScanRepository>();
-        _mockUnitOfWork.LibraryScanRepository.Returns(_mockLibraryScanRepository);
-        _mockMediaLibraryScanningService = Substitute.For<IMediaLibraryScanningService>();
-        _mockDomainEventsQueue = Substitute.For<IDomainEventsQueue>();
+        _channel = Channel.CreateUnbounded<MediaLibraryScanCompositeId>();
+        _mockScanQueue = Substitute.For<IMediaLibrariesScanQueue>();
+        _mockScanQueue.Writer.Returns(_channel.Writer);
+        _mockScanQueue.Reader.Returns(_channel.Reader);
+        _mockCancellationTracker = Substitute.For<IMediaLibrariesScanCancellationTracker>();
+        _mockProgressTracker = Substitute.For<IMediaLibrariesScanProgressTracker>();
 
-        // default stubs: the scanning service starts the scan successfully
-        _mockMediaLibraryScanningService.StartScanAsync(Arg.Any<LibraryScan>(), Arg.Any<LibraryType>(), Arg.Any<CancellationToken>())
-            .Returns(Result.Success);
+        // Default stubs: the queued scan progress is initialized successfully.
+        _mockProgressTracker.InitializeQueuedScanProgress(Arg.Any<LibraryId>(), Arg.Any<MediaLibraryScanCompositeId>())
+            .Returns(Result.Created);
 
-        _sut = new LibraryScanQueuedDomainEventHandler(_mockMediaLibraryScanningService, _mockDomainEventsQueue, _mockUnitOfWork);
+        _sut = new LibraryScanQueuedDomainEventHandler(_mockScanQueue, _mockCancellationTracker, _mockProgressTracker);
     }
 
     [Fact]
-    public async Task HandleAsync_WhenScanExists_ShouldStartTheScan()
+    public async Task HandleAsync_WhenCalled_ShouldRegisterTheScanForCancellation()
     {
         // Arrange
         LibraryScanQueuedDomainEvent domainEvent = _libraryScanQueuedDomainEventFixture.Create();
-        LibraryScanEntity scan = _libraryScanEntityFixture.Create(
-            id: domainEvent.ScanId.Value,
-            libraryId: domainEvent.LibraryId.Value);
-        _mockLibraryScanRepository.GetByIdAsync(scan.Id, cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From<LibraryScanEntity?>(scan));
 
         // Act
         await _sut.HandleAsync(domainEvent, CancellationToken.None);
 
         // Assert
-        await _mockMediaLibraryScanningService.Received(1).StartScanAsync(
-            Arg.Is<LibraryScan>(libraryScan => libraryScan.Id.Value == scan.Id),
-            scan.Library.LibraryType,
-            Arg.Any<CancellationToken>());
+        _mockCancellationTracker.Received(1).RegisterScan(
+            Arg.Is<MediaLibraryScanCompositeId>(compositeId => compositeId.ScanId == domainEvent.ScanId && compositeId.UserId == domainEvent.UserId));
     }
 
     [Fact]
-    public async Task HandleAsync_WhenGetByIdFails_ShouldThrowEventualConsistencyException()
+    public async Task HandleAsync_WhenCalled_ShouldInitializeTheQueuedScanProgress()
     {
         // Arrange
         LibraryScanQueuedDomainEvent domainEvent = _libraryScanQueuedDomainEventFixture.Create();
-        Error error = Error.Failure(description: "Failed to get library scan");
-        _mockLibraryScanRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(error);
 
         // Act
-        EventualConsistencyException exception = await Assert.ThrowsAsync<EventualConsistencyException>(
-            () => _sut.HandleAsync(domainEvent, CancellationToken.None).AsTask());
+        await _sut.HandleAsync(domainEvent, CancellationToken.None);
 
         // Assert
-        Assert.Equal(error, exception.EventualConsistencyError);
-        await _mockMediaLibraryScanningService.DidNotReceive().StartScanAsync(Arg.Any<LibraryScan>(), Arg.Any<LibraryType>(), Arg.Any<CancellationToken>());
+        _mockProgressTracker.Received(1).InitializeQueuedScanProgress(
+            domainEvent.LibraryId,
+            Arg.Is<MediaLibraryScanCompositeId>(compositeId => compositeId.ScanId == domainEvent.ScanId && compositeId.UserId == domainEvent.UserId));
     }
 
     [Fact]
-    public async Task HandleAsync_WhenScanDoesNotExist_ShouldThrowEventualConsistencyExceptionWithNotFoundError()
+    public async Task HandleAsync_WhenCalled_ShouldWriteTheCompositeScanIdToTheQueue()
     {
         // Arrange
         LibraryScanQueuedDomainEvent domainEvent = _libraryScanQueuedDomainEventFixture.Create();
-        _mockLibraryScanRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result<LibraryScanEntity?>.Success(null));
 
         // Act
-        EventualConsistencyException exception = await Assert.ThrowsAsync<EventualConsistencyException>(
-            () => _sut.HandleAsync(domainEvent, CancellationToken.None).AsTask());
+        await _sut.HandleAsync(domainEvent, CancellationToken.None);
 
         // Assert
-        Assert.Equal(DomainErrors.LibraryScanning.LibraryScanNotFound, exception.EventualConsistencyError);
-        await _mockMediaLibraryScanningService.DidNotReceive().StartScanAsync(Arg.Any<LibraryScan>(), Arg.Any<LibraryType>(), Arg.Any<CancellationToken>());
+        Assert.True(_channel.Reader.TryRead(out MediaLibraryScanCompositeId? enqueuedScanId));
+        Assert.Equal(domainEvent.ScanId, enqueuedScanId!.ScanId);
+        Assert.Equal(domainEvent.UserId, enqueuedScanId.UserId);
+        Assert.False(_channel.Reader.TryRead(out _));
     }
 
     [Fact]
-    public async Task HandleAsync_WhenStartScanFails_ShouldThrowEventualConsistencyException()
+    public async Task HandleAsync_WhenCalled_ShouldNotStartProcessingTheScan()
     {
         // Arrange
         LibraryScanQueuedDomainEvent domainEvent = _libraryScanQueuedDomainEventFixture.Create();
-        LibraryScanEntity scan = _libraryScanEntityFixture.Create(
-            id: domainEvent.ScanId.Value,
-            libraryId: domainEvent.LibraryId.Value);
-        _mockLibraryScanRepository.GetByIdAsync(scan.Id, cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From<LibraryScanEntity?>(scan));
-        Error error = Error.Failure(description: "Failed to start scan");
-        _mockMediaLibraryScanningService.StartScanAsync(Arg.Any<LibraryScan>(), Arg.Any<LibraryType>(), Arg.Any<CancellationToken>())
-            .Returns(error);
 
         // Act
-        EventualConsistencyException exception = await Assert.ThrowsAsync<EventualConsistencyException>(
-            () => _sut.HandleAsync(domainEvent, CancellationToken.None).AsTask());
+        await _sut.HandleAsync(domainEvent, CancellationToken.None);
 
         // Assert
-        Assert.Equal(error, exception.EventualConsistencyError);
-        _mockDomainEventsQueue.DidNotReceive().Enqueue(Arg.Any<IDomainEvent>());
+        // Queuing a scan only registers it and reports it as waiting: the scan processor prepares and starts it later, one scan at a time.
+        _mockProgressTracker.DidNotReceive().InitializeScanProgress(Arg.Any<LibraryId>(), Arg.Any<MediaLibraryScanCompositeId>(), Arg.Any<int>());
+        _mockProgressTracker.DidNotReceive().UpdateScanProgress(Arg.Any<LibraryId>(), Arg.Any<MediaLibraryScanCompositeId>());
+        _mockProgressTracker.DidNotReceive().UpdateScanJobProgress(Arg.Any<LibraryId>(), Arg.Any<MediaLibraryScanCompositeId>(), Arg.Any<MediaLibraryScanJobProgress>());
     }
 }

@@ -19,7 +19,7 @@ public class ScanLibrariesEndpointSummary : Summary<ScanLibrariesEndpoint, Empty
     public ScanLibrariesEndpointSummary()
     {
         Summary = "Triggers the scan of all media libraries.";
-        Description = "Starts the scanning process of all media libraries of a user, or all libraries, if the user is an Admin.";
+        Description = "Queues the scanning process of all media libraries of a user, or all libraries if the user is an Admin. The scans run one at a time, in the order in which they were queued.";
 
         Response(200, "The media libraries scan was successfully started.",
             example: new MediaLibraryScanResponse[] {

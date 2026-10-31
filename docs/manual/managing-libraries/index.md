@@ -116,17 +116,17 @@ The template is read on every scan, so changing it changes how your folders are 
 
 ## Scanning a library
 
-Creating a library only records where the media lives. To actually read it, you scan it. You can scan a single library, or all of them at once, from the Libraries page.
+Creating a library only records where the media lives. To actually read it, you scan it. You can scan a single library, or ask Lumina to scan all of them, from the Libraries page. Only one scan runs at a time: a scan that is requested while another one is running waits in the scan queue, and starts on its own when the scan ahead of it finishes.
 
 Lumina is designed to be efficient and performant. The first scan of a library reads and indexes everything it finds, so it is the slowest one. Every scan after that compares what is on disk against the previous scan and only processes what is new or changed, so it is normally much faster. How long any scan takes also depends on what is enabled for the library: metadata and artwork providers that fetch data from the web add network time on top of reading the files, and they do it only for the items that need it.
 
-How the scan reads the files depends on the hardware that stores them. A library whose content is on a solid state drive can discover and hash several files at the same time, so turn on **Content is on SSD** for it. A library on a mechanical hard drive should keep that setting off, because parallel reads make the drive seek back and forth and can make the scan slower. Metadata extraction and artwork resolution still read the files one at a time; this setting only changes file discovery and content hashing.
+How the scan reads the files depends on the hardware that stores them. A library whose content is on a solid state drive can discover and hash several files at the same time, so turn on **Content is on SSD** for it. A library on a mechanical hard drive should keep that setting off, because parallel reads make the drive seek back and forth and can make the scan slower. Metadata extraction and artwork resolution still read the files one at a time; this setting only changes file discovery and content hashing. Even when the parallel reads are on, Lumina leaves one processor free, so the rest of the application keeps responding while it scans.
 
 Scans run on the server in the background, so once one starts you can close the browser and come back later.
 
-While a scan is running, its progress is shown live: how far along it is overall, how many items it has processed, and the operation it is currently on. A scan is queued before it starts, then runs, and ends up finished, cancelled or failed. You can cancel a running scan at any time, for one library or for all of them.
+While a scan is waiting in the queue it is shown as queued, and while it is running its progress is shown live: how far along it is overall, how many items it has processed, and the operation it is currently on. A scan is queued before it starts, then runs, and ends up finished, cancelled or failed. You can cancel a scan while it is queued or running, for one library or for all of them; the library shows that its cancellation is in progress until the server confirms it.
 
-A disabled or locked library is refused a scan. Scans can also be driven by the scheduler, so libraries refresh themselves on a timetable without you lifting a finger.
+A disabled or locked library is refused a scan, and a library whose type has no scanner yet ends its scan as failed instead of staying queued forever. Scans can also be driven by the scheduler, so libraries refresh themselves on a timetable without you lifting a finger.
 
 ## Editing a library
 

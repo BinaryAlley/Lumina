@@ -46,11 +46,11 @@ public sealed class DebouncedMediaLibraryScanProgressNotifier : IMediaLibrarySca
         if (cancellationToken.IsCancellationRequested)
             return;
 
-        // throttle network traffic to no more than 20 updates a second, any more are pointless from a progress report perspective
+        // Throttle network traffic to no more than 20 updates a second, any more are pointless from a progress report perspective.
         DebounceDispatcher debouncer = _debouncers.GetOrAdd(mediaLibraryScanCompositeId, _ => new DebounceDispatcher(TimeSpan.FromMilliseconds(50)));
         await debouncer.DebounceAsync(async () =>
         {
-            // the token might be canceled after initial check but before debounced execution starts
+            // The token might be canceled after initial check but before debounced execution starts.
             if (cancellationToken.IsCancellationRequested)
                 return;
 
@@ -102,6 +102,27 @@ public sealed class DebouncedMediaLibraryScanProgressNotifier : IMediaLibrarySca
             MediaLibraryScanProgressResponse progress = progressResult.Value.ToResponse();
             await _hubContext.Clients.Group(mediaLibraryScanCompositeId.ToString()).SendAsync(
                 "libraryScanFailedEvent", progress with { Status = LibraryScanJobStatus.Failed.ToString() }, cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>
+    /// Notifies the SignalR clients about the cancellation of a media library scan.
+    /// </summary>
+    /// <param name="mediaLibraryScanCompositeId">The object representing the unique identifier for the media library scan that was cancelled.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    public async Task SendLibraryScanCancelledEventAsync(MediaLibraryScanCompositeId mediaLibraryScanCompositeId, CancellationToken cancellationToken)
+    {
+        if (cancellationToken.IsCancellationRequested)
+            return;
+        Result<MediaLibraryScanProgress> progressResult = _mediaLibrariesScanProgressTracker.RemoveScanProgress(mediaLibraryScanCompositeId);
+
+        CleanupDebouncer(mediaLibraryScanCompositeId);
+
+        if (!progressResult.IsFailure)
+        {
+            MediaLibraryScanProgressResponse progress = progressResult.Value.ToResponse();
+            await _hubContext.Clients.Group(mediaLibraryScanCompositeId.ToString()).SendAsync(
+                "libraryScanCancelledEvent", progress with { Status = LibraryScanJobStatus.Canceled.ToString() }, cancellationToken).ConfigureAwait(false);
         }
     }
 

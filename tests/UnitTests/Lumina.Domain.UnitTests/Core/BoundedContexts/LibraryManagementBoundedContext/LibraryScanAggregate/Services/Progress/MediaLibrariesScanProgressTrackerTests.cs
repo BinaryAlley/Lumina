@@ -24,6 +24,51 @@ public class MediaLibrariesScanProgressTrackerTests
     private readonly MediaLibraryScanJobProgressFixture _mediaLibraryScanJobProgressFixture = new();
 
     [Fact]
+    public void InitializeQueuedScanProgress_WhenCalled_ShouldCreatePendingProgressWithZeroTotalJobs()
+    {
+        // Arrange
+        LibraryId libraryId = _libraryIdFixture.Create();
+        MediaLibraryScanCompositeId compositeId = _mediaLibraryScanCompositeIdFixture.Create();
+
+        // Act
+        Result<Created> result = _sut.InitializeQueuedScanProgress(libraryId, compositeId);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Created, result.Value);
+        Result<MediaLibraryScanProgress> progressResult = _sut.GetScanProgress(compositeId);
+        Assert.False(progressResult.IsFailure);
+        Assert.Equal(compositeId.ScanId, progressResult.Value.ScanId);
+        Assert.Equal(compositeId.UserId, progressResult.Value.UserId);
+        Assert.Equal(libraryId, progressResult.Value.LibraryId);
+        Assert.Equal(0, progressResult.Value.CompletedJobs);
+        Assert.Equal(0, progressResult.Value.TotalJobs);
+        Assert.Equal(LibraryScanJobStatus.Pending, progressResult.Value.Status);
+        Assert.True(progressResult.Value.CurrentJobProgress.HasValue);
+        Assert.Equal("Queued", progressResult.Value.CurrentJobProgress.Value.CurrentOperation);
+    }
+
+    [Fact]
+    public void InitializeQueuedScanProgress_WhenCalledTwice_ShouldReplaceThePreviousProgress()
+    {
+        // Arrange
+        LibraryId libraryId = _libraryIdFixture.Create();
+        MediaLibraryScanCompositeId compositeId = _mediaLibraryScanCompositeIdFixture.Create();
+
+        // Act
+        _sut.InitializeQueuedScanProgress(libraryId, compositeId);
+        Result<Created> result = _sut.InitializeQueuedScanProgress(libraryId, compositeId);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Result<MediaLibraryScanProgress> progressResult = _sut.GetScanProgress(compositeId);
+        Assert.False(progressResult.IsFailure);
+        Assert.Equal(0, progressResult.Value.CompletedJobs);
+        Assert.Equal(0, progressResult.Value.TotalJobs);
+        Assert.Equal("Queued", progressResult.Value.CurrentJobProgress.Value.CurrentOperation);
+    }
+
+    [Fact]
     public void InitializeScanProgress_WhenCalled_ShouldCreateProgressWithZeroCompletedJobs()
     {
         // Arrange
@@ -46,14 +91,14 @@ public class MediaLibrariesScanProgressTrackerTests
     }
 
     [Fact]
-    public void InitializeScanProgress_WhenTotalJobsIsNotPositive_ShouldReturnError()
+    public void InitializeScanProgress_WhenTotalJobsIsNegative_ShouldReturnError()
     {
         // Arrange
         LibraryId libraryId = _libraryIdFixture.Create();
         MediaLibraryScanCompositeId compositeId = _mediaLibraryScanCompositeIdFixture.Create();
 
         // Act
-        Result<Created> result = _sut.InitializeScanProgress(libraryId, compositeId, totalJobs: 0);
+        Result<Created> result = _sut.InitializeScanProgress(libraryId, compositeId, totalJobs: -1);
 
         // Assert
         Assert.True(result.IsFailure);
