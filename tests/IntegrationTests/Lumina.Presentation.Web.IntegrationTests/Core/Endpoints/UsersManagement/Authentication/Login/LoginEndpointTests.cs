@@ -63,6 +63,25 @@ public class LoginEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Fact]
+    public async Task Login_WithValidCredentialsAndReturnUrl_ShouldReturnReturnUrlAsRedirectUrl()
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        HttpClient client = WebTestHelpers.CreateAnonymousClient(_apiFactory);
+        string antiforgeryToken = await WebTestHelpers.GetAntiforgeryTokenAsync(client);
+        HttpRequestMessage loginRequest = CreateLoginRequest(_loginRequestFixture.Create(username: "testuser", password: "TestPass123!", returnUrl: "/en-us/libraries/manage"), antiforgeryToken);
+
+        // Act
+        HttpResponseMessage response = await client.SendAsync(loginRequest);
+        using JsonDocument json = await WebTestHelpers.ReadJsonAsync(response);
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        Assert.True(json.RootElement.GetProperty("success").GetBoolean());
+        Assert.Equal("/en-us/libraries/manage", json.RootElement.GetProperty("data").GetString());
+    }
+
+    [Fact]
     public async Task Login_WhenTotpRequired_ShouldReturnTotpRequiredSignal()
     {
         // Arrange
