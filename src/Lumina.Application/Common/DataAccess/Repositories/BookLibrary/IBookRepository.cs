@@ -24,14 +24,6 @@ public interface IBookRepository : IRepository<BookEntity>,
                                    IDeleteByIdRepositoryAction<Guid>
 {
     /// <summary>
-    /// Gets all the books of the media library identified by <paramref name="libraryId"/>.
-    /// </summary>
-    /// <param name="libraryId">The Id of the media library whose books are retrieved.</param>
-    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="BookEntity"/>, or an error.</returns>
-    Task<Result<IEnumerable<BookEntity>>> GetByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken);
-
-    /// <summary>
     /// Gets the book of the media library identified by <paramref name="libraryId"/> that is stored at the provided <paramref name="path"/>.
     /// </summary>
     /// <param name="libraryId">The Id of the media library whose book is retrieved.</param>
