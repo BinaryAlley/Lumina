@@ -270,25 +270,6 @@ internal sealed class BookRepository : IBookRepository
     }
 
     /// <summary>
-    /// Gets all the books of the media library identified by <paramref name="libraryId"/>.
-    /// </summary>
-    /// <param name="libraryId">The Id of the media library whose books are retrieved.</param>
-    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="BookEntity"/>, or an error.</returns>
-    public async Task<Result<IEnumerable<BookEntity>>> GetByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken)
-    {
-        return await _luminaDbContext.Books
-            .Include(book => book.Tags)
-            .Include(book => book.Genres)
-            .Include(book => book.ISBNs)
-            .Include(book => book.Contributors)
-            .Include(book => book.Artwork)
-            .AsSplitQuery()
-            .Where(book => book.LibraryId == libraryId)
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
-    }
-
-    /// <summary>
     /// Gets the book of the media library identified by <paramref name="libraryId"/> that is stored at the provided <paramref name="path"/>.
     /// </summary>
     /// <param name="libraryId">The Id of the media library whose book is retrieved.</param>
