@@ -76,4 +76,19 @@ public class LoginViewEndpointTests : IClassFixture<LuminaWebFactory>
         string content = await response.Content.ReadAsStringAsync();
         Assert.Contains("some-return-url", content);
     }
+
+    [Fact]
+    public async Task LoginView_WhenCalledWithReturnUrlQueryValue_ShouldPreserveReturnUrlInView()
+    {
+        // Arrange
+        HttpClient client = _apiFactory.CreateClient();
+
+        // Act
+        HttpResponseMessage response = await client.GetAsync("/en-us/auth/login?returnUrl=%2Fen-us%2Flibraries%2Fmanage");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        string content = await response.Content.ReadAsStringAsync();
+        Assert.Contains("name=\"ReturnUrl\" value=\"/en-us/libraries/manage\"", content);
+    }
 }

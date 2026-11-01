@@ -42,4 +42,22 @@ public class LibrariesIndexViewEndpointTests : IClassFixture<LuminaWebFactory>
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal("text/html", response.Content.Headers.ContentType!.MediaType);
     }
+
+    [Theory]
+    [InlineData("/en-us/libraries/manage", "%2Fen-us%2Flibraries%2Fmanage")] // plain page
+    [InlineData("/en-us/libraries/manage?tab=scans", "%2Fen-us%2Flibraries%2Fmanage%3Ftab%3Dscans")] // query string is kept
+    public async Task LibrariesIndexView_WhenNavigatedToWithoutAuthentication_ShouldRedirectToLoginWithRequestedPageAsReturnUrl(string requestedUrl, string expectedEncodedReturnUrl)
+    {
+        // Arrange
+        HttpClient client = WebTestHelpers.CreateAnonymousClient(_apiFactory);
+        HttpRequestMessage request = new(HttpMethod.Get, requestedUrl);
+        request.Headers.Accept.ParseAdd("text/html");
+
+        // Act
+        HttpResponseMessage response = await client.SendAsync(request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.Equal($"http://localhost/en-us/auth/login?returnUrl={expectedEncodedReturnUrl}", response.Headers.Location!.ToString());
+    }
 }

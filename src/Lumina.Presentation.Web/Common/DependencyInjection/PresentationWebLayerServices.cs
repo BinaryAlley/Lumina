@@ -176,7 +176,14 @@ public static class PresentationWebLayerServices
                     {
                         HttpContext httpContext = redirectContext.HttpContext;
                         string culture = httpContext.Request.RouteValues["culture"]?.ToString()?.ToLower() ?? "en-us";
-                        string? lastDisplayedView = httpContext.Session.GetString(HttpContextItemKeys.LAST_DISPLAYED_VIEW);
+                        // A page the browser navigated to is itself the page to return to after login. Any other request (an AJAX call to an
+                        // "api-" endpoint, for example) is not a page, so the last page that was displayed in this session is used instead.
+                        bool isPageNavigation = HttpMethods.IsGet(httpContext.Request.Method)
+                            && (string.Equals(httpContext.Request.Headers["Sec-Fetch-Mode"].ToString(), "navigate", StringComparison.OrdinalIgnoreCase)
+                                || httpContext.Request.Headers.Accept.Any(accept => accept?.Contains("text/html", StringComparison.OrdinalIgnoreCase) == true));
+                        string? pageToReturnTo = isPageNavigation
+                            ? $"{httpContext.Request.Path}{httpContext.Request.QueryString}"
+                            : httpContext.Session.GetString(HttpContextItemKeys.LAST_DISPLAYED_VIEW);
 
                         // Build the login path considering reverse proxy and subfolder scenarios.
                         string? originalHost = httpContext.Request.Headers["X-Forwarded-Host"].FirstOrDefault() ?? httpContext.Request.Host.Value;
@@ -186,9 +193,9 @@ public static class PresentationWebLayerServices
                         string baseUrl = $"{originalScheme}://{originalHost}{originalPathBase}";
                         string loginPath = $"{baseUrl}/{culture}/auth/login";
 
-                        if (!string.IsNullOrEmpty(lastDisplayedView))
+                        if (!string.IsNullOrEmpty(pageToReturnTo))
                         {
-                            string returnUrl = Uri.EscapeDataString(lastDisplayedView);
+                            string returnUrl = Uri.EscapeDataString(pageToReturnTo);
                             redirectContext.RedirectUri = $"{loginPath}?returnUrl={returnUrl}";
                         }
                         else
