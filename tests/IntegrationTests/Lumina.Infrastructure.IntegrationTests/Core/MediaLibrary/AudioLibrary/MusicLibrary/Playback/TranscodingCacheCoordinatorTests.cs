@@ -449,11 +449,13 @@ public class TranscodingCacheCoordinatorTests : IDisposable
         string cacheId = CreateCacheId();
         string cachePath = Path.Combine(_cacheRoot, cacheId);
         PublishEntry(cacheId, 50, 100);
-        Thread.Sleep(200);
+        // The entry must be older than the grace period before the touch, and the touch must still be inside it when the reservation
+        // runs. A grace period of seconds keeps the second condition true on slow CI runners, where a few hundred milliseconds can pass between the two calls.
+        Thread.Sleep(2100);
 
         // Act
         _sut.Touch(cacheId, TimeSpan.Zero);
-        bool result = _sut.TryReserve(80, 100, TimeSpan.FromMilliseconds(100), out _);
+        bool result = _sut.TryReserve(80, 100, TimeSpan.FromSeconds(2), out _);
 
         // Assert
         Assert.False(result);

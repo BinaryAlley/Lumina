@@ -14,6 +14,7 @@ namespace Lumina.Domain.UnitTests.Core.BoundedContexts.LibraryManagementBoundedC
 public class LibraryPathTemplateTests
 {
     private readonly LibraryPathTemplateFixture _libraryPathTemplateFixture = new();
+    private readonly LibraryPathPartFixture _libraryPathPartFixture = new();
 
     [Fact]
     public void Create_WhenCalledWithParts_ShouldCreateTemplateWithThoseParts()
@@ -75,7 +76,8 @@ public class LibraryPathTemplateTests
         LibraryPathTemplate firstTemplate = _libraryPathTemplateFixture.Create();
 
         // Act
-        LibraryPathTemplate secondTemplate = _libraryPathTemplateFixture.Create();
+        // The second template extends the first one, because two random templates can be identical (a single typed part of the same kind).
+        LibraryPathTemplate secondTemplate = LibraryPathTemplate.Create([.. firstTemplate.Parts, _libraryPathPartFixture.Create()]);
 
         // Assert
         Assert.NotEqual(firstTemplate, secondTemplate);
