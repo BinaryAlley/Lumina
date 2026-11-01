@@ -43,7 +43,8 @@ public class FileHashServiceTests
             shouldParallelizeReads: true,
             () =>
             {
-                callbackInvocationCount++;
+                // The callback is invoked concurrently by the parallel reads, so a plain increment could lose a count.
+                Interlocked.Increment(ref callbackInvocationCount);
                 return Task.CompletedTask;
             },
             CancellationToken.None);
