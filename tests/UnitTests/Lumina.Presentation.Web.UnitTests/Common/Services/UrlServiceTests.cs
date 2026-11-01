@@ -215,6 +215,63 @@ public class UrlServiceTests
     }
 
     [Fact]
+    public void GetRelativeUrl_WhenOptionalRouteValueIsNotSupplied_ShouldRemoveOptionalSegment()
+    {
+        // Arrange
+        _mockHttpContextAccessor.HttpContext.Returns(TestHttpContextFactory.Create(culture: "en-us"));
+
+        // Act
+        string? url = _sut.GetRelativeUrl(WebRoutes.Authentication.LOGIN_VIEW);
+
+        // Assert
+        Assert.Equal("/en-us/auth/login", url);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public void GetRelativeUrl_WhenOptionalRouteValueIsEmpty_ShouldRemoveOptionalSegment(string? returnUrl)
+    {
+        // Arrange
+        _mockHttpContextAccessor.HttpContext.Returns(TestHttpContextFactory.Create(culture: "en-us"));
+
+        // Act
+        string? url = _sut.GetRelativeUrl(WebRoutes.Authentication.LOGIN_VIEW, new { returnUrl });
+
+        // Assert
+        Assert.Equal("/en-us/auth/login", url);
+    }
+
+    [Fact]
+    public void GetRelativeUrl_WhenOptionalRouteValueIsSupplied_ShouldReplaceOptionalPlaceholder()
+    {
+        // Arrange
+        _mockHttpContextAccessor.HttpContext.Returns(TestHttpContextFactory.Create(culture: "en-us"));
+
+        // Act
+        string? url = _sut.GetRelativeUrl(WebRoutes.Authentication.LOGIN_VIEW, new { returnUrl = "libraries" });
+
+        // Assert
+        Assert.Equal("/en-us/auth/login/libraries", url);
+    }
+
+    [Fact]
+    public void GetAbsoluteUrl_WhenOptionalRouteValueIsNotSupplied_ShouldBuildWellFormedUrl()
+    {
+        // Arrange
+        DefaultHttpContext httpContext = TestHttpContextFactory.Create(culture: "en-us");
+        httpContext.Request.Host = new HostString("localhost:5012");
+        httpContext.Request.Scheme = "http";
+        _mockHttpContextAccessor.HttpContext.Returns(httpContext);
+
+        // Act
+        string? url = _sut.GetAbsoluteUrl(WebRoutes.Authentication.LOGIN_VIEW);
+
+        // Assert
+        Assert.Equal("http://localhost:5012/en-us/auth/login", url);
+    }
+
+    [Fact]
     public void GetAbsoluteUrl_WhenCalled_ShouldComposeSchemeAndHostWithRelativeUrl()
     {
         // Arrange

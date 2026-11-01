@@ -46,9 +46,9 @@
         const manifestUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_READING_MANIFEST, new { bookId = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`) + `?libraryId=${libraryId}`;
         const availabilityUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_READING_AVAILABILITY, new { bookId = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`) + `?libraryId=${libraryId}`;
         const libraryIndexUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.INDEX)';
-        // The login route takes the page to return to as an optional route value. The template is kept, so the reader can append
-        // the current page to it when a JSON request discovers that the session ended.
-        const signInUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Authentication.LOGIN_VIEW)';
+        // The login page URL, without the optional return URL segment. The reader appends the current page to it as a query value
+        // when a JSON request discovers that the session ended.
+        const signInUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Authentication.LOGIN_VIEW)';
         const sectionUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_READING_SECTION, new { bookId = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`) + `?libraryId=${libraryId}&locationRef=`;
         const resourceUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_READING_RESOURCE, new { bookId = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`) + `?libraryId=${libraryId}&resourceKey=`;
         const startConsumptionUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.MediaConsumption.START_CONSUMPTION, new { libraryId = Model.LibraryId, mediaKind = "Book", mediaItemId = Model.BookId })';
@@ -289,10 +289,9 @@
         // redirects of the authentication middleware do, so the reader page is not encoded into the path of the login route.
         function redirectIfSessionEnded(response) {
             if (response.status === 401) {
-                if (!signInUrlTemplate)
+                if (!signInUrl)
                     return true;
                 const returnUrl = encodeURIComponent(window.location.pathname + window.location.search + window.location.hash);
-                const signInUrl = signInUrlTemplate.replace('/{returnUrl?}', '');
                 window.location.href = `${signInUrl}?returnUrl=${returnUrl}`;
                 return true;
             }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text.RegularExpressions;
 #endregion
 
 namespace Lumina.Presentation.Web.Common.Services;
@@ -19,6 +20,11 @@ public class UrlService : IUrlService
     /// The collection of route templates defined in the <see cref="WebRoutes"/> constants, used to validate the requested routes.
     /// </summary>
     private static readonly HashSet<string> s_knownRouteTemplates = GetKnownRouteTemplates();
+
+    /// <summary>
+    /// Matches an optional route parameter segment, such as <c>/{returnUrl?}</c>, that was left without a value.
+    /// </summary>
+    private static readonly Regex s_unfilledOptionalSegmentPattern = new(@"/?\{[^{}?]+\?\}", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UrlService"/> class.
@@ -62,7 +68,16 @@ public class UrlService : IUrlService
         string path = routeTemplate.Replace("{culture}", culture, StringComparison.OrdinalIgnoreCase);
         if (additionalRouteValues is not null)
             foreach (PropertyInfo property in additionalRouteValues.GetType().GetProperties())
-                path = path.Replace($"{{{property.Name}}}", property.GetValue(additionalRouteValues)?.ToString(), StringComparison.OrdinalIgnoreCase);
+            {
+                string? routeValue = property.GetValue(additionalRouteValues)?.ToString();
+                path = path.Replace($"{{{property.Name}}}", routeValue, StringComparison.OrdinalIgnoreCase);
+                // An optional parameter is only filled in when a value is supplied, otherwise its segment is removed below.
+                if (!string.IsNullOrEmpty(routeValue))
+                    path = path.Replace($"{{{property.Name}?}}", routeValue, StringComparison.OrdinalIgnoreCase);
+            }
+        // Optional parameters that received no value would otherwise end up literally in the URL (and be percent encoded by the
+        // browser, like "/auth/login/%7BreturnUrl?%7D"), producing a link that does not match the intended route.
+        path = s_unfilledOptionalSegmentPattern.Replace(path, string.Empty);
         // Ensure the path starts with a slash, so that it is relative to the server root when concatenated with the path base.
         if (!path.StartsWith('/'))
             path = "/" + path;
