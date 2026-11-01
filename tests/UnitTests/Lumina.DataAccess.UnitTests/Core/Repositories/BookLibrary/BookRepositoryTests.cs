@@ -262,7 +262,7 @@ public class BookRepositoryTests
     }
 
     [Fact]
-    public async Task GetByLibraryIdAsync_WhenCalled_ShouldReturnOnlyBooksOfTheLibrary()
+    public async Task GetAllAsync_WhenOtherLibrariesHaveBooks_ShouldReturnOnlyBooksOfTheFilteredLibrary()
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
@@ -272,13 +272,14 @@ public class BookRepositoryTests
         bookOfAnotherLibrary.LibraryId = Guid.NewGuid();
         _mockContext.Books.AddRange(bookOfLibrary, bookOfAnotherLibrary);
         await _mockContext.SaveChangesAsync();
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
 
         // Act
-        Result<IEnumerable<BookEntity>> result = await _sut.GetByLibraryIdAsync(libraryId, CancellationToken.None);
+        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetAllAsync<LibraryFilterDto>(filterModel: filter, cancellationToken: CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
-        BookEntity retrievedBook = Assert.Single(result.Value);
+        BookEntity retrievedBook = Assert.Single(result.Value.Data);
         Assert.Equal(bookOfLibrary.Id, retrievedBook.Id);
     }
 
@@ -1544,8 +1545,8 @@ public class BookRepositoryTests
     public async Task GetByIdsAsync_WhenExactlyFiveHundredIdsAreRequested_ShouldReturnEveryBook()
     {
         // Arrange
-        const int bookCount = 500;
-        List<BookEntity> books = CreateBooks(bookCount);
+        const int BOOK_COUNT = 500;
+        List<BookEntity> books = CreateBooks(BOOK_COUNT);
         _mockContext.Books.AddRange(books);
         await _mockContext.SaveChangesAsync();
 
@@ -1555,7 +1556,7 @@ public class BookRepositoryTests
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Equal(bookCount, result.Value.Count);
+        Assert.Equal(BOOK_COUNT, result.Value.Count);
         Assert.Equal(
             books.Select(book => book.Id).OrderBy(id => id),
             result.Value.Select(book => book.Id).OrderBy(id => id));
@@ -1565,8 +1566,8 @@ public class BookRepositoryTests
     public async Task GetByIdsAsync_WhenMoreThanFiveHundredIdsAreRequested_ShouldReturnEveryBook()
     {
         // Arrange
-        const int bookCount = 501;
-        List<BookEntity> books = CreateBooks(bookCount);
+        const int BOOK_COUNT = 501;
+        List<BookEntity> books = CreateBooks(BOOK_COUNT);
         _mockContext.Books.AddRange(books);
         await _mockContext.SaveChangesAsync();
 
@@ -1576,7 +1577,7 @@ public class BookRepositoryTests
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Equal(bookCount, result.Value.Count);
+        Assert.Equal(BOOK_COUNT, result.Value.Count);
         Assert.Equal(
             books.Select(book => book.Id).OrderBy(id => id),
             result.Value.Select(book => book.Id).OrderBy(id => id));
@@ -1656,8 +1657,8 @@ public class BookRepositoryTests
     public async Task GetAuthorsDisplayNamesByBookIdsAsync_WhenMoreThanFiveHundredIdsAreRequested_ShouldReturnTheAuthorOfEveryRequestedBook()
     {
         // Arrange
-        const int bookCount = 501;
-        List<BookEntity> books = CreateBooks(bookCount);
+        const int BOOK_COUNT = 501;
+        List<BookEntity> books = CreateBooks(BOOK_COUNT);
         _mockContext.Books.AddRange(books);
         MediaContributorEntity author = _mediaContributorEntityFixture.Create(displayName: "Shared Author");
         _mockContext.MediaContributors.Add(author);
@@ -1673,7 +1674,7 @@ public class BookRepositoryTests
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Equal(bookCount, result.Value.Count);
+        Assert.Equal(BOOK_COUNT, result.Value.Count);
         Assert.All(result.Value.Keys, bookId => Assert.Equal("Shared Author", result.Value[bookId]));
     }
 
