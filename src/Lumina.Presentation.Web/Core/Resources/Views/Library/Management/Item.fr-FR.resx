@@ -333,9 +333,6 @@
   <data name="MoveDown" xml:space="preserve">
     <value>Descendre</value>
   </data>
-  <data name="OrderSaved" xml:space="preserve">
-    <value>Ordre enregistré</value>
-  </data>
   <data name="DescriptionMetadataProviders" xml:space="preserve">
     <value>Les fournisseurs de métadonnées utilisés pour enrichir les éléments de cette bibliothèque, dans l'ordre où ils sont essayés.</value>
   </data>

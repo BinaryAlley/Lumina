@@ -2223,7 +2223,8 @@ namespace Lumina.DataAccess.Common.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LibraryId", "PluginId");
+                    b.HasIndex("LibraryId", "PluginId")
+                        .IsUnique();
 
                     b.ToTable("LibraryArtworkProviderConfigurations", (string)null);
                 });
@@ -2310,7 +2311,8 @@ namespace Lumina.DataAccess.Common.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LibraryId", "PluginId");
+                    b.HasIndex("LibraryId", "PluginId")
+                        .IsUnique();
 
                     b.ToTable("LibraryMetadataProviderConfigurations", (string)null);
                 });

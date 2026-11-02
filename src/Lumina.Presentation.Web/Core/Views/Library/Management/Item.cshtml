@@ -5,6 +5,8 @@
 @using Lumina.Presentation.Web.Common.DTO.Libraries
 @using Lumina.Presentation.Web.Common.Services
 @using Microsoft.AspNetCore.Mvc.Localization
+@using System.Collections.Generic
+@using System.Text.Json
 
 @{
     var id = Context.Request.RouteValues["id"] as string;
@@ -27,7 +29,6 @@
         <form method="post" id="add-media-library-form" class="inline" novalidate>
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="Id" value="@id" />
-            <input type="hidden" asp-for="UserId" value="@Model.UserId"/>
             <div class="form-row">
                 <h1 class="text-light-two w-100 text-center pt-0 pb-0 engraved-title">
                     @(_localizer[id is not null ? "EditLibrary" : "AddNewLibrary"])
@@ -271,8 +272,8 @@
                         <small class="form-label text-disabled form-description">@_localizer["DescriptionPathTemplate"]</small>
                     </div>
                 </div>
-                @if (id is not null)
-                {
+                <!-- The provider sections are shown for new and existing libraries alike, and only when the selected library type has providers of that kind. -->
+                <div id="metadata-providers-section" class="hidden">
                     <h3 class="text-light-two">@_localizer["MetadataProviders"]</h3>
                     <div class="form-row">
                         <table id="metadata-providers-table" class="w-100">
@@ -289,6 +290,8 @@
                         </table>
                         <small class="form-label text-disabled form-description">@_localizer["DescriptionMetadataProviders"]</small>
                     </div>
+                </div>
+                <div id="artwork-providers-section" class="hidden">
                     <h3 class="text-light-two">@_localizer["ArtworkProviders"]</h3>
                     <div class="form-row">
                         <table id="artwork-providers-table" class="w-100">
@@ -305,6 +308,8 @@
                         </table>
                         <small class="form-label text-disabled form-description">@_localizer["DescriptionArtworkProviders"]</small>
                     </div>
+                </div>
+                <div id="book-readers-section" class="hidden">
                     <h3 class="text-light-two">@_localizer["BookReaders"]</h3>
                     <div class="form-row">
                         <table id="book-readers-table" class="w-100">
@@ -321,7 +326,7 @@
                         </table>
                         <small class="form-label text-disabled form-description">@_localizer["DescriptionBookReaders"]</small>
                     </div>
-                }
+                </div>
                 <div class="form-row">
                     <button type="submit" class="confirm-button w-100px">@_localizer["Save"]</button>
                 </div>
@@ -340,6 +345,23 @@
     <script type="text/plain" data-form="@scriptId">
         // Create cleanup registry for this view.
         const cleanupFunctions = [];
+
+        // The localized labels of the rows built by this script, injected as JSON for the same reason as the path part labels below, and so that a translation
+        // containing a backtick or "${" cannot break out of the template literals that render the rows.
+        const rowLabels = @Html.Raw(JsonSerializer.Serialize(new Dictionary<string, string>
+        {
+            ["remove"] = _localizer["Remove"].Value,
+            ["moveUp"] = _localizer["MoveUp"].Value,
+            ["moveDown"] = _localizer["MoveDown"].Value
+        }));
+
+        // Escapes a value for use as text or as a quoted attribute value inside markup, since the chosen paths and the names, Ids and extensions of the providers
+        // are not controlled by this page.
+        function escapeHtml(value) {
+            const div = document.createElement('div');
+            div.textContent = value ?? '';
+            return div.innerHTML.replace(/"/g, '&quot;');
+        }
 
         // The element references are captured once, so that the cleanup can unbind their listeners even after the AJAX navigator has swapped the content out of the document.
         const saveSuccess = document.getElementById('save-success');
@@ -374,7 +396,6 @@
             const completionThresholdPercentage = inputCompletionThresholdPercentage.value.trim();
             const formData = {
                 Id: form.querySelector('[name="Id"]').value || null,
-                UserId: form.querySelector('[name="UserId"]').value || null,
                 Title: form.querySelector('[name="Title"]').value,
                 LibraryType: form.querySelector('#library-selected-item').getAttribute('data-value'),
                 ContentLocations: Array.from(mediaDirectoriesFormTable.querySelectorAll('.form-table-row span'))
@@ -404,7 +425,12 @@
                         Representation: getPathTemplatePillRepresentation(pill),
                         IsOptional: optional ? optional.checked : false
                     };
-                })
+                }),
+                // The provider choices are saved together with the library. A list that could not be loaded is sent as null, so the server keeps
+                // or reconciles what it has, instead of being told that every provider was left out.
+                MetadataProviders: areMetadataProvidersLoaded ? getProviderSelections(metadataProvidersTbody, 'metadata-provider-enabled') : null,
+                ArtworkProviders: areArtworkProvidersLoaded ? getProviderSelections(artworkProvidersTbody, 'artwork-provider-enabled') : null,
+                BookReaders: areBookReadersLoaded ? getProviderSelections(bookReadersTbody, 'book-reader-enabled') : null
             };
             const data = await callApiPostAsync('@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.SAVE_LIBRARY)', formData);
             if (data) {
@@ -428,8 +454,8 @@
                 if (!isDuplicate) {
                     mediaDirectoriesFormTable.insertAdjacentHTML('beforeend', `
                         <div class="form-table-row">
-                            <span title="${normalizedPath}">${normalizedPath}</span>
-                            <img src="/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" onclick="this.closest('.form-table-row').remove();" />
+                            <span title="${escapeHtml(normalizedPath)}">${escapeHtml(normalizedPath)}</span>
+                            <img src="/images/ui/delete.svg" alt="${escapeHtml(rowLabels.remove)}" title="${escapeHtml(rowLabels.remove)}" class="remove-form-table-row-icon" onclick="this.closest('.form-table-row').remove();" />
                         </div>
                     `);
                 }
@@ -446,8 +472,8 @@
                 const path = paths[0]; // Only use the first path.
                 mediaCoverFormTable.insertAdjacentHTML('beforeend', `
                     <div class="form-table-row">
-                        <span title="${path}">${path}</span>
-                        <img src="/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" onclick="this.closest('.form-table-row').remove();" />
+                        <span title="${escapeHtml(path)}">${escapeHtml(path)}</span>
+                        <img src="/images/ui/delete.svg" alt="${escapeHtml(rowLabels.remove)}" title="${escapeHtml(rowLabels.remove)}" class="remove-form-table-row-icon" onclick="this.closest('.form-table-row').remove();" />
                     </div>
                 `);
             }
@@ -494,169 +520,121 @@
         };
 
         const id = '@id';
-        const metadataProvidersTable = document.getElementById('metadata-providers-table');
-        const metadataProvidersTbody = metadataProvidersTable ? metadataProvidersTable.querySelector('tbody') : null;
+        const metadataProvidersSection = document.getElementById('metadata-providers-section');
+        const metadataProvidersTbody = document.getElementById('metadata-providers-table').querySelector('tbody');
+        const artworkProvidersSection = document.getElementById('artwork-providers-section');
+        const artworkProvidersTbody = document.getElementById('artwork-providers-table').querySelector('tbody');
+        const bookReadersSection = document.getElementById('book-readers-section');
+        const bookReadersTbody = document.getElementById('book-readers-table').querySelector('tbody');
+        // Whether each provider list was loaded for the selected library type. A list that failed to load is not sent when the library is saved.
+        let areMetadataProvidersLoaded = false;
+        let areArtworkProvidersLoaded = false;
+        let areBookReadersLoaded = false;
+        // Incremented on every load, so that the responses of a load started for a previously selected library type are discarded.
+        let providersLoadVersion = 0;
 
-        // Loads the metadata providers configured for the library, when editing an existing library.
-        async function loadMetadataProvidersAsync() {
-            if (!id || !metadataProvidersTbody) return;
-            const url = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.GET_METADATA_PROVIDERS, new { libraryId = default(Guid) })'
-                .replace('/@(default(Guid))', `/${id}`); // The libraryId needs to be replaced here, because GetAbsoluteUrl is server side, libraryId is client side.
-            const response = await callApiGetAsync(url);
-            if (response && response.length > 0) {
-                metadataProvidersTbody.innerHTML = response.map((provider, index) => renderMetadataProviderRow(provider, index, response.length)).join('');
+        // Loads the metadata providers, artwork providers and book readers of the selected library type. A new library lists the providers available for the
+        // type, the way a new library of that type starts. An existing library merges its stored configuration with them, the same way the server reconciles
+        // the configuration when the library is saved: the stored providers that the type still supports keep their state and order, the newly supported
+        // ones are added disabled after them, and the stored providers that the type no longer supports are left out, so they are never submitted.
+        async function loadProvidersAsync() {
+            const libraryType = getSelectedLibraryType();
+            const loadVersion = ++providersLoadVersion;
+            areMetadataProvidersLoaded = false;
+            areArtworkProvidersLoaded = false;
+            areBookReadersLoaded = false;
+            if (!libraryType) {
+                renderProviders(null, null, null);
+                return;
             }
+            // The Id and the type need to be replaced here, because GetAbsoluteUrl is server side, while the library Id and the selected type are client side.
+            const encodedLibraryType = encodeURIComponent(libraryType);
+            const requests = [
+                callApiGetAsync('@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.GET_LIBRARY_TYPE_METADATA_PROVIDERS, new { libraryType = "Book" })'.replace('/Book', `/${encodedLibraryType}`)),
+                callApiGetAsync('@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.GET_LIBRARY_TYPE_ARTWORK_PROVIDERS, new { libraryType = "Book" })'.replace('/Book', `/${encodedLibraryType}`)),
+                callApiGetAsync('@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.GET_LIBRARY_TYPE_BOOK_READERS, new { libraryType = "Book" })'.replace('/Book', `/${encodedLibraryType}`))
+            ];
+            if (id) {
+                requests.push(
+                    callApiGetAsync('@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.GET_METADATA_PROVIDERS, new { libraryId = default(Guid) })'.replace('/@(default(Guid))', `/${id}`)),
+                    callApiGetAsync('@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.GET_ARTWORK_PROVIDERS, new { libraryId = default(Guid) })'.replace('/@(default(Guid))', `/${id}`)),
+                    callApiGetAsync('@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.GET_BOOK_READERS, new { libraryId = default(Guid) })'.replace('/@(default(Guid))', `/${id}`)));
+            }
+            const [availableMetadataProviders, availableArtworkProviders, availableBookReaders, storedMetadataProviders, storedArtworkProviders, storedBookReaders] = await Promise.all(requests);
+            if (loadVersion !== providersLoadVersion)
+                return;
+            if (!id) {
+                renderProviders(availableMetadataProviders, availableArtworkProviders, availableBookReaders);
+                return;
+            }
+            renderProviders(
+                mergeStoredProviders(availableMetadataProviders, storedMetadataProviders),
+                mergeStoredProviders(availableArtworkProviders, storedArtworkProviders),
+                mergeStoredProviders(availableBookReaders, storedBookReaders));
         }
 
-        // Renders a metadata provider row of the library.
-        function renderMetadataProviderRow(provider, index, count) {
+        // Merges the stored configuration of a library with the providers available for the selected type. Returns null when either list could not be
+        // loaded, so that the list is not submitted and the server keeps what it has. An empty list of available providers is treated the same way:
+        // while stored providers exist, it means that no loaded plugin currently reports support for the type, not that the user left every provider
+        // out. Submitting it would tell the server that the whole list is a choice, which deletes the stored rows along with their enablement and
+        // order, and the next plugin sync would re-add them disabled.
+        function mergeStoredProviders(availableProviders, storedProviders) {
+            if (!Array.isArray(availableProviders) || !Array.isArray(storedProviders))
+                return null;
+            if (availableProviders.length === 0 && storedProviders.length > 0)
+                return null;
+            const availableProvidersById = new Map(availableProviders.map(provider => [provider.pluginId, provider]));
+            const keptProviders = storedProviders
+                .filter(provider => availableProvidersById.has(provider.pluginId))
+                .sort((first, second) => (first.rank ?? 0) - (second.rank ?? 0))
+                .map(provider => ({ ...availableProvidersById.get(provider.pluginId), isEnabled: provider.isEnabled }));
+            const keptPluginIds = new Set(keptProviders.map(provider => provider.pluginId));
+            return keptProviders.concat(availableProviders.filter(provider => !keptPluginIds.has(provider.pluginId)));
+        }
+
+        // Renders the provider lists, and shows only the sections whose list has at least one provider.
+        function renderProviders(metadataProviders, artworkProviders, bookReaders) {
+            areMetadataProvidersLoaded = Array.isArray(metadataProviders);
+            areArtworkProvidersLoaded = Array.isArray(artworkProviders);
+            areBookReadersLoaded = Array.isArray(bookReaders);
+            const metadataProviderRows = areMetadataProvidersLoaded ? metadataProviders : [];
+            const artworkProviderRows = areArtworkProvidersLoaded ? artworkProviders : [];
+            const bookReaderRows = areBookReadersLoaded ? bookReaders : [];
+            metadataProvidersTbody.innerHTML = metadataProviderRows.map(provider => renderRankedProviderRow(provider, 'metadata-provider')).join('');
+            artworkProvidersTbody.innerHTML = artworkProviderRows.map(provider => renderRankedProviderRow(provider, 'artwork-provider')).join('');
+            bookReadersTbody.innerHTML = bookReaderRows.map(reader => renderBookReaderRow(reader)).join('');
+            refreshMoveButtons(metadataProvidersTbody, 'metadata-provider');
+            refreshMoveButtons(artworkProvidersTbody, 'artwork-provider');
+            metadataProvidersSection.classList.toggle('hidden', metadataProviderRows.length === 0);
+            artworkProvidersSection.classList.toggle('hidden', artworkProviderRows.length === 0);
+            bookReadersSection.classList.toggle('hidden', bookReaderRows.length === 0);
+        }
+
+        // Renders a metadata or artwork provider row, whose position in the table is the order in which the provider is tried.
+        function renderRankedProviderRow(provider, classPrefix) {
             return `
-                <tr data-provider-plugin-id="${provider.pluginId}">
-                    <td>${provider.name}</td>
+                <tr data-plugin-id="${escapeHtml(provider.pluginId)}">
+                    <td>${escapeHtml(provider.name)}</td>
                     <td class="text-center">
                         <label class="enlightenment-checkbox-label">
-                            <input type="checkbox" class="enlightenment-checkbox-hidden metadata-provider-enabled" ${provider.isEnabled ? 'checked' : ''} />
+                            <input type="checkbox" class="enlightenment-checkbox-hidden ${classPrefix}-enabled" ${provider.isEnabled ? 'checked' : ''} />
                             <span class="enlightenment-checkbox"></span>
                         </label>
                     </td>
                     <td class="text-center">
-                        <button type="button" class="metadata-provider-move-up confirm-button f-12 h-20px" ${index === 0 ? 'disabled' : ''}>@_localizer["MoveUp"]</button>
-                        <button type="button" class="metadata-provider-move-down abort-button f-12 h-20px" ${index === count - 1 ? 'disabled' : ''}>@_localizer["MoveDown"]</button>
+                        <button type="button" class="${classPrefix}-move-up confirm-button f-12 h-20px">${escapeHtml(rowLabels.moveUp)}</button>
+                        <button type="button" class="${classPrefix}-move-down abort-button f-12 h-20px">${escapeHtml(rowLabels.moveDown)}</button>
                     </td>
                 </tr>`;
         }
 
-        // On metadata provider move button click, reorders the providers and persists the new order.
-        async function handleMetadataProviderReorderAsync(e) {
-            const button = e.target.closest('.metadata-provider-move-up, .metadata-provider-move-down');
-            if (!button || !metadataProvidersTbody) return;
-            const row = button.closest('tr');
-            if (button.classList.contains('metadata-provider-move-up')) {
-                const previousRow = row.previousElementSibling;
-                if (previousRow) metadataProvidersTbody.insertBefore(row, previousRow);
-            } else {
-                const nextRow = row.nextElementSibling;
-                if (nextRow) metadataProvidersTbody.insertBefore(nextRow, row);
-            }
-            await saveMetadataProviderOrderAsync();
-        }
-
-        // Persists the current order of the metadata providers of the library.
-        async function saveMetadataProviderOrderAsync() {
-            if (!id || !metadataProvidersTbody) return;
-            const pluginIds = Array.from(metadataProvidersTbody.querySelectorAll('tr[data-provider-plugin-id]'))
-                .map(row => row.getAttribute('data-provider-plugin-id'));
-            const result = await callApiPutAsync('@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.REORDER_METADATA_PROVIDERS)', { libraryId: id, pluginIds: pluginIds });
-            if (result.success) {
-                notificationService.show('@_localizer["OrderSaved"]', NotificationType.SUCCESS);
-            }
-        }
-
-        // On metadata provider enabled checkbox change, persists the new state.
-        async function handleMetadataProviderEnabledChangeAsync(e) {
-            if (e.target.matches('.metadata-provider-enabled')) {
-                const row = e.target.closest('tr');
-                const pluginId = row.getAttribute('data-provider-plugin-id');
-                const isEnabled = e.target.checked;
-                const result = await callApiPutAsync('@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.SET_METADATA_PROVIDER_ENABLED)', { libraryId: id, pluginId: pluginId, isEnabled: isEnabled });
-                if (!result.success) {
-                    e.target.checked = !isEnabled;
-                }
-            }
-        };
-
-        const artworkProvidersTable = document.getElementById('artwork-providers-table');
-        const artworkProvidersTbody = artworkProvidersTable ? artworkProvidersTable.querySelector('tbody') : null;
-
-        // Loads the artwork providers configured for the library, when editing an existing library.
-        async function loadArtworkProvidersAsync() {
-            if (!id || !artworkProvidersTbody) return;
-            const url = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.GET_ARTWORK_PROVIDERS, new { libraryId = default(Guid) })'
-                .replace('/@(default(Guid))', `/${id}`); // The libraryId needs to be replaced here, because GetAbsoluteUrl is server side, libraryId is client side.
-            const response = await callApiGetAsync(url);
-            if (response && response.length > 0) {
-                artworkProvidersTbody.innerHTML = response.map((provider, index) => renderArtworkProviderRow(provider, index, response.length)).join('');
-            }
-        }
-
-        // Renders an artwork provider row of the library.
-        function renderArtworkProviderRow(provider, index, count) {
-            return `
-                <tr data-provider-plugin-id="${provider.pluginId}">
-                    <td>${provider.name}</td>
-                    <td class="text-center">
-                        <label class="enlightenment-checkbox-label">
-                            <input type="checkbox" class="enlightenment-checkbox-hidden artwork-provider-enabled" ${provider.isEnabled ? 'checked' : ''} />
-                            <span class="enlightenment-checkbox"></span>
-                        </label>
-                    </td>
-                    <td class="text-center">
-                        <button type="button" class="artwork-provider-move-up confirm-button f-12 h-20px" ${index === 0 ? 'disabled' : ''}>@_localizer["MoveUp"]</button>
-                        <button type="button" class="artwork-provider-move-down abort-button f-12 h-20px" ${index === count - 1 ? 'disabled' : ''}>@_localizer["MoveDown"]</button>
-                    </td>
-                </tr>`;
-        }
-
-        // On artwork provider move button click, reorders the providers and persists the new order.
-        async function handleArtworkProviderReorderAsync(e) {
-            const button = e.target.closest('.artwork-provider-move-up, .artwork-provider-move-down');
-            if (!button || !artworkProvidersTbody) return;
-            const row = button.closest('tr');
-            if (button.classList.contains('artwork-provider-move-up')) {
-                const previousRow = row.previousElementSibling;
-                if (previousRow) artworkProvidersTbody.insertBefore(row, previousRow);
-            } else {
-                const nextRow = row.nextElementSibling;
-                if (nextRow) artworkProvidersTbody.insertBefore(nextRow, row);
-            }
-            await saveArtworkProviderOrderAsync();
-        }
-
-        // Persists the current order of the artwork providers of the library.
-        async function saveArtworkProviderOrderAsync() {
-            if (!id || !artworkProvidersTbody) return;
-            const pluginIds = Array.from(artworkProvidersTbody.querySelectorAll('tr[data-provider-plugin-id]'))
-                .map(row => row.getAttribute('data-provider-plugin-id'));
-            const result = await callApiPutAsync('@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.REORDER_ARTWORK_PROVIDERS)', { libraryId: id, pluginIds: pluginIds });
-            if (result.success) {
-                notificationService.show('@_localizer["OrderSaved"]', NotificationType.SUCCESS);
-            }
-        }
-
-        // On artwork provider enabled checkbox change, persists the new state.
-        async function handleArtworkProviderEnabledChangeAsync(e) {
-            if (e.target.matches('.artwork-provider-enabled')) {
-                const row = e.target.closest('tr');
-                const pluginId = row.getAttribute('data-provider-plugin-id');
-                const isEnabled = e.target.checked;
-                const result = await callApiPutAsync('@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.SET_ARTWORK_PROVIDER_ENABLED)', { libraryId: id, pluginId: pluginId, isEnabled: isEnabled });
-                if (!result.success) {
-                    e.target.checked = !isEnabled;
-                }
-            }
-        };
-
-        const bookReadersTable = document.getElementById('book-readers-table');
-        const bookReadersTbody = bookReadersTable ? bookReadersTable.querySelector('tbody') : null;
-
-        // Loads the book readers configured for the library, when editing an existing library.
-        async function loadBookReadersAsync() {
-            if (!id || !bookReadersTbody) return;
-            const url = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.GET_BOOK_READERS, new { libraryId = default(Guid) })'
-                .replace('/@(default(Guid))', `/${id}`); // The libraryId needs to be replaced here, because GetAbsoluteUrl is server side, libraryId is client side.
-            const response = await callApiGetAsync(url);
-            if (response && response.length > 0) {
-                bookReadersTbody.innerHTML = response.map(reader => renderBookReaderRow(reader)).join('');
-            }
-        }
-
-        // Renders a book reader row of the library.
+        // Renders a book reader row.
         function renderBookReaderRow(reader) {
             const extensions = (reader.supportedExtensions || []).join(', ');
             return `
-                <tr data-reader-plugin-id="${reader.pluginId}">
-                    <td>${reader.name}</td>
-                    <td>${extensions}</td>
+                <tr data-plugin-id="${escapeHtml(reader.pluginId)}">
+                    <td>${escapeHtml(reader.name)}</td>
+                    <td>${escapeHtml(extensions)}</td>
                     <td class="text-center">
                         <label class="enlightenment-checkbox-label">
                             <input type="checkbox" class="enlightenment-checkbox-hidden book-reader-enabled" ${reader.isEnabled ? 'checked' : ''} />
@@ -666,18 +644,47 @@
                 </tr>`;
         }
 
-        // On book reader enabled checkbox change, persists the new state.
-        async function handleBookReaderEnabledChangeAsync(e) {
-            if (e.target.matches('.book-reader-enabled')) {
-                const row = e.target.closest('tr');
-                const pluginId = row.getAttribute('data-reader-plugin-id');
-                const isEnabled = e.target.checked;
-                const result = await callApiPutAsync('@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.SET_BOOK_READER_ENABLED)', { libraryId: id, pluginId: pluginId, isEnabled: isEnabled });
-                if (!result.success) {
-                    e.target.checked = !isEnabled;
-                }
+        // Disables the move up button of the first row and the move down button of the last row, and enables all the others.
+        function refreshMoveButtons(tbody, classPrefix) {
+            const rows = Array.from(tbody.querySelectorAll('tr[data-plugin-id]'));
+            rows.forEach((row, index) => {
+                row.querySelector(`.${classPrefix}-move-up`).disabled = index === 0;
+                row.querySelector(`.${classPrefix}-move-down`).disabled = index === rows.length - 1;
+            });
+        }
+
+        // Moves the provider row of the clicked move button one position up or down. The new order is saved together with the library.
+        function moveProviderRow(e, tbody, classPrefix) {
+            const button = e.target.closest(`.${classPrefix}-move-up, .${classPrefix}-move-down`);
+            if (!button) return;
+            const row = button.closest('tr');
+            if (button.classList.contains(`${classPrefix}-move-up`)) {
+                const previousRow = row.previousElementSibling;
+                if (previousRow) tbody.insertBefore(row, previousRow);
+            } else {
+                const nextRow = row.nextElementSibling;
+                if (nextRow) tbody.insertBefore(nextRow, row);
             }
+            refreshMoveButtons(tbody, classPrefix);
+        }
+
+        // On metadata provider move button click, moves the provider.
+        const handleMetadataProviderMove = function(e) {
+            moveProviderRow(e, metadataProvidersTbody, 'metadata-provider');
         };
+
+        // On artwork provider move button click, moves the provider.
+        const handleArtworkProviderMove = function(e) {
+            moveProviderRow(e, artworkProvidersTbody, 'artwork-provider');
+        };
+
+        // Gets the choices made in a provider table, in the order of its rows.
+        function getProviderSelections(tbody, enabledCheckboxClass) {
+            return Array.from(tbody.querySelectorAll('tr[data-plugin-id]')).map(row => ({
+                PluginId: row.getAttribute('data-plugin-id'),
+                IsEnabled: row.querySelector(`.${enabledCheckboxClass}`).checked
+            }));
+        }
 
         // The default completion threshold of each library type that tracks consumption progress by default. It mirrors
         // LibraryConsumptionSettings.CreateDefault(LibraryType) in the domain, so the two must be kept in sync.
@@ -762,13 +769,15 @@
         const libraryTypeSelectedItem = document.getElementById('library-selected-item');
         // The type the library was loaded with, so that the saved template is only restored for it, and not when the user previews other types.
         const initialLibraryType = libraryTypeSelectedItem ? libraryTypeSelectedItem.getAttribute('data-value') : null;
+        // The type whose path template and providers are currently shown, so that picking the same type again keeps the unsaved edits of the form.
+        let shownLibraryType = initialLibraryType;
         const libraryTypeDropdown = form.querySelector('.enlightenment-combobox .enlightenment-dropdown');
-        const pathSeparator = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(System.IO.Path.DirectorySeparatorChar.ToString()));
-        const savedPathTemplateParts = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.PathTemplateParts, new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase }));
+        const pathSeparator = @Html.Raw(JsonSerializer.Serialize(System.IO.Path.DirectorySeparatorChar.ToString()));
+        const savedPathTemplateParts = @Html.Raw(JsonSerializer.Serialize(Model.PathTemplateParts, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
         // The localized strings used inside this script must be injected as JSON, not as raw HTML text: Razor HTML-encodes non-ASCII
         // characters into numeric entities (e.g. "ă" becomes "&#x103;"), and the browser does not decode entities inside a
         // script element, so they would show up literally. JSON escapes them as \uXXXX, which the script reads correctly.
-        const pathPartLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(new System.Collections.Generic.Dictionary<string, string>
+        const pathPartLabels = @Html.Raw(JsonSerializer.Serialize(new Dictionary<string, string>
         {
             ["Literal"] = _localizer["PathPartLiteral"].Value,
             ["Separator"] = _localizer["PathPartSeparator"].Value,
@@ -786,7 +795,7 @@
             ["SeriesNumber"] = _localizer["PathPartSeriesNumber"].Value,
             ["BookId"] = _localizer["PathPartBookId"].Value
         }));
-        const pathTemplateStrings = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(new System.Collections.Generic.Dictionary<string, string>
+        const pathTemplateStrings = @Html.Raw(JsonSerializer.Serialize(new Dictionary<string, string>
         {
             ["optional"] = _localizer["PathPartOptional"].Value,
             ["remove"] = _localizer["Remove"].Value,
@@ -1086,7 +1095,14 @@
             const option = e.target.closest('.enlightenment-option');
             if (!option || option.classList.contains('disabled') || !option.getAttribute('data-value')) return;
             setTimeout(() => {
+                // Picking the type that is already selected changes nothing, so the path template, the provider choices and the consumption settings
+                // edited since are kept, instead of being reloaded and lost.
+                const libraryType = getSelectedLibraryType();
+                if (libraryType === shownLibraryType) return;
+                shownLibraryType = libraryType;
                 loadPathTemplateAsync();
+                // The provider tables always list the providers relevant to the selected type, so they are reloaded with it.
+                loadProvidersAsync();
                 // A new library starts from the default consumption settings of its type. An existing library keeps the settings it was loaded with.
                 if (!id)
                     applyDefaultConsumptionSettings();
@@ -1109,17 +1125,8 @@
         pathTemplateDropzone.addEventListener('drop', handlePathTemplateDrop);
         pathTemplateDropzone.addEventListener('dragleave', handlePathTemplateDragLeave);
         if (libraryTypeDropdown) libraryTypeDropdown.addEventListener('click', handleLibraryTypeChange);
-        if (metadataProvidersTbody) {
-            metadataProvidersTbody.addEventListener('click', handleMetadataProviderReorderAsync);
-            metadataProvidersTbody.addEventListener('change', handleMetadataProviderEnabledChangeAsync);
-        }
-        if (artworkProvidersTbody) {
-            artworkProvidersTbody.addEventListener('click', handleArtworkProviderReorderAsync);
-            artworkProvidersTbody.addEventListener('change', handleArtworkProviderEnabledChangeAsync);
-        }
-        if (bookReadersTbody) {
-            bookReadersTbody.addEventListener('change', handleBookReaderEnabledChangeAsync);
-        }
+        metadataProvidersTbody.addEventListener('click', handleMetadataProviderMove);
+        artworkProvidersTbody.addEventListener('click', handleArtworkProviderMove);
 
         // Register cleanup for these listeners.
         cleanupFunctions.push(() => {
@@ -1138,25 +1145,12 @@
             pathTemplateDropzone.removeEventListener('drop', handlePathTemplateDrop);
             pathTemplateDropzone.removeEventListener('dragleave', handlePathTemplateDragLeave);
             if (libraryTypeDropdown) libraryTypeDropdown.removeEventListener('click', handleLibraryTypeChange);
-            if (metadataProvidersTbody) {
-                metadataProvidersTbody.removeEventListener('click', handleMetadataProviderReorderAsync);
-                metadataProvidersTbody.removeEventListener('change', handleMetadataProviderEnabledChangeAsync);
-            }
-            if (artworkProvidersTbody) {
-                artworkProvidersTbody.removeEventListener('click', handleArtworkProviderReorderAsync);
-                artworkProvidersTbody.removeEventListener('change', handleArtworkProviderEnabledChangeAsync);
-            }
-            if (bookReadersTbody) {
-                bookReadersTbody.removeEventListener('change', handleBookReaderEnabledChangeAsync);
-            }
+            metadataProvidersTbody.removeEventListener('click', handleMetadataProviderMove);
+            artworkProvidersTbody.removeEventListener('click', handleArtworkProviderMove);
         });
 
-        // Load the metadata and artwork providers and book readers when editing an existing library.
-        if (id) {
-            loadMetadataProvidersAsync();
-            loadArtworkProvidersAsync();
-            loadBookReadersAsync();
-        }
+        // Load the metadata providers, artwork providers and book readers of the selected library type, for both new and existing libraries.
+        loadProvidersAsync();
 
         // Load the path template of the selected library type, and its default, for both new and existing libraries.
         loadPathTemplateAsync();

@@ -41,19 +41,19 @@ public class GetLibraryPathTemplatePartsQueryHandler : IQueryHandler<GetLibraryP
     /// </returns>
     public Task<Result<LibraryPathTemplateCatalogResponse>> HandleAsync(GetLibraryPathTemplatePartsQuery query, CancellationToken cancellationToken)
     {
-        // the library type travels as a string taken from the route, and is matched against the enum the same way the create and update
+        // The library type travels as a string taken from the route, and is matched against the enum the same way the create and update
         // library commands do, so that a malformed type is reported as an unknown library type instead of silently returning an empty catalog.
-        if (!Enum.TryParse(query.LibraryType, ignoreCase: true, out LibraryType libraryType))
+        if (!Enum.TryParse(query.LibraryType, ignoreCase: true, out LibraryType libraryType) || !Enum.IsDefined(libraryType))
             return Task.FromResult<Result<LibraryPathTemplateCatalogResponse>>(DomainErrors.Library.UnknownLibraryType);
 
-        // only the catalog registered for the requested library type applies, so the parts and the default structure offered to the user are
+        // Only the catalog registered for the requested library type applies, so the parts and the default structure offered to the user are
         // type aware (music libraries get artist and release parts, book libraries get author and title parts, and so on).
         ILibraryPathPartCatalog? catalog = _catalogs.FirstOrDefault(candidate => candidate.SupportedLibraryType == libraryType);
         if (catalog is null)
-            // a library type without a catalog has no structure to describe, so an empty catalog is returned, which the client uses to hide the editor.
+            // A library type without a catalog has no structure to describe, so an empty catalog is returned, which the client uses to hide the editor.
             return Task.FromResult(Result<LibraryPathTemplateCatalogResponse>.Success(new LibraryPathTemplateCatalogResponse([], [])));
 
-        // the selectable parts describe what the user can drop into the template, together with the value type and the default on-disk representation of each part.
+        // The selectable parts describe what the user can drop into the template, together with the value type and the default on-disk representation of each part.
         List<LibraryPathPartDefinitionResponse> parts =
         [
             .. catalog.GetPartDefinitions().Select(definition => new LibraryPathPartDefinitionResponse(
@@ -62,7 +62,7 @@ public class GetLibraryPathTemplatePartsQueryHandler : IQueryHandler<GetLibraryP
                 definition.DefaultRepresentation,
                 definition.IsOptionalByDefault))
         ];
-        // the default template parts describe the ideal structure the application expects, pre-filled in the editor so the user only edits what deviates.
+        // The default template parts describe the ideal structure the application expects, pre-filled in the editor so the user only edits what deviates.
         List<LibraryPathTemplatePartResponse> defaultTemplateParts =
         [
             .. catalog.GetDefaultTemplate().Parts.Select(part => new LibraryPathTemplatePartResponse(part.Kind.ToString(), part.Representation, part.IsOptional))

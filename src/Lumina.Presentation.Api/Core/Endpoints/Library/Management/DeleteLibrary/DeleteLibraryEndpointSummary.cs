@@ -22,7 +22,7 @@ public class DeleteLibraryEndpointSummary : Summary<DeleteLibraryEndpoint, Delet
     public DeleteLibraryEndpointSummary()
     {
         Summary = "Deletes an existing media library.";
-        Description = "Deletes a media library, if the user making the request is an Admin, or the owner of the library.";
+        Description = "Deletes a media library, if the user making the request is an Admin, or the owner of the library holding the permission to create libraries.";
 
         ExampleRequest = new DeleteLibraryRequest(
             Id: Guid.NewGuid()
@@ -62,7 +62,7 @@ public class DeleteLibraryEndpointSummary : Summary<DeleteLibraryEndpoint, Delet
             }
         );
 
-        Response(403, "The request failed because the user making the request is not an Admin, or the owner of the media library.", "application/problem+json",
+        Response(403, "The request failed because the user making the request is neither an Admin, nor the owner of the media library holding the permission to create libraries.", "application/problem+json",
             example: new
             {
                 type = "https://tools.ietf.org/html/rfc9110#section-15.5.4",

@@ -13,6 +13,7 @@ using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
+using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -85,10 +86,12 @@ public class DeleteLibraryCommandHandler : ICommandHandler<DeleteLibraryCommand,
         else if (getLibraryResult.Value is null)
             return DomainErrors.Library.LibraryNotFound;
 
-        // Admins can delete any library; for everyone else, only the libraries they own.
-        bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
-            userId, new LibraryOwnershipPolicyContext(command.Id), cancellationToken).ConfigureAwait(false);
-        if (!canAccessLibrary)
+        // Admins can delete any library. Everyone else can only delete the libraries they own, and only while they hold the permission to manage media
+        // libraries, which can be withheld to keep a user from deleting even the libraries they own.
+        if (!await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(userId, new LibraryOwnershipPolicyContext(command.Id), cancellationToken).ConfigureAwait(false))
+            return ApplicationErrors.Authorization.NotAuthorized;
+        if (!await _authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false) &&
+            !await _authorizationService.HasPermissionAsync(userId, AuthorizationPermission.CanCreateLibraries, cancellationToken).ConfigureAwait(false))
             return ApplicationErrors.Authorization.NotAuthorized;
 
         // Create a domain library object.

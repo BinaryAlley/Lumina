@@ -333,9 +333,6 @@
   <data name="MoveDown" xml:space="preserve">
     <value>Nach unten</value>
   </data>
-  <data name="OrderSaved" xml:space="preserve">
-    <value>Reihenfolge gespeichert</value>
-  </data>
   <data name="DescriptionMetadataProviders" xml:space="preserve">
     <value>Die Metadatenanbieter, die verwendet werden, um die Elemente dieser Bibliothek anzureichern, in der Reihenfolge, in der sie versucht werden.</value>
   </data>

@@ -11,7 +11,6 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.UpdateLibrary
 /// Command for updating a media library.
 /// </summary>
 /// <param name="Id">The unique identifier of the media library.</param>
-/// <param name="OwnerId">The unique identifier of the user owning the media library.</param>
 /// <param name="Title">The title of the media library.</param>
 /// <param name="LibraryType">The type of the media library.</param>
 /// <param name="ContentLocations">The file system paths of the directories where the media library elements are located.</param>
@@ -25,10 +24,12 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.UpdateLibrary
 /// <param name="ShouldTrackConsumptionProgress">Whether the consumption progress of the media library items should be tracked, or not. When absent, the stored value is kept.</param>
 /// <param name="CompletionThresholdPercentage">The percentage of a media library item that must be consumed for its session to be considered completed. When absent, the stored value is kept.</param>
 /// <param name="PathTemplateParts">The ordered parts of the template describing the structure of the media library on disk.</param>
+/// <param name="MetadataProviders">The metadata providers of the media library, in the order in which they are tried, and whether each one is enabled. When absent, the stored configurations are kept, or reconciled with the library type when it changes.</param>
+/// <param name="ArtworkProviders">The artwork providers of the media library, in the order in which they are tried, and whether each one is enabled. When absent, the stored configurations are kept, or reconciled with the library type when it changes.</param>
+/// <param name="BookReaders">The book readers of the media library, and whether each one is enabled. When absent, the stored configurations are kept, or reconciled with the library type when it changes.</param>
 [DebuggerDisplay("Title: {Title}")]
 public record UpdateLibraryCommand(
     Guid Id,
-    Guid OwnerId,
     string? Title,
     string? LibraryType,
     string[]? ContentLocations,
@@ -41,5 +42,8 @@ public record UpdateLibraryCommand(
     bool IsContentOnSsd,
     bool? ShouldTrackConsumptionProgress,
     int? CompletionThresholdPercentage,
-    LibraryPathTemplatePartDto[]? PathTemplateParts
+    LibraryPathTemplatePartDto[]? PathTemplateParts,
+    LibraryProviderSelectionDto[]? MetadataProviders,
+    LibraryProviderSelectionDto[]? ArtworkProviders,
+    LibraryProviderSelectionDto[]? BookReaders
 ) : ICommand;

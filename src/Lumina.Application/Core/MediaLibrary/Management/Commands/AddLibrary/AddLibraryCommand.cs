@@ -22,6 +22,9 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.AddLibrary;
 /// <param name="ShouldTrackConsumptionProgress">Whether the consumption progress of the media library items should be tracked, or not. When absent, the default of the library type is used.</param>
 /// <param name="CompletionThresholdPercentage">The percentage of a media library item that must be consumed for its session to be considered completed. When absent, the default of the library type is used on creation.</param>
 /// <param name="PathTemplateParts">The ordered parts of the template describing the structure of the media library on disk.</param>
+/// <param name="MetadataProviders">The metadata providers of the media library, in the order in which they are tried, and whether each one is enabled. When absent, every provider supported by the library type is added disabled.</param>
+/// <param name="ArtworkProviders">The artwork providers of the media library, in the order in which they are tried, and whether each one is enabled. When absent, every provider supported by the library type is added disabled.</param>
+/// <param name="BookReaders">The book readers of the media library, and whether each one is enabled. When absent, every reader supported by the library type is added disabled.</param>
 [DebuggerDisplay("Title: {Title}")]
 public record AddLibraryCommand(
     string? Title,
@@ -36,5 +39,8 @@ public record AddLibraryCommand(
     bool IsContentOnSsd,
     bool? ShouldTrackConsumptionProgress,
     int? CompletionThresholdPercentage,
-    LibraryPathTemplatePartDto[]? PathTemplateParts
+    LibraryPathTemplatePartDto[]? PathTemplateParts,
+    LibraryProviderSelectionDto[]? MetadataProviders,
+    LibraryProviderSelectionDto[]? ArtworkProviders,
+    LibraryProviderSelectionDto[]? BookReaders
 ) : ICommand;

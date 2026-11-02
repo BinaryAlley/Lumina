@@ -129,7 +129,9 @@ internal sealed class PluginDetectionSyncJob : BackgroundService
             }
         }
 
-        // Seed the provider configurations of the media libraries, so that every library lists the plugins providing metadata or artwork for its type.
+        // Seed the provider configurations of the media libraries, so that every library lists the plugins providing metadata, artwork or a book reader for its type.
+        // A single ensure covers all three kinds, because the configurations it adds are only staged until the unit of work is saved, and a second ensure in the
+        // same scope would not find them and would add duplicates that break the unique index on save.
         Result<PaginatedResultDto<LibraryEntity>> getLibrariesResult = await unitOfWork.LibraryRepository.GetAllAsync<BaseFilterDto>(cancellationToken: stoppingToken).ConfigureAwait(false);
         if (getLibrariesResult.IsFailure)
             _logger.LogError("Failed to get the media libraries while seeding the provider configurations.");
@@ -140,9 +142,6 @@ internal sealed class PluginDetectionSyncJob : BackgroundService
                 Result<Success> ensureResult = await providerConfigurationStore.EnsureProviderConfigurationsAsync(library.Id, library.LibraryType, stoppingToken).ConfigureAwait(false);
                 if (ensureResult.IsFailure)
                     _logger.LogError("Failed to seed the provider configurations of the media library '{LibraryTitle}': {Error}", library.Title, ensureResult.FirstError.Description);
-                Result<Success> ensureBookReadersResult = await providerConfigurationStore.EnsureBookReaderConfigurationsAsync(library.Id, library.LibraryType, stoppingToken).ConfigureAwait(false);
-                if (ensureBookReadersResult.IsFailure)
-                    _logger.LogError("Failed to seed the book reader configurations of the media library '{LibraryTitle}': {Error}", library.Title, ensureBookReadersResult.FirstError.Description);
             }
         }
 

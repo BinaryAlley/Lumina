@@ -24,12 +24,18 @@ public class PermissionAuthorizationHandler : AuthorizationHandler<PermissionReq
     }
 
     /// <summary>
-    /// Succeeds the requirement when the currently logged in user holds any of the required permissions.
+    /// Succeeds the requirement when the currently logged in user is an administrator, or holds any of the required permissions.
     /// </summary>
     /// <param name="authorizationHandlerContext">The authorization context.</param>
     /// <param name="permissionRequirement">The permission requirement to evaluate.</param>
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext authorizationHandlerContext, PermissionRequirement permissionRequirement)
     {
+        // The API lets administrators do what the permission allows even when they do not hold it, so the Web does not deny them what the API grants.
+        if (await _authorizationService.IsInRoleAsync("Admin", CancellationToken.None).ConfigureAwait(false))
+        {
+            authorizationHandlerContext.Succeed(permissionRequirement);
+            return;
+        }
         foreach (AuthorizationPermission permission in permissionRequirement.Permissions)
         {
             if (await _authorizationService.HasPermissionAsync(permission, CancellationToken.None).ConfigureAwait(false))

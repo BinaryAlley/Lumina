@@ -23,12 +23,10 @@ public static partial class ApiRoutes
         public const string CANCEL_LIBRARY_SCAN = "libraries/{libraryId}/scans/{scanId}/cancel";
         public const string GET_LIBRARY_PATH_TEMPLATE_PARTS = "libraries/path-template-parts/{libraryType}";
         public const string GET_LIBRARY_METADATA_PROVIDERS = "libraries/{libraryId}/metadata-providers";
-        public const string SET_LIBRARY_METADATA_PROVIDER_ENABLED = "libraries/{libraryId}/metadata-providers/{pluginId}/enabled";
-        public const string REORDER_LIBRARY_METADATA_PROVIDERS = "libraries/{libraryId}/metadata-providers/reorder";
         public const string GET_LIBRARY_ARTWORK_PROVIDERS = "libraries/{libraryId}/artwork-providers";
-        public const string SET_LIBRARY_ARTWORK_PROVIDER_ENABLED = "libraries/{libraryId}/artwork-providers/{pluginId}/enabled";
-        public const string REORDER_LIBRARY_ARTWORK_PROVIDERS = "libraries/{libraryId}/artwork-providers/reorder";
         public const string GET_LIBRARY_BOOK_READERS = "libraries/{libraryId}/book-readers";
-        public const string SET_LIBRARY_BOOK_READER_ENABLED = "libraries/{libraryId}/book-readers/{pluginId}/enabled";
+        public const string GET_LIBRARY_TYPE_METADATA_PROVIDERS = "libraries/metadata-providers/{libraryType}";
+        public const string GET_LIBRARY_TYPE_ARTWORK_PROVIDERS = "libraries/artwork-providers/{libraryType}";
+        public const string GET_LIBRARY_TYPE_BOOK_READERS = "libraries/book-readers/{libraryType}";
     }
 }

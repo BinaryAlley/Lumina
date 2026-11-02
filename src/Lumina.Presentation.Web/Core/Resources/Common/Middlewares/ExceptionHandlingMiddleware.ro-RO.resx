@@ -540,11 +540,11 @@
   <data name="PluginIdCannotBeEmpty" xml:space="preserve">
     <value>Id-ul pluginului nu poate fi gol!</value>
   </data>
-  <data name="PluginIdsListCannotBeEmpty" xml:space="preserve">
-    <value>Lista Id-urilor de pluginuri nu poate fi goala!</value>
+  <data name="PluginIdsMustBeUnique" xml:space="preserve">
+    <value>Același plugin nu poate fi ales de mai multe ori!</value>
   </data>
-  <data name="PluginIdsListCannotBeNull" xml:space="preserve">
-    <value>Lista Id-urilor de pluginuri nu poate fi nula!</value>
+  <data name="PluginNotSupportedForLibraryType" xml:space="preserve">
+    <value>Pluginul nu suportă tipul bibliotecii media!</value>
   </data>
   <data name="PluginNotFound" xml:space="preserve">
     <value>Pluginul nu a fost gasit!</value>

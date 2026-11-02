@@ -40,7 +40,10 @@ public class AddLibraryEndpointSummary : Summary<AddLibraryEndpoint, AddLibraryR
             IsContentOnSsd: false,
             ShouldTrackConsumptionProgress: true,
             CompletionThresholdPercentage: 90,
-            PathTemplateParts: null
+            PathTemplateParts: null,
+            MetadataProviders: [new LibraryProviderSelectionRequest(PluginId: Guid.NewGuid(), IsEnabled: true)],
+            ArtworkProviders: [new LibraryProviderSelectionRequest(PluginId: Guid.NewGuid(), IsEnabled: true)],
+            BookReaders: null
         );
 
         RequestParam(r => r.Title, "The title of the media library. Required.");
@@ -56,6 +59,9 @@ public class AddLibraryEndpointSummary : Summary<AddLibraryEndpoint, AddLibraryR
         RequestParam(r => r.ShouldTrackConsumptionProgress, "Whether the consumption progress of the media library items should be tracked, or not. Optional, the default of the library type is used when absent.");
         RequestParam(r => r.CompletionThresholdPercentage, "The percentage of a media library item that must be consumed for its session to be considered completed. Optional, the default of the library type is used when absent.");
         RequestParam(r => r.PathTemplateParts, "The ordered parts of the template describing the structure of the media library on disk. Optional, the ideal structure of the library type is used when absent.");
+        RequestParam(r => r.MetadataProviders, "The metadata providers of the media library, in the order in which they are tried, and whether each one is enabled. Optional, every provider supported by the library type is added disabled when absent.");
+        RequestParam(r => r.ArtworkProviders, "The artwork providers of the media library, in the order in which they are tried, and whether each one is enabled. Optional, every provider supported by the library type is added disabled when absent.");
+        RequestParam(r => r.BookReaders, "The book readers of the media library, and whether each one is enabled. Optional, every reader supported by the library type is added disabled when absent.");
 
         ResponseParam<LibraryResponse>(r => r.Id, "The unique identifier of the entity.");
         ResponseParam<LibraryResponse>(r => r.UserId, "The unique identifier of the user owning the media library.");
@@ -172,7 +178,10 @@ public class AddLibraryEndpointSummary : Summary<AddLibraryEndpoint, AddLibraryR
                             "TitleMustBeMaximum255CharactersLong",
                             "CompletionThresholdPercentageMustBeNullWhenProgressTrackingIsOff",
                             "CompletionThresholdPercentageMustBeBetweenZeroAndOneHundred",
-                            "CoverFileMustBeAnImage"
+                            "CoverFileMustBeAnImage",
+                            "PluginIdCannotBeEmpty",
+                            "PluginIdsMustBeUnique",
+                            "PluginNotSupportedForLibraryType"
                         }
                     }
                 },

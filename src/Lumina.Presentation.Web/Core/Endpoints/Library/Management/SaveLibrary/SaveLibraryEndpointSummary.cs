@@ -21,7 +21,6 @@ public class SaveLibraryEndpointSummary : Summary<SaveLibraryEndpoint, LibraryDt
         Summary = "Creates or updates a media library.";
         Description = "Creates or updates the media library provided in the request.";
         RequestParam(r => r.Id, "The unique identifier of the media library. Optional, when creating a new media library.");
-        RequestParam(r => r.UserId, "The unique identifier of the user owning the media library. Optional.");
         RequestParam(r => r.Title, "The title of the media library. Required.");
         RequestParam(r => r.LibraryType, "The type of the media library. Required.");
         RequestParam(r => r.CoverImage, "The path of the image file used as the cover of the media library. Optional.");
@@ -35,6 +34,9 @@ public class SaveLibraryEndpointSummary : Summary<SaveLibraryEndpoint, LibraryDt
         RequestParam(r => r.ShouldTrackConsumptionProgress, "Whether the consumption progress of the media library items should be tracked, or not. Optional, the default of the library type is used on create, and the stored value is kept on update.");
         RequestParam(r => r.CompletionThresholdPercentage, "The percentage of a media library item that must be consumed for its session to be considered completed. Optional, the default of the library type is used on create, and the stored value is kept on update.");
         RequestParam(r => r.PathTemplateParts, "The ordered parts of the template describing the structure of the media library on disk. Optional, the ideal structure of the library type is used when absent.");
+        RequestParam(r => r.MetadataProviders, "The metadata providers of the media library, in the order in which they are tried, and whether each one is enabled. Optional, the providers are configured with their defaults on create, and the stored configurations are kept on update, when absent.");
+        RequestParam(r => r.ArtworkProviders, "The artwork providers of the media library, in the order in which they are tried, and whether each one is enabled. Optional, the providers are configured with their defaults on create, and the stored configurations are kept on update, when absent.");
+        RequestParam(r => r.BookReaders, "The book readers of the media library, and whether each one is enabled. Optional, the readers are configured with their defaults on create, and the stored configurations are kept on update, when absent.");
 
         ExampleRequest = new LibraryDto();
 

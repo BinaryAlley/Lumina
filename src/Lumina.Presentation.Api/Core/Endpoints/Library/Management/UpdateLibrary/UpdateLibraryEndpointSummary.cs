@@ -22,11 +22,10 @@ public class UpdateLibraryEndpointSummary : Summary<UpdateLibraryEndpoint, Updat
     public UpdateLibraryEndpointSummary()
     {
         Summary = "Updates an existing media library.";
-        Description = "Updates a media library and returns its details, if the user making the request is an Admin, or the owner of the library.";
+        Description = "Updates a media library and returns its details, if the user making the request is an Admin, or the owner of the library holding the permission to create libraries. The owner of the library is never changed by an update.";
 
         ExampleRequest = new UpdateLibraryRequest(
             Id: Guid.NewGuid(),
-            UserId: Guid.NewGuid(),
             Title: "TV Shows",
             LibraryType: "TvShow",
             ContentLocations: [
@@ -42,11 +41,13 @@ public class UpdateLibraryEndpointSummary : Summary<UpdateLibraryEndpoint, Updat
             IsContentOnSsd: false,
             ShouldTrackConsumptionProgress: true,
             CompletionThresholdPercentage: 90,
-            PathTemplateParts: null
+            PathTemplateParts: null,
+            MetadataProviders: [new LibraryProviderSelectionRequest(PluginId: Guid.NewGuid(), IsEnabled: true)],
+            ArtworkProviders: [new LibraryProviderSelectionRequest(PluginId: Guid.NewGuid(), IsEnabled: true)],
+            BookReaders: null
         );
 
         RequestParam(r => r.Id, "The unique identifier of the media library. Required.");
-        RequestParam(r => r.UserId, "The unique identifier of the user owning the media library. Required.");
         RequestParam(r => r.Title, "The title of the media library. Required.");
         RequestParam(r => r.LibraryType, "The type of the media library. Required.");
         RequestParam(r => r.ContentLocations, ">The file system paths of the directories where the media library elements are located. Required.");
@@ -60,6 +61,9 @@ public class UpdateLibraryEndpointSummary : Summary<UpdateLibraryEndpoint, Updat
         RequestParam(r => r.ShouldTrackConsumptionProgress, "Whether the consumption progress of the media library items should be tracked, or not. Optional, the stored value is kept when absent.");
         RequestParam(r => r.CompletionThresholdPercentage, "The percentage of a media library item that must be consumed for its session to be considered completed. Optional, the stored value is kept when absent.");
         RequestParam(r => r.PathTemplateParts, "The ordered parts of the template describing the structure of the media library on disk. Optional, the ideal structure of the library type is used when absent.");
+        RequestParam(r => r.MetadataProviders, "The metadata providers of the media library, in the order in which they are tried, and whether each one is enabled. Optional, the stored configurations are kept, or reconciled with the library type when it changes when absent.");
+        RequestParam(r => r.ArtworkProviders, "The artwork providers of the media library, in the order in which they are tried, and whether each one is enabled. Optional, the stored configurations are kept, or reconciled with the library type when it changes when absent.");
+        RequestParam(r => r.BookReaders, "The book readers of the media library, and whether each one is enabled. Optional, the stored configurations are kept, or reconciled with the library type when it changes when absent.");
 
         ResponseParam<LibraryResponse>(r => r.Id, "The unique identifier of the entity.");
         ResponseParam<LibraryResponse>(r => r.UserId, "The unique identifier of the user owning the media library.");
@@ -130,7 +134,7 @@ public class UpdateLibraryEndpointSummary : Summary<UpdateLibraryEndpoint, Updat
             }
         );
 
-        Response(403, "The request failed because the authenticated user is not allowed to manage the media library, or because the request carried an unsupported library type.", "application/problem+json",
+        Response(403, "The request failed because the authenticated user is neither an Admin, nor the owner of the media library holding the permission to create libraries, or because the request carried an unsupported library type.", "application/problem+json",
             example: new[]
             {
                 new
@@ -180,7 +184,6 @@ public class UpdateLibraryEndpointSummary : Summary<UpdateLibraryEndpoint, Updat
                         "General.Validation", new[]
                         {
                             "LibraryIdCannotBeEmpty",
-                            "UserIdCannotBeEmpty",
                             "LibraryTypeCannotBeNull",
                             "PathsListCannotBeNull",
                             "PathsListCannotBeEmpty",
@@ -189,7 +192,10 @@ public class UpdateLibraryEndpointSummary : Summary<UpdateLibraryEndpoint, Updat
                             "TitleCannotBeEmpty",
                             "TitleMustBeMaximum255CharactersLong",
                             "CompletionThresholdPercentageMustBeNullWhenProgressTrackingIsOff",
-                            "CompletionThresholdPercentageMustBeBetweenZeroAndOneHundred"
+                            "CompletionThresholdPercentageMustBeBetweenZeroAndOneHundred",
+                            "PluginIdCannotBeEmpty",
+                            "PluginIdsMustBeUnique",
+                            "PluginNotSupportedForLibraryType"
                         }
                     }
                 },

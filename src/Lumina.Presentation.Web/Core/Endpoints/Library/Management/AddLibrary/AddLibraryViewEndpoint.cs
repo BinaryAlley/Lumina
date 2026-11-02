@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
+using Lumina.Presentation.Web.Common.Authorization;
 using Lumina.Presentation.Web.Common.DTO.Libraries;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Common;
@@ -26,6 +27,7 @@ public class AddLibraryViewEndpoint : BaseEndpoint<EmptyRequest, IResult>
         Routes(WebRoutes.LibraryManagement.ADD_LIBRARY);
         DontAutoTag();
         Options(options => options.WithTags("Libraries"));
+        Policies(AuthorizationPolicies.REQUIRE_CREATE_LIBRARIES_PERMISSION);
     }
 
     /// <summary>

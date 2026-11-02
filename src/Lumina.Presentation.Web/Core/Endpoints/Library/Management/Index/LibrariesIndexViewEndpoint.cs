@@ -1,8 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
+using Lumina.Presentation.Web.Common.Authorization;
+using Lumina.Presentation.Web.Common.DTO.Libraries;
+using Lumina.Presentation.Web.Common.Enums.Authorization;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Common;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,6 +17,17 @@ namespace Lumina.Presentation.Web.Core.Endpoints.Library.Management.Index;
 /// </summary>
 public class LibrariesIndexViewEndpoint : BaseEndpoint<EmptyRequest, IResult>
 {
+    private readonly IAuthorizationService _authorizationService;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LibrariesIndexViewEndpoint"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Injected service for authorization checks against the remote API.</param>
+    public LibrariesIndexViewEndpoint(IAuthorizationService authorizationService)
+    {
+        _authorizationService = authorizationService;
+    }
+
     /// <summary>
     /// Configures the endpoint.
     /// </summary>
@@ -32,8 +45,12 @@ public class LibrariesIndexViewEndpoint : BaseEndpoint<EmptyRequest, IResult>
     /// </summary>
     /// <param name="request">The request object.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    public override Task<IResult> ExecuteAsync(EmptyRequest request, CancellationToken cancellationToken)
+    public override async Task<IResult> ExecuteAsync(EmptyRequest request, CancellationToken cancellationToken)
     {
-        return Task.FromResult(View("/Core/Views/Library/Management/Index.cshtml"));
+        // Changing and deleting a media library takes the permission to manage media libraries, or the administrator role, the same rule the API applies,
+        // so the actions are only offered to the users the API would let through.
+        bool canManageLibraries = await _authorizationService.IsInRoleAsync("Admin", cancellationToken).ConfigureAwait(false) ||
+            await _authorizationService.HasPermissionAsync(AuthorizationPermission.CanCreateLibraries, cancellationToken).ConfigureAwait(false);
+        return View("/Core/Views/Library/Management/Index.cshtml", new LibrariesIndexPageDto(canManageLibraries));
     }
 }

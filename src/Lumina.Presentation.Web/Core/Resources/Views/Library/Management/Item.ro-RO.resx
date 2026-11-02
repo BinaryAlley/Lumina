@@ -333,9 +333,6 @@
   <data name="MoveDown" xml:space="preserve">
     <value>Mută în jos</value>
   </data>
-  <data name="OrderSaved" xml:space="preserve">
-    <value>Ordine salvată</value>
-  </data>
   <data name="DescriptionMetadataProviders" xml:space="preserve">
     <value>Furnizorii de metadate folosiți pentru a îmbogăți elementele acestei biblioteci, în ordinea în care sunt încercați.</value>
   </data>

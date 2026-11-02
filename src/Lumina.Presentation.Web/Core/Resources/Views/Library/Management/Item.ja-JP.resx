@@ -333,9 +333,6 @@
   <data name="MoveDown" xml:space="preserve">
     <value>下へ移動</value>
   </data>
-  <data name="OrderSaved" xml:space="preserve">
-    <value>順序を保存しました</value>
-  </data>
   <data name="DescriptionMetadataProviders" xml:space="preserve">
     <value>このライブラリのアイテムを補完するために使用されるメタデータプロバイダーを、試行する順序で指定します。</value>
   </data>
