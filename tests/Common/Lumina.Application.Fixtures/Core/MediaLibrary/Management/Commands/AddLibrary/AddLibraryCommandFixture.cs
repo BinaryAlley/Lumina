@@ -32,6 +32,9 @@ public class AddLibraryCommandFixture
     /// <param name="shouldTrackConsumptionProgress">Optional. Whether the consumption progress of the media library items should be tracked, or not.</param>
     /// <param name="completionThresholdPercentage">Optional. The percentage of a media library item that must be consumed for its session to be considered completed.</param>
     /// <param name="pathTemplateParts">Optional. The ordered parts of the path template of the media library.</param>
+    /// <param name="metadataProviders">Optional. The choices made for the metadata providers of the media library.</param>
+    /// <param name="artworkProviders">Optional. The choices made for the artwork providers of the media library.</param>
+    /// <param name="bookReaders">Optional. The choices made for the book readers of the media library.</param>
     /// <returns>The created command.</returns>
     public AddLibraryCommand Create(
         string? title = null,
@@ -46,7 +49,10 @@ public class AddLibraryCommandFixture
         bool isContentOnSsd = false,
         bool? shouldTrackConsumptionProgress = null,
         int? completionThresholdPercentage = null,
-        LibraryPathTemplatePartDto[]? pathTemplateParts = null)
+        LibraryPathTemplatePartDto[]? pathTemplateParts = null,
+        LibraryProviderSelectionDto[]? metadataProviders = null,
+        LibraryProviderSelectionDto[]? artworkProviders = null,
+        LibraryProviderSelectionDto[]? bookReaders = null)
     {
         return new Faker<AddLibraryCommand>()
             .CustomInstantiator(f => new AddLibraryCommand(
@@ -62,6 +68,9 @@ public class AddLibraryCommandFixture
                 false,
                 shouldTrackConsumptionProgress,
                 completionThresholdPercentage,
+                null,
+                null,
+                null,
                 null
             ))
             .RuleFor(x => x.Title, f => title ?? f.Lorem.Word())
@@ -75,6 +84,9 @@ public class AddLibraryCommandFixture
             .RuleFor(x => x.ShouldSkipUnchangedDirectoriesDuringScan, shouldSkipUnchangedDirectoriesDuringScan)
             .RuleFor(x => x.IsContentOnSsd, isContentOnSsd)
             .RuleFor(x => x.PathTemplateParts, pathTemplateParts)
+            .RuleFor(x => x.MetadataProviders, metadataProviders)
+            .RuleFor(x => x.ArtworkProviders, artworkProviders)
+            .RuleFor(x => x.BookReaders, bookReaders)
             .Generate();
     }
 

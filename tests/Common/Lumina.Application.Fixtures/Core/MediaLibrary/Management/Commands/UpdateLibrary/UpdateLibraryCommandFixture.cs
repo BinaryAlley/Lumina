@@ -21,7 +21,6 @@ public class UpdateLibraryCommandFixture
     /// Creates a random valid command to update a media library.
     /// </summary>
     /// <param name="id">Optional. The Id of the media library.</param>
-    /// <param name="ownerId">Optional. The Id of the user owning the media library.</param>
     /// <param name="title">Optional. The title of the media library.</param>
     /// <param name="libraryType">Optional. The type of the media library.</param>
     /// <param name="contentLocations">Optional. The content locations of the media library.</param>
@@ -35,10 +34,12 @@ public class UpdateLibraryCommandFixture
     /// <param name="shouldTrackConsumptionProgress">Optional. Whether the consumption progress of the media library items should be tracked, or not.</param>
     /// <param name="completionThresholdPercentage">Optional. The percentage of a media library item that must be consumed for its session to be considered completed.</param>
     /// <param name="pathTemplateParts">Optional. The ordered parts of the path template of the media library.</param>
+    /// <param name="metadataProviders">Optional. The choices made for the metadata providers of the media library.</param>
+    /// <param name="artworkProviders">Optional. The choices made for the artwork providers of the media library.</param>
+    /// <param name="bookReaders">Optional. The choices made for the book readers of the media library.</param>
     /// <returns>The created command.</returns>
     public UpdateLibraryCommand Create(
         Guid? id = null,
-        Guid? ownerId = null,
         string? title = null,
         string? libraryType = null,
         string[]? contentLocations = null,
@@ -51,11 +52,13 @@ public class UpdateLibraryCommandFixture
         bool isContentOnSsd = false,
         bool? shouldTrackConsumptionProgress = null,
         int? completionThresholdPercentage = null,
-        LibraryPathTemplatePartDto[]? pathTemplateParts = null)
+        LibraryPathTemplatePartDto[]? pathTemplateParts = null,
+        LibraryProviderSelectionDto[]? metadataProviders = null,
+        LibraryProviderSelectionDto[]? artworkProviders = null,
+        LibraryProviderSelectionDto[]? bookReaders = null)
     {
         return new Faker<UpdateLibraryCommand>()
             .CustomInstantiator(f => new UpdateLibraryCommand(
-                default,
                 default,
                 default!,
                 default!,
@@ -69,10 +72,12 @@ public class UpdateLibraryCommandFixture
                 false,
                 shouldTrackConsumptionProgress,
                 completionThresholdPercentage,
+                null,
+                null,
+                null,
                 null
             ))
             .RuleFor(x => x.Id, id ?? Guid.NewGuid())
-            .RuleFor(x => x.OwnerId, ownerId ?? Guid.NewGuid())
             .RuleFor(x => x.Title, f => title ?? f.Lorem.Word())
             .RuleFor(x => x.LibraryType, f => libraryType ?? f.Random.Enum<LibraryType>().ToString())
             .RuleFor(x => x.ContentLocations, f => contentLocations ?? [f.System.DirectoryPath(), f.System.DirectoryPath(), f.System.DirectoryPath()])
@@ -84,6 +89,9 @@ public class UpdateLibraryCommandFixture
             .RuleFor(x => x.ShouldSkipUnchangedDirectoriesDuringScan, shouldSkipUnchangedDirectoriesDuringScan)
             .RuleFor(x => x.IsContentOnSsd, isContentOnSsd)
             .RuleFor(x => x.PathTemplateParts, pathTemplateParts)
+            .RuleFor(x => x.MetadataProviders, metadataProviders)
+            .RuleFor(x => x.ArtworkProviders, artworkProviders)
+            .RuleFor(x => x.BookReaders, bookReaders)
             .Generate();
     }
 

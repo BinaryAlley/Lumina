@@ -77,8 +77,6 @@ public class PluginDetectionSyncJobTests
             .Returns(Result.Deleted);
         _mockProviderConfigurationStore.EnsureProviderConfigurationsAsync(Arg.Any<Guid>(), Arg.Any<LibraryType>(), Arg.Any<CancellationToken>())
             .Returns(Result.Success);
-        _mockProviderConfigurationStore.EnsureBookReaderConfigurationsAsync(Arg.Any<Guid>(), Arg.Any<LibraryType>(), Arg.Any<CancellationToken>())
-            .Returns(Result.Success);
         _mockServiceProvider.GetService(typeof(IUnitOfWork)).Returns(_mockUnitOfWork);
         _mockServiceProvider.GetService(typeof(IMediaLibraryProviderConfigurationStore)).Returns(_mockProviderConfigurationStore);
 
@@ -229,8 +227,8 @@ public class PluginDetectionSyncJobTests
         await StartAndWaitForExecutionAsync(sut);
 
         // Assert
+        // A single ensure covers the metadata, artwork and book reader configurations, since a second one before the save would stage duplicates.
         await _mockProviderConfigurationStore.Received(1).EnsureProviderConfigurationsAsync(bookLibrary.Id, LibraryType.Book, Arg.Any<CancellationToken>());
-        await _mockProviderConfigurationStore.Received(1).EnsureBookReaderConfigurationsAsync(bookLibrary.Id, LibraryType.Book, Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -239,7 +237,7 @@ public class PluginDetectionSyncJobTests
     {
         // Arrange
         IPlugin previouslyLoadedPlugin = CreatePlugin(Guid.NewGuid(), "My Plugin", new Version(1, 0, 0));
-        _mockPluginManager.GetPlugins().Returns([]); // the plugin assembly now fails to load
+        _mockPluginManager.GetPlugins().Returns([]); // The plugin assembly now fails to load.
         _mockPluginRepository.UpsertAsync(Arg.Any<PluginEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(Result.Updated));
         PluginLoadErrorDto loadError = _pluginLoadErrorDtoFixture.Create(

@@ -4,6 +4,7 @@ using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.DataAccess.Core.UoW;
+using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Presentation.Api.Core.Endpoints.Library.Management.DeleteLibrary;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
@@ -54,7 +55,7 @@ public class DeleteLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
     /// </summary>
     public async Task InitializeAsync()
     {
-        _client = await _apiFactory.CreateAuthenticatedClientAsync();
+        _client = await _apiFactory.CreateAuthenticatedClientAsync(AuthorizationPermission.CanCreateLibraries);
     }
 
     [Fact]

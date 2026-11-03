@@ -4,6 +4,7 @@ using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Manage
 using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.Management;
 using Lumina.Contracts.Requests.MediaLibrary.Management;
 using Lumina.DataAccess.Core.UoW;
+using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
@@ -13,6 +14,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 #endregion
 
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.Management.UpdateLibrary;
@@ -49,7 +51,6 @@ public class UpdateLibraryEndpointTests : IClassFixture<LuminaApiFactory>
         string libraryId = Guid.NewGuid().ToString();
         UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
             id: Guid.NewGuid(),
-            userId: Guid.NewGuid(),
             title: "Updated Library",
             libraryType: "EBook",
             contentLocations: ["C:/Media"],
@@ -79,8 +80,8 @@ public class UpdateLibraryEndpointTests : IClassFixture<LuminaApiFactory>
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // basic SQL injection
-    [InlineData("'; DROP TABLE Libraries--")] // destructive injection
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
+    [InlineData("'; DROP TABLE Libraries--")] // Destructive injection.
     public async Task UpdateLibrary_WithSQLInjectionInTitle_ShouldNotLeakOrError(string maliciousTitle)
     {
         // Arrange
@@ -90,7 +91,6 @@ public class UpdateLibraryEndpointTests : IClassFixture<LuminaApiFactory>
         await SeedLibraryAsync(libraryId, userId);
         UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
             id: libraryId,
-            userId: userId,
             title: maliciousTitle,
             libraryType: "EBook",
             contentLocations: ["C:/Media"],
@@ -106,7 +106,7 @@ public class UpdateLibraryEndpointTests : IClassFixture<LuminaApiFactory>
         HttpResponseMessage response = await client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}", request);
 
         // Assert
-        // the malicious title passes the authenticated handler, reaches the parameterized data access, and is persisted verbatim
+        // The malicious title passes the authenticated handler, reaches the parameterized data access, and is persisted verbatim.
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
@@ -123,10 +123,10 @@ public class UpdateLibraryEndpointTests : IClassFixture<LuminaApiFactory>
     }
 
     [Theory]
-    [InlineData(-1)] // just below the allowed range
-    [InlineData(101)] // just above the allowed range
-    [InlineData(int.MinValue)] // lowest possible value
-    [InlineData(int.MaxValue)] // highest possible value
+    [InlineData(-1)] // Just below the allowed range.
+    [InlineData(101)] // Just above the allowed range.
+    [InlineData(int.MinValue)] // Lowest possible value.
+    [InlineData(int.MaxValue)] // Highest possible value.
     public async Task UpdateLibrary_WhenThresholdIsOutsideAllowedRange_ShouldRejectTheRequestAndKeepTheStoredSettings(int completionThresholdPercentage)
     {
         // Arrange
@@ -136,7 +136,6 @@ public class UpdateLibraryEndpointTests : IClassFixture<LuminaApiFactory>
         await SeedLibraryAsync(libraryId, userId, shouldTrackConsumptionProgress: true, completionThresholdPercentage: 70);
         UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
             id: libraryId,
-            userId: userId,
             title: "Test Library",
             libraryType: "EBook",
             contentLocations: ["C:/Media"],
@@ -177,7 +176,6 @@ public class UpdateLibraryEndpointTests : IClassFixture<LuminaApiFactory>
         await SeedLibraryAsync(libraryId, userId, shouldTrackConsumptionProgress: true, completionThresholdPercentage: 70);
         UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
             id: libraryId,
-            userId: userId,
             title: "Test Library",
             libraryType: "EBook",
             contentLocations: ["C:/Media"],
@@ -223,7 +221,6 @@ public class UpdateLibraryEndpointTests : IClassFixture<LuminaApiFactory>
         (Guid _, string attackerUsername) = await _apiFactory.CreateAndAuthenticateUserAsync(client);
         UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
             id: libraryId,
-            userId: ownerId,
             title: "Test Library",
             libraryType: "EBook",
             contentLocations: ["C:/Media"],
@@ -273,6 +270,129 @@ public class UpdateLibraryEndpointTests : IClassFixture<LuminaApiFactory>
 
         await _apiFactory.RemoveTestUserAsync(attackerUsername);
         await _apiFactory.RemoveTestUserAsync(ownerUsername);
+    }
+
+    [Fact]
+    public async Task UpdateLibrary_WhenNonOwnerHoldsTheManagePermission_ShouldReturnForbiddenAndKeepTheLibrary()
+    {
+        // Arrange
+        // Ownership and the manage permission are both required, so a user that holds the permission must not update a library it does not own.
+        HttpClient client = _apiFactory.CreateClient();
+        (Guid ownerId, string ownerUsername) = await _apiFactory.CreateAndAuthenticateUserAsync(client);
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, ownerId, title: "Original Title");
+        (Guid _, string attackerUsername) = await _apiFactory.CreateAndAuthenticateUserWithPermissionAsync(client, AuthorizationPermission.CanCreateLibraries);
+        UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
+            id: libraryId,
+            title: "Updated Title",
+            libraryType: "EBook",
+            contentLocations: ["C:/Media"],
+            coverImage: null);
+
+        // Act
+        HttpResponseMessage response = await client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemDetails!["status"].GetInt32());
+        Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
+        Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
+        using (IServiceScope scope = _apiFactory.Services.CreateScope())
+        {
+            LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(library => library.Id == libraryId);
+            Assert.NotNull(storedLibrary);
+            Assert.Equal("Original Title", storedLibrary!.Title);
+        }
+
+        await _apiFactory.RemoveTestUserAsync(ownerUsername);
+        await _apiFactory.RemoveTestUserAsync(attackerUsername);
+    }
+
+    [Fact]
+    public async Task UpdateLibrary_WhenTheOwnerLacksTheManagePermission_ShouldReturnForbiddenAndKeepTheLibrary()
+    {
+        // Arrange
+        // The created user holds no permission, so it owns the library without being allowed to change it.
+        HttpClient client = _apiFactory.CreateClient();
+        (Guid ownerId, string ownerUsername) = await _apiFactory.CreateAndAuthenticateUserAsync(client);
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, ownerId, title: "Original Title");
+        UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
+            id: libraryId,
+            title: "Updated Title",
+            libraryType: "Book",
+            contentLocations: ["C:/Media"],
+            coverImage: null
+        );
+
+        // Act
+        HttpResponseMessage response = await client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemDetails!["status"].GetInt32());
+        Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
+        Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
+        using (IServiceScope scope = _apiFactory.Services.CreateScope())
+        {
+            LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(library => library.Id == libraryId);
+            Assert.NotNull(storedLibrary);
+            Assert.Equal("Original Title", storedLibrary!.Title);
+            Assert.Equal(LibraryType.EBook, storedLibrary.LibraryType);
+        }
+
+        await _apiFactory.RemoveTestUserAsync(ownerUsername);
+    }
+
+    [Fact]
+    public async Task UpdateLibrary_WhenBodyNamesAnotherOwner_ShouldKeepTheStoredOwner()
+    {
+        // Arrange
+        HttpClient ownerClient = _apiFactory.CreateClient();
+        (Guid ownerId, string ownerUsername) = await _apiFactory.CreateAndAuthenticateUserAsync(ownerClient);
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, ownerId);
+        HttpClient client = _apiFactory.CreateClient();
+        Guid adminId = await _apiFactory.CreateAndAuthenticateAdminUserAsync(client);
+        UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
+            id: libraryId,
+            title: "Test Library",
+            libraryType: "EBook",
+            contentLocations: ["C:/Media"],
+            coverImage: null,
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: true
+        );
+        // The request has no owner, so the claimed owner is added to the raw body, the way a crafted request would carry it.
+        JsonObject body = JsonSerializer.SerializeToNode(request, new JsonSerializerOptions(JsonSerializerDefaults.Web))!.AsObject();
+        body["userId"] = adminId.ToString();
+
+        // Act
+        HttpResponseMessage response = await client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}", body);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        using (IServiceScope scope = _apiFactory.Services.CreateScope())
+        {
+            LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(library => library.Id == libraryId);
+            Assert.NotNull(storedLibrary);
+            Assert.Equal(ownerId, storedLibrary!.UserId);
+        }
+
+        await _apiFactory.RemoveTestUserAsync(ownerUsername);
+        await _apiFactory.RemoveAdminUserAsync(adminId);
     }
 
     /// <summary>

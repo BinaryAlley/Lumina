@@ -65,6 +65,43 @@ public class SaveLibraryEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Fact]
+    public async Task SaveLibrary_WhenAProviderChoiceHasNoEnabledState_ShouldForwardItWithoutAState()
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        Guid pluginId = Guid.NewGuid();
+        LibraryDto request = _libraryDtoFixture.Create(title: "New Books Library", libraryType: "Book");
+        request.Id = null;
+        _apiFactory.ApiClientStub.RegisterPostResponse("libraries", _libraryDtoFixture.Create(id: Guid.NewGuid(), title: request.Title, libraryType: request.LibraryType));
+        AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
+        // The choice is sent without its enabled state, the way a caller that only reorders the providers would send it.
+        HttpRequestMessage saveRequest = new(HttpMethod.Post, "/en-us/libraries/manage/api-item")
+        {
+            Content = JsonContent.Create(new
+            {
+                request.Title,
+                request.LibraryType,
+                request.ContentLocations,
+                MetadataProviders = new[] { new { PluginId = pluginId } }
+            })
+        };
+        saveRequest.Content!.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+        saveRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        saveRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);
+
+        // Act
+        HttpResponseMessage response = await webClient.Client.SendAsync(saveRequest);
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        (string _, object? data) = Assert.Single(_apiFactory.ApiClientStub.PostRequests, postRequest => postRequest.Endpoint == "libraries");
+        LibraryDto forwardedLibrary = Assert.IsType<LibraryDto>(data);
+        LibraryProviderSelectionDto forwardedChoice = Assert.Single(forwardedLibrary.MetadataProviders!);
+        Assert.Equal(pluginId, forwardedChoice.PluginId);
+        Assert.Null(forwardedChoice.IsEnabled);
+    }
+
+    [Fact]
     public async Task SaveLibrary_WhenCalledWithoutAntiforgeryToken_ShouldReturnBadRequest()
     {
         // Arrange

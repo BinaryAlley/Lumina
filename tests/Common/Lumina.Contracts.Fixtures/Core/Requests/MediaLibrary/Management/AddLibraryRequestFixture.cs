@@ -32,6 +32,9 @@ public class AddLibraryRequestFixture
     /// <param name="shouldTrackConsumptionProgress">Optional. Whether the consumption progress of the media library items should be tracked, or not.</param>
     /// <param name="completionThresholdPercentage">Optional. The percentage of a media library item that must be consumed for its session to be considered completed.</param>
     /// <param name="pathTemplateParts">Optional. The ordered parts of the path template of the media library.</param>
+    /// <param name="metadataProviders">Optional. The choices made for the metadata providers of the media library.</param>
+    /// <param name="artworkProviders">Optional. The choices made for the artwork providers of the media library.</param>
+    /// <param name="bookReaders">Optional. The choices made for the book readers of the media library.</param>
     /// <returns>The created <see cref="AddLibraryRequest"/>.</returns>
     public AddLibraryRequest Create(
         string? title = null,
@@ -46,7 +49,10 @@ public class AddLibraryRequestFixture
         bool? isContentOnSsd = null,
         bool? shouldTrackConsumptionProgress = null,
         int? completionThresholdPercentage = null,
-        LibraryPathTemplatePartRequest[]? pathTemplateParts = null)
+        LibraryPathTemplatePartRequest?[]? pathTemplateParts = null,
+        LibraryProviderSelectionRequest?[]? metadataProviders = null,
+        LibraryProviderSelectionRequest?[]? artworkProviders = null,
+        LibraryProviderSelectionRequest?[]? bookReaders = null)
     {
         return new AddLibraryRequest(
             title ?? _faker.Commerce.Department(),
@@ -61,7 +67,10 @@ public class AddLibraryRequestFixture
             isContentOnSsd ?? false,
             shouldTrackConsumptionProgress,
             completionThresholdPercentage,
-            pathTemplateParts
+            pathTemplateParts,
+            metadataProviders,
+            artworkProviders,
+            bookReaders
         );
     }
 

@@ -58,6 +58,7 @@ public class UpdateLibraryCommandHandlerTests
     private readonly LibraryPathPartFixture _libraryPathPartFixture = new();
     private readonly LibraryPathTemplateFixture _libraryPathTemplateFixture = new();
     private readonly LibraryPathTemplatePartDtoFixture _libraryPathTemplatePartDtoFixture = new();
+    private readonly LibraryProviderSelectionDtoFixture _libraryProviderSelectionDtoFixture = new();
     private readonly Guid _userId;
 
     /// <summary>
@@ -78,15 +79,17 @@ public class UpdateLibraryCommandHandlerTests
         _mockValidator = Substitute.For<IValidator<UpdateLibraryCommand>>();
         _userId = Guid.NewGuid();
 
-        // default stubs: the current user is authenticated, has the manage permission, the cover image is a valid image, and the provider configurations are reconciled successfully
+        // Default stubs: the current user is authenticated, owns the library, has the manage permission, the cover image is a valid image, and the provider configurations are configured successfully.
         _mockCurrentUserService.UserId.Returns(_userId);
         _mockAuthorizationService.HasPermissionAsync(_userId, Arg.Any<AuthorizationPermission>(), Arg.Any<CancellationToken>())
+            .Returns(true);
+        _mockAuthorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(_userId, Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>())
             .Returns(true);
         _mockEnvironmentContext.FileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(ImageType.PNG));
         _mockLibraryRepository.UpdateAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Updated);
-        _mockProviderConfigurationStore.ReconcileProviderConfigurationsAsync(Arg.Any<Guid>(), Arg.Any<LibraryType>(), Arg.Any<CancellationToken>())
+        _mockProviderConfigurationStore.ConfigureProvidersAsync(Arg.Any<Guid>(), Arg.Any<LibraryType>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
             .Returns(Result.Success);
         _mockValidator.Validate(Arg.Any<UpdateLibraryCommand>()).Returns([]);
         _mockLibraryPathTemplateService.ResolveTemplate(Arg.Any<LibraryType>(), Arg.Any<IReadOnlyList<LibraryPathPart>>()).Returns(Result.From(LibraryPathTemplate.Empty()));
@@ -99,8 +102,8 @@ public class UpdateLibraryCommandHandlerTests
     {
         // Arrange
         UpdateLibraryCommand command = _updateLibraryCommandFixture.Create();
-        LibraryType commandLibraryType = Enum.Parse<LibraryType>(command.LibraryType);
-        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: command.OwnerId);
+        LibraryType commandLibraryType = Enum.Parse<LibraryType>(command.LibraryType!);
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
         existingLibrary.LibraryType = commandLibraryType == LibraryType.Book ? LibraryType.EBook : LibraryType.Book;
         _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(existingLibrary));
@@ -112,8 +115,8 @@ public class UpdateLibraryCommandHandlerTests
         Assert.False(result.IsFailure);
         Assert.Equal(existingLibrary.Id, result.Value.Id);
         await _mockLibraryRepository.Received(1).UpdateAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
-        await _mockProviderConfigurationStore.Received(1).ReconcileProviderConfigurationsAsync(
-            command.Id, Arg.Is<LibraryType>(libraryType => libraryType == commandLibraryType), Arg.Any<CancellationToken>());
+        await _mockProviderConfigurationStore.Received(1).ConfigureProvidersAsync(
+            command.Id, Arg.Is<LibraryType>(libraryType => libraryType == commandLibraryType), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Is(true), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
         _mockDomainEventsQueue.Received(1).Enqueue(Arg.Any<LibrarySavedDomainEvent>());
     }
@@ -127,7 +130,7 @@ public class UpdateLibraryCommandHandlerTests
             completionThresholdPercentage: 50);
         LibraryEntity existingLibrary = _libraryEntityFixture.Create(
             id: command.Id,
-            userId: command.OwnerId,
+            userId: _userId,
             shouldTrackConsumptionProgress: false);
         _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(existingLibrary));
@@ -152,7 +155,7 @@ public class UpdateLibraryCommandHandlerTests
             completionThresholdPercentage: null);
         LibraryEntity existingLibrary = _libraryEntityFixture.Create(
             id: command.Id,
-            userId: command.OwnerId,
+            userId: _userId,
             libraryType: LibraryType.Music,
             shouldTrackConsumptionProgress: false);
         _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
@@ -171,12 +174,34 @@ public class UpdateLibraryCommandHandlerTests
     }
 
     [Fact]
-    public async Task HandleAsync_WhenLibraryTypeIsUnchanged_ShouldNotReconcileProviderConfigurations()
+    public async Task HandleAsync_WhenAnAdminUpdatesTheLibraryOfAnotherUser_ShouldKeepTheStoredOwner()
+    {
+        // Arrange
+        Guid ownerId = Guid.NewGuid();
+        UpdateLibraryCommand command = _updateLibraryCommandFixture.Create();
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: ownerId);
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(existingLibrary));
+        _mockAuthorizationService.IsInRoleAsync(_userId, AuthorizationRoles.ADMIN, Arg.Any<CancellationToken>())
+            .Returns(true);
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockLibraryRepository.Received(1).UpdateAsync(
+            Arg.Is<LibraryEntity>(library => library.UserId == ownerId),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenLibraryTypeIsUnchangedAndNoProviderChoicesAreMade_ShouldNotConfigureProviders()
     {
         // Arrange
         UpdateLibraryCommand command = _updateLibraryCommandFixture.Create();
-        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: command.OwnerId);
-        existingLibrary.LibraryType = Enum.Parse<LibraryType>(command.LibraryType);
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
+        existingLibrary.LibraryType = Enum.Parse<LibraryType>(command.LibraryType!);
         _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(existingLibrary));
 
@@ -185,21 +210,144 @@ public class UpdateLibraryCommandHandlerTests
 
         // Assert
         Assert.False(result.IsFailure);
-        await _mockProviderConfigurationStore.DidNotReceive().ReconcileProviderConfigurationsAsync(Arg.Any<Guid>(), Arg.Any<LibraryType>(), Arg.Any<CancellationToken>());
+        await _mockProviderConfigurationStore.DidNotReceive().ConfigureProvidersAsync(Arg.Any<Guid>(), Arg.Any<LibraryType>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
-    public async Task HandleAsync_WhenProviderConfigurationReconciliationFails_ShouldReturnErrorWithoutSaving()
+    public async Task HandleAsync_WhenProviderChoicesAreMadeAndLibraryTypeIsUnchanged_ShouldConfigureProvidersWithTheChoices()
+    {
+        // Arrange
+        LibraryProviderSelectionDto[] metadataProviders = [.. _libraryProviderSelectionDtoFixture.CreateMany(2)];
+        LibraryProviderSelectionDto[] artworkProviders = [_libraryProviderSelectionDtoFixture.Create(isEnabled: false)];
+        LibraryProviderSelectionDto[] bookReaders = [_libraryProviderSelectionDtoFixture.Create()];
+        UpdateLibraryCommand command = _updateLibraryCommandFixture.Create(metadataProviders: metadataProviders, artworkProviders: artworkProviders, bookReaders: bookReaders);
+        LibraryType commandLibraryType = Enum.Parse<LibraryType>(command.LibraryType!);
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
+        existingLibrary.LibraryType = commandLibraryType;
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(existingLibrary));
+        _mockAuthorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(_userId, Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>())
+            .Returns(true);
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockProviderConfigurationStore.Received(1).ConfigureProvidersAsync(
+            command.Id,
+            commandLibraryType,
+            Arg.Is<IReadOnlyList<LibraryProviderSelectionDto>?>(selections => selections == metadataProviders),
+            Arg.Is<IReadOnlyList<LibraryProviderSelectionDto>?>(selections => selections == artworkProviders),
+            Arg.Is<IReadOnlyList<LibraryProviderSelectionDto>?>(selections => selections == bookReaders),
+            Arg.Is(false),
+            Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task HandleAsync_WhenANonOwnerWithTheManagePermissionUpdatesTheLibrary_ShouldReturnNotAuthorizedWithoutChangingAnything(bool hasProviderChoices)
+    {
+        // Arrange
+        UpdateLibraryCommand command = _updateLibraryCommandFixture.Create(bookReaders: hasProviderChoices ? [_libraryProviderSelectionDtoFixture.Create()] : null);
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: Guid.NewGuid());
+        existingLibrary.LibraryType = Enum.Parse<LibraryType>(command.LibraryType!);
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(existingLibrary));
+        _mockAuthorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(_userId, Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>())
+            .Returns(false);
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
+        await _mockLibraryRepository.DidNotReceive().UpdateAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
+        await _mockProviderConfigurationStore.DidNotReceive().ConfigureProvidersAsync(
+            Arg.Any<Guid>(), Arg.Any<LibraryType>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenANonOwnerWithTheManagePermissionChangesTheLibraryType_ShouldReturnNotAuthorizedWithoutChangingTheConfigurations()
+    {
+        // Arrange
+        UpdateLibraryCommand command = _updateLibraryCommandFixture.Create(libraryType: nameof(LibraryType.Book));
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: Guid.NewGuid(), libraryType: LibraryType.Music);
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(existingLibrary));
+        _mockAuthorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(_userId, Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>())
+            .Returns(false);
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
+        await _mockProviderConfigurationStore.DidNotReceive().ConfigureProvidersAsync(
+            Arg.Any<Guid>(), Arg.Any<LibraryType>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenTheOwnerLacksTheManagePermission_ShouldReturnNotAuthorizedWithoutChangingAnything()
     {
         // Arrange
         UpdateLibraryCommand command = _updateLibraryCommandFixture.Create();
-        LibraryType commandLibraryType = Enum.Parse<LibraryType>(command.LibraryType);
-        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: command.OwnerId);
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(existingLibrary));
+        _mockAuthorizationService.HasPermissionAsync(_userId, Arg.Any<AuthorizationPermission>(), Arg.Any<CancellationToken>())
+            .Returns(false);
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
+        await _mockLibraryRepository.DidNotReceive().UpdateAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenAnAdminWithoutTheManagePermissionUpdatesTheLibraryOfAnotherUser_ShouldUpdateIt()
+    {
+        // Arrange
+        UpdateLibraryCommand command = _updateLibraryCommandFixture.Create();
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: Guid.NewGuid());
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(existingLibrary));
+        _mockAuthorizationService.HasPermissionAsync(_userId, Arg.Any<AuthorizationPermission>(), Arg.Any<CancellationToken>())
+            .Returns(false);
+        _mockAuthorizationService.IsInRoleAsync(_userId, AuthorizationRoles.ADMIN, Arg.Any<CancellationToken>())
+            .Returns(true);
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockLibraryRepository.Received(1).UpdateAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenConfiguringProvidersFails_ShouldReturnErrorWithoutSaving()
+    {
+        // Arrange
+        UpdateLibraryCommand command = _updateLibraryCommandFixture.Create();
+        LibraryType commandLibraryType = Enum.Parse<LibraryType>(command.LibraryType!);
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
         existingLibrary.LibraryType = commandLibraryType == LibraryType.Book ? LibraryType.EBook : LibraryType.Book;
         _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(existingLibrary));
-        _mockProviderConfigurationStore.ReconcileProviderConfigurationsAsync(Arg.Any<Guid>(), Arg.Any<LibraryType>(), Arg.Any<CancellationToken>())
-            .Returns(Error.Failure(description: "Failed to reconcile provider configurations"));
+        _mockProviderConfigurationStore.ConfigureProvidersAsync(Arg.Any<Guid>(), Arg.Any<LibraryType>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(Error.Failure(description: "Failed to configure provider configurations"));
 
         // Act
         Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
@@ -215,7 +363,7 @@ public class UpdateLibraryCommandHandlerTests
         // Arrange
         UpdateLibraryCommand command = _updateLibraryCommandFixture.Create();
         command = command with { CoverImage = null };
-        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: command.OwnerId);
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
         _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(existingLibrary));
 
@@ -234,7 +382,7 @@ public class UpdateLibraryCommandHandlerTests
         // Arrange
         UpdateLibraryCommand command = _updateLibraryCommandFixture.Create();
         command = command with { CoverImage = "C:/Users/user/cover.jpg" };
-        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: command.OwnerId);
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
         existingLibrary.CoverImage = null;
         _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(existingLibrary));
@@ -257,7 +405,7 @@ public class UpdateLibraryCommandHandlerTests
         // Arrange
         UpdateLibraryCommand command = _updateLibraryCommandFixture.Create();
         command = command with { CoverImage = "C:/Users/user/cover.jpg" };
-        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: command.OwnerId);
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
         existingLibrary.CoverImage = null;
         _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(existingLibrary));
@@ -279,7 +427,7 @@ public class UpdateLibraryCommandHandlerTests
         // Arrange
         UpdateLibraryCommand command = _updateLibraryCommandFixture.Create();
         command = command with { CoverImage = " " };
-        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: command.OwnerId);
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
         existingLibrary.CoverImage = null;
         _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(existingLibrary));
@@ -295,11 +443,38 @@ public class UpdateLibraryCommandHandlerTests
     }
 
     [Fact]
+    public async Task HandleAsync_WhenUserLacksManagePermissionAndCoverImageIsNew_ShouldNotProbeCoverImage()
+    {
+        // Arrange
+        UpdateLibraryCommand command = _updateLibraryCommandFixture.Create();
+        command = command with { CoverImage = @"\\server\share\cover.jpg" };
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
+        existingLibrary.CoverImage = null;
+        _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(existingLibrary));
+        _mockAuthorizationService.IsInRoleAsync(_userId, AuthorizationRoles.ADMIN, Arg.Any<CancellationToken>())
+            .Returns(false);
+        _mockAuthorizationService.HasPermissionAsync(_userId, AuthorizationPermission.CanCreateLibraries, Arg.Any<CancellationToken>())
+            .Returns(false);
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
+        await _mockEnvironmentContext.FileTypeService.DidNotReceive()
+            .GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>());
+        await _mockLibraryRepository.DidNotReceive().UpdateAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task HandleAsync_WhenCoverImageIsUnchanged_ShouldSkipImageTypeCheck()
     {
         // Arrange
         UpdateLibraryCommand command = _updateLibraryCommandFixture.Create();
-        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: command.OwnerId);
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
         existingLibrary.CoverImage = command.CoverImage;
         _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(existingLibrary));
@@ -334,6 +509,28 @@ public class UpdateLibraryCommandHandlerTests
     }
 
     [Fact]
+    public async Task HandleAsync_WhenLibraryDoesNotExistAndUserLacksPermission_ShouldReturnNotFoundWithoutAuthorizing()
+    {
+        // Arrange
+        UpdateLibraryCommand command = _updateLibraryCommandFixture.Create();
+        _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result<LibraryEntity?>.Success(null));
+        _mockAuthorizationService.IsInRoleAsync(_userId, AuthorizationRoles.ADMIN, Arg.Any<CancellationToken>())
+            .Returns(false);
+        _mockAuthorizationService.HasPermissionAsync(_userId, AuthorizationPermission.CanCreateLibraries, Arg.Any<CancellationToken>())
+            .Returns(false);
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(DomainErrors.Library.LibraryNotFound, result.FirstError);
+        await _mockAuthorizationService.DidNotReceive().EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
+            Arg.Any<Guid>(), Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task HandleAsync_WhenGetByIdFails_ShouldReturnError()
     {
         // Arrange
@@ -355,7 +552,7 @@ public class UpdateLibraryCommandHandlerTests
     {
         // Arrange
         UpdateLibraryCommand command = _updateLibraryCommandFixture.Create();
-        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: command.OwnerId);
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
         _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(existingLibrary));
         _mockAuthorizationService.HasPermissionAsync(_userId, Arg.Any<AuthorizationPermission>(), Arg.Any<CancellationToken>())
@@ -395,7 +592,7 @@ public class UpdateLibraryCommandHandlerTests
     {
         // Arrange
         UpdateLibraryCommand command = _updateLibraryCommandFixture.Create();
-        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: command.OwnerId);
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
         _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(existingLibrary));
         command = command with { ContentLocations = [""] };
@@ -415,7 +612,7 @@ public class UpdateLibraryCommandHandlerTests
     {
         // Arrange
         UpdateLibraryCommand command = _updateLibraryCommandFixture.Create();
-        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: command.OwnerId);
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
         _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(existingLibrary));
         _mockLibraryRepository.UpdateAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>())
@@ -434,7 +631,7 @@ public class UpdateLibraryCommandHandlerTests
     {
         // Arrange
         UpdateLibraryCommand command = _updateLibraryCommandFixture.Create();
-        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: command.OwnerId);
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
         _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(existingLibrary), Error.Failure(description: "Failed to retrieve updated library"));
 
@@ -450,7 +647,7 @@ public class UpdateLibraryCommandHandlerTests
     {
         // Arrange
         UpdateLibraryCommand command = _updateLibraryCommandFixture.Create();
-        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: command.OwnerId);
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
         _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(existingLibrary), Result<LibraryEntity?>.Success(null));
 
@@ -486,7 +683,7 @@ public class UpdateLibraryCommandHandlerTests
     {
         // Arrange
         UpdateLibraryCommand command = _updateLibraryCommandFixture.Create(pathTemplateParts: null);
-        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: command.OwnerId);
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
         _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(existingLibrary));
         LibraryPathPart defaultPart = _libraryPathPartFixture.Create(
@@ -524,7 +721,7 @@ public class UpdateLibraryCommandHandlerTests
             representation: "{0}",
             isOptional: false);
         UpdateLibraryCommand command = _updateLibraryCommandFixture.Create(pathTemplateParts: [providedDto]);
-        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: command.OwnerId);
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
         _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(existingLibrary));
         LibraryPathPart providedPart = _libraryPathPartFixture.Create(
@@ -562,7 +759,7 @@ public class UpdateLibraryCommandHandlerTests
         // Arrange
         LibraryPathTemplatePartDto invalidPart = _libraryPathTemplatePartDtoFixture.Create() with { Kind = "NotARealLibraryPathPartKind" };
         UpdateLibraryCommand command = _updateLibraryCommandFixture.Create(pathTemplateParts: [invalidPart]);
-        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: command.OwnerId);
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
         _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(existingLibrary));
 
@@ -585,7 +782,7 @@ public class UpdateLibraryCommandHandlerTests
             kind: nameof(LibraryPathPartKind.Artist),
             representation: "{0}");
         UpdateLibraryCommand command = _updateLibraryCommandFixture.Create(pathTemplateParts: [validPart]);
-        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: command.OwnerId);
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
         _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(existingLibrary));
         Error validationError = DomainErrors.Library.PathTemplateIsNotSupportedForLibraryType;
@@ -611,7 +808,7 @@ public class UpdateLibraryCommandHandlerTests
             completionThresholdPercentage: null);
         LibraryEntity existingLibrary = _libraryEntityFixture.Create(
             id: command.Id,
-            userId: command.OwnerId,
+            userId: _userId,
             libraryType: LibraryType.Book,
             shouldTrackConsumptionProgress: true,
             completionThresholdPercentage: 80);
@@ -641,7 +838,7 @@ public class UpdateLibraryCommandHandlerTests
             completionThresholdPercentage: 60);
         LibraryEntity existingLibrary = _libraryEntityFixture.Create(
             id: command.Id,
-            userId: command.OwnerId,
+            userId: _userId,
             libraryType: LibraryType.Book,
             shouldTrackConsumptionProgress: true,
             completionThresholdPercentage: 80);
@@ -671,7 +868,7 @@ public class UpdateLibraryCommandHandlerTests
             completionThresholdPercentage: null);
         LibraryEntity existingLibrary = _libraryEntityFixture.Create(
             id: command.Id,
-            userId: command.OwnerId,
+            userId: _userId,
             libraryType: LibraryType.Book,
             shouldTrackConsumptionProgress: true,
             completionThresholdPercentage: 80);
@@ -701,7 +898,7 @@ public class UpdateLibraryCommandHandlerTests
             completionThresholdPercentage: 50);
         LibraryEntity existingLibrary = _libraryEntityFixture.Create(
             id: command.Id,
-            userId: command.OwnerId,
+            userId: _userId,
             libraryType: LibraryType.Book,
             shouldTrackConsumptionProgress: true,
             completionThresholdPercentage: 80);
@@ -728,7 +925,7 @@ public class UpdateLibraryCommandHandlerTests
             completionThresholdPercentage: null);
         LibraryEntity existingLibrary = _libraryEntityFixture.Create(
             id: command.Id,
-            userId: command.OwnerId,
+            userId: _userId,
             libraryType: LibraryType.Book,
             shouldTrackConsumptionProgress: true,
             completionThresholdPercentage: 80);
@@ -758,7 +955,7 @@ public class UpdateLibraryCommandHandlerTests
             completionThresholdPercentage: null);
         LibraryEntity existingLibrary = _libraryEntityFixture.Create(
             id: command.Id,
-            userId: command.OwnerId,
+            userId: _userId,
             libraryType: LibraryType.Music,
             shouldTrackConsumptionProgress: false,
             completionThresholdPercentage: null);
@@ -788,7 +985,7 @@ public class UpdateLibraryCommandHandlerTests
             completionThresholdPercentage: 65);
         LibraryEntity existingLibrary = _libraryEntityFixture.Create(
             id: command.Id,
-            userId: command.OwnerId,
+            userId: _userId,
             libraryType: LibraryType.Music,
             shouldTrackConsumptionProgress: false,
             completionThresholdPercentage: null);

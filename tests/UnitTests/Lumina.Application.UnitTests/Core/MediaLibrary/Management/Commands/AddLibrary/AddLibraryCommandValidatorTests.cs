@@ -7,6 +7,7 @@ using Lumina.Application.UnitTests.Common.Setup;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -22,6 +23,7 @@ public class AddLibraryCommandValidatorTests
     private readonly AddLibraryCommandValidator _validator = new();
     private readonly AddLibraryCommandFixture _addLibraryCommandFixture = new();
     private readonly LibraryPathTemplatePartDtoFixture _libraryPathTemplatePartDtoFixture = new();
+    private readonly LibraryProviderSelectionDtoFixture _libraryProviderSelectionDtoFixture = new();
 
     [Fact]
     public void Validate_WhenLibraryTypeIsNull_ShouldHaveValidationError()
@@ -37,12 +39,14 @@ public class AddLibraryCommandValidatorTests
         result.ShouldHaveValidationError(Errors.Library.LibraryTypeCannotBeNull);
     }
 
-    [Fact]
-    public void Validate_WhenLibraryTypeIsUnknown_ShouldHaveValidationError()
+    [Theory]
+    [InlineData("UnknownLibraryType")] // Not a library type.
+    [InlineData("999")] // A number that is not a defined library type.
+    public void Validate_WhenLibraryTypeIsUnknown_ShouldHaveValidationError(string libraryType)
     {
         // Arrange
         AddLibraryCommand command = _addLibraryCommandFixture.Create();
-        command = command with { LibraryType = "UnknownLibraryType" };
+        command = command with { LibraryType = libraryType };
 
         // Act
         List<Error> result = _validator.TestValidate(command);
@@ -63,6 +67,36 @@ public class AddLibraryCommandValidatorTests
 
         // Assert
         result.ShouldNotHaveValidationError(Errors.Library.UnknownLibraryType);
+    }
+
+    [Theory]
+    [InlineData("book")] // The casing of the name does not matter.
+    [InlineData("eBook")] // The casing of the name does not matter.
+    public void Validate_WhenLibraryTypeDiffersInCasing_ShouldNotHaveValidationError(string libraryType)
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create();
+        command = command with { LibraryType = libraryType };
+
+        // Act
+        List<Error> result = _validator.TestValidate(command);
+
+        // Assert
+        result.ShouldNotHaveValidationError(Errors.Library.UnknownLibraryType);
+    }
+
+    [Fact]
+    public void Validate_WhenLibraryTypeIsTheNumericValueOfADefinedMember_ShouldHaveValidationError()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create();
+        command = command with { LibraryType = "0" }; // Book
+
+        // Act
+        List<Error> result = _validator.TestValidate(command);
+
+        // Assert
+        result.ShouldHaveValidationError(Errors.Library.UnknownLibraryType);
     }
 
     [Fact]
@@ -220,9 +254,9 @@ public class AddLibraryCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(null)] // an absent kind
-    [InlineData("")] // an empty kind
-    [InlineData("   ")] // a whitespace kind
+    [InlineData(null)] // An absent kind.
+    [InlineData("")] // An empty kind.
+    [InlineData("   ")] // A whitespace kind.
     public void Validate_WhenPathTemplatePartKindIsNullOrEmpty_ShouldHaveValidationError(string? kind)
     {
         // Arrange
@@ -237,9 +271,9 @@ public class AddLibraryCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(null)] // an absent representation
-    [InlineData("")] // an empty representation
-    [InlineData("   ")] // a whitespace representation
+    [InlineData(null)] // An absent representation.
+    [InlineData("")] // An empty representation.
+    [InlineData("   ")] // A whitespace representation.
     public void Validate_WhenNonSeparatorPartRepresentationIsNullOrEmpty_ShouldHaveValidationError(string? representation)
     {
         // Arrange
@@ -305,8 +339,8 @@ public class AddLibraryCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(-1)] // just below the allowed range
-    [InlineData(int.MinValue)] // the lowest possible value
+    [InlineData(-1)] // Just below the allowed range.
+    [InlineData(int.MinValue)] // The lowest possible value.
     public void Validate_WhenThresholdIsBelowZero_ShouldHaveValidationError(int completionThresholdPercentage)
     {
         // Arrange
@@ -323,8 +357,8 @@ public class AddLibraryCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(101)] // just above the allowed range
-    [InlineData(int.MaxValue)] // the highest possible value
+    [InlineData(101)] // Just above the allowed range.
+    [InlineData(int.MaxValue)] // The highest possible value.
     public void Validate_WhenThresholdIsAboveOneHundred_ShouldHaveValidationError(int completionThresholdPercentage)
     {
         // Arrange
@@ -341,8 +375,8 @@ public class AddLibraryCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(0)] // the lowest allowed boundary
-    [InlineData(100)] // the highest allowed boundary
+    [InlineData(0)] // The lowest allowed boundary.
+    [InlineData(100)] // The highest allowed boundary.
     public void Validate_WhenThresholdIsAtAnAllowedBoundary_ShouldNotHaveValidationError(int completionThresholdPercentage)
     {
         // Arrange
@@ -407,5 +441,117 @@ public class AddLibraryCommandValidatorTests
         // Assert
         result.ShouldNotHaveValidationError(Errors.Library.CompletionThresholdPercentageMustBeNullWhenProgressTrackingIsOff);
         result.ShouldNotHaveValidationError(Errors.Library.CompletionThresholdPercentageMustBeBetweenZeroAndOneHundred);
+    }
+
+    [Fact]
+    public void Validate_WhenMetadataProviderPluginIdIsEmpty_ShouldHaveValidationError()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(metadataProviders: [_libraryProviderSelectionDtoFixture.Create(pluginId: Guid.Empty)]);
+
+        // Act
+        List<Error> result = _validator.TestValidate(command);
+
+        // Assert
+        result.ShouldHaveValidationError(Errors.Plugins.PluginIdCannotBeEmpty);
+    }
+
+    [Fact]
+    public void Validate_WhenMetadataProviderPluginIdsAreDuplicated_ShouldHaveValidationError()
+    {
+        // Arrange
+        Guid pluginId = Guid.NewGuid();
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(metadataProviders: [_libraryProviderSelectionDtoFixture.Create(pluginId: pluginId), _libraryProviderSelectionDtoFixture.Create(pluginId: pluginId, isEnabled: false)]);
+
+        // Act
+        List<Error> result = _validator.TestValidate(command);
+
+        // Assert
+        result.ShouldHaveValidationError(Errors.Plugins.PluginIdsMustBeUnique);
+    }
+
+    [Fact]
+    public void Validate_WhenArtworkProviderPluginIdIsEmpty_ShouldHaveValidationError()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(artworkProviders: [_libraryProviderSelectionDtoFixture.Create(pluginId: Guid.Empty)]);
+
+        // Act
+        List<Error> result = _validator.TestValidate(command);
+
+        // Assert
+        result.ShouldHaveValidationError(Errors.Plugins.PluginIdCannotBeEmpty);
+    }
+
+    [Fact]
+    public void Validate_WhenArtworkProviderPluginIdsAreDuplicated_ShouldHaveValidationError()
+    {
+        // Arrange
+        Guid pluginId = Guid.NewGuid();
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(artworkProviders: [_libraryProviderSelectionDtoFixture.Create(pluginId: pluginId), _libraryProviderSelectionDtoFixture.Create(pluginId: pluginId, isEnabled: false)]);
+
+        // Act
+        List<Error> result = _validator.TestValidate(command);
+
+        // Assert
+        result.ShouldHaveValidationError(Errors.Plugins.PluginIdsMustBeUnique);
+    }
+
+    [Fact]
+    public void Validate_WhenBookReaderPluginIdIsEmpty_ShouldHaveValidationError()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(bookReaders: [_libraryProviderSelectionDtoFixture.Create(pluginId: Guid.Empty)]);
+
+        // Act
+        List<Error> result = _validator.TestValidate(command);
+
+        // Assert
+        result.ShouldHaveValidationError(Errors.Plugins.PluginIdCannotBeEmpty);
+    }
+
+    [Fact]
+    public void Validate_WhenBookReaderPluginIdsAreDuplicated_ShouldHaveValidationError()
+    {
+        // Arrange
+        Guid pluginId = Guid.NewGuid();
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(bookReaders: [_libraryProviderSelectionDtoFixture.Create(pluginId: pluginId), _libraryProviderSelectionDtoFixture.Create(pluginId: pluginId, isEnabled: false)]);
+
+        // Act
+        List<Error> result = _validator.TestValidate(command);
+
+        // Assert
+        result.ShouldHaveValidationError(Errors.Plugins.PluginIdsMustBeUnique);
+    }
+
+    [Fact]
+    public void Validate_WhenProviderChoicesAreValid_ShouldNotHaveProviderValidationErrors()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(
+            metadataProviders: [.. _libraryProviderSelectionDtoFixture.CreateMany(2)],
+            artworkProviders: [.. _libraryProviderSelectionDtoFixture.CreateMany(2)],
+            bookReaders: [.. _libraryProviderSelectionDtoFixture.CreateMany(2)]);
+
+        // Act
+        List<Error> result = _validator.TestValidate(command);
+
+        // Assert
+        result.ShouldNotHaveValidationError(Errors.Plugins.PluginIdCannotBeEmpty);
+        result.ShouldNotHaveValidationError(Errors.Plugins.PluginIdsMustBeUnique);
+    }
+
+    [Fact]
+    public void Validate_WhenProviderChoicesAreNotProvided_ShouldNotHaveProviderValidationErrors()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(metadataProviders: null, artworkProviders: null, bookReaders: null);
+
+        // Act
+        List<Error> result = _validator.TestValidate(command);
+
+        // Assert
+        result.ShouldNotHaveValidationError(Errors.Plugins.PluginIdCannotBeEmpty);
+        result.ShouldNotHaveValidationError(Errors.Plugins.PluginIdsMustBeUnique);
     }
 }

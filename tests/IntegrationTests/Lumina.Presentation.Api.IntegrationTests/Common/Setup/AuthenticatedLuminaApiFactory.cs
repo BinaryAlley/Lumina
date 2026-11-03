@@ -1,11 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Seed;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.DataAccess.Core.UoW;
+using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using Lumina.Infrastructure.Core.Security;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -33,6 +35,8 @@ public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
         PropertyNameCaseInsensitive = true
     };
     private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly PermissionEntityFixture _permissionEntityFixture = new();
+    private readonly UserPermissionEntityFixture _userPermissionEntityFixture = new();
     private readonly LoginRequestFixture _loginRequestFixture = new();
 
     /// <summary>
@@ -43,17 +47,18 @@ public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
     /// <summary>
     /// Creates an HTTP client with authentication headers and a test user
     /// </summary>
+    /// <param name="permissions">The permissions granted directly to the test user, if any.</param>
     /// <returns>An HTTP client configured with auth headers</returns>
-    public async Task<HttpClient> CreateAuthenticatedClientAsync()
+    public async Task<HttpClient> CreateAuthenticatedClientAsync(params AuthorizationPermission[] permissions)
     {
         HttpClient client = CreateClient();
         TestUsername = $"testuser_{Guid.NewGuid()}";
 
-        // add the X-Forwarded-For header
+        // Add the X-Forwarded-For header.
         client.DefaultRequestHeaders.Add("X-Forwarded-For", $"192.{Random.Shared.Next(0, 255)}.{Random.Shared.Next(0, 255)}.{Random.Shared.Next(0, 255)}");
 
-        // perform authentication 
-        await CreateAndAuthenticateUser(client);
+        // Perform authentication.
+        await CreateAndAuthenticateUser(client, permissions);
 
         return client;
     }
@@ -62,20 +67,23 @@ public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
     /// Creates and authenticates a test user.
     /// </summary>
     /// <param name="client">The HTTP client to configure with auth.</param>
+    /// <param name="permissions">The permissions granted directly to the test user.</param>
     /// <returns>The created user entity.</returns>
-    private async Task<UserEntity> CreateAndAuthenticateUser(HttpClient client)
+    private async Task<UserEntity> CreateAndAuthenticateUser(HttpClient client, AuthorizationPermission[] permissions)
     {
         using IServiceScope scope = Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
-        // create test user
+        // Create test user, with the permissions granted directly to it.
         UserEntity user = _userEntityFixture.Create(username: TestUsername!, password: _hashService.HashString("TestPass123!"));
         user.TotpSecret = null;
+        foreach (AuthorizationPermission permission in permissions)
+            user.UserPermissions.Add(_userPermissionEntityFixture.Create(user, _permissionEntityFixture.Create(permissionName: permission, createdBy: user.Id)));
 
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();
 
-        // authenticate user
+        // Authenticate user.
         LoginRequest loginRequest = _loginRequestFixture.Create(
             username: user.Username,
             password: "TestPass123!",
@@ -86,7 +94,7 @@ public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
         string content = await loginResponse.Content.ReadAsStringAsync();
         LoginResponse? result = JsonSerializer.Deserialize<LoginResponse>(content, _jsonOptions);
 
-        // set auth header for subsequent requests
+        // Set auth header for subsequent requests.
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result!.Token);
 
         return user;
@@ -101,11 +109,11 @@ public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
         HttpClient client = CreateClient();
         TestUsername = $"testuser_{Guid.NewGuid()}";
 
-        // add the X-Forwarded-For header
+        // Add the X-Forwarded-For header.
         client.DefaultRequestHeaders.Add("X-Forwarded-For",
             $"192.{Random.Shared.Next(0, 255)}.{Random.Shared.Next(0, 255)}.{Random.Shared.Next(0, 255)}");
 
-        // create and authenticate admin user
+        // Create and authenticate admin user.
         await CreateAndAuthenticateAdminUser(client);
 
         return client;
@@ -122,20 +130,20 @@ public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         IDataSeedService dataSeedService = scope.ServiceProvider.GetRequiredService<IDataSeedService>();
 
-        // create test user
+        // Create test user.
         UserEntity user = _userEntityFixture.Create(username: TestUsername!, password: _hashService.HashString("TestPass123!"));
         user.TotpSecret = null;
 
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();
 
-        // set up admin permissions and roles
+        // Set up admin permissions and roles.
         await dataSeedService.SetDefaultAuthorizationPermissionsAsync(user.Id, CancellationToken.None);
         await dataSeedService.SetDefaultAuthorizationRolesAsync(user.Id, CancellationToken.None);
         await dataSeedService.SetAdminRolePermissionsAsync(user.Id, CancellationToken.None);
         await dataSeedService.SetAdminRoleToAdministratorAccount(user.Id, CancellationToken.None);
 
-        // authenticate user
+        // Authenticate user.
         LoginRequest loginRequest = _loginRequestFixture.Create(
             username: user.Username,
             password: "TestPass123!",
@@ -146,7 +154,7 @@ public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
         string content = await loginResponse.Content.ReadAsStringAsync();
         LoginResponse? result = JsonSerializer.Deserialize<LoginResponse>(content, _jsonOptions);
 
-        // set auth header for subsequent requests
+        // Set auth header for subsequent requests.
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result!.Token);
 
         return user;

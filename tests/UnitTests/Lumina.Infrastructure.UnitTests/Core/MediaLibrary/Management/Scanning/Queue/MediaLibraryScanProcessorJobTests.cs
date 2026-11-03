@@ -84,10 +84,13 @@ public class MediaLibraryScanProcessorJobTests : IDisposable
         RegisterScan(firstScanId, LibraryScanJobStatus.Pending);
         RegisterScan(secondScanId, LibraryScanJobStatus.Pending);
         TaskCompletionSource<bool> releaseFirstScan = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        // ExecutionStarted is signaled before the callback runs, and resumes the test on another thread, so the test waits for the callback itself to record the scan
+        TaskCompletionSource firstScanRecorded = new(TaskCreationOptions.RunContinuationsAsynchronously);
         List<Guid> startedScanIds = [];
         FakeMediaLibraryScanDiscoveryJob firstRootJob = _mediaLibraryScanDiscoveryJobFixture.Create(onExecute: async _ =>
         {
             startedScanIds.Add(firstScanId.ScanId.Value);
+            firstScanRecorded.SetResult();
             await releaseFirstScan.Task;
         });
         FakeMediaLibraryScanDiscoveryJob secondRootJob = _mediaLibraryScanDiscoveryJobFixture.Create(onExecute: _ =>
@@ -102,7 +105,7 @@ public class MediaLibraryScanProcessorJobTests : IDisposable
         // Act
         _queue.Writer.TryWrite(firstScanId);
         _queue.Writer.TryWrite(secondScanId);
-        await firstRootJob.ExecutionStarted.WaitAsync(s_testTimeout);
+        await firstScanRecorded.Task.WaitAsync(s_testTimeout);
 
         // Assert
         // The second scan must not start while the job graph of the first one is still executing.

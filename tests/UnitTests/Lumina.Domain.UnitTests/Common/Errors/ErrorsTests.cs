@@ -348,8 +348,8 @@ public class ErrorsTests
         AssertError(DomainErrors.Plugins.PluginIdCannotBeEmpty, ErrorType.Validation);
         AssertError(DomainErrors.Plugins.PluginSettingsCannotBeNull, ErrorType.Validation);
         AssertError(DomainErrors.Plugins.LibraryIdCannotBeEmpty, ErrorType.Validation);
-        AssertError(DomainErrors.Plugins.PluginIdsListCannotBeNull, ErrorType.Validation);
-        AssertError(DomainErrors.Plugins.PluginIdsListCannotBeEmpty, ErrorType.Validation);
+        AssertError(DomainErrors.Plugins.PluginIdsMustBeUnique, ErrorType.Validation);
+        AssertError(DomainErrors.Plugins.PluginNotSupportedForLibraryType, ErrorType.Validation);
         AssertError(DomainErrors.Plugins.LibraryMetadataProviderConfigurationNotFound, ErrorType.NotFound);
         AssertError(DomainErrors.Plugins.PluginArchiveCannotBeNull, ErrorType.Validation);
         AssertError(DomainErrors.Plugins.PluginFileNameCannotBeEmpty, ErrorType.Validation);
