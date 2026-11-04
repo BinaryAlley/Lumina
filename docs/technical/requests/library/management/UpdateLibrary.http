@@ -4,7 +4,6 @@ Content-Type: application/json
 
 {
   "id": "{{$guid}}",
-  "userId": "{{$guid}}",
   "title": "Books",
   "libraryType": "Book",
   "contentLocations": [
@@ -22,5 +21,8 @@ Content-Type: application/json
   "pathTemplateParts": [
     { "kind": "Artist", "representation": "{0}", "isOptional": false },
     { "kind": "Separator", "representation": "", "isOptional": false }
-  ]
+  ],
+  "metadataProviders": null,
+  "artworkProviders": null,
+  "bookReaders": null
 }

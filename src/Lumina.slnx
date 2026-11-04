@@ -276,14 +276,12 @@
     <File Path="../docs/technical/requests/plugins/GetLibraryArtworkProviders.http" />
     <File Path="../docs/technical/requests/plugins/GetLibraryBookReaders.http" />
     <File Path="../docs/technical/requests/plugins/GetLibraryMetadataProviders.http" />
+    <File Path="../docs/technical/requests/plugins/GetLibraryTypeArtworkProviders.http" />
+    <File Path="../docs/technical/requests/plugins/GetLibraryTypeBookReaders.http" />
+    <File Path="../docs/technical/requests/plugins/GetLibraryTypeMetadataProviders.http" />
     <File Path="../docs/technical/requests/plugins/GetPlugins.http" />
     <File Path="../docs/technical/requests/plugins/GetPluginSettings.http" />
     <File Path="../docs/technical/requests/plugins/InstallPlugin.http" />
-    <File Path="../docs/technical/requests/plugins/ReorderLibraryArtworkProviders.http" />
-    <File Path="../docs/technical/requests/plugins/ReorderLibraryMetadataProviders.http" />
-    <File Path="../docs/technical/requests/plugins/SetLibraryArtworkProviderEnabled.http" />
-    <File Path="../docs/technical/requests/plugins/SetLibraryBookReaderEnabled.http" />
-    <File Path="../docs/technical/requests/plugins/SetLibraryMetadataProviderEnabled.http" />
     <File Path="../docs/technical/requests/plugins/UpdatePluginSettings.http" />
   </Folder>
   <Folder Name="/docs/technical/requests/scheduling/">
