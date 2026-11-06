@@ -17,7 +17,7 @@ namespace Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJ
 /// <param name="TaskType">The type of the task that completed its execution.</param>
 /// <param name="IsCycleRun"><see langword="true"/> when the execution was triggered by the execution cycle of the scheduled job, <see langword="false"/> when it was a one time execution.</param>
 /// <param name="CompletedOnUtc">The date and time when the execution completed.</param>
-[DebuggerDisplay("Id: {ScheduledJobId.Value}, RunId: {RunId}")]
+[DebuggerDisplay("Id: {ScheduledJobId.Value}; RunId: {RunId}")]
 public record ScheduledJobExecutionCompletedDomainEvent(
     Guid Id,
     ScheduledJobId ScheduledJobId,

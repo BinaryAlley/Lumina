@@ -9,7 +9,7 @@ namespace Lumina.Application.Common.Infrastructure.Models.DTO.MediaLibraryScanJo
 /// <summary>
 /// Represents an item for the payload of the file hashing media library scan job.
 /// </summary>
-[DebuggerDisplay("Path = {Path}, CurrentHash = {CurrentHash}, OldHash = {OldHash}, Ticks = {Ticks}, Size = {Size}")]
+[DebuggerDisplay("Path = {Path}; CurrentHash = {CurrentHash}; OldHash = {OldHash}; Ticks = {Ticks}; Size = {Size}")]
 [StructLayout(LayoutKind.Sequential)]
 public struct HashedFileSystemFileDto : IEquatable<HashedFileSystemFileDto>
 {

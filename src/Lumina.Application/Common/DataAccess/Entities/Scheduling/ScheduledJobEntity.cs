@@ -10,7 +10,7 @@ namespace Lumina.Application.Common.DataAccess.Entities.Scheduling;
 /// <summary>
 /// Repository entity for a scheduled job.
 /// </summary>
-[DebuggerDisplay("Id: {Id}, Status: {Status}")]
+[DebuggerDisplay("Id: {Id}; Status: {Status}")]
 public class ScheduledJobEntity : IStorageEntity, IAuditableEntity
 {
     /// <summary>

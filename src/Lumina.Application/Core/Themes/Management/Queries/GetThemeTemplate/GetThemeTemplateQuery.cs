@@ -11,7 +11,7 @@ namespace Lumina.Application.Core.Themes.Management.Queries.GetThemeTemplate;
 /// </summary>
 /// <param name="ThemeId">The manifest id of the theme.</param>
 /// <param name="PageKey">The page key that selects the template.</param>
-[DebuggerDisplay("ThemeId: {ThemeId}, PageKey: {PageKey}")]
+[DebuggerDisplay("ThemeId: {ThemeId}; PageKey: {PageKey}")]
 public record GetThemeTemplateQuery(
     string? ThemeId,
     string? PageKey

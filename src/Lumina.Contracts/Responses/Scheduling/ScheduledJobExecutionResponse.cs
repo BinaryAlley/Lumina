@@ -15,7 +15,7 @@ namespace Lumina.Contracts.Responses.Scheduling;
 /// <param name="IsCycleRun"><see langword="true"/> when the execution was triggered by the execution cycle of the scheduled job, <see langword="false"/> when it was a one time execution.</param>
 /// <param name="StartedOnUtc">The date and time when the execution started.</param>
 /// <param name="CompletedOnUtc">The optional date and time when the execution completed.</param>
-[DebuggerDisplay("Id: {Id}, ScheduledJobId: {ScheduledJobId}")]
+[DebuggerDisplay("Id: {Id}; ScheduledJobId: {ScheduledJobId}")]
 public record ScheduledJobExecutionResponse(
     Guid Id,
     Guid ScheduledJobId,

@@ -8,7 +8,7 @@ namespace Lumina.Presentation.Web.Common.DTO.Reading;
 /// <summary>
 /// Data transfer object for the reading availability of a book.
 /// </summary>
-[DebuggerDisplay("BookId: {BookId}, IsAvailable: {IsAvailable}")]
+[DebuggerDisplay("BookId: {BookId}; IsAvailable: {IsAvailable}")]
 public class ReadingAvailabilityDto
 {
     /// <summary>

@@ -9,7 +9,7 @@ namespace Lumina.Presentation.Web.Common.DTO.AudioLibrary;
 /// <summary>
 /// Data transfer object for the rating of an audio media element.
 /// </summary>
-[DebuggerDisplay("Value: {Value}, MaxValue: {MaxValue}")]
+[DebuggerDisplay("Value: {Value}; MaxValue: {MaxValue}")]
 public class AudioRatingDto : RatingDto
 {
     /// <summary>

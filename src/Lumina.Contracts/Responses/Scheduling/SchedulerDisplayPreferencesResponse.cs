@@ -13,7 +13,7 @@ namespace Lumina.Contracts.Responses.Scheduling;
 /// <param name="JobTypeFilter">The type of the scheduled job tasks whose executions are shown on the scheduler page, or <see langword="null"/> when all of them are shown.</param>
 /// <param name="DisplayTimeSpan">The time span, expressed in <paramref name="DisplayTimeUnit"/>, that the scheduler page shows.</param>
 /// <param name="DisplayTimeUnit">The unit in which the displayed time span of the scheduler page is expressed.</param>
-[DebuggerDisplay("UserId: {UserId}, DisplayTimeSpan: {DisplayTimeSpan} {DisplayTimeUnit}")]
+[DebuggerDisplay("UserId: {UserId}; DisplayTimeSpan: {DisplayTimeSpan} {DisplayTimeUnit}")]
 public sealed record SchedulerDisplayPreferencesResponse(
     Guid UserId,
     ScheduledTaskType? JobTypeFilter,

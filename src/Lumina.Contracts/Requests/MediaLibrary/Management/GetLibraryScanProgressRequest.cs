@@ -10,7 +10,7 @@ namespace Lumina.Contracts.Requests.MediaLibrary.Management;
 /// </summary>
 /// <param name="LibraryId">The Id of the media library whose scan progress is requested. Required.</param>
 /// <param name="ScanId">The Id of the media library scan whose progress is requested. Required.</param>
-[DebuggerDisplay("LibraryId: {LibraryId}, ScanId: {ScanId}")]
+[DebuggerDisplay("LibraryId: {LibraryId}; ScanId: {ScanId}")]
 public record GetLibraryScanProgressRequest(
     Guid LibraryId,
     Guid ScanId

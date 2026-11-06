@@ -10,7 +10,7 @@ namespace Lumina.Application.Common.DataAccess.Entities.Scheduling;
 /// <summary>
 /// Repository entity for the display preferences of the scheduler page of a user.
 /// </summary>
-[DebuggerDisplay("UserId: {UserId}, DisplayTimeSpan: {DisplayTimeSpan}")]
+[DebuggerDisplay("UserId: {UserId}; DisplayTimeSpan: {DisplayTimeSpan}")]
 public class SchedulerDisplayPreferencesEntity : IStorageEntity, IAuditableEntity
 {
     /// <summary>

@@ -9,7 +9,7 @@ namespace Lumina.Contracts.Requests.FileSystemManagement.Path;
 /// </summary>
 /// <param name="OriginalPath">The file system path to combine to. Required.</param>
 /// <param name="NewPath">The file system path to combine with. Required.</param>
-[DebuggerDisplay("OriginalPath: {OriginalPath}, NewPath: {NewPath}")]
+[DebuggerDisplay("OriginalPath: {OriginalPath}; NewPath: {NewPath}")]
 public record CombinePathRequest(
     string? OriginalPath,
     string? NewPath

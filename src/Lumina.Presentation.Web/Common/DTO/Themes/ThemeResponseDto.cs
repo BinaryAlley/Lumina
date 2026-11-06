@@ -20,7 +20,7 @@ namespace Lumina.Presentation.Web.Common.DTO.Themes;
 /// <param name="IsCurrent">Whether the theme is the currently active one.</param>
 /// <param name="InstalledAtUtc">The UTC timestamp at which the theme was installed.</param>
 /// <param name="IsDeleted">Whether the theme was deleted by the user, which is only possible for bundled themes.</param>
-[DebuggerDisplay("ThemeId: {ThemeId}, Name: {Name}")]
+[DebuggerDisplay("ThemeId: {ThemeId}; Name: {Name}")]
 public sealed record ThemeResponseDto(
     Guid Id,
     string ThemeId,

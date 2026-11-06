@@ -9,7 +9,7 @@ namespace Lumina.Presentation.Web.Common.DTO.Plugins;
 /// <summary>
 /// Data transfer object for a single setting of a plugin.
 /// </summary>
-[DebuggerDisplay("Key: {Key}, Label: {Label}")]
+[DebuggerDisplay("Key: {Key}; Label: {Label}")]
 public class PluginSettingDescriptorDto
 {
     /// <summary>

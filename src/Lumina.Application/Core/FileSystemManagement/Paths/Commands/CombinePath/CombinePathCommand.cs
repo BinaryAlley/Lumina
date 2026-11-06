@@ -10,7 +10,7 @@ namespace Lumina.Application.Core.FileSystemManagement.Paths.Commands.CombinePat
 /// </summary>
 /// <param name="OriginalPath">The path to combine to.</param>
 /// <param name="NewPath">The path to combine with.</param>
-[DebuggerDisplay("OriginalPath: {OriginalPath}, NewPath: {NewPath}")]
+[DebuggerDisplay("OriginalPath: {OriginalPath}; NewPath: {NewPath}")]
 public record CombinePathCommand(
     string? OriginalPath, 
     string? NewPath

@@ -13,7 +13,7 @@ namespace Lumina.Contracts.DTO.Common;
 /// <param name="LocalPath">The local file system path of the artwork, when the artwork is a local file.</param>
 /// <param name="RemoteUrl">The remote URL of the artwork, when the artwork is fetched over the web.</param>
 /// <param name="IsTemporary">Whether a local artwork is a temporary file produced by the provider, which is deleted after the artwork is stored.</param>
-[DebuggerDisplay("Type: {Type}, Ordinal: {Ordinal}, LocalPath: {LocalPath}, RemoteUrl: {RemoteUrl}")]
+[DebuggerDisplay("Type: {Type}; Ordinal: {Ordinal}; LocalPath: {LocalPath}; RemoteUrl: {RemoteUrl}")]
 public sealed record ArtworkDto(
     ArtworkType Type,
     int Ordinal,

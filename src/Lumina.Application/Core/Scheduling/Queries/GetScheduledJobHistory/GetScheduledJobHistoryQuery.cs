@@ -11,7 +11,7 @@ namespace Lumina.Application.Core.Scheduling.Queries.GetScheduledJobHistory;
 /// </summary>
 /// <param name="From">The optional inclusive lower bound of the interval for which the history is requested.</param>
 /// <param name="To">The optional inclusive upper bound of the interval for which the history is requested.</param>
-[DebuggerDisplay("From: {From}, To: {To}")]
+[DebuggerDisplay("From: {From}; To: {To}")]
 public record GetScheduledJobHistoryQuery(
     DateTime? From,
     DateTime? To
