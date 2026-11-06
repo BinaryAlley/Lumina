@@ -19,7 +19,7 @@ namespace Lumina.Contracts.Responses.Scheduling;
 /// <param name="Status">The status of the scheduled job.</param>
 /// <param name="LastStartedOnUtc">The optional date and time when the task of the scheduled job last started its execution.</param>
 /// <param name="LastCompletedOnUtc">The optional date and time when the task of the scheduled job last completed its execution.</param>
-[DebuggerDisplay("Id: {Id}, Name: {Name}, Status: {Status}")]
+[DebuggerDisplay("Id: {Id}; Name: {Name}; Status: {Status}")]
 public record ScheduledJobResponse(
     Guid Id,
     string Name,

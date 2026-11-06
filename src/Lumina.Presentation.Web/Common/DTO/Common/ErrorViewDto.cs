@@ -5,7 +5,7 @@ namespace Lumina.Presentation.Web.Common.DTO.Common;
 /// <summary>
 /// Data transfer object for the data shown on the error page.
 /// </summary>
-[DebuggerDisplay("RequestId: {RequestId}, ShouldShowRequestId: {ShouldShowRequestId}")]
+[DebuggerDisplay("RequestId: {RequestId}; ShouldShowRequestId: {ShouldShowRequestId}")]
 public class ErrorViewDto
 {
     /// <summary>

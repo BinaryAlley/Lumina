@@ -9,7 +9,7 @@ namespace Lumina.Presentation.Web.Common.DTO.Themes;
 /// </summary>
 /// <param name="Content">The rendered HTML content of the page section.</param>
 /// <param name="Script">The rendered script element of the page section, when the template defines one.</param>
-[DebuggerDisplay("Content length: {Content.Length}, Script length: {Script.Length}")]
+[DebuggerDisplay("Content length: {Content.Length}; Script length: {Script.Length}")]
 public sealed record ThemePageRenderResultDto(
     string Content,
     string Script

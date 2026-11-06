@@ -11,7 +11,7 @@ namespace Lumina.Contracts.DTO.Authentication;
 /// </summary>
 /// <param name="Id">The unique identifier of the permission.</param>
 /// <param name="PermissionName">The name of the permission.</param>
-[DebuggerDisplay("Id: {Id}, PermissionName: {PermissionName}")]
+[DebuggerDisplay("Id: {Id}; PermissionName: {PermissionName}")]
 public record PermissionDto(
     Guid Id,
     AuthorizationPermission PermissionName

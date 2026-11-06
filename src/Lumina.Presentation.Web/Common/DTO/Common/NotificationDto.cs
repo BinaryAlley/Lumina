@@ -12,7 +12,7 @@ namespace Lumina.Presentation.Web.Common.DTO.Common;
 /// <param name="Id">The id of the notification.</param>
 /// <param name="Message">The message of the notification.</param>
 /// <param name="Type">The type of the notification.</param>
-[DebuggerDisplay("Id: {Id}, Message: {Message}")]
+[DebuggerDisplay("Id: {Id}; Message: {Message}")]
 public record struct NotificationDto(
     Guid Id, 
     string Message, 

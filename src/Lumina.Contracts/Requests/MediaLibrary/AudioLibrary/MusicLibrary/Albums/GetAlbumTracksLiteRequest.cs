@@ -9,7 +9,7 @@ namespace Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Album
 /// </summary>
 /// <param name="CurrentPage">The page of results to retrieve. Optional.</param>
 /// <param name="PerPage">The maximum number of tracks to retrieve per page. Optional.</param>
-[DebuggerDisplay("CurrentPage: {CurrentPage}, PerPage: {PerPage}")]
+[DebuggerDisplay("CurrentPage: {CurrentPage}; PerPage: {PerPage}")]
 public record GetAlbumTracksLiteRequest(
     int? CurrentPage,
     int? PerPage

@@ -9,7 +9,7 @@ namespace Lumina.Application.Common.DataAccess.Entities.Authorization;
 /// <summary>
 /// Represents the association between a role and a permission within the authorization system.
 /// </summary>
-[DebuggerDisplay("Role: {Role.RoleName}, Permission: {Permission.PermissionName}")]
+[DebuggerDisplay("Role: {Role.RoleName}; Permission: {Permission.PermissionName}")]
 public class RolePermissionEntity : IStorageEntity, IAuditableEntity
 {
     /// <summary>

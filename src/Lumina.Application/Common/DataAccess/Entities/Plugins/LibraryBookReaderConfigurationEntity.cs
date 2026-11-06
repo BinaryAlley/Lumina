@@ -9,7 +9,7 @@ namespace Lumina.Application.Common.DataAccess.Entities.Plugins;
 /// <summary>
 /// Repository entity for the configuration of a book reader of a media library.
 /// </summary>
-[DebuggerDisplay("LibraryId: {LibraryId}, PluginId: {PluginId}")]
+[DebuggerDisplay("LibraryId: {LibraryId}; PluginId: {PluginId}")]
 public class LibraryBookReaderConfigurationEntity : IStorageEntity, IAuditableEntity
 {
     /// <summary>

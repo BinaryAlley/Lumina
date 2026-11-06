@@ -7,7 +7,7 @@ namespace Lumina.Presentation.Web.Common.DTO.Common;
 /// <summary>
 /// Data transfer object for a rating.
 /// </summary>
-[DebuggerDisplay("Value: {Value}, MaxValue: {MaxValue}")]
+[DebuggerDisplay("Value: {Value}; MaxValue: {MaxValue}")]
 public abstract class RatingDto
 {
     /// <summary>

@@ -10,7 +10,7 @@ namespace Lumina.Application.Common.DataAccess.Entities.Themes;
 /// <summary>
 /// Repository entity for a theme.
 /// </summary>
-[DebuggerDisplay("ThemeId: {ThemeId}, Name: {Name}")]
+[DebuggerDisplay("ThemeId: {ThemeId}; Name: {Name}")]
 public class ThemeEntity : IStorageEntity, IAuditableEntity
 {
     /// <summary>

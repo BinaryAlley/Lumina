@@ -9,7 +9,7 @@ namespace Lumina.Application.Common.DataAccess.Entities.Plugins;
 /// <summary>
 /// Repository entity for the configuration of a metadata provider of a media library.
 /// </summary>
-[DebuggerDisplay("LibraryId: {LibraryId}, PluginId: {PluginId}")]
+[DebuggerDisplay("LibraryId: {LibraryId}; PluginId: {PluginId}")]
 public class LibraryMetadataProviderConfigurationEntity : IStorageEntity, IAuditableEntity
 {
     /// <summary>

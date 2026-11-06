@@ -9,7 +9,7 @@ namespace Lumina.Presentation.Web.Common.Requests.Tools;
 /// </summary>
 /// <param name="NewCulture">The new culture to set. Required.</param>
 /// <param name="ReturnUrl">The URL to return to, after setting the new culture. Optional.</param>
-[DebuggerDisplay("NewCulture: {NewCulture}, ReturnUrl: {ReturnUrl}")]
+[DebuggerDisplay("NewCulture: {NewCulture}; ReturnUrl: {ReturnUrl}")]
 public record SetLanguageRequest(
     string? NewCulture,
     string? ReturnUrl

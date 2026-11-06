@@ -11,7 +11,7 @@ namespace Lumina.Presentation.Web.Common.DTO.Themes;
 /// <param name="Path">The initial path displayed by the file system browser.</param>
 /// <param name="ViewMode">The initial view mode of the file system browser.</param>
 /// <param name="IconSize">The initial icon size of the file system browser.</param>
-[DebuggerDisplay("Path: {Path}, ViewMode: {ViewMode}")]
+[DebuggerDisplay("Path: {Path}; ViewMode: {ViewMode}")]
 public sealed record ThemeFileSystemBrowserConfigurationDto(
     string ClientBasePath,
     string Path,

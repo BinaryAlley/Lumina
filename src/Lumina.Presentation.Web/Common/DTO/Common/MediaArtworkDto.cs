@@ -8,7 +8,7 @@ namespace Lumina.Presentation.Web.Common.DTO.Common;
 /// <summary>
 /// Data transfer object for a stored piece of artwork of a media item.
 /// </summary>
-[DebuggerDisplay("Type: {Type}, Ordinal: {Ordinal}, Path: {Path}")]
+[DebuggerDisplay("Type: {Type}; Ordinal: {Ordinal}; Path: {Path}")]
 public class MediaArtworkDto
 {
     /// <summary>

@@ -9,7 +9,7 @@ namespace Lumina.Presentation.Web.Common.DTO.WrittenContentLibrary.BookLibrary;
 /// <summary>
 /// Data transfer object for a book rating.
 /// </summary>
-[DebuggerDisplay("Value: {Value}, MaxValue: {MaxValue}")]
+[DebuggerDisplay("Value: {Value}; MaxValue: {MaxValue}")]
 public class BookRatingDto : RatingDto
 {
     /// <summary>

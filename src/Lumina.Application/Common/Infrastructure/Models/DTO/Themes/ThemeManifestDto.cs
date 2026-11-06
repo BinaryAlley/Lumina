@@ -9,7 +9,7 @@ namespace Lumina.Application.Common.Infrastructure.Models.DTO.Themes;
 /// <summary>
 /// Data transfer object for the theme.json manifest of a theme pack.
 /// </summary>
-[DebuggerDisplay("Id: {Id}, Name: {Name}")]
+[DebuggerDisplay("Id: {Id}; Name: {Name}")]
 public sealed class ThemeManifestDto
 {
     /// <summary>

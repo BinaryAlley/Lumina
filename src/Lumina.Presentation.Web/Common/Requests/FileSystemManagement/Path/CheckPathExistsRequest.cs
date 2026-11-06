@@ -9,7 +9,7 @@ namespace Lumina.Presentation.Web.Common.Requests.FileSystemManagement.Path;
 /// </summary>
 /// <param name="Path">The file system path to check the exitence of. Required.</param>
 /// <param name="ShouldIncludeHiddenElements">Whether to include hidden elements in the search results, or not. Optional.</param>
-[DebuggerDisplay("Path: {Path}, ShouldIncludeHiddenElements: {ShouldIncludeHiddenElements}")]
+[DebuggerDisplay("Path: {Path}; ShouldIncludeHiddenElements: {ShouldIncludeHiddenElements}")]
 public record CheckPathExistsRequest(
     string? Path,
     bool ShouldIncludeHiddenElements
