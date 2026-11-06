@@ -54,8 +54,16 @@ public class PluginsIndexViewEndpoint : BaseEndpoint<EmptyRequest, IResult>
         PluginDto[] plugins = await _apiHttpClient.GetAsync<PluginDto[]>(ApiRoutes.Plugins.GET_PLUGINS, cancellationToken).ConfigureAwait(false);
         Dictionary<Guid, PluginSettingsDto> settingsByPluginId = [];
         foreach (PluginDto plugin in plugins)
+        {
             if (plugin.LoadStatus == Lumina.Presentation.Web.Common.Enums.Plugins.PluginLoadStatus.Loaded)
-                settingsByPluginId[plugin.Id] = await _apiHttpClient.GetAsync<PluginSettingsDto>(ApiRoutes.Plugins.GET_PLUGIN_SETTINGS.Replace("{pluginId}", plugin.Id.ToString()), cancellationToken).ConfigureAwait(false);
+            {
+                PluginSettingsDto pluginSettings = await _apiHttpClient.GetAsync<PluginSettingsDto>(ApiRoutes.Plugins.GET_PLUGIN_SETTINGS.Replace("{pluginId}", plugin.Id.ToString()), cancellationToken).ConfigureAwait(false);
+                // A plugin that exposes an empty settings schema has nothing to configure, so it is left out of the map the view renders
+                // the settings buttons and panels from, instead of showing a Settings button that opens an empty panel.
+                if (pluginSettings.Schema.Count > 0)
+                    settingsByPluginId[plugin.Id] = pluginSettings;
+            }
+        }
         Dictionary<string, object?> viewData = new() { ["pluginSettings"] = settingsByPluginId };
         return View("/Core/Views/Admin/Plugins.cshtml", plugins, viewData);
     }
