@@ -2,6 +2,7 @@
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
@@ -39,6 +40,14 @@ public class DeleteLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
     };
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly LibraryScanEntityFixture _libraryScanEntityFixture = new();
+    private readonly LibraryScanResultEntityFixture _libraryScanResultEntityFixture = new();
+    private readonly LibraryScanStagingResultsEntityFixture _libraryScanStagingResultsEntityFixture = new();
+    private readonly LibraryScanSnapshotEntityFixture _libraryScanSnapshotEntityFixture = new();
+    private readonly DirectoryScanFingerprintEntityFixture _directoryScanFingerprintEntityFixture = new();
+    private readonly LibraryMetadataProviderConfigurationEntityFixture _libraryMetadataProviderConfigurationEntityFixture = new();
+    private readonly LibraryArtworkProviderConfigurationEntityFixture _libraryArtworkProviderConfigurationEntityFixture = new();
+    private readonly LibraryBookReaderConfigurationEntityFixture _libraryBookReaderConfigurationEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DeleteLibraryEndpointTests"/> class.
@@ -77,6 +86,33 @@ public class DeleteLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(lib => lib.Id == libraryId);
         Assert.Null(storedLibrary);
+    }
+
+    [Fact]
+    public async Task DeleteLibrary_WhenTheLibraryHasRelatedData_ShouldDeleteTheRelatedData()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = Guid.NewGuid();
+        Guid scanId = Guid.NewGuid();
+        await SeedLibraryWithRelatedDataAsync(libraryId, userId, scanId);
+
+        // Act
+        HttpResponseMessage response = await _client.DeleteAsync($"/api/v1/libraries/{libraryId}");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        Assert.Null(await dbContext.Libraries.FirstOrDefaultAsync(library => library.Id == libraryId));
+        Assert.False(await dbContext.LibraryScans.AnyAsync(scan => scan.LibraryId == libraryId));
+        Assert.False(await dbContext.LibraryScanResults.AnyAsync(result => result.LibraryScanId == scanId));
+        Assert.False(await dbContext.LibraryScanStagingResults.AnyAsync(result => result.LibraryScanId == scanId));
+        Assert.False(await dbContext.LibraryScanSnapshots.AnyAsync(snapshot => snapshot.LibraryId == libraryId));
+        Assert.False(await dbContext.DirectoryScanFingerprints.AnyAsync(fingerprint => fingerprint.LibraryId == libraryId));
+        Assert.False(await dbContext.LibraryMetadataProviderConfigurations.AnyAsync(configuration => configuration.LibraryId == libraryId));
+        Assert.False(await dbContext.LibraryArtworkProviderConfigurations.AnyAsync(configuration => configuration.LibraryId == libraryId));
+        Assert.False(await dbContext.LibraryBookReaderConfigurations.AnyAsync(configuration => configuration.LibraryId == libraryId));
     }
 
     [Fact]
@@ -127,6 +163,30 @@ public class DeleteLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
         Assert.Equal($"/api/v1/libraries/{libraryId}", problemDetails["instance"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
         Assert.NotEmpty(problemDetails["traceId"].GetString()!);
+    }
+
+    /// <summary>
+    /// Seeds a <see cref="LibraryEntity"/> together with the data that belongs to it.
+    /// </summary>
+    /// <param name="libraryId">The Id of the library to seed.</param>
+    /// <param name="userId">The Id of the user that owns the library.</param>
+    /// <param name="scanId">The Id of the library scan to seed.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    private async Task SeedLibraryWithRelatedDataAsync(Guid libraryId, Guid userId, Guid scanId)
+    {
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        LibraryEntity library = _libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Test Library", libraryType: LibraryType.EBook, contentLocations: []);
+        dbContext.Libraries.Add(library);
+        dbContext.LibraryScans.Add(_libraryScanEntityFixture.Create(id: scanId, libraryId: libraryId, userId: userId, libraryEntity: library));
+        dbContext.LibraryScanResults.Add(_libraryScanResultEntityFixture.Create(libraryScanId: scanId));
+        dbContext.LibraryScanStagingResults.Add(_libraryScanStagingResultsEntityFixture.Create(libraryScanId: scanId));
+        dbContext.LibraryScanSnapshots.Add(_libraryScanSnapshotEntityFixture.Create(libraryId: libraryId));
+        dbContext.DirectoryScanFingerprints.Add(_directoryScanFingerprintEntityFixture.Create(libraryId: libraryId));
+        dbContext.LibraryMetadataProviderConfigurations.Add(_libraryMetadataProviderConfigurationEntityFixture.Create(libraryId, Guid.NewGuid(), 0));
+        dbContext.LibraryArtworkProviderConfigurations.Add(_libraryArtworkProviderConfigurationEntityFixture.Create(libraryId, Guid.NewGuid(), 0));
+        dbContext.LibraryBookReaderConfigurations.Add(_libraryBookReaderConfigurationEntityFixture.Create(libraryId: libraryId));
+        await dbContext.SaveChangesAsync();
     }
 
     /// <summary>
