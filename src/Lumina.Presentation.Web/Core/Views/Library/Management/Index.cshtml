@@ -2,9 +2,11 @@
 /library/manage
 *@
 
+@using Lumina.Presentation.Web.Common.DTO.Configuration
 @using Lumina.Presentation.Web.Common.DTO.Libraries
 @using Lumina.Presentation.Web.Common.Services
 @using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.Extensions.Options
 @using System.Collections.Generic
 @using System.Security.Claims
 @using System.Text.Json
@@ -13,10 +15,13 @@
 @{
     // Generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler.
     var scriptId = ScriptIdentifierHelper.GenerateScriptId();
+    var serverConfiguration = _serverConfigurationOptions.Value;
+    string scanProgressHubUrl = $"{serverConfiguration.BaseAddress}:{serverConfiguration.Port}/scanProgressHub";
 }
 
 @inject IUrlService _urlService
 @inject IViewLocalizer _localizer
+@inject IOptionsSnapshot<ServerConfigurationDto> _serverConfigurationOptions
 
 @Html.AntiForgeryToken()
 
@@ -258,7 +263,7 @@
         // SignalR.
         const accessTokenUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Authentication.GET_API_ACCESS_TOKEN)';
         const signalRConnection = new signalR.HubConnectionBuilder()
-            .withUrl('http://localhost:5214/scanProgressHub', {
+            .withUrl('@scanProgressHubUrl', {
                 accessTokenFactory: async () => {
                     const tokenResponse = await callApiGetAsync(accessTokenUrl);
                     return tokenResponse ? tokenResponse.token : null;
