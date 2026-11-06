@@ -493,14 +493,15 @@
             await handleAddMediaLibraryAsync();
         };
 
-        // On back to libraries button click.
-        const handleBtnBackToLibrariesClick = function() {
-            window.location.href = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.INDEX)';
+        // On back to libraries button click, navigates in place through the shared AJAX navigator instead of reloading the whole page.
+        const handleBtnBackToLibrariesClick = async function() {
+            await updateContentAsync('@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.INDEX)', true);
         };
 
-        // On add new library button click.
-        const handleBtnAddNewLibraryClick = function() {
-            window.location.href = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.EDIT_LIBRARY)';
+        // On add new library button click, navigates to the add library page through the shared AJAX navigator. The route of the add page is
+        // used, not the edit route template, which still contains the Id placeholder of the library being edited.
+        const handleBtnAddNewLibraryClick = async function() {
+            await updateContentAsync('@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.ADD_LIBRARY)', true);
         };
 
         // On add media directory image click.
