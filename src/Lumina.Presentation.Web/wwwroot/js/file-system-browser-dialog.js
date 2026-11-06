@@ -823,8 +823,8 @@
         const expandButton = node.querySelector('.expand-button');
         if (expandButton && !expandButton.classList.contains('expanded'))
             await toggleFileSysemTreeViewNodeExpandAsync({ target: expandButton, stopPropagation: () => { } });
-        // split the remaining path into segments
-        const pathSegments = targetPath.slice(nodePath.length).split('\\').filter(Boolean);
+        // split the remaining path into segments, using the separator of the file system the browser is showing
+        const pathSegments = targetPath.slice(nodePath.length).split(pathSeparator).filter(Boolean);
         let currentNode = node;
         // iterate through each path segment
         for (let i = 0; i < pathSegments.length; i++) {
