@@ -540,11 +540,11 @@
   <data name="PluginIdCannotBeEmpty" xml:space="preserve">
     <value>Die Plugin-ID darf nicht leer sein!</value>
   </data>
-  <data name="PluginIdsListCannotBeEmpty" xml:space="preserve">
-    <value>Die Plugin-ID-Liste darf nicht leer sein!</value>
+  <data name="PluginIdsMustBeUnique" xml:space="preserve">
+    <value>Dasselbe Plugin darf nicht mehrfach ausgewählt werden!</value>
   </data>
-  <data name="PluginIdsListCannotBeNull" xml:space="preserve">
-    <value>Die Plugin-ID-Liste darf nicht null sein!</value>
+  <data name="PluginNotSupportedForLibraryType" xml:space="preserve">
+    <value>Das Plugin unterstützt den Medienbibliothekstyp nicht!</value>
   </data>
   <data name="PluginNotFound" xml:space="preserve">
     <value>Das Plugin wurde nicht gefunden!</value>

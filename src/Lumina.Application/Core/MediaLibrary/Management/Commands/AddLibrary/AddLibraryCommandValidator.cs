@@ -4,6 +4,7 @@ using Lumina.Application.Common.Utilities;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Domain.Common.Errors;
 using System;
+using System.Linq;
 #endregion
 
 namespace Lumina.Application.Core.MediaLibrary.Management.Commands.AddLibrary;
@@ -21,7 +22,7 @@ public class AddLibraryCommandValidator : AbstractValidator<AddLibraryCommand>
         RuleFor(command => command.LibraryType)
             .NotNull()
             .WithError(Errors.Library.LibraryTypeCannotBeNull)
-            .Must(libraryType => Enum.TryParse<LibraryType>(libraryType, out _))
+            .IsInEnum<AddLibraryCommand, LibraryType>()
             .WithError(Errors.Library.UnknownLibraryType);
 
         RuleFor(command => command.ContentLocations)
@@ -61,5 +62,32 @@ public class AddLibraryCommandValidator : AbstractValidator<AddLibraryCommand>
                     .When(pathPart => !string.Equals(pathPart.Kind, nameof(LibraryPathPartKind.Separator), StringComparison.OrdinalIgnoreCase))
                     .WithError(Errors.Library.PathTemplateLiteralCannotBeEmpty);
             });
+
+        RuleForEach(command => command.MetadataProviders)
+            .ChildRules(provider => provider.RuleFor(selection => selection.PluginId)
+                .NotEmpty()
+                .WithError(Errors.Plugins.PluginIdCannotBeEmpty));
+
+        RuleFor(command => command.MetadataProviders)
+            .Must(providers => providers is null || providers.Select(selection => selection.PluginId).Distinct().Count() == providers.Length)
+            .WithError(Errors.Plugins.PluginIdsMustBeUnique);
+
+        RuleForEach(command => command.ArtworkProviders)
+            .ChildRules(provider => provider.RuleFor(selection => selection.PluginId)
+                .NotEmpty()
+                .WithError(Errors.Plugins.PluginIdCannotBeEmpty));
+
+        RuleFor(command => command.ArtworkProviders)
+            .Must(providers => providers is null || providers.Select(selection => selection.PluginId).Distinct().Count() == providers.Length)
+            .WithError(Errors.Plugins.PluginIdsMustBeUnique);
+
+        RuleForEach(command => command.BookReaders)
+            .ChildRules(reader => reader.RuleFor(selection => selection.PluginId)
+                .NotEmpty()
+                .WithError(Errors.Plugins.PluginIdCannotBeEmpty));
+
+        RuleFor(command => command.BookReaders)
+            .Must(readers => readers is null || readers.Select(selection => selection.PluginId).Distinct().Count() == readers.Length)
+            .WithError(Errors.Plugins.PluginIdsMustBeUnique);
     }
 }

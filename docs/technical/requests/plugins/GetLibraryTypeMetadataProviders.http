@@ -1,0 +1,2 @@
+GET {{host}}/api/v1/libraries/metadata-providers/Book
+Authorization: Bearer {{ACCESS_TOKEN}}

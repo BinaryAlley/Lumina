@@ -68,9 +68,24 @@ POST api/v1/libraries
   "isContentOnSsd": false,
   "shouldTrackConsumptionProgress": true,
   "completionThresholdPercentage": 100,
-  "pathTemplateParts": []
+  "pathTemplateParts": [],
+  "metadataProviders": [
+    {
+      "pluginId": "f4c1a7de-3b52-4e6a-9d21-8c7e5b04a1f3",
+      "isEnabled": true
+    }
+  ],
+  "artworkProviders": null,
+  "bookReaders": [
+    {
+      "pluginId": "f0d1a2b3-4c5d-4e6f-8a7b-9c0d1e2f3a4b",
+      "isEnabled": true
+    }
+  ]
 }
 ```
+
+The `metadataProviders`, `artworkProviders` and `bookReaders` lists configure the providers and readers of the library in the same request: each entry names a plugin returned by the matching `GET api/v1/libraries/{metadata-providers|artwork-providers|book-readers}/{libraryType}` request, and whether it is enabled, and the order of the provider entries is the order in which the providers are tried. A supported plugin left out of a list is added disabled, after the listed ones. The `isEnabled` of an entry can be omitted, in which case the stored state is kept and a provider without one starts disabled, so a list can reorder providers without changing their state. A list that is `null` or absent adds every supported plugin disabled, in alphabetical order. A plugin that does not support the library type fails the request with `PluginNotSupportedForLibraryType`.
 
 #### Add Library Response
 
@@ -231,7 +246,6 @@ PUT api/v1/libraries/{id}
 ```json
 {
   "id": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
-  "userId": "2cff0c0f-3a67-4e30-b94f-f4e948a3b64f",
   "title": "Books",
   "libraryType": "Book",
   "contentLocations": [
@@ -246,9 +260,21 @@ PUT api/v1/libraries/{id}
   "isContentOnSsd": false,
   "shouldTrackConsumptionProgress": true,
   "completionThresholdPercentage": 100,
-  "pathTemplateParts": []
+  "pathTemplateParts": [],
+  "metadataProviders": [
+    {
+      "pluginId": "f4c1a7de-3b52-4e6a-9d21-8c7e5b04a1f3",
+      "isEnabled": true
+    }
+  ],
+  "artworkProviders": null,
+  "bookReaders": null
 }
 ```
+
+Updating a library requires being its owner and holding the `CanCreateLibraries` permission, or being an admin, who can update any library; any other user is answered with `403 NotAuthorized` before the cover image is read. The owner of the library is the user who created it: an update never changes it, so the request carries no owner.
+
+The `metadataProviders`, `artworkProviders` and `bookReaders` lists work as for [Add Library](#add-library). A list that is sent also removes the stored configurations of the plugins that do not support the library type, even when the list does not name them, and keeps the stored state of the supported plugins it leaves out, ordering them after the listed ones. A list that is `null` or absent keeps the stored configurations when the library type is unchanged, and when the type changes, removes the configurations of the plugins that do not support the new type and adds the newly supported plugins disabled.
 
 #### Update Library Response
 
@@ -287,6 +313,8 @@ PUT api/v1/libraries/{id}
 ```js
 DELETE api/v1/libraries/{id}
 ```
+
+Deleting a library requires being its owner and holding the `CanCreateLibraries` permission, or being an admin, who can delete any library; any other user is answered with `403 NotAuthorized`.
 
 #### Delete Library Response
 

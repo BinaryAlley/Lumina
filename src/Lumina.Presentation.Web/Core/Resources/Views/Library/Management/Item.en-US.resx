@@ -333,9 +333,6 @@
   <data name="MoveDown" xml:space="preserve">
     <value>Move down</value>
   </data>
-  <data name="OrderSaved" xml:space="preserve">
-    <value>Order saved</value>
-  </data>
   <data name="DescriptionMetadataProviders" xml:space="preserve">
     <value>The metadata providers used to enrich the items of this library, in the order they are tried.</value>
   </data>

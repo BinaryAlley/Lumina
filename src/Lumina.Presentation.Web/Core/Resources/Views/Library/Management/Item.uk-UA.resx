@@ -333,9 +333,6 @@
   <data name="MoveDown" xml:space="preserve">
     <value>Вниз</value>
   </data>
-  <data name="OrderSaved" xml:space="preserve">
-    <value>Порядок збережено</value>
-  </data>
   <data name="DescriptionMetadataProviders" xml:space="preserve">
     <value>Постачальники метаданих, які використовуються для збагачення елементів цієї бібліотеки, у порядку, в якому вони випробовуються.</value>
   </data>

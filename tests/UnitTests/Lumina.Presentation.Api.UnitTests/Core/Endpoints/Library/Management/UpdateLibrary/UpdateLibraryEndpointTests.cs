@@ -44,7 +44,7 @@ public class UpdateLibraryEndpointTests
         // Arrange
         UpdateLibraryRequest request = _updateLibraryRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
-        LibraryResponse expectedResponse = _libraryResponseFixture.Create(id: request.Id, userId: request.UserId);
+        LibraryResponse expectedResponse = _libraryResponseFixture.Create(id: request.Id);
         _mockHandler.HandleAsync(Arg.Any<UpdateLibraryCommand>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(expectedResponse));
 
@@ -92,7 +92,7 @@ public class UpdateLibraryEndpointTests
             completionThresholdPercentage: 65);
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<UpdateLibraryCommand>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From(_libraryResponseFixture.Create(id: request.Id, userId: request.UserId)));
+            .Returns(Result.From(_libraryResponseFixture.Create(id: request.Id)));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
@@ -101,7 +101,6 @@ public class UpdateLibraryEndpointTests
         await _mockHandler.Received(1).HandleAsync(
             Arg.Is<UpdateLibraryCommand>(command =>
                 command.Id == request.Id &&
-                command.OwnerId == request.UserId &&
                 command.Title == request.Title &&
                 command.LibraryType == request.LibraryType &&
                 command.ContentLocations == request.ContentLocations &&
@@ -126,7 +125,7 @@ public class UpdateLibraryEndpointTests
             completionThresholdPercentage: null);
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<UpdateLibraryCommand>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From(_libraryResponseFixture.Create(id: request.Id, userId: request.UserId)));
+            .Returns(Result.From(_libraryResponseFixture.Create(id: request.Id)));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
@@ -154,7 +153,7 @@ public class UpdateLibraryEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return Result.From(_libraryResponseFixture.Create(id: request.Id, userId: request.UserId));
+                return Result.From(_libraryResponseFixture.Create(id: request.Id));
             }, callInfo.Arg<CancellationToken>()));
 
         // Act

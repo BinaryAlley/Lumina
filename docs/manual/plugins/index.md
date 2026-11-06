@@ -65,7 +65,7 @@ There is no uninstall button. To remove a plugin, delete its assembly (and any f
 
 ## Enabling, ranking and configuring
 
-Plugins themselves are installed once, but they are turned on per library. Open a library to edit it and you will find a section for metadata providers and one for artwork providers. A book library has one more, for its book readers:
+Plugins themselves are installed once, but they are turned on per library. The form has a section for metadata providers and one for artwork providers, and a book library has one more, for its book readers. Your choices are saved together with the rest of the library:
 
 - **Metadata providers.** Each is switched on or off, and ordered. The providers are tried in that order, the first one that produces a result is used, and, when you enable the `Aggregate metadata when missing` setting, the fields it left empty are filled from the providers that come after it.
 - **Artwork providers.** The same idea for images: switched on or off, and ordered, so you decide which source wins when more than one has something.

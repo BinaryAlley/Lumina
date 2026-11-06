@@ -105,6 +105,16 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
         else if (getLibraryResult.Value is null)
             return DomainErrors.Library.LibraryNotFound;
 
+        // Admins can update any library. Everyone else can only update the libraries they own, and only while they hold the permission to manage media
+        // libraries, which can be withheld to keep a user from changing even the libraries they own. Authorization comes before the cover image is
+        // read, so a user who may not update the library can never make the server open a path on their behalf.
+        if (!await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(userId, new LibraryOwnershipPolicyContext(command.Id), cancellationToken).ConfigureAwait(false))
+            return ApplicationErrors.Authorization.NotAuthorized;
+        if (!await _authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false) &&
+            !await _authorizationService.HasPermissionAsync(userId, AuthorizationPermission.CanCreateLibraries, cancellationToken).ConfigureAwait(false))
+            return ApplicationErrors.Authorization.NotAuthorized;
+        bool hasProviderChoices = command.MetadataProviders is not null || command.ArtworkProviders is not null || command.BookReaders is not null;
+
         // Make sure the file is an actual supported image, but only when a new cover image was chosen; the stored cover image is
         // relative to the application base directory and is already validated, so it must not block saving unrelated changes.
         if (command.CoverImage is not null && command.CoverImage != getLibraryResult.Value.CoverImage)
@@ -120,15 +130,8 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
                 return DomainErrors.Library.CoverFileMustBeAnImage;
         }
 
-        // Admins or users with the permission to manage media libraries can update any library; other users can only update the libraries they own.
-        bool hasManagePermission = await _authorizationService.HasPermissionAsync(userId, AuthorizationPermission.CanCreateLibraries, cancellationToken).ConfigureAwait(false);
-        bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
-            userId, new LibraryOwnershipPolicyContext(command.Id), cancellationToken).ConfigureAwait(false);
-        if (!hasManagePermission && !canAccessLibrary)
-            return ApplicationErrors.Authorization.NotAuthorized;
-
         // Create a domain library object.
-        LibraryType newLibraryType = Enum.Parse<LibraryType>(command.LibraryType!);
+        LibraryType newLibraryType = Enum.Parse<LibraryType>(command.LibraryType!, ignoreCase: true);
 
         // Keep the stored consumption settings unless the request explicitly changes them. When progress tracking is enabled and
         // no threshold is supplied, the stored threshold is kept; the value object never retains a threshold while tracking is disabled.
@@ -157,9 +160,10 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
         if (pathTemplateResult.IsFailure)
             return pathTemplateResult.Errors;
 
+        // The owner of a library is the user who created it, and an update never changes it.
         Result<Library> createLibraryResult = Library.Create(
             LibraryId.Create(command.Id),
-            UserId.Create(command.OwnerId),
+            UserId.Create(getLibraryResult.Value.UserId),
             command.Title!,
             newLibraryType,
             command.ContentLocations!,
@@ -179,16 +183,19 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
         // Convert the domain library entity to a repository library entity.
         LibraryEntity persistenceLibrary = createLibraryResult.Value.ToRepositoryEntity();
 
-        // Update the repository entity, and when the library type changed, reconcile the provider configurations so that
-        // they match the plugins supporting the new type, and save the changes.
+        // Update the repository entity, apply the choices made for the providers, and when the library type changed, also reconcile the kinds of
+        // configuration that were not chosen, so they match the plugins supporting the new type; then save the changes. When the type is unchanged,
+        // a kind of configuration that was not chosen is left untouched.
         Result<Updated> updateLibraryResult = await _unitOfWork.LibraryRepository.UpdateAsync(persistenceLibrary, cancellationToken).ConfigureAwait(false);
         if (updateLibraryResult.IsFailure)
             return updateLibraryResult.Errors;
-        if (getLibraryResult.Value.LibraryType != newLibraryType)
+        bool isLibraryTypeChanged = getLibraryResult.Value.LibraryType != newLibraryType;
+        if (isLibraryTypeChanged || hasProviderChoices)
         {
-            Result<Success> reconcileResult = await _providerConfigurationStore.ReconcileProviderConfigurationsAsync(command.Id, newLibraryType, cancellationToken).ConfigureAwait(false);
-            if (reconcileResult.IsFailure)
-                return reconcileResult.Errors;
+            Result<Success> configureProvidersResult = await _providerConfigurationStore.ConfigureProvidersAsync(
+                command.Id, newLibraryType, command.MetadataProviders, command.ArtworkProviders, command.BookReaders, isLibraryTypeChanged, cancellationToken).ConfigureAwait(false);
+            if (configureProvidersResult.IsFailure)
+                return configureProvidersResult.Errors;
         }
         Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         if (saveChangesResult.IsFailure)

@@ -24,12 +24,10 @@ public static partial class WebRoutes
         public const string CANCEL_LIBRARY_SCAN = "{culture}/libraries/manage/{libraryId}/api-cancel-library-scan/{scanId}";
         public const string GET_LIBRARY_PATH_TEMPLATE_PARTS = "{culture}/libraries/manage/api-get-path-template-parts/{libraryType}";
         public const string GET_METADATA_PROVIDERS = "{culture}/libraries/manage/api-get-metadata-providers/{libraryId}";
-        public const string SET_METADATA_PROVIDER_ENABLED = "{culture}/libraries/manage/api-set-metadata-provider-enabled";
-        public const string REORDER_METADATA_PROVIDERS = "{culture}/libraries/manage/api-reorder-metadata-providers";
         public const string GET_ARTWORK_PROVIDERS = "{culture}/libraries/manage/api-get-artwork-providers/{libraryId}";
-        public const string SET_ARTWORK_PROVIDER_ENABLED = "{culture}/libraries/manage/api-set-artwork-provider-enabled";
-        public const string REORDER_ARTWORK_PROVIDERS = "{culture}/libraries/manage/api-reorder-artwork-providers";
         public const string GET_BOOK_READERS = "{culture}/libraries/manage/api-get-book-readers/{libraryId}";
-        public const string SET_BOOK_READER_ENABLED = "{culture}/libraries/manage/api-set-book-reader-enabled";
+        public const string GET_LIBRARY_TYPE_METADATA_PROVIDERS = "{culture}/libraries/manage/api-get-library-type-metadata-providers/{libraryType}";
+        public const string GET_LIBRARY_TYPE_ARTWORK_PROVIDERS = "{culture}/libraries/manage/api-get-library-type-artwork-providers/{libraryType}";
+        public const string GET_LIBRARY_TYPE_BOOK_READERS = "{culture}/libraries/manage/api-get-library-type-book-readers/{libraryType}";
     }
 }

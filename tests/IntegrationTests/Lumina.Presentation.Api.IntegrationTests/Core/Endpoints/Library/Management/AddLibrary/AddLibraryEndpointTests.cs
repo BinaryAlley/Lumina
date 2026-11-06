@@ -10,6 +10,7 @@ using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -32,6 +33,7 @@ public class AddLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
     private readonly AddLibraryRequestFixture _addLibraryRequestFixture = new();
+    private readonly LibraryProviderSelectionRequestFixture _libraryProviderSelectionRequestFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -359,6 +361,128 @@ public class AddLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         Assert.False(await dbContext.Libraries.AnyAsync(candidate => candidate.Title == title));
     }
 
+    [Fact]
+    public async Task AddLibrary_WhenAProviderChoiceNamesAnUnsupportedPlugin_ShouldReturnValidationProblemAndNotPersist()
+    {
+        // Arrange
+        string title = "Unsupported Provider Library";
+        AddLibraryRequest request = _addLibraryRequestFixture.Create(
+            title: title,
+            libraryType: "Book",
+            contentLocations: ["C:/Media"],
+            coverImage: null,
+            metadataProviders: [_libraryProviderSelectionRequestFixture.Create(isEnabled: true)]
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/libraries", request);
+
+        // Assert
+        await AssertValidationProblemAsync(response, "PluginNotSupportedForLibraryType");
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        Assert.False(await dbContext.Libraries.AnyAsync(candidate => candidate.Title == title));
+    }
+
+    [Fact]
+    public async Task AddLibrary_WhenAProviderChoiceIsNull_ShouldReturnValidationProblemAndNotPersist()
+    {
+        // Arrange
+        string title = "Null Provider Choice Library";
+        AddLibraryRequest request = _addLibraryRequestFixture.Create(
+            title: title,
+            libraryType: "Book",
+            contentLocations: ["C:/Media"],
+            coverImage: null,
+            bookReaders: [null]
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/libraries", request);
+
+        // Assert
+        await AssertValidationProblemAsync(response, "PluginIdCannotBeEmpty");
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        Assert.False(await dbContext.Libraries.AnyAsync(candidate => candidate.Title == title));
+    }
+
+    [Fact]
+    public async Task AddLibrary_WhenAPathTemplatePartIsNull_ShouldReturnValidationProblemAndNotPersist()
+    {
+        // Arrange
+        string title = "Null Path Template Part Library";
+        AddLibraryRequest request = _addLibraryRequestFixture.Create(
+            title: title,
+            libraryType: "Book",
+            contentLocations: ["C:/Media"],
+            coverImage: null,
+            pathTemplateParts: [null]
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/libraries", request);
+
+        // Assert
+        await AssertValidationProblemAsync(response, "PathTemplatePartKindNotSupportedForLibraryType");
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        Assert.False(await dbContext.Libraries.AnyAsync(candidate => candidate.Title == title));
+    }
+
+    [Fact]
+    public async Task AddLibrary_WhenProviderPluginIdsAreDuplicated_ShouldReturnValidationProblemAndNotPersist()
+    {
+        // Arrange
+        string title = "Duplicated Provider Library";
+        Guid pluginId = Guid.NewGuid();
+        AddLibraryRequest request = _addLibraryRequestFixture.Create(
+            title: title,
+            libraryType: "Book",
+            contentLocations: ["C:/Media"],
+            coverImage: null,
+            bookReaders: [_libraryProviderSelectionRequestFixture.Create(pluginId: pluginId), _libraryProviderSelectionRequestFixture.Create(pluginId: pluginId, isEnabled: false)]
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/libraries", request);
+
+        // Assert
+        await AssertValidationProblemAsync(response, "PluginIdsMustBeUnique");
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        Assert.False(await dbContext.Libraries.AnyAsync(candidate => candidate.Title == title));
+    }
+
+    [Fact]
+    public async Task AddLibrary_WhenProviderChoicesAreEmpty_ShouldCreateLibrary()
+    {
+        // Arrange
+        string title = "Empty Provider Choices Library";
+        AddLibraryRequest request = _addLibraryRequestFixture.Create(
+            title: title,
+            libraryType: "Book",
+            contentLocations: ["C:/Media"],
+            coverImage: null,
+            metadataProviders: [],
+            artworkProviders: [],
+            bookReaders: []
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/libraries", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        Assert.True(await dbContext.Libraries.AnyAsync(candidate => candidate.Title == title));
+    }
+
     /// <summary>
     /// Asserts that <paramref name="response"/> carries the standard validation problem of the add library route.
     /// </summary>
@@ -395,12 +519,12 @@ public class AddLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
-        // clear junction tables first
+        // Clear junction tables first.
         await dbContext.Set<Lumina.Application.Common.DataAccess.Entities.Authorization.RolePermissionEntity>().ExecuteDeleteAsync();
         await dbContext.Set<Lumina.Application.Common.DataAccess.Entities.Authorization.UserRoleEntity>().ExecuteDeleteAsync();
         await dbContext.Set<Lumina.Application.Common.DataAccess.Entities.Authorization.UserPermissionEntity>().ExecuteDeleteAsync();
 
-        // then clear main tables
+        // Then clear main tables.
         await dbContext.Set<Lumina.Application.Common.DataAccess.Entities.UsersManagement.UserEntity>().ExecuteDeleteAsync();
         await dbContext.Set<Lumina.Application.Common.DataAccess.Entities.Authorization.RoleEntity>().ExecuteDeleteAsync();
         await dbContext.Set<Lumina.Application.Common.DataAccess.Entities.Authorization.PermissionEntity>().ExecuteDeleteAsync();

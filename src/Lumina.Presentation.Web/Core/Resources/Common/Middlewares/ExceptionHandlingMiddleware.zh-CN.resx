@@ -540,11 +540,11 @@
   <data name="PluginIdCannotBeEmpty" xml:space="preserve">
     <value>插件 Id 不能为空！</value>
   </data>
-  <data name="PluginIdsListCannotBeEmpty" xml:space="preserve">
-    <value>插件 Id 列表不能为空！</value>
+  <data name="PluginIdsMustBeUnique" xml:space="preserve">
+    <value>同一插件不能被多次选择！</value>
   </data>
-  <data name="PluginIdsListCannotBeNull" xml:space="preserve">
-    <value>插件 Id 列表不能为 null！</value>
+  <data name="PluginNotSupportedForLibraryType" xml:space="preserve">
+    <value>该插件不支持此媒体库类型！</value>
   </data>
   <data name="PluginNotFound" xml:space="preserve">
     <value>未找到插件！</value>

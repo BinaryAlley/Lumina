@@ -31,7 +31,6 @@ public class LibraryDtoFixture
         return new LibraryDto
         {
             Id = id ?? Guid.NewGuid(),
-            UserId = Guid.NewGuid(),
             Title = title ?? _faker.Commerce.Department(),
             LibraryType = libraryType ?? _faker.PickRandom("Book", "Video", "Photo"),
             CoverImage = _faker.Image.PicsumUrl(),

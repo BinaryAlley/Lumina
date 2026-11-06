@@ -4,7 +4,6 @@ using Lumina.Application.Common.Utilities;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
-using System.Linq;
 #endregion
 
 namespace Lumina.Application.Core.MediaConsumption.Commands.StartConsumption;
@@ -35,7 +34,7 @@ public class StartConsumptionCommandValidator : AbstractValidator<StartConsumpti
             .WithError(Errors.MediaConsumption.UnsupportedMediaKind);
 
         RuleFor(command => command.MediaKind)
-            .Must(mediaKind => Enum.GetNames<MediaKind>().Contains(mediaKind, StringComparer.OrdinalIgnoreCase))
+            .IsInEnum<StartConsumptionCommand, MediaKind>()
             .When(command => command.MediaKind is not null && command.MediaKind.Length > 0)
             .WithError(Errors.MediaConsumption.UnsupportedMediaKind);
 

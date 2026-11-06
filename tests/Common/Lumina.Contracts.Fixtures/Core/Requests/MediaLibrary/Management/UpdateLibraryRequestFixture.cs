@@ -21,7 +21,6 @@ public class UpdateLibraryRequestFixture
     /// Creates a random valid <see cref="UpdateLibraryRequest"/>.
     /// </summary>
     /// <param name="id">Optional. The Id of the media library to update.</param>
-    /// <param name="userId">Optional. The Id of the user owning the media library.</param>
     /// <param name="title">Optional. The title of the media library.</param>
     /// <param name="libraryType">Optional. The type of the media library.</param>
     /// <param name="contentLocations">Optional. The file system paths of the media library content directories.</param>
@@ -35,10 +34,12 @@ public class UpdateLibraryRequestFixture
     /// <param name="shouldTrackConsumptionProgress">Optional. Whether the consumption progress of the media library items should be tracked, or not.</param>
     /// <param name="completionThresholdPercentage">Optional. The percentage of a media library item that must be consumed for its session to be considered completed.</param>
     /// <param name="pathTemplateParts">Optional. The ordered parts of the path template of the media library.</param>
+    /// <param name="metadataProviders">Optional. The choices made for the metadata providers of the media library.</param>
+    /// <param name="artworkProviders">Optional. The choices made for the artwork providers of the media library.</param>
+    /// <param name="bookReaders">Optional. The choices made for the book readers of the media library.</param>
     /// <returns>The created <see cref="UpdateLibraryRequest"/>.</returns>
     public UpdateLibraryRequest Create(
         Guid? id = null,
-        Guid? userId = null,
         string? title = null,
         string? libraryType = null,
         string[]? contentLocations = null,
@@ -51,11 +52,13 @@ public class UpdateLibraryRequestFixture
         bool? isContentOnSsd = null,
         bool? shouldTrackConsumptionProgress = null,
         int? completionThresholdPercentage = null,
-        LibraryPathTemplatePartRequest[]? pathTemplateParts = null)
+        LibraryPathTemplatePartRequest?[]? pathTemplateParts = null,
+        LibraryProviderSelectionRequest?[]? metadataProviders = null,
+        LibraryProviderSelectionRequest?[]? artworkProviders = null,
+        LibraryProviderSelectionRequest?[]? bookReaders = null)
     {
         return new UpdateLibraryRequest(
             id ?? _faker.Random.Guid(),
-            userId ?? _faker.Random.Guid(),
             title ?? _faker.Commerce.Department(),
             libraryType ?? "EBook",
             contentLocations ?? [_faker.System.DirectoryPath()],
@@ -68,7 +71,10 @@ public class UpdateLibraryRequestFixture
             isContentOnSsd ?? false,
             shouldTrackConsumptionProgress,
             completionThresholdPercentage,
-            pathTemplateParts
+            pathTemplateParts,
+            metadataProviders,
+            artworkProviders,
+            bookReaders
         );
     }
 

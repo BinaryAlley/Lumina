@@ -26,6 +26,7 @@ public class SaveLibraryEndpointTests
     private readonly IApiHttpClient _mockApiHttpClient;
     private readonly SaveLibraryEndpoint _sut;
     private readonly LibraryDtoFixture _libraryDtoFixture = new();
+    private readonly LibraryProviderSelectionDtoFixture _libraryProviderSelectionDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SaveLibraryEndpointTests"/> class.
@@ -75,5 +76,30 @@ public class SaveLibraryEndpointTests
         await _mockApiHttpClient.DidNotReceive().PutAsync<LibraryDto, LibraryDto>(Arg.Any<string>(), Arg.Any<LibraryDto>(), Arg.Any<CancellationToken>());
         using JsonDocument jsonDocument = JsonDocument.Parse(body);
         Assert.True(jsonDocument.RootElement.GetProperty("success").GetBoolean());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenProviderChoicesAreMade_ShouldForwardThemToTheApi()
+    {
+        // Arrange
+        LibraryDto request = _libraryDtoFixture.Create();
+        request.Id = null;
+        request.MetadataProviders = _libraryProviderSelectionDtoFixture.CreateMany(2);
+        request.ArtworkProviders = [];
+        request.BookReaders = null;
+        _mockApiHttpClient.PostAsync<LibraryDto, LibraryDto>(Arg.Any<string>(), Arg.Any<LibraryDto>(), Arg.Any<CancellationToken>())
+            .Returns(_libraryDtoFixture.Create());
+
+        // Act
+        await _sut.ExecuteAsync(request, CancellationToken.None);
+
+        // Assert
+        await _mockApiHttpClient.Received(1).PostAsync<LibraryDto, LibraryDto>(
+            ApiRoutes.Libraries.ADD_LIBRARY,
+            Arg.Is<LibraryDto>(library =>
+                library.MetadataProviders == request.MetadataProviders &&
+                library.ArtworkProviders == request.ArtworkProviders &&
+                library.BookReaders == null),
+            Arg.Any<CancellationToken>());
     }
 }

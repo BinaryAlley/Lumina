@@ -1,0 +1,2 @@
+GET {{host}}/api/v1/libraries/artwork-providers/Book
+Authorization: Bearer {{ACCESS_TOKEN}}

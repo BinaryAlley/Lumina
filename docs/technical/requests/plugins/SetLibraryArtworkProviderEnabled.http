@@ -1,9 +1,0 @@
-PUT {{host}}/api/v1/libraries/{{$guid}}/artwork-providers/{{$guid}}/enabled
-Authorization: Bearer {{ACCESS_TOKEN}}
-Content-Type: application/json
-
-{
-  "libraryId": "{{$guid}}",
-  "pluginId": "{{$guid}}",
-  "isEnabled": true
-}

@@ -56,6 +56,7 @@ public class AddLibraryCommandHandlerTests
     private readonly LibraryPathPartFixture _libraryPathPartFixture = new();
     private readonly LibraryPathTemplateFixture _libraryPathTemplateFixture = new();
     private readonly LibraryPathTemplatePartDtoFixture _libraryPathTemplatePartDtoFixture = new();
+    private readonly LibraryProviderSelectionDtoFixture _libraryProviderSelectionDtoFixture = new();
     private readonly Guid _userId;
 
     /// <summary>
@@ -76,14 +77,14 @@ public class AddLibraryCommandHandlerTests
         _mockValidator = Substitute.For<IValidator<AddLibraryCommand>>();
         _userId = Guid.NewGuid();
 
-        // default stubs: the current user is authenticated, is an admin, the cover image is a valid image, and the provider configurations are seeded successfully
+        // Default stubs: the current user is authenticated, is an admin, the cover image is a valid image, and the provider configurations are seeded successfully.
         _mockCurrentUserService.UserId.Returns(_userId);
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>()).Returns(true);
         _mockEnvironmentContext.FileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(ImageType.PNG));
         _mockLibraryRepository.InsertAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Created);
-        _mockProviderConfigurationStore.EnsureProviderConfigurationsAsync(Arg.Any<Guid>(), Arg.Any<LibraryType>(), Arg.Any<CancellationToken>())
+        _mockProviderConfigurationStore.ConfigureProvidersAsync(Arg.Any<Guid>(), Arg.Any<LibraryType>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
             .Returns(Result.Success);
         _mockValidator.Validate(Arg.Any<AddLibraryCommand>()).Returns([]);
         _mockLibraryPathTemplateService.ResolveTemplate(Arg.Any<LibraryType>(), Arg.Any<IReadOnlyList<LibraryPathPart>>()).Returns(Result.From(LibraryPathTemplate.Empty()));
@@ -107,8 +108,8 @@ public class AddLibraryCommandHandlerTests
         Assert.False(result.IsFailure);
         Assert.Equal(persistedLibrary.Id, result.Value.Id);
         await _mockLibraryRepository.Received(1).InsertAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
-        await _mockProviderConfigurationStore.Received(1).EnsureProviderConfigurationsAsync(
-            Arg.Any<Guid>(), Arg.Is<LibraryType>(libraryType => libraryType == Enum.Parse<LibraryType>(command.LibraryType)), Arg.Any<CancellationToken>());
+        await _mockProviderConfigurationStore.Received(1).ConfigureProvidersAsync(
+            Arg.Any<Guid>(), Arg.Is<LibraryType>(libraryType => libraryType == Enum.Parse<LibraryType>(command.LibraryType!)), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Is(true), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
         _mockDomainEventsQueue.Received(1).Enqueue(Arg.Any<LibrarySavedDomainEvent>());
     }
@@ -157,12 +158,40 @@ public class AddLibraryCommandHandlerTests
     }
 
     [Fact]
-    public async Task HandleAsync_WhenProviderConfigurationSeedingFails_ShouldReturnErrorWithoutSaving()
+    public async Task HandleAsync_WhenProviderChoicesAreMade_ShouldConfigureProvidersWithTheChoices()
+    {
+        // Arrange
+        LibraryProviderSelectionDto[] metadataProviders = [.. _libraryProviderSelectionDtoFixture.CreateMany(2)];
+        LibraryProviderSelectionDto[] artworkProviders = [_libraryProviderSelectionDtoFixture.Create(isEnabled: false)];
+        LibraryProviderSelectionDto[] bookReaders = [_libraryProviderSelectionDtoFixture.Create()];
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(metadataProviders: metadataProviders, artworkProviders: artworkProviders, bookReaders: bookReaders);
+        LibraryEntity persistedLibrary = _libraryEntityFixture.Create(userId: _userId);
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(persistedLibrary));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockProviderConfigurationStore.Received(1).ConfigureProvidersAsync(
+            Arg.Any<Guid>(),
+            Enum.Parse<LibraryType>(command.LibraryType!),
+            Arg.Is<IReadOnlyList<LibraryProviderSelectionDto>?>(selections => selections == metadataProviders),
+            Arg.Is<IReadOnlyList<LibraryProviderSelectionDto>?>(selections => selections == artworkProviders),
+            Arg.Is<IReadOnlyList<LibraryProviderSelectionDto>?>(selections => selections == bookReaders),
+            Arg.Is(true),
+            Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenConfiguringProvidersFails_ShouldReturnErrorWithoutSaving()
     {
         // Arrange
         AddLibraryCommand command = _addLibraryCommandFixture.Create();
-        _mockProviderConfigurationStore.EnsureProviderConfigurationsAsync(Arg.Any<Guid>(), Arg.Any<LibraryType>(), Arg.Any<CancellationToken>())
-            .Returns(Error.Failure(description: "Failed to seed provider configurations"));
+        _mockProviderConfigurationStore.ConfigureProvidersAsync(Arg.Any<Guid>(), Arg.Any<LibraryType>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(Error.Failure(description: "Failed to configure provider configurations"));
 
         // Act
         Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);

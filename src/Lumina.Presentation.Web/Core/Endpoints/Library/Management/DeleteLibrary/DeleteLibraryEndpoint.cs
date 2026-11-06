@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Presentation.Web.Common.Api;
+using Lumina.Presentation.Web.Common.Authorization;
 using Lumina.Presentation.Web.Common.Requests.Library.Management;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Common;
@@ -39,6 +40,7 @@ public class DeleteLibraryEndpoint : BaseEndpoint<DeleteLibraryRequest, IResult>
         DontAutoTag();
         Options(options => options.WithTags("Libraries"));
         EnableAntiforgery();
+        Policies(AuthorizationPolicies.REQUIRE_CREATE_LIBRARIES_PERMISSION);
     }
 
     /// <summary>

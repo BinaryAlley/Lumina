@@ -6,6 +6,7 @@ using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.Management;
 using Lumina.Contracts.Requests.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.DataAccess.Core.UoW;
+using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Presentation.Api.Core.Endpoints.Library.Management.UpdateLibrary;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
@@ -41,6 +42,7 @@ public class UpdateLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
     };
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly UpdateLibraryRequestFixture _updateLibraryRequestFixture = new();
+    private readonly LibraryProviderSelectionRequestFixture _libraryProviderSelectionRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdateLibraryEndpointTests"/> class.
@@ -57,7 +59,7 @@ public class UpdateLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
     /// </summary>
     public async Task InitializeAsync()
     {
-        _client = await _apiFactory.CreateAuthenticatedClientAsync();
+        _client = await _apiFactory.CreateAuthenticatedClientAsync(AuthorizationPermission.CanCreateLibraries);
     }
 
     [Fact]
@@ -69,7 +71,6 @@ public class UpdateLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
         await SeedLibraryAsync(libraryId, userId, "Original Title");
         UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
             id: libraryId,
-            userId: userId,
             title: "Updated Title",
             libraryType: "EBook",
             contentLocations: ["C:/Media"],
@@ -105,7 +106,6 @@ public class UpdateLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
         Guid libraryId = Guid.NewGuid();
         UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
             id: libraryId,
-            userId: Guid.NewGuid(),
             title: "Updated Title",
             libraryType: "EBook",
             contentLocations: ["C:/Media"],
@@ -144,7 +144,6 @@ public class UpdateLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
         await SeedLibraryAsync(libraryId, userId, "Original Title", shouldTrackConsumptionProgress: false, completionThresholdPercentage: null);
         UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
             id: libraryId,
-            userId: userId,
             title: "Updated Title",
             libraryType: "EBook",
             contentLocations: ["C:/Media"],
@@ -185,7 +184,6 @@ public class UpdateLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
         await SeedLibraryAsync(libraryId, userId, "Original Title", shouldTrackConsumptionProgress: true, completionThresholdPercentage: 70);
         UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
             id: libraryId,
-            userId: userId,
             title: "Updated Title",
             libraryType: "EBook",
             contentLocations: ["C:/Media"],
@@ -226,7 +224,6 @@ public class UpdateLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
         await SeedLibraryAsync(libraryId, userId, "Original Title", shouldTrackConsumptionProgress: true, completionThresholdPercentage: 70);
         UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
             id: libraryId,
-            userId: userId,
             title: "Updated Title",
             libraryType: "EBook",
             contentLocations: ["C:/Media"],
@@ -267,7 +264,6 @@ public class UpdateLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
         await SeedLibraryAsync(libraryId, userId, "Original Title", shouldTrackConsumptionProgress: false, completionThresholdPercentage: null);
         UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
             id: libraryId,
-            userId: userId,
             title: "Updated Title",
             libraryType: "EBook",
             contentLocations: ["C:/Media"],
@@ -308,7 +304,6 @@ public class UpdateLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
         await SeedLibraryAsync(libraryId, userId, "Original Title", shouldTrackConsumptionProgress: true, completionThresholdPercentage: 70);
         UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
             id: libraryId,
-            userId: userId,
             title: "Updated Title",
             libraryType: "EBook",
             contentLocations: ["C:/Media"],
@@ -345,7 +340,6 @@ public class UpdateLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
         await SeedLibraryAsync(libraryId, userId, "Original Title", shouldTrackConsumptionProgress: true, completionThresholdPercentage: 70);
         UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
             id: libraryId,
-            userId: userId,
             title: "Updated Title",
             libraryType: "EBook",
             contentLocations: ["C:/Media"],
@@ -371,6 +365,69 @@ public class UpdateLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
         Assert.NotNull(storedLibrary);
         Assert.True(storedLibrary!.ShouldTrackConsumptionProgress);
         Assert.Equal(70, storedLibrary.CompletionThresholdPercentage);
+    }
+
+    [Fact]
+    public async Task UpdateLibrary_WhenAProviderChoiceNamesAnUnsupportedPlugin_ShouldReturnValidationProblemAndKeepTheStoredLibrary()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, userId, "Original Title", shouldTrackConsumptionProgress: true, completionThresholdPercentage: 70);
+        UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
+            id: libraryId,
+            title: "Updated Title",
+            libraryType: "EBook",
+            contentLocations: ["C:/Media"],
+            coverImage: null,
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: 70,
+            artworkProviders: [_libraryProviderSelectionRequestFixture.Create(isEnabled: true)]
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}", request);
+
+        // Assert
+        await AssertValidationProblemAsync(response, $"/api/v1/libraries/{libraryId}", "PluginNotSupportedForLibraryType");
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(candidate => candidate.Id == libraryId);
+        Assert.NotNull(storedLibrary);
+        Assert.Equal("Original Title", storedLibrary!.Title);
+    }
+
+    [Fact]
+    public async Task UpdateLibrary_WhenProviderChoicesAreEmpty_ShouldUpdateTheLibrary()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, userId, "Original Title", shouldTrackConsumptionProgress: true, completionThresholdPercentage: 70);
+        UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
+            id: libraryId,
+            title: "Updated Title",
+            libraryType: "EBook",
+            contentLocations: ["C:/Media"],
+            coverImage: null,
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: 70,
+            metadataProviders: [],
+            artworkProviders: [],
+            bookReaders: []
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}", request);
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(candidate => candidate.Id == libraryId);
+        Assert.NotNull(storedLibrary);
+        Assert.Equal("Updated Title", storedLibrary!.Title);
     }
 
     /// <summary>

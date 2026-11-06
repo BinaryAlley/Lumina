@@ -17,27 +17,21 @@
     - [Get Library Metadata Providers](#get-library-metadata-providers)
       - [Get Library Metadata Providers Request](#get-library-metadata-providers-request)
       - [Get Library Metadata Providers Response](#get-library-metadata-providers-response)
-    - [Set Library Metadata Provider Enabled](#set-library-metadata-provider-enabled)
-      - [Set Library Metadata Provider Enabled Request](#set-library-metadata-provider-enabled-request)
-      - [Set Library Metadata Provider Enabled Response](#set-library-metadata-provider-enabled-response)
-    - [Reorder Library Metadata Providers](#reorder-library-metadata-providers)
-      - [Reorder Library Metadata Providers Request](#reorder-library-metadata-providers-request)
-      - [Reorder Library Metadata Providers Response](#reorder-library-metadata-providers-response)
     - [Get Library Artwork Providers](#get-library-artwork-providers)
       - [Get Library Artwork Providers Request](#get-library-artwork-providers-request)
       - [Get Library Artwork Providers Response](#get-library-artwork-providers-response)
-    - [Set Library Artwork Provider Enabled](#set-library-artwork-provider-enabled)
-      - [Set Library Artwork Provider Enabled Request](#set-library-artwork-provider-enabled-request)
-      - [Set Library Artwork Provider Enabled Response](#set-library-artwork-provider-enabled-response)
-    - [Reorder Library Artwork Providers](#reorder-library-artwork-providers)
-      - [Reorder Library Artwork Providers Request](#reorder-library-artwork-providers-request)
-      - [Reorder Library Artwork Providers Response](#reorder-library-artwork-providers-response)
     - [Get Library Book Readers](#get-library-book-readers)
       - [Get Library Book Readers Request](#get-library-book-readers-request)
       - [Get Library Book Readers Response](#get-library-book-readers-response)
-    - [Set Library Book Reader Enabled](#set-library-book-reader-enabled)
-      - [Set Library Book Reader Enabled Request](#set-library-book-reader-enabled-request)
-      - [Set Library Book Reader Enabled Response](#set-library-book-reader-enabled-response)
+    - [Get Library Type Metadata Providers](#get-library-type-metadata-providers)
+      - [Get Library Type Metadata Providers Request](#get-library-type-metadata-providers-request)
+      - [Get Library Type Metadata Providers Response](#get-library-type-metadata-providers-response)
+    - [Get Library Type Artwork Providers](#get-library-type-artwork-providers)
+      - [Get Library Type Artwork Providers Request](#get-library-type-artwork-providers-request)
+      - [Get Library Type Artwork Providers Response](#get-library-type-artwork-providers-response)
+    - [Get Library Type Book Readers](#get-library-type-book-readers)
+      - [Get Library Type Book Readers Request](#get-library-type-book-readers-request)
+      - [Get Library Type Book Readers Response](#get-library-type-book-readers-response)
   - [Music Plugins](#music-plugins)
 
 ## Plugins
@@ -200,7 +194,7 @@ PUT api/v1/plugins/{pluginId}/settings
 GET api/v1/libraries/{libraryId}/metadata-providers
 ```
 
-Returns the metadata providers available for the media library, one entry per plugin that provides metadata, along with whether the provider is enabled for the media library and its rank, which determines the order in which the providers are tried.
+Returns the metadata providers available for the media library, one entry per plugin that provides metadata, along with whether the provider is enabled for the media library and its rank, which determines the order in which the providers are tried. The enabled state and the rank are changed by sending the `metadataProviders` of the [Add Library](../library/management/Api.Libraries.md#add-library) or [Update Library](../library/management/Api.Libraries.md#update-library) request.
 
 #### Get Library Metadata Providers Response
 
@@ -219,52 +213,6 @@ Returns the metadata providers available for the media library, one entry per pl
 ]
 ```
 
-### Set Library Metadata Provider Enabled
-
-#### Set Library Metadata Provider Enabled Request
-
-```js
-PUT api/v1/libraries/{libraryId}/metadata-providers/{pluginId}/enabled
-```
-
-```json
-{
-  "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
-  "pluginId": "f4c1a7de-3b52-4e6a-9d21-8c7e5b04a1f3",
-  "isEnabled": true
-}
-```
-
-#### Set Library Metadata Provider Enabled Response
-
-```js
-200 Ok
-```
-
-### Reorder Library Metadata Providers
-
-#### Reorder Library Metadata Providers Request
-
-```js
-PUT api/v1/libraries/{libraryId}/metadata-providers/reorder
-```
-
-```json
-{
-  "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
-  "pluginIds": [
-    "f4c1a7de-3b52-4e6a-9d21-8c7e5b04a1f3",
-    "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d"
-  ]
-}
-```
-
-#### Reorder Library Metadata Providers Response
-
-```js
-200 Ok
-```
-
 ### Get Library Artwork Providers
 
 #### Get Library Artwork Providers Request
@@ -273,7 +221,7 @@ PUT api/v1/libraries/{libraryId}/metadata-providers/reorder
 GET api/v1/libraries/{libraryId}/artwork-providers
 ```
 
-Returns the artwork providers available for the media library, one entry per plugin that provides artwork, along with whether the provider is enabled for the media library and its rank, which determines the order in which the providers are tried when resolving the artwork.
+Returns the artwork providers available for the media library, one entry per plugin that provides artwork, along with whether the provider is enabled for the media library and its rank, which determines the order in which the providers are tried when resolving the artwork. The enabled state and the rank are changed by sending the `artworkProviders` of the [Add Library](../library/management/Api.Libraries.md#add-library) or [Update Library](../library/management/Api.Libraries.md#update-library) request.
 
 #### Get Library Artwork Providers Response
 
@@ -298,52 +246,6 @@ Returns the artwork providers available for the media library, one entry per plu
 ]
 ```
 
-### Set Library Artwork Provider Enabled
-
-#### Set Library Artwork Provider Enabled Request
-
-```js
-PUT api/v1/libraries/{libraryId}/artwork-providers/{pluginId}/enabled
-```
-
-```json
-{
-  "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
-  "pluginId": "b7e4c2a9-1f38-4d65-9a02-3e6b8f5c7d14",
-  "isEnabled": true
-}
-```
-
-#### Set Library Artwork Provider Enabled Response
-
-```js
-200 Ok
-```
-
-### Reorder Library Artwork Providers
-
-#### Reorder Library Artwork Providers Request
-
-```js
-PUT api/v1/libraries/{libraryId}/artwork-providers/reorder
-```
-
-```json
-{
-  "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
-  "pluginIds": [
-    "c9f1a7d3-2b64-4e18-8f05-7a3d9c1b6e42",
-    "b7e4c2a9-1f38-4d65-9a02-3e6b8f5c7d14"
-  ]
-}
-```
-
-#### Reorder Library Artwork Providers Response
-
-```js
-200 Ok
-```
-
 ### Get Library Book Readers
 
 #### Get Library Book Readers Request
@@ -352,7 +254,7 @@ PUT api/v1/libraries/{libraryId}/artwork-providers/reorder
 GET api/v1/libraries/{libraryId}/book-readers
 ```
 
-Returns the book readers available for the media library, one entry per plugin that provides a book reader, along with whether the reader is enabled for the media library. A book can be opened for reading only through a book reader that is enabled for its media library.
+Returns the book readers available for the media library, one entry per plugin that provides a book reader, along with whether the reader is enabled for the media library. A book can be opened for reading only through a book reader that is enabled for its media library. The enabled state is changed by sending the `bookReaders` of the [Add Library](../library/management/Api.Libraries.md#add-library) or [Update Library](../library/management/Api.Libraries.md#update-library) request.
 
 #### Get Library Book Readers Response
 
@@ -381,31 +283,98 @@ Returns the book readers available for the media library, one entry per plugin t
 ]
 ```
 
-### Set Library Book Reader Enabled
+### Get Library Type Metadata Providers
 
-#### Set Library Book Reader Enabled Request
+#### Get Library Type Metadata Providers Request
 
 ```js
-PUT api/v1/libraries/{libraryId}/book-readers/{pluginId}/enabled
+GET api/v1/libraries/metadata-providers/{libraryType}
 ```
 
-```json
-{
-  "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
-  "pluginId": "f0d1a2b3-4c5d-4e6f-8a7b-9c0d1e2f3a4b",
-  "isEnabled": true
-}
-```
+Returns the metadata providers available for a media library type, without a media library, so that the providers of a library can be chosen before it is created or before a change of its type is saved. The providers are returned the way a new media library of the type starts with them: disabled, and ranked in alphabetical order.
 
-#### Set Library Book Reader Enabled Response
+#### Get Library Type Metadata Providers Response
 
 ```js
 200 Ok
 ```
 
+```json
+[
+  {
+    "pluginId": "f4c1a7de-3b52-4e6a-9d21-8c7e5b04a1f3",
+    "name": "MusicBrainz Metadata",
+    "isEnabled": false,
+    "rank": 1
+  }
+]
+```
+
+### Get Library Type Artwork Providers
+
+#### Get Library Type Artwork Providers Request
+
+```js
+GET api/v1/libraries/artwork-providers/{libraryType}
+```
+
+Returns the artwork providers available for a media library type, without a media library, disabled and ranked in alphabetical order.
+
+#### Get Library Type Artwork Providers Response
+
+```js
+200 Ok
+```
+
+```json
+[
+  {
+    "pluginId": "b7e4c2a9-1f38-4d65-9a02-3e6b8f5c7d14",
+    "name": "Cover Art Archive",
+    "isEnabled": false,
+    "rank": 1
+  },
+  {
+    "pluginId": "c9f1a7d3-2b64-4e18-8f05-7a3d9c1b6e42",
+    "name": "Local Music Artwork",
+    "isEnabled": false,
+    "rank": 2
+  }
+]
+```
+
+### Get Library Type Book Readers
+
+#### Get Library Type Book Readers Request
+
+```js
+GET api/v1/libraries/book-readers/{libraryType}
+```
+
+Returns the book readers available for a media library type, without a media library, with their supported file extensions, disabled and in alphabetical order.
+
+#### Get Library Type Book Readers Response
+
+```js
+200 Ok
+```
+
+```json
+[
+  {
+    "pluginId": "f0d1a2b3-4c5d-4e6f-8a7b-9c0d1e2f3a4b",
+    "name": "EPUB Reader",
+    "supportedExtensions": [
+      ".epub"
+    ],
+    "isEnabled": false
+  }
+]
+```
+
 ## Music Plugins
 
-The music media library type is served by four plugins, which register their capabilities through `IPluginServiceRegistrator`. A single plugin can expose more than one capability, and the capabilities are enabled and ranked per media library through the endpoints above.
+The music media library type is served by four plugins, which register their capabilities through `IPluginServiceRegistrator`. A single plugin can expose more than one capability, and the capabilities are enabled and ranked per media library by sending the provider lists of the [Add Library](../library/management/Api.Libraries.md#add-library) or [Update Library](../library/management/Api.Libraries.md#update-library) request.
 
 | Plugin | Capability | Web access | Description |
 | --- | --- | --- | --- |

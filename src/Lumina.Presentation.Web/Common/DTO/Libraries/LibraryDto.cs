@@ -18,11 +18,6 @@ public class LibraryDto
     public Guid? Id { get; set; }
 
     /// <summary>
-    /// Gets or sets the unique identifier of the user owning the media library.
-    /// </summary>
-    public Guid? UserId { get; set; }
-
-    /// <summary>
     /// Gets or sets the title of the library.
     /// </summary>
     public string? Title { get; set; }
@@ -88,4 +83,22 @@ public class LibraryDto
     /// Gets or sets the ordered parts of the template describing the structure of the media library on disk.
     /// </summary>
     public List<LibraryPathTemplatePartDto> PathTemplateParts { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the metadata providers of the media library, in the order in which they are tried, and whether each one is enabled. When absent, the providers are configured
+    /// with their defaults on create, and on update the stored configurations are kept, or reconciled with the library type when it changes.
+    /// </summary>
+    public List<LibraryProviderSelectionDto>? MetadataProviders { get; set; }
+
+    /// <summary>
+    /// Gets or sets the artwork providers of the media library, in the order in which they are tried, and whether each one is enabled. When absent, the providers are configured
+    /// with their defaults on create, and on update the stored configurations are kept, or reconciled with the library type when it changes.
+    /// </summary>
+    public List<LibraryProviderSelectionDto>? ArtworkProviders { get; set; }
+
+    /// <summary>
+    /// Gets or sets the book readers of the media library, and whether each one is enabled. When absent, the readers are configured with their defaults on create, and on update
+    /// the stored configurations are kept, or reconciled with the library type when it changes.
+    /// </summary>
+    public List<LibraryProviderSelectionDto>? BookReaders { get; set; }
 }

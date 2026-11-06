@@ -9,6 +9,7 @@ using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.DataAccess.Common.Interceptors;
 using Lumina.DataAccess.Core.UoW;
+using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Infrastructure.Core.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -45,6 +46,8 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
     private readonly UserEntityFixture _userEntityFixture = new();
     private readonly RoleEntityFixture _roleEntityFixture = new();
     private readonly UserRoleEntityFixture _userRoleEntityFixture = new();
+    private readonly PermissionEntityFixture _permissionEntityFixture = new();
+    private readonly UserPermissionEntityFixture _userPermissionEntityFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly BookEntityFixture _bookEntityFixture = new();
     private const string TEST_ENCRYPTION_KEY = "MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=";
@@ -55,11 +58,11 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
     /// </summary>
     public LuminaApiFactory()
     {
-        // each factory gets its own uniquely named shared in-memory database, so that parallel test classes remain isolated from one another;
+        // Each factory gets its own uniquely named shared in-memory database, so that parallel test classes remain isolated from one another;
         // the shared cache allows each DbContext to open its own pooled connection to the same database, instead of sharing a single connection,
-        // which would otherwise serialize every request on one connection and cause nested transaction errors between requests
+        // which would otherwise serialize every request on one connection and cause nested transaction errors between requests.
         _sharedInMemoryConnectionString = string.Format(SHARED_IN_MEMORY_CONNECTION_STRING_PREFIX, Guid.NewGuid());
-        // keep a single anchor connection open, so that the shared in-memory database it refers to is not dropped
+        // Keep a single anchor connection open, so that the shared in-memory database it refers to is not dropped.
         _connection = new SqliteConnection(_sharedInMemoryConnectionString);
         _connection.Open();
     }
@@ -192,6 +195,40 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
         UserEntity user = _userEntityFixture.Create(id: userId, username: username, password: _hashService.HashString("TestPass123!"));
         user.TotpSecret = null;
         dbContext.Users.Add(user);
+        await dbContext.SaveChangesAsync();
+
+        HttpResponseMessage loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", _loginRequestFixture.Create(username: username, password: "TestPass123!"));
+        string content = await loginResponse.Content.ReadAsStringAsync();
+        LoginResponse? loginResult = JsonSerializer.Deserialize<LoginResponse>(content, _jsonOptions);
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResult!.Token);
+
+        return (userId, username);
+    }
+
+    /// <summary>
+    /// Creates a test user that holds a single permission directly, authenticates it on <paramref name="client"/>, and returns its Id and username.
+    /// </summary>
+    /// <param name="client">The HTTP client to configure with authentication headers.</param>
+    /// <param name="permission">The permission granted to the created user.</param>
+    /// <returns>The Id and username of the created test user.</returns>
+    public async Task<(Guid UserId, string Username)> CreateAndAuthenticateUserWithPermissionAsync(HttpClient client, AuthorizationPermission permission)
+    {
+        // A unique X-Forwarded-For isolates rate limiting state per test.
+        client.DefaultRequestHeaders.Clear();
+        client.DefaultRequestHeaders.Add("X-Forwarded-For", GetUniqueTestIp());
+
+        using IServiceScope scope = Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+
+        Guid userId = Guid.NewGuid();
+        string username = $"testuser_{Guid.NewGuid()}";
+        UserEntity user = _userEntityFixture.Create(id: userId, username: username, password: _hashService.HashString("TestPass123!"));
+        user.TotpSecret = null;
+        dbContext.Users.Add(user);
+
+        PermissionEntity permissionEntity = _permissionEntityFixture.Create(permissionName: permission);
+        dbContext.Permissions.Add(permissionEntity);
+        dbContext.UserPermissions.Add(_userPermissionEntityFixture.Create(user, permissionEntity));
         await dbContext.SaveChangesAsync();
 
         HttpResponseMessage loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", _loginRequestFixture.Create(username: username, password: "TestPass123!"));

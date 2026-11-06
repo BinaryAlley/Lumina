@@ -540,11 +540,11 @@
   <data name="PluginIdCannotBeEmpty" xml:space="preserve">
     <value>Ідентифікатор плагіна не може бути порожнім!</value>
   </data>
-  <data name="PluginIdsListCannotBeEmpty" xml:space="preserve">
-    <value>Список ідентифікаторів плагінів не може бути порожнім!</value>
+  <data name="PluginIdsMustBeUnique" xml:space="preserve">
+    <value>Той самий плагін не можна вибрати більше одного разу!</value>
   </data>
-  <data name="PluginIdsListCannotBeNull" xml:space="preserve">
-    <value>Список ідентифікаторів плагінів не може бути порожнім!</value>
+  <data name="PluginNotSupportedForLibraryType" xml:space="preserve">
+    <value>Плагін не підтримує тип медіатеки!</value>
   </data>
   <data name="PluginNotFound" xml:space="preserve">
     <value>Плагін не знайдено!</value>

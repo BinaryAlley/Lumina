@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Core.Endpoints.Library.Management.DeleteLibrary;
+using Lumina.Presentation.Web.Fixtures.Common.Responses.Authorization;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.SecurityTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
@@ -17,6 +18,7 @@ namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.Managemen
 public class DeleteLibraryEndpointTests : IClassFixture<LuminaWebFactory>
 {
     private readonly LuminaWebFactory _apiFactory;
+    private readonly GetAuthorizationResponseFixture _getAuthorizationResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DeleteLibraryEndpointTests"/> class.
@@ -62,6 +64,47 @@ public class DeleteLibraryEndpointTests : IClassFixture<LuminaWebFactory>
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
         Assert.Equal("http://localhost/en-us/auth/login", response.Headers.Location!.ToString());
         Assert.DoesNotContain(_apiFactory.ApiClientStub.DeleteEndpointsCalled, endpoint => endpoint == $"libraries/{libraryId}");
+    }
+
+    [Fact]
+    public async Task DeleteLibrary_WhenTheUserLacksTheManagePermission_ShouldRedirectToAccessDeniedWithoutDeletingTheLibrary()
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        _apiFactory.ApiClientStub.AuthorizationResponse = _getAuthorizationResponseFixture.Create(userId: Guid.NewGuid(), role: "User", permissions: []);
+        AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
+        Guid libraryId = Guid.NewGuid();
+        HttpRequestMessage deleteRequest = CreateDeleteRequest(libraryId);
+        deleteRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);
+
+        // Act
+        HttpResponseMessage response = await webClient.Client.SendAsync(deleteRequest);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.Contains("access-denied", response.Headers.Location!.ToString());
+        Assert.DoesNotContain(_apiFactory.ApiClientStub.DeleteEndpointsCalled, endpoint => endpoint == $"libraries/{libraryId}");
+    }
+
+    [Fact]
+    public async Task DeleteLibrary_WhenAnAdministratorLacksTheManagePermission_ShouldForwardTheDeletion()
+    {
+        // Arrange
+        // The API lets administrators delete any library, so the Web must not refuse them for lacking the permission.
+        _apiFactory.ApiClientStub.Reset();
+        _apiFactory.ApiClientStub.AuthorizationResponse = _getAuthorizationResponseFixture.Create(userId: Guid.NewGuid(), role: "Admin", permissions: []);
+        AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
+        Guid libraryId = Guid.NewGuid();
+        _apiFactory.ApiClientStub.RegisterDeleteSuccess($"libraries/{libraryId}");
+        HttpRequestMessage deleteRequest = CreateDeleteRequest(libraryId);
+        deleteRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);
+
+        // Act
+        HttpResponseMessage response = await webClient.Client.SendAsync(deleteRequest);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains(_apiFactory.ApiClientStub.DeleteEndpointsCalled, endpoint => endpoint == $"libraries/{libraryId}");
     }
 
     /// <summary>

@@ -51,9 +51,10 @@ public class GetLibraryPathTemplatePartsQueryHandlerTests
     }
 
     [Theory]
-    [InlineData("")] // an absent library type
-    [InlineData("   ")] // a whitespace library type
-    [InlineData("NotARealLibraryType")] // an unknown library type
+    [InlineData("")] // An absent library type.
+    [InlineData("   ")] // A whitespace library type.
+    [InlineData("NotARealLibraryType")] // An unknown library type.
+    [InlineData("999")] // A number that is not a defined library type.
     public async Task HandleAsync_WhenLibraryTypeIsUnknownOrAbsent_ShouldReturnUnknownLibraryTypeError(string libraryType)
     {
         // Arrange

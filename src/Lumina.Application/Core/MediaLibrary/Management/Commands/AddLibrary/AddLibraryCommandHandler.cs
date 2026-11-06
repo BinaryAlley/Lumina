@@ -114,7 +114,7 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Resul
                 return DomainErrors.Library.CoverFileMustBeAnImage;
         }
 
-        LibraryType libraryType = Enum.Parse<LibraryType>(command.LibraryType!);
+        LibraryType libraryType = Enum.Parse<LibraryType>(command.LibraryType!, ignoreCase: true);
 
         // A library created without explicit consumption settings uses the defaults of its type. When progress tracking is on and no threshold is
         // supplied, the default threshold of the type is used; a type without one keeps no threshold, which means completion is recorded explicitly.
@@ -158,15 +158,15 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Resul
 
         // Convert the domain library entity to a repository library entity.
         LibraryEntity persistenceLibrary = createLibraryResult.Value.ToRepositoryEntity();
-        // Insert the repository entity, seed the provider configurations of the new library so that it lists the plugins
-        // providing metadata or artwork for its type, and save the changes.
+        // Insert the repository entity, seed the provider configurations of the new library so that it lists the plugins providing metadata,
+        // artwork or book readers for its type, with the choices made for them, and save the changes.
         Result<Created> insertLibraryResult = await _unitOfWork.LibraryRepository.InsertAsync(persistenceLibrary, cancellationToken).ConfigureAwait(false);
         if (insertLibraryResult.IsFailure)
             return insertLibraryResult.Errors;
-        Result<Success> ensureProviderConfigurationsResult = await _providerConfigurationStore.EnsureProviderConfigurationsAsync(
-            createLibraryResult.Value.Id.Value, libraryType, cancellationToken).ConfigureAwait(false);
-        if (ensureProviderConfigurationsResult.IsFailure)
-            return ensureProviderConfigurationsResult.Errors;
+        Result<Success> configureProvidersResult = await _providerConfigurationStore.ConfigureProvidersAsync(
+            createLibraryResult.Value.Id.Value, libraryType, command.MetadataProviders, command.ArtworkProviders, command.BookReaders, shouldReconcileOmittedKinds: true, cancellationToken).ConfigureAwait(false);
+        if (configureProvidersResult.IsFailure)
+            return configureProvidersResult.Errors;
 
         Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         if (saveChangesResult.IsFailure)

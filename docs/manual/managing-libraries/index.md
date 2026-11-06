@@ -21,7 +21,7 @@ A media library is how you tell Lumina where a part of your collection lives and
 
 ## What a library is
 
-A library is a name, a media type, and one or more content locations. It belongs to the user who created it, but administrators, and anyone holding the permission to create libraries, can manage any library, including the ones they did not create.
+A library is a name, a media type, and one or more content locations. It belongs to the user who created it. Only its owner can change or delete it, and only while they hold the permission to create libraries, so withholding that permission keeps a user from changing even the libraries they own. Administrators can change and delete any library. The libraries page only shows the edit and delete actions to users who hold that permission and to administrators.
 
 The library keeps a catalogue of the items it indexed, together with their metadata and artwork. Your actual files stay exactly where they are and are only read, except for the one opt-in setting that writes metadata back (see below).
 
@@ -29,7 +29,7 @@ The library keeps a catalogue of the items it indexed, together with their metad
 
 Lumina can scan two kinds of libraries today:
 
-- **Book** libraries, for books and e-books. During discovery Lumina recognizes these file extensions: `.pdf`, `.epub`, `.mobi`, `.azw`, `.azw3`, `.cbz`, `.cbr`, `.djvu`, `.fb2`, `.lit`, `.prc`, `.txt`, `.doc`, `.docx` and `.rtf`. Of those, the ones a user can open and read in the browser depend on the enabled reader plugins. The EPUB and PDF readers are bundled with Lumina, but readers are disabled by default, so a freshly created book library cannot open any book until you enable one for it. The rest are still indexed and listed in the catalogue, but cannot be opened for reading until a reader for their format is enabled.
+- **Book** libraries, for books and e-books. During discovery Lumina recognizes these file extensions: `.pdf`, `.epub`, `.mobi`, `.azw`, `.azw3`, `.cbz`, `.cbr`, `.djvu`, `.fb2`, `.lit`, `.prc`, `.txt`, `.doc`, `.docx` and `.rtf`. Of those, the ones a user can open and read in the browser depend on the enabled reader plugins. The EPUB and PDF readers are bundled with Lumina, but readers are disabled by default, so a book library cannot open any book until you enable a reader for it. The rest are still indexed and listed in the catalogue, but cannot be opened for reading until a reader for their format is enabled.
 - **Music** libraries, for artists, albums and tracks. During discovery Lumina recognizes these file extensions: `.mp3`, `.flac`, `.m4a`, `.aac`, `.ogg`, `.opus`, `.wav`, `.wma`, `.aiff`, `.aif`, `.ape`, `.wv`, `.dsf`, `.dff` and `.mka`.
 
 The other types in Lumina's model, such as movies, TV shows, comics, manga, photos, podcasts and audiobooks, are designed but not implemented yet. There is no scanner for them, so they cannot be scanned.
@@ -55,8 +55,11 @@ Open the Libraries management page, choose to add a library, and fill in the for
 | Track consumption progress | the type default | Whether the latest playback or reading position of the library's items is remembered, so a user can resume where they left off. |
 | Completion threshold | the type default | The percentage of an item that must be consumed for a stopped session to be recorded as completed. Empty means completion is recorded only when it is reported explicitly. |
 | Path template | the type's ideal structure | Tells Lumina how your folders are arranged on disk. Unless you customize it, it holds the default template of the library type, which is exactly the structure Lumina expects. Optional, and explained in full below. |
+| Metadata providers, artwork providers, book readers | all off | The plugins that fill in the library's metadata and artwork, and, for a book library, open its books. The form lists the ones that support the selected type and refreshes the lists when you change the type. Each is switched on or off, and providers are put in order. A section is hidden when no installed plugin offers that kind of provider for the type. See [Plugins](../plugins/index.md). |
 
 A library that is disabled or locked is never scanned, so those two settings double as a pause switch, and `Locked` also freezes edits.
+
+Everything on the form, provider choices included, is saved in one step when you save the library.
 
 ## Path templates
 
@@ -132,7 +135,7 @@ A disabled or locked library is refused a scan, and a library whose type has no 
 
 Editing a library reopens the same form, and changes take effect on the next scan. Beyond the fields above, two things change the wider picture:
 
-- Changing the **type** of an existing library also reconciles the metadata, artwork and reader provider settings of that library, so they match the plugins that support the new type.
+- Changing the **type** of an existing library updates the provider lists on the form right away, so you can adjust them before saving: providers the library already has keep their on or off setting and their order when the new type still supports them, providers that only the new type supports are added switched off, and providers the new type does not support are removed, together with their settings, when you save.
 - Changing the **content locations** takes effect on the next scan. Items found under a location you removed are dropped from the catalogue, along with the metadata and artwork Lumina had stored for them, and items under a location you added are picked up.
 
 ## Progress tracking and completion thresholds

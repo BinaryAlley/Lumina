@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.DataAccess.Core.UoW;
+using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
@@ -60,12 +61,12 @@ public class DeleteLibraryEndpointTests : IClassFixture<LuminaApiFactory>
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // basic SQL injection
-    [InlineData("'; DROP TABLE Libraries--")] // destructive injection
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
+    [InlineData("'; DROP TABLE Libraries--")] // Destructive injection.
     public async Task DeleteLibrary_WithSQLInjectionInLibraryId_ShouldNotLeakOrError(string maliciousLibraryId)
     {
         // Arrange
-        // authenticate with an admin user and seed a library, so a valid id would reach the handler and be authorized
+        // Authenticate with an admin user and seed a library, so a valid id would reach the handler and be authorized.
         HttpClient client = _apiFactory.CreateClient();
         Guid userId = await _apiFactory.CreateAndAuthenticateAdminUserAsync(client);
         await SeedLibraryAsync(userId);
@@ -74,16 +75,77 @@ public class DeleteLibraryEndpointTests : IClassFixture<LuminaApiFactory>
         HttpResponseMessage response = await client.DeleteAsync($"/api/v1/libraries/{Uri.EscapeDataString(maliciousLibraryId)}");
 
         // Assert
-        // note: the {id} route parameter is Guid-typed, so the malicious value fails model binding before it reaches the handler
-        // note: observed status is 500 because FastEndpoints, combined with DontCatchExceptions(), turns the binding
-        // ValidationFailureException into a 500 response instead of 400/422 (pre-existing production bug, not fixed here)
-        // note: that 500 body leaks the ValidationFailureException details, so no DoesNotContain("Exception") is asserted here
+        // Note: the {id} route parameter is Guid-typed, so the malicious value fails model binding before it reaches the handler.
+        // The observed status is 500 because FastEndpoints, combined with DontCatchExceptions(), turns the binding ValidationFailureException into a 500 response instead of 400/422 (pre-existing production bug, not fixed here).
+        // That 500 body leaks the ValidationFailureException details, so no DoesNotContain("Exception") is asserted here.
         Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("password", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("hash", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("salt", content, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task DeleteLibrary_WhenTheOwnerLacksTheManagePermission_ShouldReturnForbiddenAndKeepTheLibrary()
+    {
+        // Arrange
+        // The created user holds no permission, so it owns the library without being allowed to change it.
+        HttpClient client = _apiFactory.CreateClient();
+        (Guid ownerId, string ownerUsername) = await _apiFactory.CreateAndAuthenticateUserAsync(client);
+        Guid libraryId = Guid.NewGuid();
+        await _apiFactory.SeedLibraryAsync(libraryId, ownerId);
+
+        // Act
+        HttpResponseMessage response = await client.DeleteAsync($"/api/v1/libraries/{libraryId}");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemDetails!["status"].GetInt32());
+        Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
+        Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
+        using (IServiceScope scope = _apiFactory.Services.CreateScope())
+        {
+            LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            Assert.NotNull(await dbContext.Libraries.FindAsync(libraryId));
+        }
+
+        await _apiFactory.RemoveTestUserAsync(ownerUsername);
+    }
+
+    [Fact]
+    public async Task DeleteLibrary_WhenNonOwnerHoldsTheManagePermission_ShouldReturnForbiddenAndKeepTheLibrary()
+    {
+        // Arrange
+        // Ownership and the manage permission are both required, so a user that holds the permission must not delete a library it does not own.
+        HttpClient client = _apiFactory.CreateClient();
+        (Guid ownerId, string ownerUsername) = await _apiFactory.CreateAndAuthenticateUserAsync(client);
+        Guid libraryId = Guid.NewGuid();
+        await _apiFactory.SeedLibraryAsync(libraryId, ownerId);
+        (Guid _, string attackerUsername) = await _apiFactory.CreateAndAuthenticateUserWithPermissionAsync(client, AuthorizationPermission.CanCreateLibraries);
+
+        // Act
+        HttpResponseMessage response = await client.DeleteAsync($"/api/v1/libraries/{libraryId}");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemDetails!["status"].GetInt32());
+        Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
+        Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
+        using (IServiceScope scope = _apiFactory.Services.CreateScope())
+        {
+            LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            Assert.NotNull(await dbContext.Libraries.FindAsync(libraryId));
+        }
+
+        await _apiFactory.RemoveTestUserAsync(ownerUsername);
+        await _apiFactory.RemoveTestUserAsync(attackerUsername);
     }
 
     /// <summary>

@@ -20,7 +20,7 @@ public class LibraryArtworkProviderConfigurationConfiguration : IEntityTypeConfi
         builder.ToTable("LibraryArtworkProviderConfigurations");
         builder.HasKey(configuration => configuration.Id);
         builder.Property(configuration => configuration.Id)
-            .ValueGeneratedNever() // because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it
+            .ValueGeneratedNever() // Because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it.
             .HasColumnOrder(0);
         builder.Property(configuration => configuration.LibraryId)
             .IsRequired()
@@ -35,7 +35,7 @@ public class LibraryArtworkProviderConfigurationConfiguration : IEntityTypeConfi
             .IsRequired()
             .HasColumnOrder(4);
 
-        // audit
+        // Audit.
         builder.Property(configuration => configuration.CreatedOnUtc)
             .IsRequired()
             .HasColumnOrder(5);
@@ -52,6 +52,9 @@ public class LibraryArtworkProviderConfigurationConfiguration : IEntityTypeConfi
             .HasDefaultValue(null)
             .HasColumnOrder(8);
 
-        builder.HasIndex(configuration => new { configuration.LibraryId, configuration.PluginId });
+        // A media library has at most one artwork provider configuration per plugin, so the pair is unique; the repository upserts on it, and
+        // the constraint guarantees that two concurrent upserts cannot insert duplicate rows.
+        builder.HasIndex(configuration => new { configuration.LibraryId, configuration.PluginId })
+            .IsUnique();
     }
 }

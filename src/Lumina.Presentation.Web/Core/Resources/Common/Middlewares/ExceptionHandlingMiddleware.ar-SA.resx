@@ -540,11 +540,11 @@
   <data name="PluginIdCannotBeEmpty" xml:space="preserve">
     <value>لا يمكن أن يكون معرف الإضافة فارغًا!</value>
   </data>
-  <data name="PluginIdsListCannotBeEmpty" xml:space="preserve">
-    <value>لا يمكن أن تكون قائمة معرفات الإضافات فارغة!</value>
+  <data name="PluginIdsMustBeUnique" xml:space="preserve">
+    <value>لا يمكن اختيار الإضافة نفسها أكثر من مرة!</value>
   </data>
-  <data name="PluginIdsListCannotBeNull" xml:space="preserve">
-    <value>لا يمكن أن تكون قائمة معرفات الإضافات فارغة!</value>
+  <data name="PluginNotSupportedForLibraryType" xml:space="preserve">
+    <value>الإضافة لا تدعم نوع مكتبة الوسائط!</value>
   </data>
   <data name="PluginNotFound" xml:space="preserve">
     <value>لم يتم العثور على الإضافة!</value>

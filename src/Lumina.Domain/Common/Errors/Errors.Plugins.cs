@@ -15,8 +15,8 @@ public static partial class Errors
         public static Error PluginIdCannotBeEmpty => Error.Validation(description: nameof(PluginIdCannotBeEmpty));
         public static Error PluginSettingsCannotBeNull => Error.Validation(description: nameof(PluginSettingsCannotBeNull));
         public static Error LibraryIdCannotBeEmpty => Error.Validation(description: nameof(LibraryIdCannotBeEmpty));
-        public static Error PluginIdsListCannotBeNull => Error.Validation(description: nameof(PluginIdsListCannotBeNull));
-        public static Error PluginIdsListCannotBeEmpty => Error.Validation(description: nameof(PluginIdsListCannotBeEmpty));
+        public static Error PluginIdsMustBeUnique => Error.Validation(description: nameof(PluginIdsMustBeUnique));
+        public static Error PluginNotSupportedForLibraryType => Error.Validation(description: nameof(PluginNotSupportedForLibraryType));
         public static Error LibraryMetadataProviderConfigurationNotFound => Error.NotFound(description: nameof(LibraryMetadataProviderConfigurationNotFound));
         public static Error PluginArchiveCannotBeNull => Error.Validation(description: nameof(PluginArchiveCannotBeNull));
         public static Error PluginFileNameCannotBeEmpty => Error.Validation(description: nameof(PluginFileNameCannotBeEmpty));

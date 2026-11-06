@@ -14,6 +14,7 @@ using Lumina.Application.Fixtures.Core.MediaLibrary.Management.Commands.DeleteLi
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.Events;
+using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -60,9 +61,11 @@ public class DeleteLibraryCommandHandlerTests
         _mockValidator = Substitute.For<IValidator<DeleteLibraryCommand>>();
         _userId = Guid.NewGuid();
 
-        // default stubs: the current user is authenticated, the ownership policy allows the deletion, and the provider configurations are removed successfully
+        // Default stubs: the current user is authenticated, the ownership policy allows the deletion, the user has the manage permission, and the provider configurations are removed successfully.
         _mockCurrentUserService.UserId.Returns(_userId);
         _mockAuthorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(_userId, Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>())
+            .Returns(true);
+        _mockAuthorizationService.HasPermissionAsync(_userId, AuthorizationPermission.CanCreateLibraries, Arg.Any<CancellationToken>())
             .Returns(true);
         _mockProviderConfigurationStore.RemoveProviderConfigurationsForLibraryAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
             .Returns(Result.Deleted);
@@ -168,6 +171,49 @@ public class DeleteLibraryCommandHandlerTests
         Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
         await _mockLibraryRepository.DidNotReceive().DeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenTheOwnerLacksTheManagePermission_ShouldReturnNotAuthorizedError()
+    {
+        // Arrange
+        DeleteLibraryCommand command = _deleteLibraryCommandFixture.Create();
+        LibraryEntity library = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
+        _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(library));
+        _mockAuthorizationService.HasPermissionAsync(_userId, AuthorizationPermission.CanCreateLibraries, Arg.Any<CancellationToken>())
+            .Returns(false);
+
+        // Act
+        Result<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
+        await _mockProviderConfigurationStore.DidNotReceive().RemoveProviderConfigurationsForLibraryAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockLibraryRepository.DidNotReceive().DeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenAnAdminWithoutTheManagePermissionDeletesTheLibraryOfAnotherUser_ShouldDeleteIt()
+    {
+        // Arrange
+        DeleteLibraryCommand command = _deleteLibraryCommandFixture.Create();
+        LibraryEntity library = _libraryEntityFixture.Create(id: command.Id, userId: Guid.NewGuid());
+        _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(library));
+        _mockAuthorizationService.HasPermissionAsync(_userId, AuthorizationPermission.CanCreateLibraries, Arg.Any<CancellationToken>())
+            .Returns(false);
+        _mockAuthorizationService.IsInRoleAsync(_userId, AuthorizationRoles.ADMIN, Arg.Any<CancellationToken>())
+            .Returns(true);
+
+        // Act
+        Result<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockLibraryRepository.Received(1).DeleteByIdAsync(command.Id, Arg.Any<CancellationToken>());
     }
 
     [Fact]

@@ -333,9 +333,6 @@
   <data name="MoveDown" xml:space="preserve">
     <value>下移</value>
   </data>
-  <data name="OrderSaved" xml:space="preserve">
-    <value>顺序已保存</value>
-  </data>
   <data name="DescriptionMetadataProviders" xml:space="preserve">
     <value>用于丰富此库项目内容的元数据提供程序，按其尝试顺序排列。</value>
   </data>

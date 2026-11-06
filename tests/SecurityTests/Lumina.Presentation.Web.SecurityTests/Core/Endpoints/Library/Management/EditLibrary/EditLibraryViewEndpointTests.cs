@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Core.Endpoints.Library.Management.EditLibrary;
+using Lumina.Presentation.Web.Fixtures.Common.Responses.Authorization;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.SecurityTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
@@ -15,6 +16,7 @@ namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.Managemen
 public class EditLibraryViewEndpointTests : IClassFixture<LuminaWebFactory>
 {
     private readonly LuminaWebFactory _apiFactory;
+    private readonly GetAuthorizationResponseFixture _getAuthorizationResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EditLibraryViewEndpointTests"/> class.
@@ -39,6 +41,24 @@ public class EditLibraryViewEndpointTests : IClassFixture<LuminaWebFactory>
         // Assert
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
         Assert.Equal("http://localhost/en-us/auth/login", response.Headers.Location!.ToString());
+        Assert.DoesNotContain(_apiFactory.ApiClientStub.GetEndpointsCalled, endpoint => endpoint == $"libraries/{libraryId}");
+    }
+
+    [Fact]
+    public async Task EditLibraryView_WhenTheUserLacksTheManagePermission_ShouldRedirectToAccessDeniedWithoutLoadingTheLibrary()
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        _apiFactory.ApiClientStub.AuthorizationResponse = _getAuthorizationResponseFixture.Create(userId: Guid.NewGuid(), role: "User", permissions: []);
+        AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
+        Guid libraryId = Guid.NewGuid();
+
+        // Act
+        HttpResponseMessage response = await webClient.Client.GetAsync($"/en-us/libraries/manage/item/{libraryId}");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.Contains("access-denied", response.Headers.Location!.ToString());
         Assert.DoesNotContain(_apiFactory.ApiClientStub.GetEndpointsCalled, endpoint => endpoint == $"libraries/{libraryId}");
     }
 }

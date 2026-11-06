@@ -333,9 +333,6 @@
   <data name="MoveDown" xml:space="preserve">
     <value>نقل لأسفل</value>
   </data>
-  <data name="OrderSaved" xml:space="preserve">
-    <value>تم حفظ الترتيب</value>
-  </data>
   <data name="DescriptionMetadataProviders" xml:space="preserve">
     <value>مزوّدو البيانات الوصفية المستخدمون لإثراء عناصر هذه المكتبة، بالترتيب الذي يتم تجريبهم به.</value>
   </data>

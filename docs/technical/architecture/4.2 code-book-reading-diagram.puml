@@ -123,17 +123,35 @@ class GetLibraryBookReadersQueryHandler {
     + HandleAsync(query: GetLibraryBookReadersQuery, token: CancellationToken): Task<Result<IReadOnlyList<LibraryBookReaderResponse>>>
 }
 
-class SetLibraryBookReaderEnabledCommandHandler {
+class GetLibraryTypeBookReadersQueryHandler {
     - _unitOfWork: IUnitOfWork
-    - _enablementCache: IBookReaderEnablementCache
-    + HandleAsync(command: SetLibraryBookReaderEnabledCommand, token: CancellationToken): Task<Result<Success>>
+    - _providerConfigurationStore: IMediaLibraryProviderConfigurationStore
+    - _bookReaderRegistry: IBookReaderRegistry
+    + HandleAsync(query: GetLibraryTypeBookReadersQuery, token: CancellationToken): Task<Result<IReadOnlyList<LibraryBookReaderResponse>>>
 }
 
-note right of SetLibraryBookReaderEnabledCommandHandler
-  Enables or disables the book reader of a plugin for a media
-  library by upserting its configuration row, then invalidates
-  the enablement cache so that a disabled reader stops being
-  served immediately.
+note right of GetLibraryTypeBookReadersQueryHandler
+  Lists the book readers that support a library type, disabled,
+  so that they can be chosen before a library is created or
+  before a change of its type is saved.
+end note
+
+class MediaLibraryProviderConfigurationStore {
+    - _unitOfWork: IUnitOfWork
+    - _enablementCache: IBookReaderEnablementCache
+    + ConfigureProvidersAsync(libraryId: Guid, libraryType: LibraryType, metadataProviders: IReadOnlyList<LibraryProviderSelectionDto>?, artworkProviders: IReadOnlyList<LibraryProviderSelectionDto>?, bookReaders: IReadOnlyList<LibraryProviderSelectionDto>?, shouldReconcileOmittedKinds: bool, token: CancellationToken): Task<Result<Success>>
+    + GetSupportedBookReaderPluginIds(libraryType: LibraryType): IReadOnlyList<Guid>
+}
+
+note right of MediaLibraryProviderConfigurationStore
+  Called by the add and update library commands. Applies the
+  chosen metadata providers, artwork providers and book readers
+  of a media library by upserting their configuration rows in
+  the same save as the library. When shouldReconcileOmittedKinds
+  is set, the kinds without explicit choices are reconciled with
+  the library type first. Book reader changes invalidate the
+  enablement cache of the library so that a disabled reader
+  stops being served immediately.
 end note
 
 ' ============================== BOOK READER PLUGINS ==============================
@@ -221,8 +239,10 @@ BookReaderRegistry ..> IBookReader : reads the supported extensions of loaded pl
 
 GetLibraryBookReadersQueryHandler --> ILibraryBookReaderConfigurationRepository : reads configurations
 GetLibraryBookReadersQueryHandler --> IBookReaderRegistry : reads supported extensions
-SetLibraryBookReaderEnabledCommandHandler --> ILibraryBookReaderConfigurationRepository : upserts the configuration
-SetLibraryBookReaderEnabledCommandHandler --> IBookReaderEnablementCache : invalidates the entry
+GetLibraryTypeBookReadersQueryHandler --> MediaLibraryProviderConfigurationStore : reads the supported readers
+GetLibraryTypeBookReadersQueryHandler --> IBookReaderRegistry : reads supported extensions
+MediaLibraryProviderConfigurationStore --> ILibraryBookReaderConfigurationRepository : upserts the configurations
+MediaLibraryProviderConfigurationStore --> IBookReaderEnablementCache : invalidates the library entries
 
 ILibraryBookReaderConfigurationRepository --> LibraryBookReaderConfigurationEntity : persists
 

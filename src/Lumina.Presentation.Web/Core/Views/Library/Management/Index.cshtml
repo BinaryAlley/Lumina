@@ -5,7 +5,10 @@
 @using Lumina.Presentation.Web.Common.DTO.Libraries
 @using Lumina.Presentation.Web.Common.Services
 @using Microsoft.AspNetCore.Mvc.Localization
+@using System.Collections.Generic
 @using System.Security.Claims
+@using System.Text.Json
+@model LibrariesIndexPageDto
 
 @{
     // Generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler.
@@ -165,58 +168,89 @@
         // Create cleanup registry for this view.
         const cleanupFunctions = [];
         let isInitialized = false;
-        const jsLocalizedLibraryScanStatuses = {
-            Completed: '@_localizer["Completed"]',
-            Failed: '@_localizer["Failed"]',
-            Canceled: '@_localizer["Canceled"]',
-            Cancelling: '@_localizer["Cancelling"]'
-        };
-        const jsLocalizedLibraryScanJobsStatuses = {
-            DiscoveringFiles: '@_localizer["DiscoveringFiles"]',
-            ComparingFileHashes: '@_localizer["ComparingFileHashes"]',
-            HashingFileContents: '@_localizer["HashingFileContents"]',
-            ExtractingMetadata: '@_localizer["ExtractingMetadata"]',
-            SavingScanData: '@_localizer["SavingScanData"]',
-            InvalidatingStaleEnrichment: '@_localizer["InvalidatingStaleEnrichment"]',
-            EnrichingMetadata: '@_localizer["EnrichingMetadata"]',
-            ResolvingArtwork: '@_localizer["ResolvingArtwork"]',
-            Queued: '@_localizer["Queued"]'
-        };
-        const jsLocalizedLibraryTypes = {
-            Book: '@_localizer["Book"]',
-            EBook: '@_localizer["EBook"]',
-            BookSeries: '@_localizer["BookSeries"]',
-            ComicBook: '@_localizer["ComicBook"]',
-            ComicSeries: '@_localizer["ComicSeries"]',
-            Magazine: '@_localizer["Magazine"]',
-            Manga: '@_localizer["Manga"]',
-            GraphicNovel: '@_localizer["GraphicNovel"]',
-            AcademicPaper: '@_localizer["AcademicPaper"]',
-            SheetMusic: '@_localizer["SheetMusic"]',
-            Screenplay: '@_localizer["Screenplay"]',
-            TvShow: '@_localizer["TvShow"]',
-            Movie: '@_localizer["Movie"]',
-            FilmSeries: '@_localizer["FilmSeries"]',
-            FilmFranchise: '@_localizer["FilmFranchise"]',
-            Concert: '@_localizer["Concert"]',
-            Documentary: '@_localizer["Documentary"]',
-            Tutorial: '@_localizer["Tutorial"]',
-            Personal: '@_localizer["Personal"]',
-            Anime: '@_localizer["Anime"]',
-            Youtube: '@_localizer["Youtube"]',
-            Videoclip: '@_localizer["Videoclip"]',
-            Music: '@_localizer["Music"]',
-            AudioBook: '@_localizer["AudioBook"]',
-            LivePerformance: '@_localizer["LivePerformance"]',
-            Interview: '@_localizer["Interview"]',
-            Cover: '@_localizer["Cover"]',
-            Remix: '@_localizer["Remix"]',
-            Soundeffect: '@_localizer["Soundeffect"]',
-            Podcast: '@_localizer["Podcast"]',
-            RadioShow: '@_localizer["RadioShow"]',
-            PhotoAlbum: '@_localizer["PhotoAlbum"]',
-            Other: '@_localizer["Other"]'
-        };
+        // Changing and deleting a media library takes the permission to manage media libraries, or the administrator role, so the edit and delete actions are
+        // only rendered for the users the server would let through.
+        const canManageLibraries = @(Model.CanManageLibraries ? "true" : "false");
+        // The localized strings used inside this script are injected as JSON, not as raw HTML text: Razor HTML-encodes non-ASCII characters into numeric
+        // entities, which the browser does not decode inside a script element, and a translation containing a quote, a backtick or "${" would break out of
+        // the string or template literal it was placed in. JSON escapes them, so the script reads them correctly.
+        const jsLocalizedLibraryScanStatuses = @Html.Raw(JsonSerializer.Serialize(new Dictionary<string, string>
+        {
+            ["Completed"] = _localizer["Completed"].Value,
+            ["Failed"] = _localizer["Failed"].Value,
+            ["Canceled"] = _localizer["Canceled"].Value,
+            ["Cancelling"] = _localizer["Cancelling"].Value
+        }));
+        const jsLocalizedLibraryScanJobsStatuses = @Html.Raw(JsonSerializer.Serialize(new Dictionary<string, string>
+        {
+            ["DiscoveringFiles"] = _localizer["DiscoveringFiles"].Value,
+            ["ComparingFileHashes"] = _localizer["ComparingFileHashes"].Value,
+            ["HashingFileContents"] = _localizer["HashingFileContents"].Value,
+            ["ExtractingMetadata"] = _localizer["ExtractingMetadata"].Value,
+            ["SavingScanData"] = _localizer["SavingScanData"].Value,
+            ["InvalidatingStaleEnrichment"] = _localizer["InvalidatingStaleEnrichment"].Value,
+            ["EnrichingMetadata"] = _localizer["EnrichingMetadata"].Value,
+            ["ResolvingArtwork"] = _localizer["ResolvingArtwork"].Value,
+            ["Queued"] = _localizer["Queued"].Value
+        }));
+        const jsLocalizedLibraryTypes = @Html.Raw(JsonSerializer.Serialize(new Dictionary<string, string>
+        {
+            ["Book"] = _localizer["Book"].Value,
+            ["EBook"] = _localizer["EBook"].Value,
+            ["BookSeries"] = _localizer["BookSeries"].Value,
+            ["ComicBook"] = _localizer["ComicBook"].Value,
+            ["ComicSeries"] = _localizer["ComicSeries"].Value,
+            ["Magazine"] = _localizer["Magazine"].Value,
+            ["Manga"] = _localizer["Manga"].Value,
+            ["GraphicNovel"] = _localizer["GraphicNovel"].Value,
+            ["AcademicPaper"] = _localizer["AcademicPaper"].Value,
+            ["SheetMusic"] = _localizer["SheetMusic"].Value,
+            ["Screenplay"] = _localizer["Screenplay"].Value,
+            ["TvShow"] = _localizer["TvShow"].Value,
+            ["Movie"] = _localizer["Movie"].Value,
+            ["FilmSeries"] = _localizer["FilmSeries"].Value,
+            ["FilmFranchise"] = _localizer["FilmFranchise"].Value,
+            ["Concert"] = _localizer["Concert"].Value,
+            ["Documentary"] = _localizer["Documentary"].Value,
+            ["Tutorial"] = _localizer["Tutorial"].Value,
+            ["Personal"] = _localizer["Personal"].Value,
+            ["Anime"] = _localizer["Anime"].Value,
+            ["Youtube"] = _localizer["Youtube"].Value,
+            ["Videoclip"] = _localizer["Videoclip"].Value,
+            ["Music"] = _localizer["Music"].Value,
+            ["AudioBook"] = _localizer["AudioBook"].Value,
+            ["LivePerformance"] = _localizer["LivePerformance"].Value,
+            ["Interview"] = _localizer["Interview"].Value,
+            ["Cover"] = _localizer["Cover"].Value,
+            ["Remix"] = _localizer["Remix"].Value,
+            ["Soundeffect"] = _localizer["Soundeffect"].Value,
+            ["Podcast"] = _localizer["Podcast"].Value,
+            ["RadioShow"] = _localizer["RadioShow"].Value,
+            ["PhotoAlbum"] = _localizer["PhotoAlbum"].Value,
+            ["Other"] = _localizer["Other"].Value
+        }));
+        const jsLocalizedLabels = @Html.Raw(JsonSerializer.Serialize(new Dictionary<string, string>
+        {
+            ["Yes"] = _localizer["Yes"].Value,
+            ["No"] = _localizer["No"].Value,
+            ["Completed"] = _localizer["Completed"].Value,
+            ["Failed"] = _localizer["Failed"].Value,
+            ["Canceled"] = _localizer["Canceled"].Value,
+            ["CancelScan"] = _localizer["CancelScan"].Value,
+            ["Scan"] = _localizer["Scan"].Value,
+            ["Edit"] = _localizer["Edit"].Value,
+            ["Remove"] = _localizer["Remove"].Value,
+            ["DeleteLibraryConfirm"] = _localizer["DeleteLibraryConfirm"].Value,
+            ["LibraryDeleted"] = _localizer["LibraryDeleted"].Value
+        }));
+
+        // Escapes a value for use as text or as a quoted attribute value inside markup, since the titles of the libraries are typed by their users.
+        function escapeHtml(value) {
+            const div = document.createElement('div');
+            div.textContent = value ?? '';
+            return div.innerHTML.replace(/"/g, '&quot;');
+        }
+
         // The element references are captured once, so that the cleanup can unbind their listeners even after the AJAX navigator has swapped the content out of the document.
         const btnScanAllLibraries = document.getElementById('btn-scan-all-libraries');
         const btnCancelLibrariesScan = document.getElementById('btn-cancel-libraries-scan');
@@ -250,13 +284,13 @@
                 btnScanAllLibraries.style.display = 'block';
                 tbody.innerHTML = response.map(library => {
                     const editUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.EDIT_LIBRARY, new { id = default(Guid) })'
-                        .replace('/@(default(Guid))', `/${library.id}`);
+                        .replace('/@(default(Guid))', `/${encodeURIComponent(library.id)}`);
                     return `
-                        <tr data-library-id="${library.id}">
-                            <td title="${library.title}">${library.title}</td>
-                            <td>${jsLocalizedLibraryTypes[library.libraryType]}</td>
-                            <td class="text-center">${library.isEnabled === true ? `@_localizer["Yes"]` : `@_localizer["No"]`}</td>
-                            <td class="text-center">${library.isLocked === true ? `@_localizer["Yes"]` : `@_localizer["No"]`}</td>
+                        <tr data-library-id="${escapeHtml(library.id)}">
+                            <td title="${escapeHtml(library.title)}">${escapeHtml(library.title)}</td>
+                            <td>${escapeHtml(jsLocalizedLibraryTypes[library.libraryType] ?? library.libraryType)}</td>
+                            <td class="text-center">${escapeHtml(library.isEnabled === true ? jsLocalizedLabels.Yes : jsLocalizedLabels.No)}</td>
+                            <td class="text-center">${escapeHtml(library.isLocked === true ? jsLocalizedLabels.Yes : jsLocalizedLabels.No)}</td>
                             <td class="td-scan">
                                 <span class="scan-job-status hidden">Downloading metadata</span>
                                 <div class="scan-progress hidden">
@@ -266,18 +300,19 @@
 
                                 <div class="icon-groups">
                                     <div class="status-icons">
-                                        <img src="/images/ui/green.png" alt="@_localizer["Completed"]" title="@_localizer["Completed"]" class="hidden status-icon" />
-                                        <img src="/images/ui/red.png" alt="@_localizer["Failed"]" title="@_localizer["Failed"]" class="hidden status-icon" />
-                                        <img src="/images/ui/yellow.png" alt="@_localizer["Canceled"]" title="@_localizer["Canceled"]" class="hidden status-icon" />
+                                        <img src="/images/ui/green.png" alt="${escapeHtml(jsLocalizedLabels.Completed)}" title="${escapeHtml(jsLocalizedLabels.Completed)}" class="hidden status-icon" />
+                                        <img src="/images/ui/red.png" alt="${escapeHtml(jsLocalizedLabels.Failed)}" title="${escapeHtml(jsLocalizedLabels.Failed)}" class="hidden status-icon" />
+                                        <img src="/images/ui/yellow.png" alt="${escapeHtml(jsLocalizedLabels.Canceled)}" title="${escapeHtml(jsLocalizedLabels.Canceled)}" class="hidden status-icon" />
                                     </div>
 
                                     <div class="action-icons">
-                                        <img src="/images/ui/stop.svg" alt="@_localizer["CancelScan"]" title="@_localizer["CancelScan"]" class="hidden action-icon" />
-                                        <img src="/images/ui/trigger.svg" alt="@_localizer["Scan"]" title="@_localizer["Scan"]" class="action-icon" />
-                                        <a href="${editUrl}" class="nav-link">
-                                            <img src="/images/ui/edit.svg" alt="@_localizer["Edit"]" title="@_localizer["Edit"]" class="action-icon" />
+                                        <img src="/images/ui/stop.svg" alt="${escapeHtml(jsLocalizedLabels.CancelScan)}" title="${escapeHtml(jsLocalizedLabels.CancelScan)}" class="hidden action-icon" />
+                                        <img src="/images/ui/trigger.svg" alt="${escapeHtml(jsLocalizedLabels.Scan)}" title="${escapeHtml(jsLocalizedLabels.Scan)}" class="action-icon" />
+                                        ${canManageLibraries ? `
+                                        <a href="${escapeHtml(editUrl)}" class="nav-link">
+                                            <img src="/images/ui/edit.svg" alt="${escapeHtml(jsLocalizedLabels.Edit)}" title="${escapeHtml(jsLocalizedLabels.Edit)}" class="action-icon" />
                                         </a>
-                                        <img src="/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="mr-5 action-icon" />
+                                        <img src="/images/ui/delete.svg" alt="${escapeHtml(jsLocalizedLabels.Remove)}" title="${escapeHtml(jsLocalizedLabels.Remove)}" class="mr-5 action-icon" />` : ''}
                                     </div>
                                 </div>
                             </td>
@@ -297,7 +332,7 @@
             const response = await callApiGetAsync('@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.GET_RUNNING_LIBRARY_SCANS)');
             if (response && response.length > 0) {
                 await Promise.all(response.map(async scan => {
-                    const row = document.querySelector(`tr[data-library-id="${scan.libraryId}"]`);
+                    const row = document.querySelector(`tr[data-library-id="${CSS.escape(String(scan.libraryId))}"]`);
                     if (row) {
                         // Restore UI state.
                         const scanProgress = row.querySelector('.scan-progress');
@@ -336,14 +371,14 @@
             if (e.target.matches('img[src*="delete.svg"]')) {
                 const row = e.target.closest('tr');
                 
-                if (await dialogService.show('@_localizer["DeleteLibraryConfirm"]', jsLocalizedDialogs.confirmation, DialogButtons.YES_NO, DialogIcon.QUESTION) === DialogButton.YES) {
+                if (await dialogService.show(jsLocalizedLabels.DeleteLibraryConfirm, jsLocalizedDialogs.confirmation, DialogButtons.YES_NO, DialogIcon.QUESTION) === DialogButton.YES) {
                     const libraryId = row.getAttribute('data-library-id');
                     const url = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.DELETE_LIBRARY, new { id = default(Guid) })';
                     const success = await callApiDeleteAsync(url.replace('/@(default(Guid))', `/${libraryId}`));
             
                     if (success) {
                         await loadLibrariesAsync(); // Reload the entire library list.
-                        notificationService.show('@_localizer["LibraryDeleted"]', NotificationType.SUCCESS);
+                        notificationService.show(jsLocalizedLabels.LibraryDeleted, NotificationType.SUCCESS);
                     }
                 }
             }
@@ -359,7 +394,7 @@
                 // Toggle icons only for libraries that had their scan started.
                 const tbody = document.querySelector('tbody');
                 data.forEach(async scan => {
-                    const row = tbody.querySelector(`tr[data-library-id="${scan.libraryId}"]`);
+                    const row = tbody.querySelector(`tr[data-library-id="${CSS.escape(String(scan.libraryId))}"]`);
                     if (row) {
                         row.setAttribute('data-scan-id', scan.scanId);
                         const scanIcon = row.querySelector('img[src*="trigger.svg"]');
@@ -499,7 +534,7 @@
             };
             // Progress update handler.
             const progressHandler = (progress) => {
-                const rows = document.querySelectorAll(`tr[data-scan-id="${progress.scanId}"]`);
+                const rows = document.querySelectorAll(`tr[data-scan-id="${CSS.escape(String(progress.scanId))}"]`);
                 rows.forEach(row => {
                     // Update status text.
                     const currentOperation = progress.currentJobProgress.currentOperation;
@@ -528,7 +563,7 @@
 
             // Scan completion handler.
             const completionHandler = (progress) => {
-                const rows = document.querySelectorAll(`tr[data-scan-id="${progress.scanId}"]`);
+                const rows = document.querySelectorAll(`tr[data-scan-id="${CSS.escape(String(progress.scanId))}"]`);
                 rows.forEach(row => {
                     // Remove the scan Id, its no longer being scanned.
                     row.removeAttribute('data-scan-id');
@@ -555,7 +590,7 @@
 
             // Scan failure handler.
             const failureHandler = (progress) => {
-                const rows = document.querySelectorAll(`tr[data-scan-id="${progress.scanId}"]`);
+                const rows = document.querySelectorAll(`tr[data-scan-id="${CSS.escape(String(progress.scanId))}"]`);
                 rows.forEach(row => {
                     // Remove the scan Id, its no longer being scanned.
                     row.removeAttribute('data-scan-id');
@@ -582,7 +617,7 @@
 
             // Scan cancellation handler.
             const cancelledHandler = (progress) => {
-                const rows = document.querySelectorAll(`tr[data-scan-id="${progress.scanId}"]`);
+                const rows = document.querySelectorAll(`tr[data-scan-id="${CSS.escape(String(progress.scanId))}"]`);
                 rows.forEach(row => {
                     // Remove the scan Id, its no longer being scanned.
                     row.removeAttribute('data-scan-id');
