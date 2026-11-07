@@ -168,6 +168,9 @@
   <data name="Retry" xml:space="preserve">
     <value>Reintentar</value>
   </data>
+  <data name="ServerUnreachable" xml:space="preserve">
+    <value>El servidor no está disponible</value>
+  </data>
   <data name="ToggleExpanded" xml:space="preserve">
     <value>Expandir o contraer el reproductor</value>
   </data>

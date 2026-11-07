@@ -168,6 +168,9 @@
   <data name="Retry" xml:space="preserve">
     <value>Wiederholen</value>
   </data>
+  <data name="ServerUnreachable" xml:space="preserve">
+    <value>Der Server ist nicht erreichbar</value>
+  </data>
   <data name="ToggleExpanded" xml:space="preserve">
     <value>Player ein- oder ausklappen</value>
   </data>

@@ -1,4 +1,5 @@
 @using Lumina.Presentation.Web.Common.DTO.Themes
+@using Lumina.Presentation.Web.Common.Http
 @using Lumina.Presentation.Web.Common.Primitives
 @using Lumina.Presentation.Web.Core.Themes
 @using Microsoft.AspNetCore.Html
@@ -16,6 +17,11 @@
         bodyContent.WriteTo(bodyWriter, HtmlEncoder.Default);
         bodyHtml = bodyWriter.ToString();
     }
+
+    // The page renders even when the API was unreachable during its authorization check. The marker is carried inside the main content,
+    // so the global script reports the failed navigation both on a full page load and after an AJAX navigation swapped the content.
+    if (ViewContext.HttpContext.Items[HttpContextItemKeys.SERVER_UNREACHABLE] is true)
+        bodyHtml = "<div id=\"server-unreachable-marker\" hidden></div>" + bodyHtml;
 
     string scriptsHtml;
     using (StringWriter scriptsWriter = new())
@@ -63,6 +69,7 @@ else
                 @await Html.PartialAsync("_AudioPlayer")
             }
         </div>
+        @await Html.PartialAsync("_ServerUnreachableBanner")
         <div id="modal-background-menu"></div>
         @await Html.PartialAsync("_ThemeLayoutScripts")
         <div data-section="scripts">

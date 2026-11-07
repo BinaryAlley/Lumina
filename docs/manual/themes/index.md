@@ -84,7 +84,9 @@ The manifest is a small JSON object:
 
 ### Templates
 
-Templates use a small, Mustache-style syntax: `{{name}}` prints a value, escaped; `{{{name}}}` or `{{&name}}` prints it raw; `{{#name}}...{{/name}}` repeats or shows a section; `{{^name}}...{{/name}}` shows a section when a value is absent. A theme provides a layout that wraps every page, a navigation menu, an optional 404 page, page templates for the pages it wants to restyle, and optionally templates for the file system browser component.
+Templates use a small, Mustache-style syntax: `{{name}}` prints a value, escaped; `{{{name}}}` or `{{&name}}` prints it raw; `{{#name}}...{{/name}}` repeats or shows a section; `{{^name}}...{{/name}}` shows a section when a value is absent. A theme provides a layout that wraps every page, a navigation menu, a server unreachable banner, an optional 404 page, page templates for the pages it wants to restyle, and optionally templates for the file system browser component.
+
+The server unreachable banner is the strip that appears at the bottom of the window while Lumina cannot reach its server. A theme renders it from its own `shared/server-unreachable-banner` template, or from the built-in fallback when it does not provide one, and the layout places it through the `serverUnreachableBanner` field. The theme owns the markup, the placement, the position, the size, the background and everything else about the banner; it only has to keep the `data-server-unreachable-banner` hook on its root element and hide and show that element with the `is-visible` class. The [theming guide](../../technical/theming/Theming.md) describes the message field, the fallback markup and the rest of the contract.
 
 A page is matched to a template by a key that mirrors the page's path, so the books page looks for `templates/library/written-content-library/book-library/books/index.html`, or a template at a parent scope when the exact one is missing. When a theme has no template for a page, the application renders that page itself with its own built-in view, so a theme never has to cover everything.
 

@@ -168,6 +168,9 @@
   <data name="Retry" xml:space="preserve">
     <value>再試行</value>
   </data>
+  <data name="ServerUnreachable" xml:space="preserve">
+    <value>サーバーに接続できません</value>
+  </data>
   <data name="ToggleExpanded" xml:space="preserve">
     <value>プレーヤーを展開または折りたたむ</value>
   </data>

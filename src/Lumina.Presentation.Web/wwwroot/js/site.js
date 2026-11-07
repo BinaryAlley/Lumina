@@ -10,6 +10,58 @@ let enableConsoleDebugMessages = false; // whether to display debug messages at 
 
 var ajaxCallCounter = 0;
 
+/**
+ * Shows the server unreachable notification once, and marks the API source as unreachable. A later successful call
+ * clears the state. It is used for network failures, never for an HTTP status the server actually answered with.
+ */
+function showServerUnreachableOnce() {
+    window.serverConnectionStatus?.markUnreachable('api');
+    if (window.isServerUnreachable)
+        return;
+    window.isServerUnreachable = true;
+    notificationService.show(jsLocalizedMessages.serverUnreachable, NotificationType.ERROR);
+}
+
+/**
+ * Marks the API as reachable again after a response the server produced, whether it was successful or a client error.
+ */
+function markApiReachable() {
+    window.isServerUnreachable = false;
+    window.serverConnectionStatus?.markReachable('api');
+}
+
+/**
+ * Handles an unsuccessful JSON response. An outage response marks the server unreachable and shows the single unreachable
+ * notification; any other failure shows the message the server provided.
+ * @param {Object} jsonResponse - The unsuccessful response payload.
+ */
+function handleApiFailure(jsonResponse) {
+    if (jsonResponse.serverUnreachable === true) {
+        showServerUnreachableOnce();
+        return;
+    }
+    markApiReachable();
+    notificationService.show(jsonResponse.errorMessage, NotificationType.ERROR);
+}
+
+/**
+ * Handles an HTTP response with an unsuccessful status, showing the message the server provided when it can be read.
+ * The server answered, so this is not treated as an unreachable server.
+ * @param {Response} response - The unsuccessful response.
+ */
+async function showHttpErrorAsync(response) {
+    markApiReachable();
+    let message = response.statusText || `HTTP ${response.status}`;
+    try {
+        const body = await response.json();
+        if (body && typeof body.errorMessage === 'string' && body.errorMessage.length > 0)
+            message = body.errorMessage;
+    } catch {
+        // The body was not JSON, so the status text is the best message available.
+    }
+    notificationService.show(message, NotificationType.ERROR);
+}
+
 
 //+======================================================================================+
 //|                                 API interaction                                      |
@@ -32,17 +84,31 @@ async function callApiGetAsync(url) {
         if (response.redirected) // if a redirect is requested, perform it
             window.location.href = response.url;
         else {
-            if (!response.ok)
-                throw new Error('Network response was not ok');
-            const jsonResponse = await response.json();
-            if (jsonResponse.success)
+            if (!response.ok) {
+                await showHttpErrorAsync(response);
+                return;
+            }
+            let jsonResponse;
+            try {
+                jsonResponse = await response.json();
+            } catch (error) {
+                // The server answered, but not with the expected JSON, so this is not an unreachable server.
+                console.error('Error:', error);
+                markApiReachable();
+                notificationService.show(error.message, NotificationType.ERROR);
+                return;
+            }
+            if (jsonResponse.success) {
+                markApiReachable();
                 return jsonResponse.data;
+            }
             else
-                notificationService.show(jsonResponse.errorMessage, NotificationType.ERROR);
+                handleApiFailure(jsonResponse);
         }
     } catch (error) {
+        // Fetch itself failed, which means the Web application or the network is not answering.
         console.error('Error:', error);
-        notificationService.show(error, NotificationType.ERROR);
+        showServerUnreachableOnce();
     }
 }
 
@@ -85,20 +151,32 @@ async function callApiPostAsync(url, data, options = {}) {
         if (response.redirected) // if a redirect is requested, perform it
             window.location.href = response.url;
         else {
-            if (!response.ok)
-                throw new Error(`HTTP error! status: ${response.status}`);
-            const jsonResponse = await response.json();
+            if (!response.ok) {
+                await showHttpErrorAsync(response);
+                return;
+            }
+            let jsonResponse;
+            try {
+                jsonResponse = await response.json();
+            } catch (error) {
+                console.error('Error:', error);
+                markApiReachable();
+                notificationService.show(error.message, NotificationType.ERROR);
+                return;
+            }
             if (jsonResponse.success) {
+                markApiReachable();
                 if (jsonResponse.message)
                     notificationService.show(jsonResponse.message, NotificationType.SUCCESS);
                 return jsonResponse.data;
             }
             else
-                notificationService.show(jsonResponse.errorMessage, NotificationType.ERROR);
+                handleApiFailure(jsonResponse);
         }
     } catch (error) {
+        // Fetch itself failed, which means the Web application or the network is not answering.
         console.error('Error:', error);
-        notificationService.show(error, NotificationType.ERROR);
+        showServerUnreachableOnce();
     }
 }
 
@@ -141,20 +219,32 @@ async function callApiPutAsync(url, data, options = {}) {
         if (response.redirected) // if a redirect is requested, perform it
             window.location.href = response.url;
         else {
-            if (!response.ok)
-                throw new Error(`HTTP error! status: ${response.status}`);
-            const jsonResponse = await response.json();
+            if (!response.ok) {
+                await showHttpErrorAsync(response);
+                return { success: false };
+            }
+            let jsonResponse;
+            try {
+                jsonResponse = await response.json();
+            } catch (error) {
+                console.error('Error:', error);
+                markApiReachable();
+                notificationService.show(error.message, NotificationType.ERROR);
+                return { success: false };
+            }
             if (jsonResponse.success) {
+                markApiReachable();
                 if (jsonResponse.message)
                     notificationService.show(jsonResponse.message, NotificationType.SUCCESS);
                 return { success: jsonResponse.success === true, data: jsonResponse.data };
             }
             else
-                notificationService.show(jsonResponse.errorMessage, NotificationType.ERROR);
+                handleApiFailure(jsonResponse);
         }
     } catch (error) {
+        // Fetch itself failed, which means the Web application or the network is not answering.
         console.error('Error:', error);
-        notificationService.show(error, NotificationType.ERROR);
+        showServerUnreachableOnce();
     }
     return { success: false };
 }
@@ -196,20 +286,32 @@ async function callApiDeleteAsync(url, options = {}) {
         if (response.redirected) // if a redirect is requested, perform it
             window.location.href = response.url;
         else {
-            if (!response.ok)
-                throw new Error(`HTTP error! status: ${response.status}`);
-            const jsonResponse = await response.json();
+            if (!response.ok) {
+                await showHttpErrorAsync(response);
+                return;
+            }
+            let jsonResponse;
+            try {
+                jsonResponse = await response.json();
+            } catch (error) {
+                console.error('Error:', error);
+                markApiReachable();
+                notificationService.show(error.message, NotificationType.ERROR);
+                return;
+            }
             if (jsonResponse.success) {
+                markApiReachable();
                 if (jsonResponse.message)
                     notificationService.show(jsonResponse.message, NotificationType.SUCCESS);
                 return jsonResponse.success;
             }
             else
-                notificationService.show(jsonResponse.errorMessage, NotificationType.ERROR);
+                handleApiFailure(jsonResponse);
         }
     } catch (error) {
+        // Fetch itself failed, which means the Web application or the network is not answering.
         console.error('Error:', error);
-        notificationService.show(error, NotificationType.ERROR);
+        showServerUnreachableOnce();
     }
 }
 
@@ -237,7 +339,26 @@ function initializeNavigation() {
 
     // execute the view scripts of the initially loaded page, now that the application scripts are loaded; the view scripts are
     // stored with a non-executable type, so the browser does not run them before the application scripts are available
+    showServerUnreachableNotificationIfNeeded();
     processViewScriptsAsync(document.querySelector('[data-section="scripts"]'));
+}
+
+/**
+ * Shows the navigation failed notification when the rendered page reports that its authorization could not reach the API,
+ * then removes the marker so the notification is shown once per failed navigation. While the page is marked unreachable,
+ * the API helpers suppress their own error notifications, because they all report the same outage.
+ */
+function showServerUnreachableNotificationIfNeeded() {
+    const marker = document.getElementById('server-unreachable-marker');
+    if (!marker) {
+        window.isServerUnreachable = false;
+        window.serverConnectionStatus?.markReachable('api');
+        return;
+    }
+    marker.remove();
+    window.isServerUnreachable = true;
+    window.serverConnectionStatus?.markUnreachable('api');
+    notificationService.show(jsLocalizedMessages.navigationFailed, NotificationType.ERROR);
 }
 
 /**
@@ -375,6 +496,17 @@ async function updateContentAsync(url, addToHistory) {
         });
         if (response.redirected) // if a redirect is requested, perform it
             window.location.href = response.url;
+        else if (!response.ok) {
+            // The server answered with an error page for the requested address. Keep the address the user asked for in the bar
+            // and report the failed navigation once, instead of leaving the previous address and letting the missing content throw.
+            const failedState = { url, content: document.querySelector('main').innerHTML, title: document.title };
+            if (addToHistory)
+                history.pushState(failedState, document.title, url);
+            else
+                history.replaceState(failedState, document.title, url);
+            notificationService.show(jsLocalizedMessages.navigationFailed, NotificationType.ERROR);
+            console.error('Navigation failed with status:', response.status);
+        }
         else {
             const html = await response.text();
 
@@ -387,6 +519,8 @@ async function updateContentAsync(url, addToHistory) {
             // update the page content
             document.querySelector('main').innerHTML = content;
             document.title = title;
+            // The page scripts may start calling the API immediately, so the outage flag must be set before they run.
+            showServerUnreachableNotificationIfNeeded();
 
             // process all scripts in order: component scripts first, then view scripts
             const componentScripts = doc.querySelectorAll('script[data-component-script]');

@@ -2,7 +2,9 @@
 using Lumina.Presentation.Web.Common.DTO.Themes;
 using Lumina.Presentation.Web.Common.Primitives;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Localization;
 using System;
+using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -17,6 +19,13 @@ public class ThemeLayoutRenderer
     // the page keys mirror the paths of the corresponding Razor views under Core/Views, so that theme templates can override them at the page, section or default scope
     private const string LAYOUT_PAGE_KEY = "shared/layout";
     private const string NAV_PAGE_KEY = "shared/nav-menu";
+    private const string SERVER_UNREACHABLE_BANNER_PAGE_KEY = "shared/server-unreachable-banner";
+
+    // The banner template is static for a theme, so it is cached, including the negative result of a theme that does not
+    // provide one, so a missing template does not cost an API round trip and a 404 log on every page render.
+    private static readonly ConcurrentDictionary<string, (string Template, DateTime ExpiresOnUtc)> s_bannerTemplateCache = [];
+    private static readonly TimeSpan s_bannerTemplateCacheDuration = TimeSpan.FromMinutes(5);
+    private static readonly TimeSpan s_missingBannerTemplateCacheDuration = TimeSpan.FromMinutes(1);
 
     private readonly ThemeService _themeService;
     private readonly ThemeTemplateEngine _templateEngine;
@@ -24,6 +33,7 @@ public class ThemeLayoutRenderer
     private readonly ThemeNavBuilder _navBuilder;
     private readonly ThemeAudioPlayerRenderer _audioPlayerRenderer;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IStringLocalizer _layoutLocalizer;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ThemeLayoutRenderer"/> class.
@@ -34,7 +44,8 @@ public class ThemeLayoutRenderer
     /// <param name="navBuilder">The builder used to produce the navigation menu model.</param>
     /// <param name="audioPlayerRenderer">The renderer used to produce the themed audio player bar.</param>
     /// <param name="httpContextAccessor">Injected accessor for the current HTTP context.</param>
-    public ThemeLayoutRenderer(ThemeService themeService, ThemeTemplateEngine templateEngine, RazorViewToStringRenderer viewRenderer, ThemeNavBuilder navBuilder, ThemeAudioPlayerRenderer audioPlayerRenderer, IHttpContextAccessor httpContextAccessor)
+    /// <param name="stringLocalizerFactory">Injected factory used to create the localizer of the layout resources.</param>
+    public ThemeLayoutRenderer(ThemeService themeService, ThemeTemplateEngine templateEngine, RazorViewToStringRenderer viewRenderer, ThemeNavBuilder navBuilder, ThemeAudioPlayerRenderer audioPlayerRenderer, IHttpContextAccessor httpContextAccessor, IStringLocalizerFactory stringLocalizerFactory)
     {
         _themeService = themeService;
         _templateEngine = templateEngine;
@@ -42,6 +53,7 @@ public class ThemeLayoutRenderer
         _navBuilder = navBuilder;
         _audioPlayerRenderer = audioPlayerRenderer;
         _httpContextAccessor = httpContextAccessor;
+        _layoutLocalizer = stringLocalizerFactory.Create("Lumina.Presentation.Web.Views.Shared._Layout", "Lumina.Presentation.Web");
     }
 
     /// <summary>
@@ -62,6 +74,7 @@ public class ThemeLayoutRenderer
             string appHead = await _viewRenderer.RenderPartialAsync("_ThemeLayoutHead", cancellationToken);
             string nav = await RenderNavAsync(themeId, cancellationToken);
             string audioPlayer = isAuthenticated ? await RenderAudioPlayerAsync(themeId, cancellationToken) : string.Empty;
+            string serverUnreachableBanner = await RenderServerUnreachableBannerAsync(themeId, cancellationToken);
             string appScripts = await _viewRenderer.RenderPartialAsync("_ThemeLayoutScripts", cancellationToken);
 
             ThemeLayoutModelDto layoutModel = new(
@@ -71,6 +84,7 @@ public class ThemeLayoutRenderer
                 nav,
                 page.Content,
                 audioPlayer,
+                serverUnreachableBanner,
                 appScripts,
                 page.Script,
                 isAuthenticated ? string.Empty : "bottom: 0px;");
@@ -138,5 +152,52 @@ public class ThemeLayoutRenderer
             return audioPlayerResult.Value;
 
         return await _viewRenderer.RenderPartialAsync("_AudioPlayer", cancellationToken);
+    }
+
+    /// <summary>
+    /// Renders the server unreachable banner of the active theme, falling back to the application Razor markup when the theme does not provide a template.
+    /// </summary>
+    /// <param name="themeId">The manifest id of the theme the layout was resolved with, so that the banner always matches the shell.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>The rendered server unreachable banner HTML.</returns>
+    private async Task<string> RenderServerUnreachableBannerAsync(string themeId, CancellationToken cancellationToken)
+    {
+        if (s_bannerTemplateCache.TryGetValue(themeId, out (string Template, DateTime ExpiresOnUtc) cached) && cached.ExpiresOnUtc > DateTime.UtcNow)
+            return await RenderBannerTemplateAsync(cached.Template, cancellationToken).ConfigureAwait(false);
+
+        string template = string.Empty;
+        try
+        {
+            ThemeRenderDocumentDto bannerDocument = await _themeService.GetRenderDocumentAsync(SERVER_UNREACHABLE_BANNER_PAGE_KEY, themeId, cancellationToken);
+            template = bannerDocument.Template;
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception)
+        {
+            // The banner is best effort: when the theme template cannot be loaded or rendered, the application Razor fallback is rendered instead.
+        }
+        s_bannerTemplateCache[themeId] = (template, DateTime.UtcNow + (string.IsNullOrEmpty(template) ? s_missingBannerTemplateCacheDuration : s_bannerTemplateCacheDuration));
+        return await RenderBannerTemplateAsync(template, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Renders a banner template, or the application fallback when the theme does not provide one.
+    /// </summary>
+    /// <param name="template">The raw banner template source, or an empty string when the theme does not provide one.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>The rendered server unreachable banner HTML.</returns>
+    private async Task<string> RenderBannerTemplateAsync(string template, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrEmpty(template))
+            return await _viewRenderer.RenderPartialAsync("_ServerUnreachableBanner", cancellationToken);
+
+        ThemeServerUnreachableBannerDto bannerModel = new(_layoutLocalizer["ServerUnreachable"].Value);
+        Result<ThemePageRenderResultDto> renderResult = _templateEngine.RenderPage(template, bannerModel);
+        return renderResult.IsSuccess
+            ? renderResult.Value.Content
+            : await _viewRenderer.RenderPartialAsync("_ServerUnreachableBanner", cancellationToken);
     }
 }

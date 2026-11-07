@@ -1,10 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.Enums.Authorization;
+using Lumina.Presentation.Web.Common.Exceptions;
+using Lumina.Presentation.Web.Common.Http;
 using Lumina.Presentation.Web.Common.Responses.Authorization;
 using Microsoft.AspNetCore.Http;
+using Polly.CircuitBreaker;
 using System;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -66,6 +70,38 @@ public class AuthorizationService : IAuthorizationService
         string? userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrEmpty(userId))
             return new GetAuthorizationResponse(Guid.Empty, string.Empty, []);
-        return await _apiHttpClient.GetAsync<GetAuthorizationResponse>($"auth/get-authorization?userId={Uri.EscapeDataString(userId)}", cancellationToken);
+        try
+        {
+            return await _apiHttpClient.GetAsync<GetAuthorizationResponse>($"auth/get-authorization?userId={Uri.EscapeDataString(userId)}", cancellationToken);
+        }
+        catch (Exception exception)
+        {
+            HttpContext? httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext is null || httpContext.RequestAborted.IsCancellationRequested)
+                throw;
+            if (!IsApiOutage(exception))
+                throw;
+            bool isPageNavigation = (httpContext.Request.Headers.Accept.Count == 0 && httpContext.Request.Headers.Range.Count == 0)
+                || httpContext.Request.Headers.Accept.Any(accept => accept?.Contains("text/html", StringComparison.OrdinalIgnoreCase) == true)
+                || string.Equals(httpContext.Request.Headers["Sec-Fetch-Mode"].ToString(), "navigate", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(httpContext.Request.Headers["Sec-Fetch-Dest"].ToString(), "document", StringComparison.OrdinalIgnoreCase);
+            if (!isPageNavigation)
+                throw;
+            // The page is still rendered while the API is unreachable, with no role and no permissions, and the request is marked so
+            // that the page reports the failure to the user. API requests keep propagating the failure as a JSON error.
+            httpContext.Items[HttpContextItemKeys.SERVER_UNREACHABLE] = true;
+            return new GetAuthorizationResponse(Guid.Empty, string.Empty, []);
+        }
+    }
+
+    /// <summary>
+    /// Determines whether the exception means that the API could not answer, as opposed to an authorization answer from the API.
+    /// </summary>
+    /// <param name="exception">The exception thrown by the API call.</param>
+    /// <returns><see langword="true"/> for a connection, timeout, circuit breaker or server failure; otherwise <see langword="false"/>.</returns>
+    private static bool IsApiOutage(Exception exception)
+    {
+        return exception is HttpRequestException or BrokenCircuitException or TaskCanceledException
+            || (exception is ApiException apiException && (int)apiException.HttpStatusCode >= 500);
     }
 }

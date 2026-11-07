@@ -529,12 +529,15 @@
         // Handle all SignalR stuff.
         function setupSignalRHandlers() {
             const onReconnecting = error => {
-                console.log(error ? `SignalR reconnected with error: ${error}` : "SignalR reconnecting...");
+                window.serverConnectionStatus.markUnreachable('scanProgressHub');
+                console.log(error ? `SignalR reconnecting with error: ${error}` : "SignalR reconnecting...");
             };
             const onReconnected = connectionId => {
+                window.serverConnectionStatus.markReachable('scanProgressHub');
                 console.log('SignalR reconnected:', connectionId);
             };
             const onClose = error => {
+                window.serverConnectionStatus.markUnreachable('scanProgressHub');
                 console.log(error ? `SignalR connection closed with error: ${error}` : "SignalR connection closed");
             };
             // Progress update handler.
@@ -678,8 +681,9 @@
         // Register cleanup for these listeners.
         cleanupFunctions.push(() => {            
             // Proper connection stop.
-            if (signalRConnection.state === 'Connected') 
-                signalRConnection.stop().then(() => console.log('SignalR connection stopped'));
+            window.serverConnectionStatus.markReachable('scanProgressHub');
+            if (signalRConnection.state !== 'Disconnected')
+                signalRConnection.stop().finally(() => window.serverConnectionStatus.markReachable('scanProgressHub'));
 
             btnScanAllLibraries.removeEventListener('click', handleScanAllLibrariesClick);
             btnCancelLibrariesScan.removeEventListener('click', handleCancelLibrariesScanClick);
@@ -702,11 +706,18 @@
             isInitialized = true;
             try {
                 await loadLibrariesAsync();
-                await signalRConnection.start();
+                try {
+                    await signalRConnection.start();
+                    window.serverConnectionStatus.markReachable('scanProgressHub');
+                } catch (err) {
+                    window.serverConnectionStatus.markUnreachable('scanProgressHub');
+                    console.error('SignalR connection failed:', err);
+                    return;
+                }
                 setupSignalRHandlers();
                 await getRunningLibraryScansAsync();
             } catch (err) {
-                console.error('SignalR connection failed:', err);
+                console.error('Failed to initialize the libraries page:', err);
             }
         }
 

@@ -41,6 +41,7 @@ public class HomeErrorEndpointTests : IClassFixture<LuminaWebFactory>
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal("text/html", response.Content.Headers.ContentType!.MediaType);
         string content = await response.Content.ReadAsStringAsync();
-        Assert.Contains("text-danger", content);
+        Assert.Contains("Navigation failed!", content);
+        Assert.Contains("data-server-unreachable-banner", content);
     }
 }

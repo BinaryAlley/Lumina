@@ -44,6 +44,7 @@ public class ThemeLayoutRendererTests
     private readonly IAuthorizationService _mockAuthorizationService;
     private readonly IView _mockHeadView;
     private readonly IView _mockAudioPlayerView;
+    private readonly IView _mockServerUnreachableBannerView;
     private readonly IView _mockScriptsView;
     private readonly IView _mockNavMenuView;
     private readonly ThemeResponseDtoFixture _themeResponseDtoFixture = new();
@@ -75,10 +76,12 @@ public class ThemeLayoutRendererTests
 
         _mockHeadView = CreateView("<head-fragment>");
         _mockAudioPlayerView = CreateView("<audio-fragment>");
+        _mockServerUnreachableBannerView = CreateView("<banner-fragment>");
         _mockScriptsView = CreateView("<scripts-fragment>");
         _mockNavMenuView = CreateView("<nav-menu-fragment>");
         _mockViewEngine.FindView(Arg.Any<ActionContext>(), "_ThemeLayoutHead", false).Returns(ViewEngineResult.Found("_ThemeLayoutHead", _mockHeadView));
         _mockViewEngine.FindView(Arg.Any<ActionContext>(), "_AudioPlayer", false).Returns(ViewEngineResult.Found("_AudioPlayer", _mockAudioPlayerView));
+        _mockViewEngine.FindView(Arg.Any<ActionContext>(), "_ServerUnreachableBanner", false).Returns(ViewEngineResult.Found("_ServerUnreachableBanner", _mockServerUnreachableBannerView));
         _mockViewEngine.FindView(Arg.Any<ActionContext>(), "_ThemeLayoutScripts", false).Returns(ViewEngineResult.Found("_ThemeLayoutScripts", _mockScriptsView));
         _mockViewEngine.FindView(Arg.Any<ActionContext>(), "_NavMenu", false).Returns(ViewEngineResult.Found("_NavMenu", _mockNavMenuView));
 
@@ -87,7 +90,7 @@ public class ThemeLayoutRendererTests
         ThemeService themeService = new(_mockApiHttpClient);
         ThemeAudioPlayerBuilder audioPlayerBuilder = new(_mockStringLocalizerFactory, _mockHttpContextAccessor);
         ThemeAudioPlayerRenderer audioPlayerRenderer = new(themeService, new ThemeTemplateEngine(), audioPlayerBuilder);
-        _sut = new ThemeLayoutRenderer(themeService, new ThemeTemplateEngine(), viewRenderer, navBuilder, audioPlayerRenderer, _mockHttpContextAccessor);
+        _sut = new ThemeLayoutRenderer(themeService, new ThemeTemplateEngine(), viewRenderer, navBuilder, audioPlayerRenderer, _mockHttpContextAccessor, _mockStringLocalizerFactory);
     }
 
     [Fact]
@@ -186,6 +189,45 @@ public class ThemeLayoutRendererTests
         // Assert
         await _mockApiHttpClient.Received(1).GetAsync<ThemeTemplateResponseDto>(layoutEndpoint, Arg.Any<CancellationToken>());
         await _mockApiHttpClient.Received(1).GetAsync<ThemeTemplateResponseDto>(navEndpoint, Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task RenderAsync_WhenThemeProvidesServerUnreachableBannerTemplate_ShouldRenderItInTheLayout()
+    {
+        // Arrange
+        _mockHttpContextAccessor.HttpContext.Returns(TestHttpContextFactory.Create(user: null));
+        ThemeResponseDto theme = _themeResponseDtoFixture.Create(themeId: "editorial-banner");
+        SetupRenderDocuments(theme, layoutTemplate: "{{title}}|{{{serverUnreachableBanner}}}", navTemplate: "nav:{{siteName}}");
+        string bannerEndpoint = ApiRoutes.Themes.GET_THEME_TEMPLATE
+            .Replace("{themeId}", "editorial-banner")
+            .Replace("{*pageKey}", "shared/server-unreachable-banner");
+        _mockApiHttpClient.GetAsync<ThemeTemplateResponseDto>(bannerEndpoint, Arg.Any<CancellationToken>())
+            .Returns(_themeTemplateResponseDtoFixture.Create(theme: theme, template: "banner:{{message}}"));
+        ThemeLayoutPageDto page = _themeLayoutPageDtoFixture.Create(title: "My Page", content: "<main>", script: string.Empty);
+
+        // Act
+        Result<string> result = await _sut.RenderAsync(page, "editorial-banner", CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.Equal("My Page|banner:Localized-ServerUnreachable", result.Value);
+    }
+
+    [Fact]
+    public async Task RenderAsync_WhenThemeDoesNotProvideServerUnreachableBannerTemplate_ShouldRenderTheApplicationFallback()
+    {
+        // Arrange
+        _mockHttpContextAccessor.HttpContext.Returns(TestHttpContextFactory.Create(user: null));
+        ThemeResponseDto theme = _themeResponseDtoFixture.Create(themeId: "editorial-without-banner");
+        SetupRenderDocuments(theme, layoutTemplate: "{{title}}|{{{serverUnreachableBanner}}}", navTemplate: "nav:{{siteName}}");
+        ThemeLayoutPageDto page = _themeLayoutPageDtoFixture.Create(title: "My Page", content: "<main>", script: string.Empty);
+
+        // Act
+        Result<string> result = await _sut.RenderAsync(page, "editorial-without-banner", CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.Equal("My Page|<banner-fragment>", result.Value);
     }
 
     /// <summary>

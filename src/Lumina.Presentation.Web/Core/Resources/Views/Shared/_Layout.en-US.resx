@@ -168,6 +168,9 @@
   <data name="Retry" xml:space="preserve">
     <value>Retry</value>
   </data>
+  <data name="ServerUnreachable" xml:space="preserve">
+    <value>Server is unreachable</value>
+  </data>
   <data name="ToggleExpanded" xml:space="preserve">
     <value>Expand or collapse player</value>
   </data>

@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Presentation.Web.Common.Http;
 using Microsoft.AspNetCore.Authorization;
-using System.Linq;
+using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -13,14 +14,17 @@ namespace Lumina.Presentation.Web.Common.Authorization;
 public class RoleAuthorizationHandler : AuthorizationHandler<RoleRequirement>
 {
     private readonly IAuthorizationService _authorizationService;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RoleAuthorizationHandler"/> class.
     /// </summary>
     /// <param name="authorizationService">Injected service for authorization checks against the remote API.</param>
-    public RoleAuthorizationHandler(IAuthorizationService authorizationService)
+    /// <param name="httpContextAccessor">Injected accessor for the current HTTP context.</param>
+    public RoleAuthorizationHandler(IAuthorizationService authorizationService, IHttpContextAccessor httpContextAccessor)
     {
         _authorizationService = authorizationService;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     /// <summary>
@@ -38,5 +42,13 @@ public class RoleAuthorizationHandler : AuthorizationHandler<RoleRequirement>
                 return;
             }
         }
+        // The authorization service marks a page navigation when the API could not answer. The page itself is still rendered, with
+        // no role granted, and it reports the failure to the user; the API remains the enforcement point for every data call.
+        // Endpoint routing passes the Endpoint, not the HttpContext, as the authorization resource, so the current request is read
+        // from the accessor instead. Only an authenticated user is allowed through, because the outage is not a reason to expose a
+        // page to an anonymous visitor.
+        HttpContext? httpContext = _httpContextAccessor.HttpContext;
+        if (httpContext?.User.Identity?.IsAuthenticated == true && httpContext.Items[HttpContextItemKeys.SERVER_UNREACHABLE] is true)
+            authorizationHandlerContext.Succeed(roleRequirement);
     }
 }

@@ -2470,3 +2470,49 @@ html.audio-player-initializing .audio-player-container {
 .statistics-delete-button {
     white-space: nowrap;
 }
+
+/* The global server unreachable banner is rendered by the active theme, or by the application fallback, and is toggled
+   by server-connection-status.js. A theme can restyle it by overriding this class or the custom properties in its own
+   stylesheet, which loads after this one. */
+.server-unreachable-banner {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 10000;
+    display: none;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 2px 16px;
+    background-color: var(--server-unreachable-background-color, #c62828);
+    color: var(--server-unreachable-text-color, #ffffff);
+    font-weight: 600;
+    text-align: center;
+    pointer-events: none;
+}
+
+.server-unreachable-banner.is-visible {
+    display: block;
+}
+
+/* The text pulses slowly, so the bar catches the eye without flashing. A theme can replace this with its own animation
+   by targeting the server-unreachable-banner-text class, or by rendering its own text wrapper. */
+.server-unreachable-banner.is-visible .server-unreachable-banner-text {
+    animation: server-unreachable-fade 3s ease-in-out infinite;
+}
+
+@keyframes server-unreachable-fade {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.45;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .server-unreachable-banner.is-visible .server-unreachable-banner-text {
+        animation: none;
+    }
+}

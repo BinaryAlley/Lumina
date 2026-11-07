@@ -13,6 +13,7 @@ namespace Lumina.Presentation.Web.Common.DTO.Themes;
 /// <param name="Nav">The rendered navigation menu of the page.</param>
 /// <param name="Content">The rendered content section of the page.</param>
 /// <param name="AudioPlayer">The rendered audio player, when the current user is authenticated.</param>
+/// <param name="ServerUnreachableBanner">The rendered server unreachable banner, placed by the layout.</param>
 /// <param name="AppScripts">The application global scripts, such as its client libraries and configuration.</param>
 /// <param name="Scripts">The rendered script section of the page.</param>
 /// <param name="MainStyle">The inline style of the main content area, used to fill the viewport when the user is not authenticated.</param>
@@ -24,6 +25,7 @@ public sealed record ThemeLayoutModelDto(
     string Nav,
     string Content,
     string AudioPlayer,
+    string ServerUnreachableBanner,
     string AppScripts,
     string Scripts,
     string MainStyle
