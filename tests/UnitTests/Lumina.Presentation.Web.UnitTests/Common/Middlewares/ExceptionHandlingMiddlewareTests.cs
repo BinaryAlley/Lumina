@@ -80,7 +80,8 @@ public class ExceptionHandlingMiddlewareTests
         string body = await ReadResponseBodyAsync(httpContext);
         using JsonDocument jsonDocument = JsonDocument.Parse(body);
         Assert.False(jsonDocument.RootElement.GetProperty("success").GetBoolean());
-        Assert.True(jsonDocument.RootElement.GetProperty("serverUnreachable").GetBoolean());
+        // An ordinary bug is not an unreachable server, so the client must not switch to the outage path for it.
+        Assert.False(jsonDocument.RootElement.GetProperty("serverUnreachable").GetBoolean());
         Assert.Equal("localized:InternalServerError", jsonDocument.RootElement.GetProperty("errorMessage").GetString());
         _mockLogger.Received(1).Log(
             LogLevel.Error,
@@ -95,6 +96,7 @@ public class ExceptionHandlingMiddlewareTests
     {
         // Arrange
         DefaultHttpContext httpContext = CreateHttpContext(culture: "de-DE");
+        httpContext.Request.Headers.Accept = "text/html";
         _nextDelegate = _ => throw new InvalidOperationException("Unexpected failure");
 
         // Act
@@ -110,6 +112,26 @@ public class ExceptionHandlingMiddlewareTests
             Arg.Any<object>(),
             Arg.Is<Exception>(exception => exception is InvalidOperationException && exception.Message == "Unexpected failure"),
             Arg.Any<Func<object, Exception?, string>>());
+    }
+
+    [Fact]
+    public async Task InvokeAsync_WhenNextThrowsNonApiExceptionAndRequestStatesNoPreference_ShouldWriteFailureJson()
+    {
+        // Arrange
+        // A caller that sends no Accept header is not proven to be a browser, so it keeps the historical JSON envelope.
+        DefaultHttpContext httpContext = CreateHttpContext();
+        _nextDelegate = _ => throw new InvalidOperationException("Unexpected failure");
+
+        // Act
+        await _sut.InvokeAsync(httpContext);
+
+        // Assert
+        Assert.Contains("application/json", httpContext.Response.ContentType);
+        string body = await ReadResponseBodyAsync(httpContext);
+        using JsonDocument jsonDocument = JsonDocument.Parse(body);
+        Assert.False(jsonDocument.RootElement.GetProperty("success").GetBoolean());
+        Assert.False(jsonDocument.RootElement.GetProperty("serverUnreachable").GetBoolean());
+        Assert.Equal("localized:InternalServerError", jsonDocument.RootElement.GetProperty("errorMessage").GetString());
     }
 
     [Fact]

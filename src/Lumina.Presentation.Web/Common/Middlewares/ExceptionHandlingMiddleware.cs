@@ -81,8 +81,19 @@ public class ExceptionHandlingMiddleware
                     serverUnreachable = IsApiOutage(ex),
                     errorMessage = _stringLocalizer["InternalServerError"].Value
                 });
-            else if (IsNavigationRequest(context))
+            else if (IsExplicitNavigationRequest(context))
                 await WriteHtmlErrorResponseAsync(context, (int)HttpStatusCode.InternalServerError, _stringLocalizer["InternalServerError"].Value).ConfigureAwait(false);
+            else if (IsNavigationRequest(context))
+            {
+                // A caller that states no preference is not necessarily a browser, so it keeps the historical JSON envelope instead of
+                // receiving an HTML page it cannot consume.
+                await WriteJsonResponseAsync(context, new
+                {
+                    success = false,
+                    serverUnreachable = IsApiOutage(ex),
+                    errorMessage = _stringLocalizer["InternalServerError"].Value
+                });
+            }
             else
                 await WriteStatusOnlyResponseAsync(context, (int)HttpStatusCode.InternalServerError).ConfigureAwait(false);
         }
@@ -344,6 +355,22 @@ public class ExceptionHandlingMiddleware
     {
         return (context.Request.Headers.Accept.Count == 0 && context.Request.Headers.Range.Count == 0)
             || context.Request.Headers.Accept.Any(accept => accept?.Contains("text/html", StringComparison.OrdinalIgnoreCase) == true)
+            || string.Equals(context.Request.Headers["Sec-Fetch-Mode"].ToString(), "navigate", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(context.Request.Headers["Sec-Fetch-Dest"].ToString(), "document", StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Checks if the current request explicitly identifies itself as a browser navigation, rather than merely stating no preference.
+    /// </summary>
+    /// <remarks>
+    /// A caller that sends no <c>Accept</c> header at all may be a script, a probe, or an API client, so it is not safe to answer it with
+    /// an HTML page. Only a request that asks for HTML or carries the browser navigation headers is treated as a page here.
+    /// </remarks>
+    /// <param name="context">The <see cref="HttpContext"/> for the current request.</param>
+    /// <returns><see langword="true"/> when the request is explicitly a browser navigation, <see langword="false"/> otherwise.</returns>
+    private static bool IsExplicitNavigationRequest(HttpContext context)
+    {
+        return context.Request.Headers.Accept.Any(accept => accept?.Contains("text/html", StringComparison.OrdinalIgnoreCase) == true)
             || string.Equals(context.Request.Headers["Sec-Fetch-Mode"].ToString(), "navigate", StringComparison.OrdinalIgnoreCase)
             || string.Equals(context.Request.Headers["Sec-Fetch-Dest"].ToString(), "document", StringComparison.OrdinalIgnoreCase);
     }
