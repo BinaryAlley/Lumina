@@ -737,10 +737,15 @@ It keeps the DOM contract the client script binds to, without any images or colo
             schedulerHubConnection.on('ScheduledJobExecutionCompletedAsync', execution => {
                 loadJobsAsync();
             });
+            schedulerHubConnection.onreconnecting(() => window.serverConnectionStatus.markUnreachable('scheduledJobsHub'));
+            schedulerHubConnection.onreconnected(() => window.serverConnectionStatus.markReachable('scheduledJobsHub'));
+            schedulerHubConnection.onclose(() => window.serverConnectionStatus.markUnreachable('scheduledJobsHub'));
 
             try {
                 await schedulerHubConnection.start();
+                window.serverConnectionStatus.markReachable('scheduledJobsHub');
             } catch (error) {
+                window.serverConnectionStatus.markUnreachable('scheduledJobsHub');
                 console.error('Failed to connect to the scheduled jobs hub:', error);
             }
         }
@@ -805,7 +810,7 @@ It keeps the DOM contract the client script binds to, without any images or colo
                 updateTimespanButton.removeEventListener('click', updateTimeSpanAsync);
                 addJobButton.removeEventListener('click', addJobAsync);
                 if (schedulerHubConnection)
-                    schedulerHubConnection.stop();
+                    schedulerHubConnection.stop().finally(() => window.serverConnectionStatus.markReachable('scheduledJobsHub'));
             });
         }
 

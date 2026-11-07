@@ -37,6 +37,12 @@ public class StubApiHttpClient : IApiHttpClient
     public GetAuthorizationResponse AuthorizationResponse { get; set; } = new(Guid.NewGuid(), "Admin", Enum.GetValues<AuthorizationPermission>());
 
     /// <summary>
+    /// Gets or sets the exception thrown when the <c>auth/get-authorization</c> endpoint is called, or <see langword="null"/> to return
+    /// <see cref="AuthorizationResponse"/>. It simulates an API outage during authorization.
+    /// </summary>
+    public Exception? AuthorizationException { get; set; }
+
+    /// <summary>
     /// Gets or sets the initialization response returned for the <c>initialization</c> endpoint.
     /// </summary>
     public InitializationResponse InitializationResponse { get; set; } = new() { IsInitialized = true };
@@ -198,6 +204,7 @@ public class StubApiHttpClient : IApiHttpClient
         _deleteSuccessEndpoints.Clear();
         _deleteExceptions.Clear();
         _blobResponse = null;
+        AuthorizationException = null;
         GetEndpointsCalled.Clear();
         PostRequests.Clear();
         PutRequests.Clear();
@@ -219,7 +226,11 @@ public class StubApiHttpClient : IApiHttpClient
         if (endpoint.StartsWith(ApiRoutes.Initialization.CHECK_INITIALIZATION, StringComparison.OrdinalIgnoreCase))
             return Task.FromResult((TResponse)(object)InitializationResponse);
         if (endpoint.Contains("auth/get-authorization", StringComparison.OrdinalIgnoreCase))
+        {
+            if (AuthorizationException is not null)
+                throw AuthorizationException;
             return Task.FromResult((TResponse)(object)AuthorizationResponse);
+        }
         throw new InvalidOperationException($"No GET response is registered for the endpoint '{endpoint}'.");
     }
 

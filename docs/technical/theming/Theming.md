@@ -13,6 +13,7 @@ The web client of Lumina is a themed shell: every page is rendered inside the te
     - [Safety Limits](#safety-limits)
     - [Template Resolution](#template-resolution)
     - [The Layout Template (shared/layout)](#the-layout-template-sharedlayout)
+    - [The Server Unreachable Banner](#the-server-unreachable-banner)
     - [The Audio Player Bar](#the-audio-player-bar)
       - [The VU Meter](#the-vu-meter)
       - [Play Affordances on the Music Pages](#play-affordances-on-the-music-pages)
@@ -170,6 +171,7 @@ Known page keys:
 | --- | --- |
 | `shared/layout` | The layout that wraps the shell of every page. |
 | `shared/nav-menu` | The navigation menu of the theme. |
+| `shared/server-unreachable-banner` | The banner shown while the server is unreachable. |
 | `shared/not-found` | The 404 page. |
 | `shared/audio-player` | The audio player bar shell. |
 | `shared/audio-player/queue-item` | The queue item of the audio player bar. |
@@ -196,6 +198,7 @@ Every page is rendered inside the layout template. The layout receives a model w
 | `nav` | The fully rendered navigation menu HTML. |
 | `content` | The fully rendered content section of the page. |
 | `audioPlayer` | The rendered audio player when the user is authenticated, empty otherwise. |
+| `serverUnreachableBanner` | The rendered server unreachable banner, placed by the layout. |
 | `appScripts` | The global scripts of the application. |
 | `scripts` | The rendered script section of the page. |
 | `mainStyle` | An inline style for the main content area, `bottom: 0px;` when the user is not authenticated and empty otherwise. |
@@ -213,6 +216,7 @@ The layout template of the bundled theme shows the intended shape:
     <link rel="stylesheet" href="{{assetBase}}/site.css">
 </head>
 <body>
+    {{&serverUnreachableBanner}}
     <div id="page">
         <header>
             {{&nav}}
@@ -238,6 +242,44 @@ The layout template of the bundled theme shows the intended shape:
 ```
 
 The rendered page content, navigation and scripts are inserted unescaped with `{{&...}}`, because they are trusted application HTML. The layout is best effort: when the theme cannot be loaded or rendered, the application falls back to its built-in layout, so a broken theme never takes the whole site down.
+
+### The Server Unreachable Banner
+
+The server unreachable banner is a theme component, rendered from the `shared/server-unreachable-banner` template and placed by the layout through its `serverUnreachableBanner` field:
+
+```html
+<body>
+    {{&serverUnreachableBanner}}
+    ...
+</body>
+```
+
+The template receives this model:
+
+| Field | Content |
+| --- | --- |
+| `message` | The localized message that tells the user that the server is unreachable. |
+
+The fallback template shows the shape a theme should keep:
+
+```html
+<div id="server-unreachable-banner" class="server-unreachable-banner" data-server-unreachable-banner role="status" aria-live="polite" aria-atomic="true">
+    <span class="server-unreachable-banner-text">{{message}}</span>
+</div>
+```
+
+The application fallback stylesheet gives the text a slow opacity pulse through the `server-unreachable-banner-text` class, and disables it when the user asks for reduced motion. A theme can keep that class and animation, override the animation, or render its own wrapper and animate it instead.
+
+The root element of the template must carry the `data-server-unreachable-banner` hook. It should be hidden while the `is-visible` class is absent and shown while that class is present; the global script only adds and removes that class. The theme owns the markup, the placement in the layout, the position, the size, the background, including background images and extra child elements, and every other visual aspect.
+
+When the theme does not provide the template, the application renders its own fallback markup with the `server-unreachable-banner` class. The application fallback stylesheet hides it by default and fixes it to the bottom edge of the viewport, full width, with a red background and white text, and it does not block pointer interaction with the page. A theme that uses the fallback class can restyle it directly or through these custom properties:
+
+| Custom property | Default | Meaning |
+| --- | --- | --- |
+| `--server-unreachable-background-color` | `#c62828` | The background color of the banner. |
+| `--server-unreachable-text-color` | `#ffffff` | The text color of the banner. |
+
+The banner is shown while the application health probe cannot reach the API, while an API call of the page fails before the server answers (a network failure or a timeout, reported through the `api` source of the global script), and while a SignalR connection of the page is lost. A successful health probe only clears the probe source and the API-call source, so a disconnected SignalR hub keeps the banner visible until that connection reconnects. Because the element is part of the layout, it stays in the page across the AJAX navigation that swaps the content section.
 
 ### The Audio Player Bar
 

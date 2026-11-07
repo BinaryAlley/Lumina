@@ -66,9 +66,59 @@ public class ExceptionHandlingMiddlewareTests
     }
 
     [Fact]
-    public async Task InvokeAsync_WhenNextThrowsNonApiException_ShouldLogErrorAndWriteFailureJson()
+    public async Task InvokeAsync_WhenNextThrowsNonApiExceptionAndApiRequest_ShouldLogErrorAndWriteFailureJson()
     {
         // Arrange
+        DefaultHttpContext httpContext = CreateHttpContext(isApiRequest: true);
+        _nextDelegate = _ => throw new InvalidOperationException("Unexpected failure");
+
+        // Act
+        await _sut.InvokeAsync(httpContext);
+
+        // Assert
+        Assert.Contains("application/json", httpContext.Response.ContentType);
+        string body = await ReadResponseBodyAsync(httpContext);
+        using JsonDocument jsonDocument = JsonDocument.Parse(body);
+        Assert.False(jsonDocument.RootElement.GetProperty("success").GetBoolean());
+        // An ordinary bug is not an unreachable server, so the client must not switch to the outage path for it.
+        Assert.False(jsonDocument.RootElement.GetProperty("serverUnreachable").GetBoolean());
+        Assert.Equal("localized:InternalServerError", jsonDocument.RootElement.GetProperty("errorMessage").GetString());
+        _mockLogger.Received(1).Log(
+            LogLevel.Error,
+            Arg.Any<EventId>(),
+            Arg.Any<object>(),
+            Arg.Is<Exception>(exception => exception is InvalidOperationException && exception.Message == "Unexpected failure"),
+            Arg.Any<Func<object, Exception?, string>>());
+    }
+
+    [Fact]
+    public async Task InvokeAsync_WhenNextThrowsNonApiExceptionAndPageRequest_ShouldWriteHtmlErrorPage()
+    {
+        // Arrange
+        DefaultHttpContext httpContext = CreateHttpContext(culture: "de-DE");
+        httpContext.Request.Headers.Accept = "text/html";
+        _nextDelegate = _ => throw new InvalidOperationException("Unexpected failure");
+
+        // Act
+        await _sut.InvokeAsync(httpContext);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status500InternalServerError, httpContext.Response.StatusCode);
+        Assert.Contains("text/html", httpContext.Response.ContentType);
+        Assert.Contains("localized:InternalServerError", await ReadResponseBodyAsync(httpContext));
+        _mockLogger.Received(1).Log(
+            LogLevel.Error,
+            Arg.Any<EventId>(),
+            Arg.Any<object>(),
+            Arg.Is<Exception>(exception => exception is InvalidOperationException && exception.Message == "Unexpected failure"),
+            Arg.Any<Func<object, Exception?, string>>());
+    }
+
+    [Fact]
+    public async Task InvokeAsync_WhenNextThrowsNonApiExceptionAndRequestStatesNoPreference_ShouldWriteFailureJson()
+    {
+        // Arrange
+        // A caller that sends no Accept header is not proven to be a browser, so it keeps the historical JSON envelope.
         DefaultHttpContext httpContext = CreateHttpContext();
         _nextDelegate = _ => throw new InvalidOperationException("Unexpected failure");
 
@@ -80,13 +130,24 @@ public class ExceptionHandlingMiddlewareTests
         string body = await ReadResponseBodyAsync(httpContext);
         using JsonDocument jsonDocument = JsonDocument.Parse(body);
         Assert.False(jsonDocument.RootElement.GetProperty("success").GetBoolean());
-        Assert.Equal("Unexpected failure", jsonDocument.RootElement.GetProperty("errorMessage").GetString());
-        _mockLogger.Received(1).Log(
-            LogLevel.Error,
-            Arg.Any<EventId>(),
-            Arg.Any<object>(),
-            Arg.Is<Exception>(exception => exception is InvalidOperationException && exception.Message == "Unexpected failure"),
-            Arg.Any<Func<object, Exception?, string>>());
+        Assert.False(jsonDocument.RootElement.GetProperty("serverUnreachable").GetBoolean());
+        Assert.Equal("localized:InternalServerError", jsonDocument.RootElement.GetProperty("errorMessage").GetString());
+    }
+
+    [Fact]
+    public async Task InvokeAsync_WhenNextThrowsNonApiExceptionAndRawRequest_ShouldWriteStatusCodeWithoutBody()
+    {
+        // Arrange
+        DefaultHttpContext httpContext = CreateHttpContext();
+        httpContext.Request.Headers.Accept = "audio/mpeg";
+        _nextDelegate = _ => throw new InvalidOperationException("Unexpected failure");
+
+        // Act
+        await _sut.InvokeAsync(httpContext);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status500InternalServerError, httpContext.Response.StatusCode);
+        Assert.Equal(0, httpContext.Response.Body.Length);
     }
 
     [Fact]
@@ -297,9 +358,45 @@ public class ExceptionHandlingMiddlewareTests
         await _sut.InvokeAsync(httpContext);
 
         // Assert
-        string errorMessage = await ReadErrorMessageAsync(httpContext);
+        string body = await ReadResponseBodyAsync(httpContext);
+        using JsonDocument jsonDocument = JsonDocument.Parse(body);
+        string errorMessage = jsonDocument.RootElement.GetProperty("errorMessage").GetString() ?? string.Empty;
         Assert.Contains("An error occurred.", errorMessage);
         Assert.Contains("localized:InternalServerError", errorMessage);
+        Assert.True(jsonDocument.RootElement.GetProperty("serverUnreachable").GetBoolean());
+    }
+
+    [Fact]
+    public async Task InvokeAsync_WhenApiExceptionHasNoProblemDetailsAndPageRequest_ShouldWriteHtmlErrorPage()
+    {
+        // Arrange
+        DefaultHttpContext httpContext = CreateHttpContext(culture: "en-US");
+        _nextDelegate = _ => throw new ApiException(null, HttpStatusCode.InternalServerError, "/api/v1/libraries/1");
+
+        // Act
+        await _sut.InvokeAsync(httpContext);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status500InternalServerError, httpContext.Response.StatusCode);
+        Assert.Contains("text/html", httpContext.Response.ContentType);
+        Assert.Contains("localized:InternalServerError", await ReadResponseBodyAsync(httpContext));
+    }
+
+    [Fact]
+    public async Task InvokeAsync_WhenApiExceptionHasClientErrorAndPageRequest_ShouldWriteHtmlErrorPageWithTheRealStatusAndLocalizedMessage()
+    {
+        // Arrange
+        DefaultHttpContext httpContext = CreateHttpContext(culture: "en-US");
+        ProblemDetailsDto problemDetails = _problemDetailsDtoFixture.Create(detail: "Validation.Failed", title: "General.Validation", status: 422);
+        _nextDelegate = _ => throw new ApiException(problemDetails, (HttpStatusCode)422);
+
+        // Act
+        await _sut.InvokeAsync(httpContext);
+
+        // Assert
+        Assert.Equal(422, httpContext.Response.StatusCode);
+        Assert.Contains("text/html", httpContext.Response.ContentType);
+        Assert.Contains("localized:Validation.Failed", await ReadResponseBodyAsync(httpContext));
     }
 
     /// <summary>

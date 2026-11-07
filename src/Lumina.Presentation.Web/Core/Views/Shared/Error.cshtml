@@ -1,26 +1,38 @@
 @using Lumina.Presentation.Web.Common.DTO.Common
+@using Lumina.Presentation.Web.Common.Services
+@using Microsoft.Extensions.Localization
+
 @model ErrorViewDto
+@inject IStringLocalizerFactory _stringLocalizerFactory
+
 @{
     ViewData["Title"] = "Error";
+    var scriptId = ScriptIdentifierHelper.GenerateScriptId();
+    var localizer = _stringLocalizerFactory.Create("Lumina.Presentation.Web.Views.Shared._Layout", "Lumina.Presentation.Web");
 }
 
-<h1 class="text-danger">Error.</h1>
-<h2 class="text-danger">An error occurred while processing your request.</h2>
+<div style="display: grid; grid-template-rows: auto 1fr;">
+    <div style="min-height: 1rem;"></div>
+    <div class="enlightenment-panel shadow-effect p-2 mx-auto panel w-55 mb-10" style="min-width: 320px;">
+        <div class="shine-effect"></div>
+        <div class="text-center w-100">
+            <p class="invalid-feedback f-18 w-100"><b>@localizer["Error"]</b></p>
+            <p class="invalid-feedback f-18 w-100"><b>@localizer["NavigationFailed"]</b></p>
+            @if (Model.ShouldShowRequestId)
+            {
+                <p class="text-disabled w-100">
+                    <strong>Request ID:</strong> <code>@Model.RequestId</code>
+                </p>
+            }
+        </div>
+    </div>
+</div>
 
-@if (Model.ShouldShowRequestId)
-{
-    <p>
-        <strong>Request ID:</strong> <code>@Model.RequestId</code>
-    </p>
+@section Scripts {
+    <script type="text/plain" data-form="@scriptId">
+        // The page is the navigation failure fallback, so the user is told that the page could not be loaded. When a marker
+        // driven notification was already shown for this page, it is not repeated.
+        if (!window.isServerUnreachable)
+            notificationService.show(jsLocalizedMessages.navigationFailed, NotificationType.ERROR);
+    </script>
 }
-
-<h3>Development Mode</h3>
-<p>
-    Swapping to <strong>Development</strong> environment will display more detailed information about the error that occurred.
-</p>
-<p>
-    <strong>The Development environment shouldn't be enabled for deployed applications.</strong>
-    It can result in displaying sensitive information from exceptions to end users.
-    For local debugging, enable the <strong>Development</strong> environment by setting the <strong>ASPNETCORE_ENVIRONMENT</strong> environment variable to <strong>Development</strong>
-    and restarting the app.
-</p>

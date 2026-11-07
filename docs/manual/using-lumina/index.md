@@ -25,6 +25,8 @@ The header menu rearranges itself depending on who you are. Everyone sees a site
 
 The home page is your catalogue: a grid of the libraries you are allowed to see, each shown as a card with its cover when it has one. Selecting a card opens that library's browsing page. Some library types do not have a browsing page yet, and their cards appear as plain panels rather than links.
 
+When the server cannot be reached, Lumina keeps the page you asked for and shows a red banner along the bottom. The banner belongs to the active theme, so its position, size and look can differ between themes.
+
 ## Your account
 
 Accounts are local to your Lumina server. From the account section you can:

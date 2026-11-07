@@ -1,1 +1,7 @@
+@using Lumina.Presentation.Web.Common.Http
 <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+<script>
+    // Set before any page script runs, so the API helpers suppress their duplicate error notifications when the page was
+    // rendered while the API was unreachable, and the page only shows the single navigation failed notification.
+    window.isServerUnreachable = @(ViewContext.HttpContext.Items[HttpContextItemKeys.SERVER_UNREACHABLE] is true ? "true" : "false");
+</script>

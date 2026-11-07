@@ -6,12 +6,16 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Polly.CircuitBreaker;
 #endregion
 
 namespace Lumina.Presentation.Web.Common.Middlewares;
@@ -67,12 +71,31 @@ public class ExceptionHandlingMiddleware
                 context.Abort();
                 return;
             }
-            // return a JSON result with the error details
-            await WriteJsonResponseAsync(context, new
+            // A page navigation is answered with an HTML error page at the same address, so the browser never leaves the page the user
+            // asked for and never shows raw JSON. A JSON caller still receives the JSON error, and any other caller, like a media request,
+            // receives a bare status code, because neither an HTML page nor a JSON body is a representation such a caller can consume.
+            if (IsJsonRequest(context))
+                await WriteJsonResponseAsync(context, new
+                {
+                    success = false,
+                    serverUnreachable = IsApiOutage(ex),
+                    errorMessage = _stringLocalizer["InternalServerError"].Value
+                });
+            else if (IsExplicitNavigationRequest(context))
+                await WriteHtmlErrorResponseAsync(context, (int)HttpStatusCode.InternalServerError, _stringLocalizer["InternalServerError"].Value).ConfigureAwait(false);
+            else if (IsNavigationRequest(context))
             {
-                success = false,
-                errorMessage = ex.Message
-            });
+                // A caller that states no preference is not necessarily a browser, so it keeps the historical JSON envelope instead of
+                // receiving an HTML page it cannot consume.
+                await WriteJsonResponseAsync(context, new
+                {
+                    success = false,
+                    serverUnreachable = IsApiOutage(ex),
+                    errorMessage = _stringLocalizer["InternalServerError"].Value
+                });
+            }
+            else
+                await WriteStatusOnlyResponseAsync(context, (int)HttpStatusCode.InternalServerError).ConfigureAwait(false);
         }
     }
 
@@ -169,19 +192,72 @@ public class ExceptionHandlingMiddleware
     /// </summary>
     private async Task HandleGenericApiErrorAsync(HttpContext context, ApiException apiException)
     {
-        // JSON callers and page navigations get the localized error message; any other caller, like an audio request, is answered with
-        // a bare status code, because a JSON body is not a representation such a caller can consume.
-        if (IsJsonRequest(context) || IsNavigationRequest(context))
+        // JSON callers get the localized error message, page navigations get an HTML error page at the same address, so the browser never
+        // leaves the page the user asked for and never shows raw JSON, and any other caller, like an audio request, is answered with a
+        // bare status code, because neither a JSON body nor an HTML page is a representation such a caller can consume.
+        if (IsJsonRequest(context))
         {
             string errorMessage = BuildErrorMessage(apiException);
             await WriteJsonResponseAsync(context, new
             {
                 success = false,
+                serverUnreachable = (int)apiException.HttpStatusCode >= 500,
                 errorMessage
             });
         }
+        else if (IsNavigationRequest(context))
+        {
+            bool isServerError = (int)apiException.HttpStatusCode >= 500;
+            string message = isServerError ? _stringLocalizer["InternalServerError"].Value : BuildErrorMessage(apiException);
+            await WriteHtmlErrorResponseAsync(context, (int)apiException.HttpStatusCode, message).ConfigureAwait(false);
+        }
         else
             await WriteStatusOnlyResponseAsync(context, (int)apiException.HttpStatusCode).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Determines whether the exception means that the server could not answer, as opposed to an answer the server produced.
+    /// </summary>
+    /// <param name="exception">The exception thrown while handling the request.</param>
+    /// <returns><see langword="true"/> for a connection, timeout, circuit breaker or server failure; otherwise <see langword="false"/>.</returns>
+    private static bool IsApiOutage(Exception exception)
+    {
+        return exception is HttpRequestException or BrokenCircuitException or TaskCanceledException
+            || (exception is ApiException apiException && (int)apiException.HttpStatusCode >= 500);
+    }
+
+    /// <summary>
+    /// Writes a standalone HTML error page to the client, keeping the browser on the requested address.
+    /// </summary>
+    /// <param name="context">The <see cref="HttpContext"/> for the current request.</param>
+    /// <param name="statusCode">The status code to answer with.</param>
+    /// <param name="message">The localized message to show on the page.</param>
+    private async Task WriteHtmlErrorResponseAsync(HttpContext context, int statusCode, string message)
+    {
+        context.Response.StatusCode = statusCode;
+        context.Response.ContentType = "text/html; charset=utf-8";
+        context.Response.Headers.CacheControl = "no-store";
+        string encodedMessage = HtmlEncoder.Default.Encode(message);
+        string encodedTitle = HtmlEncoder.Default.Encode(_stringLocalizer["Error"].Value);
+        string language = CultureInfo.CurrentUICulture.Name;
+        await context.Response.WriteAsync($$"""
+            <!DOCTYPE html>
+            <html lang="{{language}}">
+            <head>
+                <meta charset="utf-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                <title>{{encodedTitle}}</title>
+                <style>
+                    body { font-family: sans-serif; margin: 2rem; }
+                    h1 { color: #c62828; }
+                </style>
+            </head>
+            <body>
+                <h1>{{encodedTitle}}</h1>
+                <p>{{encodedMessage}}</p>
+            </body>
+            </html>
+            """).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -279,6 +355,22 @@ public class ExceptionHandlingMiddleware
     {
         return (context.Request.Headers.Accept.Count == 0 && context.Request.Headers.Range.Count == 0)
             || context.Request.Headers.Accept.Any(accept => accept?.Contains("text/html", StringComparison.OrdinalIgnoreCase) == true)
+            || string.Equals(context.Request.Headers["Sec-Fetch-Mode"].ToString(), "navigate", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(context.Request.Headers["Sec-Fetch-Dest"].ToString(), "document", StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Checks if the current request explicitly identifies itself as a browser navigation, rather than merely stating no preference.
+    /// </summary>
+    /// <remarks>
+    /// A caller that sends no <c>Accept</c> header at all may be a script, a probe, or an API client, so it is not safe to answer it with
+    /// an HTML page. Only a request that asks for HTML or carries the browser navigation headers is treated as a page here.
+    /// </remarks>
+    /// <param name="context">The <see cref="HttpContext"/> for the current request.</param>
+    /// <returns><see langword="true"/> when the request is explicitly a browser navigation, <see langword="false"/> otherwise.</returns>
+    private static bool IsExplicitNavigationRequest(HttpContext context)
+    {
+        return context.Request.Headers.Accept.Any(accept => accept?.Contains("text/html", StringComparison.OrdinalIgnoreCase) == true)
             || string.Equals(context.Request.Headers["Sec-Fetch-Mode"].ToString(), "navigate", StringComparison.OrdinalIgnoreCase)
             || string.Equals(context.Request.Headers["Sec-Fetch-Dest"].ToString(), "document", StringComparison.OrdinalIgnoreCase);
     }

@@ -168,6 +168,9 @@
   <data name="Retry" xml:space="preserve">
     <value>Reîncercare</value>
   </data>
+  <data name="ServerUnreachable" xml:space="preserve">
+    <value>Serverul nu este disponibil</value>
+  </data>
   <data name="ToggleExpanded" xml:space="preserve">
     <value>Extinde sau restrânge playerul</value>
   </data>

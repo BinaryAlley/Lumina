@@ -16,9 +16,11 @@
     var globalConfiguration = {
         serverBasePath: '@(_serverConfigurationModel.Value.BaseAddress):@(_serverConfigurationModel.Value.Port)',
         apiBasePath: '@(_serverConfigurationModel.Value.BaseAddress):@(_serverConfigurationModel.Value.Port)/api/v@(_serverConfigurationModel.Value.ApiVersion)',
+        healthCheckUrl: '@Url.Content("~/health/ready")'
     };
     var jsLocalizedMessages = {
         navigationFailed: '@localizer["NavigationFailed"]',
+        serverUnreachable: @Json.Serialize(localizer["ServerUnreachable"].Value)
     };
     var jsLocalizedDialogs = {
         ok: '@localizer["Ok"]',
@@ -139,6 +141,7 @@
 <script defer src="~/js/notifications.js" asp-append-version="true"></script>
 <script defer src="~/js/dialogs.js" asp-append-version="true"></script>
 <script defer src="~/js/image-viewer.js" asp-append-version="true"></script>
+<script defer src="~/js/server-connection-status.js" asp-append-version="true"></script>
 <script defer src="~/js/site.js" asp-append-version="true"></script>
 <script defer src="~/js/playlists.js" asp-append-version="true"></script>
 <script defer src="~/js/favorites.js" asp-append-version="true"></script>
