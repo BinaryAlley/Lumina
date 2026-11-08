@@ -28,7 +28,6 @@ internal class OpenLibrarySearchDocumentResponseFixture
     /// <param name="languages">Optional. The languages of the search document.</param>
     /// <param name="publishers">Optional. The publishers of the search document.</param>
     /// <param name="subjects">Optional. The subjects of the search document.</param>
-    /// <param name="publishPlaces">Optional. The publication places of the search document.</param>
     /// <param name="numberOfPagesMedian">Optional. The median number of pages of the search document.</param>
     /// <param name="ratingsAverage">Optional. The average rating of the search document.</param>
     /// <param name="ratingsCount">Optional. The number of ratings of the search document.</param>
@@ -50,7 +49,6 @@ internal class OpenLibrarySearchDocumentResponseFixture
         List<string>? languages = null,
         List<string>? publishers = null,
         List<string>? subjects = null,
-        List<string>? publishPlaces = null,
         int? numberOfPagesMedian = null,
         decimal? ratingsAverage = null,
         int? ratingsCount = null,
@@ -73,7 +71,6 @@ internal class OpenLibrarySearchDocumentResponseFixture
             Languages = languages ?? [],
             Publishers = publishers ?? [],
             Subjects = subjects ?? [],
-            PublishPlaces = publishPlaces ?? [],
             NumberOfPagesMedian = numberOfPagesMedian,
             RatingsAverage = ratingsAverage,
             RatingsCount = ratingsCount,

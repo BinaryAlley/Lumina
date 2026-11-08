@@ -48,10 +48,10 @@ internal sealed record OpenLibraryEditionResponse
     public List<string> Publishers { get; init; } = [];
 
     /// <summary>
-    /// Gets the publication places of the edition.
+    /// Gets the MARC 21 country code of the publication place of the edition.
     /// </summary>
-    [JsonPropertyName("publish_places")]
-    public List<string> PublishPlaces { get; init; } = [];
+    [JsonPropertyName("publish_country")]
+    public string? PublishCountry { get; init; }
 
     /// <summary>
     /// Gets the number of pages of the edition.

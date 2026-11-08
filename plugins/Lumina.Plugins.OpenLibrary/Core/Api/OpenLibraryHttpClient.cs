@@ -37,7 +37,7 @@ internal sealed class OpenLibraryHttpClient
 
     private const string SEARCH_FIELDS =
         "key,title,author_name,author_key,first_publish_year,edition_key,isbn," +
-        "language,publisher,subject,publish_place,number_of_pages_median," +
+        "language,publisher,subject,number_of_pages_median," +
         "ratings_average,ratings_count,id_amazon,id_goodreads,id_google," +
         "id_librarything,lccn,oclc";
 
