@@ -245,6 +245,7 @@
   <Folder Name="/docs/technical/requests/library/written-content-library/book-library/" />
   <Folder Name="/docs/technical/requests/library/written-content-library/book-library/books/">
     <File Path="../docs/technical/requests/library/written-content-library/book-library/books/AddBook.http" />
+    <File Path="../docs/technical/requests/library/written-content-library/book-library/books/DeleteBook.http" />
     <File Path="../docs/technical/requests/library/written-content-library/book-library/books/GetBook.http" />
     <File Path="../docs/technical/requests/library/written-content-library/book-library/books/GetBooks.http" />
     <File Path="../docs/technical/requests/library/written-content-library/book-library/books/GetBooksLite.http" />

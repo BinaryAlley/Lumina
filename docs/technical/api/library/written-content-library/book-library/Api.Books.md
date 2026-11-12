@@ -32,6 +32,7 @@
     - [Get Reading Section](#get-reading-section)
       - [Get Reading Section Request](#get-reading-section-request)
       - [Get Reading Section Response](#get-reading-section-response)
+    - [Delete Book](#delete-book)
 
 ## Book
 
@@ -870,3 +871,15 @@ Returns the binary resource identified by `resourceKey` of the book identified b
 ```
 
 The response is the raw bytes of the resource, served with the `Content-Type` of the resource and with `X-Content-Type-Options: nosniff`. A resource whose declared media type could be rendered as an active document (for example an SVG) is served as an opaque binary download instead.
+
+### Delete Book
+
+```js
+DELETE api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books/{bookId}
+```
+
+```js
+200 Ok
+```
+
+Deletes the book identified by the route, together with its stored artwork.
