@@ -15,6 +15,7 @@ public static partial class ApiRoutes
         public const string GET_BOOKS_LITE = "/libraries/{libraryId}/books/lite";
         public const string ADD_BOOK = "/libraries/{libraryId}/books";
         public const string UPDATE_BOOK = "/libraries/{libraryId}/books/{bookId}";
+        public const string DELETE_BOOK = "/libraries/{libraryId}/books/{bookId}";
         public const string UPDATE_BOOK_COVER = "/libraries/{libraryId}/books/{bookId}/cover";
         public const string GET_BOOK_READING_MANIFEST = "/libraries/{libraryId}/books/{bookId}/reading/manifest";
         public const string GET_BOOK_READING_AVAILABILITY = "/libraries/{libraryId}/books/{bookId}/reading/availability";
