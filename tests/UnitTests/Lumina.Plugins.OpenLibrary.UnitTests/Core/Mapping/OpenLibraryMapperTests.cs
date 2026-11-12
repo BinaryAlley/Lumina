@@ -160,7 +160,6 @@ public class OpenLibraryMapperTests
             authorNames: ["Search Author"],
             firstPublishYear: 2003,
             publishers: ["Search Publisher"],
-            publishPlaces: ["London"],
             subjects: ["Science fiction", "Space"],
             isbns: ["978-0-306-40615-7"],
             numberOfPagesMedian: 250,
@@ -205,7 +204,7 @@ public class OpenLibraryMapperTests
             title: "Edition Title",
             publishDate: "2010-05-01",
             publishers: ["Publisher Co"],
-            publishPlaces: ["New York"],
+            publishCountry: "nyu",
             numberOfPages: 320,
             physicalFormat: "Hardcover",
             editionName: "First Edition",
@@ -243,7 +242,7 @@ public class OpenLibraryMapperTests
         Assert.Equal(1987, result.ReleaseInfo.OriginalReleaseYear);
         Assert.Equal(new DateOnly(2010, 5, 1), result.ReleaseInfo.ReReleaseDate);
         Assert.Equal(2010, result.ReleaseInfo.ReReleaseYear);
-        Assert.Null(result.ReleaseInfo.ReleaseCountry);
+        Assert.Equal(ReleaseCountry.US, result.ReleaseInfo.ReleaseCountry);
         Assert.Equal("First Edition", result.ReleaseInfo.ReleaseVersion);
         GenreDto genre = Assert.Single(result.Genres!);
         Assert.Equal("Fantasy", genre.Name);
@@ -280,6 +279,33 @@ public class OpenLibraryMapperTests
         Assert.Equal(5m, mappedRating.MaxValue);
         Assert.Equal(BookRatingSource.OpenLibrary, mappedRating.Source);
         Assert.Equal(100, mappedRating.VoteCount);
+    }
+
+    [Theory]
+    [InlineData("nyu", ReleaseCountry.US)] // A MARC 21 state code that stands for the United States.
+    [InlineData("xxu", ReleaseCountry.US)] // The MARC 21 country code of the United States.
+    [InlineData("enk", ReleaseCountry.GB)] // The MARC 21 country code of England.
+    [InlineData("ENK", ReleaseCountry.GB)] // The code differs only in casing.
+    [InlineData("gw ", ReleaseCountry.DE)] // A two letter MARC 21 code, padded with a trailing space.
+    [InlineData("fr", ReleaseCountry.FR)] // A two letter MARC 21 code without padding.
+    [InlineData("abc", ReleaseCountry.CA)] // A MARC 21 province code that stands for Canada.
+    [InlineData("aca", ReleaseCountry.AU)] // A MARC 21 territory code that stands for Australia.
+    [InlineData("uk", ReleaseCountry.GB)] // A discontinued MARC 21 code that still appears in catalogued records.
+    [InlineData("cs", ReleaseCountry.CZ)] // A discontinued MARC 21 code, mapped to the country that succeeded it.
+    [InlineData("vp", null)] // A MARC 21 code that stands for various places, with no equivalent release country.
+    [InlineData("zzz", null)] // An unknown MARC 21 code.
+    [InlineData("", null)] // An empty MARC 21 code.
+    public void MapDetailed_WhenEditionHasPublishCountry_ShouldMapTheMarcCountryCode(string? publishCountry, ReleaseCountry? expected)
+    {
+        // Arrange
+        BookMetadataLookupDto lookup = _bookMetadataLookupDtoFixture.Create();
+        OpenLibraryEditionResponse edition = _openLibraryEditionResponseFixture.Create(publishCountry: publishCountry);
+
+        // Act
+        BookMetadataDto result = OpenLibraryMapper.MapDetailed(lookup, edition, null, [], null);
+
+        // Assert
+        Assert.Equal(expected, result.ReleaseInfo!.ReleaseCountry);
     }
 
     [Fact]

@@ -25,7 +25,7 @@ internal class OpenLibraryEditionResponseFixture
     /// <param name="notes">Optional. The notes of the edition.</param>
     /// <param name="publishDate">Optional. The publication date of the edition.</param>
     /// <param name="publishers">Optional. The publishers of the edition.</param>
-    /// <param name="publishPlaces">Optional. The publication places of the edition.</param>
+    /// <param name="publishCountry">Optional. The MARC 21 country code of the publication place of the edition.</param>
     /// <param name="numberOfPages">Optional. The number of pages of the edition.</param>
     /// <param name="physicalFormat">Optional. The physical format of the edition.</param>
     /// <param name="editionName">Optional. The name of the edition.</param>
@@ -49,7 +49,7 @@ internal class OpenLibraryEditionResponseFixture
         JsonElement? notes = null,
         string? publishDate = null,
         List<string>? publishers = null,
-        List<string>? publishPlaces = null,
+        string? publishCountry = null,
         int? numberOfPages = null,
         string? physicalFormat = null,
         string? editionName = null,
@@ -74,7 +74,7 @@ internal class OpenLibraryEditionResponseFixture
             Notes = notes ?? default,
             PublishDate = publishDate,
             Publishers = publishers ?? [],
-            PublishPlaces = publishPlaces ?? [],
+            PublishCountry = publishCountry,
             NumberOfPages = numberOfPages,
             PhysicalFormat = physicalFormat,
             EditionName = editionName,

@@ -71,12 +71,6 @@ internal sealed record OpenLibrarySearchDocumentResponse
     public List<string> Subjects { get; init; } = [];
 
     /// <summary>
-    /// Gets the publication places of the search document.
-    /// </summary>
-    [JsonPropertyName("publish_place")]
-    public List<string> PublishPlaces { get; init; } = [];
-
-    /// <summary>
     /// Gets the median number of pages of the search document.
     /// </summary>
     [JsonPropertyName("number_of_pages_median")]
