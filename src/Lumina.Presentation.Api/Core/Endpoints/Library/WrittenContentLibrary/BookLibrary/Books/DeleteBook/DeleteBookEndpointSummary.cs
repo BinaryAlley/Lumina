@@ -19,9 +19,9 @@ public class DeleteBookEndpointSummary : Summary<DeleteBookEndpoint, EmptyReques
     public DeleteBookEndpointSummary()
     {
         Summary = "Deletes an existing book.";
-        Description = "Deletes the book identified by the route, together with its stored artwork. The book is deleted by an Admin, who can delete the books of all libraries, or by the owner of the library of the book.";
+        Description = "Moves the book identified by the route to the deleted items of its media library, where its metadata and stored artwork are kept so that the deletion can be undone. A deleted book is no longer listed, read or materialized again by scans, until it is restored. The book is deleted by an Admin, who can delete the books of all libraries, or by the owner of the library of the book.";
 
-        Response(200, "The book was successfully deleted.");
+        Response(200, "The book was successfully deleted and can be restored from the deleted items of its media library.");
 
         Response(401, "Authentication required.", "application/problem+json",
             example: new[]
@@ -65,27 +65,15 @@ public class DeleteBookEndpointSummary : Summary<DeleteBookEndpoint, EmptyReques
             }
         );
 
-        Response(404, "The request failed because the requested book or its media library does not exist.", "application/problem+json",
-            example: new[]
+        Response(404, "The request failed because the requested book does not exist, or does not belong to the media library named by the route.", "application/problem+json",
+            example: new
             {
-                new
-                {
-                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
-                    title = "General.NotFound",
-                    status = 404,
-                    detail = "BookNotFound",
-                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}",
-                    traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
-                },
-                new
-                {
-                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
-                    title = "General.NotFound",
-                    status = 404,
-                    detail = "LibraryNotFound",
-                    instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}",
-                    traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
-                }
+                type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+                title = "General.NotFound",
+                status = 404,
+                detail = "BookNotFound",
+                instance = $"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}",
+                traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
             }
         );
 

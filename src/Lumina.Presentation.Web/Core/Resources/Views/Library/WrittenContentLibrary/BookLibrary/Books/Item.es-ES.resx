@@ -1084,4 +1084,16 @@
   <data name="AddTag" xml:space="preserve">
     <value>Añadir etiqueta</value>
   </data>
+  <data name="DeleteBook" xml:space="preserve">
+    <value>Eliminar libro</value>
+  </data>
+  <data name="BookDeleted" xml:space="preserve">
+    <value>El libro se ha eliminado.</value>
+  </data>
+  <data name="DeleteConfirm" xml:space="preserve">
+    <value>¿Seguro que quieres eliminar este elemento?</value>
+  </data>
+  <data name="DeleteFailed" xml:space="preserve">
+    <value>El elemento no se ha podido eliminar.</value>
+  </data>
 </root>

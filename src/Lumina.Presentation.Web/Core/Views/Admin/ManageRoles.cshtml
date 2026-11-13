@@ -112,7 +112,7 @@
                     { success: (await callApiPostAsync('@_urlService.GetAbsoluteUrl(WebRoutes.Admin.CREATE_ROLE)', formData)) !== undefined };
             if (result.success) {
                 await fetchRolesAsync();
-                notificationService.show(isRoleSelected ? '@_localizer["RoleUpdated"]' : '@_localizer["RoleCreated"]', NotificationType.SUCCESS);
+                notificationService.show(isRoleSelected ? @Json.Serialize(_localizer["RoleUpdated"].Value) : @Json.Serialize(_localizer["RoleCreated"].Value), NotificationType.SUCCESS);
             }
         }
 
@@ -136,7 +136,7 @@
                 });
 
                 // Update the text of the toggle button of the combobox.
-                document.querySelector('.enlightenment-selected-text').textContent = '@_localizer["SelectARole"]';
+                document.querySelector('.enlightenment-selected-text').textContent = @Json.Serialize(_localizer["SelectARole"].Value);
 
                 // All permissions should be "unchecked".
                 document.querySelectorAll("input[name='authorization-role-permissions']")
@@ -147,7 +147,7 @@
                 btnDeleteRole.classList.add('hidden');
 
                 // The "update" button should be "create".
-                btnConfirmRole.textContent = '@_localizer["CreateRole"]';
+                btnConfirmRole.textContent = @Json.Serialize(_localizer["CreateRole"].Value);
 
                 // The input for the role name should also have its text emptied.
                 txtRoleName.value = '';
@@ -195,12 +195,12 @@
         // On delete role button click.
         const handleBtnDeleteRoleClick = async function(e) {
             // Ask the user for confirmation before deleting the role.
-            if (await dialogService.show('@_localizer["DeleteRoleConfirm"]', jsLocalizedDialogs.confirmation, DialogButtons.YES_NO, DialogIcon.QUESTION) === DialogButton.YES) {
+            if (await dialogService.show(@Json.Serialize(_localizer["DeleteRoleConfirm"].Value), jsLocalizedDialogs.confirmation, DialogButtons.YES_NO, DialogIcon.QUESTION) === DialogButton.YES) {
                 const url = '@_urlService.GetAbsoluteUrl(WebRoutes.Admin.DELETE_ROLE, new { roleId = default(Guid) })';
                 const success = await callApiDeleteAsync(url.replace('/@(default(Guid))', `/${roleIdInput.value}`)); // roleId needs to be replaced here, because GetAbsoluteUrl is server side, roleId is client side.
                 if (success) {
                     await fetchRolesAsync();
-                    notificationService.show('@_localizer["RoleDeleted"]', NotificationType.SUCCESS);
+                    notificationService.show(@Json.Serialize(_localizer["RoleDeleted"].Value), NotificationType.SUCCESS);
                 }
             }
         };
@@ -218,13 +218,13 @@
                 if (roleId) {
                     btnDeleteRole.classList.remove('hidden');
                     btnDeleteRole.classList.add('inline');
-                    btnConfirmRole.textContent = '@_localizer["UpdateRole"]';
+                    btnConfirmRole.textContent = @Json.Serialize(_localizer["UpdateRole"].Value);
                     roleIdInput.value = roleId;
                 } else {
                     roleIdInput.value = '';
                     btnDeleteRole.classList.remove('inline');
                     btnDeleteRole.classList.add('hidden');
-                    btnConfirmRole.textContent = '@_localizer["CreateRole"]';
+                    btnConfirmRole.textContent = @Json.Serialize(_localizer["CreateRole"].Value);
                 }
             }
         };

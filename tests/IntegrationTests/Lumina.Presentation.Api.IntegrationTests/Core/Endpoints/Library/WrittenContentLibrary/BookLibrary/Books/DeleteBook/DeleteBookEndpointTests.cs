@@ -6,9 +6,10 @@ using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Art
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Contracts.Responses.Common;
+using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.DeleteBook;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
@@ -21,6 +22,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -64,7 +66,7 @@ public class DeleteBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
     }
 
     [Fact]
-    public async Task DeleteBook_WhenBookBelongsToAnOwnedLibrary_ShouldDeleteTheBook()
+    public async Task DeleteBook_WhenBookBelongsToAnOwnedLibrary_ShouldSoftDeleteTheBook()
     {
         // Arrange
         Guid userId = GetCurrentUserId();
@@ -78,11 +80,13 @@ public class DeleteBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-        Assert.Null(await dbContext.Books.FirstOrDefaultAsync(book => book.Id == bookId));
+        BookEntity? book = await dbContext.Books.FirstOrDefaultAsync(book => book.Id == bookId);
+        Assert.NotNull(book);
+        Assert.True(book!.IsDeleted);
     }
 
     [Fact]
-    public async Task DeleteBook_WhenBookHasStoredArtwork_ShouldRemoveTheArtworkAndTheStoredCoverFile()
+    public async Task DeleteBook_WhenBookHasStoredArtwork_ShouldKeepTheArtworkAndTheStoredCoverFileForRestore()
     {
         // Arrange
         Guid userId = GetCurrentUserId();
@@ -98,9 +102,45 @@ public class DeleteBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-        Assert.Null(await dbContext.Books.FirstOrDefaultAsync(book => book.Id == bookId));
-        Assert.Null(await dbContext.Books.SelectMany(book => book.Artwork).FirstOrDefaultAsync(artwork => artwork.BookId == bookId));
-        Assert.False(File.Exists(fullCoverPath));
+        BookEntity? book = await dbContext.Books.FirstOrDefaultAsync(book => book.Id == bookId);
+        Assert.NotNull(book);
+        Assert.True(book!.IsDeleted);
+        Assert.NotNull(await dbContext.Books.SelectMany(book => book.Artwork).FirstOrDefaultAsync(artwork => artwork.BookId == bookId));
+        Assert.True(File.Exists(fullCoverPath));
+    }
+
+    [Fact]
+    public async Task DeleteBook_WhenBookIsSoftDeleted_ShouldHideItFromTheCatalogueAndReadingEndpoints()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        (Guid libraryId, Guid bookId) = await SeedLibraryAndBookAsync(userId);
+        HttpResponseMessage deleteResponse = await _client.DeleteAsync($"/api/v1/libraries/{libraryId}/books/{bookId}");
+        deleteResponse.EnsureSuccessStatusCode();
+
+        // Act
+        HttpResponseMessage booksResponse = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books");
+        HttpResponseMessage booksLiteResponse = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/lite");
+        HttpResponseMessage bookResponse = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/{bookId}");
+        HttpResponseMessage availabilityResponse = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/{bookId}/reading/availability");
+        HttpResponseMessage manifestResponse = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/{bookId}/reading/manifest");
+        HttpResponseMessage sectionResponse = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/{bookId}/reading/sections/section-1");
+        HttpResponseMessage resourceResponse = await _client.GetAsync($"/api/v1/libraries/{libraryId}/books/{bookId}/reading/resources/resource-1");
+
+        // Assert
+        PaginatedResponse<BookResponse>? books = await booksResponse.Content.ReadFromJsonAsync<PaginatedResponse<BookResponse>>(_jsonOptions);
+        Assert.NotNull(books);
+        Assert.Equal(0, books!.Count);
+        Assert.Empty(books.Data);
+        PaginatedResponse<BookLiteResponse>? booksLite = await booksLiteResponse.Content.ReadFromJsonAsync<PaginatedResponse<BookLiteResponse>>(_jsonOptions);
+        Assert.NotNull(booksLite);
+        Assert.Equal(0, booksLite!.Count);
+        Assert.Empty(booksLite.Data);
+        await AssertNotFoundAsync(bookResponse, "BookNotFound", $"/api/v1/libraries/{libraryId}/books/{bookId}");
+        await AssertNotFoundAsync(availabilityResponse, "BookNotFound", $"/api/v1/libraries/{libraryId}/books/{bookId}/reading/availability");
+        await AssertNotFoundAsync(manifestResponse, "BookNotFound", $"/api/v1/libraries/{libraryId}/books/{bookId}/reading/manifest");
+        await AssertNotFoundAsync(sectionResponse, "BookNotFound", $"/api/v1/libraries/{libraryId}/books/{bookId}/reading/sections/section-1");
+        await AssertNotFoundAsync(resourceResponse, "BookNotFound", $"/api/v1/libraries/{libraryId}/books/{bookId}/reading/resources/resource-1");
     }
 
     [Fact]

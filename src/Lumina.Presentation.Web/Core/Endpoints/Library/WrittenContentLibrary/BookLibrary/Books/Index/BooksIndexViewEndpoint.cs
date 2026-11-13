@@ -9,11 +9,12 @@ using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Common.Services;
 using Lumina.Presentation.Web.Core.Endpoints.Common;
 using Lumina.Presentation.Web.Core.Themes;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -76,6 +77,13 @@ public class BooksIndexViewEndpoint : BaseEndpoint<GetBooksViewRequest, IResult>
             return Results.Redirect(_urlService.GetAbsoluteUrl(WebRoutes.Home.INDEX_CULTURED)!);
         LibraryDto library = await _apiHttpClient.GetAsync<LibraryDto>(ApiRoutes.Libraries.GET_LIBRARY_BY_ID.Replace("{id}", request.LibraryId.Value.ToString()), cancellationToken).ConfigureAwait(false);
 
+        Dictionary<string, object?> strings = ThemePageDataFactory.CreateLocalizedStrings(_localizer);
+        // The themed page script reads the localized strings through camel case keys, and they are serialized as JSON so that quotes and
+        // apostrophes in translations never terminate the JavaScript string literals of the template.
+        string stringsJson = JsonSerializer.Serialize(strings.ToDictionary(
+            entry => JsonNamingPolicy.CamelCase.ConvertName(entry.Key),
+            entry => entry.Value));
+
         ThemePageDto pageModel = new()
         {
             PageKey = VIEW_PAGE_KEY,
@@ -88,8 +96,11 @@ public class BooksIndexViewEndpoint : BaseEndpoint<GetBooksViewRequest, IResult>
                 ["settingsUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Settings.GET_USER_SETTINGS) ?? string.Empty,
                 ["readUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Books.READ, new { bookId = default(Guid) }) ?? string.Empty,
                 ["detailsUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Books.EDIT_BOOK, new { bookId = default(Guid) }) ?? string.Empty,
+                ["deleteUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Books.DELETE_BOOK, new { bookId = default(Guid) }) ?? string.Empty,
+                ["deletedBooksUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Books.DELETED_BOOKS) ?? string.Empty,
                 ["availabilityUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Books.GET_READING_AVAILABILITY, new { bookId = default(Guid) }) ?? string.Empty,
-                ["strings"] = ThemePageDataFactory.CreateLocalizedStrings(_localizer)
+                ["strings"] = strings,
+                ["stringsJson"] = stringsJson
             }
         };
 

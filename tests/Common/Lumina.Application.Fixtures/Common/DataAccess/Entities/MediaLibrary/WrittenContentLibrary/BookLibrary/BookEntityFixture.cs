@@ -33,6 +33,8 @@ public class BookEntityFixture
     /// <param name="path">Optional. The file system path of the book.</param>
     /// <param name="title">Optional. The title of the book.</param>
     /// <param name="originalTitle">Optional. The original title of the book.</param>
+    /// <param name="deletedOnUtc">Optional. The date and time when the book was deleted. Only used when the book is marked as deleted.</param>
+    /// <param name="isDeleted">Optional. Whether the book is marked as deleted.</param>
     /// <param name="includeMetadata">Whether the owned metadata collections (Tags, Genres, ISBNs, Ratings) should be included, or forced to empty collections.</param>
     /// <returns>The created <see cref="BookEntity"/>.</returns>
     public BookEntity Create(
@@ -41,6 +43,8 @@ public class BookEntityFixture
         string? path = null,
         string? title = null,
         string? originalTitle = null,
+        DateTime? deletedOnUtc = null,
+        bool isDeleted = false,
         bool includeMetadata = true)
     {
         int releaseYear = Random.Shared.Next(2000, 2010);
@@ -83,6 +87,8 @@ public class BookEntityFixture
             .RuleFor(x => x.AppleBooksId, f => $"id{f.Random.Number(1, 999999)}")
             .RuleFor(x => x.ISBNs, f => includeMetadata ? _isbnEntityFixture.CreateMany(f.Random.Number(1, 5)) : [])
             .RuleFor(x => x.Ratings, f => includeMetadata ? _bookRatingEntityFixture.CreateMany(f.Random.Number(1, 5)) : [])
+            .RuleFor(x => x.IsDeleted, isDeleted)
+            .RuleFor(x => x.DeletedOnUtc, f => isDeleted ? (deletedOnUtc ?? f.Date.Recent()) : null)
             .RuleFor(x => x.CreatedOnUtc, f => f.Date.Past())
             .RuleFor(x => x.UpdatedOnUtc, f => f.Date.Recent())
             .Generate();

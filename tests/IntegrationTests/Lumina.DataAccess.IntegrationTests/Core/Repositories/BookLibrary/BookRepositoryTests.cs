@@ -51,7 +51,7 @@ public class BookRepositoryTests
         anchorConnection.Open();
         using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
-        BookRepository sut = new(context);
+        BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
 
         Guid libraryId = Guid.NewGuid();
         BookEntity changedBook = _bookEntityFixture.Create();
@@ -91,7 +91,7 @@ public class BookRepositoryTests
         anchorConnection.Open();
         using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
-        BookRepository sut = new(context);
+        BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
 
         Guid libraryId = Guid.NewGuid();
         BookEntity book = _bookEntityFixture.Create();
@@ -120,7 +120,7 @@ public class BookRepositoryTests
         anchorConnection.Open();
         using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
-        BookRepository sut = new(context);
+        BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
 
         Guid libraryId = Guid.NewGuid();
         BookEntity enrichedBook = _bookEntityFixture.Create();
@@ -155,7 +155,7 @@ public class BookRepositoryTests
         anchorConnection.Open();
         using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
-        BookRepository sut = new(context);
+        BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
 
         Guid libraryId = Guid.NewGuid();
         BookEntity book = _bookEntityFixture.Create();
@@ -189,7 +189,7 @@ public class BookRepositoryTests
         anchorConnection.Open();
         using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
-        BookRepository sut = new(context);
+        BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
 
         BookEntity book = _bookEntityFixture.Create();
 
@@ -214,7 +214,7 @@ public class BookRepositoryTests
         anchorConnection.Open();
         using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
-        BookRepository sut = new(context);
+        BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
 
         Guid libraryId = Guid.NewGuid();
         BookEntity existingBook = _bookEntityFixture.Create();
@@ -244,7 +244,7 @@ public class BookRepositoryTests
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
         using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
-        BookRepository sut = new(context);
+        BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
         BookEntity book = _bookEntityFixture.Create(includeMetadata: false);
         book.Contributors = [_bookContributorEntityFixture.Create(bookId: book.Id)];
         book.Ratings = [_bookRatingEntityFixture.Create(source: BookRatingSource.GoogleBooks)];
@@ -278,7 +278,7 @@ public class BookRepositoryTests
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
         using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
-        BookRepository sut = new(context);
+        BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
         BookEntity book = _bookEntityFixture.Create(includeMetadata: false);
         book.Contributors = [_bookContributorEntityFixture.Create(bookId: book.Id)];
         book.Ratings = [_bookRatingEntityFixture.Create(source: BookRatingSource.GoogleBooks)];
@@ -315,7 +315,7 @@ public class BookRepositoryTests
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
         using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
-        BookRepository sut = new(context);
+        BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
         BookEntity book = _bookEntityFixture.Create(includeMetadata: false);
         Guid keptMediaContributorId = Guid.NewGuid();
         BookContributorEntity keptContributor = _bookContributorEntityFixture.Create(bookId: book.Id, mediaContributorId: keptMediaContributorId);
@@ -348,7 +348,7 @@ public class BookRepositoryTests
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
         using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
-        BookRepository sut = new(context);
+        BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
         BookEntity book = _bookEntityFixture.Create(includeMetadata: false);
         Guid keptMediaContributorId = Guid.NewGuid();
         BookContributorEntity keptContributor = _bookContributorEntityFixture.Create(bookId: book.Id, mediaContributorId: keptMediaContributorId);
@@ -380,7 +380,7 @@ public class BookRepositoryTests
         anchorConnection.Open();
         using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
-        BookRepository sut = new(context);
+        BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
 
         BookEntity book = _bookEntityFixture.Create(includeMetadata: false);
         book.Tags = [_tagEntityFixture.Create(name: $"noop-book-tag-{Guid.NewGuid():N}"), _tagEntityFixture.Create(name: $"noop-book-tag-two-{Guid.NewGuid():N}")];
@@ -429,7 +429,7 @@ public class BookRepositoryTests
         anchorConnection.Open();
         using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
-        BookRepository sut = new(context);
+        BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
 
         string keptTagName = $"remove-book-tag-{Guid.NewGuid():N}";
         string keptGenreName = $"remove-book-genre-{Guid.NewGuid():N}";
@@ -483,7 +483,7 @@ public class BookRepositoryTests
         anchorConnection.Open();
         using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
-        BookRepository sut = new(context);
+        BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
 
         Guid libraryId = Guid.NewGuid();
         BookEntity bookOfLibrary = _bookEntityFixture.Create();
@@ -513,7 +513,7 @@ public class BookRepositoryTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-getbyids-empty-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext context = CreateContext(anchorConnection);
-        BookRepository sut = new(context);
+        BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
         context.Books.Add(_bookEntityFixture.Create(includeMetadata: false));
         await context.SaveChangesAsync();
 
@@ -533,7 +533,7 @@ public class BookRepositoryTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-getbyids-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext context = CreateContext(anchorConnection);
-        BookRepository sut = new(context);
+        BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
         BookEntity firstBook = _bookEntityFixture.Create(includeMetadata: false);
         BookEntity secondBook = _bookEntityFixture.Create(includeMetadata: false);
         BookEntity thirdBook = _bookEntityFixture.Create(includeMetadata: false);
@@ -559,7 +559,7 @@ public class BookRepositoryTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-getbyids-notracking-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext context = CreateContext(anchorConnection);
-        BookRepository sut = new(context);
+        BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
         MediaContributorEntity author = _mediaContributorEntityFixture.Create(displayName: "Frank Herbert");
         BookEntity book = _bookEntityFixture.Create(includeMetadata: false);
         book.Tags = [_tagEntityFixture.Create(name: "HiddenTag")];
@@ -600,7 +600,7 @@ public class BookRepositoryTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-getbyids-include-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext context = CreateContext(anchorConnection);
-        BookRepository sut = new(context);
+        BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
         MediaContributorEntity author = _mediaContributorEntityFixture.Create(displayName: "Frank Herbert");
         BookEntity book = _bookEntityFixture.Create(includeMetadata: false);
         book.Tags = [_tagEntityFixture.Create(name: "LoadedTag"), _tagEntityFixture.Create(name: "SecondLoadedTag")];
@@ -635,7 +635,7 @@ public class BookRepositoryTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-getbyids-boundary-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext context = CreateContext(anchorConnection);
-        BookRepository sut = new(context);
+        BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
         const int BOOK_COUNT = 500;
         List<BookEntity> books = CreateBooks(BOOK_COUNT);
         context.Books.AddRange(books);
@@ -661,7 +661,7 @@ public class BookRepositoryTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-getbyids-chunks-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext context = CreateContext(anchorConnection);
-        BookRepository sut = new(context);
+        BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
         const int BOOK_COUNT = 501;
         List<BookEntity> books = CreateBooks(BOOK_COUNT);
         context.Books.AddRange(books);
@@ -687,7 +687,7 @@ public class BookRepositoryTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-authors-min-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext context = CreateContext(anchorConnection);
-        BookRepository sut = new(context);
+        BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
         BookEntity book = _bookEntityFixture.Create(includeMetadata: false);
         MediaContributorEntity firstAuthor = _mediaContributorEntityFixture.Create(displayName: "Zoe Author");
         MediaContributorEntity secondAuthor = _mediaContributorEntityFixture.Create(displayName: "Alice Author");
@@ -717,7 +717,7 @@ public class BookRepositoryTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-authors-requested-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext context = CreateContext(anchorConnection);
-        BookRepository sut = new(context);
+        BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
         BookEntity requestedBook = _bookEntityFixture.Create(includeMetadata: false);
         BookEntity bookNotRequested = _bookEntityFixture.Create(includeMetadata: false);
         MediaContributorEntity requestedAuthor = _mediaContributorEntityFixture.Create(displayName: "Requested Author");
@@ -746,7 +746,7 @@ public class BookRepositoryTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-authors-empty-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext context = CreateContext(anchorConnection);
-        BookRepository sut = new(context);
+        BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
         BookEntity book = _bookEntityFixture.Create(includeMetadata: false);
         MediaContributorEntity author = _mediaContributorEntityFixture.Create();
         context.Books.Add(book);
@@ -772,7 +772,7 @@ public class BookRepositoryTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-authors-chunks-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext context = CreateContext(anchorConnection);
-        BookRepository sut = new(context);
+        BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
         const int BOOK_COUNT = 501;
         List<BookEntity> books = CreateBooks(BOOK_COUNT);
         MediaContributorEntity author = _mediaContributorEntityFixture.Create(displayName: "Shared Author");

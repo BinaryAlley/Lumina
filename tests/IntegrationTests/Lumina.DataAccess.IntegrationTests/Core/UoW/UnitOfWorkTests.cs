@@ -47,7 +47,7 @@ public class UnitOfWorkTests
         {
             using (dbContext)
             {
-                UnitOfWork sut = new(dbContext);
+                UnitOfWork sut = new(dbContext, Substitute.For<IDateTimeProvider>());
 
                 // Act
                 await sut.BeginTransactionAsync(CancellationToken.None);
@@ -67,7 +67,7 @@ public class UnitOfWorkTests
         {
             using (dbContext)
             {
-                UnitOfWork sut = new(dbContext);
+                UnitOfWork sut = new(dbContext, Substitute.For<IDateTimeProvider>());
                 RoleEntity role = _roleEntityFixture.Create(roleName: "Admin");
 
                 // Act
@@ -95,7 +95,7 @@ public class UnitOfWorkTests
         {
             using (dbContext)
             {
-                UnitOfWork sut = new(dbContext);
+                UnitOfWork sut = new(dbContext, Substitute.For<IDateTimeProvider>());
 
                 // Act
                 await sut.CommitTransactionAsync(CancellationToken.None);
@@ -115,7 +115,7 @@ public class UnitOfWorkTests
         {
             using (dbContext)
             {
-                UnitOfWork sut = new(dbContext);
+                UnitOfWork sut = new(dbContext, Substitute.For<IDateTimeProvider>());
                 RoleEntity role = _roleEntityFixture.Create(roleName: "Admin");
 
                 // Act
@@ -142,7 +142,7 @@ public class UnitOfWorkTests
         {
             using (dbContext)
             {
-                UnitOfWork sut = new(dbContext);
+                UnitOfWork sut = new(dbContext, Substitute.For<IDateTimeProvider>());
 
                 // Act
                 await sut.RollbackTransactionAsync(CancellationToken.None);
@@ -162,7 +162,7 @@ public class UnitOfWorkTests
         {
             using (dbContext)
             {
-                UnitOfWork sut = new(dbContext);
+                UnitOfWork sut = new(dbContext, Substitute.For<IDateTimeProvider>());
 
                 // Act
                 await sut.BeginTransactionAsync(CancellationToken.None);
@@ -183,7 +183,7 @@ public class UnitOfWorkTests
         {
             using (dbContext)
             {
-                UnitOfWork sut = new(dbContext);
+                UnitOfWork sut = new(dbContext, Substitute.For<IDateTimeProvider>());
 
                 // Act
                 sut.Dispose();
@@ -203,7 +203,7 @@ public class UnitOfWorkTests
         {
             using (dbContext)
             {
-                UnitOfWork sut = new(dbContext);
+                UnitOfWork sut = new(dbContext, Substitute.For<IDateTimeProvider>());
                 Guid libraryId = Guid.NewGuid();
                 BookEntity firstBook = _bookEntityFixture.Create();
                 firstBook.LibraryId = libraryId;
@@ -237,7 +237,7 @@ public class UnitOfWorkTests
         {
             using (dbContext)
             {
-                UnitOfWork sut = new(dbContext);
+                UnitOfWork sut = new(dbContext, Substitute.For<IDateTimeProvider>());
 
                 // Act
                 IFavoriteRepository firstRepository = sut.FavoriteRepository;
@@ -259,7 +259,7 @@ public class UnitOfWorkTests
         {
             using (dbContext)
             {
-                UnitOfWork sut = new(dbContext);
+                UnitOfWork sut = new(dbContext, Substitute.For<IDateTimeProvider>());
                 Guid userId = Guid.NewGuid();
                 dbContext.Users.Add(_userEntityFixture.Create(id: userId));
                 Result<Success> userSaveResult = await sut.SaveChangesAsync(CancellationToken.None);
@@ -303,7 +303,7 @@ public class UnitOfWorkTests
         {
             using (dbContext)
             {
-                UnitOfWork sut = new(dbContext);
+                UnitOfWork sut = new(dbContext, Substitute.For<IDateTimeProvider>());
                 Guid userId = Guid.NewGuid();
                 UserEntity user = _userEntityFixture.Create(id: userId);
                 FavoriteEntity favorite = _favoriteEntityFixture.Create(
@@ -337,7 +337,7 @@ public class UnitOfWorkTests
         {
             using (dbContext)
             {
-                UnitOfWork sut = new(dbContext);
+                UnitOfWork sut = new(dbContext, Substitute.For<IDateTimeProvider>());
                 dbContext.Users.Add(_userEntityFixture.Create(id: userId));
                 Guid mediaItemId = Guid.NewGuid();
                 // The fixture populates the update audit columns, so the test also proves the interceptor owns them on insert.

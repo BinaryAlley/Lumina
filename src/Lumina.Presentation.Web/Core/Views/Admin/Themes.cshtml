@@ -180,7 +180,7 @@
             const button = event.target.closest('.delete-theme-button');
             if (!button)
                 return;
-            if (await dialogService.show('@_localizer["DeleteThemeConfirm"]', jsLocalizedDialogs.confirmation, DialogButtons.YES_NO, DialogIcon.QUESTION) === DialogButton.YES) {
+            if (await dialogService.show(@Json.Serialize(_localizer["DeleteThemeConfirm"].Value), jsLocalizedDialogs.confirmation, DialogButtons.YES_NO, DialogIcon.QUESTION) === DialogButton.YES) {
                 await callApiDeleteAsync(button.dataset.url);
                 refreshPageContent();
             }
@@ -238,7 +238,7 @@
             if (response.ok)
                 refreshPageContent();
             else
-                notificationService.show('@_localizer["UploadFailed"]', NotificationType.ERROR);
+                notificationService.show(@Json.Serialize(_localizer["UploadFailed"].Value), NotificationType.ERROR);
         }
 
         // Opens the file picker when the upload button is clicked.

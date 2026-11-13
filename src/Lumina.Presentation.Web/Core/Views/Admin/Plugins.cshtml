@@ -181,7 +181,7 @@
                 const url = '@_urlService.GetAbsoluteUrl(WebRoutes.Plugins.UPDATE_PLUGIN_SETTINGS)';
                 const result = await callApiPutAsync(url, { pluginId: pluginId, settings: settings });
                 if (result.success) {
-                    notificationService.show('@_localizer["SettingsSaved"]', NotificationType.SUCCESS);
+                    notificationService.show(@Json.Serialize(_localizer["SettingsSaved"].Value), NotificationType.SUCCESS);
                 }
             }
         };
@@ -205,10 +205,10 @@
                 body: formData
             });
             if (response.ok) {
-                notificationService.show('@_localizer["PluginUploadedRestartRequired"]', NotificationType.SUCCESS);
+                notificationService.show(@Json.Serialize(_localizer["PluginUploadedRestartRequired"].Value), NotificationType.SUCCESS);
                 uploadInput.value = '';
             } else {
-                notificationService.show('@_localizer["UploadFailed"]', NotificationType.ERROR);
+                notificationService.show(@Json.Serialize(_localizer["UploadFailed"].Value), NotificationType.ERROR);
             }
         }
 

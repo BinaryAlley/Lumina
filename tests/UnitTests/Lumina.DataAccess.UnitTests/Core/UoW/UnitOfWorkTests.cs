@@ -101,7 +101,7 @@ public class UnitOfWorkTests
     {
         // Arrange
         LuminaDbContext dbContext = _fixture.Create<LuminaDbContext>();
-        UnitOfWork unitOfWork = new(dbContext);
+        UnitOfWork unitOfWork = new(dbContext, Substitute.For<IDateTimeProvider>());
         CancellationToken cancellationToken = new();
 
         // Act
@@ -121,7 +121,7 @@ public class UnitOfWorkTests
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
         LuminaDbContext dbContext = new(options);
-        UnitOfWork unitOfWork = new(dbContext);
+        UnitOfWork unitOfWork = new(dbContext, Substitute.For<IDateTimeProvider>());
         dbContext.Roles.Add(_roleEntityFixture.Create(id: Guid.NewGuid(), roleName: "TestRole"));
         await dbContext.SaveChangesAsync(CancellationToken.None);
         Assert.NotEmpty(dbContext.ChangeTracker.Entries());
@@ -154,6 +154,6 @@ public class UnitOfWorkTests
 
     private UnitOfWork CreateUnitOfWork()
     {
-        return new(_fixture.Create<LuminaDbContext>());
+        return new(_fixture.Create<LuminaDbContext>(), Substitute.For<IDateTimeProvider>());
     }
 }

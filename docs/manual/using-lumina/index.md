@@ -49,7 +49,9 @@ Opening a book library shows a page with the library title, a search box, a sort
 - **The alpha picker** jumps to titles starting with a chosen character. It offers All, then the number and symbol keys, then A to Z. You can also press a letter key to filter, and press Escape to clear the filter.
 - **Pagination** splits the list into pages when you have it enabled, with previous and next buttons and a page indicator. When it is off, the whole list is shown and the count is the total.
 
-Each book is a card with its cover and title. Clicking a card opens the book in the reader; a book can only be opened when a reader for its format is enabled for the library. Right-clicking a card, or using its actions button, opens a menu with **Read** and **View details**.
+Each book is a card with its cover and title. Clicking a card opens the book in the reader; a book can only be opened when a reader for its format is enabled for the library. Right-clicking a card, or using its actions button, opens a menu with **Read**, **View details** and **Delete**.
+
+Deleting a book asks for confirmation and moves it to the library's **Deleted items**, together with the metadata and artwork Lumina stored for it. The file behind it is left untouched. The book stops appearing in the library, and an automatic scan does not add it back. If the file is later removed from disk, the next scan permanently removes the deleted book, including the metadata and artwork kept for it. The **Deleted items** button on the library page lists the deleted books and restores one when you select **Restore**. The book details page offers the same deletion with its **Delete book** button.
 
 ## Reading a book
 

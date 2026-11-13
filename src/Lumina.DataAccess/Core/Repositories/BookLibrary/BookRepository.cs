@@ -6,6 +6,7 @@ using Lumina.Application.Common.DataAccess.Repositories.BookLibrary;
 using Lumina.Application.Common.DTO.Filtering;
 using Lumina.Application.Common.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DTO.Pagination;
+using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Application.Common.Specifications;
 using Lumina.DataAccess.Common.Persistence;
 using Lumina.DataAccess.Core.Repositories.BookLibrary.Specifications;
@@ -38,14 +39,17 @@ internal sealed class BookRepository : IBookRepository
     private static readonly MethodInfo s_substringMethod = typeof(string).GetMethod(nameof(string.Substring), [typeof(int)])!;
 
     private readonly LuminaDbContext _luminaDbContext;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BookRepository"/> class.
     /// </summary>
     /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
-    public BookRepository(LuminaDbContext luminaDbContext)
+    /// <param name="dateTimeProvider">Injected provider for the current UTC time, used to stamp deletions deterministically.</param>
+    public BookRepository(LuminaDbContext luminaDbContext, IDateTimeProvider dateTimeProvider)
     {
         _luminaDbContext = luminaDbContext;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     /// <summary>
@@ -88,7 +92,7 @@ internal sealed class BookRepository : IBookRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="BookEntity"/>, or an error.</returns>
     public async Task<Result<BookEntity?>> GetByIdAsync(Guid id, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default)
     {
-        IQueryable<BookEntity> query = _luminaDbContext.Books;
+        IQueryable<BookEntity> query = _luminaDbContext.Books.Where(book => !book.IsDeleted);
         if (!shouldTrackEntities)
             query = query.AsNoTracking();
         if (shouldIncludeNavigationProperties)
@@ -119,7 +123,7 @@ internal sealed class BookRepository : IBookRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="PaginatedResultDto{BookEntity}"/>, or an error.</returns>
     public async Task<Result<PaginatedResultDto<BookEntity>>> GetAllAsync<TFilter>(PaginationDataDto? paginationData = null, string? sortBy = null, SortOrder? sortOrder = null, TFilter? filterModel = null, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default) where TFilter : BaseFilterDto
     {
-        IQueryable<BookEntity> booksQuery = _luminaDbContext.Books;
+        IQueryable<BookEntity> booksQuery = _luminaDbContext.Books.Where(book => !book.IsDeleted);
         if (!shouldTrackEntities)
             booksQuery = booksQuery.AsNoTracking();
         if (shouldIncludeNavigationProperties)
@@ -202,7 +206,7 @@ internal sealed class BookRepository : IBookRepository
             return Errors.Library.FilterMustIncludeLibraryId;
 
         // The lightweight read models are retrieved without tracking by default, because they are never modified by the caller.
-        IQueryable<BookEntity> booksQuery = _luminaDbContext.Books;
+        IQueryable<BookEntity> booksQuery = _luminaDbContext.Books.Where(book => !book.IsDeleted);
         if (!shouldTrackEntities)
             booksQuery = booksQuery.AsNoTracking();
         if (shouldIncludeNavigationProperties)
@@ -272,6 +276,10 @@ internal sealed class BookRepository : IBookRepository
     /// <summary>
     /// Gets the book of the media library identified by <paramref name="libraryId"/> that is stored at the provided <paramref name="path"/>.
     /// </summary>
+    /// <remarks>
+    /// Soft deleted books are included on purpose: when the file disappears from disk, the scan deletion strategy must be able to permanently
+    /// remove a book that the user had already deleted, instead of leaving its soft deleted row behind.
+    /// </remarks>
     /// <param name="libraryId">The Id of the media library whose book is retrieved.</param>
     /// <param name="path">The file system path of the book to be retrieved.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
@@ -288,8 +296,82 @@ internal sealed class BookRepository : IBookRepository
     }
 
     /// <summary>
+    /// Gets the soft deleted book identified by <paramref name="id"/>.
+    /// </summary>
+    /// <param name="id">The Id of the soft deleted book to get.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the soft deleted <see cref="BookEntity"/>, <see langword="null"/> when the book does not exist or is not soft deleted, or an error.</returns>
+    public async Task<Result<BookEntity?>> GetSoftDeletedByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return await _luminaDbContext.Books
+            .Include(book => book.Artwork)
+            .AsSplitQuery()
+            .FirstOrDefaultAsync(book => book.Id == id && book.IsDeleted, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Gets the soft deleted books of the media library identified by <paramref name="libraryId"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose soft deleted books are retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the soft deleted books, or an error.</returns>
+    public async Task<Result<IReadOnlyList<BookEntity>>> GetSoftDeletedByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken)
+    {
+        return await _luminaDbContext.Books
+            .AsNoTracking()
+            .Include(book => book.Artwork)
+            .AsSplitQuery()
+            .Where(book => book.LibraryId == libraryId && book.IsDeleted)
+            // The deletion time is stored when the book is deleted, so later writes to the hidden row cannot change the order of the deleted items.
+            // Every deleted row carries a deletion time after the backfill and the delete operation. All terms sort descending, so the
+            // (LibraryId, IsDeleted, DeletedOnUtc, Title, Id) index can be scanned backwards and the database does not build a temporary B-tree.
+            .OrderByDescending(book => book.DeletedOnUtc)
+            .ThenByDescending(book => book.Title)
+            .ThenByDescending(book => book.Id)
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Soft deletes the book identified by <paramref name="id"/>, without removing its stored metadata or artwork.
+    /// </summary>
+    /// <param name="id">The Id of the book to soft delete.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Updated>> SoftDeleteByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        BookEntity? book = await _luminaDbContext.Books.FirstOrDefaultAsync(repositoryBook => repositoryBook.Id == id, cancellationToken).ConfigureAwait(false);
+        if (book is null || book.IsDeleted)
+            return Errors.WrittenContent.BookNotFound;
+
+        book.IsDeleted = true;
+        book.DeletedOnUtc = _dateTimeProvider.UtcNow;
+        return Result.Updated;
+    }
+
+    /// <summary>
+    /// Restores the soft deleted book identified by <paramref name="id"/>.
+    /// </summary>
+    /// <param name="id">The Id of the book to restore.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Updated>> RestoreSoftDeletedByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        BookEntity? book = await _luminaDbContext.Books.FirstOrDefaultAsync(repositoryBook => repositoryBook.Id == id, cancellationToken).ConfigureAwait(false);
+        if (book is null || !book.IsDeleted)
+            return Errors.WrittenContent.BookNotFound;
+
+        book.IsDeleted = false;
+        book.DeletedOnUtc = null;
+        return Result.Updated;
+    }
+
+    /// <summary>
     /// Gets the subset of <paramref name="paths"/> that is already used by a book of the library identified by <paramref name="libraryId"/>.
     /// </summary>
+    /// <remarks>
+    /// Soft deleted books are included on purpose: their paths must still count as taken, so that a scan never materializes a book that the user
+    /// deleted back into the catalogue.
+    /// </remarks>
     /// <param name="libraryId">The Id of the library whose books are searched.</param>
     /// <param name="paths">The book paths to check.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
@@ -331,6 +413,7 @@ internal sealed class BookRepository : IBookRepository
             .Include(book => book.Contributors)
             .AsSplitQuery()
             .Where(book => book.LibraryId == libraryId
+                        && !book.IsDeleted
                         && book.MetadataStatus != MetadataStatus.Enriched
                         && (lastPath == null || book.Path.CompareTo(lastPath) > 0))
             .OrderBy(book => book.Path)
@@ -347,7 +430,7 @@ internal sealed class BookRepository : IBookRepository
     public async Task<Result<int>> GetBooksNeedingMetadataCountAsync(Guid libraryId, CancellationToken cancellationToken)
     {
         return await _luminaDbContext.Books
-            .CountAsync(book => book.LibraryId == libraryId && book.MetadataStatus != MetadataStatus.Enriched, cancellationToken).ConfigureAwait(false);
+            .CountAsync(book => book.LibraryId == libraryId && !book.IsDeleted && book.MetadataStatus != MetadataStatus.Enriched, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -368,6 +451,7 @@ internal sealed class BookRepository : IBookRepository
             .Include(book => book.Artwork)
             .AsSplitQuery()
             .Where(book => book.LibraryId == libraryId
+                        && !book.IsDeleted
                         && !book.Artwork.Any(artwork => artwork.ArtworkType == ArtworkType.Cover && artwork.Status == ArtworkStatus.Enriched)
                         && (lastPath == null || book.Path.CompareTo(lastPath) > 0))
             .OrderBy(book => book.Path)
@@ -385,6 +469,7 @@ internal sealed class BookRepository : IBookRepository
     {
         return await _luminaDbContext.Books
             .CountAsync(book => book.LibraryId == libraryId
+                             && !book.IsDeleted
                              && !book.Artwork.Any(artwork => artwork.ArtworkType == ArtworkType.Cover && artwork.Status == ArtworkStatus.Enriched), cancellationToken)
             .ConfigureAwait(false);
     }
@@ -393,6 +478,9 @@ internal sealed class BookRepository : IBookRepository
     /// Resets the enrichment state of the books stored at the provided <paramref name="paths"/> in the media library identified by
     /// <paramref name="libraryId"/>, so that they are re-enriched, because their content changed since the last scan.
     /// </summary>
+    /// <remarks>
+    /// Soft deleted books are included on purpose: if such a book is restored after its content changed, it must be re-enriched instead of keeping stale metadata.
+    /// </remarks>
     /// <param name="libraryId">The Id of the media library whose books are reset.</param>
     /// <param name="paths">The file system paths of the books whose enrichment state is reset.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
@@ -426,6 +514,9 @@ internal sealed class BookRepository : IBookRepository
     /// Resets the metadata enrichment status of all the books of the media library identified by <paramref name="libraryId"/>,
     /// so that they are re-enriched, because the metadata provider configuration of the library changed.
     /// </summary>
+    /// <remarks>
+    /// Soft deleted books are included on purpose: if such a book is restored after the provider configuration changed, it must be re-enriched with the new providers.
+    /// </remarks>
     /// <param name="libraryId">The Id of the media library whose books are reset.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
@@ -443,6 +534,9 @@ internal sealed class BookRepository : IBookRepository
     /// Resets the artwork status of all the artwork of the books of the media library identified by <paramref name="libraryId"/>,
     /// so that they are re-resolved, because the artwork provider configuration of the library changed.
     /// </summary>
+    /// <remarks>
+    /// Soft deleted books are included on purpose: if such a book is restored after the provider configuration changed, its artwork must be re-resolved with the new providers.
+    /// </remarks>
     /// <param name="libraryId">The Id of the media library whose artwork is reset.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
@@ -514,7 +608,7 @@ internal sealed class BookRepository : IBookRepository
         const int LOOKUP_CHUNK_SIZE = 500;
         foreach (Guid[] chunk in bookIds.Chunk(LOOKUP_CHUNK_SIZE))
         {
-            IQueryable<BookEntity> query = _luminaDbContext.Books.AsNoTracking();
+            IQueryable<BookEntity> query = _luminaDbContext.Books.AsNoTracking().Where(book => !book.IsDeleted);
             if (shouldIncludeNavigationProperties)
             {
                 query = query
@@ -570,20 +664,29 @@ internal sealed class BookRepository : IBookRepository
             .Include(book => book.Ratings)
             .Include(book => book.Contributors)
             .AsSplitQuery()
-            .FirstOrDefaultAsync(book => book.Id == data.Id, cancellationToken).ConfigureAwait(false);
+            .FirstOrDefaultAsync(book => book.Id == data.Id && !book.IsDeleted, cancellationToken).ConfigureAwait(false);
         if (foundBook is null)
             return Errors.WrittenContent.BookNotFound;
 
-        // The stored enrichment and identity columns are never overwritten by an edit: they are owned by the scan and by the record itself. The audit columns are
-        // only ever written by the auditing interceptor, which is why the copier restores them after copying the editable values.
+        // The stored enrichment, identity and deletion columns are never overwritten by an edit: they are owned by the scan, by the record itself
+        // and by the explicit delete and restore operations. The audit columns are only ever written by the auditing interceptor, which is why the
+        // copier restores them after copying the editable values.
         Guid libraryId = foundBook.LibraryId;
         string path = foundBook.Path;
+        bool isDeleted = foundBook.IsDeleted;
+        DateTime? deletedOnUtc = foundBook.DeletedOnUtc;
         MetadataStatus metadataStatus = foundBook.MetadataStatus;
         DateTime? lastMetadataUpdateUtc = foundBook.LastMetadataUpdateUtc;
         string? metadataProvider = foundBook.MetadataProvider;
         EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundBook, data);
         foundBook.LibraryId = libraryId;
         foundBook.Path = path;
+        foundBook.IsDeleted = isDeleted;
+        foundBook.DeletedOnUtc = deletedOnUtc;
+        // The deletion state is owned by the explicit delete and restore operations. Clearing the modified flags keeps it out of the UPDATE statement,
+        // so an edit that raced with a delete can never write the deletion state back and resurrect the book.
+        _luminaDbContext.Entry(foundBook).Property(book => book.IsDeleted).IsModified = false;
+        _luminaDbContext.Entry(foundBook).Property(book => book.DeletedOnUtc).IsModified = false;
         foundBook.MetadataStatus = metadataStatus;
         foundBook.LastMetadataUpdateUtc = lastMetadataUpdateUtc;
         foundBook.MetadataProvider = metadataProvider;

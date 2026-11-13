@@ -975,23 +975,23 @@
 
         // The localized labels of the release types, keyed by their canonical enum name.
         const releaseTypeLabels = {
-            'Album': '@_localizer["Album"].Value',
-            'Broadcast': '@_localizer["Broadcast"].Value',
-            'Ep': '@_localizer["Ep"].Value',
-            'Other': '@_localizer["Other"].Value',
-            'Single': '@_localizer["Single"].Value',
-            'AudioDrama': '@_localizer["AudioDrama"].Value',
-            'AudioBook': '@_localizer["AudioBook"].Value',
-            'Compilation': '@_localizer["Compilation"].Value',
-            'DjMix': '@_localizer["DjMix"].Value',
-            'Demo': '@_localizer["Demo"].Value',
-            'FieldRecording': '@_localizer["FieldRecording"].Value',
-            'Interview': '@_localizer["Interview"].Value',
-            'Live': '@_localizer["Live"].Value',
-            'Mixtape': '@_localizer["Mixtape"].Value',
-            'Remix': '@_localizer["Remix"].Value',
-            'Soundtrack': '@_localizer["Soundtrack"].Value',
-            'SpokenWord': '@_localizer["SpokenWord"].Value'
+            'Album': @Json.Serialize(_localizer["Album"].Value),
+            'Broadcast': @Json.Serialize(_localizer["Broadcast"].Value),
+            'Ep': @Json.Serialize(_localizer["Ep"].Value),
+            'Other': @Json.Serialize(_localizer["Other"].Value),
+            'Single': @Json.Serialize(_localizer["Single"].Value),
+            'AudioDrama': @Json.Serialize(_localizer["AudioDrama"].Value),
+            'AudioBook': @Json.Serialize(_localizer["AudioBook"].Value),
+            'Compilation': @Json.Serialize(_localizer["Compilation"].Value),
+            'DjMix': @Json.Serialize(_localizer["DjMix"].Value),
+            'Demo': @Json.Serialize(_localizer["Demo"].Value),
+            'FieldRecording': @Json.Serialize(_localizer["FieldRecording"].Value),
+            'Interview': @Json.Serialize(_localizer["Interview"].Value),
+            'Live': @Json.Serialize(_localizer["Live"].Value),
+            'Mixtape': @Json.Serialize(_localizer["Mixtape"].Value),
+            'Remix': @Json.Serialize(_localizer["Remix"].Value),
+            'Soundtrack': @Json.Serialize(_localizer["Soundtrack"].Value),
+            'SpokenWord': @Json.Serialize(_localizer["SpokenWord"].Value)
         };
         // The order in which the release type groups are displayed, from the most common to the least common.
         const releaseTypeOrder = ['Album', 'Compilation', 'Ep', 'Live', 'Remix', 'Single', 'Soundtrack', 'Broadcast', 'AudioDrama', 'AudioBook', 'Demo', 'DjMix', 'FieldRecording', 'Interview', 'Mixtape', 'SpokenWord', 'Other'];

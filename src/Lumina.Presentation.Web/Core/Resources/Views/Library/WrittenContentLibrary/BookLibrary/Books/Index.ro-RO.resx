@@ -57,4 +57,16 @@
   <data name="ViewDetails" xml:space="preserve">
     <value>Vezi detalii</value>
   </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Șterge</value>
+  </data>
+  <data name="DeleteConfirm" xml:space="preserve">
+    <value>Sigur doriți să ștergeți acest element?</value>
+  </data>
+  <data name="DeleteFailed" xml:space="preserve">
+    <value>Elementul nu a putut fi șters.</value>
+  </data>
+  <data name="DeletedItems" xml:space="preserve">
+    <value>Elemente șterse</value>
+  </data>
 </root>

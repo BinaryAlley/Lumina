@@ -50,7 +50,31 @@ public class BooksIndexViewEndpointTests : IClassFixture<LuminaWebFactory>
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal("text/html", response.Content.Headers.ContentType!.MediaType);
         Assert.Contains("search-input", content);
+        Assert.Contains("card-action-delete", content);
         Assert.Contains($"libraries/{libraryId}", _apiFactory.ApiClientStub.GetEndpointsCalled);
+    }
+
+    [Fact]
+    public async Task BooksIndex_WhenTheCultureUsesApostrophes_ShouldSerializeTheLocalizedStringsAsJson()
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        Guid libraryId = Guid.NewGuid();
+        LibraryDto expectedLibrary = _libraryDtoFixture.Create(id: libraryId, title: "Livres");
+        _apiFactory.ApiClientStub.RegisterGetResponse($"libraries/{libraryId}", expectedLibrary);
+        AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
+
+        // Act
+        HttpResponseMessage response = await webClient.Client.GetAsync($"/fr-fr/library/written-content-library/books-library/books?libraryId={libraryId}");
+        string content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        // The apostrophes and accents are JSON-escaped, so the translations stay valid JavaScript string literals.
+        Assert.Contains("deleteFailed: \"L", content);
+        Assert.Contains("deleteConfirm: \"", content);
+        Assert.DoesNotContain("deleteFailed: '", content);
+        Assert.DoesNotContain("deleteConfirm: '", content);
     }
 
     [Fact]

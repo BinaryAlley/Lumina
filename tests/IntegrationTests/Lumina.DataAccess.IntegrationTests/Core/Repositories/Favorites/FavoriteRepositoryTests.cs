@@ -349,6 +349,30 @@ public class FavoriteRepositoryTests
     }
 
     [Fact]
+    public async Task GetMediaItemLibraryIdAsync_WhenTheBookIsSoftDeleted_ShouldReturnSuccessWithNull()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = CreateAnchorConnection("library-id-deleted-book");
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        FavoriteRepository sut = new(context);
+        BookEntity deletedBook = _bookEntityFixture.Create(
+            libraryId: Guid.NewGuid(),
+            path: $"/books/{Guid.NewGuid()}.epub",
+            isDeleted: true,
+            includeMetadata: false);
+        context.Books.Add(deletedBook);
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<Guid?> result = await sut.GetMediaItemLibraryIdAsync(FavoriteMediaKind.Book, deletedBook.Id, CancellationToken.None);
+
+        // Assert
+        // A deleted book is hidden from the catalogue, so adding it to favorites is rejected as if the book did not exist.
+        Assert.False(result.IsFailure);
+        Assert.Null(result.Value);
+    }
+
+    [Fact]
     public async Task GetMediaItemLibraryIdAsync_WhenTheMediaItemDoesNotExist_ShouldReturnSuccessWithNull()
     {
         // Arrange
@@ -847,6 +871,38 @@ public class FavoriteRepositoryTests
         Result<PaginatedResultDto<FavoriteItemDto>> result = await sut.GetAllForUserAsync(userId, FavoriteMediaKind.MusicAlbum, paginationData: null, cancellationToken: CancellationToken.None);
 
         // Assert
+        Assert.False(result.IsFailure);
+        FavoriteItemDto item = Assert.Single(result.Value.Data);
+        Assert.Equal(favorite.Id, item.Favorite.Id);
+        Assert.Null(item.Display);
+    }
+
+    [Fact]
+    public async Task GetAllForUserAsync_WhenTheFavoritedBookIsDeleted_ShouldKeepTheFavoriteWithoutDisplayData()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = CreateAnchorConnection("list-deleted-book");
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        FavoriteRepository sut = new(context);
+        Guid userId = Guid.NewGuid();
+        Guid libraryId = Guid.NewGuid();
+        context.Users.Add(_userEntityFixture.Create(id: userId));
+        BookEntity deletedBook = _bookEntityFixture.Create(
+            libraryId: libraryId,
+            path: $"/books/{Guid.NewGuid()}.epub",
+            title: "Deleted Book",
+            isDeleted: true,
+            includeMetadata: false);
+        FavoriteEntity favorite = CreateFavorite(userId, FavoriteMediaKind.Book, deletedBook.Id);
+        context.Books.Add(deletedBook);
+        context.Favorites.Add(favorite);
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<PaginatedResultDto<FavoriteItemDto>> result = await sut.GetAllForUserAsync(userId, FavoriteMediaKind.Book, paginationData: null, cancellationToken: CancellationToken.None);
+
+        // Assert
+        // A deleted book is hidden from the catalogue, so its favorite must fall back to the unavailable state instead of exposing its display data.
         Assert.False(result.IsFailure);
         FavoriteItemDto item = Assert.Single(result.Value.Data);
         Assert.Equal(favorite.Id, item.Favorite.Id);

@@ -259,6 +259,25 @@ public static class BookEntityMapping
     }
 
     /// <summary>
+    /// Converts a deleted <paramref name="repositoryEntity"/> to <see cref="DeletedBookResponse"/>.
+    /// </summary>
+    /// <param name="repositoryEntity">The deleted repository entity to be converted.</param>
+    /// <param name="deletedOnUtc">The date and time when the book was deleted.</param>
+    /// <returns>The converted deleted book response.</returns>
+    public static DeletedBookResponse ToResponse(this BookEntity repositoryEntity, DateTime deletedOnUtc)
+    {
+        return new DeletedBookResponse(
+            repositoryEntity.Id,
+            repositoryEntity.LibraryId,
+            repositoryEntity.Title,
+            repositoryEntity.OriginalTitle,
+            repositoryEntity.Path,
+            deletedOnUtc,
+            repositoryEntity.Artwork.FirstOrDefault(artwork => artwork.ArtworkType == ArtworkType.Cover)?.FileName
+        );
+    }
+
+    /// <summary>
     /// Converts <paramref name="repositoryEntities"/> to a collection of <see cref="Book"/>.
     /// </summary>
     /// <param name="repositoryEntities">The repository entities to be converted.</param>

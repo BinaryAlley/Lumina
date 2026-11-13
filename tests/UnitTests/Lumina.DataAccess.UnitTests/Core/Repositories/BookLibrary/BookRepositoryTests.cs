@@ -6,6 +6,7 @@ using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentL
 using Lumina.Application.Common.DTO.Filtering;
 using Lumina.Application.Common.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DTO.Pagination;
+using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Common;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaContributors;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
@@ -21,6 +22,7 @@ using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -38,6 +40,7 @@ namespace Lumina.DataAccess.UnitTests.Core.Repositories.BookLibrary;
 public class BookRepositoryTests
 {
     private readonly LuminaDbContext _mockContext;
+    private readonly IDateTimeProvider _mockDateTimeProvider;
     private readonly BookRepository _sut;
     private readonly BookEntityFixture _bookEntityFixture = new();
     private readonly BookRatingEntityFixture _bookRatingEntityFixture = new();
@@ -57,7 +60,9 @@ public class BookRepositoryTests
     public BookRepositoryTests()
     {
         _mockContext = Create.MockedDbContextFor<LuminaDbContext>();
-        _sut = new BookRepository(_mockContext);
+        _mockDateTimeProvider = Substitute.For<IDateTimeProvider>();
+        _mockDateTimeProvider.UtcNow.Returns(new DateTime(2026, 1, 1, 12, 0, 0, DateTimeKind.Utc));
+        _sut = new BookRepository(_mockContext, _mockDateTimeProvider);
     }
 
     [Fact]
@@ -116,6 +121,25 @@ public class BookRepositoryTests
         Result<Created> result = await _sut.InsertAsync(bookModel, CancellationToken.None);
 
         // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.WrittenContent.BookAlreadyExists, result.FirstError);
+    }
+
+    [Fact]
+    public async Task InsertAsync_WhenADeletedBookHasTheSamePath_ShouldReturnError()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        BookEntity deletedBook = _bookEntityFixture.Create(libraryId: libraryId, path: "/books/deleted.epub", isDeleted: true);
+        _mockContext.Books.Add(deletedBook);
+        await _mockContext.SaveChangesAsync();
+        BookEntity bookModel = _bookEntityFixture.Create(libraryId: libraryId, path: "/books/deleted.epub");
+
+        // Act
+        Result<Created> result = await _sut.InsertAsync(bookModel, CancellationToken.None);
+
+        // Assert
+        // The deleted book keeps its path as a tombstone, so a scan can never insert it again.
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.WrittenContent.BookAlreadyExists, result.FirstError);
     }
@@ -300,6 +324,24 @@ public class BookRepositoryTests
     }
 
     [Fact]
+    public async Task GetByPathAsync_WhenBookIsDeleted_ShouldReturnIt()
+    {
+        // Arrange
+        BookEntity deletedBook = _bookEntityFixture.Create(isDeleted: true);
+        _mockContext.Books.Add(deletedBook);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<BookEntity?> result = await _sut.GetByPathAsync(deletedBook.LibraryId, deletedBook.Path, CancellationToken.None);
+
+        // Assert
+        // The scan deletion strategy must find the deleted row when its file disappears, so that it can remove it permanently.
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Equal(deletedBook.Id, result.Value!.Id);
+    }
+
+    [Fact]
     public async Task GetByPathAsync_WhenBookDoesNotExist_ShouldReturnNull()
     {
         // Arrange
@@ -384,6 +426,198 @@ public class BookRepositoryTests
     }
 
     [Fact]
+    public async Task GetAllAsync_WhenBooksAreDeleted_ShouldExcludeThem()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        BookEntity activeBook = _bookEntityFixture.Create(libraryId: libraryId, path: "/books/active.epub");
+        BookEntity deletedBook = _bookEntityFixture.Create(libraryId: libraryId, path: "/books/deleted.epub", isDeleted: true);
+        _mockContext.Books.AddRange(activeBook, deletedBook);
+        await _mockContext.SaveChangesAsync();
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
+
+        // Act
+        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetAllAsync<LibraryFilterDto>(filterModel: filter, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Single(result.Value.Data);
+        Assert.Equal(activeBook.Id, result.Value.Data[0].Id);
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_WhenBookIsDeleted_ShouldReturnNull()
+    {
+        // Arrange
+        BookEntity deletedBook = _bookEntityFixture.Create(isDeleted: true);
+        _mockContext.Books.Add(deletedBook);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<BookEntity?> result = await _sut.GetByIdAsync(deletedBook.Id, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Null(result.Value);
+    }
+
+    [Fact]
+    public async Task GetExistingPathsAsync_WhenBookIsDeleted_ShouldStillReportItsPathAsExisting()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        BookEntity deletedBook = _bookEntityFixture.Create(libraryId: libraryId, path: "/books/deleted.epub", isDeleted: true);
+        _mockContext.Books.Add(deletedBook);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyCollection<string>> result = await _sut.GetExistingPathsAsync(libraryId, ["/books/deleted.epub"], CancellationToken.None);
+
+        // Assert
+        // The path must keep counting as taken, so that a scan never materializes the deleted book back into the catalogue.
+        Assert.False(result.IsFailure);
+        Assert.Equal(["/books/deleted.epub"], result.Value);
+    }
+
+    [Fact]
+    public async Task GetSoftDeletedByLibraryIdAsync_WhenCalled_ShouldReturnOnlyTheDeletedBooksOfTheLibrary()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        BookEntity activeBook = _bookEntityFixture.Create(libraryId: libraryId, path: "/books/active.epub");
+        BookEntity deletedBook = _bookEntityFixture.Create(libraryId: libraryId, path: "/books/deleted.epub", isDeleted: true);
+        BookEntity otherLibraryDeletedBook = _bookEntityFixture.Create(libraryId: Guid.NewGuid(), path: "/books/other.epub", isDeleted: true);
+        _mockContext.Books.AddRange(activeBook, deletedBook, otherLibraryDeletedBook);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<BookEntity>> result = await _sut.GetSoftDeletedByLibraryIdAsync(libraryId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Single(result.Value);
+        Assert.Equal(deletedBook.Id, result.Value[0].Id);
+    }
+
+    [Fact]
+    public async Task GetSoftDeletedByLibraryIdAsync_WhenCalled_ShouldOrderByTheStoredDeletionTime()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        BookEntity olderDeletion = _bookEntityFixture.Create(libraryId: libraryId, isDeleted: true, deletedOnUtc: DateTime.UtcNow.AddHours(-2));
+        olderDeletion.UpdatedOnUtc = DateTime.UtcNow;
+        BookEntity newerDeletion = _bookEntityFixture.Create(libraryId: libraryId, isDeleted: true, deletedOnUtc: DateTime.UtcNow.AddHours(-1));
+        newerDeletion.UpdatedOnUtc = DateTime.UtcNow.AddHours(-3);
+        _mockContext.Books.AddRange(olderDeletion, newerDeletion);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<BookEntity>> result = await _sut.GetSoftDeletedByLibraryIdAsync(libraryId, CancellationToken.None);
+
+        // Assert
+        // A later write to a deleted row may change its update time, but it must not change the order of the deleted items.
+        Assert.False(result.IsFailure);
+        Assert.Equal(2, result.Value.Count);
+        Assert.Equal(newerDeletion.Id, result.Value[0].Id);
+        Assert.Equal(olderDeletion.Id, result.Value[1].Id);
+    }
+
+    [Fact]
+    public async Task GetSoftDeletedByIdAsync_WhenBookIsNotDeleted_ShouldReturnNull()
+    {
+        // Arrange
+        BookEntity activeBook = _bookEntityFixture.Create();
+        _mockContext.Books.Add(activeBook);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<BookEntity?> result = await _sut.GetSoftDeletedByIdAsync(activeBook.Id, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Null(result.Value);
+    }
+
+    [Fact]
+    public async Task SoftDeleteByIdAsync_WhenCalled_ShouldSetTheDeletionStateAndTime()
+    {
+        // Arrange
+        BookEntity book = _bookEntityFixture.Create();
+        _mockContext.Books.Add(book);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<Updated> result = await _sut.SoftDeleteByIdAsync(book.Id, CancellationToken.None);
+        await _mockContext.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.True(book.IsDeleted);
+        Assert.Equal(_mockDateTimeProvider.UtcNow, book.DeletedOnUtc);
+    }
+
+    [Fact]
+    public async Task SoftDeleteByIdAsync_WhenBookIsAlreadyDeleted_ShouldReturnBookNotFoundError()
+    {
+        // Arrange
+        BookEntity book = _bookEntityFixture.Create(isDeleted: true);
+        _mockContext.Books.Add(book);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<Updated> result = await _sut.SoftDeleteByIdAsync(book.Id, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.WrittenContent.BookNotFound, result.FirstError);
+    }
+
+    [Fact]
+    public async Task RestoreSoftDeletedByIdAsync_WhenCalled_ShouldClearTheDeletionStateAndTime()
+    {
+        // Arrange
+        BookEntity book = _bookEntityFixture.Create(isDeleted: true, deletedOnUtc: DateTime.UtcNow.AddHours(-1));
+        _mockContext.Books.Add(book);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<Updated> result = await _sut.RestoreSoftDeletedByIdAsync(book.Id, CancellationToken.None);
+        await _mockContext.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.False(book.IsDeleted);
+        Assert.Null(book.DeletedOnUtc);
+    }
+
+    [Fact]
+    public async Task RestoreSoftDeletedByIdAsync_WhenBookIsNotDeleted_ShouldReturnBookNotFoundError()
+    {
+        // Arrange
+        BookEntity book = _bookEntityFixture.Create();
+        _mockContext.Books.Add(book);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<Updated> result = await _sut.RestoreSoftDeletedByIdAsync(book.Id, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.WrittenContent.BookNotFound, result.FirstError);
+    }
+
+    [Fact]
+    public async Task SoftDeleteByIdAsync_WhenBookDoesNotExist_ShouldReturnBookNotFoundError()
+    {
+        // Act
+        Result<Updated> result = await _sut.SoftDeleteByIdAsync(Guid.NewGuid(), CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.WrittenContent.BookNotFound, result.FirstError);
+    }
+
+    [Fact]
     public async Task GetBooksNeedingMetadataAsync_WhenCalled_ShouldReturnOnlyBooksWhoseMetadataIsNotEnriched()
     {
         // Arrange
@@ -403,7 +637,11 @@ public class BookRepositoryTests
         BookEntity bookOfAnotherLibrary = _bookEntityFixture.Create();
         bookOfAnotherLibrary.LibraryId = Guid.NewGuid();
         bookOfAnotherLibrary.MetadataStatus = MetadataStatus.Pending;
-        _mockContext.Books.AddRange(pendingBook, enrichedBook, failedBook, bookOfAnotherLibrary);
+        BookEntity deletedPendingBook = _bookEntityFixture.Create(isDeleted: true);
+        deletedPendingBook.LibraryId = libraryId;
+        deletedPendingBook.Path = "/books/d.epub";
+        deletedPendingBook.MetadataStatus = MetadataStatus.Pending;
+        _mockContext.Books.AddRange(pendingBook, enrichedBook, failedBook, bookOfAnotherLibrary, deletedPendingBook);
         await _mockContext.SaveChangesAsync();
 
         // Act
@@ -414,6 +652,7 @@ public class BookRepositoryTests
         Assert.Equal(2, result.Value.Count);
         Assert.Contains(result.Value, book => book.Id == pendingBook.Id);
         Assert.Contains(result.Value, book => book.Id == failedBook.Id);
+        Assert.DoesNotContain(result.Value, book => book.Id == deletedPendingBook.Id);
     }
 
     [Fact]
@@ -483,6 +722,8 @@ public class BookRepositoryTests
 
         Guid storedLibraryId = storedBook.LibraryId;
         string storedPath = storedBook.Path;
+        bool storedIsDeleted = storedBook.IsDeleted;
+        DateTime? storedDeletedOnUtc = storedBook.DeletedOnUtc;
         MetadataStatus storedMetadataStatus = storedBook.MetadataStatus;
         DateTime? storedLastMetadataUpdateUtc = storedBook.LastMetadataUpdateUtc;
         string? storedMetadataProvider = storedBook.MetadataProvider;
@@ -493,6 +734,8 @@ public class BookRepositoryTests
         data.Title = "Updated Title";
         data.LibraryId = Guid.NewGuid();
         data.Path = "/books/updated.epub";
+        data.IsDeleted = true;
+        data.DeletedOnUtc = DateTime.UtcNow;
         data.MetadataStatus = MetadataStatus.Enriched;
         data.LastMetadataUpdateUtc = DateTime.UtcNow;
         data.MetadataProvider = "UpdatedProvider";
@@ -501,10 +744,14 @@ public class BookRepositoryTests
 
         // Act
         Result<Updated> result = await _sut.UpdateAsync(data, CancellationToken.None);
+        bool isDeletionStateModified = _mockContext.Entry(storedBook).Property(book => book.IsDeleted).IsModified;
+        bool isDeletionTimeModified = _mockContext.Entry(storedBook).Property(book => book.DeletedOnUtc).IsModified;
         await _mockContext.SaveChangesAsync();
 
         // Assert
         Assert.False(result.IsFailure);
+        Assert.False(isDeletionStateModified);
+        Assert.False(isDeletionTimeModified);
         BookEntity? retrievedBook = await _mockContext.Books
             .Include(book => book.Tags)
             .Include(book => book.Genres)
@@ -517,11 +764,34 @@ public class BookRepositoryTests
         // The identity, enrichment and audit columns of the stored book are never overwritten by an edit.
         Assert.Equal(storedLibraryId, retrievedBook.LibraryId);
         Assert.Equal(storedPath, retrievedBook.Path);
+        Assert.Equal(storedIsDeleted, retrievedBook.IsDeleted);
+        Assert.Equal(storedDeletedOnUtc, retrievedBook.DeletedOnUtc);
         Assert.Equal(storedMetadataStatus, retrievedBook.MetadataStatus);
         Assert.Equal(storedLastMetadataUpdateUtc, retrievedBook.LastMetadataUpdateUtc);
         Assert.Equal(storedMetadataProvider, retrievedBook.MetadataProvider);
         Assert.Equal(storedCreatedOnUtc, retrievedBook.CreatedOnUtc);
         Assert.Equal(storedCreatedBy, retrievedBook.CreatedBy);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WhenBookIsDeleted_ShouldReturnBookNotFoundWithoutUpdatingIt()
+    {
+        // Arrange
+        BookEntity storedBook = _bookEntityFixture.Create(isDeleted: true);
+        _mockContext.Books.Add(storedBook);
+        await _mockContext.SaveChangesAsync();
+        string storedTitle = storedBook.Title;
+        BookEntity data = _bookEntityFixture.Create(id: storedBook.Id);
+        data.Title = "Updated Title";
+
+        // Act
+        Result<Updated> result = await _sut.UpdateAsync(data, CancellationToken.None);
+
+        // Assert
+        // A soft deleted book can only be brought back by the explicit restore operation, never by an edit.
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.WrittenContent.BookNotFound, result.FirstError);
+        Assert.Equal(storedTitle, storedBook.Title);
     }
 
     [Fact]
@@ -832,7 +1102,11 @@ public class BookRepositoryTests
         BookEntity bookOfAnotherLibrary = _bookEntityFixture.Create();
         bookOfAnotherLibrary.LibraryId = Guid.NewGuid();
         bookOfAnotherLibrary.Artwork = [];
-        _mockContext.Books.AddRange(bookWithoutCover, bookWithEnrichedCover, bookWithFailedCover, bookOfAnotherLibrary);
+        BookEntity deletedBookWithoutCover = _bookEntityFixture.Create(isDeleted: true);
+        deletedBookWithoutCover.LibraryId = libraryId;
+        deletedBookWithoutCover.Path = "/books/d.epub";
+        deletedBookWithoutCover.Artwork = [];
+        _mockContext.Books.AddRange(bookWithoutCover, bookWithEnrichedCover, bookWithFailedCover, bookOfAnotherLibrary, deletedBookWithoutCover);
         await _mockContext.SaveChangesAsync();
 
         // Act
@@ -843,6 +1117,7 @@ public class BookRepositoryTests
         Assert.Equal(2, result.Value.Count);
         Assert.Contains(result.Value, book => book.Id == bookWithoutCover.Id);
         Assert.Contains(result.Value, book => book.Id == bookWithFailedCover.Id);
+        Assert.DoesNotContain(result.Value, book => book.Id == deletedBookWithoutCover.Id);
     }
 
     [Fact]
@@ -859,7 +1134,10 @@ public class BookRepositoryTests
         BookEntity bookOfAnotherLibrary = _bookEntityFixture.Create();
         bookOfAnotherLibrary.LibraryId = Guid.NewGuid();
         bookOfAnotherLibrary.Artwork = [];
-        _mockContext.Books.AddRange(bookWithoutCover, bookWithEnrichedCover, bookOfAnotherLibrary);
+        BookEntity deletedBookWithoutCover = _bookEntityFixture.Create(isDeleted: true);
+        deletedBookWithoutCover.LibraryId = libraryId;
+        deletedBookWithoutCover.Artwork = [];
+        _mockContext.Books.AddRange(bookWithoutCover, bookWithEnrichedCover, bookOfAnotherLibrary, deletedBookWithoutCover);
         await _mockContext.SaveChangesAsync();
 
         // Act
@@ -998,7 +1276,10 @@ public class BookRepositoryTests
         BookEntity bookOfAnotherLibrary = _bookEntityFixture.Create();
         bookOfAnotherLibrary.LibraryId = Guid.NewGuid();
         bookOfAnotherLibrary.MetadataStatus = MetadataStatus.Pending;
-        _mockContext.Books.AddRange(pendingBook, enrichedBook, failedBook, bookOfAnotherLibrary);
+        BookEntity deletedPendingBook = _bookEntityFixture.Create(isDeleted: true);
+        deletedPendingBook.LibraryId = libraryId;
+        deletedPendingBook.MetadataStatus = MetadataStatus.Pending;
+        _mockContext.Books.AddRange(pendingBook, enrichedBook, failedBook, bookOfAnotherLibrary, deletedPendingBook);
         await _mockContext.SaveChangesAsync();
 
         // Act
@@ -1191,7 +1472,9 @@ public class BookRepositoryTests
         List<BookEntity> books = _bookEntityFixture.CreateMany(3);
         foreach (BookEntity book in books)
             book.LibraryId = libraryId;
+        BookEntity deletedBook = _bookEntityFixture.Create(libraryId: libraryId, isDeleted: true);
         _mockContext.Books.AddRange(books);
+        _mockContext.Books.Add(deletedBook);
         await _mockContext.SaveChangesAsync();
 
         PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
@@ -1204,6 +1487,7 @@ public class BookRepositoryTests
         Assert.False(result.IsFailure);
         Assert.Equal(3, result.Value.Count);
         Assert.Equal(3, result.Value.Data.Count);
+        Assert.DoesNotContain(result.Value.Data, row => row.Id == deletedBook.Id);
         Assert.Equal(1, result.Value.CurrentPage);
         Assert.Equal(10, result.Value.PerPage);
         Assert.Equal(1, result.Value.NumberOfPages);
@@ -1490,6 +1774,24 @@ public class BookRepositoryTests
         Assert.Contains(result.Value, book => book.Id == firstBook.Id);
         Assert.Contains(result.Value, book => book.Id == thirdBook.Id);
         Assert.DoesNotContain(result.Value, book => book.Id == secondBook.Id);
+    }
+
+    [Fact]
+    public async Task GetByIdsAsync_WhenABookIsDeleted_ShouldExcludeIt()
+    {
+        // Arrange
+        BookEntity activeBook = _bookEntityFixture.Create(includeMetadata: false);
+        BookEntity deletedBook = _bookEntityFixture.Create(isDeleted: true, includeMetadata: false);
+        _mockContext.Books.AddRange(activeBook, deletedBook);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<BookEntity>> result = await _sut.GetByIdsAsync([activeBook.Id, deletedBook.Id], false, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Single(result.Value);
+        Assert.Equal(activeBook.Id, result.Value[0].Id);
     }
 
     [Fact]

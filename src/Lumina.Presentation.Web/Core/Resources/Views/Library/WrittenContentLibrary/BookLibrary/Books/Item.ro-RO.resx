@@ -1084,4 +1084,16 @@
   <data name="AddTag" xml:space="preserve">
     <value>Adaugă etichetă</value>
   </data>
+  <data name="DeleteBook" xml:space="preserve">
+    <value>Șterge cartea</value>
+  </data>
+  <data name="BookDeleted" xml:space="preserve">
+    <value>Cartea a fost ștearsă.</value>
+  </data>
+  <data name="DeleteConfirm" xml:space="preserve">
+    <value>Sigur doriți să ștergeți acest element?</value>
+  </data>
+  <data name="DeleteFailed" xml:space="preserve">
+    <value>Elementul nu a putut fi șters.</value>
+  </data>
 </root>

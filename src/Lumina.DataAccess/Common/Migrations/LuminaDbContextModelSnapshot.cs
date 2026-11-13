@@ -1913,6 +1913,10 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(32);
 
+                    b.Property<DateTime?>("DeletedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(42);
+
                     b.Property<string>("Description")
                         .HasMaxLength(2000)
                         .HasColumnType("TEXT")
@@ -1935,6 +1939,12 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasMaxLength(12)
                         .HasColumnType("TEXT")
                         .HasColumnOrder(27);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false)
+                        .HasColumnOrder(41);
 
                     b.Property<string>("LCCN")
                         .HasColumnType("TEXT")
@@ -2066,6 +2076,8 @@ namespace Lumina.DataAccess.Common.Migrations
 
                     b.HasIndex("LibraryId", "Path")
                         .IsUnique();
+
+                    b.HasIndex("LibraryId", "IsDeleted", "DeletedOnUtc", "Title", "Id");
 
                     b.ToTable("Books", (string)null);
                 });

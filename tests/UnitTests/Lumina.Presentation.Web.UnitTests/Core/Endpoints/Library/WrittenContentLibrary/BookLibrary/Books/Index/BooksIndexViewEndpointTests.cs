@@ -84,6 +84,8 @@ public class BooksIndexViewEndpointTests
         _mockUrlService.GetAbsoluteUrl(WebRoutes.Books.GET_LIBRARY_ITEMS).Returns("http://localhost/en-us/library/written-content-library/books-library/books/api-get-library-items");
         _mockUrlService.GetAbsoluteUrl(WebRoutes.Settings.GET_USER_SETTINGS).Returns("http://localhost/en-us/tools/settings/api-get-user-settings");
         _mockUrlService.GetAbsoluteUrl(WebRoutes.Books.READ, Arg.Any<object>()).Returns("http://localhost/en-us/library/written-content-library/books-library/books/00000000-0000-0000-0000-000000000000/read");
+        _mockUrlService.GetAbsoluteUrl(WebRoutes.Books.DELETE_BOOK, Arg.Any<object>()).Returns("http://localhost/en-us/library/written-content-library/books-library/books/00000000-0000-0000-0000-000000000000/api-delete-book");
+        _mockUrlService.GetAbsoluteUrl(WebRoutes.Books.DELETED_BOOKS).Returns("http://localhost/en-us/library/written-content-library/books-library/books/deleted-items");
         _mockThemePageRenderer.RenderAsync(Arg.Any<ThemePageDto>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(_themePageRenderResultDtoFixture.Create(content: "<section>content</section>", script: "<script>script</script>")));
 
@@ -99,6 +101,7 @@ public class BooksIndexViewEndpointTests
                 page.PageData.ContainsKey("libraryId") &&
                 page.PageData.ContainsKey("settingsUrl") &&
                 page.PageData.ContainsKey("strings") &&
+                page.PageData.ContainsKey("stringsJson") &&
                 string.Equals(
                     page.PageData["itemsUrl"] as string,
                     "http://localhost/en-us/library/written-content-library/books-library/books/api-get-library-items",
@@ -106,6 +109,14 @@ public class BooksIndexViewEndpointTests
                 string.Equals(
                     page.PageData["readUrl"] as string,
                     "http://localhost/en-us/library/written-content-library/books-library/books/00000000-0000-0000-0000-000000000000/read",
+                    StringComparison.Ordinal) &&
+                string.Equals(
+                    page.PageData["deleteUrl"] as string,
+                    "http://localhost/en-us/library/written-content-library/books-library/books/00000000-0000-0000-0000-000000000000/api-delete-book",
+                    StringComparison.Ordinal) &&
+                string.Equals(
+                    page.PageData["deletedBooksUrl"] as string,
+                    "http://localhost/en-us/library/written-content-library/books-library/books/deleted-items",
                     StringComparison.Ordinal)),
             Arg.Is<string?>(requestedThemeId => requestedThemeId == null),
             Arg.Any<CancellationToken>());

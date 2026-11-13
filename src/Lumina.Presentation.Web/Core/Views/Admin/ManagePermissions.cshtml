@@ -127,7 +127,7 @@
 
             const result = await callApiPutAsync('@_urlService.GetAbsoluteUrl(WebRoutes.Admin.UPDATE_USER_AUTHORIZATION)', formData);
             if (result.success)
-                notificationService.show('@_localizer["UserAuthorizationUpdated"]', NotificationType.SUCCESS);
+                notificationService.show(@Json.Serialize(_localizer["UserAuthorizationUpdated"].Value), NotificationType.SUCCESS);
         }
 
         async function fetchUserRoleAsync(userId) {
@@ -178,7 +178,7 @@
             // Users dropdown change.
             if (e.target.closest('#authorization-users-combobox .enlightenment-option')) {
                 var selectedUserId = e.target.dataset.value;
-                document.querySelector('#authorization-roles-combobox .enlightenment-selected-text').textContent = '@_localizer["SelectARole"]';
+                document.querySelector('#authorization-roles-combobox .enlightenment-selected-text').textContent = @Json.Serialize(_localizer["SelectARole"].Value);
                 document.querySelectorAll("input[name='authorization-permissions-permissions']").forEach(input => input.checked = false);
                 roleIdInput.value = '';
                 userIdInput.value = '';

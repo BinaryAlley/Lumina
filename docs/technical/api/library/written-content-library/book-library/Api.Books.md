@@ -26,13 +26,17 @@
     - [Get Reading Manifest](#get-reading-manifest)
       - [Get Reading Manifest Request](#get-reading-manifest-request)
       - [Get Reading Manifest Response](#get-reading-manifest-response)
-    - [Get Reading Resource](#get-reading-resource)
-      - [Get Reading Resource Request](#get-reading-resource-request)
-      - [Get Reading Resource Response](#get-reading-resource-response)
     - [Get Reading Section](#get-reading-section)
       - [Get Reading Section Request](#get-reading-section-request)
       - [Get Reading Section Response](#get-reading-section-response)
+    - [Get Reading Resource](#get-reading-resource)
+      - [Get Reading Resource Request](#get-reading-resource-request)
+      - [Get Reading Resource Response](#get-reading-resource-response)
+    - [Get Deleted Books](#get-deleted-books)
+      - [Get Deleted Books Request](#get-deleted-books-request)
+      - [Get Deleted Books Response](#get-deleted-books-response)
     - [Delete Book](#delete-book)
+    - [Restore Book](#restore-book)
 
 ## Book
 
@@ -872,14 +876,64 @@ Returns the binary resource identified by `resourceKey` of the book identified b
 
 The response is the raw bytes of the resource, served with the `Content-Type` of the resource and with `X-Content-Type-Options: nosniff`. A resource whose declared media type could be rendered as an active document (for example an SVG) is served as an opaque binary download instead.
 
-### Delete Book
+### Get Deleted Books
+
+#### Get Deleted Books Request
 
 ```js
-DELETE api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books/{bookId}
+GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books/deleted-items
 ```
+
+Returns the books of the media library identified by the route that the user deleted and that can still be restored. The books are ordered by the time they were deleted, most recent first.
+
+#### Get Deleted Books Response
 
 ```js
 200 Ok
 ```
 
-Deletes the book identified by the route, together with its stored artwork.
+```json
+[
+  {
+    "id": "f4c8a9a0-3d77-4e86-9b1a-2f7a5c4b6d31",
+    "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
+    "title": "The Fellowship of the Ring",
+    "originalTitle": null,
+    "path": "/media/libraries/books/the-fellowship-of-the-ring.pdf",
+    "deletedOnUtc": "2026-11-12T10:15:30Z",
+    "coverPath": "/media/books/tolkien/the-fellowship-of-the-ring/cover.jpg"
+  }
+]
+```
+
+### Delete Book
+
+#### Delete Book Request
+
+```js
+DELETE api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books/{bookId}
+```
+
+#### Delete Book Response
+
+```js
+200 Ok
+```
+
+Moves the book identified by the route to the deleted items of its media library. The book is no longer listed, read or materialized again by automatic scans, and its metadata and stored artwork are kept so that it can be restored. The deleted row keeps its file system path reserved in the library, so a later scan does not add the file back. The path stays reserved until the book is restored, or until the file disappears from disk and the scan permanently removes the deleted row.
+
+### Restore Book
+
+#### Restore Book Request
+
+```js
+POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books/{bookId}/restore
+```
+
+#### Restore Book Response
+
+```js
+200 Ok
+```
+
+Restores the deleted book identified by the route to the catalogue of its media library, together with the metadata and artwork that were kept while it was deleted. The path of the restored book stops being reserved by the deletion state, and the book is returned to the ordinary catalogue reads and scans.

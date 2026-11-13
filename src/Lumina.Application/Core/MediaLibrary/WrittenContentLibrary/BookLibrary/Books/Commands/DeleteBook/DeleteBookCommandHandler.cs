@@ -1,15 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Artwork;
 using Lumina.Domain.Common.Primitives;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -26,8 +23,6 @@ namespace Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary
 public class DeleteBookCommandHandler : ICommandHandler<DeleteBookCommand, Result<Deleted>>
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IBookArtworkService _bookArtworkService;
-    private readonly ILogger<DeleteBookCommandHandler> _logger;
     private readonly IAuthorizationService _authorizationService;
     private readonly ICurrentUserService _currentUserService;
     private readonly IValidator<DeleteBookCommand> _validator;
@@ -36,22 +31,16 @@ public class DeleteBookCommandHandler : ICommandHandler<DeleteBookCommand, Resul
     /// Initializes a new instance of the <see cref="DeleteBookCommandHandler"/> class.
     /// </summary>
     /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
-    /// <param name="bookArtworkService">Injected service for removing the artwork of a book.</param>
-    /// <param name="logger">Injected logger used to report the issues encountered while removing the stored artwork.</param>
     /// <param name="authorizationService">Injected service for authorization related functionality.</param>
     /// <param name="currentUserService">Injected service to retrieve the current user information.</param>
     /// <param name="validator">Injected validator for application validation rules.</param>
     public DeleteBookCommandHandler(
         IUnitOfWork unitOfWork,
-        IBookArtworkService bookArtworkService,
-        ILogger<DeleteBookCommandHandler> logger,
         IAuthorizationService authorizationService,
         ICurrentUserService currentUserService,
         IValidator<DeleteBookCommand> validator)
     {
         _unitOfWork = unitOfWork;
-        _bookArtworkService = bookArtworkService;
-        _logger = logger;
         _authorizationService = authorizationService;
         _currentUserService = currentUserService;
         _validator = validator;
@@ -99,28 +88,9 @@ public class DeleteBookCommandHandler : ICommandHandler<DeleteBookCommand, Resul
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
-        // A book can only belong to a library that exists, so a client can never delete a book of a library of the host that is not there.
-        Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(libraryId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
-        if (getLibraryResult.IsFailure)
-            return getLibraryResult.Errors;
-        if (getLibraryResult.Value is null)
-            return DomainErrors.Library.LibraryNotFound;
-        LibraryEntity library = getLibraryResult.Value;
-
-        // The artwork is stored under the library and author segments, so the author is resolved before the book is removed.
-        Result<IReadOnlyDictionary<Guid, string?>> getAuthorsResult = await _unitOfWork.BookRepository
-            .GetAuthorsDisplayNamesByBookIdsAsync([existingBook.Id], cancellationToken).ConfigureAwait(false);
-        if (getAuthorsResult.IsFailure)
-            return getAuthorsResult.Errors;
-        string authorName = getAuthorsResult.Value.TryGetValue(existingBook.Id, out string? authorDisplayName) && authorDisplayName is not null ? authorDisplayName : string.Empty;
-
-        // Delete the stored artwork of the book, best-effort, since a stale cover must not prevent the book from being removed.
-        Result<Deleted> deleteArtworkResult = _bookArtworkService.DeleteBookArtwork(libraryId, existingBook.Id, library.Title, authorName, existingBook.Title);
-        if (deleteArtworkResult.IsFailure)
-            _logger.LogWarning("Failed to delete the stored artwork of the book with Id '{BookId}' at path '{BookPath}', the artwork might remain orphaned.", existingBook.Id, existingBook.Path);
-
-        // Delete the book, whose stored artwork rows and participations are removed by the database cascade.
-        Result<Deleted> deleteBookResult = await _unitOfWork.BookRepository.DeleteByIdAsync(existingBook.Id, cancellationToken).ConfigureAwait(false);
+        // The book is soft deleted, so its metadata, artwork and path stay available until the user restores it or the file disappears from disk.
+        // Keeping the row is also what makes the deletion survive an automatic scan, because the scan treats its path as already catalogued.
+        Result<Updated> deleteBookResult = await _unitOfWork.BookRepository.SoftDeleteByIdAsync(existingBook.Id, cancellationToken).ConfigureAwait(false);
         if (deleteBookResult.IsFailure)
             return deleteBookResult.Errors;
 

@@ -1084,4 +1084,16 @@
   <data name="AddTag" xml:space="preserve">
     <value>添加标签</value>
   </data>
+  <data name="DeleteBook" xml:space="preserve">
+    <value>删除图书</value>
+  </data>
+  <data name="BookDeleted" xml:space="preserve">
+    <value>图书已删除。</value>
+  </data>
+  <data name="DeleteConfirm" xml:space="preserve">
+    <value>确定要删除此项目吗？</value>
+  </data>
+  <data name="DeleteFailed" xml:space="preserve">
+    <value>无法删除该项目。</value>
+  </data>
 </root>
