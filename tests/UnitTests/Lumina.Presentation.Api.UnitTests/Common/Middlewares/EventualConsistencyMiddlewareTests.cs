@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.DomainEvents;
+using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Events;
 using Lumina.Presentation.Api.Common.Http;
@@ -72,7 +73,7 @@ public class EventualConsistencyMiddlewareTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-eventual-consistency-abort-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext dbContext = CreateContext(anchorConnection);
-        using UnitOfWork unitOfWork = new(dbContext);
+        using UnitOfWork unitOfWork = new(dbContext, Substitute.For<IDateTimeProvider>());
         await dbContext.Database.ExecuteSqlRawAsync("CREATE TABLE CommitProbe (Id INTEGER NOT NULL PRIMARY KEY);");
         CapturingHttpResponseFeature responseFeature = new();
         DefaultHttpContext httpContext = new();
@@ -112,7 +113,7 @@ public class EventualConsistencyMiddlewareTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-eventual-consistency-rollback-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext dbContext = CreateContext(anchorConnection);
-        using UnitOfWork unitOfWork = new(dbContext);
+        using UnitOfWork unitOfWork = new(dbContext, Substitute.For<IDateTimeProvider>());
         await dbContext.Database.ExecuteSqlRawAsync("CREATE TABLE CommitProbe (Id INTEGER NOT NULL PRIMARY KEY);");
         CapturingHttpResponseFeature responseFeature = new();
         DefaultHttpContext httpContext = new();

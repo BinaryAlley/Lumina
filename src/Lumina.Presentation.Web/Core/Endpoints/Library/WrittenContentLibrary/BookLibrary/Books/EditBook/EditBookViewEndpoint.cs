@@ -105,6 +105,7 @@ public class EditBookViewEndpoint : BaseEndpoint<GetBookRequest, IResult>
                 ["libraryId"] = book.LibraryId.ToString(),
                 ["antiforgeryToken"] = antiforgeryTokens.RequestToken,
                 ["saveUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Books.SAVE_BOOK, new { bookId = default(Guid) }) ?? string.Empty,
+                ["deleteUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Books.DELETE_BOOK, new { bookId = default(Guid) }) ?? string.Empty,
                 ["coverUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Books.UPDATE_BOOK_COVER, new { bookId = default(Guid) }) ?? string.Empty,
                 ["backUrl"] = (_urlService.GetAbsoluteUrl(WebRoutes.Books.INDEX) ?? string.Empty) + "?libraryId=" + book.LibraryId,
                 ["bookJson"] = JsonSerializer.Serialize(book, s_camelCaseJsonOptions),

@@ -15,6 +15,9 @@ public static partial class WebRoutes
         public const string EDIT_BOOK = "{culture}/library/written-content-library/books-library/books/{bookId}";
         public const string GET_BOOK_DETAILS = "{culture}/library/written-content-library/books-library/books/{bookId}/api-get-book";
         public const string SAVE_BOOK = "{culture}/library/written-content-library/books-library/books/{bookId}/api-save-book";
+        public const string DELETE_BOOK = "{culture}/library/written-content-library/books-library/books/{bookId}/api-delete-book";
+        public const string DELETED_BOOKS = "{culture}/library/written-content-library/books-library/books/deleted-items";
+        public const string RESTORE_BOOK = "{culture}/library/written-content-library/books-library/books/{bookId}/api-restore-book";
         public const string UPDATE_BOOK_COVER = "{culture}/library/written-content-library/books-library/books/{bookId}/api-update-cover";
         public const string READ = "{culture}/library/written-content-library/books-library/books/{bookId}/read";
         public const string GET_READING_MANIFEST = "{culture}/library/written-content-library/books-library/books/{bookId}/api-get-reading-manifest";

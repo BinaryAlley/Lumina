@@ -66,6 +66,27 @@ public class GetThemeTemplateEndpointTests : IClassFixture<AuthenticatedLuminaAp
         Assert.False(string.IsNullOrWhiteSpace(result.Template));
     }
 
+    [Theory]
+    [InlineData("lumina-default")]
+    [InlineData("editorial-paper")]
+    public async Task GetThemeTemplate_WhenCalledForTheDeletedItemsPage_ShouldReturnTheBundledTemplate(string themeId)
+    {
+        // Arrange
+        await ThemeTestHelpers.WaitForBundledThemeAsync(_apiFactory);
+        HttpClient anonymousClient = _apiFactory.CreateClient();
+
+        // Act
+        HttpResponseMessage response = await anonymousClient.GetAsync($"/api/v1/themes/{themeId}/templates/library/written-content-library/book-library/books/deleted-items");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        ThemeTemplateResponse? result = await response.Content.ReadFromJsonAsync<ThemeTemplateResponse>(_jsonOptions);
+        Assert.NotNull(result);
+        Assert.Equal(themeId, result!.Theme.ThemeId);
+        Assert.Contains("btn-back-to-library", result.Template);
+        Assert.Contains("restoreUrlTemplate", result.Template);
+    }
+
     [Fact]
     public async Task GetThemeTemplate_WhenThemeDoesNotExist_ShouldReturnNotFound()
     {

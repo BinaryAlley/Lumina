@@ -107,6 +107,25 @@ public class BooksMediaLibraryScanItemMaterializerTests
         _mockPathTemplateService.Received(1).Parse(Arg.Any<LibraryType>(), Arg.Any<LibraryPathTemplate>(), "Artist\\track.epub", '\\');
     }
 
+    [Fact]
+    public async Task MaterializeItemsAsync_WhenPathIsAlreadyUsedByADeletedBook_ShouldNotInsertItAgain()
+    {
+        // Arrange
+        LibraryEntity library = _libraryEntityFixture.Create(id: _libraryId, libraryType: LibraryType.Book, contentLocations: ["C:\\Music"]);
+        _mockLibraryRepository.GetByIdAsync(_libraryId, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(library));
+        _mockBookRepository.GetExistingPathsAsync(_libraryId, Arg.Any<IReadOnlyCollection<string>>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyCollection<string>>(["C:\\Music\\deleted.epub"]));
+
+        // Act
+        Result<Success> result = await _sut.MaterializeItemsAsync(_mockUnitOfWork, _libraryId, _scanId, CreatePathSet("C:\\Music\\deleted.epub"), CancellationToken.None);
+
+        // Assert
+        // A deleted book keeps its stored path, so the scan treats the file as already catalogued and never materializes it again.
+        Assert.False(result.IsFailure);
+        await _mockBookRepository.DidNotReceive().InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>());
+    }
+
     /// <summary>
     /// Creates the set of media library scan snapshot paths that the media library scan produces.
     /// </summary>

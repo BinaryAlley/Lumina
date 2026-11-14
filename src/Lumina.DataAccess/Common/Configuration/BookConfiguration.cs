@@ -149,6 +149,13 @@ public class BookConfiguration : IEntityTypeConfiguration<BookEntity>
         builder.Property(book => book.MetadataProvider)
             .HasMaxLength(100)
             .HasColumnOrder(40);
+        builder.Property(book => book.IsDeleted)
+            .IsRequired()
+            .HasDefaultValue(false)
+            .HasColumnOrder(41);
+        builder.Property(book => book.DeletedOnUtc)
+            .HasDefaultValue(null)
+            .HasColumnOrder(42);
 
         builder.HasMany(book => book.Contributors)
             .WithOne()
@@ -226,5 +233,8 @@ public class BookConfiguration : IEntityTypeConfiguration<BookEntity>
         builder.HasIndex(book => new { book.LibraryId, book.Path })
             .IsUnique(); // the same physical book on disk cannot appear twice in the same library
         builder.HasIndex(book => new { book.LibraryId, book.MetadataStatus });
+        // The deleted items page filters by library and deletion state, and orders by the stored deletion time, the title and the Id, so the
+        // index follows the same order and no temporary B-tree is needed for the sort.
+        builder.HasIndex(book => new { book.LibraryId, book.IsDeleted, book.DeletedOnUtc, book.Title, book.Id });
     }
 }

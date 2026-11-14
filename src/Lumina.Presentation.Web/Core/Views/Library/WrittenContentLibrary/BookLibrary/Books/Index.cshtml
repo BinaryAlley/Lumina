@@ -39,6 +39,7 @@
                 <input id="search-input" type="text" class="enlightenment-input w-200px" placeholder="@_localizer["Search"]" />
                 <button id="search-button" type="button" class="confirm-button">@_localizer["Search"]</button>
                 <button id="sort-toggle" type="button" class="confirm-button">@_localizer["SortAscending"]</button>
+                <button id="btn-deleted-books" type="button" class="abort-button">@_localizer["DeletedItems"]</button>
                 <span id="count-label" class="text-light-two"></span>
             </div>
             <div style="display: flex; align-items: flex-start;">
@@ -63,10 +64,14 @@
         const cleanupFunctions = [];
         let isInitialized = false;
         let requestSequence = 0;
+        // Book Ids whose deletion request is already in flight, so a second click cannot send a duplicate request.
+        const booksBeingDeleted = new Set();
 
         const libraryId = '@(Model.Id ?? Guid.Empty)';
         const readUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.READ, new { bookId = default(Guid) })';
         const detailsUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.EDIT_BOOK, new { bookId = default(Guid) })';
+        const deleteUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.DELETE_BOOK, new { bookId = default(Guid) })';
+        const deletedBooksUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.DELETED_BOOKS)';
         const availabilityUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_READING_AVAILABILITY, new { bookId = default(Guid) })';
         // The element references are captured once, so that the cleanup can unbind their listeners even after the AJAX navigator has swapped the content out of the document.
         const booksContainer = document.getElementById('books-container');
@@ -75,6 +80,7 @@
         const searchInput = document.getElementById('search-input');
         const searchButton = document.getElementById('search-button');
         const sortToggle = document.getElementById('sort-toggle');
+        const btnDeletedBooks = document.getElementById('btn-deleted-books');
         const countLabel = document.getElementById('count-label');
         const alphaPicker = document.getElementById('alpha-picker');
         const pagination = document.getElementById('pagination');
@@ -95,16 +101,19 @@
         };
 
         const jsLocalizedStrings = {
-            all: '@_localizer["All"]',
-            items: '@_localizer["Items"]',
-            of: '@_localizer["Of"]',
-            page: '@_localizer["Page"]',
-            sortAscending: '@_localizer["SortAscending"]',
-            sortDescending: '@_localizer["SortDescending"]',
-            readerUnavailable: '@_localizer["ReaderUnavailable"]',
-            readerDisabled: '@_localizer["ReaderDisabled"]',
-            read: '@_localizer["Read"]',
-            viewDetails: '@_localizer["ViewDetails"]'
+            all: @Json.Serialize(_localizer["All"].Value),
+            items: @Json.Serialize(_localizer["Items"].Value),
+            of: @Json.Serialize(_localizer["Of"].Value),
+            page: @Json.Serialize(_localizer["Page"].Value),
+            sortAscending: @Json.Serialize(_localizer["SortAscending"].Value),
+            sortDescending: @Json.Serialize(_localizer["SortDescending"].Value),
+            readerUnavailable: @Json.Serialize(_localizer["ReaderUnavailable"].Value),
+            readerDisabled: @Json.Serialize(_localizer["ReaderDisabled"].Value),
+            read: @Json.Serialize(_localizer["Read"].Value),
+            viewDetails: @Json.Serialize(_localizer["ViewDetails"].Value),
+            deleteItem: @Json.Serialize(_localizer["Delete"].Value),
+            deleteConfirm: @Json.Serialize(_localizer["DeleteConfirm"].Value),
+            deleteFailed: @Json.Serialize(_localizer["DeleteFailed"].Value)
         };
 
         // Builds the URL of the retrieval endpoint, from the current state.
@@ -213,17 +222,23 @@
             menu.setAttribute('role', 'menu');
             menu.innerHTML = `
                                 <a role="menuitem" href="${readUrlTemplate.replace('/@(default(Guid))', `/${book.id}`) + `?libraryId=${libraryId}`}">${jsLocalizedStrings.read}</a>
-                <a role="menuitem" href="${detailsUrl}">${jsLocalizedStrings.viewDetails}</a>`;
+                <a role="menuitem" href="${detailsUrl}">${jsLocalizedStrings.viewDetails}</a>
+                <a role="menuitem" href="#" class="card-action-delete">${jsLocalizedStrings.deleteItem}</a>`;
 
             // Menu entries navigate through the same AJAX navigation used by the nav-links, so that the persistent chrome keeps running.
+            // The delete entry does not navigate, it deletes the book and reloads the list in place.
             menu.addEventListener('click', async event => {
+                const deleteItem = event.target.closest('.card-action-delete');
                 const menuItem = event.target.closest('a[role="menuitem"]');
                 if (!menuItem)
                     return;
                 event.preventDefault();
                 event.stopImmediatePropagation();
                 closeCardMenus();
-                await updateContentAsync(menuItem.href, true);
+                if (deleteItem)
+                    await deleteBookAsync(book.id, deleteItem);
+                else
+                    await updateContentAsync(menuItem.href, true);
             });
 
             // The favorite heart is a plain button: the global favorites script finds it by its data attributes, hydrates its state and handles its click.
@@ -324,6 +339,33 @@
             } else {
                 const message = jsonResponse.errorCode === 'ReaderDisabled' ? jsLocalizedStrings.readerDisabled : jsLocalizedStrings.readerUnavailable;
                 notificationService.show(message, NotificationType.WARNING);
+            }
+        }
+
+        // Deletes the book after confirmation, then reloads the list.
+        async function deleteBookAsync(bookId, actionElement) {
+            if (booksBeingDeleted.has(bookId))
+                return;
+            booksBeingDeleted.add(bookId);
+            if (actionElement) {
+                actionElement.classList.add('disabled');
+                actionElement.setAttribute('aria-disabled', 'true');
+            }
+            try {
+                if (await dialogService.show(jsLocalizedStrings.deleteConfirm, jsLocalizedDialogs.confirmation, DialogButtons.YES_NO, DialogIcon.QUESTION) !== DialogButton.YES)
+                    return;
+                const url = deleteUrlTemplate.replace('/@(default(Guid))', `/${bookId}`) + `?libraryId=${encodeURIComponent(libraryId)}`;
+                const success = await callApiDeleteAsync(url);
+                if (success)
+                    await loadItemsAsync();
+                else
+                    notificationService.show(jsLocalizedStrings.deleteFailed, NotificationType.ERROR);
+            } finally {
+                booksBeingDeleted.delete(bookId);
+                if (actionElement?.isConnected) {
+                    actionElement.classList.remove('disabled');
+                    actionElement.removeAttribute('aria-disabled');
+                }
             }
         }
 
@@ -440,6 +482,11 @@
             }
         }
 
+        // Navigates to the deleted items page of the library.
+        async function handleDeletedBooksAsync() {
+            await updateContentAsync(`${deletedBooksUrl}?libraryId=${encodeURIComponent(libraryId)}`, true);
+        }
+
         // Navigates to the previous page.
         function handlePrevPageClick() {
             state.currentPage = Math.max(1, state.currentPage - 1);
@@ -468,6 +515,7 @@
         bindEventHandler(searchButton, 'click', handleSearch);
         bindEventHandler(searchInput, 'keydown', handleSearchKeydown);
         bindEventHandler(sortToggle, 'click', handleSortToggle);
+        bindEventHandler(btnDeletedBooks, 'click', handleDeletedBooksAsync);
         bindEventHandler(prevPageButton, 'click', handlePrevPageClick);
         bindEventHandler(nextPageButton, 'click', handleNextPageClick);
         document.addEventListener('keydown', handleAlphaKeydown);
@@ -480,6 +528,7 @@
             unbindEventHandler(searchButton, 'click', handleSearch);
             unbindEventHandler(searchInput, 'keydown', handleSearchKeydown);
             unbindEventHandler(sortToggle, 'click', handleSortToggle);
+            unbindEventHandler(btnDeletedBooks, 'click', handleDeletedBooksAsync);
             unbindEventHandler(prevPageButton, 'click', handlePrevPageClick);
             unbindEventHandler(nextPageButton, 'click', handleNextPageClick);
             document.removeEventListener('keydown', handleAlphaKeydown);

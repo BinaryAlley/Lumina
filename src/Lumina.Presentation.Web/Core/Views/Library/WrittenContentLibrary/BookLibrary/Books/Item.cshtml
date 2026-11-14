@@ -527,6 +527,7 @@
 
                 <div class="form-row mt-10">
                     <button id="btn-save-book" type="button" class="confirm-button w-100px">@_localizer["Save"]</button>
+                    <button id="btn-delete-book" type="button" class="abort-button w-100px">@_localizer["DeleteBook"]</button>
                 </div>
             </div>
         </div>
@@ -545,6 +546,7 @@
         const libraryId = '@libraryId';
         const libraryIndexUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.INDEX)';
         const saveUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.SAVE_BOOK, new { bookId = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`);
+        const deleteUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.DELETE_BOOK, new { bookId = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`);
         const coverUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.UPDATE_BOOK_COVER, new { bookId = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`) + `?libraryId=${libraryId}`;
 
         // The element references are captured once, so that the cleanup can unbind their listeners even after the AJAX navigator has swapped the content out of the document.
@@ -554,6 +556,7 @@
         const btnChangeCover = document.getElementById('btn-change-cover');
         const btnBackToLibrary = document.getElementById('btn-back-to-library');
         const btnSaveBook = document.getElementById('btn-save-book');
+        const btnDeleteBook = document.getElementById('btn-delete-book');
         const isbnsBody = document.getElementById('isbns-body');
         const contributorsBody = document.getElementById('contributors-body');
         const ratingsBody = document.getElementById('ratings-body');
@@ -570,6 +573,9 @@
             coverSaved: @Json.Serialize(_localizer["CoverSaved"].Value),
             saveFailed: @Json.Serialize(_localizer["SaveFailed"].Value),
             coverUploadFailed: @Json.Serialize(_localizer["CoverUploadFailed"].Value),
+            bookDeleted: @Json.Serialize(_localizer["BookDeleted"].Value),
+            deleteConfirm: @Json.Serialize(_localizer["DeleteConfirm"].Value),
+            deleteFailed: @Json.Serialize(_localizer["DeleteFailed"].Value),
             noCover: @Json.Serialize(_localizer["NoCover"].Value),
             remove: @Json.Serialize(_localizer["Remove"].Value)
         };
@@ -696,6 +702,18 @@
             } else {
                 notificationService.show(jsLocalizedStrings.saveFailed, NotificationType.ERROR);
             }
+        }
+
+        // Deletes the book after confirmation, then returns to the library page.
+        async function handleDeleteAsync() {
+            if (await dialogService.show(jsLocalizedStrings.deleteConfirm, jsLocalizedDialogs.confirmation, DialogButtons.YES_NO, DialogIcon.QUESTION) !== DialogButton.YES)
+                return;
+            const success = await callApiDeleteAsync(`${deleteUrl}?libraryId=${encodeURIComponent(libraryId)}`);
+            if (success) {
+                notificationService.show(jsLocalizedStrings.bookDeleted, NotificationType.SUCCESS);
+                await handleBackToLibraryAsync();
+            } else 
+                notificationService.show(jsLocalizedStrings.deleteFailed, NotificationType.ERROR);
         }
 
         // Opens the file picker that chooses the new cover image.
@@ -880,6 +898,7 @@
 
         // Add listeners.
         btnSaveBook.addEventListener('click', handleSaveAsync);
+        btnDeleteBook.addEventListener('click', handleDeleteAsync);
         btnBackToLibrary.addEventListener('click', handleBackToLibraryAsync);
         btnChangeCover.addEventListener('click', handleChangeCoverClick);
         coverInput.addEventListener('change', handleCoverChangeAsync);
@@ -898,6 +917,7 @@
         // Register cleanup for these listeners.
         cleanupFunctions.push(() => {
             btnSaveBook.removeEventListener('click', handleSaveAsync);
+            btnDeleteBook.removeEventListener('click', handleDeleteAsync);
             btnBackToLibrary.removeEventListener('click', handleBackToLibraryAsync);
             btnChangeCover.removeEventListener('click', handleChangeCoverClick);
             coverInput.removeEventListener('change', handleCoverChangeAsync);

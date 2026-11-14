@@ -57,4 +57,16 @@
   <data name="ViewDetails" xml:space="preserve">
     <value>Ver detalles</value>
   </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Eliminar</value>
+  </data>
+  <data name="DeleteConfirm" xml:space="preserve">
+    <value>¿Seguro que quieres eliminar este elemento?</value>
+  </data>
+  <data name="DeleteFailed" xml:space="preserve">
+    <value>No se ha podido eliminar el elemento.</value>
+  </data>
+  <data name="DeletedItems" xml:space="preserve">
+    <value>Elementos eliminados</value>
+  </data>
 </root>

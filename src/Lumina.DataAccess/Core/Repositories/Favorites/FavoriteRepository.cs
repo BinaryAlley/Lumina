@@ -25,8 +25,9 @@ namespace Lumina.DataAccess.Core.Repositories.Favorites;
 /// </summary>
 /// <remarks>
 /// A favorite references its media item by kind and Id without a foreign key, so reading a page of favorites resolves the display data of
-/// the referenced items with one batched query per media kind present in the page, and a favorite whose item no longer exists is kept
-/// without display data. Duplicate favorites of the same user on the same item are rejected by the unique (UserId, MediaKind, MediaItemId) index.
+/// the referenced items with one batched query per media kind present in the page. A favorite whose item no longer exists, or whose book
+/// was soft deleted, is kept without display data. Duplicate favorites of the same user on the same item are rejected by the unique
+/// (UserId, MediaKind, MediaItemId) index.
 /// </remarks>
 internal sealed class FavoriteRepository : IFavoriteRepository
 {
@@ -127,7 +128,7 @@ internal sealed class FavoriteRepository : IFavoriteRepository
                 .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false),
             FavoriteMediaKind.Book => await _luminaDbContext.Books
                 .AsNoTracking()
-                .Where(book => book.Id == mediaItemId)
+                .Where(book => book.Id == mediaItemId && !book.IsDeleted)
                 .Select(book => (Guid?)book.LibraryId)
                 .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false),
             _ => null,
@@ -350,7 +351,7 @@ internal sealed class FavoriteRepository : IFavoriteRepository
                 // the same author the book listing shows, and the Id is the tiebreaker between authors that share a display name.
                 rows = await _luminaDbContext.Books
                     .AsNoTracking()
-                    .Where(book => requestedIds.Contains(book.Id))
+                    .Where(book => requestedIds.Contains(book.Id) && !book.IsDeleted)
                     .Select(book => new DisplayRow(
                         book.Id,
                         book.LibraryId,

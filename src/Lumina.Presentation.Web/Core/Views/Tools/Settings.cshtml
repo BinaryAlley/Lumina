@@ -409,7 +409,7 @@
             };
             const data = await callApiPostAsync('@_urlService.GetAbsoluteUrl(WebRoutes.Settings.UPDATE_USER_SETTINGS)', formData);
             if (data && data.isUpdated === true) {
-                notificationService.show('@_localizer["SettingsSaved"]', NotificationType.SUCCESS);
+                notificationService.show(@Json.Serialize(_localizer["SettingsSaved"].Value), NotificationType.SUCCESS);
                 // The player lives in the layout and is not recreated by the navigation manager, so the saved playback and
                 // VU meter settings are handed to it directly instead of waiting for a full page reload.
                 if (window.LuminaAudioPlayer && window.LuminaAudioPlayer.instance && typeof window.LuminaAudioPlayer.instance.reloadPreferencesAsync === 'function')

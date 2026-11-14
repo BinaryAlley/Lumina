@@ -20,6 +20,8 @@ The web client of Lumina is a themed shell: every page is rendered inside the te
       - [The audio player sub templates](#the-audio-player-sub-templates)
     - [The Navigation Template (shared/nav-menu)](#the-navigation-template-sharednav-menu)
     - [Page Templates](#page-templates)
+      - [The Books Index Page](#the-books-index-page)
+      - [The Deleted Items Page](#the-deleted-items-page)
       - [The Playlist Pages](#the-playlist-pages)
       - [The Shared Add to Playlist Action](#the-shared-add-to-playlist-action)
       - [The Album Track Actions Menu](#the-album-track-actions-menu)
@@ -161,7 +163,7 @@ Every themed page is identified by a page key that mirrors the path of the corre
 1. An explicit mapping in `templates` when the manifest declares the page key.
 2. A mirrored template file at `templates/{pageKey}.html`, walking up the scope of the path when the exact mirror does not exist.
 
-When neither an explicit mapping nor a mirrored file exists, the theme has no template for that page, and the application renders its own fallback unstylied Razor view instead.
+When neither an explicit mapping nor a mirrored file exists, the theme has no template for that page, and the application renders its own fallback unstyled Razor view instead.
 
 For example, the books index page has the page key `library/written-content-library/book-library/books/index`. The engine tries, in order: the explicit `templates` entry for that key, `templates/library/written-content-library/book-library/books/index.html`, then the parent scopes such as `templates/library/written-content-library/book-library/books.html`. When none exists, the application renders the books page view itself.
 
@@ -177,6 +179,7 @@ Known page keys:
 | `shared/audio-player/queue-item` | The queue item of the audio player bar. |
 | `shared/audio-player/playlist-item` | The playlist item of the audio player bar. |
 | `library/written-content-library/book-library/books/index` | The books browsing page. |
+| `library/written-content-library/book-library/books/deleted-items` | The deleted items page of a book library, which restores deleted books. |
 | `playlists/index` | The page that lists and deletes the playlists of the current user. |
 | `playlists/item` | The page that creates a playlist, or edits, reorders, plays and deletes an existing playlist of the current user. The `isNew` page data field tells the two modes apart. |
 | `favorites/index` | The page that lists, filters and removes the favorites of the current user across media kinds. |
@@ -554,6 +557,69 @@ Page templates are rendered into a content section that the layout wraps. A page
 </script>
 {{/scripts}}
 ```
+
+#### The Books Index Page
+
+`library/written-content-library/book-library/books/index` receives a model with the following fields:
+
+| Field | Content |
+| --- | --- |
+| `libraryId` | The Id of the library whose books are browsed. |
+| `itemsUrl` | The route that returns the books of the library. |
+| `settingsUrl` | The route that returns the settings of the current user, which drive pagination and the alpha picker. |
+| `readUrl` | The route template of the reader of a book. The trailing `00000000-0000-0000-0000-000000000000` is replaced by the Id of the book. |
+| `detailsUrl` | The route template of the details page of a book. The trailing `00000000-0000-0000-0000-000000000000` is replaced by the Id of the book. |
+| `deleteUrl` | The route template that deletes a book. The trailing `00000000-0000-0000-0000-000000000000` is replaced by the Id of the book. |
+| `deletedBooksUrl` | The route of the deleted items page of the library. |
+| `availabilityUrl` | The route template that reports whether a book can be read. The trailing `00000000-0000-0000-0000-000000000000` is replaced by the Id of the book. |
+| `strings` | The localized strings of the page, keyed by their resource names. |
+| `stringsJson` | The same localized strings serialized as JSON, with camel case keys, for the page script. |
+
+The page script renders the cards into `books-container` and drives these hooks:
+
+| Hook | Purpose |
+| --- | --- |
+| `search-input` and `search-button` | Filter the books by title. |
+| `sort-toggle` | Toggle the sort direction. |
+| `btn-deleted-books` | Opens the deleted items page of the library. |
+| `count-label` | Shows the total number of books or the range of the current page. |
+| `alpha-picker` | Filters the books by their first character. |
+| `pagination`, `prev-page`, `next-page` and `page-indicator` | Navigate the pages. |
+| `no-items` and `no-items-matching` | Show the empty states without and with active filters. |
+| `.media-card`, `.card-actions-trigger` and `.card-actions-menu` | Render a book card and its actions menu. |
+| `.card-action-delete` | Deletes the book of the card. |
+
+#### The Deleted Items Page
+
+`library/written-content-library/book-library/books/deleted-items` lists the books that were deleted from a book library and lets the user restore them. Its fallback is `Core/Views/Library/WrittenContentLibrary/BookLibrary/Books/DeletedItems.cshtml`. The bundled themes ship their own `templates/library/written-content-library/book-library/books/deleted-items.html`; when a theme has no template for the page, the application renders the fallback view.
+
+Template resolution walks up the path scopes, so a theme that ships `templates/library/written-content-library/book-library/books.html` without a `deleted-items.html` would render that parent template for this page. A theme that provides a books parent template must also provide the deleted items template.
+
+Page data:
+
+| Field | Content |
+| --- | --- |
+| `libraryId` | The Id of the library whose deleted books are listed. |
+| `libraryTitle` | The title of that library. |
+| `deletedBooksJson` | The deleted books, serialized as a JSON array. Each item carries `id`, `libraryId`, `title`, `originalTitle`, `path`, `deletedOnUtc` and `coverPath`. |
+| `restoreUrl` | The route template that restores a deleted book. The trailing `00000000-0000-0000-0000-000000000000` is replaced by the Id of the book, and `libraryId` is appended as a query parameter. |
+| `backUrl` | The route of the books page of the library. |
+| `antiforgeryToken` | The anti-forgery request token for the restore POST. |
+| `strings` | The localized strings of the page, keyed by their resource names. |
+| `stringsJson` | The same localized strings serialized as JSON, with camel case keys, for the page script. |
+
+The page script drives these hooks:
+
+| Hook | Purpose |
+| --- | --- |
+| `btn-back-to-library` | Returns to the books page of the library. |
+| `deleted-books-table` | Holds the deleted books. The restore click handler is bound to it. |
+| `no-deleted-books` | The empty state, shown when no deleted books remain. |
+| `.deleted-book-row` | A deleted book row, carrying the book Id in `data-book-id`. Removed after a successful restore. |
+| `.btn-restore-book` | The restore button of a row, carrying the book Id in `data-book-id`. |
+| `input[name="__RequestVerificationToken"]` | The anti-forgery token that the restore POST sends. |
+
+A theme that provides this page must keep these hooks and render the anti-forgery token, or reimplement the restore behavior itself.
 
 #### The Playlist Pages
 

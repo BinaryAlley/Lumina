@@ -13,6 +13,8 @@ public static partial class ApiRoutes
         public const string GET_BOOK_BY_ID = "/libraries/{libraryId}/books/{bookId}";
         public const string GET_BOOKS = "/libraries/{libraryId}/books";
         public const string GET_BOOKS_LITE = "/libraries/{libraryId}/books/lite";
+        public const string GET_DELETED_BOOKS = "/libraries/{libraryId}/books/deleted-items";
+        public const string RESTORE_BOOK = "/libraries/{libraryId}/books/{bookId}/restore";
         public const string ADD_BOOK = "/libraries/{libraryId}/books";
         public const string UPDATE_BOOK = "/libraries/{libraryId}/books/{bookId}";
         public const string DELETE_BOOK = "/libraries/{libraryId}/books/{bookId}";

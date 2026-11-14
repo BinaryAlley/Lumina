@@ -249,6 +249,8 @@
     <File Path="../docs/technical/requests/library/written-content-library/book-library/books/GetBook.http" />
     <File Path="../docs/technical/requests/library/written-content-library/book-library/books/GetBooks.http" />
     <File Path="../docs/technical/requests/library/written-content-library/book-library/books/GetBooksLite.http" />
+    <File Path="../docs/technical/requests/library/written-content-library/book-library/books/GetDeletedBooks.http" />
+    <File Path="../docs/technical/requests/library/written-content-library/book-library/books/RestoreBook.http" />
     <File Path="../docs/technical/requests/library/written-content-library/book-library/books/UpdateBook.http" />
     <File Path="../docs/technical/requests/library/written-content-library/book-library/books/UpdateBookCover.http" />
   </Folder>

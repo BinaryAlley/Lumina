@@ -103,20 +103,20 @@
         };
 
         const jsLocalizedStrings = {
-            all: '@_localizer["All"]',
-            items: '@_localizer["Items"]',
-            of: '@_localizer["Of"]',
-            page: '@_localizer["Page"]',
-            sortAscending: '@_localizer["SortAscending"]',
-            sortDescending: '@_localizer["SortDescending"]',
-            viewDetails: '@_localizer["ViewDetails"]',
-            actions: '@_localizer["Actions"]',
-            play: '@_localizer["Play"]',
-            shuffle: '@_localizer["Shuffle"]',
-            deleteItem: '@_localizer["Delete"]',
-            deleteConfirm: '@_localizer["DeleteConfirm"]',
-            deleteFailed: '@_localizer["DeleteFailed"]',
-            addToPlaylist: '@_localizer["AddToPlaylist"]'
+            all: @Json.Serialize(_localizer["All"].Value),
+            items: @Json.Serialize(_localizer["Items"].Value),
+            of: @Json.Serialize(_localizer["Of"].Value),
+            page: @Json.Serialize(_localizer["Page"].Value),
+            sortAscending: @Json.Serialize(_localizer["SortAscending"].Value),
+            sortDescending: @Json.Serialize(_localizer["SortDescending"].Value),
+            viewDetails: @Json.Serialize(_localizer["ViewDetails"].Value),
+            actions: @Json.Serialize(_localizer["Actions"].Value),
+            play: @Json.Serialize(_localizer["Play"].Value),
+            shuffle: @Json.Serialize(_localizer["Shuffle"].Value),
+            deleteItem: @Json.Serialize(_localizer["Delete"].Value),
+            deleteConfirm: @Json.Serialize(_localizer["DeleteConfirm"].Value),
+            deleteFailed: @Json.Serialize(_localizer["DeleteFailed"].Value),
+            addToPlaylist: @Json.Serialize(_localizer["AddToPlaylist"].Value)
         };
 
         function buildItemsUrl() {

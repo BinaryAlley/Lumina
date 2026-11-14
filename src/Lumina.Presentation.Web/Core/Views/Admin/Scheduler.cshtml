@@ -166,29 +166,29 @@ It keeps the DOM contract the client script binds to, without any images or colo
 
         // Localized strings.
         const schedulerStrings = {
-            noJobs: '@_localizer["NoJobs"]',
-            daily: '@_localizer["DailySchedule"]',
-            interval: '@_localizer["IntervalSchedule"]',
-            startup: '@_localizer["StartupSchedule"]',
-            jobStarted: '@_localizer["JobStarted"]',
-            jobRemoved: '@_localizer["JobRemoved"]',
-            jobStopped: '@_localizer["JobStopped"]',
-            jobFired: '@_localizer["JobFired"]',
-            jobAdded: '@_localizer["JobAdded"]',
-            jobNotFound: '@_localizer["JobNotFound"]',
-            jobAlreadyRunning: '@_localizer["JobAlreadyRunning"]',
+            noJobs: @Json.Serialize(_localizer["NoJobs"].Value),
+            daily: @Json.Serialize(_localizer["DailySchedule"].Value),
+            interval: @Json.Serialize(_localizer["IntervalSchedule"].Value),
+            startup: @Json.Serialize(_localizer["StartupSchedule"].Value),
+            jobStarted: @Json.Serialize(_localizer["JobStarted"].Value),
+            jobRemoved: @Json.Serialize(_localizer["JobRemoved"].Value),
+            jobStopped: @Json.Serialize(_localizer["JobStopped"].Value),
+            jobFired: @Json.Serialize(_localizer["JobFired"].Value),
+            jobAdded: @Json.Serialize(_localizer["JobAdded"].Value),
+            jobNotFound: @Json.Serialize(_localizer["JobNotFound"].Value),
+            jobAlreadyRunning: @Json.Serialize(_localizer["JobAlreadyRunning"].Value),
             taskTypeNames: {
-                ScanMediaLibraries: '@_localizer["TaskType.ScanMediaLibraries"]',
-                CleanTemporaryFiles: '@_localizer["TaskType.CleanTemporaryFiles"]',
-                RepairThemes: '@_localizer["TaskType.RepairThemes"]',
-                CleanScheduledJobExecutionHistory: '@_localizer["TaskType.CleanScheduledJobExecutionHistory"]',
-                TechnicalDataCleanup: '@_localizer["TaskType.TechnicalDataCleanup"]'
+                ScanMediaLibraries: @Json.Serialize(_localizer["TaskType.ScanMediaLibraries"].Value),
+                CleanTemporaryFiles: @Json.Serialize(_localizer["TaskType.CleanTemporaryFiles"].Value),
+                RepairThemes: @Json.Serialize(_localizer["TaskType.RepairThemes"].Value),
+                CleanScheduledJobExecutionHistory: @Json.Serialize(_localizer["TaskType.CleanScheduledJobExecutionHistory"].Value),
+                TechnicalDataCleanup: @Json.Serialize(_localizer["TaskType.TechnicalDataCleanup"].Value)
             },
             statusNames: {
-                Added: '@_localizer["Status.Added"]',
-                Active: '@_localizer["Status.Active"]',
-                Running: '@_localizer["Status.Running"]',
-                Completed: '@_localizer["Status.Completed"]'
+                Added: @Json.Serialize(_localizer["Status.Added"].Value),
+                Active: @Json.Serialize(_localizer["Status.Active"].Value),
+                Running: @Json.Serialize(_localizer["Status.Running"].Value),
+                Completed: @Json.Serialize(_localizer["Status.Completed"].Value)
             }
         };
 
@@ -365,7 +365,7 @@ It keeps the DOM contract the client script binds to, without any images or colo
                     <td data-label="${escapeHtml(columnLabels[1])}">${escapeHtml(job.name)}</td>
                     <td data-label="${escapeHtml(columnLabels[2])}">${schedulerStrings.taskTypeNames[job.taskType] ?? job.taskType}</td>
                     <td data-label="${escapeHtml(columnLabels[3])}">${scheduleLabel}</td>
-                    <td data-label="${escapeHtml(columnLabels[4])}">${isInterval ? job.intervalMinutes + ' ' + '@_localizer["MinutesShort"]' : '-'}</td>
+                    <td data-label="${escapeHtml(columnLabels[4])}">${isInterval ? job.intervalMinutes + ' ' + @Json.Serialize(_localizer["MinutesShort"].Value) : '-'}</td>
                     <td data-label="${escapeHtml(columnLabels[5])}">${isDaily ? String(job.hour).padStart(2, '0') + ':' + String(job.minute).padStart(2, '0') : '-'}</td>
                     <td data-label="${escapeHtml(columnLabels[6])}">${schedulerStrings.statusNames[job.status] ?? job.status}</td>
                     <td data-label="${escapeHtml(columnLabels[7])}">${formatDateTime(job.lastStartedOnUtc)}</td>
@@ -381,11 +381,11 @@ It keeps the DOM contract the client script binds to, without any images or colo
                 const isRunning = job.status === 'Running';
                 const isActive = job.status === 'Active';
                 const canStop = isActive || isRunning;
-                actionsDiv.appendChild(createActionButton('@_localizer["Start"]', () => startJobAsync(job.id), canStop));
-                actionsDiv.appendChild(createActionButton('@_localizer["Stop"]', () => stopJobAsync(job.id), !canStop));
-                actionsDiv.appendChild(createActionButton('@_localizer["Fire"]', () => fireJobAsync(job.id), isRunning));
+                actionsDiv.appendChild(createActionButton(@Json.Serialize(_localizer["Start"].Value), () => startJobAsync(job.id), canStop));
+                actionsDiv.appendChild(createActionButton(@Json.Serialize(_localizer["Stop"].Value), () => stopJobAsync(job.id), !canStop));
+                actionsDiv.appendChild(createActionButton(@Json.Serialize(_localizer["Fire"].Value), () => fireJobAsync(job.id), isRunning));
                 // The cycle of a job that was started must be stopped before the job can be removed.
-                actionsDiv.appendChild(createActionButton('@_localizer["Remove"]', () => removeJobAsync(job.id), canStop));
+                actionsDiv.appendChild(createActionButton(@Json.Serialize(_localizer["Remove"].Value), () => removeJobAsync(job.id), canStop));
                 actionsCell.appendChild(actionsDiv);
                 row.appendChild(actionsCell);
 
@@ -679,7 +679,7 @@ It keeps the DOM contract the client script binds to, without any images or colo
         }
 
         async function removeJobAsync(jobId) {
-            if (await dialogService.show('@_localizer["RemoveJobConfirm"]', jsLocalizedDialogs.confirmation, DialogButtons.YES_NO, DialogIcon.QUESTION) === DialogButton.YES) {
+            if (await dialogService.show(@Json.Serialize(_localizer["RemoveJobConfirm"].Value), jsLocalizedDialogs.confirmation, DialogButtons.YES_NO, DialogIcon.QUESTION) === DialogButton.YES) {
                 const removed = await callApiDeleteAsync(getJobActionUrl(removeJobUrlTemplate, jobId));
                 if (removed)
                     notificationService.show(schedulerStrings.jobRemoved, NotificationType.SUCCESS);
@@ -697,7 +697,7 @@ It keeps the DOM contract the client script binds to, without any images or colo
                 minute: scheduleType === 'DailyAtHourAndMinute' ? Number(jobMinuteInput.value) : null
             };
             if (!payload.name) {
-                notificationService.show('@_localizer["JobNameRequired"]', NotificationType.ERROR);
+                notificationService.show(@Json.Serialize(_localizer["JobNameRequired"].Value), NotificationType.ERROR);
                 return;
             }
             const response = await callApiPostAsync(addJobUrl, payload);

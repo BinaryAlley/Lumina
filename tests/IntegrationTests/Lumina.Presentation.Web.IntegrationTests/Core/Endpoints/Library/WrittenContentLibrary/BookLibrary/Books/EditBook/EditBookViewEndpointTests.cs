@@ -4,7 +4,6 @@ using Lumina.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookL
 using Lumina.Presentation.Web.Fixtures.Common.DTO.WrittenContentLibrary.BookLibrary;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
@@ -50,5 +49,6 @@ public class EditBookViewEndpointTests : IClassFixture<LuminaWebFactory>
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal("text/html", response.Content.Headers.ContentType!.MediaType);
         Assert.Contains("A book", content);
+        Assert.Contains("btn-delete-book", content);
     }
 }

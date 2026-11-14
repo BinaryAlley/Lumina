@@ -13,6 +13,7 @@ using Lumina.Application.Common.DataAccess.Repositories.Themes;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Errors;
+using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.DataAccess.Core.Repositories.Authorization;
 using Lumina.DataAccess.Core.Repositories.BookLibrary;
 using Lumina.DataAccess.Core.Repositories.Favorites;
@@ -42,6 +43,7 @@ namespace Lumina.DataAccess.Core.UoW;
 public class UnitOfWork : IUnitOfWork, IDisposable
 {
     private readonly LuminaDbContext _luminaDbContext;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private IDbContextTransaction? _transaction;
 
     private IPermissionRepository? _permissionRepository;
@@ -131,7 +133,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _bookRepository ??= new BookRepository(_luminaDbContext);
+            _bookRepository ??= new BookRepository(_luminaDbContext, _dateTimeProvider);
             return _bookRepository;
         }
     }
@@ -449,9 +451,11 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     /// Initializes a new instance of the <see cref="UnitOfWork"/> class.
     /// </summary>
     /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
-    public UnitOfWork(LuminaDbContext luminaDbContext)
+    /// <param name="dateTimeProvider">Injected provider for the current UTC time, passed to the repositories that stamp their own timestamps.</param>
+    public UnitOfWork(LuminaDbContext luminaDbContext, IDateTimeProvider dateTimeProvider)
     {
         _luminaDbContext = luminaDbContext;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     /// <summary>

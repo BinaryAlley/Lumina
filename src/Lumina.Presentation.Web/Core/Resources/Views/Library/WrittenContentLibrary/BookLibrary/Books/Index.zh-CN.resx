@@ -57,4 +57,16 @@
   <data name="ViewDetails" xml:space="preserve">
     <value>查看详情</value>
   </data>
+  <data name="Delete" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="DeleteConfirm" xml:space="preserve">
+    <value>确定要删除此项目吗？</value>
+  </data>
+  <data name="DeleteFailed" xml:space="preserve">
+    <value>无法删除该项目。</value>
+  </data>
+  <data name="DeletedItems" xml:space="preserve">
+    <value>已删除项目</value>
+  </data>
 </root>
