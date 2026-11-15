@@ -1,4 +1,5 @@
 @startuml Book Reading and Book Reader Plugins Code
+!pragma layout elk
 !include <C4/C4_Component>
 
 LAYOUT_WITH_LEGEND()
@@ -35,8 +36,13 @@ interface IBookReaderEnablementCache {
 class BookReadingService {
     - _extractions: ConcurrentDictionary<ReadingCacheKey, BookExtractionEntry>
     - _bookExtractionLocks: ConcurrentDictionary<ReadingCacheKey, SemaphoreSlim>
-    - _pluginIdsByReaderKey: IReadOnlyDictionary<ReaderKey, Guid>
+    - _pluginIdsByReaderKey: IReadOnlyDictionary<ReaderKey, Guid>?
+    - _serviceProvider: IServiceProvider
+    - _pluginManager: IPluginManager
     - _enablementCache: IBookReaderEnablementCache
+    - _serviceScopeFactory: IServiceScopeFactory
+    - _logger: ILogger<BookReadingService>
+    - _readerMapSync: object
     + GetManifestAsync(...): Task<Result<ReadingManifestResponse>>
     + GetSectionAsync(...): Task<Result<ReadingSectionDto>>
     + GetResourceAsync(...): Task<Result<ReadingResourceDataDto>>
@@ -119,14 +125,19 @@ class LibraryBookReaderConfigurationRepository
 
 class GetLibraryBookReadersQueryHandler {
     - _unitOfWork: IUnitOfWork
+    - _authorizationService: IAuthorizationService
+    - _currentUserService: ICurrentUserService
     - _bookReaderRegistry: IBookReaderRegistry
+    - _validator: IValidator<GetLibraryBookReadersQuery>
     + HandleAsync(query: GetLibraryBookReadersQuery, token: CancellationToken): Task<Result<IReadOnlyList<LibraryBookReaderResponse>>>
 }
 
 class GetLibraryTypeBookReadersQueryHandler {
     - _unitOfWork: IUnitOfWork
+    - _currentUserService: ICurrentUserService
     - _providerConfigurationStore: IMediaLibraryProviderConfigurationStore
     - _bookReaderRegistry: IBookReaderRegistry
+    - _validator: IValidator<GetLibraryTypeBookReadersQuery>
     + HandleAsync(query: GetLibraryTypeBookReadersQuery, token: CancellationToken): Task<Result<IReadOnlyList<LibraryBookReaderResponse>>>
 }
 
@@ -138,20 +149,28 @@ end note
 
 class MediaLibraryProviderConfigurationStore {
     - _unitOfWork: IUnitOfWork
+    - _pluginManager: IPluginManager
+    - _serviceProvider: IServiceProvider
     - _enablementCache: IBookReaderEnablementCache
+    + GetConfigurationsAsync(libraryId: Guid, token: CancellationToken): Task<Result<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>>
+    + EnsureProviderConfigurationsAsync(libraryId: Guid, libraryType: LibraryType, token: CancellationToken): Task<Result<Success>>
+    + RemoveProviderConfigurationsForLibraryAsync(libraryId: Guid, token: CancellationToken): Task<Result<Deleted>>
+    + RemoveProviderConfigurationsAsync(pluginId: Guid, token: CancellationToken): Task<Result<Deleted>>
     + ConfigureProvidersAsync(libraryId: Guid, libraryType: LibraryType, metadataProviders: IReadOnlyList<LibraryProviderSelectionDto>?, artworkProviders: IReadOnlyList<LibraryProviderSelectionDto>?, bookReaders: IReadOnlyList<LibraryProviderSelectionDto>?, shouldReconcileOmittedKinds: bool, token: CancellationToken): Task<Result<Success>>
     + GetSupportedBookReaderPluginIds(libraryType: LibraryType): IReadOnlyList<Guid>
 }
 
 note right of MediaLibraryProviderConfigurationStore
-  Called by the add and update library commands. Applies the
-  chosen metadata providers, artwork providers and book readers
-  of a media library by upserting their configuration rows in
-  the same save as the library. When shouldReconcileOmittedKinds
-  is set, the kinds without explicit choices are reconciled with
-  the library type first. Book reader changes invalidate the
-  enablement cache of the library so that a disabled reader
-  stops being served immediately.
+  Stores the metadata provider, artwork provider and book reader
+  configuration of each media library. EnsureProviderConfigurationsAsync
+  only adds the configurations that are missing, while
+  ConfigureProvidersAsync reconciles them with the plugins supporting
+  the library type and sets the enabled state and order chosen when
+  the library is added or updated. Calling them when the library or
+  a plugin is added or removed keeps the persisted rows in sync with
+  the loaded plugins. Book reader changes invalidate the enablement
+  cache of the library so that a disabled reader stops being served
+  immediately.
 end note
 
 ' ============================== BOOK READER PLUGINS ==============================
@@ -208,12 +227,20 @@ end note
 class EpubPlugin {
     + Id: Guid
     + Name: string = EPUB Reader
+    + Author: string = Lumina
+    + Version: Version
+    + Description: string
+    + GetSettingsSchema(): IReadOnlyList<PluginSettingDescriptorDto>
     + RegisterServices(services: IServiceCollection)
 }
 
 class PdfPlugin {
     + Id: Guid
     + Name: string = PDF Reader
+    + Author: string = Lumina
+    + Version: Version
+    + Description: string
+    + GetSettingsSchema(): IReadOnlyList<PluginSettingDescriptorDto>
     + RegisterServices(services: IServiceCollection)
 }
 
@@ -248,8 +275,8 @@ ILibraryBookReaderConfigurationRepository --> LibraryBookReaderConfigurationEnti
 
 ' ============================== BOOK READER PLUGIN RELATIONSHIPS ==============================
 
-EpubReader <|.. IBookReader : implements
-PdfReader <|.. IBookReader : implements
+IBookReader <|.. EpubReader : implements
+IBookReader <|.. PdfReader : implements
 
 EpubReader ..> EpubDocumentParser : parses
 PdfReader ..> PdfDocumentParser : parses and renders pages
